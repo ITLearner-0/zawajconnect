@@ -28,9 +28,9 @@ const Index = () => {
                 <CustomButton
                   size="lg"
                   variant="outline"
-                  onClick={() => navigate("/profile")}
+                  onClick={() => navigate("/auth")}
                 >
-                  Create Profile
+                  Sign In / Sign Up
                 </CustomButton>
               </div>
               <p className="text-sm text-gray-500">
