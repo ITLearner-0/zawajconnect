@@ -2,9 +2,11 @@
 import CompatibilityTest from "@/components/CompatibilityTest";
 import CustomButton from "@/components/CustomButton";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [showTest, setShowTest] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-accent/50 to-background">
@@ -19,9 +21,18 @@ const Index = () => {
               compatibility testing
             </p>
             <div className="space-y-4">
-              <CustomButton size="lg" onClick={() => setShowTest(true)}>
-                Take Compatibility Test
-              </CustomButton>
+              <div className="space-x-4">
+                <CustomButton size="lg" onClick={() => setShowTest(true)}>
+                  Take Compatibility Test
+                </CustomButton>
+                <CustomButton
+                  size="lg"
+                  variant="outline"
+                  onClick={() => navigate("/profile")}
+                >
+                  Create Profile
+                </CustomButton>
+              </div>
               <p className="text-sm text-gray-500">
                 Based on Islamic principles and values
               </p>
