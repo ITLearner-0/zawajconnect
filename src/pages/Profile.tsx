@@ -18,6 +18,7 @@ interface ProfileFormData {
   religiousLevel: string;
   familyBackground: string;
   aboutMe: string;
+  prayerFrequency: string;
 }
 
 const Profile = () => {
@@ -33,6 +34,7 @@ const Profile = () => {
     religiousLevel: "",
     familyBackground: "",
     aboutMe: "",
+    prayerFrequency: "five-daily", // Default value
   });
 
   useEffect(() => {
@@ -52,7 +54,7 @@ const Profile = () => {
       if (!error && profile) {
         setFormData({
           fullName: `${profile.first_name || ""} ${profile.last_name || ""}`.trim(),
-          age: profile.birth_date ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear() : "",
+          age: profile.birth_date ? String(new Date().getFullYear() - new Date(profile.birth_date).getFullYear()) : "",
           gender: profile.gender || "",
           location: profile.location || "",
           education: profile.education_level || "",
@@ -60,6 +62,7 @@ const Profile = () => {
           religiousLevel: profile.religious_practice_level || "",
           familyBackground: "",
           aboutMe: profile.about_me || "",
+          prayerFrequency: profile.prayer_frequency || "five-daily",
         });
       }
     };
@@ -96,7 +99,6 @@ const Profile = () => {
     const { error } = await supabase
       .from("profiles")
       .upsert({
-        id: session.user.id,
         first_name: firstName,
         last_name: lastName,
         gender: formData.gender,
@@ -104,8 +106,11 @@ const Profile = () => {
         education_level: formData.education,
         occupation: formData.occupation,
         religious_practice_level: formData.religiousLevel,
+        prayer_frequency: formData.prayerFrequency,
         about_me: formData.aboutMe,
         birth_date: formData.age ? new Date(new Date().getFullYear() - parseInt(formData.age), 0, 1).toISOString() : null,
+      }, {
+        onConflict: "id"
       });
 
     if (error) {
@@ -249,6 +254,21 @@ const Profile = () => {
                         Moderately practicing
                       </option>
                       <option value="learning">Learning more about Islam</option>
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="prayerFrequency">Prayer Frequency</Label>
+                    <select
+                      id="prayerFrequency"
+                      name="prayerFrequency"
+                      value={formData.prayerFrequency}
+                      onChange={handleChange}
+                      className="w-full h-10 px-3 rounded-md border border-input bg-background"
+                    >
+                      <option value="five-daily">Five times daily</option>
+                      <option value="regular">Regular but not all five</option>
+                      <option value="sometimes">Sometimes</option>
+                      <option value="learning">Learning to pray</option>
                     </select>
                   </div>
                   <div className="space-y-2">
