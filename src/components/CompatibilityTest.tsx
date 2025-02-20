@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import CustomButton from "./CustomButton";
@@ -142,26 +141,22 @@ const CompatibilityTest = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        // Convert answers to a plain object that can be serialized
-        const serializedAnswers = Object.entries(answers).reduce((acc, [key, value]) => {
-          acc[key] = {
-            value: value.value,
-            isBreaker: value.isBreaker,
-            breakerThreshold: value.breakerThreshold
-          };
-          return acc;
-        }, {} as Record<string, Answer>);
+        const serializedAnswers = JSON.parse(JSON.stringify(answers));
+        const serializedDealbreakers = JSON.parse(JSON.stringify(dealbreakers));
+        const serializedPreferences = JSON.parse(JSON.stringify(
+          questions.map(q => ({
+            category: q.category,
+            weight: q.weight
+          }))
+        ));
 
         const { error } = await supabase
           .from('compatibility_results')
           .insert({
             answers: serializedAnswers,
             score: finalScore,
-            dealbreakers: dealbreakers,
-            preferences: questions.map(q => ({
-              category: q.category,
-              weight: q.weight
-            })),
+            dealbreakers: serializedDealbreakers,
+            preferences: serializedPreferences,
             user_id: session.user.id
           });
 
