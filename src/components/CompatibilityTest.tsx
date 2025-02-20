@@ -68,12 +68,19 @@ const CompatibilityTest = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
+        const answersMap = Object.fromEntries(
+          Object.entries(answers).map(([qIndex, answer]) => [
+            questions[Number(qIndex)].id,
+            answer
+          ])
+        );
+
         const resultData = {
-          answers: answers as unknown as Json,
+          answers: answersMap as unknown as Json,
           score: finalScore,
           dealbreakers: dealbreakers as unknown as Json,
           preferences: questions.map(q => ({
-            category: q.category,
+            category: q.id.toString(),
             weight: q.weight
           })) as unknown as Json,
           user_id: session.user.id
