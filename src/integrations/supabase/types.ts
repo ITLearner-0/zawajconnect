@@ -9,6 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      compatibility_results: {
+        Row: {
+          answers: Json
+          created_at: string
+          dealbreakers: Json | null
+          id: string
+          preferences: Json | null
+          score: number
+          user_id: string
+        }
+        Insert: {
+          answers: Json
+          created_at?: string
+          dealbreakers?: Json | null
+          id?: string
+          preferences?: Json | null
+          score: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          dealbreakers?: Json | null
+          id?: string
+          preferences?: Json | null
+          score?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       compatibility_scores: {
         Row: {
           compatibility_score: number
