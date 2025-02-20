@@ -1,8 +1,11 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import CustomButton from "./CustomButton";
 import { Slider } from "@/components/ui/slider";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const questions = [
   {
@@ -37,6 +40,24 @@ const CompatibilityTest = () => {
   const [answers, setAnswers] = useState<number[]>([]);
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to take the compatibility test",
+          variant: "destructive",
+        });
+        navigate("/auth");
+      }
+    };
+
+    checkAuth();
+  }, [navigate, toast]);
 
   const handleAnswer = (value: number[]) => {
     const newAnswers = [...answers];
