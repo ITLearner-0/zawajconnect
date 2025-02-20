@@ -142,16 +142,28 @@ const CompatibilityTest = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        const { error } = await supabase.from('compatibility_results').insert({
-          user_id: session.user.id,
-          answers: answers,
-          score: finalScore,
-          dealbreakers: dealbreakers,
-          preferences: Object.values(questions).map(q => ({
-            category: q.category,
-            weight: q.weight
-          }))
-        });
+        // Convert answers to a plain object that can be serialized
+        const serializedAnswers = Object.entries(answers).reduce((acc, [key, value]) => {
+          acc[key] = {
+            value: value.value,
+            isBreaker: value.isBreaker,
+            breakerThreshold: value.breakerThreshold
+          };
+          return acc;
+        }, {} as Record<string, Answer>);
+
+        const { error } = await supabase
+          .from('compatibility_results')
+          .insert({
+            answers: serializedAnswers,
+            score: finalScore,
+            dealbreakers: dealbreakers,
+            preferences: questions.map(q => ({
+              category: q.category,
+              weight: q.weight
+            })),
+            user_id: session.user.id
+          });
 
         if (error) throw error;
 
