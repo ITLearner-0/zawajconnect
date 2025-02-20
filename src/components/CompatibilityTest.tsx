@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import CustomButton from "./CustomButton";
@@ -9,6 +8,7 @@ import { questions } from "@/data/compatibilityQuestions";
 import { Answer, CompatibilityResultData } from "@/types/compatibility";
 import QuestionDisplay from "./compatibility/QuestionDisplay";
 import ResultsDisplay from "./compatibility/ResultsDisplay";
+import { Json } from "@/integrations/supabase/types";
 
 const CompatibilityTest = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
