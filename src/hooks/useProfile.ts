@@ -29,13 +29,20 @@ export const useProfile = () => {
         return;
       }
 
+      console.log("Fetching profile for user:", session.user.id);
       const { data: profile, error } = await supabase
         .from("profiles")
         .select("*")
         .eq("id", session.user.id)
         .single();
 
-      if (!error && profile) {
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return;
+      }
+
+      if (profile) {
+        console.log("Profile data loaded:", profile);
         setFormData({
           fullName: `${profile.first_name || ""} ${profile.last_name || ""}`.trim(),
           age: profile.birth_date ? String(new Date().getFullYear() - new Date(profile.birth_date).getFullYear()) : "",
@@ -69,6 +76,7 @@ export const useProfile = () => {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
+      console.error("No active session found");
       toast({
         title: "Error",
         description: "Please sign in to update your profile",
@@ -80,33 +88,43 @@ export const useProfile = () => {
     const [firstName, ...lastNameParts] = formData.fullName.split(" ");
     const lastName = lastNameParts.join(" ");
 
+    const profileData = {
+      id: session.user.id,
+      first_name: firstName,
+      last_name: lastName,
+      gender: formData.gender,
+      location: formData.location,
+      education_level: formData.education,
+      occupation: formData.occupation,
+      religious_practice_level: formData.religiousLevel,
+      prayer_frequency: formData.prayerFrequency,
+      about_me: formData.aboutMe,
+      birth_date: formData.age ? new Date(new Date().getFullYear() - parseInt(formData.age), 0, 1).toISOString() : null,
+    };
+
+    console.log("Attempting to save profile with data:", profileData);
+
     const { error } = await supabase
       .from("profiles")
-      .upsert({
-        id: session.user.id,
-        first_name: firstName,
-        last_name: lastName,
-        gender: formData.gender,
-        location: formData.location,
-        education_level: formData.education,
-        occupation: formData.occupation,
-        religious_practice_level: formData.religiousLevel,
-        prayer_frequency: formData.prayerFrequency,
-        about_me: formData.aboutMe,
-        birth_date: formData.age ? new Date(new Date().getFullYear() - parseInt(formData.age), 0, 1).toISOString() : null,
-      });
+      .upsert(profileData);
 
     if (error) {
+      console.error("Error saving profile:", error);
       toast({
         title: "Error",
         description: error.message,
         variant: "destructive",
+        duration: 5000, // Show for 5 seconds
       });
     } else {
+      console.log("Profile saved successfully");
       toast({
         title: "Success",
         description: "Profile updated successfully",
+        duration: 3000,
       });
+      // Only navigate after a successful save
+      navigate("/");
     }
   };
 
