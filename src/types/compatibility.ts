@@ -1,4 +1,6 @@
 
+import { Json } from "@/integrations/supabase/types";
+
 export interface Answer {
   value: number;
   isBreaker: boolean;
@@ -6,12 +8,9 @@ export interface Answer {
 }
 
 export interface CompatibilityResultData {
-  answers: Record<number, Answer>;
+  answers: Json;
   score: number;
-  dealbreakers: string[];
-  preferences: Array<{
-    category: string;
-    weight: number;
-  }>;
+  dealbreakers: Json;
+  preferences: Json;
   user_id: string;
 }

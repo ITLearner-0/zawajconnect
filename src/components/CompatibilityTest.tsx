@@ -68,16 +68,14 @@ const CompatibilityTest = () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        const resultData: CompatibilityResultData = {
-          answers: JSON.parse(JSON.stringify(answers)),
+        const resultData = {
+          answers: answers as unknown as Json,
           score: finalScore,
-          dealbreakers: JSON.parse(JSON.stringify(dealbreakers)),
-          preferences: JSON.parse(JSON.stringify(
-            questions.map(q => ({
-              category: q.category,
-              weight: q.weight
-            }))
-          )),
+          dealbreakers: dealbreakers as unknown as Json,
+          preferences: questions.map(q => ({
+            category: q.category,
+            weight: q.weight
+          })) as unknown as Json,
           user_id: session.user.id
         };
 
