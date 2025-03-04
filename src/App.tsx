@@ -8,6 +8,7 @@ import NearbyMatches from './pages/NearbyMatches';
 import Messages from './pages/Messages';
 import AdminModeration from './pages/AdminModeration';
 import WaliDashboard from './pages/WaliDashboard';
+import Resources from './pages/Resources';
 
 function App() {
   return (
@@ -21,6 +22,8 @@ function App() {
         <Route path="/messages/:conversationId" element={<Messages />} />
         <Route path="/admin/moderation" element={<AdminModeration />} />
         <Route path="/wali" element={<WaliDashboard />} />
+        <Route path="/resources" element={<Resources />} />
+        <Route path="/resources/:resourceId" element={<Resources />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
