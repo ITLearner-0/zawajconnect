@@ -44,7 +44,9 @@ const WaliDashboard: React.FC = () => {
     );
   }
   
-  if (error) {
+  // If there's an error but we have a wali profile, show the dashboard with empty data
+  // Only show the error screen if there's no profile at all
+  if (error && !waliProfile) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <Card className="w-[600px]">
@@ -81,6 +83,15 @@ const WaliDashboard: React.FC = () => {
         statistics={statistics}
       />
       
+      {error && (
+        <Card className="mb-6 border-red-200 bg-red-50">
+          <CardContent className="p-4">
+            <p className="text-red-600">Warning: {error}</p>
+            <p className="text-sm text-red-500">Some functionality may be limited.</p>
+          </CardContent>
+        </Card>
+      )}
+      
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
         <div className="md:col-span-1">
           <AvailabilityControls 
@@ -96,9 +107,9 @@ const WaliDashboard: React.FC = () => {
               <TabsTrigger value="chat-requests" className="flex items-center">
                 <MessageCircle className="h-4 w-4 mr-2" />
                 Chat Requests
-                {chatRequests.filter(r => r.status === 'pending').length > 0 && (
+                {totalPendingRequests > 0 && (
                   <span className="ml-2 bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                    {chatRequests.filter(r => r.status === 'pending').length}
+                    {totalPendingRequests}
                   </span>
                 )}
               </TabsTrigger>

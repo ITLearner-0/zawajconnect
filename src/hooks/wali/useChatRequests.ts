@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { ChatRequest } from '@/types/wali';
 import { useToast } from '@/hooks/use-toast';
@@ -18,7 +17,10 @@ export const useChatRequests = (userId: string | null): UseChatRequestsReturn =>
 
   useEffect(() => {
     const loadChatRequests = async () => {
-      if (!userId) return;
+      if (!userId) {
+        setLoading(false);
+        return;
+      }
       
       setLoading(true);
       setError(null);
@@ -29,13 +31,14 @@ export const useChatRequests = (userId: string | null): UseChatRequestsReturn =>
       } catch (err: any) {
         console.error('Error fetching chat requests:', err);
         setError(err.message || 'Failed to load chat requests');
+        setChatRequests([]);
       } finally {
         setLoading(false);
       }
     };
 
     loadChatRequests();
-  }, [userId, toast]);
+  }, [userId]);
 
   // Handle chat request (approve/reject)
   const handleChatRequest = async (requestId: string, status: 'approved' | 'rejected') => {

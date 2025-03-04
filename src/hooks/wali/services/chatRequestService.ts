@@ -1,50 +1,66 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { ChatRequest } from '@/types/wali';
 
 export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> => {
-  // Fetch pending chat requests
-  const { data, error } = await supabase
-    .from('chat_requests')
-    .select(`
-      id,
-      requester_id,
-      recipient_id,
-      wali_id,
-      status,
-      requested_at,
-      reviewed_at,
-      wali_notes,
-      requester:requester_id(
-        first_name,
-        last_name
-      )
-    `)
-    .eq('wali_id', userId)
-    .order('requested_at', { ascending: false });
+  try {
+    // Fetch basic chat requests without joined profile data
+    const { data, error } = await supabase
+      .from('chat_requests')
+      .select(`
+        id,
+        requester_id,
+        recipient_id,
+        wali_id,
+        status,
+        requested_at,
+        reviewed_at,
+        wali_notes
+      `)
+      .eq('wali_id', userId)
+      .order('requested_at', { ascending: false });
 
-  if (error) {
-    console.error('Error fetching chat requests:', error);
-    throw new Error('Failed to load chat requests');
+    if (error) {
+      console.error('Error fetching chat requests:', error);
+      throw new Error('Failed to load chat requests');
+    }
+
+    // For each request, fetch the requester profile separately
+    const transformedRequests: ChatRequest[] = await Promise.all(
+      data.map(async (req) => {
+        // Fetch requester profile data
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('first_name, last_name, profile_image')
+          .eq('id', req.requester_id)
+          .single();
+
+        return {
+          id: req.id,
+          requester_id: req.requester_id,
+          recipient_id: req.recipient_id,
+          wali_id: req.wali_id,
+          status: req.status,
+          requested_at: req.requested_at,
+          reviewed_at: req.reviewed_at,
+          wali_notes: req.wali_notes,
+          requester_profile: profileData ? {
+            first_name: profileData.first_name,
+            last_name: profileData.last_name,
+            profile_image: profileData.profile_image
+          } : {
+            first_name: 'Unknown',
+            last_name: 'User'
+          }
+        };
+      })
+    );
+    
+    return transformedRequests;
+  } catch (err) {
+    console.error('Error fetching chat requests:', err);
+    // Return empty array instead of throwing to avoid breaking the UI
+    return [];
   }
-
-  // Transform data to match ChatRequest type
-  const transformedRequests: ChatRequest[] = data.map((req: any) => ({
-    id: req.id,
-    requester_id: req.requester_id,
-    recipient_id: req.recipient_id,
-    wali_id: req.wali_id,
-    status: req.status,
-    requested_at: req.requested_at,
-    reviewed_at: req.reviewed_at,
-    wali_notes: req.wali_notes,
-    requester_profile: req.requester ? {
-      first_name: req.requester.first_name,
-      last_name: req.requester.last_name
-    } : undefined
-  }));
-  
-  return transformedRequests;
 };
 
 export const updateChatRequestStatus = async (

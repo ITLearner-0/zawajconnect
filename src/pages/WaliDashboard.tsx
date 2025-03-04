@@ -1,41 +1,16 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import WaliDashboardComponent from '@/components/wali/WaliDashboard';
 import { Toaster } from '@/components/ui/toaster';
-import { 
-  setupModerationTables, 
-  updateProfileSchema, 
-  setupRpcFunctions 
-} from '@/utils/database';
+import { useToast } from '@/hooks/use-toast';
 
 const WaliDashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
-
-  // Initialize required database tables and schemas
-  useEffect(() => {
-    const initializeDatabase = async () => {
-      try {
-        // Setup RPC functions first
-        await setupRpcFunctions();
-        
-        // Setup moderation tables if they don't exist
-        await setupModerationTables();
-        
-        // Update profile schema with necessary fields
-        await updateProfileSchema();
-        
-        setIsInitializing(false);
-      } catch (err) {
-        console.error("Error initializing database:", err);
-        setIsInitializing(false);
-      }
-    };
-    
-    initializeDatabase();
-  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -44,6 +19,8 @@ const WaliDashboard = () => {
       
       if (!session) {
         navigate('/auth');
+      } else {
+        setIsInitializing(false);
       }
     };
     

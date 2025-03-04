@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChatRequest } from '@/types/wali';
 import { Textarea } from '@/components/ui/textarea';
 import { formatDistanceToNow } from 'date-fns';
-import { CheckCircle, XCircle, Clock, MessageSquare } from 'lucide-react';
+import { CheckCircle, XCircle, Clock, MessageSquare, AlertCircle } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 interface ChatRequestsPanelProps {
@@ -69,7 +69,15 @@ const ChatRequestsPanel: React.FC<ChatRequestsPanelProps> = ({
           </TabsList>
           
           <TabsContent value={activeTab}>
-            {filteredRequests.length === 0 ? (
+            {chatRequests.length === 0 ? (
+              <div className="text-center py-12">
+                <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                <h3 className="font-medium text-lg mb-2">No Chat Requests Available</h3>
+                <p className="text-muted-foreground">
+                  Chat requests will appear here when users request permission to communicate.
+                </p>
+              </div>
+            ) : filteredRequests.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
                 No {activeTab} chat requests
               </div>
