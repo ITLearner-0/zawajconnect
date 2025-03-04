@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -7,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { IslamicPattern } from '@/components/ui/islamic-pattern';
 import { DatabaseProfile } from '@/types/profile';
-import { ArrowLeft, Mail, Phone, MapPin, Bookmark, Heart, User, BookOpen, PrayingHands } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, MapPin, Bookmark, Heart, User, BookOpen, BookHeart } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { dummyProfiles } from '@/data/dummyData';
 import CustomButton from '@/components/CustomButton';
@@ -23,8 +22,6 @@ const UserProfile = () => {
     const fetchProfile = async () => {
       setLoading(true);
       try {
-        // In a real app, this would be an API call to fetch the user profile
-        // For demo purposes, we'll use the dummy data
         const foundProfile = dummyProfiles.find(p => p.id === id);
         
         if (foundProfile) {
@@ -98,7 +95,6 @@ const UserProfile = () => {
         </Button>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Profile Card */}
           <div className="md:col-span-1">
             <IslamicPattern variant="border" className="bg-white rounded-lg shadow-lg p-6">
               <div className="flex flex-col items-center text-center">
@@ -133,11 +129,9 @@ const UserProfile = () => {
             </IslamicPattern>
           </div>
 
-          {/* Profile Details */}
           <div className="md:col-span-2">
             <IslamicPattern variant="background" className="bg-white rounded-lg shadow-lg p-6">
               <div className="space-y-6">
-                {/* Basic Information */}
                 <div>
                   <h2 className="text-xl font-semibold text-islamic-teal flex items-center">
                     <User className="mr-2 h-5 w-5" /> Basic Information
@@ -156,7 +150,6 @@ const UserProfile = () => {
                   </div>
                 </div>
                 
-                {/* Education & Career */}
                 <div>
                   <h2 className="text-xl font-semibold text-islamic-teal flex items-center">
                     <BookOpen className="mr-2 h-5 w-5" /> Education & Career
@@ -173,10 +166,9 @@ const UserProfile = () => {
                   </div>
                 </div>
                 
-                {/* Religious Background */}
                 <div>
                   <h2 className="text-xl font-semibold text-islamic-teal flex items-center">
-                    <PrayingHands className="mr-2 h-5 w-5" /> Religious Background
+                    <BookHeart className="mr-2 h-5 w-5" /> Religious Background
                   </h2>
                   <div className="mt-3 space-y-3">
                     <div className="flex items-center text-sm">
@@ -190,13 +182,11 @@ const UserProfile = () => {
                   </div>
                 </div>
                 
-                {/* About Me */}
                 <div>
                   <h2 className="text-xl font-semibold text-islamic-teal">About Me</h2>
                   <p className="mt-2 text-gray-700">{profile.about_me}</p>
                 </div>
                 
-                {/* Contact Information for Admin/Verification */}
                 {profile.wali_name && (
                   <div className="mt-4 p-4 bg-islamic-cream rounded-lg border border-islamic-sand">
                     <h3 className="font-semibold text-islamic-burgundy">Wali Information</h3>
