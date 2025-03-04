@@ -75,7 +75,8 @@ const Demo = () => {
         content: messageInput,
         created_at: new Date().toISOString(),
         is_read: true,
-        encrypted: encryptionEnabled
+        encrypted: encryptionEnabled,
+        is_wali_visible: currentConversation.wali_supervised
       };
       
       // Add message to the conversation
