@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Violation } from '@/services/monitoring/types';  // Updated import path
+import { Violation } from '@/services/monitoring/types';
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, AlertOctagon, Flag } from 'lucide-react';
 
@@ -47,9 +47,9 @@ const ViolationItem: React.FC<ViolationItemProps> = ({ violation }) => {
             </Badge>
           </div>
           <p className="text-sm mt-1">{violation.message}</p>
-          {violation.details && (
+          {violation.metadata && violation.metadata.context && (
             <div className="mt-2 text-xs p-2 bg-background/70 rounded border">
-              <span className="font-medium">Context:</span> {violation.details}
+              <span className="font-medium">Context:</span> {violation.metadata.context}
             </div>
           )}
         </div>
