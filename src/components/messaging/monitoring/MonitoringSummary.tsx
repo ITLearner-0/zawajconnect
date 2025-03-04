@@ -1,48 +1,42 @@
 
 import React from 'react';
 import { MonitoringReport } from '@/services/aiMonitoringService';
+import ScoreCard from './ScoreCard';
 import ScoreIndicator from './ScoreIndicator';
+import { CircleAlert } from 'lucide-react';
 
 interface MonitoringSummaryProps {
-  report: MonitoringReport | null;
-  loading: boolean;
+  report: MonitoringReport;
 }
 
-const MonitoringSummary: React.FC<MonitoringSummaryProps> = ({ report, loading }) => {
-  if (loading) {
-    return <div className="text-center py-4">Loading analysis...</div>;
-  }
-
-  if (!report) {
-    return (
-      <div className="text-center py-4">
-        Analysis will appear after more messages
-      </div>
-    );
-  }
+const MonitoringSummary: React.FC<MonitoringSummaryProps> = ({ report }) => {
+  if (!report) return null;
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-3">
-        <ScoreIndicator 
-          label="Islamic Compliance" 
-          score={report.islamicComplianceScore} 
-        />
-        
-        <ScoreIndicator 
-          label="Behavioral Analysis" 
-          score={report.behavioralScore} 
-        />
-        
-        <ScoreIndicator 
-          label="Sentiment Analysis" 
-          score={report.sentimentScore} 
-        />
+    <div className="space-y-4 p-4">
+      <h3 className="text-lg font-medium">Conversation Health Summary</h3>
+      
+      <div className="flex justify-center mb-4">
+        <ScoreIndicator score={report.overall_score} size="large" />
       </div>
       
-      <div className="pt-2 text-sm text-gray-500">
-        Last updated: {new Date(report.timestamp).toLocaleTimeString()}
+      <div className="grid grid-cols-3 gap-3">
+        <ScoreCard score={report.behavioral_score} label="Behavior" />
+        <ScoreCard score={report.safety_score} label="Safety" />
+        <ScoreCard score={report.appropriateness_score} label="Appropriateness" />
       </div>
+      
+      {report.violations && report.violations.length > 0 && (
+        <div className="mt-4 bg-red-50 p-3 rounded-md">
+          <div className="flex items-center text-red-600 mb-2">
+            <CircleAlert className="h-5 w-5 mr-2" />
+            <h4 className="font-medium">Detected Issues</h4>
+          </div>
+          <p className="text-sm text-red-600">
+            {report.violations.length} potential {report.violations.length === 1 ? 'issue' : 'issues'} detected
+          </p>
+        </div>
+      )}
     </div>
   );
 };

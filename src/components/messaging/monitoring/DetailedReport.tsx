@@ -1,41 +1,28 @@
 
 import React from 'react';
 import { MonitoringReport } from '@/services/aiMonitoringService';
-import ScoreCard from './ScoreCard';
-import AnalysisSummary from './AnalysisSummary';
+import ViolationsList from './ViolationsList';
 import RecommendationsSection from './RecommendationsSection';
+import AnalysisSummary from './AnalysisSummary';
 
 interface DetailedReportProps {
-  report: MonitoringReport | null;
+  report: MonitoringReport;
 }
 
 const DetailedReport: React.FC<DetailedReportProps> = ({ report }) => {
-  if (!report) {
-    return (
-      <div className="text-center py-8 text-gray-500">
-        Detailed report will be generated after more messages
-      </div>
-    );
-  }
+  if (!report) return null;
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-3 gap-4">
-        <ScoreCard 
-          score={report.islamicComplianceScore} 
-          label="Islamic Compliance" 
-        />
-        <ScoreCard 
-          score={report.behavioralScore} 
-          label="Behavioral Score" 
-        />
-        <ScoreCard 
-          score={report.sentimentScore} 
-          label="Sentiment Score" 
-        />
-      </div>
-      
+    <div className="space-y-6 p-4">
       <AnalysisSummary report={report} />
+      
+      {report.violations && report.violations.length > 0 && (
+        <div className="space-y-2">
+          <h3 className="text-lg font-medium text-red-600">Detected Issues</h3>
+          <ViolationsList violations={report.violations} />
+        </div>
+      )}
+      
       <RecommendationsSection report={report} />
     </div>
   );

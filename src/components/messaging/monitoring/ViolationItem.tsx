@@ -1,43 +1,59 @@
 
 import React from 'react';
 import { Violation } from '@/services/aiMonitoringService';
-import { AlertTriangle } from 'lucide-react';
-import { Badge } from "@/components/ui/badge";
+import { AlertTriangle, AlertOctagon, AlertCircle } from 'lucide-react';
 
 interface ViolationItemProps {
   violation: Violation;
 }
 
 const ViolationItem: React.FC<ViolationItemProps> = ({ violation }) => {
-  const getSeverityColor = (severity: 'low' | 'medium' | 'high') => {
-    switch (severity) {
-      case 'low':
-        return 'bg-amber-100 text-amber-800';
-      case 'medium':
-        return 'bg-orange-100 text-orange-800';
+  const getIcon = () => {
+    switch (violation.severity) {
       case 'high':
-        return 'bg-red-100 text-red-800';
+        return <AlertOctagon className="h-5 w-5 text-red-500 flex-shrink-0" />;
+      case 'medium':
+        return <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0" />;
+      case 'low':
       default:
-        return 'bg-gray-100 text-gray-800';
+        return <AlertCircle className="h-5 w-5 text-blue-500 flex-shrink-0" />;
     }
   };
-  
+
+  const getSeverityClass = () => {
+    switch (violation.severity) {
+      case 'high':
+        return 'bg-red-50 border-red-200 text-red-700';
+      case 'medium':
+        return 'bg-amber-50 border-amber-200 text-amber-700';
+      case 'low':
+      default:
+        return 'bg-blue-50 border-blue-200 text-blue-700';
+    }
+  };
+
   return (
-    <div className="border rounded-md p-3">
-      <div className="flex justify-between items-start">
-        <div className="flex items-center">
-          <AlertTriangle className="h-4 w-4 text-amber-500 mr-2" />
-          <span className="font-medium">{violation.message}</span>
+    <li className={`p-3 rounded-md border ${getSeverityClass()}`}>
+      <div className="flex items-start gap-3">
+        <div className="mt-0.5">{getIcon()}</div>
+        <div className="space-y-1">
+          <p className="font-medium">{violation.type}</p>
+          <p className="text-sm">{violation.description}</p>
+          {violation.message_excerpts && violation.message_excerpts.length > 0 && (
+            <div className="mt-2">
+              <p className="text-xs font-medium mb-1">Message excerpts:</p>
+              <ul className="space-y-1 text-xs">
+                {violation.message_excerpts.map((excerpt, index) => (
+                  <li key={index} className="bg-white/50 p-1 rounded">
+                    "{excerpt}"
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
-        <Badge className={getSeverityColor(violation.severity)}>
-          {violation.severity}
-        </Badge>
       </div>
-      <div className="mt-2 text-xs text-gray-500 flex justify-between">
-        <span className="capitalize">{violation.type} violation</span>
-        <span>{new Date(violation.timestamp).toLocaleString()}</span>
-      </div>
-    </div>
+    </li>
   );
 };
 

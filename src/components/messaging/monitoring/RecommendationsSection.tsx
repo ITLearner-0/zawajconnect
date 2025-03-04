@@ -1,51 +1,29 @@
 
 import React from 'react';
-import { MessageSquare } from 'lucide-react';
-import RecommendationItem from './RecommendationItem';
 import { MonitoringReport } from '@/services/aiMonitoringService';
+import RecommendationItem from './RecommendationItem';
 
 interface RecommendationsSectionProps {
   report: MonitoringReport;
 }
 
 const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({ report }) => {
+  // If no recommendations, don't render the section
+  if (!report.recommendations || report.recommendations.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="border rounded-md p-3">
-      <h4 className="font-medium mb-2 flex items-center">
-        <MessageSquare className="h-4 w-4 mr-2" />
-        Recommendations
-      </h4>
-      <ul className="text-sm space-y-2">
-        {report.islamicComplianceScore < 80 && (
+    <div className="space-y-2">
+      <h3 className="text-lg font-medium text-blue-600">Recommendations</h3>
+      <ul className="space-y-2">
+        {report.recommendations.map((recommendation, index) => (
           <RecommendationItem 
-            text="Review Islamic guidelines for appropriate conversation topics"
-            severity={report.islamicComplianceScore < 60 ? 'high' : 'medium'}
+            key={index} 
+            text={recommendation.text} 
+            severity={recommendation.severity} 
           />
-        )}
-        {report.behavioralScore < 80 && (
-          <RecommendationItem 
-            text="Consider more thoughtful and measured communication pace"
-            severity={report.behavioralScore < 60 ? 'high' : 'medium'}
-          />
-        )}
-        {report.sentimentScore < 50 && (
-          <RecommendationItem 
-            text="Try to maintain a positive and respectful tone"
-            severity={report.sentimentScore < 30 ? 'high' : 'medium'}
-          />
-        )}
-        {report.violations.length > 0 && (
-          <RecommendationItem 
-            text="Address the specific violations noted in the Violations tab"
-            severity={report.violations.some(v => v.severity === 'high') ? 'high' : 'medium'}
-          />
-        )}
-        {report.violations.some(v => v.severity === 'high') && (
-          <RecommendationItem 
-            text="Immediate attention needed for high severity violations"
-            severity="high"
-          />
-        )}
+        ))}
       </ul>
     </div>
   );

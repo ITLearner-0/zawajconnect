@@ -1,46 +1,49 @@
 
 import React from 'react';
-import { BarChart } from 'lucide-react';
 import { MonitoringReport } from '@/services/aiMonitoringService';
+import { formatDistanceToNow } from 'date-fns';
 
 interface AnalysisSummaryProps {
   report: MonitoringReport;
 }
 
 const AnalysisSummary: React.FC<AnalysisSummaryProps> = ({ report }) => {
-  const getSummaryText = () => {
-    let text = '';
-    
-    if (report.violations.length === 0) {
-      text = "This conversation appears to be following Islamic guidelines. No significant issues detected.";
-    } else {
-      text = `This conversation has ${report.violations.length} violation(s) that may need attention.`;
-    }
-    
-    if (report.islamicComplianceScore < 70) {
-      text += " The Islamic compliance score is concerning.";
-    }
-    
-    if (report.behavioralScore < 70) {
-      text += " The behavioral patterns may need moderation.";
-    }
-    
-    if (report.sentimentScore < 40) {
-      text += " The conversation tone is becoming negative.";
-    }
-    
-    return text;
-  };
-
   return (
-    <div className="border rounded-md p-3">
-      <h4 className="font-medium mb-2 flex items-center">
-        <BarChart className="h-4 w-4 mr-2" />
-        Analysis Summary
-      </h4>
+    <div className="space-y-3">
+      <h3 className="text-lg font-medium">Analysis Summary</h3>
       <p className="text-sm text-gray-600">
-        {getSummaryText()}
+        This analysis was performed {formatDistanceToNow(new Date(report.created_at), { addSuffix: true })}.
       </p>
+      <div className="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <p className="font-medium text-gray-700">Messages Analyzed</p>
+          <p>{report.message_count}</p>
+        </div>
+        <div>
+          <p className="font-medium text-gray-700">Time Period</p>
+          <p>{report.time_period || "Recent messages"}</p>
+        </div>
+        <div>
+          <p className="font-medium text-gray-700">Content Rating</p>
+          <p className={`font-medium ${
+            report.content_category === 'problematic' ? 'text-red-600' : 
+            report.content_category === 'concerning' ? 'text-amber-600' : 'text-green-600'
+          }`}>
+            {report.content_category ? 
+              report.content_category.charAt(0).toUpperCase() + report.content_category.slice(1) : 
+              'Safe'}
+          </p>
+        </div>
+        <div>
+          <p className="font-medium text-gray-700">Overall Score</p>
+          <p className={`font-medium ${
+            report.overall_score >= 80 ? 'text-green-600' : 
+            report.overall_score >= 60 ? 'text-amber-600' : 'text-red-600'
+          }`}>
+            {report.overall_score}%
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
