@@ -111,7 +111,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           )}
           
           {/* Show this when wali is supervising */}
-          {isWaliSupervised && <WaliSupervisor />}
+          {isWaliSupervised && <WaliSupervisor conversationId={conversation.id} />}
         </div>
 
         {/* Message input */}
