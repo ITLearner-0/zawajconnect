@@ -1,4 +1,3 @@
-
 export interface ProfileFormData {
   fullName: string;
   age: string;
@@ -37,10 +36,10 @@ export interface DatabaseProfile {
   is_visible: boolean;
   privacy_settings: PrivacySettings;
   blocked_users: string[];
-  // New fields for content filtering and moderation
   content_flags: ContentFlag[];
   moderation_status: 'approved' | 'pending' | 'rejected';
   last_moderation_date: string | null;
+  role?: 'user' | 'admin' | 'moderator';
 }
 
 export interface PrivacySettings {
@@ -79,10 +78,8 @@ export interface Message {
   is_read: boolean;
   attachments?: string[];
   is_wali_visible: boolean;
-  // New fields for content filtering
   content_flags?: ContentFlag[];
   is_filtered?: boolean;
-  // New fields for encryption and message lifecycle
   encrypted?: boolean;
   iv?: string; // Initialization vector for encryption
   encryption_key_id?: string; // Reference to the key used
@@ -132,8 +129,8 @@ export interface ContentReport {
 }
 
 export interface ModerationStats {
-  pending_reports: number;
-  flagged_content: number;
-  total_processed: number;
-  resolved_today: number;
+  pendingReports: number;
+  flaggedContent: number;
+  totalProcessed: number;
+  resolvedToday: number;
 }

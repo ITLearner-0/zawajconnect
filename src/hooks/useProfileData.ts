@@ -102,11 +102,11 @@ export const useProfileData = (): UseProfileDataResult => {
         
         // Load privacy settings and account visibility status
         if (profile.privacy_settings) {
-          setPrivacySettings(profile.privacy_settings);
+          setPrivacySettings(profile.privacy_settings as PrivacySettings);
         }
         
         if (profile.blocked_users) {
-          setBlockedUsers(profile.blocked_users || []);
+          setBlockedUsers(profile.blocked_users as string[] || []);
         } else {
           setBlockedUsers([]);
         }

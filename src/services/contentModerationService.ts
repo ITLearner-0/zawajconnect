@@ -1,232 +1,216 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { Message, ContentFlag, ContentReport } from '@/types/profile';
+import { supabase } from "@/integrations/supabase/client";
+import { ContentFlag, ContentReport, ModerationStats } from "@/types/profile";
 
-// Sensitive words and patterns to filter
-const sensitivePatterns = [
-  { pattern: /\b(sex|nude|naked)\b/i, replacement: '***', flag: 'inappropriate' },
-  { pattern: /\b(idiot|stupid|dumb)\b/i, replacement: '***', flag: 'harassment' },
-  { pattern: /\b(alcohol|wine|beer|drunk)\b/i, replacement: '***', flag: 'religious_violation' },
-  { pattern: /(phone number|address|location)\s*[:;-]?\s*([0-9\s\-\+\(\)]+)/i, replacement: '***', flag: 'suspicious' }
-];
-
-// Filter message content against sensitive patterns
 export const filterMessageContent = (content: string) => {
+  // Basic implementation: scan for inappropriate words
+  const inappropriateWordsList = [
+    "inappropriate", "offensive", "explicit", "obscene", "rude", "harassment"
+  ];
+  
+  const contentLower = content.toLowerCase();
+  let flags: Partial<ContentFlag>[] = [];
+  let isFiltered = false;
   let filteredContent = content;
-  const flags: Array<{ flag_type: string; severity: string }> = [];
   
-  sensitivePatterns.forEach(({ pattern, replacement, flag }) => {
-    if (pattern.test(content)) {
-      filteredContent = filteredContent.replace(pattern, replacement);
-      
-      // Add a flag for this violation
+  for (let word of inappropriateWordsList) {
+    if (contentLower.includes(word)) {
       flags.push({
-        flag_type: flag as ContentFlag['flag_type'],
-        severity: determineViolationSeverity(flag),
+        flag_type: 'inappropriate' as ContentFlag['flag_type'],
+        severity: 'medium' as ContentFlag['severity']
       });
+      
+      isFiltered = true;
+      // Replace inappropriate word with asterisks
+      filteredContent = filteredContent.replace(new RegExp(word, 'gi'), '*'.repeat(word.length));
     }
-  });
+  }
   
-  return {
-    filteredContent,
-    flags
-  };
-};
-
-// Determine severity based on flag type
-const determineViolationSeverity = (flagType: string): ContentFlag['severity'] => {
-  switch (flagType) {
-    case 'inappropriate':
-      return 'high';
-    case 'religious_violation':
-      return 'high';
-    case 'harassment':
-      return 'medium';
-    case 'suspicious':
-      return 'low';
-    default:
-      return 'low';
-  }
-};
-
-// Report inappropriate content or behavior - Export this for the ReportDialog component
-export const submitContentReport = async (
-  reportData: Omit<ContentReport, 'id' | 'created_at' | 'status'>
-): Promise<boolean> => {
-  try {
-    const reportPayload = {
-      reported_user_id: reportData.reported_user_id,
-      reporting_user_id: reportData.reporting_user_id,
-      report_type: reportData.report_type,
-      content_reference: reportData.content_reference || '',
-      report_details: reportData.report_details,
-      created_at: new Date().toISOString(),
-      status: 'pending'
-    };
-    
-    // Use direct function instead of RPC to avoid type issues
-    const { error } = await supabase.functions.invoke('insert_content_report', {
-      body: reportPayload
-    });
-    
-    if (error) {
-      console.error("Error submitting report:", error);
-      return false;
+  // Check for religious sensitivities
+  const religiousViolationWords = ["blasphemy", "sacrilegious", "haram"];
+  
+  for (let word of religiousViolationWords) {
+    if (contentLower.includes(word)) {
+      flags.push({
+        flag_type: 'religious_violation' as ContentFlag['flag_type'],
+        severity: 'high' as ContentFlag['severity']
+      });
+      
+      isFiltered = true;
+      filteredContent = filteredContent.replace(new RegExp(word, 'gi'), '*'.repeat(word.length));
     }
-    
-    return true;
-  } catch (err) {
-    console.error("Error in report submission:", err);
-    return false;
   }
+  
+  return { flags, isFiltered, filteredContent };
 };
 
-// Flag content directly
 export const flagContent = async (
   contentId: string,
   contentType: ContentFlag['content_type'],
   flagType: ContentFlag['flag_type'],
   severity: ContentFlag['severity'],
-  flaggedBy: string
-): Promise<boolean> => {
+  userId: string
+) => {
   try {
-    const flagData = {
-      content_id: contentId,
-      content_type: contentType,
-      flag_type: flagType,
-      severity,
-      flagged_by: flaggedBy,
-      created_at: new Date().toISOString(),
-      resolved: false
-    };
+    // Check if content_flags table exists before inserting
+    const { data: tableExists } = await supabase.rpc('table_exists', { table_name: 'content_flags' });
     
-    const { error } = await supabase.functions.invoke('insert_content_flag', {
-      body: flagData
-    });
-    
-    if (error) {
-      console.error("Error flagging content:", error);
-      return false;
+    if (!tableExists) {
+      console.log("Content flags table does not exist, skipping flagging");
+      return;
     }
     
-    return true;
+    // Insert flag into database
+    const { data, error } = await supabase
+      .from('content_flags')
+      .insert({
+        content_id: contentId,
+        content_type: contentType,
+        flag_type: flagType,
+        severity: severity,
+        flagged_by: userId,
+        created_at: new Date().toISOString(),
+        resolved: false
+      });
+      
+    if (error) {
+      console.error("Error flagging content:", error);
+    }
+    
+    return data;
   } catch (err) {
-    console.error("Error in content flagging:", err);
-    return false;
+    console.error("Error in flagContent:", err);
+    return null;
   }
 };
 
-// Get statistics about moderation activities
-export const getModerationStats = async (): Promise<{ 
-  pending_reports: number, 
-  flagged_content: number,
-  resolved_reports: number 
-}> => {
+export const submitContentReport = async (
+  reportedUserId: string,
+  reportingUserId: string,
+  reportType: ContentReport['report_type'],
+  contentReference: string | undefined,
+  reportDetails: string
+) => {
   try {
-    // Use functions.invoke instead of rpc
-    const pendingReportsResult = await supabase.functions.invoke('count_pending_reports');
-    const flaggedContentResult = await supabase.functions.invoke('count_unresolved_flags');
-    const resolvedReportsResult = await supabase.functions.invoke('count_resolved_reports');
+    // Check if content_reports table exists before inserting
+    const { data: tableExists } = await supabase.rpc('table_exists', { table_name: 'content_reports' });
+    
+    if (!tableExists) {
+      console.log("Content reports table does not exist, skipping report");
+      return null;
+    }
+    
+    const { data, error } = await supabase
+      .from('content_reports')
+      .insert({
+        reported_user_id: reportedUserId,
+        reporting_user_id: reportingUserId,
+        report_type: reportType,
+        content_reference: contentReference,
+        report_details: reportDetails,
+        created_at: new Date().toISOString(),
+        status: 'pending'
+      });
+      
+    if (error) {
+      console.error("Error submitting report:", error);
+      return null;
+    }
+    
+    return data;
+  } catch (err) {
+    console.error("Error in submitContentReport:", err);
+    return null;
+  }
+};
+
+export const getModerationStats = async (): Promise<ModerationStats> => {
+  try {
+    // Default stats
+    const defaultStats: ModerationStats = {
+      pendingReports: 0,
+      flaggedContent: 0,
+      totalProcessed: 0,
+      resolvedToday: 0
+    };
+    
+    // Check if tables exist
+    const { data: reportsTableExists } = await supabase.rpc('table_exists', { table_name: 'content_reports' });
+    const { data: flagsTableExists } = await supabase.rpc('table_exists', { table_name: 'content_flags' });
+    
+    if (!reportsTableExists && !flagsTableExists) {
+      return defaultStats;
+    }
+    
+    // Get pending reports count
+    let pendingReports = 0;
+    if (reportsTableExists) {
+      const { data: pendingReportsData, error: pendingReportsError } = await supabase
+        .from('content_reports')
+        .select('id', { count: 'exact' })
+        .eq('status', 'pending');
+        
+      if (!pendingReportsError) {
+        pendingReports = pendingReportsData.length;
+      }
+    }
+    
+    // Get flagged content count
+    let flaggedContent = 0;
+    if (flagsTableExists) {
+      const { data: flaggedContentData, error: flaggedContentError } = await supabase
+        .from('content_flags')
+        .select('id', { count: 'exact' })
+        .eq('resolved', false);
+        
+      if (!flaggedContentError) {
+        flaggedContent = flaggedContentData.length;
+      }
+    }
+    
+    // Get resolved today count
+    let resolvedToday = 0;
+    if (reportsTableExists) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      const { data: resolvedTodayData, error: resolvedTodayError } = await supabase
+        .from('content_reports')
+        .select('id', { count: 'exact' })
+        .eq('status', 'resolved')
+        .gte('resolved_at', today.toISOString());
+        
+      if (!resolvedTodayError) {
+        resolvedToday = resolvedTodayData.length;
+      }
+    }
+    
+    // Get total processed count
+    let totalProcessed = 0;
+    if (reportsTableExists) {
+      const { data: totalProcessedData, error: totalProcessedError } = await supabase
+        .from('content_reports')
+        .select('id', { count: 'exact' })
+        .eq('status', 'resolved');
+        
+      if (!totalProcessedError) {
+        totalProcessed = totalProcessedData.length;
+      }
+    }
     
     return {
-      pending_reports: Number(pendingReportsResult.data || 0),
-      flagged_content: Number(flaggedContentResult.data || 0),
-      resolved_reports: Number(resolvedReportsResult.data || 0)
+      pendingReports,
+      flaggedContent,
+      totalProcessed,
+      resolvedToday
     };
   } catch (err) {
     console.error("Error getting moderation stats:", err);
     return {
-      pending_reports: 0,
-      flagged_content: 0,
-      resolved_reports: 0
+      pendingReports: 0,
+      flaggedContent: 0,
+      totalProcessed: 0,
+      resolvedToday: 0
     };
-  }
-};
-
-// Resolve a report (admin action)
-export const resolveReport = async (
-  reportId: string,
-  resolution: 'warning' | 'temporary_ban' | 'permanent_ban' | 'content_removal' | 'no_action',
-  adminNotes?: string
-): Promise<boolean> => {
-  try {
-    const { error } = await supabase.functions.invoke('resolve_content_report', {
-      body: {
-        report_id: reportId,
-        resolution_action: resolution,
-        admin_notes: adminNotes || ''
-      }
-    });
-    
-    if (error) {
-      console.error("Error resolving report:", error);
-      return false;
-    }
-    
-    return true;
-  } catch (err) {
-    console.error("Error in report resolution:", err);
-    return false;
-  }
-};
-
-// Resolve a content flag (admin action)
-export const resolveContentFlag = async (
-  flagId: string,
-  resolvedBy: string,
-  notes?: string
-): Promise<boolean> => {
-  try {
-    const { error } = await supabase.functions.invoke('resolve_content_flag', {
-      body: {
-        flag_id: flagId,
-        resolved_by_user: resolvedBy,
-        resolution_notes: notes || ''
-      }
-    });
-    
-    if (error) {
-      console.error("Error resolving flag:", error);
-      return false;
-    }
-    
-    return true;
-  } catch (err) {
-    console.error("Error in flag resolution:", err);
-    return false;
-  }
-};
-
-// Get all content reports (admin)
-export const getAllReports = async (): Promise<ContentReport[]> => {
-  try {
-    const { data, error } = await supabase.functions.invoke('get_all_content_reports');
-    
-    if (error) {
-      console.error("Error fetching reports:", error);
-      return [];
-    }
-    
-    return data as ContentReport[] || [];
-  } catch (err) {
-    console.error("Error retrieving content reports:", err);
-    return [];
-  }
-};
-
-// Get all content flags (admin)
-export const getAllFlags = async (): Promise<ContentFlag[]> => {
-  try {
-    const { data, error } = await supabase.functions.invoke('get_all_content_flags');
-    
-    if (error) {
-      console.error("Error fetching flags:", error);
-      return [];
-    }
-    
-    return data as ContentFlag[] || [];
-  } catch (err) {
-    console.error("Error retrieving content flags:", err);
-    return [];
   }
 };

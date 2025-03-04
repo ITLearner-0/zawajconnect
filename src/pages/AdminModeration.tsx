@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ContentReport, ContentFlag } from '@/types/profile';
+import { ContentReport, ContentFlag, ModerationStats } from '@/types/profile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
@@ -10,17 +10,34 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { getModerationStats } from '@/services/contentModerationService';
 
+// Function to check if the content_reports table exists
+const checkContentReportsTable = async () => {
+  const { data, error } = await supabase.rpc('table_exists', { table_name: 'content_reports' });
+  return data || false;
+};
+
+// Function to check if the content_flags table exists
+const checkContentFlagsTable = async () => {
+  const { data, error } = await supabase.rpc('table_exists', { table_name: 'content_flags' });
+  return data || false;
+};
+
 const AdminModeration = () => {
   const { toast } = useToast();
   const [reports, setReports] = useState<ContentReport[]>([]);
   const [flags, setFlags] = useState<ContentFlag[]>([]);
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<ModerationStats>({
     pendingReports: 0,
     flaggedContent: 0,
+    totalProcessed: 0,
     resolvedToday: 0
   });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('reports');
+  const [tablesExist, setTablesExist] = useState({
+    contentReports: false,
+    contentFlags: false
+  });
 
   useEffect(() => {
     const checkAdminAccess = async () => {
@@ -32,47 +49,92 @@ const AdminModeration = () => {
       }
 
       // Check if user has admin role
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', session.user.id)
-        .single();
+      try {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .single();
 
-      if (error || profile?.role !== 'admin') {
-        // Redirect to home if not admin
+        if (error || !profile || profile.role !== 'admin') {
+          // Redirect to home if not admin
+          window.location.href = '/';
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking admin role:", error);
         window.location.href = '/';
         return;
       }
+      
+      // Check if moderation tables exist
+      const reportsTableExists = await checkContentReportsTable();
+      const flagsTableExists = await checkContentFlagsTable();
+      
+      setTablesExist({
+        contentReports: reportsTableExists,
+        contentFlags: flagsTableExists
+      });
 
-      fetchData();
+      if (reportsTableExists || flagsTableExists) {
+        fetchData();
+      } else {
+        setLoading(false);
+        toast({
+          title: "Database Setup Required",
+          description: "Moderation tables have not been created yet",
+          variant: "destructive"
+        });
+      }
     };
 
     const fetchData = async () => {
       try {
         setLoading(true);
 
-        // Get reports
-        const { data: reportsData, error: reportsError } = await supabase
-          .from('content_reports')
-          .select('*')
-          .order('created_at', { ascending: false });
+        // Get reports if table exists
+        if (tablesExist.contentReports) {
+          try {
+            const { data: reportsData, error: reportsError } = await supabase
+              .from('content_reports')
+              .select('*')
+              .order('created_at', { ascending: false });
 
-        if (reportsError) throw reportsError;
-        setReports(reportsData as ContentReport[]);
+            if (reportsError) throw reportsError;
+            setReports(reportsData as unknown as ContentReport[]);
+          } catch (error) {
+            console.error("Error fetching reports:", error);
+          }
+        }
 
-        // Get flags
-        const { data: flagsData, error: flagsError } = await supabase
-          .from('content_flags')
-          .select('*')
-          .eq('resolved', false)
-          .order('created_at', { ascending: false });
+        // Get flags if table exists
+        if (tablesExist.contentFlags) {
+          try {
+            const { data: flagsData, error: flagsError } = await supabase
+              .from('content_flags')
+              .select('*')
+              .eq('resolved', false)
+              .order('created_at', { ascending: false });
 
-        if (flagsError) throw flagsError;
-        setFlags(flagsData as ContentFlag[]);
+            if (flagsError) throw flagsError;
+            setFlags(flagsData as unknown as ContentFlag[]);
+          } catch (error) {
+            console.error("Error fetching flags:", error);
+          }
+        }
 
         // Get stats
-        const stats = await getModerationStats();
-        setStats(stats);
+        try {
+          const statsData = await getModerationStats();
+          setStats({
+            pendingReports: statsData.pendingReports || 0,
+            flaggedContent: statsData.flaggedContent || 0,
+            totalProcessed: statsData.totalProcessed || 0,
+            resolvedToday: statsData.resolvedToday || 0
+          });
+        } catch (error) {
+          console.error("Error fetching stats:", error);
+        }
       } catch (error: any) {
         toast({
           title: "Error",
@@ -88,6 +150,15 @@ const AdminModeration = () => {
   }, [toast]);
 
   const handleResolveReport = async (reportId: string, action: string) => {
+    if (!tablesExist.contentReports) {
+      toast({
+        title: "Error",
+        description: "Content reports table does not exist",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
       const { error } = await supabase
         .from('content_reports')
@@ -103,7 +174,7 @@ const AdminModeration = () => {
       // Update local state
       setReports(reports.map(report => 
         report.id === reportId
-          ? { ...report, status: 'resolved', resolution_action: action }
+          ? { ...report, status: 'resolved', resolution_action: action as ContentReport['resolution_action'] }
           : report
       ));
 
@@ -121,6 +192,15 @@ const AdminModeration = () => {
   };
 
   const handleResolveFlag = async (flagId: string) => {
+    if (!tablesExist.contentFlags) {
+      toast({
+        title: "Error",
+        description: "Content flags table does not exist",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     try {
       const { error } = await supabase
         .from('content_flags')

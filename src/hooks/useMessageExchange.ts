@@ -1,320 +1,138 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types/profile';
-import { useToast } from '@/hooks/use-toast';
-import { useMessageEncryption } from './useMessageEncryption';
-import { useMessageRetention } from './useMessageRetention';
+import { useUser } from '@supabase/auth-helpers-react';
 import { useMessageModeration } from './useMessageModeration';
 
-// Hook for loading messages
-const useLoadMessages = (conversationId: string | undefined, userId: string | null) => {
+export const useMessageExchange = (conversationId: string | undefined) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
-  const { decryptMessageContent } = useMessageEncryption(conversationId, userId);
+  const { user } = useUser();
+  const userId = user?.id || null;
   
+  // Get moderation functions
+  const { 
+    violations, 
+    latestReport, 
+    monitoringEnabled, 
+    toggleMonitoring, 
+    loading: monitoringLoading, 
+    error: monitoringError,
+    moderateMessageContent,
+    processContentFlags 
+  } = useMessageModeration(conversationId, messages, userId);
+
   useEffect(() => {
-    if (!conversationId || !userId) return;
+    if (!conversationId) return;
 
     const fetchMessages = async () => {
       setLoading(true);
-      setError(null);
-      
       try {
-        // Get messages
-        const { data: messagesData, error: messagesError } = await supabase
+        const { data, error } = await supabase
           .from('messages')
           .select('*')
           .eq('conversation_id', conversationId)
           .order('created_at', { ascending: true });
 
-        if (messagesError) {
-          throw messagesError;
-        }
-
-        if (messagesData) {
-          // Decrypt encrypted messages
-          const decryptedMessages = await Promise.all(
-            messagesData.map(async (msg: Message) => {
-              if (msg.encrypted && msg.iv) {
-                try {
-                  const decryptedContent = await decryptMessageContent(msg.content, msg.iv);
-                  return { ...msg, content: decryptedContent };
-                } catch (err) {
-                  console.error('Failed to decrypt message:', err);
-                  return { ...msg, content: '[Encrypted message]' };
-                }
-              }
-              return msg;
-            })
-          );
-          
-          setMessages(decryptedMessages as Message[]);
-        
-          // Mark unread messages as read
-          const unreadMessages = messagesData
-            .filter(msg => !msg.is_read && msg.sender_id !== userId)
-            .map(msg => msg.id);
-            
-          if (unreadMessages.length > 0) {
-            const { error: updateError } = await supabase
-              .from('messages')
-              .update({ is_read: true })
-              .in('id', unreadMessages);
-              
-            if (updateError) {
-              console.error("Error marking messages as read:", updateError);
-            }
-          }
+        if (error) {
+          setError(error.message);
+        } else {
+          setMessages(data || []);
         }
       } catch (err: any) {
         setError(err.message);
-        toast({
-          title: "Error loading messages",
-          description: err.message,
-          variant: "destructive"
-        });
       } finally {
         setLoading(false);
       }
     };
 
     fetchMessages();
-    
-    // Set up real-time subscription for new messages
-    const channel = supabase
-      .channel('new_messages')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `conversation_id=eq.${conversationId}`
-      }, async (payload) => {
-        // Add the new message to the list
-        const newMessage = payload.new as Message;
-        
-        // Decrypt if message is encrypted
-        if (newMessage.encrypted && newMessage.iv) {
-          try {
-            const decryptedContent = await decryptMessageContent(newMessage.content, newMessage.iv);
-            newMessage.content = decryptedContent;
-          } catch (err) {
-            console.error('Failed to decrypt new message:', err);
-            newMessage.content = '[Encrypted message]';
-          }
-        }
-        
-        setMessages(prev => [...prev, newMessage]);
-        
-        // If message is not from current user, mark as read
-        if (newMessage.sender_id !== userId) {
-          supabase
-            .from('messages')
-            .update({ is_read: true })
-            .eq('id', newMessage.id)
-            .then(({ error }) => {
-              if (error) {
-                console.error("Error marking new message as read:", error);
-              }
-            });
+
+    // Subscribe to real-time updates
+    const messageSubscription = supabase
+      .channel('public:messages')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, payload => {
+        if (payload.eventType === 'INSERT') {
+          setMessages(prevMessages => [...prevMessages, payload.new as Message]);
+        } else if (payload.eventType === 'UPDATE') {
+          setMessages(prevMessages =>
+            prevMessages.map(msg => (msg.id === (payload.new as Message).id ? payload.new as Message : msg))
+          );
+        } else if (payload.eventType === 'DELETE') {
+          setMessages(prevMessages => prevMessages.filter(msg => msg.id !== (payload.old as Message).id));
         }
       })
       .subscribe();
-      
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [conversationId, userId, toast, decryptMessageContent]);
-  
-  return { messages, setMessages, loading, error };
-};
 
-// Hook for sending messages
-const useSendMessage = (
-  conversationId: string | undefined, 
-  userId: string | null,
-  messageInput: string,
-  setMessageInput: (value: string) => void,
-  encryptionEnabled: boolean,
-  encryptMessageContent: (content: string) => Promise<{ encryptedContent: string; iv: string; keyId: string | null }>,
-  getMessageDeletionDate: () => string | null,
-  moderateMessageContent: (content: string) => { filteredContent: string; flags: Array<{ flag_type: string; severity: string }> },
-  processContentFlags: (messageId: string | undefined, flags: Array<{ flag_type: string; severity: string }>, userId: string | null) => Promise<void>
-) => {
-  const { toast } = useToast();
-  const [sendingMessage, setSendingMessage] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  
-  const sendMessage = async () => {
-    if (!messageInput.trim() || !userId || !conversationId) return;
-    
-    setSendingMessage(true);
-    setError(null);
-    
+    return () => {
+      supabase.removeChannel(messageSubscription);
+    };
+  }, [conversationId]);
+
+  const sendMessage = async (content: string, attachments: string[] = []) => {
+    if (!conversationId || !userId || !content.trim()) {
+      console.error("Cannot send message: Missing conversation ID, user ID, or content");
+      return null;
+    }
+
     try {
-      // Filter message content before sending
-      const { filteredContent, flags } = moderateMessageContent(messageInput);
+      // Check for violations before sending
+      const { flags, isFiltered, filteredContent } = moderateMessageContent(content);
       
-      // Check if wali supervision is required for female users
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('gender, wali_name')
-        .eq('id', userId)
-        .single();
-        
-      if (profileError) {
-        throw profileError;
+      // Process any flags that were detected
+      if (flags.length > 0) {
+        const messageId = Math.random().toString(36).substring(2, 15); // Temp ID for pre-insert flagging
+        flags.forEach(flag => {
+          processContentFlags(
+            messageId, 
+            'message', 
+            flag.flag_type as 'inappropriate' | 'harassment' | 'religious_violation' | 'suspicious',
+            flag.severity as 'low' | 'medium' | 'high'
+          );
+        });
       }
-      
-      const needsWaliSupervision = profileData?.gender === 'Female' && !profileData?.wali_name;
-      
-      // Get conversation wali_supervised status
-      const { data: convData, error: convError } = await supabase
-        .from('conversations')
-        .select('wali_supervised')
-        .eq('id', conversationId)
-        .single();
-      
-      if (convError) {
-        throw convError;
-      }
-      
-      // Process content for encryption if enabled
-      let finalContent = filteredContent;
-      let iv = null;
-      let encrypted = false;
-      let keyId = null;
-      
-      if (encryptionEnabled) {
-        try {
-          // Encrypt the message
-          const encryptionResult = await encryptMessageContent(filteredContent);
-          
-          if (encryptionResult.iv) {
-            finalContent = encryptionResult.encryptedContent;
-            iv = encryptionResult.iv;
-            keyId = encryptionResult.keyId;
-            encrypted = true;
-          }
-        } catch (err) {
-          console.error('Error encrypting message:', err);
-          // Fall back to unencrypted if encryption fails
-        }
-      }
-      
-      // Calculate scheduled deletion date based on retention policy
-      const scheduledDeletion = getMessageDeletionDate();
-      
-      const newMessage = {
-        conversation_id: conversationId,
-        sender_id: userId,
-        content: finalContent,
-        is_wali_visible: (convData?.wali_supervised || needsWaliSupervision) ?? false,
-        is_filtered: filteredContent !== messageInput,
-        // Encryption fields
-        encrypted,
-        iv,
-        encryption_key_id: keyId,
-        // Deletion scheduling
-        scheduled_deletion: scheduledDeletion
-      };
-      
-      const { data: insertData, error: insertError } = await supabase
+
+      const { data: newMessage, error } = await supabase
         .from('messages')
-        .insert(newMessage)
-        .select();
-        
-      if (insertError) {
-        throw insertError;
+        .insert([
+          {
+            conversation_id: conversationId,
+            sender_id: userId,
+            content: isFiltered ? filteredContent : content,
+            attachments: attachments,
+            created_at: new Date().toISOString(),
+            is_read: false,
+            is_wali_visible: true, // Default value
+            content_flags: flags,
+            is_filtered: isFiltered
+          }
+        ])
+        .select('*')
+        .single();
+
+      if (error) {
+        setError(error.message);
+        return null;
       }
-      
-      // If there were flags, record them with the message ID
-      if (flags.length > 0 && insertData && insertData.length > 0) {
-        const messageId = insertData[0].id;
-        await processContentFlags(messageId, flags, userId);
-        
-        // If content was filtered, notify the user
-        if (filteredContent !== messageInput) {
-          toast({
-            title: "Message Modified",
-            description: "Your message was modified to comply with community guidelines.",
-            duration: 3000
-          });
-        }
-      }
-      
-      setMessageInput('');
-    } catch (err: any) {
-      setError(err.message);
-      toast({
-        title: "Error sending message",
-        description: err.message,
-        variant: "destructive"
-      });
-    } finally {
-      setSendingMessage(false);
+
+      return newMessage;
+    } catch (error: any) {
+      setError(error.message);
+      return null;
     }
   };
-  
-  return { sendMessage, sendingMessage, error };
-};
-
-// Main hook that combines the specialized hooks
-export const useMessageExchange = (conversationId: string | undefined, userId: string | null) => {
-  const [messageInput, setMessageInput] = useState('');
-  
-  // Use our specialized hooks
-  const {
-    encryptionEnabled,
-    toggleEncryption,
-    encryptMessageContent,
-    decryptMessageContent
-  } = useMessageEncryption(conversationId, userId);
-  
-  const {
-    retentionPolicy,
-    updateRetentionPolicy,
-    getMessageDeletionDate
-  } = useMessageRetention(conversationId);
-  
-  const {
-    moderateMessageContent,
-    processContentFlags
-  } = useMessageModeration(userId);
-  
-  // Load messages
-  const { messages, setMessages, loading, error } = useLoadMessages(conversationId, userId);
-  
-  // Send messages
-  const { 
-    sendMessage, 
-    sendingMessage, 
-    error: sendError 
-  } = useSendMessage(
-    conversationId, 
-    userId, 
-    messageInput, 
-    setMessageInput, 
-    encryptionEnabled, 
-    encryptMessageContent, 
-    getMessageDeletionDate, 
-    moderateMessageContent, 
-    processContentFlags
-  );
 
   return {
     messages,
-    messageInput,
-    setMessageInput,
-    sendMessage,
     loading,
-    sendingMessage,
-    error: error || sendError,
-    encryptionEnabled,
-    toggleEncryption,
-    retentionPolicy,
-    updateRetentionPolicy
+    error,
+    sendMessage,
+    violations,
+    latestReport,
+    monitoringEnabled,
+    toggleMonitoring,
+    monitoringLoading,
+    monitoringError
   };
 };

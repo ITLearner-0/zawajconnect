@@ -110,12 +110,25 @@ export const useMessageModeration = (
     setMonitoringEnabled(prev => !prev);
   };
 
+  // Process content for flags and moderation
+  const moderateMessageContent = (content: string) => {
+    return filterMessageContent(content);
+  };
+
+  // Flag content for review
+  const processContentFlags = (messageId: string, contentType: 'message' | 'profile' | 'image', flagType: 'inappropriate' | 'harassment' | 'religious_violation' | 'suspicious', severity: 'low' | 'medium' | 'high') => {
+    if (!userId) return;
+    return flagContent(messageId, contentType, flagType, severity, userId);
+  };
+
   return {
     violations,
     latestReport,
     monitoringEnabled,
     toggleMonitoring,
     loading,
-    error
+    error,
+    moderateMessageContent,
+    processContentFlags
   };
 };

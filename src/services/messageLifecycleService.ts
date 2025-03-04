@@ -1,181 +1,111 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { RetentionPolicy } from '@/types/profile';
-import { addDays } from 'date-fns';
+import { supabase } from "@/integrations/supabase/client";
+import { RetentionPolicy } from "@/types/profile";
 
-// Check if retention_policy column exists in conversations table
-export const checkRetentionPolicyColumn = async (): Promise<boolean> => {
+/**
+ * Checks if a column exists in a table
+ */
+export const columnExists = async (tableName: string, columnName: string): Promise<boolean> => {
   try {
-    // Use metadata query to check if column exists
-    const { data, error } = await supabase.functions.invoke('check_column_exists', {
-      body: { 
-        table_name: 'conversations',
-        column_name: 'retention_policy'
-      }
+    const { data, error } = await supabase.rpc('column_exists', {
+      table_name: tableName,
+      column_name: columnName
     });
     
     if (error) {
-      console.error('Error checking retention policy column:', error);
+      console.error(`Error checking if column ${columnName} exists:`, error);
       return false;
     }
     
-    return !!data?.exists;
+    return !!data;
   } catch (err) {
-    console.error('Error checking retention policy column:', err);
+    console.error(`Error in columnExists check for ${columnName}:`, err);
     return false;
   }
 };
 
-// Add retention_policy column if it doesn't exist
-export const addRetentionPolicyColumn = async (): Promise<boolean> => {
+/**
+ * Set the retention policy for a conversation
+ */
+export const setRetentionPolicy = async (conversationId: string, policy: RetentionPolicy): Promise<boolean> => {
   try {
-    const { data, error } = await supabase.functions.invoke('add_column_if_not_exists', {
-      body: { 
-        table_name: 'conversations',
-        column_name: 'retention_policy',
-        column_type: 'jsonb'
-      }
-    });
+    // Check if retention_policy column exists
+    const hasRetentionPolicy = await columnExists('conversations', 'retention_policy');
     
-    if (error) {
-      console.error('Error adding retention policy column:', error);
+    if (!hasRetentionPolicy) {
+      console.log("Retention policy column doesn't exist, cannot update");
       return false;
     }
     
-    return true;
-  } catch (err) {
-    console.error('Error adding retention policy column:', err);
-    return false;
-  }
-};
-
-// Set retention policy for a conversation
-export const setRetentionPolicy = async (
-  conversationId: string, 
-  policy: RetentionPolicy
-): Promise<boolean> => {
-  try {
-    // First check if the column exists, add it if needed
-    const columnExists = await checkRetentionPolicyColumn();
-    if (!columnExists) {
-      const added = await addRetentionPolicyColumn();
-      if (!added) return false;
-    }
-    
-    // Update the conversation with the retention policy
-    const { error } = await supabase.functions.invoke('update_conversation_retention_policy', {
-      body: {
-        conversation_id: conversationId,
-        retention_policy: policy
-      }
-    });
-    
+    const { error } = await supabase
+      .from('conversations')
+      .update({ retention_policy: policy })
+      .eq('id', conversationId);
+      
     if (error) {
-      console.error('Error setting retention policy:', error);
+      console.error("Error setting retention policy:", error);
       return false;
     }
     
     return true;
   } catch (err) {
-    console.error('Error setting retention policy:', err);
+    console.error("Error in setRetentionPolicy:", err);
     return false;
   }
 };
 
-// Check if scheduled_deletion column exists in messages table
-export const checkScheduledDeletionColumn = async (): Promise<boolean> => {
-  try {
-    const { data, error } = await supabase.functions.invoke('check_column_exists', {
-      body: {
-        table_name: 'messages',
-        column_name: 'scheduled_deletion'
-      }
-    });
-    
-    if (error) {
-      console.error('Error checking scheduled deletion column:', error);
-      return false;
-    }
-    
-    return !!data?.exists;
-  } catch (err) {
-    console.error('Error checking scheduled deletion column:', err);
-    return false;
-  }
-};
-
-// Add scheduled_deletion column if it doesn't exist
-export const addScheduledDeletionColumn = async (): Promise<boolean> => {
-  try {
-    const { data, error } = await supabase.functions.invoke('add_column_if_not_exists', {
-      body: {
-        table_name: 'messages',
-        column_name: 'scheduled_deletion',
-        column_type: 'timestamp with time zone'
-      }
-    });
-    
-    if (error) {
-      console.error('Error adding scheduled deletion column:', error);
-      return false;
-    }
-    
-    return true;
-  } catch (err) {
-    console.error('Error adding scheduled deletion column:', err);
-    return false;
-  }
-};
-
-// Calculate when a message should be deleted based on retention policy
+/**
+ * Calculate when a message should be deleted based on retention policy
+ */
 export const calculateDeletionDate = (policy?: RetentionPolicy): string | null => {
-  if (!policy || policy.type === 'permanent' || !policy.auto_delete) {
+  if (!policy || !policy.auto_delete || policy.type === 'permanent') {
     return null;
   }
   
-  // Calculate deletion date based on policy duration
   const durationDays = policy.duration_days || 30; // Default to 30 days if not specified
-  const deletionDate = addDays(new Date(), durationDays);
+  const deletionDate = new Date();
+  deletionDate.setDate(deletionDate.getDate() + durationDays);
   
   return deletionDate.toISOString();
 };
 
-// Initialize message lifecycle management
-export const initializeMessageCleanup = async (): Promise<void> => {
+/**
+ * Apply message lifecycle settings to a new message
+ */
+export const applyMessageLifecycle = async (
+  messageId: string, 
+  retentionPolicy?: RetentionPolicy
+): Promise<void> => {
   try {
-    // Check and add the scheduled_deletion column if needed
-    const columnExists = await checkScheduledDeletionColumn();
-    if (!columnExists) {
-      await addScheduledDeletionColumn();
+    // Only apply if we have a retention policy
+    if (!retentionPolicy || !retentionPolicy.auto_delete) {
+      return;
     }
     
-    // Set up a periodic cleanup job (this is just a placeholder)
-    console.log('Message cleanup initialized');
-  } catch (err) {
-    console.error('Error initializing message cleanup:', err);
-  }
-};
-
-// Clean up expired messages (to be called by a cron job or similar)
-export const cleanupExpiredMessages = async (): Promise<number> => {
-  try {
-    // First check if the column exists
-    const columnExists = await checkScheduledDeletionColumn();
-    if (!columnExists) return 0;
+    // Calculate deletion date
+    const scheduledDeletion = calculateDeletionDate(retentionPolicy);
+    if (!scheduledDeletion) {
+      return;
+    }
     
-    // Delete messages that have passed their deletion date
-    const { data, error } = await supabase.functions.invoke('delete_expired_messages', {
-      body: { current_time: new Date().toISOString() }
-    });
+    // Check if scheduled_deletion column exists
+    const hasScheduledDeletion = await columnExists('messages', 'scheduled_deletion');
     
+    if (!hasScheduledDeletion) {
+      console.log("Scheduled deletion column doesn't exist, cannot update");
+      return;
+    }
+    
+    // Update the message with scheduled deletion date
+    const { error } = await supabase
+      .from('messages')
+      .update({ scheduled_deletion: scheduledDeletion })
+      .eq('id', messageId);
+      
     if (error) {
-      console.error('Error deleting expired messages:', error);
-      return 0;
+      console.error("Error setting message scheduled deletion:", error);
     }
-    
-    return data?.count || 0;
   } catch (err) {
-    console.error('Error cleaning up expired messages:', err);
-    return 0;
+    console.error("Error in applyMessageLifecycle:", err);
   }
 };
