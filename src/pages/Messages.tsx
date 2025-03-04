@@ -74,18 +74,18 @@ const Messages = () => {
       
       <MessagesContainer
         loading={loading}
-        conversations={conversations}
+        conversations={conversations || []}
         conversationId={conversationId}
         currentConversation={currentConversation}
         onSelectConversation={selectConversation}
         errors={{
-          conversations: errors?.conversations,
-          messages: errors?.messages,
-          videoCall: "",
-          monitoring: errors?.monitoring
+          conversations: errors?.conversations || null,
+          messages: errors?.messages || null,
+          videoCall: errors?.videoCall || null,
+          monitoring: errors?.monitoring || null
         }}
       >
-        {videoCallStatus.isActive ? (
+        {videoCallStatus?.isActive ? (
           <VideoCallManager
             videoCallStatus={videoCallStatus}
             onEndCall={endVideoCall}
@@ -102,7 +102,7 @@ const Messages = () => {
               sendMessage={sendMessage}
               loading={loading}
               sendingMessage={sendingMessage}
-              error={errors?.messages}
+              error={errors?.messages || null}
               onStartVideoCall={() => {
                 const otherUserId = currentConversation.participants.find(id => id !== currentUserId);
                 if (otherUserId) {
@@ -115,7 +115,7 @@ const Messages = () => {
               monitoringEnabled={monitoringEnabled}
               toggleMonitoring={toggleMonitoring}
               monitoringLoading={monitoringLoading}
-              // New encryption and retention props
+              // Encryption and retention props
               encryptionEnabled={encryptionEnabled}
               toggleEncryption={toggleEncryption}
               retentionPolicy={retentionPolicy}

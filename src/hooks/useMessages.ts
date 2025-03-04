@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Conversation, Message, RetentionPolicy } from '@/types/profile';
@@ -14,12 +15,39 @@ export const useMessages = (conversationId?: string, currentUserId?: string | nu
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
-  const [errors, setErrors] = useState<{ conversations: string | null; messages: string | null; videoCall: string | null; monitoring?: string | null }>({
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [messageInput, setMessageInput] = useState("");
+  const [errors, setErrors] = useState<{ 
+    conversations: string | null; 
+    messages: string | null; 
+    videoCall: string | null; 
+    monitoring?: string | null 
+  }>({
     conversations: null,
     messages: null,
     videoCall: null,
     monitoring: null,
   });
+
+  // Import all required hooks
+  const { 
+    conversations, 
+    currentConversation, 
+    setCurrentConversation,
+    loadCurrentConversation 
+  } = useConversations(currentUserId || null);
+  
+  const { encryptionEnabled, toggleEncryption } = useMessageEncryption(conversationId);
+  const { retentionPolicy, updateRetentionPolicy } = useMessageRetention(conversationId);
+  const { videoCallStatus, startVideoCall, endVideoCall } = useVideoCall(conversationId);
+  const { latestReport, monitoringEnabled, toggleMonitoring, loading: monitoringLoading } = useAIMonitoring(conversationId);
+  const { violations } = useMessageModeration(conversationId, messages, currentUserId);
+
+  // Helper function for message decryption (placeholder - would be implemented in a real app)
+  const decryptMessage = async (message: Message): Promise<Message> => {
+    // In a real app, this would decrypt the message
+    return { ...message, content: message.content };
+  };
 
   // Fetch messages for the current conversation
   const fetchMessages = useCallback(async () => {
@@ -97,16 +125,84 @@ export const useMessages = (conversationId?: string, currentUserId?: string | nu
     } finally {
       setLoading(false);
     }
-  }, [conversationId, currentUserId, encryptionEnabled, decryptMessage]);
+  }, [conversationId, currentUserId, encryptionEnabled]);
 
   useEffect(() => {
     fetchMessages();
   }, [fetchMessages]);
 
+  // Load the current conversation when conversationId changes
+  useEffect(() => {
+    if (conversationId && currentUserId) {
+      loadCurrentConversation(conversationId);
+    }
+  }, [conversationId, currentUserId, loadCurrentConversation]);
+
+  // Send a message
+  const sendMessage = async () => {
+    if (!messageInput.trim() || !conversationId || !currentUserId) return;
+    
+    try {
+      setSendingMessage(true);
+      
+      // Create a new message
+      const newMessage = {
+        conversation_id: conversationId,
+        sender_id: currentUserId,
+        content: messageInput,
+        created_at: new Date().toISOString(),
+        is_read: false,
+        is_wali_visible: true
+      };
+      
+      const { error } = await supabase
+        .from('messages')
+        .insert(newMessage);
+        
+      if (error) {
+        console.error('Error sending message:', error);
+        throw error;
+      }
+      
+      // Clear input and refresh messages
+      setMessageInput('');
+      fetchMessages();
+    } catch (err: any) {
+      toast({
+        title: "Failed to send message",
+        description: err.message,
+        variant: "destructive"
+      });
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
   return {
+    // Return all required properties
     messages,
     loading,
     errors,
     fetchMessages,
+    sendingMessage,
+    messageInput,
+    setMessageInput,
+    sendMessage,
+    conversations,
+    currentConversation,
+    videoCallStatus,
+    startVideoCall,
+    endVideoCall,
+    // AI monitoring properties
+    violations,
+    latestReport,
+    monitoringEnabled,
+    toggleMonitoring,
+    monitoringLoading,
+    // Encryption and retention properties
+    encryptionEnabled,
+    toggleEncryption,
+    retentionPolicy,
+    updateRetentionPolicy
   };
 };
