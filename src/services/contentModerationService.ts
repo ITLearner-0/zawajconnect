@@ -1,6 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { ContentFlag } from '@/types/profile';
+import { ContentFlag, ContentReport } from '@/types/profile';
 import { executeSql, tableExists } from '@/utils/databaseUtils';
 
 interface FlaggedContent {
@@ -166,6 +166,19 @@ export const reportContent = async (
 };
 
 /**
+ * Submit a content report - called from the ReportDialog
+ */
+export const submitContentReport = async (report: Partial<ContentReport>): Promise<boolean> => {
+  return reportContent(
+    report.reported_user_id || '',
+    report.reporting_user_id || '',
+    report.report_type || 'other',
+    report.content_reference,
+    report.report_details || ''
+  );
+};
+
+/**
  * Resolves a content flag
  */
 export const resolveContentFlag = async (
@@ -292,10 +305,10 @@ export const getModerationStats = async (): Promise<{
     `);
     
     return {
-      pendingReports: pendingReportsResult?.result[0]?.count || 0,
-      flaggedContent: flaggedContentResult?.result[0]?.count || 0,
-      totalProcessed: totalProcessedResult?.result[0]?.count || 0,
-      resolvedToday: resolvedTodayResult?.result[0]?.count || 0
+      pendingReports: pendingReportsResult?.result?.[0]?.count || 0,
+      flaggedContent: flaggedContentResult?.result?.[0]?.count || 0,
+      totalProcessed: totalProcessedResult?.result?.[0]?.count || 0,
+      resolvedToday: resolvedTodayResult?.result?.[0]?.count || 0
     };
   } catch (err) {
     console.error('Error getting moderation stats:', err);

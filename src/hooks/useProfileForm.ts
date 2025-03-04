@@ -1,7 +1,8 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { ProfileFormData, VerificationStatus, PrivacySettings } from "@/types/profile";
 import { geocodeLocation } from "@/utils/locationUtils";
 import { updateUserCoordinates } from "@/utils/profileUtils";
@@ -56,7 +57,7 @@ export const useProfileForm = ({
     setPrivacySettings(newSettings);
   };
 
-  const handleToggleVisibility = async () => {
+  const toggleAccountVisibility = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
@@ -65,7 +66,7 @@ export const useProfileForm = ({
         description: "Please sign in to update account visibility",
         variant: "destructive",
       });
-      return;
+      return false;
     }
 
     const newVisibilityState = !isAccountVisible;
@@ -73,7 +74,9 @@ export const useProfileForm = ({
     
     const { error } = await supabase
       .from("profiles")
-      .update({ is_visible: newVisibilityState })
+      .update({ 
+        is_visible: newVisibilityState 
+      })
       .eq("id", session.user.id);
       
     if (error) {
@@ -106,7 +109,9 @@ export const useProfileForm = ({
     
     const { error } = await supabase
       .from("profiles")
-      .update({ blocked_users: updatedBlockedUsers })
+      .update({ 
+        blocked_users: updatedBlockedUsers 
+      })
       .eq("id", session.user.id);
       
     if (error) {

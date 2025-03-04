@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { ProfileFormData, VerificationStatus, PrivacySettings } from "@/types/profile";
+import { updateProfileSchema } from "@/utils/databaseUtils";
 
 interface UseProfileDataResult {
   isNewUser: boolean;
@@ -60,6 +61,9 @@ export const useProfileData = (): UseProfileDataResult => {
       setUserEmail(session.user.email || "");
       setUserId(session.user.id);
       
+      // Make sure the profile schema is updated to include new fields
+      await updateProfileSchema();
+      
       console.log("Fetching profile for user:", session.user.id);
       const { data: profile, error } = await supabase
         .from("profiles")
@@ -100,17 +104,19 @@ export const useProfileData = (): UseProfileDataResult => {
           id: isVerified && verificationDoc.startsWith("id:"),
         });
         
-        // Load privacy settings and account visibility status
+        // Load privacy settings from the profile if available
         if (profile.privacy_settings) {
-          setPrivacySettings(profile.privacy_settings as PrivacySettings);
+          setPrivacySettings(profile.privacy_settings as unknown as PrivacySettings);
         }
         
+        // Load blocked users from the profile if available
         if (profile.blocked_users) {
-          setBlockedUsers(profile.blocked_users as string[] || []);
+          setBlockedUsers(profile.blocked_users as unknown as string[] || []);
         } else {
           setBlockedUsers([]);
         }
         
+        // Set visibility status
         setIsAccountVisible(profile.is_visible !== false); // Default to true if not defined
         
         // Detect if this is a new user with minimal profile data

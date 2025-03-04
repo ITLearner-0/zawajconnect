@@ -1,10 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { WaliProfile, ChatRequest, WaliDashboardStats, SupervisionSession } from '@/types/wali';
-import { Conversation, ContentFlag } from '@/types/profile';
+import { WaliProfile, ChatRequest, SupervisionSession, WaliNotification, WaliDashboardStats, Message } from '@/types/wali';
 import { tableExists } from '@/utils/databaseUtils';
-import { useToast } from './use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 export const useWaliDashboard = () => {
   const { toast } = useToast();
@@ -16,349 +15,417 @@ export const useWaliDashboard = () => {
     totalSupervised: 0
   });
   const [chatRequests, setChatRequests] = useState<ChatRequest[]>([]);
-  const [activeConversations, setActiveConversations] = useState<(Conversation & { supervision?: SupervisionSession })[]>([]);
-  const [flaggedContent, setFlaggedContent] = useState<ContentFlag[]>([]);
+  const [activeConversations, setActiveConversations] = useState<any[]>([]);
+  const [flaggedContent, setFlaggedContent] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Get current user ID
   useEffect(() => {
-    const fetchWaliProfile = async () => {
+    const getUserId = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data && data.session) {
+        setUserId(data.session.user.id);
+      }
+    };
+    
+    getUserId();
+    
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        setUserId(session.user.id);
+      } else {
+        setUserId(null);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // Fetch wali profile and data
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!userId) return;
+      
       setLoading(true);
+      setError(null);
+
       try {
-        // Check for user session
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.user) {
-          setError('No authenticated user found');
+        // Check if wali_profiles table exists
+        const waliProfilesTableExists = await tableExists('wali_profiles');
+        
+        if (!waliProfilesTableExists) {
+          toast({
+            title: "Setup Required",
+            description: "Wali profiles table doesn't exist yet. Setting up...",
+          });
+          
+          // We'll assume the tables are created by the databaseUtils functions
+          setError("Database setup required. Please contact administrator.");
           setLoading(false);
           return;
         }
 
-        // Check if wali_profiles table exists
-        const waliTableExists = await tableExists('wali_profiles');
-        if (!waliTableExists) {
-          // Create mock data for development
-          const mockWaliProfile: WaliProfile = {
-            id: 'mock-wali-id',
-            user_id: session.user.id,
-            first_name: 'Ahmad',
-            last_name: 'Khan',
-            relationship: 'Father',
-            contact_information: 'ahmad.khan@example.com',
-            is_verified: true,
-            verification_date: new Date().toISOString(),
-            availability_status: 'available',
-            last_active: new Date().toISOString(),
-            managed_users: ['user1', 'user2'],
-            chat_preferences: {
-              auto_approve_known_contacts: true,
-              notification_level: 'all',
-              keyword_alerts: ['dating', 'meet alone', 'address'],
-              supervision_level: 'passive'
-            }
-          };
-          
-          setWaliProfile(mockWaliProfile);
-          
-          // Mock statistics
-          setStatistics({
-            pendingRequests: 3,
-            activeConversations: 2,
-            flaggedMessages: 5,
-            totalSupervised: 10
-          });
-          
-          // Mock chat requests
-          setChatRequests([
-            {
-              id: 'req1',
-              requester_id: 'user1',
-              recipient_id: 'user2',
-              status: 'pending',
-              requested_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-              requester_profile: {
-                first_name: 'Sara',
-                last_name: 'Ahmed'
-              },
-              message: 'I would like to connect with your daughter for marriage purposes',
-              wali_id: 'mock-wali-id'
-            },
-            {
-              id: 'req2',
-              requester_id: 'user3',
-              recipient_id: 'user2',
-              status: 'approved',
-              requested_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-              reviewed_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-              requester_profile: {
-                first_name: 'Yusuf',
-                last_name: 'Ali'
-              },
-              wali_notes: 'Seems like a good candidate',
-              wali_id: 'mock-wali-id'
-            },
-            {
-              id: 'req3',
-              requester_id: 'user4',
-              recipient_id: 'user2',
-              status: 'rejected',
-              requested_at: new Date(Date.now() - 1000 * 60 * 60 * 24).toISOString(),
-              reviewed_at: new Date(Date.now() - 1000 * 60 * 60 * 23).toISOString(),
-              requester_profile: {
-                first_name: 'Ibrahim',
-                last_name: 'Khan'
-              },
-              wali_notes: 'Not suitable at this time',
-              wali_id: 'mock-wali-id'
-            }
-          ]);
-          
-          // Mock active conversations
-          setActiveConversations([
-            {
-              id: 'conv1',
-              created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 3).toISOString(),
-              participants: ['user1', 'user2'],
-              last_message: {
-                id: 'msg1',
-                conversation_id: 'conv1',
-                sender_id: 'user1',
-                content: 'Looking forward to meeting your family',
-                created_at: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
-                is_read: true
-              },
-              profile: {
-                first_name: 'Sara',
-                last_name: 'Ahmed'
-              },
-              wali_supervised: true,
-              supervision: {
-                id: 'session1',
-                conversation_id: 'conv1',
-                wali_id: 'mock-wali-id',
-                started_at: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-                is_active: true,
-                supervision_level: 'passive'
-              }
-            },
-            {
-              id: 'conv2',
-              created_at: new Date(Date.now() - 1000 * 60 * 60 * 24 * 5).toISOString(),
-              participants: ['user3', 'user2'],
-              last_message: {
-                id: 'msg2',
-                conversation_id: 'conv2',
-                sender_id: 'user3',
-                content: 'I respect your family values',
-                created_at: new Date(Date.now() - 1000 * 60 * 30).toISOString(),
-                is_read: false
-              },
-              profile: {
-                first_name: 'Yusuf',
-                last_name: 'Ali'
-              },
-              wali_supervised: true
-            }
-          ]);
-          
-          // Mock flagged content
-          setFlaggedContent([
-            {
-              id: 'flag1',
-              content_id: 'msg10',
-              content_type: 'message',
-              flag_type: 'religious_violation',
-              severity: 'high',
-              flagged_by: 'system',
-              created_at: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-              resolved: false
-            },
-            {
-              id: 'flag2',
-              content_id: 'msg11',
-              content_type: 'message',
-              flag_type: 'inappropriate',
-              severity: 'medium',
-              flagged_by: 'system',
-              created_at: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
-              resolved: false
-            },
-            {
-              id: 'flag3',
-              content_id: 'msg12',
-              content_type: 'message',
-              flag_type: 'suspicious',
-              severity: 'low',
-              flagged_by: 'user',
-              created_at: new Date(Date.now() - 1000 * 60 * 60 * 20).toISOString(),
-              resolved: true,
-              resolved_by: 'admin1',
-              resolved_at: new Date(Date.now() - 1000 * 60 * 60 * 10).toISOString()
-            }
-          ]);
-        } else {
-          // Fetch actual data from supabase
-          const { data, error } = await supabase
-            .from('wali_profiles')
-            .select('*')
-            .eq('user_id', session.user.id)
-            .single();
-          
-          if (error) {
-            setError(`Error fetching Wali profile: ${error.message}`);
-          } else if (data) {
-            setWaliProfile(data as WaliProfile);
-            // Fetch actual statistics, chat requests, conversations, and flagged content
-            // ... (additional database fetches would go here)
+        // Fetch wali profile for the current user
+        const { data: profileData, error: profileError } = await supabase
+          .from('wali_profiles')
+          .select('*')
+          .eq('user_id', userId)
+          .single();
+
+        if (profileError) {
+          if (profileError.code === 'PGRST116') {
+            // Profile not found
+            setWaliProfile(null);
           } else {
-            setError('No Wali profile found for this user');
+            throw profileError;
           }
+        } else if (profileData) {
+          setWaliProfile(profileData as WaliProfile);
         }
+
+        // Fetch pending chat requests
+        const { data: requestsData, error: requestsError } = await supabase
+          .from('chat_requests')
+          .select(`
+            *,
+            requester_profile:profiles!chat_requests_requester_id_fkey(
+              first_name,
+              last_name,
+              profile_image
+            )
+          `)
+          .eq('wali_id', userId);
+
+        if (requestsError) throw requestsError;
+        setChatRequests(requestsData || []);
+
+        // Fetch active conversations
+        const { data: conversationsData, error: conversationsError } = await supabase
+          .from('conversations')
+          .select(`
+            *,
+            supervision_sessions!inner(
+              id,
+              wali_id,
+              started_at,
+              ended_at,
+              is_active
+            ),
+            messages(count)
+          `)
+          .eq('supervision_sessions.wali_id', userId)
+          .eq('supervision_sessions.is_active', true);
+
+        if (conversationsError) throw conversationsError;
+        setActiveConversations(conversationsData || []);
+
+        // Fetch flagged content
+        const { data: flaggedData, error: flaggedError } = await supabase
+          .from('content_flags')
+          .select('*')
+          .eq('resolved', false)
+          .order('created_at', { ascending: false });
+
+        if (flaggedError) throw flaggedError;
+        setFlaggedContent(flaggedData || []);
+
+        // Update statistics
+        setStatistics({
+          pendingRequests: chatRequests.filter(r => r.status === 'pending').length,
+          activeConversations: activeConversations.length,
+          flaggedMessages: flaggedContent.length,
+          totalSupervised: profileData?.managed_users?.length || 0
+        });
+
       } catch (err: any) {
-        setError(err.message);
+        console.error('Error fetching wali dashboard data:', err);
+        setError(err.message || 'Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
     };
-    
-    fetchWaliProfile();
-  }, []);
-  
+
+    fetchData();
+  }, [userId, toast]);
+
+  // Update availability status
   const updateAvailability = async (status: WaliProfile['availability_status']) => {
+    if (!userId || !waliProfile) {
+      toast({
+        title: "Error",
+        description: "Unable to update status: Wali profile not loaded",
+        variant: "destructive"
+      });
+      return false;
+    }
+
     try {
-      if (waliProfile) {
-        // In a real app, update the database
-        // For mock implementation, just update the state
-        setWaliProfile(prev => prev ? {...prev, availability_status: status} : null);
-        
-        toast({
-          title: "Status Updated",
-          description: `Your availability is now set to ${status}`,
-        });
-      }
+      const { error } = await supabase
+        .from('wali_profiles')
+        .update({ 
+          availability_status: status,
+          last_active: new Date().toISOString()
+        })
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      // Update local state
+      setWaliProfile({
+        ...waliProfile,
+        availability_status: status,
+        last_active: new Date().toISOString()
+      });
+
+      toast({
+        title: "Status Updated",
+        description: `Your status is now ${status}`,
+      });
+
+      return true;
     } catch (err: any) {
       toast({
         title: "Error",
-        description: err.message,
+        description: err.message || "Failed to update status",
         variant: "destructive"
       });
+      return false;
     }
   };
-  
+
+  // Handle chat request (approve/reject)
   const handleChatRequest = async (requestId: string, status: 'approved' | 'rejected') => {
+    if (!userId) return false;
+
     try {
-      // In a real app, update the database
-      // For mock implementation, just update the state
+      const { error } = await supabase
+        .from('chat_requests')
+        .update({ 
+          status,
+          reviewed_at: new Date().toISOString()
+        })
+        .eq('id', requestId);
+
+      if (error) throw error;
+
+      // Update local state
       setChatRequests(prev => 
         prev.map(req => 
-          req.id === requestId 
-            ? {...req, status, reviewed_at: new Date().toISOString()} 
-            : req
+          req.id === requestId ? { ...req, status, reviewed_at: new Date().toISOString() } : req
         )
       );
-      
-      // Update statistics
-      setStatistics(prev => ({
-        ...prev,
-        pendingRequests: prev.pendingRequests - 1
-      }));
-      
+
+      // If approved, create the conversation
+      if (status === 'approved') {
+        const request = chatRequests.find(r => r.id === requestId);
+        
+        if (request) {
+          // Check if conversation already exists
+          const { data: existingConversation } = await supabase
+            .from('conversations')
+            .select('id')
+            .contains('participants', [request.requester_id, request.recipient_id])
+            .maybeSingle();
+
+          if (!existingConversation) {
+            // Create a new conversation
+            const { data: newConversation, error: conversationError } = await supabase
+              .from('conversations')
+              .insert({
+                participants: [request.requester_id, request.recipient_id],
+                created_at: new Date().toISOString(),
+                wali_supervised: true
+              })
+              .select('id')
+              .single();
+
+            if (conversationError) throw conversationError;
+
+            // Create a system message
+            if (newConversation) {
+              await supabase
+                .from('messages')
+                .insert({
+                  conversation_id: newConversation.id,
+                  sender_id: 'system',
+                  content: 'Conversation approved by wali',
+                  created_at: new Date().toISOString(),
+                  is_read: true,
+                  is_wali_visible: true
+                });
+            }
+          }
+        }
+      }
+
       toast({
-        title: `Request ${status === 'approved' ? 'Approved' : 'Rejected'}`,
-        description: `Chat request has been ${status}`,
+        title: status === 'approved' ? "Request Approved" : "Request Rejected",
+        description: status === 'approved' 
+          ? "The conversation request has been approved" 
+          : "The conversation request has been rejected",
       });
+
+      return true;
     } catch (err: any) {
       toast({
         title: "Error",
-        description: err.message,
+        description: err.message || "Failed to process request",
         variant: "destructive"
       });
+      return false;
     }
   };
-  
-  const addWaliNote = async (requestId: string, note: string) => {
+
+  // Start supervision session
+  const startSupervision = async (conversationId: string) => {
+    if (!userId) return false;
+
     try {
-      // In a real app, update the database
-      // For mock implementation, just update the state
+      // Check if there's already an active session
+      const { data: existingSession } = await supabase
+        .from('supervision_sessions')
+        .select('id')
+        .eq('conversation_id', conversationId)
+        .eq('wali_id', userId)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (existingSession) {
+        toast({
+          title: "Already Supervising",
+          description: "You are already supervising this conversation",
+        });
+        return true;
+      }
+
+      // Create a new supervision session
+      const { error } = await supabase
+        .from('supervision_sessions')
+        .insert({
+          conversation_id: conversationId,
+          wali_id: userId,
+          started_at: new Date().toISOString(),
+          is_active: true,
+          supervision_level: 'passive'
+        });
+
+      if (error) throw error;
+
+      // Create a system message visible only to wali
+      await supabase
+        .from('messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_id: 'system',
+          content: 'Wali supervision started',
+          created_at: new Date().toISOString(),
+          is_read: false,
+          is_wali_visible: true
+        });
+
+      toast({
+        title: "Supervision Started",
+        description: "You are now supervising this conversation",
+      });
+
+      return true;
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Failed to start supervision",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
+  // End supervision session
+  const endSupervision = async (sessionId: string) => {
+    if (!userId) return false;
+
+    try {
+      const { data, error } = await supabase
+        .from('supervision_sessions')
+        .update({ 
+          is_active: false,
+          ended_at: new Date().toISOString()
+        })
+        .eq('id', sessionId)
+        .eq('wali_id', userId)
+        .select('conversation_id')
+        .single();
+
+      if (error) throw error;
+
+      // Create a system message visible only to wali
+      if (data) {
+        await supabase
+          .from('messages')
+          .insert({
+            conversation_id: data.conversation_id,
+            sender_id: 'system',
+            content: 'Wali supervision ended',
+            created_at: new Date().toISOString(),
+            is_read: false,
+            is_wali_visible: true
+          });
+      }
+
+      toast({
+        title: "Supervision Ended",
+        description: "You are no longer supervising this conversation",
+      });
+
+      return true;
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message || "Failed to end supervision",
+        variant: "destructive"
+      });
+      return false;
+    }
+  };
+
+  // Add wali note to a chat request
+  const addWaliNote = async (requestId: string, note: string) => {
+    if (!userId || !note.trim()) return false;
+
+    try {
+      const { error } = await supabase
+        .from('chat_requests')
+        .update({ wali_notes: note })
+        .eq('id', requestId);
+
+      if (error) throw error;
+
+      // Update local state
       setChatRequests(prev => 
         prev.map(req => 
-          req.id === requestId 
-            ? {...req, wali_notes: note} 
-            : req
+          req.id === requestId ? { ...req, wali_notes: note } : req
         )
       );
-      
+
       toast({
         title: "Note Added",
         description: "Your note has been saved",
       });
+
+      return true;
     } catch (err: any) {
       toast({
         title: "Error",
-        description: err.message,
+        description: err.message || "Failed to add note",
         variant: "destructive"
       });
+      return false;
     }
   };
-  
-  const startSupervision = async (conversationId: string, level: SupervisionSession['supervision_level']) => {
-    try {
-      // In a real app, insert into database
-      // For mock implementation, just update the state
-      const newSession: SupervisionSession = {
-        id: `session-${Date.now()}`,
-        conversation_id: conversationId,
-        wali_id: waliProfile?.id || 'mock-wali-id',
-        started_at: new Date().toISOString(),
-        is_active: true,
-        supervision_level: level
-      };
-      
-      setActiveConversations(prev => 
-        prev.map(conv => 
-          conv.id === conversationId 
-            ? {...conv, supervision: newSession} 
-            : conv
-        )
-      );
-      
-      toast({
-        title: "Supervision Started",
-        description: `You are now supervising this conversation at ${level} level`,
-      });
-    } catch (err: any) {
-      toast({
-        title: "Error",
-        description: err.message,
-        variant: "destructive"
-      });
-    }
-  };
-  
-  const endSupervision = async (sessionId: string) => {
-    try {
-      // In a real app, update the database
-      // For mock implementation, just update the state
-      setActiveConversations(prev => 
-        prev.map(conv => 
-          conv.supervision?.id === sessionId 
-            ? {...conv, supervision: {...conv.supervision, is_active: false, ended_at: new Date().toISOString()}} 
-            : conv
-        )
-      );
-      
-      toast({
-        title: "Supervision Ended",
-        description: "You have ended supervision for this conversation",
-      });
-    } catch (err: any) {
-      toast({
-        title: "Error",
-        description: err.message,
-        variant: "destructive"
-      });
-    }
-  };
-  
+
   return {
     waliProfile,
     statistics,
@@ -366,11 +433,11 @@ export const useWaliDashboard = () => {
     activeConversations,
     flaggedContent,
     loading,
-    error,
     updateAvailability,
     handleChatRequest,
     startSupervision,
     endSupervision,
-    addWaliNote
+    addWaliNote,
+    error
   };
 };

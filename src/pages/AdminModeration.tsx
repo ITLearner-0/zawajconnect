@@ -8,19 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { getModerationStats } from '@/services/contentModerationService';
-
-// Function to check if the content_reports table exists
-const checkContentReportsTable = async () => {
-  const { data, error } = await supabase.rpc('table_exists', { table_name: 'content_reports' });
-  return data || false;
-};
-
-// Function to check if the content_flags table exists
-const checkContentFlagsTable = async () => {
-  const { data, error } = await supabase.rpc('table_exists', { table_name: 'content_flags' });
-  return data || false;
-};
+import { 
+  getModerationStats, 
+  resolveContentReport, 
+  resolveContentFlag,
+  tableExists 
+} from '@/services/contentModerationService';
+import { executeSql, setupModerationTables, updateProfileSchema } from '@/utils/databaseUtils';
 
 const AdminModeration = () => {
   const { toast } = useToast();
@@ -48,16 +42,25 @@ const AdminModeration = () => {
         return;
       }
 
+      // Ensure database schema is up to date
+      await setupModerationTables();
+      await updateProfileSchema();
+      
       // Check if user has admin role
       try {
-        const { data: profile, error } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', session.user.id)
-          .single();
-
-        if (error || !profile || profile.role !== 'admin') {
+        const { data, error } = await executeSql(`
+          SELECT role FROM profiles WHERE id = '${session.user.id}'
+        `);
+        
+        const role = data?.[0]?.role;
+        
+        if (error || !role || role !== 'admin') {
           // Redirect to home if not admin
+          toast({
+            title: "Access Denied",
+            description: "You don't have permission to access this area",
+            variant: "destructive"
+          });
           window.location.href = '/';
           return;
         }
@@ -68,8 +71,8 @@ const AdminModeration = () => {
       }
       
       // Check if moderation tables exist
-      const reportsTableExists = await checkContentReportsTable();
-      const flagsTableExists = await checkContentFlagsTable();
+      const reportsTableExists = await tableExists('content_reports');
+      const flagsTableExists = await tableExists('content_flags');
       
       setTablesExist({
         contentReports: reportsTableExists,
@@ -82,7 +85,7 @@ const AdminModeration = () => {
         setLoading(false);
         toast({
           title: "Database Setup Required",
-          description: "Moderation tables have not been created yet",
+          description: "Moderation tables have been created. Refresh to start using them.",
           variant: "destructive"
         });
       }
@@ -95,13 +98,14 @@ const AdminModeration = () => {
         // Get reports if table exists
         if (tablesExist.contentReports) {
           try {
-            const { data: reportsData, error: reportsError } = await supabase
-              .from('content_reports')
-              .select('*')
-              .order('created_at', { ascending: false });
-
-            if (reportsError) throw reportsError;
-            setReports(reportsData as unknown as ContentReport[]);
+            const data = await executeSql(`
+              SELECT * FROM content_reports 
+              ORDER BY created_at DESC
+            `);
+            
+            if (data) {
+              setReports(data as unknown as ContentReport[]);
+            }
           } catch (error) {
             console.error("Error fetching reports:", error);
           }
@@ -110,14 +114,15 @@ const AdminModeration = () => {
         // Get flags if table exists
         if (tablesExist.contentFlags) {
           try {
-            const { data: flagsData, error: flagsError } = await supabase
-              .from('content_flags')
-              .select('*')
-              .eq('resolved', false)
-              .order('created_at', { ascending: false });
-
-            if (flagsError) throw flagsError;
-            setFlags(flagsData as unknown as ContentFlag[]);
+            const data = await executeSql(`
+              SELECT * FROM content_flags 
+              WHERE resolved = false 
+              ORDER BY created_at DESC
+            `);
+            
+            if (data) {
+              setFlags(data as unknown as ContentFlag[]);
+            }
           } catch (error) {
             console.error("Error fetching flags:", error);
           }
@@ -160,16 +165,11 @@ const AdminModeration = () => {
     }
     
     try {
-      const { error } = await supabase
-        .from('content_reports')
-        .update({
-          status: 'resolved',
-          resolution_action: action,
-          resolved_at: new Date().toISOString()
-        })
-        .eq('id', reportId);
+      const success = await resolveContentReport(reportId, action);
 
-      if (error) throw error;
+      if (!success) {
+        throw new Error("Failed to resolve report");
+      }
 
       // Update local state
       setReports(reports.map(report => 
@@ -181,6 +181,15 @@ const AdminModeration = () => {
       toast({
         title: "Report Resolved",
         description: `Report has been resolved with action: ${action}`
+      });
+      
+      // Refresh stats
+      const statsData = await getModerationStats();
+      setStats({
+        pendingReports: statsData.pendingReports || 0,
+        flaggedContent: statsData.flaggedContent || 0,
+        totalProcessed: statsData.totalProcessed || 0,
+        resolvedToday: statsData.resolvedToday || 0
       });
     } catch (error: any) {
       toast({
@@ -202,15 +211,17 @@ const AdminModeration = () => {
     }
     
     try {
-      const { error } = await supabase
-        .from('content_flags')
-        .update({
-          resolved: true,
-          resolved_at: new Date().toISOString()
-        })
-        .eq('id', flagId);
+      // Get current user ID for resolved_by field
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("No active session");
+      }
+      
+      const success = await resolveContentFlag(flagId, session.user.id);
 
-      if (error) throw error;
+      if (!success) {
+        throw new Error("Failed to resolve flag");
+      }
 
       // Update local state
       setFlags(flags.filter(flag => flag.id !== flagId));
@@ -218,6 +229,15 @@ const AdminModeration = () => {
       toast({
         title: "Flag Resolved",
         description: "Content flag has been marked as resolved"
+      });
+      
+      // Refresh stats
+      const statsData = await getModerationStats();
+      setStats({
+        pendingReports: statsData.pendingReports || 0,
+        flaggedContent: statsData.flaggedContent || 0,
+        totalProcessed: statsData.totalProcessed || 0,
+        resolvedToday: statsData.resolvedToday || 0
       });
     } catch (error: any) {
       toast({

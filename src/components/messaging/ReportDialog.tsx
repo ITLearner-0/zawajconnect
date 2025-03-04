@@ -51,7 +51,7 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
     setIsSubmitting(true);
 
     try {
-      const report = {
+      const report: Partial<ContentReport> = {
         reported_user_id: userId,
         reporting_user_id: currentUserId,
         report_type: reportType,
@@ -83,6 +83,11 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
     }
   };
 
+  // Helper function to handle type-safe state setting
+  const handleReportTypeChange = (value: string) => {
+    setReportType(value as ContentReport['report_type']);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
@@ -96,7 +101,7 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label>Report Type</Label>
-            <RadioGroup value={reportType} onValueChange={setReportType} className="space-y-1">
+            <RadioGroup value={reportType} onValueChange={handleReportTypeChange} className="space-y-1">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="inappropriate_message" id="inappropriate_message" />
                 <Label htmlFor="inappropriate_message">Inappropriate Message</Label>
