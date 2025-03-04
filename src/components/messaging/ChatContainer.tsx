@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, Shield } from 'lucide-react';
 import { Button } from '../ui/button';
-import { MonitoringReport } from '@/services/aiMonitoringService';
+import { MonitoringReport } from '@/services/monitoring';  // Updated import path
 import AIMonitoringDashboard from './AIMonitoringDashboard';
 
 interface ChatContainerProps {
