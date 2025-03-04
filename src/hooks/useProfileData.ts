@@ -31,6 +31,9 @@ export const useProfileData = (): UseProfileDataResult => {
     familyBackground: "",
     aboutMe: "",
     prayerFrequency: "five-daily",
+    waliName: "",
+    waliRelationship: "",
+    waliContact: "",
   });
 
   useEffect(() => {
@@ -68,6 +71,9 @@ export const useProfileData = (): UseProfileDataResult => {
           familyBackground: "",
           aboutMe: profile.about_me || "",
           prayerFrequency: profile.prayer_frequency || "five-daily",
+          waliName: profile.wali_name || "",
+          waliRelationship: profile.wali_relationship || "",
+          waliContact: profile.wali_contact || "",
         });
         
         // Determine verification status based on is_verified field and verification_document_url

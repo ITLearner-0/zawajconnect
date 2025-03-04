@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import CustomButton from "@/components/CustomButton";
 import { useProfile } from "@/hooks/useProfile";
@@ -7,6 +6,7 @@ import EducationCareer from "@/components/profile/EducationCareer";
 import ReligiousBackground from "@/components/profile/ReligiousBackground";
 import AboutMe from "@/components/profile/AboutMe";
 import VerificationPanel from "@/components/profile/VerificationPanel";
+import WaliInformation from "@/components/profile/WaliInformation";
 import { useNavigate } from "react-router-dom";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import OnboardingWrapper from "@/components/onboarding/OnboardingWrapper";
@@ -37,7 +37,6 @@ const Profile = () => {
     canProceedCurrentStep
   } = useOnboarding(formData, isNewUser);
 
-  // Render different step components based on current step
   const renderCurrentStepContent = () => {
     switch (currentStep) {
       case 0:
@@ -48,12 +47,14 @@ const Profile = () => {
         return <ReligiousBackground formData={formData} handleChange={handleChange} />;
       case 3:
         return <AboutMe formData={formData} handleChange={handleChange} />;
+      case 4:
+        return formData.gender === "female" ? 
+          <WaliInformation formData={formData} handleChange={handleChange} showRequired={true} /> : null;
       default:
         return null;
     }
   };
 
-  // Onboarding mode
   if (isOnboarding) {
     return (
       <AccessibilityProvider>
@@ -74,7 +75,6 @@ const Profile = () => {
     );
   }
 
-  // Regular profile edit mode
   return (
     <AccessibilityProvider>
       <div className="min-h-screen bg-gradient-to-b from-accent/50 to-background py-12" role="main" aria-labelledby="profile-heading">
@@ -120,6 +120,16 @@ const Profile = () => {
                   <div role="region" aria-labelledby="about-me-heading">
                     <AboutMe formData={formData} handleChange={handleChange} />
                   </div>
+                  
+                  {formData.gender === "female" && (
+                    <div role="region" aria-labelledby="wali-heading">
+                      <WaliInformation 
+                        formData={formData} 
+                        handleChange={handleChange}
+                        showRequired={true} 
+                      />
+                    </div>
+                  )}
                   
                   {/* Verification Panel */}
                   <div role="region" aria-labelledby="verification-heading">

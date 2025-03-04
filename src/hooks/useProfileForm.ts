@@ -46,6 +46,17 @@ export const useProfileForm = ({ initialFormData, initialVerificationStatus }: U
       return;
     }
 
+    // Check if wali information is provided for female users
+    if (formData.gender === "female" && (!formData.waliName || !formData.waliRelationship || !formData.waliContact)) {
+      toast({
+        title: "Wali Information Required",
+        description: "As a female user, you must provide complete wali information.",
+        variant: "destructive",
+        duration: 5000,
+      });
+      return;
+    }
+
     const [firstName, ...lastNameParts] = formData.fullName.split(" ");
     const lastName = lastNameParts.join(" ");
 
@@ -61,6 +72,9 @@ export const useProfileForm = ({ initialFormData, initialVerificationStatus }: U
       prayer_frequency: formData.prayerFrequency,
       about_me: formData.aboutMe,
       birth_date: formData.age ? new Date(new Date().getFullYear() - parseInt(formData.age), 0, 1).toISOString() : null,
+      wali_name: formData.waliName || null,
+      wali_relationship: formData.waliRelationship || null,
+      wali_contact: formData.waliContact || null,
     };
 
     console.log("Attempting to save profile with data:", profileData);

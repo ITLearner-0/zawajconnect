@@ -10,6 +10,9 @@ export interface ProfileFormData {
   familyBackground: string;
   aboutMe: string;
   prayerFrequency: string;
+  waliName?: string;
+  waliRelationship?: string;
+  waliContact?: string;
 }
 
 export interface DatabaseProfile {
@@ -27,6 +30,10 @@ export interface DatabaseProfile {
   email_verified: boolean;
   phone_verified: boolean;
   id_verified: boolean;
+  wali_name: string | null;
+  wali_relationship: string | null;
+  wali_contact: string | null;
+  wali_verified: boolean;
 }
 
 export interface VerificationStatus {

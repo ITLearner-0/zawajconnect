@@ -7,14 +7,25 @@ import CustomButton from "@/components/CustomButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [gender, setGender] = useState("");
+  const [showWaliFields, setShowWaliFields] = useState(false);
+  const [waliName, setWaliName] = useState("");
+  const [waliRelationship, setWaliRelationship] = useState("");
+  const [waliContact, setWaliContact] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleGenderChange = (value: string) => {
+    setGender(value);
+    setShowWaliFields(value === "female");
+  };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,11 +33,48 @@ const Auth = () => {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        // For registration, validate wali information for female users
+        if (gender === "female" && (!waliName || !waliRelationship || !waliContact)) {
+          toast({
+            title: "Wali Information Required",
+            description: "As a female user, you must provide complete wali information.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
         });
+
         if (error) throw error;
+
+        // If registration successful and user provides gender info, save to profile
+        if (data.user) {
+          const profileData: any = {
+            id: data.user.id,
+            gender: gender || null,
+          };
+
+          // Add wali information for female users
+          if (gender === "female") {
+            profileData.wali_name = waliName;
+            profileData.wali_relationship = waliRelationship;
+            profileData.wali_contact = waliContact;
+          }
+
+          // Create initial profile
+          const { error: profileError } = await supabase
+            .from("profiles")
+            .upsert(profileData);
+
+          if (profileError) {
+            console.error("Error creating initial profile:", profileError);
+          }
+        }
+
         toast({
           title: "Success!",
           description: "Please check your email to verify your account.",
@@ -88,6 +136,77 @@ const Auth = () => {
                   required
                 />
               </div>
+
+              {isSignUp && (
+                <div className="space-y-2">
+                  <Label htmlFor="gender">Gender</Label>
+                  <Select 
+                    value={gender} 
+                    onValueChange={handleGenderChange}
+                  >
+                    <SelectTrigger id="gender">
+                      <SelectValue placeholder="Select your gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {isSignUp && showWaliFields && (
+                <div className="space-y-4 border border-primary/20 rounded-md p-4 bg-primary/5 mt-4">
+                  <div className="text-sm">
+                    <h3 className="font-medium mb-2">Wali Information</h3>
+                    <p className="text-gray-600 mb-4">
+                      As a female user, you are required to provide your wali (guardian) information.
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="waliName">Wali Name <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="waliName"
+                      placeholder="Enter your wali's full name"
+                      value={waliName}
+                      onChange={(e) => setWaliName(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="waliRelationship">Relationship <span className="text-red-500">*</span></Label>
+                    <Select 
+                      value={waliRelationship} 
+                      onValueChange={setWaliRelationship}
+                    >
+                      <SelectTrigger id="waliRelationship">
+                        <SelectValue placeholder="Select relationship" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="father">Father</SelectItem>
+                        <SelectItem value="brother">Brother</SelectItem>
+                        <SelectItem value="uncle">Uncle</SelectItem>
+                        <SelectItem value="grandfather">Grandfather</SelectItem>
+                        <SelectItem value="other">Other Male Relative</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="waliContact">Wali Contact <span className="text-red-500">*</span></Label>
+                    <Input
+                      id="waliContact"
+                      placeholder="Enter your wali's contact number"
+                      value={waliContact}
+                      onChange={(e) => setWaliContact(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
               <CustomButton
                 type="submit"
                 className="w-full"

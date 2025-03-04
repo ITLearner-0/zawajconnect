@@ -104,6 +104,10 @@ export type Database = {
           religious_practice_level: string
           updated_at: string | null
           verification_document_url: string | null
+          wali_contact: string | null
+          wali_name: string | null
+          wali_relationship: string | null
+          wali_verified: boolean | null
         }
         Insert: {
           about_me?: string | null
@@ -130,6 +134,10 @@ export type Database = {
           religious_practice_level: string
           updated_at?: string | null
           verification_document_url?: string | null
+          wali_contact?: string | null
+          wali_name?: string | null
+          wali_relationship?: string | null
+          wali_verified?: boolean | null
         }
         Update: {
           about_me?: string | null
@@ -156,6 +164,10 @@ export type Database = {
           religious_practice_level?: string
           updated_at?: string | null
           verification_document_url?: string | null
+          wali_contact?: string | null
+          wali_name?: string | null
+          wali_relationship?: string | null
+          wali_verified?: boolean | null
         }
         Relationships: []
       }
