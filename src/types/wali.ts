@@ -30,6 +30,7 @@ export interface ChatRequest {
   requested_at: string;
   reviewed_at?: string;
   wali_notes?: string;
+  message?: string;
   requester_profile?: {
     first_name: string;
     last_name: string;
@@ -82,4 +83,4 @@ export interface WaliAction {
   notes?: string;
 }
 
-export interface { Message }; // Re-export Message type from profile
+export type { Message };
