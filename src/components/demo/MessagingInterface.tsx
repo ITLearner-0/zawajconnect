@@ -49,6 +49,18 @@ const MessagingInterface = ({
   retentionPolicy,
   updateRetentionPolicy
 }: MessagingInterfaceProps) => {
+  // Function to handle returning to conversation list
+  const handleBackToList = () => {
+    // We need to pass an object with the correct conversation shape but with empty ID
+    const emptyConversation: Conversation = {
+      id: '',
+      created_at: new Date().toISOString(),
+      participants: [],
+      wali_supervised: false
+    };
+    selectConversation(emptyConversation);
+  };
+
   return (
     <div className="h-[600px] border rounded-lg overflow-hidden">
       <MessagesContainer
@@ -87,7 +99,7 @@ const MessagingInterface = ({
                   startVideoCall(otherUserId);
                 }
               }}
-              backToList={() => selectConversation({ ...currentConversation, id: '' })}
+              backToList={handleBackToList}
               isWaliSupervised={currentConversation.wali_supervised}
               monitoringEnabled={monitoringEnabled}
               toggleMonitoring={toggleMonitoring}

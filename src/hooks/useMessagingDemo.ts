@@ -1,7 +1,8 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { dummyProfiles, dummyConversations, dummyMessages } from '@/data/dummyData';
-import { VideoCallStatus, Message, Conversation, RetentionPolicy } from '@/types/profile';
+import { VideoCallStatus, Message, Conversation, RetentionPolicy, DatabaseProfile } from '@/types/profile';
+import { toast } from 'sonner';
 
 export const useMessagingDemo = () => {
   // State for current user and selected conversation
@@ -46,13 +47,22 @@ export const useMessagingDemo = () => {
   }, [selectedConversationId, conversations]);
   
   // Select a conversation
-  const selectConversation = (conversation: Conversation) => {
-    setSelectedConversationId(conversation.id);
-  };
+  const selectConversation = useCallback((conversation: Conversation) => {
+    if (!conversation) {
+      console.error('No conversation provided to selectConversation');
+      return;
+    }
+    setSelectedConversationId(conversation.id || undefined);
+  }, []);
   
   // Send a message
-  const sendMessage = () => {
-    if (!messageInput.trim() || !currentConversation) return;
+  const sendMessage = useCallback(() => {
+    if (!messageInput.trim() || !currentConversation) {
+      if (!messageInput.trim()) {
+        toast.error('Cannot send empty message');
+      }
+      return;
+    }
     
     setSendingMessage(true);
     
@@ -84,11 +94,14 @@ export const useMessagingDemo = () => {
       // Clear input
       setMessageInput('');
       setSendingMessage(false);
+      
+      // Show success toast
+      toast.success('Message sent successfully');
     }, 800);
-  };
+  }, [messageInput, currentConversation, currentUserId, encryptionEnabled]);
   
   // Video call functions
-  const startVideoCall = (participantId: string) => {
+  const startVideoCall = useCallback((participantId: string) => {
     // Get other participant gender to determine wali presence
     const participant = dummyProfiles.find(p => p.id === participantId);
     const waliPresent = participant?.gender === 'Female';
@@ -99,24 +112,30 @@ export const useMessagingDemo = () => {
       waliPresent,
       startTime: new Date()
     });
-  };
+    
+    toast.info('Video call started');
+  }, []);
   
-  const endVideoCall = () => {
+  const endVideoCall = useCallback(() => {
     setVideoCallStatus({
       isActive: false,
       waliPresent: false
     });
-  };
+    
+    toast.info('Video call ended');
+  }, []);
   
   // Toggle encryption
-  const toggleEncryption = (enabled: boolean) => {
+  const toggleEncryption = useCallback((enabled: boolean) => {
     setEncryptionEnabled(enabled);
-  };
+    toast.info(`End-to-end encryption ${enabled ? 'enabled' : 'disabled'}`);
+  }, []);
   
   // Update retention policy
-  const updateRetentionPolicy = (policy: RetentionPolicy) => {
+  const updateRetentionPolicy = useCallback((policy: RetentionPolicy) => {
     setRetentionPolicy(policy);
-  };
+    toast.info(`Message retention policy updated: ${policy.type === 'temporary' ? `${policy.duration_days} days` : 'permanent'}`);
+  }, []);
 
   return {
     currentUserId,
