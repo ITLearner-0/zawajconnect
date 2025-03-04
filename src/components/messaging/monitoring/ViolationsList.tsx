@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Violation } from '@/services/aiMonitoringService';
 import { AlertTriangle, Filter } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
+import ViolationItem from './ViolationItem';
 
 interface ViolationsListProps {
   violations: Violation[];
@@ -14,19 +15,6 @@ const ViolationsList: React.FC<ViolationsListProps> = ({ violations }) => {
   const filteredViolations = violations.filter(violation => 
     filter === 'all' || violation.type === filter
   );
-
-  const getSeverityColor = (severity: 'low' | 'medium' | 'high') => {
-    switch (severity) {
-      case 'low':
-        return 'bg-amber-100 text-amber-800';
-      case 'medium':
-        return 'bg-orange-100 text-orange-800';
-      case 'high':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
 
   return (
     <>
@@ -52,21 +40,7 @@ const ViolationsList: React.FC<ViolationsListProps> = ({ violations }) => {
       <div className="space-y-2 max-h-[250px] overflow-y-auto">
         {filteredViolations.length > 0 ? (
           filteredViolations.map((violation, index) => (
-            <div key={index} className="border rounded-md p-3">
-              <div className="flex justify-between items-start">
-                <div className="flex items-center">
-                  <AlertTriangle className="h-4 w-4 text-amber-500 mr-2" />
-                  <span className="font-medium">{violation.message}</span>
-                </div>
-                <Badge className={getSeverityColor(violation.severity)}>
-                  {violation.severity}
-                </Badge>
-              </div>
-              <div className="mt-2 text-xs text-gray-500 flex justify-between">
-                <span className="capitalize">{violation.type} violation</span>
-                <span>{new Date(violation.timestamp).toLocaleString()}</span>
-              </div>
-            </div>
+            <ViolationItem key={index} violation={violation} />
           ))
         ) : (
           <div className="text-center py-6 text-gray-500">

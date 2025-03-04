@@ -38,8 +38,8 @@ export function analyzeBehavior(messages: Message[]): number {
   
   // Calculate time difference for rapid message detection
   const patternOfRapidMessages = messages.length > 10 && (
-    new Date(messages[messages.length - 1].created_at).getTime() - 
-    new Date(messages[messages.length - 10].created_at).getTime()
+    new Date(messages[messages.length - 1].created_at).valueOf() - 
+    new Date(messages[messages.length - 10].created_at).valueOf()
   ) < 60000; // 10 messages in less than a minute
   
   // Check for flagged words

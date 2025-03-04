@@ -1,7 +1,6 @@
 
 import { useState, useEffect } from 'react';
 import { Message } from '@/types/profile';
-import { supabase } from '@/integrations/supabase/client';
 import { 
   MonitoringReport, 
   Violation, 
@@ -57,8 +56,7 @@ export const useAIMonitoring = (
         const report = generateReport(messages);
         setLatestReport(report);
         
-        // Save report to database - instead of trying to insert into an undefined table,
-        // we'll just log the report for now
+        // Save report to database - just log for now since table doesn't exist
         if (userId) {
           console.log("Would save monitoring report:", {
             conversation_id: conversationId,
