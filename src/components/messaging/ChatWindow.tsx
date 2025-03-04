@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Conversation, Message, RetentionPolicy } from '@/types/profile';
 import ChatHeader from './ChatHeader';
@@ -6,7 +5,7 @@ import SecuritySettingsPanel from './SecuritySettingsPanel';
 import MessagesList from './MessagesList';
 import MessageInput from './MessageInput';
 import ReportDialog from './ReportDialog';
-import { MonitoringReport } from '@/services/aiMonitoringService';
+import { MonitoringReport } from '@/services/monitoring';
 
 interface ChatWindowProps {
   conversation: Conversation;

@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from 'react';
 import { Message } from '@/types/profile';
 import { 
   MonitoringReport, 
   generateReport 
-} from '@/services/aiMonitoringService';
+} from '@/services/monitoring';  // Updated import path
 import { supabase } from '@/integrations/supabase/client';
 
 export const useAIMonitoring = (conversationId: string | undefined) => {

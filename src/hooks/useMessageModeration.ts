@@ -6,7 +6,7 @@ import {
   Violation, 
   detectViolations, 
   generateReport 
-} from '@/services/aiMonitoringService';
+} from '@/services/monitoring';  // Updated import path
 import { useToast } from '@/hooks/use-toast';
 import { filterMessageContent, flagContent } from '@/services/moderation';
 

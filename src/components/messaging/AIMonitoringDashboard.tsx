@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { MonitoringReport } from '@/services/aiMonitoringService';
+import { MonitoringReport } from '@/services/monitoring';  // Updated import path
 import { X } from 'lucide-react';
 import MonitoringHeader from './monitoring/MonitoringHeader';
 import MonitoringFooter from './monitoring/MonitoringFooter';

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MonitoringReport } from '@/services/aiMonitoringService';
+import { MonitoringReport } from '@/services/monitoring';  // Updated import path
 import ViolationsList from './ViolationsList';
 import RecommendationsSection from './RecommendationsSection';
 import AnalysisSummary from './AnalysisSummary';

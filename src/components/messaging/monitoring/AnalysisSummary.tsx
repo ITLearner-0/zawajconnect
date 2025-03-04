@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MonitoringReport } from '@/services/aiMonitoringService';
+import { MonitoringReport } from '@/services/monitoring';  // Updated import path
 import { formatDistanceToNow } from 'date-fns';
 
 interface AnalysisSummaryProps {
