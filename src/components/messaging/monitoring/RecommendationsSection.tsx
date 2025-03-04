@@ -14,7 +14,7 @@ const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({ report 
     : getRecommendationsFromViolations(report);
   
   // Generate recommendations based on violations
-  function getRecommendationsFromViolations() {
+  function getRecommendationsFromViolations(report: MonitoringReport) {
     if (!report.violations || report.violations.length === 0) {
       return [];
     }
