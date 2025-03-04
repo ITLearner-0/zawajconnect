@@ -3,10 +3,9 @@ import { useEffect, useRef } from "react";
 import { Conversation, Message } from "@/types/profile";
 import { useProfileData } from "@/hooks/useProfileData";
 import { formatDistanceToNow } from "date-fns";
-import { ArrowLeft, Send, Video } from "lucide-react";
+import { ArrowLeft, Send, Video, Shield, Loader } from "lucide-react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
-import { Shield } from "lucide-react";
 
 interface ChatWindowProps {
   conversation: Conversation;
@@ -18,6 +17,9 @@ interface ChatWindowProps {
   onStartVideoCall: () => void;
   backToList: () => void;
   isWaliSupervised: boolean;
+  loading?: boolean;
+  sendingMessage?: boolean;
+  error?: string | null;
 }
 
 const ChatWindow = ({
@@ -29,7 +31,10 @@ const ChatWindow = ({
   sendMessage,
   onStartVideoCall,
   backToList,
-  isWaliSupervised
+  isWaliSupervised,
+  loading = false,
+  sendingMessage = false,
+  error = null
 }: ChatWindowProps) => {
   const { formData } = useProfileData();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -80,6 +85,7 @@ const ChatWindow = ({
           onClick={onStartVideoCall}
           title="Start video call"
           className="flex items-center"
+          disabled={loading}
         >
           <Video className="h-4 w-4 mr-1" />
           <span className="hidden sm:inline">Video Call</span>
@@ -87,8 +93,17 @@ const ChatWindow = ({
       </div>
       
       {/* Messages area */}
-      <div className="flex-grow overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 ? (
+      <div className="flex-grow overflow-y-auto p-4 space-y-4 relative">
+        {loading ? (
+          <div className="flex items-center justify-center h-full">
+            <Loader className="animate-spin mr-2" />
+            <p>Loading messages...</p>
+          </div>
+        ) : error ? (
+          <div className="flex items-center justify-center h-full text-red-500">
+            <p>Error: {error}</p>
+          </div>
+        ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full text-gray-500">
             <p>No messages yet. Start the conversation!</p>
           </div>
@@ -137,9 +152,19 @@ const ChatWindow = ({
           onChange={(e) => setMessageInput(e.target.value)}
           placeholder="Type a message..."
           className="flex-grow"
+          disabled={loading || sendingMessage}
         />
-        <Button type="submit" variant="default" size="icon">
-          <Send className="h-4 w-4" />
+        <Button 
+          type="submit" 
+          variant="default" 
+          size="icon"
+          disabled={loading || sendingMessage || !messageInput.trim()}
+        >
+          {sendingMessage ? (
+            <Loader className="h-4 w-4 animate-spin" />
+          ) : (
+            <Send className="h-4 w-4" />
+          )}
         </Button>
       </form>
     </div>

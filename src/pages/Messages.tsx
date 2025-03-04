@@ -5,6 +5,7 @@ import { useMessages } from '@/hooks/useMessages';
 import MessagesContainer from '@/components/messaging/MessagesContainer';
 import ChatWindow from '@/components/messaging/ChatWindow';
 import VideoCallManager from '@/components/messaging/VideoCallManager';
+import { Toaster } from '@/components/ui/toaster';
 
 const Messages = () => {
   const { conversationId } = useParams();
@@ -16,6 +17,8 @@ const Messages = () => {
     currentConversation,
     messages,
     loading,
+    sendingMessage,
+    errors,
     messageInput,
     setMessageInput,
     videoCallStatus,
@@ -49,6 +52,7 @@ const Messages = () => {
         conversationId={conversationId}
         currentConversation={currentConversation}
         onSelectConversation={selectConversation}
+        errors={errors}
       >
         {videoCallStatus.isActive ? (
           <VideoCallManager
@@ -65,6 +69,9 @@ const Messages = () => {
               messageInput={messageInput}
               setMessageInput={setMessageInput}
               sendMessage={sendMessage}
+              loading={loading}
+              sendingMessage={sendingMessage}
+              error={errors?.messages}
               onStartVideoCall={() => {
                 const otherUserId = currentConversation.participants.find(id => id !== userId);
                 if (otherUserId) {
@@ -77,6 +84,8 @@ const Messages = () => {
           )
         )}
       </MessagesContainer>
+      
+      <Toaster />
     </div>
   );
 };

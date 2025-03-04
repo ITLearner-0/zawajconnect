@@ -9,6 +9,7 @@ export const useConversations = (userId: string | null) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch all conversations for the current user
   useEffect(() => {
@@ -16,71 +17,88 @@ export const useConversations = (userId: string | null) => {
 
     const fetchConversations = async () => {
       setLoading(true);
+      setError(null);
       
-      const { data, error } = await supabase
-        .from('conversations')
-        .select(`
-          id,
-          created_at,
-          participants,
-          wali_supervised,
-          messages!messages(
+      try {
+        const { data, error } = await supabase
+          .from('conversations')
+          .select(`
             id,
-            content,
             created_at,
-            sender_id,
-            is_read
-          )
-        `)
-        .contains('participants', [userId])
-        .order('created_at', { ascending: false });
+            participants,
+            wali_supervised,
+            messages!messages(
+              id,
+              content,
+              created_at,
+              sender_id,
+              is_read
+            )
+          `)
+          .contains('participants', [userId])
+          .order('created_at', { ascending: false });
 
-      if (error) {
+        if (error) {
+          throw error;
+        }
+
+        // Process data to get conversations with last message
+        const processedConversations: Conversation[] = [];
+        
+        for (const conv of data || []) {
+          const otherParticipantId = conv.participants.find(p => p !== userId);
+          
+          // Get other participant's profile details
+          if (otherParticipantId) {
+            try {
+              const { data: profileData, error: profileError } = await supabase
+                .from('profiles')
+                .select('first_name, last_name')
+                .eq('id', otherParticipantId)
+                .single();
+              
+              if (profileError) {
+                throw profileError;
+              }
+              
+              // Find the last message
+              let lastMessage = null;
+              if (conv.messages && conv.messages.length > 0) {
+                const sortedMessages = [...conv.messages].sort(
+                  (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                );
+                lastMessage = sortedMessages[0];
+              }
+              
+              processedConversations.push({
+                id: conv.id,
+                created_at: conv.created_at,
+                participants: conv.participants,
+                last_message: lastMessage,
+                profile: profileData || undefined,
+                wali_supervised: conv.wali_supervised
+              });
+            } catch (profileError: any) {
+              toast({
+                title: "Error loading profile",
+                description: profileError.message,
+                variant: "destructive"
+              });
+            }
+          }
+        }
+        
+        setConversations(processedConversations);
+      } catch (err: any) {
+        setError(err.message);
         toast({
           title: "Error loading conversations",
-          description: error.message,
+          description: err.message,
           variant: "destructive"
         });
+      } finally {
         setLoading(false);
-        return;
       }
-
-      // Process data to get conversations with last message
-      const processedConversations: Conversation[] = [];
-      
-      for (const conv of data || []) {
-        const otherParticipantId = conv.participants.find(p => p !== userId);
-        
-        // Get other participant's profile details
-        if (otherParticipantId) {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('first_name, last_name')
-            .eq('id', otherParticipantId)
-            .single();
-          
-          // Find the last message
-          let lastMessage = null;
-          if (conv.messages && conv.messages.length > 0) {
-            const sortedMessages = [...conv.messages].sort(
-              (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-            );
-            lastMessage = sortedMessages[0];
-          }
-          
-          processedConversations.push({
-            id: conv.id,
-            created_at: conv.created_at,
-            participants: conv.participants,
-            last_message: lastMessage,
-            profile: profileData || undefined,
-            wali_supervised: conv.wali_supervised
-          });
-        }
-      }
-      
-      setConversations(processedConversations);
-      setLoading(false);
     };
 
     fetchConversations();
@@ -90,44 +108,58 @@ export const useConversations = (userId: string | null) => {
   const loadCurrentConversation = async (conversationId: string) => {
     if (!userId) return null;
     
-    // Get conversation details
-    const { data: convData, error: convError } = await supabase
-      .from('conversations')
-      .select('*')
-      .eq('id', conversationId)
-      .single();
+    setLoading(true);
+    setError(null);
+    
+    try {
+      // Get conversation details
+      const { data: convData, error: convError } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('id', conversationId)
+        .single();
 
-    if (convError) {
+      if (convError) {
+        throw convError;
+      }
+
+      // Set current conversation
+      const otherParticipantId = convData.participants.find(p => p !== userId);
+      if (otherParticipantId) {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', otherParticipantId)
+          .single();
+          
+        if (profileError) {
+          throw profileError;
+        }
+        
+        const conversation = {
+          id: convData.id,
+          created_at: convData.created_at,
+          participants: convData.participants,
+          profile: profileData || undefined,
+          wali_supervised: convData.wali_supervised
+        };
+        
+        setCurrentConversation(conversation);
+        return conversation;
+      }
+      
+      return null;
+    } catch (err: any) {
+      setError(err.message);
       toast({
         title: "Error loading conversation",
-        description: convError.message,
+        description: err.message,
         variant: "destructive"
       });
       return null;
+    } finally {
+      setLoading(false);
     }
-
-    // Set current conversation
-    const otherParticipantId = convData.participants.find(p => p !== userId);
-    if (otherParticipantId) {
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('first_name, last_name')
-        .eq('id', otherParticipantId)
-        .single();
-        
-      const conversation = {
-        id: convData.id,
-        created_at: convData.created_at,
-        participants: convData.participants,
-        profile: profileData || undefined,
-        wali_supervised: convData.wali_supervised
-      };
-      
-      setCurrentConversation(conversation);
-      return conversation;
-    }
-    
-    return null;
   };
 
   return {
@@ -135,6 +167,7 @@ export const useConversations = (userId: string | null) => {
     currentConversation,
     setCurrentConversation,
     loading,
+    error,
     loadCurrentConversation
   };
 };

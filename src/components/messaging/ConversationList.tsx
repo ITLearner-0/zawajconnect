@@ -2,19 +2,24 @@
 import { useState } from "react";
 import { Conversation } from "@/types/profile";
 import { formatDistanceToNow } from "date-fns";
-import { Search } from "lucide-react";
+import { Search, Loader } from "lucide-react";
 import { Input } from "../ui/input";
+import { Skeleton } from "../ui/skeleton";
 
 interface ConversationListProps {
   conversations: Conversation[];
   onSelectConversation: (conversation: Conversation) => void;
   selectedConversationId?: string;
+  loading?: boolean;
+  error?: string | null;
 }
 
 const ConversationList = ({ 
   conversations, 
   onSelectConversation,
-  selectedConversationId
+  selectedConversationId,
+  loading = false,
+  error = null
 }: ConversationListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   
@@ -35,13 +40,32 @@ const ConversationList = ({
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            disabled={loading}
           />
         </div>
       </div>
       
       {/* Conversations list */}
       <div className="overflow-y-auto flex-grow">
-        {filteredConversations.length === 0 ? (
+        {loading ? (
+          // Show skeleton loaders when loading
+          Array(5).fill(0).map((_, index) => (
+            <div key={index} className="p-3 border-b">
+              <div className="flex items-center space-x-3">
+                <Skeleton className="w-10 h-10 rounded-full" />
+                <div className="flex-1">
+                  <Skeleton className="h-4 w-3/4 mb-2" />
+                  <Skeleton className="h-3 w-1/2" />
+                </div>
+              </div>
+            </div>
+          ))
+        ) : error ? (
+          <div className="text-center p-6 text-red-500">
+            <p>Error loading conversations</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        ) : filteredConversations.length === 0 ? (
           <div className="text-center p-6 text-gray-500">
             <p>No conversations found</p>
             <p className="text-sm">Start a conversation from the Nearby page</p>

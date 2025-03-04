@@ -12,6 +12,7 @@ export const useMessages = (conversationId: string | undefined, userId: string |
     conversations, 
     currentConversation, 
     loading: conversationsLoading,
+    error: conversationsError,
     loadCurrentConversation
   } = useConversations(userId);
   
@@ -20,17 +21,27 @@ export const useMessages = (conversationId: string | undefined, userId: string |
     messageInput,
     setMessageInput,
     sendMessage: sendMessageBase,
-    loading: messagesLoading
+    loading: messagesLoading,
+    sendingMessage,
+    error: messagesError
   } = useMessageExchange(conversationId, userId);
   
   const {
     videoCallStatus,
     startVideoCall,
-    endVideoCall
+    endVideoCall,
+    error: videoCallError
   } = useVideoCall(userId, conversationId);
 
   // Loading state combines loading states from both hooks
   const loading = conversationsLoading || messagesLoading;
+  
+  // Combine errors
+  const errors = {
+    conversations: conversationsError,
+    messages: messagesError,
+    videoCall: videoCallError
+  };
 
   // Load current conversation if conversationId changes
   if (conversationId && !currentConversation) {
@@ -49,6 +60,8 @@ export const useMessages = (conversationId: string | undefined, userId: string |
     currentConversation,
     messages,
     loading,
+    sendingMessage,
+    errors,
     messageInput,
     setMessageInput,
     videoCallStatus,
