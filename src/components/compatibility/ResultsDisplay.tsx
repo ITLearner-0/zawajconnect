@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import CustomButton from "../CustomButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface ResultsDisplayProps {
   score: number;
@@ -12,6 +13,7 @@ interface ResultsDisplayProps {
 const ResultsDisplay = ({ score, onRetake }: ResultsDisplayProps) => {
   const [matchScores, setMatchScores] = useState<Array<{userId: string, score: number}>>([]);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMatches = async () => {
@@ -114,10 +116,16 @@ const ResultsDisplay = ({ score, onRetake }: ResultsDisplayProps) => {
         </div>
       )}
 
-      <div className="mt-6">
+      <div className="mt-6 space-y-3">
         <CustomButton onClick={onRetake} variant="outline">
           Take Test Again
         </CustomButton>
+        
+        <div>
+          <CustomButton onClick={() => navigate('/nearby')} variant="default">
+            Find Nearby Matches
+          </CustomButton>
+        </div>
       </div>
     </div>
   );

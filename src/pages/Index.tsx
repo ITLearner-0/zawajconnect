@@ -1,4 +1,3 @@
-
 import CompatibilityTest from "@/components/CompatibilityTest";
 import CustomButton from "@/components/CustomButton";
 import { useState, useEffect } from "react";
@@ -50,6 +49,15 @@ const Index = () => {
                 <CustomButton size="lg" onClick={handleTestClick}>
                   {isLoggedIn ? "Take Compatibility Test" : "Sign In to Take Test"}
                 </CustomButton>
+                {isLoggedIn && (
+                  <CustomButton
+                    size="lg"
+                    variant="outline"
+                    onClick={() => navigate("/nearby")}
+                  >
+                    Find Nearby Matches
+                  </CustomButton>
+                )}
                 {!isLoggedIn && (
                   <CustomButton
                     size="lg"

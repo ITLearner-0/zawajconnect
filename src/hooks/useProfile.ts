@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { ProfileFormData } from "@/types/profile";
+import { geocodeLocation } from "@/utils/locationUtils";
 
 export const useProfile = () => {
   const navigate = useNavigate();
@@ -104,6 +105,7 @@ export const useProfile = () => {
 
     console.log("Attempting to save profile with data:", profileData);
 
+    // First, update the profile data
     const { error } = await supabase
       .from("profiles")
       .upsert(profileData);
@@ -114,18 +116,41 @@ export const useProfile = () => {
         title: "Error",
         description: error.message,
         variant: "destructive",
-        duration: 5000, // Show for 5 seconds
+        duration: 5000,
       });
-    } else {
-      console.log("Profile saved successfully");
-      toast({
-        title: "Success",
-        description: "Profile updated successfully",
-        duration: 3000,
-      });
-      // Only navigate after a successful save
-      navigate("/");
+      return;
     }
+
+    // Now, attempt to geocode the location and update coordinates
+    if (formData.location) {
+      try {
+        const locationData = await geocodeLocation(formData.location);
+        
+        if (locationData) {
+          // Update the user's coordinates
+          await updateUserCoordinates(
+            session.user.id,
+            locationData.latitude,
+            locationData.longitude
+          );
+          
+          console.log("Updated user coordinates:", locationData);
+        }
+      } catch (err) {
+        console.error("Error updating coordinates:", err);
+        // We don't want to block the profile save if geocoding fails
+      }
+    }
+
+    console.log("Profile saved successfully");
+    toast({
+      title: "Success",
+      description: "Profile updated successfully",
+      duration: 3000,
+    });
+    
+    // Only navigate after a successful save
+    navigate("/");
   };
 
   const handleSignOut = async () => {
@@ -140,3 +165,18 @@ export const useProfile = () => {
     handleSignOut,
   };
 };
+
+// Function to update user coordinates via Supabase Edge Function
+async function updateUserCoordinates(userId: string, latitude: number, longitude: number) {
+  try {
+    const { data, error } = await supabase.functions.invoke('update-coordinates', {
+      body: { userId, latitude, longitude }
+    });
+    
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error('Error updating coordinates:', error);
+    return false;
+  }
+}
