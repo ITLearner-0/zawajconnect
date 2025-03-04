@@ -7,7 +7,7 @@ export interface MonitoringReport {
   islamicComplianceScore: number;
   sentimentScore: number;
   violations: Violation[];
-  recommendations: string[]; // Added this property
+  recommendations: string[];
   timestamp: string;
 }
 
@@ -34,6 +34,11 @@ const ISLAMIC_GUIDELINES = [
 export function analyzeBehavior(messages: Message[]): number {
   // Simple algorithm to score behavior (would be more sophisticated in real implementation)
   let score = 100; // Start with perfect score
+  
+  // If no messages, return default score
+  if (!messages || messages.length === 0) {
+    return score;
+  }
   
   const flaggedWords = ['meet', 'alone', 'secret', 'private'];
   
@@ -67,6 +72,11 @@ export function analyzeIslamicCompliance(messages: Message[]): { score: number; 
   let score = 100;
   const violations: Violation[] = [];
   
+  // If no messages, return default score
+  if (!messages || messages.length === 0) {
+    return { score, violations };
+  }
+  
   messages.forEach(message => {
     ISLAMIC_GUIDELINES.forEach(guideline => {
       if (guideline.pattern.test(message.content.toLowerCase())) {
@@ -94,6 +104,11 @@ export function analyzeSentiment(messages: Message[]): number {
   // Simple scoring for sentiment (would use NLP in real implementation)
   let score = 50; // Neutral starting point
   
+  // If no messages, return default score
+  if (!messages || messages.length === 0) {
+    return score;
+  }
+  
   const positiveWords = ['happy', 'glad', 'nice', 'good', 'like', 'well', 'respect', 'appreciate'];
   const negativeWords = ['angry', 'sad', 'bad', 'dislike', 'hate', 'terrible', 'annoyed', 'disrespectful'];
   
@@ -117,6 +132,10 @@ export function analyzeSentiment(messages: Message[]): number {
  */
 export function detectViolations(message: Message): Violation[] {
   const violations: Violation[] = [];
+  
+  if (!message) {
+    return violations;
+  }
   
   // Check for behavioral violations
   if (message.content.length > 500) {
@@ -149,6 +168,10 @@ export function detectViolations(message: Message): Violation[] {
  * Generates a comprehensive monitoring report
  */
 export function generateReport(messages: Message[]): MonitoringReport {
+  if (!messages) {
+    messages = [];
+  }
+  
   const behavioralScore = analyzeBehavior(messages);
   const { score: islamicComplianceScore, violations: islamicViolations } = analyzeIslamicCompliance(messages);
   const sentimentScore = analyzeSentiment(messages);
@@ -178,6 +201,11 @@ export function generateReport(messages: Message[]): MonitoringReport {
   
   // Generate recommendations based on violations
   const recommendations: string[] = violations.map(v => `Consider addressing: ${v.message}`);
+  
+  // If no recommendations but scores aren't perfect, add general advice
+  if (recommendations.length === 0 && (behavioralScore < 95 || islamicComplianceScore < 95 || sentimentScore < 60)) {
+    recommendations.push("Consider maintaining a respectful and positive tone in your conversations");
+  }
   
   return {
     behavioralScore,

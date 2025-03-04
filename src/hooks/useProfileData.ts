@@ -3,7 +3,16 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData, PrivacySettings, VerificationStatus } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
-import { executeSql } from '@/utils/database';
+import { executeSql } from '@/utils/database/core';
+
+// Default privacy settings to use when none are available
+const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
+  profileVisibilityLevel: 1,
+  showAge: true,
+  showLocation: true,
+  showOccupation: true,
+  allowNonMatchMessages: true
+};
 
 export const useProfileData = (userId?: string | null) => {
   const { toast } = useToast();
@@ -17,7 +26,7 @@ export const useProfileData = (userId?: string | null) => {
     phone: false,
     id: false
   });
-  const [privacySettings, setPrivacySettings] = useState<PrivacySettings | null>(null);
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettings>(DEFAULT_PRIVACY_SETTINGS);
   const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
   const [isAccountVisible, setIsAccountVisible] = useState(true);
 
@@ -51,16 +60,16 @@ export const useProfileData = (userId?: string | null) => {
         if (data) {
           // Map database fields to ProfileFormData
           const profileFormData: ProfileFormData = {
-            fullName: `${data.first_name} ${data.last_name}`,
-            age: data.birth_date,
-            gender: data.gender,
-            location: data.location,
-            education: data.education_level,
-            occupation: data.occupation,
-            religiousLevel: data.religious_practice_level,
+            fullName: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
+            age: data.birth_date || '',
+            gender: data.gender || '',
+            location: data.location || '',
+            education: data.education_level || '',
+            occupation: data.occupation || '',
+            religiousLevel: data.religious_practice_level || '',
             familyBackground: data.about_me || '', // If family_background doesn't exist, use about_me as fallback
-            aboutMe: data.about_me,
-            prayerFrequency: data.prayer_frequency,
+            aboutMe: data.about_me || '',
+            prayerFrequency: data.prayer_frequency || '',
             waliName: data.wali_name || '',
             waliRelationship: data.wali_relationship || '',
             waliContact: data.wali_contact || '',
@@ -75,8 +84,8 @@ export const useProfileData = (userId?: string | null) => {
             id: false, // Use appropriate field in your schema
           });
           
-          // Set privacy settings
-          setPrivacySettings(data.privacy_settings as PrivacySettings);
+          // Set privacy settings with fallback to default
+          setPrivacySettings(data.privacy_settings as PrivacySettings || DEFAULT_PRIVACY_SETTINGS);
           
           // Set blocked users
           setBlockedUsers(data.blocked_users || []);

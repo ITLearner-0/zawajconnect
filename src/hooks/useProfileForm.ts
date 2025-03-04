@@ -51,10 +51,18 @@ export const useProfileForm = ({
     initialVerificationStatus
   });
   
-  // Privacy settings
+  // Privacy settings - initialize with default values if null
+  const defaultPrivacySettings: PrivacySettings = {
+    profileVisibilityLevel: 1,
+    showAge: true,
+    showLocation: true,
+    showOccupation: true,
+    allowNonMatchMessages: true
+  };
+  
   const { privacySettings, handlePrivacySettingsChange } = usePrivacyManagement({
     userId: userId || undefined,
-    initialPrivacySettings
+    initialPrivacySettings: initialPrivacySettings || defaultPrivacySettings
   });
 
   // Account visibility
@@ -80,13 +88,7 @@ export const useProfileForm = ({
     const success = await submitProfile(
       userId, 
       formData, 
-      privacySettings || {
-        profileVisibilityLevel: 1,
-        showAge: true,
-        showLocation: true,
-        showOccupation: true,
-        allowNonMatchMessages: true
-      }
+      privacySettings || defaultPrivacySettings
     );
     
     return success;
@@ -98,7 +100,7 @@ export const useProfileForm = ({
   return {
     formData,
     verificationStatus,
-    privacySettings,
+    privacySettings: privacySettings || defaultPrivacySettings,
     blockedUsers: blockedUsersData.blockedUsers,
     isAccountVisible,
     handleChange,

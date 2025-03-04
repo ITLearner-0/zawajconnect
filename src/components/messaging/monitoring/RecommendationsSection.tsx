@@ -8,8 +8,13 @@ interface RecommendationsSectionProps {
 }
 
 const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({ report }) => {
+  // Use the recommendations from the report if available, otherwise generate them
+  const recommendations = report.recommendations && report.recommendations.length > 0 
+    ? report.recommendations.map(text => ({ text, severity: 'low' as const }))
+    : getRecommendationsFromViolations(report);
+  
   // Generate recommendations based on violations
-  const getRecommendations = () => {
+  function getRecommendationsFromViolations() {
     if (!report.violations || report.violations.length === 0) {
       return [];
     }
@@ -19,9 +24,7 @@ const RecommendationsSection: React.FC<RecommendationsSectionProps> = ({ report 
       text: `Consider addressing: ${violation.message}`,
       severity: violation.severity
     }));
-  };
-  
-  const recommendations = getRecommendations();
+  }
   
   // If no recommendations, don't render the section
   if (recommendations.length === 0) {
