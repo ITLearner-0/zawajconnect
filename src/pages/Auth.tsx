@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -19,6 +20,8 @@ const Auth = () => {
   const [waliName, setWaliName] = useState("");
   const [waliRelationship, setWaliRelationship] = useState("");
   const [waliContact, setWaliContact] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -33,6 +36,27 @@ const Auth = () => {
 
     try {
       if (isSignUp) {
+        // Validate required fields
+        if (!firstName || !lastName) {
+          toast({
+            title: "Missing Information",
+            description: "Please provide both first and last name.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
+        if (!gender) {
+          toast({
+            title: "Missing Information",
+            description: "Please select your gender.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
         // For registration, validate wali information for female users
         if (gender === "female" && (!waliName || !waliRelationship || !waliContact)) {
           toast({
@@ -44,18 +68,28 @@ const Auth = () => {
           return;
         }
 
+        // Register the user
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              gender: gender
+            }
+          }
         });
 
         if (error) throw error;
 
         // If registration successful and user provides gender info, save to profile
         if (data.user) {
-          const profileData: any = {
+          const profileData = {
             id: data.user.id,
-            gender: gender || null,
+            first_name: firstName,
+            last_name: lastName,
+            gender: gender,
           };
 
           // Add wali information for female users
@@ -72,6 +106,11 @@ const Auth = () => {
 
           if (profileError) {
             console.error("Error creating initial profile:", profileError);
+            toast({
+              title: "Profile Creation Error",
+              description: profileError.message,
+              variant: "destructive",
+            });
           }
         }
 
@@ -99,14 +138,17 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-accent/50 to-background py-12">
+    <div className="min-h-screen bg-gradient-to-b from-accent/50 to-background py-12 dark:from-islamic-darkBg dark:to-islamic-darkCard">
       <div className="container max-w-md mx-auto px-4">
-        <Card className="shadow-lg">
+        <div className="flex justify-end mb-4">
+          <ThemeToggle />
+        </div>
+        <Card className="shadow-lg dark:bg-islamic-darkCard dark:text-white">
           <CardHeader>
             <h1 className="text-2xl font-bold text-center">
               {isSignUp ? "Create Account" : "Welcome Back"}
             </h1>
-            <p className="text-center text-gray-600">
+            <p className="text-center text-gray-600 dark:text-gray-300">
               {isSignUp
                 ? "Sign up to find your compatible match"
                 : "Sign in to continue your journey"}
@@ -114,6 +156,33 @@ const Auth = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleAuth} className="space-y-4">
+              {isSignUp && (
+                <>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="firstName">First Name</Label>
+                      <Input
+                        id="firstName"
+                        placeholder="First name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="lastName">Last Name</Label>
+                      <Input
+                        id="lastName"
+                        placeholder="Last name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -156,10 +225,10 @@ const Auth = () => {
               )}
 
               {isSignUp && showWaliFields && (
-                <div className="space-y-4 border border-primary/20 rounded-md p-4 bg-primary/5 mt-4">
+                <div className="space-y-4 border border-primary/20 rounded-md p-4 bg-primary/5 mt-4 dark:bg-primary/10">
                   <div className="text-sm">
                     <h3 className="font-medium mb-2">Wali Information</h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
                       As a female user, you are required to provide your wali (guardian) information.
                     </p>
                   </div>
@@ -211,12 +280,9 @@ const Auth = () => {
                 type="submit"
                 className="w-full"
                 disabled={loading}
+                isLoading={loading}
               >
-                {loading
-                  ? "Loading..."
-                  : isSignUp
-                  ? "Create Account"
-                  : "Sign In"}
+                {isSignUp ? "Create Account" : "Sign In"}
               </CustomButton>
               <div className="text-center">
                 <button
