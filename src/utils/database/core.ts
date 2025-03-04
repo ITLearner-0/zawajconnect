@@ -6,9 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const tableExists = async (tableName: string): Promise<boolean> => {
   try {
-    // Use proper typing for RPC calls
-    const { data, error } = await supabase.rpc(
-      'check_table_exists',
+    // Use any type to bypass TS RPC function name checking
+    const { data, error } = await supabase.rpc<boolean>(
+      'check_table_exists' as any,
       { table_name: tableName }
     );
     
@@ -29,10 +29,9 @@ export const tableExists = async (tableName: string): Promise<boolean> => {
  */
 export const executeSql = async (query: string): Promise<any> => {
   try {
-    // For security, we'll use a more direct approach
-    // This assumes you have the appropriate permissions set up
-    const { data, error } = await supabase.rpc(
-      'execute_sql',
+    // For security, we'll use a more direct approach with any type for RPC function name
+    const { data, error } = await supabase.rpc<any>(
+      'execute_sql' as any,
       { sql_query: query }
     );
     
@@ -53,9 +52,9 @@ export const executeSql = async (query: string): Promise<any> => {
  */
 export const columnExists = async (tableName: string, columnName: string): Promise<boolean> => {
   try {
-    // Use RPC function to check column existence
-    const { data, error } = await supabase.rpc(
-      'check_column_exists',
+    // Use any type to bypass TS RPC function name checking
+    const { data, error } = await supabase.rpc<boolean>(
+      'check_column_exists' as any,
       { 
         table_name: tableName,
         column_name: columnName

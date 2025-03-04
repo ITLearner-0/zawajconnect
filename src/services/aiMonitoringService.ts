@@ -7,6 +7,7 @@ export interface MonitoringReport {
   islamicComplianceScore: number;
   sentimentScore: number;
   violations: Violation[];
+  recommendations: string[]; // Added this property
   timestamp: string;
 }
 
@@ -175,11 +176,15 @@ export function generateReport(messages: Message[]): MonitoringReport {
     });
   }
   
+  // Generate recommendations based on violations
+  const recommendations: string[] = violations.map(v => `Consider addressing: ${v.message}`);
+  
   return {
     behavioralScore,
     islamicComplianceScore,
     sentimentScore,
     violations,
+    recommendations,
     timestamp: new Date().toISOString()
   };
 }
