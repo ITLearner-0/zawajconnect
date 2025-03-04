@@ -6,13 +6,27 @@ import { Button } from '@/components/ui/button';
 import { Heart, User, MessageCircle } from 'lucide-react';
 import { IslamicPattern } from '@/components/ui/islamic-pattern';
 import { Link } from 'react-router-dom';
+import ProfilePictureUpload from './ProfilePictureUpload';
+import { useState } from 'react';
 
 interface ProfileListProps {
   profiles: DatabaseProfile[];
   onSelectProfile?: (profile: DatabaseProfile) => void;
 }
 
-const ProfileList = ({ profiles, onSelectProfile }: ProfileListProps) => {
+const ProfileList = ({ profiles: initialProfiles, onSelectProfile }: ProfileListProps) => {
+  const [profiles, setProfiles] = useState(initialProfiles);
+  
+  const handleProfilePictureUpdate = (profileId: string, newImageUrl: string) => {
+    setProfiles(prev => 
+      prev.map(profile => 
+        profile.id === profileId 
+          ? { ...profile, profile_picture: newImageUrl } 
+          : profile
+      )
+    );
+  };
+  
   return (
     <IslamicPattern variant="background" className="bg-white rounded-lg shadow-lg p-6">
       <h3 className="font-semibold mb-4 text-islamic-teal flex items-center">
@@ -37,12 +51,12 @@ const ProfileList = ({ profiles, onSelectProfile }: ProfileListProps) => {
             <div 
               className="flex items-center p-4 border border-islamic-sand rounded-lg hover:bg-islamic-cream transition-colors cursor-pointer"
             >
-              <Avatar className="h-12 w-12 mr-4 ring-2 ring-offset-2 ring-islamic-teal/20">
-                {profile.profile_picture ? (
-                  <AvatarImage src={profile.profile_picture} alt={`${profile.first_name}'s profile`} />
-                ) : null}
-                <AvatarFallback className="bg-islamic-teal text-white">{profile.first_name[0]}</AvatarFallback>
-              </Avatar>
+              <div className="mr-4">
+                <ProfilePictureUpload 
+                  profile={profile} 
+                  onPictureUpdate={handleProfilePictureUpdate} 
+                />
+              </div>
               <div className="flex-1">
                 <div className="font-medium text-islamic-blue">{profile.first_name} {profile.last_name}</div>
                 <div className="text-sm text-muted-foreground">{profile.occupation}</div>
