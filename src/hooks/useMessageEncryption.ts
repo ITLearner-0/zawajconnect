@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { columnExists, executeSql } from '@/utils/databaseUtils';
+import { columnExists, executeSql } from '@/utils/database';
 
 export const useMessageEncryption = (conversationId: string | undefined) => {
   const [encryptionEnabled, setEncryptionEnabled] = useState<boolean>(false);

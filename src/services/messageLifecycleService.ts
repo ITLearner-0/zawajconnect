@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { RetentionPolicy } from '@/types/profile';
-import { columnExists, executeSql } from '@/utils/databaseUtils';
+import { columnExists, executeSql } from '@/utils/database';
 
 /**
  * Sets the retention policy for a conversation

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { executeSql } from "@/utils/database";
 
 interface UseAccountVisibilityProps {
   initialIsVisible?: boolean;
@@ -19,9 +20,7 @@ export const useAccountVisibility = ({
     
     // Make sure is_visible column exists
     try {
-      await supabase.rpc('execute_sql', {
-        sql_query: `ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_visible BOOLEAN DEFAULT true`
-      });
+      await executeSql(`ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_visible BOOLEAN DEFAULT true`);
     } catch (err) {
       console.error("Error ensuring is_visible column exists:", err);
     }

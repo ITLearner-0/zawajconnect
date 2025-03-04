@@ -9,6 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      chat_requests: {
+        Row: {
+          id: string
+          message: string | null
+          recipient_id: string
+          requested_at: string | null
+          requester_id: string
+          reviewed_at: string | null
+          status: string
+          wali_id: string | null
+          wali_notes: string | null
+        }
+        Insert: {
+          id?: string
+          message?: string | null
+          recipient_id: string
+          requested_at?: string | null
+          requester_id: string
+          reviewed_at?: string | null
+          status?: string
+          wali_id?: string | null
+          wali_notes?: string | null
+        }
+        Update: {
+          id?: string
+          message?: string | null
+          recipient_id?: string
+          requested_at?: string | null
+          requester_id?: string
+          reviewed_at?: string | null
+          status?: string
+          wali_id?: string | null
+          wali_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_requests_wali_id_fkey"
+            columns: ["wali_id"]
+            isOneToOne: false
+            referencedRelation: "wali_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compatibility_results: {
         Row: {
           answers: Json
@@ -78,6 +122,87 @@ export type Database = {
           },
         ]
       }
+      content_flags: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string | null
+          flag_type: string
+          flagged_by: string
+          id: string
+          notes: string | null
+          resolved: boolean | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string | null
+          flag_type: string
+          flagged_by: string
+          id?: string
+          notes?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string | null
+          flag_type?: string
+          flagged_by?: string
+          id?: string
+          notes?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+        }
+        Relationships: []
+      }
+      content_reports: {
+        Row: {
+          admin_notes: string | null
+          content_reference: string | null
+          created_at: string | null
+          id: string
+          report_details: string
+          report_type: string
+          reported_user_id: string
+          reporting_user_id: string
+          resolution_action: string | null
+          status: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          content_reference?: string | null
+          created_at?: string | null
+          id?: string
+          report_details: string
+          report_type: string
+          reported_user_id: string
+          reporting_user_id: string
+          resolution_action?: string | null
+          status?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          content_reference?: string | null
+          created_at?: string | null
+          id?: string
+          report_details?: string
+          report_type?: string
+          reported_user_id?: string
+          reporting_user_id?: string
+          resolution_action?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
       conversations: {
         Row: {
           created_at: string | null
@@ -140,12 +265,54 @@ export type Database = {
           },
         ]
       }
+      monitoring_reports: {
+        Row: {
+          behavioral_score: number | null
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          is_flagged: boolean | null
+          recommendations: string[] | null
+          warning_triggers: string[] | null
+        }
+        Insert: {
+          behavioral_score?: number | null
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          is_flagged?: boolean | null
+          recommendations?: string[] | null
+          warning_triggers?: string[] | null
+        }
+        Update: {
+          behavioral_score?: number | null
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          is_flagged?: boolean | null
+          recommendations?: string[] | null
+          warning_triggers?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "monitoring_reports_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           about_me: string | null
           age_preference_max: number | null
           age_preference_min: number | null
           birth_date: string
+          blocked_users: string[] | null
           coordinates: unknown | null
           created_at: string | null
           education_level: string | null
@@ -156,6 +323,7 @@ export type Database = {
           id: string
           is_active: boolean | null
           is_verified: boolean | null
+          is_visible: boolean | null
           last_active: string | null
           last_name: string
           location: string
@@ -163,6 +331,7 @@ export type Database = {
           looking_for: string | null
           occupation: string | null
           prayer_frequency: string
+          privacy_settings: Json | null
           religious_practice_level: string
           updated_at: string | null
           verification_document_url: string | null
@@ -176,6 +345,7 @@ export type Database = {
           age_preference_max?: number | null
           age_preference_min?: number | null
           birth_date: string
+          blocked_users?: string[] | null
           coordinates?: unknown | null
           created_at?: string | null
           education_level?: string | null
@@ -186,6 +356,7 @@ export type Database = {
           id: string
           is_active?: boolean | null
           is_verified?: boolean | null
+          is_visible?: boolean | null
           last_active?: string | null
           last_name: string
           location: string
@@ -193,6 +364,7 @@ export type Database = {
           looking_for?: string | null
           occupation?: string | null
           prayer_frequency: string
+          privacy_settings?: Json | null
           religious_practice_level: string
           updated_at?: string | null
           verification_document_url?: string | null
@@ -206,6 +378,7 @@ export type Database = {
           age_preference_max?: number | null
           age_preference_min?: number | null
           birth_date?: string
+          blocked_users?: string[] | null
           coordinates?: unknown | null
           created_at?: string | null
           education_level?: string | null
@@ -216,6 +389,7 @@ export type Database = {
           id?: string
           is_active?: boolean | null
           is_verified?: boolean | null
+          is_visible?: boolean | null
           last_active?: string | null
           last_name?: string
           location?: string
@@ -223,6 +397,7 @@ export type Database = {
           looking_for?: string | null
           occupation?: string | null
           prayer_frequency?: string
+          privacy_settings?: Json | null
           religious_practice_level?: string
           updated_at?: string | null
           verification_document_url?: string | null
@@ -256,6 +431,51 @@ export type Database = {
           srtext?: string | null
         }
         Relationships: []
+      }
+      supervision_sessions: {
+        Row: {
+          conversation_id: string
+          ended_at: string | null
+          id: string
+          is_active: boolean | null
+          started_at: string | null
+          supervision_level: string | null
+          wali_id: string
+        }
+        Insert: {
+          conversation_id: string
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          started_at?: string | null
+          supervision_level?: string | null
+          wali_id: string
+        }
+        Update: {
+          conversation_id?: string
+          ended_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          started_at?: string | null
+          supervision_level?: string | null
+          wali_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supervision_sessions_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supervision_sessions_wali_id_fkey"
+            columns: ["wali_id"]
+            isOneToOne: false
+            referencedRelation: "wali_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       video_calls: {
         Row: {
@@ -297,6 +517,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      wali_profiles: {
+        Row: {
+          availability_status: string | null
+          chat_preferences: Json | null
+          contact_information: string
+          first_name: string
+          id: string
+          is_verified: boolean | null
+          last_active: string | null
+          last_name: string
+          managed_users: string[] | null
+          relationship: string
+          user_id: string
+          verification_date: string | null
+        }
+        Insert: {
+          availability_status?: string | null
+          chat_preferences?: Json | null
+          contact_information: string
+          first_name: string
+          id?: string
+          is_verified?: boolean | null
+          last_active?: string | null
+          last_name: string
+          managed_users?: string[] | null
+          relationship: string
+          user_id: string
+          verification_date?: string | null
+        }
+        Update: {
+          availability_status?: string | null
+          chat_preferences?: Json | null
+          contact_information?: string
+          first_name?: string
+          id?: string
+          is_verified?: boolean | null
+          last_active?: string | null
+          last_name?: string
+          managed_users?: string[] | null
+          relationship?: string
+          user_id?: string
+          verification_date?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {

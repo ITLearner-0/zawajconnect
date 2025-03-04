@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { RetentionPolicy } from '@/types/profile';
 import { setRetentionPolicy } from '@/services/messageLifecycleService';
 import { supabase } from '@/integrations/supabase/client';
-import { columnExists, executeSql } from '@/utils/databaseUtils';
+import { columnExists, executeSql } from '@/utils/database';
 
 export const useMessageRetention = (conversationId: string | undefined) => {
   const [retentionPolicy, setRetentionPolicyState] = useState<RetentionPolicy | undefined>();

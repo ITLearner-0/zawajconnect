@@ -3,6 +3,7 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { PrivacySettings } from "@/types/profile";
+import { executeSql } from "@/utils/database";
 
 interface UsePrivacyManagementProps {
   initialPrivacySettings?: PrivacySettings;
@@ -29,12 +30,10 @@ export const usePrivacyManagement = ({
   const updatePrivacySettingsInDB = async (userId: string) => {
     try {
       // Ensure privacy_settings column exists
-      await supabase.rpc('execute_sql', {
-        sql_query: `
-          ALTER TABLE profiles ADD COLUMN IF NOT EXISTS privacy_settings JSONB 
-          DEFAULT '{"profileVisibilityLevel": 1, "showAge": true, "showLocation": true, "showOccupation": true, "allowNonMatchMessages": true}'::jsonb;
-        `
-      });
+      await executeSql(`
+        ALTER TABLE profiles ADD COLUMN IF NOT EXISTS privacy_settings JSONB 
+        DEFAULT '{"profileVisibilityLevel": 1, "showAge": true, "showLocation": true, "showOccupation": true, "allowNonMatchMessages": true}'::jsonb;
+      `);
 
       const { error } = await supabase
         .from("profiles")

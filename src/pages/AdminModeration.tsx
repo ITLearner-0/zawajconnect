@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ContentReport, ContentFlag, ModerationStats } from '@/types/profile';
@@ -14,7 +13,11 @@ import {
   resolveContentFlag,
   tableExists 
 } from '@/services/contentModerationService';
-import { executeSql, setupModerationTables, updateProfileSchema } from '@/utils/databaseUtils';
+import { 
+  executeSql, 
+  setupModerationTables, 
+  updateProfileSchema 
+} from '@/utils/database';
 
 const AdminModeration = () => {
   const { toast } = useToast();
@@ -37,16 +40,13 @@ const AdminModeration = () => {
     const checkAdminAccess = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        // Redirect to login if not authenticated
         window.location.href = '/auth';
         return;
       }
 
-      // Ensure database schema is up to date
       await setupModerationTables();
       await updateProfileSchema();
       
-      // Check if user has admin role
       try {
         const { data, error } = await executeSql(`
           SELECT role FROM profiles WHERE id = '${session.user.id}'
@@ -55,7 +55,6 @@ const AdminModeration = () => {
         const role = data?.[0]?.role;
         
         if (error || !role || role !== 'admin') {
-          // Redirect to home if not admin
           toast({
             title: "Access Denied",
             description: "You don't have permission to access this area",
@@ -70,7 +69,6 @@ const AdminModeration = () => {
         return;
       }
       
-      // Check if moderation tables exist
       const reportsTableExists = await tableExists('content_reports');
       const flagsTableExists = await tableExists('content_flags');
       
@@ -95,7 +93,6 @@ const AdminModeration = () => {
       try {
         setLoading(true);
 
-        // Get reports if table exists
         if (tablesExist.contentReports) {
           try {
             const data = await executeSql(`
@@ -111,7 +108,6 @@ const AdminModeration = () => {
           }
         }
 
-        // Get flags if table exists
         if (tablesExist.contentFlags) {
           try {
             const data = await executeSql(`
@@ -128,7 +124,6 @@ const AdminModeration = () => {
           }
         }
 
-        // Get stats
         try {
           const statsData = await getModerationStats();
           setStats({
@@ -171,7 +166,6 @@ const AdminModeration = () => {
         throw new Error("Failed to resolve report");
       }
 
-      // Update local state
       setReports(reports.map(report => 
         report.id === reportId
           ? { ...report, status: 'resolved', resolution_action: action as ContentReport['resolution_action'] }
@@ -183,7 +177,6 @@ const AdminModeration = () => {
         description: `Report has been resolved with action: ${action}`
       });
       
-      // Refresh stats
       const statsData = await getModerationStats();
       setStats({
         pendingReports: statsData.pendingReports || 0,
@@ -211,7 +204,6 @@ const AdminModeration = () => {
     }
     
     try {
-      // Get current user ID for resolved_by field
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error("No active session");
@@ -223,7 +215,6 @@ const AdminModeration = () => {
         throw new Error("Failed to resolve flag");
       }
 
-      // Update local state
       setFlags(flags.filter(flag => flag.id !== flagId));
 
       toast({
@@ -231,7 +222,6 @@ const AdminModeration = () => {
         description: "Content flag has been marked as resolved"
       });
       
-      // Refresh stats
       const statsData = await getModerationStats();
       setStats({
         pendingReports: statsData.pendingReports || 0,
@@ -271,7 +261,6 @@ const AdminModeration = () => {
     <div className="container mx-auto p-4 max-w-6xl">
       <h1 className="text-2xl font-bold mb-6">Content Moderation Dashboard</h1>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <Card>
           <CardHeader className="pb-2">
@@ -301,7 +290,6 @@ const AdminModeration = () => {
         </Card>
       </div>
 
-      {/* Main Content */}
       <Card>
         <CardHeader>
           <CardTitle>Content Moderation</CardTitle>
@@ -448,7 +436,6 @@ const AdminModeration = () => {
                           <p className="text-gray-500">Flag Type</p>
                           <p>{flag.flag_type.replace('_', ' ')}</p>
                         </div>
-                        {/* Preview button - would fetch and show content in real impl */}
                         <div className="col-span-2 mt-2">
                           <Button variant="outline" size="sm">
                             Preview Content
