@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { ContentFlag } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
 
 export const useFlaggedContent = (userId: string | null) => {
   const { toast } = useToast();
-  const [flaggedContent, setFlaggedContent] = useState<any[]>([]);
+  const [flaggedContent, setFlaggedContent] = useState<ContentFlag[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,11 +18,11 @@ export const useFlaggedContent = (userId: string | null) => {
       setError(null);
 
       try {
-        // Fetch flagged content
+        // Fetch flagged content for this wali
         const { data, error } = await supabase
           .from('content_flags')
           .select('*')
-          .eq('resolved', false)
+          .eq('flagged_by', userId)
           .order('created_at', { ascending: false });
 
         if (error) {
@@ -43,7 +44,7 @@ export const useFlaggedContent = (userId: string | null) => {
   }, [userId, toast]);
 
   // Resolve flagged content
-  const resolveFlaggedContent = async (contentId: string) => {
+  const resolveFlaggedContent = async (flagId: string) => {
     if (!userId) return false;
 
     try {
@@ -54,12 +55,16 @@ export const useFlaggedContent = (userId: string | null) => {
           resolved_by: userId,
           resolved_at: new Date().toISOString()
         })
-        .eq('id', contentId);
+        .eq('id', flagId);
 
       if (error) throw error;
 
       // Update local state
-      setFlaggedContent(prev => prev.filter(item => item.id !== contentId));
+      setFlaggedContent(prev => 
+        prev.map(flag => 
+          flag.id === flagId ? { ...flag, resolved: true, resolved_by: userId, resolved_at: new Date().toISOString() } : flag
+        )
+      );
 
       toast({
         title: "Content Resolved",

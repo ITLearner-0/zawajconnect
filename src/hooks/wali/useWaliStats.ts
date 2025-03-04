@@ -4,10 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { WaliDashboardStats } from '@/types/wali';
 
 export const useWaliStats = (
-  waliId: string | null,
+  userId: string | null,
   pendingRequests: number,
   activeConversations: number,
-  flaggedContent: number
+  flaggedItems: number
 ) => {
   const [stats, setStats] = useState<WaliDashboardStats>({
     pendingRequests: 0,
@@ -15,46 +15,46 @@ export const useWaliStats = (
     flaggedMessages: 0,
     totalSupervised: 0
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchStatistics = async () => {
-      if (!waliId) return;
+    const fetchStats = async () => {
+      if (!userId) return;
       
       setLoading(true);
-      try {
-        // Get total supervised users
-        const { data: waliProfile, error: waliError } = await supabase
-          .from('wali_profiles')
-          .select('managed_users')
-          .eq('user_id', waliId)
-          .single();
+      setError(null);
 
-        if (waliError) {
-          setError(waliError.message);
+      try {
+        // Get total supervised conversations (both active and past)
+        const { count, error: countError } = await supabase
+          .from('supervision_sessions')
+          .select('*', { count: 'exact', head: true })
+          .eq('wali_id', userId);
+
+        if (countError) {
+          console.error('Error fetching supervision count:', countError);
+          setError('Failed to load statistics');
           return;
         }
 
-        const totalSupervised = waliProfile?.managed_users?.length || 0;
-
-        // Update statistics
+        // Set stats using the counts we already have plus total supervised
         setStats({
           pendingRequests,
           activeConversations,
-          flaggedMessages: flaggedContent,
-          totalSupervised
+          flaggedMessages: flaggedItems,
+          totalSupervised: count || 0
         });
       } catch (err: any) {
-        console.error('Error fetching wali statistics:', err);
-        setError(err.message);
+        console.error('Error fetching wali stats:', err);
+        setError(err.message || 'Failed to load statistics');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchStatistics();
-  }, [waliId, pendingRequests, activeConversations, flaggedContent]);
+    fetchStats();
+  }, [userId, pendingRequests, activeConversations, flaggedItems]);
 
   return {
     stats,

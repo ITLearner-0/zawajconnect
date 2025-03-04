@@ -103,11 +103,11 @@ export interface VideoCallStatus {
 
 // Content Moderation Types
 export interface ContentFlag {
-  id?: string;
+  id: string;
   content_id: string;
-  content_type: 'message' | 'profile' | 'image';
+  content_type: 'message' | 'profile' | 'conversation';
   flag_type: 'inappropriate' | 'harassment' | 'religious_violation' | 'suspicious';
-  severity: 'low' | 'medium' | 'high';
+  severity: 'high' | 'medium' | 'low';
   flagged_by: string;
   created_at: string;
   resolved: boolean;
