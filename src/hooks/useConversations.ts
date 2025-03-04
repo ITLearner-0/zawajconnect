@@ -64,9 +64,10 @@ export const useConversations = (userId: string | null) => {
               // Find the last message
               let lastMessage = null;
               if (conv.messages && conv.messages.length > 0) {
-                // Fix: Ensure we're correctly typing the messages array and accessing properties
-                const sortedMessages = [...conv.messages].sort(
-                  (a, b) => new Date(b.created_at as string).getTime() - new Date(a.created_at as string).getTime()
+                // Fix: Properly type the messages to avoid TypeScript errors
+                const messages = conv.messages as unknown as Message[];
+                const sortedMessages = [...messages].sort(
+                  (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
                 );
                 lastMessage = sortedMessages[0];
               }
