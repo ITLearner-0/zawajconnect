@@ -19,9 +19,10 @@ interface Profile {
 interface LocationMapProps {
   maxDistance?: number;
   filters?: FilterCriteria;
+  showCompatibility?: boolean;
 }
 
-const LocationMap = ({ maxDistance = 50, filters = {} }: LocationMapProps) => {
+const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false }: LocationMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
   const [loading, setLoading] = useState(true);
@@ -64,6 +65,7 @@ const LocationMap = ({ maxDistance = 50, filters = {} }: LocationMapProps) => {
         console.log(`Map would be centered on user ${session.user.id}`);
         console.log(`${nearbyProfiles.length} nearby profiles would be displayed as markers`);
         console.log("Applied filters:", filters);
+        console.log("Show compatibility scores:", showCompatibility);
         
       } catch (error) {
         console.error("Error loading map:", error);
@@ -83,7 +85,7 @@ const LocationMap = ({ maxDistance = 50, filters = {} }: LocationMapProps) => {
     return () => {
       // In a real implementation, you would destroy the map instance here
     };
-  }, [maxDistance, filters, toast]);
+  }, [maxDistance, filters, toast, showCompatibility]);
 
   return (
     <Card className="w-full">

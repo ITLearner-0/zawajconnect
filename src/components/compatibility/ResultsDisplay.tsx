@@ -54,10 +54,14 @@ const ResultsDisplay = ({ score, onRetake }: ResultsDisplayProps) => {
       if (!myResults) return;
 
       // Get profile information for all matches
-      const { data: profiles } = await supabase
+      const { data: profiles, error: profileError } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, age, gender, location, education_level, religious_practice_level')
-        .in('id', results.map(r => r.user_id));
+        .select('id, first_name, last_name, gender, location, education_level, religious_practice_level, birth_date');
+      
+      if (profileError) {
+        console.error("Error fetching profiles:", profileError);
+        return;
+      }
 
       // Calculate compatibility scores with detailed breakdown
       const compatibilityScores = results.map(otherResult => {
@@ -109,11 +113,22 @@ const ResultsDisplay = ({ score, onRetake }: ResultsDisplayProps) => {
 
         // Get profile info for this match
         const profileData = profiles?.find(p => p.id === otherResult.user_id);
+        
+        // Calculate age if birth_date exists
+        let age;
+        if (profileData?.birth_date) {
+          const birthDate = new Date(profileData.birth_date);
+          const today = new Date();
+          age = today.getFullYear() - birthDate.getFullYear();
+        }
 
         return {
           userId: otherResult.user_id,
           score: finalScore,
-          profileData,
+          profileData: profileData ? {
+            ...profileData,
+            age
+          } : undefined,
           matchDetails: {
             strengths: [...new Set(strengths)], // Remove duplicates
             differences: [...new Set(differences)],

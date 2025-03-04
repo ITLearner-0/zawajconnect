@@ -46,7 +46,11 @@ const CompatibilityBadge = ({
       <div className="flex items-center gap-1.5">
         <span>{score}%</span>
         {size !== "sm" && (
-          <Progress value={score} className={`w-10 h-1.5`} indicatorClassName={getProgressColor()} />
+          <Progress 
+            value={score} 
+            className="w-10 h-1.5" 
+            indicatorClassName={getProgressColor()} 
+          />
         )}
       </div>
     </Badge>
