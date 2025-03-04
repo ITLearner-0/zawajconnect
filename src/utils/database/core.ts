@@ -6,11 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const tableExists = async (tableName: string): Promise<boolean> => {
   try {
-    // Use any type to bypass TS RPC function name checking
-    const { data, error } = await supabase.rpc<boolean, { table_name: string }>(
-      'check_table_exists' as any,
+    // Use a more generic approach to bypass TypeScript constraints
+    const { data, error } = await (supabase.rpc(
+      'check_table_exists',
       { table_name: tableName }
-    );
+    ) as unknown as Promise<{ data: boolean; error: any }>);
     
     if (error) {
       console.error(`Error checking if table ${tableName} exists:`, error);
@@ -29,11 +29,11 @@ export const tableExists = async (tableName: string): Promise<boolean> => {
  */
 export const executeSql = async (query: string): Promise<any> => {
   try {
-    // For security, we'll use a more direct approach with any type for RPC function name
-    const { data, error } = await supabase.rpc<any, { sql_query: string }>(
-      'execute_sql' as any,
+    // For security, we'll use a more direct approach with a generic response type
+    const { data, error } = await (supabase.rpc(
+      'execute_sql',
       { sql_query: query }
-    );
+    ) as unknown as Promise<{ data: any; error: any }>);
     
     if (error) {
       console.error(`Error executing SQL: ${query}`, error);
@@ -52,14 +52,14 @@ export const executeSql = async (query: string): Promise<any> => {
  */
 export const columnExists = async (tableName: string, columnName: string): Promise<boolean> => {
   try {
-    // Use any type to bypass TS RPC function name checking
-    const { data, error } = await supabase.rpc<boolean, { table_name: string; column_name: string }>(
-      'check_column_exists' as any,
+    // Use a more generic approach to bypass TypeScript constraints
+    const { data, error } = await (supabase.rpc(
+      'check_column_exists',
       { 
         table_name: tableName,
         column_name: columnName
       }
-    );
+    ) as unknown as Promise<{ data: boolean; error: any }>);
     
     if (error) {
       console.error(`Error checking if column ${columnName} exists in table ${tableName}:`, error);
