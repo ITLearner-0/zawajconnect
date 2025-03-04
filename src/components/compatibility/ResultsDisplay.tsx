@@ -4,6 +4,7 @@ import CustomButton from "../CustomButton";
 import { useNavigate } from "react-router-dom";
 import MatchList from "./MatchList";
 import { useCompatibilityMatches } from "@/hooks/useCompatibilityMatches";
+import { MessageSquare } from "lucide-react";
 
 interface ResultsDisplayProps {
   score: number;
@@ -40,9 +41,14 @@ const ResultsDisplay = ({ score, onRetake }: ResultsDisplayProps) => {
           Take Test Again
         </CustomButton>
         
-        <div>
+        <div className="flex space-x-3 justify-center">
           <CustomButton onClick={() => navigate('/nearby')} variant="default">
             Find Nearby Matches
+          </CustomButton>
+          
+          <CustomButton onClick={() => navigate('/messages')} variant="secondary">
+            <MessageSquare className="w-4 h-4 mr-2" />
+            Messages
           </CustomButton>
         </div>
       </div>

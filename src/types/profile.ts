@@ -41,3 +41,33 @@ export interface VerificationStatus {
   phone: boolean;
   id: boolean;
 }
+
+export interface Conversation {
+  id: string;
+  created_at: string;
+  participants: string[];
+  last_message?: Message;
+  profile?: {
+    first_name: string;
+    last_name: string;
+  };
+  wali_supervised: boolean;
+}
+
+export interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  is_read: boolean;
+  attachments?: string[];
+  is_wali_visible: boolean;
+}
+
+export interface VideoCallStatus {
+  isActive: boolean;
+  participantId?: string;
+  waliPresent: boolean;
+  startTime?: Date;
+}
