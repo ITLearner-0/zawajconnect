@@ -1,15 +1,16 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types/profile';
-import { useUser } from '@supabase/auth-helpers-react';
 import { useMessageModeration } from './useMessageModeration';
 
 export const useMessageExchange = (conversationId: string | undefined) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useUser();
-  const userId = user?.id || null;
+  
+  // Get current user directly from supabase session
+  const [userId, setUserId] = useState<string | null>(null);
   
   // Get moderation functions
   const { 
@@ -22,6 +23,25 @@ export const useMessageExchange = (conversationId: string | undefined) => {
     moderateMessageContent,
     processContentFlags 
   } = useMessageModeration(conversationId, messages, userId);
+
+  // Get current user ID
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      setUserId(data.session?.user?.id || null);
+    };
+    
+    fetchUser();
+    
+    // Also set up listener for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id || null);
+    });
+    
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (!conversationId) return;
