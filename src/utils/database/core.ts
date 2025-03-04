@@ -6,10 +6,13 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const tableExists = async (tableName: string): Promise<boolean> => {
   try {
-    // Use a SQL query to check if the table exists using rpc function
-    const { data, error } = await supabase.rpc('table_exists', { 
-      table_name: tableName 
-    });
+    // Use a direct query approach to check for table existence
+    const { data, error } = await supabase
+      .from('information_schema.tables')
+      .select('table_name')
+      .eq('table_schema', 'public')
+      .eq('table_name', tableName)
+      .maybeSingle();
     
     if (error) {
       console.error(`Error checking if table ${tableName} exists:`, error);
@@ -28,9 +31,10 @@ export const tableExists = async (tableName: string): Promise<boolean> => {
  */
 export const executeSql = async (query: string): Promise<any> => {
   try {
-    // For safety, we'll use the supabase SQL API directly
-    const { data, error } = await supabase.rpc('execute_sql', { 
-      sql_query: query 
+    // For security, we'll use a more direct approach
+    // This assumes you have the appropriate permissions set up
+    const { data, error } = await supabase.rpc('run_sql_query', { 
+      query: query 
     });
     
     if (error) {
@@ -50,19 +54,21 @@ export const executeSql = async (query: string): Promise<any> => {
  */
 export const columnExists = async (tableName: string, columnName: string): Promise<boolean> => {
   try {
-    // Since we don't have direct access to information_schema via RPC,
-    // we'll use our execute_sql function to check if the column exists
-    const query = `
-      SELECT EXISTS (
-        SELECT FROM information_schema.columns 
-        WHERE table_schema = 'public' 
-        AND table_name = '${tableName}'
-        AND column_name = '${columnName}'
-      ) as exists;
-    `;
+    // Direct query to check column existence
+    const { data, error } = await supabase
+      .from('information_schema.columns')
+      .select('column_name')
+      .eq('table_schema', 'public')
+      .eq('table_name', tableName)
+      .eq('column_name', columnName)
+      .maybeSingle();
     
-    const result = await executeSql(query);
-    return result?.exists || false;
+    if (error) {
+      console.error(`Error checking if column ${columnName} exists in table ${tableName}:`, error);
+      return false;
+    }
+    
+    return !!data;
   } catch (err) {
     console.error(`Error in columnExists check for ${columnName}:`, err);
     return false;
