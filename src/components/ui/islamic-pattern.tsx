@@ -6,12 +6,14 @@ interface IslamicPatternProps {
   variant?: "border" | "background" | "divider";
   className?: string;
   color?: "primary" | "secondary" | "accent";
+  children?: React.ReactNode;
 }
 
 const IslamicPattern = ({
   variant = "border",
   className,
   color = "primary",
+  children,
 }: IslamicPatternProps) => {
   const getPatternClass = () => {
     const baseClasses = "relative overflow-hidden";
@@ -38,7 +40,9 @@ const IslamicPattern = ({
       {variant === "border" && (
         <div className="absolute -inset-0.5 opacity-20 bg-[url('/islamic-pattern.svg')] bg-repeat" />
       )}
-      {variant !== "divider" && <div className="relative z-10">{variant === "border" ? <div className="h-full w-full">{}</div> : null}</div>}
+      <div className="relative z-10">
+        {children}
+      </div>
     </div>
   );
 };
