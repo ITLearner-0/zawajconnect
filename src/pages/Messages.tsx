@@ -2,7 +2,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useMessages } from '@/hooks/useMessages';
-import { useAIMonitoring } from '@/hooks/useAIMonitoring';
 import MessagesContainer from '@/components/messaging/MessagesContainer';
 import ChatWindow from '@/components/messaging/ChatWindow';
 import VideoCallManager from '@/components/messaging/VideoCallManager';
@@ -25,18 +24,14 @@ const Messages = () => {
     videoCallStatus,
     sendMessage,
     startVideoCall,
-    endVideoCall
-  } = useMessages(conversationId, userId);
-  
-  // Use AI monitoring
-  const {
+    endVideoCall,
+    // AI monitoring states
     violations,
     latestReport,
     monitoringEnabled,
     toggleMonitoring,
-    loading: monitoringLoading,
-    error: monitoringError
-  } = useAIMonitoring(conversationId, messages, userId);
+    monitoringLoading
+  } = useMessages(conversationId, userId);
 
   // Select a conversation
   const selectConversation = (conversation: { id: string }) => {
@@ -65,7 +60,7 @@ const Messages = () => {
         onSelectConversation={selectConversation}
         errors={{
           ...errors,
-          monitoring: monitoringError
+          monitoring: errors?.monitoring
         }}
       >
         {videoCallStatus.isActive ? (
@@ -94,7 +89,6 @@ const Messages = () => {
               }}
               backToList={() => navigate('/messages')}
               isWaliSupervised={currentConversation.wali_supervised}
-              violations={violations}
               report={latestReport}
               monitoringEnabled={monitoringEnabled}
               toggleMonitoring={toggleMonitoring}

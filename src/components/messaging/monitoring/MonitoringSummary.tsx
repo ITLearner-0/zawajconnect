@@ -17,13 +17,16 @@ const MonitoringSummary: React.FC<MonitoringSummaryProps> = ({ report }) => {
       <h3 className="text-lg font-medium">Conversation Health Summary</h3>
       
       <div className="flex justify-center mb-4">
-        <ScoreIndicator score={report.overall_score} size="large" />
+        <ScoreIndicator 
+          score={report.behavioralScore + report.islamicComplianceScore + report.sentimentScore / 3} 
+          size="large" 
+        />
       </div>
       
       <div className="grid grid-cols-3 gap-3">
-        <ScoreCard score={report.behavioral_score} label="Behavior" />
-        <ScoreCard score={report.safety_score} label="Safety" />
-        <ScoreCard score={report.appropriateness_score} label="Appropriateness" />
+        <ScoreCard score={report.behavioralScore} label="Behavior" />
+        <ScoreCard score={report.islamicComplianceScore} label="Islamic Compliance" />
+        <ScoreCard score={report.sentimentScore} label="Sentiment" />
       </div>
       
       {report.violations && report.violations.length > 0 && (

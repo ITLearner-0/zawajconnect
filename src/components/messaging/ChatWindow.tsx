@@ -1,11 +1,13 @@
-import { useEffect, useRef } from "react";
-import { Conversation, Message } from "@/types/profile";
-import { Violation, MonitoringReport } from "@/services/aiMonitoringService";
-import { useProfileData } from "@/hooks/useProfileData";
-import { formatDistanceToNow } from "date-fns";
-import { ArrowLeft, Send, Video, Shield, Loader } from "lucide-react";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+
+import React from 'react';
+import { Conversation, Message } from '@/types/profile';
+import { ArrowLeft, Video, Send } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import MessageItem from './MessageItem';
+import ChatContainer from './ChatContainer';
+import WaliSupervisor from './WaliSupervisor';
+import { MonitoringReport } from '@/services/aiMonitoringService';
 
 interface ChatWindowProps {
   conversation: Conversation;
@@ -14,166 +16,130 @@ interface ChatWindowProps {
   messageInput: string;
   setMessageInput: (value: string) => void;
   sendMessage: () => void;
+  loading: boolean;
+  sendingMessage: boolean;
+  error: string | null;
   onStartVideoCall: () => void;
   backToList: () => void;
-  isWaliSupervised: boolean;
-  loading?: boolean;
-  sendingMessage?: boolean;
-  error?: string | null;
-  violations?: Violation[];
+  isWaliSupervised?: boolean;
   report?: MonitoringReport | null;
   monitoringEnabled?: boolean;
   toggleMonitoring?: () => void;
   monitoringLoading?: boolean;
 }
 
-const ChatWindow = ({
+const ChatWindow: React.FC<ChatWindowProps> = ({
   conversation,
   messages,
   currentUserId,
   messageInput,
   setMessageInput,
   sendMessage,
+  loading,
+  sendingMessage,
+  error,
   onStartVideoCall,
   backToList,
-  isWaliSupervised,
-  loading = false,
-  sendingMessage = false,
-  error = null,
-  violations = [],
+  isWaliSupervised = false,
   report = null,
   monitoringEnabled = true,
   toggleMonitoring = () => {},
   monitoringLoading = false
-}: ChatWindowProps) => {
-  const { formData } = useProfileData();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    sendMessage();
+}) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   };
 
+  const otherParticipant = conversation.profile || { first_name: 'User', last_name: '' };
+
   return (
-    <div className="flex flex-col h-full">
-      <div className="p-4 border-b flex items-center justify-between">
-        <div className="flex items-center">
-          <button 
-            onClick={backToList}
-            className="md:hidden mr-2 p-1 rounded-full hover:bg-gray-200"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white">
-              {conversation.profile?.first_name?.[0] || '?'}
-            </div>
+    <ChatContainer
+      report={report}
+      monitoringEnabled={monitoringEnabled}
+      toggleMonitoring={toggleMonitoring}
+      monitoringLoading={monitoringLoading}
+    >
+      <div className="flex flex-col h-full">
+        {/* Chat header */}
+        <div className="flex items-center justify-between p-3 border-b">
+          <div className="flex items-center">
+            <Button variant="ghost" size="sm" onClick={backToList} className="mr-2 md:hidden">
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
             <div>
-              <p className="font-medium">
-                {conversation.profile?.first_name} {conversation.profile?.last_name}
-              </p>
+              <h3 className="font-medium">
+                {otherParticipant.first_name} {otherParticipant.last_name}
+              </h3>
               {isWaliSupervised && (
-                <div className="flex items-center text-xs text-green-600">
-                  <Shield className="w-3 h-3 mr-1" />
-                  <span>Wali supervised</span>
-                </div>
+                <p className="text-xs text-green-600">Wali supervised</p>
               )}
             </div>
           </div>
+          <Button variant="ghost" size="sm" onClick={onStartVideoCall}>
+            <Video className="h-5 w-5" />
+            <span className="ml-1 hidden md:inline">Video Call</span>
+          </Button>
         </div>
-        
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onStartVideoCall}
-          title="Start video call"
-          className="flex items-center"
-          disabled={loading}
-        >
-          <Video className="h-4 w-4 mr-1" />
-          <span className="hidden sm:inline">Video Call</span>
-        </Button>
-      </div>
-      
-      <div className="flex-grow overflow-auto relative">
-        <div className="p-4 space-y-4">
+
+        {/* Messages area */}
+        <div className="flex-grow overflow-y-auto p-4 space-y-4">
           {loading ? (
-            <div className="flex items-center justify-center h-full">
-              <Loader className="animate-spin mr-2" />
-              <p>Loading messages...</p>
-            </div>
-          ) : error ? (
-            <div className="flex items-center justify-center h-full text-red-500">
-              <p>Error: {error}</p>
+            <div className="flex justify-center items-center h-full">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
             </div>
           ) : messages.length === 0 ? (
-            <div className="flex items-center justify-center h-full text-gray-500">
-              <p>No messages yet. Start the conversation!</p>
+            <div className="text-center text-gray-500 mt-8">
+              <p>No messages yet</p>
+              <p className="text-sm mt-2">Start the conversation!</p>
             </div>
           ) : (
-            messages.map((message) => {
-              const isCurrentUser = message.sender_id === currentUserId;
-              
-              return (
-                <div
-                  key={message.id}
-                  className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[75%] rounded-lg px-4 py-2 ${
-                      isCurrentUser
-                        ? 'bg-primary text-white rounded-br-none'
-                        : 'bg-gray-200 text-gray-800 rounded-bl-none'
-                    }`}
-                  >
-                    <p>{message.content}</p>
-                    <p className={`text-xs mt-1 ${isCurrentUser ? 'text-primary-foreground/80' : 'text-gray-500'}`}>
-                      {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
-                    </p>
-                    
-                    {(formData.gender === 'Female' || isWaliSupervised) && message.is_wali_visible && (
-                      <div className={`text-xs mt-1 flex items-center ${
-                        isCurrentUser ? 'text-primary-foreground/80' : 'text-gray-500'
-                      }`}>
-                        <Shield className="w-3 h-3 mr-1" />
-                        <span>Visible to wali</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })
+            messages.map((message) => (
+              <MessageItem
+                key={message.id}
+                message={message}
+                isOwn={message.sender_id === currentUserId}
+              />
+            ))
           )}
-          <div ref={messagesEndRef} />
+          {error && (
+            <div className="bg-red-50 text-red-500 p-2 rounded text-sm mt-2">
+              {error}
+            </div>
+          )}
+          
+          {/* Show this when wali is supervising */}
+          {isWaliSupervised && <WaliSupervisor />}
+        </div>
+
+        {/* Message input */}
+        <div className="p-3 border-t">
+          <div className="flex items-center">
+            <Input
+              value={messageInput}
+              onChange={(e) => setMessageInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type a message..."
+              className="flex-grow"
+              disabled={sendingMessage}
+            />
+            <Button 
+              onClick={sendMessage} 
+              disabled={sendingMessage || !messageInput.trim()} 
+              className="ml-2"
+            >
+              {sendingMessage ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
-      
-      <form onSubmit={handleSubmit} className="p-4 border-t flex items-center space-x-2">
-        <Input
-          value={messageInput}
-          onChange={(e) => setMessageInput(e.target.value)}
-          placeholder="Type a message..."
-          className="flex-grow"
-          disabled={loading || sendingMessage}
-        />
-        <Button 
-          type="submit" 
-          variant="default" 
-          size="icon"
-          disabled={loading || sendingMessage || !messageInput.trim()}
-        >
-          {sendingMessage ? (
-            <Loader className="h-4 w-4 animate-spin" />
-          ) : (
-            <Send className="h-4 w-4" />
-          )}
-        </Button>
-      </form>
-    </div>
+    </ChatContainer>
   );
 };
 

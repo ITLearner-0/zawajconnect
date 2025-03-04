@@ -29,7 +29,11 @@ const AIMonitoringDashboard: React.FC<AIMonitoringDashboardProps> = ({
   if (isLoading) {
     return (
       <div className="flex flex-col h-full">
-        <MonitoringHeader onClose={onClose} isEnabled={isEnabled} onToggleMonitoring={onToggleMonitoring} />
+        <MonitoringHeader 
+          onClose={onClose} 
+          monitoringEnabled={isEnabled} 
+          toggleMonitoring={onToggleMonitoring} 
+        />
         <div className="flex-grow flex items-center justify-center p-8">
           <div className="text-center">
             <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
@@ -44,7 +48,11 @@ const AIMonitoringDashboard: React.FC<AIMonitoringDashboardProps> = ({
   if (error) {
     return (
       <div className="flex flex-col h-full">
-        <MonitoringHeader onClose={onClose} isEnabled={isEnabled} onToggleMonitoring={onToggleMonitoring} />
+        <MonitoringHeader 
+          onClose={onClose} 
+          monitoringEnabled={isEnabled} 
+          toggleMonitoring={onToggleMonitoring} 
+        />
         <div className="flex-grow flex items-center justify-center p-8">
           <div className="text-center text-red-600">
             <p className="mb-2 font-medium">Error analyzing conversation</p>
@@ -58,7 +66,11 @@ const AIMonitoringDashboard: React.FC<AIMonitoringDashboardProps> = ({
   if (!report) {
     return (
       <div className="flex flex-col h-full">
-        <MonitoringHeader onClose={onClose} isEnabled={isEnabled} onToggleMonitoring={onToggleMonitoring} />
+        <MonitoringHeader 
+          onClose={onClose} 
+          monitoringEnabled={isEnabled} 
+          toggleMonitoring={onToggleMonitoring} 
+        />
         <div className="flex-grow flex items-center justify-center p-8">
           <div className="text-center text-gray-600">
             <p>No monitoring data available yet</p>
@@ -71,7 +83,11 @@ const AIMonitoringDashboard: React.FC<AIMonitoringDashboardProps> = ({
 
   return (
     <div className="flex flex-col h-full">
-      <MonitoringHeader onClose={onClose} isEnabled={isEnabled} onToggleMonitoring={onToggleMonitoring} />
+      <MonitoringHeader 
+        onClose={onClose} 
+        monitoringEnabled={isEnabled} 
+        toggleMonitoring={onToggleMonitoring} 
+      />
       
       <div className="flex-grow overflow-auto">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -90,7 +106,7 @@ const AIMonitoringDashboard: React.FC<AIMonitoringDashboardProps> = ({
         </Tabs>
       </div>
       
-      <MonitoringFooter reportDate={report.created_at} />
+      <MonitoringFooter report={report} />
     </div>
   );
 };

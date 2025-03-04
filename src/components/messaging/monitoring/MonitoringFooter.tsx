@@ -1,17 +1,16 @@
 
 import React from 'react';
-import { MonitoringReport } from '@/services/aiMonitoringService';
 import { CardFooter } from "@/components/ui/card";
 
 interface MonitoringFooterProps {
-  report: MonitoringReport | null;
+  report: any;
 }
 
 const MonitoringFooter: React.FC<MonitoringFooterProps> = ({ report }) => {
   return (
-    <CardFooter className="flex justify-between text-xs text-gray-500">
+    <CardFooter className="flex justify-between text-xs text-gray-500 p-4 border-t">
       <div>AI-powered monitoring for Islamic compliance</div>
-      {report && <div>Report ID: {report.timestamp.substring(0, 10)}</div>}
+      {report && <div>Report ID: {report.timestamp?.substring(0, 10)}</div>}
     </CardFooter>
   );
 };

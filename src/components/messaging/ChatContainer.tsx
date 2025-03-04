@@ -2,12 +2,11 @@
 import React, { useState } from 'react';
 import { ChevronLeft, Shield } from 'lucide-react';
 import { Button } from '../ui/button';
-import { Violation, MonitoringReport } from '@/services/aiMonitoringService';
+import { MonitoringReport } from '@/services/aiMonitoringService';
 import AIMonitoringDashboard from './AIMonitoringDashboard';
 
 interface ChatContainerProps {
   children: React.ReactNode;
-  violations?: Violation[];
   report?: MonitoringReport | null;
   monitoringEnabled?: boolean;
   toggleMonitoring?: () => void;
@@ -16,7 +15,6 @@ interface ChatContainerProps {
 
 const ChatContainer = ({ 
   children, 
-  violations = [], 
   report = null, 
   monitoringEnabled = true,
   toggleMonitoring = () => {},
@@ -48,7 +46,7 @@ const ChatContainer = ({
           <div className="flex items-center">
             <Shield className="h-4 w-4 mr-2 text-primary" />
             <span className="font-medium text-sm">
-              AI Monitoring {violations.some(v => v.severity === 'high') && '• High Risk Detected'}
+              AI Monitoring {report?.violations?.some(v => v.severity === 'high') && '• High Risk Detected'}
             </span>
           </div>
           <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
@@ -59,11 +57,12 @@ const ChatContainer = ({
         {showMonitoring && (
           <div className="p-3 h-[360px] overflow-y-auto">
             <AIMonitoringDashboard
-              violations={violations}
               report={report}
-              monitoringEnabled={monitoringEnabled}
-              toggleMonitoring={toggleMonitoring}
-              loading={monitoringLoading}
+              isEnabled={monitoringEnabled}
+              onToggleMonitoring={toggleMonitoring}
+              isLoading={monitoringLoading}
+              error={null}
+              onClose={() => setShowMonitoring(false)}
             />
           </div>
         )}
