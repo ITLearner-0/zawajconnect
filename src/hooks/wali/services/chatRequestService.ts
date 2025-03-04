@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { ChatRequest } from '@/types/wali';
 
@@ -30,7 +31,7 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
         // Fetch requester profile data
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('first_name, last_name, profile_image')
+          .select('first_name, last_name')
           .eq('id', req.requester_id)
           .single();
 
@@ -39,14 +40,13 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
           requester_id: req.requester_id,
           recipient_id: req.recipient_id,
           wali_id: req.wali_id,
-          status: req.status,
+          status: req.status as "pending" | "approved" | "rejected",
           requested_at: req.requested_at,
           reviewed_at: req.reviewed_at,
           wali_notes: req.wali_notes,
           requester_profile: profileData ? {
             first_name: profileData.first_name,
-            last_name: profileData.last_name,
-            profile_image: profileData.profile_image
+            last_name: profileData.last_name
           } : {
             first_name: 'Unknown',
             last_name: 'User'

@@ -1,126 +1,112 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { Conversation, Message, RetentionPolicy } from '@/types/profile';
+import { useToast } from './use-toast';
 import { useConversations } from './useConversations';
-import { useMessageExchange } from './useMessageExchange';
-import { useVideoCall } from './useVideoCall';
+import { useMessageUI } from './useMessageUI';
+import { useMessageModeration } from './useMessageModeration';
 import { useMessageEncryption } from './useMessageEncryption';
 import { useMessageRetention } from './useMessageRetention';
-import { useMessageUI } from './useMessageUI';
-import { Conversation, RetentionPolicy } from '@/types/profile';
+import { useAIMonitoring } from './useAIMonitoring';
+import { useVideoCall } from './useVideoCall';
 
-export const useMessages = (conversationId: string | undefined, userId: string | undefined) => {
-  // Get conversations list
-  const { 
-    conversations, 
-    currentConversation,
-    loading: conversationsLoading,
-    error: conversationsError
-  } = useConversations(userId);
-  
-  // Get messages exchange logic
-  const {
-    messages,
-    loading: messagesLoading,
-    error: messagesError,
-    sendMessage: sendMessageAPI,
-    violations,
-    latestReport,
-    monitoringEnabled,
-    toggleMonitoring,
-    monitoringLoading,
-    monitoringError
-  } = useMessageExchange(conversationId);
+export const useMessages = (conversationId?: string, currentUserId?: string | null) => {
+  const { toast } = useToast();
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errors, setErrors] = useState<{ conversations: string | null; messages: string | null; videoCall: string | null; monitoring?: string | null }>({
+    conversations: null,
+    messages: null,
+    videoCall: null,
+    monitoring: null,
+  });
 
-  // Get UI state
-  const {
-    messageInput,
-    setMessageInput,
-    sendingMessage,
-    setSendingMessage
-  } = useMessageUI();
-
-  // Get encryption utilities
-  const {
-    encryptionEnabled,
-    toggleEncryption
-  } = useMessageEncryption(conversationId);
-
-  // Get retention utilities
-  const {
-    retentionPolicy,
-    updateRetentionPolicy
-  } = useMessageRetention(conversationId);
-
-  // Get video call functionality
-  const {
-    videoCallStatus,
-    startVideoCall,
-    endVideoCall
-  } = useVideoCall(userId || '', conversationId);
-
-  // Combined loading state
-  const loading = conversationsLoading || messagesLoading;
-
-  // Combined error state
-  const errors = {
-    conversations: conversationsError,
-    messages: messagesError,
-    monitoring: monitoringError
-  };
-
-  // Handle sending messages
-  const sendMessage = async () => {
-    if (!messageInput.trim()) return;
+  // Fetch messages for the current conversation
+  const fetchMessages = useCallback(async () => {
+    if (!conversationId || !currentUserId) return;
     
-    setSendingMessage(true);
     try {
-      const message = await sendMessageAPI(messageInput);
-      if (message) {
-        setMessageInput('');
+      setLoading(true);
+      setErrors(prev => ({ ...prev, messages: null }));
+      
+      console.log('Fetching messages for conversation:', conversationId);
+      
+      // Create a messages relationship to conversations if it doesn't exist
+      const { error: checkError } = await supabase
+        .from('messages')
+        .select('id')
+        .eq('conversation_id', conversationId)
+        .limit(1);
+        
+      if (checkError) {
+        console.error('Error checking messages:', checkError);
       }
-    } catch (error) {
-      console.error('Error sending message:', error);
+      
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
+        
+      if (error) {
+        console.error('Error fetching messages:', error);
+        setErrors(prev => ({
+          ...prev,
+          messages: `Failed to load messages: ${error.message}`
+        }));
+        return;
+      }
+      
+      // Process messages for encryption if needed
+      let processedMessages: Message[] = data || [];
+      
+      if (encryptionEnabled && processedMessages.length > 0) {
+        processedMessages = await Promise.all(
+          processedMessages.map(msg => 
+            msg.encrypted ? decryptMessage(msg) : msg
+          )
+        );
+      }
+      
+      setMessages(processedMessages);
+      
+      // Mark messages as read
+      if (data && data.length > 0) {
+        const unreadMessages = data.filter(
+          msg => !msg.is_read && msg.sender_id !== currentUserId
+        );
+        
+        if (unreadMessages.length > 0) {
+          const unreadIds = unreadMessages.map(msg => msg.id);
+          const { error: updateError } = await supabase
+            .from('messages')
+            .update({ is_read: true })
+            .in('id', unreadIds);
+            
+          if (updateError) {
+            console.error('Error marking messages as read:', updateError);
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error('Error in fetchMessages:', err);
+      setErrors(prev => ({
+        ...prev,
+        messages: `An unexpected error occurred: ${err.message}`
+      }));
     } finally {
-      setSendingMessage(false);
+      setLoading(false);
     }
-  };
+  }, [conversationId, currentUserId, encryptionEnabled, decryptMessage]);
+
+  useEffect(() => {
+    fetchMessages();
+  }, [fetchMessages]);
 
   return {
-    // Conversations data
-    conversations,
-    currentConversation,
-    
-    // Messages data
     messages,
-    
-    // UI state
     loading,
     errors,
-    messageInput,
-    setMessageInput,
-    sendingMessage,
-    
-    // Message actions
-    sendMessage,
-    
-    // Video call
-    videoCallStatus,
-    startVideoCall,
-    endVideoCall,
-    
-    // Content monitoring
-    violations,
-    latestReport,
-    monitoringEnabled,
-    toggleMonitoring,
-    monitoringLoading,
-    
-    // Encryption
-    encryptionEnabled,
-    toggleEncryption,
-    
-    // Retention
-    retentionPolicy,
-    updateRetentionPolicy
+    fetchMessages,
   };
 };
