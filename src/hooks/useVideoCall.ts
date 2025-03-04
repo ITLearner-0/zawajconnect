@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { VideoCallStatus } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
 
-export const useVideoCall = (userId: string | null, conversationId: string | undefined) => {
+export const useVideoCall = (conversationId: string | undefined, userId?: string | null) => {
   const { toast } = useToast();
   const [videoCallStatus, setVideoCallStatus] = useState<VideoCallStatus>({
     isActive: false,
