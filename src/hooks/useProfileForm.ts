@@ -19,6 +19,15 @@ interface UseProfileFormProps {
   userId: string | null;
 }
 
+// Default privacy settings to use when none are available
+const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
+  profileVisibilityLevel: 1,
+  showAge: true,
+  showLocation: true,
+  showOccupation: true,
+  allowNonMatchMessages: true
+};
+
 export const useProfileForm = ({ 
   initialFormData, 
   initialVerificationStatus,
@@ -52,17 +61,9 @@ export const useProfileForm = ({
   });
   
   // Privacy settings - initialize with default values if null
-  const defaultPrivacySettings: PrivacySettings = {
-    profileVisibilityLevel: 1,
-    showAge: true,
-    showLocation: true,
-    showOccupation: true,
-    allowNonMatchMessages: true
-  };
-  
   const { privacySettings, handlePrivacySettingsChange } = usePrivacyManagement({
     userId: userId || undefined,
-    initialPrivacySettings: initialPrivacySettings || defaultPrivacySettings
+    initialPrivacySettings: initialPrivacySettings || DEFAULT_PRIVACY_SETTINGS
   });
 
   // Account visibility
@@ -88,7 +89,7 @@ export const useProfileForm = ({
     const success = await submitProfile(
       userId, 
       formData, 
-      privacySettings || defaultPrivacySettings
+      privacySettings || DEFAULT_PRIVACY_SETTINGS
     );
     
     return success;
@@ -100,7 +101,7 @@ export const useProfileForm = ({
   return {
     formData,
     verificationStatus,
-    privacySettings: privacySettings || defaultPrivacySettings,
+    privacySettings: privacySettings || DEFAULT_PRIVACY_SETTINGS,
     blockedUsers: blockedUsersData.blockedUsers,
     isAccountVisible,
     handleChange,

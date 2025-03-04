@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Message, ContentFlag } from '@/types/profile';
 import { 
@@ -44,7 +45,9 @@ export const useMessageModeration = (
             flag.flag_type as ContentFlag['flag_type'],
             flag.severity as ContentFlag['severity'],
             userId
-          );
+          ).catch(err => {
+            console.error("Error flagging content:", err);
+          });
         }
       });
     }
@@ -92,6 +95,11 @@ export const useMessageModeration = (
       } catch (err: any) {
         setError(err.message);
         console.error("Error in AI monitoring:", err);
+        toast({
+          title: "Monitoring Error",
+          description: err.message,
+          variant: "destructive"
+        });
       } finally {
         setLoading(false);
       }
@@ -102,21 +110,36 @@ export const useMessageModeration = (
       generateMonitoringReport();
     }
     
-  }, [messages, conversationId, userId, monitoringEnabled]);
+  }, [messages, conversationId, userId, monitoringEnabled, toast]);
 
   // Toggle monitoring status
   const toggleMonitoring = () => {
     setMonitoringEnabled(prev => !prev);
+    toast({
+      title: monitoringEnabled ? "Monitoring Disabled" : "Monitoring Enabled",
+      description: monitoringEnabled 
+        ? "Message monitoring has been turned off" 
+        : "Message monitoring has been turned on",
+      variant: "default"
+    });
   };
 
   // Process content for flags and moderation
   const moderateMessageContent = (content: string) => {
+    if (!content) {
+      return { flags: [], isFiltered: false, filteredContent: "" };
+    }
     return filterMessageContent(content);
   };
 
   // Flag content for review
-  const processContentFlags = (messageId: string, contentType: 'message' | 'profile' | 'image', flagType: 'inappropriate' | 'harassment' | 'religious_violation' | 'suspicious', severity: 'low' | 'medium' | 'high') => {
-    if (!userId) return;
+  const processContentFlags = (
+    messageId: string, 
+    contentType: 'message' | 'profile' | 'image', 
+    flagType: 'inappropriate' | 'harassment' | 'religious_violation' | 'suspicious', 
+    severity: 'low' | 'medium' | 'high'
+  ) => {
+    if (!userId) return Promise.resolve(null);
     return flagContent(messageId, contentType, flagType, severity, userId);
   };
 

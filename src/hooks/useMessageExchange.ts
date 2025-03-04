@@ -3,11 +3,13 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types/profile';
 import { useMessageModeration } from './useMessageModeration';
+import { useToast } from '@/hooks/use-toast';
 
 export const useMessageExchange = (conversationId: string | undefined) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
   
   // Get current user directly from supabase session
   const [userId, setUserId] = useState<string | null>(null);
@@ -49,19 +51,30 @@ export const useMessageExchange = (conversationId: string | undefined) => {
     const fetchMessages = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
+        const { data, error: fetchError } = await supabase
           .from('messages')
           .select('*')
           .eq('conversation_id', conversationId)
           .order('created_at', { ascending: true });
 
-        if (error) {
-          setError(error.message);
+        if (fetchError) {
+          setError(fetchError.message);
+          toast({
+            title: "Error fetching messages",
+            description: fetchError.message,
+            variant: "destructive"
+          });
         } else {
           setMessages(data || []);
+          setError(null);
         }
       } catch (err: any) {
         setError(err.message);
+        toast({
+          title: "Error fetching messages",
+          description: err.message,
+          variant: "destructive"
+        });
       } finally {
         setLoading(false);
       }
@@ -71,7 +84,7 @@ export const useMessageExchange = (conversationId: string | undefined) => {
 
     // Subscribe to real-time updates
     const messageSubscription = supabase
-      .channel('public:messages')
+      .channel(`messages-${conversationId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, payload => {
         if (payload.eventType === 'INSERT') {
           setMessages(prevMessages => [...prevMessages, payload.new as Message]);
@@ -88,7 +101,7 @@ export const useMessageExchange = (conversationId: string | undefined) => {
     return () => {
       supabase.removeChannel(messageSubscription);
     };
-  }, [conversationId]);
+  }, [conversationId, toast]);
 
   const sendMessage = async (content: string, attachments: string[] = []) => {
     if (!conversationId || !userId || !content.trim()) {
@@ -104,16 +117,18 @@ export const useMessageExchange = (conversationId: string | undefined) => {
       if (flags.length > 0) {
         const messageId = Math.random().toString(36).substring(2, 15); // Temp ID for pre-insert flagging
         flags.forEach(flag => {
-          processContentFlags(
-            messageId, 
-            'message', 
-            flag.flag_type as 'inappropriate' | 'harassment' | 'religious_violation' | 'suspicious',
-            flag.severity as 'low' | 'medium' | 'high'
-          );
+          if (flag.flag_type && flag.severity) {
+            processContentFlags(
+              messageId, 
+              'message', 
+              flag.flag_type as 'inappropriate' | 'harassment' | 'religious_violation' | 'suspicious',
+              flag.severity as 'low' | 'medium' | 'high'
+            );
+          }
         });
       }
 
-      const { data: newMessage, error } = await supabase
+      const { data: newMessage, error: sendError } = await supabase
         .from('messages')
         .insert([
           {
@@ -131,14 +146,24 @@ export const useMessageExchange = (conversationId: string | undefined) => {
         .select('*')
         .single();
 
-      if (error) {
-        setError(error.message);
+      if (sendError) {
+        setError(sendError.message);
+        toast({
+          title: "Error sending message",
+          description: sendError.message,
+          variant: "destructive"
+        });
         return null;
       }
 
       return newMessage;
     } catch (error: any) {
       setError(error.message);
+      toast({
+        title: "Error sending message",
+        description: error.message,
+        variant: "destructive"
+      });
       return null;
     }
   };
@@ -153,6 +178,6 @@ export const useMessageExchange = (conversationId: string | undefined) => {
     monitoringEnabled,
     toggleMonitoring,
     monitoringLoading,
-    monitoringError
+    monitoringError: monitoringError || error
   };
 };
