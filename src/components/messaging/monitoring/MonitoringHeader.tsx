@@ -1,47 +1,50 @@
 
 import React from 'react';
-import { Shield, X } from 'lucide-react';
+import { CardHeader } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Shield, X } from "lucide-react";
 
 interface MonitoringHeaderProps {
-  monitoringEnabled: boolean;
-  toggleMonitoring: () => void;
-  onClose: () => void;
+  isEnabled: boolean;
+  onToggleMonitoring: () => void;
+  isLoading: boolean;
+  onClose?: () => void;
 }
 
 const MonitoringHeader: React.FC<MonitoringHeaderProps> = ({ 
-  monitoringEnabled,
-  toggleMonitoring,
+  isEnabled, 
+  onToggleMonitoring, 
+  isLoading,
   onClose
 }) => {
   return (
-    <div className="flex justify-between items-center p-4">
-      <div>
-        <CardTitle className="flex items-center">
-          <Shield className="mr-2 h-5 w-5" />
-          AI Monitoring Dashboard
-        </CardTitle>
-        <CardDescription>
-          Islamic compliance and behavior analysis
-        </CardDescription>
-      </div>
+    <CardHeader className="flex flex-row items-center justify-between p-4 pb-2 border-b">
       <div className="flex items-center space-x-2">
-        <Label htmlFor="monitoring-toggle">
-          {monitoringEnabled ? "Monitoring Active" : "Monitoring Paused"}
-        </Label>
-        <Switch
-          id="monitoring-toggle"
-          checked={monitoringEnabled}
-          onCheckedChange={toggleMonitoring}
-        />
-        <Button variant="ghost" size="sm" onClick={onClose} className="ml-2">
-          <X className="h-4 w-4" />
-        </Button>
+        <Shield className="h-5 w-5 text-primary" />
+        <h3 className="font-semibold">AI Monitoring Dashboard</h3>
       </div>
-    </div>
+      
+      <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm mr-2">
+            {isEnabled ? 'Enabled' : 'Disabled'}
+          </span>
+          
+          <Switch
+            checked={isEnabled}
+            onCheckedChange={onToggleMonitoring}
+            disabled={isLoading}
+          />
+        </div>
+
+        {onClose && (
+          <Button size="sm" variant="ghost" className="h-8 w-8 p-0" onClick={onClose}>
+            <X className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </CardHeader>
   );
 };
 

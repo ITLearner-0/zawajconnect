@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Message } from '@/types/profile';
-import { Avatar } from '@/components/ui/avatar';
 import { format } from 'date-fns';
 
 interface MessageItemProps {

@@ -5,8 +5,8 @@ import { ArrowLeft, Video, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import MessageItem from '@/components/messaging/MessageItem';
-import ChatContainer from './ChatContainer';
-import WaliSupervisor from './WaliSupervisor';
+import ChatContainer from '@/components/messaging/ChatContainer';
+import WaliSupervisor from '@/components/messaging/WaliSupervisor';
 import { MonitoringReport } from '@/services/aiMonitoringService';
 
 interface ChatWindowProps {

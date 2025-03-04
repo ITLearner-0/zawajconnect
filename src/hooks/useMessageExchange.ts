@@ -32,21 +32,23 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
           throw messagesError;
         }
 
-        setMessages(messagesData as Message[]);
+        if (messagesData) {
+          setMessages(messagesData as Message[]);
         
-        // Mark unread messages as read
-        const unreadMessages = messagesData
-          .filter(msg => !msg.is_read && msg.sender_id !== userId)
-          .map(msg => msg.id);
-          
-        if (unreadMessages.length > 0) {
-          const { error: updateError } = await supabase
-            .from('messages')
-            .update({ is_read: true })
-            .in('id', unreadMessages);
+          // Mark unread messages as read
+          const unreadMessages = messagesData
+            .filter(msg => !msg.is_read && msg.sender_id !== userId)
+            .map(msg => msg.id);
             
-          if (updateError) {
-            console.error("Error marking messages as read:", updateError);
+          if (unreadMessages.length > 0) {
+            const { error: updateError } = await supabase
+              .from('messages')
+              .update({ is_read: true })
+              .in('id', unreadMessages);
+              
+            if (updateError) {
+              console.error("Error marking messages as read:", updateError);
+            }
           }
         }
       } catch (err: any) {
