@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { filterMessageContent } from '@/services/contentModerationService';
+import { ContentFlag } from '@/types/profile';
 
 export const useMessageModeration = (userId: string | null) => {
   // Filter message content before sending
@@ -28,13 +29,20 @@ export const useMessageModeration = (userId: string | null) => {
         resolved: false
       }));
       
-      // Insert each flag
+      // Insert each flag using RPC function to avoid type issues
       for (const flag of flagsWithMetadata) {
         try {
-          // Use supabase directly instead of RPC to avoid type issues
+          // Use RPC function instead of direct insert
           const { error: flagError } = await supabase
-            .from('content_flags')
-            .insert(flag);
+            .rpc('insert_content_flag', {
+              content_id: flag.content_id,
+              content_type: flag.content_type,
+              flag_type: flag.flag_type,
+              severity: flag.severity,
+              flagged_by: flag.flagged_by,
+              created_at: flag.created_at,
+              resolved: flag.resolved
+            });
             
           if (flagError) {
             console.error("Error inserting content flag:", flagError);

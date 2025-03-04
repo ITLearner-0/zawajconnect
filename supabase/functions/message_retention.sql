@@ -61,6 +61,55 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Function to check if a column exists in a table
+CREATE OR REPLACE FUNCTION column_exists(
+  table_name TEXT,
+  column_name TEXT
+) RETURNS BOOLEAN AS $$
+DECLARE
+  exists_check BOOLEAN;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_name = column_exists.table_name
+    AND column_name = column_exists.column_name
+  ) INTO exists_check;
+  
+  RETURN exists_check;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to add retention_policy column to conversations table
+CREATE OR REPLACE FUNCTION add_retention_policy_column()
+RETURNS VOID AS $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_name = 'conversations'
+    AND column_name = 'retention_policy'
+  ) THEN
+    EXECUTE 'ALTER TABLE conversations ADD COLUMN retention_policy JSONB';
+  END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to add scheduled_deletion column to messages table
+CREATE OR REPLACE FUNCTION add_scheduled_deletion_column()
+RETURNS VOID AS $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_name = 'messages'
+    AND column_name = 'scheduled_deletion'
+  ) THEN
+    EXECUTE 'ALTER TABLE messages ADD COLUMN scheduled_deletion TIMESTAMP WITH TIME ZONE';
+  END IF;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Function to resolve content report
 CREATE OR REPLACE FUNCTION resolve_content_report(
   report_id TEXT,

@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Message, ContentFlag, ContentReport } from '@/types/profile';
 
@@ -49,19 +48,25 @@ const determineViolationSeverity = (flagType: string): ContentFlag['severity'] =
   }
 };
 
-// Report inappropriate content or behavior
-export const reportContent = async (
+// Report inappropriate content or behavior - Export this for the ReportDialog component
+export const submitContentReport = async (
   reportData: Omit<ContentReport, 'id' | 'created_at' | 'status'>
 ): Promise<boolean> => {
   try {
-    // We'll use RPC function to insert reports to handle the table missing from types
     const reportPayload = {
-      ...reportData,
+      reported_user_id: reportData.reported_user_id,
+      reporting_user_id: reportData.reporting_user_id,
+      report_type: reportData.report_type,
+      content_reference: reportData.content_reference || '',
+      report_details: reportData.report_details,
       created_at: new Date().toISOString(),
       status: 'pending'
     };
     
-    const { error } = await supabase.rpc('insert_content_report', reportPayload);
+    // Use direct function instead of RPC to avoid type issues
+    const { error } = await supabase.functions.invoke('insert_content_report', {
+      body: reportPayload
+    });
     
     if (error) {
       console.error("Error submitting report:", error);
@@ -94,7 +99,9 @@ export const flagContent = async (
       resolved: false
     };
     
-    const { error } = await supabase.rpc('insert_content_flag', flagData);
+    const { error } = await supabase.functions.invoke('insert_content_flag', {
+      body: flagData
+    });
     
     if (error) {
       console.error("Error flagging content:", error);
@@ -115,15 +122,15 @@ export const getModerationStats = async (): Promise<{
   resolved_reports: number 
 }> => {
   try {
-    // Query using RPC functions to safely work with tables
-    const pendingReportsResult = await supabase.rpc('count_pending_reports');
-    const flaggedContentResult = await supabase.rpc('count_unresolved_flags');
-    const resolvedReportsResult = await supabase.rpc('count_resolved_reports');
+    // Use functions.invoke instead of rpc
+    const pendingReportsResult = await supabase.functions.invoke('count_pending_reports');
+    const flaggedContentResult = await supabase.functions.invoke('count_unresolved_flags');
+    const resolvedReportsResult = await supabase.functions.invoke('count_resolved_reports');
     
     return {
-      pending_reports: pendingReportsResult.data || 0,
-      flagged_content: flaggedContentResult.data || 0,
-      resolved_reports: resolvedReportsResult.data || 0
+      pending_reports: Number(pendingReportsResult.data || 0),
+      flagged_content: Number(flaggedContentResult.data || 0),
+      resolved_reports: Number(resolvedReportsResult.data || 0)
     };
   } catch (err) {
     console.error("Error getting moderation stats:", err);
@@ -142,10 +149,12 @@ export const resolveReport = async (
   adminNotes?: string
 ): Promise<boolean> => {
   try {
-    const { error } = await supabase.rpc('resolve_content_report', {
-      report_id: reportId,
-      resolution_action: resolution,
-      admin_notes: adminNotes || ''
+    const { error } = await supabase.functions.invoke('resolve_content_report', {
+      body: {
+        report_id: reportId,
+        resolution_action: resolution,
+        admin_notes: adminNotes || ''
+      }
     });
     
     if (error) {
@@ -167,10 +176,12 @@ export const resolveContentFlag = async (
   notes?: string
 ): Promise<boolean> => {
   try {
-    const { error } = await supabase.rpc('resolve_content_flag', {
-      flag_id: flagId,
-      resolved_by_user: resolvedBy,
-      resolution_notes: notes || ''
+    const { error } = await supabase.functions.invoke('resolve_content_flag', {
+      body: {
+        flag_id: flagId,
+        resolved_by_user: resolvedBy,
+        resolution_notes: notes || ''
+      }
     });
     
     if (error) {
@@ -188,14 +199,14 @@ export const resolveContentFlag = async (
 // Get all content reports (admin)
 export const getAllReports = async (): Promise<ContentReport[]> => {
   try {
-    const { data, error } = await supabase.rpc('get_all_content_reports');
+    const { data, error } = await supabase.functions.invoke('get_all_content_reports');
     
     if (error) {
       console.error("Error fetching reports:", error);
       return [];
     }
     
-    return data || [];
+    return data as ContentReport[] || [];
   } catch (err) {
     console.error("Error retrieving content reports:", err);
     return [];
@@ -205,14 +216,14 @@ export const getAllReports = async (): Promise<ContentReport[]> => {
 // Get all content flags (admin)
 export const getAllFlags = async (): Promise<ContentFlag[]> => {
   try {
-    const { data, error } = await supabase.rpc('get_all_content_flags');
+    const { data, error } = await supabase.functions.invoke('get_all_content_flags');
     
     if (error) {
       console.error("Error fetching flags:", error);
       return [];
     }
     
-    return data || [];
+    return data as ContentFlag[] || [];
   } catch (err) {
     console.error("Error retrieving content flags:", err);
     return [];

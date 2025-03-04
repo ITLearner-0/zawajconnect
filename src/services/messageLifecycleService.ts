@@ -2,6 +2,26 @@
 import { supabase } from '@/integrations/supabase/client';
 import { RetentionPolicy } from '@/types/profile';
 
+// Check if a column exists in a table
+const checkColumnExists = async (tableName: string, columnName: string): Promise<boolean> => {
+  try {
+    const { data, error } = await supabase.rpc('column_exists', {
+      table_name: tableName,
+      column_name: columnName
+    });
+    
+    if (error) {
+      console.error(`Error checking if column ${columnName} exists in ${tableName}:`, error);
+      return false;
+    }
+    
+    return !!data;
+  } catch (err) {
+    console.error(`Error checking if column ${columnName} exists in ${tableName}:`, err);
+    return false;
+  }
+};
+
 // Calculate deletion date based on retention policy
 export const calculateDeletionDate = (policy: RetentionPolicy | undefined): string | null => {
   if (!policy || !policy.auto_delete) {
@@ -26,16 +46,18 @@ export const setRetentionPolicy = async (
   policy: RetentionPolicy
 ): Promise<boolean> => {
   try {
-    // First check if the column exists before updating
-    const { data: columnCheck } = await supabase
-      .rpc('column_exists', {
-        table_name: 'conversations',
-        column_name: 'retention_policy'
-      });
-
-    if (!columnCheck) {
+    // First check if the column exists
+    const retentionPolicyExists = await checkColumnExists('conversations', 'retention_policy');
+    
+    if (!retentionPolicyExists) {
       console.error('Column retention_policy does not exist in conversations table');
-      return false;
+      // Create the column if it doesn't exist
+      const { error: alterError } = await supabase.rpc('add_retention_policy_column');
+      
+      if (alterError) {
+        console.error('Error adding retention_policy column:', alterError);
+        return false;
+      }
     }
     
     // Update the conversation with the new retention policy
@@ -56,16 +78,18 @@ export const setRetentionPolicy = async (
       const deletionDate = calculateDeletionDate(policy);
       
       if (deletionDate) {
-        // First check if the column exists before updating
-        const { data: msgColumnCheck } = await supabase
-          .rpc('column_exists', {
-            table_name: 'messages',
-            column_name: 'scheduled_deletion'
-          });
-
-        if (!msgColumnCheck) {
+        // Check if the scheduled_deletion column exists
+        const scheduledDeletionExists = await checkColumnExists('messages', 'scheduled_deletion');
+        
+        if (!scheduledDeletionExists) {
           console.error('Column scheduled_deletion does not exist in messages table');
-          return true; // We still succeeded in updating the policy
+          // Create the column if it doesn't exist
+          const { error: alterError } = await supabase.rpc('add_scheduled_deletion_column');
+          
+          if (alterError) {
+            console.error('Error adding scheduled_deletion column:', alterError);
+            return true; // We still succeeded in updating the policy
+          }
         }
         
         const { error: updateError } = await supabase
@@ -92,14 +116,10 @@ export const setRetentionPolicy = async (
 // Apply scheduled deletion to clean up old messages
 export const cleanupExpiredMessages = async (): Promise<void> => {
   try {
-    // First check if the column exists before deleting
-    const { data: columnCheck } = await supabase
-      .rpc('column_exists', {
-        table_name: 'messages',
-        column_name: 'scheduled_deletion'
-      });
-
-    if (!columnCheck) {
+    // Check if the scheduled_deletion column exists
+    const scheduledDeletionExists = await checkColumnExists('messages', 'scheduled_deletion');
+    
+    if (!scheduledDeletionExists) {
       console.error('Column scheduled_deletion does not exist in messages table');
       return;
     }
@@ -127,17 +147,4 @@ export const initializeMessageCleanup = (): void => {
   
   // Set up interval for periodic cleanup (every hour)
   setInterval(cleanupExpiredMessages, 60 * 60 * 1000);
-};
-
-// Helper function to check if a column exists in a table
-// Note: This is a placeholder. In a real app, you would need to create this RPC function in Supabase
-const checkColumnExists = async (tableName: string, columnName: string): Promise<boolean> => {
-  try {
-    // In a real implementation, this would be an RPC call to Supabase
-    // For now, we'll just return true to avoid type errors
-    return true;
-  } catch (err) {
-    console.error(`Error checking if column ${columnName} exists in ${tableName}:`, err);
-    return false;
-  }
 };

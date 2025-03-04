@@ -13,6 +13,17 @@ export const useMessageRetention = (conversationId: string | undefined) => {
     
     const getRetentionPolicy = async () => {
       try {
+        // First check if the column exists
+        const { data: columnExists } = await supabase.rpc('column_exists', {
+          table_name: 'conversations',
+          column_name: 'retention_policy'
+        });
+        
+        if (!columnExists) {
+          console.log('Retention policy column does not exist yet');
+          return;
+        }
+        
         const { data, error } = await supabase
           .from('conversations')
           .select('retention_policy')
