@@ -9,6 +9,7 @@ import Messages from './pages/Messages';
 import AdminModeration from './pages/AdminModeration';
 import WaliDashboard from './pages/WaliDashboard';
 import Resources from './pages/Resources';
+import Demo from './pages/Demo';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/wali" element={<WaliDashboard />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/resources/:resourceId" element={<Resources />} />
+        <Route path="/demo" element={<Demo />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
