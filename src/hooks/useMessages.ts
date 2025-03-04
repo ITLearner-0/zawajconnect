@@ -4,9 +4,17 @@ import { useMessageExchange } from './useMessageExchange';
 import { useVideoCall } from './useVideoCall';
 import { useAIMonitoring } from './useAIMonitoring';
 import { useNavigate } from 'react-router-dom';
+import { initializeMessageCleanup } from '@/services/messageLifecycleService';
+import { useEffect } from 'react';
+import { RetentionPolicy } from '@/types/profile';
 
 export const useMessages = (conversationId: string | undefined, userId: string | null) => {
   const navigate = useNavigate();
+  
+  // Initialize message cleanup on component mount
+  useEffect(() => {
+    initializeMessageCleanup();
+  }, []);
   
   // Use the specialized hooks
   const { 
@@ -24,7 +32,11 @@ export const useMessages = (conversationId: string | undefined, userId: string |
     sendMessage: sendMessageBase,
     loading: messagesLoading,
     sendingMessage,
-    error: messagesError
+    error: messagesError,
+    encryptionEnabled,
+    toggleEncryption,
+    retentionPolicy,
+    updateRetentionPolicy
   } = useMessageExchange(conversationId, userId);
   
   const {
@@ -59,10 +71,17 @@ export const useMessages = (conversationId: string | undefined, userId: string |
     loadCurrentConversation(conversationId);
   }
 
-  // Wrapper for sendMessage that includes the current conversationId
+  // Wrapper for sendMessage
   const sendMessage = () => {
     if (conversationId) {
-      sendMessageBase(conversationId);
+      sendMessageBase();
+    }
+  };
+
+  // Wrapper for updating retention policy
+  const updateRetentionSettings = (policy: RetentionPolicy) => {
+    if (updateRetentionPolicy) {
+      updateRetentionPolicy(policy);
     }
   };
 
@@ -84,6 +103,11 @@ export const useMessages = (conversationId: string | undefined, userId: string |
     latestReport,
     monitoringEnabled,
     toggleMonitoring,
-    monitoringLoading
+    monitoringLoading,
+    // Encryption and retention states
+    encryptionEnabled,
+    toggleEncryption,
+    retentionPolicy,
+    updateRetentionPolicy: updateRetentionSettings
   };
 };

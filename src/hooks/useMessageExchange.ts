@@ -1,9 +1,20 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Message } from '@/types/profile';
+import { Message, RetentionPolicy } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
 import { filterMessageContent } from '@/services/contentModerationService';
+import { 
+  encryptMessage, 
+  decryptMessage, 
+  generateIV, 
+  generateEncryptionKey, 
+  exportKey, 
+  storeEncryptionKey, 
+  getEncryptionKey, 
+  generateKeyId 
+} from '@/services/encryptionService';
+import { calculateDeletionDate } from '@/services/messageLifecycleService';
 
 export const useMessageExchange = (conversationId: string | undefined, userId: string | null) => {
   const { toast } = useToast();
@@ -12,6 +23,57 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
   const [loading, setLoading] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [encryptionEnabled, setEncryptionEnabled] = useState(true);
+  const [retentionPolicy, setRetentionPolicy] = useState<RetentionPolicy | undefined>();
+
+  // Initialize encryption for this conversation
+  useEffect(() => {
+    if (!conversationId || !userId) return;
+
+    const initializeEncryption = async () => {
+      // Check if we already have a key for this conversation
+      let keyString = getEncryptionKey(conversationId);
+      
+      if (!keyString) {
+        try {
+          // Generate a new encryption key for this conversation
+          const newKey = await generateEncryptionKey();
+          keyString = await exportKey(newKey);
+          
+          // Store the key locally
+          storeEncryptionKey(conversationId, keyString);
+        } catch (err) {
+          console.error('Failed to initialize encryption:', err);
+          setEncryptionEnabled(false);
+        }
+      }
+    };
+
+    // Get conversation retention policy
+    const getRetentionPolicy = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('conversations')
+          .select('retention_policy')
+          .eq('id', conversationId)
+          .single();
+          
+        if (error) {
+          console.error('Error fetching retention policy:', error);
+          return;
+        }
+        
+        if (data && data.retention_policy) {
+          setRetentionPolicy(data.retention_policy);
+        }
+      } catch (err) {
+        console.error('Failed to get retention policy:', err);
+      }
+    };
+
+    initializeEncryption();
+    getRetentionPolicy();
+  }, [conversationId, userId]);
 
   // Load messages when conversation is selected
   useEffect(() => {
@@ -34,7 +96,31 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
         }
 
         if (messagesData) {
-          setMessages(messagesData as Message[]);
+          // Decrypt encrypted messages
+          const decryptedMessages = await Promise.all(
+            messagesData.map(async (msg: Message) => {
+              if (msg.encrypted && msg.iv) {
+                const keyString = getEncryptionKey(conversationId);
+                
+                if (keyString) {
+                  try {
+                    const decryptedContent = await decryptMessage(
+                      msg.content,
+                      keyString,
+                      msg.iv
+                    );
+                    return { ...msg, content: decryptedContent };
+                  } catch (err) {
+                    console.error('Failed to decrypt message:', err);
+                    return { ...msg, content: '[Encrypted message]' };
+                  }
+                }
+              }
+              return msg;
+            })
+          );
+          
+          setMessages(decryptedMessages as Message[]);
         
           // Mark unread messages as read
           const unreadMessages = messagesData
@@ -74,9 +160,29 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
         schema: 'public',
         table: 'messages',
         filter: `conversation_id=eq.${conversationId}`
-      }, (payload) => {
+      }, async (payload) => {
         // Add the new message to the list
         const newMessage = payload.new as Message;
+        
+        // Decrypt if message is encrypted
+        if (newMessage.encrypted && newMessage.iv) {
+          const keyString = getEncryptionKey(conversationId);
+          
+          if (keyString) {
+            try {
+              const decryptedContent = await decryptMessage(
+                newMessage.content,
+                keyString,
+                newMessage.iv
+              );
+              newMessage.content = decryptedContent;
+            } catch (err) {
+              console.error('Failed to decrypt new message:', err);
+              newMessage.content = '[Encrypted message]';
+            }
+          }
+        }
+        
         setMessages(prev => [...prev, newMessage]);
         
         // If message is not from current user, mark as read
@@ -125,7 +231,7 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
       // Get conversation wali_supervised status
       const { data: convData, error: convError } = await supabase
         .from('conversations')
-        .select('wali_supervised')
+        .select('wali_supervised, retention_policy')
         .eq('id', conversationId)
         .single();
       
@@ -133,12 +239,49 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
         throw convError;
       }
       
+      // Process content for encryption if enabled
+      let finalContent = filteredContent;
+      let iv = null;
+      let encrypted = false;
+      let keyId = null;
+      
+      if (encryptionEnabled) {
+        try {
+          // Get the encryption key
+          const keyString = getEncryptionKey(conversationId);
+          
+          if (keyString) {
+            // Generate a unique IV for this message
+            iv = generateIV();
+            
+            // Encrypt the message content
+            finalContent = await encryptMessage(filteredContent, keyString, iv);
+            encrypted = true;
+            keyId = generateKeyId();
+          }
+        } catch (err) {
+          console.error('Error encrypting message:', err);
+          // Fall back to unencrypted if encryption fails
+        }
+      }
+      
+      // Calculate scheduled deletion date based on retention policy
+      const scheduledDeletion = calculateDeletionDate(
+        retentionPolicy || convData?.retention_policy
+      );
+      
       const newMessage = {
         conversation_id: conversationId,
         sender_id: userId,
-        content: filteredContent, // Use filtered content
+        content: finalContent,
         is_wali_visible: (convData?.wali_supervised || needsWaliSupervision) ?? false,
-        is_filtered: filteredContent !== messageInput, // Flag if message was modified
+        is_filtered: filteredContent !== messageInput,
+        // Encryption fields
+        encrypted,
+        iv,
+        encryption_key_id: keyId,
+        // Deletion scheduling
+        scheduled_deletion: scheduledDeletion
       };
       
       const { data: insertData, error: insertError } = await supabase
@@ -154,20 +297,24 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
       if (flags.length > 0 && insertData && insertData.length > 0) {
         const messageId = insertData[0].id;
         
-        // Insert flags into content_flags table
+        // Create flag objects with proper fields
         const flagsWithMetadata = flags.map(flag => ({
-          ...flag,
           content_id: messageId,
+          content_type: 'message',
+          flag_type: flag.flag_type,
+          severity: flag.severity,
           flagged_by: userId,
-          created_at: new Date().toISOString()
+          created_at: new Date().toISOString(),
+          resolved: false
         }));
         
-        const { error: flagError } = await supabase
-          .from('content_flags')
-          .insert(flagsWithMetadata);
-          
-        if (flagError) {
-          console.error("Error inserting content flags:", flagError);
+        // Use a properly formatted insert that works with Supabase's RPC
+        for (const flag of flagsWithMetadata) {
+          const { error: flagError } = await supabase.rpc('insert_content_flag', flag);
+            
+          if (flagError) {
+            console.error("Error inserting content flag:", flagError);
+          }
         }
         
         // If content was filtered, notify the user
@@ -193,13 +340,27 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
     }
   };
 
+  // Update the retention policy
+  const updateRetentionPolicy = (policy: RetentionPolicy) => {
+    setRetentionPolicy(policy);
+  };
+
+  // Toggle encryption for the conversation
+  const toggleEncryption = (enabled: boolean) => {
+    setEncryptionEnabled(enabled);
+  };
+
   return {
     messages,
     messageInput,
     setMessageInput,
-    sendMessage: () => sendMessage(),
+    sendMessage,
     loading,
     sendingMessage,
-    error
+    error,
+    encryptionEnabled,
+    toggleEncryption,
+    retentionPolicy,
+    updateRetentionPolicy
   };
 };

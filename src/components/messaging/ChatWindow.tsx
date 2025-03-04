@@ -1,14 +1,17 @@
 
 import React, { useState } from 'react';
-import { Conversation, Message } from '@/types/profile';
-import { ArrowLeft, Video, Send, Flag } from 'lucide-react';
+import { Conversation, Message, RetentionPolicy } from '@/types/profile';
+import { ArrowLeft, Video, Send, Flag, Lock, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
 import MessageItem from '@/components/messaging/MessageItem';
 import ChatContainer from '@/components/messaging/ChatContainer';
 import WaliSupervisor from '@/components/messaging/WaliSupervisor';
 import ReportDialog from '@/components/messaging/ReportDialog';
+import RetentionSettings from '@/components/messaging/RetentionSettings';
 import { MonitoringReport } from '@/services/aiMonitoringService';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface ChatWindowProps {
   conversation: Conversation;
@@ -27,6 +30,10 @@ interface ChatWindowProps {
   monitoringEnabled?: boolean;
   toggleMonitoring?: () => void;
   monitoringLoading?: boolean;
+  encryptionEnabled?: boolean;
+  toggleEncryption?: (enabled: boolean) => void;
+  retentionPolicy?: RetentionPolicy;
+  updateRetentionPolicy?: (policy: RetentionPolicy) => void;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -45,10 +52,15 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   report = null,
   monitoringEnabled = true,
   toggleMonitoring = () => {},
-  monitoringLoading = false
+  monitoringLoading = false,
+  encryptionEnabled = true,
+  toggleEncryption = () => {},
+  retentionPolicy,
+  updateRetentionPolicy = () => {}
 }) => {
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -84,6 +96,24 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             </div>
           </div>
           <div className="flex items-center space-x-2">
+            {/* Security settings button */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setShowSecuritySettings(!showSecuritySettings)}
+              className={showSecuritySettings ? 'bg-muted' : ''}
+            >
+              <Lock className="h-4 w-4 mr-1" />
+              <span className="hidden md:inline">Security</span>
+            </Button>
+            
+            {/* Retention settings */}
+            <RetentionSettings 
+              conversationId={conversation.id}
+              currentPolicy={retentionPolicy}
+              onPolicyChanged={updateRetentionPolicy}
+            />
+            
             <Button 
               variant="outline" 
               size="sm" 
@@ -101,6 +131,27 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
             </Button>
           </div>
         </div>
+        
+        {/* Security settings panel (collapsible) */}
+        {showSecuritySettings && (
+          <div className="bg-muted/30 p-3 border-b">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Lock className="h-4 w-4" />
+                <div>
+                  <h4 className="text-sm font-medium">End-to-End Encryption</h4>
+                  <p className="text-xs text-muted-foreground">
+                    Messages are encrypted and can only be read by participants in this conversation
+                  </p>
+                </div>
+              </div>
+              <Switch 
+                checked={encryptionEnabled} 
+                onCheckedChange={toggleEncryption}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Messages area */}
         <div className="flex-grow overflow-y-auto p-4 space-y-4">
@@ -139,11 +190,25 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         {/* Message input */}
         <div className="p-3 border-t">
           <div className="flex items-center">
+            {encryptionEnabled && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="mr-2">
+                      <Lock className="h-4 w-4 text-green-600" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">End-to-end encrypted</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
             <Input
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Type a message..."
+              placeholder={`Type a message${encryptionEnabled ? ' (encrypted)' : ''}`}
               className="flex-grow"
               disabled={sendingMessage}
             />

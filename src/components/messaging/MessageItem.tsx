@@ -2,8 +2,9 @@
 import React from 'react';
 import { Message } from '@/types/profile';
 import { format } from 'date-fns';
-import { Flag } from 'lucide-react';
+import { Flag, Lock, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface MessageItemProps {
   message: Message;
@@ -12,6 +13,11 @@ interface MessageItemProps {
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) => {
+  // Format deletion date for display
+  const formattedDeletionDate = message.scheduled_deletion 
+    ? format(new Date(message.scheduled_deletion), 'MMM d, yyyy')
+    : null;
+    
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
       <div 
@@ -22,9 +28,39 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) =
         }`}
       >
         <div className="flex justify-between items-center gap-2 mb-1">
-          <span className="text-xs opacity-70">
-            {format(new Date(message.created_at), 'MMM d, h:mm a')}
-          </span>
+          <div className="flex items-center gap-1">
+            <span className="text-xs opacity-70">
+              {format(new Date(message.created_at), 'MMM d, h:mm a')}
+            </span>
+            
+            {/* Encryption indicator */}
+            {message.encrypted && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Lock className="h-3 w-3 opacity-70" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">End-to-end encrypted</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            
+            {/* Expiration indicator */}
+            {formattedDeletionDate && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Clock className="h-3 w-3 opacity-70" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="text-xs">Expires on {formattedDeletionDate}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+          </div>
           
           {/* Show filtered tag if message was filtered */}
           {message.is_filtered && (

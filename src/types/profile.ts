@@ -67,6 +67,7 @@ export interface Conversation {
     last_name: string;
   };
   wali_supervised: boolean;
+  retention_policy?: RetentionPolicy; // Added for message retention
 }
 
 export interface Message {
@@ -81,6 +82,18 @@ export interface Message {
   // New fields for content filtering
   content_flags?: ContentFlag[];
   is_filtered?: boolean;
+  // New fields for encryption and message lifecycle
+  encrypted?: boolean;
+  iv?: string; // Initialization vector for encryption
+  encryption_key_id?: string; // Reference to the key used
+  scheduled_deletion?: string; // ISO date when message should be deleted
+  encrypted_for?: string[]; // IDs of users who can decrypt
+}
+
+export interface RetentionPolicy {
+  type: 'temporary' | 'permanent';
+  duration_days?: number; // Number of days to keep messages
+  auto_delete: boolean; // Whether to automatically delete messages
 }
 
 export interface VideoCallStatus {

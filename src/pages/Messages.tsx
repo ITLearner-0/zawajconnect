@@ -30,7 +30,12 @@ const Messages = () => {
     latestReport,
     monitoringEnabled,
     toggleMonitoring,
-    monitoringLoading
+    monitoringLoading,
+    // Encryption and retention states
+    encryptionEnabled,
+    toggleEncryption,
+    retentionPolicy,
+    updateRetentionPolicy
   } = useMessages(conversationId, userId);
 
   // Select a conversation
@@ -93,6 +98,11 @@ const Messages = () => {
               monitoringEnabled={monitoringEnabled}
               toggleMonitoring={toggleMonitoring}
               monitoringLoading={monitoringLoading}
+              // New encryption and retention props
+              encryptionEnabled={encryptionEnabled}
+              toggleEncryption={toggleEncryption}
+              retentionPolicy={retentionPolicy}
+              updateRetentionPolicy={updateRetentionPolicy}
             />
           )
         )}
