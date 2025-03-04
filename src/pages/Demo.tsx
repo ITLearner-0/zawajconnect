@@ -7,9 +7,10 @@ import MessagingInterface from '@/components/demo/MessagingInterface';
 import DemoHeader from '@/components/demo/DemoHeader';
 import { useMessagingDemo } from '@/hooks/useMessagingDemo';
 import { DatabaseProfile } from '@/types/profile';
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Demo = () => {
+  const navigate = useNavigate();
   const {
     currentUserId,
     selectedConversationId,
@@ -35,7 +36,11 @@ const Demo = () => {
   
   // Handle selecting a profile from the list
   const handleSelectProfile = (profile: DatabaseProfile) => {
-    // Find if a conversation exists with this profile
+    // Option 1: Navigate to profile page
+    navigate(`/profile/${profile.id}`);
+    
+    // Option 2: Find if a conversation exists with this profile
+    // and open the conversation (this functionality is maintained as before)
     const existingConversation = conversations.find(c => 
       c.participants.includes(profile.id)
     );

@@ -5,6 +5,7 @@ import { DatabaseProfile } from '@/types/profile';
 import { Button } from '@/components/ui/button';
 import { Heart, User, MessageCircle } from 'lucide-react';
 import { IslamicPattern } from '@/components/ui/islamic-pattern';
+import { Link } from 'react-router-dom';
 
 interface ProfileListProps {
   profiles: DatabaseProfile[];
@@ -20,28 +21,40 @@ const ProfileList = ({ profiles, onSelectProfile }: ProfileListProps) => {
       </h3>
       <div className="space-y-3">
         {profiles.map(profile => (
-          <div 
+          <Link 
             key={profile.id} 
-            className="flex items-center p-4 border border-islamic-sand rounded-lg hover:bg-islamic-cream transition-colors cursor-pointer"
-            onClick={() => onSelectProfile && onSelectProfile(profile)}
+            to={`/profile/${profile.id}`}
+            className="block"
+            onClick={(e) => {
+              // If onSelectProfile is provided, call it and prevent default navigation
+              if (onSelectProfile) {
+                e.preventDefault();
+                onSelectProfile(profile);
+              }
+            }}
+            aria-label={`View ${profile.first_name} ${profile.last_name}'s profile`}
           >
-            <Avatar className="h-12 w-12 mr-4 ring-2 ring-offset-2 ring-islamic-teal/20">
-              {profile.profile_picture ? (
-                <AvatarImage src={profile.profile_picture} alt={`${profile.first_name}'s profile`} />
-              ) : null}
-              <AvatarFallback className="bg-islamic-teal text-white">{profile.first_name[0]}</AvatarFallback>
-            </Avatar>
-            <div className="flex-1">
-              <div className="font-medium text-islamic-blue">{profile.first_name} {profile.last_name}</div>
-              <div className="text-sm text-muted-foreground">{profile.occupation}</div>
+            <div 
+              className="flex items-center p-4 border border-islamic-sand rounded-lg hover:bg-islamic-cream transition-colors cursor-pointer"
+            >
+              <Avatar className="h-12 w-12 mr-4 ring-2 ring-offset-2 ring-islamic-teal/20">
+                {profile.profile_picture ? (
+                  <AvatarImage src={profile.profile_picture} alt={`${profile.first_name}'s profile`} />
+                ) : null}
+                <AvatarFallback className="bg-islamic-teal text-white">{profile.first_name[0]}</AvatarFallback>
+              </Avatar>
+              <div className="flex-1">
+                <div className="font-medium text-islamic-blue">{profile.first_name} {profile.last_name}</div>
+                <div className="text-sm text-muted-foreground">{profile.occupation}</div>
+              </div>
+              <Badge variant={profile.gender === 'Male' ? 'default' : 'secondary'} className={`ml-auto ${profile.gender === 'Male' ? 'bg-islamic-blue' : 'bg-islamic-gold'}`}>
+                {profile.gender}
+              </Badge>
+              <Button variant="ghost" size="sm" className="ml-2 text-islamic-teal">
+                <MessageCircle className="h-4 w-4" />
+              </Button>
             </div>
-            <Badge variant={profile.gender === 'Male' ? 'default' : 'secondary'} className={`ml-auto ${profile.gender === 'Male' ? 'bg-islamic-blue' : 'bg-islamic-gold'}`}>
-              {profile.gender}
-            </Badge>
-            <Button variant="ghost" size="sm" className="ml-2 text-islamic-teal">
-              <MessageCircle className="h-4 w-4" />
-            </Button>
-          </div>
+          </Link>
         ))}
       </div>
     </IslamicPattern>
