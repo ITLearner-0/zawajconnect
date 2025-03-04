@@ -1,19 +1,27 @@
 
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { CustomButton } from "@/components/CustomButton";
+import AccessibilityControls from "@/components/AccessibilityControls";
 
-const ProfileHeader = () => {
-  const navigate = useNavigate();
-  
+interface ProfileHeaderProps {
+  onSignOut: () => void;
+}
+
+const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
   return (
-    <Button 
-      onClick={() => navigate('/demo')} 
-      variant="ghost" 
-      className="mb-4 hover:bg-islamic-teal/10"
-    >
-      <ArrowLeft className="mr-2 h-4 w-4" /> Back to Profiles
-    </Button>
+    <div className="flex justify-between items-center">
+      <h1 id="profile-heading" className="text-2xl font-bold text-center">Update Your Profile</h1>
+      <div className="flex items-center gap-2">
+        <AccessibilityControls />
+        <CustomButton 
+          variant="outline" 
+          onClick={onSignOut}
+          aria-label="Sign out of your account"
+        >
+          Sign Out
+        </CustomButton>
+      </div>
+    </div>
   );
 };
 
