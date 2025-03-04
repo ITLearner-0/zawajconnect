@@ -15,6 +15,10 @@ export interface Violation {
   message: string;
   messageId: string;
   timestamp: string;
+  metadata?: {
+    context?: string;
+    [key: string]: any;
+  };
 }
 
 // Islamic guidelines (simplified for demonstration)
