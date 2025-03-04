@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ChevronRight, ChevronLeft, Shield } from 'lucide-react';
+import { ChevronLeft, Shield } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Violation, MonitoringReport } from '@/services/aiMonitoringService';
 import AIMonitoringDashboard from './AIMonitoringDashboard';
