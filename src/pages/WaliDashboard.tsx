@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import WaliDashboardComponent from '@/components/wali/WaliDashboard';
 import { Toaster } from '@/components/ui/toaster';
-import { setupModerationTables, updateProfileSchema } from '@/utils/databaseUtils';
+import { setupModerationTables, updateProfileSchema, setupRpcFunctions } from '@/utils/databaseUtils';
 
 const WaliDashboard = () => {
   const navigate = useNavigate();
@@ -15,6 +15,9 @@ const WaliDashboard = () => {
   useEffect(() => {
     const initializeDatabase = async () => {
       try {
+        // Setup RPC functions first
+        await setupRpcFunctions();
+        
         // Setup moderation tables if they don't exist
         await setupModerationTables();
         

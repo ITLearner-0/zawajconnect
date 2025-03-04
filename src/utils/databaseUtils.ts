@@ -7,9 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 export const tableExists = async (tableName: string): Promise<boolean> => {
   try {
     // Use a direct SQL query to check if the table exists
-    const { data, error } = await supabase.rpc('table_exists', { 
-      table_name: tableName 
-    });
+    const { data, error } = await supabase
+      .from('pg_tables')
+      .select('tablename')
+      .eq('schemaname', 'public')
+      .eq('tablename', tableName)
+      .maybeSingle();
     
     if (error) {
       console.error(`Error checking if table ${tableName} exists:`, error);
@@ -28,7 +31,7 @@ export const tableExists = async (tableName: string): Promise<boolean> => {
  */
 export const executeSql = async (query: string): Promise<any> => {
   try {
-    // Use RPC to execute custom SQL
+    // For safety, we'll use the supabase SQL API directly
     const { data, error } = await supabase.rpc('execute_sql', { 
       sql_query: query 
     });
@@ -50,16 +53,14 @@ export const executeSql = async (query: string): Promise<any> => {
  */
 export const columnExists = async (tableName: string, columnName: string): Promise<boolean> => {
   try {
-    const result = await executeSql(`
-      SELECT EXISTS (
-        SELECT FROM information_schema.columns 
-        WHERE table_schema = 'public' 
-        AND table_name = '${tableName}' 
-        AND column_name = '${columnName}'
-      ) as exists
-    `);
+    // Since we don't have direct access to information_schema via RPC,
+    // we'll check by attempting to select the column in a limit 0 query
+    const query = `
+      SELECT ${columnName} FROM ${tableName} LIMIT 0;
+    `;
     
-    return !!result?.exists;
+    const result = await executeSql(query);
+    return result !== null;
   } catch (err) {
     console.error(`Error in columnExists check for ${columnName}:`, err);
     return false;
@@ -100,10 +101,11 @@ export const addColumnIfNotExists = async (
     const exists = await columnExists(tableName, columnName);
     
     if (!exists) {
-      await executeSql(`
+      const query = `
         ALTER TABLE ${tableName}
-        ADD COLUMN ${columnName} ${columnDefinition}
-      `);
+        ADD COLUMN IF NOT EXISTS ${columnName} ${columnDefinition}
+      `;
+      await executeSql(query);
       return true;
     }
     
@@ -120,8 +122,8 @@ export const addColumnIfNotExists = async (
 export const setupModerationTables = async (): Promise<boolean> => {
   try {
     // Create content_flags table
-    await createTableIfNotExists('content_flags', `
-      CREATE TABLE content_flags (
+    await executeSql(`
+      CREATE TABLE IF NOT EXISTS content_flags (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         content_id TEXT NOT NULL,
         content_type TEXT NOT NULL,
@@ -137,8 +139,8 @@ export const setupModerationTables = async (): Promise<boolean> => {
     `);
     
     // Create content_reports table
-    await createTableIfNotExists('content_reports', `
-      CREATE TABLE content_reports (
+    await executeSql(`
+      CREATE TABLE IF NOT EXISTS content_reports (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         reported_user_id UUID NOT NULL,
         reporting_user_id UUID NOT NULL,
@@ -153,11 +155,11 @@ export const setupModerationTables = async (): Promise<boolean> => {
       )
     `);
     
-    // Create wali_profiles table if it doesn't exist
-    await createTableIfNotExists('wali_profiles', `
-      CREATE TABLE wali_profiles (
+    // Create wali_profiles table
+    await executeSql(`
+      CREATE TABLE IF NOT EXISTS wali_profiles (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        user_id UUID NOT NULL REFERENCES auth.users(id),
+        user_id UUID NOT NULL,
         first_name TEXT NOT NULL,
         last_name TEXT NOT NULL,
         relationship TEXT NOT NULL,
@@ -176,7 +178,87 @@ export const setupModerationTables = async (): Promise<boolean> => {
       )
     `);
     
-    // Add RPC functions for table existence and SQL execution if not existing
+    // Create chat_requests table
+    await executeSql(`
+      CREATE TABLE IF NOT EXISTS chat_requests (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        requester_id UUID NOT NULL,
+        recipient_id UUID NOT NULL,
+        wali_id UUID,
+        status TEXT DEFAULT 'pending',
+        requested_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        reviewed_at TIMESTAMP WITH TIME ZONE,
+        wali_notes TEXT
+      )
+    `);
+    
+    // Create supervision_sessions table
+    await executeSql(`
+      CREATE TABLE IF NOT EXISTS supervision_sessions (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        conversation_id UUID NOT NULL,
+        wali_id UUID NOT NULL,
+        started_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        ended_at TIMESTAMP WITH TIME ZONE,
+        is_active BOOLEAN DEFAULT TRUE,
+        supervision_level TEXT DEFAULT 'passive'
+      )
+    `);
+    
+    // Add extensions if needed
+    await executeSql(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
+    
+    return true;
+  } catch (err) {
+    console.error('Error setting up moderation tables:', err);
+    return false;
+  }
+};
+
+/**
+ * Updates the profile table to include privacy and blocking fields if needed
+ */
+export const updateProfileSchema = async (): Promise<boolean> => {
+  try {
+    // Add privacy_settings column if it doesn't exist
+    await executeSql(`
+      ALTER TABLE profiles 
+      ADD COLUMN IF NOT EXISTS privacy_settings JSONB 
+      DEFAULT '{"profileVisibilityLevel": 1, "showAge": true, "showLocation": true, "showOccupation": true, "allowNonMatchMessages": true}'::jsonb
+    `);
+    
+    // Add blocked_users column if it doesn't exist
+    await executeSql(`
+      ALTER TABLE profiles 
+      ADD COLUMN IF NOT EXISTS blocked_users TEXT[] 
+      DEFAULT '{}'::text[]
+    `);
+    
+    // Add is_visible column if it doesn't exist
+    await executeSql(`
+      ALTER TABLE profiles 
+      ADD COLUMN IF NOT EXISTS is_visible BOOLEAN 
+      DEFAULT true
+    `);
+    
+    // Add role column if it doesn't exist for admin features
+    await executeSql(`
+      ALTER TABLE profiles 
+      ADD COLUMN IF NOT EXISTS role TEXT 
+      DEFAULT 'user'
+    `);
+    
+    return true;
+  } catch (err) {
+    console.error('Error updating profile schema:', err);
+    return false;
+  }
+};
+
+// Add RPC functions for table operations
+export const setupRpcFunctions = async (): Promise<boolean> => {
+  try {
+    // Create function for checking if a table exists
     await executeSql(`
       CREATE OR REPLACE FUNCTION table_exists(table_name TEXT) 
       RETURNS BOOLEAN AS $$
@@ -190,6 +272,7 @@ export const setupModerationTables = async (): Promise<boolean> => {
       $$ LANGUAGE plpgsql SECURITY DEFINER;
     `);
     
+    // Create function for executing SQL
     await executeSql(`
       CREATE OR REPLACE FUNCTION execute_sql(sql_query TEXT) 
       RETURNS JSONB AS $$
@@ -206,47 +289,7 @@ export const setupModerationTables = async (): Promise<boolean> => {
     
     return true;
   } catch (err) {
-    console.error('Error setting up moderation tables:', err);
-    return false;
-  }
-};
-
-/**
- * Updates the profile table to include privacy and blocking fields if needed
- */
-export const updateProfileSchema = async (): Promise<boolean> => {
-  try {
-    // Add privacy_settings column if it doesn't exist
-    await addColumnIfNotExists(
-      'profiles',
-      'privacy_settings',
-      'JSONB DEFAULT \'{"profileVisibilityLevel": 1, "showAge": true, "showLocation": true, "showOccupation": true, "allowNonMatchMessages": true}\'::jsonb'
-    );
-    
-    // Add blocked_users column if it doesn't exist
-    await addColumnIfNotExists(
-      'profiles',
-      'blocked_users',
-      'TEXT[] DEFAULT \'{}\'::text[]'
-    );
-    
-    // Add is_visible column if it doesn't exist
-    await addColumnIfNotExists(
-      'profiles',
-      'is_visible',
-      'BOOLEAN DEFAULT true'
-    );
-    
-    // Add role column if it doesn't exist for admin features
-    await addColumnIfNotExists(
-      'profiles',
-      'role',
-      'TEXT DEFAULT \'user\''
-    );
-    
-    return true;
-  } catch (err) {
-    console.error('Error updating profile schema:', err);
+    console.error('Error setting up RPC functions:', err);
     return false;
   }
 };

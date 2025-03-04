@@ -1,119 +1,117 @@
 
 import { useState, useEffect } from 'react';
 import { Message } from '@/types/profile';
-import { 
-  MonitoringReport, 
-  Violation, 
-  detectViolations, 
-  generateReport 
-} from '@/services/aiMonitoringService';
-import { useToast } from '@/hooks/use-toast';
-import { filterMessageContent, flagContent } from '@/services/contentModerationService';
+import { MonitoringReport, Violation, analyzeBehavior, analyzeIslamicCompliance, analyzeSentiment, detectViolations, generateReport } from '@/services/aiMonitoringService';
+import { supabase } from '@/integrations/supabase/client';
+import { flagContent } from '@/services/contentModerationService';
 
-export const useAIMonitoring = (
-  conversationId: string | undefined, 
-  messages: Message[], 
-  userId: string | null
-) => {
-  const { toast } = useToast();
-  const [violations, setViolations] = useState<Violation[]>([]);
-  const [latestReport, setLatestReport] = useState<MonitoringReport | null>(null);
-  const [monitoringEnabled, setMonitoringEnabled] = useState(true);
+interface UseAIMonitoringProps {
+  conversationId: string;
+  messages: Message[];
+  userId: string;
+}
+
+export const useAIMonitoring = ({ conversationId, messages, userId }: UseAIMonitoringProps) => {
+  const [report, setReport] = useState<MonitoringReport | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [violations, setViolations] = useState<Violation[]>([]);
+  const [lastAnalyzedCount, setLastAnalyzedCount] = useState(0);
 
-  // Check new messages for violations in real-time
+  // Generate monitoring report
   useEffect(() => {
-    if (!monitoringEnabled || messages.length === 0 || !userId) return;
+    // Only regenerate when we have 5+ new messages
+    if (messages.length === 0 || messages.length < lastAnalyzedCount + 5) {
+      return;
+    }
     
-    const latestMessage = messages[messages.length - 1];
-    if (!latestMessage) return;
+    setLoading(true);
+    const generatedReport = generateReport(messages);
+    setReport(generatedReport);
+    setViolations(generatedReport.violations);
+    setLastAnalyzedCount(messages.length);
+    setLoading(false);
     
-    // Only check sent messages, not received ones
-    if (latestMessage.sender_id !== userId) return;
-    
-    // Check message content through the filter
-    const { flags } = filterMessageContent(latestMessage.content);
-    
-    // If flags detected, record them in the database
-    if (flags.length > 0) {
-      flags.forEach(flag => {
+    // Automatically flag severe violations in the system
+    generatedReport.violations
+      .filter(v => v.severity === 'high')
+      .forEach(violation => {
+        // Auto-flag high severity violations
         flagContent(
-          latestMessage.id,
+          violation.messageId,
           'message',
-          flag.flag_type,
-          flag.severity,
-          userId
+          violation.type === 'islamic' ? 'religious_violation' : 
+                 violation.type === 'behavioral' ? 'suspicious' : 'inappropriate',
+          'high',
+          'system'
         );
       });
-    }
-    
-    // Check only the newest message for violations
-    const newViolations = detectViolations(latestMessage);
+  }, [messages, lastAnalyzedCount]);
+  
+  // Real-time message monitoring
+  const monitorNewMessage = (message: Message) => {
+    const newViolations = detectViolations(message);
     
     if (newViolations.length > 0) {
+      // Update violations list
       setViolations(prev => [...prev, ...newViolations]);
       
-      // Alert about high severity violations
-      const highSeverityViolations = newViolations.filter(v => v.severity === 'high');
-      if (highSeverityViolations.length > 0) {
-        toast({
-          title: "Compliance Alert",
-          description: highSeverityViolations[0].message,
-          variant: "destructive"
+      // Auto-flag high severity violations
+      newViolations
+        .filter(v => v.severity === 'high')
+        .forEach(violation => {
+          flagContent(
+            violation.messageId,
+            'message',
+            violation.type === 'islamic' ? 'religious_violation' : 
+                  violation.type === 'behavioral' ? 'suspicious' : 'inappropriate',
+            'high',
+            'system'
+          );
         });
-      }
-    }
-  }, [messages, monitoringEnabled, toast, userId]);
-
-  // Generate comprehensive report periodically or when messages change significantly
-  useEffect(() => {
-    if (!monitoringEnabled || messages.length < 5 || !conversationId) return;
-    
-    const generateMonitoringReport = async () => {
-      try {
-        setLoading(true);
-        const report = generateReport(messages);
-        setLatestReport(report);
-        
-        // Save report to database - just log for now since table doesn't exist
-        if (userId) {
-          console.log("Would save monitoring report:", {
-            conversation_id: conversationId,
-            user_id: userId,
-            behavioral_score: report.behavioralScore,
-            islamic_compliance_score: report.islamicComplianceScore,
-            sentiment_score: report.sentimentScore,
-            violation_count: report.violations.length,
-            report_data: report
-          });
-        }
-      } catch (err: any) {
-        setError(err.message);
-        console.error("Error in AI monitoring:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    // Generate report when we have 5 messages or message count is multiple of 10
-    if (messages.length === 5 || messages.length % 10 === 0) {
-      generateMonitoringReport();
+      
+      return true;
     }
     
-  }, [messages, conversationId, userId, monitoringEnabled]);
-
-  // Toggle monitoring status
-  const toggleMonitoring = () => {
-    setMonitoringEnabled(prev => !prev);
+    return false;
   };
-
+  
+  // Save the report to the database
+  const saveReport = async () => {
+    if (!report) return false;
+    
+    try {
+      const { error } = await supabase
+        .from('monitoring_reports')
+        .insert({
+          conversation_id: conversationId,
+          user_id: userId,
+          behavioral_score: report.behavioralScore,
+          islamic_compliance_score: report.islamicComplianceScore,
+          sentiment_score: report.sentimentScore,
+          violations: report.violations,
+          created_at: new Date().toISOString()
+        });
+        
+      if (error) {
+        console.error('Error saving monitoring report:', error);
+        return false;
+      }
+      
+      return true;
+    } catch (err) {
+      console.error('Error in saveReport:', err);
+      return false;
+    }
+  };
+  
   return {
-    violations,
-    latestReport,
-    monitoringEnabled,
-    toggleMonitoring,
+    report,
     loading,
-    error
+    isOpen,
+    setIsOpen,
+    violations,
+    monitorNewMessage,
+    saveReport
   };
 };

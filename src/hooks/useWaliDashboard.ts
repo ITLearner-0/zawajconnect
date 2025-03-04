@@ -1,8 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { WaliProfile, ChatRequest, SupervisionSession, WaliNotification, WaliDashboardStats, Message } from '@/types/wali';
-import { tableExists } from '@/utils/databaseUtils';
+import { WaliProfile, ChatRequest, SupervisionSession, WaliDashboardStats } from '@/types/wali';
+import { Message } from '@/types/profile';
+import { setupModerationTables } from '@/utils/databaseUtils';
 import { useToast } from '@/hooks/use-toast';
 
 export const useWaliDashboard = () => {
@@ -54,74 +55,132 @@ export const useWaliDashboard = () => {
       setError(null);
 
       try {
-        // Check if wali_profiles table exists
-        const waliProfilesTableExists = await tableExists('wali_profiles');
-        
-        if (!waliProfilesTableExists) {
-          toast({
-            title: "Setup Required",
-            description: "Wali profiles table doesn't exist yet. Setting up...",
-          });
-          
-          // We'll assume the tables are created by the databaseUtils functions
-          setError("Database setup required. Please contact administrator.");
-          setLoading(false);
-          return;
-        }
+        // Ensure tables exist
+        await setupModerationTables();
 
-        // Fetch wali profile for the current user
-        const { data: profileData, error: profileError } = await supabase
-          .from('wali_profiles')
-          .select('*')
-          .eq('user_id', userId)
-          .single();
-
-        if (profileError) {
-          if (profileError.code === 'PGRST116') {
-            // Profile not found
-            setWaliProfile(null);
-          } else {
-            throw profileError;
+        // Initialize empty profile structure if it doesn't exist
+        const upsertProfile = async () => {
+          const { data, error } = await supabase
+            .from('wali_profiles')
+            .select('*')
+            .eq('user_id', userId)
+            .maybeSingle();
+            
+          if (error && error.code !== 'PGRST116') {
+            console.error('Error checking wali profile:', error);
+            return null;
           }
-        } else if (profileData) {
-          setWaliProfile(profileData as WaliProfile);
+          
+          // If no profile exists, create a basic one
+          if (!data) {
+            const { data: userData } = await supabase
+              .from('profiles')
+              .select('first_name, last_name')
+              .eq('id', userId)
+              .single();
+              
+            const defaultProfile = {
+              user_id: userId,
+              first_name: userData?.first_name || 'New',
+              last_name: userData?.last_name || 'Wali',
+              relationship: 'self',
+              contact_information: '',
+              is_verified: false,
+              availability_status: 'offline' as const,
+              last_active: new Date().toISOString(),
+              managed_users: []
+            };
+            
+            const { data: insertedProfile, error: insertError } = await supabase
+              .from('wali_profiles')
+              .insert(defaultProfile)
+              .select()
+              .single();
+              
+            if (insertError) {
+              console.error('Error creating wali profile:', insertError);
+              return null;
+            }
+            
+            return insertedProfile as WaliProfile;
+          }
+          
+          return data as WaliProfile;
+        };
+        
+        // Get or create wali profile
+        const profileData = await upsertProfile();
+        if (profileData) {
+          setWaliProfile(profileData);
         }
 
         // Fetch pending chat requests
         const { data: requestsData, error: requestsError } = await supabase
           .from('chat_requests')
           .select(`
-            *,
-            requester_profile:profiles!chat_requests_requester_id_fkey(
+            id,
+            requester_id,
+            recipient_id,
+            wali_id,
+            status,
+            requested_at,
+            reviewed_at,
+            wali_notes,
+            requester:requester_id(
               first_name,
-              last_name,
-              profile_image
+              last_name
             )
           `)
-          .eq('wali_id', userId);
+          .eq('wali_id', userId)
+          .order('requested_at', { ascending: false });
 
-        if (requestsError) throw requestsError;
-        setChatRequests(requestsData || []);
+        if (requestsError) {
+          console.error('Error fetching chat requests:', requestsError);
+        } else {
+          // Transform data to match ChatRequest type
+          const transformedRequests: ChatRequest[] = requestsData.map((req: any) => ({
+            id: req.id,
+            requester_id: req.requester_id,
+            recipient_id: req.recipient_id,
+            wali_id: req.wali_id,
+            status: req.status,
+            requested_at: req.requested_at,
+            reviewed_at: req.reviewed_at,
+            wali_notes: req.wali_notes,
+            requester_profile: req.requester ? {
+              first_name: req.requester.first_name,
+              last_name: req.requester.last_name
+            } : undefined
+          }));
+          
+          setChatRequests(transformedRequests);
+        }
 
-        // Fetch active conversations
-        const { data: conversationsData, error: conversationsError } = await supabase
-          .from('conversations')
+        // Fetch active conversations with supervision
+        const { data: supervisionsData, error: supervisionsError } = await supabase
+          .from('supervision_sessions')
           .select(`
-            *,
-            supervision_sessions!inner(
+            id,
+            conversation_id,
+            wali_id,
+            started_at,
+            ended_at,
+            is_active,
+            supervision_level,
+            conversation:conversation_id(
               id,
-              wali_id,
-              started_at,
-              ended_at,
-              is_active
-            ),
-            messages(count)
+              participants,
+              created_at
+            )
           `)
-          .eq('supervision_sessions.wali_id', userId)
-          .eq('supervision_sessions.is_active', true);
+          .eq('wali_id', userId)
+          .eq('is_active', true);
 
-        if (conversationsError) throw conversationsError;
-        setActiveConversations(conversationsData || []);
+        if (supervisionsError) {
+          console.error('Error fetching supervisions:', supervisionsError);
+        } else {
+          setActiveConversations(supervisionsData || []);
+        }
 
         // Fetch flagged content
         const { data: flaggedData, error: flaggedError } = await supabase
@@ -130,14 +189,17 @@ export const useWaliDashboard = () => {
           .eq('resolved', false)
           .order('created_at', { ascending: false });
 
-        if (flaggedError) throw flaggedError;
-        setFlaggedContent(flaggedData || []);
+        if (flaggedError) {
+          console.error('Error fetching flagged content:', flaggedError);
+        } else {
+          setFlaggedContent(flaggedData || []);
+        }
 
         // Update statistics
         setStatistics({
-          pendingRequests: chatRequests.filter(r => r.status === 'pending').length,
-          activeConversations: activeConversations.length,
-          flaggedMessages: flaggedContent.length,
+          pendingRequests: (chatRequests || []).filter(r => r.status === 'pending').length,
+          activeConversations: (supervisionsData || []).length,
+          flaggedMessages: (flaggedData || []).length,
           totalSupervised: profileData?.managed_users?.length || 0
         });
 
@@ -348,25 +410,32 @@ export const useWaliDashboard = () => {
     if (!userId) return false;
 
     try {
-      const { data, error } = await supabase
+      // First get the conversation_id from the session
+      const { data: session, error: sessionError } = await supabase
+        .from('supervision_sessions')
+        .select('conversation_id')
+        .eq('id', sessionId)
+        .single();
+
+      if (sessionError) throw sessionError;
+
+      const { error } = await supabase
         .from('supervision_sessions')
         .update({ 
           is_active: false,
           ended_at: new Date().toISOString()
         })
         .eq('id', sessionId)
-        .eq('wali_id', userId)
-        .select('conversation_id')
-        .single();
+        .eq('wali_id', userId);
 
       if (error) throw error;
 
       // Create a system message visible only to wali
-      if (data) {
+      if (session) {
         await supabase
           .from('messages')
           .insert({
-            conversation_id: data.conversation_id,
+            conversation_id: session.conversation_id,
             sender_id: 'system',
             content: 'Wali supervision ended',
             created_at: new Date().toISOString(),

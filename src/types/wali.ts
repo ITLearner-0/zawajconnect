@@ -1,4 +1,6 @@
 
+import { Message } from "@/types/profile";
+
 export interface WaliProfile {
   id: string;
   user_id: string;
@@ -8,34 +10,31 @@ export interface WaliProfile {
   contact_information: string;
   is_verified: boolean;
   verification_date?: string;
-  availability_status: 'available' | 'busy' | 'offline';
+  availability_status: 'online' | 'away' | 'busy' | 'offline';
   last_active: string;
-  managed_users: string[];
-  chat_preferences: WaliChatPreferences;
-}
-
-export interface WaliChatPreferences {
-  auto_approve_known_contacts: boolean;
-  notification_level: 'all' | 'important' | 'minimal';
-  keyword_alerts: string[];
-  supervision_level: 'passive' | 'active' | 'strict';
+  managed_users?: string[];
+  chat_preferences?: {
+    auto_approve_known_contacts: boolean;
+    notification_level: 'all' | 'important' | 'none';
+    keyword_alerts: string[];
+    supervision_level: 'active' | 'passive' | 'minimal';
+  };
 }
 
 export interface ChatRequest {
   id: string;
   requester_id: string;
   recipient_id: string;
-  status: 'pending' | 'approved' | 'rejected' | 'cancelled';
+  wali_id?: string;
+  status: 'pending' | 'approved' | 'rejected';
   requested_at: string;
   reviewed_at?: string;
+  wali_notes?: string;
   requester_profile?: {
     first_name: string;
     last_name: string;
     profile_image?: string;
   };
-  message?: string;
-  wali_notes?: string;
-  wali_id?: string;
 }
 
 export interface SupervisionSession {
@@ -45,20 +44,18 @@ export interface SupervisionSession {
   started_at: string;
   ended_at?: string;
   is_active: boolean;
-  notes?: string;
-  action_taken?: 'warning' | 'terminated' | 'reported' | 'none';
-  supervision_level: 'passive' | 'active' | 'intervening';
+  supervision_level: 'active' | 'passive' | 'minimal';
 }
 
 export interface WaliNotification {
   id: string;
   wali_id: string;
-  type: 'chat_request' | 'keyword_alert' | 'conversation_started' | 'system';
+  type: 'chat_request' | 'flag' | 'message' | 'system';
   content: string;
-  related_id?: string;
-  created_at: string;
   is_read: boolean;
-  urgency: 'low' | 'medium' | 'high';
+  created_at: string;
+  link?: string;
+  priority: 'high' | 'medium' | 'low';
 }
 
 export interface WaliDashboardStats {
@@ -67,3 +64,22 @@ export interface WaliDashboardStats {
   flaggedMessages: number;
   totalSupervised: number;
 }
+
+export interface WaliChatSettings {
+  autoApproveKnownContacts: boolean;
+  notificationLevel: 'all' | 'important' | 'none';
+  keywordAlerts: string[];
+  supervisionLevel: 'active' | 'passive' | 'minimal';
+}
+
+export interface WaliAction {
+  id: string;
+  wali_id: string;
+  action_type: 'approve' | 'reject' | 'flag' | 'intervene' | 'message';
+  target_id: string;
+  target_type: 'conversation' | 'message' | 'user';
+  performed_at: string;
+  notes?: string;
+}
+
+export interface { Message }; // Re-export Message type from profile

@@ -72,11 +72,18 @@ export const useProfileForm = ({
     const newVisibilityState = !isAccountVisible;
     setIsAccountVisible(newVisibilityState);
     
+    // Make sure is_visible column exists
+    try {
+      await supabase.rpc('execute_sql', {
+        sql_query: `ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_visible BOOLEAN DEFAULT true`
+      });
+    } catch (err) {
+      console.error("Error ensuring is_visible column exists:", err);
+    }
+    
     const { error } = await supabase
       .from("profiles")
-      .update({ 
-        is_visible: newVisibilityState 
-      })
+      .update({ is_visible: newVisibilityState })
       .eq("id", session.user.id);
       
     if (error) {
@@ -107,11 +114,18 @@ export const useProfileForm = ({
     
     const updatedBlockedUsers = blockedUsers.filter(id => id !== userIdToUnblock);
     
+    // Make sure blocked_users column exists
+    try {
+      await supabase.rpc('execute_sql', {
+        sql_query: `ALTER TABLE profiles ADD COLUMN IF NOT EXISTS blocked_users TEXT[] DEFAULT '{}'::text[]`
+      });
+    } catch (err) {
+      console.error("Error ensuring blocked_users column exists:", err);
+    }
+    
     const { error } = await supabase
       .from("profiles")
-      .update({ 
-        blocked_users: updatedBlockedUsers 
-      })
+      .update({ blocked_users: updatedBlockedUsers })
       .eq("id", session.user.id);
       
     if (error) {
@@ -154,6 +168,22 @@ export const useProfileForm = ({
 
     const [firstName, ...lastNameParts] = formData.fullName.split(" ");
     const lastName = lastNameParts.join(" ");
+
+    // Ensure required columns exist
+    try {
+      await supabase.rpc('execute_sql', {
+        sql_query: `
+          ALTER TABLE profiles ADD COLUMN IF NOT EXISTS privacy_settings JSONB 
+          DEFAULT '{"profileVisibilityLevel": 1, "showAge": true, "showLocation": true, "showOccupation": true, "allowNonMatchMessages": true}'::jsonb;
+          
+          ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_visible BOOLEAN DEFAULT true;
+          
+          ALTER TABLE profiles ADD COLUMN IF NOT EXISTS blocked_users TEXT[] DEFAULT '{}'::text[];
+        `
+      });
+    } catch (err) {
+      console.error("Error ensuring columns exist:", err);
+    }
 
     const profileData = {
       id: session.user.id,

@@ -100,24 +100,42 @@ export const useProfileData = (): UseProfileDataResult => {
         
         setVerificationStatus({
           email: session.user.email_confirmed_at !== null,
-          phone: isVerified && verificationDoc.startsWith("phone:"),
-          id: isVerified && verificationDoc.startsWith("id:"),
+          phone: isVerified && (verificationDoc?.startsWith("phone:") || false),
+          id: isVerified && (verificationDoc?.startsWith("id:") || false),
         });
         
-        // Load privacy settings from the profile if available
-        if (profile.privacy_settings) {
-          setPrivacySettings(profile.privacy_settings as unknown as PrivacySettings);
+        // Handle privacy settings
+        let userPrivacySettings = DEFAULT_PRIVACY_SETTINGS;
+        try {
+          // Try to parse privacy settings from the profile
+          if (profile.privacy_settings) {
+            userPrivacySettings = typeof profile.privacy_settings === 'string' 
+              ? JSON.parse(profile.privacy_settings) 
+              : profile.privacy_settings;
+          }
+        } catch (e) {
+          console.error("Error parsing privacy settings:", e);
         }
+        setPrivacySettings(userPrivacySettings);
         
-        // Load blocked users from the profile if available
-        if (profile.blocked_users) {
-          setBlockedUsers(profile.blocked_users as unknown as string[] || []);
-        } else {
-          setBlockedUsers([]);
+        // Handle blocked users
+        let userBlockedUsers: string[] = [];
+        try {
+          // Try to parse blocked users from the profile
+          if (profile.blocked_users) {
+            userBlockedUsers = Array.isArray(profile.blocked_users)
+              ? profile.blocked_users
+              : typeof profile.blocked_users === 'string'
+                ? JSON.parse(profile.blocked_users)
+                : [];
+          }
+        } catch (e) {
+          console.error("Error parsing blocked users:", e);
         }
+        setBlockedUsers(userBlockedUsers);
         
-        // Set visibility status
-        setIsAccountVisible(profile.is_visible !== false); // Default to true if not defined
+        // Set visibility status - default to true if not defined
+        setIsAccountVisible(profile.is_visible !== false);
         
         // Detect if this is a new user with minimal profile data
         setIsNewUser(
