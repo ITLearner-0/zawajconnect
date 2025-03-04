@@ -105,15 +105,15 @@ export interface VideoCallStatus {
 export interface ContentFlag {
   id: string;
   content_id: string;
-  content_type: 'message' | 'profile' | 'conversation';
-  flag_type: 'inappropriate' | 'harassment' | 'religious_violation' | 'suspicious';
-  severity: 'high' | 'medium' | 'low';
+  content_type: "message" | "profile" | "conversation" | "image";
+  flag_type: string;
   flagged_by: string;
   created_at: string;
+  notes: string;
+  severity: string;
   resolved: boolean;
-  resolved_by?: string;
-  resolved_at?: string;
-  notes?: string;
+  resolved_by: string | null;
+  resolved_at: string | null;
 }
 
 export interface ContentReport {

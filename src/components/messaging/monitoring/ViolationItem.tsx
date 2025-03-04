@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Violation } from '@/services/monitoring';  // Updated import path
+import { Violation } from '@/services/monitoring/types';  // Updated import path
 import { Badge } from '@/components/ui/badge';
 import { AlertTriangle, AlertOctagon, Flag } from 'lucide-react';
 
@@ -37,7 +37,7 @@ const ViolationItem: React.FC<ViolationItemProps> = ({ violation }) => {
         <div className="mr-2 mt-1">{getSeverityIcon()}</div>
         <div className="flex-1">
           <div className="flex justify-between items-start">
-            <h4 className="font-medium">{violation.rule}</h4>
+            <h4 className="font-medium">{violation.type}</h4>
             <Badge variant="outline" className={`ml-2 ${
               violation.severity === 'high' ? 'text-red-500 border-red-200' :
               violation.severity === 'medium' ? 'text-amber-500 border-amber-200' :
@@ -46,10 +46,10 @@ const ViolationItem: React.FC<ViolationItemProps> = ({ violation }) => {
               {violation.severity}
             </Badge>
           </div>
-          <p className="text-sm mt-1">{violation.description}</p>
-          {violation.context && (
+          <p className="text-sm mt-1">{violation.message}</p>
+          {violation.details && (
             <div className="mt-2 text-xs p-2 bg-background/70 rounded border">
-              <span className="font-medium">Context:</span> {violation.context}
+              <span className="font-medium">Context:</span> {violation.details}
             </div>
           )}
         </div>

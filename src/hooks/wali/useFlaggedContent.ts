@@ -31,7 +31,13 @@ export const useFlaggedContent = (userId: string | null) => {
           return;
         }
 
-        setFlaggedContent(data || []);
+        // Ensure the content_type matches the expected type
+        const typedData = data?.map((item: any) => ({
+          ...item,
+          content_type: item.content_type as ContentFlag['content_type']
+        })) || [];
+        
+        setFlaggedContent(typedData);
       } catch (err: any) {
         console.error('Error fetching flagged content:', err);
         setError(err.message || 'Failed to load flagged content');
