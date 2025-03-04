@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Conversation } from '@/types/profile';
+import { Conversation, Message } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
 
 export const useConversations = (userId: string | null) => {
@@ -64,8 +64,9 @@ export const useConversations = (userId: string | null) => {
               // Find the last message
               let lastMessage = null;
               if (conv.messages && conv.messages.length > 0) {
+                // Fix: Ensure we're correctly typing the messages array and accessing properties
                 const sortedMessages = [...conv.messages].sort(
-                  (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                  (a, b) => new Date(b.created_at as string).getTime() - new Date(a.created_at as string).getTime()
                 );
                 lastMessage = sortedMessages[0];
               }
