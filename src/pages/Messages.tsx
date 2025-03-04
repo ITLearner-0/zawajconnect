@@ -4,8 +4,7 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useMessages } from '@/hooks/useMessages';
 import MessagesContainer from '@/components/messaging/MessagesContainer';
 import ChatWindow from '@/components/messaging/ChatWindow';
-import VideoChat from '@/components/messaging/VideoChat';
-import WaliSupervisor from '@/components/messaging/WaliSupervisor';
+import VideoCallManager from '@/components/messaging/VideoCallManager';
 
 const Messages = () => {
   const { conversationId } = useParams();
@@ -52,15 +51,11 @@ const Messages = () => {
         onSelectConversation={selectConversation}
       >
         {videoCallStatus.isActive ? (
-          <div className="flex flex-col h-full">
-            <VideoChat 
-              participantId={videoCallStatus.participantId || ''} 
-              onEndCall={endVideoCall}
-            />
-            {videoCallStatus.waliPresent && (
-              <WaliSupervisor conversationId={conversationId || ''} />
-            )}
-          </div>
+          <VideoCallManager
+            videoCallStatus={videoCallStatus}
+            onEndCall={endVideoCall}
+            conversationId={conversationId}
+          />
         ) : (
           currentConversation && (
             <ChatWindow
