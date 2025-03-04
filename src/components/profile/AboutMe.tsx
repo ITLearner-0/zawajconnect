@@ -11,7 +11,7 @@ interface AboutMeProps {
 
 const AboutMe = ({ formData, handleChange }: AboutMeProps) => (
   <div className="space-y-4">
-    <h2 className="text-xl font-semibold text-primary">About Me</h2>
+    <h2 id="about-me-heading" className="text-xl font-semibold text-primary">About Me</h2>
     <div className="space-y-2">
       <div className="flex items-center">
         <Label htmlFor="aboutMe">Tell us about yourself</Label>
@@ -26,7 +26,11 @@ const AboutMe = ({ formData, handleChange }: AboutMeProps) => (
         onChange={handleChange}
         placeholder="Share more about yourself, your interests, and what you're looking for"
         className="w-full min-h-[150px] px-3 py-2 rounded-md border border-input bg-background"
+        aria-describedby="aboutMe-description"
       />
+      <p id="aboutMe-description" className="sr-only">
+        Describe yourself, your interests, hobbies, values, and what you're looking for in a partner
+      </p>
     </div>
   </div>
 );

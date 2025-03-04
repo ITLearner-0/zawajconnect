@@ -11,7 +11,7 @@ interface ReligiousBackgroundProps {
 
 const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProps) => (
   <div className="space-y-4">
-    <h2 className="text-xl font-semibold text-primary">Religious Background</h2>
+    <h2 id="religious-background-heading" className="text-xl font-semibold text-primary">Religious Background</h2>
     <div className="grid grid-cols-1 gap-4">
       <div className="space-y-2">
         <div className="flex items-center">
@@ -26,6 +26,7 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
           value={formData.religiousLevel}
           onChange={handleChange}
           className="w-full h-10 px-3 rounded-md border border-input bg-background"
+          aria-describedby="religiousLevel-description"
         >
           <option value="">Select level</option>
           <option value="very-practicing">Very practicing</option>
@@ -33,6 +34,9 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
           <option value="moderately-practicing">Moderately practicing</option>
           <option value="learning">Learning more about Islam</option>
         </select>
+        <p id="religiousLevel-description" className="sr-only">
+          How you would describe your level of religious practice
+        </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
@@ -47,12 +51,16 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
           value={formData.prayerFrequency}
           onChange={handleChange}
           className="w-full h-10 px-3 rounded-md border border-input bg-background"
+          aria-describedby="prayerFrequency-description"
         >
           <option value="five-daily">Five times daily</option>
           <option value="regular">Regular but not all five</option>
           <option value="sometimes">Sometimes</option>
           <option value="learning">Learning to pray</option>
         </select>
+        <p id="prayerFrequency-description" className="sr-only">
+          How frequently you perform prayers
+        </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
@@ -68,7 +76,11 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
           onChange={handleChange}
           placeholder="Share about your family background"
           className="w-full min-h-[100px] px-3 py-2 rounded-md border border-input bg-background"
+          aria-describedby="familyBackground-description"
         />
+        <p id="familyBackground-description" className="sr-only">
+          Information about your family's cultural and religious background
+        </p>
       </div>
     </div>
   </div>

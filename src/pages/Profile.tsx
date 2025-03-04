@@ -11,6 +11,8 @@ import { useNavigate } from "react-router-dom";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import OnboardingWrapper from "@/components/onboarding/OnboardingWrapper";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
+import AccessibilityControls from "@/components/AccessibilityControls";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -54,69 +56,103 @@ const Profile = () => {
   // Onboarding mode
   if (isOnboarding) {
     return (
-      <OnboardingWrapper
-        steps={steps}
-        currentStep={currentStep}
-        onNext={handleNext}
-        onPrevious={handlePrevious}
-        onComplete={() => {
-          completeOnboarding();
-          handleSubmit();
-        }}
-        canProceed={canProceedCurrentStep()}
-      >
-        {renderCurrentStepContent()}
-      </OnboardingWrapper>
+      <AccessibilityProvider>
+        <OnboardingWrapper
+          steps={steps}
+          currentStep={currentStep}
+          onNext={handleNext}
+          onPrevious={handlePrevious}
+          onComplete={() => {
+            completeOnboarding();
+            handleSubmit();
+          }}
+          canProceed={canProceedCurrentStep()}
+        >
+          {renderCurrentStepContent()}
+        </OnboardingWrapper>
+      </AccessibilityProvider>
     );
   }
 
   // Regular profile edit mode
   return (
-    <div className="min-h-screen bg-gradient-to-b from-accent/50 to-background py-12">
-      <div className="container max-w-3xl mx-auto px-4">
-        <Card className="shadow-lg">
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-center">Update Your Profile</h1>
-              <CustomButton variant="outline" onClick={handleSignOut}>
-                Sign Out
-              </CustomButton>
-            </div>
-            <p className="text-center text-gray-600">
-              Keep your profile information up to date
-            </p>
-          </CardHeader>
-          <CardContent>
-            <TooltipProvider>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <BasicInformation formData={formData} handleChange={handleChange} />
-                <EducationCareer formData={formData} handleChange={handleChange} />
-                <ReligiousBackground formData={formData} handleChange={handleChange} />
-                <AboutMe formData={formData} handleChange={handleChange} />
-                
-                {/* Verification Panel */}
-                <VerificationPanel
-                  verificationStatus={verificationStatus}
-                  onVerificationChange={handleVerificationChange}
-                  userEmail={userEmail}
-                />
-
-                <div className="flex justify-between pt-6">
-                  <CustomButton
-                    type="button"
-                    variant="outline"
-                    onClick={() => navigate("/")}
+    <AccessibilityProvider>
+      <div className="min-h-screen bg-gradient-to-b from-accent/50 to-background py-12" role="main" aria-labelledby="profile-heading">
+        <div className="container max-w-3xl mx-auto px-4">
+          <Card className="shadow-lg">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <h1 id="profile-heading" className="text-2xl font-bold text-center">Update Your Profile</h1>
+                <div className="flex items-center gap-2">
+                  <AccessibilityControls />
+                  <CustomButton 
+                    variant="outline" 
+                    onClick={handleSignOut}
+                    aria-label="Sign out of your account"
                   >
-                    Back
+                    Sign Out
                   </CustomButton>
-                  <CustomButton type="submit">Save Profile</CustomButton>
                 </div>
-              </form>
-            </TooltipProvider>
-          </CardContent>
-        </Card>
+              </div>
+              <p className="text-center text-gray-600">
+                Keep your profile information up to date
+              </p>
+            </CardHeader>
+            <CardContent>
+              <TooltipProvider>
+                <form 
+                  onSubmit={handleSubmit} 
+                  className="space-y-6"
+                  aria-label="Profile form"
+                >
+                  <div role="region" aria-labelledby="basic-info-heading">
+                    <BasicInformation formData={formData} handleChange={handleChange} />
+                  </div>
+                  
+                  <div role="region" aria-labelledby="education-career-heading">
+                    <EducationCareer formData={formData} handleChange={handleChange} />
+                  </div>
+                  
+                  <div role="region" aria-labelledby="religious-background-heading">
+                    <ReligiousBackground formData={formData} handleChange={handleChange} />
+                  </div>
+                  
+                  <div role="region" aria-labelledby="about-me-heading">
+                    <AboutMe formData={formData} handleChange={handleChange} />
+                  </div>
+                  
+                  {/* Verification Panel */}
+                  <div role="region" aria-labelledby="verification-heading">
+                    <VerificationPanel
+                      verificationStatus={verificationStatus}
+                      onVerificationChange={handleVerificationChange}
+                      userEmail={userEmail}
+                    />
+                  </div>
+
+                  <div className="flex justify-between pt-6">
+                    <CustomButton
+                      type="button"
+                      variant="outline"
+                      onClick={() => navigate("/")}
+                      aria-label="Back to home page"
+                    >
+                      Back
+                    </CustomButton>
+                    <CustomButton 
+                      type="submit"
+                      aria-label="Save your profile information"
+                    >
+                      Save Profile
+                    </CustomButton>
+                  </div>
+                </form>
+              </TooltipProvider>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </AccessibilityProvider>
   );
 };
 

@@ -1,36 +1,28 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
-import Profile from "./pages/Profile";
 import Auth from "./pages/Auth";
-import NotFound from "./pages/NotFound";
+import Profile from "./pages/Profile";
 import NearbyMatches from "./pages/NearbyMatches";
-import { StrictMode } from "react";
+import NotFound from "./pages/NotFound";
+import { Toaster } from "./components/ui/toaster";
+import { AccessibilityProvider } from "./contexts/AccessibilityContext";
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
+function App() {
+  return (
+    <AccessibilityProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/nearby" element={<NearbyMatches />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
         <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/nearby" element={<NearbyMatches />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
-  </StrictMode>
-);
+      </Router>
+    </AccessibilityProvider>
+  );
+}
 
 export default App;
