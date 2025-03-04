@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -86,10 +85,18 @@ const UserProfile = () => {
     );
   }
 
+  const handleSignOut = () => {
+    navigate('/');
+    toast({
+      title: "Signed Out",
+      description: "You have been successfully signed out.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-accent/10 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
-        <ProfileHeader />
+        <ProfileHeader onSignOut={handleSignOut} />
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1">

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { CustomButton } from "@/components/CustomButton";
+import CustomButton from "@/components/CustomButton";
 import AccessibilityControls from "@/components/AccessibilityControls";
 
 interface ProfileHeaderProps {

@@ -1,7 +1,7 @@
 
 import React from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { CustomButton } from "@/components/CustomButton";
+import CustomButton from "@/components/CustomButton";
 import { useNavigate } from "react-router-dom";
 import BasicInformation from "@/components/profile/BasicInformation";
 import EducationCareer from "@/components/profile/EducationCareer";
