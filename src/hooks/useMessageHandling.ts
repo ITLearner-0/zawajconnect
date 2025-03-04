@@ -146,6 +146,7 @@ export const useMessageHandling = (conversationId?: string, currentUserId?: stri
     sendingMessage,
     messageInput,
     setMessageInput,
-    sendMessage
+    sendMessage,
+    decryptMessage
   };
 };
