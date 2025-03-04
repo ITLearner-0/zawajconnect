@@ -8,6 +8,7 @@ import {
   generateReport 
 } from '@/services/aiMonitoringService';
 import { useToast } from '@/hooks/use-toast';
+import { filterMessageContent, flagContent } from '@/services/contentModerationService';
 
 export const useAIMonitoring = (
   conversationId: string | undefined, 
@@ -23,12 +24,31 @@ export const useAIMonitoring = (
 
   // Check new messages for violations in real-time
   useEffect(() => {
-    if (!monitoringEnabled || messages.length === 0) return;
+    if (!monitoringEnabled || messages.length === 0 || !userId) return;
     
     const latestMessage = messages[messages.length - 1];
     if (!latestMessage) return;
     
-    // Check only the newest message
+    // Only check sent messages, not received ones
+    if (latestMessage.sender_id !== userId) return;
+    
+    // Check message content through the filter
+    const { flags } = filterMessageContent(latestMessage.content);
+    
+    // If flags detected, record them in the database
+    if (flags.length > 0) {
+      flags.forEach(flag => {
+        flagContent(
+          latestMessage.id,
+          'message',
+          flag.flag_type,
+          flag.severity,
+          userId
+        );
+      });
+    }
+    
+    // Check only the newest message for violations
     const newViolations = detectViolations(latestMessage);
     
     if (newViolations.length > 0) {
@@ -44,7 +64,7 @@ export const useAIMonitoring = (
         });
       }
     }
-  }, [messages, monitoringEnabled, toast]);
+  }, [messages, monitoringEnabled, toast, userId]);
 
   // Generate comprehensive report periodically or when messages change significantly
   useEffect(() => {
@@ -67,9 +87,6 @@ export const useAIMonitoring = (
             violation_count: report.violations.length,
             report_data: report
           });
-          
-          // Note: In a real implementation, you would need to create the monitoring_reports table
-          // in Supabase and update the database types in src/integrations/supabase/types.ts
         }
       } catch (err: any) {
         setError(err.message);

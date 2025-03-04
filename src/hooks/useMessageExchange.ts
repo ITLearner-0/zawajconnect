@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
+import { filterMessageContent } from '@/services/contentModerationService';
 
 export const useMessageExchange = (conversationId: string | undefined, userId: string | null) => {
   const { toast } = useToast();
@@ -98,13 +99,16 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
     };
   }, [conversationId, userId, toast]);
 
-  const sendMessage = async (conversationId: string) => {
-    if (!messageInput.trim() || !userId) return;
+  const sendMessage = async () => {
+    if (!messageInput.trim() || !userId || !conversationId) return;
     
     setSendingMessage(true);
     setError(null);
     
     try {
+      // Filter message content before sending
+      const { filteredContent, flags } = filterMessageContent(messageInput);
+      
       // Check if wali supervision is required for female users
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -132,16 +136,48 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
       const newMessage = {
         conversation_id: conversationId,
         sender_id: userId,
-        content: messageInput,
-        is_wali_visible: (convData?.wali_supervised || needsWaliSupervision) ?? false
+        content: filteredContent, // Use filtered content
+        is_wali_visible: (convData?.wali_supervised || needsWaliSupervision) ?? false,
+        is_filtered: filteredContent !== messageInput, // Flag if message was modified
       };
       
-      const { error: insertError } = await supabase
+      const { data: insertData, error: insertError } = await supabase
         .from('messages')
-        .insert(newMessage);
+        .insert(newMessage)
+        .select();
         
       if (insertError) {
         throw insertError;
+      }
+      
+      // If there were flags, record them with the message ID
+      if (flags.length > 0 && insertData && insertData.length > 0) {
+        const messageId = insertData[0].id;
+        
+        // Insert flags into content_flags table
+        const flagsWithMetadata = flags.map(flag => ({
+          ...flag,
+          content_id: messageId,
+          flagged_by: userId,
+          created_at: new Date().toISOString()
+        }));
+        
+        const { error: flagError } = await supabase
+          .from('content_flags')
+          .insert(flagsWithMetadata);
+          
+        if (flagError) {
+          console.error("Error inserting content flags:", flagError);
+        }
+        
+        // If content was filtered, notify the user
+        if (filteredContent !== messageInput) {
+          toast({
+            title: "Message Modified",
+            description: "Your message was modified to comply with community guidelines.",
+            duration: 3000
+          });
+        }
       }
       
       setMessageInput('');
@@ -161,7 +197,7 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
     messages,
     messageInput,
     setMessageInput,
-    sendMessage,
+    sendMessage: () => sendMessage(),
     loading,
     sendingMessage,
     error

@@ -1,12 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Conversation, Message } from '@/types/profile';
-import { ArrowLeft, Video, Send } from 'lucide-react';
+import { ArrowLeft, Video, Send, Flag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import MessageItem from '@/components/messaging/MessageItem';
 import ChatContainer from '@/components/messaging/ChatContainer';
 import WaliSupervisor from '@/components/messaging/WaliSupervisor';
+import ReportDialog from '@/components/messaging/ReportDialog';
 import { MonitoringReport } from '@/services/aiMonitoringService';
 
 interface ChatWindowProps {
@@ -46,6 +47,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   toggleMonitoring = () => {},
   monitoringLoading = false
 }) => {
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -54,6 +58,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   };
 
   const otherParticipant = conversation.profile || { first_name: 'User', last_name: '' };
+  const otherUserId = conversation.participants.find(id => id !== currentUserId) || '';
 
   return (
     <ChatContainer
@@ -78,10 +83,23 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
               )}
             </div>
           </div>
-          <Button variant="ghost" size="sm" onClick={onStartVideoCall}>
-            <Video className="h-5 w-5" />
-            <span className="ml-1 hidden md:inline">Video Call</span>
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => {
+                setSelectedMessage(null);
+                setIsReportDialogOpen(true);
+              }}
+            >
+              <Flag className="h-4 w-4 text-red-500 mr-1" />
+              <span className="hidden md:inline">Report</span>
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onStartVideoCall}>
+              <Video className="h-5 w-5" />
+              <span className="ml-1 hidden md:inline">Video Call</span>
+            </Button>
+          </div>
         </div>
 
         {/* Messages area */}
@@ -101,6 +119,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
                 key={message.id}
                 message={message}
                 isOwn={message.sender_id === currentUserId}
+                onReport={() => {
+                  setSelectedMessage(message);
+                  setIsReportDialogOpen(true);
+                }}
               />
             ))
           )}
@@ -139,6 +161,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Report Dialog */}
+      <ReportDialog
+        isOpen={isReportDialogOpen}
+        onClose={() => setIsReportDialogOpen(false)}
+        userId={otherUserId}
+        messageId={selectedMessage?.id}
+        conversationId={conversation.id}
+        currentUserId={currentUserId || ''}
+      />
     </ChatContainer>
   );
 };

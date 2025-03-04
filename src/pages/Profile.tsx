@@ -1,3 +1,4 @@
+
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import CustomButton from "@/components/CustomButton";
 import { useProfile } from "@/hooks/useProfile";
@@ -60,6 +61,15 @@ const Profile = () => {
       default:
         return null;
     }
+  };
+
+  // Wrapper functions to convert boolean returns to void
+  const handleToggleVisibility = async () => {
+    await toggleAccountVisibility();
+  };
+  
+  const handleUnblockUser = async (userId: string) => {
+    await unblockUser(userId);
   };
 
   if (isOnboarding) {
@@ -154,8 +164,8 @@ const Profile = () => {
                       blockedUsers={blockedUsers}
                       isAccountVisible={isAccountVisible}
                       onPrivacyChange={handlePrivacySettingsChange}
-                      onToggleAccountVisibility={toggleAccountVisibility}
-                      onUnblockUser={unblockUser}
+                      onToggleAccountVisibility={handleToggleVisibility}
+                      onUnblockUser={handleUnblockUser}
                     />
                   </div>
 

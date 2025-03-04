@@ -106,7 +106,9 @@ export const useProfileData = (): UseProfileDataResult => {
         }
         
         if (profile.blocked_users) {
-          setBlockedUsers(profile.blocked_users);
+          setBlockedUsers(profile.blocked_users || []);
+        } else {
+          setBlockedUsers([]);
         }
         
         setIsAccountVisible(profile.is_visible !== false); // Default to true if not defined

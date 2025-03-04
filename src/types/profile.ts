@@ -37,6 +37,10 @@ export interface DatabaseProfile {
   is_visible: boolean;
   privacy_settings: PrivacySettings;
   blocked_users: string[];
+  // New fields for content filtering and moderation
+  content_flags: ContentFlag[];
+  moderation_status: 'approved' | 'pending' | 'rejected';
+  last_moderation_date: string | null;
 }
 
 export interface PrivacySettings {
@@ -74,6 +78,9 @@ export interface Message {
   is_read: boolean;
   attachments?: string[];
   is_wali_visible: boolean;
+  // New fields for content filtering
+  content_flags?: ContentFlag[];
+  is_filtered?: boolean;
 }
 
 export interface VideoCallStatus {
@@ -81,4 +88,39 @@ export interface VideoCallStatus {
   participantId?: string;
   waliPresent: boolean;
   startTime?: Date;
+}
+
+// Content Moderation Types
+export interface ContentFlag {
+  id?: string;
+  content_id: string;
+  content_type: 'message' | 'profile' | 'image';
+  flag_type: 'inappropriate' | 'harassment' | 'religious_violation' | 'suspicious';
+  severity: 'low' | 'medium' | 'high';
+  flagged_by: string;
+  created_at: string;
+  resolved: boolean;
+  resolved_by?: string;
+  resolved_at?: string;
+  notes?: string;
+}
+
+export interface ContentReport {
+  id?: string;
+  reported_user_id: string;
+  reporting_user_id: string;
+  report_type: 'inappropriate_message' | 'inappropriate_profile' | 'harassment' | 'spam' | 'impersonation' | 'other';
+  content_reference?: string; // Like message_id or conversation_id
+  report_details: string;
+  created_at: string;
+  status: 'pending' | 'reviewing' | 'resolved' | 'dismissed';
+  admin_notes?: string;
+  resolution_action?: 'warning' | 'temporary_ban' | 'permanent_ban' | 'content_removal' | 'no_action';
+}
+
+export interface ModerationStats {
+  pending_reports: number;
+  flagged_content: number;
+  total_processed: number;
+  resolved_today: number;
 }
