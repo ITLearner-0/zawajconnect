@@ -24,6 +24,10 @@ const ChatContainer = ({
 }: ChatContainerProps) => {
   const [showMonitoring, setShowMonitoring] = useState(false);
   
+  // Create proper implementations for the missing icons
+  const ChevronUp = () => <ChevronLeft className="h-4 w-4 transform rotate-90" />;
+  const ChevronDown = () => <ChevronLeft className="h-4 w-4 transform -rotate-90" />;
+  
   return (
     <div className="flex flex-col h-full relative">
       {/* Main chat content */}
@@ -48,7 +52,7 @@ const ChatContainer = ({
             </span>
           </div>
           <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
-            {showMonitoring ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+            {showMonitoring ? <ChevronDown /> : <ChevronUp />}
           </Button>
         </div>
         
@@ -67,9 +71,5 @@ const ChatContainer = ({
     </div>
   );
 };
-
-// Add missing ChevronUp and ChevronDown components
-const ChevronUp = ChevronLeft;
-const ChevronDown = ChevronRight;
 
 export default ChatContainer;

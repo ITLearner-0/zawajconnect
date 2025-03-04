@@ -57,23 +57,21 @@ export const useAIMonitoring = (
         const report = generateReport(messages);
         setLatestReport(report);
         
-        // Save report to database
+        // Save report to database - instead of trying to insert into an undefined table,
+        // we'll just log the report for now
         if (userId) {
-          const { error: reportError } = await supabase
-            .from('monitoring_reports')
-            .insert({
-              conversation_id: conversationId,
-              user_id: userId,
-              behavioral_score: report.behavioralScore,
-              islamic_compliance_score: report.islamicComplianceScore,
-              sentiment_score: report.sentimentScore,
-              violation_count: report.violations.length,
-              report_data: report
-            });
-            
-          if (reportError) {
-            console.error("Error saving monitoring report:", reportError);
-          }
+          console.log("Would save monitoring report:", {
+            conversation_id: conversationId,
+            user_id: userId,
+            behavioral_score: report.behavioralScore,
+            islamic_compliance_score: report.islamicComplianceScore,
+            sentiment_score: report.sentimentScore,
+            violation_count: report.violations.length,
+            report_data: report
+          });
+          
+          // Note: In a real implementation, you would need to create the monitoring_reports table
+          // in Supabase and update the database types in src/integrations/supabase/types.ts
         }
       } catch (err: any) {
         setError(err.message);

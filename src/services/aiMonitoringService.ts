@@ -20,11 +20,11 @@ export interface Violation {
 
 // Sample Islamic guidelines (simplified for demonstration)
 const ISLAMIC_GUIDELINES = [
-  { pattern: /dating|boyfriend|girlfriend/, severity: 'high', message: 'Dating terms detected' },
-  { pattern: /alcohol|wine|beer|drinking/, severity: 'medium', message: 'Alcohol references detected' },
-  { pattern: /meet alone|private meeting/, severity: 'medium', message: 'Meeting without wali supervision' },
-  { pattern: /inappropriate|flirting/, severity: 'medium', message: 'Potentially inappropriate tone' },
-  { pattern: /phone number|address|location/, severity: 'low', message: 'Sharing personal details' },
+  { pattern: /dating|boyfriend|girlfriend/, severity: 'high' as const, message: 'Dating terms detected' },
+  { pattern: /alcohol|wine|beer|drinking/, severity: 'medium' as const, message: 'Alcohol references detected' },
+  { pattern: /meet alone|private meeting/, severity: 'medium' as const, message: 'Meeting without wali supervision' },
+  { pattern: /inappropriate|flirting/, severity: 'medium' as const, message: 'Potentially inappropriate tone' },
+  { pattern: /phone number|address|location/, severity: 'low' as const, message: 'Sharing personal details' },
 ];
 
 /**
@@ -35,9 +35,11 @@ export function analyzeBehavior(messages: Message[]): number {
   let score = 100; // Start with perfect score
   
   const flaggedWords = ['meet', 'alone', 'secret', 'private'];
+  
+  // Calculate time difference for rapid message detection
   const patternOfRapidMessages = messages.length > 10 && (
-    messages[messages.length - 1].created_at.getTime() - 
-    messages[messages.length - 10].created_at.getTime()
+    new Date(messages[messages.length - 1].created_at).getTime() - 
+    new Date(messages[messages.length - 10].created_at).getTime()
   ) < 60000; // 10 messages in less than a minute
   
   // Check for flagged words
