@@ -6,9 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const tableExists = async (tableName: string): Promise<boolean> => {
   try {
-    // Use a more generic approach to bypass TypeScript constraints
+    // Use a more generic approach to bypass TypeScript constraints by casting the RPC function name
     const { data, error } = await (supabase.rpc(
-      'check_table_exists',
+      'check_table_exists' as any,
       { table_name: tableName }
     ) as unknown as Promise<{ data: boolean; error: any }>);
     
@@ -31,7 +31,7 @@ export const executeSql = async (query: string): Promise<any> => {
   try {
     // For security, we'll use a more direct approach with a generic response type
     const { data, error } = await (supabase.rpc(
-      'execute_sql',
+      'execute_sql' as any,
       { sql_query: query }
     ) as unknown as Promise<{ data: any; error: any }>);
     
@@ -54,7 +54,7 @@ export const columnExists = async (tableName: string, columnName: string): Promi
   try {
     // Use a more generic approach to bypass TypeScript constraints
     const { data, error } = await (supabase.rpc(
-      'check_column_exists',
+      'check_column_exists' as any,
       { 
         table_name: tableName,
         column_name: columnName
