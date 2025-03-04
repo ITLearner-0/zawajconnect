@@ -51,11 +51,19 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
       // In a real app, verify the code with backend
       // For this demo, accept any 6-digit code
       if (verificationCode.length === 6 && /^\d+$/.test(verificationCode)) {
-        // Update verification status
+        // Update verification status using the is_verified field with a phone_method metadata
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) throw new Error("User not found");
+        
+        // Update the profile with verification metadata
         const { error } = await supabase
           .from("profiles")
-          .update({ phone_verified: true })
-          .eq("id", (await supabase.auth.getUser()).data.user?.id);
+          .update({ 
+            is_verified: true,
+            verification_document_url: `phone:${phoneNumber}` // Store verification method and data
+          })
+          .eq("id", user.id);
         
         if (error) throw error;
         

@@ -4,6 +4,7 @@ import { Label } from "@/components/ui/label";
 import CustomButton from "@/components/CustomButton";
 import { ShieldCheck, Check } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface IdVerificationProps {
   isVerified: boolean;
@@ -12,12 +13,41 @@ interface IdVerificationProps {
 const IdVerification = ({ isVerified }: IdVerificationProps) => {
   const { toast } = useToast();
 
-  const startIdVerification = () => {
-    // In a real app, redirect to a KYC provider
-    toast({
-      title: "ID Verification",
-      description: "This would redirect to an ID verification service in a production app",
-    });
+  const startIdVerification = async () => {
+    try {
+      // In a real app, redirect to a KYC provider
+      // For this demo, we'll simulate verification
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("User not found");
+      }
+      
+      // Update the profile with verification metadata
+      const { error } = await supabase
+        .from("profiles")
+        .update({ 
+          is_verified: true,
+          verification_document_url: "id:verified" // Store verification method
+        })
+        .eq("id", user.id);
+      
+      if (error) throw error;
+      
+      toast({
+        title: "ID Verification",
+        description: "Your ID has been successfully verified",
+      });
+      
+      // Refresh to update UI
+      window.location.reload();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Could not complete verification. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

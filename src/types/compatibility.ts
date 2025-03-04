@@ -44,3 +44,19 @@ export interface FilterCriteria {
   religiousLevel: string[];
   verifiedOnly: boolean;
 }
+
+// Add the missing interfaces
+export interface Answer {
+  value: number;
+  weight?: number;
+  isBreaker?: boolean;
+  breakerThreshold?: number;
+}
+
+export interface CompatibilityResultData {
+  user_id: string;
+  score: number;
+  answers: Record<string, Answer>;
+  dealbreakers?: string[];
+  preferences?: Array<{ category: string; weight: number }>;
+}

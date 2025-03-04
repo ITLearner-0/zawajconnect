@@ -65,10 +65,15 @@ export const useProfile = () => {
           prayerFrequency: profile.prayer_frequency || "five-daily",
         });
         
+        // Determine verification status based on is_verified field and verification_document_url
+        // In a real app, you would have more robust verification tracking
+        const isVerified = profile.is_verified || false;
+        const verificationDoc = profile.verification_document_url || "";
+        
         setVerificationStatus({
-          email: profile.email_verified || false,
-          phone: profile.phone_verified || false,
-          id: profile.id_verified || false,
+          email: session.user.email_confirmed || false,
+          phone: isVerified && verificationDoc.startsWith("phone:"),
+          id: isVerified && verificationDoc.startsWith("id:"),
         });
         
         // Detect if this is a new user with minimal profile data
