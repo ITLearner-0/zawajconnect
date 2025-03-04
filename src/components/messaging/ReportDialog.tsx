@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { submitContentReport } from '@/services/contentModerationService';
 import { useToast } from '@/hooks/use-toast';
+import { ContentReport } from '@/types/profile';
 
 interface ReportDialogProps {
   isOpen: boolean;
@@ -33,7 +34,7 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
   currentUserId,
 }) => {
   const { toast } = useToast();
-  const [reportType, setReportType] = useState<string>('inappropriate_message');
+  const [reportType, setReportType] = useState<ContentReport['report_type']>('inappropriate_message');
   const [reportDetails, setReportDetails] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -53,7 +54,7 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
       const report = {
         reported_user_id: userId,
         reporting_user_id: currentUserId,
-        report_type: reportType as any,
+        report_type: reportType,
         content_reference: messageId || conversationId,
         report_details: reportDetails,
       };

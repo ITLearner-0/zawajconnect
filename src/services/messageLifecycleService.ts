@@ -1,28 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { RetentionPolicy } from "@/types/profile";
-
-/**
- * Checks if a column exists in a table
- */
-export const columnExists = async (tableName: string, columnName: string): Promise<boolean> => {
-  try {
-    const { data, error } = await supabase.rpc('column_exists', {
-      table_name: tableName,
-      column_name: columnName
-    });
-    
-    if (error) {
-      console.error(`Error checking if column ${columnName} exists:`, error);
-      return false;
-    }
-    
-    return !!data;
-  } catch (err) {
-    console.error(`Error in columnExists check for ${columnName}:`, err);
-    return false;
-  }
-};
+import { columnExists } from "@/utils/databaseUtils";
 
 /**
  * Set the retention policy for a conversation
@@ -37,10 +16,14 @@ export const setRetentionPolicy = async (conversationId: string, policy: Retenti
       return false;
     }
     
-    const { error } = await supabase
-      .from('conversations')
-      .update({ retention_policy: policy })
-      .eq('id', conversationId);
+    // Use execute_sql for update
+    const { error } = await supabase.rpc('execute_sql', {
+      sql_query: `
+        UPDATE conversations 
+        SET retention_policy = '${JSON.stringify(policy)}' 
+        WHERE id = '${conversationId}'
+      `
+    });
       
     if (error) {
       console.error("Error setting retention policy:", error);
@@ -96,11 +79,14 @@ export const applyMessageLifecycle = async (
       return;
     }
     
-    // Update the message with scheduled deletion date
-    const { error } = await supabase
-      .from('messages')
-      .update({ scheduled_deletion: scheduledDeletion })
-      .eq('id', messageId);
+    // Use execute_sql for update
+    const { error } = await supabase.rpc('execute_sql', {
+      sql_query: `
+        UPDATE messages 
+        SET scheduled_deletion = '${scheduledDeletion}' 
+        WHERE id = '${messageId}'
+      `
+    });
       
     if (error) {
       console.error("Error setting message scheduled deletion:", error);
@@ -108,4 +94,12 @@ export const applyMessageLifecycle = async (
   } catch (err) {
     console.error("Error in applyMessageLifecycle:", err);
   }
+};
+
+/**
+ * Initialize the message cleanup routine
+ */
+export const initializeMessageCleanup = (): void => {
+  // Placeholder for message cleanup initialization
+  console.log("Message cleanup initialized");
 };

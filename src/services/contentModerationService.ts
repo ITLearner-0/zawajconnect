@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { ContentFlag, ContentReport, ModerationStats } from "@/types/profile";
+import { tableExists } from "@/utils/databaseUtils";
 
 export const filterMessageContent = (content: string) => {
   // Basic implementation: scan for inappropriate words
@@ -16,8 +17,13 @@ export const filterMessageContent = (content: string) => {
   for (let word of inappropriateWordsList) {
     if (contentLower.includes(word)) {
       flags.push({
-        flag_type: 'inappropriate' as ContentFlag['flag_type'],
-        severity: 'medium' as ContentFlag['severity']
+        content_id: 'temp', // Will be replaced with actual ID
+        content_type: 'message',
+        flag_type: 'inappropriate',
+        severity: 'medium',
+        flagged_by: 'system',
+        created_at: new Date().toISOString(),
+        resolved: false
       });
       
       isFiltered = true;
@@ -32,8 +38,13 @@ export const filterMessageContent = (content: string) => {
   for (let word of religiousViolationWords) {
     if (contentLower.includes(word)) {
       flags.push({
-        flag_type: 'religious_violation' as ContentFlag['flag_type'],
-        severity: 'high' as ContentFlag['severity']
+        content_id: 'temp', // Will be replaced with actual ID
+        content_type: 'message',
+        flag_type: 'religious_violation',
+        severity: 'high',
+        flagged_by: 'system',
+        created_at: new Date().toISOString(),
+        resolved: false
       });
       
       isFiltered = true;
@@ -53,74 +64,78 @@ export const flagContent = async (
 ) => {
   try {
     // Check if content_flags table exists before inserting
-    const { data: tableExists } = await supabase.rpc('table_exists', { table_name: 'content_flags' });
+    const hasTable = await tableExists('content_flags');
     
-    if (!tableExists) {
+    if (!hasTable) {
       console.log("Content flags table does not exist, skipping flagging");
-      return;
+      return null;
     }
     
-    // Insert flag into database
-    const { data, error } = await supabase
-      .from('content_flags')
-      .insert({
-        content_id: contentId,
-        content_type: contentType,
-        flag_type: flagType,
-        severity: severity,
-        flagged_by: userId,
-        created_at: new Date().toISOString(),
-        resolved: false
-      });
+    // Use execute_sql to insert data
+    const { data, error } = await supabase.rpc('execute_sql', {
+      sql_query: `
+        INSERT INTO content_flags (
+          content_id, content_type, flag_type, severity, flagged_by, created_at, resolved
+        ) VALUES (
+          '${contentId}', '${contentType}', '${flagType}', '${severity}', '${userId}', 
+          '${new Date().toISOString()}', false
+        )
+        RETURNING *
+      `
+    });
       
     if (error) {
       console.error("Error flagging content:", error);
+      return null;
     }
     
-    return data;
+    return data?.[0];
   } catch (err) {
     console.error("Error in flagContent:", err);
     return null;
   }
 };
 
-export const submitContentReport = async (
-  reportedUserId: string,
-  reportingUserId: string,
-  reportType: ContentReport['report_type'],
-  contentReference: string | undefined,
-  reportDetails: string
-) => {
+export const submitContentReport = async (report: {
+  reported_user_id: string;
+  reporting_user_id: string;
+  report_type: ContentReport['report_type'];
+  content_reference?: string;
+  report_details: string;
+}) => {
   try {
     // Check if content_reports table exists before inserting
-    const { data: tableExists } = await supabase.rpc('table_exists', { table_name: 'content_reports' });
+    const hasTable = await tableExists('content_reports');
     
-    if (!tableExists) {
+    if (!hasTable) {
       console.log("Content reports table does not exist, skipping report");
-      return null;
+      return false;
     }
     
-    const { data, error } = await supabase
-      .from('content_reports')
-      .insert({
-        reported_user_id: reportedUserId,
-        reporting_user_id: reportingUserId,
-        report_type: reportType,
-        content_reference: contentReference,
-        report_details: reportDetails,
-        created_at: new Date().toISOString(),
-        status: 'pending'
-      });
+    // Use execute_sql to insert data
+    const { data, error } = await supabase.rpc('execute_sql', {
+      sql_query: `
+        INSERT INTO content_reports (
+          reported_user_id, reporting_user_id, report_type, 
+          content_reference, report_details, created_at, status
+        ) VALUES (
+          '${report.reported_user_id}', '${report.reporting_user_id}', '${report.report_type}', 
+          ${report.content_reference ? `'${report.content_reference}'` : 'NULL'}, 
+          '${report.report_details}', '${new Date().toISOString()}', 'pending'
+        )
+        RETURNING *
+      `
+    });
       
     if (error) {
       console.error("Error submitting report:", error);
-      return null;
+      return false;
     }
     
-    return data;
+    return !!data;
   } catch (err) {
     console.error("Error in submitContentReport:", err);
-    return null;
+    return false;
   }
 };
 
@@ -135,75 +150,67 @@ export const getModerationStats = async (): Promise<ModerationStats> => {
     };
     
     // Check if tables exist
-    const { data: reportsTableExists } = await supabase.rpc('table_exists', { table_name: 'content_reports' });
-    const { data: flagsTableExists } = await supabase.rpc('table_exists', { table_name: 'content_flags' });
+    const reportsTableExists = await tableExists('content_reports');
+    const flagsTableExists = await tableExists('content_flags');
     
     if (!reportsTableExists && !flagsTableExists) {
       return defaultStats;
     }
     
+    let stats = {...defaultStats};
+    
     // Get pending reports count
-    let pendingReports = 0;
     if (reportsTableExists) {
-      const { data: pendingReportsData, error: pendingReportsError } = await supabase
-        .from('content_reports')
-        .select('id', { count: 'exact' })
-        .eq('status', 'pending');
+      const { data: pendingReportsData, error: pendingReportsError } = await supabase.rpc('execute_sql', {
+        sql_query: `SELECT COUNT(*) FROM content_reports WHERE status = 'pending'`
+      });
         
-      if (!pendingReportsError) {
-        pendingReports = pendingReportsData.length;
+      if (!pendingReportsError && pendingReportsData?.[0]) {
+        stats.pendingReports = parseInt(pendingReportsData[0].count, 10) || 0;
       }
     }
     
     // Get flagged content count
-    let flaggedContent = 0;
     if (flagsTableExists) {
-      const { data: flaggedContentData, error: flaggedContentError } = await supabase
-        .from('content_flags')
-        .select('id', { count: 'exact' })
-        .eq('resolved', false);
+      const { data: flaggedContentData, error: flaggedContentError } = await supabase.rpc('execute_sql', {
+        sql_query: `SELECT COUNT(*) FROM content_flags WHERE resolved = false`
+      });
         
-      if (!flaggedContentError) {
-        flaggedContent = flaggedContentData.length;
+      if (!flaggedContentError && flaggedContentData?.[0]) {
+        stats.flaggedContent = parseInt(flaggedContentData[0].count, 10) || 0;
       }
     }
     
     // Get resolved today count
-    let resolvedToday = 0;
     if (reportsTableExists) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       
-      const { data: resolvedTodayData, error: resolvedTodayError } = await supabase
-        .from('content_reports')
-        .select('id', { count: 'exact' })
-        .eq('status', 'resolved')
-        .gte('resolved_at', today.toISOString());
+      const { data: resolvedTodayData, error: resolvedTodayError } = await supabase.rpc('execute_sql', {
+        sql_query: `
+          SELECT COUNT(*) FROM content_reports 
+          WHERE status = 'resolved' 
+          AND resolved_at >= '${today.toISOString()}'
+        `
+      });
         
-      if (!resolvedTodayError) {
-        resolvedToday = resolvedTodayData.length;
+      if (!resolvedTodayError && resolvedTodayData?.[0]) {
+        stats.resolvedToday = parseInt(resolvedTodayData[0].count, 10) || 0;
       }
     }
     
     // Get total processed count
-    let totalProcessed = 0;
     if (reportsTableExists) {
-      const { data: totalProcessedData, error: totalProcessedError } = await supabase
-        .from('content_reports')
-        .select('id', { count: 'exact' })
-        .eq('status', 'resolved');
+      const { data: totalProcessedData, error: totalProcessedError } = await supabase.rpc('execute_sql', {
+        sql_query: `SELECT COUNT(*) FROM content_reports WHERE status = 'resolved'`
+      });
         
-      if (!totalProcessedError) {
-        totalProcessed = totalProcessedData.length;
+      if (!totalProcessedError && totalProcessedData?.[0]) {
+        stats.totalProcessed = parseInt(totalProcessedData[0].count, 10) || 0;
       }
     }
     
-    return {
-      pendingReports,
-      flaggedContent,
-      totalProcessed,
-      resolvedToday
-    };
+    return stats;
   } catch (err) {
     console.error("Error getting moderation stats:", err);
     return {

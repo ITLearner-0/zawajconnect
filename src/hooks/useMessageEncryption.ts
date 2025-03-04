@@ -1,112 +1,94 @@
 
 import { useState, useEffect } from 'react';
-import { 
-  generateEncryptionKey, 
-  exportKey, 
-  storeEncryptionKey, 
-  getEncryptionKey, 
-  generateKeyId, 
-  encryptMessage, 
-  decryptMessage, 
-  generateIV 
-} from '@/services/encryptionService';
+import { supabase } from '@/integrations/supabase/client';
+import { columnExists } from '@/utils/databaseUtils';
 
-export const useMessageEncryption = (conversationId: string | undefined, userId: string | null) => {
-  const [encryptionEnabled, setEncryptionEnabled] = useState(true);
-  const [encryptionInitialized, setEncryptionInitialized] = useState(false);
+export const useMessageEncryption = (conversationId: string | undefined) => {
+  const [encryptionEnabled, setEncryptionEnabled] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Initialize encryption for this conversation
+  // Check if encryption is supported (columns exist)
   useEffect(() => {
-    if (!conversationId || !userId) return;
+    if (!conversationId) return;
 
-    const initializeEncryption = async () => {
+    const checkEncryptionSupport = async () => {
+      setLoading(true);
       try {
-        // Check if we already have a key for this conversation
-        let keyString = getEncryptionKey(conversationId);
+        // Check if encryption-related columns exist
+        const hasEncryptedColumn = await columnExists('messages', 'encrypted');
+        const hasIVColumn = await columnExists('messages', 'iv');
         
-        if (!keyString) {
-          // Generate a new encryption key for this conversation
-          const newKey = await generateEncryptionKey();
-          keyString = await exportKey(newKey);
-          
-          // Store the key locally
-          storeEncryptionKey(conversationId, keyString);
+        // Only enable if both columns exist
+        if (hasEncryptedColumn && hasIVColumn) {
+          // Check if encryption is enabled for this conversation
+          const { data, error } = await supabase
+            .from('conversations')
+            .select('encryption_enabled')
+            .eq('id', conversationId)
+            .single();
+
+          if (!error && data) {
+            setEncryptionEnabled(!!data.encryption_enabled);
+          } else {
+            // Default to false if not set
+            setEncryptionEnabled(false);
+          }
+        } else {
+          setEncryptionEnabled(false);
         }
-        
-        setEncryptionInitialized(true);
-      } catch (err) {
-        console.error('Failed to initialize encryption:', err);
-        setEncryptionEnabled(false);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
-    initializeEncryption();
-  }, [conversationId, userId]);
+    checkEncryptionSupport();
+  }, [conversationId]);
 
   // Toggle encryption for the conversation
-  const toggleEncryption = (enabled: boolean) => {
-    setEncryptionEnabled(enabled);
-  };
-
-  // Encrypt a message
-  const encryptMessageContent = async (content: string): Promise<{ 
-    encryptedContent: string, 
-    iv: string, 
-    keyId: string | null 
-  }> => {
-    if (!encryptionEnabled || !conversationId) {
-      return { encryptedContent: content, iv: '', keyId: null };
-    }
-
-    try {
-      // Get the encryption key
-      const keyString = getEncryptionKey(conversationId);
-      
-      if (keyString) {
-        // Generate a unique IV for this message
-        const iv = generateIV();
-        
-        // Encrypt the message content
-        const encryptedContent = await encryptMessage(content, keyString, iv);
-        const keyId = generateKeyId();
-        
-        return { encryptedContent, iv, keyId };
-      }
-    } catch (err) {
-      console.error('Error encrypting message:', err);
-    }
+  const toggleEncryption = async (enabled: boolean): Promise<boolean> => {
+    if (!conversationId) return false;
     
-    // Fall back to unencrypted if encryption fails
-    return { encryptedContent: content, iv: '', keyId: null };
-  };
-
-  // Decrypt a message
-  const decryptMessageContent = async (
-    encryptedContent: string, 
-    iv: string | null
-  ): Promise<string> => {
-    if (!encryptedContent || !iv || !conversationId) {
-      return encryptedContent;
-    }
-
+    setLoading(true);
     try {
-      const keyString = getEncryptionKey(conversationId);
+      // Check if the column exists first
+      const hasColumn = await columnExists('conversations', 'encryption_enabled');
       
-      if (keyString) {
-        return await decryptMessage(encryptedContent, keyString, iv);
+      if (!hasColumn) {
+        console.log("Encryption column doesn't exist, cannot update");
+        return false;
       }
-    } catch (err) {
-      console.error('Failed to decrypt message:', err);
+      
+      // Update encryption setting
+      const { error } = await supabase.rpc('execute_sql', {
+        sql_query: `
+          UPDATE conversations 
+          SET encryption_enabled = ${enabled} 
+          WHERE id = '${conversationId}'
+        `
+      });
+        
+      if (error) {
+        setError(error.message);
+        return false;
+      }
+      
+      setEncryptionEnabled(enabled);
+      return true;
+    } catch (err: any) {
+      setError(err.message);
+      return false;
+    } finally {
+      setLoading(false);
     }
-    
-    return '[Encrypted message]';
   };
 
   return {
     encryptionEnabled,
-    encryptionInitialized,
     toggleEncryption,
-    encryptMessageContent,
-    decryptMessageContent
+    loading,
+    error
   };
 };

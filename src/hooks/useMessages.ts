@@ -1,113 +1,126 @@
 
+import { useState, useEffect } from 'react';
 import { useConversations } from './useConversations';
 import { useMessageExchange } from './useMessageExchange';
 import { useVideoCall } from './useVideoCall';
-import { useAIMonitoring } from './useAIMonitoring';
-import { useNavigate } from 'react-router-dom';
-import { initializeMessageCleanup } from '@/services/messageLifecycleService';
-import { useEffect } from 'react';
-import { RetentionPolicy } from '@/types/profile';
+import { useMessageEncryption } from './useMessageEncryption';
+import { useMessageRetention } from './useMessageRetention';
+import { useMessageUI } from './useMessageUI';
+import { Conversation, RetentionPolicy } from '@/types/profile';
 
-export const useMessages = (conversationId: string | undefined, userId: string | null) => {
-  const navigate = useNavigate();
-  
-  // Initialize message cleanup on component mount
-  useEffect(() => {
-    initializeMessageCleanup();
-  }, []);
-  
-  // Use the specialized hooks
+export const useMessages = (conversationId: string | undefined, userId: string | undefined) => {
+  // Get conversations list
   const { 
     conversations, 
-    currentConversation, 
+    currentConversation,
     loading: conversationsLoading,
-    error: conversationsError,
-    loadCurrentConversation
+    error: conversationsError
   } = useConversations(userId);
   
+  // Get messages exchange logic
   const {
     messages,
-    messageInput,
-    setMessageInput,
-    sendMessage: sendMessageBase,
     loading: messagesLoading,
-    sendingMessage,
     error: messagesError,
-    encryptionEnabled,
-    toggleEncryption,
-    retentionPolicy,
-    updateRetentionPolicy
-  } = useMessageExchange(conversationId, userId);
-  
-  const {
-    videoCallStatus,
-    startVideoCall,
-    endVideoCall,
-    error: videoCallError
-  } = useVideoCall(userId, conversationId);
-  
-  const {
-    violations,
-    latestReport,
-    monitoringEnabled,
-    toggleMonitoring,
-    loading: monitoringLoading,
-    error: monitoringError
-  } = useAIMonitoring(conversationId, messages, userId);
-
-  // Loading state combines loading states from all hooks
-  const loading = conversationsLoading || messagesLoading || monitoringLoading;
-  
-  // Combine errors
-  const errors = {
-    conversations: conversationsError,
-    messages: messagesError,
-    videoCall: videoCallError,
-    monitoring: monitoringError
-  };
-
-  // Load current conversation if conversationId changes
-  if (conversationId && !currentConversation) {
-    loadCurrentConversation(conversationId);
-  }
-
-  // Wrapper for sendMessage
-  const sendMessage = () => {
-    if (conversationId) {
-      sendMessageBase();
-    }
-  };
-
-  // Wrapper for updating retention policy
-  const updateRetentionSettings = (policy: RetentionPolicy) => {
-    if (updateRetentionPolicy) {
-      updateRetentionPolicy(policy);
-    }
-  };
-
-  return {
-    conversations,
-    currentConversation,
-    messages,
-    loading,
-    sendingMessage,
-    errors,
-    messageInput,
-    setMessageInput,
-    videoCallStatus,
-    sendMessage,
-    startVideoCall,
-    endVideoCall,
-    // AI monitoring states
+    sendMessage: sendMessageAPI,
     violations,
     latestReport,
     monitoringEnabled,
     toggleMonitoring,
     monitoringLoading,
-    // Encryption and retention states
+    monitoringError
+  } = useMessageExchange(conversationId);
+
+  // Get UI state
+  const {
+    messageInput,
+    setMessageInput,
+    sendingMessage,
+    setSendingMessage
+  } = useMessageUI();
+
+  // Get encryption utilities
+  const {
+    encryptionEnabled,
+    toggleEncryption
+  } = useMessageEncryption(conversationId);
+
+  // Get retention utilities
+  const {
+    retentionPolicy,
+    updateRetentionPolicy
+  } = useMessageRetention(conversationId);
+
+  // Get video call functionality
+  const {
+    videoCallStatus,
+    startVideoCall,
+    endVideoCall
+  } = useVideoCall(userId || '', conversationId);
+
+  // Combined loading state
+  const loading = conversationsLoading || messagesLoading;
+
+  // Combined error state
+  const errors = {
+    conversations: conversationsError,
+    messages: messagesError,
+    monitoring: monitoringError
+  };
+
+  // Handle sending messages
+  const sendMessage = async () => {
+    if (!messageInput.trim()) return;
+    
+    setSendingMessage(true);
+    try {
+      const message = await sendMessageAPI(messageInput);
+      if (message) {
+        setMessageInput('');
+      }
+    } catch (error) {
+      console.error('Error sending message:', error);
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  return {
+    // Conversations data
+    conversations,
+    currentConversation,
+    
+    // Messages data
+    messages,
+    
+    // UI state
+    loading,
+    errors,
+    messageInput,
+    setMessageInput,
+    sendingMessage,
+    
+    // Message actions
+    sendMessage,
+    
+    // Video call
+    videoCallStatus,
+    startVideoCall,
+    endVideoCall,
+    
+    // Content monitoring
+    violations,
+    latestReport,
+    monitoringEnabled,
+    toggleMonitoring,
+    monitoringLoading,
+    
+    // Encryption
     encryptionEnabled,
     toggleEncryption,
+    
+    // Retention
     retentionPolicy,
-    updateRetentionPolicy: updateRetentionSettings
+    updateRetentionPolicy
   };
 };
