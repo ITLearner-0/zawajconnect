@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -26,15 +25,15 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#9b87f5",
+          DEFAULT: "#28717c",
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#D6BCFA",
+          DEFAULT: "#d4af37",
           foreground: "#221F26",
         },
         accent: {
-          DEFAULT: "#E5DEFF",
+          DEFAULT: "#f8f7f2",
           foreground: "#221F26",
         },
         destructive: {
@@ -52,6 +51,14 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        islamic: {
+          teal: "#28717c",
+          gold: "#d4af37",
+          burgundy: "#6b2025",
+          blue: "#235789",
+          cream: "#f8f7f2",
+          sand: "#e6dbc9",
         },
       },
       keyframes: {
