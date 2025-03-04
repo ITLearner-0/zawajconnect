@@ -1,14 +1,16 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import CustomButton from "./CustomButton";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { questions } from "@/data/compatibilityQuestions";
+import { questions, calculateMaxPossibleScore } from "@/data/compatibilityQuestions";
 import { Answer, CompatibilityResultData } from "@/types/compatibility";
 import QuestionDisplay from "./compatibility/QuestionDisplay";
 import ResultsDisplay from "./compatibility/ResultsDisplay";
 import { Json } from "@/integrations/supabase/types";
+import { Progress } from "@/components/ui/progress";
 
 const CompatibilityTest = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -17,6 +19,7 @@ const CompatibilityTest = () => {
   const [score, setScore] = useState(0);
   const [isDealbreaker, setIsDealbreaker] = useState(false);
   const [breakerThreshold, setBreakerthreshold] = useState(50);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -33,13 +36,17 @@ const CompatibilityTest = () => {
       }
     };
 
+    // Set initial dealbreaker state based on current question
+    setIsDealbreaker(questions[currentQuestion]?.isBreaker || false);
+
     checkAuth();
-  }, [navigate, toast]);
+  }, [navigate, toast, currentQuestion]);
 
   const handleAnswer = (value: number[]) => {
     setAnswers(prev => ({
       ...prev,
       [currentQuestion]: {
+        ...prev[currentQuestion],
         value: value[0],
         isBreaker: isDealbreaker,
         breakerThreshold: isDealbreaker ? breakerThreshold : undefined
@@ -47,15 +54,28 @@ const CompatibilityTest = () => {
     }));
   };
 
+  const handleWeightChange = (value: number[]) => {
+    setAnswers(prev => ({
+      ...prev,
+      [currentQuestion]: {
+        ...prev[currentQuestion],
+        weight: value[0]
+      }
+    }));
+  };
+
   const calculateAndSaveScore = async () => {
+    setLoading(true);
     let totalWeightedScore = 0;
     let totalWeight = 0;
     let dealbreakers = [];
 
     for (const [index, answer] of Object.entries(answers)) {
       const question = questions[Number(index)];
-      totalWeightedScore += (answer.value * question.weight);
-      totalWeight += question.weight;
+      const effectiveWeight = answer.weight || question.weight;
+      
+      totalWeightedScore += (answer.value * effectiveWeight);
+      totalWeight += effectiveWeight;
 
       if (answer.isBreaker && answer.breakerThreshold && answer.value < answer.breakerThreshold) {
         dealbreakers.push(question.category);
@@ -81,7 +101,7 @@ const CompatibilityTest = () => {
           dealbreakers: dealbreakers as unknown as Json,
           preferences: questions.map(q => ({
             category: q.id.toString(),
-            weight: q.weight
+            weight: answers[questions.findIndex(quest => quest.id === q.id)]?.weight || q.weight
           })) as unknown as Json,
           user_id: session.user.id
         };
@@ -104,16 +124,23 @@ const CompatibilityTest = () => {
         description: "Failed to save your results. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleNext = async () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(currentQuestion + 1);
-      setIsDealbreaker(questions[currentQuestion + 1].isBreaker);
     } else {
       await calculateAndSaveScore();
       setShowResult(true);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
     }
   };
 
@@ -136,14 +163,28 @@ const CompatibilityTest = () => {
               onAnswerChange={handleAnswer}
               onDealbreakerChange={setIsDealbreaker}
               onThresholdChange={(value) => setBreakerthreshold(value[0])}
+              onWeightChange={handleWeightChange}
             />
-            <div className="flex justify-between items-center mt-6">
-              <span className="text-sm text-gray-500">
-                Question {currentQuestion + 1} of {questions.length}
-              </span>
-              <CustomButton onClick={handleNext}>
-                {currentQuestion === questions.length - 1 ? "See Results" : "Next"}
-              </CustomButton>
+            <div className="mt-8 space-y-4">
+              <Progress 
+                value={(currentQuestion + 1) / questions.length * 100} 
+                className="h-2 w-full"
+              />
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-500">
+                  Question {currentQuestion + 1} of {questions.length}
+                </span>
+                <div className="space-x-3">
+                  {currentQuestion > 0 && (
+                    <CustomButton variant="outline" onClick={handlePrevious}>
+                      Previous
+                    </CustomButton>
+                  )}
+                  <CustomButton onClick={handleNext} disabled={loading}>
+                    {currentQuestion === questions.length - 1 ? (loading ? "Calculating..." : "See Results") : "Next"}
+                  </CustomButton>
+                </div>
+              </div>
             </div>
           </>
         ) : (
