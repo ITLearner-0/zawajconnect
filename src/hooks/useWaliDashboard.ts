@@ -60,17 +60,22 @@ export const useWaliDashboard = () => {
     error: flaggedContentError 
   } = useFlaggedContent(userId);
   
+  // Compute totals
+  const totalPendingRequests = chatRequests.filter(req => req.status === 'pending').length;
+  const totalActiveConversations = activeConversations.length;
+  const totalFlaggedItems = flaggedContent.length;
+  
   // Get wali statistics
   const { 
     stats,
     loading: isLoadingStats,
     error: statsError 
-  } = useWaliStats(userId, true, true, true, true);
-  
-  // Compute totals
-  const totalPendingRequests = chatRequests.filter(req => req.status === 'pending').length;
-  const totalActiveConversations = activeConversations.length;
-  const totalFlaggedItems = flaggedContent.length;
+  } = useWaliStats(
+    userId, 
+    totalPendingRequests, 
+    totalActiveConversations, 
+    totalFlaggedItems
+  );
   
   // Sign out function
   const handleSignOut = async () => {

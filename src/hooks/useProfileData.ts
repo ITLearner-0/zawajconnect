@@ -67,11 +67,12 @@ export const useProfileData = (userId?: string | null) => {
           };
           setProfileData(profileFormData);
           
-          // Set verification status
+          // Set verification status - using is_verified for email verification
+          // In a real app, there would be separate columns for each verification type
           setVerificationStatus({
-            email: !!data.email_verified,
-            phone: !!data.phone_verified,
-            id: !!data.id_verified
+            email: !!data.is_verified,
+            phone: false, // Use appropriate field in your schema
+            id: false, // Use appropriate field in your schema
           });
           
           // Set privacy settings

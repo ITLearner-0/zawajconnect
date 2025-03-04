@@ -9,41 +9,56 @@ export const useWaliStats = (
   activeConversations: number,
   flaggedContent: number
 ) => {
-  const [statistics, setStatistics] = useState<WaliDashboardStats>({
+  const [stats, setStats] = useState<WaliDashboardStats>({
     pendingRequests: 0,
     activeConversations: 0,
     flaggedMessages: 0,
     totalSupervised: 0
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStatistics = async () => {
       if (!waliId) return;
-
+      
+      setLoading(true);
       try {
         // Get total supervised users
-        const { data: waliProfile } = await supabase
+        const { data: waliProfile, error: waliError } = await supabase
           .from('wali_profiles')
           .select('managed_users')
           .eq('user_id', waliId)
           .single();
 
+        if (waliError) {
+          setError(waliError.message);
+          return;
+        }
+
         const totalSupervised = waliProfile?.managed_users?.length || 0;
 
         // Update statistics
-        setStatistics({
+        setStats({
           pendingRequests,
           activeConversations,
           flaggedMessages: flaggedContent,
           totalSupervised
         });
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching wali statistics:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchStatistics();
   }, [waliId, pendingRequests, activeConversations, flaggedContent]);
 
-  return statistics;
+  return {
+    stats,
+    loading,
+    error
+  };
 };

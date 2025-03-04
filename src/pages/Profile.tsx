@@ -118,7 +118,10 @@ const Profile = () => {
             <CardContent>
               <TooltipProvider>
                 <form 
-                  onSubmit={handleSubmit} 
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmit();
+                  }} 
                   className="space-y-6"
                   aria-label="Profile form"
                 >

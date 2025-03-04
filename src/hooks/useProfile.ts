@@ -19,21 +19,19 @@ export const useProfile = () => {
   }, []);
   
   const { 
+    profileData,
+    loading,
+    error,
     isNewUser, 
     userEmail, 
-    formData: initialFormData, 
-    verificationStatus: initialVerificationStatus,
-    privacySettings: initialPrivacySettings,
-    blockedUsers: initialBlockedUsers,
-    isAccountVisible: initialIsVisible
+    verificationStatus,
+    privacySettings,
+    blockedUsers,
+    isAccountVisible
   } = useProfileData(userId);
 
   const {
     formData,
-    verificationStatus,
-    privacySettings,
-    blockedUsers,
-    isAccountVisible,
     handleChange,
     handleVerificationChange,
     handlePrivacySettingsChange,
@@ -42,11 +40,11 @@ export const useProfile = () => {
     toggleAccountVisibility,
     unblockUser,
   } = useProfileForm({
-    initialFormData,
-    initialVerificationStatus,
-    initialPrivacySettings,
-    initialBlockedUsers,
-    initialIsVisible,
+    initialFormData: profileData,
+    initialVerificationStatus: verificationStatus,
+    initialPrivacySettings: privacySettings,
+    initialBlockedUsers: blockedUsers,
+    initialIsVisible: isAccountVisible,
     userId
   });
 

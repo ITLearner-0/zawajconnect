@@ -14,7 +14,19 @@ export const useAccountVisibility = ({
   const { toast } = useToast();
   const [isAccountVisible, setIsAccountVisible] = useState<boolean>(initialIsVisible !== false);
 
-  const toggleAccountVisibility = async (userId: string) => {
+  const toggleAccountVisibility = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "User not authenticated",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    const userId = user.id;
     const newVisibilityState = !isAccountVisible;
     setIsAccountVisible(newVisibilityState);
     

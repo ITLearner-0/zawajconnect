@@ -8,6 +8,7 @@ import { useBlockedUsers } from "./profile/useBlockedUsers";
 import { useProfileSubmission } from "./profile/useProfileSubmission";
 import { useAuthSignOut } from "./profile/useAuthSignOut";
 import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
 
 interface UseProfileFormProps {
   initialFormData: ProfileFormData | null;
@@ -52,7 +53,7 @@ export const useProfileForm = ({
   
   // Privacy settings
   const { privacySettings, handlePrivacySettingsChange } = usePrivacyManagement({
-    userId,
+    userId: userId || undefined,
     initialPrivacySettings
   });
 
@@ -62,11 +63,11 @@ export const useProfileForm = ({
   });
 
   // Blocked users
-  const { blockedUsers, unblockUser } = useBlockedUsers(userId);
+  const blockedUsersData = useBlockedUsers(userId);
   
   useEffect(() => {
     if (userId) {
-      blockedUsers.fetchBlockedUsers();
+      blockedUsersData.fetchBlockedUsers();
     }
   }, [userId]);
 
@@ -75,13 +76,20 @@ export const useProfileForm = ({
   
   const handleSubmit = async () => {
     if (!userId) return false;
-    return await submitProfile(userId, formData, privacySettings || {
-      profileVisibilityLevel: 1,
-      showAge: true,
-      showLocation: true,
-      showOccupation: true,
-      allowNonMatchMessages: true
-    });
+    
+    const success = await submitProfile(
+      userId, 
+      formData, 
+      privacySettings || {
+        profileVisibilityLevel: 1,
+        showAge: true,
+        showLocation: true,
+        showOccupation: true,
+        allowNonMatchMessages: true
+      }
+    );
+    
+    return success;
   };
 
   // Auth sign out
@@ -91,7 +99,7 @@ export const useProfileForm = ({
     formData,
     verificationStatus,
     privacySettings,
-    blockedUsers: blockedUsers.blockedUsers,
+    blockedUsers: blockedUsersData.blockedUsers,
     isAccountVisible,
     handleChange,
     handleVerificationChange,
@@ -99,9 +107,6 @@ export const useProfileForm = ({
     handleSubmit,
     handleSignOut,
     toggleAccountVisibility,
-    unblockUser: blockedUsers.unblockUser,
+    unblockUser: blockedUsersData.unblockUser,
   };
 };
-
-// Add the missing import
-import { useEffect } from "react";
