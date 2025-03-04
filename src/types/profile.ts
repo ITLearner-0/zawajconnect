@@ -144,5 +144,7 @@ export interface MonitoringReport {
   is_flagged: boolean;
   warning_triggers: string[];
   content: string;
-  recommendations: string[]; // Add this field to match API
+  recommendations: string[];
+  violations?: { type: string; severity: string; details: string }[];
+  behavioralScore?: number;
 }

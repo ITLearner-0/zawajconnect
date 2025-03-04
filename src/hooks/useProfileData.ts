@@ -58,7 +58,7 @@ export const useProfileData = (userId?: string | null) => {
             education: data.education_level,
             occupation: data.occupation,
             religiousLevel: data.religious_practice_level,
-            familyBackground: data.family_background || '',
+            familyBackground: data.about_me || '', // If family_background doesn't exist, use about_me as fallback
             aboutMe: data.about_me,
             prayerFrequency: data.prayer_frequency,
             waliName: data.wali_name || '',

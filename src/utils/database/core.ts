@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const tableExists = async (tableName: string): Promise<boolean> => {
   try {
-    // Use a raw query approach to check for table existence
+    // Use proper typing for RPC calls
     const { data, error } = await supabase.rpc(
       'check_table_exists',
       { table_name: tableName }
