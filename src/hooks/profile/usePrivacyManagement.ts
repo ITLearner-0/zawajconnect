@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { PrivacySettings } from '@/types/profile';
@@ -30,9 +31,11 @@ export const usePrivacyManagement = ({ userId, initialPrivacySettings }: UsePriv
     setError(null);
 
     try {
+      const updatedSettings = { ...privacySettings, ...newSettings };
+      
       const { data, error } = await supabase
         .from('profiles')
-        .update({ privacy_settings: { ...privacySettings, ...newSettings } })
+        .update({ privacy_settings: updatedSettings })
         .eq('id', userId)
         .select('privacy_settings')
         .single();
@@ -43,8 +46,8 @@ export const usePrivacyManagement = ({ userId, initialPrivacySettings }: UsePriv
         return false;
       }
 
-      // Update the local state with the new privacy settings
-      setPrivacySettings(data.privacy_settings);
+      // Type assertion to ensure correct typing
+      setPrivacySettings(data.privacy_settings as PrivacySettings);
       return true;
     } catch (err: any) {
       console.error('Error updating privacy settings:', err);
@@ -54,11 +57,23 @@ export const usePrivacyManagement = ({ userId, initialPrivacySettings }: UsePriv
       setIsLoading(false);
     }
   };
+  
+  const handlePrivacySettingsChange = (newSettings: Partial<PrivacySettings>) => {
+    // Update local state first
+    setPrivacySettings(prevSettings => ({
+      ...prevSettings,
+      ...newSettings
+    }));
+    
+    // Then persist to database
+    return updatePrivacySettings(newSettings);
+  };
 
   return {
     privacySettings,
     isLoading,
     error,
     updatePrivacySettings,
+    handlePrivacySettingsChange
   };
 };

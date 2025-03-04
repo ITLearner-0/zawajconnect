@@ -6,13 +6,11 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const tableExists = async (tableName: string): Promise<boolean> => {
   try {
-    // Use a direct query approach to check for table existence
-    const { data, error } = await supabase
-      .from('information_schema.tables')
-      .select('table_name')
-      .eq('table_schema', 'public')
-      .eq('table_name', tableName)
-      .maybeSingle();
+    // Use a raw query approach to check for table existence
+    const { data, error } = await supabase.rpc(
+      'check_table_exists',
+      { table_name: tableName }
+    );
     
     if (error) {
       console.error(`Error checking if table ${tableName} exists:`, error);
@@ -33,9 +31,10 @@ export const executeSql = async (query: string): Promise<any> => {
   try {
     // For security, we'll use a more direct approach
     // This assumes you have the appropriate permissions set up
-    const { data, error } = await supabase.rpc('run_sql_query', { 
-      query: query 
-    });
+    const { data, error } = await supabase.rpc(
+      'execute_sql',
+      { sql_query: query }
+    );
     
     if (error) {
       console.error(`Error executing SQL: ${query}`, error);
@@ -54,14 +53,14 @@ export const executeSql = async (query: string): Promise<any> => {
  */
 export const columnExists = async (tableName: string, columnName: string): Promise<boolean> => {
   try {
-    // Direct query to check column existence
-    const { data, error } = await supabase
-      .from('information_schema.columns')
-      .select('column_name')
-      .eq('table_schema', 'public')
-      .eq('table_name', tableName)
-      .eq('column_name', columnName)
-      .maybeSingle();
+    // Use RPC function to check column existence
+    const { data, error } = await supabase.rpc(
+      'check_column_exists',
+      { 
+        table_name: tableName,
+        column_name: columnName
+      }
+    );
     
     if (error) {
       console.error(`Error checking if column ${columnName} exists in table ${tableName}:`, error);

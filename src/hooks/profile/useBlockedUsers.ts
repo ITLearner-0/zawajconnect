@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { executeSql } from '@/utils/database';
 
@@ -35,7 +36,7 @@ export const useBlockedUsers = (userId: string | null) => {
   };
 
   const blockUser = async (targetUserId: string) => {
-    if (!userId) return;
+    if (!userId) return false;
 
     setLoading(true);
     setError(null);
@@ -53,19 +54,22 @@ export const useBlockedUsers = (userId: string | null) => {
 
       if (!result) {
         setError("Failed to block user.");
+        return false;
       } else {
         setBlockedUsers(prev => [...prev, targetUserId]);
+        return true;
       }
     } catch (err: any) {
       console.error("Error blocking user:", err);
       setError("Failed to block user.");
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
   const unblockUser = async (targetUserId: string) => {
-    if (!userId) return;
+    if (!userId) return false;
 
     setLoading(true);
     setError(null);
@@ -82,12 +86,15 @@ export const useBlockedUsers = (userId: string | null) => {
 
       if (!result) {
         setError("Failed to unblock user.");
+        return false;
       } else {
         setBlockedUsers(prev => prev.filter(id => id !== targetUserId));
+        return true;
       }
     } catch (err: any) {
       console.error("Error unblocking user:", err);
       setError("Failed to unblock user.");
+      return false;
     } finally {
       setLoading(false);
     }

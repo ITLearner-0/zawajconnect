@@ -1,14 +1,25 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ProfileFormData } from '@/types/profile';
+import { ProfileFormData, PrivacySettings, VerificationStatus } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
 import { executeSql } from '@/utils/database';
 
-export const useProfileData = (userId: string | null) => {
+export const useProfileData = (userId?: string | null) => {
   const { toast } = useToast();
   const [profileData, setProfileData] = useState<ProfileFormData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isNewUser, setIsNewUser] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>({
+    email: false,
+    phone: false,
+    id: false
+  });
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettings | null>(null);
+  const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
+  const [isAccountVisible, setIsAccountVisible] = useState(true);
 
   useEffect(() => {
     const fetchProfileData = async () => {
@@ -21,6 +32,10 @@ export const useProfileData = (userId: string | null) => {
       setError(null);
 
       try {
+        // Get user email from auth session
+        const { data: { session } } = await supabase.auth.getSession();
+        setUserEmail(session?.user?.email || null);
+
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
@@ -51,8 +66,28 @@ export const useProfileData = (userId: string | null) => {
             waliContact: data.wali_contact || '',
           };
           setProfileData(profileFormData);
+          
+          // Set verification status
+          setVerificationStatus({
+            email: !!data.email_verified,
+            phone: !!data.phone_verified,
+            id: !!data.id_verified
+          });
+          
+          // Set privacy settings
+          setPrivacySettings(data.privacy_settings as PrivacySettings);
+          
+          // Set blocked users
+          setBlockedUsers(data.blocked_users || []);
+          
+          // Set account visibility
+          setIsAccountVisible(data.is_visible !== false);
+          
+          // Determine if user is new based on data completeness
+          setIsNewUser(!data.first_name || !data.last_name || !data.gender);
         } else {
           setProfileData(null); // No profile data found
+          setIsNewUser(true);
         }
       } catch (err: any) {
         setError(err.message);
@@ -131,5 +166,13 @@ export const useProfileData = (userId: string | null) => {
     loading,
     error,
     updateProfileData,
+    isNewUser,
+    userEmail,
+    formData: profileData,
+    verificationStatus,
+    userId,
+    privacySettings,
+    blockedUsers,
+    isAccountVisible
   };
 };

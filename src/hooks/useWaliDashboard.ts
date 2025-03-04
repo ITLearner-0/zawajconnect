@@ -6,9 +6,21 @@ import { useSupervision } from './wali/useSupervision';
 import { useFlaggedContent } from './wali/useFlaggedContent';
 import { useWaliStats } from './wali/useWaliStats';
 import { WaliProfile } from '@/types/wali';
+import { supabase } from '@/integrations/supabase/client';
 
 export const useWaliDashboard = () => {
-  const userId = ''; // This will be replaced with actual user ID
+  const [userId, setUserId] = useState<string>('');
+  
+  useEffect(() => {
+    const getUserId = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        setUserId(session.user.id);
+      }
+    };
+    
+    getUserId();
+  }, []);
   
   // Get wali profile data
   const { 
@@ -16,7 +28,7 @@ export const useWaliDashboard = () => {
     loading: isLoading, 
     updateAvailability: updateAvailabilityStatus,
     error: profileError 
-  } = useWaliProfile();
+  } = useWaliProfile(userId);
   
   // Get chat requests data
   const { 
@@ -50,10 +62,10 @@ export const useWaliDashboard = () => {
   
   // Get wali statistics
   const { 
-    waliStats: statistics, 
+    stats,
     loading: isLoadingStats,
     error: statsError 
-  } = useWaliStats(userId);
+  } = useWaliStats(userId, true, true, true, true);
   
   // Compute totals
   const totalPendingRequests = chatRequests.filter(req => req.status === 'pending').length;
@@ -62,8 +74,8 @@ export const useWaliDashboard = () => {
   
   // Sign out function
   const handleSignOut = async () => {
-    // Implementation here
-    return true;
+    const { error } = await supabase.auth.signOut();
+    return !error;
   };
   
   return {
@@ -96,7 +108,7 @@ export const useWaliDashboard = () => {
     totalFlaggedItems,
     
     // Statistics 
-    statistics,
+    statistics: stats,
     
     // Sign out
     handleSignOut,

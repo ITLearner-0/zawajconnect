@@ -135,3 +135,14 @@ export interface ModerationStats {
   totalProcessed: number;
   resolvedToday: number;
 }
+
+export interface MonitoringReport {
+  id?: string;
+  conversation_id: string;
+  created_at: string;
+  behavioral_score: number;
+  is_flagged: boolean;
+  warning_triggers: string[];
+  content: string;
+  recommendations: string[]; // Add this field to match API
+}

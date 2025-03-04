@@ -6,11 +6,26 @@ import MessagesContainer from '@/components/messaging/MessagesContainer';
 import ChatWindow from '@/components/messaging/ChatWindow';
 import VideoCallManager from '@/components/messaging/VideoCallManager';
 import { Toaster } from '@/components/ui/toaster';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 const Messages = () => {
   const { conversationId } = useParams();
   const navigate = useNavigate();
-  const { userId, formData } = useProfileData();
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const getUserId = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        setCurrentUserId(session.user.id);
+      }
+    };
+    
+    getUserId();
+  }, []);
+  
+  const { profileData: userData } = useProfileData(currentUserId);
   
   const {
     conversations,
@@ -36,14 +51,14 @@ const Messages = () => {
     toggleEncryption,
     retentionPolicy,
     updateRetentionPolicy
-  } = useMessages(conversationId, userId);
+  } = useMessages(conversationId, currentUserId);
 
   // Select a conversation
   const selectConversation = (conversation: { id: string }) => {
     navigate(`/messages/${conversation.id}`);
   };
 
-  if (!userId) {
+  if (!currentUserId) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p>Please sign in to view messages</p>
@@ -81,7 +96,7 @@ const Messages = () => {
             <ChatWindow
               conversation={currentConversation}
               messages={messages}
-              currentUserId={userId}
+              currentUserId={currentUserId}
               messageInput={messageInput}
               setMessageInput={setMessageInput}
               sendMessage={sendMessage}
@@ -89,7 +104,7 @@ const Messages = () => {
               sendingMessage={sendingMessage}
               error={errors?.messages}
               onStartVideoCall={() => {
-                const otherUserId = currentConversation.participants.find(id => id !== userId);
+                const otherUserId = currentConversation.participants.find(id => id !== currentUserId);
                 if (otherUserId) {
                   startVideoCall(otherUserId);
                 }

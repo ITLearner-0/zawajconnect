@@ -7,13 +7,15 @@ import { useAccountVisibility } from "./profile/useAccountVisibility";
 import { useBlockedUsers } from "./profile/useBlockedUsers";
 import { useProfileSubmission } from "./profile/useProfileSubmission";
 import { useAuthSignOut } from "./profile/useAuthSignOut";
+import { supabase } from "@/integrations/supabase/client";
 
 interface UseProfileFormProps {
-  initialFormData: ProfileFormData;
+  initialFormData: ProfileFormData | null;
   initialVerificationStatus: VerificationStatus;
-  initialPrivacySettings?: PrivacySettings;
+  initialPrivacySettings?: PrivacySettings | null;
   initialBlockedUsers?: string[];
   initialIsVisible?: boolean;
+  userId: string | null;
 }
 
 export const useProfileForm = ({ 
@@ -21,11 +23,26 @@ export const useProfileForm = ({
   initialVerificationStatus,
   initialPrivacySettings,
   initialBlockedUsers,
-  initialIsVisible
+  initialIsVisible,
+  userId
 }: UseProfileFormProps) => {
   // Form state management
   const { formData, handleChange } = useProfileFormState({
-    initialFormData
+    initialFormData: initialFormData || {
+      fullName: '',
+      age: '',
+      gender: '',
+      location: '',
+      education: '',
+      occupation: '',
+      religiousLevel: '',
+      familyBackground: '',
+      aboutMe: '',
+      prayerFrequency: '',
+      waliName: '',
+      waliRelationship: '',
+      waliContact: ''
+    }
   });
 
   // Verification status
@@ -35,6 +52,7 @@ export const useProfileForm = ({
   
   // Privacy settings
   const { privacySettings, handlePrivacySettingsChange } = usePrivacyManagement({
+    userId,
     initialPrivacySettings
   });
 
@@ -44,58 +62,46 @@ export const useProfileForm = ({
   });
 
   // Blocked users
-  const { blockedUsers, unblockUser } = useBlockedUsers({
-    initialBlockedUsers
-  });
+  const { blockedUsers, unblockUser } = useBlockedUsers(userId);
+  
+  useEffect(() => {
+    if (userId) {
+      blockedUsers.fetchBlockedUsers();
+    }
+  }, [userId]);
 
   // Profile submission
-  const { handleSubmit } = useProfileSubmission({
-    formData,
-    privacySettings,
-    blockedUsers,
-    isAccountVisible
-  });
+  const { submitProfile } = useProfileSubmission();
+  
+  const handleSubmit = async () => {
+    if (!userId) return false;
+    return await submitProfile(userId, formData, privacySettings || {
+      profileVisibilityLevel: 1,
+      showAge: true,
+      showLocation: true,
+      showOccupation: true,
+      allowNonMatchMessages: true
+    });
+  };
 
   // Auth sign out
   const { handleSignOut } = useAuthSignOut();
-
-  // Wrapper for toggleAccountVisibility to make it work with the current interface
-  const handleToggleAccountVisibility = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      return false;
-    }
-    
-    return toggleAccountVisibility(session.user.id);
-  };
-
-  // Wrapper for unblockUser to make it work with the current interface
-  const handleUnblockUser = async (userIdToUnblock: string) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      return false;
-    }
-    
-    return unblockUser(session.user.id, userIdToUnblock);
-  };
 
   return {
     formData,
     verificationStatus,
     privacySettings,
-    blockedUsers,
+    blockedUsers: blockedUsers.blockedUsers,
     isAccountVisible,
     handleChange,
     handleVerificationChange,
     handlePrivacySettingsChange,
     handleSubmit,
     handleSignOut,
-    toggleAccountVisibility: handleToggleAccountVisibility,
-    unblockUser: handleUnblockUser,
+    toggleAccountVisibility,
+    unblockUser: blockedUsers.unblockUser,
   };
 };
 
-// Missing import - adding it here
-import { supabase } from "@/integrations/supabase/client";
+// Add the missing import
+import { useEffect } from "react";
