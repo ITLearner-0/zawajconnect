@@ -1,55 +1,121 @@
 
-import { supabase } from '@/integrations/supabase/client';
-import { filterMessageContent } from '@/services/contentModerationService';
-import { ContentFlag } from '@/types/profile';
+import { useState, useEffect } from 'react';
+import { Message, ContentFlag } from '@/types/profile';
+import { 
+  MonitoringReport, 
+  Violation, 
+  detectViolations, 
+  generateReport 
+} from '@/services/aiMonitoringService';
+import { useToast } from '@/hooks/use-toast';
+import { filterMessageContent, flagContent } from '@/services/contentModerationService';
 
-export const useMessageModeration = (userId: string | null) => {
-  // Filter message content before sending
-  const moderateMessageContent = (messageText: string) => {
-    return filterMessageContent(messageText);
-  };
-  
-  // Process content flags if any are found
-  const processContentFlags = async (
-    messageId: string | undefined, 
-    flags: Array<{ flag_type: string; severity: string }>,
-    userId: string | null
-  ): Promise<void> => {
-    if (!flags.length || !messageId || !userId) return;
+export const useMessageModeration = (
+  conversationId: string | undefined, 
+  messages: Message[], 
+  userId: string | null
+) => {
+  const { toast } = useToast();
+  const [violations, setViolations] = useState<Violation[]>([]);
+  const [latestReport, setLatestReport] = useState<MonitoringReport | null>(null);
+  const [monitoringEnabled, setMonitoringEnabled] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Check new messages for violations in real-time
+  useEffect(() => {
+    if (!monitoringEnabled || messages.length === 0 || !userId) return;
     
-    try {
-      // Create flag objects with proper fields
-      const flagsWithMetadata = flags.map(flag => ({
-        content_id: messageId,
-        content_type: 'message',
-        flag_type: flag.flag_type,
-        severity: flag.severity,
-        flagged_by: userId,
-        created_at: new Date().toISOString(),
-        resolved: false
-      }));
-      
-      // Insert flags directly using Supabase's insert method
-      for (const flag of flagsWithMetadata) {
-        try {
-          const { error: flagError } = await supabase
-            .from('content_flags')
-            .insert(flag);
-            
-          if (flagError) {
-            console.error("Error inserting content flag:", flagError);
-          }
-        } catch (err) {
-          console.error("Error processing flag:", err);
+    const latestMessage = messages[messages.length - 1];
+    if (!latestMessage) return;
+    
+    // Only check sent messages, not received ones
+    if (latestMessage.sender_id !== userId) return;
+    
+    // Check message content through the filter
+    const { flags } = filterMessageContent(latestMessage.content);
+    
+    // If flags detected, record them in the database
+    if (flags.length > 0) {
+      flags.forEach(flag => {
+        if (flag.flag_type && flag.severity) {
+          flagContent(
+            latestMessage.id,
+            'message',
+            flag.flag_type as ContentFlag['flag_type'],
+            flag.severity as ContentFlag['severity'],
+            userId
+          );
         }
-      }
-    } catch (err) {
-      console.error("Error in processContentFlags:", err);
+      });
     }
+    
+    // Check only the newest message for violations
+    const newViolations = detectViolations(latestMessage);
+    
+    if (newViolations.length > 0) {
+      setViolations(prev => [...prev, ...newViolations]);
+      
+      // Alert about high severity violations
+      const highSeverityViolations = newViolations.filter(v => v.severity === 'high');
+      if (highSeverityViolations.length > 0) {
+        toast({
+          title: "Compliance Alert",
+          description: highSeverityViolations[0].message,
+          variant: "destructive"
+        });
+      }
+    }
+  }, [messages, monitoringEnabled, toast, userId]);
+
+  // Generate comprehensive report periodically or when messages change significantly
+  useEffect(() => {
+    if (!monitoringEnabled || messages.length < 5 || !conversationId) return;
+    
+    const generateMonitoringReport = async () => {
+      try {
+        setLoading(true);
+        const report = generateReport(messages);
+        setLatestReport(report);
+        
+        // Save report to database - just log for now since table doesn't exist
+        if (userId) {
+          console.log("Would save monitoring report:", {
+            conversation_id: conversationId,
+            user_id: userId,
+            behavioral_score: report.behavioralScore,
+            islamic_compliance_score: report.islamicComplianceScore,
+            sentiment_score: report.sentimentScore,
+            violation_count: report.violations.length,
+            report_data: report
+          });
+        }
+      } catch (err: any) {
+        setError(err.message);
+        console.error("Error in AI monitoring:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    // Generate report when we have 5 messages or message count is multiple of 10
+    if (messages.length === 5 || messages.length % 10 === 0) {
+      generateMonitoringReport();
+    }
+    
+  }, [messages, conversationId, userId, monitoringEnabled]);
+
+  // Toggle monitoring status
+  const toggleMonitoring = () => {
+    setMonitoringEnabled(prev => !prev);
   };
 
   return {
-    moderateMessageContent,
-    processContentFlags
+    violations,
+    latestReport,
+    monitoringEnabled,
+    toggleMonitoring,
+    loading,
+    error
   };
 };

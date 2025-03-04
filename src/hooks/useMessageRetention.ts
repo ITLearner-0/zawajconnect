@@ -13,34 +13,18 @@ export const useMessageRetention = (conversationId: string | undefined) => {
     
     const getRetentionPolicy = async () => {
       try {
-        // Check if retention_policy column exists
-        const { data: columnExistsData, error: columnExistsError } = await supabase
-          .from('conversations')
-          .select('id')
-          .eq('id', conversationId)
-          .limit(1);
-          
-        if (columnExistsError) {
-          console.error('Error checking if retention policy exists:', columnExistsError);
+        // Use RPC to check if column exists and get data
+        const { data, error } = await supabase.functions.invoke('get_conversation_retention_policy', {
+          body: { conversation_id: conversationId }
+        });
+        
+        if (error) {
+          console.error('Error fetching retention policy:', error);
           return;
         }
         
-        // If we can fetch the conversation, try to get its retention policy
-        if (columnExistsData && columnExistsData.length > 0) {
-          const { data, error } = await supabase
-            .from('conversations')
-            .select('*')
-            .eq('id', conversationId)
-            .single();
-            
-          if (error) {
-            console.error('Error fetching retention policy:', error);
-            return;
-          }
-          
-          if (data && data.retention_policy) {
-            setRetentionPolicyState(data.retention_policy);
-          }
+        if (data && data.retention_policy) {
+          setRetentionPolicyState(data.retention_policy);
         }
       } catch (err) {
         console.error('Failed to get retention policy:', err);

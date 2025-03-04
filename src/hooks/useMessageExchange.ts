@@ -7,34 +7,14 @@ import { useMessageEncryption } from './useMessageEncryption';
 import { useMessageRetention } from './useMessageRetention';
 import { useMessageModeration } from './useMessageModeration';
 
-export const useMessageExchange = (conversationId: string | undefined, userId: string | null) => {
-  const { toast } = useToast();
+// Hook for loading messages
+const useLoadMessages = (conversationId: string | undefined, userId: string | null) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [messageInput, setMessageInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [sendingMessage, setSendingMessage] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+  const { decryptMessageContent } = useMessageEncryption(conversationId, userId);
   
-  // Use our new specialized hooks
-  const {
-    encryptionEnabled,
-    toggleEncryption,
-    encryptMessageContent,
-    decryptMessageContent
-  } = useMessageEncryption(conversationId, userId);
-  
-  const {
-    retentionPolicy,
-    updateRetentionPolicy,
-    getMessageDeletionDate
-  } = useMessageRetention(conversationId);
-  
-  const {
-    moderateMessageContent,
-    processContentFlags
-  } = useMessageModeration(userId);
-
-  // Load messages when conversation is selected
   useEffect(() => {
     if (!conversationId || !userId) return;
 
@@ -147,7 +127,26 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
       supabase.removeChannel(channel);
     };
   }, [conversationId, userId, toast, decryptMessageContent]);
+  
+  return { messages, setMessages, loading, error };
+};
 
+// Hook for sending messages
+const useSendMessage = (
+  conversationId: string | undefined, 
+  userId: string | null,
+  messageInput: string,
+  setMessageInput: (value: string) => void,
+  encryptionEnabled: boolean,
+  encryptMessageContent: (content: string) => Promise<{ encryptedContent: string; iv: string; keyId: string | null }>,
+  getMessageDeletionDate: () => string | null,
+  moderateMessageContent: (content: string) => { filteredContent: string; flags: Array<{ flag_type: string; severity: string }> },
+  processContentFlags: (messageId: string | undefined, flags: Array<{ flag_type: string; severity: string }>, userId: string | null) => Promise<void>
+) => {
+  const { toast } = useToast();
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
   const sendMessage = async () => {
     if (!messageInput.trim() || !userId || !conversationId) return;
     
@@ -258,6 +257,52 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
       setSendingMessage(false);
     }
   };
+  
+  return { sendMessage, sendingMessage, error };
+};
+
+// Main hook that combines the specialized hooks
+export const useMessageExchange = (conversationId: string | undefined, userId: string | null) => {
+  const [messageInput, setMessageInput] = useState('');
+  
+  // Use our specialized hooks
+  const {
+    encryptionEnabled,
+    toggleEncryption,
+    encryptMessageContent,
+    decryptMessageContent
+  } = useMessageEncryption(conversationId, userId);
+  
+  const {
+    retentionPolicy,
+    updateRetentionPolicy,
+    getMessageDeletionDate
+  } = useMessageRetention(conversationId);
+  
+  const {
+    moderateMessageContent,
+    processContentFlags
+  } = useMessageModeration(userId);
+  
+  // Load messages
+  const { messages, setMessages, loading, error } = useLoadMessages(conversationId, userId);
+  
+  // Send messages
+  const { 
+    sendMessage, 
+    sendingMessage, 
+    error: sendError 
+  } = useSendMessage(
+    conversationId, 
+    userId, 
+    messageInput, 
+    setMessageInput, 
+    encryptionEnabled, 
+    encryptMessageContent, 
+    getMessageDeletionDate, 
+    moderateMessageContent, 
+    processContentFlags
+  );
 
   return {
     messages,
@@ -266,7 +311,7 @@ export const useMessageExchange = (conversationId: string | undefined, userId: s
     sendMessage,
     loading,
     sendingMessage,
-    error,
+    error: error || sendError,
     encryptionEnabled,
     toggleEncryption,
     retentionPolicy,

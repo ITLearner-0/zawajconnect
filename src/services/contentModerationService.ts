@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Message, ContentFlag, ContentReport } from '@/types/profile';
 
@@ -12,7 +13,7 @@ const sensitivePatterns = [
 // Filter message content against sensitive patterns
 export const filterMessageContent = (content: string) => {
   let filteredContent = content;
-  const flags: Partial<ContentFlag>[] = [];
+  const flags: Array<{ flag_type: string; severity: string }> = [];
   
   sensitivePatterns.forEach(({ pattern, replacement, flag }) => {
     if (pattern.test(content)) {
