@@ -1,141 +1,58 @@
 
 import { useState } from "react";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import CustomButton from "@/components/CustomButton";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
-import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
-import { geocodeLocation, updateUserCoordinates } from "@/utils/locationUtils";
-import { supabase } from "@/integrations/supabase/client";
 import LocationMap from "@/components/LocationMap";
+import FilterPanel from "@/components/FilterPanel";
+import CustomButton from "@/components/CustomButton";
+import { FilterCriteria } from "@/utils/locationUtils";
+import { Slider } from "@/components/ui/slider";
+import { Label } from "@/components/ui/label";
+import { ArrowLeft } from "lucide-react";
 
 const NearbyMatches = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [location, setLocation] = useState("");
-  const [maxDistance, setMaxDistance] = useState([50]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [showMap, setShowMap] = useState(false);
+  const [maxDistance, setMaxDistance] = useState(50);
+  const [filters, setFilters] = useState<FilterCriteria>({});
 
-  const handleUpdateLocation = async () => {
-    if (!location.trim()) {
-      toast({
-        title: "Location required",
-        description: "Please enter a location to search.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSearching(true);
-
-    try {
-      // Get current user
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to search for matches.",
-          variant: "destructive",
-        });
-        navigate("/auth");
-        return;
-      }
-
-      // Geocode the location
-      const locationData = await geocodeLocation(location);
-      
-      if (!locationData) {
-        toast({
-          title: "Location not found",
-          description: "Could not find coordinates for the entered location. Please try a different location.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Update user's coordinates in the database
-      const success = await updateUserCoordinates(
-        session.user.id, 
-        locationData.latitude, 
-        locationData.longitude
-      );
-      
-      if (!success) {
-        throw new Error("Failed to update location");
-      }
-
-      toast({
-        title: "Location updated",
-        description: "Your location has been updated. Showing nearby matches.",
-      });
-      
-      setShowMap(true);
-    } catch (error) {
-      console.error("Error updating location:", error);
-      toast({
-        title: "Error",
-        description: "Failed to update your location. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSearching(false);
-    }
+  const handleApplyFilters = (newFilters: FilterCriteria) => {
+    setFilters(newFilters);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-accent/50 to-background py-12">
-      <div className="container max-w-3xl mx-auto px-4">
-        <Card className="shadow-lg">
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <h1 className="text-2xl font-bold">Find Nearby Matches</h1>
-              <CustomButton variant="outline" onClick={() => navigate("/")}>
-                Back to Home
-              </CustomButton>
-            </div>
-            <p className="text-gray-600">
-              Discover compatible matches in your area
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="location">Your Location</Label>
-                <div className="flex space-x-2">
-                  <Input
-                    id="location"
-                    placeholder="Enter city, region or address"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                  />
-                  <CustomButton 
-                    onClick={handleUpdateLocation}
-                    disabled={isSearching}
-                  >
-                    {isSearching ? "Searching..." : "Search"}
-                  </CustomButton>
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Maximum Distance: {maxDistance[0]} km</Label>
-                <Slider
-                  min={5}
-                  max={100}
-                  step={5}
-                  value={maxDistance}
-                  onValueChange={setMaxDistance}
-                />
-              </div>
-            </div>
+    <div className="min-h-screen bg-gradient-to-b from-accent/50 to-background">
+      <div className="container mx-auto px-4 py-12">
+        <div className="mb-6 flex items-center">
+          <CustomButton
+            variant="ghost"
+            onClick={() => navigate("/")}
+            className="mr-4"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </CustomButton>
+          <h1 className="text-3xl font-bold">Find Nearby Matches</h1>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-1 space-y-6">
+            <FilterPanel onApplyFilters={handleApplyFilters} />
             
-            {showMap && <LocationMap maxDistance={maxDistance[0]} />}
-          </CardContent>
-        </Card>
+            <div className="bg-white p-6 rounded-lg shadow">
+              <Label className="mb-3 block">Maximum Distance: {maxDistance} km</Label>
+              <Slider
+                value={[maxDistance]}
+                min={1}
+                max={100}
+                step={1}
+                onValueChange={(value) => setMaxDistance(value[0])}
+              />
+            </div>
+          </div>
+          
+          <div className="lg:col-span-2">
+            <LocationMap maxDistance={maxDistance} filters={filters} />
+          </div>
+        </div>
       </div>
     </div>
   );

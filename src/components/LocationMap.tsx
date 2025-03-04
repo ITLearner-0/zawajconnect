@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
-import { findNearbyProfiles } from "@/utils/locationUtils";
+import { findNearbyProfiles, FilterCriteria } from "@/utils/locationUtils";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Profile {
@@ -11,13 +11,17 @@ interface Profile {
   first_name: string;
   last_name: string;
   distance: number;
+  age?: number;
+  practice_level?: string;
+  education?: string;
 }
 
 interface LocationMapProps {
   maxDistance?: number;
+  filters?: FilterCriteria;
 }
 
-const LocationMap = ({ maxDistance = 50 }: LocationMapProps) => {
+const LocationMap = ({ maxDistance = 50, filters = {} }: LocationMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<any>(null);
   const [loading, setLoading] = useState(true);
@@ -43,8 +47,8 @@ const LocationMap = ({ maxDistance = 50 }: LocationMapProps) => {
           return;
         }
         
-        // Fetch nearby profiles
-        const nearbyProfiles = await findNearbyProfiles(session.user.id, maxDistance);
+        // Fetch nearby profiles with filters
+        const nearbyProfiles = await findNearbyProfiles(session.user.id, maxDistance, filters);
         setProfiles(nearbyProfiles);
         
         // Here you would initialize the map with the profiles
@@ -59,6 +63,7 @@ const LocationMap = ({ maxDistance = 50 }: LocationMapProps) => {
         // For demonstration purposes, we'll just log what we would do
         console.log(`Map would be centered on user ${session.user.id}`);
         console.log(`${nearbyProfiles.length} nearby profiles would be displayed as markers`);
+        console.log("Applied filters:", filters);
         
       } catch (error) {
         console.error("Error loading map:", error);
@@ -78,7 +83,7 @@ const LocationMap = ({ maxDistance = 50 }: LocationMapProps) => {
     return () => {
       // In a real implementation, you would destroy the map instance here
     };
-  }, [maxDistance, toast]);
+  }, [maxDistance, filters, toast]);
 
   return (
     <Card className="w-full">
@@ -116,6 +121,11 @@ const LocationMap = ({ maxDistance = 50 }: LocationMapProps) => {
                     >
                       <div>
                         <p className="font-medium">{profile.first_name} {profile.last_name}</p>
+                        <div className="text-sm text-gray-500">
+                          {profile.age && <span className="mr-2">{profile.age} years</span>}
+                          {profile.education && <span className="mr-2">{profile.education}</span>}
+                          {profile.practice_level && <span>{profile.practice_level}</span>}
+                        </div>
                       </div>
                       <span className="text-sm text-gray-500">
                         {profile.distance.toFixed(1)} km away
