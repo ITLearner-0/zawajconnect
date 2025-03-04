@@ -24,4 +24,13 @@ export interface DatabaseProfile {
   religious_practice_level: string;
   prayer_frequency: string;
   about_me: string;
+  email_verified: boolean;
+  phone_verified: boolean;
+  id_verified: boolean;
+}
+
+export interface VerificationStatus {
+  email: boolean;
+  phone: boolean;
+  id: boolean;
 }

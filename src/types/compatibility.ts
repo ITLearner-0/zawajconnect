@@ -1,35 +1,46 @@
 
-import { Json } from "@/integrations/supabase/types";
-
-export interface Answer {
-  value: number;
-  isBreaker: boolean;
-  breakerThreshold?: number;
-  weight?: number; // User can assign custom weights
+export interface CompatibilityQuestion {
+  id: string;
+  text: string;
+  category: string;
+  options: {
+    value: string;
+    label: string;
+  }[];
 }
 
-export interface CompatibilityResultData {
-  answers: Json;
-  score: number;
-  dealbreakers: Json;
-  preferences: Json;
-  user_id: string;
+export interface CompatibilityAnswer {
+  questionId: string;
+  answer: string;
+  importance: number;
 }
 
 export interface CompatibilityMatch {
   userId: string;
   score: number;
-  profileData?: any;
+  distance?: number;
   matchDetails?: {
     strengths: string[];
     differences: string[];
     dealbreakers?: string[];
   };
+  profileData?: {
+    first_name: string;
+    last_name?: string;
+    age?: number;
+    location?: string;
+    religious_practice_level?: string;
+    education_level?: string;
+    occupation?: string;
+    email_verified?: boolean;
+    phone_verified?: boolean;
+    id_verified?: boolean;
+  };
 }
 
-export interface WeightedCategory {
-  category: string;
-  weight: number;
-  userScore?: number;
-  matchScore?: number;
+export interface FilterCriteria {
+  ageRange: [number, number];
+  minScore: number;
+  religiousLevel: string[];
+  verifiedOnly: boolean;
 }

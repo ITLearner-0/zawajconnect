@@ -6,6 +6,7 @@ import BasicInformation from "@/components/profile/BasicInformation";
 import EducationCareer from "@/components/profile/EducationCareer";
 import ReligiousBackground from "@/components/profile/ReligiousBackground";
 import AboutMe from "@/components/profile/AboutMe";
+import VerificationPanel from "@/components/profile/VerificationPanel";
 import { useNavigate } from "react-router-dom";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import OnboardingWrapper from "@/components/onboarding/OnboardingWrapper";
@@ -13,7 +14,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { formData, isNewUser, handleChange, handleSubmit, handleSignOut } = useProfile();
+  const { 
+    formData, 
+    isNewUser, 
+    userEmail,
+    verificationStatus,
+    handleChange, 
+    handleSubmit, 
+    handleSignOut,
+    handleVerificationChange 
+  } = useProfile();
   
   const {
     isOnboarding,
@@ -83,6 +93,13 @@ const Profile = () => {
                 <EducationCareer formData={formData} handleChange={handleChange} />
                 <ReligiousBackground formData={formData} handleChange={handleChange} />
                 <AboutMe formData={formData} handleChange={handleChange} />
+                
+                {/* Verification Panel */}
+                <VerificationPanel
+                  verificationStatus={verificationStatus}
+                  onVerificationChange={handleVerificationChange}
+                  userEmail={userEmail}
+                />
 
                 <div className="flex justify-between pt-6">
                   <CustomButton

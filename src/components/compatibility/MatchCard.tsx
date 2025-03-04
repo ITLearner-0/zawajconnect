@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { CompatibilityMatch } from "@/types/compatibility";
+import { Check, Shield, Mail, Phone } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface MatchCardProps {
   match: CompatibilityMatch;
@@ -19,11 +21,64 @@ const MatchCard = ({ match }: MatchCardProps) => {
         onClick={() => setExpanded(!expanded)}
       >
         <div className="text-left">
-          <span className="font-medium">
-            {match.profileData ? 
-              `${match.profileData.first_name} ${match.profileData.last_name?.charAt(0) || ""}` : 
-              `Match #${match.userId.slice(0, 4)}`}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="font-medium">
+              {match.profileData ? 
+                `${match.profileData.first_name} ${match.profileData.last_name?.charAt(0) || ""}` : 
+                `Match #${match.userId.slice(0, 4)}`}
+            </span>
+            
+            {/* Verification Badges */}
+            {match.profileData && (
+              <div className="flex gap-1">
+                {match.profileData.email_verified && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant="outline" className="h-5 px-1 bg-green-50 text-green-700 border-green-200">
+                          <Mail className="h-3 w-3 mr-1" />
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Email Verified</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+                
+                {match.profileData.phone_verified && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant="outline" className="h-5 px-1 bg-green-50 text-green-700 border-green-200">
+                          <Phone className="h-3 w-3 mr-1" />
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Phone Verified</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+                
+                {match.profileData.id_verified && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge variant="outline" className="h-5 px-1 bg-blue-50 text-blue-700 border-blue-200">
+                          <Shield className="h-3 w-3 mr-1" />
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>ID Verified</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
+              </div>
+            )}
+          </div>
+          
           {match.profileData && (
             <p className="text-sm text-gray-500">
               {[

@@ -3,13 +3,19 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { ProfileFormData } from "@/types/profile";
+import { ProfileFormData, VerificationStatus } from "@/types/profile";
 import { geocodeLocation } from "@/utils/locationUtils";
 
 export const useProfile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isNewUser, setIsNewUser] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>({
+    email: false,
+    phone: false,
+    id: false,
+  });
   const [formData, setFormData] = useState<ProfileFormData>({
     fullName: "",
     age: "",
@@ -31,6 +37,7 @@ export const useProfile = () => {
         return;
       }
 
+      setUserEmail(session.user.email || "");
       console.log("Fetching profile for user:", session.user.id);
       const { data: profile, error } = await supabase
         .from("profiles")
@@ -58,6 +65,12 @@ export const useProfile = () => {
           prayerFrequency: profile.prayer_frequency || "five-daily",
         });
         
+        setVerificationStatus({
+          email: profile.email_verified || false,
+          phone: profile.phone_verified || false,
+          id: profile.id_verified || false,
+        });
+        
         // Detect if this is a new user with minimal profile data
         setIsNewUser(
           !profile.first_name || 
@@ -83,6 +96,10 @@ export const useProfile = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleVerificationChange = (newStatus: VerificationStatus) => {
+    setVerificationStatus(newStatus);
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -114,6 +131,9 @@ export const useProfile = () => {
       prayer_frequency: formData.prayerFrequency,
       about_me: formData.aboutMe,
       birth_date: formData.age ? new Date(new Date().getFullYear() - parseInt(formData.age), 0, 1).toISOString() : null,
+      email_verified: verificationStatus.email,
+      phone_verified: verificationStatus.phone,
+      id_verified: verificationStatus.id,
     };
 
     console.log("Attempting to save profile with data:", profileData);
@@ -174,7 +194,10 @@ export const useProfile = () => {
   return {
     formData,
     isNewUser,
+    userEmail,
+    verificationStatus,
     handleChange,
+    handleVerificationChange,
     handleSubmit,
     handleSignOut,
   };
