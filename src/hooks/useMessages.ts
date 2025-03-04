@@ -2,6 +2,7 @@
 import { useConversations } from './useConversations';
 import { useMessageExchange } from './useMessageExchange';
 import { useVideoCall } from './useVideoCall';
+import { useAIMonitoring } from './useAIMonitoring';
 import { useNavigate } from 'react-router-dom';
 
 export const useMessages = (conversationId: string | undefined, userId: string | null) => {
@@ -32,15 +33,25 @@ export const useMessages = (conversationId: string | undefined, userId: string |
     endVideoCall,
     error: videoCallError
   } = useVideoCall(userId, conversationId);
+  
+  const {
+    violations,
+    latestReport,
+    monitoringEnabled,
+    toggleMonitoring,
+    loading: monitoringLoading,
+    error: monitoringError
+  } = useAIMonitoring(conversationId, messages, userId);
 
-  // Loading state combines loading states from both hooks
-  const loading = conversationsLoading || messagesLoading;
+  // Loading state combines loading states from all hooks
+  const loading = conversationsLoading || messagesLoading || monitoringLoading;
   
   // Combine errors
   const errors = {
     conversations: conversationsError,
     messages: messagesError,
-    videoCall: videoCallError
+    videoCall: videoCallError,
+    monitoring: monitoringError
   };
 
   // Load current conversation if conversationId changes
@@ -67,6 +78,12 @@ export const useMessages = (conversationId: string | undefined, userId: string |
     videoCallStatus,
     sendMessage,
     startVideoCall,
-    endVideoCall
+    endVideoCall,
+    // AI monitoring states
+    violations,
+    latestReport,
+    monitoringEnabled,
+    toggleMonitoring,
+    monitoringLoading
   };
 };

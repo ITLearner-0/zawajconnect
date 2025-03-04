@@ -1,16 +1,75 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { ChevronRight, ChevronLeft, Shield } from 'lucide-react';
+import { Button } from '../ui/button';
+import { Violation, MonitoringReport } from '@/services/aiMonitoringService';
+import AIMonitoringDashboard from './AIMonitoringDashboard';
 
 interface ChatContainerProps {
   children: React.ReactNode;
+  violations?: Violation[];
+  report?: MonitoringReport | null;
+  monitoringEnabled?: boolean;
+  toggleMonitoring?: () => void;
+  monitoringLoading?: boolean;
 }
 
-const ChatContainer = ({ children }: ChatContainerProps) => {
+const ChatContainer = ({ 
+  children, 
+  violations = [], 
+  report = null, 
+  monitoringEnabled = true,
+  toggleMonitoring = () => {},
+  monitoringLoading = false
+}: ChatContainerProps) => {
+  const [showMonitoring, setShowMonitoring] = useState(false);
+  
   return (
-    <div className="flex flex-col h-full">
-      {children}
+    <div className="flex flex-col h-full relative">
+      {/* Main chat content */}
+      <div className="flex-grow overflow-hidden">
+        {children}
+      </div>
+      
+      {/* AI Monitoring Panel (collapsible) */}
+      <div 
+        className={`border-t transition-all duration-300 ${
+          showMonitoring ? 'h-[400px]' : 'h-10'
+        } bg-background`}
+      >
+        <div 
+          className="h-10 flex items-center justify-between px-4 cursor-pointer"
+          onClick={() => setShowMonitoring(!showMonitoring)}
+        >
+          <div className="flex items-center">
+            <Shield className="h-4 w-4 mr-2 text-primary" />
+            <span className="font-medium text-sm">
+              AI Monitoring {violations.some(v => v.severity === 'high') && '• High Risk Detected'}
+            </span>
+          </div>
+          <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+            {showMonitoring ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+          </Button>
+        </div>
+        
+        {showMonitoring && (
+          <div className="p-3 h-[360px] overflow-y-auto">
+            <AIMonitoringDashboard
+              violations={violations}
+              report={report}
+              monitoringEnabled={monitoringEnabled}
+              toggleMonitoring={toggleMonitoring}
+              loading={monitoringLoading}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };
+
+// Add missing ChevronUp and ChevronDown components
+const ChevronUp = ChevronLeft;
+const ChevronDown = ChevronRight;
 
 export default ChatContainer;

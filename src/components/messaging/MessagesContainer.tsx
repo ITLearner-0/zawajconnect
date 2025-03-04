@@ -17,6 +17,7 @@ interface MessagesContainerProps {
     conversations: string | null;
     messages: string | null;
     videoCall: string | null;
+    monitoring?: string | null;
   };
 }
 
@@ -29,7 +30,7 @@ const MessagesContainer = ({
   children,
   errors
 }: MessagesContainerProps) => {
-  const hasErrors = errors && (errors.conversations || errors.messages || errors.videoCall);
+  const hasErrors = errors && (errors.conversations || errors.messages || errors.videoCall || errors.monitoring);
 
   return (
     <div className="flex flex-col h-full">
@@ -38,7 +39,7 @@ const MessagesContainer = ({
         <Alert variant="destructive" className="m-2">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            {errors?.conversations || errors?.messages || errors?.videoCall}
+            {errors?.conversations || errors?.messages || errors?.videoCall || errors?.monitoring}
           </AlertDescription>
         </Alert>
       )}
