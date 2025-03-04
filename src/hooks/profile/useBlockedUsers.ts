@@ -1,51 +1,104 @@
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { executeSql } from '@/utils/database';
 
-import { useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+export const useBlockedUsers = (userId: string | null) => {
+  const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-interface UseBlockedUsersProps {
-  initialBlockedUsers?: string[];
-}
+  const fetchBlockedUsers = async () => {
+    if (!userId) return;
 
-export const useBlockedUsers = ({
-  initialBlockedUsers
-}: UseBlockedUsersProps) => {
-  const { toast } = useToast();
-  const [blockedUsers, setBlockedUsers] = useState<string[]>(initialBlockedUsers || []);
+    setLoading(true);
+    setError(null);
 
-  const unblockUser = async (userId: string, userIdToUnblock: string) => {
-    const updatedBlockedUsers = blockedUsers.filter(id => id !== userIdToUnblock);
-    
-    // Make sure blocked_users column exists
     try {
-      await supabase.rpc('execute_sql', {
-        sql_query: `ALTER TABLE profiles ADD COLUMN IF NOT EXISTS blocked_users TEXT[] DEFAULT '{}'::text[]`
-      });
-    } catch (err) {
-      console.error("Error ensuring blocked_users column exists:", err);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('blocked_users')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching blocked users:", error);
+        setError("Failed to load blocked users.");
+      } else {
+        setBlockedUsers(data?.blocked_users || []);
+      }
+    } catch (err: any) {
+      console.error("Error fetching blocked users:", err);
+      setError("Failed to load blocked users.");
+    } finally {
+      setLoading(false);
     }
-    
-    const { error } = await supabase
-      .from("profiles")
-      .update({ blocked_users: updatedBlockedUsers })
-      .eq("id", userId);
-      
-    if (error) {
-      console.error("Error unblocking user:", error);
-      toast({
-        title: "Error",
-        description: "Failed to unblock user",
-        variant: "destructive",
-      });
-      return false;
+  };
+
+  const blockUser = async (targetUserId: string) => {
+    if (!userId) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Use SQL query to update the blocked_users array
+      const query = `
+        UPDATE profiles
+        SET blocked_users = array_append(blocked_users, '${targetUserId}')
+        WHERE id = '${userId}'
+        AND NOT array_contains(blocked_users, ARRAY['${targetUserId}'])
+      `;
+
+      const result = await executeSql(query);
+
+      if (!result) {
+        setError("Failed to block user.");
+      } else {
+        setBlockedUsers(prev => [...prev, targetUserId]);
+      }
+    } catch (err: any) {
+      console.error("Error blocking user:", err);
+      setError("Failed to block user.");
+    } finally {
+      setLoading(false);
     }
-    
-    setBlockedUsers(updatedBlockedUsers);
-    return true;
+  };
+
+  const unblockUser = async (targetUserId: string) => {
+    if (!userId) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Use SQL query to update the blocked_users array
+      const query = `
+        UPDATE profiles
+        SET blocked_users = array_remove(blocked_users, '${targetUserId}')
+        WHERE id = '${userId}'
+      `;
+
+      const result = await executeSql(query);
+
+      if (!result) {
+        setError("Failed to unblock user.");
+      } else {
+        setBlockedUsers(prev => prev.filter(id => id !== targetUserId));
+      }
+    } catch (err: any) {
+      console.error("Error unblocking user:", err);
+      setError("Failed to unblock user.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return {
     blockedUsers,
+    loading,
+    error,
+    fetchBlockedUsers,
+    blockUser,
     unblockUser
   };
 };

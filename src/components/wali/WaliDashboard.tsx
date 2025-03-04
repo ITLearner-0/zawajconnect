@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,23 +12,30 @@ import { useWaliDashboard } from '@/hooks/useWaliDashboard';
 
 const WaliDashboard: React.FC = () => {
   const {
+    userId,
+    isLoading, 
     waliProfile,
-    statistics,
+    updateAvailabilityStatus,
     chatRequests,
+    handleApproveRequest,
+    handleRejectRequest,
+    totalPendingRequests,
+    addWaliNote,
     activeConversations,
-    flaggedContent,
-    loading,
-    updateAvailability,
-    handleChatRequest,
     startSupervision,
     endSupervision,
-    addWaliNote,
+    totalActiveConversations,
+    flaggedContent,
+    resolveFlaggedContent,
+    totalFlaggedItems,
+    statistics,
+    handleSignOut,
     error
   } = useWaliDashboard();
   
   const [activeTab, setActiveTab] = useState('chat-requests');
   
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
@@ -78,7 +84,7 @@ const WaliDashboard: React.FC = () => {
         <div className="md:col-span-1">
           <AvailabilityControls 
             availabilityStatus={waliProfile.availability_status}
-            onUpdateAvailability={updateAvailability}
+            onUpdateAvailability={updateAvailabilityStatus}
           />
           <WaliStats statistics={statistics} className="mt-6" />
         </div>
@@ -108,8 +114,8 @@ const WaliDashboard: React.FC = () => {
             <TabsContent value="chat-requests">
               <ChatRequestsPanel 
                 chatRequests={chatRequests}
-                onApprove={(id) => handleChatRequest(id, 'approved')}
-                onReject={(id) => handleChatRequest(id, 'rejected')}
+                onApprove={(id) => handleApproveRequest(id)}
+                onReject={(id) => handleRejectRequest(id)}
                 onAddNote={addWaliNote}
               />
             </TabsContent>

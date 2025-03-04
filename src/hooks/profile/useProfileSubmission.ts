@@ -1,136 +1,83 @@
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { ProfileFormData, PrivacySettings } from '@/types/profile';
+import { useToast } from '@/hooks/use-toast';
+import { executeSql } from '@/utils/database';
 
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { ProfileFormData, PrivacySettings } from "@/types/profile";
-import { geocodeLocation } from "@/utils/locationUtils";
-import { updateUserCoordinates } from "@/utils/profileUtils";
-
-interface UseProfileSubmissionProps {
-  formData: ProfileFormData;
-  privacySettings: PrivacySettings;
-  blockedUsers: string[];
-  isAccountVisible: boolean;
-}
-
-export const useProfileSubmission = ({
-  formData,
-  privacySettings,
-  blockedUsers,
-  isAccountVisible
-}: UseProfileSubmissionProps) => {
-  const navigate = useNavigate();
+export const useProfileSubmission = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    const { data: { session } } = await supabase.auth.getSession();
-    
-    if (!session) {
-      console.error("No active session found");
-      toast({
-        title: "Error",
-        description: "Please sign in to update your profile",
-        variant: "destructive",
-      });
-      return;
-    }
+  const submitProfile = async (
+    userId: string,
+    profileData: ProfileFormData,
+    privacySettings: PrivacySettings
+  ) => {
+    setIsLoading(true);
+    setError(null);
 
-    if (formData.gender === "female" && (!formData.waliName || !formData.waliRelationship || !formData.waliContact)) {
-      toast({
-        title: "Wali Information Required",
-        description: "As a female user, you must provide complete wali information.",
-        variant: "destructive",
-        duration: 5000,
-      });
-      return;
-    }
-
-    const [firstName, ...lastNameParts] = formData.fullName.split(" ");
-    const lastName = lastNameParts.join(" ");
-
-    // Ensure required columns exist
     try {
-      await supabase.rpc('execute_sql', {
-        sql_query: `
-          ALTER TABLE profiles ADD COLUMN IF NOT EXISTS privacy_settings JSONB 
-          DEFAULT '{"profileVisibilityLevel": 1, "showAge": true, "showLocation": true, "showOccupation": true, "allowNonMatchMessages": true}'::jsonb;
-          
-          ALTER TABLE profiles ADD COLUMN IF NOT EXISTS is_visible BOOLEAN DEFAULT true;
-          
-          ALTER TABLE profiles ADD COLUMN IF NOT EXISTS blocked_users TEXT[] DEFAULT '{}'::text[];
-        `
+      // Convert age to birth_date (assuming age is provided in years)
+      const currentYear = new Date().getFullYear();
+      const birthYear = currentYear - parseInt(profileData.age, 10);
+      const birthDate = `${birthYear}-01-01`; // Just year is stored
+
+      const { data, error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: profileData.fullName.split(' ')[0],
+          last_name: profileData.fullName.split(' ').slice(1).join(' ') || '',
+          birth_date: birthDate,
+          gender: profileData.gender,
+          location: profileData.location,
+          education_level: profileData.education,
+          occupation: profileData.occupation,
+          religious_practice_level: profileData.religiousLevel,
+          prayer_frequency: profileData.prayerFrequency,
+          about_me: profileData.aboutMe,
+          wali_name: profileData.waliName || null,
+          wali_relationship: profileData.waliRelationship || null,
+          wali_contact: profileData.waliContact || null,
+          privacy_settings: privacySettings,
+          is_visible: true // Default value
+        })
+        .eq('id', userId)
+        .select();
+
+      if (error) {
+        console.error("Error updating profile:", error);
+        setError(error.message);
+        toast({
+          title: "Error",
+          description: "Failed to update profile. Please try again.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been successfully updated.",
       });
-    } catch (err) {
-      console.error("Error ensuring columns exist:", err);
-    }
-
-    const profileData = {
-      id: session.user.id,
-      first_name: firstName,
-      last_name: lastName,
-      gender: formData.gender,
-      location: formData.location,
-      education_level: formData.education,
-      occupation: formData.occupation,
-      religious_practice_level: formData.religiousLevel,
-      prayer_frequency: formData.prayerFrequency,
-      about_me: formData.aboutMe,
-      birth_date: formData.age ? new Date(new Date().getFullYear() - parseInt(formData.age), 0, 1).toISOString() : null,
-      wali_name: formData.waliName || null,
-      wali_relationship: formData.waliRelationship || null,
-      wali_contact: formData.waliContact || null,
-      privacy_settings: privacySettings,
-      is_visible: isAccountVisible,
-      blocked_users: blockedUsers,
-    };
-
-    console.log("Attempting to save profile with data:", profileData);
-
-    const { error } = await supabase
-      .from("profiles")
-      .upsert(profileData);
-
-    if (error) {
-      console.error("Error saving profile:", error);
+      return true;
+    } catch (err: any) {
+      console.error("Unexpected error during profile update:", err);
+      setError(err.message);
       toast({
         title: "Error",
-        description: error.message,
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
-        duration: 5000,
       });
-      return;
+      return false;
+    } finally {
+      setIsLoading(false);
     }
-
-    if (formData.location) {
-      try {
-        const locationData = await geocodeLocation(formData.location);
-        
-        if (locationData) {
-          await updateUserCoordinates(
-            session.user.id,
-            locationData.latitude,
-            locationData.longitude
-          );
-          
-          console.log("Updated user coordinates:", locationData);
-        }
-      } catch (err) {
-        console.error("Error updating coordinates:", err);
-      }
-    }
-
-    console.log("Profile saved successfully");
-    toast({
-      title: "Success",
-      description: "Profile updated successfully",
-      duration: 3000,
-    });
-    
-    navigate("/");
   };
 
   return {
-    handleSubmit
+    isLoading,
+    error,
+    submitProfile,
   };
 };

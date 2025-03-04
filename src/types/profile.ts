@@ -48,6 +48,7 @@ export interface PrivacySettings {
   showLocation: boolean;
   showOccupation: boolean;
   allowNonMatchMessages: boolean;
+  [key: string]: boolean | number; // Add index signature for compatibility with Json type
 }
 
 export interface VerificationStatus {

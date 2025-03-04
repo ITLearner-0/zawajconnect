@@ -1,169 +1,135 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { ProfileFormData } from '@/types/profile';
+import { useToast } from '@/hooks/use-toast';
+import { executeSql } from '@/utils/database';
 
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { ProfileFormData, VerificationStatus, PrivacySettings } from "@/types/profile";
-import { updateProfileSchema } from "@/utils/databaseUtils";
-
-interface UseProfileDataResult {
-  isNewUser: boolean;
-  userEmail: string;
-  formData: ProfileFormData;
-  verificationStatus: VerificationStatus;
-  userId: string | null;
-  privacySettings: PrivacySettings;
-  blockedUsers: string[];
-  isAccountVisible: boolean;
-}
-
-const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
-  profileVisibilityLevel: 1, // Moderate by default
-  showAge: true,
-  showLocation: true,
-  showOccupation: true,
-  allowNonMatchMessages: true,
-};
-
-export const useProfileData = (): UseProfileDataResult => {
-  const [isNewUser, setIsNewUser] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
-  const [userId, setUserId] = useState<string | null>(null);
-  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>({
-    email: false,
-    phone: false,
-    id: false,
-  });
-  const [privacySettings, setPrivacySettings] = useState<PrivacySettings>(DEFAULT_PRIVACY_SETTINGS);
-  const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
-  const [isAccountVisible, setIsAccountVisible] = useState<boolean>(true);
-  const [formData, setFormData] = useState<ProfileFormData>({
-    fullName: "",
-    age: "",
-    gender: "",
-    location: "",
-    education: "",
-    occupation: "",
-    religiousLevel: "",
-    familyBackground: "",
-    aboutMe: "",
-    prayerFrequency: "five-daily",
-    waliName: "",
-    waliRelationship: "",
-    waliContact: "",
-  });
+export const useProfileData = (userId: string | null) => {
+  const { toast } = useToast();
+  const [profileData, setProfileData] = useState<ProfileFormData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProfileData = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        return null;
+      if (!userId) {
+        setLoading(false);
+        return;
       }
 
-      setUserEmail(session.user.email || "");
-      setUserId(session.user.id);
-      
-      // Make sure the profile schema is updated to include new fields
-      await updateProfileSchema();
-      
-      console.log("Fetching profile for user:", session.user.id);
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", session.user.id)
-        .single();
+      setLoading(true);
+      setError(null);
 
-      if (error) {
-        console.error("Error fetching profile:", error);
-        return null;
-      }
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .single();
 
-      if (profile) {
-        console.log("Profile data loaded:", profile);
-        setFormData({
-          fullName: `${profile.first_name || ""} ${profile.last_name || ""}`.trim(),
-          age: profile.birth_date ? String(new Date().getFullYear() - new Date(profile.birth_date).getFullYear()) : "",
-          gender: profile.gender || "",
-          location: profile.location || "",
-          education: profile.education_level || "",
-          occupation: profile.occupation || "",
-          religiousLevel: profile.religious_practice_level || "",
-          familyBackground: "",
-          aboutMe: profile.about_me || "",
-          prayerFrequency: profile.prayer_frequency || "five-daily",
-          waliName: profile.wali_name || "",
-          waliRelationship: profile.wali_relationship || "",
-          waliContact: profile.wali_contact || "",
-        });
-        
-        // Determine verification status based on is_verified field and verification_document_url
-        const isVerified = profile.is_verified || false;
-        const verificationDoc = profile.verification_document_url || "";
-        
-        setVerificationStatus({
-          email: session.user.email_confirmed_at !== null,
-          phone: isVerified && (verificationDoc?.startsWith("phone:") || false),
-          id: isVerified && (verificationDoc?.startsWith("id:") || false),
-        });
-        
-        // Handle privacy settings
-        let userPrivacySettings = DEFAULT_PRIVACY_SETTINGS;
-        try {
-          // Try to parse privacy settings from the profile
-          if (profile.privacy_settings) {
-            userPrivacySettings = typeof profile.privacy_settings === 'string' 
-              ? JSON.parse(profile.privacy_settings) 
-              : profile.privacy_settings;
-          }
-        } catch (e) {
-          console.error("Error parsing privacy settings:", e);
+        if (error) {
+          setError(error.message);
+          console.error("Supabase error fetching profile:", error);
+          return;
         }
-        setPrivacySettings(userPrivacySettings);
-        
-        // Handle blocked users
-        let userBlockedUsers: string[] = [];
-        try {
-          // Try to parse blocked users from the profile
-          if (profile.blocked_users) {
-            userBlockedUsers = Array.isArray(profile.blocked_users)
-              ? profile.blocked_users
-              : typeof profile.blocked_users === 'string'
-                ? JSON.parse(profile.blocked_users)
-                : [];
-          }
-        } catch (e) {
-          console.error("Error parsing blocked users:", e);
+
+        if (data) {
+          // Map database fields to ProfileFormData
+          const profileFormData: ProfileFormData = {
+            fullName: `${data.first_name} ${data.last_name}`,
+            age: data.birth_date,
+            gender: data.gender,
+            location: data.location,
+            education: data.education_level,
+            occupation: data.occupation,
+            religiousLevel: data.religious_practice_level,
+            familyBackground: data.family_background || '',
+            aboutMe: data.about_me,
+            prayerFrequency: data.prayer_frequency,
+            waliName: data.wali_name || '',
+            waliRelationship: data.wali_relationship || '',
+            waliContact: data.wali_contact || '',
+          };
+          setProfileData(profileFormData);
+        } else {
+          setProfileData(null); // No profile data found
         }
-        setBlockedUsers(userBlockedUsers);
-        
-        // Set visibility status - default to true if not defined
-        setIsAccountVisible(profile.is_visible !== false);
-        
-        // Detect if this is a new user with minimal profile data
-        setIsNewUser(
-          !profile.first_name || 
-          !profile.gender || 
-          !profile.location || 
-          !profile.religious_practice_level || 
-          !profile.about_me
-        );
-      } else {
-        // No profile found, definitely a new user
-        setIsNewUser(true);
+      } catch (err: any) {
+        setError(err.message);
+        console.error("Error fetching profile:", err);
+      } finally {
+        setLoading(false);
       }
-      
-      return profile;
     };
 
     fetchProfileData();
-  }, []);
+  }, [userId, toast]);
+
+  // Function to update profile data
+  const updateProfileData = async (newProfileData: ProfileFormData) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Destructure fullName into first_name and last_name
+      const [first_name, ...lastNameParts] = newProfileData.fullName.split(' ');
+      const last_name = lastNameParts.join(' ');
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          first_name: first_name,
+          last_name: last_name,
+          birth_date: newProfileData.age,
+          gender: newProfileData.gender,
+          location: newProfileData.location,
+          education_level: newProfileData.education,
+          occupation: newProfileData.occupation,
+          religious_practice_level: newProfileData.religiousLevel,
+          about_me: newProfileData.aboutMe,
+          prayer_frequency: newProfileData.prayerFrequency,
+          wali_name: newProfileData.waliName || null,
+          wali_relationship: newProfileData.waliRelationship || null,
+          wali_contact: newProfileData.waliContact || null,
+        })
+        .eq('id', userId);
+
+      if (error) {
+        setError(error.message);
+        console.error("Supabase error updating profile:", error);
+        toast({
+          title: "Error",
+          description: "Failed to update profile. Please try again.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      // Update local state with new data
+      setProfileData(newProfileData);
+      toast({
+        title: "Profile Updated",
+        description: "Your profile has been updated successfully.",
+      });
+      return true;
+    } catch (err: any) {
+      setError(err.message);
+      console.error("Error updating profile:", err);
+      toast({
+        title: "Error",
+        description: "Failed to update profile. Please try again.",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
-    isNewUser,
-    userEmail,
-    formData,
-    verificationStatus,
-    userId,
-    privacySettings,
-    blockedUsers,
-    isAccountVisible
+    profileData,
+    loading,
+    error,
+    updateProfileData,
   };
 };

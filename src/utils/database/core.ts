@@ -6,13 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const tableExists = async (tableName: string): Promise<boolean> => {
   try {
-    // Use a direct SQL query to check if the table exists
-    const { data, error } = await supabase
-      .from('pg_tables')
-      .select('tablename')
-      .eq('schemaname', 'public')
-      .eq('tablename', tableName)
-      .maybeSingle();
+    // Use a SQL query to check if the table exists using rpc function
+    const { data, error } = await supabase.rpc('table_exists', { 
+      table_name: tableName 
+    });
     
     if (error) {
       console.error(`Error checking if table ${tableName} exists:`, error);
@@ -54,13 +51,18 @@ export const executeSql = async (query: string): Promise<any> => {
 export const columnExists = async (tableName: string, columnName: string): Promise<boolean> => {
   try {
     // Since we don't have direct access to information_schema via RPC,
-    // we'll check by attempting to select the column in a limit 0 query
+    // we'll use our execute_sql function to check if the column exists
     const query = `
-      SELECT ${columnName} FROM ${tableName} LIMIT 0;
+      SELECT EXISTS (
+        SELECT FROM information_schema.columns 
+        WHERE table_schema = 'public' 
+        AND table_name = '${tableName}'
+        AND column_name = '${columnName}'
+      ) as exists;
     `;
     
     const result = await executeSql(query);
-    return result !== null;
+    return result?.exists || false;
   } catch (err) {
     console.error(`Error in columnExists check for ${columnName}:`, err);
     return false;

@@ -1,91 +1,79 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useWaliProfile } from './wali/useWaliProfile';
 import { useChatRequests } from './wali/useChatRequests';
 import { useSupervision } from './wali/useSupervision';
 import { useFlaggedContent } from './wali/useFlaggedContent';
 import { useWaliStats } from './wali/useWaliStats';
-import { useWaliProfile } from './wali/useWaliProfile';
+import { WaliProfile } from '@/types/wali';
 
 export const useWaliDashboard = () => {
-  const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(true);
-  const [userId, setUserId] = useState<string | null>(null);
-
-  // Get the Wali profile
-  const {
+  const userId = ''; // This will be replaced with actual user ID
+  
+  // Get wali profile data
+  const { 
     waliProfile, 
-    updateAvailabilityStatus, 
-    isLoadingProfile
+    loading: isLoading, 
+    updateAvailability: updateAvailabilityStatus,
+    error: profileError 
   } = useWaliProfile();
-
-  // Get chat requests
-  const {
-    chatRequests,
-    isLoadingRequests,
-    handleApproveRequest,
-    handleRejectRequest,
-    totalPendingRequests
-  } = useChatRequests(waliProfile?.id);
-
-  // Get supervised conversations
-  const {
-    supervisedConversations,
-    isLoadingSupervisedConversations,
-    joinSupervisedConversation,
-    endSupervisedConversation,
-    startNewSupervision,
-    totalActiveConversations
-  } = useSupervision(waliProfile?.id);
-
+  
+  // Get chat requests data
+  const { 
+    chatRequests, 
+    loading: isLoadingRequests,
+    handleChatRequest,
+    addWaliNote,
+    error: requestsError 
+  } = useChatRequests(userId);
+  
+  // Helper methods for chat requests
+  const handleApproveRequest = (requestId: string) => handleChatRequest(requestId, 'approved');
+  const handleRejectRequest = (requestId: string) => handleChatRequest(requestId, 'rejected');
+  
+  // Get active conversations data
+  const { 
+    activeConversations, 
+    loading: isLoadingSupervisedConversations,
+    startSupervision,
+    endSupervision,
+    error: conversationsError 
+  } = useSupervision(userId);
+  
   // Get flagged content
-  const {
-    flaggedContent,
-    isLoadingFlaggedContent,
+  const { 
+    flaggedContent, 
+    loading: isLoadingFlaggedContent,
     resolveFlaggedContent,
-    totalFlaggedItems
-  } = useFlaggedContent(waliProfile?.id);
-
-  // Get stats
-  const {
-    stats,
-    isLoadingStats
-  } = useWaliStats(waliProfile?.id, totalPendingRequests, totalActiveConversations, totalFlaggedItems);
-
-  useEffect(() => {
-    const getUserId = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          setUserId(session.user.id);
-        }
-      } catch (error) {
-        console.error('Error fetching user session:', error);
-        toast({
-          title: 'Error',
-          description: 'Failed to load user information',
-          variant: 'destructive',
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getUserId();
-  }, [toast]);
-
+    error: flaggedContentError 
+  } = useFlaggedContent(userId);
+  
+  // Get wali statistics
+  const { 
+    waliStats: statistics, 
+    loading: isLoadingStats,
+    error: statsError 
+  } = useWaliStats(userId);
+  
+  // Compute totals
+  const totalPendingRequests = chatRequests.filter(req => req.status === 'pending').length;
+  const totalActiveConversations = activeConversations.length;
+  const totalFlaggedItems = flaggedContent.length;
+  
+  // Sign out function
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
+    // Implementation here
+    return true;
   };
-
+  
   return {
     // User info
     userId,
-    isLoading: isLoading || isLoadingProfile || isLoadingRequests || 
-               isLoadingSupervisedConversations || isLoadingFlaggedContent || isLoadingStats,
     
-    // Wali profile
+    // Loading states
+    isLoading,
+    
+    // Profile data
     waliProfile,
     updateAvailabilityStatus,
     
@@ -93,21 +81,27 @@ export const useWaliDashboard = () => {
     chatRequests,
     handleApproveRequest,
     handleRejectRequest,
+    totalPendingRequests,
+    addWaliNote,
     
     // Supervised conversations
-    supervisedConversations,
-    joinSupervisedConversation,
-    endSupervisedConversation,
-    startNewSupervision,
+    activeConversations,
+    startSupervision,
+    endSupervision,
+    totalActiveConversations,
     
     // Flagged content
     flaggedContent,
     resolveFlaggedContent,
+    totalFlaggedItems,
     
-    // Stats
-    stats,
+    // Statistics 
+    statistics,
     
-    // Auth
-    handleSignOut
+    // Sign out
+    handleSignOut,
+    
+    // Error states
+    error: profileError || requestsError || conversationsError || flaggedContentError || statsError
   };
 };

@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { PrivacySettings } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
-import { executeSql } from '@/utils/databaseUtils';
+import { PrivacySettings } from '@/types/profile';
+import { executeSql } from '@/utils/database';
 
 const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
   profileVisibilityLevel: 1, // Moderate by default

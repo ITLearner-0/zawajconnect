@@ -1,117 +1,102 @@
-
 import { useState, useEffect } from 'react';
 import { Message } from '@/types/profile';
-import { MonitoringReport, Violation, analyzeBehavior, analyzeIslamicCompliance, analyzeSentiment, detectViolations, generateReport } from '@/services/aiMonitoringService';
+import { 
+  MonitoringReport, 
+  generateReport 
+} from '@/services/aiMonitoringService';
 import { supabase } from '@/integrations/supabase/client';
-import { flagContent } from '@/services/contentModerationService';
 
-interface UseAIMonitoringProps {
-  conversationId: string;
-  messages: Message[];
-  userId: string;
-}
-
-export const useAIMonitoring = ({ conversationId, messages, userId }: UseAIMonitoringProps) => {
-  const [report, setReport] = useState<MonitoringReport | null>(null);
+export const useAIMonitoring = (conversationId: string | undefined) => {
+  const [latestReport, setLatestReport] = useState<MonitoringReport | null>(null);
+  const [monitoringEnabled, setMonitoringEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [violations, setViolations] = useState<Violation[]>([]);
-  const [lastAnalyzedCount, setLastAnalyzedCount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
-  // Generate monitoring report
   useEffect(() => {
-    // Only regenerate when we have 5+ new messages
-    if (messages.length === 0 || messages.length < lastAnalyzedCount + 5) {
-      return;
-    }
+    if (!monitoringEnabled || !conversationId) return;
     
-    setLoading(true);
-    const generatedReport = generateReport(messages);
-    setReport(generatedReport);
-    setViolations(generatedReport.violations);
-    setLastAnalyzedCount(messages.length);
-    setLoading(false);
+    const fetchMessagesAndGenerateReport = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch all messages for the conversation
+        const { data: messages, error: fetchError } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('conversation_id', conversationId)
+          .order('created_at', { ascending: true });
+        
+        if (fetchError) {
+          setError(fetchError.message);
+          return;
+        }
+        
+        if (!messages || messages.length === 0) {
+          // No messages, nothing to report
+          setLatestReport(null);
+          return;
+        }
+        
+        // Generate the monitoring report
+        const report = generateReport(messages as Message[]);
+        setLatestReport(report);
+        
+        // Save report to database
+        if (conversationId) {
+          await saveMonitoringReport(conversationId, report);
+        }
+      } catch (err: any) {
+        setError(err.message);
+        console.error("Error in AI monitoring:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    // Automatically flag severe violations in the system
-    generatedReport.violations
-      .filter(v => v.severity === 'high')
-      .forEach(violation => {
-        // Auto-flag high severity violations
-        flagContent(
-          violation.messageId,
-          'message',
-          violation.type === 'islamic' ? 'religious_violation' : 
-                 violation.type === 'behavioral' ? 'suspicious' : 'inappropriate',
-          'high',
-          'system'
-        );
-      });
-  }, [messages, lastAnalyzedCount]);
-  
-  // Real-time message monitoring
-  const monitorNewMessage = (message: Message) => {
-    const newViolations = detectViolations(message);
+    fetchMessagesAndGenerateReport();
     
-    if (newViolations.length > 0) {
-      // Update violations list
-      setViolations(prev => [...prev, ...newViolations]);
-      
-      // Auto-flag high severity violations
-      newViolations
-        .filter(v => v.severity === 'high')
-        .forEach(violation => {
-          flagContent(
-            violation.messageId,
-            'message',
-            violation.type === 'islamic' ? 'religious_violation' : 
-                  violation.type === 'behavioral' ? 'suspicious' : 'inappropriate',
-            'high',
-            'system'
-          );
-        });
-      
-      return true;
-    }
+    // Set up interval to periodically generate report
+    const intervalId = setInterval(fetchMessagesAndGenerateReport, 60000); // Every 60 seconds
     
-    return false;
-  };
-  
-  // Save the report to the database
-  const saveReport = async () => {
-    if (!report) return false;
+    return () => clearInterval(intervalId); // Cleanup interval on unmount
     
+  }, [conversationId, monitoringEnabled]);
+
+  // Save monitoring report to the database
+  const saveMonitoringReport = async (conversationId: string, report: MonitoringReport) => {
     try {
-      const { error } = await supabase
+      // Fix the monitoring_reports table insert
+      const { error: saveError } = await supabase
         .from('monitoring_reports')
         .insert({
           conversation_id: conversationId,
-          user_id: userId,
+          content: JSON.stringify(report),
           behavioral_score: report.behavioralScore,
-          islamic_compliance_score: report.islamicComplianceScore,
-          sentiment_score: report.sentimentScore,
-          violations: report.violations,
-          created_at: new Date().toISOString()
+          is_flagged: report.violations.length > 0,
+          warning_triggers: report.violations.map(v => v.type),
+          recommendations: report.recommendations
         });
-        
-      if (error) {
-        console.error('Error saving monitoring report:', error);
-        return false;
-      }
       
-      return true;
+      if (saveError) {
+        console.error("Error saving monitoring report:", saveError);
+      } else {
+        console.log("Monitoring report saved successfully.");
+      }
     } catch (err) {
-      console.error('Error in saveReport:', err);
-      return false;
+      console.error("Error saving monitoring report:", err);
     }
   };
-  
+
+  // Toggle monitoring status
+  const toggleMonitoring = () => {
+    setMonitoringEnabled(prev => !prev);
+  };
+
   return {
-    report,
+    latestReport,
+    monitoringEnabled,
+    toggleMonitoring,
     loading,
-    isOpen,
-    setIsOpen,
-    violations,
-    monitorNewMessage,
-    saveReport
+    error
   };
 };

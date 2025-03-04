@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Message, ContentFlag } from '@/types/profile';
 import { 
@@ -8,7 +7,7 @@ import {
   generateReport 
 } from '@/services/aiMonitoringService';
 import { useToast } from '@/hooks/use-toast';
-import { filterMessageContent, flagContent } from '@/services/contentModerationService';
+import { filterMessageContent, flagContent } from '@/services/moderation';
 
 export const useMessageModeration = (
   conversationId: string | undefined, 
