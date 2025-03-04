@@ -60,6 +60,14 @@ export default {
           blue: "#235789",
           cream: "#f8f7f2",
           sand: "#e6dbc9",
+          // Dark mode variants
+          darkTeal: "#1a4c54",
+          darkGold: "#9e7f24",
+          darkBurgundy: "#4a161a",
+          darkBlue: "#173a57",
+          darkCream: "#e8e1d4",
+          darkBg: "#1a1a1a",
+          darkCard: "#2a2a2a",
         },
       },
       keyframes: {

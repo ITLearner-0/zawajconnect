@@ -10,25 +10,31 @@ import AdminModeration from './pages/AdminModeration';
 import WaliDashboard from './pages/WaliDashboard';
 import Resources from './pages/Resources';
 import Demo from './pages/Demo';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { AccessibilityProvider } from './contexts/AccessibilityContext';
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/nearby" element={<NearbyMatches />} />
-        <Route path="/messages" element={<Messages />} />
-        <Route path="/messages/:conversationId" element={<Messages />} />
-        <Route path="/admin/moderation" element={<AdminModeration />} />
-        <Route path="/wali" element={<WaliDashboard />} />
-        <Route path="/resources" element={<Resources />} />
-        <Route path="/resources/:resourceId" element={<Resources />} />
-        <Route path="/demo" element={<Demo />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Router>
+    <ThemeProvider>
+      <AccessibilityProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/nearby" element={<NearbyMatches />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/messages/:conversationId" element={<Messages />} />
+            <Route path="/admin/moderation" element={<AdminModeration />} />
+            <Route path="/wali" element={<WaliDashboard />} />
+            <Route path="/resources" element={<Resources />} />
+            <Route path="/resources/:resourceId" element={<Resources />} />
+            <Route path="/demo" element={<Demo />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Router>
+      </AccessibilityProvider>
+    </ThemeProvider>
   );
 }
 

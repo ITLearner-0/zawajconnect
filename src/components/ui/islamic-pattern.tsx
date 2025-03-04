@@ -26,11 +26,11 @@ const IslamicPattern = ({
 
   // Map colors to Tailwind classes
   const colorClasses = {
-    primary: "text-primary border-primary/20",
-    secondary: "text-secondary border-secondary/20",
-    accent: "text-accent border-accent/20",
-    gold: "text-islamic-gold border-islamic-gold/20",
-    teal: "text-islamic-teal border-islamic-teal/20",
+    primary: "text-primary border-primary/20 dark:text-white dark:border-white/20",
+    secondary: "text-secondary border-secondary/20 dark:text-islamic-gold dark:border-islamic-gold/20",
+    accent: "text-accent border-accent/20 dark:text-islamic-darkCream dark:border-islamic-darkCream/20",
+    gold: "text-islamic-gold border-islamic-gold/20 dark:text-islamic-darkGold dark:border-islamic-darkGold/20",
+    teal: "text-islamic-teal border-islamic-teal/20 dark:text-islamic-darkTeal dark:border-islamic-darkTeal/20",
   };
 
   const getPatternClass = () => {
@@ -40,31 +40,31 @@ const IslamicPattern = ({
       case "border":
         return cn(
           baseClasses, 
-          `border-2 rounded-lg p-4 ${colorClasses[color]}`, 
+          `border-2 rounded-lg p-4 ${colorClasses[color]} dark:bg-islamic-darkCard/30`, 
           className
         );
       case "background":
         return cn(
           baseClasses, 
-          `before:absolute before:inset-0 before:bg-[url('/islamic-pattern-enhanced.svg')] before:${opacityMap[intensity]} before:bg-repeat ${colorClasses[color]}`, 
+          `before:absolute before:inset-0 before:bg-[url('/islamic-pattern-enhanced.svg')] before:${opacityMap[intensity]} before:bg-repeat ${colorClasses[color]} dark:before:opacity-30`, 
           className
         );
       case "divider":
         return cn(
           baseClasses, 
-          `h-8 bg-gradient-to-r from-transparent via-${color === 'gold' ? 'islamic-gold' : 'islamic-teal'}/30 to-transparent my-6 ${colorClasses[color]}`, 
+          `h-8 bg-gradient-to-r from-transparent via-${color === 'gold' ? 'islamic-gold' : 'islamic-teal'}/30 to-transparent my-6 ${colorClasses[color]} dark:via-${color === 'gold' ? 'islamic-darkGold' : 'islamic-darkTeal'}/40`, 
           className
         );
       case "card":
         return cn(
           baseClasses,
-          `bg-white shadow-md border border-${color === 'gold' ? 'islamic-gold' : 'islamic-teal'}/10 rounded-lg ${colorClasses[color]}`,
+          `bg-white shadow-md border border-${color === 'gold' ? 'islamic-gold' : 'islamic-teal'}/10 rounded-lg ${colorClasses[color]} dark:bg-islamic-darkCard dark:border-${color === 'gold' ? 'islamic-darkGold' : 'islamic-darkTeal'}/20`,
           className
         );
       case "gradient":
         return cn(
           baseClasses,
-          `bg-gradient-to-br from-islamic-teal/5 to-islamic-gold/10 border border-${color === 'gold' ? 'islamic-gold' : 'islamic-teal'}/10 rounded-lg ${colorClasses[color]}`,
+          `bg-gradient-to-br from-islamic-teal/5 to-islamic-gold/10 border border-${color === 'gold' ? 'islamic-gold' : 'islamic-teal'}/10 rounded-lg ${colorClasses[color]} dark:from-islamic-darkTeal/20 dark:to-islamic-darkGold/30 dark:border-${color === 'gold' ? 'islamic-darkGold' : 'islamic-darkTeal'}/20`,
           className
         );
       default:
@@ -75,7 +75,7 @@ const IslamicPattern = ({
   return (
     <div className={getPatternClass()}>
       {variant === "border" && (
-        <div className={`absolute -inset-0.5 ${opacityMap[intensity]} bg-[url('/islamic-pattern-enhanced.svg')] bg-repeat`} />
+        <div className={`absolute -inset-0.5 ${opacityMap[intensity]} bg-[url('/islamic-pattern-enhanced.svg')] bg-repeat dark:opacity-30`} />
       )}
       <div className="relative z-10">
         {children}
