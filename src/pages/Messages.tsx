@@ -8,9 +8,10 @@ import VideoCallManager from '@/components/messaging/VideoCallManager';
 import { Toaster } from '@/components/ui/toaster';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from '@/hooks/use-toast';
 
 const Messages = () => {
-  const { conversationId } = useParams();
+  const { conversationId } = useParams<{ conversationId: string }>();
   const navigate = useNavigate();
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   
@@ -27,6 +28,7 @@ const Messages = () => {
   
   const { profileData: userData } = useProfileData(currentUserId);
   
+  // Use conversationId directly from useParams
   const {
     conversations,
     currentConversation,
@@ -52,6 +54,20 @@ const Messages = () => {
     retentionPolicy,
     updateRetentionPolicy
   } = useMessages(conversationId, currentUserId);
+
+  // Debug logs
+  useEffect(() => {
+    console.log("Current conversation ID:", conversationId);
+    console.log("Current user ID:", currentUserId);
+    if (errors.messages) {
+      console.error("Message error:", errors.messages);
+      toast({
+        variant: "destructive",
+        title: "Error loading messages",
+        description: errors.messages
+      });
+    }
+  }, [conversationId, currentUserId, errors.messages]);
 
   // Select a conversation
   const selectConversation = (conversation: { id: string }) => {
