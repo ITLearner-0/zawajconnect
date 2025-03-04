@@ -3,20 +3,42 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-import { ProfileFormData, VerificationStatus } from "@/types/profile";
+import { ProfileFormData, VerificationStatus, PrivacySettings } from "@/types/profile";
 import { geocodeLocation } from "@/utils/locationUtils";
 import { updateUserCoordinates } from "@/utils/profileUtils";
 
 interface UseProfileFormProps {
   initialFormData: ProfileFormData;
   initialVerificationStatus: VerificationStatus;
+  initialPrivacySettings?: PrivacySettings;
+  initialBlockedUsers?: string[];
+  initialIsVisible?: boolean;
 }
 
-export const useProfileForm = ({ initialFormData, initialVerificationStatus }: UseProfileFormProps) => {
+export const useProfileForm = ({ 
+  initialFormData, 
+  initialVerificationStatus,
+  initialPrivacySettings,
+  initialBlockedUsers,
+  initialIsVisible
+}: UseProfileFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [formData, setFormData] = useState<ProfileFormData>(initialFormData);
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>(initialVerificationStatus);
+  
+  // Privacy and account settings
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettings>(
+    initialPrivacySettings || {
+      profileVisibilityLevel: 1,
+      showAge: true,
+      showLocation: true,
+      showOccupation: true,
+      allowNonMatchMessages: true,
+    }
+  );
+  const [blockedUsers, setBlockedUsers] = useState<string[]>(initialBlockedUsers || []);
+  const [isAccountVisible, setIsAccountVisible] = useState<boolean>(initialIsVisible !== false);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -30,6 +52,10 @@ export const useProfileForm = ({ initialFormData, initialVerificationStatus }: U
 
   const handleVerificationChange = (newStatus: VerificationStatus) => {
     setVerificationStatus(newStatus);
+  };
+
+  const handlePrivacySettingsChange = (newSettings: PrivacySettings) => {
+    setPrivacySettings(newSettings);
   };
 
   const handleSubmit = async (e?: React.FormEvent) => {
@@ -75,6 +101,9 @@ export const useProfileForm = ({ initialFormData, initialVerificationStatus }: U
       wali_name: formData.waliName || null,
       wali_relationship: formData.waliRelationship || null,
       wali_contact: formData.waliContact || null,
+      privacy_settings: privacySettings,
+      is_visible: isAccountVisible,
+      blocked_users: blockedUsers,
     };
 
     console.log("Attempting to save profile with data:", profileData);
@@ -132,12 +161,85 @@ export const useProfileForm = ({ initialFormData, initialVerificationStatus }: U
     navigate("/auth");
   };
 
+  const toggleAccountVisibility = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast({
+        title: "Error",
+        description: "Please sign in to update account visibility",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const newVisibilityState = !isAccountVisible;
+    setIsAccountVisible(newVisibilityState);
+    
+    const { error } = await supabase
+      .from("profiles")
+      .update({ is_visible: newVisibilityState })
+      .eq("id", session.user.id);
+      
+    if (error) {
+      console.error("Error toggling account visibility:", error);
+      setIsAccountVisible(!newVisibilityState); // Revert on error
+      toast({
+        title: "Error",
+        description: "Failed to update account visibility",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    return true;
+  };
+
+  const unblockUser = async (userIdToUnblock: string) => {
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      toast({
+        title: "Error",
+        description: "Please sign in to unblock users",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    const updatedBlockedUsers = blockedUsers.filter(id => id !== userIdToUnblock);
+    
+    const { error } = await supabase
+      .from("profiles")
+      .update({ blocked_users: updatedBlockedUsers })
+      .eq("id", session.user.id);
+      
+    if (error) {
+      console.error("Error unblocking user:", error);
+      toast({
+        title: "Error",
+        description: "Failed to unblock user",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
+    setBlockedUsers(updatedBlockedUsers);
+    return true;
+  };
+
   return {
     formData,
     verificationStatus,
+    privacySettings,
+    blockedUsers,
+    isAccountVisible,
     handleChange,
     handleVerificationChange,
+    handlePrivacySettingsChange,
     handleSubmit,
     handleSignOut,
+    toggleAccountVisibility,
+    unblockUser,
   };
 };

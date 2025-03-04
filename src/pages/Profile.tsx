@@ -7,6 +7,7 @@ import ReligiousBackground from "@/components/profile/ReligiousBackground";
 import AboutMe from "@/components/profile/AboutMe";
 import VerificationPanel from "@/components/profile/VerificationPanel";
 import WaliInformation from "@/components/profile/WaliInformation";
+import PrivacySettings from "@/components/profile/PrivacySettings";
 import { useNavigate } from "react-router-dom";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import OnboardingWrapper from "@/components/onboarding/OnboardingWrapper";
@@ -21,10 +22,16 @@ const Profile = () => {
     isNewUser, 
     userEmail,
     verificationStatus,
+    privacySettings,
+    blockedUsers,
+    isAccountVisible,
     handleChange, 
+    handleVerificationChange,
+    handlePrivacySettingsChange,
     handleSubmit, 
     handleSignOut,
-    handleVerificationChange 
+    toggleAccountVisibility,
+    unblockUser
   } = useProfile();
   
   const {
@@ -137,6 +144,18 @@ const Profile = () => {
                       verificationStatus={verificationStatus}
                       onVerificationChange={handleVerificationChange}
                       userEmail={userEmail}
+                    />
+                  </div>
+                  
+                  {/* Privacy Settings */}
+                  <div role="region" aria-labelledby="privacy-heading">
+                    <PrivacySettings
+                      privacySettings={privacySettings}
+                      blockedUsers={blockedUsers}
+                      isAccountVisible={isAccountVisible}
+                      onPrivacyChange={handlePrivacySettingsChange}
+                      onToggleAccountVisibility={toggleAccountVisibility}
+                      onUnblockUser={unblockUser}
                     />
                   </div>
 

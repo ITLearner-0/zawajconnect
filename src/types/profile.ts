@@ -34,6 +34,17 @@ export interface DatabaseProfile {
   wali_relationship: string | null;
   wali_contact: string | null;
   wali_verified: boolean;
+  is_visible: boolean;
+  privacy_settings: PrivacySettings;
+  blocked_users: string[];
+}
+
+export interface PrivacySettings {
+  profileVisibilityLevel: number; // 0=public, 1=moderate, 2=private
+  showAge: boolean;
+  showLocation: boolean;
+  showOccupation: boolean;
+  allowNonMatchMessages: boolean;
 }
 
 export interface VerificationStatus {

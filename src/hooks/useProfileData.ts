@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { ProfileFormData, VerificationStatus } from "@/types/profile";
+import { ProfileFormData, VerificationStatus, PrivacySettings } from "@/types/profile";
 
 interface UseProfileDataResult {
   isNewUser: boolean;
@@ -9,7 +9,18 @@ interface UseProfileDataResult {
   formData: ProfileFormData;
   verificationStatus: VerificationStatus;
   userId: string | null;
+  privacySettings: PrivacySettings;
+  blockedUsers: string[];
+  isAccountVisible: boolean;
 }
+
+const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
+  profileVisibilityLevel: 1, // Moderate by default
+  showAge: true,
+  showLocation: true,
+  showOccupation: true,
+  allowNonMatchMessages: true,
+};
 
 export const useProfileData = (): UseProfileDataResult => {
   const [isNewUser, setIsNewUser] = useState(false);
@@ -20,6 +31,9 @@ export const useProfileData = (): UseProfileDataResult => {
     phone: false,
     id: false,
   });
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettings>(DEFAULT_PRIVACY_SETTINGS);
+  const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
+  const [isAccountVisible, setIsAccountVisible] = useState<boolean>(true);
   const [formData, setFormData] = useState<ProfileFormData>({
     fullName: "",
     age: "",
@@ -86,6 +100,17 @@ export const useProfileData = (): UseProfileDataResult => {
           id: isVerified && verificationDoc.startsWith("id:"),
         });
         
+        // Load privacy settings and account visibility status
+        if (profile.privacy_settings) {
+          setPrivacySettings(profile.privacy_settings);
+        }
+        
+        if (profile.blocked_users) {
+          setBlockedUsers(profile.blocked_users);
+        }
+        
+        setIsAccountVisible(profile.is_visible !== false); // Default to true if not defined
+        
         // Detect if this is a new user with minimal profile data
         setIsNewUser(
           !profile.first_name || 
@@ -110,6 +135,9 @@ export const useProfileData = (): UseProfileDataResult => {
     userEmail,
     formData,
     verificationStatus,
-    userId
+    userId,
+    privacySettings,
+    blockedUsers,
+    isAccountVisible
   };
 };
