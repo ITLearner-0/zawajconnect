@@ -1,6 +1,6 @@
 
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { InfoCircle } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 const DemoHeader = () => {
   return (
@@ -8,7 +8,7 @@ const DemoHeader = () => {
       <CardHeader>
         <CardTitle className="text-2xl font-bold flex items-center gap-2">
           Demo: Messaging and Video Chat
-          <InfoCircle className="h-5 w-5 text-muted-foreground" />
+          <Info className="h-5 w-5 text-muted-foreground" />
         </CardTitle>
       </CardHeader>
       <CardContent>
