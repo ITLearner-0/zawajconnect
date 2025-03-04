@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,7 +8,7 @@ import ConversationList from '@/components/messaging/ConversationList';
 import ChatWindow from '@/components/messaging/ChatWindow';
 import VideoChat from '@/components/messaging/VideoChat';
 import WaliSupervisor from '@/components/messaging/WaliSupervisor';
-import { Spinner } from 'lucide-react';
+import { Loader } from 'lucide-react';
 import CustomButton from '@/components/CustomButton';
 
 const Messages = () => {
@@ -315,7 +314,7 @@ const Messages = () => {
       
       {loading && !conversationId ? (
         <div className="flex items-center justify-center flex-grow">
-          <Spinner className="animate-spin mr-2" />
+          <Loader className="animate-spin mr-2" />
           <p>Loading conversations...</p>
         </div>
       ) : (
