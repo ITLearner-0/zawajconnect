@@ -78,6 +78,68 @@ export type Database = {
           },
         ]
       }
+      conversations: {
+        Row: {
+          created_at: string | null
+          id: string
+          participants: string[]
+          wali_supervised: boolean | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          participants: string[]
+          wali_supervised?: boolean | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          participants?: string[]
+          wali_supervised?: boolean | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          attachments: string[] | null
+          content: string
+          conversation_id: string
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          is_wali_visible: boolean | null
+          sender_id: string
+        }
+        Insert: {
+          attachments?: string[] | null
+          content: string
+          conversation_id: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          is_wali_visible?: boolean | null
+          sender_id: string
+        }
+        Update: {
+          attachments?: string[] | null
+          content?: string
+          conversation_id?: string
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          is_wali_visible?: boolean | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           about_me: string | null
@@ -194,6 +256,47 @@ export type Database = {
           srtext?: string | null
         }
         Relationships: []
+      }
+      video_calls: {
+        Row: {
+          conversation_id: string
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          initiator_id: string
+          receiver_id: string
+          started_at: string | null
+          wali_present: boolean | null
+        }
+        Insert: {
+          conversation_id: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          initiator_id: string
+          receiver_id: string
+          started_at?: string | null
+          wali_present?: boolean | null
+        }
+        Update: {
+          conversation_id?: string
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          initiator_id?: string
+          receiver_id?: string
+          started_at?: string | null
+          wali_present?: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_calls_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

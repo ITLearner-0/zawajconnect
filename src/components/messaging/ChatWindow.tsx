@@ -1,178 +1,146 @@
 
-import React, { useState, useRef, useEffect } from "react";
-import { Message } from "@/types/profile";
-import { format } from "date-fns";
-import { Send, Video, Eye, EyeOff } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { useEffect, useRef } from "react";
+import { Conversation, Message } from "@/types/profile";
+import { useProfileData } from "@/hooks/useProfileData";
+import { formatDistanceToNow } from "date-fns";
+import { ArrowLeft, Send, Video } from "lucide-react";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { Shield } from "lucide-react";
 
 interface ChatWindowProps {
+  conversation: Conversation;
   messages: Message[];
-  isLoading: boolean;
   currentUserId: string;
-  onSendMessage: (content: string, isWaliVisible: boolean) => void;
+  messageInput: string;
+  setMessageInput: (value: string) => void;
+  sendMessage: () => void;
   onStartVideoCall: () => void;
-  waliSupervisionRequired: boolean;
+  backToList: () => void;
+  isWaliSupervised: boolean;
 }
 
-const ChatWindow: React.FC<ChatWindowProps> = ({
+const ChatWindow = ({
+  conversation,
   messages,
-  isLoading,
   currentUserId,
-  onSendMessage,
+  messageInput,
+  setMessageInput,
+  sendMessage,
   onStartVideoCall,
-  waliSupervisionRequired,
-}) => {
-  const [messageText, setMessageText] = useState("");
-  const [isWaliVisible, setIsWaliVisible] = useState(true);
+  backToList,
+  isWaliSupervised
+}: ChatWindowProps) => {
+  const { formData } = useProfileData();
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
+  
   // Scroll to bottom when messages change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  // Handle message input submission
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (messageText.trim()) {
-      onSendMessage(messageText.trim(), isWaliVisible);
-      setMessageText("");
-    }
+    sendMessage();
   };
 
   return (
     <div className="flex flex-col h-full">
-      {/* Chat header */}
-      <div className="bg-white p-4 border-b flex justify-between items-center">
-        <h2 className="font-semibold">Conversation</h2>
-        <div className="flex items-center space-x-2">
-          {waliSupervisionRequired && (
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center text-sm text-green-600">
-                    <span className="mr-1">Wali Supervised</span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>This conversation is supervised by a wali</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={onStartVideoCall}
-            className="flex items-center"
+      {/* Header */}
+      <div className="p-4 border-b flex items-center justify-between">
+        <div className="flex items-center">
+          <button 
+            onClick={backToList}
+            className="md:hidden mr-2 p-1 rounded-full hover:bg-gray-200"
           >
-            <Video className="h-4 w-4 mr-1" />
-            Video Call
-          </Button>
+            <ArrowLeft size={20} />
+          </button>
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white">
+              {conversation.profile?.first_name?.[0] || '?'}
+            </div>
+            <div>
+              <p className="font-medium">
+                {conversation.profile?.first_name} {conversation.profile?.last_name}
+              </p>
+              {isWaliSupervised && (
+                <div className="flex items-center text-xs text-green-600">
+                  <Shield className="w-3 h-3 mr-1" />
+                  <span>Wali supervised</span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
+        
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onStartVideoCall}
+          title="Start video call"
+          className="flex items-center"
+        >
+          <Video className="h-4 w-4 mr-1" />
+          <span className="hidden sm:inline">Video Call</span>
+        </Button>
       </div>
-
+      
       {/* Messages area */}
-      <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
-        {isLoading ? (
-          <div className="text-center text-gray-500">Loading messages...</div>
-        ) : messages.length === 0 ? (
-          <div className="text-center text-gray-500">
-            <p>No messages yet</p>
-            <p className="text-sm mt-1">Start the conversation by sending a message</p>
+      <div className="flex-grow overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 ? (
+          <div className="flex items-center justify-center h-full text-gray-500">
+            <p>No messages yet. Start the conversation!</p>
           </div>
         ) : (
-          <div className="space-y-4">
-            {messages.map((message) => (
+          messages.map((message) => {
+            const isCurrentUser = message.sender_id === currentUserId;
+            
+            return (
               <div
                 key={message.id}
-                className={`flex ${
-                  message.sender_id === currentUserId ? "justify-end" : "justify-start"
-                }`}
+                className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-3/4 px-4 py-2 rounded-lg ${
-                    message.sender_id === currentUserId
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-white border border-gray-200"
+                  className={`max-w-[75%] rounded-lg px-4 py-2 ${
+                    isCurrentUser
+                      ? 'bg-primary text-white rounded-br-none'
+                      : 'bg-gray-200 text-gray-800 rounded-bl-none'
                   }`}
                 >
-                  <div className="text-sm">{message.content}</div>
-                  <div className="text-xs mt-1 flex items-center space-x-1">
-                    <span>
-                      {format(new Date(message.created_at), "MMM d, h:mm a")}
-                    </span>
-                    {message.sender_id === currentUserId && (
-                      <>
-                        {message.is_wali_visible ? (
-                          <Eye className="h-3 w-3 ml-1" />
-                        ) : (
-                          <EyeOff className="h-3 w-3 ml-1" />
-                        )}
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        )}
-      </div>
-
-      {/* Message input area */}
-      <form onSubmit={handleSendMessage} className="bg-white p-4 border-t">
-        <div className="flex items-center mb-2">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="wali-visibility"
-              checked={isWaliVisible}
-              onCheckedChange={setIsWaliVisible}
-            />
-            <Label htmlFor="wali-visibility" className="text-sm">
-              Visible to Wali
-            </Label>
-          </div>
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <div className="ml-2">
-                  {isWaliVisible ? (
-                    <Eye className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <EyeOff className="h-4 w-4 text-amber-500" />
+                  <p>{message.content}</p>
+                  <p className={`text-xs mt-1 ${isCurrentUser ? 'text-primary-foreground/80' : 'text-gray-500'}`}>
+                    {formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}
+                  </p>
+                  
+                  {/* Show wali visibility indicator for users who need to know */}
+                  {(formData.gender === 'Female' || isWaliSupervised) && message.is_wali_visible && (
+                    <div className={`text-xs mt-1 flex items-center ${
+                      isCurrentUser ? 'text-primary-foreground/80' : 'text-gray-500'
+                    }`}>
+                      <Shield className="w-3 h-3 mr-1" />
+                      <span>Visible to wali</span>
+                    </div>
                   )}
                 </div>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>
-                  {isWaliVisible
-                    ? "This message will be visible to the wali"
-                    : "This message will be hidden from the wali"}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-        <div className="flex">
-          <input
-            type="text"
-            value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 p-2 border rounded-l-md focus:outline-none focus:ring-1 focus:ring-primary"
-          />
-          <Button
-            type="submit"
-            variant="default"
-            className="rounded-l-none"
-            disabled={!messageText.trim()}
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-        </div>
+              </div>
+            );
+          })
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+      
+      {/* Input area */}
+      <form onSubmit={handleSubmit} className="p-4 border-t flex items-center space-x-2">
+        <Input
+          value={messageInput}
+          onChange={(e) => setMessageInput(e.target.value)}
+          placeholder="Type a message..."
+          className="flex-grow"
+        />
+        <Button type="submit" variant="default" size="icon">
+          <Send className="h-4 w-4" />
+        </Button>
       </form>
     </div>
   );

@@ -46,7 +46,7 @@ const ResultsDisplay = ({ score, onRetake }: ResultsDisplayProps) => {
             Find Nearby Matches
           </CustomButton>
           
-          <CustomButton onClick={() => navigate('/messages')} variant="secondary">
+          <CustomButton onClick={() => navigate('/messages')} variant="outline">
             <MessageSquare className="w-4 h-4 mr-2" />
             Messages
           </CustomButton>

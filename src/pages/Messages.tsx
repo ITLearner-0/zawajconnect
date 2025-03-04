@@ -1,244 +1,383 @@
 
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Conversation, Message, VideoCallStatus } from "@/types/profile";
-import ConversationList from "@/components/messaging/ConversationList";
-import ChatWindow from "@/components/messaging/ChatWindow";
-import VideoChat from "@/components/messaging/VideoChat";
-import WaliSupervisor from "@/components/messaging/WaliSupervisor";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
-import { useProfileData } from "@/hooks/useProfileData";
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useProfileData } from '@/hooks/useProfileData';
+import { Conversation, Message } from '@/types/profile';
+import { useToast } from '@/hooks/use-toast';
+import ConversationList from '@/components/messaging/ConversationList';
+import ChatWindow from '@/components/messaging/ChatWindow';
+import VideoChat from '@/components/messaging/VideoChat';
+import WaliSupervisor from '@/components/messaging/WaliSupervisor';
+import { Spinner } from 'lucide-react';
+import CustomButton from '@/components/CustomButton';
 
 const Messages = () => {
-  const { conversationId } = useParams<{ conversationId: string }>();
+  const { conversationId } = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { toast } = useToast();
   const { userId, formData } = useProfileData();
-  const [videoCall, setVideoCall] = useState<VideoCallStatus>({
+  
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [messageInput, setMessageInput] = useState('');
+  const [videoCallStatus, setVideoCallStatus] = useState<{
+    isActive: boolean; 
+    participantId?: string;
+    waliPresent: boolean;
+    startTime?: Date;
+  }>({
     isActive: false,
-    waliPresent: false,
+    waliPresent: false
   });
 
-  // Fetch conversations
-  const { data: conversations = [], isLoading: conversationsLoading } = useQuery({
-    queryKey: ["conversations", userId],
-    queryFn: async () => {
-      if (!userId) return [];
+  // Fetch all conversations for the current user
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchConversations = async () => {
+      setLoading(true);
       
       const { data, error } = await supabase
-        .from("conversations")
+        .from('conversations')
         .select(`
-          id, 
-          created_at, 
+          id,
+          created_at,
           participants,
           wali_supervised,
-          last_message:messages(
-            content, 
-            created_at, 
+          messages!messages(
+            id,
+            content,
+            created_at,
+            sender_id,
             is_read
           )
         `)
         .contains('participants', [userId])
-        .order("created_at", { ascending: false });
-        
+        .order('created_at', { ascending: false });
+
       if (error) {
         toast({
-          title: "Error fetching conversations",
+          title: "Error loading conversations",
           description: error.message,
-          variant: "destructive",
+          variant: "destructive"
         });
-        return [];
+        setLoading(false);
+        return;
       }
-      
-      return data as Conversation[];
-    },
-    enabled: !!userId,
-  });
 
-  // Fetch messages for the current conversation
-  const { data: messages = [], isLoading: messagesLoading } = useQuery({
-    queryKey: ["messages", conversationId],
-    queryFn: async () => {
-      if (!conversationId) return [];
+      // Process data to get conversations with last message
+      const processedConversations: Conversation[] = [];
       
-      const { data, error } = await supabase
-        .from("messages")
-        .select("*")
-        .eq("conversation_id", conversationId)
-        .order("created_at", { ascending: true });
+      for (const conv of data || []) {
+        const otherParticipantId = conv.participants.find(p => p !== userId);
         
-      if (error) {
-        toast({
-          title: "Error fetching messages",
-          description: error.message,
-          variant: "destructive",
-        });
-        return [];
+        // Get other participant's profile details
+        if (otherParticipantId) {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', otherParticipantId)
+            .single();
+          
+          // Find the last message
+          let lastMessage = null;
+          if (conv.messages && conv.messages.length > 0) {
+            const sortedMessages = [...conv.messages].sort(
+              (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+            );
+            lastMessage = sortedMessages[0];
+          }
+          
+          processedConversations.push({
+            id: conv.id,
+            created_at: conv.created_at,
+            participants: conv.participants,
+            last_message: lastMessage,
+            profile: profileData || undefined,
+            wali_supervised: conv.wali_supervised
+          });
+        }
       }
       
-      return data as Message[];
-    },
-    enabled: !!conversationId,
-  });
+      setConversations(processedConversations);
+      setLoading(false);
+    };
 
-  // Get current conversation details
-  const currentConversation = conversations.find(
-    (conv) => conv.id === conversationId
-  );
+    fetchConversations();
+  }, [userId, toast]);
 
-  // Send message mutation
-  const sendMessageMutation = useMutation({
-    mutationFn: async (newMessage: Omit<Message, "id" | "created_at" | "is_read">) => {
-      const { data, error } = await supabase
-        .from("messages")
-        .insert([{
-          ...newMessage,
-          is_read: false,
-        }])
-        .select()
+  // Load messages when conversation is selected
+  useEffect(() => {
+    if (!conversationId || !userId) return;
+
+    const fetchMessages = async () => {
+      setLoading(true);
+      
+      // Get conversation details first
+      const { data: convData, error: convError } = await supabase
+        .from('conversations')
+        .select('*, profiles!conversations_profiles_fkey(first_name, last_name)')
+        .eq('id', conversationId)
         .single();
-        
-      if (error) throw error;
-      return data;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["messages", conversationId] });
-      queryClient.invalidateQueries({ queryKey: ["conversations", userId] });
-    },
-    onError: (error) => {
-      toast({
-        title: "Failed to send message",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
 
-  // Handle sending a new message
-  const handleSendMessage = (content: string, isWaliVisible: boolean = true) => {
-    if (!userId || !conversationId) return;
+      if (convError) {
+        toast({
+          title: "Error loading conversation",
+          description: convError.message,
+          variant: "destructive"
+        });
+        navigate('/messages');
+        setLoading(false);
+        return;
+      }
+
+      // Set current conversation
+      const otherParticipantId = convData.participants.find(p => p !== userId);
+      if (otherParticipantId) {
+        const { data: profileData } = await supabase
+          .from('profiles')
+          .select('first_name, last_name')
+          .eq('id', otherParticipantId)
+          .single();
+          
+        setCurrentConversation({
+          id: convData.id,
+          created_at: convData.created_at,
+          participants: convData.participants,
+          profile: profileData || undefined,
+          wali_supervised: convData.wali_supervised
+        });
+      }
+
+      // Get messages
+      const { data: messagesData, error: messagesError } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true });
+
+      if (messagesError) {
+        toast({
+          title: "Error loading messages",
+          description: messagesError.message,
+          variant: "destructive"
+        });
+      } else {
+        setMessages(messagesData as Message[]);
+        
+        // Mark unread messages as read
+        const unreadMessages = messagesData
+          .filter(msg => !msg.is_read && msg.sender_id !== userId)
+          .map(msg => msg.id);
+          
+        if (unreadMessages.length > 0) {
+          await supabase
+            .from('messages')
+            .update({ is_read: true })
+            .in('id', unreadMessages);
+        }
+      }
+      
+      setLoading(false);
+    };
+
+    fetchMessages();
     
-    sendMessageMutation.mutate({
+    // Set up real-time subscription for new messages
+    const channel = supabase
+      .channel('new_messages')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `conversation_id=eq.${conversationId}`
+      }, (payload) => {
+        // Add the new message to the list
+        const newMessage = payload.new as Message;
+        setMessages(prev => [...prev, newMessage]);
+        
+        // If message is not from current user, mark as read
+        if (newMessage.sender_id !== userId) {
+          supabase
+            .from('messages')
+            .update({ is_read: true })
+            .eq('id', newMessage.id);
+        }
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [conversationId, userId, navigate, toast]);
+
+  const sendMessage = async () => {
+    if (!messageInput.trim() || !conversationId || !userId) return;
+    
+    // Check if wali supervision is required for female users
+    const needsWaliSupervision = formData.gender === 'Female' && !formData.waliName;
+    
+    const newMessage = {
       conversation_id: conversationId,
       sender_id: userId,
-      content,
-      is_wali_visible: isWaliVisible,
-    });
-  };
-
-  // Handle starting a video call
-  const handleStartVideoCall = () => {
-    if (!currentConversation) return;
+      content: messageInput,
+      is_wali_visible: currentConversation?.wali_supervised || needsWaliSupervision
+    };
     
-    // Check if wali supervision is required and wali is verified
-    const isFemaleSender = formData.gender === "female";
-    const waliRequired = isFemaleSender && !formData.waliVerified;
-    
-    if (waliRequired) {
-      toast({
-        title: "Wali Supervision Required",
-        description: "As a female user, you need your wali to be present for video calls.",
-        variant: "default",
-      });
+    const { error } = await supabase
+      .from('messages')
+      .insert(newMessage);
       
-      setVideoCall({
-        isActive: true,
-        participantId: currentConversation.participants.find(p => p !== userId),
-        waliPresent: false,
-        startTime: new Date(),
+    if (error) {
+      toast({
+        title: "Error sending message",
+        description: error.message,
+        variant: "destructive"
       });
     } else {
-      setVideoCall({
-        isActive: true,
-        participantId: currentConversation.participants.find(p => p !== userId),
-        waliPresent: !isFemaleSender,
-        startTime: new Date(),
-      });
+      setMessageInput('');
     }
   };
 
-  // Handle ending a video call
-  const handleEndVideoCall = () => {
-    setVideoCall({
+  const startVideoCall = async (participantId: string) => {
+    if (!userId || !conversationId) return;
+    
+    // Check if wali supervision is required
+    const isUserFemale = formData.gender === 'Female';
+    const waliPresent = isUserFemale;
+    
+    setVideoCallStatus({
+      isActive: true,
+      participantId,
+      waliPresent,
+      startTime: new Date()
+    });
+    
+    // Log video call start in database
+    await supabase
+      .from('video_calls')
+      .insert({
+        conversation_id: conversationId,
+        initiator_id: userId,
+        receiver_id: participantId,
+        wali_present: waliPresent
+      });
+  };
+
+  const endVideoCall = async () => {
+    if (!videoCallStatus.startTime || !userId) return;
+    
+    // Calculate duration
+    const duration = Math.round(
+      (new Date().getTime() - videoCallStatus.startTime.getTime()) / 1000
+    );
+    
+    // Update video call record
+    if (conversationId && videoCallStatus.participantId) {
+      await supabase
+        .from('video_calls')
+        .update({
+          ended_at: new Date().toISOString(),
+          duration_seconds: duration
+        })
+        .eq('conversation_id', conversationId)
+        .eq('initiator_id', userId)
+        .is('ended_at', null);
+    }
+    
+    setVideoCallStatus({
       isActive: false,
-      waliPresent: false,
+      waliPresent: false
     });
   };
 
-  // Confirm wali is present
-  const confirmWaliPresent = () => {
-    setVideoCall(prev => ({
-      ...prev,
-      waliPresent: true,
-    }));
-    
-    toast({
-      title: "Wali Confirmed",
-      description: "Your wali's supervision has been confirmed for this video call.",
-      variant: "default",
-    });
+  // Select a conversation
+  const selectConversation = (conversation: Conversation) => {
+    navigate(`/messages/${conversation.id}`);
   };
+
+  if (!userId) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>Please sign in to view messages</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar with conversation list */}
-      <div className="w-1/4 bg-white border-r">
-        <div className="p-4 border-b">
-          <h1 className="text-xl font-semibold">Messages</h1>
-        </div>
-        
-        {conversationsLoading ? (
-          <div className="p-4 text-center">Loading conversations...</div>
-        ) : (
-          <ConversationList 
-            conversations={conversations} 
-            currentConversationId={conversationId}
-            onSelectConversation={(id) => navigate(`/messages/${id}`)}
-          />
-        )}
+    <div className="flex flex-col h-screen">
+      <div className="bg-primary text-white p-4">
+        <h1 className="text-xl font-bold">Messages</h1>
       </div>
       
-      {/* Main chat area */}
-      <div className="flex flex-col flex-1">
-        {!conversationId ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center text-gray-500">
-              <p>Select a conversation to start messaging</p>
-            </div>
+      {loading && !conversationId ? (
+        <div className="flex items-center justify-center flex-grow">
+          <Spinner className="animate-spin mr-2" />
+          <p>Loading conversations...</p>
+        </div>
+      ) : (
+        <div className="flex flex-row h-full">
+          {/* Conversation list */}
+          <div className={`w-full md:w-1/3 border-r ${conversationId ? 'hidden md:block' : 'block'}`}>
+            <ConversationList 
+              conversations={conversations} 
+              onSelectConversation={selectConversation}
+              selectedConversationId={conversationId}
+            />
           </div>
-        ) : (
-          <>
-            {videoCall.isActive ? (
-              <div className="flex-1 flex flex-col">
-                <VideoChat
-                  participantId={videoCall.participantId || ""}
-                  waliPresent={videoCall.waliPresent}
-                  onEndCall={handleEndVideoCall}
-                />
-                
-                {formData.gender === "female" && !videoCall.waliPresent && (
-                  <WaliSupervisor
-                    waliName={formData.waliName || ""}
-                    onConfirmPresent={confirmWaliPresent}
+          
+          {/* Chat window or placeholder */}
+          <div className={`w-full md:w-2/3 ${!conversationId ? 'hidden md:flex' : 'flex'} flex-col`}>
+            {conversationId && currentConversation ? (
+              <>
+                {videoCallStatus.isActive ? (
+                  <div className="flex flex-col h-full">
+                    <VideoChat 
+                      participantId={videoCallStatus.participantId || ''} 
+                      onEndCall={endVideoCall}
+                    />
+                    {videoCallStatus.waliPresent && (
+                      <WaliSupervisor conversationId={conversationId} />
+                    )}
+                  </div>
+                ) : (
+                  <ChatWindow
+                    conversation={currentConversation}
+                    messages={messages}
+                    currentUserId={userId}
+                    messageInput={messageInput}
+                    setMessageInput={setMessageInput}
+                    sendMessage={sendMessage}
+                    onStartVideoCall={() => {
+                      const otherUserId = currentConversation.participants.find(id => id !== userId);
+                      if (otherUserId) {
+                        startVideoCall(otherUserId);
+                      }
+                    }}
+                    backToList={() => navigate('/messages')}
+                    isWaliSupervised={currentConversation.wali_supervised}
                   />
                 )}
-              </div>
+              </>
             ) : (
-              <ChatWindow
-                messages={messages}
-                isLoading={messagesLoading}
-                currentUserId={userId || ""}
-                onSendMessage={handleSendMessage}
-                onStartVideoCall={handleStartVideoCall}
-                waliSupervisionRequired={currentConversation?.wali_supervised || false}
-              />
+              <div className="flex items-center justify-center flex-grow text-gray-500">
+                <div className="text-center">
+                  <p className="mb-4">Select a conversation or start a new one</p>
+                  <CustomButton 
+                    onClick={() => navigate('/nearby')} 
+                    variant="outline"
+                  >
+                    Find People Nearby
+                  </CustomButton>
+                </div>
+              </div>
             )}
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
