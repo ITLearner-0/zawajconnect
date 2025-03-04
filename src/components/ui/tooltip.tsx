@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as TooltipPrimitive from "@radix-ui/react-tooltip"
 
@@ -25,4 +26,16 @@ const TooltipContent = React.forwardRef<
 ))
 TooltipContent.displayName = TooltipPrimitive.Content.displayName
 
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider }
+// Helper component for field tooltips
+const FieldTooltip = ({ text }: { text: string }) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      <div className="ml-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary/20 text-primary text-xs cursor-help">?</div>
+    </TooltipTrigger>
+    <TooltipContent>
+      <p>{text}</p>
+    </TooltipContent>
+  </Tooltip>
+);
+
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider, FieldTooltip }

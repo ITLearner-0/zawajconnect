@@ -9,6 +9,7 @@ import { geocodeLocation } from "@/utils/locationUtils";
 export const useProfile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [isNewUser, setIsNewUser] = useState(false);
   const [formData, setFormData] = useState<ProfileFormData>({
     fullName: "",
     age: "",
@@ -56,6 +57,18 @@ export const useProfile = () => {
           aboutMe: profile.about_me || "",
           prayerFrequency: profile.prayer_frequency || "five-daily",
         });
+        
+        // Detect if this is a new user with minimal profile data
+        setIsNewUser(
+          !profile.first_name || 
+          !profile.gender || 
+          !profile.location || 
+          !profile.religious_practice_level || 
+          !profile.about_me
+        );
+      } else {
+        // No profile found, definitely a new user
+        setIsNewUser(true);
       }
     };
 
@@ -72,8 +85,8 @@ export const useProfile = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session) {
@@ -160,6 +173,7 @@ export const useProfile = () => {
 
   return {
     formData,
+    isNewUser,
     handleChange,
     handleSubmit,
     handleSignOut,

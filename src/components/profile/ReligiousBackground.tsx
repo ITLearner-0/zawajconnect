@@ -1,6 +1,8 @@
 
 import { Label } from "@/components/ui/label";
 import { ProfileFormData } from "@/types/profile";
+import { FieldTooltip, TooltipProvider } from "@/components/ui/tooltip";
+import { fieldTooltips } from "@/utils/profileTooltips";
 
 interface ReligiousBackgroundProps {
   formData: ProfileFormData;
@@ -12,7 +14,12 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
     <h2 className="text-xl font-semibold text-primary">Religious Background</h2>
     <div className="grid grid-cols-1 gap-4">
       <div className="space-y-2">
-        <Label htmlFor="religiousLevel">Religious Practice Level</Label>
+        <div className="flex items-center">
+          <Label htmlFor="religiousLevel">Religious Practice Level</Label>
+          <TooltipProvider>
+            <FieldTooltip text={fieldTooltips.religiousLevel} />
+          </TooltipProvider>
+        </div>
         <select
           id="religiousLevel"
           name="religiousLevel"
@@ -28,7 +35,12 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
         </select>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="prayerFrequency">Prayer Frequency</Label>
+        <div className="flex items-center">
+          <Label htmlFor="prayerFrequency">Prayer Frequency</Label>
+          <TooltipProvider>
+            <FieldTooltip text={fieldTooltips.prayerFrequency} />
+          </TooltipProvider>
+        </div>
         <select
           id="prayerFrequency"
           name="prayerFrequency"
@@ -43,7 +55,12 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
         </select>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="familyBackground">Family Background</Label>
+        <div className="flex items-center">
+          <Label htmlFor="familyBackground">Family Background</Label>
+          <TooltipProvider>
+            <FieldTooltip text={fieldTooltips.familyBackground} />
+          </TooltipProvider>
+        </div>
         <textarea
           id="familyBackground"
           name="familyBackground"

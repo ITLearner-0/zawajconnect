@@ -2,6 +2,8 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ProfileFormData } from "@/types/profile";
+import { FieldTooltip, TooltipProvider } from "@/components/ui/tooltip";
+import { fieldTooltips } from "@/utils/profileTooltips";
 
 interface BasicInformationProps {
   formData: ProfileFormData;
@@ -13,7 +15,12 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
     <h2 className="text-xl font-semibold text-primary">Basic Information</h2>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
-        <Label htmlFor="fullName">Full Name</Label>
+        <div className="flex items-center">
+          <Label htmlFor="fullName">Full Name</Label>
+          <TooltipProvider>
+            <FieldTooltip text={fieldTooltips.fullName} />
+          </TooltipProvider>
+        </div>
         <Input
           id="fullName"
           name="fullName"
@@ -23,7 +30,12 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="age">Age</Label>
+        <div className="flex items-center">
+          <Label htmlFor="age">Age</Label>
+          <TooltipProvider>
+            <FieldTooltip text={fieldTooltips.age} />
+          </TooltipProvider>
+        </div>
         <Input
           id="age"
           name="age"
@@ -34,7 +46,12 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="gender">Gender</Label>
+        <div className="flex items-center">
+          <Label htmlFor="gender">Gender</Label>
+          <TooltipProvider>
+            <FieldTooltip text={fieldTooltips.gender} />
+          </TooltipProvider>
+        </div>
         <select
           id="gender"
           name="gender"
@@ -48,7 +65,12 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
         </select>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="location">Location</Label>
+        <div className="flex items-center">
+          <Label htmlFor="location">Location</Label>
+          <TooltipProvider>
+            <FieldTooltip text={fieldTooltips.location} />
+          </TooltipProvider>
+        </div>
         <Input
           id="location"
           name="location"
