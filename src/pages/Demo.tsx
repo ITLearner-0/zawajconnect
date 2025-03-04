@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,7 +10,7 @@ import MessagesContainer from '@/components/messaging/MessagesContainer';
 import VideoCallManager from '@/components/messaging/VideoCallManager';
 import { Toaster } from '@/components/ui/toaster';
 
-import { dummyProfiles, dummyConversations, dummyMessages } from '@/data/dummyProfiles';
+import { dummyProfiles, dummyConversations, dummyMessages } from '@/data/dummyData';
 import { VideoCallStatus, Message, Conversation, RetentionPolicy } from '@/types/profile';
 
 const Demo = () => {

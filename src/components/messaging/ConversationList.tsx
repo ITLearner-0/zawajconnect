@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Conversation } from "@/types/profile";
 import { formatDistanceToNow } from "date-fns";
@@ -6,7 +5,7 @@ import { Search, Loader } from "lucide-react";
 import { Input } from "../ui/input";
 import { Skeleton } from "../ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { dummyProfiles } from "@/data/dummyProfiles";
+import { dummyProfiles } from "@/data/dummyData";
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -25,13 +24,11 @@ const ConversationList = ({
 }: ConversationListProps) => {
   const [searchTerm, setSearchTerm] = useState("");
   
-  // Filter conversations based on search term
   const filteredConversations = conversations.filter(conv => {
     const fullName = `${conv.profile?.first_name} ${conv.profile?.last_name}`.toLowerCase();
     return fullName.includes(searchTerm.toLowerCase());
   });
 
-  // Find profile picture for a participant in a conversation
   const getProfilePicture = (conversationId: string) => {
     const conversation = conversations.find(c => c.id === conversationId);
     if (!conversation) return null;
@@ -45,7 +42,6 @@ const ConversationList = ({
 
   return (
     <div className="flex flex-col h-full">
-      {/* Search bar */}
       <div className="p-3 border-b">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
@@ -59,10 +55,8 @@ const ConversationList = ({
         </div>
       </div>
       
-      {/* Conversations list */}
       <div className="overflow-y-auto flex-grow">
         {loading ? (
-          // Show skeleton loaders when loading
           Array(5).fill(0).map((_, index) => (
             <div key={index} className="p-3 border-b">
               <div className="flex items-center space-x-3">
@@ -125,7 +119,6 @@ const ConversationList = ({
                   </div>
                 </div>
                 
-                {/* Wali supervision indicator */}
                 {conversation.wali_supervised && (
                   <div className="mt-1 text-xs text-primary-foreground bg-primary/20 px-2 py-0.5 rounded-full inline-block">
                     Wali Supervised
