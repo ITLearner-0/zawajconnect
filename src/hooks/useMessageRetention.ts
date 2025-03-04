@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { RetentionPolicy } from '@/types/profile';
 import { setRetentionPolicy } from '@/services/messageLifecycleService';
 import { supabase } from '@/integrations/supabase/client';
+import { columnExists, executeSql } from '@/utils/databaseUtils';
 
 export const useMessageRetention = (conversationId: string | undefined) => {
   const [retentionPolicy, setRetentionPolicyState] = useState<RetentionPolicy | undefined>();
@@ -16,19 +17,29 @@ export const useMessageRetention = (conversationId: string | undefined) => {
     const fetchRetentionPolicy = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase
-          .from('conversations')
-          .select('retention_policy')
-          .eq('id', conversationId)
-          .single();
-
-        if (error) {
-          console.error('Error fetching retention policy:', error);
-          setError(error.message);
-        } else if (data && data.retention_policy) {
-          setRetentionPolicyState(data.retention_policy as RetentionPolicy);
+        // Check if the retention_policy column exists
+        const hasColumn = await columnExists('conversations', 'retention_policy');
+        
+        if (hasColumn) {
+          // Fetch the retention policy using safe SQL execution
+          const result = await executeSql(`
+            SELECT retention_policy 
+            FROM conversations 
+            WHERE id = '${conversationId}'
+          `);
+          
+          if (result && result.result && result.result.length > 0 && result.result[0].retention_policy) {
+            setRetentionPolicyState(result.result[0].retention_policy as RetentionPolicy);
+          } else {
+            // Set default policy if none exists
+            const defaultPolicy: RetentionPolicy = {
+              type: 'permanent',
+              auto_delete: false
+            };
+            setRetentionPolicyState(defaultPolicy);
+          }
         } else {
-          // Set default policy if none exists
+          // Set default policy if column doesn't exist
           const defaultPolicy: RetentionPolicy = {
             type: 'permanent',
             auto_delete: false

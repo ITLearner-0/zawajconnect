@@ -1,223 +1,304 @@
 
-import { supabase } from "@/integrations/supabase/client";
-import { ContentFlag, ContentReport, ModerationStats } from "@/types/profile";
-import { tableExists } from "@/utils/databaseUtils";
+import { supabase } from '@/integrations/supabase/client';
+import { ContentFlag } from '@/types/profile';
+import { executeSql, tableExists } from '@/utils/databaseUtils';
 
-export const filterMessageContent = (content: string) => {
-  // Basic implementation: scan for inappropriate words
-  const inappropriateWordsList = [
-    "inappropriate", "offensive", "explicit", "obscene", "rude", "harassment"
+interface FlaggedContent {
+  flags: {
+    flag_type: string;
+    severity: string;
+  }[];
+  isFiltered: boolean;
+  filteredContent: string;
+}
+
+/**
+ * Filters message content for inappropriate terms
+ */
+export const filterMessageContent = (content: string): FlaggedContent => {
+  // Inappropriate terms to filter
+  const inappropriateTerms = [
+    { term: 'dating', flag: 'religious_violation', severity: 'high' },
+    { term: 'girlfriend', flag: 'religious_violation', severity: 'high' },
+    { term: 'boyfriend', flag: 'religious_violation', severity: 'high' },
+    { term: 'alcohol', flag: 'inappropriate', severity: 'medium' },
+    { term: 'drinking', flag: 'inappropriate', severity: 'medium' },
+    { term: 'meet alone', flag: 'suspicious', severity: 'medium' },
+    { term: 'private meeting', flag: 'suspicious', severity: 'medium' },
+    { term: 'flirting', flag: 'inappropriate', severity: 'medium' },
+    { term: 'sexy', flag: 'inappropriate', severity: 'high' },
+    { term: 'phone number', flag: 'suspicious', severity: 'low' },
+    { term: 'address', flag: 'suspicious', severity: 'low' },
   ];
   
-  const contentLower = content.toLowerCase();
-  let flags: Partial<ContentFlag>[] = [];
-  let isFiltered = false;
   let filteredContent = content;
+  const flags: { flag_type: string; severity: string }[] = [];
+  let isFiltered = false;
   
-  for (let word of inappropriateWordsList) {
-    if (contentLower.includes(word)) {
-      flags.push({
-        content_id: 'temp', // Will be replaced with actual ID
-        content_type: 'message',
-        flag_type: 'inappropriate',
-        severity: 'medium',
-        flagged_by: 'system',
-        created_at: new Date().toISOString(),
-        resolved: false
-      });
-      
+  // Check for inappropriate terms
+  inappropriateTerms.forEach(item => {
+    const regex = new RegExp(item.term, 'gi');
+    if (regex.test(content)) {
+      filteredContent = filteredContent.replace(regex, '***');
       isFiltered = true;
-      // Replace inappropriate word with asterisks
-      filteredContent = filteredContent.replace(new RegExp(word, 'gi'), '*'.repeat(word.length));
-    }
-  }
-  
-  // Check for religious sensitivities
-  const religiousViolationWords = ["blasphemy", "sacrilegious", "haram"];
-  
-  for (let word of religiousViolationWords) {
-    if (contentLower.includes(word)) {
-      flags.push({
-        content_id: 'temp', // Will be replaced with actual ID
-        content_type: 'message',
-        flag_type: 'religious_violation',
-        severity: 'high',
-        flagged_by: 'system',
-        created_at: new Date().toISOString(),
-        resolved: false
-      });
       
-      isFiltered = true;
-      filteredContent = filteredContent.replace(new RegExp(word, 'gi'), '*'.repeat(word.length));
+      // Add flag if not already added for this type
+      if (!flags.some(f => f.flag_type === item.flag)) {
+        flags.push({
+          flag_type: item.flag,
+          severity: item.severity
+        });
+      }
     }
-  }
+  });
   
-  return { flags, isFiltered, filteredContent };
+  return {
+    flags,
+    isFiltered,
+    filteredContent
+  };
 };
 
+/**
+ * Flags content for moderation review
+ */
 export const flagContent = async (
   contentId: string,
   contentType: ContentFlag['content_type'],
   flagType: ContentFlag['flag_type'],
   severity: ContentFlag['severity'],
-  userId: string
-) => {
+  flaggedBy: string
+): Promise<boolean> => {
   try {
-    // Check if content_flags table exists before inserting
-    const hasTable = await tableExists('content_flags');
+    // Check if the table exists
+    const exists = await tableExists('content_flags');
     
-    if (!hasTable) {
-      console.log("Content flags table does not exist, skipping flagging");
-      return null;
-    }
-    
-    // Use execute_sql to insert data
-    const { data, error } = await supabase.rpc('execute_sql', {
-      sql_query: `
-        INSERT INTO content_flags (
-          content_id, content_type, flag_type, severity, flagged_by, created_at, resolved
-        ) VALUES (
-          '${contentId}', '${contentType}', '${flagType}', '${severity}', '${userId}', 
-          '${new Date().toISOString()}', false
-        )
-        RETURNING *
-      `
-    });
-      
-    if (error) {
-      console.error("Error flagging content:", error);
-      return null;
-    }
-    
-    return data?.[0];
-  } catch (err) {
-    console.error("Error in flagContent:", err);
-    return null;
-  }
-};
-
-export const submitContentReport = async (report: {
-  reported_user_id: string;
-  reporting_user_id: string;
-  report_type: ContentReport['report_type'];
-  content_reference?: string;
-  report_details: string;
-}) => {
-  try {
-    // Check if content_reports table exists before inserting
-    const hasTable = await tableExists('content_reports');
-    
-    if (!hasTable) {
-      console.log("Content reports table does not exist, skipping report");
+    if (!exists) {
+      console.log("content_flags table doesn't exist, flag not created");
       return false;
     }
     
-    // Use execute_sql to insert data
-    const { data, error } = await supabase.rpc('execute_sql', {
-      sql_query: `
-        INSERT INTO content_reports (
-          reported_user_id, reporting_user_id, report_type, 
-          content_reference, report_details, created_at, status
-        ) VALUES (
-          '${report.reported_user_id}', '${report.reporting_user_id}', '${report.report_type}', 
-          ${report.content_reference ? `'${report.content_reference}'` : 'NULL'}, 
-          '${report.report_details}', '${new Date().toISOString()}', 'pending'
-        )
-        RETURNING *
-      `
-    });
-      
-    if (error) {
-      console.error("Error submitting report:", error);
+    // Insert content flag using safe SQL execution
+    const result = await executeSql(`
+      INSERT INTO content_flags (
+        content_id,
+        content_type,
+        flag_type,
+        severity,
+        flagged_by,
+        created_at,
+        resolved
+      ) VALUES (
+        '${contentId}',
+        '${contentType}',
+        '${flagType}',
+        '${severity}',
+        '${flaggedBy}',
+        NOW(),
+        false
+      )
+    `);
+    
+    if (!result) {
+      console.error("Error creating content flag");
       return false;
     }
     
-    return !!data;
+    return true;
   } catch (err) {
-    console.error("Error in submitContentReport:", err);
+    console.error('Error flagging content:', err);
     return false;
   }
 };
 
-export const getModerationStats = async (): Promise<ModerationStats> => {
+/**
+ * Creates a content report
+ */
+export const reportContent = async (
+  reportedUserId: string,
+  reportingUserId: string,
+  reportType: string,
+  contentReference: string | undefined,
+  reportDetails: string
+): Promise<boolean> => {
   try {
-    // Default stats
-    const defaultStats: ModerationStats = {
-      pendingReports: 0,
-      flaggedContent: 0,
-      totalProcessed: 0,
-      resolvedToday: 0
-    };
+    // Check if the table exists
+    const exists = await tableExists('content_reports');
     
-    // Check if tables exist
-    const reportsTableExists = await tableExists('content_reports');
-    const flagsTableExists = await tableExists('content_flags');
-    
-    if (!reportsTableExists && !flagsTableExists) {
-      return defaultStats;
+    if (!exists) {
+      console.log("content_reports table doesn't exist, report not created");
+      return false;
     }
     
-    let stats = {...defaultStats};
+    // Insert content report using safe SQL execution
+    const contentRef = contentReference ? `'${contentReference}'` : 'NULL';
+    
+    const result = await executeSql(`
+      INSERT INTO content_reports (
+        reported_user_id,
+        reporting_user_id,
+        report_type,
+        content_reference,
+        report_details,
+        created_at,
+        status
+      ) VALUES (
+        '${reportedUserId}',
+        '${reportingUserId}',
+        '${reportType}',
+        ${contentRef},
+        '${reportDetails}',
+        NOW(),
+        'pending'
+      )
+    `);
+    
+    if (!result) {
+      console.error("Error creating content report");
+      return false;
+    }
+    
+    return true;
+  } catch (err) {
+    console.error('Error reporting content:', err);
+    return false;
+  }
+};
+
+/**
+ * Resolves a content flag
+ */
+export const resolveContentFlag = async (
+  flagId: string,
+  resolvedBy: string,
+  notes?: string
+): Promise<boolean> => {
+  try {
+    // Check if the table exists
+    const exists = await tableExists('content_flags');
+    
+    if (!exists) {
+      return false;
+    }
+    
+    // Safe SQL execution
+    const notesValue = notes ? `'${notes}'` : 'NULL';
+    
+    const result = await executeSql(`
+      UPDATE content_flags
+      SET resolved = true,
+          resolved_by = '${resolvedBy}',
+          resolved_at = NOW(),
+          notes = ${notesValue}
+      WHERE id = '${flagId}'
+    `);
+    
+    if (!result) {
+      console.error("Error resolving content flag");
+      return false;
+    }
+    
+    return true;
+  } catch (err) {
+    console.error('Error resolving content flag:', err);
+    return false;
+  }
+};
+
+/**
+ * Resolves a content report
+ */
+export const resolveContentReport = async (
+  reportId: string,
+  resolutionAction: string,
+  adminNotes?: string
+): Promise<boolean> => {
+  try {
+    // Check if the table exists
+    const exists = await tableExists('content_reports');
+    
+    if (!exists) {
+      return false;
+    }
+    
+    // Safe SQL execution
+    const notesValue = adminNotes ? `'${adminNotes}'` : 'NULL';
+    
+    const result = await executeSql(`
+      UPDATE content_reports
+      SET status = 'resolved',
+          resolution_action = '${resolutionAction}',
+          admin_notes = ${notesValue}
+      WHERE id = '${reportId}'
+    `);
+    
+    if (!result) {
+      console.error("Error resolving content report");
+      return false;
+    }
+    
+    return true;
+  } catch (err) {
+    console.error('Error resolving content report:', err);
+    return false;
+  }
+};
+
+/**
+ * Gets moderation statistics
+ */
+export const getModerationStats = async (): Promise<{
+  pendingReports: number;
+  flaggedContent: number;
+  totalProcessed: number;
+  resolvedToday: number;
+}> => {
+  const defaults = {
+    pendingReports: 0,
+    flaggedContent: 0,
+    totalProcessed: 0,
+    resolvedToday: 0
+  };
+  
+  try {
+    // Check if tables exist
+    const reportsExist = await tableExists('content_reports');
+    const flagsExist = await tableExists('content_flags');
+    
+    if (!reportsExist || !flagsExist) {
+      return defaults;
+    }
     
     // Get pending reports count
-    if (reportsTableExists) {
-      const { data: pendingReportsData, error: pendingReportsError } = await supabase.rpc('execute_sql', {
-        sql_query: `SELECT COUNT(*) FROM content_reports WHERE status = 'pending'`
-      });
-        
-      if (!pendingReportsError && pendingReportsData?.[0]) {
-        stats.pendingReports = parseInt(pendingReportsData[0].count, 10) || 0;
-      }
-    }
+    const pendingReportsResult = await executeSql(`
+      SELECT COUNT(*) as count FROM content_reports WHERE status = 'pending'
+    `);
     
-    // Get flagged content count
-    if (flagsTableExists) {
-      const { data: flaggedContentData, error: flaggedContentError } = await supabase.rpc('execute_sql', {
-        sql_query: `SELECT COUNT(*) FROM content_flags WHERE resolved = false`
-      });
-        
-      if (!flaggedContentError && flaggedContentData?.[0]) {
-        stats.flaggedContent = parseInt(flaggedContentData[0].count, 10) || 0;
-      }
-    }
-    
-    // Get resolved today count
-    if (reportsTableExists) {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      
-      const { data: resolvedTodayData, error: resolvedTodayError } = await supabase.rpc('execute_sql', {
-        sql_query: `
-          SELECT COUNT(*) FROM content_reports 
-          WHERE status = 'resolved' 
-          AND resolved_at >= '${today.toISOString()}'
-        `
-      });
-        
-      if (!resolvedTodayError && resolvedTodayData?.[0]) {
-        stats.resolvedToday = parseInt(resolvedTodayData[0].count, 10) || 0;
-      }
-    }
+    // Get unresolved flags count
+    const flaggedContentResult = await executeSql(`
+      SELECT COUNT(*) as count FROM content_flags WHERE resolved = false
+    `);
     
     // Get total processed count
-    if (reportsTableExists) {
-      const { data: totalProcessedData, error: totalProcessedError } = await supabase.rpc('execute_sql', {
-        sql_query: `SELECT COUNT(*) FROM content_reports WHERE status = 'resolved'`
-      });
-        
-      if (!totalProcessedError && totalProcessedData?.[0]) {
-        stats.totalProcessed = parseInt(totalProcessedData[0].count, 10) || 0;
-      }
-    }
+    const totalProcessedResult = await executeSql(`
+      SELECT COUNT(*) as count FROM content_reports WHERE status = 'resolved'
+    `);
     
-    return stats;
-  } catch (err) {
-    console.error("Error getting moderation stats:", err);
+    // Get resolved today count
+    const resolvedTodayResult = await executeSql(`
+      SELECT COUNT(*) as count FROM content_reports 
+      WHERE status = 'resolved' 
+      AND resolved_at::date = CURRENT_DATE
+    `);
+    
     return {
-      pendingReports: 0,
-      flaggedContent: 0,
-      totalProcessed: 0,
-      resolvedToday: 0
+      pendingReports: pendingReportsResult?.result[0]?.count || 0,
+      flaggedContent: flaggedContentResult?.result[0]?.count || 0,
+      totalProcessed: totalProcessedResult?.result[0]?.count || 0,
+      resolvedToday: resolvedTodayResult?.result[0]?.count || 0
     };
+  } catch (err) {
+    console.error('Error getting moderation stats:', err);
+    return defaults;
   }
 };

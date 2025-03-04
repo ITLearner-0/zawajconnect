@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { columnExists } from '@/utils/databaseUtils';
+import { columnExists, executeSql } from '@/utils/databaseUtils';
 
 export const useMessageEncryption = (conversationId: string | undefined) => {
   const [encryptionEnabled, setEncryptionEnabled] = useState<boolean>(false);
@@ -19,17 +19,20 @@ export const useMessageEncryption = (conversationId: string | undefined) => {
         const hasEncryptedColumn = await columnExists('messages', 'encrypted');
         const hasIVColumn = await columnExists('messages', 'iv');
         
+        // Check if encryption_enabled column exists
+        const hasEncryptionEnabledColumn = await columnExists('conversations', 'encryption_enabled');
+        
         // Only enable if both columns exist
-        if (hasEncryptedColumn && hasIVColumn) {
+        if (hasEncryptedColumn && hasIVColumn && hasEncryptionEnabledColumn) {
           // Check if encryption is enabled for this conversation
-          const { data, error } = await supabase
-            .from('conversations')
-            .select('encryption_enabled')
-            .eq('id', conversationId)
-            .single();
+          const result = await executeSql(`
+            SELECT encryption_enabled 
+            FROM conversations 
+            WHERE id = '${conversationId}'
+          `);
 
-          if (!error && data) {
-            setEncryptionEnabled(!!data.encryption_enabled);
+          if (result && result.result && result.result.length > 0) {
+            setEncryptionEnabled(!!result.result[0].encryption_enabled);
           } else {
             // Default to false if not set
             setEncryptionEnabled(false);
@@ -61,17 +64,15 @@ export const useMessageEncryption = (conversationId: string | undefined) => {
         return false;
       }
       
-      // Update encryption setting
-      const { error } = await supabase.rpc('execute_sql', {
-        sql_query: `
-          UPDATE conversations 
-          SET encryption_enabled = ${enabled} 
-          WHERE id = '${conversationId}'
-        `
-      });
+      // Update encryption setting using safer SQL execution
+      const result = await executeSql(`
+        UPDATE conversations 
+        SET encryption_enabled = ${enabled} 
+        WHERE id = '${conversationId}'
+      `);
         
-      if (error) {
-        setError(error.message);
+      if (!result) {
+        setError("Failed to update encryption setting");
         return false;
       }
       

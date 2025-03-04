@@ -64,7 +64,9 @@ const Messages = () => {
         currentConversation={currentConversation}
         onSelectConversation={selectConversation}
         errors={{
-          ...errors,
+          conversations: errors?.conversations,
+          messages: errors?.messages,
+          videoCall: "",
           monitoring: errors?.monitoring
         }}
       >
