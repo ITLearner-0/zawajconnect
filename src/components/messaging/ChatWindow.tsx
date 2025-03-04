@@ -4,7 +4,7 @@ import { Conversation, Message } from '@/types/profile';
 import { ArrowLeft, Video, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import MessageItem from './MessageItem';
+import MessageItem from '@/components/messaging/MessageItem';
 import ChatContainer from './ChatContainer';
 import WaliSupervisor from './WaliSupervisor';
 import { MonitoringReport } from '@/services/aiMonitoringService';
