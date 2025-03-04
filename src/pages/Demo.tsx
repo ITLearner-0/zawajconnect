@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -148,6 +147,9 @@ const Demo = () => {
                   {dummyProfiles.map(profile => (
                     <div key={profile.id} className="flex items-center p-3 border rounded-lg">
                       <Avatar className="h-10 w-10 mr-3">
+                        {profile.profile_picture ? (
+                          <AvatarImage src={profile.profile_picture} alt={`${profile.first_name}'s profile`} />
+                        ) : null}
                         <AvatarFallback>{profile.first_name[0]}</AvatarFallback>
                       </Avatar>
                       <div>

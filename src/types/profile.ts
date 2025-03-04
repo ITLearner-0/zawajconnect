@@ -12,6 +12,7 @@ export interface ProfileFormData {
   waliName?: string;
   waliRelationship?: string;
   waliContact?: string;
+  profilePicture?: string;
 }
 
 export interface DatabaseProfile {
@@ -34,6 +35,7 @@ export interface DatabaseProfile {
   wali_contact: string | null;
   wali_verified: boolean;
   is_visible: boolean;
+  profile_picture?: string;
   privacy_settings: PrivacySettings;
   blocked_users: string[];
   content_flags: ContentFlag[];
