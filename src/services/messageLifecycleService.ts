@@ -5,17 +5,17 @@ import { RetentionPolicy } from '@/types/profile';
 // Check if a column exists in a table
 const checkColumnExists = async (tableName: string, columnName: string): Promise<boolean> => {
   try {
-    const { data, error } = await supabase.rpc('column_exists', {
-      table_name: tableName,
-      column_name: columnName
-    });
+    // Use a simple query to check if the column exists by trying to select it
+    const query = `SELECT ${columnName} FROM ${tableName} LIMIT 1`;
+    const { data, error } = await supabase.rpc('execute_sql', { query });
     
+    // If there's an error, the column likely doesn't exist
     if (error) {
-      console.error(`Error checking if column ${columnName} exists in ${tableName}:`, error);
+      console.error(`Column ${columnName} likely doesn't exist in ${tableName}:`, error);
       return false;
     }
     
-    return !!data;
+    return true;
   } catch (err) {
     console.error(`Error checking if column ${columnName} exists in ${tableName}:`, err);
     return false;
@@ -51,8 +51,9 @@ export const setRetentionPolicy = async (
     
     if (!retentionPolicyExists) {
       console.error('Column retention_policy does not exist in conversations table');
-      // Create the column if it doesn't exist
-      const { error: alterError } = await supabase.rpc('add_retention_policy_column');
+      // Create the column if it doesn't exist - in a real app, you'd use a migration
+      const alterQuery = `ALTER TABLE conversations ADD COLUMN IF NOT EXISTS retention_policy JSONB`;
+      const { error: alterError } = await supabase.rpc('execute_sql', { query: alterQuery });
       
       if (alterError) {
         console.error('Error adding retention_policy column:', alterError);
@@ -84,7 +85,8 @@ export const setRetentionPolicy = async (
         if (!scheduledDeletionExists) {
           console.error('Column scheduled_deletion does not exist in messages table');
           // Create the column if it doesn't exist
-          const { error: alterError } = await supabase.rpc('add_scheduled_deletion_column');
+          const alterQuery = `ALTER TABLE messages ADD COLUMN IF NOT EXISTS scheduled_deletion TIMESTAMP WITH TIME ZONE`;
+          const { error: alterError } = await supabase.rpc('execute_sql', { query: alterQuery });
           
           if (alterError) {
             console.error('Error adding scheduled_deletion column:', alterError);
@@ -92,6 +94,7 @@ export const setRetentionPolicy = async (
           }
         }
         
+        // Update messages that don't already have a scheduled deletion date
         const { error: updateError } = await supabase
           .from('messages')
           .update({ 

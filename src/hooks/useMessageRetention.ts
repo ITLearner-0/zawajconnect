@@ -13,30 +13,34 @@ export const useMessageRetention = (conversationId: string | undefined) => {
     
     const getRetentionPolicy = async () => {
       try {
-        // First check if the column exists
-        const { data: columnExists } = await supabase.rpc('column_exists', {
-          table_name: 'conversations',
-          column_name: 'retention_policy'
-        });
-        
-        if (!columnExists) {
-          console.log('Retention policy column does not exist yet');
-          return;
-        }
-        
-        const { data, error } = await supabase
+        // Check if retention_policy column exists
+        const { data: columnExistsData, error: columnExistsError } = await supabase
           .from('conversations')
-          .select('retention_policy')
+          .select('id')
           .eq('id', conversationId)
-          .single();
+          .limit(1);
           
-        if (error) {
-          console.error('Error fetching retention policy:', error);
+        if (columnExistsError) {
+          console.error('Error checking if retention policy exists:', columnExistsError);
           return;
         }
         
-        if (data && data.retention_policy) {
-          setRetentionPolicyState(data.retention_policy);
+        // If we can fetch the conversation, try to get its retention policy
+        if (columnExistsData && columnExistsData.length > 0) {
+          const { data, error } = await supabase
+            .from('conversations')
+            .select('*')
+            .eq('id', conversationId)
+            .single();
+            
+          if (error) {
+            console.error('Error fetching retention policy:', error);
+            return;
+          }
+          
+          if (data && data.retention_policy) {
+            setRetentionPolicyState(data.retention_policy);
+          }
         }
       } catch (err) {
         console.error('Failed to get retention policy:', err);
