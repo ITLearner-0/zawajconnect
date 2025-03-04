@@ -11,7 +11,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-islamic-cream to-background">
       <header className="bg-gradient-to-r from-islamic-teal to-islamic-teal/90 text-white py-16 px-4 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/islamic-pattern.svg')] bg-repeat opacity-10"></div>
+        <div className="absolute inset-0 bg-[url('/islamic-pattern-enhanced.svg')] bg-repeat opacity-20 animate-slow-pulse"></div>
         <div className="relative z-10 max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 font-serif">Finding Your Muslim Spouse</h1>
           <p className="text-xl mb-8 text-islamic-cream">A marriage app built on Islamic values</p>
@@ -160,7 +160,7 @@ const Index = () => {
       </main>
 
       <footer className="bg-islamic-teal/95 text-white py-12 px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/islamic-pattern.svg')] bg-repeat opacity-5"></div>
+        <div className="absolute inset-0 bg-[url('/islamic-pattern-enhanced.svg')] bg-repeat opacity-10"></div>
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <p className="text-islamic-cream/90">
             &copy; {new Date().getFullYear()} Islamic Marriage App. All rights reserved.

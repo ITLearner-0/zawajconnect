@@ -46,7 +46,7 @@ const IslamicPattern = ({
       case "background":
         return cn(
           baseClasses, 
-          `before:absolute before:inset-0 before:bg-[url('/islamic-pattern.svg')] before:${opacityMap[intensity]} before:bg-repeat ${colorClasses[color]}`, 
+          `before:absolute before:inset-0 before:bg-[url('/islamic-pattern-enhanced.svg')] before:${opacityMap[intensity]} before:bg-repeat ${colorClasses[color]}`, 
           className
         );
       case "divider":
@@ -75,7 +75,7 @@ const IslamicPattern = ({
   return (
     <div className={getPatternClass()}>
       {variant === "border" && (
-        <div className={`absolute -inset-0.5 ${opacityMap[intensity]} bg-[url('/islamic-pattern.svg')] bg-repeat`} />
+        <div className={`absolute -inset-0.5 ${opacityMap[intensity]} bg-[url('/islamic-pattern-enhanced.svg')] bg-repeat`} />
       )}
       <div className="relative z-10">
         {children}
