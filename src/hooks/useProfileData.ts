@@ -99,13 +99,24 @@ export const useProfileData = (userId?: string | null) => {
           setIsNewUser(!profile.first_name || !profile.last_name || !profile.gender);
         } else {
           // Create a new profile if none exists
+          const defaultProfileData = {
+            first_name: '',
+            last_name: '',
+            birth_date: new Date().toISOString().split('T')[0], // Current date as default
+            gender: '',
+            location: '',
+            religious_practice_level: '',
+            prayer_frequency: '',
+            privacy_settings: DEFAULT_PRIVACY_SETTINGS,
+            blocked_users: [],
+            is_visible: true
+          };
+          
           const { error: insertError } = await supabase
             .from('profiles')
             .insert({
               id: userId,
-              privacy_settings: DEFAULT_PRIVACY_SETTINGS,
-              blocked_users: [],
-              is_visible: true
+              ...defaultProfileData
             });
             
           if (insertError) {
