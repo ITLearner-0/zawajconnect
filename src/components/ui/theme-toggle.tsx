@@ -18,8 +18,8 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       size="icon"
       onClick={toggleTheme}
       className={cn(
-        "rounded-full bg-white/20 backdrop-blur-sm border-white/30 hover:bg-white/30", 
-        theme === "dark" ? "text-white" : "text-gray-800",
+        "rounded-full bg-white/30 backdrop-blur-sm border-white/40 hover:bg-white/40 dark:bg-slate-800/70 dark:border-slate-700 dark:hover:bg-slate-700/90", 
+        theme === "dark" ? "text-yellow-300" : "text-slate-700",
         className
       )}
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
