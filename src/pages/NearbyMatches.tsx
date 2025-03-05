@@ -12,6 +12,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Switch } from "@/components/ui/switch";
 import { IslamicPattern } from "@/components/ui/islamic-pattern";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import AccessibilityControls from "@/components/AccessibilityControls";
 
 const NearbyMatches = () => {
   const navigate = useNavigate();
@@ -66,20 +68,26 @@ const NearbyMatches = () => {
     <div className="min-h-screen bg-gradient-to-b from-islamic-cream to-background relative">
       <div className="absolute inset-0 bg-[url('/islamic-pattern.svg')] bg-repeat opacity-5 pointer-events-none"></div>
       <div className="container mx-auto px-4 py-12 relative z-10">
-        <div className="mb-6 flex items-center">
-          <CustomButton
-            variant="ghost"
-            onClick={() => navigate("/")}
-            className="mr-4 hover:bg-islamic-teal/10 group"
-            aria-label="Back to home"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4 text-islamic-teal group-hover:translate-x-[-2px] transition-transform" />
-            Back
-          </CustomButton>
-          <h1 className="text-3xl font-bold text-islamic-teal flex items-center gap-2 font-serif">
-            Find Nearby Matches
-            <Star className="h-5 w-5 text-islamic-gold" />
-          </h1>
+        <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center">
+            <CustomButton
+              variant="ghost"
+              onClick={() => navigate("/")}
+              className="mr-4 hover:bg-islamic-teal/10 group"
+              aria-label="Back to home"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4 text-islamic-teal group-hover:translate-x-[-2px] transition-transform" />
+              Back
+            </CustomButton>
+            <h1 className="text-3xl font-bold text-islamic-teal flex items-center gap-2 font-serif">
+              Find Nearby Matches
+              <Star className="h-5 w-5 text-islamic-gold" />
+            </h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <AccessibilityControls />
+            <ThemeToggle />
+          </div>
         </div>
 
         <IslamicPattern variant="divider" color="teal" />
