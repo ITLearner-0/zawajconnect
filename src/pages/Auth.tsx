@@ -85,18 +85,43 @@ const Auth = () => {
 
         // If registration successful and user provides gender info, save to profile
         if (data.user) {
+          // Create complete profile data with all required fields
           const profileData = {
             id: data.user.id,
             first_name: firstName,
             last_name: lastName,
             gender: gender,
+            birth_date: new Date().toISOString().split('T')[0], // Default to current date
+            location: "Not specified", // Default value
+            prayer_frequency: "Not specified", // Default value
+            religious_practice_level: "Not specified", // Default value
+            about_me: "", // Empty string for optional fields
+            education_level: "",
+            occupation: "",
+            is_visible: true,
+            privacy_settings: {
+              profileVisibilityLevel: 1,
+              showAge: true,
+              showLocation: true,
+              showOccupation: true,
+              allowNonMatchMessages: true
+            },
+            email_verified: false,
+            phone_verified: false,
+            id_verified: false,
+            wali_verified: false
           };
 
           // Add wali information for female users
           if (gender === "female") {
-            profileData.wali_name = waliName;
-            profileData.wali_relationship = waliRelationship;
-            profileData.wali_contact = waliContact;
+            profileData["wali_name"] = waliName;
+            profileData["wali_relationship"] = waliRelationship;
+            profileData["wali_contact"] = waliContact;
+          } else {
+            // For males, set wali fields to null
+            profileData["wali_name"] = null;
+            profileData["wali_relationship"] = null;
+            profileData["wali_contact"] = null;
           }
 
           // Create initial profile
