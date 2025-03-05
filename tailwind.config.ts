@@ -56,6 +56,9 @@ export default {
         islamic: {
           teal: "#28717c",
           gold: "#d4af37",
+          brightGold: "#e9c46a", // Enhanced brighter gold
+          solidGreen: "#e1f5e0", // New solid green background
+          lightGreen: "#f0f9ef", // Lighter green for gradients
           burgundy: "#6b2025",
           blue: "#235789",
           cream: "#f8f7f2",
@@ -63,6 +66,8 @@ export default {
           // Dark mode variants
           darkTeal: "#1a4c54",
           darkGold: "#9e7f24",
+          darkBrightGold: "#c9a53d", // Enhanced darker gold
+          darkGreen: "#1e3a1f", // Dark green for dark mode
           darkBurgundy: "#4a161a",
           darkBlue: "#173a57",
           darkCream: "#e8e1d4",

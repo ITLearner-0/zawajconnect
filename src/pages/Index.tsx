@@ -11,10 +11,8 @@ import AccessibilityControls from "@/components/AccessibilityControls";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-islamic-cream to-background dark:from-islamic-darkBg dark:to-islamic-darkBg/80">
+    <div className="min-h-screen bg-islamic-solidGreen dark:bg-islamic-darkGreen">
       <header className="bg-gradient-to-r from-islamic-teal to-islamic-teal/90 text-white py-16 px-4 text-center relative overflow-hidden dark:from-islamic-darkTeal dark:to-islamic-darkTeal/90">
-        <div className="absolute inset-0 bg-[url('/islamic-pattern-enhanced.svg')] bg-repeat opacity-20 animate-slow-pulse dark:opacity-30"></div>
-        
         {/* Controls positioned in top right corner */}
         <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
           <AccessibilityControls />
@@ -25,10 +23,10 @@ const Index = () => {
           <h1 className="text-4xl md:text-5xl font-bold mb-4 font-serif">Finding Your Muslim Spouse</h1>
           <p className="text-xl mb-8 text-islamic-cream dark:text-islamic-darkCream">A marriage app built on Islamic values</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild size="lg" className="bg-islamic-gold hover:bg-islamic-gold/90 text-islamic-burgundy font-medium dark:bg-islamic-darkGold dark:hover:bg-islamic-darkGold/90 dark:text-islamic-darkBurgundy">
+            <Button asChild size="lg" className="bg-islamic-brightGold hover:bg-islamic-brightGold/90 text-islamic-burgundy font-medium dark:bg-islamic-darkBrightGold dark:hover:bg-islamic-darkBrightGold/90 dark:text-islamic-darkBurgundy">
               <Link to="/auth">Get Started</Link>
             </Button>
-            <Button asChild variant="outline" size="lg" className="border-white bg-white text-islamic-burgundy hover:bg-white/90 hover:text-islamic-burgundy font-medium dark:bg-islamic-darkCard dark:border-islamic-darkCream/20 dark:text-islamic-darkCream dark:hover:bg-islamic-darkCard/80">
+            <Button asChild variant="outline" size="lg" className="border-white bg-white/80 text-islamic-burgundy hover:bg-white/90 hover:text-islamic-burgundy font-medium dark:bg-islamic-darkCard dark:border-islamic-darkCream/20 dark:text-islamic-darkCream dark:hover:bg-islamic-darkCard/80">
               <Link to="/nearby">Browse Matches</Link>
             </Button>
           </div>
@@ -58,10 +56,10 @@ const Index = () => {
               </CardContent>
             </IslamicPattern>
             
-            <IslamicPattern variant="card" color="teal" className="transform transition-transform hover:scale-105">
+            <IslamicPattern variant="card" color="gold" className="transform transition-transform hover:scale-105">
               <CardContent className="pt-6">
-                <div className="bg-islamic-gold/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4 mx-auto dark:bg-islamic-darkGold/20">
-                  <Users className="h-6 w-6 text-islamic-gold dark:text-islamic-darkGold" />
+                <div className="bg-islamic-brightGold/10 p-3 rounded-full w-12 h-12 flex items-center justify-center mb-4 mx-auto dark:bg-islamic-darkBrightGold/20">
+                  <Users className="h-6 w-6 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-center text-islamic-teal dark:text-islamic-darkTeal">Verified Profiles</h3>
                 <p className="text-center text-gray-600 dark:text-gray-300">
@@ -96,12 +94,12 @@ const Index = () => {
             Try Our Features
           </h2>
           <div className="max-w-2xl mx-auto">
-            <IslamicPattern variant="gradient" className="p-6">
+            <div className="bg-white dark:bg-islamic-darkCard rounded-xl shadow-md p-6">
               <DemoLink className="mt-4" />
               <p className="text-center text-muted-foreground mt-4 dark:text-gray-300">
                 Experience our messaging and video chat features with dummy profiles
               </p>
-            </IslamicPattern>
+            </div>
           </div>
         </section>
 
@@ -134,44 +132,39 @@ const Index = () => {
             Success Stories
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <IslamicPattern variant="card" color="gold" className="bg-gradient-to-br from-white to-islamic-cream/30 dark:from-islamic-darkCard dark:to-islamic-darkBg">
-              <CardContent className="pt-6">
-                <div className="flex justify-center mb-4">
-                  <Star className="h-5 w-5 text-islamic-gold dark:text-islamic-darkGold" />
-                  <Star className="h-5 w-5 text-islamic-gold dark:text-islamic-darkGold" />
-                  <Star className="h-5 w-5 text-islamic-gold dark:text-islamic-darkGold" />
-                  <Star className="h-5 w-5 text-islamic-gold dark:text-islamic-darkGold" />
-                  <Star className="h-5 w-5 text-islamic-gold dark:text-islamic-darkGold" />
-                </div>
-                <blockquote className="italic text-gray-700 dark:text-gray-300">
-                  "Alhamdulillah, I found my husband through this app. The wali
-                  supervision feature gave my family peace of mind."
-                </blockquote>
-                <p className="mt-4 font-medium text-islamic-teal dark:text-islamic-darkTeal">Fatima S., Chicago</p>
-              </CardContent>
-            </IslamicPattern>
-            <IslamicPattern variant="card" color="gold" className="bg-gradient-to-br from-white to-islamic-cream/30 dark:from-islamic-darkCard dark:to-islamic-darkBg">
-              <CardContent className="pt-6">
-                <div className="flex justify-center mb-4">
-                  <Star className="h-5 w-5 text-islamic-gold dark:text-islamic-darkGold" />
-                  <Star className="h-5 w-5 text-islamic-gold dark:text-islamic-darkGold" />
-                  <Star className="h-5 w-5 text-islamic-gold dark:text-islamic-darkGold" />
-                  <Star className="h-5 w-5 text-islamic-gold dark:text-islamic-darkGold" />
-                  <Star className="h-5 w-5 text-islamic-gold dark:text-islamic-darkGold" />
-                </div>
-                <blockquote className="italic text-gray-700 dark:text-gray-300">
-                  "This platform helped me find someone who truly shares my
-                  values and vision for an Islamic household."
-                </blockquote>
-                <p className="mt-4 font-medium text-islamic-teal dark:text-islamic-darkTeal">Ahmed K., London</p>
-              </CardContent>
-            </IslamicPattern>
+            <div className="bg-white dark:bg-islamic-darkCard rounded-xl shadow-md p-6">
+              <div className="flex justify-center mb-4">
+                <Star className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+                <Star className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+                <Star className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+                <Star className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+                <Star className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+              </div>
+              <blockquote className="italic text-gray-700 dark:text-gray-300">
+                "Alhamdulillah, I found my husband through this app. The wali
+                supervision feature gave my family peace of mind."
+              </blockquote>
+              <p className="mt-4 font-medium text-islamic-teal dark:text-islamic-darkTeal">Fatima S., Chicago</p>
+            </div>
+            <div className="bg-white dark:bg-islamic-darkCard rounded-xl shadow-md p-6">
+              <div className="flex justify-center mb-4">
+                <Star className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+                <Star className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+                <Star className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+                <Star className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+                <Star className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+              </div>
+              <blockquote className="italic text-gray-700 dark:text-gray-300">
+                "This platform helped me find someone who truly shares my
+                values and vision for an Islamic household."
+              </blockquote>
+              <p className="mt-4 font-medium text-islamic-teal dark:text-islamic-darkTeal">Ahmed K., London</p>
+            </div>
           </div>
         </section>
       </main>
 
       <footer className="bg-islamic-teal/95 text-white py-12 px-4 relative overflow-hidden dark:bg-islamic-darkTeal">
-        <div className="absolute inset-0 bg-[url('/islamic-pattern-enhanced.svg')] bg-repeat opacity-10 dark:opacity-20"></div>
         <div className="max-w-7xl mx-auto text-center relative z-10">
           <p className="text-islamic-cream/90 dark:text-islamic-darkCream">
             &copy; {new Date().getFullYear()} Islamic Marriage App. All rights reserved.
