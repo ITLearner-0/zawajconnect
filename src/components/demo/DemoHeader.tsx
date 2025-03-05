@@ -10,13 +10,13 @@ const DemoHeader = () => {
         <CardHeader>
           <CardTitle className="text-2xl font-bold flex items-center gap-2 text-islamic-teal">
             <Star className="h-5 w-5 text-islamic-gold" />
-            Demo: Messaging and Video Chat
+            Nikah Connect Demo: Messaging and Video Chat
             <Info className="h-5 w-5 text-muted-foreground" />
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground">
-            This page demonstrates the messaging and video chat capabilities of the app using dummy profiles.
+            This page demonstrates the messaging and video chat capabilities of Nikah Connect using dummy profiles.
             You can select different conversations, send messages, and simulate video calls.
           </p>
           

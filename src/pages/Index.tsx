@@ -20,7 +20,7 @@ const Index = () => {
         </div>
         
         <div className="relative z-10 max-w-4xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 font-serif text-white dark:text-white">Finding Your Muslim Spouse</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 font-serif text-white dark:text-white">Nikah Connect</h1>
           <p className="text-xl mb-8 text-white dark:text-white">A marriage app built on Islamic values</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="bg-islamic-brightGold hover:bg-islamic-brightGold/90 text-islamic-burgundy font-medium dark:bg-islamic-darkBrightGold dark:hover:bg-islamic-darkBrightGold/90 dark:text-black">
