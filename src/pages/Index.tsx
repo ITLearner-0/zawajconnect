@@ -14,11 +14,14 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-b from-islamic-cream to-background dark:from-islamic-darkBg dark:to-islamic-darkBg/80">
       <header className="bg-gradient-to-r from-islamic-teal to-islamic-teal/90 text-white py-16 px-4 text-center relative overflow-hidden dark:from-islamic-darkTeal dark:to-islamic-darkTeal/90">
         <div className="absolute inset-0 bg-[url('/islamic-pattern-enhanced.svg')] bg-repeat opacity-20 animate-slow-pulse dark:opacity-30"></div>
+        
+        {/* Controls positioned in top right corner */}
+        <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+          <AccessibilityControls />
+          <ThemeToggle />
+        </div>
+        
         <div className="relative z-10 max-w-4xl mx-auto">
-          <div className="absolute top-4 right-4 flex items-center gap-2">
-            <AccessibilityControls />
-            <ThemeToggle />
-          </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 font-serif">Finding Your Muslim Spouse</h1>
           <p className="text-xl mb-8 text-islamic-cream dark:text-islamic-darkCream">A marriage app built on Islamic values</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
