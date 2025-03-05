@@ -14,11 +14,11 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ score, label }) => {
   };
 
   return (
-    <div className="border border-islamic-brightGold/30 dark:border-islamic-darkBrightGold/40 rounded-md p-3 text-center bg-white/70 dark:bg-islamic-darkCard/70 shadow-sm">
-      <div className={`text-2xl font-bold mb-1 ${getScoreColor(score)}`}>
+    <div className="border-2 border-islamic-brightGold/40 dark:border-islamic-darkBrightGold/50 rounded-lg p-4 text-center bg-white/80 dark:bg-islamic-darkCard/80 shadow-md">
+      <div className={`text-3xl font-bold mb-2 ${getScoreColor(score)}`}>
         {score}%
       </div>
-      <div className="text-sm text-islamic-burgundy/90 dark:text-islamic-cream/80">
+      <div className="text-sm font-medium text-islamic-burgundy dark:text-islamic-cream">
         {label}
       </div>
     </div>

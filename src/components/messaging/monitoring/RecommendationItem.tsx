@@ -14,30 +14,30 @@ const RecommendationItem: React.FC<RecommendationItemProps> = ({
   const getIcon = () => {
     switch (severity) {
       case 'high':
-        return <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />;
+        return <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-400 flex-shrink-0" />;
       case 'medium':
-        return <Lightbulb className="h-4 w-4 text-islamic-brightGold dark:text-islamic-gold flex-shrink-0" />;
+        return <Lightbulb className="h-5 w-5 text-islamic-brightGold dark:text-islamic-gold flex-shrink-0" />;
       case 'low':
       default:
-        return <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />;
+        return <CheckCircle className="h-5 w-5 text-green-500 dark:text-green-400 flex-shrink-0" />;
     }
   };
 
   const getTextColor = () => {
     switch (severity) {
       case 'high':
-        return 'text-red-600 dark:text-red-400';
+        return 'text-red-700 dark:text-red-300';
       case 'medium':
         return 'text-islamic-burgundy dark:text-islamic-brightGold';
       default:
-        return 'text-islamic-teal dark:text-islamic-cream/90';
+        return 'text-islamic-teal dark:text-islamic-cream';
     }
   };
 
   return (
-    <li className={`flex items-start gap-2 mb-2 ${getTextColor()}`}>
-      {getIcon()}
-      <span className="text-sm">{text}</span>
+    <li className={`flex items-start gap-3 mb-3 p-2 rounded-md border border-islamic-brightGold/20 dark:border-islamic-darkBrightGold/30 bg-white/60 dark:bg-islamic-darkCard/60 ${getTextColor()}`}>
+      <div className="mt-0.5">{getIcon()}</div>
+      <span className="text-sm font-medium">{text}</span>
     </li>
   );
 };
