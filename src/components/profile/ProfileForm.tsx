@@ -56,10 +56,10 @@ const ProfileForm = ({
         aria-label="Profile form"
       >
         <div role="region" aria-labelledby="basic-info-heading">
-          <IslamicPattern variant="card" color="teal" className="overflow-hidden">
+          <IslamicPattern variant="card" color="teal" className="overflow-hidden bg-white dark:bg-islamic-darkCard">
             <div className="bg-islamic-teal/10 p-4 flex items-center border-b border-islamic-teal/10">
-              <User className="h-5 w-5 mr-2 text-islamic-teal" />
-              <h2 id="basic-info-heading" className="text-xl font-medium text-islamic-teal">Basic Information</h2>
+              <User className="h-5 w-5 mr-2 text-islamic-teal dark:text-islamic-brightGold" />
+              <h2 id="basic-info-heading" className="text-xl font-medium text-islamic-teal dark:text-islamic-cream">Basic Information</h2>
             </div>
             <div className="p-6">
               <BasicInformation formData={formData} handleChange={handleChange} />
@@ -68,10 +68,10 @@ const ProfileForm = ({
         </div>
         
         <div role="region" aria-labelledby="education-career-heading">
-          <IslamicPattern variant="card" color="teal" className="overflow-hidden">
+          <IslamicPattern variant="card" color="teal" className="overflow-hidden bg-white dark:bg-islamic-darkCard">
             <div className="bg-islamic-teal/10 p-4 flex items-center border-b border-islamic-teal/10">
-              <Briefcase className="h-5 w-5 mr-2 text-islamic-teal" />
-              <h2 id="education-career-heading" className="text-xl font-medium text-islamic-teal">Education & Career</h2>
+              <Briefcase className="h-5 w-5 mr-2 text-islamic-teal dark:text-islamic-brightGold" />
+              <h2 id="education-career-heading" className="text-xl font-medium text-islamic-teal dark:text-islamic-cream">Education & Career</h2>
             </div>
             <div className="p-6">
               <EducationCareer formData={formData} handleChange={handleChange} />
@@ -80,10 +80,10 @@ const ProfileForm = ({
         </div>
         
         <div role="region" aria-labelledby="religious-background-heading">
-          <IslamicPattern variant="card" color="teal" className="overflow-hidden">
+          <IslamicPattern variant="card" color="teal" className="overflow-hidden bg-white dark:bg-islamic-darkCard">
             <div className="bg-islamic-teal/10 p-4 flex items-center border-b border-islamic-teal/10">
-              <BookOpen className="h-5 w-5 mr-2 text-islamic-teal" />
-              <h2 id="religious-background-heading" className="text-xl font-medium text-islamic-teal">Religious Background</h2>
+              <BookOpen className="h-5 w-5 mr-2 text-islamic-teal dark:text-islamic-brightGold" />
+              <h2 id="religious-background-heading" className="text-xl font-medium text-islamic-teal dark:text-islamic-cream">Religious Background</h2>
             </div>
             <div className="p-6">
               <ReligiousBackground formData={formData} handleChange={handleChange} />
@@ -92,10 +92,10 @@ const ProfileForm = ({
         </div>
         
         <div role="region" aria-labelledby="about-me-heading">
-          <IslamicPattern variant="card" color="teal" className="overflow-hidden">
+          <IslamicPattern variant="card" color="teal" className="overflow-hidden bg-white dark:bg-islamic-darkCard">
             <div className="bg-islamic-teal/10 p-4 flex items-center border-b border-islamic-teal/10">
-              <Heart className="h-5 w-5 mr-2 text-islamic-teal" />
-              <h2 id="about-me-heading" className="text-xl font-medium text-islamic-teal">About Me</h2>
+              <Heart className="h-5 w-5 mr-2 text-islamic-teal dark:text-islamic-brightGold" />
+              <h2 id="about-me-heading" className="text-xl font-medium text-islamic-teal dark:text-islamic-cream">About Me</h2>
             </div>
             <div className="p-6">
               <AboutMe formData={formData} handleChange={handleChange} />
@@ -105,10 +105,10 @@ const ProfileForm = ({
         
         {formData.gender === "female" && (
           <div role="region" aria-labelledby="wali-heading">
-            <IslamicPattern variant="card" color="gold" className="overflow-hidden">
-              <div className="bg-islamic-gold/10 p-4 flex items-center border-b border-islamic-gold/10">
-                <Shield className="h-5 w-5 mr-2 text-islamic-gold" />
-                <h2 id="wali-heading" className="text-xl font-medium text-islamic-burgundy">Wali Information</h2>
+            <IslamicPattern variant="card" color="gold" className="overflow-hidden bg-white dark:bg-islamic-darkCard">
+              <div className="bg-islamic-brightGold/20 p-4 flex items-center border-b border-islamic-brightGold/10">
+                <Shield className="h-5 w-5 mr-2 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+                <h2 id="wali-heading" className="text-xl font-medium text-islamic-burgundy dark:text-islamic-cream">Wali Information</h2>
               </div>
               <div className="p-6">
                 <WaliInformation 
@@ -123,10 +123,10 @@ const ProfileForm = ({
         
         {/* Verification Panel */}
         <div role="region" aria-labelledby="verification-heading">
-          <IslamicPattern variant="card" color="gold" className="overflow-hidden">
-            <div className="bg-islamic-gold/10 p-4 flex items-center border-b border-islamic-gold/10">
-              <Shield className="h-5 w-5 mr-2 text-islamic-gold" />
-              <h2 id="verification-heading" className="text-xl font-medium text-islamic-burgundy">Verification</h2>
+          <IslamicPattern variant="card" color="gold" className="overflow-hidden bg-white dark:bg-islamic-darkCard">
+            <div className="bg-islamic-brightGold/20 p-4 flex items-center border-b border-islamic-brightGold/10">
+              <Shield className="h-5 w-5 mr-2 text-islamic-brightGold dark:text-islamic-darkBrightGold" />
+              <h2 id="verification-heading" className="text-xl font-medium text-islamic-burgundy dark:text-islamic-cream">Verification</h2>
             </div>
             <div className="p-6">
               <VerificationPanel
@@ -140,10 +140,10 @@ const ProfileForm = ({
         
         {/* Privacy Settings */}
         <div role="region" aria-labelledby="privacy-heading">
-          <IslamicPattern variant="card" color="teal" className="overflow-hidden">
+          <IslamicPattern variant="card" color="teal" className="overflow-hidden bg-white dark:bg-islamic-darkCard">
             <div className="bg-islamic-teal/10 p-4 flex items-center border-b border-islamic-teal/10">
-              <LockKeyhole className="h-5 w-5 mr-2 text-islamic-teal" />
-              <h2 id="privacy-heading" className="text-xl font-medium text-islamic-teal">Privacy Settings</h2>
+              <LockKeyhole className="h-5 w-5 mr-2 text-islamic-teal dark:text-islamic-brightGold" />
+              <h2 id="privacy-heading" className="text-xl font-medium text-islamic-teal dark:text-islamic-cream">Privacy Settings</h2>
             </div>
             <div className="p-6">
               <PrivacySettings
@@ -164,14 +164,14 @@ const ProfileForm = ({
             variant="outline"
             onClick={() => navigate("/")}
             aria-label="Back to home page"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-islamic-teal/30 hover:bg-islamic-teal/5 dark:border-islamic-darkTeal/40 dark:hover:bg-islamic-darkTeal/20"
           >
             <ArrowLeft className="h-4 w-4" />
             Back
           </CustomButton>
           <CustomButton 
             type="submit"
-            variant="teal"
+            variant="gold"
             aria-label="Save your profile information"
             className="flex items-center gap-2"
           >

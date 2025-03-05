@@ -53,17 +53,17 @@ const IdVerification = ({ isVerified }: IdVerificationProps) => {
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-2">
-        <ShieldCheck className="h-5 w-5 text-primary" />
+        <ShieldCheck className="h-5 w-5 text-islamic-teal dark:text-islamic-brightGold" />
         <div>
-          <Label>ID Verification</Label>
-          <p className="text-xs text-gray-500">Verify your identity for maximum trust</p>
+          <Label className="text-islamic-burgundy dark:text-islamic-cream">ID Verification</Label>
+          <p className="text-xs text-gray-500 dark:text-islamic-cream/70">Verify your identity for maximum trust</p>
         </div>
       </div>
       <div>
         {isVerified ? (
           <Badge
             variant="outline"
-            className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1"
+            className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700/50"
           >
             <Check className="h-3 w-3" />
             Verified
@@ -71,6 +71,7 @@ const IdVerification = ({ isVerified }: IdVerificationProps) => {
         ) : (
           <CustomButton
             size="sm"
+            variant="gold"
             onClick={startIdVerification}
           >
             Verify ID

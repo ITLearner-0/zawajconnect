@@ -85,21 +85,21 @@ const Profile = () => {
 
   return (
     <AccessibilityProvider>
-      <div className="min-h-screen bg-gradient-to-b from-accent/50 to-background py-12" role="main" aria-labelledby="profile-heading">
+      <div className="min-h-screen bg-islamic-solidGreen dark:bg-islamic-darkGreen py-12" role="main" aria-labelledby="profile-heading">
         <div className="container max-w-3xl mx-auto px-4">
-          <Card className="shadow-lg">
+          <Card className="shadow-lg border-islamic-teal/10 dark:border-islamic-darkTeal/20">
             <CardHeader>
               <ProfileHeader onSignOut={handleSignOut} />
-              <p className="text-center text-gray-600">
+              <p className="text-center text-islamic-burgundy/80 dark:text-islamic-cream/80">
                 Keep your profile information up to date
               </p>
             </CardHeader>
             <CardContent>
               {isSaving && (
                 <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-                  <div className="bg-white p-4 rounded-lg shadow-lg flex items-center gap-2">
-                    <Loader2 className="h-5 w-5 animate-spin text-islamic-teal" />
-                    <span>Saving profile...</span>
+                  <div className="bg-white p-4 rounded-lg shadow-lg flex items-center gap-2 dark:bg-islamic-darkCard">
+                    <Loader2 className="h-5 w-5 animate-spin text-islamic-teal dark:text-islamic-brightGold" />
+                    <span className="dark:text-islamic-cream">Saving profile...</span>
                   </div>
                 </div>
               )}

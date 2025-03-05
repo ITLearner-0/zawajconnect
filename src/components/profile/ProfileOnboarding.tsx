@@ -36,31 +36,31 @@ const ProfileOnboarding = ({
     switch (currentStep) {
       case 0:
         return (
-          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg">
+          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard">
             <BasicInformation formData={formData} handleChange={handleChange} />
           </IslamicPattern>
         );
       case 1:
         return (
-          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg">
+          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard">
             <EducationCareer formData={formData} handleChange={handleChange} />
           </IslamicPattern>
         );
       case 2:
         return (
-          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg">
+          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard">
             <ReligiousBackground formData={formData} handleChange={handleChange} />
           </IslamicPattern>
         );
       case 3:
         return (
-          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg">
+          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard">
             <AboutMe formData={formData} handleChange={handleChange} />
           </IslamicPattern>
         );
       case 4:
         return formData.gender === "female" ? (
-          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg">
+          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard">
             <WaliInformation formData={formData} handleChange={handleChange} showRequired={true} />
           </IslamicPattern>
         ) : null;
@@ -70,19 +70,21 @@ const ProfileOnboarding = ({
   };
 
   return (
-    <OnboardingWrapper
-      steps={steps}
-      currentStep={currentStep}
-      onNext={handleNext}
-      onPrevious={handlePrevious}
-      onComplete={() => {
-        completeOnboarding();
-        // Note: handleSubmit will be called in the parent component
-      }}
-      canProceed={canProceedCurrentStep()}
-    >
-      {renderCurrentStepContent()}
-    </OnboardingWrapper>
+    <div className="min-h-screen bg-islamic-solidGreen dark:bg-islamic-darkGreen py-12">
+      <OnboardingWrapper
+        steps={steps}
+        currentStep={currentStep}
+        onNext={handleNext}
+        onPrevious={handlePrevious}
+        onComplete={() => {
+          completeOnboarding();
+          // Note: handleSubmit will be called in the parent component
+        }}
+        canProceed={canProceedCurrentStep()}
+      >
+        {renderCurrentStepContent()}
+      </OnboardingWrapper>
+    </div>
   );
 };
 
