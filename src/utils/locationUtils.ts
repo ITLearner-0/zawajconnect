@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -9,6 +10,8 @@ export const updateUserCoordinates = async (
   longitude: number
 ): Promise<boolean> => {
   try {
+    console.log(`Updating coordinates for user ${userId}: ${latitude}, ${longitude}`);
+    
     // Using supabase functions instead of RPC due to the error
     const { data, error } = await supabase.functions.invoke('update-coordinates', {
       body: { 
@@ -23,7 +26,8 @@ export const updateUserCoordinates = async (
       return false;
     }
     
-    return Boolean(data) || false;
+    console.log("Coordinates updated successfully:", data);
+    return Boolean(data?.success) || false;
   } catch (err) {
     console.error("Error in updateUserCoordinates:", err);
     return false;
@@ -39,6 +43,8 @@ export const findNearbyProfiles = async (
   filters?: FilterCriteria
 ): Promise<any[]> => {
   try {
+    console.log(`Finding profiles near user ${userId} within ${maxDistance}km`);
+    
     // Try to get the user's current coordinates
     let { data: profiles, error } = await supabase.rpc(
       'find_nearby_profiles',
@@ -53,7 +59,7 @@ export const findNearbyProfiles = async (
       console.log("Using mock data instead");
       
       // If the RPC fails, use mock data for demonstration
-      profiles = generateMockProfiles(10, maxDistance);
+      profiles = await generateMockProfiles(10, maxDistance);
     }
     
     // If filters are provided, apply them on the client side
@@ -69,7 +75,7 @@ export const findNearbyProfiles = async (
 };
 
 // Generate mock profiles for demonstration
-const generateMockProfiles = (count: number, maxDistance: number): any[] => {
+const generateMockProfiles = async (count: number, maxDistance: number): Promise<any[]> => {
   const profiles = [];
   
   // Get user's location or use a default
@@ -79,12 +85,18 @@ const generateMockProfiles = (count: number, maxDistance: number): any[] => {
   // Try to get the user's location from browser
   if (navigator.geolocation) {
     try {
-      // Note: This is synchronous and won't actually work as intended
-      // This function should ideally be async but we're keeping it for backward compatibility
-      navigator.geolocation.getCurrentPosition((position) => {
+      // Use promise-based approach to get location
+      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      }).catch(() => {
+        console.log("Using default location");
+        return null;
+      });
+      
+      if (position) {
         userLat = position.coords.latitude;
         userLng = position.coords.longitude;
-      });
+      }
     } catch (e) {
       console.error("Error getting user location:", e);
     }

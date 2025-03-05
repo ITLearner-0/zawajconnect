@@ -60,6 +60,31 @@ serve(async (req) => {
       );
     }
 
+    // Check if the user profile exists, create if needed
+    const { data: profileExists, error: checkError } = await supabaseClient
+      .from('profiles')
+      .select('id')
+      .eq('id', userId)
+      .maybeSingle();
+      
+    if (checkError) {
+      console.error('Error checking profile:', checkError);
+    }
+    
+    if (!profileExists) {
+      // Create basic profile if it doesn't exist
+      const { error: insertError } = await supabaseClient
+        .from('profiles')
+        .insert({
+          id: userId,
+          is_visible: true
+        });
+        
+      if (insertError) {
+        console.error('Error creating profile:', insertError);
+      }
+    }
+
     // Create a PostGIS point and update the profile
     const { data, error } = await supabaseClient.rpc(
       'update_user_coordinates',

@@ -7,8 +7,11 @@ import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileOnboarding from "@/components/profile/ProfileOnboarding";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 const Profile = () => {
+  const [isSaving, setIsSaving] = useState(false);
   const { 
     formData, 
     isNewUser, 
@@ -36,6 +39,23 @@ const Profile = () => {
     canProceedCurrentStep
   } = useOnboarding(formData, isNewUser);
 
+  // Wrapper function to handle the save process with loading state
+  const handleSaveProfile = async () => {
+    setIsSaving(true);
+    console.log("Save profile button clicked");
+    try {
+      const success = await handleSubmit();
+      console.log("Profile save result:", success);
+      if (success) {
+        console.log("Profile saved successfully");
+      }
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+  
   // Wrapper functions to convert boolean returns to void
   const handleToggleVisibility = async () => {
     await toggleAccountVisibility();
@@ -75,10 +95,18 @@ const Profile = () => {
               </p>
             </CardHeader>
             <CardContent>
+              {isSaving && (
+                <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
+                  <div className="bg-white p-4 rounded-lg shadow-lg flex items-center gap-2">
+                    <Loader2 className="h-5 w-5 animate-spin text-islamic-teal" />
+                    <span>Saving profile...</span>
+                  </div>
+                </div>
+              )}
               <ProfileForm
                 formData={formData}
                 handleChange={handleChange}
-                handleSubmit={handleSubmit}
+                handleSubmit={handleSaveProfile}
                 verificationStatus={verificationStatus}
                 userEmail={userEmail}
                 handleVerificationChange={handleVerificationChange}

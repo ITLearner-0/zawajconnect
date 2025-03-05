@@ -45,11 +45,11 @@ export const useProfileData = (userId?: string | null) => {
         const { data: { session } } = await supabase.auth.getSession();
         setUserEmail(session?.user?.email || null);
 
+        // Get profile data without using .single() to avoid errors with empty results
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
-          .eq('id', userId)
-          .single();
+          .eq('id', userId);
 
         if (error) {
           setError(error.message);
@@ -57,45 +57,61 @@ export const useProfileData = (userId?: string | null) => {
           return;
         }
 
-        if (data) {
+        // Check if we have data before proceeding
+        if (data && data.length > 0) {
+          const profile = data[0];
+          
           // Map database fields to ProfileFormData
           const profileFormData: ProfileFormData = {
-            fullName: `${data.first_name || ''} ${data.last_name || ''}`.trim(),
-            age: data.birth_date || '',
-            gender: data.gender || '',
-            location: data.location || '',
-            education: data.education_level || '',
-            occupation: data.occupation || '',
-            religiousLevel: data.religious_practice_level || '',
-            familyBackground: data.about_me || '', // If family_background doesn't exist, use about_me as fallback
-            aboutMe: data.about_me || '',
-            prayerFrequency: data.prayer_frequency || '',
-            waliName: data.wali_name || '',
-            waliRelationship: data.wali_relationship || '',
-            waliContact: data.wali_contact || '',
+            fullName: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
+            age: profile.birth_date || '',
+            gender: profile.gender || '',
+            location: profile.location || '',
+            education: profile.education_level || '',
+            occupation: profile.occupation || '',
+            religiousLevel: profile.religious_practice_level || '',
+            familyBackground: profile.about_me || '', // If family_background doesn't exist, use about_me as fallback
+            aboutMe: profile.about_me || '',
+            prayerFrequency: profile.prayer_frequency || '',
+            waliName: profile.wali_name || '',
+            waliRelationship: profile.wali_relationship || '',
+            waliContact: profile.wali_contact || '',
           };
           setProfileData(profileFormData);
           
           // Set verification status - using is_verified for email verification
-          // In a real app, there would be separate columns for each verification type
           setVerificationStatus({
-            email: !!data.is_verified,
+            email: !!profile.is_verified,
             phone: false, // Use appropriate field in your schema
             id: false, // Use appropriate field in your schema
           });
           
           // Set privacy settings with fallback to default
-          setPrivacySettings(data.privacy_settings as PrivacySettings || DEFAULT_PRIVACY_SETTINGS);
+          setPrivacySettings(profile.privacy_settings as PrivacySettings || DEFAULT_PRIVACY_SETTINGS);
           
           // Set blocked users
-          setBlockedUsers(data.blocked_users || []);
+          setBlockedUsers(profile.blocked_users || []);
           
           // Set account visibility
-          setIsAccountVisible(data.is_visible !== false);
+          setIsAccountVisible(profile.is_visible !== false);
           
           // Determine if user is new based on data completeness
-          setIsNewUser(!data.first_name || !data.last_name || !data.gender);
+          setIsNewUser(!profile.first_name || !profile.last_name || !profile.gender);
         } else {
+          // Create a new profile if none exists
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert({
+              id: userId,
+              privacy_settings: DEFAULT_PRIVACY_SETTINGS,
+              blocked_users: [],
+              is_visible: true
+            });
+            
+          if (insertError) {
+            console.error("Error creating new profile:", insertError);
+          }
+          
           setProfileData(null); // No profile data found
           setIsNewUser(true);
         }
