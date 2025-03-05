@@ -20,14 +20,26 @@ const NearbyMatches = () => {
   const [maxDistance, setMaxDistance] = useState(50);
   const [filters, setFilters] = useState<FilterCriteria>({});
   const [showCompatibility, setShowCompatibility] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check if user has taken compatibility test
-    const checkCompatibility = async () => {
+    // Check authentication status
+    const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
+      setIsAuthenticated(!!session);
+      
+      if (!session) {
+        toast({
+          title: "Authentication required",
+          description: "You need to sign in to view matches near you.",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return;
+      }
+      
+      // Check if user has taken compatibility test
       const { data, error } = await supabase
         .from('compatibility_results')
         .select('id')
@@ -57,12 +69,25 @@ const NearbyMatches = () => {
       }
     };
 
-    checkCompatibility();
+    checkAuth();
   }, [navigate, toast]);
 
   const handleApplyFilters = (newFilters: FilterCriteria) => {
     setFilters(newFilters);
   };
+
+  if (isAuthenticated === false) {
+    return null; // Will redirect to auth page
+  }
+
+  if (isAuthenticated === null) {
+    // Loading state
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-islamic-cream to-background relative">

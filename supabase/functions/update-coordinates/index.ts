@@ -70,7 +70,9 @@ serve(async (req) => {
       }
     );
 
-    if (error) throw error;
+    if (error) {
+      throw error;
+    }
 
     return new Response(
       JSON.stringify({ success: true, data }),

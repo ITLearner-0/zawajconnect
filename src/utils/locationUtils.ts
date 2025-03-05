@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -13,7 +12,7 @@ export const updateUserCoordinates = async (
     // Using supabase functions instead of RPC due to the error
     const { data, error } = await supabase.functions.invoke('update-coordinates', {
       body: { 
-        user_id: userId,
+        userId,
         latitude,
         longitude
       }
@@ -80,6 +79,8 @@ const generateMockProfiles = (count: number, maxDistance: number): any[] => {
   // Try to get the user's location from browser
   if (navigator.geolocation) {
     try {
+      // Note: This is synchronous and won't actually work as intended
+      // This function should ideally be async but we're keeping it for backward compatibility
       navigator.geolocation.getCurrentPosition((position) => {
         userLat = position.coords.latitude;
         userLng = position.coords.longitude;

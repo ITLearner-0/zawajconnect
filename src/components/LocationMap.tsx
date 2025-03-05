@@ -27,31 +27,45 @@ interface LocationMapProps {
 }
 
 // This would normally come from Supabase Edge Function Secrets
-// For demonstration, we'll use a placeholder that can be replaced with user input
-const MAPBOX_TOKEN = 'YOUR_MAPBOX_PUBLIC_TOKEN';
+// For demonstration, we'll use localStorage to store the token after user input
+const MAPBOX_TOKEN_KEY = 'mapbox_token';
 
 const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false }: LocationMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [mapboxToken, setMapboxToken] = useState<string>(MAPBOX_TOKEN);
+  const [mapboxToken, setMapboxToken] = useState<string>('');
   const { toast } = useToast();
   const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
 
+  // Load token from localStorage
+  useEffect(() => {
+    const storedToken = localStorage.getItem(MAPBOX_TOKEN_KEY);
+    if (storedToken) {
+      setMapboxToken(storedToken);
+    }
+  }, []);
+
   // For development purposes - allow user to input their Mapbox token
   const promptForMapboxToken = () => {
-    if (MAPBOX_TOKEN === 'YOUR_MAPBOX_PUBLIC_TOKEN') {
-      const token = prompt(
-        "Please enter your Mapbox public token. You can get one at https://mapbox.com/account/access-tokens",
-        ""
-      );
-      if (token) {
-        setMapboxToken(token);
-        return token;
-      }
+    const storedToken = localStorage.getItem(MAPBOX_TOKEN_KEY);
+    if (storedToken) {
+      return storedToken;
     }
-    return mapboxToken;
+    
+    const token = prompt(
+      "Please enter your Mapbox public token. You can get one at https://mapbox.com/account/access-tokens",
+      ""
+    );
+    
+    if (token) {
+      localStorage.setItem(MAPBOX_TOKEN_KEY, token);
+      setMapboxToken(token);
+      return token;
+    }
+    
+    return null;
   };
 
   useEffect(() => {
@@ -86,93 +100,127 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
         }
         
         // Check if we can get the user's current location
+        if (!navigator.geolocation) {
+          toast({
+            title: "Location Error",
+            description: "Geolocation is not supported by your browser.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+        
         navigator.geolocation.getCurrentPosition(
           async (position) => {
             const { latitude, longitude } = position.coords;
             setUserCoordinates([longitude, latitude]);
             
-            // Update user coordinates in the database
-            await supabase.functions.invoke('update-coordinates', {
-              body: { 
-                user_id: session.user.id,
-                latitude,
-                longitude
+            try {
+              // Update user coordinates in the database
+              const { error: coordError } = await supabase.functions.invoke('update-coordinates', {
+                body: { 
+                  user_id: session.user.id,
+                  latitude,
+                  longitude
+                }
+              });
+              
+              if (coordError) {
+                console.error("Error updating coordinates:", coordError);
+                toast({
+                  title: "Warning",
+                  description: "Could not update your location. Using current location for this session only.",
+                });
               }
-            });
-            
-            // Fetch nearby profiles with filters
-            const nearbyProfiles = await findNearbyProfiles(session.user.id, maxDistance, filters);
-            setProfiles(nearbyProfiles);
-            
-            // Initialize Mapbox
-            mapboxgl.accessToken = token;
-            
-            if (!mapContainer.current) return;
-            
-            // Create the map
-            map.current = new mapboxgl.Map({
-              container: mapContainer.current,
-              style: 'mapbox://styles/mapbox/light-v11',
-              center: [longitude, latitude],
-              zoom: 9,
-              pitchWithRotate: false,
-            });
-            
-            // Add navigation controls
-            map.current.addControl(
-              new mapboxgl.NavigationControl(),
-              'top-right'
-            );
-            
-            // Add user marker
-            new mapboxgl.Marker({ color: '#28717c' })
-              .setLngLat([longitude, latitude])
-              .setPopup(new mapboxgl.Popup().setHTML('<h3>Your Location</h3>'))
-              .addTo(map.current);
-            
-            // Add markers for nearby profiles
-            nearbyProfiles.forEach(profile => {
-              if (profile.latitude && profile.longitude) {
-                const compatibilityScore = showCompatibility ? 
-                  Math.floor(Math.random() * 100) : null; // Mock compatibility score
-                
-                const markerEl = document.createElement('div');
-                markerEl.className = 'custom-marker';
-                markerEl.style.backgroundColor = '#d4af37';
-                markerEl.style.width = '20px';
-                markerEl.style.height = '20px';
-                markerEl.style.borderRadius = '50%';
-                markerEl.style.border = '2px solid white';
-                
-                // Create popup content
-                let popupContent = `
-                  <div class="map-popup">
-                    <h3>${profile.first_name} ${profile.last_name}</h3>
-                    <p>${profile.distance.toFixed(1)} km away</p>
-                `;
-                
-                if (profile.age) {
-                  popupContent += `<p>Age: ${profile.age}</p>`;
-                }
-                
-                if (profile.practice_level) {
-                  popupContent += `<p>Practice: ${profile.practice_level}</p>`;
-                }
-                
-                if (compatibilityScore !== null) {
-                  popupContent += `<p>Compatibility: ${compatibilityScore}%</p>`;
-                }
-                
-                popupContent += `</div>`;
-                
-                new mapboxgl.Marker(markerEl)
-                  .setLngLat([profile.longitude, profile.latitude])
-                  .setPopup(new mapboxgl.Popup().setHTML(popupContent))
-                  .addTo(map.current);
+              
+              // Fetch nearby profiles with filters
+              const nearbyProfiles = await findNearbyProfiles(session.user.id, maxDistance, filters);
+              setProfiles(nearbyProfiles);
+              
+              if (!mapContainer.current) {
+                setLoading(false);
+                return;
               }
-            });
-            
-            setLoading(false);
+              
+              // Initialize Mapbox
+              mapboxgl.accessToken = token;
+              
+              // Create the map
+              map.current = new mapboxgl.Map({
+                container: mapContainer.current,
+                style: 'mapbox://styles/mapbox/light-v11',
+                center: [longitude, latitude],
+                zoom: 9,
+                pitchWithRotate: false,
+              });
+              
+              // Add navigation controls
+              map.current.addControl(
+                new mapboxgl.NavigationControl(),
+                'top-right'
+              );
+              
+              // Add user marker after map loads
+              map.current.on('load', () => {
+                // Add user marker
+                new mapboxgl.Marker({ color: '#28717c' })
+                  .setLngLat([longitude, latitude])
+                  .setPopup(new mapboxgl.Popup().setHTML('<h3>Your Location</h3>'))
+                  .addTo(map.current!);
+                
+                // Add markers for nearby profiles
+                nearbyProfiles.forEach(profile => {
+                  if (profile.latitude && profile.longitude) {
+                    const compatibilityScore = showCompatibility ? 
+                      Math.floor(Math.random() * 100) : null; // Mock compatibility score
+                    
+                    const markerEl = document.createElement('div');
+                    markerEl.className = 'custom-marker';
+                    markerEl.style.backgroundColor = '#d4af37';
+                    markerEl.style.width = '20px';
+                    markerEl.style.height = '20px';
+                    markerEl.style.borderRadius = '50%';
+                    markerEl.style.border = '2px solid white';
+                    
+                    // Create popup content
+                    let popupContent = `
+                      <div class="map-popup">
+                        <h3>${profile.first_name} ${profile.last_name}</h3>
+                        <p>${profile.distance.toFixed(1)} km away</p>
+                    `;
+                    
+                    if (profile.age) {
+                      popupContent += `<p>Age: ${profile.age}</p>`;
+                    }
+                    
+                    if (profile.practice_level) {
+                      popupContent += `<p>Practice: ${profile.practice_level}</p>`;
+                    }
+                    
+                    if (compatibilityScore !== null) {
+                      popupContent += `<p>Compatibility: ${compatibilityScore}%</p>`;
+                    }
+                    
+                    popupContent += `</div>`;
+                    
+                    new mapboxgl.Marker(markerEl)
+                      .setLngLat([profile.longitude, profile.latitude])
+                      .setPopup(new mapboxgl.Popup().setHTML(popupContent))
+                      .addTo(map.current!);
+                  }
+                });
+                
+                setLoading(false);
+              });
+            } catch (innerError) {
+              console.error("Error in map initialization:", innerError);
+              toast({
+                title: "Error",
+                description: "There was a problem loading the map data.",
+                variant: "destructive",
+              });
+              setLoading(false);
+            }
           },
           (error) => {
             console.error("Error getting location:", error);
@@ -182,6 +230,11 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
               variant: "destructive",
             });
             setLoading(false);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
           }
         );
       } catch (error) {
