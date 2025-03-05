@@ -62,7 +62,7 @@ const MessagingInterface = ({
   };
 
   return (
-    <div className="h-[600px] border rounded-lg overflow-hidden">
+    <div className="h-[600px] border border-islamic-teal/20 dark:border-islamic-darkTeal/30 rounded-lg overflow-hidden bg-islamic-solidGreen/5 dark:bg-islamic-darkGreen/10">
       <MessagesContainer
         loading={loading}
         conversations={conversations}

@@ -27,7 +27,7 @@ const ChatContainer = ({
   const ChevronDown = () => <ChevronLeft className="h-4 w-4 transform -rotate-90" />;
   
   return (
-    <div className="flex flex-col h-full relative">
+    <div className="flex flex-col h-full relative bg-islamic-solidGreen/10 dark:bg-islamic-darkGreen/20 border border-islamic-teal/20 dark:border-islamic-darkTeal/20 rounded-lg">
       {/* Main chat content */}
       <div className="flex-grow overflow-hidden">
         {children}
@@ -35,21 +35,21 @@ const ChatContainer = ({
       
       {/* AI Monitoring Panel (collapsible) */}
       <div 
-        className={`border-t transition-all duration-300 ${
+        className={`border-t border-islamic-teal/20 dark:border-islamic-darkTeal/30 transition-all duration-300 ${
           showMonitoring ? 'h-[400px]' : 'h-10'
-        } bg-background`}
+        } bg-islamic-cream/50 dark:bg-islamic-darkCard/50`}
       >
         <div 
           className="h-10 flex items-center justify-between px-4 cursor-pointer"
           onClick={() => setShowMonitoring(!showMonitoring)}
         >
           <div className="flex items-center">
-            <Shield className="h-4 w-4 mr-2 text-primary" />
-            <span className="font-medium text-sm">
+            <Shield className="h-4 w-4 mr-2 text-islamic-teal dark:text-islamic-brightGold" />
+            <span className="font-medium text-sm text-islamic-burgundy dark:text-islamic-cream">
               AI Monitoring {report?.violations?.some(v => v.severity === 'high') && '• High Risk Detected'}
             </span>
           </div>
-          <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
+          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-islamic-teal hover:bg-islamic-teal/10 dark:text-islamic-brightGold dark:hover:bg-islamic-brightGold/10">
             {showMonitoring ? <ChevronDown /> : <ChevronUp />}
           </Button>
         </div>

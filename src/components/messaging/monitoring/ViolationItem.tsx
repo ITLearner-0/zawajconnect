@@ -24,10 +24,10 @@ const ViolationItem: React.FC<ViolationItemProps> = ({ violation }) => {
 
   const getSeverityColor = () => {
     switch (violation.severity) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-amber-100 text-amber-800 border-amber-200';
-      case 'low': return 'bg-blue-100 text-blue-800 border-blue-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'high': return 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-700/30';
+      case 'medium': return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-300 dark:border-amber-700/30';
+      case 'low': return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700/30';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800/50 dark:text-gray-300 dark:border-gray-700/30';
     }
   };
 
@@ -39,16 +39,16 @@ const ViolationItem: React.FC<ViolationItemProps> = ({ violation }) => {
           <div className="flex justify-between items-start">
             <h4 className="font-medium">{violation.type}</h4>
             <Badge variant="outline" className={`ml-2 ${
-              violation.severity === 'high' ? 'text-red-500 border-red-200' :
-              violation.severity === 'medium' ? 'text-amber-500 border-amber-200' :
-              'text-blue-500 border-blue-200'
+              violation.severity === 'high' ? 'text-red-500 border-red-200 dark:text-red-400 dark:border-red-700/30' :
+              violation.severity === 'medium' ? 'text-amber-500 border-amber-200 dark:text-amber-400 dark:border-amber-700/30' :
+              'text-blue-500 border-blue-200 dark:text-blue-400 dark:border-blue-700/30'
             }`}>
               {violation.severity}
             </Badge>
           </div>
           <p className="text-sm mt-1">{violation.message}</p>
           {violation.metadata && violation.metadata.context && (
-            <div className="mt-2 text-xs p-2 bg-background/70 rounded border">
+            <div className="mt-2 text-xs p-2 bg-white/70 rounded border border-islamic-teal/10 dark:bg-islamic-darkCard/50 dark:border-islamic-darkTeal/20">
               <span className="font-medium">Context:</span> {violation.metadata.context}
             </div>
           )}

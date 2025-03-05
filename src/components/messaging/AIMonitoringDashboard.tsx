@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
@@ -27,7 +28,7 @@ const AIMonitoringDashboard: React.FC<AIMonitoringDashboardProps> = ({
   onClose
 }) => {
   return (
-    <Card className="w-full shadow-sm border">
+    <Card className="w-full shadow-sm border border-islamic-teal/20 dark:border-islamic-darkTeal/30 bg-white dark:bg-islamic-darkCard">
       <MonitoringHeader 
         isEnabled={isEnabled} 
         onToggleMonitoring={onToggleMonitoring} 
@@ -38,13 +39,13 @@ const AIMonitoringDashboard: React.FC<AIMonitoringDashboardProps> = ({
       <CardContent className="p-4">
         {!isEnabled ? (
           <div className="text-center p-6">
-            <h3 className="font-medium mb-2">AI Monitoring is disabled</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-medium mb-2 text-islamic-burgundy dark:text-islamic-cream">AI Monitoring is disabled</h3>
+            <p className="text-sm text-muted-foreground dark:text-islamic-cream/70">
               Enable monitoring to get real-time insights into conversation compliance.
             </p>
             <Button 
               onClick={onToggleMonitoring} 
-              className="mt-4"
+              className="mt-4 bg-islamic-brightGold text-islamic-burgundy hover:bg-islamic-brightGold/90 dark:bg-islamic-darkBrightGold dark:text-islamic-cream dark:hover:bg-islamic-darkBrightGold/90"
               disabled={isLoading}
             >
               Enable Monitoring
@@ -57,10 +58,10 @@ const AIMonitoringDashboard: React.FC<AIMonitoringDashboardProps> = ({
         ) : !report ? (
           <div className="text-center p-6">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+              <div className="h-4 bg-islamic-teal/10 dark:bg-islamic-darkTeal/20 rounded w-3/4 mx-auto mb-2"></div>
+              <div className="h-4 bg-islamic-teal/10 dark:bg-islamic-darkTeal/20 rounded w-1/2 mx-auto"></div>
             </div>
-            <p className="text-sm text-muted-foreground mt-4">
+            <p className="text-sm text-muted-foreground dark:text-islamic-cream/70 mt-4">
               Generating compliance report...
             </p>
           </div>

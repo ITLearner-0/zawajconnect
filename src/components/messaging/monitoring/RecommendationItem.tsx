@@ -16,7 +16,7 @@ const RecommendationItem: React.FC<RecommendationItemProps> = ({
       case 'high':
         return <AlertTriangle className="h-4 w-4 text-red-500 flex-shrink-0" />;
       case 'medium':
-        return <Lightbulb className="h-4 w-4 text-amber-500 flex-shrink-0" />;
+        return <Lightbulb className="h-4 w-4 text-islamic-brightGold dark:text-islamic-darkBrightGold flex-shrink-0" />;
       case 'low':
       default:
         return <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />;
@@ -26,11 +26,11 @@ const RecommendationItem: React.FC<RecommendationItemProps> = ({
   const getTextColor = () => {
     switch (severity) {
       case 'high':
-        return 'text-red-600';
+        return 'text-red-600 dark:text-red-400';
       case 'medium':
-        return 'text-amber-600';
+        return 'text-islamic-burgundy dark:text-islamic-brightGold';
       default:
-        return 'text-gray-600';
+        return 'text-islamic-teal dark:text-islamic-cream/90';
     }
   };
 

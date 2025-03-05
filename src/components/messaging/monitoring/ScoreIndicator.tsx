@@ -18,21 +18,21 @@ const ScoreIndicator: React.FC<ScoreIndicatorProps> = ({
   size = 'medium'
 }) => {
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600";
-    if (score >= 60) return "text-amber-600";
-    return "text-red-600";
+    if (score >= 80) return "text-green-600 dark:text-green-400";
+    if (score >= 60) return "text-islamic-brightGold dark:text-islamic-darkBrightGold";
+    return "text-red-600 dark:text-red-400";
   };
 
   const getProgressColor = (score: number) => {
-    if (score >= 80) return "bg-green-600";
-    if (score >= 60) return "bg-amber-600";
-    return "bg-red-600";
+    if (score >= 80) return "bg-green-600 dark:bg-green-500";
+    if (score >= 60) return "bg-islamic-brightGold dark:bg-islamic-darkBrightGold";
+    return "bg-red-600 dark:bg-red-500";
   };
 
   const getScoreIcon = (score: number) => {
-    if (score >= 80) return <ThumbsUp className={`${size === 'large' ? 'h-6 w-6' : 'h-4 w-4'} text-green-600`} />;
-    if (score >= 60) return <Signal className={`${size === 'large' ? 'h-6 w-6' : 'h-4 w-4'} text-amber-600`} />;
-    return <AlertTriangle className={`${size === 'large' ? 'h-6 w-6' : 'h-4 w-4'} text-red-600`} />;
+    if (score >= 80) return <ThumbsUp className={`${size === 'large' ? 'h-6 w-6' : 'h-4 w-4'} text-green-600 dark:text-green-400`} />;
+    if (score >= 60) return <Signal className={`${size === 'large' ? 'h-6 w-6' : 'h-4 w-4'} text-islamic-brightGold dark:text-islamic-darkBrightGold`} />;
+    return <AlertTriangle className={`${size === 'large' ? 'h-6 w-6' : 'h-4 w-4'} text-red-600 dark:text-red-400`} />;
   };
 
   const sizeClasses = {
@@ -49,10 +49,10 @@ const ScoreIndicator: React.FC<ScoreIndicatorProps> = ({
           {score}%
           {showIcon && getScoreIcon(score)}
         </div>
-        {label && <div className="text-sm text-gray-500 mb-1">{label}</div>}
+        {label && <div className="text-sm text-islamic-burgundy dark:text-islamic-cream/70 mb-1">{label}</div>}
         <Progress 
           value={score} 
-          className="h-2 w-20" 
+          className="h-2 w-20 bg-islamic-teal/10 dark:bg-islamic-darkTeal/20" 
           indicatorClassName={getProgressColor(score)} 
         />
       </div>
@@ -62,7 +62,7 @@ const ScoreIndicator: React.FC<ScoreIndicatorProps> = ({
   return (
     <div>
       <div className="flex justify-between mb-1 items-center">
-        {label && <span>{label}</span>}
+        {label && <span className="text-islamic-burgundy dark:text-islamic-cream/90">{label}</span>}
         <div className="flex items-center gap-1">
           <span className={getScoreColor(score)}>
             {score}%
@@ -73,7 +73,7 @@ const ScoreIndicator: React.FC<ScoreIndicatorProps> = ({
                 <TooltipTrigger asChild>
                   <span>{getScoreIcon(score)}</span>
                 </TooltipTrigger>
-                <TooltipContent>
+                <TooltipContent className="bg-white dark:bg-islamic-darkCard border-islamic-teal/20 dark:border-islamic-darkTeal/30">
                   {score >= 80 && "Good standing"}
                   {score >= 60 && score < 80 && "Needs attention"}
                   {score < 60 && "Critical issues detected"}
@@ -85,7 +85,7 @@ const ScoreIndicator: React.FC<ScoreIndicatorProps> = ({
       </div>
       <Progress 
         value={score} 
-        className="h-2" 
+        className="h-2 bg-islamic-teal/10 dark:bg-islamic-darkTeal/20" 
         indicatorClassName={getProgressColor(score)} 
       />
     </div>

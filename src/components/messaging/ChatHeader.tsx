@@ -33,17 +33,22 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
   const otherParticipant = conversation.profile || { first_name: 'User', last_name: '' };
 
   return (
-    <div className="flex items-center justify-between p-3 border-b">
+    <div className="flex items-center justify-between p-3 border-b border-islamic-teal/20 dark:border-islamic-darkTeal/30 bg-islamic-cream/50 dark:bg-islamic-darkCard/50">
       <div className="flex items-center">
-        <Button variant="ghost" size="sm" onClick={backToList} className="mr-2 md:hidden">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={backToList} 
+          className="mr-2 md:hidden text-islamic-teal hover:bg-islamic-teal/10 dark:text-islamic-brightGold dark:hover:bg-islamic-brightGold/10"
+        >
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div>
-          <h3 className="font-medium">
+          <h3 className="font-medium text-islamic-burgundy dark:text-islamic-cream">
             {otherParticipant.first_name} {otherParticipant.last_name}
           </h3>
           {isWaliSupervised && (
-            <p className="text-xs text-green-600">Wali supervised</p>
+            <p className="text-xs text-green-600 dark:text-green-400">Wali supervised</p>
           )}
         </div>
       </div>
@@ -53,7 +58,9 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           variant="outline" 
           size="sm" 
           onClick={() => setShowSecuritySettings(!showSecuritySettings)}
-          className={showSecuritySettings ? 'bg-muted' : ''}
+          className={`border-islamic-teal/20 text-islamic-teal hover:bg-islamic-teal/10 dark:border-islamic-darkTeal/30 dark:text-islamic-brightGold dark:hover:bg-islamic-brightGold/10 ${
+            showSecuritySettings ? 'bg-islamic-teal/10 dark:bg-islamic-brightGold/10' : ''
+          }`}
         >
           <Lock className="h-4 w-4 mr-1" />
           <span className="hidden md:inline">Security</span>
@@ -70,11 +77,17 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({
           variant="outline" 
           size="sm" 
           onClick={openReportDialog}
+          className="border-islamic-teal/20 hover:bg-islamic-teal/10 dark:border-islamic-darkTeal/30 dark:hover:bg-islamic-darkTeal/20"
         >
           <Flag className="h-4 w-4 text-red-500 mr-1" />
           <span className="hidden md:inline">Report</span>
         </Button>
-        <Button variant="ghost" size="sm" onClick={onStartVideoCall}>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={onStartVideoCall}
+          className="text-islamic-teal hover:bg-islamic-teal/10 dark:text-islamic-brightGold dark:hover:bg-islamic-brightGold/10"
+        >
           <Video className="h-5 w-5" />
           <span className="ml-1 hidden md:inline">Video Call</span>
         </Button>

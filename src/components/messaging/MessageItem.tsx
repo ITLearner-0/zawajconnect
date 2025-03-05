@@ -23,8 +23,8 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) =
       <div 
         className={`max-w-[75%] rounded-lg p-3 relative group ${
           isOwn 
-            ? 'bg-primary text-primary-foreground' 
-            : 'bg-muted text-muted-foreground'
+            ? 'bg-islamic-teal text-white dark:bg-islamic-darkTeal' 
+            : 'bg-islamic-cream/70 text-islamic-burgundy dark:bg-islamic-darkCard/70 dark:text-islamic-cream'
         }`}
       >
         <div className="flex justify-between items-center gap-2 mb-1">
@@ -40,7 +40,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) =
                   <TooltipTrigger asChild>
                     <Lock className="h-3 w-3 opacity-70" />
                   </TooltipTrigger>
-                  <TooltipContent>
+                  <TooltipContent className="bg-white dark:bg-islamic-darkCard border-islamic-teal/20 dark:border-islamic-darkTeal/30">
                     <p className="text-xs">End-to-end encrypted</p>
                   </TooltipContent>
                 </Tooltip>
@@ -54,7 +54,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) =
                   <TooltipTrigger asChild>
                     <Clock className="h-3 w-3 opacity-70" />
                   </TooltipTrigger>
-                  <TooltipContent>
+                  <TooltipContent className="bg-white dark:bg-islamic-darkCard border-islamic-teal/20 dark:border-islamic-darkTeal/30">
                     <p className="text-xs">Expires on {formattedDeletionDate}</p>
                   </TooltipContent>
                 </Tooltip>
@@ -64,13 +64,13 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) =
           
           {/* Show filtered tag if message was filtered */}
           {message.is_filtered && (
-            <span className="text-xs bg-amber-200 text-amber-800 px-1 rounded">
+            <span className="text-xs bg-islamic-brightGold/80 text-islamic-burgundy px-1 rounded dark:bg-islamic-darkBrightGold/80 dark:text-islamic-cream">
               filtered
             </span>
           )}
         </div>
         
-        <p className={`${isOwn ? 'text-primary-foreground' : 'text-foreground'}`}>
+        <p className={`${isOwn ? 'text-white dark:text-white' : 'text-islamic-burgundy dark:text-islamic-cream'}`}>
           {message.content}
         </p>
         
@@ -80,9 +80,9 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) =
             variant="ghost"
             size="sm"
             onClick={onReport}
-            className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
+            className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 text-red-500 hover:bg-red-500/10"
           >
-            <Flag className="h-3 w-3 text-red-500" />
+            <Flag className="h-3 w-3" />
           </Button>
         )}
       </div>
