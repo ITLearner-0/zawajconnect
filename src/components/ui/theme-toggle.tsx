@@ -18,7 +18,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       size="icon"
       onClick={toggleTheme}
       className={cn(
-        "rounded-full bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20", 
+        "rounded-full bg-white/20 backdrop-blur-sm border-white/30 hover:bg-white/30", 
         theme === "dark" ? "text-white" : "text-gray-800",
         className
       )}

@@ -63,16 +63,16 @@ export default {
           blue: "#235789",
           cream: "#f8f7f2",
           sand: "#e6dbc9",
-          // Dark mode variants
-          darkTeal: "#1a4c54",
-          darkGold: "#9e7f24",
-          darkBrightGold: "#c9a53d", // Enhanced darker gold
-          darkGreen: "#1e3a1f", // Dark green for dark mode
-          darkBurgundy: "#4a161a",
-          darkBlue: "#173a57",
-          darkCream: "#e8e1d4",
-          darkBg: "#1a1a1a",
-          darkCard: "#2a2a2a",
+          // Dark mode variants - enhanced for better visibility
+          darkTeal: "#39a0af", // Lightened for better visibility
+          darkGold: "#f0c64a", // Brightened for better contrast
+          darkBrightGold: "#ffd966", // Enhanced brighter gold for dark mode
+          darkGreen: "#132c12", // Darker background for better contrast
+          darkBurgundy: "#9c2731", // Brightened for visibility
+          darkBlue: "#4d8fd3", // Brightened for visibility
+          darkCream: "#fff8e6", // Brightened for visibility
+          darkBg: "#121212", // Darker background
+          darkCard: "#1e1e1e", // Darker card background
         },
       },
       keyframes: {

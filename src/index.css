@@ -56,7 +56,7 @@
   }
 
   .dark {
-    --background: 120 15% 12%;
+    --background: 120 15% 8%;
     --foreground: 210 40% 98%;
 
     --card: 222.2 84% 4.9%;
@@ -72,7 +72,7 @@
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted-foreground: 215 20.2% 75.1%;
 
     --accent: 217.2 32.6% 17.5%;
     --accent-foreground: 210 40% 98%;
@@ -80,7 +80,7 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
+    --border: 217.2 32.6% 30.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
     
@@ -93,9 +93,9 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
     
-    --gold-primary: 43 55% 45%;
-    --gold-light: 43 65% 55%;
-    --gold-dark: 43 45% 35%;
+    --gold-primary: 43 75% 60%;
+    --gold-light: 43 85% 70%;
+    --gold-dark: 43 60% 50%;
   }
   
   .high-contrast {
@@ -210,14 +210,30 @@
   }
   
   .gold-accent {
-    @apply text-islamic-brightGold dark:text-islamic-darkBrightGold;
+    @apply text-islamic-brightGold dark:text-islamic-darkBrightGold font-medium;
   }
   
   .gold-bg {
-    @apply bg-islamic-brightGold dark:bg-islamic-darkBrightGold text-islamic-burgundy dark:text-islamic-darkBurgundy;
+    @apply bg-islamic-brightGold dark:bg-islamic-darkBrightGold text-islamic-burgundy dark:text-islamic-darkBg;
   }
   
   .gold-border {
-    @apply border-islamic-brightGold dark:border-islamic-darkBrightGold;
+    @apply border-islamic-brightGold dark:border-islamic-darkBrightGold border-opacity-70 dark:border-opacity-90;
+  }
+
+  .dark-text-enhanced {
+    @apply dark:text-white dark:text-opacity-90;
+  }
+  
+  .dark-heading {
+    @apply dark:text-islamic-darkCream font-bold;
+  }
+  
+  .dark-subheading {
+    @apply dark:text-islamic-darkBrightGold font-medium;
+  }
+  
+  .dark-card {
+    @apply dark:bg-islamic-darkCard/90 dark:border-islamic-darkTeal/40 dark:shadow-lg dark:shadow-black/30;
   }
 }
