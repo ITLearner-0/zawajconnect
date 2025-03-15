@@ -1,72 +1,197 @@
 
 import React, { useState } from 'react';
-import { ChevronLeft, Shield } from 'lucide-react';
-import { Button } from '../ui/button';
-import { MonitoringReport } from '@/services/monitoring';  // Updated import path
+import ChatHeader from './ChatHeader';
+import MessagesList from './MessagesList';
+import MessageInput from './MessageInput';
+import SecuritySettingsPanel from './SecuritySettingsPanel';
+import RetentionSettings from './RetentionSettings';
 import AIMonitoringDashboard from './AIMonitoringDashboard';
+import ReportDialog from './ReportDialog';
+import WaliSupervisor from './WaliSupervisor';
+import EmergencyPanel from './EmergencyPanel';
+import { useToast } from '@/hooks/use-toast';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Video } from 'lucide-react';
+import { useMessageModeration } from '@/hooks/useMessageModeration';
+import { useAIMonitoring } from '@/hooks/useAIMonitoring';
 
 interface ChatContainerProps {
-  children: React.ReactNode;
-  report?: MonitoringReport | null;
-  monitoringEnabled?: boolean;
-  toggleMonitoring?: () => void;
-  monitoringLoading?: boolean;
+  conversationId: string;
+  userId: string;
+  otherUserId: string;
+  otherUserName: string;
+  otherUserImage?: string;
+  messages: any[];
+  onSendMessage: (content: string) => void;
+  onStartVideoCall: () => void;
+  isWaliSupervised?: boolean;
+  isSupervisor?: boolean;
 }
 
-const ChatContainer = ({ 
-  children, 
-  report = null, 
-  monitoringEnabled = true,
-  toggleMonitoring = () => {},
-  monitoringLoading = false
-}: ChatContainerProps) => {
+const ChatContainer: React.FC<ChatContainerProps> = ({
+  conversationId,
+  userId,
+  otherUserId,
+  otherUserName,
+  otherUserImage,
+  messages,
+  onSendMessage,
+  onStartVideoCall,
+  isWaliSupervised = false,
+  isSupervisor = false
+}) => {
+  const { toast } = useToast();
+  const [showRetentionSettings, setShowRetentionSettings] = useState(false);
+  const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   const [showMonitoring, setShowMonitoring] = useState(false);
+  const [showReportDialog, setShowReportDialog] = useState(false);
+  const [showEmergencyPanel, setShowEmergencyPanel] = useState(false);
   
-  // Create proper implementations for the missing icons
-  const ChevronUp = () => <ChevronLeft className="h-4 w-4 transform rotate-90" />;
-  const ChevronDown = () => <ChevronLeft className="h-4 w-4 transform -rotate-90" />;
+  const { 
+    violations,
+    latestReport,
+    monitoringEnabled,
+    toggleMonitoring,
+    loading: monitoringLoading,
+    error: monitoringError
+  } = useAIMonitoring(conversationId);
   
-  return (
-    <div className="flex flex-col h-full relative bg-islamic-solidGreen/10 dark:bg-islamic-darkGreen/20 border border-islamic-teal/20 dark:border-islamic-darkTeal/20 rounded-lg">
-      {/* Main chat content */}
-      <div className="flex-grow overflow-hidden">
-        {children}
-      </div>
+  const { 
+    moderateMessageContent, 
+    processContentFlags 
+  } = useMessageModeration(conversationId, messages, userId);
+
+  const handleSendMessage = (content: string) => {
+    // Apply content moderation
+    const { flags, filteredContent, isFiltered } = moderateMessageContent(content);
+    
+    // If the content was filtered, show a toast
+    if (isFiltered) {
+      toast({
+        title: "Message Modified",
+        description: "Your message contained inappropriate content and was modified before sending.",
+        variant: "default"
+      });
       
-      {/* AI Monitoring Panel (collapsible) */}
-      <div 
-        className={`border-t border-islamic-teal/20 dark:border-islamic-darkTeal/30 transition-all duration-300 ${
-          showMonitoring ? 'h-[400px]' : 'h-10'
-        } bg-islamic-cream/50 dark:bg-islamic-darkCard/50`}
-      >
-        <div 
-          className="h-10 flex items-center justify-between px-4 cursor-pointer"
-          onClick={() => setShowMonitoring(!showMonitoring)}
-        >
-          <div className="flex items-center">
-            <Shield className="h-4 w-4 mr-2 text-islamic-teal dark:text-islamic-brightGold" />
-            <span className="font-medium text-sm text-islamic-burgundy dark:text-islamic-cream">
-              AI Monitoring {report?.violations?.some(v => v.severity === 'high') && '• High Risk Detected'}
-            </span>
-          </div>
-          <Button variant="ghost" size="sm" className="h-6 w-6 p-0 text-islamic-teal hover:bg-islamic-teal/10 dark:text-islamic-brightGold dark:hover:bg-islamic-brightGold/10">
-            {showMonitoring ? <ChevronDown /> : <ChevronUp />}
-          </Button>
-        </div>
+      // Process content flags
+      flags.forEach(flag => {
+        if (flag.flag_type && flag.severity && userId) {
+          processContentFlags(
+            conversationId, 
+            'message',
+            flag.flag_type as any,
+            flag.severity as any
+          );
+        }
+      });
+      
+      // Send the filtered content
+      onSendMessage(filteredContent);
+    } else {
+      // Send the original content
+      onSendMessage(content);
+    }
+  };
+  
+  const toggleRetentionSettings = () => {
+    setShowRetentionSettings(!showRetentionSettings);
+    // Close other panels
+    if (!showRetentionSettings) {
+      setShowSecuritySettings(false);
+      setShowMonitoring(false);
+      setShowEmergencyPanel(false);
+    }
+  };
+  
+  const toggleSecuritySettings = () => {
+    setShowSecuritySettings(!showSecuritySettings);
+    // Close other panels
+    if (!showSecuritySettings) {
+      setShowRetentionSettings(false);
+      setShowMonitoring(false);
+      setShowEmergencyPanel(false);
+    }
+  };
+  
+  const toggleMonitoring = () => {
+    setShowMonitoring(!showMonitoring);
+    // Close other panels
+    if (!showMonitoring) {
+      setShowRetentionSettings(false);
+      setShowSecuritySettings(false);
+      setShowEmergencyPanel(false);
+    }
+  };
+  
+  const toggleEmergencyPanel = () => {
+    setShowEmergencyPanel(!showEmergencyPanel);
+    // Close other panels
+    if (!showEmergencyPanel) {
+      setShowRetentionSettings(false);
+      setShowSecuritySettings(false);
+      setShowMonitoring(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-islamic-darkCard">
+      <ChatHeader 
+        userName={otherUserName}
+        userImage={otherUserImage}
+        onStartVideoCall={onStartVideoCall}
+        onOpenRetention={toggleRetentionSettings}
+        onOpenSecurity={toggleSecuritySettings}
+        onOpenMonitoring={toggleMonitoring}
+        onOpenReport={() => setShowReportDialog(true)}
+        onOpenEmergency={toggleEmergencyPanel}
+      />
+      
+      {isWaliSupervised && <WaliSupervisor conversationId={conversationId} />}
+      
+      <div className="flex-1 overflow-hidden flex flex-col">
+        {showRetentionSettings && (
+          <RetentionSettings onClose={() => setShowRetentionSettings(false)} />
+        )}
+        
+        {showSecuritySettings && (
+          <SecuritySettingsPanel onClose={() => setShowSecuritySettings(false)} />
+        )}
         
         {showMonitoring && (
-          <div className="p-3 h-[360px] overflow-y-auto">
-            <AIMonitoringDashboard
-              report={report}
-              isEnabled={monitoringEnabled}
-              onToggleMonitoring={toggleMonitoring}
-              isLoading={monitoringLoading}
-              error={null}
-              onClose={() => setShowMonitoring(false)}
-            />
-          </div>
+          <AIMonitoringDashboard
+            report={latestReport}
+            isEnabled={monitoringEnabled}
+            onToggleMonitoring={toggleMonitoring}
+            isLoading={monitoringLoading}
+            error={monitoringError}
+            onClose={() => setShowMonitoring(false)}
+          />
         )}
+        
+        {showEmergencyPanel && (
+          <EmergencyPanel
+            conversationId={conversationId}
+            userId={userId}
+            otherUserId={otherUserId}
+          />
+        )}
+        
+        <MessagesList 
+          messages={messages}
+          currentUserId={userId}
+        />
       </div>
+      
+      <MessageInput onSendMessage={handleSendMessage} />
+      
+      <ReportDialog 
+        isOpen={showReportDialog}
+        onClose={() => setShowReportDialog(false)}
+        userId={otherUserId}
+        messageId={undefined}
+        conversationId={conversationId}
+        currentUserId={userId}
+      />
     </div>
   );
 };
