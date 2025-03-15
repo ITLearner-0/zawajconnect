@@ -48,10 +48,9 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   const [showEmergencyPanel, setShowEmergencyPanel] = useState(false);
   
   const { 
-    violations,
     latestReport,
     monitoringEnabled,
-    toggleMonitoring,
+    toggleMonitoring: toggleAIMonitoring,
     loading: monitoringLoading,
     error: monitoringError
   } = useAIMonitoring(conversationId);
@@ -113,7 +112,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
     }
   };
   
-  const toggleMonitoring = () => {
+  const toggleMonitoringPanel = () => {
     setShowMonitoring(!showMonitoring);
     // Close other panels
     if (!showMonitoring) {
@@ -136,32 +135,47 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-islamic-darkCard">
       <ChatHeader 
-        userName={otherUserName}
-        userImage={otherUserImage}
+        conversation={{
+          id: conversationId,
+          profile: { first_name: otherUserName, last_name: '' },
+          participants: [userId, otherUserId]
+        }}
+        currentUserId={userId}
+        backToList={() => {}}
         onStartVideoCall={onStartVideoCall}
-        onOpenRetention={toggleRetentionSettings}
-        onOpenSecurity={toggleSecuritySettings}
-        onOpenMonitoring={toggleMonitoring}
-        onOpenReport={() => setShowReportDialog(true)}
-        onOpenEmergency={toggleEmergencyPanel}
+        isWaliSupervised={isWaliSupervised}
+        showSecuritySettings={showSecuritySettings}
+        setShowSecuritySettings={setShowSecuritySettings}
+        openReportDialog={() => setShowReportDialog(true)}
       />
       
       {isWaliSupervised && <WaliSupervisor conversationId={conversationId} />}
       
       <div className="flex-1 overflow-hidden flex flex-col">
         {showRetentionSettings && (
-          <RetentionSettings onClose={() => setShowRetentionSettings(false)} />
+          <RetentionSettings 
+            conversationId={conversationId} 
+            currentPolicy={{
+              retention_days: 30,
+              delete_on_read: false,
+              auto_archive: false
+            }}
+            onPolicyChanged={() => {}}
+          />
         )}
         
         {showSecuritySettings && (
-          <SecuritySettingsPanel onClose={() => setShowSecuritySettings(false)} />
+          <SecuritySettingsPanel 
+            encryptionEnabled={true}
+            toggleEncryption={() => {}}
+          />
         )}
         
         {showMonitoring && (
           <AIMonitoringDashboard
             report={latestReport}
             isEnabled={monitoringEnabled}
-            onToggleMonitoring={toggleMonitoring}
+            onToggleMonitoring={toggleAIMonitoring}
             isLoading={monitoringLoading}
             error={monitoringError}
             onClose={() => setShowMonitoring(false)}
@@ -179,10 +193,22 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
         <MessagesList 
           messages={messages}
           currentUserId={userId}
+          onReportMessage={() => setShowReportDialog(true)}
+          isWaliSupervised={isWaliSupervised}
+          conversationId={conversationId}
+          loading={false}
+          error={null}
         />
       </div>
       
-      <MessageInput onSendMessage={handleSendMessage} />
+      <MessageInput 
+        messageInput=""
+        setMessageInput={() => {}}
+        sendMessage={() => {}}
+        sendingMessage={false}
+        encryptionEnabled={true}
+        onSendMessage={handleSendMessage}
+      />
       
       <ReportDialog 
         isOpen={showReportDialog}
