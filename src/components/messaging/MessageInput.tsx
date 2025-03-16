@@ -11,6 +11,7 @@ interface MessageInputProps {
   sendMessage: () => void;
   sendingMessage: boolean;
   encryptionEnabled: boolean;
+  onSendMessage?: (content: string) => void; // Optional prop for backward compatibility
 }
 
 const MessageInput: React.FC<MessageInputProps> = ({
@@ -18,11 +19,21 @@ const MessageInput: React.FC<MessageInputProps> = ({
   setMessageInput,
   sendMessage,
   sendingMessage,
-  encryptionEnabled
+  encryptionEnabled,
+  onSendMessage
 }) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const handleSend = () => {
+    if (onSendMessage && messageInput.trim()) {
+      onSendMessage(messageInput);
+      setMessageInput('');
+    } else {
       sendMessage();
     }
   };
@@ -53,7 +64,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
           disabled={sendingMessage}
         />
         <Button 
-          onClick={sendMessage} 
+          onClick={handleSend} 
           disabled={sendingMessage || !messageInput.trim()} 
           className="ml-2"
         >

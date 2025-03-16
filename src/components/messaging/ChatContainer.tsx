@@ -46,6 +46,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   const [showMonitoring, setShowMonitoring] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [showEmergencyPanel, setShowEmergencyPanel] = useState(false);
+  const [messageInput, setMessageInput] = useState("");
   
   const { 
     latestReport,
@@ -138,7 +139,9 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
         conversation={{
           id: conversationId,
           profile: { first_name: otherUserName, last_name: '' },
-          participants: [userId, otherUserId]
+          participants: [userId, otherUserId],
+          created_at: new Date().toISOString(),
+          wali_supervised: isWaliSupervised
         }}
         currentUserId={userId}
         backToList={() => {}}
@@ -156,9 +159,8 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
           <RetentionSettings 
             conversationId={conversationId} 
             currentPolicy={{
-              retention_days: 30,
-              delete_on_read: false,
-              auto_archive: false
+              type: 'permanent',
+              auto_delete: false
             }}
             onPolicyChanged={() => {}}
           />
@@ -202,12 +204,11 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
       </div>
       
       <MessageInput 
-        messageInput=""
-        setMessageInput={() => {}}
-        sendMessage={() => {}}
+        messageInput={messageInput}
+        setMessageInput={setMessageInput}
+        sendMessage={() => handleSendMessage(messageInput)}
         sendingMessage={false}
         encryptionEnabled={true}
-        onSendMessage={handleSendMessage}
       />
       
       <ReportDialog 

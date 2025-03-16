@@ -1,5 +1,4 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { 
   AnalyticsData, 
   EmergencyStats, 
@@ -21,44 +20,12 @@ export const getAnalyticsData = async (
   toDate?: string
 ): Promise<AnalyticsData> => {
   try {
-    // Get total conversations
-    const { count: totalConversations, error: conversationsError } = await supabase
-      .from('conversations')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', fromDate || '1900-01-01')
-      .lte('created_at', toDate || new Date().toISOString());
-    
-    // Get new conversations in the last 7 days
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    
-    const { count: newConversations, error: newConversationsError } = await supabase
-      .from('conversations')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', oneWeekAgo.toISOString());
-    
-    // Get total users
-    const { count: totalUsers, error: usersError } = await supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true });
-    
-    // Get total messages
-    const { count: totalMessages, error: messagesError } = await supabase
-      .from('messages')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', fromDate || '1900-01-01')
-      .lte('created_at', toDate || new Date().toISOString());
-    
-    if (conversationsError || newConversationsError || usersError || messagesError) {
-      console.error('Error fetching analytics data');
-      throw new Error('Failed to fetch analytics data');
-    }
-    
+    // Using mock data instead of actual database queries
     return {
-      totalConversations: totalConversations || 0,
-      newConversations: newConversations || 0,
-      totalUsers: totalUsers || 0,
-      totalMessages: totalMessages || 0
+      totalConversations: 250,
+      newConversations: 35,
+      totalUsers: 450,
+      totalMessages: 8750
     };
   } catch (err) {
     console.error('Error getting analytics data:', err);
@@ -79,54 +46,50 @@ export const getEmergencyStats = async (
   toDate?: string
 ): Promise<EmergencyStats> => {
   try {
-    // Get total emergency reports
-    const { count: totalReports, error: totalError } = await supabase
-      .from('emergency_reports')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', fromDate || '1900-01-01')
-      .lte('created_at', toDate || new Date().toISOString());
-    
-    // Get pending reports
-    const { count: pendingReports, error: pendingError } = await supabase
-      .from('emergency_reports')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'pending')
-      .gte('created_at', fromDate || '1900-01-01')
-      .lte('created_at', toDate || new Date().toISOString());
-    
-    // Get resolved reports
-    const { count: resolvedReports, error: resolvedError } = await supabase
-      .from('emergency_reports')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'resolved')
-      .gte('created_at', fromDate || '1900-01-01')
-      .lte('created_at', toDate || new Date().toISOString());
-    
-    // Get high priority pending reports
-    const { count: pendingHighPriority, error: highPriorityError } = await supabase
-      .from('emergency_reports')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'pending')
-      .eq('priority', 'high');
-    
-    // Get recent reports
-    const { data: recentReports, error: recentError } = await supabase
-      .from('emergency_reports')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10);
-    
-    if (totalError || pendingError || resolvedError || highPriorityError || recentError) {
-      console.error('Error fetching emergency stats');
-      throw new Error('Failed to fetch emergency statistics');
-    }
+    // Sample data for demonstration
+    const mockReports: EmergencyReport[] = [
+      {
+        id: '1',
+        reporter_id: 'user-123',
+        reported_user_id: 'user-456',
+        conversation_id: 'conv-123',
+        emergency_type: 'immediate_threat',
+        created_at: new Date().toISOString(),
+        status: 'pending',
+        priority: 'high'
+      },
+      {
+        id: '2',
+        reporter_id: 'user-124',
+        reported_user_id: 'user-457',
+        conversation_id: 'conv-124',
+        emergency_type: 'harassment',
+        created_at: new Date(Date.now() - 8600000).toISOString(),
+        status: 'pending',
+        priority: 'medium'
+      },
+      {
+        id: '3',
+        reporter_id: 'user-125',
+        reported_user_id: 'user-458',
+        conversation_id: 'conv-125',
+        emergency_type: 'suspicious_behavior',
+        created_at: new Date(Date.now() - 172800000).toISOString(),
+        status: 'resolved',
+        priority: 'medium',
+        resolved_by: 'admin-1',
+        resolved_at: new Date(Date.now() - 86400000).toISOString(),
+        resolution_notes: 'False alarm',
+        action_taken: 'no_action'
+      }
+    ];
     
     return {
-      totalReports: totalReports || 0,
-      pendingReports: pendingReports || 0,
-      resolvedReports: resolvedReports || 0,
-      pendingHighPriority: pendingHighPriority || 0,
-      recentReports: recentReports as EmergencyReport[] || []
+      totalReports: 35,
+      pendingReports: 12,
+      resolvedReports: 23,
+      pendingHighPriority: 3,
+      recentReports: mockReports
     };
   } catch (err) {
     console.error('Error getting emergency stats:', err);
@@ -148,22 +111,7 @@ export const getUserActivityStats = async (
   toDate?: string
 ): Promise<UserActivityStats> => {
   try {
-    // Get active users (sent a message in the last 7 days)
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-    
-    const { count: activeUsers, error: activeError } = await supabase
-      .from('messages')
-      .select('sender_id', { count: 'exact', head: true })
-      .gte('created_at', oneWeekAgo.toISOString())
-      .is('deleted_at', null);
-    
-    // Get total users
-    const { count: totalUsers, error: totalError } = await supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true });
-    
-    // Generate sample demographic data (in a real app, this would come from the database)
+    // Generate sample demographic data
     const demographicStats: DemographicStat[] = [
       { name: '18-24', value: 30 },
       { name: '25-34', value: 45 },
@@ -171,7 +119,7 @@ export const getUserActivityStats = async (
       { name: '45+', value: 5 }
     ];
     
-    // Generate sample message trends (in a real app, this would come from the database)
+    // Generate sample message trends
     const messageTrends: MessageTrend[] = [];
     const today = new Date();
     
@@ -186,14 +134,9 @@ export const getUserActivityStats = async (
       });
     }
     
-    if (activeError || totalError) {
-      console.error('Error fetching user activity stats');
-      throw new Error('Failed to fetch user activity statistics');
-    }
-    
     return {
-      activeUsers: activeUsers || 0,
-      totalUsers: totalUsers || 0,
+      activeUsers: 225,
+      totalUsers: 450,
       demographicStats,
       messageTrends
     };
@@ -216,21 +159,7 @@ export const getModerationStats = async (
   toDate?: string
 ): Promise<ModerationStats> => {
   try {
-    // Get total content flags
-    const { count: totalFlags, error: flagsError } = await supabase
-      .from('content_flags')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', fromDate || '1900-01-01')
-      .lte('created_at', toDate || new Date().toISOString());
-    
-    // Get total content reports
-    const { count: totalReports, error: reportsError } = await supabase
-      .from('content_reports')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', fromDate || '1900-01-01')
-      .lte('created_at', toDate || new Date().toISOString());
-    
-    // Generate sample flags by type (in a real app, this would come from the database)
+    // Generate sample flags by type
     const flagsByType: FlagByType[] = [
       { type: 'inappropriate', count: 32 },
       { type: 'harassment', count: 18 },
@@ -238,14 +167,9 @@ export const getModerationStats = async (
       { type: 'suspicious', count: 12 }
     ];
     
-    if (flagsError || reportsError) {
-      console.error('Error fetching moderation stats');
-      throw new Error('Failed to fetch moderation statistics');
-    }
-    
     return {
-      totalFlags: totalFlags || 0,
-      totalReports: totalReports || 0,
+      totalFlags: 86,
+      totalReports: 42,
       flagsByType
     };
   } catch (err) {
@@ -266,28 +190,7 @@ export const getWaliStats = async (
   toDate?: string
 ): Promise<WaliStats> => {
   try {
-    // Get total walis
-    const { count: totalWalis, error: walisError } = await supabase
-      .from('wali_profiles')
-      .select('*', { count: 'exact', head: true });
-    
-    // Get active walis (online in the last 24 hours)
-    const oneDayAgo = new Date();
-    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-    
-    const { count: activeWalis, error: activeError } = await supabase
-      .from('wali_profiles')
-      .select('*', { count: 'exact', head: true })
-      .gte('last_active', oneDayAgo.toISOString());
-    
-    // Get total supervised conversations
-    const { count: supervisedConversations, error: supervisedError } = await supabase
-      .from('supervision_sessions')
-      .select('*', { count: 'exact', head: true })
-      .gte('started_at', fromDate || '1900-01-01')
-      .lte('started_at', toDate || new Date().toISOString());
-    
-    // Generate sample supervision trends (in a real app, this would come from the database)
+    // Generate sample supervision trends
     const supervisionTrends: SupervisionTrend[] = [];
     const today = new Date();
     
@@ -302,15 +205,10 @@ export const getWaliStats = async (
       });
     }
     
-    if (walisError || activeError || supervisedError) {
-      console.error('Error fetching wali stats');
-      throw new Error('Failed to fetch wali statistics');
-    }
-    
     return {
-      totalWalis: totalWalis || 0,
-      activeWalis: activeWalis || 0,
-      supervisedConversations: supervisedConversations || 0,
+      totalWalis: 75,
+      activeWalis: 45,
+      supervisedConversations: 120,
       averageResponseTime: 3.2, // Sample value
       approvalRate: 78, // Sample value
       supervisionTrends

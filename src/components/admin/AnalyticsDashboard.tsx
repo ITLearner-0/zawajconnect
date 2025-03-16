@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -10,9 +9,11 @@ import { useAnalyticsData } from '@/hooks/admin/useAnalyticsData';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Users, MessageCircle, Shield, AlertTriangle, Check } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { DateRange } from "react-day-picker";
 
 const AnalyticsDashboard: React.FC = () => {
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | undefined>();
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  
   const { 
     analytics, 
     loading, 
@@ -37,7 +38,7 @@ const AnalyticsDashboard: React.FC = () => {
         <div className="flex flex-col sm:flex-row gap-3">
           <DateRangePicker 
             value={dateRange}
-            onChange={setDateRange}
+            onChange={(range) => setDateRange(range)}
           />
           <Button 
             variant="outline" 

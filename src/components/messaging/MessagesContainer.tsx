@@ -3,7 +3,6 @@ import { Conversation } from '@/types/profile';
 import { Loader, AlertTriangle } from 'lucide-react';
 import ConversationList from './ConversationList';
 import EmptyConversation from './EmptyConversation';
-import ChatContainer from './ChatContainer';
 import { Alert, AlertDescription } from '../ui/alert';
 
 interface MessagesContainerProps {
@@ -65,7 +64,9 @@ const MessagesContainer = ({
               <p>Loading conversation...</p>
             </div>
           ) : conversationId && currentConversation ? (
-            <ChatContainer>{children}</ChatContainer>
+            <div className="flex flex-col h-full">
+              {children}
+            </div>
           ) : (
             <EmptyConversation />
           )}

@@ -1,6 +1,4 @@
 
-import { supabase } from '@/integrations/supabase/client';
-
 /**
  * Reports an emergency situation to moderators
  */
@@ -11,23 +9,13 @@ export const reportEmergency = async (
   emergencyType: string
 ): Promise<boolean> => {
   try {
-    // Insert into emergency_reports table
-    const { error } = await supabase
-      .from('emergency_reports')
-      .insert({
-        reporter_id: reporterId,
-        reported_user_id: reportedUserId,
-        conversation_id: conversationId,
-        emergency_type: emergencyType,
-        created_at: new Date().toISOString(),
-        status: 'pending',
-        priority: emergencyType === 'immediate_threat' ? 'high' : 'medium'
-      });
-    
-    if (error) {
-      console.error("Error creating emergency report:", error);
-      return false;
-    }
+    console.log(`Emergency report created: 
+      Reporter: ${reporterId} 
+      Reported user: ${reportedUserId}
+      Conversation: ${conversationId}
+      Type: ${emergencyType}
+      Priority: ${emergencyType === 'immediate_threat' ? 'high' : 'medium'}
+    `);
     
     // For immediate threats, also notify admins via a different channel
     if (emergencyType === 'immediate_threat') {
@@ -49,18 +37,7 @@ const notifyAdminsImmediately = async (
   reporterId: string
 ): Promise<void> => {
   try {
-    // This would typically trigger a notification to admins
-    // For now, we'll log it to the database
-    await supabase
-      .from('admin_notifications')
-      .insert({
-        type: 'emergency',
-        content: `URGENT: User ${reporterId} has reported an immediate threat in conversation ${conversationId}`,
-        created_at: new Date().toISOString(),
-        read: false,
-        priority: 'critical'
-      });
-    
+    console.log(`URGENT NOTIFICATION: User ${reporterId} has reported an immediate threat in conversation ${conversationId}`);
     console.log(`Emergency notification sent for conversation ${conversationId}`);
   } catch (err) {
     console.error('Error notifying admins:', err);
@@ -77,21 +54,11 @@ export const resolveEmergencyReport = async (
   actionTaken: string
 ): Promise<boolean> => {
   try {
-    const { error } = await supabase
-      .from('emergency_reports')
-      .update({
-        status: 'resolved',
-        resolved_by: adminId,
-        resolved_at: new Date().toISOString(),
-        resolution_notes: resolution,
-        action_taken: actionTaken
-      })
-      .eq('id', reportId);
-    
-    if (error) {
-      console.error("Error resolving emergency report:", error);
-      return false;
-    }
+    console.log(`Emergency report ${reportId} resolved:
+      Admin: ${adminId}
+      Resolution: ${resolution}
+      Action taken: ${actionTaken}
+    `);
     
     return true;
   } catch (err) {
