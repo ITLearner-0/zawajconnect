@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -12,6 +13,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { DateRange } from "react-day-picker";
 
 const AnalyticsDashboard: React.FC = () => {
+  // Use DateRange type directly to match what DateRangePicker returns
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   
   const { 
