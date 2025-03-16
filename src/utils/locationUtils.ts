@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
 /**
@@ -67,6 +66,7 @@ export const findNearbyProfiles = async (
       profiles = applyFilters(profiles, filters);
     }
     
+    console.log("Found profiles:", profiles);
     return profiles || [];
   } catch (err) {
     console.error("Error in findNearbyProfiles:", err);

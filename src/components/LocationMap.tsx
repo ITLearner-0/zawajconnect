@@ -33,6 +33,7 @@ const MAPBOX_TOKEN_KEY = 'mapbox_token';
 const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false }: LocationMapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const markersRef = useRef<{[id: string]: mapboxgl.Marker}>({});
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [mapboxToken, setMapboxToken] = useState<string>('');
@@ -135,6 +136,7 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
               
               // Fetch nearby profiles with filters
               const nearbyProfiles = await findNearbyProfiles(session.user.id, maxDistance, filters);
+              console.log("Retrieved profiles:", nearbyProfiles);
               setProfiles(nearbyProfiles);
               
               if (!mapContainer.current) {
@@ -203,10 +205,13 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
                     
                     popupContent += `</div>`;
                     
-                    new mapboxgl.Marker(markerEl)
+                    const marker = new mapboxgl.Marker(markerEl)
                       .setLngLat([profile.longitude, profile.latitude])
                       .setPopup(new mapboxgl.Popup().setHTML(popupContent))
                       .addTo(map.current!);
+                      
+                    // Store marker reference by profile ID for later access
+                    markersRef.current[profile.id] = marker;
                   }
                 });
                 
@@ -257,6 +262,36 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
       }
     };
   }, [maxDistance, filters, toast, showCompatibility, mapboxToken]);
+
+  // Handle profile click and fly to location
+  const handleProfileClick = (profileId: string) => {
+    console.log("Profile clicked:", profileId);
+    const profile = profiles.find(p => p.id === profileId);
+    
+    if (profile && profile.latitude && profile.longitude && map.current) {
+      console.log(`Flying to: ${profile.longitude}, ${profile.latitude}`);
+      
+      // Fly to the profile's location
+      map.current.flyTo({
+        center: [profile.longitude, profile.latitude],
+        zoom: 13,
+        essential: true
+      });
+      
+      // Open the popup for this marker
+      const marker = markersRef.current[profileId];
+      if (marker) {
+        marker.togglePopup();
+      }
+    } else {
+      console.error("Could not find coordinates for profile:", profileId);
+      toast({
+        title: "Error",
+        description: "Could not locate this profile on the map.",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Add custom styling for map
   useEffect(() => {
@@ -323,15 +358,10 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
                     <div 
                       key={profile.id} 
                       className="p-3 border rounded-md flex justify-between items-center hover:bg-islamic-cream/30 transition-colors cursor-pointer"
-                      onClick={() => {
-                        if (map.current && profile.latitude && profile.longitude) {
-                          map.current.flyTo({
-                            center: [profile.longitude, profile.latitude],
-                            zoom: 12,
-                            essential: true
-                          });
-                        }
-                      }}
+                      onClick={() => handleProfileClick(profile.id)}
+                      role="button"
+                      tabIndex={0}
+                      aria-label={`View ${profile.first_name}'s location on map`}
                     >
                       <div>
                         <p className="font-medium">{profile.first_name} {profile.last_name}</p>
