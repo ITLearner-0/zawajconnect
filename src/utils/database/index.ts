@@ -17,6 +17,8 @@ export { setupEmergencyTables as setupEmergencyTablesIfNeeded } from './emergenc
 export const setupAdminNotificationsTable = async () => {
   // This is actually handled inside setupEmergencyTables now
   console.log('Setting up admin notifications table via emergencyTables...');
+  // Import setupEmergencyTables locally to avoid conflicts with the export
+  const { setupEmergencyTables } = require('./emergencyTables');
   const result = await setupEmergencyTables();
   return result;
 };
