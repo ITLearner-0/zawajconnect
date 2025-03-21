@@ -80,6 +80,30 @@ export const setupModerationTables = async (): Promise<boolean> => {
       )
     `);
     
+    // Ensure existing chat_requests table has the new columns
+    await executeSql(`
+      DO $$
+      BEGIN
+        BEGIN
+          ALTER TABLE chat_requests ADD COLUMN IF NOT EXISTS message TEXT;
+        EXCEPTION WHEN OTHERS THEN
+          RAISE NOTICE 'Error adding message column: %', SQLERRM;
+        END;
+        
+        BEGIN
+          ALTER TABLE chat_requests ADD COLUMN IF NOT EXISTS request_type TEXT;
+        EXCEPTION WHEN OTHERS THEN
+          RAISE NOTICE 'Error adding request_type column: %', SQLERRM;
+        END;
+        
+        BEGIN
+          ALTER TABLE chat_requests ADD COLUMN IF NOT EXISTS suggested_time TEXT;
+        EXCEPTION WHEN OTHERS THEN
+          RAISE NOTICE 'Error adding suggested_time column: %', SQLERRM;
+        END;
+      END $$;
+    `);
+    
     // Create supervision_sessions table
     await executeSql(`
       CREATE TABLE IF NOT EXISTS supervision_sessions (
