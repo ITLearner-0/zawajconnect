@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -5,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { DatabaseProfile } from '@/types/profile';
 import { ArrowLeft } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { dummyProfiles } from '@/data/dummyData';
+import { dummyProfiles } from '@/data/profiles';
 
 // Import the refactored components
 import ProfileHeader from '@/components/profile/ProfileHeader';
@@ -24,11 +25,15 @@ const UserProfile = () => {
     const fetchProfile = async () => {
       setLoading(true);
       try {
+        console.log("Fetching profile with ID:", id);
+        console.log("Available profiles:", dummyProfiles);
         const foundProfile = dummyProfiles.find(p => p.id === id);
         
         if (foundProfile) {
+          console.log("Found profile:", foundProfile);
           setProfile(foundProfile);
         } else {
+          console.error("Profile not found with ID:", id);
           toast({
             title: "Profile not found",
             description: "We couldn't find the profile you're looking for.",
