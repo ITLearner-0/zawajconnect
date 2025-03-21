@@ -1,5 +1,5 @@
 
-import { executeSql } from "./core";
+import { executeSql, columnExists } from "./core";
 
 /**
  * Creates the required moderation tables if they don't exist
@@ -80,29 +80,22 @@ export const setupModerationTables = async (): Promise<boolean> => {
       )
     `);
     
-    // Ensure existing chat_requests table has the new columns
-    await executeSql(`
-      DO $$
-      BEGIN
-        BEGIN
-          ALTER TABLE chat_requests ADD COLUMN IF NOT EXISTS message TEXT;
-        EXCEPTION WHEN OTHERS THEN
-          RAISE NOTICE 'Error adding message column: %', SQLERRM;
-        END;
-        
-        BEGIN
-          ALTER TABLE chat_requests ADD COLUMN IF NOT EXISTS request_type TEXT;
-        EXCEPTION WHEN OTHERS THEN
-          RAISE NOTICE 'Error adding request_type column: %', SQLERRM;
-        END;
-        
-        BEGIN
-          ALTER TABLE chat_requests ADD COLUMN IF NOT EXISTS suggested_time TEXT;
-        EXCEPTION WHEN OTHERS THEN
-          RAISE NOTICE 'Error adding suggested_time column: %', SQLERRM;
-        END;
-      END $$;
-    `);
+    // Make sure to add the columns if they don't exist in the chat_requests table
+    // This is more reliable than the previous approach
+    const hasMessageColumn = await columnExists('chat_requests', 'message');
+    if (!hasMessageColumn) {
+      await executeSql(`ALTER TABLE chat_requests ADD COLUMN message TEXT`);
+    }
+    
+    const hasRequestTypeColumn = await columnExists('chat_requests', 'request_type');
+    if (!hasRequestTypeColumn) {
+      await executeSql(`ALTER TABLE chat_requests ADD COLUMN request_type TEXT`);
+    }
+    
+    const hasSuggestedTimeColumn = await columnExists('chat_requests', 'suggested_time');
+    if (!hasSuggestedTimeColumn) {
+      await executeSql(`ALTER TABLE chat_requests ADD COLUMN suggested_time TEXT`);
+    }
     
     // Create supervision_sessions table
     await executeSql(`
