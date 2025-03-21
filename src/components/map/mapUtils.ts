@@ -23,7 +23,7 @@ export const promptForMapboxToken = (): string | null => {
 };
 
 // Add custom map styling
-export const addMapCustomStyling = (): void => {
+export const addMapCustomStyling = (): (() => void) => {
   const style = document.createElement('style');
   style.textContent = `
     .mapboxgl-popup-content {
