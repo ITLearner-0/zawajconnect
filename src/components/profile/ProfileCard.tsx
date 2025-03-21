@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DatabaseProfile } from '@/types/profile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -27,7 +27,7 @@ const ProfileCard = ({ profile }: ProfileCardProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Determine if the current user is male to enforce wali approval for messaging/video calls with females
-  useState(() => {
+  useEffect(() => {
     const getCurrentUser = async () => {
       const { data } = await supabase.auth.getSession();
       if (data.session?.user) {

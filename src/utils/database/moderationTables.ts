@@ -63,7 +63,7 @@ export const setupModerationTables = async (): Promise<boolean> => {
       )
     `);
     
-    // Create chat_requests table
+    // Create chat_requests table with request_type and suggested_time columns
     await executeSql(`
       CREATE TABLE IF NOT EXISTS chat_requests (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -73,7 +73,10 @@ export const setupModerationTables = async (): Promise<boolean> => {
         status TEXT DEFAULT 'pending',
         requested_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
         reviewed_at TIMESTAMP WITH TIME ZONE,
-        wali_notes TEXT
+        wali_notes TEXT,
+        message TEXT,
+        request_type TEXT,
+        suggested_time TEXT
       )
     `);
     

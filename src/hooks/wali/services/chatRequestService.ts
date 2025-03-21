@@ -28,6 +28,10 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
       throw new Error('Failed to load chat requests');
     }
 
+    if (!data) {
+      return [];
+    }
+
     // For each request, fetch the requester profile separately
     const transformedRequests: ChatRequest[] = await Promise.all(
       data.map(async (req) => {
@@ -48,7 +52,7 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
           reviewed_at: req.reviewed_at,
           wali_notes: req.wali_notes,
           message: req.message,
-          request_type: req.request_type,
+          request_type: req.request_type as "message" | "video" | undefined,
           suggested_time: req.suggested_time,
           requester_profile: profileData ? {
             first_name: profileData.first_name,
