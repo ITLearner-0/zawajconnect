@@ -63,7 +63,7 @@ export const setupModerationTables = async (): Promise<boolean> => {
       )
     `);
     
-    // Create chat_requests table with request_type and suggested_time columns
+    // Create chat_requests table with all required columns
     await executeSql(`
       CREATE TABLE IF NOT EXISTS chat_requests (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -81,7 +81,6 @@ export const setupModerationTables = async (): Promise<boolean> => {
     `);
     
     // Make sure to add the columns if they don't exist in the chat_requests table
-    // This is more reliable than the previous approach
     const hasMessageColumn = await columnExists('chat_requests', 'message');
     if (!hasMessageColumn) {
       await executeSql(`ALTER TABLE chat_requests ADD COLUMN message TEXT`);

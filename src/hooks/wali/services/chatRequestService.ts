@@ -40,6 +40,25 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
     // For each request, fetch the requester profile separately
     const transformedRequests: ChatRequest[] = await Promise.all(
       data.map(async (req) => {
+        // Create a default request object with the data we have
+        const chatRequest: ChatRequest = {
+          id: req.id,
+          requester_id: req.requester_id,
+          recipient_id: req.recipient_id,
+          wali_id: req.wali_id,
+          status: req.status as "pending" | "approved" | "rejected",
+          requested_at: req.requested_at,
+          reviewed_at: req.reviewed_at,
+          wali_notes: req.wali_notes,
+          message: req.message,
+          request_type: req.request_type as "message" | "video" | undefined,
+          suggested_time: req.suggested_time,
+          requester_profile: {
+            first_name: 'Unknown',
+            last_name: 'User'
+          }
+        };
+
         try {
           // Fetch requester profile data
           const { data: profileData, error: profileError } = await supabase
@@ -48,67 +67,18 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
             .eq('id', req.requester_id)
             .single();
 
-          if (profileError) {
-            console.error('Error fetching profile:', profileError);
-            return {
-              id: req.id,
-              requester_id: req.requester_id,
-              recipient_id: req.recipient_id,
-              wali_id: req.wali_id,
-              status: req.status as "pending" | "approved" | "rejected",
-              requested_at: req.requested_at,
-              reviewed_at: req.reviewed_at,
-              wali_notes: req.wali_notes,
-              message: req.message,
-              request_type: req.request_type as "message" | "video" | undefined,
-              suggested_time: req.suggested_time,
-              requester_profile: {
-                first_name: 'Unknown',
-                last_name: 'User'
-              }
-            };
-          }
-
-          return {
-            id: req.id,
-            requester_id: req.requester_id,
-            recipient_id: req.recipient_id,
-            wali_id: req.wali_id,
-            status: req.status as "pending" | "approved" | "rejected",
-            requested_at: req.requested_at,
-            reviewed_at: req.reviewed_at,
-            wali_notes: req.wali_notes,
-            message: req.message,
-            request_type: req.request_type as "message" | "video" | undefined,
-            suggested_time: req.suggested_time,
-            requester_profile: profileData ? {
+          if (!profileError && profileData) {
+            chatRequest.requester_profile = {
               first_name: profileData.first_name,
               last_name: profileData.last_name
-            } : {
-              first_name: 'Unknown',
-              last_name: 'User'
-            }
-          };
+            };
+          }
         } catch (profileError) {
           console.error('Error in profile fetch:', profileError);
-          return {
-            id: req.id,
-            requester_id: req.requester_id,
-            recipient_id: req.recipient_id,
-            wali_id: req.wali_id,
-            status: req.status as "pending" | "approved" | "rejected",
-            requested_at: req.requested_at,
-            reviewed_at: req.reviewed_at,
-            wali_notes: req.wali_notes,
-            message: req.message,
-            request_type: req.request_type as "message" | "video" | undefined,
-            suggested_time: req.suggested_time,
-            requester_profile: {
-              first_name: 'Unknown',
-              last_name: 'User'
-            }
-          };
+          // We already have default values set, so just continue
         }
+
+        return chatRequest;
       })
     );
     
