@@ -31,6 +31,8 @@ export interface ChatRequest {
   reviewed_at?: string;
   wali_notes?: string;
   message?: string;
+  request_type?: 'message' | 'video';
+  suggested_time?: string;
   requester_profile?: {
     first_name: string;
     last_name: string;

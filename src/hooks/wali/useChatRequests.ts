@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { ChatRequest } from '@/types/wali';
 import { useToast } from '@/hooks/use-toast';
@@ -41,16 +42,21 @@ export const useChatRequests = (userId: string | null): UseChatRequestsReturn =>
   }, [userId]);
 
   // Handle chat request (approve/reject)
-  const handleChatRequest = async (requestId: string, status: 'approved' | 'rejected') => {
+  const handleChatRequest = async (requestId: string, status: 'approved' | 'rejected', suggestedTime?: string) => {
     if (!userId) return false;
 
     try {
-      await updateChatRequestStatus(requestId, status);
+      await updateChatRequestStatus(requestId, status, suggestedTime);
 
       // Update local state
       setChatRequests(prev => 
         prev.map(req => 
-          req.id === requestId ? { ...req, status, reviewed_at: new Date().toISOString() } : req
+          req.id === requestId ? { 
+            ...req, 
+            status, 
+            reviewed_at: new Date().toISOString(),
+            suggested_time: suggestedTime || req.suggested_time 
+          } : req
         )
       );
 
@@ -63,11 +69,21 @@ export const useChatRequests = (userId: string | null): UseChatRequestsReturn =>
         }
       }
 
+      const message = status === 'approved' 
+        ? "Request Approved"
+        : suggestedTime 
+          ? "Alternative Time Suggested" 
+          : "Request Rejected";
+          
+      const description = status === 'approved'
+        ? "The conversation request has been approved"
+        : suggestedTime
+          ? `You've suggested an alternative time: ${suggestedTime}`
+          : "The conversation request has been rejected";
+
       toast({
-        title: status === 'approved' ? "Request Approved" : "Request Rejected",
-        description: status === 'approved' 
-          ? "The conversation request has been approved" 
-          : "The conversation request has been rejected",
+        title: message,
+        description,
       });
 
       return true;

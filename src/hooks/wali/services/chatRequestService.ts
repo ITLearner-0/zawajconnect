@@ -15,7 +15,10 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
         status,
         requested_at,
         reviewed_at,
-        wali_notes
+        wali_notes,
+        message,
+        request_type,
+        suggested_time
       `)
       .eq('wali_id', userId)
       .order('requested_at', { ascending: false });
@@ -44,6 +47,9 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
           requested_at: req.requested_at,
           reviewed_at: req.reviewed_at,
           wali_notes: req.wali_notes,
+          message: req.message,
+          request_type: req.request_type,
+          suggested_time: req.suggested_time,
           requester_profile: profileData ? {
             first_name: profileData.first_name,
             last_name: profileData.last_name
@@ -65,14 +71,21 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
 
 export const updateChatRequestStatus = async (
   requestId: string, 
-  status: 'approved' | 'rejected'
+  status: 'approved' | 'rejected',
+  suggestedTime?: string
 ): Promise<void> => {
+  const updateData: any = { 
+    status,
+    reviewed_at: new Date().toISOString()
+  };
+  
+  if (suggestedTime) {
+    updateData.suggested_time = suggestedTime;
+  }
+  
   const { error } = await supabase
     .from('chat_requests')
-    .update({ 
-      status,
-      reviewed_at: new Date().toISOString()
-    })
+    .update(updateData)
     .eq('id', requestId);
 
   if (error) throw error;

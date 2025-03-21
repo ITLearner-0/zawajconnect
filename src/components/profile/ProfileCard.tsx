@@ -4,11 +4,13 @@ import { DatabaseProfile } from '@/types/profile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { IslamicPattern } from '@/components/ui/islamic-pattern';
-import { Mail, Bookmark, Video, UserCheck } from 'lucide-react';
+import { Mail, Bookmark, Video, UserCheck, Calendar } from 'lucide-react';
 import CustomButton from '@/components/CustomButton';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose, DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProfileCardProps {
   profile: DatabaseProfile;
@@ -18,22 +20,50 @@ const ProfileCard = ({ profile }: ProfileCardProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [waliRequestDialogOpen, setWaliRequestDialogOpen] = useState(false);
+  const [requestType, setRequestType] = useState<'message' | 'video' | null>(null);
+  const [requestMessage, setRequestMessage] = useState('');
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const handleMessage = () => {
-    // Redirect to messages page for this user
-    navigate(`/messages/${profile.id}`);
-    toast({
-      title: "Starting conversation",
-      description: `You're about to message ${profile.first_name}.`,
-    });
+  // Determine if the current user is male to enforce wali approval for messaging/video calls with females
+  useState(() => {
+    const getCurrentUser = async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.user) {
+        setCurrentUserId(data.session.user.id);
+      }
+    };
+    getCurrentUser();
+  }, []);
+  
+  const handleMessage = async () => {
+    if (profile.gender === 'Female' && hasWali) {
+      // For female profiles with wali, show the request dialog
+      setRequestType('message');
+      setWaliRequestDialogOpen(true);
+    } else {
+      // For male profiles or females without wali, direct message
+      navigate(`/messages/${profile.id}`);
+      toast({
+        title: "Starting conversation",
+        description: `You're about to message ${profile.first_name}.`,
+      });
+    }
   };
   
-  const handleVideoCall = () => {
-    // Future implementation will use actual video call
-    toast({
-      title: "Video call requested",
-      description: `Video call request sent to ${profile.first_name}.`,
-    });
+  const handleVideoCall = async () => {
+    if (profile.gender === 'Female' && hasWali) {
+      // For female profiles with wali, show the request dialog
+      setRequestType('video');
+      setWaliRequestDialogOpen(true);
+    } else {
+      // For male profiles or females without wali, direct video call
+      toast({
+        title: "Video call requested",
+        description: `Video call request sent to ${profile.first_name}.`,
+      });
+    }
   };
   
   const handleContactWali = () => {
@@ -45,6 +75,69 @@ const ProfileCard = ({ profile }: ProfileCardProps) => {
         description: "This profile does not have wali contact information available.",
         variant: "destructive",
       });
+    }
+  };
+  
+  const handleWaliRequest = async () => {
+    if (!currentUserId) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to send a request.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Get the wali ID from the profile's wali information
+      const { data: waliData, error: waliError } = await supabase
+        .from('wali_profiles')
+        .select('id')
+        .eq('user_id', profile.id)
+        .single();
+      
+      if (waliError) {
+        console.error("Error finding wali:", waliError);
+        throw new Error("Could not find the wali information");
+      }
+      
+      const waliId = waliData?.id;
+      
+      // Create a chat request in the database
+      const { error: requestError } = await supabase
+        .from('chat_requests')
+        .insert({
+          requester_id: currentUserId,
+          recipient_id: profile.id,
+          wali_id: waliId,
+          status: 'pending',
+          message: requestMessage,
+          request_type: requestType
+        });
+      
+      if (requestError) {
+        console.error("Error creating request:", requestError);
+        throw new Error("Failed to send request to wali");
+      }
+      
+      toast({
+        title: "Request sent",
+        description: `Your ${requestType} request has been sent to ${profile.first_name}'s wali.`,
+      });
+      
+      setWaliRequestDialogOpen(false);
+    } catch (error) {
+      console.error("Error submitting request:", error);
+      toast({
+        title: "Request failed",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+      setRequestMessage('');
     }
   };
   
@@ -146,6 +239,53 @@ const ProfileCard = ({ profile }: ProfileCardProps) => {
               </CustomButton>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Wali Request Dialog */}
+      <Dialog open={waliRequestDialogOpen} onOpenChange={setWaliRequestDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Request Permission from Wali</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              To {requestType === 'message' ? 'message' : 'video call'} {profile.first_name}, 
+              you need permission from her wali ({profile.wali_name}).
+            </p>
+            
+            <div className="bg-accent/20 p-4 rounded-md">
+              <p className="text-sm mb-2">Please include a message to the wali explaining your intentions:</p>
+              <textarea 
+                className="w-full p-2 border border-gray-300 rounded-md" 
+                rows={4}
+                value={requestMessage}
+                onChange={(e) => setRequestMessage(e.target.value)}
+                placeholder={`Assalamu alaikum, I would like to ${requestType === 'message' ? 'have a conversation' : 'schedule a video call'} with ${profile.first_name}...`}
+              />
+              
+              <div className="flex items-center mt-4">
+                <Calendar className="h-4 w-4 mr-2 text-islamic-teal" />
+                <p className="text-sm text-muted-foreground">
+                  The wali can approve, reject, or suggest an alternative time.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="flex flex-col sm:flex-row sm:justify-end gap-2">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button 
+              onClick={handleWaliRequest}
+              disabled={isSubmitting || !requestMessage.trim()}
+              className="bg-islamic-teal hover:bg-islamic-teal/80 text-white"
+            >
+              {isSubmitting ? 'Sending...' : 'Send Request'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </IslamicPattern>
