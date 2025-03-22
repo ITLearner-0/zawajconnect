@@ -1,3 +1,4 @@
+
 import { useParams, useNavigate } from 'react-router-dom';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useMessages } from '@/hooks/useMessages';
@@ -18,6 +19,7 @@ const Messages = () => {
   const [isDemoConversation, setIsDemoConversation] = useState(false);
   const [demoMessages, setDemoMessages] = useState<any[]>([]);
   
+  // Séparer l'effet de détection d'utilisateur et de démo pour éviter les dépendances circulaires
   useEffect(() => {
     const getUserId = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -30,22 +32,28 @@ const Messages = () => {
     };
     
     getUserId();
-    
+  }, []);
+
+  // Effet séparé pour la détection de conversation démo
+  useEffect(() => {
     // Check if this is a demo conversation (user-X format)
     if (conversationId && conversationId.startsWith('user-')) {
       setIsDemoConversation(true);
       console.log('Demo conversation detected:', conversationId);
       
       // Load demo messages
-      if (conversationId === 'user-1' && dummyMessages['conv-1']) {
-        setDemoMessages(dummyMessages['conv-1']);
-      } else if (conversationId === 'user-2' && dummyMessages['conv-2']) {
-        setDemoMessages(dummyMessages['conv-2']);
-      } else if (conversationId === 'user-3' && dummyMessages['conv-3']) {
-        setDemoMessages(dummyMessages['conv-3']);
-      } else if (conversationId === 'user-4' && dummyMessages['conv-4']) {
-        setDemoMessages(dummyMessages['conv-4']);
+      if (conversationId === 'user-1') {
+        setDemoMessages(dummyMessages['conv-1'] || []);
+      } else if (conversationId === 'user-2') {
+        setDemoMessages(dummyMessages['conv-2'] || []);
+      } else if (conversationId === 'user-3') {
+        setDemoMessages(dummyMessages['conv-3'] || []);
+      } else if (conversationId === 'user-4') {
+        setDemoMessages(dummyMessages['conv-4'] || []);
       }
+    } else {
+      setIsDemoConversation(false);
+      setDemoMessages([]);
     }
   }, [conversationId]);
   
@@ -96,6 +104,8 @@ const Messages = () => {
   }, [conversationId, currentUserId, isDemoConversation, demoMessages, errors?.messages]);
 
   // Handle demo conversation for profiles with user-X IDs
+  const [demoMessageInput, setDemoMessageInput] = useState('');
+  
   const handleDemoSendMessage = (content: string) => {
     if (isDemoConversation && currentUserId) {
       const newMessage = {
@@ -128,7 +138,8 @@ const Messages = () => {
 
   // Handle special case for demo profiles
   if (isDemoConversation && conversationId) {
-    const demoProfile = dummyProfiles.find(p => p.id === conversationId);
+    const demoProfileId = conversationId;
+    const demoProfile = dummyProfiles.find(p => p.id === demoProfileId);
     
     if (demoProfile) {
       // For demo profiles, show a working chat interface with dummy messages
@@ -143,7 +154,7 @@ const Messages = () => {
             conversations={conversations || []}
             conversationId={conversationId}
             currentConversation={{
-              id: `demo-${conversationId}`,
+              id: conversationId,
               created_at: new Date().toISOString(),
               participants: [currentUserId, conversationId],
               profile: {
@@ -161,7 +172,7 @@ const Messages = () => {
           >
             <ChatWindow
               conversation={{
-                id: `demo-${conversationId}`,
+                id: conversationId,
                 created_at: new Date().toISOString(),
                 participants: [currentUserId, conversationId],
                 profile: {
@@ -172,12 +183,12 @@ const Messages = () => {
               }}
               messages={demoMessages}
               currentUserId={currentUserId}
-              messageInput={messageInput}
-              setMessageInput={setMessageInput}
+              messageInput={demoMessageInput}
+              setMessageInput={setDemoMessageInput}
               sendMessage={() => {
-                if (messageInput.trim()) {
-                  handleDemoSendMessage(messageInput);
-                  setMessageInput('');
+                if (demoMessageInput.trim()) {
+                  handleDemoSendMessage(demoMessageInput);
+                  setDemoMessageInput('');
                 }
               }}
               loading={false}
