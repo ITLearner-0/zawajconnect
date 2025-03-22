@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -18,12 +17,13 @@ interface ChatMessageHandlerProps {
   ) => void;
 }
 
-const ChatMessageHandler: React.FC<ChatMessageHandlerProps> = ({
+// Convert to a custom hook instead of a React component
+export const useChatMessageHandler = ({
   conversationId,
   onSendMessage,
   moderateMessageContent,
   processContentFlags
-}) => {
+}: ChatMessageHandlerProps) => {
   const { toast } = useToast();
 
   const handleSendMessage = (content: string) => {
@@ -59,6 +59,12 @@ const ChatMessageHandler: React.FC<ChatMessageHandlerProps> = ({
   };
 
   return { handleSendMessage };
+};
+
+// Keep the default export for backward compatibility, although we'll be using the hook directly
+const ChatMessageHandler: React.FC<ChatMessageHandlerProps> = (props) => {
+  // This won't actually be used, but keeps the component type-correct
+  return null;
 };
 
 export default ChatMessageHandler;

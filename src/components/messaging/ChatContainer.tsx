@@ -5,7 +5,7 @@ import MessageInput from './MessageInput';
 import ReportDialog from './ReportDialog';
 import ChatBody from './chat/ChatBody';
 import { useChatControls } from './chat/useChatControls';
-import ChatMessageHandler from './chat/ChatMessageHandler';
+import { useChatMessageHandler } from './chat/ChatMessageHandler';
 import { useMessageModeration } from '@/hooks/useMessageModeration';
 import { useAIMonitoring } from '@/hooks/useAIMonitoring';
 
@@ -63,8 +63,8 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
     processContentFlags 
   } = useMessageModeration(conversationId, messages, userId);
 
-  // Initialize message handler
-  const messageHandler = ChatMessageHandler({
+  // Initialize message handler using the hook
+  const { handleSendMessage } = useChatMessageHandler({
     conversationId,
     onSendMessage,
     moderateMessageContent,
@@ -86,7 +86,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
         onStartVideoCall={onStartVideoCall}
         isWaliSupervised={isWaliSupervised}
         showSecuritySettings={showSecuritySettings}
-        setShowSecuritySettings={setShowSecuritySettings}
+        setShowSecuritySettings={toggleSecuritySettings}
         openReportDialog={() => setShowReportDialog(true)}
       />
       
@@ -112,7 +112,12 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
       <MessageInput 
         messageInput={messageInput}
         setMessageInput={setMessageInput}
-        sendMessage={() => messageHandler.handleSendMessage(messageInput)}
+        sendMessage={() => {
+          if (messageInput.trim()) {
+            handleSendMessage(messageInput);
+            setMessageInput("");
+          }
+        }}
         sendingMessage={false}
         encryptionEnabled={true}
       />
