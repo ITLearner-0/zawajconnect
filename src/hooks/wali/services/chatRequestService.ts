@@ -40,19 +40,23 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
     // For each request, fetch the requester profile separately
     const transformedRequests: ChatRequest[] = await Promise.all(
       data.map(async (request) => {
+        // Type assertion to ensure TypeScript knows this is a valid data object, not an error
+        // This is safe since we've already checked for errors above
+        const validRequest = request as any;
+        
         // Create a default request object with the data we have
         const chatRequest: ChatRequest = {
-          id: request.id || '',
-          requester_id: request.requester_id || '',
-          recipient_id: request.recipient_id || '',
-          wali_id: request.wali_id,
-          status: (request.status as "pending" | "approved" | "rejected") || 'pending',
-          requested_at: request.requested_at || new Date().toISOString(),
-          reviewed_at: request.reviewed_at,
-          wali_notes: request.wali_notes,
-          message: request.message,
-          request_type: request.request_type as "message" | "video" | undefined,
-          suggested_time: request.suggested_time,
+          id: validRequest.id || '',
+          requester_id: validRequest.requester_id || '',
+          recipient_id: validRequest.recipient_id || '',
+          wali_id: validRequest.wali_id || '',
+          status: (validRequest.status as "pending" | "approved" | "rejected") || 'pending',
+          requested_at: validRequest.requested_at || new Date().toISOString(),
+          reviewed_at: validRequest.reviewed_at || null,
+          wali_notes: validRequest.wali_notes || '',
+          message: validRequest.message || '',
+          request_type: validRequest.request_type as "message" | "video" | undefined,
+          suggested_time: validRequest.suggested_time || '',
           requester_profile: {
             first_name: 'Unknown',
             last_name: 'User'
@@ -61,12 +65,12 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
 
         try {
           // Only proceed with profile fetch if we have a valid requester_id
-          if (request.requester_id) {
+          if (chatRequest.requester_id) {
             // Fetch requester profile data
             const { data: profileData, error: profileError } = await supabase
               .from('profiles')
               .select('first_name, last_name')
-              .eq('id', request.requester_id)
+              .eq('id', chatRequest.requester_id)
               .single();
 
             if (!profileError && profileData) {
