@@ -39,20 +39,20 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
 
     // For each request, fetch the requester profile separately
     const transformedRequests: ChatRequest[] = await Promise.all(
-      data.map(async (req) => {
+      data.map(async (request) => {
         // Create a default request object with the data we have
         const chatRequest: ChatRequest = {
-          id: req.id,
-          requester_id: req.requester_id,
-          recipient_id: req.recipient_id,
-          wali_id: req.wali_id,
-          status: req.status as "pending" | "approved" | "rejected",
-          requested_at: req.requested_at,
-          reviewed_at: req.reviewed_at,
-          wali_notes: req.wali_notes,
-          message: req.message,
-          request_type: req.request_type as "message" | "video" | undefined,
-          suggested_time: req.suggested_time,
+          id: request.id || '',
+          requester_id: request.requester_id || '',
+          recipient_id: request.recipient_id || '',
+          wali_id: request.wali_id,
+          status: (request.status as "pending" | "approved" | "rejected") || 'pending',
+          requested_at: request.requested_at || new Date().toISOString(),
+          reviewed_at: request.reviewed_at,
+          wali_notes: request.wali_notes,
+          message: request.message,
+          request_type: request.request_type as "message" | "video" | undefined,
+          suggested_time: request.suggested_time,
           requester_profile: {
             first_name: 'Unknown',
             last_name: 'User'
@@ -60,18 +60,21 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
         };
 
         try {
-          // Fetch requester profile data
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('first_name, last_name')
-            .eq('id', req.requester_id)
-            .single();
+          // Only proceed with profile fetch if we have a valid requester_id
+          if (request.requester_id) {
+            // Fetch requester profile data
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('first_name, last_name')
+              .eq('id', request.requester_id)
+              .single();
 
-          if (!profileError && profileData) {
-            chatRequest.requester_profile = {
-              first_name: profileData.first_name,
-              last_name: profileData.last_name
-            };
+            if (!profileError && profileData) {
+              chatRequest.requester_profile = {
+                first_name: profileData.first_name || 'Unknown',
+                last_name: profileData.last_name || 'User'
+              };
+            }
           }
         } catch (profileError) {
           console.error('Error in profile fetch:', profileError);
