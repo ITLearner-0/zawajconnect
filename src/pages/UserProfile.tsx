@@ -26,20 +26,28 @@ const UserProfile = () => {
       setLoading(true);
       try {
         console.log("Fetching profile with ID:", id);
-        console.log("Available profiles:", dummyProfiles);
-        const foundProfile = dummyProfiles.find(p => p.id === id);
         
-        if (foundProfile) {
-          console.log("Found profile:", foundProfile);
-          setProfile(foundProfile);
+        // First check if this is a demo profile
+        const demoProfile = dummyProfiles.find(p => p.id === id);
+        
+        if (demoProfile) {
+          console.log("Found demo profile:", demoProfile);
+          setProfile(demoProfile);
         } else {
-          console.error("Profile not found with ID:", id);
-          toast({
-            title: "Profile not found",
-            description: "We couldn't find the profile you're looking for.",
-            variant: "destructive",
-          });
-          navigate('/demo');
+          // If not a demo profile, try to fetch from database
+          console.log("Not a demo profile, fetching from database...");
+          // Add your real profile fetching logic here
+          
+          // If profile not found
+          if (!demoProfile) {
+            console.error("Profile not found with ID:", id);
+            toast({
+              title: "Profile not found",
+              description: "We couldn't find the profile you're looking for.",
+              variant: "destructive",
+            });
+            navigate('/demo');
+          }
         }
       } catch (error) {
         console.error("Error fetching profile:", error);
