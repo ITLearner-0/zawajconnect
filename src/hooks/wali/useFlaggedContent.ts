@@ -1,21 +1,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Message } from '@/types/wali';
+import { FlaggedItem, Message } from '@/types/wali';
 import { useToast } from '../use-toast';
-
-interface FlaggedItem {
-  id: string;
-  message: Message;
-  conversation_id: string;
-  flag_reason: string;
-  flagged_at: string;
-  flagged_by: string;
-  status: 'pending' | 'resolved';
-  resolved_at?: string;
-  resolved_by?: string;
-  resolution_notes?: string;
-}
 
 export const useFlaggedContent = (waliId: string) => {
   const [flaggedContent, setFlaggedContent] = useState<FlaggedItem[]>([]);
@@ -54,18 +41,30 @@ export const useFlaggedContent = (waliId: string) => {
       // Now get flagged content related to these users
       const { data: flags, error: flagsError } = await supabase
         .from('content_flags')
-        .select(`
-          *,
-          message:messages(*)
-        `)
+        .select('*')
         .in('flagged_by', waliProfile.managed_users)
-        .order('flagged_at', { ascending: false });
+        .order('created_at', { ascending: false });
 
       if (flagsError) {
         throw flagsError;
       }
 
-      setFlaggedContent(flags as FlaggedItem[]);
+      // Process the data to match our FlaggedItem type
+      const processedFlags: FlaggedItem[] = flags.map(flag => ({
+        id: flag.id,
+        message_id: flag.content_id,
+        message: {} as Message, // We'll fetch this later if needed
+        conversation_id: flag.content_type === 'message' ? 'unknown' : flag.content_id,
+        flag_reason: flag.flag_type,
+        flagged_at: flag.created_at,
+        flagged_by: flag.flagged_by,
+        status: flag.resolved ? 'resolved' : 'pending',
+        resolved_at: flag.resolved_at,
+        resolved_by: flag.resolved_by,
+        resolution_notes: flag.notes
+      }));
+
+      setFlaggedContent(processedFlags);
     } catch (err: any) {
       console.error('Error fetching flagged content:', err);
       setError(err.message || 'Failed to load flagged content');
@@ -104,10 +103,10 @@ export const useFlaggedContent = (waliId: string) => {
       const { error: updateError } = await supabase
         .from('content_flags')
         .update({ 
-          status: 'resolved',
+          resolved: true,
           resolved_at: new Date().toISOString(),
           resolved_by: waliId,
-          resolution_notes: notes
+          notes: notes
         })
         .eq('id', flagId);
 

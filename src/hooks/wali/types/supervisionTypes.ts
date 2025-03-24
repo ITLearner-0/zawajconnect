@@ -1,16 +1,10 @@
 
-import { SupervisionSession } from '@/types/wali';
-
-export interface SupervisionState {
-  activeConversations: any[];
-  loading: boolean;
-  error: string | null;
-}
+import { SupervisedConversation } from '@/types/wali';
 
 export interface UseSupervisionReturn {
-  activeConversations: any[];
+  activeConversations: SupervisedConversation[];
   loading: boolean;
   error: string | null;
-  startSupervision: (conversationId: string, supervisionLevel: SupervisionSession['supervision_level']) => Promise<boolean>;
-  endSupervision: (sessionId: string) => Promise<boolean>;
+  startSupervision: (conversationId: string, level?: 'active' | 'passive' | 'minimal') => Promise<boolean>;
+  endSupervision: (supervisionId: string, conversationId: string) => Promise<boolean>;
 }

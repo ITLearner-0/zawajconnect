@@ -50,6 +50,31 @@ export interface SupervisionSession {
   supervision_level: 'active' | 'passive' | 'minimal';
 }
 
+export interface SupervisedConversation {
+  id: string;
+  participants: string[];
+  participant_names?: string[];
+  created_at: string;
+  last_message_at?: string;
+  supervisionId: string;
+  supervisionStarted: string;
+  supervisionLevel: 'active' | 'passive' | 'minimal';
+}
+
+export interface FlaggedItem {
+  id: string;
+  message_id: string;
+  message: Message;
+  conversation_id: string;
+  flag_reason: string;
+  flagged_at: string;
+  flagged_by: string;
+  status: 'pending' | 'resolved';
+  resolved_at?: string;
+  resolved_by?: string;
+  resolution_notes?: string;
+}
+
 export interface WaliNotification {
   id: string;
   wali_id: string;

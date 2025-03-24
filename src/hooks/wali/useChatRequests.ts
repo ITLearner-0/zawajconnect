@@ -21,16 +21,10 @@ export const useChatRequests = (waliId: string) => {
     setError(null);
 
     try {
+      // First fetch the chat requests
       const { data, error: fetchError } = await supabase
         .from('chat_requests')
-        .select(`
-          *,
-          requester_profile:profiles!requester_id(
-            first_name,
-            last_name,
-            profile_image
-          )
-        `)
+        .select('*')
         .eq('wali_id', waliId)
         .order('requested_at', { ascending: false });
 
@@ -38,7 +32,44 @@ export const useChatRequests = (waliId: string) => {
         throw fetchError;
       }
 
-      setChatRequests(data as ChatRequest[]);
+      // Then fetch the requester profiles for each request
+      const requestsWithProfiles = await Promise.all(
+        data.map(async (request) => {
+          try {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('first_name, last_name, profile_image')
+              .eq('id', request.requester_id)
+              .single();
+
+            if (profileError) {
+              return {
+                ...request,
+                requester_profile: {
+                  first_name: 'Unknown',
+                  last_name: 'User',
+                }
+              };
+            }
+
+            return {
+              ...request,
+              requester_profile: profileData
+            };
+          } catch (err) {
+            console.error('Error fetching profile for request:', err);
+            return {
+              ...request,
+              requester_profile: {
+                first_name: 'Unknown',
+                last_name: 'User',
+              }
+            };
+          }
+        })
+      );
+
+      setChatRequests(requestsWithProfiles as ChatRequest[]);
     } catch (err: any) {
       console.error('Error fetching chat requests:', err);
       setError(err.message || 'Failed to load chat requests');

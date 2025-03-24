@@ -10,6 +10,7 @@ import MonitoringPanel from './MonitoringPanel';
 import AvailabilityControls from './AvailabilityControls';
 import WaliStats from './WaliStats';
 import { useWaliDashboard } from '@/hooks/useWaliDashboard';
+import { SupervisedConversation } from '@/types/wali';
 
 const WaliDashboard: React.FC = () => {
   const {
@@ -81,6 +82,7 @@ const WaliDashboard: React.FC = () => {
       <WaliHeader 
         profile={waliProfile} 
         statistics={statistics}
+        onSignOut={handleSignOut}
       />
       
       {error && (
@@ -134,7 +136,7 @@ const WaliDashboard: React.FC = () => {
             
             <TabsContent value="active-supervision">
               <ActiveConversationsPanel 
-                conversations={activeConversations}
+                conversations={activeConversations as SupervisedConversation[]}
                 onStartSupervision={startSupervision}
                 onEndSupervision={endSupervision}
               />

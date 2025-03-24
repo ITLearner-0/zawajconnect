@@ -10,20 +10,10 @@ import {
   MessagesSquare, 
   Users
 } from 'lucide-react';
-
-interface Conversation {
-  id: string;
-  participants: string[];
-  created_at: string;
-  last_message_at?: string;
-  supervisionId: string;
-  supervisionStarted: string;
-  supervisionLevel: 'active' | 'passive' | 'minimal';
-  profiles: any;
-}
+import { SupervisedConversation } from '@/types/wali';
 
 interface ActiveConversationsPanelProps {
-  conversations: Conversation[];
+  conversations: SupervisedConversation[];
   onStartSupervision: (conversationId: string, level?: 'active' | 'passive' | 'minimal') => void;
   onEndSupervision: (supervisionId: string, conversationId: string) => void;
   loading?: boolean;
@@ -71,11 +61,8 @@ const ActiveConversationsPanel: React.FC<ActiveConversationsPanelProps> = ({
   return (
     <div className="space-y-4">
       {conversations.map((conversation) => {
-        // Extract participant names
-        const participantNames = conversation.participants.map(id => {
-          const profile = conversation.profiles?.find((p: any) => p.id === id);
-          return profile ? `${profile.first_name} ${profile.last_name}` : 'Unknown User';
-        }).join(' & ');
+        // Extract participant names from participant_names array
+        const participantNames = conversation.participant_names?.join(' & ') || 'Unknown Users';
         
         return (
           <Card key={conversation.id}>

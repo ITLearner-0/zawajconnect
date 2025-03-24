@@ -5,7 +5,7 @@ import { useChatRequests } from './wali/useChatRequests';
 import { useSupervision } from './wali/useSupervision';
 import { useFlaggedContent } from './wali/useFlaggedContent';
 import { useWaliStats } from './wali/useWaliStats';
-import { WaliProfile } from '@/types/wali';
+import { SupervisedConversation, WaliProfile } from '@/types/wali';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useWaliDashboard = () => {
@@ -13,9 +13,13 @@ export const useWaliDashboard = () => {
   
   useEffect(() => {
     const getUserId = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.id) {
-        setUserId(session.user.id);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.id) {
+          setUserId(session.user.id);
+        }
+      } catch (error) {
+        console.error("Error getting user session:", error);
       }
     };
     
@@ -79,8 +83,13 @@ export const useWaliDashboard = () => {
   
   // Sign out function
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    return !error;
+    try {
+      const { error } = await supabase.auth.signOut();
+      return !error;
+    } catch (error) {
+      console.error("Error signing out:", error);
+      return false;
+    }
   };
   
   return {

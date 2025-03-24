@@ -174,7 +174,7 @@ const ChatRequestsPanel: React.FC<ChatRequestsPanelProps> = ({
                         <span className="font-medium text-sm">
                           {request.requester_profile?.first_name} {request.requester_profile?.last_name}
                         </span>
-                        <Badge variant={request.status === 'approved' ? 'success' : 'secondary'} className="text-xs">
+                        <Badge variant={request.status === 'approved' ? 'default' : 'secondary'} className="text-xs">
                           {request.status === 'approved' ? 'Approved' : 'Rejected'}
                         </Badge>
                       </div>
