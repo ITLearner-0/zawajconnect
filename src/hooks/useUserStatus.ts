@@ -73,9 +73,14 @@ export const useUserStatus = (userId: string | null) => {
         const tableExists = await checkTableExists('user_sessions');
         
         if (tableExists) {
-          // If table exists, check user_sessions table
-          const { data: sessionData, error: sessionError } = await supabase
-            .rpc('get_user_session', { user_id_param: userId });
+          // If table exists, check user_sessions table using a type assertion approach
+          const { data: sessionData, error: sessionError } = await supabase.rpc(
+            'get_user_session', 
+            { user_id_param: userId }
+          ) as unknown as { 
+            data: { status: UserStatus; last_active: string | null } | null; 
+            error: any 
+          };
 
           if (sessionError) {
             console.error('Error fetching user session:', sessionError);
@@ -84,7 +89,7 @@ export const useUserStatus = (userId: string | null) => {
 
           if (sessionData) {
             setUserStatusInfo({
-              status: sessionData.status as UserStatus || 'offline',
+              status: sessionData.status || 'offline',
               lastActive: sessionData.last_active || null,
               loading: false,
               error: null
@@ -191,7 +196,10 @@ export const useUserStatus = (userId: string | null) => {
  */
 const checkTableExists = async (tableName: string): Promise<boolean> => {
   try {
-    const { data, error } = await supabase.rpc('check_table_exists', { table_name: tableName });
+    const { data, error } = await supabase.rpc(
+      'check_table_exists', 
+      { table_name: tableName }
+    ) as unknown as { data: boolean; error: any };
     
     if (error) {
       console.error(`Error checking if table ${tableName} exists:`, error);
