@@ -6,7 +6,7 @@ import MessagesContainer from '@/components/messaging/MessagesContainer';
 import ChatWindow from '@/components/messaging/ChatWindow';
 import VideoCallManager from '@/components/messaging/VideoCallManager';
 import { Toaster } from '@/components/ui/toaster';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { dummyProfiles } from '@/data/profiles';
@@ -18,15 +18,16 @@ const Messages = () => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isDemoConversation, setIsDemoConversation] = useState(false);
   const [demoMessages, setDemoMessages] = useState<any[]>([]);
+  const [demoMessageInput, setDemoMessageInput] = useState('');
   
-  // Séparer l'effet de détection d'utilisateur et de démo pour éviter les dépendances circulaires
+  // Get current user ID
   useEffect(() => {
     const getUserId = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.id) {
         setCurrentUserId(session.user.id);
       } else {
-        // Si pas connecté, utiliser un ID temporaire pour la démo
+        // If not logged in, use a temporary ID for the demo
         setCurrentUserId('current-user');
       }
     };
@@ -34,22 +35,33 @@ const Messages = () => {
     getUserId();
   }, []);
 
-  // Effet séparé pour la détection de conversation démo
+  // Handle demo conversation detection
   useEffect(() => {
+    if (!conversationId) {
+      setIsDemoConversation(false);
+      setDemoMessages([]);
+      return;
+    }
+
     // Check if this is a demo conversation (user-X format)
-    if (conversationId && conversationId.startsWith('user-')) {
+    if (conversationId.startsWith('user-')) {
       setIsDemoConversation(true);
       console.log('Demo conversation detected:', conversationId);
       
-      // Load demo messages
-      if (conversationId === 'user-1') {
-        setDemoMessages(dummyMessages['conv-1'] || []);
-      } else if (conversationId === 'user-2') {
-        setDemoMessages(dummyMessages['conv-2'] || []);
-      } else if (conversationId === 'user-3') {
-        setDemoMessages(dummyMessages['conv-3'] || []);
-      } else if (conversationId === 'user-4') {
-        setDemoMessages(dummyMessages['conv-4'] || []);
+      // Load demo messages based on the conversation ID
+      const conversationMap: Record<string, string> = {
+        'user-1': 'conv-1',
+        'user-2': 'conv-2',
+        'user-3': 'conv-3',
+        'user-4': 'conv-4'
+      };
+      
+      const demoConvId = conversationMap[conversationId];
+      if (demoConvId && dummyMessages[demoConvId]) {
+        setDemoMessages(dummyMessages[demoConvId]);
+      } else {
+        // Default to empty array if no messages found
+        setDemoMessages([]);
       }
     } else {
       setIsDemoConversation(false);
@@ -57,9 +69,10 @@ const Messages = () => {
     }
   }, [conversationId]);
   
+  // Get user profile data
   const { profileData: userData } = useProfileData(currentUserId);
   
-  // Use conversationId directly from useParams
+  // Use conversationId from useParams for real conversations
   const {
     conversations,
     currentConversation,
@@ -103,31 +116,38 @@ const Messages = () => {
     }
   }, [conversationId, currentUserId, isDemoConversation, demoMessages, errors?.messages]);
 
-  // Handle demo conversation for profiles with user-X IDs
-  const [demoMessageInput, setDemoMessageInput] = useState('');
-  
-  const handleDemoSendMessage = (content: string) => {
-    if (isDemoConversation && currentUserId) {
-      const newMessage = {
-        id: `msg-${Date.now()}`,
-        conversation_id: conversationId || '',
-        sender_id: currentUserId,
-        content: content,
-        created_at: new Date().toISOString(),
-        is_read: true,
-        is_wali_visible: true
-      };
-      
-      setDemoMessages(prev => [...prev, newMessage]);
-      console.log("Demo message sent:", newMessage);
+  // Memoize the demo send message function to prevent recreation on each render
+  const handleDemoSendMessage = useCallback((content: string) => {
+    if (!isDemoConversation || !currentUserId || !content.trim()) return;
+    
+    const newMessage = {
+      id: `msg-${Date.now()}`,
+      conversation_id: conversationId || '',
+      sender_id: currentUserId,
+      content: content,
+      created_at: new Date().toISOString(),
+      is_read: true,
+      is_wali_visible: true
+    };
+    
+    setDemoMessages(prev => [...prev, newMessage]);
+    console.log("Demo message sent:", newMessage);
+  }, [isDemoConversation, currentUserId, conversationId]);
+
+  // Handle sending demo messages
+  const sendDemoMessage = useCallback(() => {
+    if (demoMessageInput.trim()) {
+      handleDemoSendMessage(demoMessageInput);
+      setDemoMessageInput('');
     }
-  };
+  }, [demoMessageInput, handleDemoSendMessage]);
 
   // Select a conversation
-  const selectConversation = (conversation: { id: string }) => {
+  const selectConversation = useCallback((conversation: { id: string }) => {
     navigate(`/messages/${conversation.id}`);
-  };
+  }, [navigate]);
 
+  // Loading state
   if (!currentUserId) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -138,22 +158,46 @@ const Messages = () => {
 
   // Handle special case for demo profiles
   if (isDemoConversation && conversationId) {
-    const demoProfileId = conversationId;
-    const demoProfile = dummyProfiles.find(p => p.id === demoProfileId);
+    const demoProfile = dummyProfiles.find(p => p.id === conversationId);
     
-    if (demoProfile) {
-      // For demo profiles, show a working chat interface with dummy messages
+    if (!demoProfile) {
       return (
-        <div className="flex flex-col h-screen">
-          <div className="bg-primary text-white p-4">
-            <h1 className="text-xl font-bold">Messages</h1>
-          </div>
-          
-          <MessagesContainer
-            loading={false}
-            conversations={conversations || []}
-            conversationId={conversationId}
-            currentConversation={{
+        <div className="flex items-center justify-center h-screen">
+          <p>Demo profile not found</p>
+        </div>
+      );
+    }
+    
+    // For demo profiles, show a working chat interface with dummy messages
+    return (
+      <div className="flex flex-col h-screen">
+        <div className="bg-primary text-white p-4">
+          <h1 className="text-xl font-bold">Messages</h1>
+        </div>
+        
+        <MessagesContainer
+          loading={false}
+          conversations={conversations || []}
+          conversationId={conversationId}
+          currentConversation={{
+            id: conversationId,
+            created_at: new Date().toISOString(),
+            participants: [currentUserId, conversationId],
+            profile: {
+              first_name: demoProfile.first_name,
+              last_name: demoProfile.last_name
+            },
+            wali_supervised: demoProfile.gender === 'Female'
+          }}
+          onSelectConversation={selectConversation}
+          errors={{
+            conversations: null,
+            messages: null,
+            videoCall: null
+          }}
+        >
+          <ChatWindow
+            conversation={{
               id: conversationId,
               created_at: new Date().toISOString(),
               participants: [currentUserId, conversationId],
@@ -163,47 +207,23 @@ const Messages = () => {
               },
               wali_supervised: demoProfile.gender === 'Female'
             }}
-            onSelectConversation={selectConversation}
-            errors={{
-              conversations: null,
-              messages: null,
-              videoCall: null
-            }}
-          >
-            <ChatWindow
-              conversation={{
-                id: conversationId,
-                created_at: new Date().toISOString(),
-                participants: [currentUserId, conversationId],
-                profile: {
-                  first_name: demoProfile.first_name,
-                  last_name: demoProfile.last_name
-                },
-                wali_supervised: demoProfile.gender === 'Female'
-              }}
-              messages={demoMessages}
-              currentUserId={currentUserId}
-              messageInput={demoMessageInput}
-              setMessageInput={setDemoMessageInput}
-              sendMessage={() => {
-                if (demoMessageInput.trim()) {
-                  handleDemoSendMessage(demoMessageInput);
-                  setDemoMessageInput('');
-                }
-              }}
-              loading={false}
-              sendingMessage={false}
-              error={null}
-              onStartVideoCall={() => {}}
-              backToList={() => navigate('/messages')}
-              isWaliSupervised={demoProfile.gender === 'Female'}
-            />
-          </MessagesContainer>
-          
-          <Toaster />
-        </div>
-      );
-    }
+            messages={demoMessages}
+            currentUserId={currentUserId}
+            messageInput={demoMessageInput}
+            setMessageInput={setDemoMessageInput}
+            sendMessage={sendDemoMessage}
+            loading={false}
+            sendingMessage={false}
+            error={null}
+            onStartVideoCall={() => {}}
+            backToList={() => navigate('/messages')}
+            isWaliSupervised={demoProfile.gender === 'Female'}
+          />
+        </MessagesContainer>
+        
+        <Toaster />
+      </div>
+    );
   }
 
   return (
