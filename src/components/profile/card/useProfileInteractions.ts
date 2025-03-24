@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { DatabaseProfile } from '@/types/profile';
 
 export const useProfileInteractions = (profile: DatabaseProfile) => {
@@ -35,9 +35,11 @@ export const useProfileInteractions = (profile: DatabaseProfile) => {
       setWaliRequestDialogOpen(true);
     } else {
       // For male profiles or females without wali, direct video call
+      // First navigate to messages and then initiate a video call
+      navigate(`/messages/${profile.id}`);
       toast({
-        title: "Video call requested",
-        description: `Video call request sent to ${profile.first_name}.`,
+        title: "Video call initiated",
+        description: `Starting video call with ${profile.first_name}.`,
       });
     }
   };

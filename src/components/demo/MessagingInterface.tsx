@@ -61,6 +61,17 @@ const MessagingInterface = ({
     selectConversation(emptyConversation);
   };
 
+  // Function to handle starting a video call
+  const handleStartVideoCall = () => {
+    if (!currentConversation) return;
+    
+    const otherUserId = currentConversation.participants.find(id => id !== currentUserId);
+    if (otherUserId) {
+      console.log('Starting video call with participant:', otherUserId);
+      startVideoCall(otherUserId);
+    }
+  };
+
   return (
     <div className="h-[600px] border border-islamic-teal/20 dark:border-islamic-darkTeal/30 rounded-lg overflow-hidden bg-islamic-solidGreen/5 dark:bg-islamic-darkGreen/10">
       <MessagesContainer
@@ -93,12 +104,7 @@ const MessagingInterface = ({
               loading={loading}
               sendingMessage={sendingMessage}
               error={null}
-              onStartVideoCall={() => {
-                const otherUserId = currentConversation.participants.find(id => id !== currentUserId);
-                if (otherUserId) {
-                  startVideoCall(otherUserId);
-                }
-              }}
+              onStartVideoCall={handleStartVideoCall}
               backToList={handleBackToList}
               isWaliSupervised={currentConversation.wali_supervised}
               monitoringEnabled={monitoringEnabled}

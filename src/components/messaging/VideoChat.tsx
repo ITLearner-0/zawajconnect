@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/button';
-import { Phone, PhoneOff, Mic, MicOff, Video, VideoOff } from 'lucide-react';
+import { PhoneOff, Mic, MicOff, Video, VideoOff } from 'lucide-react';
 
 interface VideoChatProps {
   participantId: string;
@@ -13,6 +13,7 @@ const VideoChat = ({ participantId, onEndCall }: VideoChatProps) => {
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(true);
   
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -21,6 +22,9 @@ const VideoChat = ({ participantId, onEndCall }: VideoChatProps) => {
   useEffect(() => {
     const startVideoChat = async () => {
       try {
+        setIsConnecting(true);
+        console.log('Starting video chat with participant:', participantId);
+        
         // For demo purposes, we're just getting the local stream
         // In a real app, you'd implement WebRTC peer connections
         const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -37,12 +41,16 @@ const VideoChat = ({ participantId, onEndCall }: VideoChatProps) => {
         
         // In a real app, you'd connect to the other participant here
         // For demo, we'll create a mock remote stream (just a copy)
-        setRemoteStream(stream);
-        if (remoteVideoRef.current) {
-          remoteVideoRef.current.srcObject = stream;
-        }
+        setTimeout(() => {
+          setRemoteStream(stream);
+          if (remoteVideoRef.current) {
+            remoteVideoRef.current.srcObject = stream;
+          }
+          setIsConnecting(false);
+        }, 1500);
       } catch (error) {
         console.error('Error accessing media devices:', error);
+        setIsConnecting(false);
       }
     };
     
@@ -85,13 +93,20 @@ const VideoChat = ({ participantId, onEndCall }: VideoChatProps) => {
     <div className="flex flex-col h-full bg-gray-900">
       <div className="flex-grow p-4 relative">
         {/* Remote video (full size) */}
-        <div className="w-full h-full bg-black rounded-lg overflow-hidden">
-          <video
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-            className="w-full h-full object-cover"
-          />
+        <div className="w-full h-full bg-black rounded-lg overflow-hidden flex items-center justify-center">
+          {isConnecting ? (
+            <div className="text-white flex flex-col items-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
+              <p>Connecting to {participantId}...</p>
+            </div>
+          ) : (
+            <video
+              ref={remoteVideoRef}
+              autoPlay
+              playsInline
+              className="w-full h-full object-cover"
+            />
+          )}
         </div>
         
         {/* Local video (picture-in-picture) */}
