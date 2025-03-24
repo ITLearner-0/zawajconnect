@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Conversation } from "@/types/profile";
 import { formatDistanceToNow } from "date-fns";
@@ -25,7 +26,7 @@ const ConversationList = ({
   const [searchTerm, setSearchTerm] = useState("");
   
   const filteredConversations = conversations.filter(conv => {
-    const fullName = `${conv.profile?.first_name} ${conv.profile?.last_name}`.toLowerCase();
+    const fullName = `${conv.profile?.first_name || ''} ${conv.profile?.last_name || ''}`.toLowerCase();
     return fullName.includes(searchTerm.toLowerCase());
   });
 
@@ -46,7 +47,7 @@ const ConversationList = ({
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
-            placeholder="Search messages"
+            placeholder="Filter conversations"
             className="pl-10"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}

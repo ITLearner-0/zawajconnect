@@ -4,6 +4,7 @@ import { Loader, AlertTriangle } from 'lucide-react';
 import ConversationList from './ConversationList';
 import EmptyConversation from './EmptyConversation';
 import { Alert, AlertDescription } from '../ui/alert';
+import MessageSearch from './MessageSearch';
 
 interface MessagesContainerProps {
   loading: boolean;
@@ -31,6 +32,14 @@ const MessagesContainer = ({
 }: MessagesContainerProps) => {
   const hasErrors = errors && (errors.conversations || errors.messages || errors.videoCall || errors.monitoring);
 
+  // Function to handle search result selection
+  const handleSearchResultSelect = (selectedConversationId: string) => {
+    const conversation = conversations.find(conv => conv.id === selectedConversationId);
+    if (conversation) {
+      onSelectConversation(conversation);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full">
       {/* Error alert */}
@@ -46,7 +55,14 @@ const MessagesContainer = ({
       {/* Main content */}
       <div className="flex flex-row h-full flex-grow">
         {/* Conversation list */}
-        <div className={`w-full md:w-1/3 border-r ${conversationId ? 'hidden md:block' : 'block'}`}>
+        <div className={`w-full md:w-1/3 border-r ${conversationId ? 'hidden md:flex md:flex-col' : 'flex flex-col'}`}>
+          <div className="flex items-center justify-between p-3 border-b">
+            <h2 className="font-medium">Messages</h2>
+            <MessageSearch 
+              userId={currentConversation?.participants.find(id => id !== conversationId) || null}
+              onSelectResult={handleSearchResultSelect}
+            />
+          </div>
           <ConversationList 
             conversations={conversations} 
             onSelectConversation={onSelectConversation}
