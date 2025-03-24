@@ -1,91 +1,98 @@
 
 import React from 'react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
-import { Clock, BellRing, BellOff } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import { WaliProfile } from '@/types/wali';
+import { CircleOff, Clock, Radio, Loader2 } from "lucide-react";
 
 interface AvailabilityControlsProps {
-  availabilityStatus: WaliProfile['availability_status'];
-  onUpdateAvailability: (status: WaliProfile['availability_status']) => void;
+  availabilityStatus: string;
+  onUpdateAvailability: (status: 'online' | 'away' | 'busy' | 'offline') => Promise<boolean>;
+  loading?: boolean;
 }
 
-const AvailabilityControls: React.FC<AvailabilityControlsProps> = ({ 
-  availabilityStatus, 
-  onUpdateAvailability 
+const AvailabilityControls: React.FC<AvailabilityControlsProps> = ({
+  availabilityStatus,
+  onUpdateAvailability,
+  loading = false
 }) => {
+  const handleStatusChange = (value: string) => {
+    onUpdateAvailability(value as 'online' | 'away' | 'busy' | 'offline');
+  };
+
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center text-lg">
-          <Clock className="mr-2 h-5 w-5" />
-          Availability Status
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg flex items-center">
+          <Radio className="h-5 w-5 mr-2 text-islamic-teal" />
+          <span>Availability Status</span>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <RadioGroup
-          value={availabilityStatus}
-          onValueChange={(value) => onUpdateAvailability(value as WaliProfile['availability_status'])}
-          className="space-y-3"
-        >
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="available" id="available" />
-            <Label 
-              htmlFor="available" 
-              className="flex items-center cursor-pointer"
-            >
-              <span className="h-2.5 w-2.5 rounded-full bg-green-500 mr-2"></span>
-              Available
-            </Label>
-          </div>
+        <div className="relative">
+          <Select
+            value={availabilityStatus}
+            onValueChange={handleStatusChange}
+            disabled={loading}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Set your availability" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="online" className="flex items-center">
+                <div className="flex items-center">
+                  <span className="h-2 w-2 rounded-full bg-green-500 mr-2"></span>
+                  Online
+                </div>
+              </SelectItem>
+              <SelectItem value="away">
+                <div className="flex items-center">
+                  <span className="h-2 w-2 rounded-full bg-yellow-500 mr-2"></span>
+                  Away
+                </div>
+              </SelectItem>
+              <SelectItem value="busy">
+                <div className="flex items-center">
+                  <span className="h-2 w-2 rounded-full bg-red-500 mr-2"></span>
+                  Busy
+                </div>
+              </SelectItem>
+              <SelectItem value="offline">
+                <div className="flex items-center">
+                  <span className="h-2 w-2 rounded-full bg-gray-500 mr-2"></span>
+                  Offline
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
           
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="busy" id="busy" />
-            <Label 
-              htmlFor="busy" 
-              className="flex items-center cursor-pointer"
-            >
-              <span className="h-2.5 w-2.5 rounded-full bg-amber-500 mr-2"></span>
-              Busy
-            </Label>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="offline" id="offline" />
-            <Label 
-              htmlFor="offline" 
-              className="flex items-center cursor-pointer"
-            >
-              <span className="h-2.5 w-2.5 rounded-full bg-gray-500 mr-2"></span>
-              Offline
-            </Label>
-          </div>
-        </RadioGroup>
-        
-        <div className="mt-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <BellRing className="h-4 w-4" />
-              <Label htmlFor="notifications">Notification Alerts</Label>
+          {loading && (
+            <div className="absolute right-10 top-3">
+              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
             </div>
-            <Switch id="notifications" defaultChecked />
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <BellOff className="h-4 w-4" />
-              <Label htmlFor="quiet-hours">Quiet Hours</Label>
-            </div>
-            <Switch id="quiet-hours" />
-          </div>
+          )}
         </div>
         
-        <Button className="w-full mt-6">
-          Update Settings
-        </Button>
+        <div className="mt-4 text-sm text-muted-foreground">
+          <div className="flex items-start mb-2">
+            <Clock className="h-4 w-4 mr-2 mt-0.5" />
+            <p>
+              Your availability controls when users can reach you and how notifications are prioritized.
+            </p>
+          </div>
+          
+          <div className="flex items-start">
+            <CircleOff className="h-4 w-4 mr-2 mt-0.5" />
+            <p>
+              Setting yourself to Offline will pause all new chat requests.
+            </p>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

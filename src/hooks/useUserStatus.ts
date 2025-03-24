@@ -1,279 +1,247 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from './use-toast';
+import { tableExists } from '@/utils/database/core';
+
+type UserStatus = 'online' | 'offline' | 'away' | 'busy';
 
 interface UserStatusData {
-  status: 'online' | 'offline' | 'away' | 'busy';
+  status: UserStatus;
   lastActive: string | null;
 }
 
-/**
- * Hook to get and set user status
- */
-export const useUserStatus = (userId: string | null | undefined) => {
-  const [status, setStatus] = useState<'online' | 'offline' | 'away' | 'busy'>('offline');
+export const useUserStatus = (userId: string | null) => {
+  const [status, setStatus] = useState<UserStatus>('offline');
   const [lastActive, setLastActive] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  // Check if this is a demo user ID (starting with 'user-')
+  // Don't attempt database operations for demo users
   const isDemoUser = userId?.startsWith('user-');
 
-  useEffect(() => {
-    // Skip for demo users or when userId is not available
+  // Get user status
+  const fetchUserStatus = useCallback(async () => {
     if (!userId || isDemoUser) {
-      // Set default status for demo users
-      if (isDemoUser) {
-        setStatus('online');
-        setLastActive(new Date().toISOString());
-      }
-      
       setLoading(false);
       return;
     }
 
-    // Fetch initial status
-    fetchUserStatus();
-
-    // Set up subscription for real-time updates
-    const channel = supabase.channel(`user_status_${userId}`);
-    
-    channel
-      .on('presence', { event: 'sync' }, () => {
-        updateStatusFromPresence(channel, userId);
-      })
-      .on('presence', { event: 'join' }, () => {
-        updateStatusFromPresence(channel, userId);
-      })
-      .on('presence', { event: 'leave' }, () => {
-        updateStatusFromPresence(channel, userId);
-      })
-      .subscribe(async (status) => {
-        if (status !== 'SUBSCRIBED') return;
-        
-        // No need to track our own status in this hook
-      });
-
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [userId, isDemoUser]);
-
-  /**
-   * Update status based on presence information
-   */
-  const updateStatusFromPresence = (channel: any, userId: string) => {
-    try {
-      const presenceState = channel.presenceState();
-      const userPresence = Object.values(presenceState)
-        .flat()
-        .find((presence: any) => presence.user_id === userId);
-      
-      if (userPresence) {
-        setStatus(userPresence.status || 'online');
-        setLastActive(userPresence.last_active || new Date().toISOString());
-      } else {
-        checkDatabaseStatus(userId);
-      }
-    } catch (err: any) {
-      console.error("Error updating status from presence:", err);
-    }
-  };
-
-  /**
-   * Fetch user status from database
-   */
-  const fetchUserStatus = async () => {
     try {
       setLoading(true);
       setError(null);
-      
-      // Skip database operations for demo users
-      if (isDemoUser) {
-        setStatus('online');
-        setLastActive(new Date().toISOString());
-        setLoading(false);
-        return;
-      }
 
-      // First check if the user_sessions table exists
-      const tableExists = await checkTableExists('user_sessions');
+      // Check if the user_sessions table exists
+      const sessionsTableExists = await tableExists('user_sessions');
       
-      if (!tableExists) {
+      if (!sessionsTableExists) {
         setStatus('offline');
         setLastActive(null);
         setLoading(false);
         return;
       }
 
-      // Try to get user session from database
-      await checkDatabaseStatus(userId as string);
-      
+      // Perform RPC call to get user session data
+      const { data, error: rpcError } = await supabase.rpc(
+        'get_user_session' as any,
+        { user_id: userId }
+      );
+
+      if (rpcError) {
+        console.error('Error fetching user status:', rpcError);
+        throw rpcError;
+      }
+
+      if (data) {
+        setStatus(data.status as UserStatus);
+        setLastActive(data.last_active);
+      } else {
+        // Default to offline if no session found
+        setStatus('offline');
+        setLastActive(null);
+      }
     } catch (err: any) {
-      console.error("Error fetching user status:", err);
-      setError(`Failed to fetch user status: ${err.message}`);
+      console.error('Error fetching user status:', err);
+      setError(err.message || 'Failed to load user status');
+      
+      // Default to offline status on error
       setStatus('offline');
+      setLastActive(null);
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId, isDemoUser, toast]);
 
-  /**
-   * Set user status
-   */
-  const setUserStatus = async (newStatus: 'online' | 'offline' | 'away' | 'busy') => {
-    try {
-      // Skip for demo users
-      if (isDemoUser) {
-        setStatus(newStatus);
-        return;
-      }
-      
-      const tableExists = await checkTableExists('user_sessions');
-      
-      if (!tableExists) {
-        console.log("User sessions table doesn't exist, skipping status update");
-        return;
-      }
-      
-      const timestamp = new Date().toISOString();
-      
-      // Try to update existing session
-      const { error: updateError } = await supabase
-        .from('user_sessions')
-        .update({
-          status: newStatus,
-          last_active: timestamp
-        })
-        .eq('user_id', userId);
-      
-      if (updateError) {
-        // If update fails, try to insert
-        const { error: insertError } = await supabase
-          .from('user_sessions')
-          .insert({
-            user_id: userId,
-            status: newStatus,
-            last_active: timestamp
-          });
-          
-        if (insertError) {
-          throw insertError;
-        }
-      }
-      
-      // Update local state
-      setStatus(newStatus);
-      setLastActive(timestamp);
-      
-    } catch (err: any) {
-      console.error("Error setting user status:", err);
-      setError(`Failed to set user status: ${err.message}`);
-    }
-  };
+  // Update user status
+  const updateUserStatus = useCallback(async (newStatus: UserStatus) => {
+    if (!userId || isDemoUser) return false;
 
-  /**
-   * Check user status from database
-   */
-  const checkDatabaseStatus = async (userId: string) => {
     try {
-      // Check if user has an active session in the database
-      const { data, error } = await supabase
-        .from('user_sessions')
-        .select('status, last_active')
-        .eq('user_id', userId)
-        .maybeSingle();
-        
-      if (error) {
-        throw error;
-      }
-      
-      if (data) {
-        // If session exists, check if it's still valid (within last 5 minutes)
-        const lastActiveTime = new Date(data.last_active).getTime();
-        const now = new Date().getTime();
-        const fiveMinutesInMs = 5 * 60 * 1000;
-        
-        if (now - lastActiveTime < fiveMinutesInMs) {
-          setStatus(data.status || 'online');
-        } else {
-          setStatus('offline');
-        }
-        
-        setLastActive(data.last_active);
-      } else {
-        setStatus('offline');
-        setLastActive(null);
-      }
-    } catch (err: any) {
-      console.error("Error checking database status:", err);
-      setStatus('offline');
-    }
-  };
+      setError(null);
 
-  /**
-   * Check if a table exists in the database
-   */
-  const checkTableExists = async (tableName: string): Promise<boolean> => {
-    try {
-      // Use RPC call to check if table exists
-      const { data, error } = await supabase.rpc('check_table_exists' as any, {
-        table_name: tableName
-      });
+      // Check if the user_sessions table exists
+      const sessionsTableExists = await tableExists('user_sessions');
       
-      if (error) {
-        console.error("Error checking if table exists:", error);
+      if (!sessionsTableExists) {
+        // Table doesn't exist, can't update status
+        toast({
+          title: "Status Update Failed",
+          description: "User status tracking is not available",
+          variant: "destructive"
+        });
         return false;
       }
+
+      // First check if a record exists for this user
+      const { data: existingSession } = await supabase
+        .from('user_sessions' as any)
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (existingSession) {
+        // Update existing record
+        const { error: updateError } = await supabase
+          .from('user_sessions' as any)
+          .update({ 
+            status: newStatus,
+            last_active: new Date().toISOString()
+          })
+          .eq('user_id', userId);
+
+        if (updateError) throw updateError;
+      } else {
+        // Insert new record
+        const { error: insertError } = await supabase
+          .from('user_sessions' as any)
+          .insert({ 
+            user_id: userId, 
+            status: newStatus,
+            last_active: new Date().toISOString()
+          });
+
+        if (insertError) throw insertError;
+      }
+
+      // Update local state
+      setStatus(newStatus);
+      setLastActive(new Date().toISOString());
       
-      return !!data;
+      return true;
     } catch (err: any) {
-      console.error(`Error checking if table ${tableName} exists:`, err);
+      console.error('Error updating user status:', err);
+      setError(err.message || 'Failed to update status');
+      
+      toast({
+        title: "Status Update Failed",
+        description: err.message || "Could not update your status",
+        variant: "destructive"
+      });
+      
       return false;
     }
-  };
+  }, [userId, isDemoUser, toast]);
 
-  /**
-   * Set user as offline when they leave the site
-   */
+  // Fetch status on component mount or when userId changes
   useEffect(() => {
-    // Skip for demo users
-    if (isDemoUser || !userId) return;
+    fetchUserStatus();
     
-    const handleBeforeUnload = async () => {
-      try {
-        await setUserStatus('offline');
-      } catch (err) {
-        console.error("Error setting offline status on unload:", err);
+    // Set up a listening channel for status updates
+    if (userId && !isDemoUser) {
+      const channel = supabase
+        .channel(`user_status_${userId}`)
+        .on('postgres_changes', { 
+          event: 'UPDATE', 
+          schema: 'public', 
+          table: 'user_sessions',
+          filter: `user_id=eq.${userId}`
+        }, (payload) => {
+          if (payload.new) {
+            const userData = payload.new as any;
+            setStatus(userData.status || 'offline');
+            setLastActive(userData.last_active || null);
+          }
+        })
+        .subscribe();
+        
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [userId, fetchUserStatus, isDemoUser]);
+
+  // Update to offline status when component unmounts
+  useEffect(() => {
+    // When the user leaves or closes the tab
+    const handleBeforeUnload = () => {
+      if (userId && !isDemoUser) {
+        // This is a synchronous call that might not complete before the page unloads
+        // But we'll try anyway
+        supabase
+          .from('user_sessions' as any)
+          .update({ 
+            status: 'offline',
+            last_active: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+          .then(() => {
+            console.log('Status set to offline on page unload');
+          })
+          .catch(err => {
+            console.error('Error updating status on unload:', err);
+          });
       }
     };
-    
+
     window.addEventListener('beforeunload', handleBeforeUnload);
     
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      handleBeforeUnload();
+      
+      // Also try to set status to offline when component unmounts
+      if (userId && !isDemoUser) {
+        supabase
+          .from('user_sessions' as any)
+          .update({ 
+            status: 'offline',
+            last_active: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+          .then(() => {
+            console.log('Status set to offline on unmount');
+          })
+          .catch(err => {
+            console.error('Error updating status on unmount:', err);
+          });
+      }
     };
   }, [userId, isDemoUser]);
 
-  // Provide default values for demo users
-  if (isDemoUser) {
-    return {
-      status: 'online' as const,
-      lastActive: new Date().toISOString(),
-      loading: false,
-      error: null,
-      setUserStatus: (status: 'online' | 'offline' | 'away' | 'busy') => {
-        setStatus(status);
+  // Check if table exists before initial query
+  useEffect(() => {
+    const checkTable = async () => {
+      if (!userId || isDemoUser) return;
+      
+      try {
+        const exists = await tableExists('user_sessions');
+        if (!exists) {
+          console.log('user_sessions table does not exist');
+        }
+      } catch (err) {
+        console.error('Error checking if user_sessions table exists:', err);
       }
     };
-  }
+    
+    checkTable();
+  }, [userId, isDemoUser]);
 
   return {
     status,
     lastActive,
     loading,
     error,
-    setUserStatus
+    updateStatus: updateUserStatus,
+    refreshStatus: fetchUserStatus
   };
 };

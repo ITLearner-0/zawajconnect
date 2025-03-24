@@ -1,74 +1,67 @@
 
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 /**
- * Safely checks if a table exists in the database schema
+ * Check if a table exists in the database
  */
 export const tableExists = async (tableName: string): Promise<boolean> => {
   try {
-    // Use a more generic approach to bypass TypeScript constraints by casting
-    const response = await supabase.rpc(
-      'check_table_exists' as any,
-      { table_name: tableName }
-    );
-    
-    if (response.error) {
-      console.error(`Error checking if table ${tableName} exists:`, response.error);
+    const { data, error } = await supabase.rpc('check_table_exists' as any, {
+      table_name: tableName
+    });
+
+    if (error) {
+      console.error('Error checking if table exists:', error);
       return false;
     }
-    
-    return !!response.data;
+
+    return data || false;
   } catch (err) {
-    console.error(`Error in tableExists check for ${tableName}:`, err);
+    console.error('Error checking if table exists:', err);
     return false;
   }
 };
 
 /**
- * Safely executes SQL queries through Supabase
+ * Execute a SQL query directly
+ * Note: This should be used carefully and only for admin functions
  */
-export const executeSql = async (query: string): Promise<any> => {
+export const executeSql = async (sql: string): Promise<any> => {
   try {
-    // For security, we'll use a more direct approach
-    const response = await supabase.rpc(
-      'execute_sql' as any,
-      { sql_query: query }
-    );
-    
-    if (response.error) {
-      console.error(`Error executing SQL: ${query}`, response.error);
-      return null;
+    const { data, error } = await supabase.rpc('execute_sql' as any, {
+      query: sql
+    });
+
+    if (error) {
+      console.error('Error executing SQL:', error);
+      throw error;
     }
-    
-    return response.data;
+
+    return data;
   } catch (err) {
-    console.error(`Error in executeSql:`, err);
-    return null;
+    console.error('Error executing SQL:', err);
+    throw err;
   }
 };
 
 /**
- * Checks if a column exists in a table
+ * Check if a column exists in a table
  */
 export const columnExists = async (tableName: string, columnName: string): Promise<boolean> => {
   try {
-    // Use a more generic approach to bypass TypeScript constraints
-    const response = await supabase.rpc(
-      'check_column_exists' as any,
-      { 
-        table_name: tableName,
-        column_name: columnName
-      }
-    );
-    
-    if (response.error) {
-      console.error(`Error checking if column ${columnName} exists in table ${tableName}:`, response.error);
+    const { data, error } = await supabase.rpc('check_column_exists' as any, {
+      table_name: tableName,
+      column_name: columnName
+    });
+
+    if (error) {
+      console.error('Error checking if column exists:', error);
       return false;
     }
-    
-    return !!response.data;
+
+    return data || false;
   } catch (err) {
-    console.error(`Error in columnExists check for ${columnName}:`, err);
+    console.error('Error checking if column exists:', err);
     return false;
   }
 };

@@ -1,89 +1,151 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ContentFlag } from '@/types/profile';
-import { useToast } from '@/hooks/use-toast';
+import { Message } from '@/types/wali';
+import { useToast } from '../use-toast';
 
-export const useFlaggedContent = (userId: string | null) => {
-  const { toast } = useToast();
-  const [flaggedContent, setFlaggedContent] = useState<ContentFlag[]>([]);
+interface FlaggedItem {
+  id: string;
+  message: Message;
+  conversation_id: string;
+  flag_reason: string;
+  flagged_at: string;
+  flagged_by: string;
+  status: 'pending' | 'resolved';
+  resolved_at?: string;
+  resolved_by?: string;
+  resolution_notes?: string;
+}
+
+export const useFlaggedContent = (waliId: string) => {
+  const [flaggedContent, setFlaggedContent] = useState<FlaggedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchFlaggedContent = async () => {
-      if (!userId) return;
-      
-      setLoading(true);
-      setError(null);
+  // Fetch flagged content
+  const fetchFlaggedContent = useCallback(async () => {
+    if (!waliId) {
+      setLoading(false);
+      return;
+    }
 
-      try {
-        // Fetch flagged content for this wali
-        const { data, error } = await supabase
-          .from('content_flags')
-          .select('*')
-          .eq('flagged_by', userId)
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.error('Error fetching flagged content:', error);
-          setError('Failed to load flagged content');
-          return;
-        }
-
-        // Ensure the content_type matches the expected type
-        const typedData = data?.map((item: any) => ({
-          ...item,
-          content_type: item.content_type as ContentFlag['content_type']
-        })) || [];
-        
-        setFlaggedContent(typedData);
-      } catch (err: any) {
-        console.error('Error fetching flagged content:', err);
-        setError(err.message || 'Failed to load flagged content');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchFlaggedContent();
-  }, [userId, toast]);
-
-  // Resolve flagged content
-  const resolveFlaggedContent = async (flagId: string) => {
-    if (!userId) return false;
+    setLoading(true);
+    setError(null);
 
     try {
-      const { error } = await supabase
+      // First get conversations this wali is responsible for
+      const { data: waliProfile, error: waliError } = await supabase
+        .from('wali_profiles')
+        .select('managed_users')
+        .eq('user_id', waliId)
+        .single();
+
+      if (waliError) {
+        throw waliError;
+      }
+
+      if (!waliProfile?.managed_users || !waliProfile.managed_users.length) {
+        setFlaggedContent([]);
+        setLoading(false);
+        return;
+      }
+
+      // Now get flagged content related to these users
+      const { data: flags, error: flagsError } = await supabase
+        .from('content_flags')
+        .select(`
+          *,
+          message:messages(*)
+        `)
+        .in('flagged_by', waliProfile.managed_users)
+        .order('flagged_at', { ascending: false });
+
+      if (flagsError) {
+        throw flagsError;
+      }
+
+      setFlaggedContent(flags as FlaggedItem[]);
+    } catch (err: any) {
+      console.error('Error fetching flagged content:', err);
+      setError(err.message || 'Failed to load flagged content');
+    } finally {
+      setLoading(false);
+    }
+  }, [waliId]);
+
+  useEffect(() => {
+    fetchFlaggedContent();
+
+    // Set up real-time subscription for content flags
+    if (waliId) {
+      const channel = supabase
+        .channel(`flagged_content_${waliId}`)
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'content_flags'
+        }, () => {
+          fetchFlaggedContent();
+        })
+        .subscribe();
+        
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }
+  }, [waliId, fetchFlaggedContent]);
+
+  // Resolve a flagged item
+  const resolveFlaggedContent = async (flagId: string, notes: string = 'Resolved by wali') => {
+    if (!waliId) return false;
+
+    try {
+      const { error: updateError } = await supabase
         .from('content_flags')
         .update({ 
-          resolved: true,
-          resolved_by: userId,
-          resolved_at: new Date().toISOString()
+          status: 'resolved',
+          resolved_at: new Date().toISOString(),
+          resolved_by: waliId,
+          resolution_notes: notes
         })
         .eq('id', flagId);
 
-      if (error) throw error;
+      if (updateError) {
+        throw updateError;
+      }
 
       // Update local state
       setFlaggedContent(prev => 
-        prev.map(flag => 
-          flag.id === flagId ? { ...flag, resolved: true, resolved_by: userId, resolved_at: new Date().toISOString() } : flag
+        prev.map(item => 
+          item.id === flagId 
+            ? { 
+                ...item, 
+                status: 'resolved',
+                resolved_at: new Date().toISOString(),
+                resolved_by: waliId,
+                resolution_notes: notes
+              } 
+            : item
         )
       );
 
       toast({
-        title: "Content Resolved",
-        description: "The flagged content has been marked as resolved",
+        title: "Flag Resolved",
+        description: "You have resolved this flagged content",
+        variant: "default"
       });
 
       return true;
     } catch (err: any) {
+      console.error('Error resolving flagged content:', err);
+      
       toast({
-        title: "Error",
-        description: err.message || "Failed to resolve flagged content",
+        title: "Action Failed",
+        description: err.message || "Could not resolve this flag",
         variant: "destructive"
       });
+      
       return false;
     }
   };
@@ -92,6 +154,7 @@ export const useFlaggedContent = (userId: string | null) => {
     flaggedContent,
     loading,
     error,
-    resolveFlaggedContent
+    resolveFlaggedContent,
+    refreshFlaggedContent: fetchFlaggedContent
   };
 };
