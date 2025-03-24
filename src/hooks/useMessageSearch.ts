@@ -18,8 +18,11 @@ export const useMessageSearch = (currentUserId: string | null) => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Check if this is a demo user
+  const isDemoUser = currentUserId?.startsWith('user-');
+
   const searchMessages = useCallback(async () => {
-    if (!searchTerm.trim() || !currentUserId) {
+    if (!searchTerm.trim() || !currentUserId || isDemoUser) {
       setSearchResults([]);
       return;
     }
@@ -122,7 +125,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
     } finally {
       setLoading(false);
     }
-  }, [searchTerm, currentUserId, toast]);
+  }, [searchTerm, currentUserId, toast, isDemoUser]);
 
   return {
     searchTerm,

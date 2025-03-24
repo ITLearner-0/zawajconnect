@@ -25,8 +25,13 @@ const MessageSearch: React.FC<MessageSearchProps> = ({ userId, onSelectResult })
     clearSearch
   } = useMessageSearch(userId);
 
+  // Check if this is a demo user ID
+  const isDemoUser = userId?.startsWith('user-');
+
   // Debounce search
   useEffect(() => {
+    if (isDemoUser) return; // Skip search for demo users
+    
     const timer = setTimeout(() => {
       if (open && searchTerm.trim().length > 2) {
         searchMessages();
@@ -34,7 +39,7 @@ const MessageSearch: React.FC<MessageSearchProps> = ({ userId, onSelectResult })
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, searchMessages, open]);
+  }, [searchTerm, searchMessages, open, isDemoUser]);
 
   const handleResultClick = (result: SearchResult) => {
     onSelectResult(result.conversationId);
@@ -81,7 +86,9 @@ const MessageSearch: React.FC<MessageSearchProps> = ({ userId, onSelectResult })
         </div>
         
         <div className="text-sm text-muted-foreground mt-1 mb-2">
-          {searchTerm.length > 0 && searchTerm.length < 3 ? 
+          {isDemoUser ? (
+            'Search not available for demo users'
+          ) : searchTerm.length > 0 && searchTerm.length < 3 ? 
             'Type at least 3 characters to search' : 
             loading ? 
               'Searching...' : 
@@ -93,7 +100,12 @@ const MessageSearch: React.FC<MessageSearchProps> = ({ userId, onSelectResult })
         </div>
         
         <ScrollArea className="flex-grow overflow-auto">
-          {loading ? (
+          {isDemoUser ? (
+            <div className="flex justify-center items-center py-10">
+              <MessageSquare className="mx-auto h-8 w-8 opacity-20 mb-2" />
+              <p className="text-center text-muted-foreground">Search is not available in demo mode</p>
+            </div>
+          ) : loading ? (
             <div className="flex justify-center items-center py-10">
               <Loader className="animate-spin mr-2 h-5 w-5" />
               <span>Searching messages...</span>

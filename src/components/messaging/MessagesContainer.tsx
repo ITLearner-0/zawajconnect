@@ -32,6 +32,12 @@ const MessagesContainer = ({
 }: MessagesContainerProps) => {
   const hasErrors = errors && (errors.conversations || errors.messages || errors.videoCall || errors.monitoring);
 
+  // Get other user ID for search
+  let otherUserId = null;
+  if (currentConversation && conversationId) {
+    otherUserId = currentConversation.participants.find(id => id !== conversationId) || null;
+  }
+
   // Function to handle search result selection
   const handleSearchResultSelect = (selectedConversationId: string) => {
     const conversation = conversations.find(conv => conv.id === selectedConversationId);
@@ -59,7 +65,7 @@ const MessagesContainer = ({
           <div className="flex items-center justify-between p-3 border-b">
             <h2 className="font-medium">Messages</h2>
             <MessageSearch 
-              userId={currentConversation?.participants.find(id => id !== conversationId) || null}
+              userId={otherUserId}
               onSelectResult={handleSearchResultSelect}
             />
           </div>
