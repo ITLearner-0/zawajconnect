@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { tableExists } from '@/utils/database/core';
 
 type UserStatus = 'online' | 'offline' | 'away' | 'busy';
 
@@ -70,17 +71,17 @@ export const useUserStatus = (userId: string | null) => {
         }
 
         // Check if user_sessions table exists before trying to query it
-        const tableExists = await checkTableExists('user_sessions');
+        const userSessionsTableExists = await tableExists('user_sessions');
         
-        if (tableExists) {
-          // If table exists, check user_sessions table using a type assertion approach
-          const { data: sessionData, error: sessionError } = await supabase.rpc(
-            'get_user_session', 
+        if (userSessionsTableExists) {
+          // If table exists, use a generic approach to call the stored procedure
+          const response = await supabase.rpc(
+            'get_user_session' as any, 
             { user_id_param: userId }
-          ) as unknown as { 
-            data: { status: UserStatus; last_active: string | null } | null; 
-            error: any 
-          };
+          );
+          
+          const sessionData = response.data as { status: string; last_active: string | null } | null;
+          const sessionError = response.error;
 
           if (sessionError) {
             console.error('Error fetching user session:', sessionError);
@@ -88,9 +89,25 @@ export const useUserStatus = (userId: string | null) => {
           }
 
           if (sessionData) {
+            // Map the status to our UserStatus type
+            let status: UserStatus = 'offline';
+            switch (sessionData.status) {
+              case 'online':
+                status = 'online';
+                break;
+              case 'away':
+                status = 'away';
+                break;
+              case 'busy':
+                status = 'busy';
+                break;
+              default:
+                status = 'offline';
+            }
+            
             setUserStatusInfo({
-              status: sessionData.status || 'offline',
-              lastActive: sessionData.last_active || null,
+              status,
+              lastActive: sessionData.last_active,
               loading: false,
               error: null
             });
@@ -121,8 +138,8 @@ export const useUserStatus = (userId: string | null) => {
     // Set up a realtime subscription for user status changes
     // Only if user_sessions table exists
     const checkAndSubscribe = async () => {
-      const tableExists = await checkTableExists('user_sessions');
-      if (!tableExists) return;
+      const userSessionsTableExists = await tableExists('user_sessions');
+      if (!userSessionsTableExists) return;
       
       const userStatusChannel = supabase
         .channel('user_status_changes')
@@ -189,26 +206,4 @@ export const useUserStatus = (userId: string | null) => {
   }, [userId]);
 
   return userStatusInfo;
-};
-
-/**
- * Helper function to check if a table exists
- */
-const checkTableExists = async (tableName: string): Promise<boolean> => {
-  try {
-    const { data, error } = await supabase.rpc(
-      'check_table_exists', 
-      { table_name: tableName }
-    ) as unknown as { data: boolean; error: any };
-    
-    if (error) {
-      console.error(`Error checking if table ${tableName} exists:`, error);
-      return false;
-    }
-    
-    return !!data;
-  } catch (err) {
-    console.error(`Error in checkTableExists for ${tableName}:`, err);
-    return false;
-  }
 };
