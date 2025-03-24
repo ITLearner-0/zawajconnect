@@ -132,7 +132,7 @@ const DemoConversation: React.FC<DemoConversationProps> = ({
           onStartVideoCall={() => {}}
           backToList={() => navigate('/messages')}
           isWaliSupervised={demoProfile.gender === 'Female'}
-          userStatus={getDemoStatus()}
+          userStatus={getDemoStatus() as 'online' | 'offline' | 'away' | 'busy'}
           lastActive={getRandomLastActive()}
         />
       </MessagesContainer>

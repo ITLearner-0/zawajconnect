@@ -30,6 +30,8 @@ interface ChatWindowProps {
   toggleEncryption?: (enabled: boolean) => void;
   retentionPolicy?: RetentionPolicy;
   updateRetentionPolicy?: (policy: RetentionPolicy) => void;
+  userStatus?: 'online' | 'offline' | 'away' | 'busy';
+  lastActive?: string | null;
 }
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
@@ -52,7 +54,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   encryptionEnabled = true,
   toggleEncryption = () => {},
   retentionPolicy,
-  updateRetentionPolicy = () => {}
+  updateRetentionPolicy = () => {},
+  userStatus,
+  lastActive
 }) => {
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
@@ -61,8 +65,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   // Get the other user ID to fetch their status
   const otherUserId = conversation.participants.find(id => id !== currentUserId) || '';
   
-  // Use our new hook to get user status
-  const { status: userStatus, lastActive } = useUserStatus(otherUserId);
+  // Use our hook to get user status if not provided through props
+  const userStatusInfo = useUserStatus(otherUserId);
+  
+  // Use props if available, otherwise use the hook data
+  const status = userStatus || userStatusInfo.status;
+  const lastActiveTime = lastActive || userStatusInfo.lastActive;
   
   const openReportDialog = () => {
     setSelectedMessage(null);
@@ -88,8 +96,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         openReportDialog={openReportDialog}
         retentionPolicy={retentionPolicy}
         updateRetentionPolicy={updateRetentionPolicy}
-        userStatus={userStatus}
-        lastActive={lastActive}
+        userStatus={status}
+        lastActive={lastActiveTime}
       />
       
       {/* Security settings panel (collapsible) */}
