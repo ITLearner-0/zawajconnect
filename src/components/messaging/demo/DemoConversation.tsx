@@ -64,6 +64,24 @@ const DemoConversation: React.FC<DemoConversationProps> = ({
     navigate(`/messages/${conversation.id}`);
   }, [navigate]);
   
+  // Generate a simulated last active time (5-30 minutes ago)
+  const getRandomLastActive = () => {
+    const now = new Date();
+    const minutesAgo = Math.floor(Math.random() * 25) + 5; // 5-30 minutes ago
+    now.setMinutes(now.getMinutes() - minutesAgo);
+    return now.toISOString();
+  };
+  
+  // Get a simulated status for demo users
+  const getDemoStatus = () => {
+    const statuses = ['online', 'offline', 'away', 'busy'];
+    // For female profiles, higher chance of being online (for demo purposes)
+    if (demoProfile.gender === 'Female') {
+      return Math.random() > 0.3 ? 'online' : statuses[Math.floor(Math.random() * statuses.length)];
+    }
+    return statuses[Math.floor(Math.random() * statuses.length)];
+  };
+  
   // For demo profiles, show a working chat interface with dummy messages
   return (
     <div className="flex flex-col h-screen">
@@ -114,6 +132,8 @@ const DemoConversation: React.FC<DemoConversationProps> = ({
           onStartVideoCall={() => {}}
           backToList={() => navigate('/messages')}
           isWaliSupervised={demoProfile.gender === 'Female'}
+          userStatus={getDemoStatus()}
+          lastActive={getRandomLastActive()}
         />
       </MessagesContainer>
       

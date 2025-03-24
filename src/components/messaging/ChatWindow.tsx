@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Conversation, Message, RetentionPolicy } from '@/types/profile';
 import ChatHeader from './ChatHeader';
@@ -6,6 +7,7 @@ import MessagesList from './MessagesList';
 import MessageInput from './MessageInput';
 import ReportDialog from './ReportDialog';
 import { MonitoringReport } from '@/services/monitoring';
+import { useUserStatus } from '@/hooks/useUserStatus';
 
 interface ChatWindowProps {
   conversation: Conversation;
@@ -56,6 +58,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   
+  // Get the other user ID to fetch their status
+  const otherUserId = conversation.participants.find(id => id !== currentUserId) || '';
+  
+  // Use our new hook to get user status
+  const { status: userStatus, lastActive } = useUserStatus(otherUserId);
+  
   const openReportDialog = () => {
     setSelectedMessage(null);
     setIsReportDialogOpen(true);
@@ -65,8 +73,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     setSelectedMessage(message);
     setIsReportDialogOpen(true);
   };
-
-  const otherUserId = conversation.participants.find(id => id !== currentUserId) || '';
 
   return (
     <div className="flex flex-col h-full">
@@ -82,6 +88,8 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         openReportDialog={openReportDialog}
         retentionPolicy={retentionPolicy}
         updateRetentionPolicy={updateRetentionPolicy}
+        userStatus={userStatus}
+        lastActive={lastActive}
       />
       
       {/* Security settings panel (collapsible) */}
