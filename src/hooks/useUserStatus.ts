@@ -178,6 +178,7 @@ export const useUserStatus = (userId: string | null) => {
       if (userId && !isDemoUser) {
         // This is a synchronous call that might not complete before the page unloads
         // But we'll try anyway
+        // Fix: Removed the .catch() method as it doesn't exist on PromiseLike<void>
         supabase
           .from('user_sessions' as any)
           .update({ 
@@ -187,9 +188,6 @@ export const useUserStatus = (userId: string | null) => {
           .eq('user_id', userId)
           .then(() => {
             console.log('Status set to offline on page unload');
-          })
-          .catch(err => {
-            console.error('Error updating status on unload:', err);
           });
       }
     };
@@ -200,6 +198,7 @@ export const useUserStatus = (userId: string | null) => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       
       // Also try to set status to offline when component unmounts
+      // Fix: Removed the .catch() method as it doesn't exist on PromiseLike<void>
       if (userId && !isDemoUser) {
         supabase
           .from('user_sessions' as any)
@@ -210,9 +209,6 @@ export const useUserStatus = (userId: string | null) => {
           .eq('user_id', userId)
           .then(() => {
             console.log('Status set to offline on unmount');
-          })
-          .catch(err => {
-            console.error('Error updating status on unmount:', err);
           });
       }
     };
