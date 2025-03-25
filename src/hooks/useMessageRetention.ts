@@ -28,10 +28,22 @@ export const useMessageRetention = (conversationId: string | undefined) => {
             WHERE id = '${conversationId}'
           `);
           
-          if (result && result.result && result.result.length > 0 && result.result[0].retention_policy) {
-            setRetentionPolicyState(result.result[0].retention_policy as RetentionPolicy);
+          // Since executeSql returns true or a data object, handle accordingly
+          if (result && typeof result !== 'boolean') {
+            // Check if there's data in the results and has the retention_policy field
+            const data = Array.isArray(result) ? result[0] : result;
+            if (data?.retention_policy) {
+              setRetentionPolicyState(data.retention_policy as RetentionPolicy);
+            } else {
+              // Set default policy if none exists
+              const defaultPolicy: RetentionPolicy = {
+                type: 'permanent',
+                auto_delete: false
+              };
+              setRetentionPolicyState(defaultPolicy);
+            }
           } else {
-            // Set default policy if none exists
+            // Set default policy if no valid result
             const defaultPolicy: RetentionPolicy = {
               type: 'permanent',
               auto_delete: false

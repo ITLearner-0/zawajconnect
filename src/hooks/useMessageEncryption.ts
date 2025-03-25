@@ -31,8 +31,11 @@ export const useMessageEncryption = (conversationId: string | undefined) => {
             WHERE id = '${conversationId}'
           `);
 
-          if (result && result.result && result.result.length > 0) {
-            setEncryptionEnabled(!!result.result[0].encryption_enabled);
+          // Since executeSql returns true or a data object, handle accordingly
+          if (result && typeof result !== 'boolean') {
+            // Check if there's data in the results and has the encryption_enabled field
+            const data = Array.isArray(result) ? result[0] : result;
+            setEncryptionEnabled(!!data?.encryption_enabled);
           } else {
             // Default to false if not set
             setEncryptionEnabled(false);
