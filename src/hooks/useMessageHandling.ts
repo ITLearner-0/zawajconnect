@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types/profile';
 import { useToast } from './use-toast';
+import { dummyMessages } from '@/data/messages';
 
 export const useMessageHandling = (conversationId?: string, currentUserId?: string | null) => {
   const { toast } = useToast();
@@ -22,7 +23,7 @@ export const useMessageHandling = (conversationId?: string, currentUserId?: stri
 
   // Fetch messages for the current conversation
   const fetchMessages = useCallback(async (encryptionEnabled: boolean) => {
-    if (!conversationId || !currentUserId) return;
+    if (!conversationId) return;
     
     try {
       setLoading(true);
@@ -30,62 +31,91 @@ export const useMessageHandling = (conversationId?: string, currentUserId?: stri
       
       console.log('Fetching messages for conversation:', conversationId);
       
-      // Create a messages relationship to conversations if it doesn't exist
-      const { error: checkError } = await supabase
-        .from('messages')
-        .select('id')
-        .eq('conversation_id', conversationId)
-        .limit(1);
+      // Check if this is a demo conversation
+      if (conversationId.startsWith('user-') || conversationId.startsWith('conv-')) {
+        // Get demo messages
+        let demoConvId = conversationId;
+        if (conversationId.startsWith('user-')) {
+          const userNumber = conversationId.split('-')[1];
+          demoConvId = `conv-${userNumber}`;
+        }
         
-      if (checkError) {
-        console.error('Error checking messages:', checkError);
-      }
-      
-      const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('conversation_id', conversationId)
-        .order('created_at', { ascending: true });
-        
-      if (error) {
-        console.error('Error fetching messages:', error);
-        setErrors(prev => ({
-          ...prev,
-          messages: `Failed to load messages: ${error.message}`
-        }));
+        if (dummyMessages[demoConvId]) {
+          console.log('Using demo messages for:', demoConvId);
+          setMessages(dummyMessages[demoConvId]);
+        } else {
+          console.log('No demo messages found for:', demoConvId);
+          setMessages([]);
+        }
+        setLoading(false);
         return;
       }
       
-      // Process messages for encryption if needed
-      let processedMessages: Message[] = data || [];
-      
-      if (encryptionEnabled && processedMessages.length > 0) {
-        processedMessages = await Promise.all(
-          processedMessages.map(msg => 
-            msg.encrypted ? decryptMessage(msg) : msg
-          )
-        );
-      }
-      
-      setMessages(processedMessages);
-      
-      // Mark messages as read
-      if (data && data.length > 0) {
-        const unreadMessages = data.filter(
-          msg => !msg.is_read && msg.sender_id !== currentUserId
-        );
+      // For real conversations, fetch from Supabase
+      try {
+        // Create a messages relationship to conversations if it doesn't exist
+        const { error: checkError } = await supabase
+          .from('messages')
+          .select('id')
+          .eq('conversation_id', conversationId)
+          .limit(1);
+          
+        if (checkError) {
+          console.error('Error checking messages:', checkError);
+        }
         
-        if (unreadMessages.length > 0) {
-          const unreadIds = unreadMessages.map(msg => msg.id);
-          const { error: updateError } = await supabase
-            .from('messages')
-            .update({ is_read: true })
-            .in('id', unreadIds);
-            
-          if (updateError) {
-            console.error('Error marking messages as read:', updateError);
+        const { data, error } = await supabase
+          .from('messages')
+          .select('*')
+          .eq('conversation_id', conversationId)
+          .order('created_at', { ascending: true });
+          
+        if (error) {
+          console.error('Error fetching messages:', error);
+          setErrors(prev => ({
+            ...prev,
+            messages: `Failed to load messages: ${error.message}`
+          }));
+          return;
+        }
+        
+        // Process messages for encryption if needed
+        let processedMessages: Message[] = data || [];
+        
+        if (encryptionEnabled && processedMessages.length > 0) {
+          processedMessages = await Promise.all(
+            processedMessages.map(msg => 
+              msg.encrypted ? decryptMessage(msg) : msg
+            )
+          );
+        }
+        
+        setMessages(processedMessages);
+        
+        // Mark messages as read
+        if (data && data.length > 0 && currentUserId) {
+          const unreadMessages = data.filter(
+            msg => !msg.is_read && msg.sender_id !== currentUserId
+          );
+          
+          if (unreadMessages.length > 0) {
+            const unreadIds = unreadMessages.map(msg => msg.id);
+            const { error: updateError } = await supabase
+              .from('messages')
+              .update({ is_read: true })
+              .in('id', unreadIds);
+              
+            if (updateError) {
+              console.error('Error marking messages as read:', updateError);
+            }
           }
         }
+      } catch (err: any) {
+        console.error('Supabase operation error:', err);
+        setErrors(prev => ({
+          ...prev,
+          messages: `Database operation failed: ${err.message}`
+        }));
       }
     } catch (err: any) {
       console.error('Error in fetchMessages:', err);
@@ -100,10 +130,34 @@ export const useMessageHandling = (conversationId?: string, currentUserId?: stri
 
   // Send a message
   const sendMessage = async () => {
-    if (!messageInput.trim() || !conversationId || !currentUserId) return;
+    if (!messageInput.trim() || !conversationId) return;
     
     try {
       setSendingMessage(true);
+      
+      // Check if this is a demo conversation
+      if (conversationId.startsWith('user-') || conversationId.startsWith('conv-')) {
+        // For demo conversations, just add the message locally
+        const newMessage: Message = {
+          id: `msg-${Date.now()}`,
+          conversation_id: conversationId,
+          sender_id: currentUserId || 'current-user',
+          content: messageInput,
+          created_at: new Date().toISOString(),
+          is_read: false,
+          is_wali_visible: true
+        };
+        
+        setMessages(prev => [...prev, newMessage]);
+        setMessageInput('');
+        setSendingMessage(false);
+        return;
+      }
+      
+      // For real conversations, send to Supabase
+      if (!currentUserId) {
+        throw new Error("You must be logged in to send messages");
+      }
       
       // Create a new message
       const newMessage = {

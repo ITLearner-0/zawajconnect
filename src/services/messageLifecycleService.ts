@@ -11,6 +11,12 @@ export const setRetentionPolicy = async (
   policy: RetentionPolicy
 ): Promise<boolean> => {
   try {
+    // For demo conversations, just return success
+    if (conversationId.startsWith('user-') || conversationId.startsWith('conv-')) {
+      console.log(`Setting retention policy for demo conversation ${conversationId}:`, policy);
+      return true;
+    }
+    
     // Check if the column exists
     const hasColumn = await columnExists('conversations', 'retention_policy');
     
@@ -52,6 +58,12 @@ const scheduleMessageDeletion = async (
   durationDays: number
 ): Promise<boolean> => {
   try {
+    // For demo conversations, just return success
+    if (conversationId.startsWith('user-') || conversationId.startsWith('conv-')) {
+      console.log(`Scheduling message deletion for demo conversation ${conversationId} after ${durationDays} days`);
+      return true;
+    }
+    
     // Check if scheduled_deletion column exists
     const hasColumn = await columnExists('messages', 'scheduled_deletion');
     
@@ -120,6 +132,12 @@ export const deleteExpiredMessages = async (): Promise<boolean> => {
  */
 export const deleteAllMessages = async (conversationId: string): Promise<boolean> => {
   try {
+    // For demo conversations, just return success
+    if (conversationId.startsWith('user-') || conversationId.startsWith('conv-')) {
+      console.log(`Deleting all messages for demo conversation ${conversationId}`);
+      return true;
+    }
+    
     const result = await executeSql(`
       DELETE FROM messages
       WHERE conversation_id = '${conversationId}'

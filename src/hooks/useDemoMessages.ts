@@ -13,23 +13,23 @@ export const useDemoMessages = (conversationId: string | undefined) => {
       return;
     }
 
-    // Check if this is a demo conversation (user-X format)
-    if (conversationId.startsWith('user-')) {
+    // Check if this is a demo conversation (starts with 'user-' or is in the conv-X format)
+    if (conversationId.startsWith('user-') || conversationId.startsWith('conv-')) {
       setIsDemoConversation(true);
       console.log('Demo conversation detected:', conversationId);
       
-      // Load demo messages based on the conversation ID
-      const conversationMap: Record<string, string> = {
-        'user-1': 'conv-1',
-        'user-2': 'conv-2',
-        'user-3': 'conv-3',
-        'user-4': 'conv-4'
-      };
+      // Map user-X to conv-X if needed
+      let demoConvId = conversationId;
+      if (conversationId.startsWith('user-')) {
+        const userNumber = conversationId.split('-')[1];
+        demoConvId = `conv-${userNumber}`;
+      }
       
-      const demoConvId = conversationMap[conversationId];
-      if (demoConvId && dummyMessages[demoConvId]) {
+      if (dummyMessages[demoConvId]) {
+        console.log(`Loading demo messages for ${demoConvId}`);
         setDemoMessages(dummyMessages[demoConvId]);
       } else {
+        console.log(`No demo messages found for ${demoConvId}, available conversations:`, Object.keys(dummyMessages));
         // Default to empty array if no messages found
         setDemoMessages([]);
       }

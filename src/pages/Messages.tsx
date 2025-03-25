@@ -66,20 +66,21 @@ const Messages = () => {
   }, [conversationId, currentUserId, isDemoConversation, demoMessages, errors?.messages]);
 
   // Loading state
-  if (userLoading || !currentUserId) {
+  if (userLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>Please sign in to view messages</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-islamic-teal"></div>
       </div>
     );
   }
 
   // Render the appropriate conversation interface based on type
   if (isDemoConversation && conversationId) {
+    console.log("Rendering demo conversation for:", conversationId);
     return (
       <DemoConversation
         conversationId={conversationId}
-        currentUserId={currentUserId}
+        currentUserId={currentUserId || 'current-user'} // Default to 'current-user' for demo
         demoMessages={demoMessages}
         setDemoMessages={setDemoMessages}
       />
@@ -89,7 +90,7 @@ const Messages = () => {
   return (
     <RegularConversation
       conversationId={conversationId}
-      currentUserId={currentUserId}
+      currentUserId={currentUserId || ''}
       conversations={conversations}
       currentConversation={currentConversation}
       messages={messages}

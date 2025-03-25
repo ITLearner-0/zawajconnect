@@ -20,6 +20,8 @@ export const useProfileInteractions = (profile: DatabaseProfile) => {
       setWaliRequestDialogOpen(true);
     } else {
       // For male profiles or females without wali, direct message
+      // Check if this is a demo profile (ID starts with 'user-')
+      console.log("Navigating to messages with profile ID:", profile.id);
       navigate(`/messages/${profile.id}`);
       toast({
         title: "Starting conversation",
@@ -36,6 +38,7 @@ export const useProfileInteractions = (profile: DatabaseProfile) => {
     } else {
       // For male profiles or females without wali, direct video call
       // First navigate to messages and then initiate a video call
+      console.log("Starting video call with profile ID:", profile.id);
       navigate(`/messages/${profile.id}`);
       toast({
         title: "Video call initiated",
