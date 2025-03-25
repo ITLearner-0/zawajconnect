@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import MonitoringPanel from '@/components/wali/MonitoringPanel';
 import ModerationStats from '@/components/admin/ModerationStats';
 import QuickActions from '@/components/admin/QuickActions';
@@ -16,16 +16,22 @@ const AdminModeration: React.FC = () => {
     loading, 
     error, 
     showSetupButton, 
-    flaggedContent 
+    flaggedContent,
+    refreshData
   } = useModerationData();
   
   const [activeTab, setActiveTab] = useState('moderation');
+  
+  const handleSetupComplete = useCallback(() => {
+    // Refresh data after setup is complete
+    refreshData();
+  }, [refreshData]);
   
   return (
     <div className="container mx-auto py-10">
       <h1 className="text-3xl font-semibold mb-6">Admin Moderation Dashboard</h1>
       
-      <SetupButton show={showSetupButton} />
+      <SetupButton show={showSetupButton} onSetupComplete={handleSetupComplete} />
       
       {error && (
         <div className="text-red-500 mb-4">Error: {error}</div>
