@@ -1,19 +1,12 @@
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData, PrivacySettings, VerificationStatus } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
+import { DEFAULT_PRIVACY_SETTINGS } from './constants/defaultSettings';
+import { fetchProfileFromDb, createNewProfile, getUserEmail } from './utils/profileDbUtils';
+import { ProfileFetcherResult, ProfileFetcherOptions } from './types/profileFetcher';
 
-// Default privacy settings to use when none are available
-const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
-  profileVisibilityLevel: 1,
-  showAge: true,
-  showLocation: true,
-  showOccupation: true,
-  allowNonMatchMessages: true
-};
-
-export const useProfileFetcher = (userId?: string | null) => {
+export const useProfileFetcher = (userId?: string | null): ProfileFetcherResult => {
   const { toast } = useToast();
   const [profileData, setProfileData] = useState<ProfileFormData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,14 +34,11 @@ export const useProfileFetcher = (userId?: string | null) => {
 
       try {
         // Get user email from auth session
-        const { data: { session } } = await supabase.auth.getSession();
-        setUserEmail(session?.user?.email || null);
+        const email = await getUserEmail();
+        setUserEmail(email);
 
         // Get profile data without using .single() to avoid errors with empty results
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', userId);
+        const { data, error } = await fetchProfileFromDb(userId);
 
         if (error) {
           setError(error.message);
@@ -98,25 +88,7 @@ export const useProfileFetcher = (userId?: string | null) => {
           setIsNewUser(!profile.first_name || !profile.last_name || !profile.gender);
         } else {
           // Create a new profile if none exists
-          const defaultProfileData = {
-            first_name: '',
-            last_name: '',
-            birth_date: new Date().toISOString().split('T')[0], // Current date as default
-            gender: '',
-            location: '',
-            religious_practice_level: '',
-            prayer_frequency: '',
-            privacy_settings: DEFAULT_PRIVACY_SETTINGS,
-            blocked_users: [],
-            is_visible: true
-          };
-          
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert({
-              id: userId,
-              ...defaultProfileData
-            });
+          const { error: insertError } = await createNewProfile(userId);
             
           if (insertError) {
             console.error("Error creating new profile:", insertError);
