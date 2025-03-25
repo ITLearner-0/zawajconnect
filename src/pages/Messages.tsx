@@ -50,20 +50,22 @@ const Messages = () => {
 
   // Debug logs and error handling
   useEffect(() => {
-    console.log("Current conversation ID:", conversationId);
-    console.log("Current user ID:", currentUserId);
-    console.log("Is demo conversation:", isDemoConversation);
-    console.log("Demo messages:", demoMessages);
-    
-    if (errors?.messages) {
-      console.error("Message error:", errors.messages);
-      toast({
-        variant: "destructive",
-        title: "Error loading messages",
-        description: errors.messages
-      });
+    if (!loading && !userLoading) {
+      console.log("Current conversation ID:", conversationId);
+      console.log("Current user ID:", currentUserId);
+      console.log("Is demo conversation:", isDemoConversation);
+      console.log("Demo messages:", demoMessages);
+      
+      if (errors?.messages) {
+        console.error("Message error:", errors.messages);
+        toast({
+          variant: "destructive",
+          title: "Error loading messages",
+          description: errors.messages
+        });
+      }
     }
-  }, [conversationId, currentUserId, isDemoConversation, demoMessages, errors?.messages]);
+  }, [conversationId, currentUserId, isDemoConversation, demoMessages, errors?.messages, loading, userLoading]);
 
   // Loading state
   if (userLoading) {
@@ -91,12 +93,12 @@ const Messages = () => {
     <RegularConversation
       conversationId={conversationId}
       currentUserId={currentUserId || ''}
-      conversations={conversations}
+      conversations={conversations || []}
       currentConversation={currentConversation}
-      messages={messages}
+      messages={messages || []}
       loading={loading}
       sendingMessage={sendingMessage}
-      errors={errors}
+      errors={errors || {}}
       messageInput={messageInput}
       setMessageInput={setMessageInput}
       videoCallStatus={videoCallStatus}

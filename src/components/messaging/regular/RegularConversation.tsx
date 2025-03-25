@@ -15,9 +15,9 @@ interface RegularConversationProps {
   loading: boolean;
   sendingMessage: boolean;
   errors: {
-    conversations: string | null;
-    messages: string | null;
-    videoCall: string | null;
+    conversations?: string | null;
+    messages?: string | null;
+    videoCall?: string | null;
     monitoring?: string | null;
   };
   messageInput: string;
@@ -39,25 +39,25 @@ interface RegularConversationProps {
 const RegularConversation: React.FC<RegularConversationProps> = ({
   conversationId,
   currentUserId,
-  conversations,
+  conversations = [],
   currentConversation,
-  messages,
-  loading,
-  sendingMessage,
-  errors,
-  messageInput,
+  messages = [],
+  loading = false,
+  sendingMessage = false,
+  errors = {},
+  messageInput = "",
   setMessageInput,
-  videoCallStatus,
+  videoCallStatus = {},
   sendMessage,
   startVideoCall,
   endVideoCall,
-  latestReport,
-  monitoringEnabled,
+  latestReport = null,
+  monitoringEnabled = false,
   toggleMonitoring,
-  monitoringLoading,
-  encryptionEnabled,
+  monitoringLoading = false,
+  encryptionEnabled = false,
   toggleEncryption,
-  retentionPolicy,
+  retentionPolicy = {},
   updateRetentionPolicy
 }) => {
   const navigate = useNavigate();
@@ -65,6 +65,14 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
   // Select a conversation
   const selectConversation = (conversation: { id: string }) => {
     navigate(`/messages/${conversation.id}`);
+  };
+
+  // Make sure errors object has all required fields
+  const normalizedErrors = {
+    conversations: errors?.conversations || null,
+    messages: errors?.messages || null,
+    videoCall: errors?.videoCall || null,
+    monitoring: errors?.monitoring || null
   };
 
   return (
@@ -75,16 +83,11 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
       
       <MessagesContainer
         loading={loading}
-        conversations={conversations || []}
+        conversations={conversations}
         conversationId={conversationId}
         currentConversation={currentConversation}
         onSelectConversation={selectConversation}
-        errors={{
-          conversations: errors?.conversations || null,
-          messages: errors?.messages || null,
-          videoCall: errors?.videoCall || null,
-          monitoring: errors?.monitoring || null
-        }}
+        errors={normalizedErrors}
       >
         {videoCallStatus?.isActive ? (
           <VideoCallManager
@@ -103,15 +106,15 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
               sendMessage={sendMessage}
               loading={loading}
               sendingMessage={sendingMessage}
-              error={errors?.messages || null}
+              error={normalizedErrors.messages}
               onStartVideoCall={() => {
-                const otherUserId = currentConversation.participants.find(id => id !== currentUserId);
+                const otherUserId = currentConversation.participants?.find(id => id !== currentUserId);
                 if (otherUserId) {
                   startVideoCall(otherUserId);
                 }
               }}
               backToList={() => navigate('/messages')}
-              isWaliSupervised={currentConversation.wali_supervised}
+              isWaliSupervised={currentConversation.wali_supervised || false}
               report={latestReport}
               monitoringEnabled={monitoringEnabled}
               toggleMonitoring={toggleMonitoring}

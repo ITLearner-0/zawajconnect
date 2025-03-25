@@ -23,18 +23,18 @@ interface MessagesContainerProps {
 
 const MessagesContainer = ({ 
   loading, 
-  conversations, 
+  conversations = [], 
   conversationId, 
   currentConversation,
   onSelectConversation,
   children,
-  errors
+  errors = { conversations: null, messages: null, videoCall: null, monitoring: null }
 }: MessagesContainerProps) => {
   const hasErrors = errors && (errors.conversations || errors.messages || errors.videoCall || errors.monitoring);
 
   // Get other user ID for search
   let otherUserId = null;
-  if (currentConversation && conversationId) {
+  if (currentConversation && currentConversation.participants) {
     otherUserId = currentConversation.participants.find(id => id !== conversationId) || null;
   }
 
