@@ -7,10 +7,13 @@ import { useDemoMessages } from '@/hooks/useDemoMessages';
 import DemoConversation from '@/components/messaging/demo/DemoConversation';
 import RegularConversation from '@/components/messaging/regular/RegularConversation';
 import { toast } from '@/hooks/use-toast';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 const Messages = () => {
   const { conversationId } = useParams<{ conversationId: string }>();
+  
+  // Use ref to track initial render and prevent excessive logging
+  const initialRenderDone = useRef(false);
   
   // Get current user session
   const { currentUserId, loading: userLoading } = useUserSession();
@@ -48,9 +51,12 @@ const Messages = () => {
     updateRetentionPolicy
   } = useMessages(conversationId, currentUserId);
 
-  // Debug logs and error handling
+  // Debug logs and error handling - only log on first render or when key values change
   useEffect(() => {
-    if (!loading && !userLoading) {
+    if (!loading && !userLoading && (!initialRenderDone.current || errors?.messages)) {
+      // Set ref to true to prevent future logs unless errors change
+      initialRenderDone.current = true;
+      
       // Only log once to prevent console spam
       console.log("Current conversation ID:", conversationId);
       console.log("Current user ID:", currentUserId);
@@ -78,7 +84,6 @@ const Messages = () => {
 
   // Render the appropriate conversation interface based on type
   if (isDemoConversation && conversationId) {
-    console.log("Rendering demo conversation for:", conversationId);
     return (
       <DemoConversation
         conversationId={conversationId}

@@ -17,6 +17,17 @@ export const useMessages = (conversationId?: string, currentUserId?: string | nu
     monitoringEnabled: messagesData.monitoringEnabled || false,
     monitoringLoading: messagesData.monitoringLoading || false,
     encryptionEnabled: messagesData.encryptionEnabled || false,
-    retentionPolicy: messagesData.retentionPolicy || {}
+    retentionPolicy: messagesData.retentionPolicy || {},
+    videoCallStatus: messagesData.videoCallStatus || { isActive: false, waliPresent: false },
+    sendMessage: messagesData.sendMessage || (() => Promise.resolve()),
+    startVideoCall: messagesData.startVideoCall || (() => {}),
+    endVideoCall: messagesData.endVideoCall || (() => {}),
+    toggleMonitoring: messagesData.toggleMonitoring || (() => {}),
+    toggleEncryption: messagesData.toggleEncryption || (() => {}),
+    updateRetentionPolicy: messagesData.updateRetentionPolicy || (() => {}),
+    violations: messagesData.violations || [],
+    latestReport: messagesData.latestReport || null,
+    fetchMessages: messagesData.fetchMessages || (() => Promise.resolve()),
+    setMessageInput: messagesData.setMessageInput || (() => {}),
   };
 };

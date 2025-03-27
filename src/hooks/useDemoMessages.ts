@@ -1,11 +1,19 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { dummyMessages } from '@/data/messages';
 
 export const useDemoMessages = (conversationId: string | undefined) => {
   const [isDemoConversation, setIsDemoConversation] = useState(false);
   const [demoMessages, setDemoMessages] = useState<any[]>([]);
 
+  // Use a callback to determine if this is a demo conversation to prevent
+  // this function from being recreated on each render
+  const checkIsDemoConversation = useCallback((convId: string | undefined) => {
+    if (!convId) return false;
+    return convId.startsWith('user-') || convId.startsWith('conv-');
+  }, []);
+
+  // Load demo messages only once when the conversation ID changes
   useEffect(() => {
     if (!conversationId) {
       setIsDemoConversation(false);
@@ -13,9 +21,11 @@ export const useDemoMessages = (conversationId: string | undefined) => {
       return;
     }
 
-    // Check if this is a demo conversation (starts with 'user-' or is in the conv-X format)
-    if (conversationId.startsWith('user-') || conversationId.startsWith('conv-')) {
-      setIsDemoConversation(true);
+    // Check if this is a demo conversation
+    const isDemo = checkIsDemoConversation(conversationId);
+    setIsDemoConversation(isDemo);
+    
+    if (isDemo) {
       console.log('Demo conversation detected:', conversationId);
       
       // Map user-X to conv-X if needed
@@ -34,10 +44,9 @@ export const useDemoMessages = (conversationId: string | undefined) => {
         setDemoMessages([]);
       }
     } else {
-      setIsDemoConversation(false);
       setDemoMessages([]);
     }
-  }, [conversationId]);
+  }, [conversationId, checkIsDemoConversation]);
 
   return {
     isDemoConversation,

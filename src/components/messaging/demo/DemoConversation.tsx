@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dummyProfiles } from '@/data/profiles';
 import MessagesContainer from '@/components/messaging/MessagesContainer';
@@ -22,8 +22,10 @@ const DemoConversation: React.FC<DemoConversationProps> = ({
   const navigate = useNavigate();
   const [demoMessageInput, setDemoMessageInput] = useState('');
   
-  // Find the demo profile
-  const demoProfile = dummyProfiles.find(p => p.id === conversationId);
+  // Find the demo profile - memoize to prevent recalculation
+  const demoProfile = useMemo(() => {
+    return dummyProfiles.find(p => p.id === conversationId);
+  }, [conversationId]);
   
   if (!demoProfile) {
     return (
@@ -34,53 +36,57 @@ const DemoConversation: React.FC<DemoConversationProps> = ({
   }
   
   // Memoize the demo send message function to prevent recreation on each render
-  const handleDemoSendMessage = useCallback((content: string) => {
-    if (!content.trim()) return;
+  const handleDemoSendMessage = useCallback(() => {
+    if (!demoMessageInput.trim()) return;
     
     const newMessage = {
       id: `msg-${Date.now()}`,
       conversation_id: conversationId || '',
       sender_id: currentUserId,
-      content: content,
+      content: demoMessageInput,
       created_at: new Date().toISOString(),
       is_read: true,
       is_wali_visible: true
     };
     
     setDemoMessages(prev => [...prev, newMessage]);
-    console.log("Demo message sent:", newMessage);
-  }, [conversationId, currentUserId, setDemoMessages]);
+    setDemoMessageInput('');
+  }, [conversationId, currentUserId, demoMessageInput, setDemoMessages]);
 
-  // Handle sending demo messages
-  const sendDemoMessage = useCallback(() => {
-    if (demoMessageInput.trim()) {
-      handleDemoSendMessage(demoMessageInput);
-      setDemoMessageInput('');
-    }
-  }, [demoMessageInput, handleDemoSendMessage]);
-
-  // Select a conversation
+  // Memoize conversation selection to prevent recreating function on each render
   const selectConversation = useCallback((conversation: { id: string }) => {
     navigate(`/messages/${conversation.id}`);
   }, [navigate]);
   
   // Generate a simulated last active time (5-30 minutes ago)
-  const getRandomLastActive = () => {
+  const lastActive = useMemo(() => {
     const now = new Date();
     const minutesAgo = Math.floor(Math.random() * 25) + 5; // 5-30 minutes ago
     now.setMinutes(now.getMinutes() - minutesAgo);
     return now.toISOString();
-  };
+  }, []);
   
-  // Get a simulated status for demo users
-  const getDemoStatus = () => {
+  // Get a simulated status for demo users - memoize to prevent recreation on each render
+  const demoStatus = useMemo(() => {
     const statuses = ['online', 'offline', 'away', 'busy'];
     // For female profiles, higher chance of being online (for demo purposes)
     if (demoProfile.gender === 'Female') {
       return Math.random() > 0.3 ? 'online' : statuses[Math.floor(Math.random() * statuses.length)];
     }
     return statuses[Math.floor(Math.random() * statuses.length)];
-  };
+  }, [demoProfile.gender]);
+
+  // Memoize the demo conversation data to prevent recreation on each render
+  const demoConversation = useMemo(() => ({
+    id: conversationId,
+    created_at: new Date().toISOString(),
+    participants: [currentUserId, conversationId],
+    profile: {
+      first_name: demoProfile.first_name,
+      last_name: demoProfile.last_name
+    },
+    wali_supervised: demoProfile.gender === 'Female'
+  }), [conversationId, currentUserId, demoProfile.first_name, demoProfile.last_name, demoProfile.gender]);
   
   // For demo profiles, show a working chat interface with dummy messages
   return (
@@ -93,16 +99,7 @@ const DemoConversation: React.FC<DemoConversationProps> = ({
         loading={false}
         conversations={[]}
         conversationId={conversationId}
-        currentConversation={{
-          id: conversationId,
-          created_at: new Date().toISOString(),
-          participants: [currentUserId, conversationId],
-          profile: {
-            first_name: demoProfile.first_name,
-            last_name: demoProfile.last_name
-          },
-          wali_supervised: demoProfile.gender === 'Female'
-        }}
+        currentConversation={demoConversation}
         onSelectConversation={selectConversation}
         errors={{
           conversations: null,
@@ -111,29 +108,20 @@ const DemoConversation: React.FC<DemoConversationProps> = ({
         }}
       >
         <ChatWindow
-          conversation={{
-            id: conversationId,
-            created_at: new Date().toISOString(),
-            participants: [currentUserId, conversationId],
-            profile: {
-              first_name: demoProfile.first_name,
-              last_name: demoProfile.last_name
-            },
-            wali_supervised: demoProfile.gender === 'Female'
-          }}
+          conversation={demoConversation}
           messages={demoMessages}
           currentUserId={currentUserId}
           messageInput={demoMessageInput}
           setMessageInput={setDemoMessageInput}
-          sendMessage={sendDemoMessage}
+          sendMessage={handleDemoSendMessage}
           loading={false}
           sendingMessage={false}
           error={null}
           onStartVideoCall={() => {}}
           backToList={() => navigate('/messages')}
           isWaliSupervised={demoProfile.gender === 'Female'}
-          userStatus={getDemoStatus() as 'online' | 'offline' | 'away' | 'busy'}
-          lastActive={getRandomLastActive()}
+          userStatus={demoStatus as 'online' | 'offline' | 'away' | 'busy'}
+          lastActive={lastActive}
         />
       </MessagesContainer>
       
