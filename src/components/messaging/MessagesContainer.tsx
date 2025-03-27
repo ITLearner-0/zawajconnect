@@ -22,24 +22,28 @@ interface MessagesContainerProps {
 }
 
 const MessagesContainer = ({ 
-  loading, 
+  loading = false, 
   conversations = [], 
   conversationId, 
-  currentConversation,
+  currentConversation = null,
   onSelectConversation,
   children,
   errors = { conversations: null, messages: null, videoCall: null, monitoring: null }
 }: MessagesContainerProps) => {
   const hasErrors = errors && (errors.conversations || errors.messages || errors.videoCall || errors.monitoring);
 
-  // Get other user ID for search
+  // Get other user ID for search - add null checks
   let otherUserId = null;
-  if (currentConversation && currentConversation.participants) {
+  if (currentConversation && 
+      currentConversation.participants && 
+      Array.isArray(currentConversation.participants)) {
     otherUserId = currentConversation.participants.find(id => id !== conversationId) || null;
   }
 
   // Function to handle search result selection
   const handleSearchResultSelect = (selectedConversationId: string) => {
+    if (!selectedConversationId) return;
+    
     const conversation = conversations.find(conv => conv.id === selectedConversationId);
     if (conversation) {
       onSelectConversation(conversation);

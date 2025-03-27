@@ -53,12 +53,12 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
   endVideoCall,
   latestReport = null,
   monitoringEnabled = false,
-  toggleMonitoring,
+  toggleMonitoring = () => {},
   monitoringLoading = false,
   encryptionEnabled = false,
-  toggleEncryption,
+  toggleEncryption = () => {},
   retentionPolicy = {},
-  updateRetentionPolicy
+  updateRetentionPolicy = () => {}
 }) => {
   const navigate = useNavigate();
 
@@ -74,6 +74,9 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
     videoCall: errors?.videoCall || null,
     monitoring: errors?.monitoring || null
   };
+
+  // Check if currentConversation is valid before rendering ChatWindow
+  const isValidConversation = currentConversation && typeof currentConversation === 'object';
 
   return (
     <div className="flex flex-col h-screen">
@@ -96,7 +99,7 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
             conversationId={conversationId}
           />
         ) : (
-          currentConversation && (
+          isValidConversation ? (
             <ChatWindow
               conversation={currentConversation}
               messages={messages}
@@ -124,6 +127,10 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
               retentionPolicy={retentionPolicy}
               updateRetentionPolicy={updateRetentionPolicy}
             />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              <p>Select a conversation</p>
+            </div>
           )
         )}
       </MessagesContainer>

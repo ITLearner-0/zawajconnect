@@ -51,10 +51,10 @@ const Messages = () => {
   // Debug logs and error handling
   useEffect(() => {
     if (!loading && !userLoading) {
+      // Only log once to prevent console spam
       console.log("Current conversation ID:", conversationId);
       console.log("Current user ID:", currentUserId);
       console.log("Is demo conversation:", isDemoConversation);
-      console.log("Demo messages:", demoMessages);
       
       if (errors?.messages) {
         console.error("Message error:", errors.messages);
@@ -65,7 +65,7 @@ const Messages = () => {
         });
       }
     }
-  }, [conversationId, currentUserId, isDemoConversation, demoMessages, errors?.messages, loading, userLoading]);
+  }, [conversationId, currentUserId, isDemoConversation, errors?.messages, loading, userLoading]);
 
   // Loading state
   if (userLoading) {
