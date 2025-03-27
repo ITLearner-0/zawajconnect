@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { dummyProfiles } from '@/data/profiles';
 import MessagesContainer from '@/components/messaging/MessagesContainer';
@@ -21,19 +21,18 @@ const DemoConversation: React.FC<DemoConversationProps> = ({
 }) => {
   const navigate = useNavigate();
   const [demoMessageInput, setDemoMessageInput] = useState('');
+  const renderCount = useRef(0);
   
   // Find the demo profile - memoize to prevent recalculation
   const demoProfile = useMemo(() => {
-    return dummyProfiles.find(p => p.id === conversationId);
+    const profileId = conversationId.startsWith('user-') ? conversationId : null;
+    return dummyProfiles.find(p => p.id === profileId) || {
+      id: conversationId,
+      first_name: 'Demo',
+      last_name: 'User',
+      gender: 'Other'
+    };
   }, [conversationId]);
-  
-  if (!demoProfile) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Demo profile not found</p>
-      </div>
-    );
-  }
   
   // Memoize the demo send message function to prevent recreation on each render
   const handleDemoSendMessage = useCallback(() => {
@@ -87,6 +86,9 @@ const DemoConversation: React.FC<DemoConversationProps> = ({
     },
     wali_supervised: demoProfile.gender === 'Female'
   }), [conversationId, currentUserId, demoProfile.first_name, demoProfile.last_name, demoProfile.gender]);
+  
+  renderCount.current += 1;
+  console.log(`DemoConversation render #${renderCount.current} for ${conversationId}`);
   
   // For demo profiles, show a working chat interface with dummy messages
   return (

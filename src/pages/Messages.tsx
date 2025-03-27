@@ -14,6 +14,7 @@ const Messages = () => {
   
   // Use ref to track initial render and prevent excessive logging
   const initialRenderDone = useRef(false);
+  const renderCount = useRef(0);
   
   // Get current user session
   const { currentUserId, loading: userLoading } = useUserSession();
@@ -53,7 +54,7 @@ const Messages = () => {
 
   // Debug logs and error handling - only log on first render or when key values change
   useEffect(() => {
-    if (!loading && !userLoading && (!initialRenderDone.current || errors?.messages)) {
+    if (!initialRenderDone.current && !loading && !userLoading) {
       // Set ref to true to prevent future logs unless errors change
       initialRenderDone.current = true;
       
@@ -61,17 +62,21 @@ const Messages = () => {
       console.log("Current conversation ID:", conversationId);
       console.log("Current user ID:", currentUserId);
       console.log("Is demo conversation:", isDemoConversation);
-      
-      if (errors?.messages) {
-        console.error("Message error:", errors.messages);
-        toast({
-          variant: "destructive",
-          title: "Error loading messages",
-          description: errors.messages
-        });
-      }
+    }
+    
+    // Log errors separately so they're always reported
+    if (errors?.messages) {
+      console.error("Message error:", errors.messages);
+      toast({
+        variant: "destructive",
+        title: "Error loading messages",
+        description: errors.messages
+      });
     }
   }, [conversationId, currentUserId, isDemoConversation, errors?.messages, loading, userLoading]);
+
+  renderCount.current += 1;
+  console.log(`Messages component render #${renderCount.current}`);
 
   // Loading state
   if (userLoading) {

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Conversation, Message, RetentionPolicy } from '@/types/profile';
 import ChatHeader from './ChatHeader';
 import SecuritySettingsPanel from './SecuritySettingsPanel';
@@ -36,16 +36,16 @@ interface ChatWindowProps {
 
 const ChatWindow: React.FC<ChatWindowProps> = ({
   conversation,
-  messages,
+  messages = [],
   currentUserId,
-  messageInput,
-  setMessageInput,
-  sendMessage,
-  loading,
-  sendingMessage,
-  error,
-  onStartVideoCall,
-  backToList,
+  messageInput = "",
+  setMessageInput = () => {},
+  sendMessage = () => {},
+  loading = false,
+  sendingMessage = false,
+  error = null,
+  onStartVideoCall = () => {},
+  backToList = () => {},
   isWaliSupervised = false,
   report = null,
   monitoringEnabled = true,
@@ -61,9 +61,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
+  const renderCount = useRef(0);
   
   // Get the other user ID to fetch their status
-  const otherUserId = conversation.participants.find(id => id !== currentUserId) || '';
+  const otherUserId = conversation?.participants?.find(id => id !== currentUserId) || '';
   
   // Use our hook to get user status if not provided through props
   const userStatusInfo = useUserStatus(otherUserId);
@@ -81,6 +82,9 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
     setSelectedMessage(message);
     setIsReportDialogOpen(true);
   };
+
+  renderCount.current += 1;
+  console.log(`ChatWindow render #${renderCount.current} for conversation ${conversation?.id}`);
 
   return (
     <div className="flex flex-col h-full">
@@ -114,7 +118,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         currentUserId={currentUserId}
         onReportMessage={handleReportMessage}
         isWaliSupervised={isWaliSupervised}
-        conversationId={conversation.id}
+        conversationId={conversation?.id || ''}
         loading={loading}
         error={error}
       />
@@ -134,7 +138,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         onClose={() => setIsReportDialogOpen(false)}
         userId={otherUserId}
         messageId={selectedMessage?.id}
-        conversationId={conversation.id}
+        conversationId={conversation?.id || ''}
         currentUserId={currentUserId || ''}
       />
     </div>
