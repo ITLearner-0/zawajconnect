@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { setupModerationTables } from '@/utils/database/moderationTables';
+import { setupRLSPolicies, checkRLSPolicies } from '@/utils/database/rls';
 import { toast } from 'sonner';
 
 interface SetupButtonProps {
@@ -17,20 +18,29 @@ const SetupButton: React.FC<SetupButtonProps> = ({ show, onSetupComplete }) => {
   const handleSetupTables = async () => {
     setLoading(true);
     try {
-      const success = await setupModerationTables();
+      // Setup moderation tables
+      const moderationSuccess = await setupModerationTables();
       
-      if (success) {
-        toast.success('Moderation tables have been set up successfully!');
+      // Check and setup RLS policies
+      const rlsExist = await checkRLSPolicies();
+      let rlsSuccess = rlsExist;
+      
+      if (!rlsExist) {
+        rlsSuccess = await setupRLSPolicies();
+      }
+      
+      if (moderationSuccess && rlsSuccess) {
+        toast.success('Database tables and security policies have been set up successfully!');
         // Notify parent component that setup is complete
         if (onSetupComplete) {
           onSetupComplete();
         }
       } else {
-        toast.error('Failed to set up moderation tables.');
+        toast.error('Failed to complete database setup.');
       }
     } catch (error) {
-      console.error('Error setting up moderation tables:', error);
-      toast.error('An error occurred while setting up moderation tables.');
+      console.error('Error setting up database:', error);
+      toast.error('An error occurred during database setup.');
     } finally {
       setLoading(false);
     }
@@ -43,7 +53,7 @@ const SetupButton: React.FC<SetupButtonProps> = ({ show, onSetupComplete }) => {
         disabled={loading}
         className="flex items-center gap-2"
       >
-        {loading ? 'Setting up...' : 'Setup Moderation Tables'}
+        {loading ? 'Setting up...' : 'Setup Database & Security'}
       </Button>
     </div>
   );

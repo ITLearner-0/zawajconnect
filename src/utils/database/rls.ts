@@ -19,6 +19,9 @@ export const setupRLSPolicies = async () => {
     // Create monitoring policies
     await supabase.rpc('setup_monitoring_policies' as any);
     
+    // Create spatial reference system policies
+    await supabase.rpc('setup_spatial_policies' as any);
+    
     console.log('RLS policies setup complete');
     return true;
   } catch (error) {

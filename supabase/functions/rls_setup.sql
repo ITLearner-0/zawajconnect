@@ -1,4 +1,3 @@
-
 -- Function to enable RLS on all important tables
 CREATE OR REPLACE FUNCTION public.enable_rls_on_tables()
 RETURNS boolean
@@ -35,6 +34,9 @@ BEGIN
   
   -- Enable RLS on user_sessions for online status
   ALTER TABLE public.user_sessions ENABLE ROW LEVEL SECURITY;
+  
+  -- Enable RLS on spatial_ref_sys table
+  ALTER TABLE public.spatial_ref_sys ENABLE ROW LEVEL SECURITY;
   
   RETURN true;
 END;
@@ -179,6 +181,28 @@ BEGIN
 END;
 $$;
 
+-- Create policies for spatial_ref_sys table
+CREATE OR REPLACE FUNCTION public.setup_spatial_policies()
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  -- Drop existing policies if any
+  DROP POLICY IF EXISTS "Allow read access to spatial_ref_sys" ON public.spatial_ref_sys;
+  
+  -- Create read-only policy for spatial_ref_sys
+  -- This allows authenticated users to read the spatial reference data
+  CREATE POLICY "Allow read access to spatial_ref_sys"
+    ON public.spatial_ref_sys
+    FOR SELECT
+    USING (auth.role() = 'authenticated');
+    
+  RETURN true;
+END;
+$$;
+
 -- Function to check if RLS policies are properly set up
 CREATE OR REPLACE FUNCTION public.check_rls_policies()
 RETURNS boolean
@@ -188,7 +212,7 @@ SET search_path = public
 AS $$
 DECLARE
   rls_enabled_count integer;
-  expected_tables integer := 13; -- Update this count if you add more tables
+  expected_tables integer := 14; -- Updated count with spatial_ref_sys
 BEGIN
   -- Count tables with RLS enabled
   SELECT COUNT(*) INTO rls_enabled_count
@@ -200,7 +224,7 @@ BEGIN
     'profiles', 'conversations', 'messages', 'compatibility_results',
     'compatibility_scores', 'content_flags', 'content_reports',
     'monitoring_reports', 'wali_profiles', 'chat_requests',
-    'supervision_sessions', 'video_calls', 'user_sessions'
+    'supervision_sessions', 'video_calls', 'user_sessions', 'spatial_ref_sys'
   );
   
   -- Check if all expected tables have RLS enabled

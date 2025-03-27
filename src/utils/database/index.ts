@@ -6,6 +6,7 @@ export { setupEmergencyTables } from './emergencyTables';
 export { setupRpcFunctions } from './rpcSetup';
 export { updateProfileSchema } from './profileSchema';
 export { createTableIfNotExists, addColumnIfNotExists } from './schema';
+export { setupRLSPolicies, checkRLSPolicies } from './rls';
 
 // Re-export additional utility functions from schema handling
 export * from './schema';
