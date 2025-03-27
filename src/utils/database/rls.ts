@@ -8,16 +8,16 @@ import { toast } from '@/hooks/use-toast';
 export const setupRLSPolicies = async () => {
   try {
     // Enable RLS on important tables
-    await supabase.rpc('enable_rls_on_tables');
+    await supabase.rpc('enable_rls_on_tables' as any);
     
     // Create profile policies
-    await supabase.rpc('setup_profile_policies');
+    await supabase.rpc('setup_profile_policies' as any);
     
     // Create messaging policies
-    await supabase.rpc('setup_messaging_policies');
+    await supabase.rpc('setup_messaging_policies' as any);
     
     // Create monitoring policies
-    await supabase.rpc('setup_monitoring_policies');
+    await supabase.rpc('setup_monitoring_policies' as any);
     
     console.log('RLS policies setup complete');
     return true;
@@ -38,7 +38,7 @@ export const setupRLSPolicies = async () => {
  */
 export const checkRLSPolicies = async () => {
   try {
-    const { data, error } = await supabase.rpc('check_rls_policies');
+    const { data, error } = await supabase.rpc('check_rls_policies' as any);
     
     if (error) throw error;
     
