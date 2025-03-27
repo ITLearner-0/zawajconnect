@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LocationMap from "@/components/LocationMap";
@@ -14,8 +13,10 @@ import { Switch } from "@/components/ui/switch";
 import { IslamicPattern } from "@/components/ui/islamic-pattern";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import AccessibilityControls from "@/components/AccessibilityControls";
+import { useRLSSetup } from "@/hooks/useRLSSetup";
 
 const NearbyMatches = () => {
+  const { isSetup: rlsSetup, isLoading: rlsLoading } = useRLSSetup();
   const navigate = useNavigate();
   const [maxDistance, setMaxDistance] = useState(50);
   const [filters, setFilters] = useState<FilterCriteria>({});
@@ -80,11 +81,25 @@ const NearbyMatches = () => {
     return null; // Will redirect to auth page
   }
 
-  if (isAuthenticated === null) {
+  if (isAuthenticated === null || rlsLoading) {
     // Loading state
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (rlsSetup === false) {
+    return (
+      <div className="flex justify-center items-center min-h-screen flex-col gap-4">
+        <div className="text-xl font-bold text-red-500">Database Security Issue</div>
+        <p className="text-center max-w-md">
+          There was a problem setting up database security. Please contact the administrator.
+        </p>
+        <CustomButton onClick={() => navigate("/")}>
+          Return to Home
+        </CustomButton>
       </div>
     );
   }
