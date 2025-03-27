@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
-import { findNearbyProfiles } from "@/utils/locationUtils";
+import { findNearbyProfiles } from "@/utils/location"; // Updated import
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import 'mapbox-gl/dist/mapbox-gl.css';

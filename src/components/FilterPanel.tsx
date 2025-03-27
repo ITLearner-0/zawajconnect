@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import CustomButton from "@/components/CustomButton";
-import { FilterCriteria, saveFilter, getSavedFilters, deleteSavedFilter } from "@/utils/locationUtils";
+import { FilterCriteria, saveFilter, getSavedFilters, deleteSavedFilter } from "@/utils/location"; // Updated import
 import { Check, X, Save } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 

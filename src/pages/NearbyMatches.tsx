@@ -1,9 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import LocationMap from "@/components/LocationMap";
 import FilterPanel from "@/components/FilterPanel";
 import CustomButton from "@/components/CustomButton";
-import { FilterCriteria } from "@/utils/locationUtils";
+import { FilterCriteria } from "@/utils/location"; // Updated import
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Star, MapPin, Heart, Filter } from "lucide-react";
