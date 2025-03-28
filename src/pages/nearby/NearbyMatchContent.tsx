@@ -3,6 +3,7 @@ import { IslamicPattern } from "@/components/ui/islamic-pattern";
 import LocationMap from "@/components/LocationMap";
 import NearbyQuote from "./NearbyQuote";
 import { FilterCriteria } from "@/utils/location";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface NearbyMatchContentProps {
   maxDistance: number;
@@ -15,8 +16,10 @@ const NearbyMatchContent = ({
   filters, 
   showCompatibility 
 }: NearbyMatchContentProps) => {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="lg:col-span-2">
+    <div className={isMobile ? "w-full" : "lg:col-span-2"}>
       <IslamicPattern variant="card" color="teal" className="p-0.5 overflow-hidden shadow-lg">
         <div className="rounded-lg overflow-hidden">
           <LocationMap 

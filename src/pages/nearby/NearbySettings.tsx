@@ -7,6 +7,7 @@ import { IslamicPattern } from "@/components/ui/islamic-pattern";
 import FilterPanel from "@/components/FilterPanel";
 import { FilterCriteria } from "@/utils/location";
 import { Filter } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface NearbySettingsProps {
   maxDistance: number;
@@ -23,19 +24,21 @@ const NearbySettings = ({
   setShowCompatibility,
   onApplyFilters
 }: NearbySettingsProps) => {
+  const isMobile = useIsMobile();
+  
   return (
-    <div className="lg:col-span-1 space-y-6">
+    <div className={isMobile ? "w-full" : "lg:col-span-1 space-y-6"}>
       <IslamicPattern variant="card" color="teal" className="overflow-hidden">
-        <div className="bg-islamic-teal text-white p-4 flex items-center">
-          <Filter className="h-5 w-5 mr-2" />
-          <h2 className="text-xl font-medium">Search Filters</h2>
+        <div className="bg-islamic-teal text-white p-3 sm:p-4 flex items-center">
+          <Filter className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+          <h2 className="text-lg sm:text-xl font-medium">Search Filters</h2>
         </div>
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           <FilterPanel onApplyFilters={onApplyFilters} />
         </div>
       </IslamicPattern>
       
-      <IslamicPattern variant="gradient" className="p-6 space-y-4">
+      <IslamicPattern variant="gradient" className="p-4 sm:p-6 space-y-4">
         <Label className="mb-3 block font-medium text-islamic-teal">Maximum Distance: {maxDistance} km</Label>
         <Slider
           value={[maxDistance]}
