@@ -1,13 +1,40 @@
 
+import { IslamicPattern } from "@/components/ui/islamic-pattern";
+import { QuoteIcon } from "lucide-react";
+
+const quotes = [
+  {
+    text: "And of His signs is that He created for you from yourselves mates that you may find tranquility in them; and He placed between you affection and mercy.",
+    source: "Quran 30:21"
+  },
+  {
+    text: "Marriage is half of faith.",
+    source: "Prophet Muhammad (PBUH)"
+  },
+  {
+    text: "When a person gets married, they have fulfilled half of their religion.",
+    source: "Hadith"
+  },
+  {
+    text: "The most perfect believer in faith is the one whose character is finest and who is kindest to his wife.",
+    source: "Prophet Muhammad (PBUH)"
+  }
+];
+
 const NearbyQuote = () => {
+  // Randomly select a quote
+  const quote = quotes[Math.floor(Math.random() * quotes.length)];
+  
   return (
-    <div className="text-center mt-6 bg-islamic-cream/50 p-4 rounded-lg border border-islamic-gold/10">
-      <p className="italic text-islamic-blue font-serif">
-        "And among His Signs is that He created for you mates from among yourselves, 
-        that you may dwell in tranquility with them, and He has put love and mercy between your hearts."
-      </p>
-      <p className="text-xs mt-1 text-islamic-burgundy">- Ar-Rum 30:21</p>
-    </div>
+    <IslamicPattern variant="gradient" className="mt-6 p-6">
+      <div className="flex items-start">
+        <QuoteIcon className="text-islamic-teal h-6 w-6 mr-3 flex-shrink-0 mt-1" />
+        <div>
+          <p className="text-islamic-burgundy italic mb-2">{quote.text}</p>
+          <p className="text-islamic-teal text-sm font-medium text-right">— {quote.source}</p>
+        </div>
+      </div>
+    </IslamicPattern>
   );
 };
 
