@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useRLSSetup } from "@/hooks/useRLSSetup";
+import CustomButton from "@/components/CustomButton";
 
 interface AuthCheckProps {
   children: React.ReactNode;

@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import { IslamicPattern } from "@/components/ui/islamic-pattern";
 import FilterPanel from "@/components/FilterPanel";
 import { FilterCriteria } from "@/utils/location";
+import { Filter } from "lucide-react";
 
 interface NearbySettingsProps {
   maxDistance: number;
