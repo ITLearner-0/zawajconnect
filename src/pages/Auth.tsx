@@ -9,6 +9,8 @@ import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { useTranslation } from "react-i18next";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -24,6 +26,7 @@ const Auth = () => {
   const [lastName, setLastName] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleGenderChange = (value: string) => {
     setGender(value);
@@ -68,7 +71,9 @@ const Auth = () => {
           return;
         }
 
-        // Register the user
+        console.log("Starting signup process with:", { email, firstName, lastName, gender });
+        
+        // Register the user - use the signUp method correctly
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -81,10 +86,17 @@ const Auth = () => {
           }
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error("Signup error:", error);
+          throw error;
+        }
+
+        console.log("Signup successful, user data:", data);
 
         // If registration successful and user provides gender info, save to profile
         if (data.user) {
+          console.log("Creating profile for user:", data.user.id);
+          
           // Create complete profile data with all required fields
           const profileData = {
             id: data.user.id,
@@ -124,6 +136,8 @@ const Auth = () => {
             profileData["wali_contact"] = null;
           }
 
+          console.log("Inserting profile data:", profileData);
+
           // Create initial profile
           const { error: profileError } = await supabase
             .from("profiles")
@@ -136,6 +150,8 @@ const Auth = () => {
               description: profileError.message,
               variant: "destructive",
             });
+          } else {
+            console.log("Profile created successfully");
           }
         }
 
@@ -144,14 +160,21 @@ const Auth = () => {
           description: "Please check your email to verify your account.",
         });
       } else {
+        // Login flow
+        console.log("Starting login process with:", email);
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
+        if (error) {
+          console.error("Login error:", error);
+          throw error;
+        }
+        console.log("Login successful, redirecting to profile");
         navigate("/profile");
       }
     } catch (error: any) {
+      console.error("Authentication error:", error);
       toast({
         title: "Error",
         description: error.message,
@@ -165,18 +188,19 @@ const Auth = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-accent/50 to-background py-12 dark:from-islamic-darkBg dark:to-islamic-darkCard">
       <div className="container max-w-md mx-auto px-4">
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-between mb-4">
+          <LanguageSwitcher />
           <ThemeToggle />
         </div>
         <Card className="shadow-lg dark:bg-islamic-darkCard dark:text-white">
           <CardHeader>
             <h1 className="text-2xl font-bold text-center">
-              {isSignUp ? "Create Account" : "Welcome Back"}
+              {isSignUp ? t("auth.createAccount") : t("auth.welcomeBack")}
             </h1>
             <p className="text-center text-gray-600 dark:text-gray-300">
               {isSignUp
-                ? "Sign up to find your compatible match"
-                : "Sign in to continue your journey"}
+                ? t("auth.signUpToFind")
+                : t("auth.signInToContinue")}
             </p>
           </CardHeader>
           <CardContent>
@@ -307,7 +331,7 @@ const Auth = () => {
                 disabled={loading}
                 isLoading={loading}
               >
-                {isSignUp ? "Create Account" : "Sign In"}
+                {isSignUp ? t("auth.createAccount") : t("auth.signIn")}
               </CustomButton>
               <div className="text-center">
                 <button
@@ -316,8 +340,8 @@ const Auth = () => {
                   className="text-sm text-primary hover:underline"
                 >
                   {isSignUp
-                    ? "Already have an account? Sign in"
-                    : "Don't have an account? Sign up"}
+                    ? t("auth.alreadyHaveAccount")
+                    : t("auth.dontHaveAccount")}
                 </button>
               </div>
             </form>

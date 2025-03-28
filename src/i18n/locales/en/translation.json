@@ -19,7 +19,14 @@
   },
   "auth": {
     "getStarted": "Get Started",
-    "browseMatches": "Browse Matches"
+    "browseMatches": "Browse Matches",
+    "createAccount": "Create Account",
+    "welcomeBack": "Welcome Back",
+    "signUpToFind": "Sign up to find your compatible match",
+    "signInToContinue": "Sign in to continue your journey",
+    "signIn": "Sign In", 
+    "alreadyHaveAccount": "Already have an account? Sign in",
+    "dontHaveAccount": "Don't have an account? Sign up"
   },
   "quotes": {
     "title": "Success Stories"

@@ -19,7 +19,14 @@
   },
   "auth": {
     "getStarted": "ابدأ الآن",
-    "browseMatches": "تصفح المتطابقين"
+    "browseMatches": "تصفح المتطابقين",
+    "createAccount": "إنشاء حساب",
+    "welcomeBack": "مرحبًا بعودتك",
+    "signUpToFind": "سجل للعثور على شريك متوافق",
+    "signInToContinue": "تسجيل الدخول لمواصلة رحلتك",
+    "signIn": "تسجيل الدخول",
+    "alreadyHaveAccount": "لديك حساب بالفعل؟ تسجيل الدخول",
+    "dontHaveAccount": "ليس لديك حساب؟ اشترك الآن"
   },
   "quotes": {
     "title": "قصص نجاح"

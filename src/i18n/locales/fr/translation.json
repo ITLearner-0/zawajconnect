@@ -19,7 +19,14 @@
   },
   "auth": {
     "getStarted": "Commencer",
-    "browseMatches": "Parcourir les correspondances"
+    "browseMatches": "Parcourir les correspondances",
+    "createAccount": "Créer un compte",
+    "welcomeBack": "Bienvenue à nouveau",
+    "signUpToFind": "Inscrivez-vous pour trouver votre match compatible",
+    "signInToContinue": "Connectez-vous pour continuer votre parcours",
+    "signIn": "Se connecter",
+    "alreadyHaveAccount": "Vous avez déjà un compte? Connectez-vous",
+    "dontHaveAccount": "Vous n'avez pas de compte? Inscrivez-vous"
   },
   "quotes": {
     "title": "Témoignages de réussite"
