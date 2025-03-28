@@ -1,0 +1,30 @@
+
+{
+  "app": {
+    "name": "Nikah Connect",
+    "description": "A marriage app built on Islamic values"
+  },
+  "header": {
+    "back": "Back",
+    "nearby": "Nearby",
+    "findNearbyMatches": "Find Nearby Matches"
+  },
+  "nearby": {
+    "searchFilters": "Search Filters",
+    "maxDistance": "Maximum Distance",
+    "km": "km",
+    "showCompatibility": "Show Compatibility Scores",
+    "compatibilityTestRequired": "Take the compatibility test to enable compatibility scoring",
+    "searchSettings": "Search Settings"
+  },
+  "auth": {
+    "getStarted": "Get Started",
+    "browseMatches": "Browse Matches"
+  },
+  "quotes": {
+    "title": "Success Stories"
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  }
+}

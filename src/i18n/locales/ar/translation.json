@@ -1,0 +1,30 @@
+
+{
+  "app": {
+    "name": "نكاح كونكت",
+    "description": "تطبيق زواج مبني على القيم الإسلامية"
+  },
+  "header": {
+    "back": "رجوع",
+    "nearby": "بالقرب",
+    "findNearbyMatches": "البحث عن شريك قريب"
+  },
+  "nearby": {
+    "searchFilters": "فلاتر البحث",
+    "maxDistance": "الحد الأقصى للمسافة",
+    "km": "كم",
+    "showCompatibility": "إظهار درجات التوافق",
+    "compatibilityTestRequired": "خذ اختبار التوافق لتمكين تقييم التوافق",
+    "searchSettings": "إعدادات البحث"
+  },
+  "auth": {
+    "getStarted": "ابدأ الآن",
+    "browseMatches": "تصفح المتطابقين"
+  },
+  "quotes": {
+    "title": "قصص نجاح"
+  },
+  "footer": {
+    "rights": "جميع الحقوق محفوظة."
+  }
+}

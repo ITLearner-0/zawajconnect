@@ -2,13 +2,14 @@
 import { useState } from "react";
 import { FilterCriteria } from "@/utils/location";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Map, Settings } from "lucide-react";
+import { Settings } from "lucide-react";
 import CustomButton from "@/components/CustomButton";
 import { useIsMobile } from "@/hooks/use-mobile";
 import AuthCheck from "./AuthCheck";
 import NearbyHeader from "./NearbyHeader";
 import NearbySettings from "./NearbySettings";
 import NearbyMatchContent from "./NearbyMatchContent";
+import { useTranslation } from "react-i18next";
 
 const NearbyMatches = () => {
   const [maxDistance, setMaxDistance] = useState(50);
@@ -16,6 +17,7 @@ const NearbyMatches = () => {
   const [showCompatibility, setShowCompatibility] = useState(true);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
 
   const handleApplyFilters = (newFilters: FilterCriteria) => {
     setFilters(newFilters);
@@ -41,7 +43,7 @@ const NearbyMatches = () => {
                     className="flex items-center gap-2 mb-4 w-full justify-center"
                   >
                     <Settings className="h-4 w-4" />
-                    <span>Search Settings</span>
+                    <span>{t('nearby.searchSettings')}</span>
                   </CustomButton>
                 </SheetTrigger>
                 <SheetContent side="left" className="w-[85vw] max-w-md p-0 pt-12 overflow-y-auto">
