@@ -5,20 +5,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useTranslation } from "react-i18next";
 import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { UseFormReturn } from "react-hook-form";
+import { z } from "zod";
 
-interface WaliFormValues {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  gender: string;
-  waliName?: string;
-  waliRelationship?: string;
-  waliContact?: string;
-}
+// Define the schema using zod
+export const signUpFormSchema = z.object({
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  email: z.string().email().min(1),
+  password: z.string().min(6).max(100),
+  gender: z.string().min(1),
+  waliName: z.string().optional(),
+  waliRelationship: z.string().optional(),
+  waliContact: z.string().optional(),
+});
+
+// Export the type so it can be used in other components
+export type SignUpFormValues = z.infer<typeof signUpFormSchema>;
 
 interface WaliInformationFieldsProps {
-  form: UseFormReturn<WaliFormValues>;
+  form: UseFormReturn<SignUpFormValues>;
   loading: boolean;
 }
 

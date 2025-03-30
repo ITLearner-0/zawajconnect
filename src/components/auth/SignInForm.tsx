@@ -28,8 +28,11 @@ const SignInForm: React.FC<SignInFormProps> = ({
     password: z.string().min(6, t("auth.passwordMinLength")).max(100, t("auth.passwordMaxLength")),
   });
 
+  // Define the form values type based on the schema
+  type FormValues = z.infer<typeof formSchema>;
+
   // Initialize form with react-hook-form
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
@@ -38,8 +41,12 @@ const SignInForm: React.FC<SignInFormProps> = ({
   });
 
   // Handle form submission
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    onSubmit(values);
+  const handleSubmit = (values: FormValues) => {
+    // Since we're using zod validation, these values are guaranteed to be defined
+    onSubmit({
+      email: values.email,
+      password: values.password
+    });
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);

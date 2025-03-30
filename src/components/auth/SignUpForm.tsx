@@ -1,12 +1,10 @@
 
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CustomButton from "@/components/CustomButton";
-import WaliInformationFields from "./WaliInformationFields";
+import WaliInformationFields, { signUpFormSchema, SignUpFormValues } from "./WaliInformationFields";
 import { useTranslation } from "react-i18next";
-import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form, FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -34,16 +32,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showWaliFields, setShowWaliFields] = useState(false);
   
-  const formSchema = z.object({
-    firstName: z.string().min(1, t("auth.firstNameRequired")),
-    lastName: z.string().min(1, t("auth.lastNameRequired")),
-    email: z.string().email(t("auth.invalidEmail")).min(1, t("auth.emailRequired")),
-    password: z.string().min(6, t("auth.passwordMinLength")).max(100, t("auth.passwordMaxLength")),
-    gender: z.string().min(1, t("auth.genderRequired")),
-    waliName: z.string().optional(),
-    waliRelationship: z.string().optional(),
-    waliContact: z.string().optional(),
-  }).refine((data) => {
+  // Extend the schema with conditional validation for wali fields
+  const formSchema = signUpFormSchema.refine((data) => {
     // If gender is female, wali information is required
     if (data.gender === "female") {
       return !!data.waliName && !!data.waliRelationship && !!data.waliContact;
@@ -54,7 +44,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({
     path: ["waliName"]
   });
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<SignUpFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       firstName: "",
@@ -74,8 +64,18 @@ const SignUpForm: React.FC<SignUpFormProps> = ({
     setShowWaliFields(gender === "female");
   }, [gender]);
 
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    onSubmit(values);
+  const handleSubmit = (values: SignUpFormValues) => {
+    // All these values will be defined due to zod validation
+    onSubmit({
+      email: values.email,
+      password: values.password,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      gender: values.gender,
+      waliName: values.waliName,
+      waliRelationship: values.waliRelationship,
+      waliContact: values.waliContact,
+    });
   };
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
