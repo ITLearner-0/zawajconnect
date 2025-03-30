@@ -8,37 +8,42 @@ import { useAuth } from "@/hooks/useAuth";
 import SignUpForm from "@/components/auth/SignUpForm";
 import SignInForm from "@/components/auth/SignInForm";
 import AuthHeader from "@/components/auth/AuthHeader";
+import { useToast } from "@/components/ui/use-toast";
 
 const Auth = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
-  const [gender, setGender] = useState("");
-  const [waliName, setWaliName] = useState("");
-  const [waliRelationship, setWaliRelationship] = useState("");
-  const [waliContact, setWaliContact] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
   const { t } = useTranslation();
   const { loading, signUp, signIn } = useAuth();
+  const { toast } = useToast();
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Auth form submitted", { isSignUp, email, firstName, lastName, gender });
-    
-    if (isSignUp) {
-      await signUp({
-        email,
-        password,
-        firstName,
-        lastName,
-        gender,
-        waliName,
-        waliRelationship,
-        waliContact
+  const handleSignIn = async (data: { email: string; password: string }) => {
+    const success = await signIn(data);
+    if (!success) {
+      toast({
+        title: t("auth.loginError"),
+        description: t("auth.checkCredentials"),
+        variant: "destructive",
       });
-    } else {
-      await signIn({ email, password });
+    }
+  };
+
+  const handleSignUp = async (data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    gender: string;
+    waliName?: string;
+    waliRelationship?: string;
+    waliContact?: string;
+  }) => {
+    const success = await signUp(data);
+    if (!success) {
+      toast({
+        title: t("auth.registrationError"),
+        description: t("auth.registrationFailed"),
+        variant: "destructive",
+      });
     }
   };
 
@@ -54,33 +59,13 @@ const Auth = () => {
           <CardContent>
             {isSignUp ? (
               <SignUpForm
-                email={email}
-                setEmail={setEmail}
-                password={password}
-                setPassword={setPassword}
-                firstName={firstName}
-                setFirstName={setFirstName}
-                lastName={lastName}
-                setLastName={setLastName}
-                gender={gender}
-                setGender={setGender}
-                waliName={waliName}
-                setWaliName={setWaliName}
-                waliRelationship={waliRelationship}
-                setWaliRelationship={setWaliRelationship}
-                waliContact={waliContact}
-                setWaliContact={setWaliContact}
                 loading={loading}
-                onSubmit={handleAuth}
+                onSubmit={handleSignUp}
               />
             ) : (
               <SignInForm
-                email={email}
-                setEmail={setEmail}
-                password={password}
-                setPassword={setPassword}
                 loading={loading}
-                onSubmit={handleAuth}
+                onSubmit={handleSignIn}
               />
             )}
             <div className="text-center mt-4">

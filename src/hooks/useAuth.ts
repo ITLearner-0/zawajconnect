@@ -32,52 +32,6 @@ export const useAuth = () => {
     setLoading(true);
 
     try {
-      // Validate required fields
-      if (!firstName || !lastName) {
-        console.log("Missing name fields");
-        toast({
-          title: t("auth.missingInfo"),
-          description: t("auth.provideBothNames"),
-          variant: "destructive",
-        });
-        setLoading(false);
-        return false;
-      }
-
-      if (!gender) {
-        console.log("Missing gender");
-        toast({
-          title: t("auth.missingInfo"),
-          description: t("auth.selectGender"),
-          variant: "destructive",
-        });
-        setLoading(false);
-        return false;
-      }
-
-      // For registration, validate wali information for female users
-      if (gender === "female" && (!waliName || !waliRelationship || !waliContact)) {
-        console.log("Missing wali information");
-        toast({
-          title: t("auth.waliInformation"),
-          description: t("auth.waliRequired"),
-          variant: "destructive",
-        });
-        setLoading(false);
-        return false;
-      }
-
-      if (!email || !password) {
-        console.log("Missing email or password");
-        toast({
-          title: t("auth.missingInfo"),
-          description: t("auth.provideBothEmailPassword"),
-          variant: "destructive",
-        });
-        setLoading(false);
-        return false;
-      }
-
       console.log("Starting signup process with:", { email, firstName, lastName, gender });
       
       // Register the user
@@ -192,16 +146,6 @@ export const useAuth = () => {
     setLoading(true);
 
     try {
-      if (!email || !password) {
-        toast({
-          title: t("auth.missingInfo"),
-          description: t("auth.provideBothEmailPassword"),
-          variant: "destructive",
-        });
-        setLoading(false);
-        return false;
-      }
-
       console.log("Starting login process with:", email);
       const { error } = await supabase.auth.signInWithPassword({
         email,

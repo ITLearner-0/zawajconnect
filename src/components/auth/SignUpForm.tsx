@@ -1,147 +1,203 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CustomButton from "@/components/CustomButton";
 import WaliInformationFields from "./WaliInformationFields";
 import { useTranslation } from "react-i18next";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Form, FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Eye, EyeOff } from "lucide-react";
 
 interface SignUpFormProps {
-  email: string;
-  setEmail: (value: string) => void;
-  password: string;
-  setPassword: (value: string) => void;
-  firstName: string;
-  setFirstName: (value: string) => void;
-  lastName: string;
-  setLastName: (value: string) => void;
-  gender: string;
-  setGender: (value: string) => void;
-  waliName: string;
-  setWaliName: (value: string) => void;
-  waliRelationship: string;
-  setWaliRelationship: (value: string) => void;
-  waliContact: string;
-  setWaliContact: (value: string) => void;
   loading: boolean;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    gender: string;
+    waliName?: string;
+    waliRelationship?: string;
+    waliContact?: string;
+  }) => void;
 }
 
 const SignUpForm: React.FC<SignUpFormProps> = ({
-  email,
-  setEmail,
-  password,
-  setPassword,
-  firstName,
-  setFirstName,
-  lastName,
-  setLastName,
-  gender,
-  setGender,
-  waliName,
-  setWaliName,
-  waliRelationship,
-  setWaliRelationship,
-  waliContact,
-  setWaliContact,
   loading,
   onSubmit,
 }) => {
   const { t } = useTranslation();
-  const [showWaliFields, setShowWaliFields] = useState(gender === "female");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showWaliFields, setShowWaliFields] = useState(false);
+  
+  const formSchema = z.object({
+    firstName: z.string().min(1, t("auth.firstNameRequired")),
+    lastName: z.string().min(1, t("auth.lastNameRequired")),
+    email: z.string().email(t("auth.invalidEmail")).min(1, t("auth.emailRequired")),
+    password: z.string().min(6, t("auth.passwordMinLength")).max(100, t("auth.passwordMaxLength")),
+    gender: z.string().min(1, t("auth.genderRequired")),
+    waliName: z.string().optional(),
+    waliRelationship: z.string().optional(),
+    waliContact: z.string().optional(),
+  }).refine((data) => {
+    // If gender is female, wali information is required
+    if (data.gender === "female") {
+      return !!data.waliName && !!data.waliRelationship && !!data.waliContact;
+    }
+    return true;
+  }, {
+    message: t("auth.waliRequired"),
+    path: ["waliName"]
+  });
 
-  const handleGenderChange = (value: string) => {
-    setGender(value);
-    setShowWaliFields(value === "female");
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      gender: "",
+      waliName: "",
+      waliRelationship: "",
+      waliContact: "",
+    },
+  });
+
+  const gender = form.watch("gender");
+
+  useEffect(() => {
+    setShowWaliFields(gender === "female");
+  }, [gender]);
+
+  const handleSubmit = (values: z.infer<typeof formSchema>) => {
+    onSubmit(values);
   };
 
+  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="firstName">{t("auth.firstName")}</Label>
-          <Input
-            id="firstName"
-            placeholder={t("auth.firstNamePlaceholder")}
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-          />
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <FormItem>
+            <FormLabel>{t("auth.firstName")}</FormLabel>
+            <FormControl>
+              <Input
+                {...form.register("firstName")}
+                placeholder={t("auth.firstNamePlaceholder")}
+                disabled={loading}
+                aria-invalid={!!form.formState.errors.firstName}
+              />
+            </FormControl>
+            {form.formState.errors.firstName && (
+              <FormMessage>{form.formState.errors.firstName.message}</FormMessage>
+            )}
+          </FormItem>
+          <FormItem>
+            <FormLabel>{t("auth.lastName")}</FormLabel>
+            <FormControl>
+              <Input
+                {...form.register("lastName")}
+                placeholder={t("auth.lastNamePlaceholder")}
+                disabled={loading}
+                aria-invalid={!!form.formState.errors.lastName}
+              />
+            </FormControl>
+            {form.formState.errors.lastName && (
+              <FormMessage>{form.formState.errors.lastName.message}</FormMessage>
+            )}
+          </FormItem>
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="lastName">{t("auth.lastName")}</Label>
-          <Input
-            id="lastName"
-            placeholder={t("auth.lastNamePlaceholder")}
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            required
+
+        <FormItem>
+          <FormLabel>{t("auth.email")}</FormLabel>
+          <FormControl>
+            <Input
+              {...form.register("email")}
+              type="email"
+              placeholder={t("auth.emailPlaceholder")}
+              autoComplete="email"
+              disabled={loading}
+              aria-invalid={!!form.formState.errors.email}
+            />
+          </FormControl>
+          {form.formState.errors.email && (
+            <FormMessage>{form.formState.errors.email.message}</FormMessage>
+          )}
+        </FormItem>
+        
+        <FormItem>
+          <FormLabel>{t("auth.password")}</FormLabel>
+          <div className="relative">
+            <FormControl>
+              <Input
+                {...form.register("password")}
+                type={showPassword ? "text" : "password"}
+                placeholder={t("auth.passwordPlaceholder")}
+                autoComplete="new-password"
+                disabled={loading}
+                aria-invalid={!!form.formState.errors.password}
+              />
+            </FormControl>
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+              onClick={togglePasswordVisibility}
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
+          {form.formState.errors.password && (
+            <FormMessage>{form.formState.errors.password.message}</FormMessage>
+          )}
+        </FormItem>
+
+        <FormItem>
+          <FormLabel>{t("auth.gender")}</FormLabel>
+          <Select
+            disabled={loading}
+            onValueChange={(value) => form.setValue("gender", value, { shouldValidate: true })}
+            value={form.watch("gender")}
+          >
+            <FormControl>
+              <SelectTrigger className={form.formState.errors.gender ? "border-destructive" : ""}>
+                <SelectValue placeholder={t("auth.genderPlaceholder")} />
+              </SelectTrigger>
+            </FormControl>
+            <SelectContent>
+              <SelectItem value="male">{t("auth.male")}</SelectItem>
+              <SelectItem value="female">{t("auth.female")}</SelectItem>
+            </SelectContent>
+          </Select>
+          {form.formState.errors.gender && (
+            <FormMessage>{form.formState.errors.gender.message}</FormMessage>
+          )}
+        </FormItem>
+
+        {showWaliFields && (
+          <WaliInformationFields
+            form={form}
+            loading={loading}
           />
-        </div>
-      </div>
+        )}
 
-      <div className="space-y-2">
-        <Label htmlFor="email">{t("auth.email")}</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder={t("auth.emailPlaceholder")}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      
-      <div className="space-y-2">
-        <Label htmlFor="password">{t("auth.password")}</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder={t("auth.passwordPlaceholder")}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="gender">{t("auth.gender")}</Label>
-        <Select 
-          value={gender} 
-          onValueChange={handleGenderChange}
+        <CustomButton
+          type="submit"
+          className="w-full"
+          disabled={loading}
+          isLoading={loading}
+          variant="gold"
         >
-          <SelectTrigger id="gender">
-            <SelectValue placeholder={t("auth.genderPlaceholder")} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="male">{t("auth.male")}</SelectItem>
-            <SelectItem value="female">{t("auth.female")}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {showWaliFields && (
-        <WaliInformationFields
-          waliName={waliName}
-          setWaliName={setWaliName}
-          waliRelationship={waliRelationship}
-          setWaliRelationship={setWaliRelationship}
-          waliContact={waliContact}
-          setWaliContact={setWaliContact}
-        />
-      )}
-
-      <CustomButton
-        type="submit"
-        className="w-full"
-        disabled={loading}
-        isLoading={loading}
-        variant="gold"
-      >
-        {t("auth.createAccount")}
-      </CustomButton>
-    </form>
+          {t("auth.createAccount")}
+        </CustomButton>
+      </form>
+    </Form>
   );
 };
 

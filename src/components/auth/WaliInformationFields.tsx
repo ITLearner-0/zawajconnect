@@ -1,26 +1,30 @@
 
 import React from "react";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTranslation } from "react-i18next";
+import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { UseFormReturn } from "react-hook-form";
+
+interface WaliFormValues {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  gender: string;
+  waliName?: string;
+  waliRelationship?: string;
+  waliContact?: string;
+}
 
 interface WaliInformationFieldsProps {
-  waliName: string;
-  setWaliName: (value: string) => void;
-  waliRelationship: string;
-  setWaliRelationship: (value: string) => void;
-  waliContact: string;
-  setWaliContact: (value: string) => void;
+  form: UseFormReturn<WaliFormValues>;
+  loading: boolean;
 }
 
 const WaliInformationFields: React.FC<WaliInformationFieldsProps> = ({
-  waliName,
-  setWaliName,
-  waliRelationship,
-  setWaliRelationship,
-  waliContact,
-  setWaliContact,
+  form,
+  loading
 }) => {
   const { t } = useTranslation();
 
@@ -33,26 +37,37 @@ const WaliInformationFields: React.FC<WaliInformationFieldsProps> = ({
         </p>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="waliName">{t("auth.waliName")} <span className="text-red-500">*</span></Label>
-        <Input
-          id="waliName"
-          placeholder={t("auth.waliNamePlaceholder")}
-          value={waliName}
-          onChange={(e) => setWaliName(e.target.value)}
-          required
-        />
-      </div>
+      <FormItem>
+        <FormLabel>
+          {t("auth.waliName")} <span className="text-red-500">*</span>
+        </FormLabel>
+        <FormControl>
+          <Input
+            {...form.register("waliName")}
+            placeholder={t("auth.waliNamePlaceholder")}
+            disabled={loading}
+            aria-invalid={!!form.formState.errors.waliName}
+          />
+        </FormControl>
+        {form.formState.errors.waliName && (
+          <FormMessage>{form.formState.errors.waliName.message}</FormMessage>
+        )}
+      </FormItem>
 
-      <div className="space-y-2">
-        <Label htmlFor="waliRelationship">{t("auth.relationship")} <span className="text-red-500">*</span></Label>
-        <Select 
-          value={waliRelationship} 
-          onValueChange={setWaliRelationship}
+      <FormItem>
+        <FormLabel>
+          {t("auth.relationship")} <span className="text-red-500">*</span>
+        </FormLabel>
+        <Select
+          disabled={loading}
+          onValueChange={(value) => form.setValue("waliRelationship", value, { shouldValidate: true })}
+          value={form.watch("waliRelationship") || ""}
         >
-          <SelectTrigger id="waliRelationship">
-            <SelectValue placeholder={t("auth.relationshipPlaceholder")} />
-          </SelectTrigger>
+          <FormControl>
+            <SelectTrigger className={form.formState.errors.waliRelationship ? "border-destructive" : ""}>
+              <SelectValue placeholder={t("auth.relationshipPlaceholder")} />
+            </SelectTrigger>
+          </FormControl>
           <SelectContent>
             <SelectItem value="father">{t("auth.father")}</SelectItem>
             <SelectItem value="brother">{t("auth.brother")}</SelectItem>
@@ -61,18 +76,27 @@ const WaliInformationFields: React.FC<WaliInformationFieldsProps> = ({
             <SelectItem value="other">{t("auth.otherMaleRelative")}</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+        {form.formState.errors.waliRelationship && (
+          <FormMessage>{form.formState.errors.waliRelationship.message}</FormMessage>
+        )}
+      </FormItem>
 
-      <div className="space-y-2">
-        <Label htmlFor="waliContact">{t("auth.waliContact")} <span className="text-red-500">*</span></Label>
-        <Input
-          id="waliContact"
-          placeholder={t("auth.waliContactPlaceholder")}
-          value={waliContact}
-          onChange={(e) => setWaliContact(e.target.value)}
-          required
-        />
-      </div>
+      <FormItem>
+        <FormLabel>
+          {t("auth.waliContact")} <span className="text-red-500">*</span>
+        </FormLabel>
+        <FormControl>
+          <Input
+            {...form.register("waliContact")}
+            placeholder={t("auth.waliContactPlaceholder")}
+            disabled={loading}
+            aria-invalid={!!form.formState.errors.waliContact}
+          />
+        </FormControl>
+        {form.formState.errors.waliContact && (
+          <FormMessage>{form.formState.errors.waliContact.message}</FormMessage>
+        )}
+      </FormItem>
     </div>
   );
 };

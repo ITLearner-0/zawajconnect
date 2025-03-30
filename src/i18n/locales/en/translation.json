@@ -59,8 +59,16 @@
     "missingInfo": "Missing Information",
     "provideBothNames": "Please provide both first and last name.",
     "selectGender": "Please select your gender.",
-    "waliRequired": "As a female user, you must provide complete wali information.",
-    "provideBothEmailPassword": "Please provide both email and password."
+    "provideBothEmailPassword": "Please provide both email and password.",
+    "firstNameRequired": "First name is required",
+    "lastNameRequired": "Last name is required",
+    "emailRequired": "Email is required",
+    "invalidEmail": "Please enter a valid email address",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "passwordMaxLength": "Password cannot exceed 100 characters",
+    "genderRequired": "Please select your gender",
+    "checkCredentials": "Please check your credentials and try again",
+    "registrationFailed": "Registration failed. Please try again later."
   },
   "quotes": {
     "title": "Success Stories"
