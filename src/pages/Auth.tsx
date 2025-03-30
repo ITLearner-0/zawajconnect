@@ -35,12 +35,15 @@ const Auth = () => {
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Auth form submitted", { isSignUp, email, firstName, lastName, gender });
+    
     setLoading(true);
 
     try {
       if (isSignUp) {
         // Validate required fields
         if (!firstName || !lastName) {
+          console.log("Missing name fields");
           toast({
             title: "Missing Information",
             description: "Please provide both first and last name.",
@@ -51,6 +54,7 @@ const Auth = () => {
         }
 
         if (!gender) {
+          console.log("Missing gender");
           toast({
             title: "Missing Information",
             description: "Please select your gender.",
@@ -62,6 +66,7 @@ const Auth = () => {
 
         // For registration, validate wali information for female users
         if (gender === "female" && (!waliName || !waliRelationship || !waliContact)) {
+          console.log("Missing wali information");
           toast({
             title: "Wali Information Required",
             description: "As a female user, you must provide complete wali information.",
@@ -209,20 +214,20 @@ const Auth = () => {
                 <>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
+                      <Label htmlFor="firstName">{t("auth.firstName")}</Label>
                       <Input
                         id="firstName"
-                        placeholder="First name"
+                        placeholder={t("auth.firstNamePlaceholder")}
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
                         required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
+                      <Label htmlFor="lastName">{t("auth.lastName")}</Label>
                       <Input
                         id="lastName"
-                        placeholder="Last name"
+                        placeholder={t("auth.lastNamePlaceholder")}
                         value={lastName}
                         onChange={(e) => setLastName(e.target.value)}
                         required
@@ -233,22 +238,22 @@ const Auth = () => {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("auth.email")}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t("auth.emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("auth.password")}</Label>
                 <Input
                   id="password"
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder={t("auth.passwordPlaceholder")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -257,17 +262,17 @@ const Auth = () => {
 
               {isSignUp && (
                 <div className="space-y-2">
-                  <Label htmlFor="gender">Gender</Label>
+                  <Label htmlFor="gender">{t("auth.gender")}</Label>
                   <Select 
                     value={gender} 
                     onValueChange={handleGenderChange}
                   >
                     <SelectTrigger id="gender">
-                      <SelectValue placeholder="Select your gender" />
+                      <SelectValue placeholder={t("auth.genderPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="male">{t("auth.male")}</SelectItem>
+                      <SelectItem value="female">{t("auth.female")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -276,17 +281,17 @@ const Auth = () => {
               {isSignUp && showWaliFields && (
                 <div className="space-y-4 border border-primary/20 rounded-md p-4 bg-primary/5 mt-4 dark:bg-primary/10">
                   <div className="text-sm">
-                    <h3 className="font-medium mb-2">Wali Information</h3>
+                    <h3 className="font-medium mb-2">{t("auth.waliInformation")}</h3>
                     <p className="text-gray-600 dark:text-gray-300 mb-4">
-                      As a female user, you are required to provide your wali (guardian) information.
+                      {t("auth.waliRequired")}
                     </p>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="waliName">Wali Name <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="waliName">{t("auth.waliName")} <span className="text-red-500">*</span></Label>
                     <Input
                       id="waliName"
-                      placeholder="Enter your wali's full name"
+                      placeholder={t("auth.waliNamePlaceholder")}
                       value={waliName}
                       onChange={(e) => setWaliName(e.target.value)}
                       required
@@ -294,29 +299,29 @@ const Auth = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="waliRelationship">Relationship <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="waliRelationship">{t("auth.relationship")} <span className="text-red-500">*</span></Label>
                     <Select 
                       value={waliRelationship} 
                       onValueChange={setWaliRelationship}
                     >
                       <SelectTrigger id="waliRelationship">
-                        <SelectValue placeholder="Select relationship" />
+                        <SelectValue placeholder={t("auth.relationshipPlaceholder")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="father">Father</SelectItem>
-                        <SelectItem value="brother">Brother</SelectItem>
-                        <SelectItem value="uncle">Uncle</SelectItem>
-                        <SelectItem value="grandfather">Grandfather</SelectItem>
-                        <SelectItem value="other">Other Male Relative</SelectItem>
+                        <SelectItem value="father">{t("auth.father")}</SelectItem>
+                        <SelectItem value="brother">{t("auth.brother")}</SelectItem>
+                        <SelectItem value="uncle">{t("auth.uncle")}</SelectItem>
+                        <SelectItem value="grandfather">{t("auth.grandfather")}</SelectItem>
+                        <SelectItem value="other">{t("auth.otherMaleRelative")}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="waliContact">Wali Contact <span className="text-red-500">*</span></Label>
+                    <Label htmlFor="waliContact">{t("auth.waliContact")} <span className="text-red-500">*</span></Label>
                     <Input
                       id="waliContact"
-                      placeholder="Enter your wali's contact number"
+                      placeholder={t("auth.waliContactPlaceholder")}
                       value={waliContact}
                       onChange={(e) => setWaliContact(e.target.value)}
                       required
@@ -330,6 +335,7 @@ const Auth = () => {
                 className="w-full"
                 disabled={loading}
                 isLoading={loading}
+                variant="gold"
               >
                 {isSignUp ? t("auth.createAccount") : t("auth.signIn")}
               </CustomButton>
