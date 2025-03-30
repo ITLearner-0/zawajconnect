@@ -51,7 +51,16 @@
     "genderPlaceholder": "اختر جنسك",
     "waliNamePlaceholder": "أدخل الاسم الكامل للولي",
     "relationshipPlaceholder": "اختر صلة القرابة",
-    "waliContactPlaceholder": "أدخل رقم هاتف الولي"
+    "waliContactPlaceholder": "أدخل رقم هاتف الولي",
+    "registrationError": "خطأ في التسجيل",
+    "loginError": "خطأ في تسجيل الدخول",
+    "success": "نجاح!",
+    "emailVerification": "يرجى التحقق من بريدك الإلكتروني لتأكيد حسابك.",
+    "missingInfo": "معلومات ناقصة",
+    "provideBothNames": "يرجى تقديم الاسم الأول واسم العائلة.",
+    "selectGender": "يرجى تحديد جنسك.",
+    "waliRequired": "كمستخدمة أنثى، يجب عليك تقديم معلومات كاملة عن الولي الخاص بك.",
+    "provideBothEmailPassword": "يرجى تقديم البريد الإلكتروني وكلمة المرور."
   },
   "quotes": {
     "title": "قصص نجاح"

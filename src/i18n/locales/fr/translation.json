@@ -51,7 +51,16 @@
     "genderPlaceholder": "Sélectionnez votre genre",
     "waliNamePlaceholder": "Entrez le nom complet de votre wali",
     "relationshipPlaceholder": "Sélectionnez la relation",
-    "waliContactPlaceholder": "Entrez le numéro de contact de votre wali"
+    "waliContactPlaceholder": "Entrez le numéro de contact de votre wali",
+    "registrationError": "Erreur d'inscription",
+    "loginError": "Erreur de connexion",
+    "success": "Succès!",
+    "emailVerification": "Veuillez vérifier votre email pour confirmer votre compte.",
+    "missingInfo": "Informations manquantes",
+    "provideBothNames": "Veuillez fournir à la fois le prénom et le nom.",
+    "selectGender": "Veuillez sélectionner votre genre.",
+    "waliRequired": "En tant qu'utilisatrice, vous devez fournir des informations complètes sur votre wali.",
+    "provideBothEmailPassword": "Veuillez fournir à la fois l'email et le mot de passe."
   },
   "quotes": {
     "title": "Témoignages de réussite"

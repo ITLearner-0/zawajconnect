@@ -76,9 +76,20 @@ const Auth = () => {
           return;
         }
 
+        if (!email || !password) {
+          console.log("Missing email or password");
+          toast({
+            title: "Missing Information",
+            description: "Please provide both email and password.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+
         console.log("Starting signup process with:", { email, firstName, lastName, gender });
         
-        // Register the user - use the signUp method correctly
+        // Register the user
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -93,7 +104,13 @@ const Auth = () => {
 
         if (error) {
           console.error("Signup error:", error);
-          throw error;
+          toast({
+            title: "Registration Error",
+            description: error.message,
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
         }
 
         console.log("Signup successful, user data:", data);
@@ -173,7 +190,13 @@ const Auth = () => {
         });
         if (error) {
           console.error("Login error:", error);
-          throw error;
+          toast({
+            title: "Login Error",
+            description: error.message,
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
         }
         console.log("Login successful, redirecting to profile");
         navigate("/profile");
