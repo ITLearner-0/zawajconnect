@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import CustomButton from "@/components/CustomButton";
 import { useTranslation } from "react-i18next";
 import { FormControl, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form";
@@ -38,6 +37,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
       email: "",
       password: "",
     },
+    mode: "onChange"
   });
 
   // Handle form submission

@@ -34,6 +34,27 @@ export const useAuth = () => {
     try {
       console.log("Starting signup process with:", { email, firstName, lastName, gender });
       
+      // Check if user already exists
+      const { data: existingUsers, error: checkError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("email", email)
+        .maybeSingle();
+        
+      if (checkError) {
+        console.error("Error checking existing user:", checkError);
+      }
+
+      if (existingUsers) {
+        toast({
+          title: t("auth.registrationError"),
+          description: t("auth.emailAlreadyExists"),
+          variant: "destructive",
+        });
+        setLoading(false);
+        return false;
+      }
+      
       // Register the user
       const { data: userData, error } = await supabase.auth.signUp({
         email,
@@ -49,11 +70,22 @@ export const useAuth = () => {
 
       if (error) {
         console.error("Signup error:", error);
-        toast({
-          title: t("auth.registrationError"),
-          description: error.message,
-          variant: "destructive",
-        });
+        
+        // More specific error messages
+        if (error.message.includes("already registered")) {
+          toast({
+            title: t("auth.registrationError"),
+            description: t("auth.emailAlreadyExists"),
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: t("auth.registrationError"),
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+        
         setLoading(false);
         return false;
       }
@@ -147,21 +179,37 @@ export const useAuth = () => {
 
     try {
       console.log("Starting login process with:", email);
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data: sessionData, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
+      
       if (error) {
         console.error("Login error:", error);
-        toast({
-          title: t("auth.loginError"),
-          description: error.message,
-          variant: "destructive",
-        });
+        
+        // More specific error messages
+        if (error.message.includes("Invalid login credentials")) {
+          toast({
+            title: t("auth.loginError"),
+            description: t("auth.invalidCredentials"),
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: t("auth.loginError"),
+            description: error.message,
+            variant: "destructive",
+          });
+        }
+        
         setLoading(false);
         return false;
       }
+      
       console.log("Login successful, redirecting to profile");
+      // Store session data
+      console.log("Session data:", sessionData);
+      
       navigate("/profile");
       setLoading(false);
       return true;

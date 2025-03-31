@@ -17,11 +17,17 @@ const Auth = () => {
   const { toast } = useToast();
 
   const handleSignIn = async (data: { email: string; password: string }) => {
-    const success = await signIn(data);
-    if (!success) {
+    try {
+      const success = await signIn(data);
+      if (!success) {
+        // Error is already handled in useAuth hook
+        console.log("Sign in failed");
+      }
+    } catch (error) {
+      console.error("Unexpected error during sign in:", error);
       toast({
         title: t("auth.loginError"),
-        description: t("auth.checkCredentials"),
+        description: t("auth.unexpectedError"),
         variant: "destructive",
       });
     }
@@ -37,11 +43,17 @@ const Auth = () => {
     waliRelationship?: string;
     waliContact?: string;
   }) => {
-    const success = await signUp(data);
-    if (!success) {
+    try {
+      const success = await signUp(data);
+      if (!success) {
+        // Error is already handled in useAuth hook
+        console.log("Sign up failed");
+      }
+    } catch (error) {
+      console.error("Unexpected error during registration:", error);
       toast({
         title: t("auth.registrationError"),
-        description: t("auth.registrationFailed"),
+        description: t("auth.unexpectedError"),
         variant: "destructive",
       });
     }

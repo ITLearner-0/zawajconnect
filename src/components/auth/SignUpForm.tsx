@@ -56,6 +56,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({
       waliRelationship: "",
       waliContact: "",
     },
+    mode: "onChange"
   });
 
   const gender = form.watch("gender");
