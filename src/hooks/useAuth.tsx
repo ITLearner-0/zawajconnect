@@ -21,6 +21,16 @@ interface SignInData {
   password: string;
 }
 
+// Define privacy settings interface to avoid circular references
+interface PrivacySettings {
+  profileVisibilityLevel: number;
+  showAge: boolean;
+  showLocation: boolean;
+  showOccupation: boolean;
+  allowNonMatchMessages: boolean;
+  [key: string]: boolean | number;
+}
+
 // Define a simpler type for profile data to avoid recursive type definitions
 interface ProfileData {
   id: string;
@@ -35,14 +45,7 @@ interface ProfileData {
   education_level: string;
   occupation: string;
   is_visible: boolean;
-  privacy_settings: {
-    profileVisibilityLevel: number;
-    showAge: boolean;
-    showLocation: boolean;
-    showOccupation: boolean;
-    allowNonMatchMessages: boolean;
-    [key: string]: boolean | number;
-  };
+  privacy_settings: PrivacySettings;
   email_verified: boolean;
   phone_verified: boolean;
   id_verified: boolean;
@@ -128,7 +131,7 @@ export const useAuth = () => {
       if (userData.user) {
         console.log("Creating profile for user:", userData.user.id);
         
-        // Create complete profile data with all required fields
+        // Create initial profile object with explicit type
         const profileData: ProfileData = {
           id: userData.user.id,
           first_name: firstName,
