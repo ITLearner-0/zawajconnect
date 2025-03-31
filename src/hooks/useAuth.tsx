@@ -21,6 +21,38 @@ interface SignInData {
   password: string;
 }
 
+// Define a simpler type for profile data to avoid recursive type definitions
+interface ProfileData {
+  id: string;
+  first_name: string;
+  last_name: string;
+  gender: string;
+  birth_date: string;
+  location: string;
+  prayer_frequency: string;
+  religious_practice_level: string;
+  about_me: string;
+  education_level: string;
+  occupation: string;
+  is_visible: boolean;
+  privacy_settings: {
+    profileVisibilityLevel: number;
+    showAge: boolean;
+    showLocation: boolean;
+    showOccupation: boolean;
+    allowNonMatchMessages: boolean;
+    [key: string]: boolean | number;
+  };
+  email_verified: boolean;
+  phone_verified: boolean;
+  id_verified: boolean;
+  wali_verified: boolean;
+  wali_name?: string | null;
+  wali_relationship?: string | null;
+  wali_contact?: string | null;
+  [key: string]: any; // Allow for additional properties without causing circular references
+}
+
 export const useAuth = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -97,7 +129,7 @@ export const useAuth = () => {
         console.log("Creating profile for user:", userData.user.id);
         
         // Create complete profile data with all required fields
-        const profileData = {
+        const profileData: ProfileData = {
           id: userData.user.id,
           first_name: firstName,
           last_name: lastName,
@@ -125,14 +157,14 @@ export const useAuth = () => {
 
         // Add wali information for female users
         if (gender === "female") {
-          profileData["wali_name"] = waliName;
-          profileData["wali_relationship"] = waliRelationship;
-          profileData["wali_contact"] = waliContact;
+          profileData.wali_name = waliName;
+          profileData.wali_relationship = waliRelationship;
+          profileData.wali_contact = waliContact;
         } else {
           // For males, set wali fields to null
-          profileData["wali_name"] = null;
-          profileData["wali_relationship"] = null;
-          profileData["wali_contact"] = null;
+          profileData.wali_name = null;
+          profileData.wali_relationship = null;
+          profileData.wali_contact = null;
         }
 
         console.log("Inserting profile data:", profileData);
