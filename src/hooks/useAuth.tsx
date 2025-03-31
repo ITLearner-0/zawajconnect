@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -20,17 +21,17 @@ interface SignInData {
   password: string;
 }
 
-// Define privacy settings interface to avoid circular references
+// Define privacy settings interface with index signature
 interface PrivacySettings {
   profileVisibilityLevel: number;
   showAge: boolean;
   showLocation: boolean;
   showOccupation: boolean;
   allowNonMatchMessages: boolean;
-  [key: string]: boolean | number;
+  [key: string]: boolean | number; // Add index signature to prevent type recursion
 }
 
-// Define a simpler type for profile data to avoid recursive type definitions
+// Define a simpler type for profile data with index signature
 interface ProfileData {
   id: string;
   first_name: string;
@@ -52,7 +53,7 @@ interface ProfileData {
   wali_name?: string | null;
   wali_relationship?: string | null;
   wali_contact?: string | null;
-  [key: string]: any; // Allow for additional properties without causing circular references
+  [key: string]: any; // Add index signature to prevent type recursion
 }
 
 export const useAuth = () => {
