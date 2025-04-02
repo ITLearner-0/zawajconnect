@@ -1,16 +1,10 @@
 
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthActions } from "../auth/useAuthActions";
 
 export const useAuthSignOut = () => {
-  const navigate = useNavigate();
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/auth");
-  };
+  const { signOut } = useAuthActions();
 
   return {
-    handleSignOut
+    handleSignOut: signOut
   };
 };

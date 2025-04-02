@@ -2,9 +2,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { SignInData } from "@/types/auth";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
 
-export const signIn = async (data: SignInData, t: ReturnType<typeof useTranslation>["t"]) => {
+export const signIn = async (data: SignInData, t: (key: string) => string) => {
   const { email, password } = data;
 
   try {
@@ -31,10 +30,7 @@ export const signIn = async (data: SignInData, t: ReturnType<typeof useTranslati
       return false;
     }
     
-    console.log("Login successful, redirecting to profile");
-    // Store session data
-    console.log("Session data:", sessionData);
-    
+    console.log("Login successful, returning session");
     return true;
   } catch (error: any) {
     console.error("Authentication error:", error);

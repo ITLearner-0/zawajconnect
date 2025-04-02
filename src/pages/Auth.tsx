@@ -1,60 +1,57 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import { useTranslation } from "react-i18next";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
+import { useAuthActions } from "@/hooks/auth/useAuthActions";
 import SignUpForm from "@/components/auth/SignUpForm";
 import SignInForm from "@/components/auth/SignInForm";
 import AuthHeader from "@/components/auth/AuthHeader";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
+import { SignInData, SignUpData } from "@/types/auth";
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const { t } = useTranslation();
-  const { loading, signUp, signIn } = useAuth();
-  const { toast } = useToast();
+  const { loading, signUp, signIn } = useAuthActions();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      navigate("/profile");
+    }
+  }, [user, navigate]);
 
-  const handleSignIn = async (data: { email: string; password: string }) => {
+  const handleSignIn = async (data: SignInData) => {
     try {
       const success = await signIn(data);
       if (!success) {
-        // Error is already handled in useAuth hook
         console.log("Sign in failed");
       }
     } catch (error) {
       console.error("Unexpected error during sign in:", error);
-      toast({
-        title: t("auth.loginError"),
-        description: t("auth.unexpectedError"),
-        variant: "destructive",
+      toast(t("auth.loginError"), {
+        description: t("auth.unexpectedError")
       });
     }
   };
 
-  const handleSignUp = async (data: {
-    email: string;
-    password: string;
-    firstName: string;
-    lastName: string;
-    gender: string;
-    waliName?: string;
-    waliRelationship?: string;
-    waliContact?: string;
-  }) => {
+  const handleSignUp = async (data: SignUpData) => {
     try {
       const success = await signUp(data);
-      if (!success) {
-        // Error is already handled in useAuth hook
-        console.log("Sign up failed");
+      if (success) {
+        // Switch to sign in if signup is successful
+        setIsSignUp(false);
       }
     } catch (error) {
       console.error("Unexpected error during registration:", error);
-      toast({
-        title: t("auth.registrationError"),
-        description: t("auth.unexpectedError"),
-        variant: "destructive",
+      toast(t("auth.registrationError"), {
+        description: t("auth.unexpectedError")
       });
     }
   };

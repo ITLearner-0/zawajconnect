@@ -2,13 +2,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { SignUpData } from "@/types/auth";
 import { toast } from "sonner";
-import { useTranslation } from "react-i18next";
 
-// Remove the circular type reference by using a more direct type annotation
-export const signUp = async (
-  data: SignUpData, 
-  t: ReturnType<typeof useTranslation>["t"]
-) => {
+export const signUp = async (data: SignUpData, t: (key: string) => string) => {
   const { email, password, firstName, lastName, gender, waliName, waliRelationship, waliContact } = data;
 
   try {
@@ -48,7 +43,6 @@ export const signUp = async (
     if (error) {
       console.error("Signup error:", error);
       
-      // More specific error messages
       if (error.message.includes("already registered")) {
         toast(t("auth.emailAlreadyExists"), {
           description: t("auth.registrationError")
@@ -64,21 +58,20 @@ export const signUp = async (
 
     console.log("Signup successful, user data:", userData);
 
-    // If registration successful and user provides gender info, save to profile
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
-      // Create initial profile - use explicit type annotation to avoid deep nesting
-      const profileData: Record<string, any> = {
+      // Create profile data with explicit typing
+      const profileData = {
         id: userData.user.id,
         first_name: firstName,
         last_name: lastName,
         gender: gender,
-        birth_date: new Date().toISOString().split('T')[0], // Default to current date
-        location: "Not specified", // Default value
-        prayer_frequency: "Not specified", // Default value
-        religious_practice_level: "Not specified", // Default value
-        about_me: "", // Empty string for optional fields
+        birth_date: new Date().toISOString().split('T')[0], 
+        location: "Not specified",
+        prayer_frequency: "Not specified", 
+        religious_practice_level: "Not specified",
+        about_me: "",
         education_level: "",
         occupation: "",
         is_visible: true,
@@ -92,20 +85,11 @@ export const signUp = async (
         email_verified: false,
         phone_verified: false,
         id_verified: false,
-        wali_verified: false
+        wali_verified: false,
+        wali_name: gender === "female" ? waliName || null : null,
+        wali_relationship: gender === "female" ? waliRelationship || null : null,
+        wali_contact: gender === "female" ? waliContact || null : null
       };
-
-      // Add wali information for female users
-      if (gender === "female") {
-        profileData.wali_name = waliName || null;
-        profileData.wali_relationship = waliRelationship || null;
-        profileData.wali_contact = waliContact || null;
-      } else {
-        // For males, set wali fields to null
-        profileData.wali_name = null;
-        profileData.wali_relationship = null;
-        profileData.wali_contact = null;
-      }
 
       console.log("Inserting profile data:", profileData);
 

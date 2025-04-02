@@ -8,10 +8,11 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff } from "lucide-react";
+import { SignInData } from "@/types/auth";
 
 interface SignInFormProps {
   loading: boolean;
-  onSubmit: (data: { email: string; password: string }) => void;
+  onSubmit: (data: SignInData) => void;
 }
 
 const SignInForm: React.FC<SignInFormProps> = ({
@@ -42,7 +43,6 @@ const SignInForm: React.FC<SignInFormProps> = ({
 
   // Handle form submission
   const handleSubmit = (values: FormValues) => {
-    // Since we're using zod validation, these values are guaranteed to be defined
     onSubmit({
       email: values.email,
       password: values.password
