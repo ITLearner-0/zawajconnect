@@ -4,7 +4,11 @@ import { SignUpData } from "@/types/auth";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
-export const signUp = async (data: SignUpData, t: ReturnType<typeof useTranslation>["t"]) => {
+// Remove the circular type reference by using a more direct type annotation
+export const signUp = async (
+  data: SignUpData, 
+  t: ReturnType<typeof useTranslation>["t"]
+) => {
   const { email, password, firstName, lastName, gender, waliName, waliRelationship, waliContact } = data;
 
   try {
@@ -64,8 +68,8 @@ export const signUp = async (data: SignUpData, t: ReturnType<typeof useTranslati
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
-      // Create initial profile
-      const profileData: any = {
+      // Create initial profile - use explicit type annotation to avoid deep nesting
+      const profileData: Record<string, any> = {
         id: userData.user.id,
         first_name: firstName,
         last_name: lastName,
