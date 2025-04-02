@@ -61,8 +61,8 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
-      // Create profile data with explicit typing
-      const profileData = {
+      // Create profile data
+      const profileData: Record<string, any> = {
         id: userData.user.id,
         first_name: firstName,
         last_name: lastName,

@@ -30,13 +30,7 @@ export interface AuthProfileData {
   education_level: string;
   occupation: string;
   is_visible: boolean;
-  privacy_settings: {
-    profileVisibilityLevel: number;
-    showAge: boolean;
-    showLocation: boolean;
-    showOccupation: boolean;
-    allowNonMatchMessages: boolean;
-  };
+  privacy_settings: Record<string, any>;
   email_verified: boolean;
   phone_verified: boolean;
   id_verified: boolean;
