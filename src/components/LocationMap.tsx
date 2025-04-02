@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -171,10 +172,6 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
                 showCompatibility={showCompatibility}
                 onNavigateToProfile={navigateToProfile}
               />
-            ) : (
-              <div className="h-[400px] flex items-center justify-center bg-gray-100 rounded-md">
-                <p>Map loading failed. Please check your location settings and try again.</p>
-              </div>
             )}
             
             <div className="space-y-2 mt-4">
