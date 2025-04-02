@@ -1,6 +1,5 @@
-
 import mapboxgl from 'mapbox-gl';
-import { MAPBOX_TOKEN_KEY } from './types';
+import { MAPBOX_TOKEN_KEY, MAPBOX_PUBLIC_TOKEN } from './types';
 
 // Initialize the Mapbox map
 export const initializeMap = async ({
@@ -12,7 +11,8 @@ export const initializeMap = async ({
   userCoordinates: [number, number];
   token: string;
 }) => {
-  mapboxgl.accessToken = token;
+  // Always use the built-in public token
+  mapboxgl.accessToken = MAPBOX_PUBLIC_TOKEN;
   
   const map = new mapboxgl.Map({
     container: mapContainer,
@@ -44,22 +44,7 @@ export const addMapCustomStyling = () => {
   };
 };
 
-// Check if Mapbox token is available and prompt if not
-export const promptForMapboxToken = (): string => {
-  // Try to get token from localStorage
-  let token = localStorage.getItem(MAPBOX_TOKEN_KEY);
-  
-  // If no token found, prompt the user
-  if (!token) {
-    token = window.prompt(
-      'Please enter your Mapbox access token to display the map. You can get a free token at mapbox.com.'
-    );
-    
-    // If user provides a token, save it
-    if (token) {
-      localStorage.setItem(MAPBOX_TOKEN_KEY, token);
-    }
-  }
-  
-  return token || '';
+// Get the Mapbox token (now returns the built-in public token)
+export const getMapboxToken = (): string => {
+  return MAPBOX_PUBLIC_TOKEN;
 };

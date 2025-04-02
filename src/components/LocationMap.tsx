@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -12,28 +11,19 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 // Import refactored components and utilities
 import MapContainer from "./map/MapContainer";
 import ProfileList from "./map/ProfileList";
-import { Profile, LocationMapProps, MAPBOX_TOKEN_KEY } from "./map/types";
-import { promptForMapboxToken, addMapCustomStyling } from "./map/mapUtils";
+import { Profile, LocationMapProps, MAPBOX_PUBLIC_TOKEN } from "./map/types";
+import { addMapCustomStyling, getMapboxToken } from "./map/mapUtils";
 import CustomButton from "./CustomButton";
 
 const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false }: LocationMapProps) => {
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [mapboxToken, setMapboxToken] = useState<string>('');
   const { toast } = useToast();
   const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const navigate = useNavigate();
   const mapContainerRef = useRef<any>(null);
   const { userId } = useUserStatus();
-
-  // Load token from localStorage
-  useEffect(() => {
-    const storedToken = localStorage.getItem(MAPBOX_TOKEN_KEY);
-    if (storedToken) {
-      setMapboxToken(storedToken);
-    }
-  }, []);
 
   useEffect(() => {
     // Function to load the map
@@ -55,19 +45,8 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
           return;
         }
         
-        // Get the Mapbox token
-        const token = promptForMapboxToken();
-        if (!token) {
-          toast({
-            title: "Mapbox token required",
-            description: "A Mapbox token is required to display the map.",
-            variant: "destructive",
-          });
-          setLoading(false);
-          return;
-        }
-        
-        setMapboxToken(token);
+        // Always use our built-in Mapbox token
+        const token = getMapboxToken();
         
         // Check if we can get the user's current location
         if (!navigator.geolocation) {
@@ -188,7 +167,7 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
                 ref={mapContainerRef}
                 profiles={profiles}
                 userCoordinates={userCoordinates}
-                mapboxToken={mapboxToken}
+                mapboxToken={MAPBOX_PUBLIC_TOKEN}
                 showCompatibility={showCompatibility}
                 onNavigateToProfile={navigateToProfile}
               />

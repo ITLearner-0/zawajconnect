@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { SignUpData, ProfileData } from "@/types/auth";
+import { SignUpData } from "@/types/auth";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
@@ -64,8 +64,8 @@ export const signUp = async (data: SignUpData, t: ReturnType<typeof useTranslati
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
-      // Create initial profile with properly typed object
-      const profileData: ProfileData = {
+      // Create initial profile
+      const profileData = {
         id: userData.user.id,
         first_name: firstName,
         last_name: lastName,

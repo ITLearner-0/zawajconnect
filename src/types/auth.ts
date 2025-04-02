@@ -9,7 +9,7 @@ export interface PrivacySettings {
   [key: string]: boolean | number; // Simple index signature with primitive types
 }
 
-// Define ProfileData with specific primitive types for each property
+// Define ProfileData without circular references
 export interface ProfileData {
   id: string;
   first_name: string;
@@ -31,8 +31,7 @@ export interface ProfileData {
   wali_name?: string | null;
   wali_relationship?: string | null;
   wali_contact?: string | null;
-  // Use a more specific index signature to avoid circular references
-  [key: string]: string | boolean | number | null | undefined | PrivacySettings;
+  [key: string]: any; // Use a more generic indexer to avoid type recursion
 }
 
 export interface SignUpData {
