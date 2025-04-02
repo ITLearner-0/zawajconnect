@@ -3,19 +3,18 @@ import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { tableExists } from '@/utils/database/core';
 import { useToast } from '@/hooks/use-toast';
-
-type UserStatus = 'online' | 'offline' | 'away' | 'busy';
+import { UserStatusType } from './types';
 
 export const useUpdateUserStatus = (
   userId: string | null,
   isDemoUser: boolean,
-  setStatus: (status: UserStatus) => void,
+  setStatus: (status: UserStatusType) => void,
   setLastActive: (lastActive: string | null) => void,
   setError: (error: string | null) => void
 ) => {
   const { toast } = useToast();
 
-  const updateUserStatus = useCallback(async (newStatus: UserStatus) => {
+  const updateUserStatus = useCallback(async (newStatus: UserStatusType) => {
     if (!userId || isDemoUser) return false;
 
     try {

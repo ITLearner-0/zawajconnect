@@ -1,8 +1,7 @@
 
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-
-type UserStatusType = 'online' | 'offline' | 'away';
+import { UserStatusType } from './types';
 
 export const useStatusSync = (
   userId: string | null,

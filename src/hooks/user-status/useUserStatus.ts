@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { UserStatus } from './types';
+import { UserStatus, UserStatusType } from './types';
 import { useOfflineTracking } from './useOfflineTracking';
 import { useStatusTableCheck } from './useStatusTableCheck';
 import { useFetchUserStatus } from './useFetchUserStatus';
@@ -58,8 +58,8 @@ export const useUserStatus = (userId?: string) => {
   const { fetchUserStatus } = useFetchUserStatus(
     userToCheck,
     isDemoUser,
-    (status) => setUserStatus(prev => ({ ...prev, status })),
-    (lastActive) => setUserStatus(prev => ({ ...prev, lastActive })),
+    (status: UserStatusType) => setUserStatus(prev => ({ ...prev, status })),
+    (lastActive: string | null) => setUserStatus(prev => ({ ...prev, lastActive })),
     setLoading,
     setError
   );
@@ -68,8 +68,8 @@ export const useUserStatus = (userId?: string) => {
   useStatusSync(
     userToCheck,
     isDemoUser,
-    (status) => setUserStatus(prev => ({ ...prev, status })),
-    (lastActive) => setUserStatus(prev => ({ ...prev, lastActive }))
+    (status: UserStatusType) => setUserStatus(prev => ({ ...prev, status })),
+    (lastActive: string | null) => setUserStatus(prev => ({ ...prev, lastActive }))
   );
 
   // Handle offline status tracking
@@ -94,7 +94,7 @@ export const useUserStatus = (userId?: string) => {
     }
   };
 
-  const updateUserStatus = async (uid: string, status: 'online' | 'away' | 'offline') => {
+  const updateUserStatus = async (uid: string, status: UserStatusType) => {
     try {
       const now = new Date().toISOString();
 

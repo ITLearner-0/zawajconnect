@@ -2,13 +2,12 @@
 import { useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { tableExists } from '@/utils/database/core';
-
-type UserStatus = 'online' | 'offline' | 'away' | 'busy';
+import { UserStatusType } from './types';
 
 export const useFetchUserStatus = (
   userId: string | null,
   isDemoUser: boolean,
-  setStatus: (status: UserStatus) => void,
+  setStatus: (status: UserStatusType) => void,
   setLastActive: (lastActive: string | null) => void,
   setLoading: (loading: boolean) => void,
   setError: (error: string | null) => void
@@ -46,7 +45,7 @@ export const useFetchUserStatus = (
       }
 
       if (data) {
-        setStatus(data.status as UserStatus);
+        setStatus(data.status as UserStatusType);
         setLastActive(data.last_active);
       } else {
         // Default to offline if no session found
