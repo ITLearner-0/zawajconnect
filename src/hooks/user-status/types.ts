@@ -1,7 +1,6 @@
 
-export type UserStatus = 'online' | 'offline' | 'away' | 'busy';
-
-export interface UserStatusData {
-  status: UserStatus;
+export type UserStatus = {
+  online: boolean;
   lastActive: string | null;
-}
+  status: 'online' | 'offline' | 'away';
+};
