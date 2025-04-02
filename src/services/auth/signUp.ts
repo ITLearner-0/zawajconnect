@@ -65,7 +65,7 @@ export const signUp = async (data: SignUpData, t: ReturnType<typeof useTranslati
       console.log("Creating profile for user:", userData.user.id);
       
       // Create initial profile
-      const profileData = {
+      const profileData: any = {
         id: userData.user.id,
         first_name: firstName,
         last_name: lastName,

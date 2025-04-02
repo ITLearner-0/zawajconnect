@@ -1,4 +1,6 @@
 
+import { FilterCriteria } from "@/utils/location/filterUtils";
+
 export const MAPBOX_TOKEN_KEY = 'mapbox_access_token';
 export const MAPBOX_PUBLIC_TOKEN = 'pk.eyJ1IjoiMTIzNDEwMTIiLCJhIjoiY203dmt2dWc3MDEzbzJscXhwZDg1YW0xbiJ9.zD2OgQ9xO7yRNkrGWwlgWw';
 

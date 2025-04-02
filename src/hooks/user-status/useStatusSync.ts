@@ -2,12 +2,12 @@
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
-type UserStatus = 'online' | 'offline' | 'away' | 'busy';
+type UserStatusType = 'online' | 'offline' | 'away';
 
 export const useStatusSync = (
   userId: string | null,
   isDemoUser: boolean,
-  setStatus: (status: UserStatus) => void,
+  setStatus: (status: UserStatusType) => void,
   setLastActive: (lastActive: string | null) => void
 ) => {
   // Set up a listening channel for status updates

@@ -162,7 +162,7 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
           </div>
         ) : (
           <div className="space-y-4">
-            {userCoordinates && mapboxToken ? (
+            {userCoordinates && (
               <MapContainer
                 ref={mapContainerRef}
                 profiles={profiles}
