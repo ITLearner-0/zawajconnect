@@ -23,7 +23,7 @@ export interface ProfileData {
   education_level: string;
   occupation: string;
   is_visible: boolean;
-  privacy_settings: PrivacySettings; // Use the PrivacySettings interface
+  privacy_settings: PrivacySettings;
   email_verified: boolean;
   phone_verified: boolean;
   id_verified: boolean;
@@ -31,7 +31,7 @@ export interface ProfileData {
   wali_name?: string | null;
   wali_relationship?: string | null;
   wali_contact?: string | null;
-  // Index signature with only primitive types 
+  // Use a more specific index signature to avoid circular references
   [key: string]: string | boolean | number | null | undefined | PrivacySettings;
 }
 
