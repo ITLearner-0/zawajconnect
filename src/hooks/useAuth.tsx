@@ -30,7 +30,7 @@ interface PrivacySettings {
   [key: string]: boolean | number; // Index signature with specific allowed types
 }
 
-// Explicitly type all properties and use a more specific index signature
+// Use a completely flat type structure to avoid recursion
 interface ProfileData {
   id: string;
   first_name: string;
@@ -44,14 +44,7 @@ interface ProfileData {
   education_level: string;
   occupation: string;
   is_visible: boolean;
-  privacy_settings: {
-    profileVisibilityLevel: number;
-    showAge: boolean;
-    showLocation: boolean;
-    showOccupation: boolean;
-    allowNonMatchMessages: boolean;
-    [key: string]: boolean | number;
-  };
+  privacy_settings: PrivacySettings;
   email_verified: boolean;
   phone_verified: boolean;
   id_verified: boolean;
@@ -59,8 +52,8 @@ interface ProfileData {
   wali_name?: string | null;
   wali_relationship?: string | null;
   wali_contact?: string | null;
-  // More specific index signature that won't cause infinite recursion
-  [key: string]: string | boolean | number | null | undefined | { [key: string]: boolean | number | string };
+  // Use primitive types in index signature to avoid recursion
+  [key: string]: string | boolean | number | null | undefined | PrivacySettings;
 }
 
 export const useAuth = () => {
@@ -138,7 +131,7 @@ export const useAuth = () => {
       if (userData.user) {
         console.log("Creating profile for user:", userData.user.id);
         
-        // Create initial profile object with explicit type
+        // Create initial profile with explicit type to avoid recursion
         const profileData: ProfileData = {
           id: userData.user.id,
           first_name: firstName,
