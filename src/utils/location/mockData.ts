@@ -12,9 +12,12 @@ export const generateMockProfiles = async (count: number, maxDistance: number): 
     try {
       // Use promise-based approach to get location
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          timeout: 5000,
+          maximumAge: 0
+        });
       }).catch(() => {
-        console.log("Using default location");
+        console.log("Using default location for mock data");
         return null;
       });
       
@@ -23,7 +26,7 @@ export const generateMockProfiles = async (count: number, maxDistance: number): 
         userLng = position.coords.longitude;
       }
     } catch (e) {
-      console.error("Error getting user location:", e);
+      console.error("Error getting user location for mock data:", e);
     }
   }
   

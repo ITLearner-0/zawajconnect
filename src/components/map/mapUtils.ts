@@ -1,94 +1,65 @@
 
 import mapboxgl from 'mapbox-gl';
-import { toast } from '@/components/ui/use-toast';
+import { MAPBOX_TOKEN_KEY } from './types';
 
-// Prompts for Mapbox token if not already stored
-export const promptForMapboxToken = (): string | null => {
-  const storedToken = localStorage.getItem('mapbox_token');
-  if (storedToken) {
-    return storedToken;
-  }
+// Initialize the Mapbox map
+export const initializeMap = async ({
+  mapContainer,
+  userCoordinates,
+  token
+}: {
+  mapContainer: HTMLDivElement;
+  userCoordinates: [number, number];
+  token: string;
+}) => {
+  mapboxgl.accessToken = token;
   
-  const token = prompt(
-    "Please enter your Mapbox public token. You can get one at https://mapbox.com/account/access-tokens",
-    ""
-  );
+  const map = new mapboxgl.Map({
+    container: mapContainer,
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: userCoordinates,
+    zoom: 11
+  });
   
-  if (token) {
-    localStorage.setItem('mapbox_token', token);
-    return token;
-  }
-  
-  return null;
+  return map;
 };
 
-// Add custom map styling
-export const addMapCustomStyling = (): (() => void) => {
+// Add custom styling for the map
+export const addMapCustomStyling = () => {
+  // Add custom styling for the map markers and popups
   const style = document.createElement('style');
-  style.textContent = `
-    .mapboxgl-popup-content {
-      background-color: #fff;
-      border-radius: 8px;
-      padding: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      border-left: 4px solid #28717c;
-    }
-    .mapboxgl-popup-content h3 {
-      margin: 0 0 5px 0;
-      color: #28717c;
-      font-weight: 600;
-    }
-    .mapboxgl-popup-content p {
-      margin: 5px 0;
-      color: #6b2025;
-    }
-    .custom-marker {
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .custom-marker:hover {
-      transform: scale(1.2);
-    }
-    .map-popup {
-      min-width: 150px;
-    }
-    .view-profile-btn:hover {
-      background-color: #1e5762 !important;
-    }
+  style.innerHTML = `
+    .map-popup { padding: 8px; max-width: 200px; }
+    .map-popup h3 { font-weight: bold; margin: 0 0 5px 0; }
+    .map-popup p { margin: 2px 0; font-size: 13px; }
+    .view-profile-btn { transition: all 0.2s ease; }
+    .view-profile-btn:hover { background-color: #1a5059 !important; }
+    .custom-marker { box-shadow: 0 0 0 4px rgba(255,255,255,0.5); }
   `;
   document.head.appendChild(style);
   
+  // Return cleanup function
   return () => {
     document.head.removeChild(style);
   };
 };
 
-// Function to initialize the map
-export const initializeMap = async ({
-  mapContainer,
-  userCoordinates,
-  token,
-}: {
-  mapContainer: HTMLDivElement;
-  userCoordinates: [number, number];
-  token: string;
-}): Promise<mapboxgl.Map> => {
-  mapboxgl.accessToken = token;
+// Check if Mapbox token is available and prompt if not
+export const promptForMapboxToken = (): string => {
+  // Try to get token from localStorage
+  let token = localStorage.getItem(MAPBOX_TOKEN_KEY);
   
-  // Create the map
-  const map = new mapboxgl.Map({
-    container: mapContainer,
-    style: 'mapbox://styles/mapbox/light-v11',
-    center: userCoordinates,
-    zoom: 9,
-    pitchWithRotate: false,
-  });
+  // If no token found, prompt the user
+  if (!token) {
+    token = window.prompt(
+      'Please enter your Mapbox access token to display the map. You can get a free token at mapbox.com.'
+    );
+    
+    // If user provides a token, save it
+    if (token) {
+      localStorage.setItem(MAPBOX_TOKEN_KEY, token);
+    }
+  }
   
-  // Add navigation controls
-  map.addControl(
-    new mapboxgl.NavigationControl(),
-    'top-right'
-  );
-  
-  return map;
+  return token || '';
 };

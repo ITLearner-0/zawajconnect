@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -20,17 +21,17 @@ interface SignInData {
   password: string;
 }
 
-// Break the circular type reference by using specific types
+// Define PrivacySettings as a simple interface with no recursive types
 interface PrivacySettings {
   profileVisibilityLevel: number;
   showAge: boolean;
   showLocation: boolean;
   showOccupation: boolean;
   allowNonMatchMessages: boolean;
-  [key: string]: boolean | number; // Index signature with specific allowed types
+  [key: string]: boolean | number; // Simple index signature with primitive types
 }
 
-// Use a completely flat type structure to avoid recursion
+// Define ProfileData with specific primitive types for each property
 interface ProfileData {
   id: string;
   first_name: string;
@@ -44,7 +45,7 @@ interface ProfileData {
   education_level: string;
   occupation: string;
   is_visible: boolean;
-  privacy_settings: PrivacySettings;
+  privacy_settings: PrivacySettings; // Use the PrivacySettings interface
   email_verified: boolean;
   phone_verified: boolean;
   id_verified: boolean;
@@ -52,7 +53,7 @@ interface ProfileData {
   wali_name?: string | null;
   wali_relationship?: string | null;
   wali_contact?: string | null;
-  // Use primitive types in index signature to avoid recursion
+  // Index signature with only primitive types and the explicitly defined PrivacySettings
   [key: string]: string | boolean | number | null | undefined | PrivacySettings;
 }
 
@@ -131,7 +132,7 @@ export const useAuth = () => {
       if (userData.user) {
         console.log("Creating profile for user:", userData.user.id);
         
-        // Create initial profile with explicit type to avoid recursion
+        // Create initial profile with properly typed object
         const profileData: ProfileData = {
           id: userData.user.id,
           first_name: firstName,
@@ -160,9 +161,9 @@ export const useAuth = () => {
 
         // Add wali information for female users
         if (gender === "female") {
-          profileData.wali_name = waliName;
-          profileData.wali_relationship = waliRelationship;
-          profileData.wali_contact = waliContact;
+          profileData.wali_name = waliName || null;
+          profileData.wali_relationship = waliRelationship || null;
+          profileData.wali_contact = waliContact || null;
         } else {
           // For males, set wali fields to null
           profileData.wali_name = null;

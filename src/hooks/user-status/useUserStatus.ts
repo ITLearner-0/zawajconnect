@@ -1,61 +1,114 @@
 
-import { useState, useEffect, useCallback } from 'react';
-import { useFetchUserStatus } from './useFetchUserStatus';
-import { useUpdateUserStatus } from './useUpdateUserStatus';
-import { useStatusTableCheck } from './useStatusTableCheck';
-import { useStatusSync } from './useStatusSync';
-import { useOfflineTracking } from './useOfflineTracking';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { UserStatus } from './types';
 
-type UserStatus = 'online' | 'offline' | 'away' | 'busy';
-
-export const useUserStatus = (userId: string | null) => {
-  const [status, setStatus] = useState<UserStatus>('offline');
-  const [lastActive, setLastActive] = useState<string | null>(null);
+export const useUserStatus = () => {
+  const [userId, setUserId] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [userStatus, setUserStatus] = useState<UserStatus>({
+    online: false,
+    lastActive: null,
+    status: 'offline'
+  });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  // Don't attempt database operations for demo users
-  const isDemoUser = userId?.startsWith('user-');
-
-  // Get user status
-  const { fetchUserStatus } = useFetchUserStatus(
-    userId, 
-    isDemoUser, 
-    setStatus, 
-    setLastActive, 
-    setLoading, 
-    setError
-  );
-
-  // Update user status
-  const { updateUserStatus } = useUpdateUserStatus(
-    userId, 
-    isDemoUser, 
-    setStatus, 
-    setLastActive, 
-    setError
-  );
-
-  // Check if table exists before initial query
-  useStatusTableCheck(userId, isDemoUser);
-
-  // Set up a listening channel for status updates
-  useStatusSync(userId, isDemoUser, setStatus, setLastActive);
-
-  // Handle offline status when the component unmounts or window unloads
-  useOfflineTracking(userId, isDemoUser);
-
-  // Initial fetch of user status on mount
   useEffect(() => {
-    fetchUserStatus();
-  }, [fetchUserStatus]);
+    // Get the user's session
+    const checkSession = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (session) {
+          setUserId(session.user.id);
+          setIsAuthenticated(true);
+          updateUserStatus(session.user.id, 'online');
+        } else {
+          setIsAuthenticated(false);
+          setUserId(null);
+        }
+      } catch (error) {
+        console.error('Error checking user session:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkSession();
+
+    // Set up auth state change listener
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          setUserId(session.user.id);
+          setIsAuthenticated(true);
+          updateUserStatus(session.user.id, 'online');
+        } else if (event === 'SIGNED_OUT') {
+          if (userId) {
+            updateUserStatus(userId, 'offline');
+          }
+          setUserId(null);
+          setIsAuthenticated(false);
+        }
+      }
+    );
+
+    // Clean up the subscription
+    return () => {
+      authListener.subscription.unsubscribe();
+      
+      // Set status to offline on unmount if we have a userId
+      if (userId) {
+        updateUserStatus(userId, 'offline');
+      }
+    };
+  }, [userId]);
+
+  const updateUserStatus = async (uid: string, status: 'online' | 'away' | 'offline') => {
+    try {
+      const now = new Date().toISOString();
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          is_active: status !== 'offline',
+          last_active: now
+        })
+        .eq('id', uid);
+
+      if (error) {
+        console.error('Error updating user status:', error);
+        return;
+      }
+
+      setUserStatus({
+        online: status !== 'offline',
+        lastActive: now,
+        status
+      });
+    } catch (error) {
+      console.error('Error in updateUserStatus:', error);
+    }
+  };
+
+  const setAway = () => {
+    if (userId) {
+      updateUserStatus(userId, 'away');
+    }
+  };
+
+  const setOnline = () => {
+    if (userId) {
+      updateUserStatus(userId, 'online');
+    }
+  };
 
   return {
-    status,
-    lastActive,
+    userId,
+    isAuthenticated,
+    userStatus,
     loading,
-    error,
-    updateStatus: updateUserStatus,
-    refreshStatus: fetchUserStatus
+    setAway,
+    setOnline
   };
 };

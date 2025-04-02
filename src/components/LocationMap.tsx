@@ -3,9 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
-import { findNearbyProfiles } from "@/utils/location"; // Updated import
+import { findNearbyProfiles } from "@/utils/location/nearbyProfiles"; 
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { useUserStatus } from "@/hooks/useUserStatus";
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 // Import refactored components and utilities
@@ -13,6 +14,7 @@ import MapContainer from "./map/MapContainer";
 import ProfileList from "./map/ProfileList";
 import { Profile, LocationMapProps, MAPBOX_TOKEN_KEY } from "./map/types";
 import { promptForMapboxToken, addMapCustomStyling } from "./map/mapUtils";
+import CustomButton from "./CustomButton";
 
 const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false }: LocationMapProps) => {
   const [loading, setLoading] = useState(true);
@@ -20,8 +22,10 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
   const [mapboxToken, setMapboxToken] = useState<string>('');
   const { toast } = useToast();
   const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const navigate = useNavigate();
   const mapContainerRef = useRef<any>(null);
+  const { userId } = useUserStatus();
 
   // Load token from localStorage
   useEffect(() => {
@@ -35,100 +39,96 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
     // Function to load the map
     const loadMapData = async () => {
       setLoading(true);
+      setLocationError(null);
       
-      // Get current user
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast({
-          title: "Authentication required",
-          description: "Please sign in to view matches in your area.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      
-      // Get the Mapbox token
-      const token = promptForMapboxToken();
-      if (!token) {
-        toast({
-          title: "Mapbox token required",
-          description: "A Mapbox token is required to display the map.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      
-      // Check if we can get the user's current location
-      if (!navigator.geolocation) {
-        toast({
-          title: "Location Error",
-          description: "Geolocation is not supported by your browser.",
-          variant: "destructive",
-        });
-        setLoading(false);
-        return;
-      }
-      
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          setUserCoordinates([longitude, latitude]);
-          
-          try {
-            // Update user coordinates in the database
-            const { error: coordError } = await supabase.functions.invoke('update-coordinates', {
-              body: { 
-                user_id: session.user.id,
-                latitude,
-                longitude
-              }
-            });
-            
-            if (coordError) {
-              console.error("Error updating coordinates:", coordError);
-              toast({
-                title: "Warning",
-                description: "Could not update your location. Using current location for this session only.",
-              });
-            }
-            
-            // Fetch nearby profiles with filters
-            const nearbyProfiles = await findNearbyProfiles(session.user.id, maxDistance, filters);
-            console.log("Retrieved profiles:", nearbyProfiles);
-            setProfiles(nearbyProfiles);
-            setLoading(false);
-          } catch (innerError) {
-            console.error("Error in map initialization:", innerError);
-            toast({
-              title: "Error",
-              description: "There was a problem loading the map data.",
-              variant: "destructive",
-            });
-            setLoading(false);
-          }
-        },
-        (error) => {
-          console.error("Error getting location:", error);
+      try {
+        // Get current user
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
           toast({
-            title: "Location Error",
-            description: "Unable to get your location. Please enable location services.",
+            title: "Authentication required",
+            description: "Please sign in to view matches in your area.",
             variant: "destructive",
           });
           setLoading(false);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 0
+          return;
         }
-      );
+        
+        // Get the Mapbox token
+        const token = promptForMapboxToken();
+        if (!token) {
+          toast({
+            title: "Mapbox token required",
+            description: "A Mapbox token is required to display the map.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+        
+        setMapboxToken(token);
+        
+        // Check if we can get the user's current location
+        if (!navigator.geolocation) {
+          setLocationError("Geolocation is not supported by your browser.");
+          toast({
+            title: "Location Error",
+            description: "Geolocation is not supported by your browser.",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+        
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            setUserCoordinates([longitude, latitude]);
+            
+            try {
+              console.log("User coordinates:", longitude, latitude);
+              
+              // Fetch nearby profiles with filters without updating the database
+              // We'll just use the current coordinates for this session
+              const nearbyProfiles = await findNearbyProfiles(session.user.id, maxDistance, filters);
+              console.log("Retrieved profiles:", nearbyProfiles);
+              setProfiles(nearbyProfiles);
+              setLoading(false);
+            } catch (innerError) {
+              console.error("Error in map initialization:", innerError);
+              toast({
+                title: "Error",
+                description: "There was a problem loading the map data.",
+                variant: "destructive",
+              });
+              setLoading(false);
+            }
+          },
+          (error) => {
+            console.error("Error getting location:", error);
+            setLocationError("Unable to get your location. Please enable location services.");
+            toast({
+              title: "Location Error",
+              description: "Unable to get your location. Please enable location services.",
+              variant: "destructive",
+            });
+            setLoading(false);
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 0
+          }
+        );
+      } catch (error) {
+        console.error("General error:", error);
+        setLoading(false);
+      }
     };
 
     loadMapData();
-  }, [maxDistance, filters, toast, showCompatibility]);
+  }, [maxDistance, filters, toast, showCompatibility, userId]);
 
   // Add custom styling for map
   useEffect(() => {
@@ -153,6 +153,17 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
     }
   };
 
+  // Function to retry loading with location
+  const handleRetryLocation = () => {
+    setLocationError(null);
+    loadMapData();
+  };
+
+  const loadMapData = () => {
+    setLoading(true);
+    window.location.reload(); // Simple reload to retry getting location
+  };
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -162,6 +173,13 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
         {loading ? (
           <div className="space-y-2">
             <Skeleton className="h-[400px] w-full rounded-md" />
+          </div>
+        ) : locationError ? (
+          <div className="h-[400px] flex flex-col items-center justify-center bg-gray-100 rounded-md p-6 text-center">
+            <p className="mb-4 text-red-600">{locationError}</p>
+            <CustomButton onClick={handleRetryLocation}>
+              Retry with Location Services
+            </CustomButton>
           </div>
         ) : (
           <div className="space-y-4">
