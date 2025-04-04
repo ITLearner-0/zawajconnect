@@ -16,7 +16,7 @@ export interface SignInData {
   password: string;
 }
 
-// Profile data used in authentication flows
+// We'll define a specific interface for the profile data used in the authentication flow
 export interface AuthProfileData {
   id: string;
   first_name: string;
@@ -30,7 +30,13 @@ export interface AuthProfileData {
   education_level: string;
   occupation: string;
   is_visible: boolean;
-  privacy_settings: Record<string, any>;
+  privacy_settings: {
+    profileVisibilityLevel: number;
+    showAge: boolean;
+    showLocation: boolean;
+    showOccupation: boolean;
+    allowNonMatchMessages: boolean;
+  };
   email_verified: boolean;
   phone_verified: boolean;
   id_verified: boolean;

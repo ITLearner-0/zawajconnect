@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { SignUpData } from "@/types/auth";
+import { SignUpData, AuthProfileData } from "@/types/auth";
 import { toast } from "sonner";
 
 export const signUp = async (data: SignUpData, t: (key: string) => string) => {
@@ -61,8 +61,8 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
-      // Create profile data
-      const profileData: Record<string, any> = {
+      // Create profile data with the proper type
+      const profileData: AuthProfileData = {
         id: userData.user.id,
         first_name: firstName,
         last_name: lastName,
