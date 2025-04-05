@@ -7,25 +7,29 @@ import { useDemoMessages } from '@/hooks/useDemoMessages';
 import DemoConversation from '@/components/messaging/demo/DemoConversation';
 import RegularConversation from '@/components/messaging/regular/RegularConversation';
 import { toast } from '@/hooks/use-toast';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 
 const Messages = () => {
   const { conversationId } = useParams<{ conversationId: string }>();
   
   // Use ref to track initial render and prevent excessive logging
   const initialRenderDone = useRef(false);
-  const renderCount = useRef(0);
   
   // Get current user session
   const { currentUserId, loading: userLoading } = useUserSession();
   
-  // Handle demo conversation detection and messages
+  // Handle demo conversation detection and messages - memoize to prevent re-renders
   const { isDemoConversation, demoMessages, setDemoMessages } = useDemoMessages(conversationId);
   
   // Get user profile data
   const { profileData: userData } = useProfileData(currentUserId);
   
-  // Use conversationId from useParams for real conversations
+  // Use conversationId from useParams for real conversations - memoize options to prevent re-renders
+  const messagesOptions = useMemo(() => ({
+    conversationId,
+    currentUserId
+  }), [conversationId, currentUserId]);
+  
   const {
     conversations,
     currentConversation,
@@ -50,7 +54,7 @@ const Messages = () => {
     toggleEncryption,
     retentionPolicy,
     updateRetentionPolicy
-  } = useMessages(conversationId, currentUserId);
+  } = useMessages(messagesOptions.conversationId, messagesOptions.currentUserId);
 
   // Debug logs and error handling - only log on first render or when key values change
   useEffect(() => {
@@ -74,9 +78,6 @@ const Messages = () => {
       });
     }
   }, [conversationId, currentUserId, isDemoConversation, errors?.messages, loading, userLoading]);
-
-  renderCount.current += 1;
-  console.log(`Messages component render #${renderCount.current}`);
 
   // Loading state
   if (userLoading) {

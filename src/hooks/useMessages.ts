@@ -1,9 +1,13 @@
 
 import { useMessagesCore } from './useMessagesCore';
+import { useMemo } from 'react';
 
 export const useMessages = (conversationId?: string, currentUserId?: string | null) => {
+  // Memoize inputs to prevent excessive re-renders
+  const inputs = useMemo(() => ({ conversationId, currentUserId }), [conversationId, currentUserId]);
+  
   // Delegate to the core implementation with better error handling
-  const messagesData = useMessagesCore(conversationId, currentUserId);
+  const messagesData = useMessagesCore(inputs.conversationId, inputs.currentUserId);
   
   // Return with defaulted values to prevent undefined issues
   return {

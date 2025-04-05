@@ -22,7 +22,7 @@ interface ChatContainerProps {
   isSupervisor?: boolean;
 }
 
-const ChatContainer: React.FC<ChatContainerProps> = ({
+const ChatContainer = ({
   conversationId,
   userId,
   otherUserId,
@@ -33,7 +33,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   onStartVideoCall,
   isWaliSupervised = false,
   isSupervisor = false
-}) => {
+}: ChatContainerProps) => {
   const [messageInput, setMessageInput] = useState("");
   
   // Use our custom hooks
