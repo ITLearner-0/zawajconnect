@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { SignUpData } from "@/types/auth";
+import { SignUpData, AuthProfileData } from "@/types/auth";
 import { toast } from "sonner";
 
 export const signUp = async (data: SignUpData, t: (key: string) => string) => {
@@ -61,35 +61,8 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
-      // Create profile data with explicit type definition to avoid circular references
-      const profileData: {
-        id: string;
-        first_name: string;
-        last_name: string;
-        gender: string;
-        birth_date: string;
-        location: string;
-        prayer_frequency: string;
-        religious_practice_level: string;
-        about_me: string;
-        education_level: string;
-        occupation: string;
-        is_visible: boolean;
-        privacy_settings: {
-          profileVisibilityLevel: number;
-          showAge: boolean;
-          showLocation: boolean;
-          showOccupation: boolean;
-          allowNonMatchMessages: boolean;
-        };
-        email_verified: boolean;
-        phone_verified: boolean;
-        id_verified: boolean;
-        wali_verified: boolean;
-        wali_name: string | null;
-        wali_relationship: string | null;
-        wali_contact: string | null;
-      } = {
+      // Create profile data using the AuthProfileData type to avoid circular references
+      const profileData: AuthProfileData = {
         id: userData.user.id,
         first_name: firstName,
         last_name: lastName,
