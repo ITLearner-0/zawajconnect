@@ -61,8 +61,8 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
-      // Create the profile data object using the AuthProfileData interface
-      const profileData: AuthProfileData = {
+      // Create profile data object using a direct object literal to avoid type recursion issues
+      const profileData = {
         id: userData.user.id,
         first_name: firstName,
         last_name: lastName,
@@ -89,7 +89,7 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
         wali_name: gender === "female" ? waliName || null : null,
         wali_relationship: gender === "female" ? waliRelationship || null : null,
         wali_contact: gender === "female" ? waliContact || null : null
-      };
+      } as AuthProfileData; // Use type assertion instead of direct typing
 
       console.log("Inserting profile data:", profileData);
 
