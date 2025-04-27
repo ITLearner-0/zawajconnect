@@ -61,7 +61,7 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
-      // Create profile data object using a direct object literal to avoid type recursion issues
+      // Create profile data object as a plain object first, then use type assertion
       const profileData = {
         id: userData.user.id,
         first_name: firstName,
@@ -89,14 +89,17 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
         wali_name: gender === "female" ? waliName || null : null,
         wali_relationship: gender === "female" ? waliRelationship || null : null,
         wali_contact: gender === "female" ? waliContact || null : null
-      } as AuthProfileData; // Use type assertion instead of direct typing
+      };
 
-      console.log("Inserting profile data:", profileData);
+      // Type assertion instead of direct typing
+      const typedProfileData = profileData as AuthProfileData;
+      
+      console.log("Inserting profile data:", typedProfileData);
 
       // Create initial profile
       const { error: profileError } = await supabase
         .from("profiles")
-        .upsert(profileData);
+        .upsert(typedProfileData);
 
       if (profileError) {
         console.error("Error creating initial profile:", profileError);
