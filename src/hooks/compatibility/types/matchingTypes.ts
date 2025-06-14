@@ -1,5 +1,6 @@
 
 import { UserAnswers, UserPreferences } from "./validationTypes";
+import { PaginationOptions } from "./paginationTypes";
 
 export interface MatchingFilters {
   ageRange?: [number, number];
@@ -8,6 +9,7 @@ export interface MatchingFilters {
   religiousLevel?: string[];
   minCompatibilityScore?: number;
   verifiedOnly?: boolean;
+  pagination?: PaginationOptions;
 }
 
 export interface ValidatedProfileData {

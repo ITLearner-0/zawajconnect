@@ -1,12 +1,49 @@
-
 import { CompatibilityMatch } from "@/types/compatibility";
 import { MatchingFilters } from "../types/matchingTypes";
+import { PaginatedResult, PaginationOptions } from "../types/paginationTypes";
 import { backgroundProcessingService } from "./backgroundProcessingService";
 import { cacheService } from "./cacheService";
+import { paginationService } from "./paginationService";
 import { logInfo, logError, logWarning } from "./loggingService";
 import { findCompatibilityMatches } from "./matchingService";
 
 export class EnhancedMatchingService {
+  // Find matches with pagination support
+  async findMatchesWithPagination(
+    userId: string,
+    filters?: MatchingFilters
+  ): Promise<PaginatedResult<CompatibilityMatch>> {
+    try {
+      logInfo('enhancedMatching', `Finding paginated matches for user: ${userId}`, { filters });
+
+      // Get all matches first (this could be optimized to fetch only what's needed)
+      const allMatches = await this.findMatchesWithBackgroundProcessing(
+        userId,
+        { ...filters, pagination: undefined }, // Remove pagination for full fetch
+        true
+      );
+
+      // Apply pagination
+      const paginationOptions = filters?.pagination || { limit: 20 };
+      const paginatedResult = paginationService.paginateMatches(allMatches, paginationOptions);
+
+      logInfo('enhancedMatching', 'Paginated matches result', {
+        totalMatches: allMatches.length,
+        pageSize: paginatedResult.data.length,
+        hasMore: paginatedResult.hasMore
+      });
+
+      return paginatedResult;
+    } catch (error) {
+      logError('enhancedMatching', error as Error, { userId });
+      return {
+        data: [],
+        hasMore: false,
+        totalCount: 0
+      };
+    }
+  }
+
   // Find matches with background processing support
   async findMatchesWithBackgroundProcessing(
     userId: string,
@@ -43,13 +80,45 @@ export class EnhancedMatchingService {
       }
 
       // For now, return regular matches but with smaller batch to be faster
-      const limitedFilters = { ...filters, limit: 10 };
+      const limitedFilters = { ...filters, limit: filters?.pagination?.limit || 50 };
       return await findCompatibilityMatches(userId, limitedFilters);
 
     } catch (error) {
       logError('enhancedMatching', error as Error, { userId });
       // Fallback to regular matching on error
       return await findCompatibilityMatches(userId, filters);
+    }
+  }
+
+  // Load more matches (for pagination)
+  async loadMoreMatches(
+    userId: string,
+    existingMatches: CompatibilityMatch[],
+    paginationOptions: PaginationOptions,
+    filters?: MatchingFilters
+  ): Promise<PaginatedResult<CompatibilityMatch>> {
+    try {
+      const filtersWithPagination = {
+        ...filters,
+        pagination: paginationOptions
+      };
+
+      const paginatedResult = await this.findMatchesWithPagination(userId, filtersWithPagination);
+      
+      // Merge with existing matches
+      const mergedMatches = paginationService.mergeResults(existingMatches, paginatedResult.data);
+      
+      return {
+        ...paginatedResult,
+        data: mergedMatches
+      };
+    } catch (error) {
+      logError('enhancedMatching', error as Error, { userId });
+      return {
+        data: existingMatches,
+        hasMore: false,
+        totalCount: existingMatches.length
+      };
     }
   }
 

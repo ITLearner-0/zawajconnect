@@ -1,19 +1,23 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { CompatibilityMatch } from "@/types/compatibility";
 import { MatchingFilters } from "./types/matchingTypes";
+import { PaginationOptions, PaginatedResult } from "./types/paginationTypes";
 import { enhancedMatchingService } from "./services/enhancedMatchingService";
+import { paginationService } from "./services/paginationService";
 import { logInfo, logError } from "./services/loggingService";
 
 export function useEnhancedCompatibilityMatching() {
   const [matches, setMatches] = useState<CompatibilityMatch[]>([]);
   const [loading, setLoading] = useState(false);
   const [backgroundProcessing, setBackgroundProcessing] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
   const { toast } = useToast();
 
-  // Find matches with background processing
+  // Find matches with pagination support
   const findMatches = async (
     filters?: MatchingFilters,
     useBackground = true,
@@ -34,21 +38,15 @@ export function useEnhancedCompatibilityMatching() {
         });
       }
 
-      // Check for cached matches first
-      const cachedMatches = await enhancedMatchingService.getCachedMatches(session.user.id);
-      if (cachedMatches && !filters) {
-        setMatches(cachedMatches);
-        logInfo('useEnhancedMatching', 'Loaded cached matches', { count: cachedMatches.length });
-        return cachedMatches;
-      }
-
-      const results = await enhancedMatchingService.findMatchesWithBackgroundProcessing(
+      // Use pagination for initial load
+      const paginatedResult = await enhancedMatchingService.findMatchesWithPagination(
         session.user.id,
-        filters,
-        useBackground
+        { ...filters, pagination: { limit: 20 } }
       );
 
-      setMatches(results);
+      setMatches(paginatedResult.data);
+      setHasMore(paginatedResult.hasMore);
+      setTotalCount(paginatedResult.totalCount || 0);
       
       if (useBackground) {
         setBackgroundProcessing(true);
@@ -73,7 +71,12 @@ export function useEnhancedCompatibilityMatching() {
         }, 120000);
       }
 
-      return results;
+      logInfo('useEnhancedMatching', 'Loaded initial matches', { 
+        count: paginatedResult.data.length,
+        hasMore: paginatedResult.hasMore
+      });
+
+      return paginatedResult.data;
     } catch (error) {
       logError('useEnhancedMatching', error as Error);
       toast({
@@ -86,6 +89,40 @@ export function useEnhancedCompatibilityMatching() {
       setLoading(false);
     }
   };
+
+  // Load more matches for pagination
+  const loadMoreMatches = useCallback(async (
+    paginationOptions: PaginationOptions,
+    filters?: MatchingFilters
+  ): Promise<void> => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+
+      const result = await enhancedMatchingService.loadMoreMatches(
+        session.user.id,
+        matches,
+        paginationOptions,
+        filters
+      );
+
+      setMatches(result.data);
+      setHasMore(result.hasMore);
+      setTotalCount(result.totalCount || 0);
+
+      logInfo('useEnhancedMatching', 'Loaded more matches', {
+        newTotal: result.data.length,
+        hasMore: result.hasMore
+      });
+    } catch (error) {
+      logError('useEnhancedMatching', error as Error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger plus de correspondances",
+        variant: "destructive",
+      });
+    }
+  }, [matches, toast]);
 
   // Refresh matches with high priority
   const refreshMatches = async (): Promise<void> => {
@@ -101,6 +138,11 @@ export function useEnhancedCompatibilityMatching() {
       });
 
       setBackgroundProcessing(true);
+      
+      // Reset pagination state
+      setMatches([]);
+      setHasMore(false);
+      setTotalCount(0);
     } catch (error) {
       logError('useEnhancedMatching', error as Error);
       toast({
@@ -146,7 +188,10 @@ export function useEnhancedCompatibilityMatching() {
     matches,
     loading,
     backgroundProcessing,
+    hasMore,
+    totalCount,
     findMatches,
+    loadMoreMatches,
     refreshMatches,
     getProcessingStatus
   };
@@ -154,3 +199,4 @@ export function useEnhancedCompatibilityMatching() {
 
 // Export types for external use
 export type { MatchingFilters } from "./types/matchingTypes";
+export type { PaginationOptions, PaginatedResult } from "./types/paginationTypes";

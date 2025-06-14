@@ -61,3 +61,11 @@ export interface CompatibilityResultData {
   dealbreakers?: string[];
   preferences?: Array<{ category: string; weight: number }>;
 }
+
+// Pagination support for compatibility matches
+export interface CompatibilityMatchPage {
+  matches: CompatibilityMatch[];
+  hasMore: boolean;
+  totalCount: number;
+  nextCursor?: string;
+}
