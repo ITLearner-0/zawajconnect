@@ -4,6 +4,8 @@ import { useEnhancedLazyImage } from '@/hooks/useLazyLoading/useEnhancedLazyImag
 import { useAccessibleLazyLoading } from '@/hooks/useLazyLoading/useAccessibleLazyLoading';
 import { useResilientImageLoading } from '@/hooks/useLazyLoading/useResilientImageLoading';
 import { useNetworkStatus } from '@/hooks/useLazyLoading/useNetworkStatus';
+import { useDebuggedLazyLoading } from '@/hooks/useLazyLoading/useDebuggedLazyLoading';
+import { usePerformanceMonitor } from '@/hooks/useLazyLoading/usePerformanceMonitor';
 import EnhancedLoadingState from './EnhancedLoadingState';
 import ProgressiveImage from './ProgressiveImage';
 import LazyLoadingErrorBoundary from './LazyLoadingErrorBoundary';
@@ -23,9 +25,12 @@ interface LazyImageProps {
   enableRetry?: boolean;
   enableResilientLoading?: boolean;
   enableNetworkOptimization?: boolean;
+  enableDebug?: boolean;
+  enablePerformanceMonitoring?: boolean;
   maxRetries?: number;
   showLoadingText?: boolean;
   showNetworkStatus?: boolean;
+  debugId?: string;
 }
 
 const LazyImage = ({
@@ -41,9 +46,12 @@ const LazyImage = ({
   enableRetry = true,
   enableResilientLoading = true,
   enableNetworkOptimization = true,
+  enableDebug = process.env.NODE_ENV === 'development',
+  enablePerformanceMonitoring = false,
   maxRetries = 3,
   showLoadingText = false,
   showNetworkStatus = false,
+  debugId,
 }: LazyImageProps) => {
   const [loadState, setLoadState] = useState<'loading' | 'loaded' | 'error' | 'retry'>('loading');
 
@@ -57,10 +65,20 @@ const LazyImage = ({
 
   const {
     elementRef,
+    shouldLoad,
+    debug,
+  } = useDebuggedLazyLoading<HTMLDivElement>({
+    threshold: 0.1,
+    triggerOnce: true,
+    configType: 'image',
+    enableDebug,
+    debugId,
+  });
+
+  const {
     imageSrc,
     isLoaded,
     hasError,
-    shouldLoad,
     handleLoad,
     handleError,
   } = useEnhancedLazyImage(src, {
@@ -78,24 +96,48 @@ const LazyImage = ({
     maxRetries: enableRetry ? maxRetries : 1,
     onLoad: () => {
       setLoadState('loaded');
+      debug.logLoadEnd(true);
     },
     onError: (error) => {
       setLoadState('error');
+      debug.logLoadEnd(false);
+      debug.logError(error);
       onError?.();
       console.error('Resilient image loading failed:', error);
     },
   });
 
+  const {
+    metrics: performanceMetrics,
+    startMonitoring,
+    endMonitoring,
+    getPerformanceGrade,
+    getOptimizationSuggestions,
+  } = usePerformanceMonitor(enablePerformanceMonitoring ? src : undefined);
+
   const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
     handleLoad(event.nativeEvent);
     setLoadState('loaded');
+    debug.logLoadEnd(true);
+    
+    if (enablePerformanceMonitoring) {
+      endMonitoring(true);
+    }
+    
     onLoad?.(event);
   };
 
   const handleImageError = () => {
     handleError();
+    debug.logError(new Error('Image failed to load'));
+    
+    if (enablePerformanceMonitoring) {
+      endMonitoring(false);
+    }
+    
     if (enableRetry && resilientLoading.loadAttempt < maxRetries) {
       setLoadState('retry');
+      debug.logRetry();
       resilientLoading.retry();
     } else {
       setLoadState('error');
@@ -105,8 +147,17 @@ const LazyImage = ({
 
   const handleRetryClick = () => {
     setLoadState('retry');
+    debug.logRetry();
     resilientLoading.retry();
   };
+
+  // Start monitoring when image should load
+  React.useEffect(() => {
+    if (shouldLoad && enablePerformanceMonitoring) {
+      debug.logLoadStart();
+      startMonitoring();
+    }
+  }, [shouldLoad, enablePerformanceMonitoring, debug, startMonitoring]);
 
   // Use resilient loading when enabled
   const actualImageSrc = enableResilientLoading ? resilientLoading.currentSrc : imageSrc;
@@ -127,7 +178,19 @@ const LazyImage = ({
         className={cn('relative overflow-hidden', className)}
         role="img"
         aria-label={alt}
+        data-debug-id={enableDebug ? debug.elementId : undefined}
       >
+        {/* Debug Performance Info */}
+        {enableDebug && enablePerformanceMonitoring && performanceMetrics && (
+          <div className="absolute top-0 left-0 z-20 bg-black bg-opacity-75 text-white text-xs p-1 rounded-br">
+            <div>Grade: {getPerformanceGrade()}</div>
+            <div>Time: {performanceMetrics.totalTime.toFixed(0)}ms</div>
+            {performanceMetrics.transferSize > 0 && (
+              <div>Size: {(performanceMetrics.transferSize / 1024).toFixed(1)}KB</div>
+            )}
+          </div>
+        )}
+
         {/* Network Status Indicator */}
         {showNetworkStatus && (
           <div className="absolute top-2 right-2 z-10">
