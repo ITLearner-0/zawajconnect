@@ -9,69 +9,224 @@ export interface Question {
 }
 
 export const questions: Question[] = [
+  // 1. FONDEMENTS SPIRITUELS ET RELIGIEUX
   {
     id: 1,
-    question: "How important is regular prayer in your daily life?",
-    category: "Religious Practice",
+    question: "Je considère que la prière en commun (quand possible) renforce le lien conjugal.",
+    category: "Fondements Spirituels",
     weight: 2.0,
     isBreaker: true,
-    description: "This question helps match individuals with similar dedication to daily prayers."
+    description: "La prière commune renforce l'unité spirituelle du couple."
   },
   {
     id: 2,
-    question: "How significant is family involvement in your life decisions?",
-    category: "Family Values",
-    weight: 1.5,
-    isBreaker: false,
-    description: "This determines compatibility regarding family influence and involvement."
+    question: "Je souhaite que nous nous encouragions mutuellement dans nos obligations religieuses.",
+    category: "Fondements Spirituels",
+    weight: 2.0,
+    isBreaker: true,
+    description: "L'entraide spirituelle est essentielle dans un mariage islamique."
   },
   {
     id: 3,
-    question: "How important is continuing Islamic education to you?",
-    category: "Education",
-    weight: 1.2,
+    question: "Il est important pour moi que nous lisions le Coran ensemble régulièrement.",
+    category: "Fondements Spirituels",
+    weight: 1.8,
     isBreaker: false,
-    description: "This measures alignment on ongoing religious learning."
+    description: "La lecture commune du Coran enrichit la spiritualité conjugale."
   },
   {
     id: 4,
-    question: "How traditional are your views on marriage roles?",
-    category: "Marriage Views",
-    weight: 1.8,
+    question: "Notre mariage doit nous rapprocher d'Allah (SWT).",
+    category: "Objectifs Spirituels",
+    weight: 2.0,
     isBreaker: true,
-    description: "This assesses compatibility on traditional versus modern marriage role expectations."
+    description: "Le mariage doit être un moyen d'amélioration spirituelle."
   },
   {
     id: 5,
-    question: "How important is maintaining Islamic dietary restrictions?",
-    category: "Lifestyle",
-    weight: 1.5,
-    isBreaker: true,
-    description: "This determines alignment on halal dietary practices."
-  },
-  {
-    id: 6,
-    question: "How important is modest dressing to you?",
-    category: "Lifestyle",
+    question: "Accomplir le Hajj ensemble est un objectif important pour moi.",
+    category: "Objectifs Spirituels",
     weight: 1.5,
     isBreaker: false,
-    description: "This measures compatibility regarding dress code preferences."
+    description: "Le pèlerinage ensemble renforce les liens spirituels."
+  },
+
+  // 2. RÔLES ET RESPONSABILITÉS CONJUGALES
+  {
+    id: 6,
+    question: "Je comprends et accepte les responsabilités de l'époux selon l'Islam (qiwama).",
+    category: "Rôles Conjugaux",
+    weight: 1.9,
+    isBreaker: true,
+    description: "Comprendre les rôles selon l'Islam est fondamental."
   },
   {
     id: 7,
-    question: "How important is it that your spouse has similar cultural background?",
-    category: "Cultural Values",
-    weight: 1.0,
+    question: "Les décisions importantes doivent être prises par consultation mutuelle (shoura).",
+    category: "Rôles Conjugaux",
+    weight: 1.8,
     isBreaker: false,
-    description: "This identifies compatibility on cultural alignment preferences."
+    description: "La consultation mutuelle est recommandée en Islam."
   },
   {
     id: 8,
-    question: "How important is financial responsibility in marriage?",
-    category: "Financial Values",
-    weight: 1.3,
+    question: "Nous devons nous compléter dans nos forces et faiblesses.",
+    category: "Complémentarité",
+    weight: 1.7,
     isBreaker: false,
-    description: "This helps match individuals with similar financial values and expectations."
+    description: "La complémentarité enrichit le couple."
+  },
+
+  // 3. COMMUNICATION ET COMPORTEMENT
+  {
+    id: 9,
+    question: "Nous devons toujours nous parler avec respect et douceur.",
+    category: "Communication",
+    weight: 1.9,
+    isBreaker: true,
+    description: "Le respect mutuel est un pilier du mariage islamique."
+  },
+  {
+    id: 10,
+    question: "Nous ne devons jamais nous coucher en étant fâchés l'un contre l'autre.",
+    category: "Gestion des Conflits",
+    weight: 1.6,
+    isBreaker: false,
+    description: "Résoudre les conflits rapidement préserve l'harmonie."
+  },
+
+  // 4. ASPECTS FINANCIERS ET MATÉRIELS
+  {
+    id: 11,
+    question: "Le mari doit assurer la nafaqah (entretien) de son épouse.",
+    category: "Gestion Financière",
+    weight: 1.8,
+    isBreaker: true,
+    description: "La nafaqah est une obligation religieuse de l'époux."
+  },
+  {
+    id: 12,
+    question: "Nous devons éviter les dépenses excessives (israf).",
+    category: "Mode de Vie",
+    weight: 1.5,
+    isBreaker: false,
+    description: "L'Islam encourage la modération dans les dépenses."
+  },
+
+  // 5. ÉDUCATION DES ENFANTS
+  {
+    id: 13,
+    question: "L'éducation religieuse de nos enfants est notre priorité absolue.",
+    category: "Éducation des Enfants",
+    weight: 2.0,
+    isBreaker: true,
+    description: "L'éducation islamique des enfants est primordiale."
+  },
+  {
+    id: 14,
+    question: "Nos enfants doivent apprendre le respect des parents (birr al-walidayn).",
+    category: "Transmission des Valeurs",
+    weight: 1.8,
+    isBreaker: false,
+    description: "Le respect des parents est un pilier de l'Islam."
+  },
+
+  // 6. RELATIONS FAMILIALES ET SOCIALES
+  {
+    id: 15,
+    question: "Respecter et honorer les parents de mon conjoint est un devoir.",
+    category: "Relations Familiales",
+    weight: 1.7,
+    isBreaker: false,
+    description: "Le respect des beaux-parents est important en Islam."
+  },
+  {
+    id: 16,
+    question: "Participer aux activités de la communauté musulmane est important.",
+    category: "Vie Sociale",
+    weight: 1.4,
+    isBreaker: false,
+    description: "L'engagement communautaire renforce la foi."
+  },
+
+  // 7. INTIMITÉ ET VIE PRIVÉE
+  {
+    id: 17,
+    question: "L'intimité conjugale est un droit et un devoir mutuels.",
+    category: "Intimité",
+    weight: 1.8,
+    isBreaker: true,
+    description: "L'intimité conjugale est reconnue comme un droit mutuel en Islam."
+  },
+  {
+    id: 18,
+    question: "La pudeur et le respect doivent toujours être préservés.",
+    category: "Pudeur",
+    weight: 1.7,
+    isBreaker: false,
+    description: "La pudeur est une valeur centrale de l'Islam."
+  },
+
+  // 8. PROJETS DE VIE ET OBJECTIFS COMMUNS
+  {
+    id: 19,
+    question: "Nous voulons que notre mariage soit béni dans cette vie et l'au-delà.",
+    category: "Aspirations Spirituelles",
+    weight: 2.0,
+    isBreaker: true,
+    description: "Le mariage doit viser la satisfaction d'Allah."
+  },
+  {
+    id: 20,
+    question: "Équilibrer notre réussite professionnelle avec nos devoirs religieux.",
+    category: "Réalisations Terrestres",
+    weight: 1.6,
+    isBreaker: false,
+    description: "L'équilibre entre dunya et akhira est important."
+  },
+
+  // 9. DÉFIS ET ÉPREUVES
+  {
+    id: 21,
+    question: "Les épreuves d'Allah doivent nous rapprocher, pas nous séparer.",
+    category: "Face aux Difficultés",
+    weight: 1.8,
+    isBreaker: false,
+    description: "Les épreuves testent et renforcent la foi du couple."
+  },
+  {
+    id: 22,
+    question: "Nous devons nous aider à corriger nos défauts.",
+    category: "Croissance Personnelle",
+    weight: 1.6,
+    isBreaker: false,
+    description: "L'amélioration mutuelle est un objectif du mariage."
+  },
+
+  // 10. ENGAGEMENT ET FIDÉLITÉ
+  {
+    id: 23,
+    question: "La fidélité absolue est un pilier non négociable de notre mariage.",
+    category: "Fidélité",
+    weight: 2.0,
+    isBreaker: true,
+    description: "La fidélité est fondamentale dans le mariage islamique."
+  },
+  {
+    id: 24,
+    question: "Notre mariage doit durer jusqu'à la mort, inch'Allah.",
+    category: "Engagement Long Terme",
+    weight: 1.9,
+    isBreaker: true,
+    description: "L'engagement à vie est l'idéal du mariage islamique."
+  },
+  {
+    id: 25,
+    question: "Faire du'a pour la bénédiction d'Allah sur notre union.",
+    category: "Engagement Long Terme",
+    weight: 1.7,
+    isBreaker: false,
+    description: "Les invocations renforcent la baraka du mariage."
   }
 ];
 
