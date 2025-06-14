@@ -4,6 +4,34 @@ import { supabase } from '@/integrations/supabase/client';
 import { WaliProfile } from '@/types/wali';
 import { useToast } from '../use-toast';
 
+// Helper function to safely parse chat preferences
+const parseChatPreferences = (preferences: any) => {
+  if (!preferences) {
+    return {
+      auto_approve_known_contacts: false,
+      notification_level: 'important' as const,
+      keyword_alerts: [],
+      supervision_level: 'passive' as const
+    };
+  }
+  
+  if (typeof preferences === 'object') {
+    return {
+      auto_approve_known_contacts: preferences.auto_approve_known_contacts || false,
+      notification_level: preferences.notification_level || 'important',
+      keyword_alerts: preferences.keyword_alerts || [],
+      supervision_level: preferences.supervision_level || 'passive'
+    };
+  }
+  
+  return {
+    auto_approve_known_contacts: false,
+    notification_level: 'important' as const,
+    keyword_alerts: [],
+    supervision_level: 'passive' as const
+  };
+};
+
 export const useWaliProfile = (userId: string) => {
   const [waliProfile, setWaliProfile] = useState<WaliProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,7 +60,13 @@ export const useWaliProfile = (userId: string) => {
           throw fetchError;
         }
 
-        setWaliProfile(data as WaliProfile);
+        // Convert the database record to WaliProfile with proper type handling
+        const waliProfile: WaliProfile = {
+          ...data,
+          chat_preferences: parseChatPreferences(data.chat_preferences)
+        };
+
+        setWaliProfile(waliProfile);
       } catch (err: any) {
         console.error('Error fetching wali profile:', err);
         setError(err.message || 'Failed to load wali profile');

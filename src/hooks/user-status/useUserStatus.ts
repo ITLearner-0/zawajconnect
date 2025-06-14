@@ -85,7 +85,7 @@ export const useUserStatus = (userId?: string | null) => {
   };
 
   return {
-    userId: currentUserId, // Add userId to the return object
+    userId: currentUserId,
     status: userStatus?.status || 'offline',
     lastActive: userStatus?.last_active || null,
     isOnline,

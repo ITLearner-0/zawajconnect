@@ -26,11 +26,11 @@ export const useWaliStats = (
       setError(null);
 
       try {
-        // Get total supervised conversations (both active and past)
+        // Get total supervised conversations using existing conversations table
         const { count, error: countError } = await supabase
-          .from('supervision_sessions')
+          .from('conversations')
           .select('*', { count: 'exact', head: true })
-          .eq('wali_id', userId);
+          .eq('wali_supervised', true);
 
         if (countError) {
           console.error('Error fetching supervision count:', countError);

@@ -3,19 +3,17 @@ import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Check if a table exists in the database
+ * Note: This is a mock implementation since we don't have access to database metadata
  */
 export const tableExists = async (tableName: string): Promise<boolean> => {
   try {
-    const { data, error } = await supabase.rpc('check_table_exists' as any, {
-      table_name: tableName
-    });
+    // Simple check by trying to query the table
+    const { error } = await supabase
+      .from(tableName as any)
+      .select('*', { count: 'exact', head: true });
 
-    if (error) {
-      console.error('Error checking if table exists:', error);
-      return false;
-    }
-
-    return data || false;
+    // If no error, table exists
+    return !error;
   } catch (err) {
     console.error('Error checking if table exists:', err);
     return false;
@@ -24,20 +22,12 @@ export const tableExists = async (tableName: string): Promise<boolean> => {
 
 /**
  * Execute a SQL query directly
- * Note: This should be used carefully and only for admin functions
+ * Note: This is disabled since we can't execute arbitrary SQL from the client
  */
 export const executeSql = async (sql: string): Promise<any> => {
   try {
-    const { data, error } = await supabase.rpc('execute_sql' as any, {
-      query: sql
-    });
-
-    if (error) {
-      console.error('Error executing SQL:', error);
-      throw error;
-    }
-
-    return data;
+    console.log('SQL execution requested but not available from client:', sql);
+    throw new Error('SQL execution not available from client side');
   } catch (err) {
     console.error('Error executing SQL:', err);
     throw err;
@@ -46,20 +36,12 @@ export const executeSql = async (sql: string): Promise<any> => {
 
 /**
  * Check if a column exists in a table
+ * Note: This is a mock implementation
  */
 export const columnExists = async (tableName: string, columnName: string): Promise<boolean> => {
   try {
-    const { data, error } = await supabase.rpc('check_column_exists' as any, {
-      table_name: tableName,
-      column_name: columnName
-    });
-
-    if (error) {
-      console.error('Error checking if column exists:', error);
-      return false;
-    }
-
-    return data || false;
+    console.log('Column existence check requested but not available from client:', tableName, columnName);
+    return false;
   } catch (err) {
     console.error('Error checking if column exists:', err);
     return false;

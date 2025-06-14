@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ContentReport } from '@/types/profile';
 
 /**
- * Creates a content report
+ * Creates a content report using content_flags table since content_reports doesn't exist
  */
 export const reportContent = async (
   reportedUserId: string,
@@ -13,27 +13,28 @@ export const reportContent = async (
   reportDetails: string
 ): Promise<boolean> => {
   try {
-    // Insert into content_reports table directly
+    // Use content_flags table instead of content_reports
     const { error } = await supabase
-      .from('content_reports')
+      .from('content_flags')
       .insert({
-        reported_user_id: reportedUserId,
-        reporting_user_id: reportingUserId,
-        report_type: reportType,
-        content_reference: contentReference,
-        report_details: reportDetails,
+        content_id: contentReference || reportedUserId,
+        content_type: 'profile',
+        flag_type: reportType,
+        flagged_by: reportingUserId,
+        severity: 'medium',
+        notes: reportDetails,
         created_at: new Date().toISOString(),
-        status: 'pending'
+        resolved: false
       });
     
     if (error) {
-      console.error("Error creating content report:", error);
+      console.error("Error creating content flag:", error);
       return false;
     }
     
     return true;
   } catch (err) {
-    console.error('Error reporting content:', err);
+    console.error('Error flagging content:', err);
     return false;
   }
 };
@@ -52,7 +53,7 @@ export const submitContentReport = async (report: Partial<ContentReport>): Promi
 };
 
 /**
- * Resolves a content report
+ * Resolves a content flag
  */
 export const resolveContentReport = async (
   reportId: string,
@@ -61,22 +62,22 @@ export const resolveContentReport = async (
 ): Promise<boolean> => {
   try {
     const { error } = await supabase
-      .from('content_reports')
+      .from('content_flags')
       .update({
-        status: 'resolved',
-        resolution_action: resolutionAction,
-        admin_notes: adminNotes
+        resolved: true,
+        resolved_at: new Date().toISOString(),
+        notes: adminNotes
       })
       .eq('id', reportId);
     
     if (error) {
-      console.error("Error resolving content report:", error);
+      console.error("Error resolving content flag:", error);
       return false;
     }
     
     return true;
   } catch (err) {
-    console.error('Error resolving content report:', err);
+    console.error('Error resolving content flag:', err);
     return false;
   }
 };
