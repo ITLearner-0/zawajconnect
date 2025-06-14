@@ -1,9 +1,18 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { SupervisionSession } from '@/types/wali';
-import { Conversation } from '@/types/profile';
+import { Conversation, RetentionPolicy } from '@/types/profile';
 import { useToast } from '../use-toast';
+
+export interface SupervisionSession {
+  id: string;
+  conversation_id: string;
+  wali_id: string;
+  started_at: string;
+  ended_at?: string;
+  is_active: boolean;
+  supervision_level: 'active' | 'passive' | 'minimal';
+}
 
 interface SupervisedConversation extends Conversation {
   supervisionId: string;
@@ -11,13 +20,25 @@ interface SupervisedConversation extends Conversation {
   supervisionLevel: 'active' | 'passive' | 'minimal';
 }
 
+// Helper function to safely parse retention policy
+const parseRetentionPolicy = (policy: any): RetentionPolicy | undefined => {
+  if (!policy) return undefined;
+  if (typeof policy === 'object' && policy.type) {
+    return policy as RetentionPolicy;
+  }
+  return undefined;
+};
+
 export const useSupervision = (waliId: string) => {
   const [activeConversations, setActiveConversations] = useState<SupervisedConversation[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Fetch active supervised conversations
+  // Mock function to simulate supervision sessions since the table doesn't exist
+  const mockSupervisionSessions: SupervisionSession[] = [];
+
+  // Fetch active supervised conversations - using mock data since supervision_sessions table doesn't exist
   const fetchActiveConversations = useCallback(async () => {
     if (!waliId) {
       setLoading(false);
@@ -28,48 +49,28 @@ export const useSupervision = (waliId: string) => {
     setError(null);
 
     try {
-      // First get active supervision sessions
-      const { data: sessions, error: sessionsError } = await supabase
-        .from('supervision_sessions')
-        .select('*')
-        .eq('wali_id', waliId)
-        .eq('is_active', true);
-
-      if (sessionsError) {
-        throw sessionsError;
-      }
-
-      if (!sessions.length) {
-        setActiveConversations([]);
-        setLoading(false);
-        return;
-      }
-
-      // Get conversation details for each active session
-      const conversationIds = sessions.map(session => session.conversation_id);
-      
+      // Since supervision_sessions table doesn't exist, we'll use a simpler approach
+      // We'll just fetch conversations that are marked as wali_supervised
       const { data: conversations, error: conversationsError } = await supabase
         .from('conversations')
         .select(`
           *,
           profiles:profiles(*)
         `)
-        .in('id', conversationIds);
+        .eq('wali_supervised', true);
 
       if (conversationsError) {
         throw conversationsError;
       }
 
-      // Combine the data
-      const supervisedConversations = conversations.map(conversation => {
-        const session = sessions.find(s => s.conversation_id === conversation.id);
-        return {
-          ...conversation,
-          supervisionId: session?.id || '',
-          supervisionStarted: session?.started_at || '',
-          supervisionLevel: session?.supervision_level || 'passive'
-        } as SupervisedConversation;
-      });
+      // Convert to supervised conversations with mock supervision data
+      const supervisedConversations = (conversations || []).map(conversation => ({
+        ...conversation,
+        supervisionId: `mock-${conversation.id}`,
+        supervisionStarted: conversation.created_at || new Date().toISOString(),
+        supervisionLevel: 'passive' as const,
+        retention_policy: parseRetentionPolicy(conversation.retention_policy)
+      })) as SupervisedConversation[];
 
       setActiveConversations(supervisedConversations);
     } catch (err: any) {
@@ -83,15 +84,15 @@ export const useSupervision = (waliId: string) => {
   useEffect(() => {
     fetchActiveConversations();
 
-    // Set up real-time subscription for supervision sessions
+    // Set up real-time subscription for conversations
     if (waliId) {
       const channel = supabase
         .channel(`wali_supervision_${waliId}`)
         .on('postgres_changes', { 
           event: '*', 
           schema: 'public', 
-          table: 'supervision_sessions',
-          filter: `wali_id=eq.${waliId}`
+          table: 'conversations',
+          filter: `wali_supervised=eq.true`
         }, () => {
           fetchActiveConversations();
         })
@@ -108,43 +109,6 @@ export const useSupervision = (waliId: string) => {
     if (!waliId) return false;
 
     try {
-      // Check if already supervising this conversation
-      const { data: existing, error: checkError } = await supabase
-        .from('supervision_sessions')
-        .select('*')
-        .eq('conversation_id', conversationId)
-        .eq('wali_id', waliId)
-        .eq('is_active', true)
-        .maybeSingle();
-
-      if (checkError) {
-        throw checkError;
-      }
-
-      if (existing) {
-        toast({
-          title: "Already Supervising",
-          description: "You are already supervising this conversation",
-          variant: "default"
-        });
-        return true;
-      }
-
-      // Create new supervision session
-      const { error: createError } = await supabase
-        .from('supervision_sessions')
-        .insert({
-          conversation_id: conversationId,
-          wali_id: waliId,
-          started_at: new Date().toISOString(),
-          is_active: true,
-          supervision_level: level
-        });
-
-      if (createError) {
-        throw createError;
-      }
-
       // Update the conversation to mark it as wali-supervised
       const { error: updateError } = await supabase
         .from('conversations')
@@ -183,41 +147,14 @@ export const useSupervision = (waliId: string) => {
     if (!waliId) return false;
 
     try {
-      // End the supervision session
-      const { error: updateError } = await supabase
-        .from('supervision_sessions')
-        .update({ 
-          is_active: false,
-          ended_at: new Date().toISOString()
-        })
-        .eq('id', supervisionId)
-        .eq('wali_id', waliId);
+      // Update conversation to mark it as not supervised
+      const { error: convError } = await supabase
+        .from('conversations')
+        .update({ wali_supervised: false })
+        .eq('id', conversationId);
 
-      if (updateError) {
-        throw updateError;
-      }
-
-      // Check if there are any other active sessions for this conversation
-      const { data: otherSessions, error: checkError } = await supabase
-        .from('supervision_sessions')
-        .select('*')
-        .eq('conversation_id', conversationId)
-        .eq('is_active', true);
-
-      if (checkError) {
-        throw checkError;
-      }
-
-      // If no other active sessions, update conversation
-      if (!otherSessions.length) {
-        const { error: convError } = await supabase
-          .from('conversations')
-          .update({ wali_supervised: false })
-          .eq('id', conversationId);
-
-        if (convError) {
-          throw convError;
-        }
+      if (convError) {
+        throw convError;
       }
 
       toast({
