@@ -13,11 +13,11 @@ import { Save } from 'lucide-react';
 
 interface ProfileFormWithEnhancedPrivacyProps {
   formData: ProfileFormData;
-  handleChange: (field: keyof ProfileFormData, value: string) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
   handleSubmit: () => Promise<boolean>;
   verificationStatus: VerificationStatus;
   userEmail: string | null;
-  handleVerificationChange: (field: keyof VerificationStatus, value: boolean) => void;
+  handleVerificationChange: (newStatus: VerificationStatus) => void;
   privacySettings: PrivacySettings;
   blockedUsers: string[];
   isAccountVisible: boolean;
