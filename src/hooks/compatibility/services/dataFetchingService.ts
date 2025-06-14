@@ -5,6 +5,20 @@ import { compatibilityCache, logCacheOperation } from "./cachingService";
 import { DatabaseConnectionError, UserNotFoundError } from "./errorHandling";
 import { logInfo, logWarning, logError } from "./loggingService";
 
+// Helper function to safely convert Json to Record<string, any>
+function safeJsonToRecord(json: any): Record<string, any> {
+  if (json && typeof json === 'object' && !Array.isArray(json)) {
+    return json as Record<string, any>;
+  }
+  logWarning('safeJsonToRecord', 'Invalid Json format, returning empty object', { json });
+  return {};
+}
+
+// Helper function to safely convert Json to any type
+function safeJsonToAny(json: any): any {
+  return json;
+}
+
 export async function fetchUserResults(userId: string): Promise<{ answers: Record<string, any>; preferences: any }> {
   // Check cache first
   const cachedResults = compatibilityCache.getUserResults(userId);
@@ -32,7 +46,10 @@ export async function fetchUserResults(userId: string): Promise<{ answers: Recor
       throw new UserNotFoundError();
     }
 
-    const results = data;
+    const results = {
+      answers: safeJsonToRecord(data.answers),
+      preferences: safeJsonToAny(data.preferences)
+    };
     
     // Cache the results
     compatibilityCache.setUserResults(userId, results);
@@ -59,7 +76,12 @@ export async function fetchOtherUsers(userId: string): Promise<Array<{ user_id: 
       throw new DatabaseConnectionError('fetching other users results', error);
     }
 
-    const otherUsers = data || [];
+    const otherUsers = (data || []).map(user => ({
+      user_id: user.user_id,
+      answers: safeJsonToRecord(user.answers),
+      preferences: safeJsonToAny(user.preferences)
+    }));
+    
     logInfo('fetchOtherUsers', `Found ${otherUsers.length} other users with compatibility results`);
 
     if (otherUsers.length === 0) {
