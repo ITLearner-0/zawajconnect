@@ -7,10 +7,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { questions, calculateMaxPossibleScore } from "@/data/compatibilityQuestions";
 import { Answer, CompatibilityResultData } from "@/types/compatibility";
-import QuestionDisplay from "./compatibility/QuestionDisplay";
-import ResultsDisplay from "./compatibility/ResultsDisplay";
 import { Json } from "@/integrations/supabase/types";
 import { Progress } from "@/components/ui/progress";
+import CategoryProgress from "./compatibility/CategoryProgress";
+import MobileOptimizedQuestion from "./compatibility/MobileOptimizedQuestion";
+import EnhancedResultsDisplay from "./compatibility/EnhancedResultsDisplay";
 
 const CompatibilityTest = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -151,11 +152,13 @@ const CompatibilityTest = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-6 animate-fadeIn">
-      <Card className="p-6 shadow-lg">
+    <div className="w-full max-w-4xl mx-auto p-4 md:p-6 animate-fadeIn">
+      <Card className="p-4 md:p-6 shadow-lg">
         {!showResult ? (
           <>
-            <QuestionDisplay
+            <CategoryProgress currentQuestion={currentQuestion} answers={answers} />
+            
+            <MobileOptimizedQuestion
               question={questions[currentQuestion]}
               answer={answers[currentQuestion]}
               isDealbreaker={isDealbreaker}
@@ -165,30 +168,38 @@ const CompatibilityTest = () => {
               onThresholdChange={(value) => setBreakerthreshold(value[0])}
               onWeightChange={handleWeightChange}
             />
+            
             <div className="mt-8 space-y-4">
               <Progress 
                 value={(currentQuestion + 1) / questions.length * 100} 
-                className="h-2 w-full"
+                className="h-3 w-full"
               />
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500">
-                  Question {currentQuestion + 1} of {questions.length}
+                  Question {currentQuestion + 1} sur {questions.length}
                 </span>
                 <div className="space-x-3">
                   {currentQuestion > 0 && (
                     <CustomButton variant="outline" onClick={handlePrevious}>
-                      Previous
+                      Précédent
                     </CustomButton>
                   )}
-                  <CustomButton onClick={handleNext} disabled={loading}>
-                    {currentQuestion === questions.length - 1 ? (loading ? "Calculating..." : "See Results") : "Next"}
+                  <CustomButton 
+                    onClick={handleNext} 
+                    disabled={loading || !answers[currentQuestion]?.value}
+                  >
+                    {currentQuestion === questions.length - 1 ? (loading ? "Calcul..." : "Voir les Résultats") : "Suivant"}
                   </CustomButton>
                 </div>
               </div>
             </div>
           </>
         ) : (
-          <ResultsDisplay score={score} onRetake={handleRetake} />
+          <EnhancedResultsDisplay 
+            score={score} 
+            answers={answers}
+            onRetake={handleRetake} 
+          />
         )}
       </Card>
     </div>
