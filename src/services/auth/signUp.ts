@@ -13,7 +13,7 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     const { data: existingUsers, error: checkError } = await supabase
       .from("profiles")
       .select("id")
-      .eq("email", email)
+      .eq("id", email)
       .maybeSingle();
       
     if (checkError) {
@@ -61,12 +61,12 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
-      // Create profile data object directly
-      const profileData = {
+      // Create profile data object with minimal required fields
+      const profileInsert = {
         id: userData.user.id,
-        first_name: firstName,
-        last_name: lastName,
-        gender: gender,
+        first_name: firstName || "",
+        last_name: lastName || "",
+        gender: gender || null,
         birth_date: new Date().toISOString().split('T')[0], 
         location: "Not specified",
         prayer_frequency: "Not specified", 
@@ -75,28 +75,21 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
         education_level: "",
         occupation: "",
         is_visible: true,
-        privacy_settings: {
-          profileVisibilityLevel: 1,
-          showAge: true,
-          showLocation: true,
-          showOccupation: true,
-          allowNonMatchMessages: true
-        },
         email_verified: false,
         phone_verified: false,
         id_verified: false,
         wali_verified: false,
-        wali_name: gender === "female" ? waliName || null : null,
-        wali_relationship: gender === "female" ? waliRelationship || null : null,
-        wali_contact: gender === "female" ? waliContact || null : null
+        wali_name: gender === "female" ? (waliName || null) : null,
+        wali_relationship: gender === "female" ? (waliRelationship || null) : null,
+        wali_contact: gender === "female" ? (waliContact || null) : null
       };
       
-      console.log("Inserting profile data:", profileData);
+      console.log("Inserting profile data:", profileInsert);
 
       // Create initial profile
       const { error: profileError } = await supabase
         .from("profiles")
-        .upsert(profileData);
+        .insert(profileInsert);
 
       if (profileError) {
         console.error("Error creating initial profile:", profileError);

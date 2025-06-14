@@ -52,7 +52,9 @@ export const useUserStatus = (userId?: string | null) => {
   // Use the custom hooks
   const { userStatus, loading: fetchLoading, error: fetchError } = useFetchUserStatus(userId || currentUserId);
   const { updateStatus, loading: updateLoading } = useUpdateUserStatus();
-  const { } = useOfflineTracking(currentUserId);
+  
+  // Pass both required arguments to useOfflineTracking
+  useOfflineTracking(currentUserId, false); // assuming not a demo user by default
 
   // Update user status when online status changes
   useEffect(() => {

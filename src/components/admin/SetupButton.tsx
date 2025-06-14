@@ -22,7 +22,8 @@ const SetupButton: React.FC<SetupButtonProps> = ({ show, onSetupComplete }) => {
       const moderationSuccess = await setupModerationTables();
       
       // Check and setup RLS policies
-      const rlsExist = await checkRLSPolicies();
+      const rlsPolicies = await checkRLSPolicies();
+      const rlsExist = Object.keys(rlsPolicies).length > 0 && Object.values(rlsPolicies).every(Boolean);
       let rlsSuccess = rlsExist;
       
       if (!rlsExist) {
