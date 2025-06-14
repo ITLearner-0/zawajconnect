@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { useEnhancedLazyImage } from '@/hooks/useLazyLoading/useEnhancedLazyImage';
 import { useAccessibleLazyLoading } from '@/hooks/useLazyLoading/useAccessibleLazyLoading';
-import { useRetryableLoad } from '@/hooks/useLazyLoading/useRetryableLoad';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useResilientImageLoading } from '@/hooks/useLazyLoading/useResilientImageLoading';
+import { useNetworkStatus } from '@/hooks/useLazyLoading/useNetworkStatus';
 import EnhancedLoadingState from './EnhancedLoadingState';
 import ProgressiveImage from './ProgressiveImage';
+import LazyLoadingErrorBoundary from './LazyLoadingErrorBoundary';
+import { WifiOff, Signal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LazyImageProps {
@@ -19,8 +21,11 @@ interface LazyImageProps {
   enableMemoryOptimization?: boolean;
   enableProgressiveLoading?: boolean;
   enableRetry?: boolean;
+  enableResilientLoading?: boolean;
+  enableNetworkOptimization?: boolean;
   maxRetries?: number;
   showLoadingText?: boolean;
+  showNetworkStatus?: boolean;
 }
 
 const LazyImage = ({
@@ -34,8 +39,11 @@ const LazyImage = ({
   enableMemoryOptimization = true,
   enableProgressiveLoading = false,
   enableRetry = true,
+  enableResilientLoading = true,
+  enableNetworkOptimization = true,
   maxRetries = 3,
   showLoadingText = false,
+  showNetworkStatus = false,
 }: LazyImageProps) => {
   const [loadState, setLoadState] = useState<'loading' | 'loaded' | 'error' | 'retry'>('loading');
 
@@ -44,6 +52,8 @@ const LazyImage = ({
     triggerOnce: true,
     configType: 'image',
   });
+
+  const { isOnline, isSlowConnection } = useNetworkStatus();
 
   const {
     elementRef,
@@ -60,21 +70,19 @@ const LazyImage = ({
     maxRetries: enableRetry ? maxRetries : 1,
   });
 
-  const loadImage = async () => {
-    // This would trigger the image load - the actual loading is handled by useEnhancedLazyImage
-    return new Promise<void>((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => reject(new Error('Image load failed'));
-      img.src = src;
-    });
-  };
-
-  const { retry, isRetrying, canRetry } = useRetryableLoad(loadImage, {
+  const resilientLoading = useResilientImageLoading({
+    src,
+    fallbackSources: fallbackSrc ? [fallbackSrc] : [],
+    enableNetworkOptimization,
+    enableCircuitBreaker: enableResilientLoading,
     maxRetries: enableRetry ? maxRetries : 1,
-    onRetryExhausted: () => {
+    onLoad: () => {
+      setLoadState('loaded');
+    },
+    onError: (error) => {
       setLoadState('error');
       onError?.();
+      console.error('Resilient image loading failed:', error);
     },
   });
 
@@ -86,9 +94,9 @@ const LazyImage = ({
 
   const handleImageError = () => {
     handleError();
-    if (enableRetry && canRetry) {
+    if (enableRetry && resilientLoading.loadAttempt < maxRetries) {
       setLoadState('retry');
-      retry();
+      resilientLoading.retry();
     } else {
       setLoadState('error');
       onError?.();
@@ -96,11 +104,14 @@ const LazyImage = ({
   };
 
   const handleRetryClick = () => {
-    if (canRetry) {
-      setLoadState('retry');
-      retry();
-    }
+    setLoadState('retry');
+    resilientLoading.retry();
   };
+
+  // Use resilient loading when enabled
+  const actualImageSrc = enableResilientLoading ? resilientLoading.currentSrc : imageSrc;
+  const actualIsLoaded = enableResilientLoading ? !resilientLoading.isLoading && !resilientLoading.hasError : isLoaded;
+  const actualHasError = enableResilientLoading ? resilientLoading.hasError : hasError;
 
   // Generate low quality src for progressive loading
   const lowQualitySrc = enableProgressiveLoading && src.includes('?') 
@@ -110,79 +121,109 @@ const LazyImage = ({
     : undefined;
 
   return (
-    <div 
-      ref={elementRef} 
-      className={cn('relative overflow-hidden', className)}
-      role="img"
-      aria-label={alt}
-    >
-      {!shouldLoad || (!isLoaded && !hasError && !isRetrying) ? (
-        <EnhancedLoadingState
-          state="loading"
-          className={cn('w-full h-full', placeholderClassName)}
-          showText={showLoadingText}
-          reducedMotion={reducedMotion}
-        />
-      ) : null}
-
-      {isRetrying && (
-        <EnhancedLoadingState
-          state="retry"
-          className={cn('w-full h-full', placeholderClassName)}
-          showText={showLoadingText}
-          reducedMotion={reducedMotion}
-        />
-      )}
-
-      {loadState === 'error' && (
-        <EnhancedLoadingState
-          state="error"
-          onRetry={enableRetry ? handleRetryClick : undefined}
-          className={cn('w-full h-full', placeholderClassName)}
-          showText={showLoadingText}
-          reducedMotion={reducedMotion}
-        />
-      )}
-      
-      {shouldLoad && imageSrc && loadState !== 'error' && !isRetrying && (
-        enableProgressiveLoading ? (
-          <ProgressiveImage
-            src={hasError && fallbackSrc ? fallbackSrc : imageSrc}
-            lowQualitySrc={lowQualitySrc}
-            alt={alt}
-            className={cn(
-              'w-full h-full object-cover',
-              isLoaded ? 'opacity-100' : 'opacity-0',
-              !reducedMotion && 'transition-opacity duration-300'
+    <LazyLoadingErrorBoundary showRetry={enableRetry}>
+      <div 
+        ref={elementRef} 
+        className={cn('relative overflow-hidden', className)}
+        role="img"
+        aria-label={alt}
+      >
+        {/* Network Status Indicator */}
+        {showNetworkStatus && (
+          <div className="absolute top-2 right-2 z-10">
+            {!isOnline ? (
+              <WifiOff className="h-4 w-4 text-red-500" />
+            ) : isSlowConnection ? (
+              <Signal className="h-4 w-4 text-yellow-500" />
+            ) : (
+              <Signal className="h-4 w-4 text-green-500" />
             )}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
+          </div>
+        )}
+
+        {/* Offline State */}
+        {!isOnline && (
+          <EnhancedLoadingState
+            state="offline"
+            className={cn('w-full h-full', placeholderClassName)}
+            showText={showLoadingText}
             reducedMotion={reducedMotion}
           />
-        ) : (
-          <img
-            src={hasError && fallbackSrc ? fallbackSrc : imageSrc}
-            alt={alt}
-            className={cn(
-              'w-full h-full object-cover',
-              !reducedMotion && 'transition-opacity duration-300',
-              isLoaded ? 'opacity-100' : 'opacity-0'
-            )}
-            onLoad={handleImageLoad}
-            onError={handleImageError}
-            loading="lazy"
-          />
-        )
-      )}
+        )}
 
-      {/* Screen reader announcements */}
-      <div className="sr-only" aria-live="polite" aria-atomic="true">
-        {loadState === 'loading' && 'Image is loading'}
-        {loadState === 'loaded' && 'Image loaded successfully'}
-        {loadState === 'error' && 'Image failed to load'}
-        {loadState === 'retry' && 'Retrying image load'}
+        {/* Loading State */}
+        {isOnline && (!shouldLoad || (!actualIsLoaded && !actualHasError && !resilientLoading.isLoading)) && (
+          <EnhancedLoadingState
+            state="loading"
+            className={cn('w-full h-full', placeholderClassName)}
+            showText={showLoadingText}
+            reducedMotion={reducedMotion}
+          />
+        )}
+
+        {/* Retry State */}
+        {isOnline && (resilientLoading.isLoading || loadState === 'retry') && (
+          <EnhancedLoadingState
+            state="retry"
+            className={cn('w-full h-full', placeholderClassName)}
+            showText={showLoadingText}
+            reducedMotion={reducedMotion}
+          />
+        )}
+
+        {/* Error State */}
+        {isOnline && actualHasError && loadState === 'error' && (
+          <EnhancedLoadingState
+            state="error"
+            onRetry={enableRetry ? handleRetryClick : undefined}
+            className={cn('w-full h-full', placeholderClassName)}
+            showText={showLoadingText}
+            reducedMotion={reducedMotion}
+          />
+        )}
+        
+        {/* Image Display */}
+        {isOnline && shouldLoad && actualImageSrc && !actualHasError && (
+          enableProgressiveLoading ? (
+            <ProgressiveImage
+              src={actualImageSrc}
+              lowQualitySrc={lowQualitySrc}
+              alt={alt}
+              className={cn(
+                'w-full h-full object-cover',
+                actualIsLoaded ? 'opacity-100' : 'opacity-0',
+                !reducedMotion && 'transition-opacity duration-300'
+              )}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              reducedMotion={reducedMotion}
+            />
+          ) : (
+            <img
+              src={actualImageSrc}
+              alt={alt}
+              className={cn(
+                'w-full h-full object-cover',
+                !reducedMotion && 'transition-opacity duration-300',
+                actualIsLoaded ? 'opacity-100' : 'opacity-0'
+              )}
+              onLoad={handleImageLoad}
+              onError={handleImageError}
+              loading="lazy"
+            />
+          )
+        )}
+
+        {/* Screen reader announcements */}
+        <div className="sr-only" aria-live="polite" aria-atomic="true">
+          {!isOnline && 'No internet connection'}
+          {isOnline && loadState === 'loading' && 'Image is loading'}
+          {isOnline && loadState === 'loaded' && 'Image loaded successfully'}
+          {isOnline && loadState === 'error' && 'Image failed to load'}
+          {isOnline && loadState === 'retry' && 'Retrying image load'}
+        </div>
       </div>
-    </div>
+    </LazyLoadingErrorBoundary>
   );
 };
 
