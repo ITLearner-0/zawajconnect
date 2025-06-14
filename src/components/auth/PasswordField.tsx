@@ -50,7 +50,7 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
         </button>
       </div>
       {form.formState.errors.password && (
-        <FormMessage>{form.formState.errors.password.message}</FormMessage>
+        <FormMessage>{String(form.formState.errors.password.message)}</FormMessage>
       )}
     </FormItem>
   );

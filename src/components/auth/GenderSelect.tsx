@@ -32,7 +32,7 @@ const GenderSelect: React.FC<GenderSelectProps> = ({ form, loading }) => {
         </SelectContent>
       </Select>
       {form.formState.errors.gender && (
-        <FormMessage>{form.formState.errors.gender.message}</FormMessage>
+        <FormMessage>{String(form.formState.errors.gender.message)}</FormMessage>
       )}
     </FormItem>
   );

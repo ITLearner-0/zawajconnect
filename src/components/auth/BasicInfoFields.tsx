@@ -27,7 +27,7 @@ const BasicInfoFields: React.FC<BasicInfoFieldsProps> = ({ form, loading }) => {
             />
           </FormControl>
           {form.formState.errors.firstName && (
-            <FormMessage>{form.formState.errors.firstName.message}</FormMessage>
+            <FormMessage>{String(form.formState.errors.firstName.message)}</FormMessage>
           )}
         </FormItem>
         
@@ -42,7 +42,7 @@ const BasicInfoFields: React.FC<BasicInfoFieldsProps> = ({ form, loading }) => {
             />
           </FormControl>
           {form.formState.errors.lastName && (
-            <FormMessage>{form.formState.errors.lastName.message}</FormMessage>
+            <FormMessage>{String(form.formState.errors.lastName.message)}</FormMessage>
           )}
         </FormItem>
       </div>
@@ -60,7 +60,7 @@ const BasicInfoFields: React.FC<BasicInfoFieldsProps> = ({ form, loading }) => {
           />
         </FormControl>
         {form.formState.errors.email && (
-          <FormMessage>{form.formState.errors.email.message}</FormMessage>
+          <FormMessage>{String(form.formState.errors.email.message)}</FormMessage>
         )}
       </FormItem>
     </>
