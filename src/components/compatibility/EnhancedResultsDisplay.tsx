@@ -4,6 +4,7 @@ import ScoreDisplay from "./results/ScoreDisplay";
 import CategoryBreakdown from "./results/CategoryBreakdown";
 import ActionButtons from "./results/ActionButtons";
 import IslamicReminder from "./results/IslamicReminder";
+import { compatibilityTranslations } from "@/utils/translations";
 
 interface EnhancedResultsDisplayProps {
   score: number;
@@ -25,7 +26,7 @@ const EnhancedResultsDisplay = ({ score, answers, onRetake }: EnhancedResultsDis
           variant="outline"
           className="text-sm"
         >
-          Refaire le Test
+          {compatibilityTranslations.retakeTest}
         </CustomButton>
       </div>
     </div>

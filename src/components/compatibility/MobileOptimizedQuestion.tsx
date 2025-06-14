@@ -10,6 +10,7 @@ import { Info, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { compatibilityTranslations, formatAgreementLevel } from "@/utils/translations";
 
 interface MobileOptimizedQuestionProps {
   question: Question;
@@ -23,11 +24,11 @@ interface MobileOptimizedQuestionProps {
 }
 
 const agreementLevels = [
-  { value: 20, label: "PTA", fullLabel: "Pas du tout d'accord", color: "bg-red-500", textColor: "text-white" },
-  { value: 40, label: "PA", fullLabel: "Pas d'accord", color: "bg-red-300", textColor: "text-white" },
-  { value: 60, label: "N", fullLabel: "Neutre", color: "bg-gray-400", textColor: "text-white" },
-  { value: 80, label: "A", fullLabel: "D'accord", color: "bg-green-300", textColor: "text-white" },
-  { value: 100, label: "TA", fullLabel: "Tout à fait d'accord", color: "bg-green-500", textColor: "text-white" }
+  { value: 20, label: "PTA", fullLabel: compatibilityTranslations.agreementLevels.stronglyDisagree, color: "bg-red-500", textColor: "text-white" },
+  { value: 40, label: "PA", fullLabel: compatibilityTranslations.agreementLevels.disagree, color: "bg-red-300", textColor: "text-white" },
+  { value: 60, label: "N", fullLabel: compatibilityTranslations.agreementLevels.neutral, color: "bg-gray-400", textColor: "text-white" },
+  { value: 80, label: "A", fullLabel: compatibilityTranslations.agreementLevels.agree, color: "bg-green-300", textColor: "text-white" },
+  { value: 100, label: "TA", fullLabel: compatibilityTranslations.agreementLevels.stronglyAgree, color: "bg-green-500", textColor: "text-white" }
 ];
 
 const MobileOptimizedQuestion = ({
@@ -47,11 +48,11 @@ const MobileOptimizedQuestion = ({
 
   return (
     <TooltipProvider>
-      <div className="space-y-4">
+      <div className="space-y-4 md:space-y-6">
         {/* Category and Info */}
         <div className="flex items-center justify-between">
-          <Badge className="bg-rose-100 text-rose-800 border-rose-300">
-            {question.category}
+          <Badge className="bg-rose-100 text-rose-800 border-rose-300 text-xs md:text-sm">
+            {compatibilityTranslations.categories[question.category] || question.category}
           </Badge>
           {question.description && (
             <Tooltip>
@@ -66,26 +67,26 @@ const MobileOptimizedQuestion = ({
         </div>
 
         {/* Question */}
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 leading-relaxed">
+        <h3 className="text-base md:text-lg font-semibold text-gray-800 dark:text-gray-200 leading-relaxed">
           {question.question}
         </h3>
 
         {/* Quick Response Buttons */}
-        <div className="grid grid-cols-5 gap-2">
+        <div className="grid grid-cols-5 gap-1 md:gap-2">
           {agreementLevels.map((level) => (
             <Button
               key={level.value}
               variant={Math.abs(level.value - (answer?.value || 60)) <= 10 ? "default" : "outline"}
               size="sm"
               onClick={() => onAnswerChange([level.value])}
-              className={`flex flex-col p-3 h-auto min-h-[4rem] ${
+              className={`flex flex-col p-2 md:p-3 h-auto min-h-[3rem] md:min-h-[4rem] text-xs ${
                 Math.abs(level.value - (answer?.value || 60)) <= 10 
                   ? `${level.color} ${level.textColor}` 
                   : "hover:bg-gray-50"
               }`}
             >
-              <span className="font-bold text-sm">{level.label}</span>
-              <span className="text-xs text-center leading-tight mt-1">
+              <span className="font-bold">{level.label}</span>
+              <span className="text-[10px] md:text-xs text-center leading-tight mt-1 hidden md:block">
                 {level.fullLabel.split(' ').map((word, i) => (
                   <span key={i} className="block">{word}</span>
                 ))}
@@ -96,8 +97,8 @@ const MobileOptimizedQuestion = ({
 
         {/* Current Selection Display */}
         <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className={`text-xl font-bold ${currentLevel.color} ${currentLevel.textColor} inline-block px-3 py-1 rounded`}>
-            {currentLevel.fullLabel}
+          <div className={`text-lg md:text-xl font-bold ${currentLevel.color} ${currentLevel.textColor} inline-block px-3 py-1 rounded`}>
+            {formatAgreementLevel(answer?.value || 60)}
           </div>
         </div>
 
@@ -119,14 +120,14 @@ const MobileOptimizedQuestion = ({
           <CollapsibleTrigger asChild>
             <Button variant="ghost" size="sm" className="w-full">
               <Settings className="h-4 w-4 mr-2" />
-              Paramètres avancés
+              {compatibilityTranslations.advancedSettings}
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="space-y-4 pt-2">
             {onWeightChange && (
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <Label className="text-sm">Importance: {((answer?.weight || question.weight) / 2 * 10).toFixed(1)}</Label>
+                  <Label className="text-sm">{compatibilityTranslations.importance}: {((answer?.weight || question.weight) / 2 * 10).toFixed(1)}</Label>
                   <span className="text-xs text-gray-500">Défaut: {(question.weight / 2 * 10).toFixed(1)}</span>
                 </div>
                 <Slider
@@ -150,13 +151,13 @@ const MobileOptimizedQuestion = ({
                     onCheckedChange={onDealbreakerChange}
                   />
                   <Label htmlFor="dealbreaker" className="text-sm text-amber-800 dark:text-amber-200">
-                    Critère non négociable
+                    {compatibilityTranslations.dealbreaker}
                   </Label>
                 </div>
                 {isDealbreaker && (
                   <div className="space-y-2">
                     <Label className="text-sm text-amber-800 dark:text-amber-200">
-                      Niveau minimum: {breakerThreshold}%
+                      {compatibilityTranslations.minimumThreshold}: {breakerThreshold}%
                     </Label>
                     <Slider
                       defaultValue={[70]}

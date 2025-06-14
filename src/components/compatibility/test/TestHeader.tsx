@@ -1,7 +1,9 @@
 
+import { useMediaQuery } from "@/hooks/use-mobile";
+import MobileTestHeader from "./MobileTestHeader";
+import CategoryProgress from "../CategoryProgress";
 import { Progress } from "@/components/ui/progress";
 import { questions } from "@/data/compatibilityQuestions";
-import CategoryProgress from "../CategoryProgress";
 import { Answer } from "@/types/compatibility";
 
 interface TestHeaderProps {
@@ -10,6 +12,12 @@ interface TestHeaderProps {
 }
 
 const TestHeader = ({ currentQuestion, answers }: TestHeaderProps) => {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
+  if (isMobile) {
+    return <MobileTestHeader currentQuestion={currentQuestion} answers={answers} />;
+  }
+
   return (
     <div className="space-y-4">
       <CategoryProgress currentQuestion={currentQuestion} answers={answers} />
