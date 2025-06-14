@@ -1,12 +1,34 @@
-
 import { CompatibilityMatch } from "@/types/compatibility";
 import { UserResultWithProfile } from "../types/matchingTypes";
 import { ValidatedUserResults } from "./dataFetchingService";
 import { UserAnswers, UserPreferences, AnswerValue } from "../types/validationTypes";
 import { logError, logInfo } from "./loggingService";
+import { calculateEnhancedCompatibilityScore, EnhancedCompatibilityMatch } from "../utils/enhancedCompatibilityScoring";
 
 export class CompatibilityCalculator {
   calculateCompatibilityScore(
+    myResults: ValidatedUserResults,
+    otherUser: UserResultWithProfile
+  ): EnhancedCompatibilityMatch {
+    try {
+      // Use the enhanced scoring algorithm that includes quality metrics
+      return calculateEnhancedCompatibilityScore(myResults, otherUser);
+    } catch (error) {
+      logError('calculateCompatibilityScore', error as Error);
+      return {
+        userId: otherUser.user_id,
+        score: 0,
+        matchDetails: {
+          strengths: [],
+          differences: ['Error calculating compatibility'],
+          dealbreakers: ['Calculation error']
+        }
+      };
+    }
+  }
+
+  // Keep the legacy method for backward compatibility
+  calculateBasicCompatibilityScore(
     myResults: ValidatedUserResults,
     otherUser: UserResultWithProfile
   ): CompatibilityMatch {
@@ -87,7 +109,7 @@ export class CompatibilityCalculator {
         }
       };
     } catch (error) {
-      logError('calculateCompatibilityScore', error as Error);
+      logError('calculateBasicCompatibilityScore', error as Error);
       return {
         userId: otherUser.user_id,
         score: 0,

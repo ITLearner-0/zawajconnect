@@ -3,11 +3,17 @@ import { questions } from "@/data/compatibilityQuestions";
 import { CompatibilityMatch } from "@/types/compatibility";
 import { UserResultWithProfile } from "../types/matchingTypes";
 import { getIslamicWeight, calculateCategoryCompatibility, calculateIslamicBonus } from "./islamicScoring";
+import { matchQualityService, MatchQualityMetrics } from "../services/matchQualityService";
+import { ValidatedUserResults } from "../services/dataFetchingService";
+
+export interface EnhancedCompatibilityMatch extends CompatibilityMatch {
+  qualityMetrics?: MatchQualityMetrics;
+}
 
 export function calculateEnhancedCompatibilityScore(
-  myResults: any,
+  myResults: ValidatedUserResults,
   otherUser: UserResultWithProfile
-): CompatibilityMatch {
+): EnhancedCompatibilityMatch {
   const myAnswers = myResults.answers as Record<string, any>;
   const otherAnswers = otherUser.answers as Record<string, any>;
   const profile = otherUser.profiles;
@@ -75,7 +81,7 @@ export function calculateEnhancedCompatibilityScore(
     age = new Date().getFullYear() - new Date(profile.birth_date).getFullYear();
   }
 
-  return {
+  const compatibilityMatch: CompatibilityMatch = {
     userId: otherUser.user_id,
     score: Math.round(finalScore),
     profileData: {
@@ -95,5 +101,17 @@ export function calculateEnhancedCompatibilityScore(
       dealbreakers: dealbreakers.length ? [...new Set(dealbreakers)] : undefined,
       categoryScores
     }
+  };
+
+  // Calculate quality metrics
+  const qualityMetrics = matchQualityService.calculateMatchQuality(
+    myResults,
+    otherUser,
+    compatibilityMatch
+  );
+
+  return {
+    ...compatibilityMatch,
+    qualityMetrics
   };
 }

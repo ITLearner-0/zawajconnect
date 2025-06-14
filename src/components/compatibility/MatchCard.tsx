@@ -4,15 +4,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { CompatibilityMatch } from "@/types/compatibility";
-import { Check, Shield, Mail, Phone } from "lucide-react";
+import { Check, Shield, Mail, Phone, TrendingUp } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import MatchQualityDisplay from "./MatchQualityDisplay";
+import { EnhancedCompatibilityMatch } from "@/hooks/compatibility/utils/enhancedCompatibilityScoring";
 
 interface MatchCardProps {
-  match: CompatibilityMatch;
+  match: CompatibilityMatch | EnhancedCompatibilityMatch;
 }
 
 const MatchCard = ({ match }: MatchCardProps) => {
   const [expanded, setExpanded] = useState(false);
+  const [showQuality, setShowQuality] = useState(false);
+
+  const enhancedMatch = match as EnhancedCompatibilityMatch;
+  const hasQualityMetrics = enhancedMatch.qualityMetrics !== undefined;
 
   return (
     <Card key={match.userId} className="overflow-hidden">
@@ -75,6 +81,30 @@ const MatchCard = ({ match }: MatchCardProps) => {
                     </Tooltip>
                   </TooltipProvider>
                 )}
+
+                {/* Quality Indicator */}
+                {hasQualityMetrics && (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Badge 
+                          variant="outline" 
+                          className="h-5 px-1 bg-purple-50 text-purple-700 border-purple-200 cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowQuality(!showQuality);
+                          }}
+                        >
+                          <TrendingUp className="h-3 w-3 mr-1" />
+                          {enhancedMatch.qualityMetrics!.confidenceScore}%
+                        </Badge>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Match Confidence Score</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                )}
               </div>
             )}
           </div>
@@ -87,6 +117,13 @@ const MatchCard = ({ match }: MatchCardProps) => {
                 match.profileData.religious_practice_level
               ].filter(Boolean).join(" • ")}
             </p>
+          )}
+
+          {/* Compact Quality Display */}
+          {hasQualityMetrics && !showQuality && (
+            <div className="mt-2">
+              <MatchQualityDisplay metrics={enhancedMatch.qualityMetrics!} compact={true} />
+            </div>
           )}
         </div>
         <div className="text-right">
@@ -111,9 +148,19 @@ const MatchCard = ({ match }: MatchCardProps) => {
         </div>
       </div>
       
-      {expanded && match.matchDetails && (
+      {expanded && (
         <CardContent className="pt-4 pb-4 bg-gray-50">
-          <MatchDetails details={match.matchDetails} />
+          {/* Quality Metrics Display */}
+          {hasQualityMetrics && showQuality && (
+            <div className="mb-4">
+              <MatchQualityDisplay metrics={enhancedMatch.qualityMetrics!} />
+            </div>
+          )}
+
+          {/* Match Details */}
+          {match.matchDetails && (
+            <MatchDetails details={match.matchDetails} />
+          )}
         </CardContent>
       )}
     </Card>

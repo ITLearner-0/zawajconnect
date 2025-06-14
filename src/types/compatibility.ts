@@ -69,3 +69,20 @@ export interface CompatibilityMatchPage {
   totalCount: number;
   nextCursor?: string;
 }
+
+// Enhanced match quality metrics
+export interface MatchQualityMetrics {
+  confidenceScore: number;
+  compatibilityReasons: string[];
+  improvementSuggestions: string[];
+  dataQuality: {
+    profileCompleteness: number;
+    answersQuality: number;
+    verificationLevel: number;
+  };
+}
+
+// Enhanced compatibility match with quality metrics
+export interface EnhancedCompatibilityMatch extends CompatibilityMatch {
+  qualityMetrics?: MatchQualityMetrics;
+}
