@@ -17,8 +17,19 @@ const HeroSection = () => {
       {/* Navigation */}
       <nav className="absolute top-0 left-0 right-0 z-20 p-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="text-3xl md:text-4xl font-bold text-rose-800 dark:text-rose-100 font-serif">
-            Nikah Connect
+          <div className="relative">
+            <div className="text-4xl md:text-5xl font-bold text-rose-800 dark:text-rose-100 font-serif tracking-wide">
+              <span className="relative inline-block">
+                <span className="bg-gradient-to-r from-rose-600 via-pink-500 to-rose-500 dark:from-rose-200 dark:via-pink-200 dark:to-rose-300 bg-clip-text text-transparent drop-shadow-sm">
+                  Nikah
+                </span>
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-rose-400 to-pink-400 rounded-full animate-pulse"></span>
+              </span>
+              <span className="ml-3 bg-gradient-to-r from-pink-600 via-rose-500 to-pink-500 dark:from-pink-200 dark:via-rose-200 dark:to-pink-300 bg-clip-text text-transparent drop-shadow-sm">
+                Connect
+              </span>
+            </div>
+            <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-rose-400 via-pink-400 to-rose-400 rounded-full opacity-60"></div>
           </div>
           <div className="flex items-center gap-4">
             <AccessibilityControls />
