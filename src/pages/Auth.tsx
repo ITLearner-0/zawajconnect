@@ -1,6 +1,7 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAuthActions } from "@/hooks/auth/useAuthActions";
 import { useAuthRedirect } from "@/hooks/auth/useAuthRedirect";
@@ -11,13 +12,24 @@ import { toast } from "sonner";
 import { SignInData, SignUpData } from "@/types/auth";
 
 const Auth = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [searchParams] = useSearchParams();
+  const shouldSignUp = searchParams.get('signup') === 'true';
+  const preselectedGender = searchParams.get('gender');
+  
+  const [isSignUp, setIsSignUp] = useState(shouldSignUp);
   const { t } = useTranslation();
   const { loading, signUp, signIn } = useAuthActions();
   const { user, loading: authLoading } = useAuth();
   
   // Handle auth redirects
   useAuthRedirect({ user, loading: authLoading });
+
+  // Set signup mode based on URL parameters
+  useEffect(() => {
+    if (shouldSignUp) {
+      setIsSignUp(true);
+    }
+  }, [shouldSignUp]);
 
   const handleSignIn = async (data: SignInData) => {
     try {
@@ -53,6 +65,7 @@ const Auth = () => {
         <SignUpForm
           loading={loading}
           onSubmit={handleSignUp}
+          preselectedGender={preselectedGender}
         />
       ) : (
         <SignInForm

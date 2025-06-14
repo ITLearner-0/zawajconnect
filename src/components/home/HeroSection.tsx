@@ -59,7 +59,7 @@ const HeroSection = () => {
             size="lg" 
             className="bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white font-bold px-8 py-4 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 text-base border-0"
           >
-            <Link to="/auth" className="flex items-center gap-2">
+            <Link to="/auth?signup=true&gender=female" className="flex items-center gap-2">
               INSCRIPTION FEMME
               <ArrowRight className="h-5 w-5" />
             </Link>
@@ -73,7 +73,7 @@ const HeroSection = () => {
             size="lg" 
             className="border-2 border-rose-400 text-rose-600 bg-white/50 backdrop-blur-sm hover:bg-rose-50 dark:border-rose-300 dark:text-rose-200 dark:bg-rose-900/30 dark:hover:bg-rose-800/50 font-bold px-8 py-4 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 text-base"
           >
-            <Link to="/auth" className="flex items-center gap-2">
+            <Link to="/auth?signup=true&gender=male" className="flex items-center gap-2">
               INSCRIPTION HOMME
               <ArrowRight className="h-5 w-5" />
             </Link>
