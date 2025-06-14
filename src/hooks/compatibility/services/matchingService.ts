@@ -1,9 +1,9 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { CompatibilityMatch } from "@/types/compatibility";
 import { MatchingFilters, UserResultWithProfile } from "../types/matchingTypes";
 import { applyFilters } from "../utils/matchingFilters";
-import { calculateEnhancedCompatibilityScore } from "../utils/enhancedCompatibilityScoring";
+import { memoizedCompatibilityScore, batchMemoizedCompatibilityScores } from "./memoizationService";
+import { compatibilityCache, logCacheOperation } from "./cachingService";
 
 // Custom error types for better error handling
 export class CompatibilityServiceError extends Error {
@@ -55,27 +55,40 @@ export async function findCompatibilityMatches(
   try {
     logInfo('findCompatibilityMatches', `Starting match search for user: ${userId}`, { filters });
 
-    // Step 1: Get current user's compatibility results
+    // Step 1: Get current user's compatibility results with caching
     let myResults;
     try {
-      const { data, error } = await supabase
-        .from('compatibility_results')
-        .select('answers, preferences')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .single();
+      // Check cache first
+      const cachedResults = compatibilityCache.getUserResults(userId);
+      if (cachedResults) {
+        logCacheOperation('cache-hit', { operation: 'user-results', userId });
+        myResults = cachedResults;
+      } else {
+        logCacheOperation('cache-miss', { operation: 'user-results', userId });
+        
+        const { data, error } = await supabase
+          .from('compatibility_results')
+          .select('answers, preferences')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
 
-      if (error) {
-        throw new DatabaseConnectionError('fetching user results', error);
+        if (error) {
+          throw new DatabaseConnectionError('fetching user results', error);
+        }
+
+        if (!data) {
+          throw new UserNotFoundError();
+        }
+
+        myResults = data;
+        
+        // Cache the results
+        compatibilityCache.setUserResults(userId, myResults);
+        logCacheOperation('cache-set', { operation: 'user-results', userId });
+        logInfo('fetchUserResults', 'Successfully fetched and cached user results');
       }
-
-      if (!data) {
-        throw new UserNotFoundError();
-      }
-
-      myResults = data;
-      logInfo('fetchUserResults', 'Successfully fetched user results');
     } catch (error) {
       if (error instanceof CompatibilityServiceError) {
         throw error;
@@ -107,38 +120,81 @@ export async function findCompatibilityMatches(
         throw error;
       }
       logError('fetchOtherUsers', error as Error);
-      // Graceful degradation: return empty array instead of throwing
       return [];
     }
 
-    // Step 3: Get profiles with error handling and partial data support
+    // Step 3: Get profiles with caching and error handling
     let profiles;
     try {
       const userIds = otherUsers.map(user => user.user_id);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          first_name,
-          last_name,
-          gender,
-          location,
-          birth_date,
-          religious_practice_level,
-          education_level,
-          email_verified,
-          phone_verified,
-          id_verified,
-          is_visible
-        `)
-        .in('id', userIds)
-        .eq('is_visible', true);
+      
+      // Check cache for profile data
+      const cachedProfiles: any[] = [];
+      const uncachedUserIds: string[] = [];
+      
+      for (const userIdToCheck of userIds) {
+        const cachedProfile = compatibilityCache.getProfileData(userIdToCheck);
+        if (cachedProfile) {
+          cachedProfiles.push({ id: userIdToCheck, ...cachedProfile });
+        } else {
+          uncachedUserIds.push(userIdToCheck);
+        }
+      }
+      
+      logInfo('profileCacheCheck', `Found ${cachedProfiles.length} cached profiles, need to fetch ${uncachedUserIds.length}`);
 
-      if (error) {
-        throw new DatabaseConnectionError('fetching profiles', error);
+      let fetchedProfiles: any[] = [];
+      if (uncachedUserIds.length > 0) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select(`
+            id,
+            first_name,
+            last_name,
+            gender,
+            location,
+            birth_date,
+            religious_practice_level,
+            education_level,
+            email_verified,
+            phone_verified,
+            id_verified,
+            is_visible
+          `)
+          .in('id', uncachedUserIds)
+          .eq('is_visible', true);
+
+        if (error) {
+          throw new DatabaseConnectionError('fetching profiles', error);
+        }
+
+        fetchedProfiles = data || [];
+        
+        // Cache the fetched profiles
+        for (const profile of fetchedProfiles) {
+          const profileData = {
+            first_name: profile.first_name || '',
+            last_name: profile.last_name || null,
+            gender: profile.gender || '',
+            location: profile.location || null,
+            birth_date: profile.birth_date || '',
+            religious_practice_level: profile.religious_practice_level || null,
+            education_level: profile.education_level || null,
+            email_verified: profile.email_verified || false,
+            phone_verified: profile.phone_verified || false,
+            id_verified: profile.id_verified || false,
+            is_visible: profile.is_visible || true
+          };
+          compatibilityCache.setProfileData(profile.id, profileData);
+        }
+        
+        logCacheOperation('cache-set-batch', { 
+          operation: 'profile-data', 
+          count: fetchedProfiles.length 
+        });
       }
 
-      profiles = data || [];
+      profiles = [...cachedProfiles, ...fetchedProfiles];
       logInfo('fetchProfiles', `Found ${profiles.length} visible profiles out of ${userIds.length} users`);
 
       if (profiles.length === 0) {
@@ -150,7 +206,6 @@ export async function findCompatibilityMatches(
         throw error;
       }
       logError('fetchProfiles', error as Error);
-      // Graceful degradation: return empty array
       return [];
     }
 
@@ -201,11 +256,10 @@ export async function findCompatibilityMatches(
       logInfo('combineUserData', `Successfully combined data for ${usersWithProfiles.length} users`);
     } catch (error) {
       logError('combineUserData', error as Error);
-      // Graceful degradation: return empty array if data combination fails
       return [];
     }
 
-    // Step 5: Apply filters and calculate scores with error handling
+    // Step 5: Apply filters and calculate scores with caching
     let matches: CompatibilityMatch[] = [];
     try {
       const filteredUsers = usersWithProfiles.filter((user) => {
@@ -213,38 +267,33 @@ export async function findCompatibilityMatches(
           return applyFilters(user, filters);
         } catch (error) {
           logError('applyFilters', error as Error, { userId: user.user_id });
-          return false; // Skip this user if filtering fails
+          return false;
         }
       });
 
       logInfo('applyFilters', `${filteredUsers.length} users passed filters out of ${usersWithProfiles.length}`);
 
-      matches = filteredUsers
-        .map((user) => {
-          try {
-            return calculateEnhancedCompatibilityScore(myResults, user);
-          } catch (error) {
-            logError('calculateCompatibilityScore', error as Error, { userId: user.user_id });
-            return null; // Skip this user if score calculation fails
-          }
-        })
-        .filter((match): match is CompatibilityMatch => match !== null)
+      // Use batch memoized compatibility scoring for better cache utilization
+      matches = batchMemoizedCompatibilityScores(myResults, filteredUsers, userId)
         .filter(match => match.score >= (filters?.minCompatibilityScore || 50))
         .sort((a, b) => b.score - a.score);
 
       logInfo('calculateScores', `Generated ${matches.length} final matches`);
     } catch (error) {
       logError('calculateScores', error as Error);
-      // Graceful degradation: return empty array if scoring fails
       return [];
     }
 
-    const finalMatches = matches.slice(0, 20); // Limit to top 20 matches
+    const finalMatches = matches.slice(0, 20);
+    
+    // Log cache statistics
+    const cacheStats = compatibilityCache.getCacheStats();
+    logInfo('cacheStatistics', 'Current cache state', cacheStats);
+    
     logInfo('findCompatibilityMatches', `Returning ${finalMatches.length} matches for user: ${userId}`);
     
     return finalMatches;
   } catch (error) {
-    // Log the final error and re-throw
     if (error instanceof CompatibilityServiceError) {
       logError('findCompatibilityMatches', error, { userId, filters });
       throw error;
@@ -260,3 +309,6 @@ export async function findCompatibilityMatches(
     throw serviceError;
   }
 }
+
+// Export cache management functions for external use
+export { compatibilityCache } from "./cachingService";
