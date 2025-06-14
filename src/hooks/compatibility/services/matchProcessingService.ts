@@ -2,9 +2,9 @@
 import { CompatibilityMatch } from "@/types/compatibility";
 import { MatchingFilters, UserResultWithProfile } from "../types/matchingTypes";
 import { ValidatedUserResults } from "./dataFetchingService";
-import { applyFilters } from "../utils/matchingFilters";
-import { batchMemoizedCompatibilityScores } from "./memoizationService";
-import { compatibilityCache } from "./cachingService";
+import { matchingFiltersService } from "./matchingFiltersService";
+import { compatibilityCalculator } from "./compatibilityCalculator";
+import { cacheService } from "./cacheService";
 import { logError, logInfo } from "./loggingService";
 
 export function processMatches(
@@ -14,19 +14,19 @@ export function processMatches(
   filters?: MatchingFilters
 ): CompatibilityMatch[] {
   try {
-    const filteredUsers = usersWithProfiles.filter((user) => {
-      try {
-        return applyFilters(user, filters);
-      } catch (error) {
-        logError('applyFilters', error as Error, { userId: user.user_id });
-        return false;
-      }
-    });
+    const filteredUsers = matchingFiltersService.filterUsers(usersWithProfiles, filters);
 
-    logInfo('applyFilters', `${filteredUsers.length} users passed filters out of ${usersWithProfiles.length}`);
-
-    // Use batch memoized compatibility scoring for better cache utilization
-    const matches = batchMemoizedCompatibilityScores(myResults, filteredUsers, myUserId)
+    // Calculate compatibility scores
+    const matches = filteredUsers
+      .map(user => {
+        try {
+          return compatibilityCalculator.calculateCompatibilityScore(myResults, user);
+        } catch (error) {
+          logError('calculateCompatibilityScore', error as Error, { userId: user.user_id });
+          return null;
+        }
+      })
+      .filter((match): match is CompatibilityMatch => match !== null)
       .filter(match => match.score >= (filters?.minCompatibilityScore || 50))
       .sort((a, b) => b.score - a.score);
 
@@ -43,7 +43,7 @@ export function finalizePipeline(matches: CompatibilityMatch[], userId: string):
   const finalMatches = matches.slice(0, 20);
   
   // Log cache statistics
-  const cacheStats = compatibilityCache.getCacheStats();
+  const cacheStats = cacheService.getCacheStats();
   logInfo('cacheStatistics', 'Current cache state', cacheStats);
   
   logInfo('findCompatibilityMatches', `Returning ${finalMatches.length} matches for user: ${userId}`);

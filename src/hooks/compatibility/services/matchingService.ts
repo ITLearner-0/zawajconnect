@@ -1,7 +1,8 @@
 
 import { CompatibilityMatch } from "@/types/compatibility";
 import { MatchingFilters } from "../types/matchingTypes";
-import { fetchUserResults, fetchOtherUsers, fetchProfiles } from "./dataFetchingService";
+import { fetchUserResults, fetchOtherUsers } from "./dataFetchingService";
+import { profileService } from "./profileService";
 import { combineUserDataWithProfiles } from "./dataProcessingService";
 import { processMatches, finalizePipeline } from "./matchProcessingService";
 import { 
@@ -13,7 +14,7 @@ import {
 import { logError, logInfo } from "./loggingService";
 
 // Export cache management functions for external use
-export { compatibilityCache } from "./cachingService";
+export { cacheService as compatibilityCache } from "./cacheService";
 
 export async function findCompatibilityMatches(
   userId: string,
@@ -33,7 +34,7 @@ export async function findCompatibilityMatches(
 
     // Step 3: Get profiles with validation
     const userIds = otherUsers.map(user => user.user_id);
-    const profiles = await fetchProfiles(userIds);
+    const profiles = await profileService.fetchProfiles(userIds);
     if (profiles.length === 0) {
       return [];
     }

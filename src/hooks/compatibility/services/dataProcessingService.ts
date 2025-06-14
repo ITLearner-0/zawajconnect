@@ -1,6 +1,7 @@
 
 import { UserResultWithProfile } from "../types/matchingTypes";
-import { ValidatedOtherUser, ValidatedProfileData } from "./dataFetchingService";
+import { ValidatedOtherUser } from "./dataFetchingService";
+import { ValidatedProfileData } from "./profileService";
 import { logWarning, logError, logInfo } from "./loggingService";
 
 export function combineUserDataWithProfiles(

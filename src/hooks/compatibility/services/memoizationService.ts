@@ -2,7 +2,7 @@
 import { CompatibilityMatch } from "@/types/compatibility";
 import { UserResultWithProfile } from "../types/matchingTypes";
 import { ValidatedUserResults } from "./dataFetchingService";
-import { calculateEnhancedCompatibilityScore } from "../utils/enhancedCompatibilityScoring";
+import { compatibilityCalculator } from "./compatibilityCalculator";
 import { logInfo } from "./loggingService";
 
 // Memoization cache for compatibility scores
@@ -27,8 +27,8 @@ export function memoizedCompatibilityScore(
     return compatibilityScoreCache.get(cacheKey)!;
   }
   
-  // Calculate new score
-  const match = calculateEnhancedCompatibilityScore(myResults, otherUser);
+  // Calculate new score using the dedicated calculator
+  const match = compatibilityCalculator.calculateCompatibilityScore(myResults, otherUser);
   
   // Cache management - remove oldest entries if cache is full
   if (compatibilityScoreCache.size >= CACHE_SIZE_LIMIT) {

@@ -1,6 +1,7 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { UserResultWithProfile } from "../types/matchingTypes";
-import { compatibilityCache, logCacheOperation } from "./cachingService";
+import { cacheService, logCacheOperation } from "./cacheService";
 import { DatabaseConnectionError, UserNotFoundError } from "./errorHandling";
 import { logInfo, logWarning, logError } from "./loggingService";
 import { 
@@ -17,9 +18,32 @@ export interface ValidatedUserResults {
   preferences: UserPreferences;
 }
 
+// JSON type helpers
+function safeJsonToRecord(value: any): Record<string, any> {
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return {};
+    }
+  }
+  return value || {};
+}
+
+function safeJsonToAny(value: any): any {
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
+  }
+  return value;
+}
+
 export async function fetchUserResults(userId: string): Promise<ValidatedUserResults> {
   // Check cache first
-  const cachedResults = compatibilityCache.getUserResults(userId);
+  const cachedResults = cacheService.getUserResults(userId);
   if (cachedResults) {
     logCacheOperation('cache-hit', { operation: 'user-results', userId });
     return cachedResults;
@@ -45,12 +69,12 @@ export async function fetchUserResults(userId: string): Promise<ValidatedUserRes
     }
 
     const results: ValidatedUserResults = {
-      answers: safeValidateUserAnswers(data.answers),
-      preferences: safeValidateUserPreferences(data.preferences)
+      answers: safeValidateUserAnswers(safeJsonToRecord(data.answers)),
+      preferences: safeValidateUserPreferences(safeJsonToAny(data.preferences))
     };
     
     // Cache the results
-    compatibilityCache.setUserResults(userId, results);
+    cacheService.setUserResults(userId, results);
     logCacheOperation('cache-set', { operation: 'user-results', userId });
     logInfo('fetchUserResults', 'Successfully fetched and cached user results');
 
@@ -82,8 +106,8 @@ export async function fetchOtherUsers(userId: string): Promise<ValidatedOtherUse
 
     const otherUsers: ValidatedOtherUser[] = (data || []).map(user => ({
       user_id: user.user_id,
-      answers: safeValidateUserAnswers(user.answers),
-      preferences: safeValidateUserPreferences(user.preferences)
+      answers: safeValidateUserAnswers(safeJsonToRecord(user.answers)),
+      preferences: safeValidateUserPreferences(safeJsonToAny(user.preferences))
     }));
     
     logInfo('fetchOtherUsers', `Found ${otherUsers.length} other users with compatibility results`);
@@ -102,115 +126,5 @@ export async function fetchOtherUsers(userId: string): Promise<ValidatedOtherUse
   }
 }
 
-export interface ValidatedProfileData {
-  id: string;
-  first_name: string;
-  last_name: string | null;
-  gender: string;
-  location: string | null;
-  birth_date: string;
-  religious_practice_level: string | null;
-  education_level: string | null;
-  email_verified: boolean;
-  phone_verified: boolean;
-  id_verified: boolean;
-  is_visible: boolean;
-}
-
-export async function fetchProfiles(userIds: string[]): Promise<ValidatedProfileData[]> {
-  try {
-    // Check cache for profile data
-    const cachedProfiles: ValidatedProfileData[] = [];
-    const uncachedUserIds: string[] = [];
-    
-    for (const userIdToCheck of userIds) {
-      const cachedProfile = compatibilityCache.getProfileData(userIdToCheck);
-      if (cachedProfile) {
-        cachedProfiles.push({ id: userIdToCheck, ...cachedProfile });
-      } else {
-        uncachedUserIds.push(userIdToCheck);
-      }
-    }
-    
-    logInfo('profileCacheCheck', `Found ${cachedProfiles.length} cached profiles, need to fetch ${uncachedUserIds.length}`);
-
-    let fetchedProfiles: ValidatedProfileData[] = [];
-    if (uncachedUserIds.length > 0) {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          first_name,
-          last_name,
-          gender,
-          location,
-          birth_date,
-          religious_practice_level,
-          education_level,
-          email_verified,
-          phone_verified,
-          id_verified,
-          is_visible
-        `)
-        .in('id', uncachedUserIds)
-        .eq('is_visible', true);
-
-      if (error) {
-        throw new DatabaseConnectionError('fetching profiles', error);
-      }
-
-      fetchedProfiles = (data || []).map(profile => ({
-        id: profile.id,
-        first_name: profile.first_name || '',
-        last_name: profile.last_name || null,
-        gender: profile.gender || '',
-        location: profile.location || null,
-        birth_date: profile.birth_date || '',
-        religious_practice_level: profile.religious_practice_level || null,
-        education_level: profile.education_level || null,
-        email_verified: profile.email_verified || false,
-        phone_verified: profile.phone_verified || false,
-        id_verified: profile.id_verified || false,
-        is_visible: profile.is_visible || true
-      }));
-      
-      // Cache the fetched profiles
-      for (const profile of fetchedProfiles) {
-        const profileData = {
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          gender: profile.gender,
-          location: profile.location,
-          birth_date: profile.birth_date,
-          religious_practice_level: profile.religious_practice_level,
-          education_level: profile.education_level,
-          email_verified: profile.email_verified,
-          phone_verified: profile.phone_verified,
-          id_verified: profile.id_verified,
-          is_visible: profile.is_visible
-        };
-        compatibilityCache.setProfileData(profile.id, profileData);
-      }
-      
-      logCacheOperation('cache-set-batch', { 
-        operation: 'profile-data', 
-        count: fetchedProfiles.length 
-      });
-    }
-
-    const profiles = [...cachedProfiles, ...fetchedProfiles];
-    logInfo('fetchProfiles', `Found ${profiles.length} visible profiles out of ${userIds.length} users`);
-
-    if (profiles.length === 0) {
-      logWarning('fetchProfiles', 'No visible profiles found');
-    }
-
-    return profiles;
-  } catch (error) {
-    if (error instanceof DatabaseConnectionError) {
-      throw error;
-    }
-    logError('fetchProfiles', error as Error);
-    return [];
-  }
-}
+// Re-export from profileService for backward compatibility
+export { ValidatedProfileData, profileService as fetchProfiles } from "./profileService";
