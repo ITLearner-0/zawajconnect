@@ -37,7 +37,15 @@ export interface ProfileVisibilitySettings {
   allowProfileScreenshots: boolean;
 }
 
-export interface EnhancedPrivacySettings extends PrivacySettings {
+export interface EnhancedPrivacySettings {
+  // Include all PrivacySettings properties explicitly
+  profileVisibilityLevel: number;
+  showAge: boolean;
+  showLocation: boolean;
+  showOccupation: boolean;
+  allowNonMatchMessages: boolean;
+  
+  // Enhanced privacy features
   progressiveReveal: ProgressiveRevealSettings;
   incognito: IncognitoSettings;
   profileVisibility: ProfileVisibilitySettings;

@@ -82,7 +82,7 @@ export class ProgressiveRevealService {
     const baseProfile = {
       id: profile.id,
       first_name: profile.first_name,
-      created_at: profile.created_at
+      updated_at: profile.updated_at
     };
 
     switch (revealLevel) {
