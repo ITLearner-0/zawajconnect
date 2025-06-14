@@ -56,8 +56,15 @@ export async function fetchCompatibilityResults(): Promise<{
     .single();
 
   return {
-    myResults,
-    otherResults: results
+    myResults: myResults ? {
+      answers: myResults.answers as Record<string, any>,
+      preferences: myResults.preferences
+    } : null,
+    otherResults: results.map(result => ({
+      user_id: result.user_id,
+      answers: result.answers as Record<string, any>,
+      preferences: result.preferences
+    }))
   };
 }
 
