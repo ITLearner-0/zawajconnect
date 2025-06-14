@@ -1,9 +1,12 @@
 
-// Define filter criteria type
+import { AdvancedFilters } from "@/hooks/compatibility/types/advancedFilterTypes";
+
+// Define extended filter criteria type
 export interface FilterCriteria {
   ageRange?: [number, number];
   practiceLevel?: string[];
   education?: string[];
+  advanced?: AdvancedFilters;
 }
 
 // Apply filters to the profiles
@@ -30,6 +33,8 @@ export const applyFilters = (profiles: any[], filters: FilterCriteria): any[] =>
         return false;
       }
     }
+    
+    // Note: Advanced filters are handled separately in the compatibility matching service
     
     return true;
   });

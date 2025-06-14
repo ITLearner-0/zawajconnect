@@ -1,9 +1,12 @@
+
 import { CompatibilityMatch } from "@/types/compatibility";
 import { MatchingFilters } from "../types/matchingTypes";
+import { EnhancedMatchingFilters } from "../types/advancedFilterTypes";
 import { userResultsService } from "./userResultsService";
 import { profileService } from "./profileService";
 import { combineUserDataWithProfiles } from "./dataProcessingService";
 import { processMatches, finalizePipeline } from "./matchProcessingService";
+import { advancedFiltersService } from "./advancedFiltersService";
 import { 
   CompatibilityServiceError, 
   UserNotFoundError, 
@@ -17,7 +20,7 @@ export { cacheService as compatibilityCache } from "./cacheService";
 
 export async function findCompatibilityMatches(
   userId: string,
-  filters?: MatchingFilters
+  filters?: MatchingFilters | EnhancedMatchingFilters
 ): Promise<CompatibilityMatch[]> {
   try {
     logInfo('findCompatibilityMatches', `Starting match search for user: ${userId}`, { filters });
@@ -39,13 +42,32 @@ export async function findCompatibilityMatches(
     }
 
     // Step 4: Combine data with type safety
-    const usersWithProfiles = combineUserDataWithProfiles(otherUsers, profiles);
+    let usersWithProfiles = combineUserDataWithProfiles(otherUsers, profiles);
 
-    // Step 5: Apply filters and calculate scores with validated data
+    // Step 5: Apply basic filters and calculate scores with validated data
     const matches = processMatches(myResults, usersWithProfiles, userId, filters);
 
-    // Step 6: Finalize and return results
-    return finalizePipeline(matches, userId);
+    // Step 6: Apply advanced filters if present
+    let finalMatches = matches;
+    if (filters && 'advanced' in filters && filters.advanced) {
+      const { filteredUsers, filteredMatches } = advancedFiltersService.applyAdvancedFilters(
+        usersWithProfiles,
+        matches,
+        filters.advanced
+      );
+      
+      usersWithProfiles = filteredUsers;
+      finalMatches = filteredMatches;
+      
+      logInfo('findCompatibilityMatches', `Advanced filters applied`, {
+        originalMatches: matches.length,
+        filteredMatches: finalMatches.length,
+        filterSummary: advancedFiltersService.getFilterSummary(filters.advanced)
+      });
+    }
+
+    // Step 7: Finalize and return results
+    return finalizePipeline(finalMatches, userId);
 
   } catch (error) {
     if (error instanceof CompatibilityServiceError) {
