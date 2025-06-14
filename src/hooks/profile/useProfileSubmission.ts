@@ -12,7 +12,8 @@ export const useProfileSubmission = () => {
   const submitProfile = async (
     userId: string,
     profileData: ProfileFormData,
-    privacySettings: PrivacySettings
+    privacySettings: PrivacySettings,
+    onSuccess?: (savedData: ProfileFormData) => void
   ) => {
     setIsLoading(true);
     setError(null);
@@ -78,6 +79,11 @@ export const useProfileSubmission = () => {
           variant: "destructive",
         });
         return false;
+      }
+
+      // Call the success callback to update the form data
+      if (onSuccess) {
+        onSuccess(profileData);
       }
 
       toast({

@@ -37,7 +37,7 @@ export const useProfileForm = ({
   userId
 }: UseProfileFormProps) => {
   // Form state management
-  const { formData, handleChange } = useProfileFormState({
+  const { formData, handleChange, setFormData } = useProfileFormState({
     initialFormData: initialFormData || {
       fullName: '',
       age: '',
@@ -89,7 +89,11 @@ export const useProfileForm = ({
     const success = await submitProfile(
       userId, 
       formData, 
-      privacySettings || DEFAULT_PRIVACY_SETTINGS
+      privacySettings || DEFAULT_PRIVACY_SETTINGS,
+      (savedData) => {
+        // Update form data with the saved data to retain the information
+        setFormData(savedData);
+      }
     );
     
     return success;

@@ -21,6 +21,7 @@ export const useProfileFormState = ({ initialFormData }: UseProfileFormStateProp
 
   return {
     formData,
-    handleChange
+    handleChange,
+    setFormData
   };
 };
