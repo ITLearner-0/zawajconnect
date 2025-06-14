@@ -1,4 +1,3 @@
-
 export interface CompatibilityQuestion {
   id: string;
   text: string;
@@ -36,6 +35,7 @@ export interface CompatibilityMatch {
     email_verified?: boolean;
     phone_verified?: boolean;
     id_verified?: boolean;
+    profile_picture?: string;
   };
 }
 

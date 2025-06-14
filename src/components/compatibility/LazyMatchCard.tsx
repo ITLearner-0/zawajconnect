@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -11,6 +10,7 @@ import MatchQualityDisplay from "./MatchQualityDisplay";
 import { EnhancedCompatibilityMatch } from "@/hooks/compatibility/utils/enhancedCompatibilityScoring";
 import { useAccessibleLazyLoading } from "@/hooks/useLazyLoading/useAccessibleLazyLoading";
 import LazyImage from "@/components/ui/LazyImage";
+import { cn } from "@/lib/utils";
 
 interface LazyMatchCardProps {
   match: CompatibilityMatch | EnhancedCompatibilityMatch;

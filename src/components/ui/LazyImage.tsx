@@ -14,7 +14,7 @@ interface LazyImageProps {
   className?: string;
   placeholderClassName?: string;
   fallbackSrc?: string;
-  onLoad?: () => void;
+  onLoad?: (event: React.SyntheticEvent<HTMLImageElement>) => void;
   onError?: () => void;
   enableMemoryOptimization?: boolean;
   enableProgressiveLoading?: boolean;
@@ -81,7 +81,7 @@ const LazyImage = ({
   const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
     handleLoad(event.nativeEvent);
     setLoadState('loaded');
-    onLoad?.();
+    onLoad?.(event);
   };
 
   const handleImageError = () => {
