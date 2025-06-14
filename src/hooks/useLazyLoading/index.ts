@@ -1,3 +1,4 @@
+
 // Re-export original hooks for backward compatibility
 export { useLazyLoading, useLazyImage } from '../useLazyLoading';
 
@@ -36,7 +37,7 @@ export { PerformanceConfigService } from './services/performanceConfig';
 export { IntersectionObserverService } from './services/observerService';
 export { MemoryManagementService } from './services/memoryService';
 export { errorRecoveryService } from './services/errorRecoveryService';
-export { debugService } from './services/debugService';
+export { debugService } from './services/debug/debugService';
 
 // Export components
 export { default as LazyLoadingDevPanel } from '../../components/ui/LazyLoadingDevPanel';

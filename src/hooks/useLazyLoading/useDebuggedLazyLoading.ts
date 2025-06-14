@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useEnhancedLazyLoading } from './useEnhancedLazyLoading';
-import { debugService } from './services/debugService';
+import { debugService } from './services/debug/debugService';
 
 interface UseDebuggedLazyLoadingOptions {
   threshold?: number;
