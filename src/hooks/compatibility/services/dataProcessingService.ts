@@ -1,6 +1,6 @@
 
 import { UserResultWithProfile } from "../types/matchingTypes";
-import { ValidatedOtherUser } from "./dataFetchingService";
+import { ValidatedOtherUser } from "./userResultsService";
 import { ValidatedProfileData } from "./profileService";
 import { logWarning, logError, logInfo } from "./loggingService";
 

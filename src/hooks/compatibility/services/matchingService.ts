@@ -1,7 +1,7 @@
 
 import { CompatibilityMatch } from "@/types/compatibility";
 import { MatchingFilters } from "../types/matchingTypes";
-import { fetchUserResults, fetchOtherUsers } from "./dataFetchingService";
+import { userResultsService } from "./userResultsService";
 import { profileService } from "./profileService";
 import { combineUserDataWithProfiles } from "./dataProcessingService";
 import { processMatches, finalizePipeline } from "./matchProcessingService";
@@ -24,10 +24,10 @@ export async function findCompatibilityMatches(
     logInfo('findCompatibilityMatches', `Starting match search for user: ${userId}`, { filters });
 
     // Step 1: Get current user's compatibility results with validation
-    const myResults = await fetchUserResults(userId);
+    const myResults = await userResultsService.fetchUserResults(userId);
 
     // Step 2: Get other users' compatibility results with validation
-    const otherUsers = await fetchOtherUsers(userId);
+    const otherUsers = await userResultsService.fetchOtherUsers(userId);
     if (otherUsers.length === 0) {
       return [];
     }
