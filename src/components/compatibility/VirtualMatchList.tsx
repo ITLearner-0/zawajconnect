@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { CompatibilityMatch } from "@/types/compatibility";
 import { VirtualScrollConfig } from "@/hooks/compatibility/types/paginationTypes";
-import { paginationService } from "@/hooks/compatibility/services/paginationService";
+import { PaginationService } from "@/hooks/compatibility/services/paginationService";
 import MatchCard from "./MatchCard";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -28,7 +28,7 @@ const VirtualMatchList = ({
   const { itemHeight, containerHeight, overscan = 5 } = config;
 
   // Calculate visible items
-  const { start, end } = paginationService.calculateVisibleItems(
+  const { start, end } = PaginationService.calculateVisibleItems(
     itemHeight,
     containerHeight,
     scrollTop,

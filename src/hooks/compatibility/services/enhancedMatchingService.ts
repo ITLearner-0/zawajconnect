@@ -3,7 +3,7 @@ import { MatchingFilters } from "../types/matchingTypes";
 import { PaginatedResult, PaginationOptions } from "../types/paginationTypes";
 import { backgroundProcessingService } from "./backgroundProcessingService";
 import { cacheService } from "./cacheService";
-import { paginationService } from "./paginationService";
+import { PaginationService } from "./paginationService";
 import { logInfo, logError, logWarning } from "./loggingService";
 import { findCompatibilityMatches } from "./matchingService";
 
@@ -25,7 +25,7 @@ export class EnhancedMatchingService {
 
       // Apply pagination
       const paginationOptions = filters?.pagination || { limit: 20 };
-      const paginatedResult = paginationService.paginateMatches(allMatches, paginationOptions);
+      const paginatedResult = PaginationService.paginateMatches(allMatches, paginationOptions);
 
       logInfo('enhancedMatching', 'Paginated matches result', {
         totalMatches: allMatches.length,
@@ -106,7 +106,7 @@ export class EnhancedMatchingService {
       const paginatedResult = await this.findMatchesWithPagination(userId, filtersWithPagination);
       
       // Merge with existing matches
-      const mergedMatches = paginationService.mergeResults(existingMatches, paginatedResult.data);
+      const mergedMatches = PaginationService.mergeResults(existingMatches, paginatedResult.data);
       
       return {
         ...paginatedResult,
@@ -122,7 +122,6 @@ export class EnhancedMatchingService {
     }
   }
 
-  // Pre-calculate matches for active users
   async preCalculatePopularMatches(userIds: string[]): Promise<void> {
     try {
       logInfo('enhancedMatching', `Pre-calculating matches for ${userIds.length} users`);
