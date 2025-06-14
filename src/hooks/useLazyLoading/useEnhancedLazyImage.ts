@@ -1,6 +1,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useEnhancedLazyLoading } from './useEnhancedLazyLoading';
+import { MemoryManagementService } from './services/memoryService';
 
 interface UseEnhancedLazyImageOptions {
   threshold?: number;
@@ -9,6 +10,7 @@ interface UseEnhancedLazyImageOptions {
   maxRetries?: number;
   fallbackSources?: string[];
   enableProgressiveLoading?: boolean;
+  enableMemoryOptimization?: boolean;
 }
 
 export const useEnhancedLazyImage = (
@@ -19,10 +21,11 @@ export const useEnhancedLazyImage = (
     maxRetries = 3,
     fallbackSources = [],
     enableProgressiveLoading = false,
+    enableMemoryOptimization = true,
     ...lazyOptions
   } = options;
 
-  const { elementRef, shouldLoad, config } = useEnhancedLazyLoading<HTMLDivElement>({
+  const { elementRef, shouldLoad, config, isIntersecting } = useEnhancedLazyLoading<HTMLDivElement>({
     ...lazyOptions,
     configType: 'image',
   });
@@ -33,6 +36,8 @@ export const useEnhancedLazyImage = (
   const [retryCount, setRetryCount] = useState(0);
   const [loadStartTime, setLoadStartTime] = useState<number | null>(null);
 
+  const memoryService = enableMemoryOptimization ? MemoryManagementService.getInstance() : null;
+
   // Performance tracking (development only)
   const trackLoadTime = useCallback((startTime: number) => {
     if (process.env.NODE_ENV === 'development') {
@@ -41,13 +46,20 @@ export const useEnhancedLazyImage = (
     }
   }, []);
 
-  const handleLoad = useCallback(() => {
+  const handleLoad = useCallback((event: Event) => {
+    const imgElement = event.target as HTMLImageElement;
+    
+    // Cache the image for memory optimization
+    if (memoryService && imgElement) {
+      memoryService.cacheImage(src, imgElement);
+    }
+
     setIsLoaded(true);
     setHasError(false);
     if (loadStartTime) {
       trackLoadTime(loadStartTime);
     }
-  }, [loadStartTime, trackLoadTime]);
+  }, [loadStartTime, trackLoadTime, memoryService, src]);
 
   const handleError = useCallback(() => {
     if (retryCount < maxRetries) {
@@ -61,12 +73,41 @@ export const useEnhancedLazyImage = (
     }
   }, [retryCount, maxRetries, fallbackSources, src]);
 
+  // Memory optimization: unload image when not visible and triggerOnce is false
+  useEffect(() => {
+    if (enableMemoryOptimization && !isIntersecting && !options.triggerOnce && isLoaded) {
+      // Don't immediately unload, wait a bit to avoid thrashing
+      const unloadTimer = setTimeout(() => {
+        if (!isIntersecting) {
+          setImageSrc(undefined);
+          setIsLoaded(false);
+          if (process.env.NODE_ENV === 'development') {
+            console.log('Unloaded image to save memory:', src);
+          }
+        }
+      }, 5000); // Wait 5 seconds before unloading
+
+      return () => clearTimeout(unloadTimer);
+    }
+  }, [isIntersecting, options.triggerOnce, isLoaded, enableMemoryOptimization, src]);
+
   useEffect(() => {
     if (shouldLoad && src && !imageSrc) {
+      // Check if image is already cached
+      const cachedImage = memoryService?.getCachedImage(src);
+      if (cachedImage) {
+        setImageSrc(src);
+        setIsLoaded(true);
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Using cached image:', src);
+        }
+        return;
+      }
+
       setLoadStartTime(performance.now());
       setImageSrc(src);
     }
-  }, [shouldLoad, src, imageSrc]);
+  }, [shouldLoad, src, imageSrc, memoryService]);
 
   // Progressive loading effect
   useEffect(() => {

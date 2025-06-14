@@ -6,6 +6,10 @@ export { useLazyLoading, useLazyImage } from '../useLazyLoading';
 export { useEnhancedLazyLoading } from './useEnhancedLazyLoading';
 export { useEnhancedLazyImage } from './useEnhancedLazyImage';
 
+// Export memory-optimized hooks
+export { useMemoryOptimizedLazyLoading } from './useMemoryOptimizedLazyLoading';
+
 // Export services
 export { PerformanceConfigService } from './services/performanceConfig';
 export { IntersectionObserverService } from './services/observerService';
+export { MemoryManagementService } from './services/memoryService';

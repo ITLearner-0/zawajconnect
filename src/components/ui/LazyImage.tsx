@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useLazyImage } from '@/hooks/useLazyLoading';
+import { useEnhancedLazyImage } from '@/hooks/useLazyLoading';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
@@ -12,6 +12,8 @@ interface LazyImageProps {
   fallbackSrc?: string;
   onLoad?: () => void;
   onError?: () => void;
+  enableMemoryOptimization?: boolean;
+  enableProgressiveLoading?: boolean;
 }
 
 const LazyImage = ({
@@ -22,6 +24,8 @@ const LazyImage = ({
   fallbackSrc,
   onLoad,
   onError,
+  enableMemoryOptimization = true,
+  enableProgressiveLoading = false,
 }: LazyImageProps) => {
   const {
     elementRef,
@@ -31,10 +35,14 @@ const LazyImage = ({
     shouldLoad,
     handleLoad,
     handleError,
-  } = useLazyImage(src);
+  } = useEnhancedLazyImage(src, {
+    enableMemoryOptimization,
+    enableProgressiveLoading,
+    fallbackSources: fallbackSrc ? [fallbackSrc] : [],
+  });
 
-  const handleImageLoad = () => {
-    handleLoad();
+  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
+    handleLoad(event.nativeEvent);
     onLoad?.();
   };
 
@@ -49,7 +57,7 @@ const LazyImage = ({
         <Skeleton className={cn('w-full h-full', placeholderClassName)} />
       ) : null}
       
-      {shouldLoad && (
+      {shouldLoad && imageSrc && (
         <img
           src={hasError && fallbackSrc ? fallbackSrc : imageSrc}
           alt={alt}
