@@ -1,7 +1,9 @@
 
 import { ReactNode, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { Button } from '@/components/ui/button';
+import { Home, ArrowLeft } from 'lucide-react';
 
 type ProtectedRouteProps = {
   children: ReactNode;
@@ -23,8 +25,18 @@ const ProtectedRoute = ({
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
+      <div className="flex flex-col justify-center items-center min-h-screen gap-4">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        <Button
+          asChild
+          variant="outline"
+          className="flex items-center gap-2"
+        >
+          <Link to="/">
+            <Home className="h-4 w-4" />
+            Back to Home
+          </Link>
+        </Button>
       </div>
     );
   }
