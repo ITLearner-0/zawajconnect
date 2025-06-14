@@ -4,15 +4,23 @@ import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileOnboarding from "@/components/profile/ProfileOnboarding";
 
 const Profile = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [hasCompatibilityResults, setHasCompatibilityResults] = useState<boolean | null>(null);
+  
   const { 
     formData, 
     isNewUser, 
     userEmail,
+    userId,
     verificationStatus,
     privacySettings,
     blockedUsers,
@@ -36,7 +44,33 @@ const Profile = () => {
     canProceedCurrentStep
   } = useOnboarding(formData, isNewUser);
 
-  // Wrapper function to handle the save process
+  // Check if user has taken compatibility test
+  useEffect(() => {
+    const checkCompatibilityResults = async () => {
+      if (!userId) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('compatibility_results')
+          .select('id')
+          .eq('user_id', userId)
+          .limit(1);
+
+        if (error) {
+          console.error("Error checking compatibility results:", error);
+          return;
+        }
+
+        setHasCompatibilityResults(data && data.length > 0);
+      } catch (error) {
+        console.error("Error checking compatibility results:", error);
+      }
+    };
+
+    checkCompatibilityResults();
+  }, [userId]);
+
+  // Wrapper function to handle the save process and redirect to compatibility test
   const handleSaveProfile = async () => {
     console.log("Save profile button clicked");
     try {
@@ -44,6 +78,24 @@ const Profile = () => {
       console.log("Profile save result:", success);
       if (success) {
         console.log("Profile saved successfully");
+        
+        // Check if user has taken compatibility test
+        if (hasCompatibilityResults === false) {
+          toast({
+            title: "Profile Saved Successfully!",
+            description: "Now let's complete your compatibility test to find better matches.",
+          });
+          
+          // Small delay to let the user see the success message
+          setTimeout(() => {
+            navigate("/compatibility");
+          }, 1500);
+        } else {
+          toast({
+            title: "Profile Updated",
+            description: "Your profile has been successfully updated.",
+          });
+        }
       }
       return success;
     } catch (error) {

@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useRLSSetup } from "@/hooks/useRLSSetup";
 import CustomButton from "@/components/CustomButton";
+import { Card, CardContent } from "@/components/ui/card";
+import { TestTube, User } from "lucide-react";
 
 interface AuthCheckProps {
   children: React.ReactNode;
@@ -14,10 +16,11 @@ const AuthCheck = ({ children }: AuthCheckProps) => {
   const { isSetup: rlsSetup, isLoading: rlsLoading } = useRLSSetup();
   const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [hasCompatibilityTest, setHasCompatibilityTest] = useState<boolean | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
-    // Check authentication status
+    // Check authentication status and compatibility test
     const checkAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
@@ -44,21 +47,7 @@ const AuthCheck = ({ children }: AuthCheckProps) => {
         return;
       }
 
-      if (!data || data.length === 0) {
-        toast({
-          title: "Compatibility Test",
-          description: "Take the compatibility test to see how well you match with others",
-          action: (
-            <CustomButton
-              variant="outline"
-              size="sm"
-              onClick={() => navigate("/compatibility")}
-            >
-              Take Test
-            </CustomButton>
-          ),
-        });
-      }
+      setHasCompatibilityTest(data && data.length > 0);
     };
 
     checkAuth();
@@ -68,7 +57,7 @@ const AuthCheck = ({ children }: AuthCheckProps) => {
     return null; // Will redirect to auth page
   }
 
-  if (isAuthenticated === null || rlsLoading) {
+  if (isAuthenticated === null || rlsLoading || hasCompatibilityTest === null) {
     // Loading state
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -87,6 +76,58 @@ const AuthCheck = ({ children }: AuthCheckProps) => {
         <CustomButton onClick={() => navigate("/")}>
           Return to Home
         </CustomButton>
+      </div>
+    );
+  }
+
+  // Show compatibility test requirement if not completed
+  if (!hasCompatibilityTest) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm border-rose-200 dark:border-rose-700">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-6">
+              <div className="flex justify-center">
+                <TestTube className="h-16 w-16 text-rose-600 dark:text-rose-300" />
+              </div>
+              
+              <div>
+                <h2 className="text-xl font-semibold text-rose-800 dark:text-rose-200 mb-2">
+                  Compatibility Test Required
+                </h2>
+                <p className="text-rose-600 dark:text-rose-300 text-sm">
+                  To view profiles with compatibility percentages and find meaningful matches, you need to complete the compatibility test first.
+                </p>
+              </div>
+
+              <div className="bg-rose-50 dark:bg-rose-900/50 p-4 rounded-lg border border-rose-200 dark:border-rose-700">
+                <p className="text-xs text-rose-700 dark:text-rose-300">
+                  This test helps us match you with people who share similar Islamic values and life goals.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3">
+                <CustomButton
+                  onClick={() => navigate("/compatibility")}
+                  variant="gold"
+                  className="w-full flex items-center gap-2"
+                >
+                  <TestTube className="h-4 w-4" />
+                  Take Compatibility Test
+                </CustomButton>
+                
+                <CustomButton
+                  onClick={() => navigate("/profile")}
+                  variant="outline"
+                  className="w-full flex items-center gap-2"
+                >
+                  <User className="h-4 w-4" />
+                  Back to Profile
+                </CustomButton>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
