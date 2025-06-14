@@ -111,7 +111,7 @@ export class RealtimeService {
         },
         (payload) => {
           logInfo('realtimeService', 'New notification received', payload);
-          const notification = payload.new as MatchNotification;
+          const notification = this.mapToMatchNotification(payload.new);
           
           if (this.callbacks.onNotification) {
             this.callbacks.onNotification(notification);
@@ -181,11 +181,25 @@ export class RealtimeService {
         throw error;
       }
 
-      return data || [];
+      return (data || []).map(this.mapToMatchNotification);
     } catch (error) {
       logError('realtimeService', error as Error, { userId });
       return [];
     }
+  }
+
+  // Map database row to MatchNotification interface
+  private mapToMatchNotification(dbRow: any): MatchNotification {
+    return {
+      id: dbRow.id,
+      user_id: dbRow.user_id,
+      match_user_id: dbRow.match_user_id,
+      notification_type: dbRow.notification_type as 'new_match' | 'score_update' | 'profile_update',
+      score: dbRow.score,
+      message: dbRow.message,
+      is_read: dbRow.is_read,
+      created_at: dbRow.created_at,
+    };
   }
 
   // Handle compatibility result changes
