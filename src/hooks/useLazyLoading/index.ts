@@ -17,6 +17,9 @@ export { useRetryableLoad } from './useRetryableLoad';
 export { useNetworkStatus } from './useNetworkStatus';
 export { useResilientImageLoading } from './useResilientImageLoading';
 
+// Export network optimization hooks
+export { useNetworkOptimization } from './useNetworkOptimization';
+
 // Export developer experience hooks
 export { useDebuggedLazyLoading } from './useDebuggedLazyLoading';
 export { usePerformanceMonitor } from './usePerformanceMonitor';
@@ -29,8 +32,14 @@ export { useEnhancedMonitoring } from './useEnhancedMonitoring';
 export { analyticsService } from './services/analyticsService';
 export type { LazyLoadingMetrics, AggregatedMetrics, UsagePattern } from './services/analyticsService';
 
+// Export network optimization service
+export { networkOptimizationService } from './services/networkOptimizationService';
+
 // Export monitoring & analytics components
 export { default as LazyLoadingAnalyticsDashboard } from '../../components/ui/LazyLoadingAnalyticsDashboard';
+
+// Export network-optimized components
+export { default as NetworkOptimizedImage } from '../../components/ui/NetworkOptimizedImage';
 
 // Export services
 export { PerformanceConfigService } from './services/performanceConfig';

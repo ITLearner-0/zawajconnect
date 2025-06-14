@@ -5,6 +5,7 @@ import LazyImageStatusIndicators from './lazy-image/LazyImageStatusIndicators';
 import LazyImageStates from './lazy-image/LazyImageStates';
 import LazyImageAccessibility from './lazy-image/LazyImageAccessibility';
 import LazyLoadingErrorBoundary from './LazyLoadingErrorBoundary';
+import { useNetworkOptimization } from '@/hooks/useLazyLoading/useNetworkOptimization';
 import { cn } from '@/lib/utils';
 
 interface LazyImageProps {
@@ -52,8 +53,28 @@ const LazyImage = ({
   showPerformanceInfo = false,
   debugId,
 }: LazyImageProps) => {
+  // Network optimization hook
+  const networkOptimization = useNetworkOptimization({
+    enableAdaptiveLoading: enableNetworkOptimization,
+    enableBandwidthMonitoring: enableNetworkOptimization,
+  });
+
+  // Use optimized image URL if network optimization is enabled
+  const optimizedSrc = enableNetworkOptimization 
+    ? networkOptimization.optimizeImageUrl(src)
+    : src;
+
+  // Adjust progressive loading based on network conditions
+  const shouldUseProgressiveLoading = enableProgressiveLoading || 
+    (enableNetworkOptimization && networkOptimization.loadingStrategy.enableProgressiveLoading);
+
+  // Adjust retry attempts based on network conditions
+  const optimizedMaxRetries = enableNetworkOptimization && networkOptimization.isSlowConnection
+    ? Math.min(maxRetries, 2)
+    : maxRetries;
+
   const coreProps = LazyImageCore({
-    src,
+    src: optimizedSrc,
     alt,
     className,
     onLoad,
@@ -62,7 +83,7 @@ const LazyImage = ({
     enableMemoryOptimization,
     enableRetry,
     enableResilientLoading,
-    maxRetries,
+    maxRetries: optimizedMaxRetries,
     debugId,
     enableDebug,
     enablePerformanceMonitoring,
@@ -91,6 +112,8 @@ const LazyImage = ({
         role="img"
         aria-label={alt}
         data-debug-id={enableDebug ? debugId : undefined}
+        data-network-optimized={enableNetworkOptimization}
+        data-connection-type={enableNetworkOptimization ? networkOptimization.effectiveType : undefined}
       >
         <LazyImageStatusIndicators
           showNetworkStatus={showNetworkStatus}
@@ -104,11 +127,11 @@ const LazyImage = ({
           actualIsLoaded={actualIsLoaded}
           actualHasError={actualHasError}
           loadState={loadState}
-          src={src}
+          src={optimizedSrc}
           alt={alt}
           className={className}
           placeholderClassName={placeholderClassName}
-          enableProgressiveLoading={enableProgressiveLoading}
+          enableProgressiveLoading={shouldUseProgressiveLoading}
           enableRetry={enableRetry}
           showLoadingText={showLoadingText}
           handleImageLoad={handleImageLoad}
