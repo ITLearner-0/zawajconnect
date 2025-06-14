@@ -26,33 +26,40 @@ export const useProfileSubmission = () => {
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
-      // Handle birth date conversion if needed
-      let birthDate = profileData.age;
-      if (!birthDate.includes('-') && !isNaN(Number(birthDate))) {
-        // If age is a number, convert to a birth year
-        const currentYear = new Date().getFullYear();
-        const birthYear = currentYear - parseInt(birthDate, 10);
-        birthDate = `${birthYear}-01-01`; // Just year is stored
+      // Handle birth date conversion - only process if age is provided and valid
+      let birthDate = null;
+      if (profileData.age && profileData.age.trim() !== '') {
+        if (profileData.age.includes('-')) {
+          // If age is already a date format, use it directly
+          birthDate = profileData.age;
+        } else if (!isNaN(Number(profileData.age))) {
+          // If age is a number, convert to a birth year
+          const currentYear = new Date().getFullYear();
+          const birthYear = currentYear - parseInt(profileData.age, 10);
+          birthDate = `${birthYear}-01-01`;
+        }
       }
 
-      // Prepare update data
-      const updateData = {
+      // Prepare update data - only include non-empty values
+      const updateData: any = {
         first_name: firstName,
         last_name: lastName,
-        birth_date: birthDate,
-        gender: profileData.gender,
-        location: profileData.location,
-        education_level: profileData.education,
-        occupation: profileData.occupation,
-        religious_practice_level: profileData.religiousLevel,
-        prayer_frequency: profileData.prayerFrequency,
-        about_me: profileData.aboutMe,
-        wali_name: profileData.waliName || null,
-        wali_relationship: profileData.waliRelationship || null,
-        wali_contact: profileData.waliContact || null,
         privacy_settings: privacySettings,
-        is_visible: true // Default value
+        is_visible: true
       };
+
+      // Only add fields that have values
+      if (birthDate) updateData.birth_date = birthDate;
+      if (profileData.gender) updateData.gender = profileData.gender;
+      if (profileData.location) updateData.location = profileData.location;
+      if (profileData.education) updateData.education_level = profileData.education;
+      if (profileData.occupation) updateData.occupation = profileData.occupation;
+      if (profileData.religiousLevel) updateData.religious_practice_level = profileData.religiousLevel;
+      if (profileData.prayerFrequency) updateData.prayer_frequency = profileData.prayerFrequency;
+      if (profileData.aboutMe) updateData.about_me = profileData.aboutMe;
+      if (profileData.waliName) updateData.wali_name = profileData.waliName;
+      if (profileData.waliRelationship) updateData.wali_relationship = profileData.waliRelationship;
+      if (profileData.waliContact) updateData.wali_contact = profileData.waliContact;
 
       console.log("Update data:", updateData);
       
