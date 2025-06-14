@@ -62,13 +62,13 @@ export async function findCompatibilityMatches(
       return [];
     }
 
-    // Combine the data and cast types properly
-    const usersWithProfiles = otherUsers
-      .map(user => {
-        const profile = profiles.find(p => p.id === user.user_id);
-        if (!profile) return null;
-
-        return {
+    // Combine the data with proper type handling
+    const usersWithProfiles: UserResultWithProfile[] = [];
+    
+    for (const user of otherUsers) {
+      const profile = profiles.find(p => p.id === user.user_id);
+      if (profile) {
+        usersWithProfiles.push({
           user_id: user.user_id,
           answers: user.answers as Record<string, any>,
           preferences: user.preferences as any,
@@ -85,9 +85,9 @@ export async function findCompatibilityMatches(
             id_verified: profile.id_verified || null,
             is_visible: profile.is_visible
           }
-        } as UserResultWithProfile;
-      })
-      .filter(Boolean) as UserResultWithProfile[];
+        });
+      }
+    }
 
     // Apply filters and calculate compatibility scores
     const matches = usersWithProfiles
