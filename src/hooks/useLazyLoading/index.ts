@@ -30,3 +30,7 @@ export { debugService } from './services/debugService';
 
 // Export components
 export { default as LazyLoadingDevPanel } from '../../components/ui/LazyLoadingDevPanel';
+
+// Export accessibility context and components
+export { AccessibilityProvider, useAccessibility } from '../../contexts/AccessibilityContext';
+export { default as AccessibilityControls } from '../../components/AccessibilityControls';
