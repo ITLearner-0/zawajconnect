@@ -91,8 +91,8 @@ export async function findCompatibilityMatches(
 
     // Apply filters and calculate compatibility scores
     const matches = usersWithProfiles
-      .filter((user: UserResultWithProfile) => applyFilters(user, filters))
-      .map((user: UserResultWithProfile) => calculateEnhancedCompatibilityScore(myResults, user))
+      .filter((user) => applyFilters(user, filters))
+      .map((user) => calculateEnhancedCompatibilityScore(myResults, user))
       .filter(match => match.score >= (filters?.minCompatibilityScore || 50))
       .sort((a, b) => b.score - a.score);
 
