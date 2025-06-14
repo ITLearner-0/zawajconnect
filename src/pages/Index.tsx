@@ -22,7 +22,7 @@ const Index = () => {
         {/* Navigation */}
         <nav className="absolute top-0 left-0 right-0 z-20 p-6">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
-            <div className="text-2xl font-bold text-rose-800 dark:text-rose-100 font-serif">
+            <div className="text-4xl font-bold text-rose-800 dark:text-rose-100 font-serif">
               Nikah Connect
             </div>
             <div className="flex items-center gap-4">
@@ -34,7 +34,7 @@ const Index = () => {
         
         {/* Hero Content */}
         <div className="relative z-10 text-center max-w-5xl mx-auto">
-          <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-8 text-rose-800 dark:text-rose-100 font-serif leading-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-8 text-rose-800 dark:text-rose-100 font-serif leading-tight">
             SE MARIER DE MANIÈRE
             <span className="block bg-gradient-to-r from-rose-500 to-pink-400 dark:from-rose-300 dark:to-pink-200 bg-clip-text text-transparent">
               LÉGIFÉRÉE
