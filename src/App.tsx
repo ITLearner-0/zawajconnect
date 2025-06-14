@@ -15,7 +15,7 @@ import Compatibility from './pages/Compatibility';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import { AuthProvider } from './contexts/AuthContext';
-import { LazyLoadingProvider } from './hooks/useLazyLoading';
+import { LazyLoadingProvider } from './hooks/useLazyLoading/context/LazyLoadingContext';
 
 function App() {
   return (

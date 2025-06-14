@@ -34,8 +34,8 @@ export const useCentralizedLazyLoading = <T extends HTMLElement = HTMLDivElement
   const markAsLoaded = useCallback(() => {
     if (loadStartTime.current) {
       const loadTime = performance.now() - loadStartTime.current;
-      // FIX: Update metrics using the correct structure
-      actions.updateMetrics({ 
+      // Update the state's averageLoadTime directly
+      actions.updateConfig({ 
         averageLoadTime: (state.averageLoadTime + loadTime) / 2 
       });
     }
