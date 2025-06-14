@@ -7,7 +7,7 @@ interface UseLazyLoadingOptions {
   triggerOnce?: boolean;
 }
 
-export const useLazyLoading = (options: UseLazyLoadingOptions = {}) => {
+export const useLazyLoading = <T extends HTMLElement = HTMLDivElement>(options: UseLazyLoadingOptions = {}) => {
   const {
     threshold = 0.1,
     rootMargin = '50px',
@@ -16,7 +16,7 @@ export const useLazyLoading = (options: UseLazyLoadingOptions = {}) => {
 
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
-  const elementRef = useRef<HTMLElement | null>(null);
+  const elementRef = useRef<T>(null);
 
   useEffect(() => {
     const element = elementRef.current;
@@ -50,7 +50,7 @@ export const useLazyLoading = (options: UseLazyLoadingOptions = {}) => {
 };
 
 export const useLazyImage = (src: string, options?: UseLazyLoadingOptions) => {
-  const { elementRef, shouldLoad } = useLazyLoading(options);
+  const { elementRef, shouldLoad } = useLazyLoading<HTMLDivElement>(options);
   const [imageSrc, setImageSrc] = useState<string | undefined>(undefined);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);

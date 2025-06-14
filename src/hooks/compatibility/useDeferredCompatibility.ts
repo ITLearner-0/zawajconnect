@@ -16,7 +16,7 @@ export const useDeferredCompatibility = ({
 }: UseDeferredCompatibilityOptions) => {
   const [processedCount, setProcessedCount] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
-  const { elementRef, shouldLoad } = useLazyLoading({
+  const { elementRef, shouldLoad } = useLazyLoading<HTMLDivElement>({
     threshold: 0.5,
     triggerOnce: false,
   });

@@ -19,7 +19,7 @@ interface LazyMatchCardProps {
 const LazyMatchCard = ({ match }: LazyMatchCardProps) => {
   const [expanded, setExpanded] = useState(false);
   const [showQuality, setShowQuality] = useState(false);
-  const { elementRef, shouldLoad } = useLazyLoading({
+  const { elementRef, shouldLoad } = useLazyLoading<HTMLDivElement>({
     threshold: 0.1,
     triggerOnce: true,
   });
