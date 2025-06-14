@@ -57,7 +57,7 @@ export function useEnhancedCompatibilityMatches() {
         // Get profile information for all matches
         const { data: profiles, error: profileError } = await supabase
           .from('profiles')
-          .select('id, first_name, last_name, gender, location, education_level, religious_practice_level, birth_date');
+          .select('id, first_name, last_name, gender, location, education_level, religious_practice_level, birth_date, email_verified, phone_verified, id_verified');
         
         if (profileError) {
           console.error("Error fetching profiles:", profileError);
@@ -177,15 +177,19 @@ export function useEnhancedCompatibilityMatches() {
             // Primary sort by score
             if (b.score !== a.score) return b.score - a.score;
             
-            // Secondary sort by verification status
-            const aVerified = (a.profileData?.email_verified ? 1 : 0) + 
-                             (a.profileData?.phone_verified ? 1 : 0) + 
-                             (a.profileData?.id_verified ? 1 : 0);
-            const bVerified = (b.profileData?.email_verified ? 1 : 0) + 
-                             (b.profileData?.phone_verified ? 1 : 0) + 
-                             (b.profileData?.id_verified ? 1 : 0);
+            // Secondary sort by verification status (if available)
+            if (a.profileData && b.profileData) {
+              const aVerified = (a.profileData.email_verified ? 1 : 0) + 
+                               (a.profileData.phone_verified ? 1 : 0) + 
+                               (a.profileData.id_verified ? 1 : 0);
+              const bVerified = (b.profileData.email_verified ? 1 : 0) + 
+                               (b.profileData.phone_verified ? 1 : 0) + 
+                               (b.profileData.id_verified ? 1 : 0);
+              
+              return bVerified - aVerified;
+            }
             
-            return bVerified - aVerified;
+            return 0;
           });
 
         setMatchScores(sortedMatches);

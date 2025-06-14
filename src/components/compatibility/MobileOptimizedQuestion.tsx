@@ -3,6 +3,7 @@ import { Question } from "@/data/compatibilityQuestions";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import { Answer } from "@/types/compatibility";
 import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Info, Settings } from "lucide-react";
