@@ -11,6 +11,7 @@ import WaliDashboard from './pages/WaliDashboard';
 import Resources from './pages/Resources';
 import Demo from './pages/Demo';
 import UserProfile from './pages/UserProfile';
+import Compatibility from './pages/Compatibility';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -26,6 +27,7 @@ function App() {
               <Route path="/auth" element={<Auth />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/profile/:id" element={<UserProfile />} />
+              <Route path="/compatibility" element={<Compatibility />} />
               <Route path="/nearby" element={<NearbyMatches />} />
               <Route path="/messages" element={<Messages />} />
               <Route path="/messages/:conversationId" element={<Messages />} />
