@@ -33,9 +33,9 @@ export const performance = {
     operation: () => Promise<T> | T,
     label?: string
   ): Promise<{ result: T; duration: number }> => {
-    const start = performance.now();
+    const start = globalThis.performance.now();
     const result = await operation();
-    const duration = performance.now() - start;
+    const duration = globalThis.performance.now() - start;
     
     if (label) {
       console.log(`[Performance] ${label}: ${duration.toFixed(2)}ms`);
@@ -46,8 +46,8 @@ export const performance = {
 
   // Memory usage helper
   getMemoryUsage: (): string => {
-    if ('memory' in performance) {
-      const memory = (performance as any).memory;
+    if ('memory' in globalThis.performance) {
+      const memory = (globalThis.performance as any).memory;
       return `Used: ${(memory.usedJSHeapSize / 1048576).toFixed(2)}MB / Limit: ${(memory.jsHeapSizeLimit / 1048576).toFixed(2)}MB`;
     }
     return 'Memory info not available';
