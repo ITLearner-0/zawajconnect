@@ -63,7 +63,7 @@ export async function findCompatibilityMatches(
     }
 
     // Combine the data and cast types properly
-    const usersWithProfiles: UserResultWithProfile[] = otherUsers
+    const usersWithProfiles = otherUsers
       .map(user => {
         const profile = profiles.find(p => p.id === user.user_id);
         if (!profile) return null;
@@ -85,9 +85,9 @@ export async function findCompatibilityMatches(
             id_verified: profile.id_verified || null,
             is_visible: profile.is_visible
           }
-        };
+        } as UserResultWithProfile;
       })
-      .filter((user): user is UserResultWithProfile => user !== null);
+      .filter(Boolean) as UserResultWithProfile[];
 
     // Apply filters and calculate compatibility scores
     const matches = usersWithProfiles
