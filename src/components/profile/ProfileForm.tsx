@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import CustomButton from "@/components/CustomButton";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +11,7 @@ import VerificationPanel from "@/components/profile/VerificationPanel";
 import PrivacySettings from "@/components/profile/PrivacySettings";
 import { ProfileFormData, VerificationStatus, PrivacySettings as PrivacySettingsType } from "@/types/profile";
 import { IslamicPattern } from "@/components/ui/islamic-pattern";
-import { Save, ArrowLeft, User, Briefcase, BookOpen, Heart, Shield, LockKeyhole } from "lucide-react";
+import { Save, ArrowLeft, User, Briefcase, BookOpen, Heart, Shield, LockKeyhole, CheckCircle } from "lucide-react";
 
 interface ProfileFormProps {
   formData: ProfileFormData;
@@ -44,17 +43,37 @@ const ProfileForm = ({
   onUnblockUser
 }: ProfileFormProps) => {
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitSuccess(false);
+    
+    try {
+      await handleSubmit();
+      setSubmitSuccess(true);
+      
+      // Reset success state after 3 seconds
+      setTimeout(() => {
+        setSubmitSuccess(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <TooltipProvider>
       <form 
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }} 
+        onSubmit={handleFormSubmit}
         className="space-y-8"
         aria-label="Profile form"
       >
+        
         <div role="region" aria-labelledby="basic-info-heading">
           <IslamicPattern variant="card" color="teal" className="overflow-hidden bg-white dark:bg-islamic-darkCard">
             <div className="bg-islamic-teal/10 p-4 flex items-center border-b border-islamic-teal/10">
@@ -171,12 +190,31 @@ const ProfileForm = ({
           </CustomButton>
           <CustomButton 
             type="submit"
-            variant="gold"
+            variant={submitSuccess ? "default" : "gold"}
+            disabled={isSubmitting}
             aria-label="Save your profile information"
-            className="flex items-center gap-2"
+            className={`flex items-center gap-2 transition-all duration-300 ${
+              submitSuccess 
+                ? "bg-green-600 hover:bg-green-700 text-white" 
+                : ""
+            }`}
           >
-            <Save className="h-4 w-4" />
-            Save Profile
+            {isSubmitting ? (
+              <>
+                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                Saving...
+              </>
+            ) : submitSuccess ? (
+              <>
+                <CheckCircle className="h-4 w-4" />
+                Saved!
+              </>
+            ) : (
+              <>
+                <Save className="h-4 w-4" />
+                Save Profile
+              </>
+            )}
           </CustomButton>
         </div>
       </form>

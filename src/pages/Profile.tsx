@@ -7,11 +7,8 @@ import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileOnboarding from "@/components/profile/ProfileOnboarding";
-import { useState } from "react";
-import { Loader2 } from "lucide-react";
 
 const Profile = () => {
-  const [isSaving, setIsSaving] = useState(false);
   const { 
     formData, 
     isNewUser, 
@@ -39,9 +36,8 @@ const Profile = () => {
     canProceedCurrentStep
   } = useOnboarding(formData, isNewUser);
 
-  // Wrapper function to handle the save process with loading state
+  // Wrapper function to handle the save process
   const handleSaveProfile = async () => {
-    setIsSaving(true);
     console.log("Save profile button clicked");
     try {
       const success = await handleSubmit();
@@ -49,10 +45,10 @@ const Profile = () => {
       if (success) {
         console.log("Profile saved successfully");
       }
+      return success;
     } catch (error) {
       console.error("Error saving profile:", error);
-    } finally {
-      setIsSaving(false);
+      return false;
     }
   };
   
@@ -95,14 +91,6 @@ const Profile = () => {
               </p>
             </CardHeader>
             <CardContent>
-              {isSaving && (
-                <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-                  <div className="bg-white/90 dark:bg-rose-900/90 p-4 rounded-lg shadow-lg flex items-center gap-2 backdrop-blur-sm border border-rose-200 dark:border-rose-700">
-                    <Loader2 className="h-5 w-5 animate-spin text-rose-600 dark:text-rose-300" />
-                    <span className="text-rose-700 dark:text-rose-200">Saving profile...</span>
-                  </div>
-                </div>
-              )}
               <ProfileForm
                 formData={formData}
                 handleChange={handleChange}
