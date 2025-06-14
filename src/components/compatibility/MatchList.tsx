@@ -2,7 +2,8 @@
 import { useState } from "react";
 import { CompatibilityMatch } from "@/types/compatibility";
 import { PaginationOptions } from "@/hooks/compatibility/types/paginationTypes";
-import MatchCard from "./MatchCard";
+import LazyMatchCard from "./LazyMatchCard";
+import LazyMatchList from "./LazyMatchList";
 import VirtualMatchList from "./VirtualMatchList";
 import CustomButton from "@/components/CustomButton";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -13,6 +14,7 @@ interface MatchListProps {
   hasMore?: boolean;
   loading?: boolean;
   useVirtualScroll?: boolean;
+  useLazyLoading?: boolean;
 }
 
 const MatchList = ({ 
@@ -20,7 +22,8 @@ const MatchList = ({
   onLoadMore, 
   hasMore = false, 
   loading = false,
-  useVirtualScroll = false 
+  useVirtualScroll = false,
+  useLazyLoading = true
 }: MatchListProps) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const isMobile = useIsMobile();
@@ -47,7 +50,18 @@ const MatchList = ({
     }
   };
 
-  // Use virtual scrolling for large lists or when explicitly enabled
+  // Use lazy loading for better performance on large lists
+  if (useLazyLoading && matches.length > 20) {
+    return (
+      <LazyMatchList 
+        matches={matches}
+        batchSize={10}
+        delay={100}
+      />
+    );
+  }
+
+  // Use virtual scrolling for very large lists
   if (useVirtualScroll || matches.length > 50) {
     return (
       <VirtualMatchList
@@ -68,7 +82,7 @@ const MatchList = ({
   return (
     <div className="space-y-4">
       {matches.map((match) => (
-        <MatchCard key={match.userId} match={match} />
+        <LazyMatchCard key={match.userId} match={match} />
       ))}
       
       {loading && matches.length === 0 && (
