@@ -7,6 +7,28 @@ import {
 } from '@/services/monitoring';  // Updated import path
 import { supabase } from '@/integrations/supabase/client';
 
+// Helper function to safely parse content_flags
+const parseContentFlags = (flags: any): any[] => {
+  if (!flags) return [];
+  if (Array.isArray(flags)) return flags;
+  if (typeof flags === 'string') {
+    try {
+      return JSON.parse(flags);
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
+// Helper function to convert database message to our Message type
+const convertDbMessageToMessage = (dbMessage: any): Message => {
+  return {
+    ...dbMessage,
+    content_flags: parseContentFlags(dbMessage.content_flags)
+  };
+};
+
 export const useAIMonitoring = (conversationId: string | undefined) => {
   const [latestReport, setLatestReport] = useState<MonitoringReport | null>(null);
   const [monitoringEnabled, setMonitoringEnabled] = useState(true);
@@ -21,7 +43,7 @@ export const useAIMonitoring = (conversationId: string | undefined) => {
         setLoading(true);
         
         // Fetch all messages for the conversation
-        const { data: messages, error: fetchError } = await supabase
+        const { data: messagesData, error: fetchError } = await supabase
           .from('messages')
           .select('*')
           .eq('conversation_id', conversationId)
@@ -32,19 +54,29 @@ export const useAIMonitoring = (conversationId: string | undefined) => {
           return;
         }
         
-        if (!messages || messages.length === 0) {
+        if (!messagesData || messagesData.length === 0) {
           // No messages, nothing to report
           setLatestReport(null);
           return;
         }
         
+        // Convert database messages to our Message type
+        const messages = messagesData.map(convertDbMessageToMessage);
+        
         // Generate the monitoring report
-        const report = generateReport(messages as Message[]);
+        const report = generateReport(messages);
         setLatestReport(report);
         
-        // Save report to database
+        // Save report to database - just log for now since monitoring_reports table doesn't exist
         if (conversationId) {
-          await saveMonitoringReport(conversationId, report);
+          console.log("Would save monitoring report:", {
+            conversation_id: conversationId,
+            content: JSON.stringify(report),
+            behavioral_score: report.behavioralScore,
+            is_flagged: report.violations.length > 0,
+            warning_triggers: report.violations.map(v => v.type),
+            recommendations: report.recommendations
+          });
         }
       } catch (err: any) {
         setError(err.message);
@@ -62,31 +94,6 @@ export const useAIMonitoring = (conversationId: string | undefined) => {
     return () => clearInterval(intervalId); // Cleanup interval on unmount
     
   }, [conversationId, monitoringEnabled]);
-
-  // Save monitoring report to the database
-  const saveMonitoringReport = async (conversationId: string, report: MonitoringReport) => {
-    try {
-      // Fix the monitoring_reports table insert
-      const { error: saveError } = await supabase
-        .from('monitoring_reports')
-        .insert({
-          conversation_id: conversationId,
-          content: JSON.stringify(report),
-          behavioral_score: report.behavioralScore,
-          is_flagged: report.violations.length > 0,
-          warning_triggers: report.violations.map(v => v.type),
-          recommendations: report.recommendations
-        });
-      
-      if (saveError) {
-        console.error("Error saving monitoring report:", saveError);
-      } else {
-        console.log("Monitoring report saved successfully.");
-      }
-    } catch (err) {
-      console.error("Error saving monitoring report:", err);
-    }
-  };
 
   // Toggle monitoring status
   const toggleMonitoring = () => {

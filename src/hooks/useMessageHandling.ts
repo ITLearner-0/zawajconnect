@@ -5,6 +5,28 @@ import { Message } from '@/types/profile';
 import { useToast } from './use-toast';
 import { dummyMessages } from '@/data/messages';
 
+// Helper function to safely parse content_flags
+const parseContentFlags = (flags: any): any[] => {
+  if (!flags) return [];
+  if (Array.isArray(flags)) return flags;
+  if (typeof flags === 'string') {
+    try {
+      return JSON.parse(flags);
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
+// Helper function to convert database message to our Message type
+const convertDbMessageToMessage = (dbMessage: any): Message => {
+  return {
+    ...dbMessage,
+    content_flags: parseContentFlags(dbMessage.content_flags)
+  };
+};
+
 export const useMessageHandling = (conversationId?: string, currentUserId?: string | null) => {
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -80,7 +102,7 @@ export const useMessageHandling = (conversationId?: string, currentUserId?: stri
         }
         
         // Process messages for encryption if needed
-        let processedMessages: Message[] = data || [];
+        let processedMessages: Message[] = (data || []).map(convertDbMessageToMessage);
         
         if (encryptionEnabled && processedMessages.length > 0) {
           processedMessages = await Promise.all(

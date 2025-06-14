@@ -5,6 +5,28 @@ import { Message } from '@/types/profile';
 import { useMessageModeration } from './useMessageModeration';
 import { useToast } from '@/hooks/use-toast';
 
+// Helper function to safely parse content_flags
+const parseContentFlags = (flags: any): any[] => {
+  if (!flags) return [];
+  if (Array.isArray(flags)) return flags;
+  if (typeof flags === 'string') {
+    try {
+      return JSON.parse(flags);
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
+// Helper function to convert database message to our Message type
+const convertDbMessageToMessage = (dbMessage: any): Message => {
+  return {
+    ...dbMessage,
+    content_flags: parseContentFlags(dbMessage.content_flags)
+  };
+};
+
 export const useMessageExchange = (conversationId: string | undefined) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,7 +87,9 @@ export const useMessageExchange = (conversationId: string | undefined) => {
             variant: "destructive"
           });
         } else {
-          setMessages(data || []);
+          // Convert database messages to our Message type
+          const convertedMessages = (data || []).map(convertDbMessageToMessage);
+          setMessages(convertedMessages);
           setError(null);
         }
       } catch (err: any) {
@@ -87,13 +111,15 @@ export const useMessageExchange = (conversationId: string | undefined) => {
       .channel(`messages-${conversationId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, payload => {
         if (payload.eventType === 'INSERT') {
-          setMessages(prevMessages => [...prevMessages, payload.new as Message]);
+          const newMessage = convertDbMessageToMessage(payload.new);
+          setMessages(prevMessages => [...prevMessages, newMessage]);
         } else if (payload.eventType === 'UPDATE') {
+          const updatedMessage = convertDbMessageToMessage(payload.new);
           setMessages(prevMessages =>
-            prevMessages.map(msg => (msg.id === (payload.new as Message).id ? payload.new as Message : msg))
+            prevMessages.map(msg => (msg.id === updatedMessage.id ? updatedMessage : msg))
           );
         } else if (payload.eventType === 'DELETE') {
-          setMessages(prevMessages => prevMessages.filter(msg => msg.id !== (payload.old as Message).id));
+          setMessages(prevMessages => prevMessages.filter(msg => msg.id !== (payload.old as any).id));
         }
       })
       .subscribe();
@@ -156,7 +182,7 @@ export const useMessageExchange = (conversationId: string | undefined) => {
         return null;
       }
 
-      return newMessage;
+      return convertDbMessageToMessage(newMessage);
     } catch (error: any) {
       setError(error.message);
       toast({

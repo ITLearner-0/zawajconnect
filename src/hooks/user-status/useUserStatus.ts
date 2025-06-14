@@ -1,134 +1,95 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { UserStatus, UserStatusType } from './types';
-import { useOfflineTracking } from './useOfflineTracking';
-import { useStatusTableCheck } from './useStatusTableCheck';
 import { useFetchUserStatus } from './useFetchUserStatus';
-import { useStatusSync } from './useStatusSync';
+import { useUpdateUserStatus } from './useUpdateUserStatus';
+import { useOfflineTracking } from './useOfflineTracking';
 
-export const useUserStatus = (userId?: string) => {
-  // Internal state for the hook
-  const [userToCheck, setUserToCheck] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-  const [userStatus, setUserStatus] = useState<UserStatus>({
-    online: false,
-    lastActive: null,
-    status: 'offline'
-  });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  
-  // If userId is passed, we're checking another user's status
-  const isDemoUser = !userId || userId === 'current-user';
+export interface UserStatusData {
+  status: 'online' | 'offline' | 'away' | 'busy';
+  lastActive: string | null;
+}
 
-  // Set userToCheck based on input userId or current user session
+export const useUserStatus = (userId?: string | null) => {
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  // Get current user ID if not provided
   useEffect(() => {
     if (userId) {
-      setUserToCheck(userId);
-      setLoading(false);
-    } else {
-      // Get the user's session
-      const checkSession = async () => {
-        try {
-          const { data: { session } } = await supabase.auth.getSession();
-          
-          if (session) {
-            setUserToCheck(session.user.id);
-            setIsAuthenticated(true);
-          } else {
-            setIsAuthenticated(false);
-            setUserToCheck(null);
-          }
-        } catch (error) {
-          console.error('Error checking user session:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      checkSession();
+      setCurrentUserId(userId);
+      return;
     }
+
+    const getCurrentUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setCurrentUserId(session?.user?.id || null);
+    };
+
+    getCurrentUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setCurrentUserId(session?.user?.id || null);
+    });
+
+    return () => subscription.unsubscribe();
   }, [userId]);
 
-  // Check if user_sessions table exists before querying
-  useStatusTableCheck(userToCheck, isDemoUser);
-
-  // Fetch user status
-  const { fetchUserStatus } = useFetchUserStatus(
-    userToCheck,
-    isDemoUser,
-    (status: UserStatusType) => setUserStatus(prev => ({ ...prev, status })),
-    (lastActive: string | null) => setUserStatus(prev => ({ ...prev, lastActive })),
-    setLoading,
-    setError
-  );
-
-  // Set up realtime subscription for status updates
-  useStatusSync(
-    userToCheck,
-    isDemoUser,
-    (status: UserStatusType) => setUserStatus(prev => ({ ...prev, status })),
-    (lastActive: string | null) => setUserStatus(prev => ({ ...prev, lastActive }))
-  );
-
-  // Handle offline status tracking
-  useOfflineTracking(userToCheck, isDemoUser);
-
-  // Fetch the initial status
+  // Track online/offline status
   useEffect(() => {
-    if (userToCheck) {
-      fetchUserStatus();
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  // Use the custom hooks
+  const { userStatus, loading: fetchLoading, error: fetchError } = useFetchUserStatus(userId || currentUserId);
+  const { updateStatus, loading: updateLoading } = useUpdateUserStatus();
+  const { } = useOfflineTracking(currentUserId);
+
+  // Update user status when online status changes
+  useEffect(() => {
+    if (currentUserId && updateStatus) {
+      const status = isOnline ? 'online' : 'offline';
+      updateStatus(status);
     }
-  }, [userToCheck, fetchUserStatus]);
+  }, [isOnline, currentUserId, updateStatus]);
 
-  const setAway = () => {
-    if (userToCheck && !isDemoUser) {
-      updateUserStatus(userToCheck, 'away');
-    }
-  };
+  // Update user status on page visibility change
+  useEffect(() => {
+    if (!currentUserId || !updateStatus) return;
 
-  const setOnline = () => {
-    if (userToCheck && !isDemoUser) {
-      updateUserStatus(userToCheck, 'online');
-    }
-  };
-
-  const updateUserStatus = async (uid: string, status: UserStatusType) => {
-    try {
-      const now = new Date().toISOString();
-
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          is_active: status !== 'offline',
-          last_active: now
-        })
-        .eq('id', uid);
-
-      if (error) {
-        console.error('Error updating user status:', error);
-        return;
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        updateStatus('online');
+      } else {
+        updateStatus('away');
       }
+    };
 
-      setUserStatus({
-        online: status !== 'offline',
-        lastActive: now,
-        status
-      });
-    } catch (error) {
-      console.error('Error in updateUserStatus:', error);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [currentUserId, updateStatus]);
+
+  const setUserStatus = async (status: 'online' | 'offline' | 'away' | 'busy') => {
+    if (updateStatus) {
+      await updateStatus(status);
     }
   };
 
   return {
-    userId: userToCheck,
-    isAuthenticated,
-    userStatus,
-    status: userStatus.status,
-    lastActive: userStatus.lastActive,
-    loading,
-    setAway,
-    setOnline
+    status: userStatus?.status || 'offline',
+    lastActive: userStatus?.last_active || null,
+    isOnline,
+    setStatus: setUserStatus,
+    loading: fetchLoading || updateLoading,
+    error: fetchError
   };
 };

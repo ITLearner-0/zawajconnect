@@ -1,3 +1,4 @@
+
 export interface ProfileFormData {
   fullName: string;
   age: string;
@@ -81,7 +82,7 @@ export interface Message {
   is_read: boolean;
   attachments?: string[];
   is_wali_visible: boolean;
-  content_flags?: ContentFlag[];
+  content_flags?: ContentFlag[] | null;
   is_filtered?: boolean;
   encrypted?: boolean;
   iv?: string; // Initialization vector for encryption

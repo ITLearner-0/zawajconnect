@@ -5,6 +5,28 @@ import { Message } from '@/types/profile';
 import { tableExists } from '@/utils/database/core';
 import { useToast } from './use-toast';
 
+// Helper function to safely parse content_flags
+const parseContentFlags = (flags: any): any[] => {
+  if (!flags) return [];
+  if (Array.isArray(flags)) return flags;
+  if (typeof flags === 'string') {
+    try {
+      return JSON.parse(flags);
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
+// Helper function to convert database message to our Message type
+const convertDbMessageToMessage = (dbMessage: any): Message => {
+  return {
+    ...dbMessage,
+    content_flags: parseContentFlags(dbMessage.content_flags)
+  };
+};
+
 export interface SearchResult {
   message: Message;
   conversationId: string;
@@ -60,7 +82,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
       const conversationIds = conversations.map(conv => conv.id);
 
       // Search for messages containing the search term in these conversations
-      const { data: messages, error: msgError } = await supabase
+      const { data: messagesData, error: msgError } = await supabase
         .from('messages')
         .select('*')
         .in('conversation_id', conversationIds)
@@ -75,7 +97,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
       // If we have results, fetch participant information for each conversation
       const results: SearchResult[] = [];
 
-      if (messages && messages.length > 0) {
+      if (messagesData && messagesData.length > 0) {
         // Build a map of conversation participants
         const participantsMap = new Map();
         
@@ -84,7 +106,9 @@ export const useMessageSearch = (currentUserId: string | null) => {
         });
 
         // Process each message
-        for (const message of messages) {
+        for (const messageData of messagesData) {
+          const message = convertDbMessageToMessage(messageData);
+          
           // Get the other participant in this conversation
           const participants = participantsMap.get(message.conversation_id) || [];
           const otherParticipantId = participants.find(id => id !== currentUserId);
