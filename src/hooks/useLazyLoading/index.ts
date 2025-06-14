@@ -9,6 +9,10 @@ export { useEnhancedLazyImage } from './useEnhancedLazyImage';
 // Export memory-optimized hooks
 export { useMemoryOptimizedLazyLoading } from './useMemoryOptimizedLazyLoading';
 
+// Export UX enhancement hooks
+export { useAccessibleLazyLoading } from './useAccessibleLazyLoading';
+export { useRetryableLoad } from './useRetryableLoad';
+
 // Export services
 export { PerformanceConfigService } from './services/performanceConfig';
 export { IntersectionObserverService } from './services/observerService';
