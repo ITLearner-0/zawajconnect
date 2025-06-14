@@ -81,8 +81,7 @@ export class ProgressiveRevealService {
   ): Partial<DatabaseProfile> {
     const baseProfile = {
       id: profile.id,
-      first_name: profile.first_name,
-      updated_at: profile.updated_at
+      first_name: profile.first_name
     };
 
     switch (revealLevel) {

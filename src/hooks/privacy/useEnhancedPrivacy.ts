@@ -102,9 +102,12 @@ export const useEnhancedPrivacy = (userId?: string) => {
     if (!userId) return false;
 
     try {
+      // Convert to a plain object that Supabase can handle
+      const settingsJson = JSON.parse(JSON.stringify(newSettings));
+      
       const { error } = await supabase
         .from('profiles')
-        .update({ privacy_settings: newSettings })
+        .update({ privacy_settings: settingsJson })
         .eq('id', userId);
 
       if (error) {
