@@ -23,6 +23,7 @@ export interface CompatibilityMatch {
     strengths: string[];
     differences: string[];
     dealbreakers?: string[];
+    categoryScores?: Record<string, { score: number; weight: number }>;
   };
   profileData?: {
     first_name: string;

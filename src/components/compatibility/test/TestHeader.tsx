@@ -1,5 +1,5 @@
 
-import { useMediaQuery } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import MobileTestHeader from "./MobileTestHeader";
 import CategoryProgress from "../CategoryProgress";
 import { Progress } from "@/components/ui/progress";
@@ -12,7 +12,7 @@ interface TestHeaderProps {
 }
 
 const TestHeader = ({ currentQuestion, answers }: TestHeaderProps) => {
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useIsMobile();
 
   if (isMobile) {
     return <MobileTestHeader currentQuestion={currentQuestion} answers={answers} />;
