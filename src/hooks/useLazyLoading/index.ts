@@ -1,4 +1,3 @@
-
 // Re-export original hooks for backward compatibility
 export { useLazyLoading, useLazyImage } from '../useLazyLoading';
 
@@ -54,3 +53,13 @@ export { default as LazyLoadingDevPanel } from '../../components/ui/LazyLoadingD
 // Export accessibility context and components
 export { AccessibilityProvider, useAccessibility } from '../../contexts/AccessibilityContext';
 export { default as AccessibilityControls } from '../../components/AccessibilityControls';
+
+// Export state management
+export { LazyLoadingProvider, useLazyLoadingContext, useLazyLoadingState, useLazyLoadingActions } from './context/LazyLoadingContext';
+export { useCentralizedLazyLoading } from './state/useCentralizedLazyLoading';
+export { useStatefulLazyImage } from './state/useStatefulLazyImage';
+export { useBatchLoading } from './state/useBatchLoading';
+
+// Export state management components
+export { default as StatefulLazyImage } from '../../components/ui/StatefulLazyImage';
+export { default as LazyLoadingGlobalStatus } from '../../components/ui/LazyLoadingGlobalStatus';
