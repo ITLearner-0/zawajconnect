@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useEnhancedLazyImage } from '@/hooks/useLazyLoading';
+import { useEnhancedLazyImage } from '@/hooks/useLazyLoading/useEnhancedLazyImage';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 

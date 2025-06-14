@@ -21,8 +21,8 @@ type WeakRefImpl<T extends object> = WeakRefLike<T>;
 
 // Use native WeakRef if available, otherwise use polyfill
 const createWeakRef = <T extends object>(target: T): WeakRefImpl<T> => {
-  if (typeof WeakRef !== 'undefined') {
-    return new WeakRef(target) as WeakRefImpl<T>;
+  if (typeof globalThis !== 'undefined' && 'WeakRef' in globalThis) {
+    return new (globalThis as any).WeakRef(target) as WeakRefImpl<T>;
   }
   return new WeakRefPolyfill(target);
 };
