@@ -147,15 +147,15 @@ export class MatchQualityService {
 
   private getProfileCompleteness(user: UserResultWithProfile): number {
     const profile = user.profiles;
+    // Only check fields that actually exist in ValidatedProfileData
     const fields = [
       profile.first_name,
       profile.last_name,
       profile.birth_date,
       profile.location,
       profile.education_level,
-      profile.occupation,
       profile.religious_practice_level,
-      profile.about_me
+      profile.gender
     ];
 
     const completedFields = fields.filter(field => field && field.toString().trim().length > 0).length;
