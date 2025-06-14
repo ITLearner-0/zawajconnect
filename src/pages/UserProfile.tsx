@@ -68,24 +68,24 @@ const UserProfile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin h-12 w-12 border-t-2 border-islamic-teal rounded-full"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
+        <div className="animate-spin h-12 w-12 border-t-2 border-rose-600 dark:border-rose-300 rounded-full"></div>
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
+        <Card className="w-full max-w-md bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm border-rose-200 dark:border-rose-700">
           <CardContent className="pt-6">
             <div className="text-center">
-              <h2 className="text-xl font-semibold">Profile Not Found</h2>
-              <p className="text-muted-foreground mt-2">
+              <h2 className="text-xl font-semibold text-rose-800 dark:text-rose-200">Profile Not Found</h2>
+              <p className="text-rose-600 dark:text-rose-300 mt-2">
                 We couldn't find the profile you're looking for.
               </p>
               <Button 
-                className="mt-4" 
+                className="mt-4 bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white" 
                 onClick={() => navigate('/demo')}
                 variant="default"
               >
@@ -107,7 +107,7 @@ const UserProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-accent/10 py-8">
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <ProfileHeader onSignOut={handleSignOut} />
         

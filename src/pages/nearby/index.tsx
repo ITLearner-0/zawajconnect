@@ -28,7 +28,7 @@ const NearbyMatches = () => {
 
   return (
     <AuthCheck>
-      <div className="min-h-screen bg-gradient-to-b from-islamic-cream to-background relative">
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 relative">
         <div className="absolute inset-0 bg-[url('/islamic-pattern.svg')] bg-repeat opacity-5 pointer-events-none"></div>
         <div className="container mx-auto px-4 py-6 md:py-12 relative z-10">
           <NearbyHeader />
@@ -40,13 +40,13 @@ const NearbyMatches = () => {
                 <SheetTrigger asChild>
                   <CustomButton 
                     variant="outline" 
-                    className="flex items-center gap-2 mb-4 w-full justify-center"
+                    className="flex items-center gap-2 mb-4 w-full justify-center border-rose-300 text-rose-700 hover:bg-rose-100 dark:border-rose-600 dark:text-rose-300 dark:hover:bg-rose-800"
                   >
                     <Settings className="h-4 w-4" />
                     <span>{t('nearby.searchSettings')}</span>
                   </CustomButton>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[85vw] max-w-md p-0 pt-12 overflow-y-auto">
+                <SheetContent side="left" className="w-[85vw] max-w-md p-0 pt-12 overflow-y-auto bg-white/95 dark:bg-rose-900/95 backdrop-blur-sm border-rose-200 dark:border-rose-700">
                   <div className="p-4">
                     <NearbySettings 
                       maxDistance={maxDistance}

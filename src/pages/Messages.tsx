@@ -82,8 +82,8 @@ const Messages = () => {
   // Loading state
   if (userLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-islamic-teal"></div>
+      <div className="flex items-center justify-center h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-rose-600 dark:border-rose-300"></div>
       </div>
     );
   }

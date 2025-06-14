@@ -85,21 +85,21 @@ const Profile = () => {
 
   return (
     <AccessibilityProvider>
-      <div className="min-h-screen bg-islamic-solidGreen dark:bg-islamic-darkGreen py-12" role="main" aria-labelledby="profile-heading">
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-12" role="main" aria-labelledby="profile-heading">
         <div className="container max-w-3xl mx-auto px-4">
-          <Card className="shadow-lg border-islamic-teal/10 dark:border-islamic-darkTeal/20">
+          <Card className="shadow-lg border-rose-200 dark:border-rose-700 bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm">
             <CardHeader>
               <ProfileHeader onSignOut={handleSignOut} />
-              <p className="text-center text-islamic-burgundy/80 dark:text-islamic-cream/80">
+              <p className="text-center text-rose-600 dark:text-rose-300">
                 Keep your profile information up to date
               </p>
             </CardHeader>
             <CardContent>
               {isSaving && (
                 <div className="fixed inset-0 bg-black/20 flex items-center justify-center z-50">
-                  <div className="bg-white p-4 rounded-lg shadow-lg flex items-center gap-2 dark:bg-islamic-darkCard">
-                    <Loader2 className="h-5 w-5 animate-spin text-islamic-teal dark:text-islamic-brightGold" />
-                    <span className="dark:text-islamic-cream">Saving profile...</span>
+                  <div className="bg-white/90 dark:bg-rose-900/90 p-4 rounded-lg shadow-lg flex items-center gap-2 backdrop-blur-sm border border-rose-200 dark:border-rose-700">
+                    <Loader2 className="h-5 w-5 animate-spin text-rose-600 dark:text-rose-300" />
+                    <span className="text-rose-700 dark:text-rose-200">Saving profile...</span>
                   </div>
                 </div>
               )}
