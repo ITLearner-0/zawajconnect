@@ -1,4 +1,3 @@
-
 // Re-export original hooks for backward compatibility
 export { useLazyLoading, useLazyImage } from '../useLazyLoading';
 
@@ -20,6 +19,17 @@ export { useResilientImageLoading } from './useResilientImageLoading';
 // Export developer experience hooks
 export { useDebuggedLazyLoading } from './useDebuggedLazyLoading';
 export { usePerformanceMonitor } from './usePerformanceMonitor';
+
+// Export monitoring & analytics hooks
+export { useAnalytics } from './useAnalytics';
+export { useEnhancedMonitoring } from './useEnhancedMonitoring';
+
+// Export monitoring & analytics services
+export { analyticsService } from './services/analyticsService';
+export type { LazyLoadingMetrics, AggregatedMetrics, UsagePattern } from './services/analyticsService';
+
+// Export monitoring & analytics components
+export { default as LazyLoadingAnalyticsDashboard } from '../../components/ui/LazyLoadingAnalyticsDashboard';
 
 // Export services
 export { PerformanceConfigService } from './services/performanceConfig';

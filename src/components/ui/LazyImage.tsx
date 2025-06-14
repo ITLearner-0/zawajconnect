@@ -4,8 +4,7 @@ import { useEnhancedLazyImage } from '@/hooks/useLazyLoading/useEnhancedLazyImag
 import { useAccessibleLazyLoading } from '@/hooks/useLazyLoading/useAccessibleLazyLoading';
 import { useResilientImageLoading } from '@/hooks/useLazyLoading/useResilientImageLoading';
 import { useNetworkStatus } from '@/hooks/useLazyLoading/useNetworkStatus';
-import { useDebuggedLazyLoading } from '@/hooks/useLazyLoading/useDebuggedLazyLoading';
-import { usePerformanceMonitor } from '@/hooks/useLazyLoading/usePerformanceMonitor';
+import { useEnhancedMonitoring } from '@/hooks/useLazyLoading/useEnhancedMonitoring';
 import EnhancedLoadingState from './EnhancedLoadingState';
 import ProgressiveImage from './ProgressiveImage';
 import LazyLoadingErrorBoundary from './LazyLoadingErrorBoundary';
@@ -27,9 +26,11 @@ interface LazyImageProps {
   enableNetworkOptimization?: boolean;
   enableDebug?: boolean;
   enablePerformanceMonitoring?: boolean;
+  enableAnalytics?: boolean;
   maxRetries?: number;
   showLoadingText?: boolean;
   showNetworkStatus?: boolean;
+  showPerformanceInfo?: boolean;
   debugId?: string;
 }
 
@@ -48,9 +49,11 @@ const LazyImage = ({
   enableNetworkOptimization = true,
   enableDebug = process.env.NODE_ENV === 'development',
   enablePerformanceMonitoring = false,
+  enableAnalytics = false,
   maxRetries = 3,
   showLoadingText = false,
   showNetworkStatus = false,
+  showPerformanceInfo = false,
   debugId,
 }: LazyImageProps) => {
   const [loadState, setLoadState] = useState<'loading' | 'loaded' | 'error' | 'retry'>('loading');
@@ -63,16 +66,16 @@ const LazyImage = ({
 
   const { isOnline, isSlowConnection } = useNetworkStatus();
 
-  const {
-    elementRef,
-    shouldLoad,
-    debug,
-  } = useDebuggedLazyLoading<HTMLDivElement>({
+  // Enhanced monitoring with analytics, performance, and debug capabilities
+  const monitoring = useEnhancedMonitoring<HTMLDivElement>({
+    elementId: debugId,
+    elementType: 'image',
+    enableAnalytics,
+    enablePerformanceMonitoring,
+    enableDebugMode: enableDebug,
+    trackConversions: false,
     threshold: 0.1,
     triggerOnce: true,
-    configType: 'image',
-    enableDebug,
-    debugId,
   });
 
   const {
@@ -96,68 +99,43 @@ const LazyImage = ({
     maxRetries: enableRetry ? maxRetries : 1,
     onLoad: () => {
       setLoadState('loaded');
-      debug.logLoadEnd(true);
+      monitoring.endMonitoring(true);
     },
     onError: (error) => {
       setLoadState('error');
-      debug.logLoadEnd(false);
-      debug.logError(error);
+      monitoring.endMonitoring(false);
+      monitoring.trackError(error);
       onError?.();
       console.error('Resilient image loading failed:', error);
     },
   });
 
-  const {
-    metrics: performanceMetrics,
-    startMonitoring,
-    endMonitoring,
-    getPerformanceGrade,
-    getOptimizationSuggestions,
-  } = usePerformanceMonitor(enablePerformanceMonitoring ? src : undefined);
-
   const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement>) => {
     handleLoad(event.nativeEvent);
     setLoadState('loaded');
-    debug.logLoadEnd(true);
-    
-    if (enablePerformanceMonitoring) {
-      endMonitoring(true);
-    }
-    
+    monitoring.endMonitoring(true);
     onLoad?.(event);
   };
 
   const handleImageError = () => {
     handleError();
-    debug.logError(new Error('Image failed to load'));
-    
-    if (enablePerformanceMonitoring) {
-      endMonitoring(false);
-    }
+    const error = new Error('Image failed to load');
+    monitoring.trackError(error);
     
     if (enableRetry && resilientLoading.loadAttempt < maxRetries) {
       setLoadState('retry');
-      debug.logRetry();
       resilientLoading.retry();
     } else {
       setLoadState('error');
+      monitoring.endMonitoring(false);
       onError?.();
     }
   };
 
   const handleRetryClick = () => {
     setLoadState('retry');
-    debug.logRetry();
     resilientLoading.retry();
   };
-
-  // Start monitoring when image should load
-  React.useEffect(() => {
-    if (shouldLoad && enablePerformanceMonitoring) {
-      debug.logLoadStart();
-      startMonitoring();
-    }
-  }, [shouldLoad, enablePerformanceMonitoring, debug, startMonitoring]);
 
   // Use resilient loading when enabled
   const actualImageSrc = enableResilientLoading ? resilientLoading.currentSrc : imageSrc;
@@ -174,20 +152,28 @@ const LazyImage = ({
   return (
     <LazyLoadingErrorBoundary showRetry={enableRetry}>
       <div 
-        ref={elementRef} 
+        ref={monitoring.elementRef} 
         className={cn('relative overflow-hidden', className)}
         role="img"
         aria-label={alt}
-        data-debug-id={enableDebug ? debug.elementId : undefined}
+        data-debug-id={enableDebug ? debugId : undefined}
       >
-        {/* Debug Performance Info */}
-        {enableDebug && enablePerformanceMonitoring && performanceMetrics && (
+        {/* Performance Info */}
+        {showPerformanceInfo && monitoring.performance?.metrics && (
           <div className="absolute top-0 left-0 z-20 bg-black bg-opacity-75 text-white text-xs p-1 rounded-br">
-            <div>Grade: {getPerformanceGrade()}</div>
-            <div>Time: {performanceMetrics.totalTime.toFixed(0)}ms</div>
-            {performanceMetrics.transferSize > 0 && (
-              <div>Size: {(performanceMetrics.transferSize / 1024).toFixed(1)}KB</div>
+            <div>Grade: {monitoring.performance.getPerformanceGrade()}</div>
+            <div>Time: {monitoring.performance.metrics.totalTime.toFixed(0)}ms</div>
+            {monitoring.performance.metrics.transferSize > 0 && (
+              <div>Size: {(monitoring.performance.metrics.transferSize / 1024).toFixed(1)}KB</div>
             )}
+          </div>
+        )}
+
+        {/* Analytics Info */}
+        {enableAnalytics && monitoring.analytics?.aggregatedMetrics && (
+          <div className="absolute top-0 right-0 z-20 bg-blue-900 bg-opacity-75 text-white text-xs p-1 rounded-bl">
+            <div>Success: {monitoring.analytics.aggregatedMetrics.successRate.toFixed(1)}%</div>
+            <div>Cache: {monitoring.analytics.aggregatedMetrics.cacheHitRate.toFixed(1)}%</div>
           </div>
         )}
 
@@ -215,7 +201,7 @@ const LazyImage = ({
         )}
 
         {/* Loading State */}
-        {isOnline && (!shouldLoad || (!actualIsLoaded && !actualHasError && !resilientLoading.isLoading)) && (
+        {isOnline && (!monitoring.shouldLoad || (!actualIsLoaded && !actualHasError && !resilientLoading.isLoading)) && (
           <EnhancedLoadingState
             state="loading"
             className={cn('w-full h-full', placeholderClassName)}
@@ -246,7 +232,7 @@ const LazyImage = ({
         )}
         
         {/* Image Display */}
-        {isOnline && shouldLoad && actualImageSrc && !actualHasError && (
+        {isOnline && monitoring.shouldLoad && actualImageSrc && !actualHasError && (
           enableProgressiveLoading ? (
             <ProgressiveImage
               src={actualImageSrc}
