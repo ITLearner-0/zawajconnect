@@ -32,6 +32,18 @@ const parseChatPreferences = (preferences: any) => {
   };
 };
 
+// Helper function to safely parse availability status
+const parseAvailabilityStatus = (status: string | null): 'online' | 'away' | 'busy' | 'offline' => {
+  if (!status) return 'offline';
+  
+  const validStatuses = ['online', 'away', 'busy', 'offline'] as const;
+  if (validStatuses.includes(status as any)) {
+    return status as 'online' | 'away' | 'busy' | 'offline';
+  }
+  
+  return 'offline';
+};
+
 export const useWaliProfile = (userId: string) => {
   const [waliProfile, setWaliProfile] = useState<WaliProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,6 +75,7 @@ export const useWaliProfile = (userId: string) => {
         // Convert the database record to WaliProfile with proper type handling
         const waliProfile: WaliProfile = {
           ...data,
+          availability_status: parseAvailabilityStatus(data.availability_status),
           chat_preferences: parseChatPreferences(data.chat_preferences)
         };
 

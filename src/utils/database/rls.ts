@@ -23,6 +23,9 @@ export const enableRLSPolicies = async (): Promise<boolean> => {
   }
 };
 
+// Add the missing export alias
+export const setupRLSPolicies = enableRLSPolicies;
+
 /**
  * Check if RLS policies are properly configured
  */

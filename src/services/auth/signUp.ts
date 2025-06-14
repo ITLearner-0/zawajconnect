@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { SignUpData, AuthProfileData } from "@/types/auth";
+import { SignUpData } from "@/types/auth";
 import { toast } from "sonner";
 
 export const signUp = async (data: SignUpData, t: (key: string) => string) => {
@@ -61,7 +61,7 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
-      // Create profile data object as a plain object first, then use type assertion
+      // Create profile data object directly
       const profileData = {
         id: userData.user.id,
         first_name: firstName,
@@ -90,16 +90,13 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
         wali_relationship: gender === "female" ? waliRelationship || null : null,
         wali_contact: gender === "female" ? waliContact || null : null
       };
-
-      // Type assertion instead of direct typing
-      const typedProfileData = profileData as AuthProfileData;
       
-      console.log("Inserting profile data:", typedProfileData);
+      console.log("Inserting profile data:", profileData);
 
       // Create initial profile
       const { error: profileError } = await supabase
         .from("profiles")
-        .upsert(typedProfileData);
+        .upsert(profileData);
 
       if (profileError) {
         console.error("Error creating initial profile:", profileError);

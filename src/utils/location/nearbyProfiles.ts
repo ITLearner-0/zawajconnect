@@ -32,6 +32,8 @@ export const findNearbyProfiles = async (
     // Convert to Profile format and add mock coordinates
     const nearbyProfiles: Profile[] = filteredProfiles.map((profile: any, index: number) => ({
       id: profile.id,
+      first_name: profile.first_name || 'Unknown',
+      last_name: profile.last_name || '',
       name: `${profile.first_name || 'Unknown'} ${profile.last_name || ''}`.trim(),
       age: profile.birth_date ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear() : null,
       location: profile.location || 'Unknown',
