@@ -74,15 +74,15 @@ export async function findCompatibilityMatches(
           preferences: user.preferences as any,
           profiles: {
             first_name: profile.first_name,
-            last_name: profile.last_name,
+            last_name: profile.last_name || null,
             gender: profile.gender,
-            location: profile.location,
+            location: profile.location || null,
             birth_date: profile.birth_date,
-            religious_practice_level: profile.religious_practice_level,
-            education_level: profile.education_level,
-            email_verified: profile.email_verified,
-            phone_verified: profile.phone_verified,
-            id_verified: profile.id_verified,
+            religious_practice_level: profile.religious_practice_level || null,
+            education_level: profile.education_level || null,
+            email_verified: profile.email_verified || null,
+            phone_verified: profile.phone_verified || null,
+            id_verified: profile.id_verified || null,
             is_visible: profile.is_visible
           }
         };

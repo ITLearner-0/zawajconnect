@@ -14,15 +14,15 @@ export interface UserResultWithProfile {
   preferences: any;
   profiles: {
     first_name: string;
-    last_name?: string;
+    last_name: string | null;
     gender: string;
-    location?: string;
+    location: string | null;
     birth_date: string;
-    religious_practice_level?: string;
-    education_level?: string;
-    email_verified?: boolean;
-    phone_verified?: boolean;
-    id_verified?: boolean;
+    religious_practice_level: string | null;
+    education_level: string | null;
+    email_verified: boolean | null;
+    phone_verified: boolean | null;
+    id_verified: boolean | null;
     is_visible: boolean;
   };
 }
