@@ -52,7 +52,7 @@ const SetupButton: React.FC<SetupButtonProps> = ({ show, onSetupComplete }) => {
       <Button 
         onClick={handleSetupTables} 
         disabled={loading}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300"
       >
         {loading ? 'Setting up...' : 'Setup Database & Security'}
       </Button>

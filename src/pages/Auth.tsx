@@ -57,13 +57,13 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-accent/50 to-background py-12 dark:from-islamic-darkBg dark:to-islamic-darkCard">
+    <div className="min-h-screen bg-gradient-to-br from-rose-100 via-pink-50 to-rose-200 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-12">
       <div className="container max-w-md mx-auto px-4">
         <div className="flex justify-between mb-4">
           <LanguageSwitcher />
           <ThemeToggle />
         </div>
-        <Card className="shadow-lg dark:bg-islamic-darkCard dark:text-white">
+        <Card className="shadow-2xl border border-rose-200 dark:border-rose-700 bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm">
           <AuthHeader isSignUp={isSignUp} />
           <CardContent>
             {isSignUp ? (
@@ -81,7 +81,7 @@ const Auth = () => {
               <button
                 type="button"
                 onClick={() => setIsSignUp(!isSignUp)}
-                className="text-sm text-primary hover:underline"
+                className="text-sm text-rose-600 dark:text-rose-300 hover:underline transition-colors"
               >
                 {isSignUp
                   ? t("auth.alreadyHaveAccount")
