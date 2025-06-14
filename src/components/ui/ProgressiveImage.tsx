@@ -7,7 +7,7 @@ interface ProgressiveImageProps {
   lowQualitySrc?: string;
   alt: string;
   className?: string;
-  onLoad?: () => void;
+  onLoad?: (event: React.SyntheticEvent<HTMLImageElement>) => void;
   onError?: () => void;
   enableBlur?: boolean;
   reducedMotion?: boolean;
@@ -27,12 +27,12 @@ const ProgressiveImage = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [isHighQualityLoaded, setIsHighQualityLoaded] = useState(false);
 
-  const handleImageLoad = useCallback(() => {
+  const handleImageLoad = useCallback((event: React.SyntheticEvent<HTMLImageElement>) => {
     setIsLoaded(true);
     if (currentSrc === src) {
       setIsHighQualityLoaded(true);
     }
-    onLoad?.();
+    onLoad?.(event);
   }, [currentSrc, src, onLoad]);
 
   const handleImageError = useCallback(() => {
