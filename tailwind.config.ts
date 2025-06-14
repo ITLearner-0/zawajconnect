@@ -26,15 +26,15 @@ export default {
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
-          DEFAULT: "#28717c",
+          DEFAULT: "#28717c", // islamic-teal
           foreground: "#FFFFFF",
         },
         secondary: {
-          DEFAULT: "#d4af37",
+          DEFAULT: "#d4af37", // islamic-gold
           foreground: "#221F26",
         },
         accent: {
-          DEFAULT: "#f8f7f2",
+          DEFAULT: "#f8f7f2", // islamic-cream
           foreground: "#221F26",
         },
         destructive: {
@@ -92,14 +92,20 @@ export default {
           "0%, 100%": { opacity: "0.2" },
           "50%": { opacity: "0.3" },
         },
+        'title-pulse': {
+          '0%, 100%': { transform: 'scale(1)', opacity: '0.95' },
+          '50%': { transform: 'scale(1.02)', opacity: '1' },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         fadeIn: "fadeIn 0.5s ease-out forwards",
         "slow-pulse": "slow-pulse 8s ease-in-out infinite",
+        'title-pulse': 'title-pulse 4s ease-in-out infinite',
       },
     },
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+

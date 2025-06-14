@@ -18,8 +18,11 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       size="icon"
       onClick={toggleTheme}
       className={cn(
-        "rounded-full bg-white/30 backdrop-blur-sm border-white/40 hover:bg-white/40 dark:bg-slate-800/70 dark:border-slate-700 dark:hover:bg-slate-700/90", 
-        theme === "dark" ? "text-yellow-300" : "text-slate-700",
+        "rounded-full transition-all duration-300 ease-in-out",
+        "bg-transparent backdrop-blur-sm",
+        "border-islamic-gold/50 hover:border-islamic-gold dark:border-islamic-darkGold/50 dark:hover:border-islamic-darkGold",
+        "text-islamic-gold hover:text-islamic-brightGold dark:text-islamic-darkGold dark:hover:text-islamic-darkBrightGold",
+        "hover:bg-islamic-gold/10 dark:hover:bg-islamic-darkGold/10",
         className
       )}
       aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
@@ -33,3 +36,4 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
     </Button>
   );
 }
+
