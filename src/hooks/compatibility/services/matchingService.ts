@@ -1,4 +1,3 @@
-
 import { CompatibilityMatch } from "@/types/compatibility";
 import { MatchingFilters } from "../types/matchingTypes";
 import { userResultsService } from "./userResultsService";
@@ -72,3 +71,7 @@ export {
   DatabaseConnectionError,
   NoMatchesFoundError
 } from "./errorHandling";
+
+// Re-export enhanced matching service
+export { enhancedMatchingService } from "./enhancedMatchingService";
+export { backgroundProcessingService } from "./backgroundProcessingService";
