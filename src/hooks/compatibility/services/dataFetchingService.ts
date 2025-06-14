@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { UserResultWithProfile } from "../types/matchingTypes";
 import { compatibilityCache, logCacheOperation } from "./cachingService";
@@ -6,10 +5,12 @@ import { DatabaseConnectionError, UserNotFoundError } from "./errorHandling";
 import { logInfo, logWarning, logError } from "./loggingService";
 import { 
   safeValidateUserAnswers, 
-  safeValidateUserPreferences,
-  UserAnswers,
-  UserPreferences 
+  safeValidateUserPreferences
 } from "./validationService";
+import {
+  UserAnswers,
+  UserPreferences
+} from "../types/validationTypes";
 
 export interface ValidatedUserResults {
   answers: UserAnswers;
