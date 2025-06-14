@@ -22,11 +22,13 @@ interface SignUpFormProps {
     waliRelationship?: string;
     waliContact?: string;
   }) => void;
+  preselectedGender?: string | null;
 }
 
 const SignUpForm: React.FC<SignUpFormProps> = ({
   loading,
   onSubmit,
+  preselectedGender,
 }) => {
   const { t } = useTranslation();
   const [showWaliFields, setShowWaliFields] = useState(false);
@@ -50,7 +52,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({
       lastName: "",
       email: "",
       password: "",
-      gender: "",
+      gender: preselectedGender || "",
       waliName: "",
       waliRelationship: "",
       waliContact: "",
@@ -63,6 +65,13 @@ const SignUpForm: React.FC<SignUpFormProps> = ({
   useEffect(() => {
     setShowWaliFields(gender === "female");
   }, [gender]);
+
+  // Set preselected gender when component mounts or preselectedGender changes
+  useEffect(() => {
+    if (preselectedGender) {
+      form.setValue("gender", preselectedGender);
+    }
+  }, [preselectedGender, form]);
 
   const handleSubmit = (values: SignUpFormValues) => {
     onSubmit({
