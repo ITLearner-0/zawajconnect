@@ -127,4 +127,5 @@ export async function fetchOtherUsers(userId: string): Promise<ValidatedOtherUse
 }
 
 // Re-export from profileService for backward compatibility
-export { ValidatedProfileData, profileService as fetchProfiles } from "./profileService";
+export type { ValidatedProfileData } from "./profileService";
+export { profileService as fetchProfiles } from "./profileService";

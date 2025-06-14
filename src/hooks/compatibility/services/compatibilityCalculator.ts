@@ -77,7 +77,6 @@ export class CompatibilityCalculator {
         profileData: {
           first_name: otherUser.profiles.first_name,
           last_name: otherUser.profiles.last_name,
-          gender: otherUser.profiles.gender,
           location: otherUser.profiles.location,
           religious_practice_level: otherUser.profiles.religious_practice_level,
           education_level: otherUser.profiles.education_level,
