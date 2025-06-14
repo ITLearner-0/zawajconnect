@@ -1,3 +1,4 @@
+
 // Re-export original hooks for backward compatibility
 export { useLazyLoading, useLazyImage } from '../useLazyLoading';
 
@@ -54,7 +55,7 @@ export { default as LazyLoadingDevPanel } from '../../components/ui/LazyLoadingD
 export { AccessibilityProvider, useAccessibility } from '../../contexts/AccessibilityContext';
 export { default as AccessibilityControls } from '../../components/AccessibilityControls';
 
-// Export state management
+// Export state management - FIX: Add LazyLoadingProvider export
 export { LazyLoadingProvider, useLazyLoadingContext, useLazyLoadingState, useLazyLoadingActions } from './context/LazyLoadingContext';
 export { useCentralizedLazyLoading } from './state/useCentralizedLazyLoading';
 export { useStatefulLazyImage } from './state/useStatefulLazyImage';
