@@ -23,59 +23,77 @@ export async function findCompatibilityMatches(
       throw new Error("Vous devez d'abord passer le test de compatibilité");
     }
 
-    // Single optimized query with JOIN to get other users' results with their profiles
-    const { data: otherUsersWithProfiles, error } = await supabase
+    // Get other users' compatibility results
+    const { data: otherUsers, error: otherUsersError } = await supabase
       .from('compatibility_results')
-      .select(`
-        user_id,
-        answers,
-        preferences,
-        profiles!inner (
-          id,
-          first_name,
-          last_name,
-          gender,
-          location,
-          birth_date,
-          religious_practice_level,
-          education_level,
-          email_verified,
-          phone_verified,
-          id_verified,
-          is_visible
-        )
-      `)
-      .neq('user_id', userId)
-      .eq('profiles.is_visible', true);
+      .select('user_id, answers, preferences')
+      .neq('user_id', userId);
 
-    if (error) {
-      console.error('Database query error:', error);
-      throw error;
+    if (otherUsersError) {
+      console.error('Error fetching other users results:', otherUsersError);
+      throw otherUsersError;
     }
 
-    if (!otherUsersWithProfiles?.length) {
+    if (!otherUsers?.length) {
       return [];
     }
 
-    // Transform the joined data to match our expected type structure
-    const usersWithProfiles: UserResultWithProfile[] = otherUsersWithProfiles.map(item => ({
-      user_id: item.user_id,
-      answers: item.answers as Record<string, any>,
-      preferences: item.preferences as any,
-      profiles: {
-        first_name: item.profiles.first_name,
-        last_name: item.profiles.last_name || null,
-        gender: item.profiles.gender,
-        location: item.profiles.location || null,
-        birth_date: item.profiles.birth_date,
-        religious_practice_level: item.profiles.religious_practice_level || null,
-        education_level: item.profiles.education_level || null,
-        email_verified: item.profiles.email_verified || null,
-        phone_verified: item.profiles.phone_verified || null,
-        id_verified: item.profiles.id_verified || null,
-        is_visible: item.profiles.is_visible
-      }
-    }));
+    // Get profiles for these users in a single optimized query
+    const userIds = otherUsers.map(user => user.user_id);
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select(`
+        id,
+        first_name,
+        last_name,
+        gender,
+        location,
+        birth_date,
+        religious_practice_level,
+        education_level,
+        email_verified,
+        phone_verified,
+        id_verified,
+        is_visible
+      `)
+      .in('id', userIds)
+      .eq('is_visible', true);
+
+    if (profilesError) {
+      console.error('Error fetching profiles:', profilesError);
+      throw profilesError;
+    }
+
+    if (!profiles?.length) {
+      return [];
+    }
+
+    // Combine the data efficiently
+    const usersWithProfiles: UserResultWithProfile[] = otherUsers
+      .map(user => {
+        const profile = profiles.find(p => p.id === user.user_id);
+        if (!profile) return null;
+        
+        return {
+          user_id: user.user_id,
+          answers: user.answers as Record<string, any>,
+          preferences: user.preferences as any,
+          profiles: {
+            first_name: profile.first_name,
+            last_name: profile.last_name || null,
+            gender: profile.gender,
+            location: profile.location || null,
+            birth_date: profile.birth_date,
+            religious_practice_level: profile.religious_practice_level || null,
+            education_level: profile.education_level || null,
+            email_verified: profile.email_verified || null,
+            phone_verified: profile.phone_verified || null,
+            id_verified: profile.id_verified || null,
+            is_visible: profile.is_visible
+          }
+        };
+      })
+      .filter((user): user is UserResultWithProfile => user !== null);
 
     // Apply filters and calculate compatibility scores
     const matches = usersWithProfiles
