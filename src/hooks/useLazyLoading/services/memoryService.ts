@@ -1,4 +1,20 @@
 
+// WeakRef polyfill for better browser compatibility
+class WeakRefPolyfill<T extends object> {
+  private ref: T | undefined;
+  
+  constructor(target: T) {
+    this.ref = target;
+  }
+  
+  deref(): T | undefined {
+    return this.ref;
+  }
+}
+
+// Use native WeakRef if available, otherwise use polyfill
+const WeakRefImpl = typeof WeakRef !== 'undefined' ? WeakRef : WeakRefPolyfill;
+
 interface MemoryStats {
   totalObservedElements: number;
   totalCachedImages: number;
@@ -7,7 +23,7 @@ interface MemoryStats {
 
 interface ImageCacheEntry {
   url: string;
-  element: WeakRef<HTMLImageElement>;
+  element: WeakRefImpl<HTMLImageElement>;
   lastAccessed: number;
   size: number;
 }
@@ -60,7 +76,7 @@ export class MemoryManagementService {
 
     this.imageCache.set(url, {
       url,
-      element: new WeakRef(element),
+      element: new WeakRefImpl(element),
       lastAccessed: Date.now(),
       size: this.estimateImageSize(element),
     });
