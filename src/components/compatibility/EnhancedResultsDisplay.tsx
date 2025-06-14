@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import CustomButton from "../CustomButton";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +19,7 @@ const EnhancedResultsDisplay = ({ score, answers, onRetake }: EnhancedResultsDis
   // Calculate category-wise scores
   const categoryScores = questions.reduce((acc, question, index) => {
     if (!acc[question.category]) {
-      acc[question.category] = { total: 0, weight: 0, count: 0, weight: 0 };
+      acc[question.category] = { total: 0, weight: 0, count: 0 };
     }
     
     const answer = answers[index];
