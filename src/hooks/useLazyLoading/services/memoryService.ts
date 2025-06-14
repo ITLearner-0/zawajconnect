@@ -1,6 +1,10 @@
 
 // WeakRef polyfill for better browser compatibility
-class WeakRefPolyfill<T extends object> {
+interface WeakRefLike<T extends object> {
+  deref(): T | undefined;
+}
+
+class WeakRefPolyfill<T extends object> implements WeakRefLike<T> {
   private ref: T | undefined;
   
   constructor(target: T) {
@@ -12,8 +16,16 @@ class WeakRefPolyfill<T extends object> {
   }
 }
 
+// Type-safe WeakRef implementation
+type WeakRefImpl<T extends object> = WeakRefLike<T>;
+
 // Use native WeakRef if available, otherwise use polyfill
-const WeakRefImpl = typeof WeakRef !== 'undefined' ? WeakRef : WeakRefPolyfill;
+const createWeakRef = <T extends object>(target: T): WeakRefImpl<T> => {
+  if (typeof WeakRef !== 'undefined') {
+    return new WeakRef(target) as WeakRefImpl<T>;
+  }
+  return new WeakRefPolyfill(target);
+};
 
 interface MemoryStats {
   totalObservedElements: number;
@@ -76,7 +88,7 @@ export class MemoryManagementService {
 
     this.imageCache.set(url, {
       url,
-      element: new WeakRefImpl(element),
+      element: createWeakRef(element),
       lastAccessed: Date.now(),
       size: this.estimateImageSize(element),
     });
