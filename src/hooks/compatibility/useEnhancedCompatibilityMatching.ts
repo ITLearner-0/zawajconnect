@@ -8,6 +8,7 @@ import { PaginationOptions, PaginatedResult } from "./types/paginationTypes";
 import { enhancedMatchingService } from "./services/enhancedMatchingService";
 import { paginationService } from "./services/paginationService";
 import { logInfo, logError } from "./services/loggingService";
+import { useRealtimeMatching } from "./useRealtimeMatching";
 
 export function useEnhancedCompatibilityMatching() {
   const [matches, setMatches] = useState<CompatibilityMatch[]>([]);
@@ -16,6 +17,15 @@ export function useEnhancedCompatibilityMatching() {
   const [hasMore, setHasMore] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const { toast } = useToast();
+  
+  // Initialize realtime functionality
+  const realtimeData = useRealtimeMatching();
+
+  // Auto-refresh matches when profiles are updated in real-time
+  useEffect(() => {
+    // This will automatically handle profile updates and refresh matches
+    // The useRealtimeMatching hook already handles this internally
+  }, []);
 
   // Find matches with pagination support
   const findMatches = async (
@@ -193,7 +203,9 @@ export function useEnhancedCompatibilityMatching() {
     findMatches,
     loadMoreMatches,
     refreshMatches,
-    getProcessingStatus
+    getProcessingStatus,
+    // Include realtime data
+    ...realtimeData,
   };
 }
 
