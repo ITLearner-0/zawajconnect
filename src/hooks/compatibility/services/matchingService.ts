@@ -22,26 +22,26 @@ export async function findCompatibilityMatches(
   try {
     logInfo('findCompatibilityMatches', `Starting match search for user: ${userId}`, { filters });
 
-    // Step 1: Get current user's compatibility results
+    // Step 1: Get current user's compatibility results with validation
     const myResults = await fetchUserResults(userId);
 
-    // Step 2: Get other users' compatibility results
+    // Step 2: Get other users' compatibility results with validation
     const otherUsers = await fetchOtherUsers(userId);
     if (otherUsers.length === 0) {
       return [];
     }
 
-    // Step 3: Get profiles
+    // Step 3: Get profiles with validation
     const userIds = otherUsers.map(user => user.user_id);
     const profiles = await fetchProfiles(userIds);
     if (profiles.length === 0) {
       return [];
     }
 
-    // Step 4: Combine data
+    // Step 4: Combine data with type safety
     const usersWithProfiles = combineUserDataWithProfiles(otherUsers, profiles);
 
-    // Step 5: Apply filters and calculate scores
+    // Step 5: Apply filters and calculate scores with validated data
     const matches = processMatches(myResults, usersWithProfiles, userId, filters);
 
     // Step 6: Finalize and return results

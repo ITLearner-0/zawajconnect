@@ -1,10 +1,11 @@
 
 import { UserResultWithProfile } from "../types/matchingTypes";
+import { ValidatedOtherUser, ValidatedProfileData } from "./dataFetchingService";
 import { logWarning, logError, logInfo } from "./loggingService";
 
 export function combineUserDataWithProfiles(
-  otherUsers: Array<{ user_id: string; answers: Record<string, any>; preferences: any }>,
-  profiles: any[]
+  otherUsers: ValidatedOtherUser[],
+  profiles: ValidatedProfileData[]
 ): UserResultWithProfile[] {
   let skippedUsers = 0;
 
@@ -20,20 +21,20 @@ export function combineUserDataWithProfiles(
           
           return {
             user_id: user.user_id,
-            answers: user.answers as Record<string, any>,
-            preferences: user.preferences as any,
+            answers: user.answers,
+            preferences: user.preferences,
             profiles: {
-              first_name: profile.first_name || '',
-              last_name: profile.last_name || null,
-              gender: profile.gender || '',
-              location: profile.location || null,
-              birth_date: profile.birth_date || '',
-              religious_practice_level: profile.religious_practice_level || null,
-              education_level: profile.education_level || null,
-              email_verified: profile.email_verified || false,
-              phone_verified: profile.phone_verified || false,
-              id_verified: profile.id_verified || false,
-              is_visible: profile.is_visible || true
+              first_name: profile.first_name,
+              last_name: profile.last_name,
+              gender: profile.gender,
+              location: profile.location,
+              birth_date: profile.birth_date,
+              religious_practice_level: profile.religious_practice_level,
+              education_level: profile.education_level,
+              email_verified: profile.email_verified,
+              phone_verified: profile.phone_verified,
+              id_verified: profile.id_verified,
+              is_visible: profile.is_visible
             }
           };
         } catch (error) {

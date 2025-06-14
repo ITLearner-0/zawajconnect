@@ -1,13 +1,14 @@
 
 import { CompatibilityMatch } from "@/types/compatibility";
 import { MatchingFilters, UserResultWithProfile } from "../types/matchingTypes";
+import { ValidatedUserResults } from "./dataFetchingService";
 import { applyFilters } from "../utils/matchingFilters";
 import { batchMemoizedCompatibilityScores } from "./memoizationService";
 import { compatibilityCache } from "./cachingService";
 import { logError, logInfo } from "./loggingService";
 
 export function processMatches(
-  myResults: { answers: Record<string, any>; preferences: any },
+  myResults: ValidatedUserResults,
   usersWithProfiles: UserResultWithProfile[],
   myUserId: string,
   filters?: MatchingFilters

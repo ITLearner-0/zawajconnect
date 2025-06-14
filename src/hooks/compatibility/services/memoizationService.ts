@@ -1,118 +1,78 @@
 
-import { calculateEnhancedCompatibilityScore } from "../utils/enhancedCompatibilityScoring";
 import { CompatibilityMatch } from "@/types/compatibility";
 import { UserResultWithProfile } from "../types/matchingTypes";
-import { compatibilityCache, logCacheOperation } from "./cachingService";
+import { ValidatedUserResults } from "./dataFetchingService";
+import { calculateEnhancedCompatibilityScore } from "../utils/enhancedCompatibilityScoring";
+import { logInfo } from "./loggingService";
 
-// Memoized compatibility score calculation
+// Memoization cache for compatibility scores
+const compatibilityScoreCache = new Map<string, CompatibilityMatch>();
+const CACHE_SIZE_LIMIT = 1000;
+
+function generateScoreKey(myUserId: string, otherUserId: string): string {
+  // Create a consistent key regardless of order
+  const sortedIds = [myUserId, otherUserId].sort();
+  return `${sortedIds[0]}:${sortedIds[1]}`;
+}
+
 export function memoizedCompatibilityScore(
-  myResults: { answers: Record<string, any>; preferences: any },
+  myResults: ValidatedUserResults,
   otherUser: UserResultWithProfile,
   myUserId: string
-): CompatibilityMatch | null {
-  try {
-    // Check cache first
-    const cachedScore = compatibilityCache.getCompatibilityScore(myUserId, otherUser.user_id);
-    
-    if (cachedScore !== null) {
-      logCacheOperation('cache-hit', {
-        operation: 'compatibility-score',
-        userId1: myUserId,
-        userId2: otherUser.user_id,
-        cachedScore
-      });
-      
-      // Return cached result with profile data
-      return {
-        userId: otherUser.user_id,
-        score: cachedScore,
-        profileData: {
-          first_name: otherUser.profiles.first_name,
-          last_name: otherUser.profiles.last_name || undefined,
-          age: calculateAge(otherUser.profiles.birth_date),
-          location: otherUser.profiles.location || undefined,
-          religious_practice_level: otherUser.profiles.religious_practice_level || undefined,
-          education_level: otherUser.profiles.education_level || undefined,
-          email_verified: otherUser.profiles.email_verified,
-          phone_verified: otherUser.profiles.phone_verified,
-          id_verified: otherUser.profiles.id_verified
-        }
-      };
-    }
-
-    // Calculate score if not cached
-    logCacheOperation('cache-miss', {
-      operation: 'compatibility-score',
-      userId1: myUserId,
-      userId2: otherUser.user_id
-    });
-    
-    const compatibilityMatch = calculateEnhancedCompatibilityScore(myResults, otherUser);
-    
-    // Cache the calculated score
-    if (compatibilityMatch) {
-      compatibilityCache.setCompatibilityScore(myUserId, otherUser.user_id, compatibilityMatch.score);
-      
-      logCacheOperation('cache-set', {
-        operation: 'compatibility-score',
-        userId1: myUserId,
-        userId2: otherUser.user_id,
-        score: compatibilityMatch.score
-      });
-    }
-    
-    return compatibilityMatch;
-  } catch (error) {
-    console.error('[MemoizationService] Error calculating compatibility score:', error);
-    return null;
-  }
-}
-
-// Utility function to calculate age
-function calculateAge(birthDate: string): number | undefined {
-  if (!birthDate) return undefined;
+): CompatibilityMatch {
+  const cacheKey = generateScoreKey(myUserId, otherUser.user_id);
   
-  const birth = new Date(birthDate);
-  const today = new Date();
-  let age = today.getFullYear() - birth.getFullYear();
-  const monthDiff = today.getMonth() - birth.getMonth();
-  
-  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-    age--;
+  // Check cache first
+  if (compatibilityScoreCache.has(cacheKey)) {
+    return compatibilityScoreCache.get(cacheKey)!;
   }
   
-  return age;
+  // Calculate new score
+  const match = calculateEnhancedCompatibilityScore(myResults, otherUser);
+  
+  // Cache management - remove oldest entries if cache is full
+  if (compatibilityScoreCache.size >= CACHE_SIZE_LIMIT) {
+    const firstKey = compatibilityScoreCache.keys().next().value;
+    compatibilityScoreCache.delete(firstKey);
+  }
+  
+  // Store in cache
+  compatibilityScoreCache.set(cacheKey, match);
+  
+  return match;
 }
 
-// Batch memoization for multiple users
 export function batchMemoizedCompatibilityScores(
-  myResults: { answers: Record<string, any>; preferences: any },
+  myResults: ValidatedUserResults,
   otherUsers: UserResultWithProfile[],
   myUserId: string
 ): CompatibilityMatch[] {
-  const results: CompatibilityMatch[] = [];
-  let cacheHits = 0;
-  let cacheMisses = 0;
-
-  for (const otherUser of otherUsers) {
-    const result = memoizedCompatibilityScore(myResults, otherUser, myUserId);
-    if (result) {
-      results.push(result);
-      
-      // Track cache performance
-      const wasCached = compatibilityCache.getCompatibilityScore(myUserId, otherUser.user_id) !== null;
-      if (wasCached) cacheHits++;
-      else cacheMisses++;
-    }
-  }
-
-  logCacheOperation('batch-operation-complete', {
-    totalUsers: otherUsers.length,
-    successfulMatches: results.length,
+  const startTime = performance.now();
+  
+  const matches = otherUsers.map(otherUser => 
+    memoizedCompatibilityScore(myResults, otherUser, myUserId)
+  );
+  
+  const endTime = performance.now();
+  const cacheHits = otherUsers.length - matches.filter(match => !compatibilityScoreCache.has(generateScoreKey(myUserId, match.userId))).length;
+  
+  logInfo('batchMemoizedScoring', `Processed ${matches.length} matches in ${(endTime - startTime).toFixed(2)}ms`, {
     cacheHits,
-    cacheMisses,
-    cacheHitRate: otherUsers.length > 0 ? ((cacheHits / otherUsers.length) * 100).toFixed(2) + '%' : '0%'
+    cacheMisses: matches.length - cacheHits,
+    cacheSize: compatibilityScoreCache.size
   });
+  
+  return matches;
+}
 
-  return results;
+export function clearCompatibilityScoreCache(): void {
+  compatibilityScoreCache.clear();
+  logInfo('clearCompatibilityScoreCache', 'Compatibility score cache cleared');
+}
+
+export function getCompatibilityScoreCacheStats(): { size: number; limit: number; hitRate?: number } {
+  return {
+    size: compatibilityScoreCache.size,
+    limit: CACHE_SIZE_LIMIT
+  };
 }
