@@ -7,6 +7,7 @@ const CACHE_CONFIG = {
   COMPATIBILITY_SCORES_TTL: 30 * 60 * 1000, // 30 minutes
   PROFILE_DATA_TTL: 15 * 60 * 1000, // 15 minutes
   USER_RESULTS_TTL: 60 * 60 * 1000, // 1 hour
+  GENERIC_CACHE_TTL: 30 * 60 * 1000, // 30 minutes for generic cache
   MAX_CACHE_SIZE: 1000 // Maximum number of cached items
 };
 
@@ -29,10 +30,15 @@ interface UserResultsCache {
   [userId: string]: CacheItem<{ answers: UserAnswers; preferences: UserPreferences }>;
 }
 
+interface GenericCache {
+  [key: string]: CacheItem<any>;
+}
+
 export class CacheService {
   private compatibilityScores: CompatibilityScoreCache = {};
   private profileData: ProfileDataCache = {};
   private userResults: UserResultsCache = {};
+  private genericCache: GenericCache = {};
 
   private isExpired<T>(item: CacheItem<T>): boolean {
     return Date.now() - item.timestamp > item.ttl;
@@ -47,6 +53,32 @@ export class CacheService {
         .slice(0, entries.length - maxSize)
         .forEach(([key]) => delete cache[key]);
     }
+  }
+
+  // Generic cache methods for background processing
+  get(key: string): any | null {
+    const item = this.genericCache[key];
+    
+    if (!item || this.isExpired(item)) {
+      delete this.genericCache[key];
+      return null;
+    }
+    
+    return item.data;
+  }
+
+  set(key: string, value: any, ttl?: number): void {
+    this.genericCache[key] = {
+      data: value,
+      timestamp: Date.now(),
+      ttl: ttl || CACHE_CONFIG.GENERIC_CACHE_TTL
+    };
+    
+    this.cleanupCache(this.genericCache, CACHE_CONFIG.MAX_CACHE_SIZE);
+  }
+
+  delete(key: string): void {
+    delete this.genericCache[key];
   }
 
   // Compatibility scores caching
@@ -136,11 +168,16 @@ export class CacheService {
     this.userResults = {};
   }
 
+  clearGenericCache(): void {
+    this.genericCache = {};
+  }
+
   // Clear all caches
   clearAllCaches(): void {
     this.compatibilityScores = {};
     this.profileData = {};
     this.userResults = {};
+    this.genericCache = {};
   }
 
   // Get cache statistics
@@ -157,6 +194,10 @@ export class CacheService {
       userResults: {
         count: Object.keys(this.userResults).length,
         size: Object.keys(this.userResults).length
+      },
+      genericCache: {
+        count: Object.keys(this.genericCache).length,
+        size: Object.keys(this.genericCache).length
       }
     };
   }
