@@ -177,7 +177,8 @@ const ResourceCard: React.FC<{ resource: IslamicResource }> = ({ resource }) => 
           <Badge variant="secondary" className="bg-gradient-to-r from-rose-100 to-pink-100 dark:from-rose-800 dark:to-pink-800 text-rose-700 dark:text-rose-200">{resource.contentType}</Badge>
         </div>
         <CardTitle className="line-clamp-2 text-rose-800 dark:text-rose-200">{resource.title}</CardTitle>
-        <CardDescription className="line-clamp-2 text-rose-600 dark:text-rose-300">{resource.description}</CardHeader>
+        <CardDescription className="line-clamp-2 text-rose-600 dark:text-rose-300">{resource.description}</CardDescription>
+      </CardHeader>
       <CardContent className="flex-grow">
         <div className="flex items-center gap-2 text-sm text-rose-500 dark:text-rose-400 mb-4">
           {resource.author && (
