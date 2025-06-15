@@ -23,31 +23,45 @@ export const signIn = async (data: SignInData, t: (key: string) => string) => {
           description: "Veuillez vérifier vos identifiants"
         });
       } else if (error.message.includes("captcha verification process failed")) {
-        toast.error("Problème de vérification", {
-          description: "Veuillez réessayer dans quelques instants"
+        toast.error("Erreur de vérification CAPTCHA", {
+          description: "Veuillez désactiver le CAPTCHA dans les paramètres Supabase ou réessayer dans quelques instants",
+          duration: 6000
         });
       } else if (error.message.includes("Email not confirmed")) {
         toast.error("Email non confirmé", {
           description: "Veuillez vérifier votre email pour confirmer votre compte"
         });
+      } else if (error.message.includes("Too many requests")) {
+        toast.error("Trop de tentatives", {
+          description: "Veuillez attendre quelques minutes avant de réessayer"
+        });
       } else {
         toast.error("Erreur de connexion", {
-          description: error.message
+          description: error.message,
+          duration: 5000
         });
       }
       
       return false;
     }
     
-    console.log("Login successful");
-    toast.success("Connexion réussie", {
-      description: "Bienvenue !"
-    });
-    return true;
+    if (sessionData?.session && sessionData?.user) {
+      console.log("Login successful");
+      toast.success("Connexion réussie", {
+        description: "Bienvenue !"
+      });
+      return true;
+    } else {
+      console.log("Login failed - no session or user data");
+      toast.error("Échec de la connexion", {
+        description: "Aucune session créée"
+      });
+      return false;
+    }
   } catch (error: any) {
     console.error("Authentication error:", error);
     toast.error("Erreur inattendue", {
-      description: "Veuillez réessayer"
+      description: "Veuillez réessayer ou contacter le support"
     });
     return false;
   }
