@@ -224,10 +224,11 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
         </CardHeader>
         <CardContent>
           <EnhancedPrivacySettings
+            userId={formData.id || ""}
             privacySettings={privacySettings}
             blockedUsers={blockedUsers}
             isAccountVisible={isAccountVisible}
-            onPrivacySettingsChange={handlePrivacySettingsChange}
+            onPrivacyChange={handlePrivacySettingsChange}
             onToggleAccountVisibility={onToggleAccountVisibility}
             onUnblockUser={onUnblockUser}
           />
