@@ -24,6 +24,8 @@ export const useSubscription = () => {
     
     setLoading(true);
     try {
+      console.log('Checking subscription for user:', user.email);
+      
       const { data, error } = await supabase.functions.invoke('check-subscription');
       
       if (error) {
@@ -32,6 +34,7 @@ export const useSubscription = () => {
         return;
       }
 
+      console.log('Subscription data received:', data);
       setSubscriptionData(data);
     } catch (error) {
       console.error('Error checking subscription:', error);
@@ -47,11 +50,15 @@ export const useSubscription = () => {
       return;
     }
 
+    console.log('Creating checkout session for plan:', plan);
     setLoading(true);
+    
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
         body: { plan }
       });
+
+      console.log('Checkout response:', { data, error });
 
       if (error) {
         console.error('Error creating checkout session:', error);
@@ -59,8 +66,17 @@ export const useSubscription = () => {
         return;
       }
 
+      if (!data?.url) {
+        console.error('No URL returned from checkout session');
+        toast.error('Aucune URL de paiement reçue');
+        return;
+      }
+
+      console.log('Redirecting to checkout URL:', data.url);
       // Open Stripe checkout in new tab
       window.open(data.url, '_blank');
+      
+      toast.success('Redirection vers le paiement...');
     } catch (error) {
       console.error('Error creating checkout session:', error);
       toast.error('Erreur lors de la création de la session de paiement');
@@ -70,11 +86,18 @@ export const useSubscription = () => {
   };
 
   const openCustomerPortal = async () => {
-    if (!user) return;
+    if (!user) {
+      toast.error('Vous devez être connecté');
+      return;
+    }
 
+    console.log('Opening customer portal for user:', user.email);
     setLoading(true);
+    
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
+
+      console.log('Customer portal response:', { data, error });
 
       if (error) {
         console.error('Error opening customer portal:', error);
@@ -82,8 +105,17 @@ export const useSubscription = () => {
         return;
       }
 
+      if (!data?.url) {
+        console.error('No URL returned from customer portal');
+        toast.error('Aucune URL de portail reçue');
+        return;
+      }
+
+      console.log('Redirecting to customer portal URL:', data.url);
       // Open customer portal in new tab
       window.open(data.url, '_blank');
+      
+      toast.success('Ouverture du portail client...');
     } catch (error) {
       console.error('Error opening customer portal:', error);
       toast.error('Erreur lors de l\'ouverture du portail client');

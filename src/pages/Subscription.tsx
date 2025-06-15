@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useSubscription } from '@/hooks/useSubscription';
-import { Check, Crown, Star, Zap } from 'lucide-react';
+import { Check, Crown, Star, Zap, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Subscription = () => {
@@ -25,6 +25,21 @@ const Subscription = () => {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const handlePremiumClick = () => {
+    console.log('Premium button clicked');
+    createCheckoutSession('premium');
+  };
+
+  const handleVipClick = () => {
+    console.log('VIP button clicked');
+    createCheckoutSession('vip');
+  };
+
+  const handleManageSubscription = () => {
+    console.log('Manage subscription clicked');
+    openCustomerPortal();
   };
 
   return (
@@ -57,11 +72,18 @@ const Subscription = () => {
               </CardHeader>
               <CardContent>
                 <Button 
-                  onClick={openCustomerPortal}
+                  onClick={handleManageSubscription}
                   disabled={loading}
                   className="w-full bg-rose-600 hover:bg-rose-700 text-white"
                 >
-                  Gérer Mon Abonnement
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Chargement...
+                    </>
+                  ) : (
+                    'Gérer Mon Abonnement'
+                  )}
                 </Button>
               </CardContent>
             </Card>
@@ -153,11 +175,20 @@ const Subscription = () => {
                 </li>
               </ul>
               <Button 
-                onClick={() => createCheckoutSession('premium')}
+                onClick={handlePremiumClick}
                 disabled={loading || isPremium}
                 className="w-full bg-rose-600 hover:bg-rose-700 text-white"
               >
-                {isPremium ? 'Plan Actuel' : 'Choisir Premium'}
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Chargement...
+                  </>
+                ) : isPremium ? (
+                  'Plan Actuel'
+                ) : (
+                  'Choisir Premium'
+                )}
               </Button>
             </CardContent>
           </Card>
@@ -208,11 +239,20 @@ const Subscription = () => {
                 </li>
               </ul>
               <Button 
-                onClick={() => createCheckoutSession('vip')}
+                onClick={handleVipClick}
                 disabled={loading || isVip}
                 className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
               >
-                {isVip ? 'Plan Actuel' : 'Choisir VIP'}
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    Chargement...
+                  </>
+                ) : isVip ? (
+                  'Plan Actuel'
+                ) : (
+                  'Choisir VIP'
+                )}
               </Button>
             </CardContent>
           </Card>
