@@ -2,12 +2,30 @@
 import { supabase } from "@/integrations/supabase/client";
 import { SignUpData } from "@/types/auth";
 import { toast } from "sonner";
+import { sanitizeProfileData, validateEmail } from "@/utils/security/inputSanitization";
 
 export const signUp = async (data: SignUpData, t: (key: string) => string) => {
   const { email, password, firstName, lastName, gender, waliName, waliRelationship, waliContact } = data;
 
   try {
     console.log("Starting signup process with:", { email, firstName, lastName, gender });
+    
+    // Validate email format
+    if (!validateEmail(email)) {
+      toast.error("Email invalide", {
+        description: "Veuillez entrer une adresse email valide"
+      });
+      return false;
+    }
+
+    // Sanitize input data
+    const sanitizedData = sanitizeProfileData({
+      firstName,
+      lastName,
+      waliName,
+      waliRelationship,
+      waliContact
+    });
     
     // Check if user already exists
     const { data: existingUsers, error: checkError } = await supabase
@@ -27,7 +45,7 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
       return false;
     }
     
-    // Register the user with proper redirect URL
+    // Register the user with proper redirect URL and email confirmation required
     const redirectUrl = `${window.location.origin}/profile`;
     
     const { data: userData, error } = await supabase.auth.signUp({
@@ -36,8 +54,8 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
       options: {
         emailRedirectTo: redirectUrl,
         data: {
-          first_name: firstName,
-          last_name: lastName,
+          first_name: sanitizedData.firstName,
+          last_name: sanitizedData.lastName,
           gender: gender
         }
       }
@@ -52,7 +70,7 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
         });
       } else {
         toast.error("Erreur d'inscription", {
-          description: error.message
+          description: "Veuillez vérifier vos informations et réessayer"
         });
       }
       
@@ -64,11 +82,11 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
-      // Create profile data object with minimal required fields
+      // Create profile data object with sanitized input
       const profileInsert = {
         id: userData.user.id,
-        first_name: firstName || "",
-        last_name: lastName || "",
+        first_name: sanitizedData.firstName || "",
+        last_name: sanitizedData.lastName || "",
         gender: gender || null,
         birth_date: new Date().toISOString().split('T')[0], 
         location: "Not specified",
@@ -82,9 +100,9 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
         phone_verified: false,
         id_verified: false,
         wali_verified: false,
-        wali_name: gender === "female" ? (waliName || null) : null,
-        wali_relationship: gender === "female" ? (waliRelationship || null) : null,
-        wali_contact: gender === "female" ? (waliContact || null) : null
+        wali_name: gender === "female" ? (sanitizedData.waliName || null) : null,
+        wali_relationship: gender === "female" ? (sanitizedData.waliRelationship || null) : null,
+        wali_contact: gender === "female" ? (sanitizedData.waliContact || null) : null
       };
       
       console.log("Inserting profile data:", profileInsert);
@@ -105,7 +123,7 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     }
 
     toast.success("Inscription réussie", {
-      description: "Veuillez vérifier votre email pour confirmer votre compte"
+      description: "Veuillez vérifier votre email pour confirmer votre compte avant de vous connecter"
     });
 
     return true;

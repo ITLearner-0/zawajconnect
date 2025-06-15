@@ -2,6 +2,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { SignInData } from "@/types/auth";
 import { toast } from "sonner";
+import { enforceEmailVerification } from "./securityEnforcement";
 
 export const signIn = async (data: SignInData, t: (key: string) => string) => {
   const { email, password } = data;
@@ -17,14 +18,14 @@ export const signIn = async (data: SignInData, t: (key: string) => string) => {
     if (error) {
       console.error("Login error:", error);
       
-      // Handle specific error cases
+      // Handle specific error cases - removed CAPTCHA bypass recommendation
       if (error.message.includes("Invalid login credentials")) {
         toast.error("Email ou mot de passe incorrect", {
           description: "Veuillez vérifier vos identifiants"
         });
       } else if (error.message.includes("captcha verification process failed")) {
         toast.error("Erreur de vérification CAPTCHA", {
-          description: "Veuillez désactiver le CAPTCHA dans les paramètres Supabase ou réessayer dans quelques instants",
+          description: "Trop de tentatives de connexion. Veuillez attendre quelques minutes et réessayer.",
           duration: 6000
         });
       } else if (error.message.includes("Email not confirmed")) {
@@ -37,7 +38,7 @@ export const signIn = async (data: SignInData, t: (key: string) => string) => {
         });
       } else {
         toast.error("Erreur de connexion", {
-          description: error.message,
+          description: "Échec de la connexion. Veuillez réessayer.",
           duration: 5000
         });
       }
@@ -47,6 +48,15 @@ export const signIn = async (data: SignInData, t: (key: string) => string) => {
     
     if (sessionData?.session && sessionData?.user) {
       console.log("Login successful");
+      
+      // Enforce email verification for new security policy
+      const emailVerified = await enforceEmailVerification();
+      if (!emailVerified) {
+        // Sign out the user if email is not verified
+        await supabase.auth.signOut();
+        return false;
+      }
+      
       toast.success("Connexion réussie", {
         description: "Bienvenue !"
       });
