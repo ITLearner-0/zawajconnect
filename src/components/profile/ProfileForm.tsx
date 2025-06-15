@@ -14,6 +14,7 @@ import EnhancedPrivacySettings from "./EnhancedPrivacySettings";
 import { useSecurityMiddleware } from "@/hooks/useSecurityMiddleware";
 import { sanitizeProfileData } from "@/utils/security/inputSanitization";
 import { toast } from "sonner";
+import { PrivacySettings } from "@/types/profile";
 
 interface ProfileFormProps {
   formData: any;
@@ -97,6 +98,14 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     // Convert the newStatus object to individual field updates
     Object.keys(newStatus).forEach(field => {
       handleVerificationChange(field, newStatus[field]);
+    });
+  };
+
+  // Create a wrapper for privacy settings change to match expected signature
+  const handlePrivacyChange = (settings: PrivacySettings) => {
+    // Convert the settings object to individual field updates
+    Object.keys(settings).forEach(field => {
+      handlePrivacySettingsChange(field, settings[field as keyof PrivacySettings]);
     });
   };
 
@@ -228,7 +237,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             privacySettings={privacySettings}
             blockedUsers={blockedUsers}
             isAccountVisible={isAccountVisible}
-            onPrivacyChange={handlePrivacySettingsChange}
+            onPrivacyChange={handlePrivacyChange}
             onToggleAccountVisibility={onToggleAccountVisibility}
             onUnblockUser={onUnblockUser}
           />
