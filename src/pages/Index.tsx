@@ -8,6 +8,7 @@ import TrustBadges from "@/components/home/TrustBadges";
 import Footer from "@/components/home/Footer";
 import Divider from "@/components/home/Divider";
 import SectionTransition from "@/components/home/SectionTransition";
+import PerformanceMonitor from "@/components/ui/PerformanceMonitor";
 
 const Index = () => {
   return (
@@ -53,6 +54,7 @@ const Index = () => {
       </main>
 
       <Footer />
+      <PerformanceMonitor />
     </div>
   );
 };

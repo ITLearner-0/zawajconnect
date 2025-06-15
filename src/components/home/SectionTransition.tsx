@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 interface SectionTransitionProps {
   children: React.ReactNode;
@@ -9,13 +10,22 @@ interface SectionTransitionProps {
 }
 
 const SectionTransition = ({ children, id, className = "", delay = 0 }: SectionTransitionProps) => {
+  const { ref, hasIntersected } = useIntersectionObserver({ 
+    threshold: 0.1, 
+    rootMargin: '50px' 
+  });
+
   return (
     <section 
+      ref={ref}
       id={id}
-      className={`scroll-mt-20 transition-all duration-700 ease-in-out ${className}`}
+      className={`scroll-mt-20 transition-all duration-700 ease-in-out ${
+        hasIntersected 
+          ? 'opacity-100 translate-y-0' 
+          : 'opacity-0 translate-y-8'
+      } ${className}`}
       style={{ 
-        animationDelay: `${delay}ms`,
-        animation: 'fadeIn 0.8s ease-out forwards'
+        transitionDelay: hasIntersected ? `${delay}ms` : '0ms'
       }}
     >
       {children}
