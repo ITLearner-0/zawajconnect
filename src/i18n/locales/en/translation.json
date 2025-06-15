@@ -29,7 +29,27 @@
       "Try video calling using the video call button",
       "Experiment with different privacy and security settings",
       "Experience Wali supervision for appropriate conversations"
-    ]
+    ],
+    "availableProfiles": "Available Profiles",
+    "features": "Features",
+    "settings": "Settings",
+    "featuresList": {
+      "realtimeMessaging": "Real-time messaging (simulated)",
+      "videoCalls": "Video calls with WebRTC (simulated)",
+      "waliSupervision": "Wali supervision for female profiles",
+      "endToEndEncryption": "End-to-end encryption",
+      "messageRetention": "Message retention policies",
+      "contentMonitoring": "Content monitoring and moderation"
+    },
+    "settingsLabels": {
+      "encryption": "Encryption",
+      "retention": "Retention",
+      "aiMonitoring": "AI Monitoring",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "days": "days",
+      "permanent": "Permanent"
+    }
   },
   "home": {
     "demoSection": {

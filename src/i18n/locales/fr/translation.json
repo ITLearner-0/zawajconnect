@@ -29,7 +29,27 @@
       "Essayez l'appel vidéo en utilisant le bouton d'appel vidéo",
       "Expérimentez avec différents paramètres de confidentialité et de sécurité",
       "Découvrez la supervision Wali pour les conversations appropriées"
-    ]
+    ],
+    "availableProfiles": "Profils Disponibles",
+    "features": "Fonctionnalités",
+    "settings": "Paramètres",
+    "featuresList": {
+      "realtimeMessaging": "Messagerie en temps réel (simulée)",
+      "videoCalls": "Appels vidéo avec WebRTC (simulés)",
+      "waliSupervision": "Supervision Wali pour les profils féminins",
+      "endToEndEncryption": "Chiffrement de bout en bout",
+      "messageRetention": "Politiques de rétention des messages",
+      "contentMonitoring": "Surveillance et modération du contenu"
+    },
+    "settingsLabels": {
+      "encryption": "Chiffrement",
+      "retention": "Rétention",
+      "aiMonitoring": "Surveillance IA",
+      "enabled": "Activé",
+      "disabled": "Désactivé",
+      "days": "jours",
+      "permanent": "Permanent"
+    }
   },
   "home": {
     "demoSection": {
