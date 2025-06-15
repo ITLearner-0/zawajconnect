@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Play, ChevronDown } from "lucide-react";
+import { ArrowRight, Play, ChevronDown, LogIn } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import AccessibilityControls from "@/components/AccessibilityControls";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
@@ -43,6 +43,17 @@ const EnhancedHeroSection = () => {
             <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-rose-400 via-pink-400 to-rose-400 rounded-full opacity-60"></div>
           </div>
           <div className="flex items-center gap-4">
+            <Button 
+              asChild 
+              variant="ghost"
+              size="sm"
+              className="text-rose-600 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-800/30"
+            >
+              <Link to="/auth" className="flex items-center gap-2">
+                <LogIn className="h-4 w-4" />
+                Se Connecter
+              </Link>
+            </Button>
             <LanguageSwitcher />
             <AccessibilityControls />
             <ThemeToggle />
@@ -95,6 +106,21 @@ const EnhancedHeroSection = () => {
             <Link to="/auth?signup=true&gender=male" className="flex items-center gap-2">
               INSCRIPTION HOMME
               <ArrowRight className="h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
+
+        {/* Sign In Button */}
+        <div className="flex justify-center mb-8">
+          <Button 
+            asChild 
+            variant="ghost"
+            size="sm"
+            className="text-rose-600 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-800/30 border border-rose-300 dark:border-rose-600"
+          >
+            <Link to="/auth" className="flex items-center gap-2">
+              <LogIn className="h-4 w-4" />
+              Déjà membre ? Se connecter
             </Link>
           </Button>
         </div>
