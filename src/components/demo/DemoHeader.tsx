@@ -7,6 +7,10 @@ import { useTranslation } from 'react-i18next';
 const DemoHeader = () => {
   const { t } = useTranslation();
 
+  // Safely get the arrays with proper typing
+  const messagingTips = t('demo.messagingTips', { returnObjects: true }) as string[];
+  const videoTips = t('demo.videoTips', { returnObjects: true }) as string[];
+
   return (
     <IslamicPattern variant="border" className="mb-6 bg-white">
       <Card className="border-0 shadow-none bg-transparent">
@@ -29,7 +33,7 @@ const DemoHeader = () => {
                 <h3 className="font-medium">{t('demo.messagingFeatures')}</h3>
               </div>
               <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
-                {t('demo.messagingTips', { returnObjects: true }).map((tip: string, index: number) => (
+                {Array.isArray(messagingTips) && messagingTips.map((tip: string, index: number) => (
                   <li key={index}>{tip}</li>
                 ))}
               </ul>
@@ -41,7 +45,7 @@ const DemoHeader = () => {
                 <h3 className="font-medium">{t('demo.videoFeatures')}</h3>
               </div>
               <ul className="text-sm text-muted-foreground space-y-1 ml-6 list-disc">
-                {t('demo.videoTips', { returnObjects: true }).map((tip: string, index: number) => (
+                {Array.isArray(videoTips) && videoTips.map((tip: string, index: number) => (
                   <li key={index}>{tip}</li>
                 ))}
               </ul>
