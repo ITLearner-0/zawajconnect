@@ -9,7 +9,9 @@ import EducationFilter from './EducationFilter';
 import AdvancedFilterPanel from './AdvancedFilterPanel';
 import SavedFilters from './SavedFilters';
 import FilterActions from './FilterActions';
+import SaveFilterForm from './SaveFilterForm';
 import { useTranslation } from 'react-i18next';
+import { getSavedFilters, saveFilter, deleteSavedFilter } from '@/utils/location/filterUtils';
 
 interface FilterPanelProps {
   onApplyFilters: (filters: FilterCriteria) => void;
@@ -18,6 +20,8 @@ interface FilterPanelProps {
 const FilterPanel: React.FC<FilterPanelProps> = ({ onApplyFilters }) => {
   const { t } = useTranslation();
   const [filters, setFilters] = useState<FilterCriteria>({});
+  const [savedFilters, setSavedFilters] = useState<Record<string, FilterCriteria>>(getSavedFilters());
+  const [showSaveForm, setShowSaveForm] = useState(false);
 
   const handleFilterChange = (key: keyof FilterCriteria, value: any) => {
     setFilters(prev => ({
@@ -30,9 +34,32 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ onApplyFilters }) => {
     onApplyFilters(filters);
   };
 
-  const handleClearFilters = () => {
+  const handleResetFilters = () => {
     setFilters({});
     onApplyFilters({});
+  };
+
+  const handleSaveFilter = (name: string) => {
+    saveFilter(name, filters);
+    setSavedFilters(getSavedFilters());
+    setShowSaveForm(false);
+  };
+
+  const handleLoadFilter = (name: string) => {
+    const savedFilter = savedFilters[name];
+    if (savedFilter) {
+      setFilters(savedFilter);
+      onApplyFilters(savedFilter);
+    }
+  };
+
+  const handleDeleteFilter = (name: string) => {
+    deleteSavedFilter(name);
+    setSavedFilters(getSavedFilters());
+  };
+
+  const handleShowSaveForm = () => {
+    setShowSaveForm(true);
   };
 
   return (
@@ -63,26 +90,46 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ onApplyFilters }) => {
           
           <FilterActions 
             onApply={handleApplyFilters}
-            onClear={handleClearFilters}
-            onSave={() => {}} // Implement save functionality
+            onReset={handleResetFilters}
+            onShowSaveForm={handleShowSaveForm}
+            showSaveForm={showSaveForm}
           />
+          
+          {showSaveForm && (
+            <SaveFilterForm 
+              onSave={handleSaveFilter}
+              onCancel={() => setShowSaveForm(false)}
+            />
+          )}
         </TabsContent>
         
         <TabsContent value="advanced" className="space-y-4">
           <AdvancedFilterPanel 
-            filters={filters.advanced}
-            onChange={(advanced) => handleFilterChange('advanced', advanced)}
+            filters={filters.advanced || {}}
+            onFiltersChange={(advanced) => handleFilterChange('advanced', advanced)}
           />
           
           <FilterActions 
             onApply={handleApplyFilters}
-            onClear={handleClearFilters}
-            onSave={() => {}} // Implement save functionality
+            onReset={handleResetFilters}
+            onShowSaveForm={handleShowSaveForm}
+            showSaveForm={showSaveForm}
           />
+          
+          {showSaveForm && (
+            <SaveFilterForm 
+              onSave={handleSaveFilter}
+              onCancel={() => setShowSaveForm(false)}
+            />
+          )}
         </TabsContent>
       </Tabs>
       
-      <SavedFilters onLoadFilter={(savedFilter) => setFilters(savedFilter)} />
+      <SavedFilters 
+        savedFilters={savedFilters}
+        onLoadFilter={handleLoadFilter}
+        onDeleteFilter={handleDeleteFilter}
+      />
     </div>
   );
 };
