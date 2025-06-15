@@ -205,7 +205,6 @@ const EnhancedHeroSection = () => {
             <SmoothScrollButton 
               targetSection="trust"
               variant="outline"
-              size="lg"
               className="border-2 border-rose-400 text-rose-600 bg-white/50 backdrop-blur-sm hover:bg-rose-50 dark:border-rose-300 dark:text-rose-200 dark:bg-rose-900/30 dark:hover:bg-rose-800/50 font-bold px-8 py-3 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
             >
               En Savoir Plus
