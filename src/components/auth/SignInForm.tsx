@@ -21,16 +21,18 @@ const SignInForm: React.FC<SignInFormProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  // Create schema for form validation
+  // Create schema for form validation with proper French messages
   const formSchema = z.object({
-    email: z.string().email(t("auth.invalidEmail")).min(1, t("auth.emailRequired")),
-    password: z.string().min(6, t("auth.passwordMinLength")).max(100, t("auth.passwordMaxLength")),
+    email: z.string()
+      .email("Veuillez entrer une adresse email valide")
+      .min(1, "L'email est requis"),
+    password: z.string()
+      .min(6, "Le mot de passe doit contenir au moins 6 caractères")
+      .max(100, "Le mot de passe ne peut pas dépasser 100 caractères"),
   });
 
-  // Define the form values type based on the schema
   type FormValues = z.infer<typeof formSchema>;
 
-  // Initialize form with react-hook-form
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,7 +42,6 @@ const SignInForm: React.FC<SignInFormProps> = ({
     mode: "onChange"
   });
 
-  // Handle form submission
   const handleSubmit = (values: FormValues) => {
     onSubmit({
       email: values.email,
@@ -52,11 +53,11 @@ const SignInForm: React.FC<SignInFormProps> = ({
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormItem>
-          <FormLabel>{t("auth.email")}</FormLabel>
+          <FormLabel>Email</FormLabel>
           <FormControl>
             <Input
               {...form.register("email")}
-              placeholder={t("auth.emailPlaceholder")}
+              placeholder="votre.email@exemple.com"
               type="email"
               autoComplete="email"
               disabled={loading}
@@ -81,7 +82,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
           isLoading={loading}
           variant="gold"
         >
-          {t("auth.signIn")}
+          Se Connecter
         </CustomButton>
       </form>
     </Form>

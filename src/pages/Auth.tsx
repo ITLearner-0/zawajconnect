@@ -39,8 +39,8 @@ const Auth = () => {
       }
     } catch (error) {
       console.error("Unexpected error during sign in:", error);
-      toast(t("auth.loginError"), {
-        description: t("auth.unexpectedError")
+      toast.error("Erreur de connexion", {
+        description: "Une erreur inattendue s'est produite"
       });
     }
   };
@@ -50,11 +50,14 @@ const Auth = () => {
       const success = await signUp(data);
       if (success) {
         setIsSignUp(false);
+        toast.success("Inscription réussie", {
+          description: "Vous pouvez maintenant vous connecter"
+        });
       }
     } catch (error) {
       console.error("Unexpected error during registration:", error);
-      toast(t("auth.registrationError"), {
-        description: t("auth.unexpectedError")
+      toast.error("Erreur d'inscription", {
+        description: "Une erreur inattendue s'est produite"
       });
     }
   };
@@ -80,8 +83,8 @@ const Auth = () => {
           className="text-sm text-rose-600 dark:text-rose-300 hover:underline transition-colors"
         >
           {isSignUp
-            ? t("auth.alreadyHaveAccount")
-            : t("auth.dontHaveAccount")}
+            ? "Vous avez déjà un compte ? Se connecter"
+            : "Pas encore de compte ? S'inscrire"}
         </button>
       </div>
     </AuthLayout>

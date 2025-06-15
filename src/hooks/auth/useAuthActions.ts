@@ -14,29 +14,47 @@ export const useAuthActions = () => {
 
   const handleSignUp = async (data: SignUpData) => {
     setLoading(true);
-    const result = await signUp(data, t);
-    setLoading(false);
-    return result;
+    try {
+      const result = await signUp(data, t);
+      setLoading(false);
+      return result;
+    } catch (error) {
+      console.error("Error in handleSignUp:", error);
+      setLoading(false);
+      return false;
+    }
   };
 
   const handleSignIn = async (data: SignInData) => {
     setLoading(true);
-    const result = await signIn(data, t);
-    if (result) {
-      navigate("/profile");
+    try {
+      const result = await signIn(data, t);
+      if (result) {
+        navigate("/profile");
+      }
+      setLoading(false);
+      return result;
+    } catch (error) {
+      console.error("Error in handleSignIn:", error);
+      setLoading(false);
+      return false;
     }
-    setLoading(false);
-    return result;
   };
 
   const handleSignOut = async () => {
     setLoading(true);
-    const result = await signOut(t);
-    if (result) {
-      navigate("/auth");
+    try {
+      const result = await signOut(t);
+      if (result) {
+        navigate("/auth");
+      }
+      setLoading(false);
+      return result;
+    } catch (error) {
+      console.error("Error in handleSignOut:", error);
+      setLoading(false);
+      return false;
     }
-    setLoading(false);
-    return result;
   };
 
   return {

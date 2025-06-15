@@ -21,17 +21,20 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     }
 
     if (existingUsers) {
-      toast(t("auth.emailAlreadyExists"), {
-        description: t("auth.registrationError")
+      toast.error("Email déjà utilisé", {
+        description: "Un compte existe déjà avec cette adresse email"
       });
       return false;
     }
     
-    // Register the user
+    // Register the user with proper redirect URL
+    const redirectUrl = `${window.location.origin}/profile`;
+    
     const { data: userData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
+        emailRedirectTo: redirectUrl,
         data: {
           first_name: firstName,
           last_name: lastName,
@@ -44,12 +47,12 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
       console.error("Signup error:", error);
       
       if (error.message.includes("already registered")) {
-        toast(t("auth.emailAlreadyExists"), {
-          description: t("auth.registrationError")
+        toast.error("Email déjà utilisé", {
+          description: "Un compte existe déjà avec cette adresse email"
         });
       } else {
-        toast(error.message, {
-          description: t("auth.registrationError")
+        toast.error("Erreur d'inscription", {
+          description: error.message
         });
       }
       
@@ -93,23 +96,23 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
 
       if (profileError) {
         console.error("Error creating initial profile:", profileError);
-        toast(profileError.message, {
-          description: "Profile Creation Error"
+        toast.error("Erreur de création du profil", {
+          description: profileError.message
         });
       } else {
         console.log("Profile created successfully");
       }
     }
 
-    toast(t("auth.emailVerification"), {
-      description: t("auth.success")
+    toast.success("Inscription réussie", {
+      description: "Veuillez vérifier votre email pour confirmer votre compte"
     });
 
     return true;
   } catch (error: any) {
     console.error("Authentication error:", error);
-    toast(error.message, {
-      description: "Error"
+    toast.error("Erreur inattendue", {
+      description: "Veuillez réessayer"
     });
     return false;
   }

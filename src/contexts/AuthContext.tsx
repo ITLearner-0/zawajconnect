@@ -1,8 +1,8 @@
+
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { useAuthState } from '@/hooks/auth/useAuthState';
 import { useAuthActions } from '@/hooks/auth/useAuthActions';
-import { useAuthRedirect } from '@/hooks/auth/useAuthRedirect';
 import { supabase } from '@/integrations/supabase/client';
 
 interface AuthContextType {
@@ -66,9 +66,6 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [user]);
 
   const loading = authLoading || actionsLoading;
-
-  // Keep existing useAuthRedirect
-  useAuthRedirect({ user, loading });
 
   const value = {
     user,
