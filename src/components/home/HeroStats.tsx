@@ -4,10 +4,10 @@ import { Users, Heart, Shield, Star } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 const stats = [
-  { icon: Users, value: "10,000+", label: "Membres Actifs", targetNumber: 10000 },
-  { icon: Heart, value: "500+", label: "Mariages Réussis", targetNumber: 500 },
-  { icon: Shield, value: "100%", label: "Halal Vérifié", targetNumber: 100 },
-  { icon: Star, value: "4.9/5", label: "Satisfaction", targetNumber: 4.9 }
+  { icon: Users, value: "2,500+", label: "Membres Actifs", targetNumber: 2500 },
+  { icon: Heart, value: "150+", label: "Mariages Halal", targetNumber: 150 },
+  { icon: Shield, value: "100%", label: "Conformité Islamique", targetNumber: 100 },
+  { icon: Star, value: "4.8/5", label: "Supervision Wali", targetNumber: 4.8 }
 ];
 
 const AnimatedNumber = memo(({ target, suffix = "", decimals = 0 }: { target: number, suffix?: string, decimals?: number }) => {
@@ -58,9 +58,9 @@ const StatCard = memo(({ stat, index }: { stat: typeof stats[0], index: number }
       <stat.icon className="h-6 w-6 text-rose-600 dark:text-rose-300 mx-auto mb-2" />
       <div className="text-lg font-bold text-rose-800 dark:text-rose-200">
         {hasIntersected ? (
-          stat.label === "Satisfaction" ? (
+          stat.label === "Supervision Wali" ? (
             <AnimatedNumber target={stat.targetNumber} suffix="/5" decimals={1} />
-          ) : stat.label === "Halal Vérifié" ? (
+          ) : stat.label === "Conformité Islamique" ? (
             <AnimatedNumber target={stat.targetNumber} suffix="%" />
           ) : (
             <AnimatedNumber target={stat.targetNumber} suffix="+" />
