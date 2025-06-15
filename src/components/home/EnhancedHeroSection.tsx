@@ -29,7 +29,7 @@ const EnhancedHeroSection = () => {
       <nav className="absolute top-0 left-0 right-0 z-20 p-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="relative">
-            <div className="text-4xl md:text-5xl font-bold text-rose-800 dark:text-rose-100 font-serif tracking-wide">
+            <div className="text-5xl md:text-6xl lg:text-7xl font-bold text-rose-800 dark:text-rose-100 font-serif tracking-wide">
               <span className="relative inline-block">
                 <span className="bg-gradient-to-r from-rose-600 via-pink-500 to-rose-500 dark:from-rose-200 dark:via-pink-200 dark:to-rose-300 bg-clip-text text-transparent drop-shadow-sm">
                   Nikah
@@ -62,10 +62,10 @@ const EnhancedHeroSection = () => {
       </nav>
       
       {/* Hero Content */}
-      <div className="relative z-10 text-center max-w-6xl mx-auto">
+      <div className="relative z-10 text-center max-w-6xl mx-auto pt-32">
         <IslamicBismillah />
         
-        <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-6 text-rose-800 dark:text-rose-100 font-serif leading-tight">
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 text-rose-800 dark:text-rose-100 font-serif leading-tight">
           SE MARIER DE MANIÈRE
           <span className="block bg-gradient-to-r from-rose-500 to-pink-400 dark:from-rose-300 dark:to-pink-200 bg-clip-text text-transparent animate-title-pulse">
             LÉGIFÉRÉE
