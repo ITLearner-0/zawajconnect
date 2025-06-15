@@ -7,6 +7,7 @@ import EnhancedTestimonialsSection from "@/components/home/EnhancedTestimonialsS
 import TrustBadges from "@/components/home/TrustBadges";
 import Footer from "@/components/home/Footer";
 import Divider from "@/components/home/Divider";
+import SectionTransition from "@/components/home/SectionTransition";
 
 const Index = () => {
   return (
@@ -15,30 +16,40 @@ const Index = () => {
 
       <main className="relative bg-gradient-to-b from-rose-50 to-pink-50 dark:from-rose-950 dark:to-pink-950">
         {/* Trust Badges Section */}
-        <section className="py-16 md:py-20 px-4">
-          <div className="max-w-7xl mx-auto text-center">
-            <h3 className="text-2xl md:text-3xl font-bold mb-12 text-rose-800 dark:text-rose-200">
-              Pourquoi Nous Faire Confiance ?
-            </h3>
-            <TrustBadges />
-          </div>
-        </section>
+        <SectionTransition id="trust" delay={100}>
+          <section className="py-16 md:py-20 px-4">
+            <div className="max-w-7xl mx-auto text-center">
+              <h3 className="text-2xl md:text-3xl font-bold mb-12 text-rose-800 dark:text-rose-200">
+                Pourquoi Nous Faire Confiance ?
+              </h3>
+              <TrustBadges />
+            </div>
+          </section>
+        </SectionTransition>
 
         <Divider />
 
-        <FeaturesSection />
+        <SectionTransition id="features" delay={200}>
+          <FeaturesSection />
+        </SectionTransition>
 
         <Divider />
 
-        <DemoSection />
+        <SectionTransition id="demo" delay={300}>
+          <DemoSection />
+        </SectionTransition>
 
         <Divider variant="pink" />
 
-        <ResourcesSection />
+        <SectionTransition id="resources" delay={400}>
+          <ResourcesSection />
+        </SectionTransition>
 
         <Divider />
 
-        <EnhancedTestimonialsSection />
+        <SectionTransition id="testimonials" delay={500}>
+          <EnhancedTestimonialsSection />
+        </SectionTransition>
       </main>
 
       <Footer />

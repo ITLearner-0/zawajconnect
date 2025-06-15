@@ -1,12 +1,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Play } from "lucide-react";
+import { ArrowRight, Play, ChevronDown } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import AccessibilityControls from "@/components/AccessibilityControls";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import IslamicBismillah from "./IslamicBismillah";
 import HeroStats from "./HeroStats";
+import SmoothScrollButton from "./SmoothScrollButton";
 
 const EnhancedHeroSection = () => {
   return (
@@ -112,26 +113,30 @@ const EnhancedHeroSection = () => {
             </Link>
           </Button>
           
-          <Button 
-            asChild 
+          <SmoothScrollButton 
+            targetSection="features"
             variant="ghost"
-            size="sm"
             className="text-rose-600 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-800/30"
           >
-            <Link to="/resources" className="flex items-center gap-2">
-              En Savoir Plus
-            </Link>
-          </Button>
+            En Savoir Plus
+          </SmoothScrollButton>
         </div>
       </div>
       
       {/* Enhanced Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-rose-600 dark:text-rose-300 animate-bounce">
-        <div className="w-6 h-10 border-2 border-rose-400 dark:border-rose-300 rounded-full flex justify-center relative">
-          <div className="w-1 h-3 bg-rose-400 dark:bg-rose-300 rounded-full mt-2 animate-pulse"></div>
+      <SmoothScrollButton 
+        targetSection="trust"
+        variant="ghost"
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-rose-600 dark:text-rose-300 animate-bounce p-2"
+      >
+        <div className="flex flex-col items-center">
+          <div className="w-6 h-10 border-2 border-rose-400 dark:border-rose-300 rounded-full flex justify-center relative">
+            <div className="w-1 h-3 bg-rose-400 dark:bg-rose-300 rounded-full mt-2 animate-pulse"></div>
+          </div>
+          <ChevronDown className="h-4 w-4 mt-2" />
+          <p className="text-xs mt-1 font-medium">Découvrir</p>
         </div>
-        <p className="text-xs mt-2 font-medium">Découvrir</p>
-      </div>
+      </SmoothScrollButton>
     </header>
   );
 };
