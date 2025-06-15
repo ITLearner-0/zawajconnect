@@ -5,6 +5,7 @@ import ProfileList from '@/components/demo/ProfileList';
 import FeaturesAndSettings from '@/components/demo/FeaturesAndSettings';
 import MessagingInterface from '@/components/demo/MessagingInterface';
 import DemoHeader from '@/components/demo/DemoHeader';
+import DemoNavigation from '@/components/demo/DemoNavigation';
 import { useMessagingDemo } from '@/hooks/useMessagingDemo';
 import { DatabaseProfile } from '@/types/profile';
 import { useNavigate } from 'react-router-dom';
@@ -68,6 +69,8 @@ const Demo = () => {
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
+      <DemoNavigation />
+      
       <div className="container mx-auto py-6">
         <DemoHeader />
         
