@@ -1,33 +1,33 @@
 
 import React, { memo } from 'react';
-import { Shield, Award, Users, CheckCircle } from 'lucide-react';
+import { Shield, Heart, Users, CheckCircle } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 const badges = [
   {
     icon: Shield,
-    title: "Certifié Halal",
-    description: "Approuvé par des érudits islamiques"
+    title: "Respect des Valeurs",
+    description: "Conçu selon les principes islamiques"
   },
   {
-    icon: Award,
-    title: "Leader du Marché",
-    description: "N°1 des plateformes de mariage islamique"
+    icon: Heart,
+    title: "Supervision Wali",
+    description: "Conversations supervisées par le tuteur"
   },
   {
     icon: Users,
-    title: "Communauté Vérifiée",
-    description: "Tous les profils sont authentifiés"
+    title: "Communauté Respectueuse",
+    description: "Utilisateurs partageant les mêmes valeurs"
   },
   {
     icon: CheckCircle,
-    title: "Sécurisé",
-    description: "Données protégées et confidentielles"
+    title: "Plateforme Sécurisée",
+    description: "Chiffrement des données personnelles"
   }
 ];
 
 const TrustBadge = memo(({ badge, index }: { badge: typeof badges[0], index: number }) => {
-  const { ref, hasIntersected } = useIntersectionObserver({ threshold: 0.2 });
+  const { ref, hasIntersected } = useIntersectionObserver<HTMLDivElement>({ threshold: 0.2 });
 
   return (
     <div 
