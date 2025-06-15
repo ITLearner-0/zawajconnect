@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { MessageSquare, Video } from "lucide-react";
+import { MessageSquare, Video, Play, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DemoLinkProps {
@@ -13,14 +13,16 @@ const DemoLink = ({ className }: DemoLinkProps) => {
     <div className={cn("flex justify-center", className)}>
       <Button 
         asChild 
-        variant="outline" 
         size="lg" 
-        className="gap-2 border-islamic-gold text-islamic-gold bg-transparent hover:bg-islamic-gold/10 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 dark:border-islamic-darkGold dark:text-islamic-darkGold dark:hover:bg-islamic-darkGold/10"
+        className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold px-8 py-4 rounded-full shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 text-base border-0 group"
       >
-        <Link to="/demo">
-          <MessageSquare className="h-5 w-5" />
-          <Video className="h-5 w-5" />
-          <span>Try Messaging & Video Demo</span>
+        <Link to="/demo" className="flex items-center gap-3">
+          <div className="flex items-center gap-1">
+            <MessageSquare className="h-5 w-5" />
+            <Video className="h-5 w-5" />
+          </div>
+          <span>Tester la Démo Interactive</span>
+          <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
         </Link>
       </Button>
     </div>
@@ -28,4 +30,3 @@ const DemoLink = ({ className }: DemoLinkProps) => {
 };
 
 export default DemoLink;
-
