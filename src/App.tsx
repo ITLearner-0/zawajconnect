@@ -22,18 +22,18 @@ function App() {
   return (
     <ThemeProvider>
       <AccessibilityProvider>
-        <AuthProvider>
-          <LazyLoadingProvider
-            initialConfig={{
-              enableAnalytics: true,
-              enableDebug: process.env.NODE_ENV === 'development',
-              batchSize: 8,
-              preloadDistance: 300,
-              networkOptimization: true,
-              memoryOptimization: true,
-            }}
-          >
-            <Router>
+        <LazyLoadingProvider
+          initialConfig={{
+            enableAnalytics: true,
+            enableDebug: process.env.NODE_ENV === 'development',
+            batchSize: 8,
+            preloadDistance: 300,
+            networkOptimization: true,
+            memoryOptimization: true,
+          }}
+        >
+          <Router>
+            <AuthProvider>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
@@ -51,9 +51,9 @@ function App() {
                 <Route path="/subscription" element={<Subscription />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </Router>
-          </LazyLoadingProvider>
-        </AuthProvider>
+            </AuthProvider>
+          </Router>
+        </LazyLoadingProvider>
       </AccessibilityProvider>
     </ThemeProvider>
   );
