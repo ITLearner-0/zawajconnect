@@ -104,6 +104,31 @@ const Profile = () => {
     }
   };
   
+  // Create a wrapper for handleChange to match expected signature
+  const handleFieldChange = (field: string, value: any) => {
+    // Convert to the event-based signature that handleChange expects
+    const event = {
+      target: {
+        name: field,
+        value: value
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    handleChange(event);
+  };
+
+  // Create a wrapper for verification change to match expected signature
+  const handleVerificationFieldChange = (field: string, value: boolean) => {
+    const newStatus = { ...verificationStatus, [field]: value };
+    handleVerificationChange(newStatus);
+  };
+
+  // Create a wrapper for privacy settings change
+  const handlePrivacyFieldChange = (field: string, value: any) => {
+    const newSettings = { ...privacySettings, [field]: value };
+    handlePrivacySettingsChange(newSettings);
+  };
+  
   // Wrapper functions to convert boolean returns to void
   const handleToggleVisibility = async () => {
     await toggleAccountVisibility();
@@ -145,15 +170,15 @@ const Profile = () => {
             <CardContent>
               <ProfileForm
                 formData={formData}
-                handleChange={handleChange}
+                handleChange={handleFieldChange}
                 handleSubmit={handleSaveProfile}
                 verificationStatus={verificationStatus}
                 userEmail={userEmail}
-                handleVerificationChange={handleVerificationChange}
+                handleVerificationChange={handleVerificationFieldChange}
                 privacySettings={privacySettings}
                 blockedUsers={blockedUsers}
                 isAccountVisible={isAccountVisible}
-                handlePrivacySettingsChange={handlePrivacySettingsChange}
+                handlePrivacySettingsChange={handlePrivacyFieldChange}
                 onToggleAccountVisibility={handleToggleVisibility}
                 onUnblockUser={handleUnblockUser}
               />

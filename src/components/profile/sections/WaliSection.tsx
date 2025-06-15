@@ -1,62 +1,62 @@
 
 import React from "react";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { ProfileFormData } from "@/types/profile";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface WaliSectionProps {
-  form: UseFormReturn<ProfileFormData>;
-  isOnboarding?: boolean;
-  showWaliFields?: boolean;
+  formData: any;
+  handleChange: (field: string, value: any) => void;
 }
 
-const WaliSection: React.FC<WaliSectionProps> = ({ form, isOnboarding, showWaliFields }) => {
-  if (!showWaliFields) return null;
+const WaliSection: React.FC<WaliSectionProps> = ({ formData, handleChange }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleChange(e.target.name, e.target.value);
+  };
+
+  const handleSelectChange = (field: string, value: string) => {
+    handleChange(field, value);
+  };
 
   return (
     <div className="space-y-4">
-      <FormItem>
-        <FormLabel>Wali Name</FormLabel>
-        <FormControl>
-          <Input
-            {...form.register("waliName")}
-            placeholder="Enter your wali's name"
-            disabled={!isOnboarding}
-          />
-        </FormControl>
-        {form.formState.errors.waliName && (
-          <FormMessage>{String(form.formState.errors.waliName.message)}</FormMessage>
-        )}
-      </FormItem>
+      <div className="space-y-2">
+        <Label htmlFor="waliName">Nom du Wali</Label>
+        <Input
+          id="waliName"
+          name="waliName"
+          value={formData.waliName || ""}
+          onChange={handleInputChange}
+          placeholder="Entrez le nom de votre wali"
+        />
+      </div>
 
-      <FormItem>
-        <FormLabel>Wali Relationship</FormLabel>
-        <FormControl>
-          <Input
-            {...form.register("waliRelationship")}
-            placeholder="Enter relationship to wali"
-            disabled={!isOnboarding}
-          />
-        </FormControl>
-        {form.formState.errors.waliRelationship && (
-          <FormMessage>{String(form.formState.errors.waliRelationship.message)}</FormMessage>
-        )}
-      </FormItem>
+      <div className="space-y-2">
+        <Label htmlFor="waliRelationship">Relation</Label>
+        <Select value={formData.waliRelationship || ""} onValueChange={(value) => handleSelectChange("waliRelationship", value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionnez la relation" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="father">Père</SelectItem>
+            <SelectItem value="brother">Frère</SelectItem>
+            <SelectItem value="uncle">Oncle</SelectItem>
+            <SelectItem value="grandfather">Grand-père</SelectItem>
+            <SelectItem value="other">Autre parent masculin</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-      <FormItem>
-        <FormLabel>Wali Contact</FormLabel>
-        <FormControl>
-          <Input
-            {...form.register("waliContact")}
-            placeholder="Enter wali's contact information"
-            disabled={!isOnboarding}
-          />
-        </FormControl>
-        {form.formState.errors.waliContact && (
-          <FormMessage>{String(form.formState.errors.waliContact.message)}</FormMessage>
-        )}
-      </FormItem>
+      <div className="space-y-2">
+        <Label htmlFor="waliContact">Contact du Wali</Label>
+        <Input
+          id="waliContact"
+          name="waliContact"
+          value={formData.waliContact || ""}
+          onChange={handleInputChange}
+          placeholder="Numéro de contact du wali"
+        />
+      </div>
     </div>
   );
 };

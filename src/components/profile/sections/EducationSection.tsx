@@ -1,45 +1,43 @@
 
 import React from "react";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { ProfileFormData } from "@/types/profile";
+import { Label } from "@/components/ui/label";
 
 interface EducationSectionProps {
-  form: UseFormReturn<ProfileFormData>;
-  isOnboarding?: boolean;
+  formData: any;
+  handleChange: (field: string, value: any) => void;
 }
 
-const EducationSection: React.FC<EducationSectionProps> = ({ form, isOnboarding }) => {
+const EducationSection: React.FC<EducationSectionProps> = ({ formData, handleChange }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleChange(e.target.name, e.target.value);
+  };
+
   return (
     <div className="space-y-4">
-      <FormItem>
-        <FormLabel>Education</FormLabel>
-        <FormControl>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="education">Niveau d'Éducation</Label>
           <Input
-            {...form.register("education")}
-            placeholder="Enter your education level"
-            disabled={!isOnboarding}
+            id="education"
+            name="education"
+            value={formData.education || ""}
+            onChange={handleInputChange}
+            placeholder="Entrez votre niveau d'éducation"
           />
-        </FormControl>
-        {form.formState.errors.education && (
-          <FormMessage>{String(form.formState.errors.education.message)}</FormMessage>
-        )}
-      </FormItem>
+        </div>
 
-      <FormItem>
-        <FormLabel>Occupation</FormLabel>
-        <FormControl>
+        <div className="space-y-2">
+          <Label htmlFor="occupation">Profession</Label>
           <Input
-            {...form.register("occupation")}
-            placeholder="Enter your occupation"
-            disabled={!isOnboarding}
+            id="occupation"
+            name="occupation"
+            value={formData.occupation || ""}
+            onChange={handleInputChange}
+            placeholder="Entrez votre profession"
           />
-        </FormControl>
-        {form.formState.errors.occupation && (
-          <FormMessage>{String(form.formState.errors.occupation.message)}</FormMessage>
-        )}
-      </FormItem>
+        </div>
+      </div>
     </div>
   );
 };

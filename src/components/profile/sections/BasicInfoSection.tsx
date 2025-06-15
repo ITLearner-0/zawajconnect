@@ -1,74 +1,75 @@
 
 import React from "react";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { ProfileFormData } from "@/types/profile";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface BasicInfoSectionProps {
-  form: UseFormReturn<ProfileFormData>;
-  isOnboarding?: boolean;
+  formData: any;
+  handleChange: (field: string, value: any) => void;
 }
 
-const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ form, isOnboarding }) => {
+const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleChange }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    handleChange(e.target.name, e.target.value);
+  };
+
+  const handleSelectChange = (field: string, value: string) => {
+    handleChange(field, value);
+  };
+
   return (
     <div className="space-y-4">
-      <FormItem>
-        <FormLabel>Full Name</FormLabel>
-        <FormControl>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="fullName">Nom Complet</Label>
           <Input
-            {...form.register("fullName")}
-            placeholder="Enter your full name"
-            disabled={!isOnboarding}
+            id="fullName"
+            name="fullName"
+            value={formData.fullName || ""}
+            onChange={handleInputChange}
+            placeholder="Entrez votre nom complet"
           />
-        </FormControl>
-        {form.formState.errors.fullName && (
-          <FormMessage>{String(form.formState.errors.fullName.message)}</FormMessage>
-        )}
-      </FormItem>
-
-      <FormItem>
-        <FormLabel>Age</FormLabel>
-        <FormControl>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="age">Âge</Label>
           <Input
-            {...form.register("age")}
+            id="age"
+            name="age"
             type="number"
-            placeholder="Enter your age"
-            disabled={!isOnboarding}
+            value={formData.age || ""}
+            onChange={handleInputChange}
+            placeholder="Votre âge"
+            min="18"
+            max="120"
           />
-        </FormControl>
-        {form.formState.errors.age && (
-          <FormMessage>{String(form.formState.errors.age.message)}</FormMessage>
-        )}
-      </FormItem>
-
-      <FormItem>
-        <FormLabel>Gender</FormLabel>
-        <FormControl>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="gender">Genre</Label>
+          <Select value={formData.gender || ""} onValueChange={(value) => handleSelectChange("gender", value)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Sélectionnez votre genre" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="male">Homme</SelectItem>
+              <SelectItem value="female">Femme</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="location">Localisation</Label>
           <Input
-            {...form.register("gender")}
-            placeholder="Enter your gender"
-            disabled={!isOnboarding}
+            id="location"
+            name="location"
+            value={formData.location || ""}
+            onChange={handleInputChange}
+            placeholder="Ville, Pays"
           />
-        </FormControl>
-        {form.formState.errors.gender && (
-          <FormMessage>{String(form.formState.errors.gender.message)}</FormMessage>
-        )}
-      </FormItem>
-
-      <FormItem>
-        <FormLabel>Location</FormLabel>
-        <FormControl>
-          <Input
-            {...form.register("location")}
-            placeholder="Enter your location"
-            disabled={!isOnboarding}
-          />
-        </FormControl>
-        {form.formState.errors.location && (
-          <FormMessage>{String(form.formState.errors.location.message)}</FormMessage>
-        )}
-      </FormItem>
+        </div>
+      </div>
     </div>
   );
 };

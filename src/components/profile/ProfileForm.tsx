@@ -26,8 +26,8 @@ interface ProfileFormProps {
   blockedUsers: string[];
   isAccountVisible: boolean;
   handlePrivacySettingsChange: (field: string, value: any) => void;
-  onToggleAccountVisibility: () => void;
-  onUnblockUser: (userId: string) => void;
+  onToggleAccountVisibility: () => Promise<void>;
+  onUnblockUser: (userId: string) => Promise<void>;
 }
 
 const ProfileForm: React.FC<ProfileFormProps> = ({
@@ -90,6 +90,14 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  // Create a wrapper for verification change to match expected signature
+  const handleVerificationUpdate = (newStatus: any) => {
+    // Convert the newStatus object to individual field updates
+    Object.keys(newStatus).forEach(field => {
+      handleVerificationChange(field, newStatus[field]);
+    });
   };
 
   return (
@@ -201,7 +209,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
           <VerificationPanel
             verificationStatus={verificationStatus}
             userEmail={userEmail}
-            onVerificationChange={handleVerificationChange}
+            onVerificationChange={handleVerificationUpdate}
           />
         </CardContent>
       </Card>

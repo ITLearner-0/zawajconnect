@@ -1,59 +1,67 @@
 
 import React from "react";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UseFormReturn } from "react-hook-form";
-import { ProfileFormData } from "@/types/profile";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ReligiousSectionProps {
-  form: UseFormReturn<ProfileFormData>;
-  isOnboarding?: boolean;
+  formData: any;
+  handleChange: (field: string, value: any) => void;
 }
 
-const ReligiousSection: React.FC<ReligiousSectionProps> = ({ form, isOnboarding }) => {
+const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleChange }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    handleChange(e.target.name, e.target.value);
+  };
+
+  const handleSelectChange = (field: string, value: string) => {
+    handleChange(field, value);
+  };
+
   return (
     <div className="space-y-4">
-      <FormItem>
-        <FormLabel>Religious Level</FormLabel>
-        <FormControl>
-          <Input
-            {...form.register("religiousLevel")}
-            placeholder="Enter your religious practice level"
-            disabled={!isOnboarding}
-          />
-        </FormControl>
-        {form.formState.errors.religiousLevel && (
-          <FormMessage>{String(form.formState.errors.religiousLevel.message)}</FormMessage>
-        )}
-      </FormItem>
+      <div className="space-y-2">
+        <Label htmlFor="religiousLevel">Niveau de Pratique Religieuse</Label>
+        <Select value={formData.religiousLevel || ""} onValueChange={(value) => handleSelectChange("religiousLevel", value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionnez votre niveau" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="very-practicing">Très pratiquant</SelectItem>
+            <SelectItem value="practicing">Pratiquant</SelectItem>
+            <SelectItem value="moderately-practicing">Modérément pratiquant</SelectItem>
+            <SelectItem value="learning">Apprend l'Islam</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-      <FormItem>
-        <FormLabel>Prayer Frequency</FormLabel>
-        <FormControl>
-          <Input
-            {...form.register("prayerFrequency")}
-            placeholder="Enter your prayer frequency"
-            disabled={!isOnboarding}
-          />
-        </FormControl>
-        {form.formState.errors.prayerFrequency && (
-          <FormMessage>{String(form.formState.errors.prayerFrequency.message)}</FormMessage>
-        )}
-      </FormItem>
+      <div className="space-y-2">
+        <Label htmlFor="prayerFrequency">Fréquence de Prière</Label>
+        <Select value={formData.prayerFrequency || ""} onValueChange={(value) => handleSelectChange("prayerFrequency", value)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Sélectionnez la fréquence" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="five-daily">Cinq fois par jour</SelectItem>
+            <SelectItem value="regular">Régulière mais pas les cinq</SelectItem>
+            <SelectItem value="sometimes">Parfois</SelectItem>
+            <SelectItem value="learning">Apprend à prier</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
-      <FormItem>
-        <FormLabel>Family Background</FormLabel>
-        <FormControl>
-          <Input
-            {...form.register("familyBackground")}
-            placeholder="Enter your family background"
-            disabled={!isOnboarding}
-          />
-        </FormControl>
-        {form.formState.errors.familyBackground && (
-          <FormMessage>{String(form.formState.errors.familyBackground.message)}</FormMessage>
-        )}
-      </FormItem>
+      <div className="space-y-2">
+        <Label htmlFor="familyBackground">Contexte Familial</Label>
+        <Textarea
+          id="familyBackground"
+          name="familyBackground"
+          value={formData.familyBackground || ""}
+          onChange={handleInputChange}
+          placeholder="Partagez votre contexte familial"
+          className="min-h-[100px]"
+        />
+      </div>
     </div>
   );
 };
