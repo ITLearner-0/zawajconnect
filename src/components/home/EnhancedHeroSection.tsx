@@ -5,7 +5,6 @@ import { ArrowRight, Play, ChevronDown, LogIn } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import AccessibilityControls from "@/components/AccessibilityControls";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
-import IslamicBismillah from "./IslamicBismillah";
 import HeroStats from "./HeroStats";
 import SmoothScrollButton from "./SmoothScrollButton";
 
@@ -27,21 +26,7 @@ const EnhancedHeroSection = () => {
       
       {/* Navigation */}
       <nav className="absolute top-0 left-0 right-0 z-20 p-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="relative">
-            <div className="text-5xl md:text-6xl lg:text-7xl font-bold text-rose-800 dark:text-rose-100 font-serif tracking-wide">
-              <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-rose-600 via-pink-500 to-rose-500 dark:from-rose-200 dark:via-pink-200 dark:to-rose-300 bg-clip-text text-transparent drop-shadow-sm">
-                  Nikah
-                </span>
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-rose-400 to-pink-400 rounded-full animate-pulse"></span>
-              </span>
-              <span className="ml-3 bg-gradient-to-r from-pink-600 via-rose-500 to-pink-500 dark:from-pink-200 dark:via-rose-200 dark:to-pink-300 bg-clip-text text-transparent drop-shadow-sm">
-                Connect
-              </span>
-            </div>
-            <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-rose-400 via-pink-400 to-rose-400 rounded-full opacity-60"></div>
-          </div>
+        <div className="max-w-7xl mx-auto flex items-center justify-end">
           <div className="flex items-center gap-4">
             <Button 
               asChild 
@@ -62,9 +47,34 @@ const EnhancedHeroSection = () => {
       </nav>
       
       {/* Hero Content */}
-      <div className="relative z-10 text-center max-w-6xl mx-auto pt-32">
-        <IslamicBismillah />
+      <div className="relative z-10 text-center max-w-6xl mx-auto pt-20">
+        {/* Arabic text and translation at the top */}
+        <div className="text-center mb-8">
+          <div className="text-xl md:text-2xl lg:text-3xl font-arabic text-rose-700 dark:text-rose-300 mb-3 leading-relaxed">
+            بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ
+          </div>
+          <div className="text-sm md:text-base lg:text-lg text-rose-600 dark:text-rose-400 italic mb-8">
+            Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux
+          </div>
+        </div>
         
+        {/* Site name */}
+        <div className="relative mb-8">
+          <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-rose-800 dark:text-rose-100 font-serif tracking-wide">
+            <span className="relative inline-block">
+              <span className="bg-gradient-to-r from-rose-600 via-pink-500 to-rose-500 dark:from-rose-200 dark:via-pink-200 dark:to-rose-300 bg-clip-text text-transparent drop-shadow-sm">
+                Nikah
+              </span>
+              <span className="absolute -top-1 -right-1 w-2 h-2 bg-gradient-to-r from-rose-400 to-pink-400 rounded-full animate-pulse"></span>
+            </span>
+            <span className="ml-3 bg-gradient-to-r from-pink-600 via-rose-500 to-pink-500 dark:from-pink-200 dark:via-rose-200 dark:to-pink-300 bg-clip-text text-transparent drop-shadow-sm">
+              Connect
+            </span>
+          </div>
+          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-3/4 h-1 bg-gradient-to-r from-rose-400 via-pink-400 to-rose-400 rounded-full opacity-60"></div>
+        </div>
+        
+        {/* Main tagline */}
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-6 text-rose-800 dark:text-rose-100 font-serif leading-tight">
           SE MARIER DE MANIÈRE
           <span className="block bg-gradient-to-r from-rose-500 to-pink-400 dark:from-rose-300 dark:to-pink-200 bg-clip-text text-transparent animate-title-pulse">
