@@ -7,6 +7,7 @@ import { findNearbyProfiles } from "@/utils/location/nearbyProfiles";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useUserStatus } from "@/hooks/useUserStatus";
+import { useTranslation } from "react-i18next";
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 // Import refactored components and utilities
@@ -20,6 +21,7 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
   const [loading, setLoading] = useState(true);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [userCoordinates, setUserCoordinates] = useState<[number, number] | null>(null);
   const [locationError, setLocationError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -147,7 +149,7 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Matches Near You</CardTitle>
+        <CardTitle>{t('nearby.matchesNearYou')}</CardTitle>
       </CardHeader>
       <CardContent>
         {loading ? (
@@ -175,7 +177,7 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
             )}
             
             <div className="space-y-2 mt-4">
-              <h3 className="text-lg font-medium">Nearby Profiles ({profiles.length})</h3>
+              <h3 className="text-lg font-medium">{t('nearby.matchesNearYou')} ({profiles.length})</h3>
               <ProfileList profiles={profiles} onNavigateToProfile={navigateToProfile} />
             </div>
           </div>

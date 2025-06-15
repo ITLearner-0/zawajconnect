@@ -7,7 +7,8 @@
   "header": {
     "back": "Retour",
     "nearby": "À proximité",
-    "findNearbyMatches": "Trouver des correspondances à proximité"
+    "findNearbyMatches": "Trouver des correspondances à proximité",
+    "home": "Accueil"
   },
   "navigation": {
     "home": "Accueil",
@@ -112,7 +113,20 @@
     "km": "km",
     "showCompatibility": "Afficher les scores de compatibilité",
     "compatibilityTestRequired": "Passez le test de compatibilité pour activer l'évaluation de compatibilité",
-    "searchSettings": "Paramètres de recherche"
+    "searchSettings": "Paramètres de recherche",
+    "matchesNearYou": "Correspondances près de vous",
+    "filterMatches": "Filtrer les correspondances",
+    "basicFilters": "Filtres de base",
+    "advancedFilters": "Filtres avancés",
+    "ageRange": "Tranche d'âge",
+    "practiceLevel": "Niveau de pratique",
+    "education": "Éducation",
+    "beginner": "Débutant",
+    "intermediate": "Intermédiaire",
+    "advanced": "Avancé",
+    "veryPracticing": "Très pratiquant",
+    "highSchool": "Lycée",
+    "bachelors": "Licence"
   },
   "auth": {
     "getStarted": "Commencer",

@@ -1,34 +1,44 @@
 
-import React from "react";
-import { Label } from "@/components/ui/label";
+import React from 'react';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 interface PracticeLevelFilterProps {
-  selectedLevels: string[];
-  toggleLevel: (level: string) => void;
+  value?: string[];
+  onChange: (levels: string[]) => void;
 }
 
-const PRACTICE_LEVELS = ["Beginner", "Intermediate", "Advanced", "Very Practicing"];
+const PracticeLevelFilter: React.FC<PracticeLevelFilterProps> = ({ value = [], onChange }) => {
+  const { t } = useTranslation();
 
-const PracticeLevelFilter: React.FC<PracticeLevelFilterProps> = ({ 
-  selectedLevels, 
-  toggleLevel 
-}) => {
+  const practiceLevels = [
+    { key: 'beginner', label: t('nearby.beginner') },
+    { key: 'intermediate', label: t('nearby.intermediate') },
+    { key: 'advanced', label: t('nearby.advanced') },
+    { key: 'very_practicing', label: t('nearby.veryPracticing') }
+  ];
+
+  const toggleLevel = (level: string) => {
+    const newValue = value.includes(level)
+      ? value.filter(l => l !== level)
+      : [...value, level];
+    onChange(newValue);
+  };
+
   return (
     <div className="space-y-3">
-      <Label>Practice Level</Label>
+      <Label className="text-sm font-medium">{t('nearby.practiceLevel')}</Label>
       <div className="flex flex-wrap gap-2">
-        {PRACTICE_LEVELS.map(level => (
-          <button
-            key={level}
-            className={`px-3 py-1 rounded-full text-sm ${
-              selectedLevels.includes(level)
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground"
-            }`}
-            onClick={() => toggleLevel(level)}
+        {practiceLevels.map(level => (
+          <Badge
+            key={level.key}
+            variant={value.includes(level.key) ? "default" : "outline"}
+            className="cursor-pointer"
+            onClick={() => toggleLevel(level.key)}
           >
-            {level}
-          </button>
+            {level.label}
+          </Badge>
         ))}
       </div>
     </div>

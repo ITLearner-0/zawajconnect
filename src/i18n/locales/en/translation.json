@@ -7,7 +7,8 @@
   "header": {
     "back": "Back",
     "nearby": "Nearby",
-    "findNearbyMatches": "Find Nearby Matches"
+    "findNearbyMatches": "Find Nearby Matches",
+    "home": "Home"
   },
   "navigation": {
     "home": "Home",
@@ -112,7 +113,20 @@
     "km": "km",
     "showCompatibility": "Show Compatibility Scores",
     "compatibilityTestRequired": "Take the compatibility test to enable compatibility scoring",
-    "searchSettings": "Search Settings"
+    "searchSettings": "Search Settings",
+    "matchesNearYou": "Matches Near You",
+    "filterMatches": "Filter Matches",
+    "basicFilters": "Basic Filters",
+    "advancedFilters": "Advanced Filters",
+    "ageRange": "Age Range",
+    "practiceLevel": "Practice Level",
+    "education": "Education",
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced",
+    "veryPracticing": "Very Practicing",
+    "highSchool": "High School",
+    "bachelors": "Bachelor's"
   },
   "auth": {
     "getStarted": "Get Started",

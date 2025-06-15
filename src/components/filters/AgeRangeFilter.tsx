@@ -1,23 +1,33 @@
 
-import React from "react";
-import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+import React from 'react';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { useTranslation } from 'react-i18next';
 
 interface AgeRangeFilterProps {
-  ageRange: [number, number];
-  setAgeRange: (value: [number, number]) => void;
+  value?: [number, number];
+  onChange: (range: [number, number]) => void;
 }
 
-const AgeRangeFilter: React.FC<AgeRangeFilterProps> = ({ ageRange, setAgeRange }) => {
+const AgeRangeFilter: React.FC<AgeRangeFilterProps> = ({ value = [18, 50], onChange }) => {
+  const { t } = useTranslation();
+
+  const handleValueChange = (newValue: number[]) => {
+    onChange([newValue[0], newValue[1]]);
+  };
+
   return (
     <div className="space-y-3">
-      <Label>Age Range: {ageRange[0]} - {ageRange[1]}</Label>
-      <Slider 
-        value={ageRange} 
-        min={18} 
-        max={80} 
-        step={1} 
-        onValueChange={(value) => setAgeRange(value as [number, number])} 
+      <Label className="text-sm font-medium">
+        {t('nearby.ageRange')}: {value[0]} - {value[1]}
+      </Label>
+      <Slider
+        value={value}
+        onValueChange={handleValueChange}
+        min={18}
+        max={70}
+        step={1}
+        className="w-full"
       />
     </div>
   );

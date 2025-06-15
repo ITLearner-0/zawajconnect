@@ -1,34 +1,45 @@
 
-import React from "react";
-import { Label } from "@/components/ui/label";
+import React from 'react';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 
 interface EducationFilterProps {
-  selectedLevels: string[];
-  toggleLevel: (level: string) => void;
+  value?: string[];
+  onChange: (education: string[]) => void;
 }
 
-const EDUCATION_LEVELS = ["High School", "Bachelor's", "Master's", "PhD", "Islamic Studies"];
+const EducationFilter: React.FC<EducationFilterProps> = ({ value = [], onChange }) => {
+  const { t } = useTranslation();
 
-const EducationFilter: React.FC<EducationFilterProps> = ({ 
-  selectedLevels, 
-  toggleLevel 
-}) => {
+  const educationLevels = [
+    { key: 'high_school', label: t('nearby.highSchool') },
+    { key: 'bachelors', label: t('nearby.bachelors') },
+    { key: 'masters', label: 'Master\'s' },
+    { key: 'phd', label: 'PhD' },
+    { key: 'other', label: 'Other' }
+  ];
+
+  const toggleEducation = (education: string) => {
+    const newValue = value.includes(education)
+      ? value.filter(e => e !== education)
+      : [...value, education];
+    onChange(newValue);
+  };
+
   return (
     <div className="space-y-3">
-      <Label>Education</Label>
+      <Label className="text-sm font-medium">{t('nearby.education')}</Label>
       <div className="flex flex-wrap gap-2">
-        {EDUCATION_LEVELS.map(level => (
-          <button
-            key={level}
-            className={`px-3 py-1 rounded-full text-sm ${
-              selectedLevels.includes(level)
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground"
-            }`}
-            onClick={() => toggleLevel(level)}
+        {educationLevels.map(education => (
+          <Badge
+            key={education.key}
+            variant={value.includes(education.key) ? "default" : "outline"}
+            className="cursor-pointer"
+            onClick={() => toggleEducation(education.key)}
           >
-            {level}
-          </button>
+            {education.label}
+          </Badge>
         ))}
       </div>
     </div>
