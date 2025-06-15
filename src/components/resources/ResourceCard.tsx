@@ -18,7 +18,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
       <CardHeader>
         <div className="flex justify-between items-start mb-2">
           <Badge variant="outline" className="border-rose-300 text-rose-600 bg-rose-50 dark:border-rose-600 dark:text-rose-300 dark:bg-rose-900/30">
-            {resourceCategories.find(c => c.id === resource.category)?.name || 'Uncategorized'}
+            {resourceCategories.find(c => c.id === resource.category)?.name || 'Non catégorisé'}
           </Badge>
           <Badge variant="secondary" className="bg-gradient-to-r from-rose-100 to-pink-100 dark:from-rose-800 dark:to-pink-800 text-rose-700 dark:text-rose-200">{resource.contentType}</Badge>
         </div>
@@ -42,7 +42,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
       <CardFooter className="pt-0">
         <Button asChild className="w-full bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white">
           <Link to={`/resources/${resource.id}`}>
-            Read More
+            Lire Plus
           </Link>
         </Button>
       </CardFooter>

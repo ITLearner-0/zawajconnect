@@ -25,14 +25,14 @@ const ResourceList: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
       <ResourcesHeader />
       <div className="container mx-auto py-12 px-4">
-        <h1 className="text-3xl font-bold mb-2 text-rose-800 dark:text-rose-200">Islamic Marriage Resources</h1>
+        <h1 className="text-3xl font-bold mb-2 text-rose-800 dark:text-rose-200">Ressources Mariage Islamique</h1>
         <p className="text-rose-600 dark:text-rose-300 mb-8">
-          Guides, articles, and resources to help you prepare for marriage in accordance with Islamic principles
+          Guides, articles et ressources pour vous aider à préparer le mariage selon les principes islamiques
         </p>
         
         <Tabs value={activeCategory} onValueChange={setActiveCategory} className="mb-8">
           <TabsList className="mb-4 bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm border border-rose-200 dark:border-rose-700">
-            <TabsTrigger value="all" className="data-[state=active]:bg-rose-100 data-[state=active]:text-rose-700 dark:data-[state=active]:bg-rose-800 dark:data-[state=active]:text-rose-200">All Resources</TabsTrigger>
+            <TabsTrigger value="all" className="data-[state=active]:bg-rose-100 data-[state=active]:text-rose-700 dark:data-[state=active]:bg-rose-800 dark:data-[state=active]:text-rose-200">Toutes les Ressources</TabsTrigger>
             {resourceCategories.map(category => (
               <TabsTrigger key={category.id} value={category.id} className="flex items-center gap-1 data-[state=active]:bg-rose-100 data-[state=active]:text-rose-700 dark:data-[state=active]:bg-rose-800 dark:data-[state=active]:text-rose-200">
                 {iconMap[category.icon]}

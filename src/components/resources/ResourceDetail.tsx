@@ -24,9 +24,9 @@ const ResourceDetail: React.FC<ResourceDetailProps> = ({ resource }) => {
         <div className="container mx-auto py-12 px-4">
           <Card className="bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm border-rose-200 dark:border-rose-700">
             <CardContent className="pt-6">
-              <p className="text-rose-700 dark:text-rose-300">Resource not found.</p>
+              <p className="text-rose-700 dark:text-rose-300">Ressource non trouvée.</p>
               <Button variant="outline" className="mt-4 border-rose-300 text-rose-700 hover:bg-rose-100 dark:border-rose-600 dark:text-rose-300 dark:hover:bg-rose-800" onClick={() => navigate('/resources')}>
-                <ChevronLeft className="mr-2 h-4 w-4" /> Back to resources
+                <ChevronLeft className="mr-2 h-4 w-4" /> Retour aux ressources
               </Button>
             </CardContent>
           </Card>
@@ -40,14 +40,14 @@ const ResourceDetail: React.FC<ResourceDetailProps> = ({ resource }) => {
       <ResourcesHeader />
       <div className="container mx-auto py-12 px-4 max-w-4xl">
         <Button variant="outline" className="mb-6 border-rose-300 text-rose-700 hover:bg-rose-100 dark:border-rose-600 dark:text-rose-300 dark:hover:bg-rose-800" onClick={() => navigate('/resources')}>
-          <ChevronLeft className="mr-2 h-4 w-4" /> Back to resources
+          <ChevronLeft className="mr-2 h-4 w-4" /> Retour aux ressources
         </Button>
         
         <Card className="bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm border-rose-200 dark:border-rose-700">
           <CardHeader>
             <div className="flex items-center gap-2 mb-2">
               <Badge variant="outline" className="border-rose-300 text-rose-600 bg-rose-50 dark:border-rose-600 dark:text-rose-300 dark:bg-rose-900/30">
-                {resourceCategories.find(c => c.id === resource.category)?.name || 'Uncategorized'}
+                {resourceCategories.find(c => c.id === resource.category)?.name || 'Non catégorisé'}
               </Badge>
               <Badge variant="secondary" className="bg-gradient-to-r from-rose-100 to-pink-100 dark:from-rose-800 dark:to-pink-800 text-rose-700 dark:text-rose-200">{resource.contentType}</Badge>
             </div>
@@ -86,7 +86,7 @@ const ResourceDetail: React.FC<ResourceDetailProps> = ({ resource }) => {
               <div className="my-6">
                 <Button variant="outline" asChild className="border-rose-300 text-rose-700 hover:bg-rose-100 dark:border-rose-600 dark:text-rose-300 dark:hover:bg-rose-800">
                   <a href={resource.url} target="_blank" rel="noopener noreferrer" className="flex items-center">
-                    View Resource <ExternalLink className="ml-2 h-4 w-4" />
+                    Voir la Ressource <ExternalLink className="ml-2 h-4 w-4" />
                   </a>
                 </Button>
               </div>
