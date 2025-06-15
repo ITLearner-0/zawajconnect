@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ArrowRight, Play, ChevronDown, LogIn } from "lucide-react";
+import { ArrowRight, Play, ChevronDown, LogIn, Crown } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import AccessibilityControls from "@/components/AccessibilityControls";
 import { LanguageSwitcher } from "@/components/ui/language-switcher";
@@ -26,8 +26,22 @@ const EnhancedHeroSection = () => {
       
       {/* Navigation */}
       <nav className="absolute top-0 left-0 right-0 z-20 p-6">
-        <div className="max-w-7xl mx-auto flex items-center justify-end">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div>
+            {/* Logo placeholder */}
+          </div>
           <div className="flex items-center gap-4">
+            <Button 
+              asChild 
+              variant="ghost"
+              size="sm"
+              className="text-purple-600 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-800/30"
+            >
+              <Link to="/subscription" className="flex items-center gap-2">
+                <Crown className="h-4 w-4" />
+                Premium
+              </Link>
+            </Button>
             <Button 
               asChild 
               variant="ghost"
@@ -116,6 +130,19 @@ const EnhancedHeroSection = () => {
             <Link to="/auth?signup=true&gender=male" className="flex items-center gap-2">
               INSCRIPTION HOMME
               <ArrowRight className="h-5 w-5" />
+            </Link>
+          </Button>
+        </div>
+
+        {/* Premium CTA */}
+        <div className="flex justify-center mb-8">
+          <Button 
+            asChild 
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold px-6 py-3 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+          >
+            <Link to="/subscription" className="flex items-center gap-2">
+              <Crown className="h-5 w-5" />
+              Découvrir Premium
             </Link>
           </Button>
         </div>

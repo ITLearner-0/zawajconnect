@@ -12,6 +12,7 @@ import Resources from './pages/Resources';
 import Demo from './pages/Demo';
 import UserProfile from './pages/UserProfile';
 import Compatibility from './pages/Compatibility';
+import Subscription from './pages/Subscription';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import { AuthProvider } from './contexts/AuthContext';
@@ -47,6 +48,7 @@ function App() {
                 <Route path="/resources" element={<Resources />} />
                 <Route path="/resources/:resourceId" element={<Resources />} />
                 <Route path="/demo" element={<Demo />} />
+                <Route path="/subscription" element={<Subscription />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Router>
