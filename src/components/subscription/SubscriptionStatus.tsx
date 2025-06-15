@@ -5,10 +5,12 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useSubscription } from '@/hooks/useSubscription';
 import { Crown, Star, Zap } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const SubscriptionStatus = () => {
-  const { subscribed, subscription_tier, isPremium, isVip } = useSubscription();
+  const { subscribed, subscription_tier, isPremium, isVip, openCustomerPortal } = useSubscription();
+  const location = useLocation();
+  const isOnSubscriptionPage = location.pathname === '/subscription';
 
   if (!subscribed) {
     return (
@@ -23,11 +25,20 @@ const SubscriptionStatus = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Button asChild className="w-full bg-rose-600 hover:bg-rose-700 text-white">
-            <Link to="/subscription">
+          {isOnSubscriptionPage ? (
+            <Button 
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="w-full bg-rose-600 hover:bg-rose-700 text-white"
+            >
               Voir les Plans Premium
-            </Link>
-          </Button>
+            </Button>
+          ) : (
+            <Button asChild className="w-full bg-rose-600 hover:bg-rose-700 text-white">
+              <Link to="/subscription">
+                Voir les Plans Premium
+              </Link>
+            </Button>
+          )}
         </CardContent>
       </Card>
     );
@@ -52,16 +63,34 @@ const SubscriptionStatus = () => {
       </CardHeader>
       <CardContent>
         <div className="flex gap-2">
-          <Button asChild variant="outline" className="flex-1">
-            <Link to="/subscription">
+          {isOnSubscriptionPage ? (
+            <Button 
+              onClick={openCustomerPortal}
+              variant="outline" 
+              className="flex-1"
+            >
               Gérer l'Abonnement
-            </Link>
-          </Button>
-          {isPremium && (
+            </Button>
+          ) : (
+            <Button asChild variant="outline" className="flex-1">
+              <Link to="/subscription">
+                Gérer l'Abonnement
+              </Link>
+            </Button>
+          )}
+          {isPremium && !isOnSubscriptionPage && (
             <Button asChild className="flex-1 bg-purple-600 hover:bg-purple-700 text-white">
               <Link to="/subscription">
                 Passer au VIP
               </Link>
+            </Button>
+          )}
+          {isPremium && isOnSubscriptionPage && (
+            <Button 
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              Passer au VIP
             </Button>
           )}
         </div>
