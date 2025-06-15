@@ -9,6 +9,83 @@
     "nearby": "À proximité",
     "findNearbyMatches": "Trouver des correspondances à proximité"
   },
+  "navigation": {
+    "home": "Accueil",
+    "signup": "Inscription",
+    "demo": "Mode Démonstration",
+    "back": "Retour"
+  },
+  "demo": {
+    "title": "Nikah Connect Demo: Messagerie et Chat Vidéo",
+    "description": "Cette page démontre les capacités de messagerie et d'appels vidéo de Nikah Connect en utilisant des profils de démonstration. Vous pouvez sélectionner différentes conversations, envoyer des messages et simuler des appels vidéo.",
+    "messagingFeatures": "Fonctionnalités de Messagerie",
+    "videoFeatures": "Fonctionnalités Vidéo",
+    "messagingTips": [
+      "Cliquez sur un profil pour commencer une conversation",
+      "Envoyez des messages avec le champ de saisie en bas",
+      "Testez le chiffrement des messages et les politiques de rétention"
+    ],
+    "videoTips": [
+      "Essayez l'appel vidéo en utilisant le bouton d'appel vidéo",
+      "Expérimentez avec différents paramètres de confidentialité et de sécurité",
+      "Découvrez la supervision Wali pour les conversations appropriées"
+    ]
+  },
+  "home": {
+    "demoSection": {
+      "title": "Découvrez Notre Plateforme",
+      "subtitle": "Explorez toutes nos fonctionnalités avec des profils de démonstration interactifs. Testez la messagerie, les appels vidéo et découvrez comment nous respectons les valeurs islamiques.",
+      "features": {
+        "secureMessaging": {
+          "title": "Messagerie Sécurisée",
+          "description": "Chat en temps réel avec chiffrement end-to-end"
+        },
+        "videoCalls": {
+          "title": "Appels Vidéo",
+          "description": "Rencontres virtuelles supervisées par le Wali"
+        },
+        "waliSupervision": {
+          "title": "Supervision Wali",
+          "description": "Surveillance respectueuse des conversations"
+        },
+        "compatibility": {
+          "title": "Compatibilité",
+          "description": "Système de matching basé sur les valeurs islamiques"
+        }
+      },
+      "testDemo": "Tester la Démo Interactive",
+      "secureEnvironment": "Environnement de test sécurisé • Aucun engagement requis",
+      "featuresToTest": "Fonctionnalités à Tester",
+      "stats": {
+        "dailyTests": "Tests par Jour",
+        "satisfaction": "Satisfaction Demo",
+        "availability": "Disponibilité", 
+        "secure": "Sécurisé"
+      },
+      "readyToStart": "Prêt à commencer votre voyage vers le mariage halal ?",
+      "signUpNow": "S'inscrire Maintenant",
+      "learnMore": "En Savoir Plus"
+    },
+    "trustBadges": {
+      "title": "Pourquoi Nous Faire Confiance ?",
+      "respectValues": {
+        "title": "Respect des Valeurs",
+        "description": "Conçu selon les principes islamiques"
+      },
+      "waliSupervision": {
+        "title": "Supervision Wali",
+        "description": "Conversations supervisées par le tuteur"
+      },
+      "respectfulCommunity": {
+        "title": "Communauté Respectueuse", 
+        "description": "Utilisateurs partageant les mêmes valeurs"
+      },
+      "securePlatform": {
+        "title": "Plateforme Sécurisée",
+        "description": "Chiffrement des données personnelles"
+      }
+    }
+  },
   "nearby": {
     "searchFilters": "Filtres de recherche",
     "maxDistance": "Distance maximale",

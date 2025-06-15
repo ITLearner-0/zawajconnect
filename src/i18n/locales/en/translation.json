@@ -9,6 +9,83 @@
     "nearby": "Nearby",
     "findNearbyMatches": "Find Nearby Matches"
   },
+  "navigation": {
+    "home": "Home",
+    "signup": "Sign Up",
+    "demo": "Demo Mode",
+    "back": "Back"
+  },
+  "demo": {
+    "title": "Nikah Connect Demo: Messaging and Video Chat",
+    "description": "This page demonstrates the messaging and video chat capabilities of Nikah Connect using dummy profiles. You can select different conversations, send messages, and simulate video calls.",
+    "messagingFeatures": "Messaging Features",
+    "videoFeatures": "Video Features",
+    "messagingTips": [
+      "Click on a profile to start a conversation",
+      "Send messages with the chat input at the bottom", 
+      "Test message encryption and retention policies"
+    ],
+    "videoTips": [
+      "Try video calling using the video call button",
+      "Experiment with different privacy and security settings",
+      "Experience Wali supervision for appropriate conversations"
+    ]
+  },
+  "home": {
+    "demoSection": {
+      "title": "Discover Our Platform",
+      "subtitle": "Explore all our features with interactive demo profiles. Test messaging, video calls and discover how we respect Islamic values.",
+      "features": {
+        "secureMessaging": {
+          "title": "Secure Messaging", 
+          "description": "Real-time chat with end-to-end encryption"
+        },
+        "videoCalls": {
+          "title": "Video Calls",
+          "description": "Virtual meetings supervised by Wali"
+        },
+        "waliSupervision": {
+          "title": "Wali Supervision",
+          "description": "Respectful conversation monitoring"
+        },
+        "compatibility": {
+          "title": "Compatibility",
+          "description": "Matching system based on Islamic values"
+        }
+      },
+      "testDemo": "Test Interactive Demo",
+      "secureEnvironment": "Secure test environment • No commitment required",
+      "featuresToTest": "Features to Test",
+      "stats": {
+        "dailyTests": "Daily Tests",
+        "satisfaction": "Demo Satisfaction", 
+        "availability": "Availability",
+        "secure": "Secure"
+      },
+      "readyToStart": "Ready to start your halal marriage journey?",
+      "signUpNow": "Sign Up Now",
+      "learnMore": "Learn More"
+    },
+    "trustBadges": {
+      "title": "Why Trust Us?",
+      "respectValues": {
+        "title": "Respect for Values",
+        "description": "Designed according to Islamic principles"
+      },
+      "waliSupervision": {
+        "title": "Wali Supervision", 
+        "description": "Conversations supervised by guardian"
+      },
+      "respectfulCommunity": {
+        "title": "Respectful Community",
+        "description": "Users sharing the same values"
+      },
+      "securePlatform": {
+        "title": "Secure Platform",
+        "description": "Personal data encryption"
+      }
+    }
+  },
   "nearby": {
     "searchFilters": "Search Filters",
     "maxDistance": "Maximum Distance",

@@ -9,8 +9,11 @@ import Footer from "@/components/home/Footer";
 import Divider from "@/components/home/Divider";
 import SectionTransition from "@/components/home/SectionTransition";
 import PerformanceMonitor from "@/components/ui/PerformanceMonitor";
+import { useTranslation } from "react-i18next";
 
 const Index = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-300 via-pink-200 to-rose-100 dark:from-rose-900 dark:via-rose-800 dark:to-pink-900 text-foreground">
       <EnhancedHeroSection />
@@ -21,7 +24,7 @@ const Index = () => {
           <section className="py-16 md:py-20 px-4">
             <div className="max-w-7xl mx-auto text-center">
               <h3 className="text-2xl md:text-3xl font-bold mb-12 text-rose-800 dark:text-rose-200">
-                Pourquoi Nous Faire Confiance ?
+                {t('home.trustBadges.title')}
               </h3>
               <TrustBadges />
             </div>

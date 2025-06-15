@@ -2,31 +2,9 @@
 import React, { memo } from 'react';
 import { Shield, Heart, Users, CheckCircle } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useTranslation } from 'react-i18next';
 
-const badges = [
-  {
-    icon: Shield,
-    title: "Respect des Valeurs",
-    description: "Conçu selon les principes islamiques"
-  },
-  {
-    icon: Heart,
-    title: "Supervision Wali",
-    description: "Conversations supervisées par le tuteur"
-  },
-  {
-    icon: Users,
-    title: "Communauté Respectueuse",
-    description: "Utilisateurs partageant les mêmes valeurs"
-  },
-  {
-    icon: CheckCircle,
-    title: "Plateforme Sécurisée",
-    description: "Chiffrement des données personnelles"
-  }
-];
-
-const TrustBadge = memo(({ badge, index }: { badge: typeof badges[0], index: number }) => {
+const TrustBadge = memo(({ badge, index }: { badge: any, index: number }) => {
   const { ref, hasIntersected } = useIntersectionObserver<HTMLDivElement>({ threshold: 0.2 });
 
   return (
@@ -51,6 +29,31 @@ const TrustBadge = memo(({ badge, index }: { badge: typeof badges[0], index: num
 TrustBadge.displayName = 'TrustBadge';
 
 const TrustBadges = memo(() => {
+  const { t } = useTranslation();
+
+  const badges = [
+    {
+      icon: Shield,
+      title: t('home.trustBadges.respectValues.title'),
+      description: t('home.trustBadges.respectValues.description')
+    },
+    {
+      icon: Heart,
+      title: t('home.trustBadges.waliSupervision.title'),
+      description: t('home.trustBadges.waliSupervision.description')
+    },
+    {
+      icon: Users,
+      title: t('home.trustBadges.respectfulCommunity.title'),
+      description: t('home.trustBadges.respectfulCommunity.description')
+    },
+    {
+      icon: CheckCircle,
+      title: t('home.trustBadges.securePlatform.title'),
+      description: t('home.trustBadges.securePlatform.description')
+    }
+  ];
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
       {badges.map((badge, index) => (

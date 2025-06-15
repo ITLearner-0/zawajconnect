@@ -3,9 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Home, ArrowLeft, User, MessageSquare } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { LanguageSwitcher } from "@/components/ui/language-switcher";
 import AccessibilityControls from "@/components/AccessibilityControls";
+import { useTranslation } from "react-i18next";
 
 const DemoNavigation = () => {
+  const { t } = useTranslation();
+
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-rose-100/95 via-pink-50/95 to-rose-100/95 dark:from-rose-900/95 dark:via-rose-800/95 dark:to-pink-900/95 backdrop-blur-md border-b border-rose-200 dark:border-rose-700">
       <nav className="container mx-auto px-4 py-4">
@@ -26,7 +30,7 @@ const DemoNavigation = () => {
           {/* Demo Badge */}
           <div className="hidden md:flex items-center gap-2 bg-gradient-to-r from-rose-500/10 to-pink-500/10 dark:from-rose-300/10 dark:to-pink-300/10 px-4 py-2 rounded-full border border-rose-300/50 dark:border-rose-600/50">
             <MessageSquare className="h-4 w-4 text-rose-600 dark:text-rose-300" />
-            <span className="text-sm font-medium text-rose-700 dark:text-rose-200">Mode Démonstration</span>
+            <span className="text-sm font-medium text-rose-700 dark:text-rose-200">{t('navigation.demo')}</span>
           </div>
 
           {/* Navigation Links */}
@@ -34,13 +38,13 @@ const DemoNavigation = () => {
             <Button variant="ghost" asChild className="text-rose-700 hover:text-rose-800 hover:bg-rose-100 dark:text-rose-300 dark:hover:text-rose-200 dark:hover:bg-rose-800/50">
               <Link to="/" className="flex items-center gap-2">
                 <Home className="h-4 w-4" />
-                Accueil
+                {t('navigation.home')}
               </Link>
             </Button>
             <Button variant="ghost" asChild className="text-rose-700 hover:text-rose-800 hover:bg-rose-100 dark:text-rose-300 dark:hover:text-rose-200 dark:hover:bg-rose-800/50">
               <Link to="/auth">
                 <User className="h-4 w-4 mr-2" />
-                Inscription
+                {t('navigation.signup')}
               </Link>
             </Button>
           </div>
@@ -50,10 +54,11 @@ const DemoNavigation = () => {
             <Button variant="outline" asChild className="md:hidden border-rose-300 text-rose-700 hover:bg-rose-100 dark:border-rose-600 dark:text-rose-300 dark:hover:bg-rose-800">
               <Link to="/" className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
-                Retour
+                {t('navigation.back')}
               </Link>
             </Button>
             <AccessibilityControls />
+            <LanguageSwitcher />
             <ThemeToggle />
           </div>
         </div>

@@ -3,12 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { MessageSquare, Video, Play, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface DemoLinkProps {
   className?: string;
 }
 
 const DemoLink = ({ className }: DemoLinkProps) => {
+  const { t } = useTranslation();
+
   return (
     <div className={cn("flex justify-center", className)}>
       <Button 
@@ -21,7 +24,7 @@ const DemoLink = ({ className }: DemoLinkProps) => {
             <MessageSquare className="h-5 w-5" />
             <Video className="h-5 w-5" />
           </div>
-          <span>Tester la Démo Interactive</span>
+          <span>{t('home.demoSection.testDemo')}</span>
           <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
         </Link>
       </Button>
