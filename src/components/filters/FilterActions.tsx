@@ -20,16 +20,16 @@ const FilterActions: React.FC<FilterActionsProps> = ({
     <div className="flex justify-between">
       <div className="space-x-2">
         <CustomButton variant="outline" onClick={onReset}>
-          Reset
+          Réinitialiser
         </CustomButton>
         <CustomButton onClick={onApply}>
-          Apply Filters
+          Appliquer les Filtres
         </CustomButton>
       </div>
       {!showSaveForm && (
         <CustomButton variant="outline" onClick={onShowSaveForm}>
           <Save size={16} className="mr-2" />
-          Save Filter
+          Sauvegarder le Filtre
         </CustomButton>
       )}
     </div>

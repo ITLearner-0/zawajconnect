@@ -24,11 +24,11 @@ const SaveFilterForm: React.FC<SaveFilterFormProps> = ({
 
   return (
     <div className="space-y-3 border p-3 rounded-md">
-      <Label htmlFor="filter-name">Save Current Filter</Label>
+      <Label htmlFor="filter-name">Sauvegarder le Filtre Actuel</Label>
       <div className="flex gap-2">
         <Input 
           id="filter-name" 
-          placeholder="Filter name" 
+          placeholder="Nom du filtre" 
           value={filterName} 
           onChange={(e) => setFilterName(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSave()}

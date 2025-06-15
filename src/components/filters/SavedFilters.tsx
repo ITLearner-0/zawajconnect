@@ -20,7 +20,7 @@ const SavedFilters: React.FC<SavedFiltersProps> = ({
 
   return (
     <div className="space-y-3">
-      <Label>Saved Filters</Label>
+      <Label>Filtres Sauvegardés</Label>
       <div className="space-y-2">
         {Object.entries(savedFilters).map(([name, _]) => (
           <div key={name} className="flex items-center justify-between bg-secondary p-2 rounded">
@@ -30,13 +30,13 @@ const SavedFilters: React.FC<SavedFiltersProps> = ({
                 onClick={() => onLoadFilter(name)}
                 className="text-xs px-2 py-1 bg-primary text-primary-foreground rounded"
               >
-                Load
+                Charger
               </button>
               <button 
                 onClick={() => onDeleteFilter(name)}
                 className="text-xs px-2 py-1 bg-destructive text-destructive-foreground rounded"
               >
-                Delete
+                Supprimer
               </button>
             </div>
           </div>

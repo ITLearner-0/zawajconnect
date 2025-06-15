@@ -1,6 +1,6 @@
 
 export const compatibilityTranslations = {
-  // Test interface
+  // Interface du test
   testTitle: "Test de Compatibilité Matrimoniale selon le Coran et la Sunna",
   testDescription: "Répondez honnêtement à chaque question pour évaluer votre compatibilité avec de futurs partenaires selon les valeurs islamiques.",
   
@@ -11,7 +11,7 @@ export const compatibilityTranslations = {
   calculating: "Calcul en cours...",
   retakeTest: "Refaire le Test",
   
-  // Agreement levels
+  // Niveaux d'accord
   agreementLevels: {
     stronglyDisagree: "Pas du tout d'accord",
     disagree: "Pas d'accord", 
@@ -20,7 +20,7 @@ export const compatibilityTranslations = {
     stronglyAgree: "Tout à fait d'accord"
   },
   
-  // Categories
+  // Catégories
   categories: {
     "Pratique Religieuse": "Pratique Religieuse",
     "Objectifs Spirituels": "Objectifs Spirituels",
@@ -32,13 +32,13 @@ export const compatibilityTranslations = {
     "Communication": "Communication"
   },
   
-  // Settings
+  // Paramètres
   advancedSettings: "Paramètres Avancés",
   importance: "Niveau d'Importance",
   dealbreaker: "Critère Non Négociable",
   minimumThreshold: "Seuil Minimum Acceptable",
   
-  // Results
+  // Résultats
   compatibilityScore: "Score de Compatibilité",
   excellent: "Excellente Compatibilité",
   veryGood: "Très Bonne Compatibilité", 
@@ -46,28 +46,28 @@ export const compatibilityTranslations = {
   average: "Compatibilité Moyenne",
   needsWork: "Nécessite du Travail",
   
-  // Matching
+  // Correspondances
   findingMatches: "Recherche de correspondances...",
   noMatches: "Aucune correspondance trouvée",
   matchesFound: "correspondances trouvées",
   
-  // Verification status
+  // Statut de vérification
   verified: "Vérifié(e)",
   emailVerified: "Email vérifié",
   phoneVerified: "Téléphone vérifié",
   idVerified: "Identité vérifiée",
   
-  // Errors and messages
+  // Erreurs et messages
   authRequired: "Vous devez être connecté pour passer le test",
   testRequired: "Vous devez passer le test de compatibilité",
   saveError: "Erreur lors de la sauvegarde",
   loadError: "Erreur lors du chargement",
   
-  // Islamic reminders
+  // Rappels islamiques
   islamicReminder: "Rappel Spirituel",
   ayahMarriage: "\"Et parmi Ses signes Il a créé de vous, pour vous, des épouses pour que vous viviez en tranquillité avec elles et Il a mis entre vous de l'affection et de la bonté.\" - Coran 30:21",
   
-  // Progress indicators
+  // Indicateurs de progression
   questionsAnswered: "questions répondues",
   categoryProgress: "Progression par catégorie",
   completed: "Terminé",

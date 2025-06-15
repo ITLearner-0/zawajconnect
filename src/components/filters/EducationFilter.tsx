@@ -2,7 +2,6 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { useTranslation } from 'react-i18next';
 
 interface EducationFilterProps {
   value?: string[];
@@ -10,14 +9,12 @@ interface EducationFilterProps {
 }
 
 const EducationFilter: React.FC<EducationFilterProps> = ({ value = [], onChange }) => {
-  const { t } = useTranslation();
-
   const educationLevels = [
-    { key: 'high_school', label: t('nearby.highSchool') },
-    { key: 'bachelors', label: t('nearby.bachelors') },
-    { key: 'masters', label: 'Master\'s' },
-    { key: 'phd', label: 'PhD' },
-    { key: 'other', label: 'Other' }
+    { key: 'high_school', label: 'Lycée' },
+    { key: 'bachelors', label: 'Licence' },
+    { key: 'masters', label: 'Master' },
+    { key: 'phd', label: 'Doctorat' },
+    { key: 'other', label: 'Autre' }
   ];
 
   const toggleEducation = (education: string) => {
@@ -29,7 +26,7 @@ const EducationFilter: React.FC<EducationFilterProps> = ({ value = [], onChange 
 
   return (
     <div className="space-y-3">
-      <Label className="text-sm font-medium">{t('nearby.education')}</Label>
+      <Label className="text-sm font-medium">Éducation</Label>
       <div className="flex flex-wrap gap-2">
         {educationLevels.map(education => (
           <Badge

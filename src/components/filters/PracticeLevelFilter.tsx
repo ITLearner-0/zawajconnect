@@ -2,7 +2,6 @@
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { useTranslation } from 'react-i18next';
 
 interface PracticeLevelFilterProps {
   value?: string[];
@@ -10,13 +9,11 @@ interface PracticeLevelFilterProps {
 }
 
 const PracticeLevelFilter: React.FC<PracticeLevelFilterProps> = ({ value = [], onChange }) => {
-  const { t } = useTranslation();
-
   const practiceLevels = [
-    { key: 'beginner', label: t('nearby.beginner') },
-    { key: 'intermediate', label: t('nearby.intermediate') },
-    { key: 'advanced', label: t('nearby.advanced') },
-    { key: 'very_practicing', label: t('nearby.veryPracticing') }
+    { key: 'beginner', label: 'Débutant' },
+    { key: 'intermediate', label: 'Intermédiaire' },
+    { key: 'advanced', label: 'Avancé' },
+    { key: 'very_practicing', label: 'Très Pratiquant' }
   ];
 
   const toggleLevel = (level: string) => {
@@ -28,7 +25,7 @@ const PracticeLevelFilter: React.FC<PracticeLevelFilterProps> = ({ value = [], o
 
   return (
     <div className="space-y-3">
-      <Label className="text-sm font-medium">{t('nearby.practiceLevel')}</Label>
+      <Label className="text-sm font-medium">Niveau de Pratique</Label>
       <div className="flex flex-wrap gap-2">
         {practiceLevels.map(level => (
           <Badge
