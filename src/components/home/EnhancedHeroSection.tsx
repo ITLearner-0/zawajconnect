@@ -184,6 +184,34 @@ const EnhancedHeroSection = () => {
             En Savoir Plus
           </SmoothScrollButton>
         </div>
+
+        {/* Bottom CTA Section - Ready to Start */}
+        <div className="bg-gradient-to-r from-rose-900/10 to-pink-900/10 dark:from-rose-800/20 dark:to-pink-800/20 rounded-2xl p-8 mb-8 backdrop-blur-sm border border-rose-200/20 dark:border-rose-700/20">
+          <h3 className="text-xl md:text-2xl font-bold mb-4 text-rose-800 dark:text-rose-200">
+            Prêt à commencer votre voyage vers le mariage halal ?
+          </h3>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button 
+              asChild 
+              size="lg" 
+              className="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 text-white font-bold px-8 py-3 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+            >
+              <Link to="/auth?signup=true" className="flex items-center gap-2">
+                S'inscrire Maintenant
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </Button>
+            
+            <SmoothScrollButton 
+              targetSection="trust"
+              variant="outline"
+              size="lg"
+              className="border-2 border-rose-400 text-rose-600 bg-white/50 backdrop-blur-sm hover:bg-rose-50 dark:border-rose-300 dark:text-rose-200 dark:bg-rose-900/30 dark:hover:bg-rose-800/50 font-bold px-8 py-3 rounded-full shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
+            >
+              En Savoir Plus
+            </SmoothScrollButton>
+          </div>
+        </div>
       </div>
       
       {/* Enhanced Scroll Indicator */}
