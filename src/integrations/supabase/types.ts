@@ -253,6 +253,7 @@ export type Database = {
           education_level: string | null
           email_verified: boolean | null
           first_name: string | null
+          gallery: string[] | null
           gender: string | null
           id: string
           id_verified: boolean | null
@@ -264,6 +265,7 @@ export type Database = {
           phone_verified: boolean | null
           prayer_frequency: string | null
           privacy_settings: Json | null
+          profile_picture: string | null
           religious_practice_level: string | null
           updated_at: string | null
           verification_document_url: string | null
@@ -280,6 +282,7 @@ export type Database = {
           education_level?: string | null
           email_verified?: boolean | null
           first_name?: string | null
+          gallery?: string[] | null
           gender?: string | null
           id: string
           id_verified?: boolean | null
@@ -291,6 +294,7 @@ export type Database = {
           phone_verified?: boolean | null
           prayer_frequency?: string | null
           privacy_settings?: Json | null
+          profile_picture?: string | null
           religious_practice_level?: string | null
           updated_at?: string | null
           verification_document_url?: string | null
@@ -307,6 +311,7 @@ export type Database = {
           education_level?: string | null
           email_verified?: boolean | null
           first_name?: string | null
+          gallery?: string[] | null
           gender?: string | null
           id?: string
           id_verified?: boolean | null
@@ -318,6 +323,7 @@ export type Database = {
           phone_verified?: boolean | null
           prayer_frequency?: string | null
           privacy_settings?: Json | null
+          profile_picture?: string | null
           religious_practice_level?: string | null
           updated_at?: string | null
           verification_document_url?: string | null

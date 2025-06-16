@@ -54,10 +54,11 @@ export function useCompatibilityMatches() {
           return;
         }
 
-        // Get profile information for all matches
+        // Get profile information for all matches including profile pictures
         const { data: profiles, error: profileError } = await supabase
           .from('profiles')
-          .select('id, first_name, last_name, gender, location, education_level, religious_practice_level, birth_date');
+          .select('id, first_name, last_name, gender, location, education_level, religious_practice_level, birth_date, profile_picture')
+          .eq('is_visible', true);
         
         if (profileError) {
           console.error("Error fetching profiles:", profileError);

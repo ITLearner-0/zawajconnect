@@ -2,6 +2,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Heart, CheckCircle } from 'lucide-react';
+import LazyImage from '@/components/ui/LazyImage';
 
 interface CompatibilityMatch {
   userId: string;
@@ -15,6 +16,7 @@ interface CompatibilityMatch {
     education_level?: string;
     religious_practice_level?: string;
     age?: number;
+    profile_picture?: string;
   };
 }
 
@@ -59,8 +61,20 @@ const CompatibilityProfileList = ({ matches, onNavigateToProfile }: Compatibilit
               )}
               
               <div className="flex items-start gap-3 mb-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-rose-400 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold">
-                  {profile.first_name?.charAt(0)}{profile.last_name?.charAt(0)}
+                <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white font-semibold">
+                  {profile.profile_picture ? (
+                    <LazyImage
+                      src={profile.profile_picture}
+                      alt={`${profile.first_name}'s profile picture`}
+                      className="w-full h-full object-cover"
+                      placeholderClassName="bg-rose-100 dark:bg-rose-800"
+                      fallbackSrc="https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=48&h=48&fit=crop&crop=face"
+                    />
+                  ) : (
+                    <>
+                      {profile.first_name?.charAt(0)}{profile.last_name?.charAt(0)}
+                    </>
+                  )}
                 </div>
                 
                 <div className="flex-1 min-w-0">

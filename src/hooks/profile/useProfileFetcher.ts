@@ -65,6 +65,8 @@ export const useProfileFetcher = (userId?: string | null): ProfileFetcherResult 
             waliName: profile.wali_name || '',
             waliRelationship: profile.wali_relationship || '',
             waliContact: profile.wali_contact || '',
+            profilePicture: profile.profile_picture || '',
+            gallery: profile.gallery || []
           };
           setProfileData(profileFormData);
           

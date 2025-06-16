@@ -69,6 +69,14 @@ export const useProfileSubmission = () => {
       if (sanitizedData.waliRelationship || profileData.waliRelationship) updateData.wali_relationship = sanitizedData.waliRelationship || profileData.waliRelationship;
       if (sanitizedData.waliContact || profileData.waliContact) updateData.wali_contact = sanitizedData.waliContact || profileData.waliContact;
 
+      // Handle profile picture and gallery
+      if (profileData.profilePicture !== undefined) {
+        updateData.profile_picture = profileData.profilePicture || null;
+      }
+      if (profileData.gallery !== undefined) {
+        updateData.gallery = profileData.gallery || [];
+      }
+
       console.log("Données de mise à jour finale:", updateData);
       
       // Update the profile
