@@ -21,7 +21,7 @@ interface OptimizationConfig {
 
 class PerformanceOptimizer {
   private metrics: PerformanceMetrics[] = [];
-  private cache = new Map<string, any>();
+  private dataCache = new Map<string, any>();
   private memoizedFunctions = new Map<string, any>();
   private config: OptimizationConfig;
 
@@ -43,7 +43,7 @@ class PerformanceOptimizer {
     const metric: PerformanceMetrics = {
       id,
       name,
-      startTime: performance.measureTime(() => {}, name).then(r => r.duration).catch(() => 0) as any,
+      startTime: Date.now(),
       metadata
     };
     
@@ -69,7 +69,7 @@ class PerformanceOptimizer {
       return factory();
     }
 
-    const cached = this.cache.get(key);
+    const cached = this.dataCache.get(key);
     if (cached && Date.now() - cached.timestamp < ttl) {
       console.log(`📦 Cache: Hit for ${key}`);
       return cached.value;
@@ -78,15 +78,15 @@ class PerformanceOptimizer {
     console.log(`📦 Cache: Miss for ${key}, generating...`);
     const value = factory();
     
-    this.cache.set(key, {
+    this.dataCache.set(key, {
       value,
       timestamp: Date.now()
     });
 
     // Cleanup old cache entries
-    if (this.cache.size > this.config.cacheSize) {
-      const oldestKey = this.cache.keys().next().value;
-      this.cache.delete(oldestKey);
+    if (this.dataCache.size > this.config.cacheSize) {
+      const oldestKey = this.dataCache.keys().next().value;
+      this.dataCache.delete(oldestKey);
     }
 
     return value;
@@ -126,34 +126,6 @@ class PerformanceOptimizer {
     return memoizedFn as T;
   }
 
-  // Bundle optimization analysis
-  analyzeBundleSize(): {
-    totalSize: number;
-    largestChunks: { name: string; size: number }[];
-    recommendations: string[];
-  } {
-    // Simulate bundle analysis (would be real in production)
-    const chunks = [
-      { name: 'main', size: 245000 },
-      { name: 'vendor', size: 180000 },
-      { name: 'components', size: 95000 },
-      { name: 'utils', size: 45000 }
-    ];
-
-    const totalSize = chunks.reduce((sum, chunk) => sum + chunk.size, 0);
-    const largestChunks = chunks.sort((a, b) => b.size - a.size).slice(0, 3);
-
-    const recommendations = [];
-    if (totalSize > 500000) {
-      recommendations.push('Consider code splitting for large bundles');
-    }
-    if (largestChunks[0].size > 200000) {
-      recommendations.push('Split large vendor chunks');
-    }
-
-    return { totalSize, largestChunks, recommendations };
-  }
-
   // Get performance report
   getPerformanceReport(): {
     metrics: PerformanceMetrics[];
@@ -190,7 +162,7 @@ class PerformanceOptimizer {
   // Clear all data
   clear(): void {
     this.metrics = [];
-    this.cache.clear();
+    this.dataCache.clear();
     this.memoizedFunctions.clear();
   }
 }

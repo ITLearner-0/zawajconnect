@@ -56,13 +56,13 @@ export const performance = {
   // Advanced performance monitoring
   startProfiling: (name: string): { end: () => number } => {
     const start = globalThis.performance.now();
-    performance.mark(`${name}-start`);
+    globalThis.performance.mark(`${name}-start`);
     
     return {
       end: () => {
         const end = globalThis.performance.now();
-        performance.mark(`${name}-end`);
-        performance.measure(name, `${name}-start`, `${name}-end`);
+        globalThis.performance.mark(`${name}-end`);
+        globalThis.performance.measure(name, `${name}-start`, `${name}-end`);
         const duration = end - start;
         console.log(`🚀 Performance Profile [${name}]: ${duration.toFixed(2)}ms`);
         return duration;
@@ -78,7 +78,7 @@ export const performance = {
     other: number;
     totalSize: number;
   } => {
-    const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+    const resources = globalThis.performance.getEntriesByType('resource') as PerformanceResourceTiming[];
     const analysis = {
       scripts: 0,
       stylesheets: 0,
@@ -117,13 +117,13 @@ export const performance = {
       const vitals: any = {};
 
       // First Contentful Paint
-      const fcpEntry = performance.getEntriesByName('first-contentful-paint')[0];
+      const fcpEntry = globalThis.performance.getEntriesByName('first-contentful-paint')[0];
       if (fcpEntry) {
         vitals.fcp = fcpEntry.startTime;
       }
 
       // Time to First Byte
-      const navigationEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      const navigationEntry = globalThis.performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
       if (navigationEntry) {
         vitals.ttfb = navigationEntry.responseStart - navigationEntry.requestStart;
       }
