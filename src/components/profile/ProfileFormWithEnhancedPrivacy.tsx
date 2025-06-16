@@ -8,8 +8,6 @@ import AboutMe from './AboutMe';
 import WaliInformation from './WaliInformation';
 import VerificationPanel from './VerificationPanel';
 import EnhancedPrivacySettings from './EnhancedPrivacySettings';
-import ProfilePictureUpload from './ProfilePictureUpload';
-import ProfileGallery from './ProfileGallery';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
 
@@ -44,36 +42,9 @@ const ProfileFormWithEnhancedPrivacy = ({
   onUnblockUser,
   userId
 }: ProfileFormWithEnhancedPrivacyProps) => {
-  const [profileImages, setProfileImages] = React.useState<string[]>([]);
-
-  const handleProfilePictureUpdate = (imageUrl: string) => {
-    // Update profile picture in form data
-    console.log('Profile picture updated:', imageUrl);
-  };
-
-  const handleGalleryUpdate = (images: string[]) => {
-    setProfileImages(images);
-    console.log('Gallery updated:', images);
-  };
-
   return (
     <div className="space-y-6">
       <form className="space-y-6">
-        {/* Profile Picture and Gallery */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <ProfilePictureUpload
-            currentImage={formData.profilePicture}
-            onImageUpdate={handleProfilePictureUpdate}
-            isEditing={true}
-          />
-          <ProfileGallery
-            images={profileImages}
-            onImagesUpdate={handleGalleryUpdate}
-            isEditing={true}
-            maxImages={6}
-          />
-        </div>
-        
         {/* Basic Information */}
         <BasicInformation formData={formData} handleChange={handleChange} />
         
