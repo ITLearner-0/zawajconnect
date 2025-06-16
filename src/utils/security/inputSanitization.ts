@@ -2,6 +2,11 @@
 import { sanitizeText, sanitizeHtml } from './enhancedValidation';
 import { ProfileFormData } from '@/types/profile';
 
+export const validateEmail = (email: string): boolean => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
 export const sanitizeProfileData = (data: Partial<ProfileFormData>): Partial<ProfileFormData> => {
   const sanitizedData: Partial<ProfileFormData> = {};
 

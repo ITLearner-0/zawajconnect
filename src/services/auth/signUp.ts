@@ -18,10 +18,12 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
       return false;
     }
 
-    // Sanitize input data
+    // Combine firstName and lastName into fullName for sanitization
+    const fullName = `${firstName} ${lastName}`.trim();
+    
+    // Sanitize input data using the correct ProfileFormData structure
     const sanitizedData = sanitizeProfileData({
-      firstName,
-      lastName,
+      fullName,
       waliName,
       waliRelationship,
       waliContact
@@ -54,8 +56,8 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
       options: {
         emailRedirectTo: redirectUrl,
         data: {
-          first_name: sanitizedData.firstName,
-          last_name: sanitizedData.lastName,
+          first_name: firstName,
+          last_name: lastName,
           gender: gender
         }
       }
@@ -82,11 +84,16 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     if (userData.user) {
       console.log("Creating profile for user:", userData.user.id);
       
+      // Extract first and last name from sanitized fullName
+      const nameParts = (sanitizedData.fullName || fullName).split(' ');
+      const sanitizedFirstName = nameParts[0] || firstName;
+      const sanitizedLastName = nameParts.slice(1).join(' ') || lastName;
+      
       // Create profile data object with sanitized input
       const profileInsert = {
         id: userData.user.id,
-        first_name: sanitizedData.firstName || "",
-        last_name: sanitizedData.lastName || "",
+        first_name: sanitizedFirstName,
+        last_name: sanitizedLastName,
         gender: gender || null,
         birth_date: new Date().toISOString().split('T')[0], 
         location: "Not specified",
