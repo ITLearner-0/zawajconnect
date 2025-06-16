@@ -10,6 +10,7 @@ export interface ProfileFormData {
   familyBackground: string;
   aboutMe: string;
   prayerFrequency: string;
+  polygamyStance?: string;
   waliName?: string;
   waliRelationship?: string;
   waliContact?: string;

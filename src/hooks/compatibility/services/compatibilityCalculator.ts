@@ -1,3 +1,4 @@
+
 import { CompatibilityMatch } from "@/types/compatibility";
 import { UserResultWithProfile } from "../types/matchingTypes";
 import { ValidatedUserResults } from "./dataFetchingService";
@@ -40,6 +41,24 @@ export class CompatibilityCalculator {
       let differences: string[] = [];
       let dealbreakers: string[] = [];
 
+      // Check polygamy compatibility first as it's critical
+      const polygamyCompatibility = this.checkPolygamyCompatibility(myResults, otherUser);
+      if (polygamyCompatibility.isDealbreaker) {
+        dealbreakers.push(polygamyCompatibility.reason);
+        return {
+          userId: otherUser.user_id,
+          score: 0,
+          matchDetails: {
+            strengths: [],
+            differences: [polygamyCompatibility.reason],
+            dealbreakers
+          },
+          profileData: this.buildProfileData(otherUser)
+        };
+      } else if (polygamyCompatibility.isStrength) {
+        strengths.push("Compatible sur la polygamie");
+      }
+
       // Calculate category-based compatibility
       const categoryMap = this.getCategoryMap();
       
@@ -81,11 +100,17 @@ export class CompatibilityCalculator {
       }
 
       // Apply user preferences
-      const finalScore = this.applyUserPreferences(
+      let finalScore = this.applyUserPreferences(
         totalWeight > 0 ? (totalScore / totalWeight) : 0,
         myResults.preferences,
         categoryScores
       );
+
+      // Apply polygamy compatibility bonus/penalty
+      if (polygamyCompatibility.scoreModifier !== 0) {
+        finalScore += polygamyCompatibility.scoreModifier;
+        finalScore = Math.max(0, Math.min(100, finalScore));
+      }
 
       return {
         userId: otherUser.user_id,
@@ -96,17 +121,7 @@ export class CompatibilityCalculator {
           dealbreakers: dealbreakers.length > 0 ? dealbreakers : undefined,
           categoryScores
         },
-        profileData: {
-          first_name: otherUser.profiles.first_name,
-          last_name: otherUser.profiles.last_name,
-          location: otherUser.profiles.location,
-          religious_practice_level: otherUser.profiles.religious_practice_level,
-          education_level: otherUser.profiles.education_level,
-          email_verified: otherUser.profiles.email_verified,
-          phone_verified: otherUser.profiles.phone_verified,
-          id_verified: otherUser.profiles.id_verified,
-          age: otherUser.profiles.birth_date ? this.calculateAge(otherUser.profiles.birth_date) : undefined
-        }
+        profileData: this.buildProfileData(otherUser)
       };
     } catch (error) {
       logError('calculateBasicCompatibilityScore', error as Error);
@@ -120,6 +135,116 @@ export class CompatibilityCalculator {
         }
       };
     }
+  }
+
+  private checkPolygamyCompatibility(
+    myResults: ValidatedUserResults,
+    otherUser: UserResultWithProfile
+  ): { isDealbreaker: boolean; isStrength: boolean; scoreModifier: number; reason: string } {
+    const myGender = myResults.profileData?.gender;
+    const otherGender = otherUser.profiles?.gender;
+    const myPolygamyStance = myResults.profileData?.polygamy_stance;
+    const otherPolygamyStance = otherUser.profiles?.polygamy_stance;
+
+    // If either doesn't have a stance, neutral compatibility
+    if (!myPolygamyStance || !otherPolygamyStance) {
+      return { isDealbreaker: false, isStrength: false, scoreModifier: 0, reason: "" };
+    }
+
+    // Male-Female compatibility check
+    if (myGender === 'male' && otherGender === 'female') {
+      // Man wants polygamy, woman refuses
+      if ((myPolygamyStance === 'oui') && (otherPolygamyStance === 'refuse')) {
+        return { 
+          isDealbreaker: true, 
+          isStrength: false, 
+          scoreModifier: 0, 
+          reason: "Incompatibilité sur la polygamie : homme souhaite, femme refuse" 
+        };
+      }
+      
+      // Man doesn't want polygamy, woman only accepts polygamy
+      if ((myPolygamyStance === 'non') && (otherPolygamyStance === 'accepte')) {
+        return { 
+          isDealbreaker: false, 
+          isStrength: false, 
+          scoreModifier: -10, 
+          reason: "Différence sur la polygamie : homme préfère monogamie, femme accepte polygamie" 
+        };
+      }
+      
+      // Perfect match: both want monogamy
+      if ((myPolygamyStance === 'non') && (otherPolygamyStance === 'refuse')) {
+        return { 
+          isDealbreaker: false, 
+          isStrength: true, 
+          scoreModifier: 15, 
+          reason: "Excellente compatibilité : tous deux préfèrent la monogamie" 
+        };
+      }
+      
+      // Good match: man wants polygamy, woman accepts
+      if ((myPolygamyStance === 'oui' || myPolygamyStance === 'peut_etre') && 
+          (otherPolygamyStance === 'accepte' || otherPolygamyStance === 'conditionnelle')) {
+        return { 
+          isDealbreaker: false, 
+          isStrength: true, 
+          scoreModifier: 10, 
+          reason: "Bonne compatibilité sur la polygamie" 
+        };
+      }
+    }
+    
+    // Female-Male compatibility check (reverse perspective)
+    if (myGender === 'female' && otherGender === 'male') {
+      // Woman refuses polygamy, man wants it
+      if ((myPolygamyStance === 'refuse') && (otherPolygamyStance === 'oui')) {
+        return { 
+          isDealbreaker: true, 
+          isStrength: false, 
+          scoreModifier: 0, 
+          reason: "Incompatibilité sur la polygamie : femme refuse, homme souhaite" 
+        };
+      }
+      
+      // Perfect match: both prefer monogamy
+      if ((myPolygamyStance === 'refuse') && (otherPolygamyStance === 'non')) {
+        return { 
+          isDealbreaker: false, 
+          isStrength: true, 
+          scoreModifier: 15, 
+          reason: "Excellente compatibilité : tous deux préfèrent la monogamie" 
+        };
+      }
+      
+      // Good match: woman accepts, man wants polygamy
+      if ((myPolygamyStance === 'accepte' || myPolygamyStance === 'conditionnelle') && 
+          (otherPolygamyStance === 'oui' || otherPolygamyStance === 'peut_etre')) {
+        return { 
+          isDealbreaker: false, 
+          isStrength: true, 
+          scoreModifier: 10, 
+          reason: "Bonne compatibilité sur la polygamie" 
+        };
+      }
+    }
+
+    // Default neutral compatibility
+    return { isDealbreaker: false, isStrength: false, scoreModifier: 0, reason: "" };
+  }
+
+  private buildProfileData(otherUser: UserResultWithProfile) {
+    return {
+      first_name: otherUser.profiles.first_name,
+      last_name: otherUser.profiles.last_name,
+      location: otherUser.profiles.location,
+      religious_practice_level: otherUser.profiles.religious_practice_level,
+      education_level: otherUser.profiles.education_level,
+      email_verified: otherUser.profiles.email_verified,
+      phone_verified: otherUser.profiles.phone_verified,
+      id_verified: otherUser.profiles.id_verified,
+      age: otherUser.profiles.birth_date ? this.calculateAge(otherUser.profiles.birth_date) : undefined
+    };
   }
 
   private calculateQuestionScore(myAnswer: AnswerValue, theirAnswer: AnswerValue): number {

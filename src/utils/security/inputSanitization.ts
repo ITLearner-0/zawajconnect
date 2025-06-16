@@ -32,6 +32,9 @@ export const sanitizeProfileData = (data: Partial<ProfileFormData>): Partial<Pro
   if (data.prayerFrequency !== undefined) {
     sanitizedData.prayerFrequency = sanitizeText(data.prayerFrequency);
   }
+  if (data.polygamyStance !== undefined) {
+    sanitizedData.polygamyStance = sanitizeText(data.polygamyStance);
+  }
   if (data.waliName !== undefined) {
     sanitizedData.waliName = sanitizeText(data.waliName);
   }
