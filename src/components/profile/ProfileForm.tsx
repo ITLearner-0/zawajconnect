@@ -46,6 +46,25 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     handleChange('profilePicture', imageUrl || '');
   };
 
+  // Create wrapper function for verification change to match expected signature
+  const handleVerificationFieldChange = (newStatus: VerificationStatus) => {
+    // Convert the new status object back to individual field calls
+    Object.entries(newStatus).forEach(([field, value]) => {
+      if (verificationStatus[field as keyof VerificationStatus] !== value) {
+        handleVerificationChange(field, value);
+      }
+    });
+  };
+
+  // Create wrapper functions to return promises
+  const handleToggleAccountVisibilityAsync = async () => {
+    onToggleAccountVisibility();
+  };
+
+  const handleUnblockUserAsync = async (userId: string) => {
+    onUnblockUser(userId);
+  };
+
   return (
     <div className="space-y-6">
       {/* Profile Picture Section */}
@@ -119,20 +138,21 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       {/* Verification Panel */}
       <VerificationPanel
         verificationStatus={verificationStatus}
-        userEmail={userEmail}
-        handleVerificationChange={handleVerificationChange}
+        userEmail={userEmail || ''}
+        onVerificationChange={handleVerificationFieldChange}
       />
 
       <Separator />
 
       {/* Privacy Settings */}
       <EnhancedPrivacySettings
+        userId={userEmail || ''}
         privacySettings={privacySettings}
         blockedUsers={blockedUsers}
         isAccountVisible={isAccountVisible}
-        handlePrivacySettingsChange={handlePrivacySettingsChange}
-        onToggleAccountVisibility={onToggleAccountVisibility}
-        onUnblockUser={onUnblockUser}
+        onPrivacyChange={handlePrivacySettingsChange}
+        onToggleAccountVisibility={handleToggleAccountVisibilityAsync}
+        onUnblockUser={handleUnblockUserAsync}
       />
 
       <div className="flex justify-center pt-6">
