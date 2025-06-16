@@ -1,7 +1,20 @@
+
 import { toast } from 'sonner';
 import { checkRateLimit } from '@/utils/security/securityUtils';
+import { useAuth } from '@/contexts/AuthContext';
+import { useContext } from 'react';
+import { SecurityContext } from './SecurityContext';
 
 export const useSecurityValidation = () => {
+  const { session } = useAuth();
+  const context = useContext(SecurityContext);
+  
+  if (!context) {
+    throw new Error('useSecurityValidation must be used within a SecurityProvider');
+  }
+  
+  const { threatLevel } = context;
+
   const validateUserAction = async (action: string, data?: any): Promise<boolean> => {
     try {
       // Rate limiting check
