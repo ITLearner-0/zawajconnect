@@ -75,7 +75,7 @@ const ProfileFormWithEnhancedPrivacy = ({
             className="bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white px-8 py-2"
           >
             <Save className="mr-2 h-4 w-4" />
-            Save Profile
+            Sauvegarder le Profil
           </Button>
         </div>
       </form>
