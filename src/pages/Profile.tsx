@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
@@ -116,7 +115,9 @@ const Profile = () => {
   };
 
   // Create a wrapper for verification change to match expected signature
-  const handleVerificationStatusChange = (newStatus: VerificationStatus) => {
+  const handleVerificationStatusChange = (...args: any[]) => {
+    // Only use the first argument, which should be the VerificationStatus
+    const newStatus = args[0] as VerificationStatus;
     handleVerificationChange(newStatus);
   };
 
