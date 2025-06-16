@@ -115,9 +115,7 @@ const Profile = () => {
   };
 
   // Create a wrapper for verification change to match expected signature
-  const handleVerificationStatusChange = (...args: any[]) => {
-    // Only use the first argument, which should be the VerificationStatus
-    const newStatus = args[0] as VerificationStatus;
+  const handleVerificationStatusChange = (newStatus: VerificationStatus) => {
     handleVerificationChange(newStatus);
   };
 
