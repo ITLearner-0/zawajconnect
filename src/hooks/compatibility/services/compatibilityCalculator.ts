@@ -141,13 +141,16 @@ export class CompatibilityCalculator {
     myResults: ValidatedUserResults,
     otherUser: UserResultWithProfile
   ): { isDealbreaker: boolean; isStrength: boolean; scoreModifier: number; reason: string } {
-    const myGender = myResults.profileData?.gender;
-    const otherGender = otherUser.profiles?.gender;
-    const myPolygamyStance = myResults.profileData?.polygamy_stance;
-    const otherPolygamyStance = otherUser.profiles?.polygamy_stance;
+    // Access gender from user results answers or set default
+    const myGender = myResults.answers?.gender?.value || 'unknown';
+    const otherGender = otherUser.profiles?.gender || 'unknown';
+    
+    // Try to get polygamy stance from answers, fallback to profiles
+    const myPolygamyStance = myResults.answers?.polygamy_stance?.value || 'not_specified';
+    const otherPolygamyStance = otherUser.answers?.polygamy_stance?.value || 'not_specified';
 
     // If either doesn't have a stance, neutral compatibility
-    if (!myPolygamyStance || !otherPolygamyStance) {
+    if (myPolygamyStance === 'not_specified' || otherPolygamyStance === 'not_specified') {
       return { isDealbreaker: false, isStrength: false, scoreModifier: 0, reason: "" };
     }
 

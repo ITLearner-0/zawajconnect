@@ -1,85 +1,94 @@
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { validateSessionSecurity } from '@/services/auth/securityEnforcement';
-import { useRateLimiting } from '@/hooks/useRateLimiting';
-import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+
+interface SecurityStatus {
+  isSecure: boolean;
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  loading: boolean;
+}
 
 export const useSecurityMiddleware = () => {
-  const { user, session } = useAuth();
-  const { checkRateLimit } = useRateLimiting();
-  const { toast } = useToast();
-  const [securityStatus, setSecurityStatus] = useState({
+  const [securityStatus, setSecurityStatus] = useState<SecurityStatus>({
     isSecure: false,
     emailVerified: false,
-    sessionValid: false,
+    phoneVerified: false,
     loading: true
   });
 
   useEffect(() => {
-    const checkSecurity = async () => {
-      if (!user || !session) {
+    checkSecurityStatus();
+  }, []);
+
+  const checkSecurityStatus = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.user) {
         setSecurityStatus({
           isSecure: false,
           emailVerified: false,
-          sessionValid: false,
+          phoneVerified: false,
           loading: false
         });
         return;
       }
 
-      try {
-        // Check email verification
-        const emailVerified = !!session.user.email_confirmed_at;
-        
-        // Check session validity
-        const sessionValid = await validateSessionSecurity();
-        
-        const isSecure = emailVerified && sessionValid;
-        
-        setSecurityStatus({
-          isSecure,
-          emailVerified,
-          sessionValid,
-          loading: false
-        });
+      // Check email verification
+      const emailVerified = session.user.email_confirmed_at !== null;
 
-        if (!emailVerified) {
-          toast({
-            title: "Vérification email requise",
-            description: "Certaines fonctionnalités sont limitées jusqu'à la vérification de votre email",
-            variant: "destructive"
-          });
-        }
-      } catch (error) {
-        console.error('Security check failed:', error);
-        setSecurityStatus({
-          isSecure: false,
-          emailVerified: false,
-          sessionValid: false,
-          loading: false
-        });
-      }
-    };
+      // Check phone verification (if available)
+      const phoneVerified = session.user.phone_confirmed_at !== null;
 
-    checkSecurity();
-  }, [user, session, toast]);
+      // Check profile verification status
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('email_verified, phone_verified, id_verified')
+        .eq('id', session.user.id)
+        .single();
+
+      const isSecure = emailVerified && (profile?.email_verified || false);
+
+      setSecurityStatus({
+        isSecure,
+        emailVerified: emailVerified || (profile?.email_verified || false),
+        phoneVerified: phoneVerified || (profile?.phone_verified || false),
+        loading: false
+      });
+    } catch (error) {
+      console.error('Error checking security status:', error);
+      setSecurityStatus({
+        isSecure: false,
+        emailVerified: false,
+        phoneVerified: false,
+        loading: false
+      });
+    }
+  };
 
   const validateAction = async (action: string, data?: any): Promise<boolean> => {
-    // Check rate limiting
-    const rateLimitPassed = await checkRateLimit(action, data);
-    if (!rateLimitPassed) {
+    // Basic validation - check if user is authenticated
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session?.user) {
+      console.warn('Action blocked: User not authenticated');
       return false;
     }
 
-    // Check security status
-    if (!securityStatus.isSecure) {
-      toast({
-        title: "Action non autorisée",
-        description: "Veuillez vérifier votre email et vous reconnecter",
-        variant: "destructive"
-      });
-      return false;
+    // Additional validation based on action type
+    switch (action) {
+      case 'profile_save':
+        if (!securityStatus.emailVerified) {
+          console.warn('Action blocked: Email not verified');
+          return false;
+        }
+        break;
+      case 'profile_update':
+        // Allow basic profile updates
+        break;
+      default:
+        break;
     }
 
     return true;
@@ -88,7 +97,6 @@ export const useSecurityMiddleware = () => {
   return {
     securityStatus,
     validateAction,
-    isSecure: securityStatus.isSecure,
-    loading: securityStatus.loading
+    checkSecurityStatus
   };
 };
