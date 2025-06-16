@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData, PrivacySettings } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
+import { sanitizeProfileData } from '@/utils/security/inputSanitization';
 
 export const useProfileSubmission = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -19,29 +20,34 @@ export const useProfileSubmission = () => {
     setError(null);
 
     try {
-      console.log("Submitting profile for user:", userId);
-      console.log("Profile data:", profileData);
+      console.log("Début de la soumission du profil pour l'utilisateur:", userId);
+      console.log("Données du profil avant sanitisation:", profileData);
+      
+      // Sanitize the profile data
+      const sanitizedData = sanitizeProfileData(profileData);
+      console.log("Données sanitisées:", sanitizedData);
       
       // Extract first and last name from full name
-      const nameParts = profileData.fullName.split(' ');
+      const nameParts = (sanitizedData.fullName || profileData.fullName || '').split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
       // Handle birth date conversion - only process if age is provided and valid
       let birthDate = null;
-      if (profileData.age && profileData.age.trim() !== '') {
-        if (profileData.age.includes('-')) {
+      const ageValue = sanitizedData.age || profileData.age;
+      if (ageValue && ageValue.trim() !== '') {
+        if (ageValue.includes('-')) {
           // If age is already a date format, use it directly
-          birthDate = profileData.age;
-        } else if (!isNaN(Number(profileData.age))) {
+          birthDate = ageValue;
+        } else if (!isNaN(Number(ageValue))) {
           // If age is a number, convert to a birth year
           const currentYear = new Date().getFullYear();
-          const birthYear = currentYear - parseInt(profileData.age, 10);
+          const birthYear = currentYear - parseInt(ageValue, 10);
           birthDate = `${birthYear}-01-01`;
         }
       }
 
-      // Prepare update data - only include non-empty values
+      // Prepare update data - include all provided fields
       const updateData: any = {
         first_name: firstName,
         last_name: lastName,
@@ -49,20 +55,20 @@ export const useProfileSubmission = () => {
         is_visible: true
       };
 
-      // Only add fields that have values
+      // Add all other fields from sanitized data, falling back to original data
       if (birthDate) updateData.birth_date = birthDate;
-      if (profileData.gender) updateData.gender = profileData.gender;
-      if (profileData.location) updateData.location = profileData.location;
-      if (profileData.education) updateData.education_level = profileData.education;
-      if (profileData.occupation) updateData.occupation = profileData.occupation;
-      if (profileData.religiousLevel) updateData.religious_practice_level = profileData.religiousLevel;
-      if (profileData.prayerFrequency) updateData.prayer_frequency = profileData.prayerFrequency;
-      if (profileData.aboutMe) updateData.about_me = profileData.aboutMe;
-      if (profileData.waliName) updateData.wali_name = profileData.waliName;
-      if (profileData.waliRelationship) updateData.wali_relationship = profileData.waliRelationship;
-      if (profileData.waliContact) updateData.wali_contact = profileData.waliContact;
+      if (sanitizedData.gender || profileData.gender) updateData.gender = sanitizedData.gender || profileData.gender;
+      if (sanitizedData.location || profileData.location) updateData.location = sanitizedData.location || profileData.location;
+      if (sanitizedData.education || profileData.education) updateData.education_level = sanitizedData.education || profileData.education;
+      if (sanitizedData.occupation || profileData.occupation) updateData.occupation = sanitizedData.occupation || profileData.occupation;
+      if (sanitizedData.religiousLevel || profileData.religiousLevel) updateData.religious_practice_level = sanitizedData.religiousLevel || profileData.religiousLevel;
+      if (sanitizedData.prayerFrequency || profileData.prayerFrequency) updateData.prayer_frequency = sanitizedData.prayerFrequency || profileData.prayerFrequency;
+      if (sanitizedData.aboutMe || profileData.aboutMe) updateData.about_me = sanitizedData.aboutMe || profileData.aboutMe;
+      if (sanitizedData.waliName || profileData.waliName) updateData.wali_name = sanitizedData.waliName || profileData.waliName;
+      if (sanitizedData.waliRelationship || profileData.waliRelationship) updateData.wali_relationship = sanitizedData.waliRelationship || profileData.waliRelationship;
+      if (sanitizedData.waliContact || profileData.waliContact) updateData.wali_contact = sanitizedData.waliContact || profileData.waliContact;
 
-      console.log("Update data:", updateData);
+      console.log("Données de mise à jour finale:", updateData);
       
       // Update the profile
       const { error } = await supabase
@@ -71,32 +77,35 @@ export const useProfileSubmission = () => {
         .eq('id', userId);
 
       if (error) {
-        console.error("Error updating profile:", error);
+        console.error("Erreur lors de la mise à jour du profil:", error);
         setError(error.message);
         toast({
-          title: "Error",
-          description: "Failed to update profile. Please try again.",
+          title: "Erreur",
+          description: "Échec de la mise à jour du profil. Veuillez réessayer.",
           variant: "destructive",
         });
         return false;
       }
 
-      // Call the success callback to update the form data
+      console.log("Profil mis à jour avec succès");
+
+      // Call the success callback to update the form data with original (non-sanitized) data
+      // This ensures the user sees their original input
       if (onSuccess) {
         onSuccess(profileData);
       }
 
       toast({
-        title: "Profile Updated",
-        description: "Your profile has been successfully updated.",
+        title: "Profil Mis à Jour",
+        description: "Votre profil a été mis à jour avec succès.",
       });
       return true;
     } catch (err: any) {
-      console.error("Unexpected error during profile update:", err);
+      console.error("Erreur inattendue lors de la mise à jour du profil:", err);
       setError(err.message);
       toast({
-        title: "Error",
-        description: "An unexpected error occurred. Please try again.",
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite. Veuillez réessayer.",
         variant: "destructive",
       });
       return false;

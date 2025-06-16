@@ -53,14 +53,9 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     const isValid = await validateAction('profile_update', { field, value });
     if (!isValid) return;
 
-    // Sanitize input based on field type
-    let sanitizedValue = value;
-    if (typeof value === 'string') {
-      const sanitizedData = sanitizeProfileData({ [field]: value });
-      sanitizedValue = sanitizedData[field];
-    }
-
-    handleChange(field, sanitizedValue);
+    // Directly pass the value without sanitizing here to preserve user input
+    // Sanitization will happen during form submission
+    handleChange(field, value);
   };
 
   const handleSecureSubmit = async () => {
@@ -77,17 +72,17 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 
     setIsSubmitting(true);
     try {
-      // Sanitize all form data before submission
-      const sanitizedData = sanitizeProfileData(formData);
+      console.log("Données du formulaire avant sauvegarde:", formData);
+      const success = await handleSubmit();
       
-      // Update form data with sanitized version
-      Object.keys(sanitizedData).forEach(key => {
-        if (sanitizedData[key] !== formData[key]) {
-          handleChange(key, sanitizedData[key]);
-        }
-      });
-
-      await handleSubmit();
+      if (success) {
+        toast.success("Profil sauvegardé avec succès!");
+      } else {
+        toast.error("Erreur lors de la sauvegarde du profil");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde:", error);
+      toast.error("Une erreur inattendue s'est produite");
     } finally {
       setIsSubmitting(false);
     }
