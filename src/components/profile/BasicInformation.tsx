@@ -12,11 +12,11 @@ interface BasicInformationProps {
 
 const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => (
   <div className="space-y-4">
-    <h2 id="basic-info-heading" className="text-xl font-semibold text-primary">Basic Information</h2>
+    <h2 id="basic-info-heading" className="text-xl font-semibold text-primary">Informations de Base</h2>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="fullName">Full Name</Label>
+          <Label htmlFor="fullName">Nom Complet</Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.fullName} />
           </TooltipProvider>
@@ -26,17 +26,17 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           name="fullName"
           value={formData.fullName}
           onChange={handleChange}
-          placeholder="Enter your full name"
+          placeholder="Entrez votre nom complet"
           aria-required="true"
           aria-describedby="fullName-description"
         />
         <p id="fullName-description" className="sr-only">
-          Your legal first and last name as it appears on official documents
+          Votre nom et prénom légaux tels qu'ils apparaissent sur les documents officiels
         </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="age">Age</Label>
+          <Label htmlFor="age">Âge</Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.age} />
           </TooltipProvider>
@@ -47,19 +47,19 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           type="number"
           value={formData.age}
           onChange={handleChange}
-          placeholder="Your age"
+          placeholder="Votre âge"
           aria-required="true"
           min="18"
           max="120"
           aria-describedby="age-description"
         />
         <p id="age-description" className="sr-only">
-          Your current age in years. Must be at least 18.
+          Votre âge actuel en années. Doit être d'au moins 18 ans.
         </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="gender">Gender</Label>
+          <Label htmlFor="gender">Genre</Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.gender} />
           </TooltipProvider>
@@ -73,17 +73,17 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           aria-required="true"
           aria-describedby="gender-description"
         >
-          <option value="">Select gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+          <option value="">Sélectionnez le genre</option>
+          <option value="male">Homme</option>
+          <option value="female">Femme</option>
         </select>
         <p id="gender-description" className="sr-only">
-          Please select your gender
+          Veuillez sélectionner votre genre
         </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="location">Location</Label>
+          <Label htmlFor="location">Localisation</Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.location} />
           </TooltipProvider>
@@ -93,12 +93,12 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           name="location"
           value={formData.location}
           onChange={handleChange}
-          placeholder="City, Country"
+          placeholder="Ville, Pays"
           aria-required="true"
           aria-describedby="location-description"
         />
         <p id="location-description" className="sr-only">
-          Your current city and country of residence
+          Votre ville et pays de résidence actuels
         </p>
       </div>
     </div>

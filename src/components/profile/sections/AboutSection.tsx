@@ -22,7 +22,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ formData, handleChange }) =
           name="aboutMe"
           value={formData.aboutMe || ""}
           onChange={handleInputChange}
-          placeholder="Parlez-nous de vous..."
+          placeholder="Parlez-nous de vous, de vos intérêts, valeurs et ce que vous recherchez..."
           rows={4}
           className="min-h-[150px]"
         />
