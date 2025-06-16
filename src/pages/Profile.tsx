@@ -21,6 +21,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [hasCompatibilityResults, setHasCompatibilityResults] = useState<boolean | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   
   const { 
     formData, 
@@ -74,6 +75,7 @@ const Profile = () => {
       if (!userId) return;
       
       try {
+        console.log("Checking compatibility results for user:", userId);
         const { data, error } = await supabase
           .from('compatibility_results')
           .select('id')
@@ -82,49 +84,80 @@ const Profile = () => {
 
         if (error) {
           console.error("Error checking compatibility results:", error);
+          setHasCompatibilityResults(false);
           return;
         }
 
-        setHasCompatibilityResults(data && data.length > 0);
+        const hasResults = data && data.length > 0;
+        console.log("User has compatibility results:", hasResults);
+        setHasCompatibilityResults(hasResults);
       } catch (error) {
         console.error("Error checking compatibility results:", error);
+        setHasCompatibilityResults(false);
       }
     };
 
     checkCompatibilityResults();
   }, [userId]);
 
-  // Wrapper function to handle the save process and redirect to compatibility test
+  // Wrapper function to handle the save process and redirect to compatibility test or nearby
   const handleSaveProfile = async () => {
+    if (isSaving) return false;
+    
+    setIsSaving(true);
     console.log("Save profile button clicked");
+    console.log("User ID:", userId);
+    console.log("Has compatibility results:", hasCompatibilityResults);
+    
     try {
       const success = await handleSubmit();
       console.log("Profile save result:", success);
+      
       if (success) {
         console.log("Profile saved successfully");
         
         // Check if user has taken compatibility test
         if (hasCompatibilityResults === false) {
           toast({
-            title: "Profile Saved Successfully!",
-            description: "Now let's complete your compatibility test to find better matches.",
+            title: "Profil Sauvegardé!",
+            description: "Maintenant, complétez votre test de compatibilité pour trouver de meilleurs matches.",
           });
           
           // Small delay to let the user see the success message
           setTimeout(() => {
+            console.log("Redirecting to compatibility test");
             navigate("/compatibility");
-          }, 1500);
+          }, 2000);
         } else {
           toast({
-            title: "Profile Updated",
-            description: "Your profile has been successfully updated.",
+            title: "Profil Mis à Jour",
+            description: "Votre profil a été mis à jour avec succès.",
           });
+          
+          // If user has already taken the test, redirect to nearby matches
+          setTimeout(() => {
+            console.log("Redirecting to nearby matches");
+            navigate("/nearby");
+          }, 2000);
         }
+      } else {
+        toast({
+          title: "Erreur",
+          description: "Impossible de sauvegarder le profil. Veuillez réessayer.",
+          variant: "destructive",
+        });
       }
       return success;
     } catch (error) {
       console.error("Error saving profile:", error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur inattendue s'est produite. Veuillez réessayer.",
+        variant: "destructive",
+      });
       return false;
+    } finally {
+      setIsSaving(false);
     }
   };
   
