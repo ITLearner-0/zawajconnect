@@ -1,3 +1,4 @@
+
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
@@ -105,29 +106,21 @@ const Profile = () => {
     }
   };
   
-  // Create a wrapper for handleChange to match expected signature
-  const handleFieldChange = (field: string, value: any) => {
-    // Convert to the event-based signature that handleChange expects
-    const event = {
-      target: {
-        name: field,
-        value: value
-      }
-    } as React.ChangeEvent<HTMLInputElement>;
-    
-    handleChange(event);
+  // Create a wrapper for handleChange to match the event-based signature
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    // Convert to the field-based signature that handleChange expects
+    handleChange(e.target.name, e.target.value);
   };
 
   // Create a wrapper for verification change to match expected signature
-  const handleVerificationFieldChange = (field: string, value: boolean) => {
-    const newStatus = { ...verificationStatus, [field]: value };
+  const handleVerificationStatusChange = (newStatus: any) => {
     handleVerificationChange(newStatus);
   };
 
-  // Create a wrapper for privacy settings change
-  const handlePrivacyFieldChange = (field: string, value: any) => {
-    const newSettings = { ...privacySettings, [field]: value };
-    handlePrivacySettingsChange(newSettings);
+  // Create a wrapper for privacy settings change to match expected signature
+  const handlePrivacyChange = async (newSettings: any) => {
+    const success = await handlePrivacySettingsChange(newSettings);
+    return success;
   };
   
   // Wrapper functions to convert boolean returns to void
@@ -171,15 +164,15 @@ const Profile = () => {
             <CardContent>
               <ProfileFormWithEnhancedPrivacy
                 formData={formData}
-                handleChange={handleFieldChange}
+                handleChange={handleFormChange}
                 handleSubmit={handleSaveProfile}
                 verificationStatus={verificationStatus}
                 userEmail={userEmail}
-                handleVerificationChange={handleVerificationFieldChange}
+                handleVerificationChange={handleVerificationStatusChange}
                 privacySettings={privacySettings}
                 blockedUsers={blockedUsers}
                 isAccountVisible={isAccountVisible}
-                handlePrivacySettingsChange={handlePrivacyFieldChange}
+                handlePrivacySettingsChange={handlePrivacyChange}
                 onToggleAccountVisibility={handleToggleVisibility}
                 onUnblockUser={handleUnblockUser}
                 userId={userId}
