@@ -14,11 +14,11 @@ import { useEnhancedPrivacy } from '@/hooks/privacy/useEnhancedPrivacy';
 import EnhancedPrivacyControls from '@/components/privacy/EnhancedPrivacyControls';
 
 interface EnhancedPrivacySettingsProps {
-  userId: string;
+  userId?: string;
   privacySettings: PrivacySettingsType;
   blockedUsers: string[];
   isAccountVisible: boolean;
-  onPrivacyChange: (settings: PrivacySettingsType) => void;
+  onPrivacyChange: (settings: PrivacySettingsType) => Promise<boolean>;
   onToggleAccountVisibility: () => Promise<void>;
   onUnblockUser: (userId: string) => Promise<void>;
 }
@@ -39,18 +39,22 @@ const EnhancedPrivacySettings = ({
     loading 
   } = useEnhancedPrivacy(userId);
 
+  console.log("EnhancedPrivacySettings rendered with:", { userId, privacySettings, isAccountVisible });
+
   const handleSettingChange = (settingName: keyof PrivacySettingsType, value: boolean) => {
-    onPrivacyChange({
+    const newSettings = {
       ...privacySettings,
       [settingName]: value
-    });
+    };
+    onPrivacyChange(newSettings);
   };
 
   const handleProfileVisibilityChange = (value: number[]) => {
-    onPrivacyChange({
+    const newSettings = {
       ...privacySettings,
       profileVisibilityLevel: value[0]
-    });
+    };
+    onPrivacyChange(newSettings);
   };
 
   const getVisibilityLevelText = (level: number) => {
@@ -63,6 +67,11 @@ const EnhancedPrivacySettings = ({
   };
 
   const handleEnhancedSettingsChange = async (newSettings: EnhancedPrivacySettingsType) => {
+    if (!userId) {
+      console.warn("No userId provided to EnhancedPrivacySettings");
+      return;
+    }
+    
     const success = await updateEnhancedSettings(newSettings);
     if (!success) {
       toast({
@@ -193,11 +202,19 @@ const EnhancedPrivacySettings = ({
           </TabsContent>
 
           <TabsContent value="advanced" className="mt-6">
-            <EnhancedPrivacyControls
-              userId={userId}
-              currentSettings={enhancedSettings}
-              onSettingsChange={handleEnhancedSettingsChange}
-            />
+            {userId ? (
+              <EnhancedPrivacyControls
+                userId={userId}
+                currentSettings={enhancedSettings}
+                onSettingsChange={handleEnhancedSettingsChange}
+              />
+            ) : (
+              <div className="p-4 border rounded-lg">
+                <p className="text-sm text-muted-foreground">
+                  Advanced privacy settings will be available once your profile is loaded.
+                </p>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="incognito" className="mt-6">
@@ -210,7 +227,6 @@ const EnhancedPrivacySettings = ({
                 Browse privately and control your digital footprint while using the platform.
               </p>
               
-              {/* This content is handled in EnhancedPrivacyControls */}
               <div className="p-4 border rounded-lg">
                 <p className="text-sm">Incognito settings are available in the Advanced tab.</p>
               </div>
@@ -225,14 +241,14 @@ const EnhancedPrivacySettings = ({
               </h3>
               {blockedUsers.length > 0 ? (
                 <div className="space-y-2 mt-2">
-                  {blockedUsers.map(userId => (
-                    <div key={userId} className="flex justify-between items-center p-2 bg-gray-50 rounded-md">
-                      <span className="text-sm">User ID: {userId.substring(0, 8)}...</span>
+                  {blockedUsers.map(blockedUserId => (
+                    <div key={blockedUserId} className="flex justify-between items-center p-2 bg-gray-50 rounded-md">
+                      <span className="text-sm">User ID: {blockedUserId.substring(0, 8)}...</span>
                       <Button 
                         variant="ghost" 
                         size="sm"
                         onClick={async () => {
-                          await onUnblockUser(userId);
+                          await onUnblockUser(blockedUserId);
                           toast({
                             title: "User Unblocked",
                             description: "You can now interact with this user again.",

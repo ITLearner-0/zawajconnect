@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +9,7 @@ import { useEffect, useState } from "react";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileOnboarding from "@/components/profile/ProfileOnboarding";
+import ProfileFormWithEnhancedPrivacy from "@/components/profile/ProfileFormWithEnhancedPrivacy";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -73,6 +73,7 @@ const Profile = () => {
   // Wrapper function to handle the save process and redirect to compatibility test
   const handleSaveProfile = async () => {
     console.log("Save profile button clicked");
+    console.log("Données du formulaire avant sauvegarde:", formData);
     try {
       const success = await handleSubmit();
       console.log("Profile save result:", success);
@@ -168,7 +169,7 @@ const Profile = () => {
               </p>
             </CardHeader>
             <CardContent>
-              <ProfileForm
+              <ProfileFormWithEnhancedPrivacy
                 formData={formData}
                 handleChange={handleFieldChange}
                 handleSubmit={handleSaveProfile}
@@ -181,6 +182,7 @@ const Profile = () => {
                 handlePrivacySettingsChange={handlePrivacyFieldChange}
                 onToggleAccountVisibility={handleToggleVisibility}
                 onUnblockUser={handleUnblockUser}
+                userId={userId}
               />
             </CardContent>
           </Card>

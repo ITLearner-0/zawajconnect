@@ -63,7 +63,6 @@ export const useProfileSubmission = () => {
       if (sanitizedData.occupation || profileData.occupation) updateData.occupation = sanitizedData.occupation || profileData.occupation;
       if (sanitizedData.religiousLevel || profileData.religiousLevel) updateData.religious_practice_level = sanitizedData.religiousLevel || profileData.religiousLevel;
       if (sanitizedData.prayerFrequency || profileData.prayerFrequency) updateData.prayer_frequency = sanitizedData.prayerFrequency || profileData.prayerFrequency;
-      if (sanitizedData.polygamyStance || profileData.polygamyStance) updateData.polygamy_stance = sanitizedData.polygamyStance || profileData.polygamyStance;
       if (sanitizedData.aboutMe || profileData.aboutMe) updateData.about_me = sanitizedData.aboutMe || profileData.aboutMe;
       if (sanitizedData.waliName || profileData.waliName) updateData.wali_name = sanitizedData.waliName || profileData.waliName;
       if (sanitizedData.waliRelationship || profileData.waliRelationship) updateData.wali_relationship = sanitizedData.waliRelationship || profileData.waliRelationship;
