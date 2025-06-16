@@ -1,4 +1,5 @@
 
+
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
@@ -108,8 +109,10 @@ const Profile = () => {
   
   // Create a wrapper for handleChange to match the event-based signature
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    // Convert to the field-based signature that handleChange expects
-    handleChange(e.target.name, e.target.value);
+    // Extract field and value from the event and call handleChange with correct signature
+    const field = e.target.name;
+    const value = e.target.value;
+    handleChange(field, value);
   };
 
   // Create a wrapper for verification change to match expected signature
@@ -186,3 +189,4 @@ const Profile = () => {
 };
 
 export default Profile;
+
