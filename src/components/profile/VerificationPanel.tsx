@@ -20,10 +20,10 @@ const VerificationPanel = ({
     <Card className="mt-6">
       <CardHeader>
         <h2 className="text-xl font-semibold text-primary">
-          Verify Your Profile
+          Vérifiez Votre Profil
         </h2>
         <p className="text-sm text-gray-600">
-          Verified profiles receive more attention and trust from other users
+          Les profils vérifiés reçoivent plus d'attention et de confiance de la part des autres utilisateurs
         </p>
       </CardHeader>
       <CardContent className="space-y-6">

@@ -12,15 +12,15 @@ const VerificationBadge = ({ type, verified }: VerificationBadgeProps) => {
   if (!verified) return null;
 
   const labels = {
-    email: "Email Verified",
-    phone: "Phone Verified",
-    id: "ID Verified",
+    email: "Email Vérifié",
+    phone: "Téléphone Vérifié",
+    id: "Identité Vérifiée",
   };
 
   const descriptions = {
-    email: "User has verified their email address",
-    phone: "User has verified their phone number",
-    id: "User has completed identity verification",
+    email: "L'utilisateur a vérifié son adresse email",
+    phone: "L'utilisateur a vérifié son numéro de téléphone",
+    id: "L'utilisateur a complété la vérification d'identité",
   };
 
   return (

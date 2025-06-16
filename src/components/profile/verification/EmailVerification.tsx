@@ -25,13 +25,13 @@ const EmailVerification = ({ isVerified, userEmail }: EmailVerificationProps) =>
       });
       
       toast({
-        title: "Verification email sent",
-        description: "Please check your inbox and click the verification link",
+        title: "Email de vérification envoyé",
+        description: "Veuillez vérifier votre boîte de réception et cliquer sur le lien de vérification",
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Could not send verification email. Please try again.",
+        title: "Erreur",
+        description: "Impossible d'envoyer l'email de vérification. Veuillez réessayer.",
         variant: "destructive",
       });
     } finally {
@@ -44,8 +44,8 @@ const EmailVerification = ({ isVerified, userEmail }: EmailVerificationProps) =>
       <div className="flex items-center gap-2">
         <Mail className="h-5 w-5 text-islamic-teal dark:text-islamic-brightGold" />
         <div>
-          <Label className="text-islamic-burgundy dark:text-islamic-cream">Email Verification</Label>
-          <p className="text-xs text-gray-500 dark:text-islamic-cream/70">Verify your email address</p>
+          <Label className="text-islamic-burgundy dark:text-islamic-cream">Vérification Email</Label>
+          <p className="text-xs text-gray-500 dark:text-islamic-cream/70">Vérifiez votre adresse email</p>
         </div>
       </div>
       <div>
@@ -55,7 +55,7 @@ const EmailVerification = ({ isVerified, userEmail }: EmailVerificationProps) =>
             className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700/50"
           >
             <Check className="h-3 w-3" />
-            Verified
+            Vérifié
           </Badge>
         ) : (
           <CustomButton
@@ -64,7 +64,7 @@ const EmailVerification = ({ isVerified, userEmail }: EmailVerificationProps) =>
             onClick={sendEmailVerification}
             disabled={loading}
           >
-            Verify Email
+            Vérifier Email
           </CustomButton>
         )}
       </div>
