@@ -7,9 +7,15 @@ import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileOnboarding from "@/components/profile/ProfileOnboarding";
+import ProfileAnalytics from "@/components/profile/ProfileAnalytics";
+import ProfileRecommendations from "@/components/profile/ProfileRecommendations";
+import ProfileVisibilityManager from "@/components/profile/ProfileVisibilityManager";
+import { useProfileAnalytics } from "@/hooks/profile/useProfileAnalytics";
+import { useProfileRecommendations } from "@/hooks/profile/useProfileRecommendations";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -33,6 +39,14 @@ const Profile = () => {
     toggleAccountVisibility,
     unblockUser
   } = useProfile();
+
+  // Analytics and recommendations
+  const { analytics, loading: analyticsLoading } = useProfileAnalytics(userId);
+  const { 
+    recommendations, 
+    loading: recommendationsLoading, 
+    handleRecommendationAction 
+  } = useProfileRecommendations(userId);
   
   const {
     isOnboarding,
@@ -43,6 +57,16 @@ const Profile = () => {
     completeOnboarding,
     canProceedCurrentStep
   } = useOnboarding(formData, isNewUser);
+
+  // Visibility settings state
+  const [visibilitySettings, setVisibilitySettings] = useState({
+    isVisible: isAccountVisible,
+    visibilityLevel: 80,
+    showOnlyToMatches: false,
+    hideFromSearch: false,
+    temporaryHide: false,
+    temporaryHideUntil: undefined
+  });
 
   // Check if user has taken compatibility test
   useEffect(() => {
@@ -138,6 +162,11 @@ const Profile = () => {
     await unblockUser(userId);
   };
 
+  const handleVisibilitySettingsChange = (newSettings: any) => {
+    setVisibilitySettings(newSettings);
+    // Here you could also sync with backend if needed
+  };
+
   if (isOnboarding) {
     return (
       <AccessibilityProvider>
@@ -159,29 +188,70 @@ const Profile = () => {
   return (
     <AccessibilityProvider>
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-12" role="main" aria-labelledby="profile-heading">
-        <div className="container max-w-3xl mx-auto px-4">
+        <div className="container max-w-4xl mx-auto px-4">
           <Card className="shadow-lg border-rose-200 dark:border-rose-700 bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm">
             <CardHeader>
               <ProfileHeader onSignOut={handleSignOut} />
               <p className="text-center text-rose-600 dark:text-rose-300">
-                Keep your profile information up to date
+                Manage your profile and privacy settings
               </p>
             </CardHeader>
             <CardContent>
-              <ProfileForm
-                formData={formData}
-                handleChange={handleFieldChange}
-                handleSubmit={handleSaveProfile}
-                verificationStatus={verificationStatus}
-                userEmail={userEmail}
-                handleVerificationChange={handleVerificationFieldChange}
-                privacySettings={privacySettings}
-                blockedUsers={blockedUsers}
-                isAccountVisible={isAccountVisible}
-                handlePrivacySettingsChange={handlePrivacyFieldChange}
-                onToggleAccountVisibility={handleToggleVisibility}
-                onUnblockUser={handleUnblockUser}
-              />
+              <Tabs defaultValue="profile" className="w-full">
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="profile">Profile</TabsTrigger>
+                  <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                  <TabsTrigger value="recommendations">Tips</TabsTrigger>
+                  <TabsTrigger value="visibility">Visibility</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="profile" className="mt-6">
+                  <ProfileForm
+                    formData={formData}
+                    handleChange={handleFieldChange}
+                    handleSubmit={handleSaveProfile}
+                    verificationStatus={verificationStatus}
+                    userEmail={userEmail}
+                    handleVerificationChange={handleVerificationFieldChange}
+                    privacySettings={privacySettings}
+                    blockedUsers={blockedUsers}
+                    isAccountVisible={isAccountVisible}
+                    handlePrivacySettingsChange={handlePrivacyFieldChange}
+                    onToggleAccountVisibility={handleToggleVisibility}
+                    onUnblockUser={handleUnblockUser}
+                  />
+                </TabsContent>
+
+                <TabsContent value="analytics" className="mt-6">
+                  {analyticsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin h-8 w-8 border-t-2 border-rose-600 rounded-full"></div>
+                    </div>
+                  ) : (
+                    <ProfileAnalytics analytics={analytics} />
+                  )}
+                </TabsContent>
+
+                <TabsContent value="recommendations" className="mt-6">
+                  {recommendationsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin h-8 w-8 border-t-2 border-rose-600 rounded-full"></div>
+                    </div>
+                  ) : (
+                    <ProfileRecommendations 
+                      recommendations={recommendations}
+                      onActionClick={handleRecommendationAction}
+                    />
+                  )}
+                </TabsContent>
+
+                <TabsContent value="visibility" className="mt-6">
+                  <ProfileVisibilityManager
+                    settings={visibilitySettings}
+                    onSettingsChange={handleVisibilitySettingsChange}
+                  />
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         </div>
