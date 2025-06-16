@@ -1,3 +1,4 @@
+
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
@@ -9,8 +10,6 @@ import { useEffect, useState } from "react";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileOnboarding from "@/components/profile/ProfileOnboarding";
-import ProfileFormWithEnhancedPrivacy from "@/components/profile/ProfileFormWithEnhancedPrivacy";
-import { VerificationStatus } from "@/types/profile";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -74,7 +73,6 @@ const Profile = () => {
   // Wrapper function to handle the save process and redirect to compatibility test
   const handleSaveProfile = async () => {
     console.log("Save profile button clicked");
-    console.log("Données du formulaire avant sauvegarde:", formData);
     try {
       const success = await handleSubmit();
       console.log("Profile save result:", success);
@@ -106,15 +104,29 @@ const Profile = () => {
     }
   };
   
-  // Create a wrapper for handleChange to match the event-based signature
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    handleChange(e);
+  // Create a wrapper for handleChange to match expected signature
+  const handleFieldChange = (field: string, value: any) => {
+    // Convert to the event-based signature that handleChange expects
+    const event = {
+      target: {
+        name: field,
+        value: value
+      }
+    } as React.ChangeEvent<HTMLInputElement>;
+    
+    handleChange(event);
   };
 
-  // Create a wrapper for privacy settings change to match expected signature
-  const handlePrivacyChange = async (newSettings: any) => {
-    const success = await handlePrivacySettingsChange(newSettings);
-    return success;
+  // Create a wrapper for verification change to match expected signature
+  const handleVerificationFieldChange = (field: string, value: boolean) => {
+    const newStatus = { ...verificationStatus, [field]: value };
+    handleVerificationChange(newStatus);
+  };
+
+  // Create a wrapper for privacy settings change
+  const handlePrivacyFieldChange = (field: string, value: any) => {
+    const newSettings = { ...privacySettings, [field]: value };
+    handlePrivacySettingsChange(newSettings);
   };
   
   // Wrapper functions to convert boolean returns to void
@@ -156,20 +168,19 @@ const Profile = () => {
               </p>
             </CardHeader>
             <CardContent>
-              <ProfileFormWithEnhancedPrivacy
+              <ProfileForm
                 formData={formData}
-                handleChange={handleFormChange}
+                handleChange={handleFieldChange}
                 handleSubmit={handleSaveProfile}
                 verificationStatus={verificationStatus}
                 userEmail={userEmail}
-                handleVerificationChange={handleVerificationChange}
+                handleVerificationChange={handleVerificationFieldChange}
                 privacySettings={privacySettings}
                 blockedUsers={blockedUsers}
                 isAccountVisible={isAccountVisible}
-                handlePrivacySettingsChange={handlePrivacyChange}
+                handlePrivacySettingsChange={handlePrivacyFieldChange}
                 onToggleAccountVisibility={handleToggleVisibility}
                 onUnblockUser={handleUnblockUser}
-                userId={userId}
               />
             </CardContent>
           </Card>

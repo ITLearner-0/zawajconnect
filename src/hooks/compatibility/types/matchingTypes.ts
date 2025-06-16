@@ -24,7 +24,6 @@ export interface ValidatedProfileData {
   phone_verified: boolean;
   id_verified: boolean;
   is_visible: boolean;
-  polygamy_stance?: string | null;
 }
 
 export interface UserResultWithProfile {

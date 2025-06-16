@@ -1,3 +1,4 @@
+
 import EnhancedHeroSection from "@/components/home/EnhancedHeroSection";
 import FeaturesSection from "@/components/home/FeaturesSection";
 import DemoSection from "@/components/home/DemoSection";
@@ -9,35 +10,9 @@ import Divider from "@/components/home/Divider";
 import SectionTransition from "@/components/home/SectionTransition";
 import PerformanceMonitor from "@/components/ui/PerformanceMonitor";
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
-import { performance } from "@/utils/helpers/performance";
-import { useEnhancedMetrics } from "@/hooks/useEnhancedMetrics";
 
 const Index = () => {
   const { t } = useTranslation();
-  
-  // Initialize enhanced metrics tracking
-  const { trackInteraction, trackComponentPerformance } = useEnhancedMetrics({
-    componentName: 'HomePage',
-    trackPageViews: true,
-    trackPerformance: true,
-    trackUserInteractions: true
-  });
-
-  // Track scroll interactions
-  useEffect(() => {
-    const handleScroll = () => {
-      trackInteraction('scroll', 'homepage', {
-        scrollY: window.scrollY,
-        scrollPercent: Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100)
-      });
-    };
-
-    const throttledScroll = performance.throttle(handleScroll, 1000);
-    window.addEventListener('scroll', throttledScroll);
-
-    return () => window.removeEventListener('scroll', throttledScroll);
-  }, [trackInteraction]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-300 via-pink-200 to-rose-100 dark:from-rose-900 dark:via-rose-800 dark:to-pink-900 text-foreground">

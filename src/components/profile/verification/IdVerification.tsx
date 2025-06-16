@@ -20,7 +20,7 @@ const IdVerification = ({ isVerified }: IdVerificationProps) => {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) {
-        throw new Error("Utilisateur non trouvé");
+        throw new Error("User not found");
       }
       
       // Update the profile with verification metadata
@@ -35,16 +35,16 @@ const IdVerification = ({ isVerified }: IdVerificationProps) => {
       if (error) throw error;
       
       toast({
-        title: "Vérification d'Identité",
-        description: "Votre identité a été vérifiée avec succès",
+        title: "ID Verification",
+        description: "Your ID has been successfully verified",
       });
       
       // Refresh to update UI
       window.location.reload();
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Impossible de compléter la vérification. Veuillez réessayer.",
+        title: "Error",
+        description: "Could not complete verification. Please try again.",
         variant: "destructive",
       });
     }
@@ -55,8 +55,8 @@ const IdVerification = ({ isVerified }: IdVerificationProps) => {
       <div className="flex items-center gap-2">
         <ShieldCheck className="h-5 w-5 text-islamic-teal dark:text-islamic-brightGold" />
         <div>
-          <Label className="text-islamic-burgundy dark:text-islamic-cream">Vérification d'Identité</Label>
-          <p className="text-xs text-gray-500 dark:text-islamic-cream/70">Vérifiez votre identité pour une confiance maximale</p>
+          <Label className="text-islamic-burgundy dark:text-islamic-cream">ID Verification</Label>
+          <p className="text-xs text-gray-500 dark:text-islamic-cream/70">Verify your identity for maximum trust</p>
         </div>
       </div>
       <div>
@@ -66,7 +66,7 @@ const IdVerification = ({ isVerified }: IdVerificationProps) => {
             className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1 dark:bg-green-900/30 dark:text-green-300 dark:border-green-700/50"
           >
             <Check className="h-3 w-3" />
-            Vérifié
+            Verified
           </Badge>
         ) : (
           <CustomButton
@@ -74,7 +74,7 @@ const IdVerification = ({ isVerified }: IdVerificationProps) => {
             variant="gold"
             onClick={startIdVerification}
           >
-            Vérifier Identité
+            Verify ID
           </CustomButton>
         )}
       </div>

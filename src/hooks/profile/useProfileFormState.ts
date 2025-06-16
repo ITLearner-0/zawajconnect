@@ -9,25 +9,14 @@ interface UseProfileFormStateProps {
 export const useProfileFormState = ({ initialFormData }: UseProfileFormStateProps) => {
   const [formData, setFormData] = useState<ProfileFormData>(initialFormData);
 
-  // Handle both event-based calls and direct field/value calls
   const handleChange = (
-    fieldOrEvent: string | React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
-    value?: string
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
-    if (typeof fieldOrEvent === 'string' && value !== undefined) {
-      // Direct field/value call
-      setFormData((prev) => ({
-        ...prev,
-        [fieldOrEvent]: value,
-      }));
-    } else if (typeof fieldOrEvent === 'object' && fieldOrEvent.target) {
-      // Event-based call
-      const { name, value: eventValue } = fieldOrEvent.target;
-      setFormData((prev) => ({
-        ...prev,
-        [name]: eventValue,
-      }));
-    }
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   return {

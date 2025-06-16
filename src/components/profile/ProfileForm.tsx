@@ -1,24 +1,29 @@
 
-import React from 'react';
-import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
-import BasicInformation from './BasicInformation';
-import EducationCareer from './EducationCareer';
-import ReligiousBackground from './ReligiousBackground';
-import AboutMe from './AboutMe';
-import WaliInformation from './WaliInformation';
-import VerificationPanel from './VerificationPanel';
-import EnhancedPrivacySettings from './EnhancedPrivacySettings';
-import { Button } from '@/components/ui/button';
-import { Save } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Shield, Eye, EyeOff } from "lucide-react";
+import BasicInformationSection from "./sections/BasicInfoSection";
+import ReligiousSection from "./sections/ReligiousSection";
+import EducationSection from "./sections/EducationSection";
+import AboutSection from "./sections/AboutSection";
+import WaliSection from "./sections/WaliSection";
+import VerificationPanel from "./VerificationPanel";
+import EnhancedPrivacySettings from "./EnhancedPrivacySettings";
+import { useSecurityMiddleware } from "@/hooks/useSecurityMiddleware";
+import { sanitizeProfileData } from "@/utils/security/inputSanitization";
+import { toast } from "sonner";
+import { PrivacySettings } from "@/types/profile";
 
 interface ProfileFormProps {
-  formData: ProfileFormData;
+  formData: any;
   handleChange: (field: string, value: any) => void;
   handleSubmit: () => Promise<boolean>;
-  verificationStatus: VerificationStatus;
-  userEmail: string | null;
+  verificationStatus: any;
+  userEmail: string;
   handleVerificationChange: (field: string, value: boolean) => void;
-  privacySettings: PrivacySettings;
+  privacySettings: any;
   blockedUsers: string[];
   isAccountVisible: boolean;
   handlePrivacySettingsChange: (field: string, value: any) => void;
@@ -26,7 +31,7 @@ interface ProfileFormProps {
   onUnblockUser: (userId: string) => Promise<void>;
 }
 
-const ProfileForm = ({
+const ProfileForm: React.FC<ProfileFormProps> = ({
   formData,
   handleChange,
   handleSubmit,
@@ -38,82 +43,215 @@ const ProfileForm = ({
   isAccountVisible,
   handlePrivacySettingsChange,
   onToggleAccountVisibility,
-  onUnblockUser
-}: ProfileFormProps) => {
-  console.log("ProfileForm rendered with privacySettings:", privacySettings);
-  
-  // Convert handleChange to event-based signature for form components
-  const handleFieldChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    handleChange(e.target.name, e.target.value);
+  onUnblockUser,
+}) => {
+  const { validateAction, securityStatus } = useSecurityMiddleware();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSecureChange = async (field: string, value: any) => {
+    // Validate action before allowing changes
+    const isValid = await validateAction('profile_update', { field, value });
+    if (!isValid) return;
+
+    // Directly pass the value without sanitizing here to preserve user input
+    // Sanitization will happen during form submission
+    handleChange(field, value);
   };
 
-  // Convert verification change to match expected signature
-  const handleVerificationFieldChange = (newStatus: VerificationStatus) => {
-    Object.entries(newStatus).forEach(([field, value]) => {
-      if (verificationStatus[field as keyof VerificationStatus] !== value) {
-        handleVerificationChange(field, value);
+  const handleSecureSubmit = async () => {
+    // Validate action before submission
+    const isValid = await validateAction('profile_save', formData);
+    if (!isValid) return;
+
+    if (!securityStatus.emailVerified) {
+      toast.error("Vérification email requise", {
+        description: "Veuillez vérifier votre email avant de sauvegarder le profil"
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      console.log("Données du formulaire avant sauvegarde:", formData);
+      const success = await handleSubmit();
+      
+      if (success) {
+        toast.success("Profil sauvegardé avec succès!");
+      } else {
+        toast.error("Erreur lors de la sauvegarde du profil");
       }
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde:", error);
+      toast.error("Une erreur inattendue s'est produite");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Create a wrapper for verification change to match expected signature
+  const handleVerificationUpdate = (newStatus: any) => {
+    // Convert the newStatus object to individual field updates
+    Object.keys(newStatus).forEach(field => {
+      handleVerificationChange(field, newStatus[field]);
     });
   };
 
-  // Convert privacy settings change
+  // Create a wrapper for privacy settings change to match expected signature
   const handlePrivacyChange = (settings: PrivacySettings) => {
-    Object.entries(settings).forEach(([field, value]) => {
-      if (privacySettings[field as keyof PrivacySettings] !== value) {
-        handlePrivacySettingsChange(field, value);
-      }
+    // Convert the settings object to individual field updates
+    Object.keys(settings).forEach(field => {
+      handlePrivacySettingsChange(field, settings[field as keyof PrivacySettings]);
     });
-    return Promise.resolve(true);
   };
 
   return (
     <div className="space-y-6">
-      <form className="space-y-6">
-        {/* Basic Information */}
-        <BasicInformation formData={formData} handleChange={handleFieldChange} />
-        
-        {/* Education & Career */}
-        <EducationCareer formData={formData} handleChange={handleFieldChange} />
-        
-        {/* Religious Background */}
-        <ReligiousBackground formData={formData} handleChange={handleFieldChange} />
-        
-        {/* About Me */}
-        <AboutMe formData={formData} handleChange={handleFieldChange} />
-        
-        {/* Wali Information */}
-        <WaliInformation formData={formData} handleChange={handleFieldChange} />
-        
-        {/* Verification Panel */}
-        <VerificationPanel
-          verificationStatus={verificationStatus}
-          userEmail={userEmail}
-          onVerificationChange={handleVerificationFieldChange}
-        />
+      {/* Security Status Indicator */}
+      {!securityStatus.loading && (
+        <Card className={`border-2 ${securityStatus.isSecure ? 'border-green-200 bg-green-50' : 'border-yellow-200 bg-yellow-50'}`}>
+          <CardContent className="pt-4">
+            <div className="flex items-center gap-2">
+              <Shield className={`h-4 w-4 ${securityStatus.isSecure ? 'text-green-600' : 'text-yellow-600'}`} />
+              <span className={`text-sm font-medium ${securityStatus.isSecure ? 'text-green-800' : 'text-yellow-800'}`}>
+                {securityStatus.isSecure ? 'Compte sécurisé' : 'Sécurité à améliorer'}
+              </span>
+            </div>
+            {!securityStatus.emailVerified && (
+              <p className="text-xs text-yellow-700 mt-1">
+                Vérifiez votre email pour accéder à toutes les fonctionnalités
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
-        {/* Save Button */}
-        <div className="flex justify-end pt-4">
-          <Button 
-            type="button" 
-            onClick={handleSubmit}
-            className="bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white px-8 py-2"
-          >
-            <Save className="mr-2 h-4 w-4" />
-            Sauvegarder le Profil
-          </Button>
-        </div>
-      </form>
+      {/* Basic Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-rose-800 dark:text-rose-200">
+            Informations Personnelles
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <BasicInformationSection
+            formData={formData}
+            handleChange={handleSecureChange}
+          />
+        </CardContent>
+      </Card>
 
-      {/* Enhanced Privacy Settings - always show with current user ID */}
-      <EnhancedPrivacySettings
-        userId="current-user" // This will be replaced by the actual userId from the parent
-        privacySettings={privacySettings}
-        blockedUsers={blockedUsers}
-        isAccountVisible={isAccountVisible}
-        onPrivacyChange={handlePrivacyChange}
-        onToggleAccountVisibility={onToggleAccountVisibility}
-        onUnblockUser={onUnblockUser}
-      />
+      {/* Religious Practice */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-rose-800 dark:text-rose-200">
+            Pratique Religieuse
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ReligiousSection
+            formData={formData}
+            handleChange={handleSecureChange}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Education & Career */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-rose-800 dark:text-rose-200">
+            Éducation et Carrière
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EducationSection
+            formData={formData}
+            handleChange={handleSecureChange}
+          />
+        </CardContent>
+      </Card>
+
+      {/* About Me */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-rose-800 dark:text-rose-200">
+            À Propos de Moi
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AboutSection
+            formData={formData}
+            handleChange={handleSecureChange}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Wali Information (for women) */}
+      {formData.gender === "female" && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold text-rose-800 dark:text-rose-200">
+              Informations du Wali
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <WaliSection
+              formData={formData}
+              handleChange={handleSecureChange}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Verification */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-rose-800 dark:text-rose-200">
+            Vérification du Profil
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <VerificationPanel
+            verificationStatus={verificationStatus}
+            userEmail={userEmail}
+            onVerificationChange={handleVerificationUpdate}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Privacy Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold text-rose-800 dark:text-rose-200 flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Paramètres de Confidentialité
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <EnhancedPrivacySettings
+            userId={formData.id || ""}
+            privacySettings={privacySettings}
+            blockedUsers={blockedUsers}
+            isAccountVisible={isAccountVisible}
+            onPrivacyChange={handlePrivacyChange}
+            onToggleAccountVisibility={onToggleAccountVisibility}
+            onUnblockUser={onUnblockUser}
+          />
+        </CardContent>
+      </Card>
+
+      <Separator />
+
+      {/* Submit Button */}
+      <div className="flex justify-center">
+        <Button
+          onClick={handleSecureSubmit}
+          size="lg"
+          className="bg-rose-600 hover:bg-rose-700 text-white px-8 py-3"
+          disabled={isSubmitting || securityStatus.loading}
+        >
+          {isSubmitting ? "Sauvegarde en cours..." : "Sauvegarder le Profil"}
+        </Button>
+      </div>
     </div>
   );
 };

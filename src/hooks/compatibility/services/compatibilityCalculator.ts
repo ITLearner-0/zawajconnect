@@ -1,3 +1,4 @@
+
 import { CompatibilityMatch } from "@/types/compatibility";
 import { UserResultWithProfile } from "../types/matchingTypes";
 import { ValidatedUserResults } from "./dataFetchingService";
@@ -27,6 +28,7 @@ export class CompatibilityCalculator {
     }
   }
 
+  // Keep the legacy method for backward compatibility
   calculateBasicCompatibilityScore(
     myResults: ValidatedUserResults,
     otherUser: UserResultWithProfile
@@ -139,16 +141,13 @@ export class CompatibilityCalculator {
     myResults: ValidatedUserResults,
     otherUser: UserResultWithProfile
   ): { isDealbreaker: boolean; isStrength: boolean; scoreModifier: number; reason: string } {
-    // Get genders from profile data
-    const myGender = myResults.profile?.gender;
+    const myGender = myResults.profileData?.gender;
     const otherGender = otherUser.profiles?.gender;
-    
-    // Get polygamy stances from profile data
-    const myPolygamyStance = myResults.profile?.polygamy_stance;
+    const myPolygamyStance = myResults.profileData?.polygamy_stance;
     const otherPolygamyStance = otherUser.profiles?.polygamy_stance;
 
-    // If either doesn't have gender or polygamy stance data, skip compatibility check
-    if (!myGender || !otherGender || !myPolygamyStance || !otherPolygamyStance) {
+    // If either doesn't have a stance, neutral compatibility
+    if (!myPolygamyStance || !otherPolygamyStance) {
       return { isDealbreaker: false, isStrength: false, scoreModifier: 0, reason: "" };
     }
 

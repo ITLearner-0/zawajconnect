@@ -30,7 +30,7 @@ const VerificationBadges = ({ profileData, match, showQuality, onQualityToggle }
               </Badge>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Email Vérifié</p>
+              <p>Email Verified</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -45,7 +45,7 @@ const VerificationBadges = ({ profileData, match, showQuality, onQualityToggle }
               </Badge>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Téléphone Vérifié</p>
+              <p>Phone Verified</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -60,7 +60,7 @@ const VerificationBadges = ({ profileData, match, showQuality, onQualityToggle }
               </Badge>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Identité Vérifiée</p>
+              <p>ID Verified</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>
@@ -80,7 +80,7 @@ const VerificationBadges = ({ profileData, match, showQuality, onQualityToggle }
               </Badge>
             </TooltipTrigger>
             <TooltipContent>
-              <p>Score de Confiance du Match</p>
+              <p>Match Confidence Score</p>
             </TooltipContent>
           </Tooltip>
         </TooltipProvider>

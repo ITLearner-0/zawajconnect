@@ -30,13 +30,13 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
       
       setShowVerificationInput(true);
       toast({
-        title: "Code de vérification envoyé",
-        description: "Nous avons envoyé un code à votre numéro de téléphone",
+        title: "Verification code sent",
+        description: "We've sent a code to your phone number",
       });
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer le code de vérification. Veuillez réessayer.",
+        title: "Error",
+        description: "Could not send verification code. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -54,7 +54,7 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
         // Update verification status using the is_verified field with a phone_method metadata
         const { data: { user } } = await supabase.auth.getUser();
         
-        if (!user) throw new Error("Utilisateur non trouvé");
+        if (!user) throw new Error("User not found");
         
         // Update the profile with verification metadata
         const { error } = await supabase
@@ -69,23 +69,23 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
         
         setShowVerificationInput(false);
         toast({
-          title: "Téléphone vérifié",
-          description: "Votre numéro de téléphone a été vérifié avec succès",
+          title: "Phone verified",
+          description: "Your phone number has been successfully verified",
         });
         
         // Refresh the page to update the verification status
         window.location.reload();
       } else {
         toast({
-          title: "Code invalide",
-          description: "Veuillez entrer un code à 6 chiffres valide",
+          title: "Invalid code",
+          description: "Please enter a valid 6-digit code",
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Impossible de vérifier le téléphone. Veuillez réessayer.",
+        title: "Error",
+        description: "Could not verify phone. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -99,8 +99,8 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
         <div className="flex items-center gap-2">
           <Phone className="h-5 w-5 text-primary" />
           <div>
-            <Label>Vérification Téléphone</Label>
-            <p className="text-xs text-gray-500">Vérifiez votre numéro de téléphone</p>
+            <Label>Phone Verification</Label>
+            <p className="text-xs text-gray-500">Verify your phone number</p>
           </div>
         </div>
         <div>
@@ -110,7 +110,7 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
               className="bg-green-50 text-green-700 border-green-200 flex items-center gap-1"
             >
               <Check className="h-3 w-3" />
-              Vérifié
+              Verified
             </Badge>
           ) : !showVerificationInput ? (
             <CustomButton
@@ -118,7 +118,7 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
               onClick={sendPhoneVerification}
               disabled={loading || !phoneNumber}
             >
-              Envoyer Code
+              Send Code
             </CustomButton>
           ) : null}
         </div>
@@ -127,7 +127,7 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
       {!isVerified && (
         <div className="space-y-2">
           <Input
-            placeholder="Entrez votre numéro de téléphone"
+            placeholder="Enter your phone number"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
             disabled={loading || showVerificationInput}
@@ -136,7 +136,7 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
           {showVerificationInput && (
             <div className="mt-2 space-y-2">
               <Input
-                placeholder="Entrez le code de vérification"
+                placeholder="Enter verification code"
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value)}
                 disabled={loading}
@@ -148,14 +148,14 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
                   onClick={() => setShowVerificationInput(false)}
                   disabled={loading}
                 >
-                  Annuler
+                  Cancel
                 </CustomButton>
                 <CustomButton
                   size="sm"
                   onClick={verifyPhone}
                   disabled={loading || verificationCode.length !== 6}
                 >
-                  Vérifier
+                  Verify
                 </CustomButton>
               </div>
             </div>

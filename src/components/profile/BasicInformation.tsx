@@ -12,11 +12,11 @@ interface BasicInformationProps {
 
 const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => (
   <div className="space-y-4">
-    <h2 id="basic-info-heading" className="text-xl font-semibold text-primary">Informations de Base</h2>
+    <h2 id="basic-info-heading" className="text-xl font-semibold text-primary">Basic Information</h2>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="fullName">Nom Complet</Label>
+          <Label htmlFor="fullName">Full Name</Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.fullName} />
           </TooltipProvider>
@@ -26,17 +26,17 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           name="fullName"
           value={formData.fullName}
           onChange={handleChange}
-          placeholder="Entrez votre nom complet"
+          placeholder="Enter your full name"
           aria-required="true"
           aria-describedby="fullName-description"
         />
         <p id="fullName-description" className="sr-only">
-          Votre nom et prénom légaux tels qu'ils apparaissent sur les documents officiels
+          Your legal first and last name as it appears on official documents
         </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="age">Âge</Label>
+          <Label htmlFor="age">Age</Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.age} />
           </TooltipProvider>
@@ -47,19 +47,19 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           type="number"
           value={formData.age}
           onChange={handleChange}
-          placeholder="Votre âge"
+          placeholder="Your age"
           aria-required="true"
           min="18"
           max="120"
           aria-describedby="age-description"
         />
         <p id="age-description" className="sr-only">
-          Votre âge actuel en années. Doit être d'au moins 18 ans.
+          Your current age in years. Must be at least 18.
         </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="gender">Genre</Label>
+          <Label htmlFor="gender">Gender</Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.gender} />
           </TooltipProvider>
@@ -73,17 +73,17 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           aria-required="true"
           aria-describedby="gender-description"
         >
-          <option value="">Sélectionnez le genre</option>
-          <option value="male">Homme</option>
-          <option value="female">Femme</option>
+          <option value="">Select gender</option>
+          <option value="male">Male</option>
+          <option value="female">Female</option>
         </select>
         <p id="gender-description" className="sr-only">
-          Veuillez sélectionner votre genre
+          Please select your gender
         </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="location">Localisation</Label>
+          <Label htmlFor="location">Location</Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.location} />
           </TooltipProvider>
@@ -93,12 +93,12 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           name="location"
           value={formData.location}
           onChange={handleChange}
-          placeholder="Ville, Pays"
+          placeholder="City, Country"
           aria-required="true"
           aria-describedby="location-description"
         />
         <p id="location-description" className="sr-only">
-          Votre ville et pays de résidence actuels
+          Your current city and country of residence
         </p>
       </div>
     </div>

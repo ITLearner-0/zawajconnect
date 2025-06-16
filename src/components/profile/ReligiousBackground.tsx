@@ -11,11 +11,11 @@ interface ReligiousBackgroundProps {
 
 const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProps) => (
   <div className="space-y-4">
-    <h2 id="religious-background-heading" className="text-xl font-semibold text-primary">Pratique Religieuse</h2>
+    <h2 id="religious-background-heading" className="text-xl font-semibold text-primary">Religious Background</h2>
     <div className="grid grid-cols-1 gap-4">
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="religiousLevel">Niveau de Pratique Religieuse</Label>
+          <Label htmlFor="religiousLevel">Religious Practice Level</Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.religiousLevel} />
           </TooltipProvider>
@@ -28,19 +28,19 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
           className="w-full h-10 px-3 rounded-md border border-input bg-background"
           aria-describedby="religiousLevel-description"
         >
-          <option value="">Sélectionnez le niveau</option>
-          <option value="very-practicing">Très pratiquant</option>
-          <option value="practicing">Pratiquant</option>
-          <option value="moderately-practicing">Modérément pratiquant</option>
-          <option value="learning">Apprend l'Islam</option>
+          <option value="">Select level</option>
+          <option value="very-practicing">Very practicing</option>
+          <option value="practicing">Practicing</option>
+          <option value="moderately-practicing">Moderately practicing</option>
+          <option value="learning">Learning more about Islam</option>
         </select>
         <p id="religiousLevel-description" className="sr-only">
-          Comment vous décrivez votre niveau de pratique religieuse
+          How you would describe your level of religious practice
         </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="prayerFrequency">Fréquence de Prière</Label>
+          <Label htmlFor="prayerFrequency">Prayer Frequency</Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.prayerFrequency} />
           </TooltipProvider>
@@ -53,18 +53,18 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
           className="w-full h-10 px-3 rounded-md border border-input bg-background"
           aria-describedby="prayerFrequency-description"
         >
-          <option value="five-daily">Cinq fois par jour</option>
-          <option value="regular">Régulièrement mais pas les cinq</option>
-          <option value="sometimes">Parfois</option>
-          <option value="learning">Apprend à prier</option>
+          <option value="five-daily">Five times daily</option>
+          <option value="regular">Regular but not all five</option>
+          <option value="sometimes">Sometimes</option>
+          <option value="learning">Learning to pray</option>
         </select>
         <p id="prayerFrequency-description" className="sr-only">
-          À quelle fréquence vous effectuez vos prières
+          How frequently you perform prayers
         </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="familyBackground">Contexte Familial</Label>
+          <Label htmlFor="familyBackground">Family Background</Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.familyBackground} />
           </TooltipProvider>
@@ -74,12 +74,12 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
           name="familyBackground"
           value={formData.familyBackground}
           onChange={handleChange}
-          placeholder="Partagez des informations sur votre contexte familial"
+          placeholder="Share about your family background"
           className="w-full min-h-[100px] px-3 py-2 rounded-md border border-input bg-background"
           aria-describedby="familyBackground-description"
         />
         <p id="familyBackground-description" className="sr-only">
-          Informations sur le contexte culturel et religieux de votre famille
+          Information about your family's cultural and religious background
         </p>
       </div>
     </div>
