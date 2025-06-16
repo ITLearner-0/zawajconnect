@@ -1,4 +1,3 @@
-
 import { CompatibilityMatch } from "@/types/compatibility";
 import { UserResultWithProfile } from "../types/matchingTypes";
 import { ValidatedUserResults } from "./dataFetchingService";
@@ -141,13 +140,13 @@ export class CompatibilityCalculator {
     myResults: ValidatedUserResults,
     otherUser: UserResultWithProfile
   ): { isDealbreaker: boolean; isStrength: boolean; scoreModifier: number; reason: string } {
-    // Access gender from user results answers or set default
-    const myGender = myResults.answers?.gender?.value || 'unknown';
+    // Access gender from profiles, not answers
+    const myGender = myResults.answers?.gender?.value?.toString() || otherUser.profiles?.gender || 'unknown';
     const otherGender = otherUser.profiles?.gender || 'unknown';
     
-    // Try to get polygamy stance from answers, fallback to profiles
-    const myPolygamyStance = myResults.answers?.polygamy_stance?.value || 'not_specified';
-    const otherPolygamyStance = otherUser.answers?.polygamy_stance?.value || 'not_specified';
+    // Try to get polygamy stance from answers as string values
+    const myPolygamyStance = myResults.answers?.polygamy_stance?.value?.toString() || 'not_specified';
+    const otherPolygamyStance = otherUser.answers?.polygamy_stance?.value?.toString() || 'not_specified';
 
     // If either doesn't have a stance, neutral compatibility
     if (myPolygamyStance === 'not_specified' || otherPolygamyStance === 'not_specified') {
