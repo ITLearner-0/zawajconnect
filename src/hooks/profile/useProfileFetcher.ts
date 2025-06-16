@@ -37,7 +37,7 @@ export const useProfileFetcher = (userId?: string | null): ProfileFetcherResult 
         const email = await getUserEmail();
         setUserEmail(email);
 
-        // Get profile data without using .single() to avoid errors with empty results
+        // Get profile data
         const { data, error } = await fetchProfileFromDb(userId);
 
         if (error) {
@@ -50,7 +50,7 @@ export const useProfileFetcher = (userId?: string | null): ProfileFetcherResult 
         if (data && data.length > 0) {
           const profile = data[0];
           
-          // Map database fields to ProfileFormData
+          // Map database fields to ProfileFormData, preserving all existing data
           const profileFormData: ProfileFormData = {
             fullName: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
             age: profile.birth_date || '',
@@ -59,7 +59,7 @@ export const useProfileFetcher = (userId?: string | null): ProfileFetcherResult 
             education: profile.education_level || '',
             occupation: profile.occupation || '',
             religiousLevel: profile.religious_practice_level || '',
-            familyBackground: profile.about_me || '', // If family_background doesn't exist, use about_me as fallback
+            familyBackground: profile.about_me || '',
             aboutMe: profile.about_me || '',
             prayerFrequency: profile.prayer_frequency || '',
             waliName: profile.wali_name || '',
@@ -70,11 +70,11 @@ export const useProfileFetcher = (userId?: string | null): ProfileFetcherResult 
           };
           setProfileData(profileFormData);
           
-          // Set verification status - using is_verified for email verification
+          // Set verification status
           setVerificationStatus({
             email: !!profile.is_verified,
-            phone: false, // Use appropriate field in your schema
-            id: false, // Use appropriate field in your schema
+            phone: !!profile.phone_verified,
+            id: !!profile.id_verified,
           });
           
           // Set privacy settings with fallback to default
@@ -96,7 +96,24 @@ export const useProfileFetcher = (userId?: string | null): ProfileFetcherResult 
             console.error("Error creating new profile:", insertError);
           }
           
-          setProfileData(null); // No profile data found
+          // Set default empty profile data
+          setProfileData({
+            fullName: '',
+            age: '',
+            gender: '',
+            location: '',
+            education: '',
+            occupation: '',
+            religiousLevel: '',
+            familyBackground: '',
+            aboutMe: '',
+            prayerFrequency: '',
+            waliName: '',
+            waliRelationship: '',
+            waliContact: '',
+            profilePicture: '',
+            gallery: []
+          });
           setIsNewUser(true);
         }
       } catch (err: any) {

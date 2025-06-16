@@ -28,24 +28,34 @@ export const useProfileUpdater = (userId?: string | null) => {
       const [first_name, ...lastNameParts] = newProfileData.fullName.split(' ');
       const last_name = lastNameParts.join(' ');
 
-      const { error } = await supabase
+      // Prepare update data, preserving existing values
+      const updateData: any = {
+        first_name: first_name || '',
+        last_name: last_name || '',
+        birth_date: newProfileData.age || null,
+        gender: newProfileData.gender || null,
+        location: newProfileData.location || null,
+        education_level: newProfileData.education || null,
+        occupation: newProfileData.occupation || null,
+        religious_practice_level: newProfileData.religiousLevel || null,
+        about_me: newProfileData.aboutMe || null,
+        prayer_frequency: newProfileData.prayerFrequency || null,
+        wali_name: newProfileData.waliName || null,
+        wali_relationship: newProfileData.waliRelationship || null,
+        wali_contact: newProfileData.waliContact || null,
+        profile_picture: newProfileData.profilePicture || null,
+        gallery: newProfileData.gallery || []
+      };
+
+      // Use upsert to handle both insert and update
+      const { data, error } = await supabase
         .from('profiles')
-        .update({
-          first_name: first_name,
-          last_name: last_name,
-          birth_date: newProfileData.age,
-          gender: newProfileData.gender,
-          location: newProfileData.location,
-          education_level: newProfileData.education,
-          occupation: newProfileData.occupation,
-          religious_practice_level: newProfileData.religiousLevel,
-          about_me: newProfileData.aboutMe,
-          prayer_frequency: newProfileData.prayerFrequency,
-          wali_name: newProfileData.waliName || null,
-          wali_relationship: newProfileData.waliRelationship || null,
-          wali_contact: newProfileData.waliContact || null,
+        .upsert({ id: userId, ...updateData }, { 
+          onConflict: 'id',
+          ignoreDuplicates: false 
         })
-        .eq('id', userId);
+        .select()
+        .single();
 
       if (error) {
         setError(error.message);
@@ -58,6 +68,7 @@ export const useProfileUpdater = (userId?: string | null) => {
         return false;
       }
 
+      console.log("Profile updated successfully:", data);
       toast({
         title: "Profile Updated",
         description: "Your profile has been updated successfully.",

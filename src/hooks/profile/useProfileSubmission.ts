@@ -20,21 +20,21 @@ export const useProfileSubmission = () => {
     setError(null);
 
     try {
-      console.log("Début de la soumission du profil pour l'utilisateur:", userId);
-      console.log("Données du profil avant sanitisation:", profileData);
+      console.log("Starting profile submission for user:", userId);
+      console.log("Profile data before sanitization:", profileData);
       
       // Sanitize the profile data
       const sanitizedData = sanitizeProfileData(profileData);
-      console.log("Données sanitisées:", sanitizedData);
+      console.log("Sanitized data:", sanitizedData);
       
       // Extract first and last name from full name
-      const nameParts = (sanitizedData.fullName || profileData.fullName || '').split(' ');
+      const nameParts = (profileData.fullName || '').split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
       // Handle birth date conversion - only process if age is provided and valid
       let birthDate = null;
-      const ageValue = sanitizedData.age || profileData.age;
+      const ageValue = profileData.age;
       if (ageValue && ageValue.trim() !== '') {
         if (ageValue.includes('-')) {
           // If age is already a date format, use it directly
@@ -47,7 +47,7 @@ export const useProfileSubmission = () => {
         }
       }
 
-      // Prepare update data - include all provided fields
+      // Prepare update data - preserve all existing data and update only what's provided
       const updateData: any = {
         first_name: firstName,
         last_name: lastName,
@@ -55,21 +55,21 @@ export const useProfileSubmission = () => {
         is_visible: true
       };
 
-      // Add all other fields from sanitized data, falling back to original data
+      // Add all other fields, preserving existing values
       if (birthDate) updateData.birth_date = birthDate;
-      if (sanitizedData.gender || profileData.gender) updateData.gender = sanitizedData.gender || profileData.gender;
-      if (sanitizedData.location || profileData.location) updateData.location = sanitizedData.location || profileData.location;
-      if (sanitizedData.education || profileData.education) updateData.education_level = sanitizedData.education || profileData.education;
-      if (sanitizedData.occupation || profileData.occupation) updateData.occupation = sanitizedData.occupation || profileData.occupation;
-      if (sanitizedData.religiousLevel || profileData.religiousLevel) updateData.religious_practice_level = sanitizedData.religiousLevel || profileData.religiousLevel;
-      if (sanitizedData.prayerFrequency || profileData.prayerFrequency) updateData.prayer_frequency = sanitizedData.prayerFrequency || profileData.prayerFrequency;
-      if (sanitizedData.polygamyStance || profileData.polygamyStance) updateData.polygamy_stance = sanitizedData.polygamyStance || profileData.polygamyStance;
-      if (sanitizedData.aboutMe || profileData.aboutMe) updateData.about_me = sanitizedData.aboutMe || profileData.aboutMe;
-      if (sanitizedData.waliName || profileData.waliName) updateData.wali_name = sanitizedData.waliName || profileData.waliName;
-      if (sanitizedData.waliRelationship || profileData.waliRelationship) updateData.wali_relationship = sanitizedData.waliRelationship || profileData.waliRelationship;
-      if (sanitizedData.waliContact || profileData.waliContact) updateData.wali_contact = sanitizedData.waliContact || profileData.waliContact;
+      if (profileData.gender) updateData.gender = profileData.gender;
+      if (profileData.location) updateData.location = profileData.location;
+      if (profileData.education) updateData.education_level = profileData.education;
+      if (profileData.occupation) updateData.occupation = profileData.occupation;
+      if (profileData.religiousLevel) updateData.religious_practice_level = profileData.religiousLevel;
+      if (profileData.prayerFrequency) updateData.prayer_frequency = profileData.prayerFrequency;
+      if (profileData.polygamyStance) updateData.polygamy_stance = profileData.polygamyStance;
+      if (profileData.aboutMe) updateData.about_me = profileData.aboutMe;
+      if (profileData.waliName) updateData.wali_name = profileData.waliName;
+      if (profileData.waliRelationship) updateData.wali_relationship = profileData.waliRelationship;
+      if (profileData.waliContact) updateData.wali_contact = profileData.waliContact;
 
-      // Handle profile picture and gallery
+      // Handle profile picture and gallery - preserve existing values if not provided
       if (profileData.profilePicture !== undefined) {
         updateData.profile_picture = profileData.profilePicture || null;
       }
@@ -77,16 +77,21 @@ export const useProfileSubmission = () => {
         updateData.gallery = profileData.gallery || [];
       }
 
-      console.log("Données de mise à jour finale:", updateData);
+      console.log("Final update data:", updateData);
       
-      // Update the profile
-      const { error } = await supabase
+      // Update the profile using upsert to handle both insert and update cases
+      const { data, error } = await supabase
         .from('profiles')
-        .update(updateData)
-        .eq('id', userId);
+        .upsert(updateData, { 
+          onConflict: 'id',
+          ignoreDuplicates: false 
+        })
+        .eq('id', userId)
+        .select()
+        .single();
 
       if (error) {
-        console.error("Erreur lors de la mise à jour du profil:", error);
+        console.error("Error updating profile:", error);
         setError(error.message);
         toast({
           title: "Erreur",
@@ -96,10 +101,9 @@ export const useProfileSubmission = () => {
         return false;
       }
 
-      console.log("Profil mis à jour avec succès");
+      console.log("Profile updated successfully:", data);
 
-      // Call the success callback to update the form data with original (non-sanitized) data
-      // This ensures the user sees their original input
+      // Call the success callback with the original profile data to maintain form state
       if (onSuccess) {
         onSuccess(profileData);
       }
@@ -110,7 +114,7 @@ export const useProfileSubmission = () => {
       });
       return true;
     } catch (err: any) {
-      console.error("Erreur inattendue lors de la mise à jour du profil:", err);
+      console.error("Unexpected error updating profile:", err);
       setError(err.message);
       toast({
         title: "Erreur",
