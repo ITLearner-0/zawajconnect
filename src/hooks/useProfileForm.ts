@@ -85,7 +85,16 @@ export const useProfileForm = ({
   const { submitProfile } = useProfileSubmission();
   
   const handleSubmit = async () => {
-    if (!userId) return false;
+    if (!userId) {
+      console.error("No user ID available");
+      return false;
+    }
+    
+    console.log("handleSubmit called with:", {
+      userId,
+      formData,
+      privacySettings: privacySettings || DEFAULT_PRIVACY_SETTINGS
+    });
     
     const success = await submitProfile(
       userId, 
@@ -97,6 +106,7 @@ export const useProfileForm = ({
       }
     );
     
+    console.log("submitProfile returned:", success);
     return success;
   };
 

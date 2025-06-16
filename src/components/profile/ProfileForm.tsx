@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -77,6 +78,19 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 
   const handleUnblockUserAsync = async (userId: string) => {
     onUnblockUser(userId);
+  };
+
+  // Handle form submission with proper async handling
+  const handleFormSubmit = async () => {
+    console.log("ProfileForm handleFormSubmit called");
+    try {
+      const result = await handleSubmit();
+      console.log("ProfileForm handleSubmit result:", result);
+      return result;
+    } catch (error) {
+      console.error("ProfileForm handleSubmit error:", error);
+      return false;
+    }
   };
 
   return (
@@ -184,7 +198,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 
       <div className="flex justify-center pt-6">
         <Button 
-          onClick={handleSubmit}
+          onClick={handleFormSubmit}
           size="lg"
           className="bg-rose-600 hover:bg-rose-700 dark:bg-rose-500 dark:hover:bg-rose-600 text-white px-8"
         >

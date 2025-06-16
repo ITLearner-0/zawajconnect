@@ -16,6 +16,12 @@ export const useProfileSubmission = () => {
     privacySettings: PrivacySettings,
     onSuccess?: (savedData: ProfileFormData) => void
   ) => {
+    console.log("submitProfile function called with:", {
+      userId,
+      profileData,
+      privacySettings
+    });
+
     setIsLoading(true);
     setError(null);
 
@@ -49,6 +55,7 @@ export const useProfileSubmission = () => {
 
       // Prepare update data - preserve all existing data and update only what's provided
       const updateData: any = {
+        id: userId,
         first_name: firstName,
         last_name: lastName,
         privacy_settings: privacySettings,
@@ -86,7 +93,6 @@ export const useProfileSubmission = () => {
           onConflict: 'id',
           ignoreDuplicates: false 
         })
-        .eq('id', userId)
         .select()
         .single();
 
