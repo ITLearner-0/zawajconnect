@@ -38,12 +38,15 @@ export interface DatabaseProfile {
   wali_verified: boolean;
   is_visible: boolean;
   profile_picture?: string;
+  gallery?: string[];
   privacy_settings: PrivacySettings;
   blocked_users: string[];
   content_flags: ContentFlag[];
   moderation_status: 'approved' | 'pending' | 'rejected';
   last_moderation_date: string | null;
   role?: 'user' | 'admin' | 'moderator';
+  created_at: string;
+  updated_at: string;
 }
 
 export interface PrivacySettings {

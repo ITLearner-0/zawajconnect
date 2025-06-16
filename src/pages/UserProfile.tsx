@@ -99,7 +99,19 @@ const UserProfile = () => {
             email_verified: profileData.email_verified || false,
             phone_verified: profileData.phone_verified || false,
             id_verified: profileData.id_verified || false,
+            wali_verified: profileData.wali_verified || false,
             is_visible: profileData.is_visible || false,
+            privacy_settings: profileData.privacy_settings || {
+              profileVisibilityLevel: 1,
+              showAge: true,
+              showLocation: true,
+              showOccupation: true,
+              allowNonMatchMessages: true
+            },
+            blocked_users: profileData.blocked_users || [],
+            content_flags: [],
+            moderation_status: 'approved',
+            last_moderation_date: null,
             created_at: profileData.created_at || '',
             updated_at: profileData.updated_at || ''
           };
