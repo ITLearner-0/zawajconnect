@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
@@ -115,6 +114,12 @@ const Profile = () => {
     handleChange(field, value);
   };
 
+  // Create a wrapper for verification change that accepts any arguments but only uses the first
+  const handleVerificationStatusChange = (newStatus: VerificationStatus, ...extraArgs: any[]) => {
+    // Only use the first argument (VerificationStatus) and ignore any extra arguments
+    handleVerificationChange(newStatus);
+  };
+
   // Create a wrapper for privacy settings change to match expected signature
   const handlePrivacyChange = async (newSettings: any) => {
     const success = await handlePrivacySettingsChange(newSettings);
@@ -166,7 +171,7 @@ const Profile = () => {
                 handleSubmit={handleSaveProfile}
                 verificationStatus={verificationStatus}
                 userEmail={userEmail}
-                handleVerificationChange={handleVerificationChange}
+                handleVerificationChange={handleVerificationStatusChange}
                 privacySettings={privacySettings}
                 blockedUsers={blockedUsers}
                 isAccountVisible={isAccountVisible}
