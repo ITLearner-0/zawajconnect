@@ -31,6 +31,9 @@ export const useProfileAnalytics = (userId?: string) => {
       try {
         setLoading(true);
 
+        // Calculate profile completeness
+        const completeness = await calculateProfileCompleteness(userId);
+
         // For now, return mock data since we don't have analytics tables
         // In a real implementation, you would fetch from analytics tables
         const mockAnalytics: ProfileAnalytics = {
@@ -38,7 +41,7 @@ export const useProfileAnalytics = (userId?: string) => {
           profileViewsThisWeek: Math.floor(Math.random() * 50) + 5,
           averageMatchScore: Math.floor(Math.random() * 30) + 65,
           responseRate: Math.floor(Math.random() * 40) + 50,
-          profileCompleteness: calculateProfileCompleteness(userId),
+          profileCompleteness: completeness,
           popularTimes: ['14h-16h', '19h-21h', '21h-23h'],
           topMatchingCategories: ['Pratique religieuse', 'Valeurs familiales', 'Éducation']
         };
