@@ -100,9 +100,11 @@ const EnhancedHeroSection = () => {
 
           {/* Scroll Button */}
           <SmoothScrollButton 
-            targetId="features" 
+            targetSection="features" 
             className="mx-auto animate-bounce"
-          />
+          >
+            <span className="sr-only">Faire défiler vers les fonctionnalités</span>
+          </SmoothScrollButton>
         </div>
       </div>
     </section>
