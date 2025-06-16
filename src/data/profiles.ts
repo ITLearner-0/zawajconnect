@@ -24,6 +24,7 @@ export const dummyProfiles: DatabaseProfile[] = [
     wali_verified: false,
     is_visible: true,
     profile_picture: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952',
+    gallery: [],
     privacy_settings: {
       profileVisibilityLevel: 1,
       showAge: true,
@@ -34,7 +35,9 @@ export const dummyProfiles: DatabaseProfile[] = [
     blocked_users: [],
     content_flags: [],
     moderation_status: 'approved',
-    last_moderation_date: '2023-08-10'
+    last_moderation_date: '2023-08-10',
+    created_at: '2023-08-01T10:00:00Z',
+    updated_at: '2023-08-10T15:30:00Z'
   },
   {
     id: 'user-2',
@@ -57,6 +60,7 @@ export const dummyProfiles: DatabaseProfile[] = [
     wali_verified: true,
     is_visible: true,
     profile_picture: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    gallery: [],
     privacy_settings: {
       profileVisibilityLevel: 2,
       showAge: false,
@@ -67,7 +71,9 @@ export const dummyProfiles: DatabaseProfile[] = [
     blocked_users: [],
     content_flags: [],
     moderation_status: 'approved',
-    last_moderation_date: '2023-08-12'
+    last_moderation_date: '2023-08-12',
+    created_at: '2023-08-02T09:15:00Z',
+    updated_at: '2023-08-12T14:20:00Z'
   },
   {
     id: 'user-3',
@@ -90,6 +96,7 @@ export const dummyProfiles: DatabaseProfile[] = [
     wali_verified: false,
     is_visible: true,
     profile_picture: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952',
+    gallery: [],
     privacy_settings: {
       profileVisibilityLevel: 1,
       showAge: true,
@@ -100,7 +107,9 @@ export const dummyProfiles: DatabaseProfile[] = [
     blocked_users: [],
     content_flags: [],
     moderation_status: 'approved',
-    last_moderation_date: '2023-07-22'
+    last_moderation_date: '2023-07-22',
+    created_at: '2023-07-01T11:30:00Z',
+    updated_at: '2023-07-22T16:45:00Z'
   },
   {
     id: 'user-4',
@@ -123,6 +132,7 @@ export const dummyProfiles: DatabaseProfile[] = [
     wali_verified: true,
     is_visible: true,
     profile_picture: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+    gallery: [],
     privacy_settings: {
       profileVisibilityLevel: 1,
       showAge: true,
@@ -133,7 +143,9 @@ export const dummyProfiles: DatabaseProfile[] = [
     blocked_users: [],
     content_flags: [],
     moderation_status: 'approved',
-    last_moderation_date: '2023-08-01'
+    last_moderation_date: '2023-08-01',
+    created_at: '2023-07-15T08:20:00Z',
+    updated_at: '2023-08-01T13:10:00Z'
   },
   {
     id: 'user-5',
@@ -156,6 +168,7 @@ export const dummyProfiles: DatabaseProfile[] = [
     wali_verified: false,
     is_visible: true,
     profile_picture: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952',
+    gallery: [],
     privacy_settings: {
       profileVisibilityLevel: 1,
       showAge: true,
@@ -166,6 +179,8 @@ export const dummyProfiles: DatabaseProfile[] = [
     blocked_users: [],
     content_flags: [],
     moderation_status: 'approved',
-    last_moderation_date: '2023-07-15'
+    last_moderation_date: '2023-07-15',
+    created_at: '2023-06-20T12:45:00Z',
+    updated_at: '2023-07-15T17:30:00Z'
   }
 ];
