@@ -100,7 +100,7 @@ const Profile = () => {
     checkCompatibilityResults();
   }, [userId]);
 
-  // Wrapper function to handle the save process and redirect to compatibility test or nearby
+  // Wrapper function to handle the save process and redirect
   const handleSaveProfile = async () => {
     if (isSaving) return false;
     

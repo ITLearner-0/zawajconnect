@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { DatabaseProfile } from '@/types/profile';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, User } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { dummyProfiles } from '@/data/profiles';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,6 +20,18 @@ const UserProfile = () => {
   const { toast } = useToast();
   const [profile, setProfile] = useState<DatabaseProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getCurrentUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.id) {
+        setCurrentUserId(session.user.id);
+      }
+    };
+    
+    getCurrentUser();
+  }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -135,6 +146,10 @@ const UserProfile = () => {
     fetchProfile();
   }, [id, toast]);
 
+  const handleEditMyProfile = () => {
+    navigate('/profile');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
@@ -184,10 +199,26 @@ const UserProfile = () => {
     });
   };
 
+  // Check if this is the current user's own profile
+  const isOwnProfile = currentUserId === id;
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
         <ProfileHeader onSignOut={handleSignOut} />
+        
+        {/* Add Edit Profile button if viewing own profile */}
+        {isOwnProfile && (
+          <div className="mb-6 text-center">
+            <Button
+              onClick={handleEditMyProfile}
+              className="bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white"
+            >
+              <User className="mr-2 h-4 w-4" />
+              Edit My Profile
+            </Button>
+          </div>
+        )}
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1">
