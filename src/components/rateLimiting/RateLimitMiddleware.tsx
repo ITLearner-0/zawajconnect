@@ -4,9 +4,9 @@ import { useRateLimiting } from '@/hooks/useRateLimiting';
 
 interface RateLimitContextType {
   checkRateLimit: (endpoint: string, requestData?: any) => Promise<boolean>;
-  isBlocked: boolean;
+  isBlocked: (endpoint?: string) => boolean;
   blockInfo: { until: number; reason: string } | null;
-  getRemainingBlockTime: () => number;
+  getRemainingBlockTime: (endpoint?: string) => number;
 }
 
 const RateLimitContext = createContext<RateLimitContextType | undefined>(undefined);
@@ -16,10 +16,17 @@ interface RateLimitProviderProps {
 }
 
 export const RateLimitProvider: React.FC<RateLimitProviderProps> = ({ children }) => {
-  const rateLimiting = useRateLimiting();
+  const { checkRateLimit, isBlocked, getBlockInfo, getRemainingBlockTime } = useRateLimiting();
+
+  const contextValue: RateLimitContextType = {
+    checkRateLimit,
+    isBlocked,
+    blockInfo: getBlockInfo(''),
+    getRemainingBlockTime
+  };
 
   return (
-    <RateLimitContext.Provider value={rateLimiting}>
+    <RateLimitContext.Provider value={contextValue}>
       {children}
     </RateLimitContext.Provider>
   );
@@ -59,11 +66,13 @@ export const RateLimitedButton: React.FC<RateLimitedButtonProps> = ({
     }
   };
 
+  const buttonBlocked = isBlocked(endpoint);
+
   return (
     <button
       onClick={handleClick}
-      disabled={disabled || isBlocked}
-      className={`${className} ${isBlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
+      disabled={disabled || buttonBlocked}
+      className={`${className} ${buttonBlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
     >
       {children}
     </button>

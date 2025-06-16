@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { toast } from 'sonner';
 
 interface RateLimitConfig {
@@ -196,7 +196,7 @@ export const useRateLimiting = () => {
     checkRateLimit,
     getRemainingRequests,
     isBlocked: (endpoint?: string) => endpoint ? isBlocked(endpoint) : Object.values(rateLimitStates).some(state => state.blocked && state.blockUntil > Date.now()),
-    blockInfo: getBlockInfo(''),
+    getBlockInfo,
     getRemainingBlockTime
   };
 };

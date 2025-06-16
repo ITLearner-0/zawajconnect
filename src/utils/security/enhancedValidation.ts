@@ -1,4 +1,3 @@
-
 import { z } from 'zod';
 import DOMPurify from 'dompurify';
 
@@ -38,6 +37,14 @@ export const sanitizeText = (text: string): string => {
   return cleaned
     .replace(/[<>'"]/g, '') // Remove remaining dangerous characters
     .trim();
+};
+
+// HTML sanitization with allowed tags
+export const sanitizeHtml = (html: string): string => {
+  return DOMPurify.sanitize(html, {
+    ALLOWED_TAGS: ['p', 'br', 'strong', 'em', 'u'],
+    ALLOWED_ATTR: []
+  });
 };
 
 // Content appropriateness checking
