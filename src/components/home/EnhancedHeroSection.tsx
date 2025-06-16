@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Heart, Users, Shield, Sparkles } from "lucide-react";
+import { Heart, Users, Shield, Sparkles, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import SmoothScrollButton from "./SmoothScrollButton";
 
@@ -103,7 +103,7 @@ const EnhancedHeroSection = () => {
             targetSection="features" 
             className="mx-auto animate-bounce"
           >
-            <span className="sr-only">Faire défiler vers les fonctionnalités</span>
+            <ChevronDown className="h-6 w-6 text-rose-400" />
           </SmoothScrollButton>
         </div>
       </div>
