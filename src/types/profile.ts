@@ -1,4 +1,3 @@
-
 export interface ProfileFormData {
   fullName: string;
   age: string;
@@ -15,6 +14,7 @@ export interface ProfileFormData {
   waliRelationship?: string;
   waliContact?: string;
   profilePicture?: string;
+  gallery?: string[];
 }
 
 export interface DatabaseProfile {

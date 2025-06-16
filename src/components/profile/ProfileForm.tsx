@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,7 @@ import WaliSection from './sections/WaliSection';
 import VerificationPanel from './VerificationPanel';
 import EnhancedPrivacySettings from './EnhancedPrivacySettings';
 import ProfilePictureUpload from './ProfilePictureUpload';
+import ProfileGallery from './ProfileGallery';
 
 interface ProfileFormProps {
   formData: ProfileFormData;
@@ -44,6 +44,10 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 }) => {
   const handleProfilePictureChange = (imageUrl: string | null) => {
     handleChange('profilePicture', imageUrl || '');
+  };
+
+  const handleGalleryChange = (gallery: string[]) => {
+    handleChange('gallery', gallery);
   };
 
   // Create wrapper function for verification change to match expected signature
@@ -87,6 +91,19 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
             currentPicture={formData.profilePicture}
             fullName={formData.fullName}
             onPictureChange={handleProfilePictureChange}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Photo Gallery Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-rose-800 dark:text-rose-200">Galerie de photos</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ProfileGallery
+            gallery={formData.gallery || []}
+            onGalleryChange={handleGalleryChange}
           />
         </CardContent>
       </Card>

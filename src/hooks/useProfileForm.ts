@@ -51,7 +51,8 @@ export const useProfileForm = ({
       prayerFrequency: '',
       waliName: '',
       waliRelationship: '',
-      waliContact: ''
+      waliContact: '',
+      gallery: []
     }
   });
 
