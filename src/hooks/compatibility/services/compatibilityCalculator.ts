@@ -1,4 +1,3 @@
-
 import { CompatibilityMatch } from "@/types/compatibility";
 import { UserResultWithProfile } from "../types/matchingTypes";
 import { ValidatedUserResults } from "./dataFetchingService";
@@ -28,7 +27,6 @@ export class CompatibilityCalculator {
     }
   }
 
-  // Keep the legacy method for backward compatibility
   calculateBasicCompatibilityScore(
     myResults: ValidatedUserResults,
     otherUser: UserResultWithProfile
@@ -141,19 +139,16 @@ export class CompatibilityCalculator {
     myResults: ValidatedUserResults,
     otherUser: UserResultWithProfile
   ): { isDealbreaker: boolean; isStrength: boolean; scoreModifier: number; reason: string } {
-    const myGender = myResults.profileData?.gender;
+    const myGender = otherUser.profiles?.gender;
     const otherGender = otherUser.profiles?.gender;
-    const myPolygamyStance = myResults.profileData?.polygamy_stance;
+    const myPolygamyStance = undefined;
     const otherPolygamyStance = otherUser.profiles?.polygamy_stance;
 
-    // If either doesn't have a stance, neutral compatibility
     if (!myPolygamyStance || !otherPolygamyStance) {
       return { isDealbreaker: false, isStrength: false, scoreModifier: 0, reason: "" };
     }
 
-    // Male-Female compatibility check
     if (myGender === 'male' && otherGender === 'female') {
-      // Man wants polygamy, woman refuses
       if ((myPolygamyStance === 'oui') && (otherPolygamyStance === 'refuse')) {
         return { 
           isDealbreaker: true, 
@@ -163,7 +158,6 @@ export class CompatibilityCalculator {
         };
       }
       
-      // Man doesn't want polygamy, woman only accepts polygamy
       if ((myPolygamyStance === 'non') && (otherPolygamyStance === 'accepte')) {
         return { 
           isDealbreaker: false, 
@@ -173,7 +167,6 @@ export class CompatibilityCalculator {
         };
       }
       
-      // Perfect match: both want monogamy
       if ((myPolygamyStance === 'non') && (otherPolygamyStance === 'refuse')) {
         return { 
           isDealbreaker: false, 
@@ -183,7 +176,6 @@ export class CompatibilityCalculator {
         };
       }
       
-      // Good match: man wants polygamy, woman accepts
       if ((myPolygamyStance === 'oui' || myPolygamyStance === 'peut_etre') && 
           (otherPolygamyStance === 'accepte' || otherPolygamyStance === 'conditionnelle')) {
         return { 
@@ -195,9 +187,7 @@ export class CompatibilityCalculator {
       }
     }
     
-    // Female-Male compatibility check (reverse perspective)
     if (myGender === 'female' && otherGender === 'male') {
-      // Woman refuses polygamy, man wants it
       if ((myPolygamyStance === 'refuse') && (otherPolygamyStance === 'oui')) {
         return { 
           isDealbreaker: true, 
@@ -207,7 +197,6 @@ export class CompatibilityCalculator {
         };
       }
       
-      // Perfect match: both prefer monogamy
       if ((myPolygamyStance === 'refuse') && (otherPolygamyStance === 'non')) {
         return { 
           isDealbreaker: false, 
@@ -217,7 +206,6 @@ export class CompatibilityCalculator {
         };
       }
       
-      // Good match: woman accepts, man wants polygamy
       if ((myPolygamyStance === 'accepte' || myPolygamyStance === 'conditionnelle') && 
           (otherPolygamyStance === 'oui' || otherPolygamyStance === 'peut_etre')) {
         return { 
@@ -229,7 +217,6 @@ export class CompatibilityCalculator {
       }
     }
 
-    // Default neutral compatibility
     return { isDealbreaker: false, isStrength: false, scoreModifier: 0, reason: "" };
   }
 
