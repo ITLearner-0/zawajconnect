@@ -1,5 +1,4 @@
 
-
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { useProfile } from "@/hooks/useProfile";
 import { useNavigate } from "react-router-dom";
@@ -12,6 +11,7 @@ import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileOnboarding from "@/components/profile/ProfileOnboarding";
 import ProfileFormWithEnhancedPrivacy from "@/components/profile/ProfileFormWithEnhancedPrivacy";
+import { VerificationStatus } from "@/types/profile";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -116,7 +116,7 @@ const Profile = () => {
   };
 
   // Create a wrapper for verification change to match expected signature
-  const handleVerificationStatusChange = (newStatus: any) => {
+  const handleVerificationStatusChange = (newStatus: VerificationStatus) => {
     handleVerificationChange(newStatus);
   };
 
