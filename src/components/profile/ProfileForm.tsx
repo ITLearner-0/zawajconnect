@@ -56,6 +56,16 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     });
   };
 
+  // Create wrapper function for privacy settings change to match expected signature
+  const handlePrivacySettingsChangeWrapper = (newSettings: PrivacySettings) => {
+    // Convert the settings object to individual field calls
+    Object.entries(newSettings).forEach(([field, value]) => {
+      if (privacySettings[field as keyof PrivacySettings] !== value) {
+        handlePrivacySettingsChange(field, value);
+      }
+    });
+  };
+
   // Create wrapper functions to return promises
   const handleToggleAccountVisibilityAsync = async () => {
     onToggleAccountVisibility();
@@ -150,7 +160,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
         privacySettings={privacySettings}
         blockedUsers={blockedUsers}
         isAccountVisible={isAccountVisible}
-        onPrivacyChange={handlePrivacySettingsChange}
+        onPrivacyChange={handlePrivacySettingsChangeWrapper}
         onToggleAccountVisibility={handleToggleAccountVisibilityAsync}
         onUnblockUser={handleUnblockUserAsync}
       />
