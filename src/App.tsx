@@ -1,61 +1,62 @@
 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Index from './pages/Index';
-import Auth from './pages/Auth';
-import Profile from './pages/Profile';
-import NotFound from './pages/NotFound';
-import NearbyMatches from './pages/NearbyMatches';
-import Messages from './pages/Messages';
-import AdminModeration from './pages/AdminModeration';
-import WaliDashboard from './pages/WaliDashboard';
-import Resources from './pages/Resources';
-import Demo from './pages/Demo';
-import UserProfile from './pages/UserProfile';
-import Compatibility from './pages/Compatibility';
-import Subscription from './pages/Subscription';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { AccessibilityProvider } from './contexts/AccessibilityContext';
-import AuthProvider from './contexts/AuthContext';
-import { LazyLoadingProvider } from './hooks/useLazyLoading/context/LazyLoadingContext';
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
+import GlobalErrorBoundary from "@/components/error/GlobalErrorBoundary";
+import Index from "./pages/Index";
+import Auth from "./pages/Auth";
+import Profile from "./pages/Profile";
+import UserProfile from "./pages/UserProfile";
+import Messages from "./pages/Messages";
+import Compatibility from "./pages/Compatibility";
+import Demo from "./pages/Demo";
+import Resources from "./pages/Resources";
+import AdminModeration from "./pages/AdminModeration";
+import WaliDashboard from "./pages/WaliDashboard";
+import NearbyMatches from "./pages/NearbyMatches";
+import Subscription from "./pages/Subscription";
+import Matches from "./pages/Matches";
+import Settings from "./pages/Settings";
+import Support from "./pages/Support";
+import Notifications from "./pages/Notifications";
+
+const queryClient = new QueryClient();
 
 function App() {
   return (
-    <ThemeProvider>
-      <AccessibilityProvider>
-        <LazyLoadingProvider
-          initialConfig={{
-            enableAnalytics: true,
-            enableDebug: process.env.NODE_ENV === 'development',
-            batchSize: 8,
-            preloadDistance: 300,
-            networkOptimization: true,
-            memoryOptimization: true,
-          }}
-        >
-          <Router>
-            <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <GlobalErrorBoundary>
+        <AccessibilityProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/profile/:id" element={<UserProfile />} />
-                <Route path="/compatibility" element={<Compatibility />} />
-                <Route path="/nearby" element={<NearbyMatches />} />
                 <Route path="/messages" element={<Messages />} />
-                <Route path="/messages/:conversationId" element={<Messages />} />
-                <Route path="/admin/moderation" element={<AdminModeration />} />
-                <Route path="/wali" element={<WaliDashboard />} />
-                <Route path="/resources" element={<Resources />} />
-                <Route path="/resources/:resourceId" element={<Resources />} />
+                <Route path="/compatibility" element={<Compatibility />} />
                 <Route path="/demo" element={<Demo />} />
+                <Route path="/resources" element={<Resources />} />
+                <Route path="/admin" element={<AdminModeration />} />
+                <Route path="/wali" element={<WaliDashboard />} />
+                <Route path="/nearby" element={<NearbyMatches />} />
                 <Route path="/subscription" element={<Subscription />} />
-                <Route path="*" element={<NotFound />} />
+                <Route path="/matches" element={<Matches />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/support" element={<Support />} />
+                <Route path="/notifications" element={<Notifications />} />
               </Routes>
-            </AuthProvider>
-          </Router>
-        </LazyLoadingProvider>
-      </AccessibilityProvider>
-    </ThemeProvider>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AccessibilityProvider>
+      </GlobalErrorBoundary>
+    </QueryClientProvider>
   );
 }
 
