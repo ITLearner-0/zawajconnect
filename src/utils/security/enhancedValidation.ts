@@ -1,4 +1,3 @@
-
 import DOMPurify from 'dompurify';
 import { z } from 'zod';
 
@@ -50,7 +49,6 @@ export const sanitizeHtml = (input: string): string => {
     KEEP_CONTENT: true,
     RETURN_DOM: false,
     RETURN_DOM_FRAGMENT: false,
-    RETURN_DOM_IMPORT: false,
     SANITIZE_DOM: true
   });
   
