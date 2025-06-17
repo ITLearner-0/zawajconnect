@@ -263,6 +263,7 @@ export type Database = {
           location: string | null
           occupation: string | null
           phone_verified: boolean | null
+          polygamy_stance: string | null
           prayer_frequency: string | null
           privacy_settings: Json | null
           profile_picture: string | null
@@ -292,6 +293,7 @@ export type Database = {
           location?: string | null
           occupation?: string | null
           phone_verified?: boolean | null
+          polygamy_stance?: string | null
           prayer_frequency?: string | null
           privacy_settings?: Json | null
           profile_picture?: string | null
@@ -321,6 +323,7 @@ export type Database = {
           location?: string | null
           occupation?: string | null
           phone_verified?: boolean | null
+          polygamy_stance?: string | null
           prayer_frequency?: string | null
           privacy_settings?: Json | null
           profile_picture?: string | null

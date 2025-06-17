@@ -21,7 +21,6 @@ const Profile = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [hasCompatibilityResults, setHasCompatibilityResults] = useState<boolean | null>(null);
-  const [isSaving, setIsSaving] = useState(false);
   
   const { 
     formData, 
@@ -102,9 +101,6 @@ const Profile = () => {
 
   // Wrapper function to handle the save process and redirect
   const handleSaveProfile = async () => {
-    if (isSaving) return false;
-    
-    setIsSaving(true);
     console.log("Save profile button clicked");
     console.log("User ID:", userId);
     console.log("Has compatibility results:", hasCompatibilityResults);
@@ -156,8 +152,6 @@ const Profile = () => {
         variant: "destructive",
       });
       return false;
-    } finally {
-      setIsSaving(false);
     }
   };
   
