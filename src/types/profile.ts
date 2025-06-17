@@ -62,6 +62,7 @@ export interface VerificationStatus {
   email: boolean;
   phone: boolean;
   id: boolean;
+  wali: boolean;
 }
 
 export interface Conversation {
