@@ -80,9 +80,15 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     onUnblockUser(userId);
   };
 
-  // Handle form submission with proper async handling
+  // Handle form submission with proper async handling and loading state
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  
   const handleFormSubmit = async () => {
+    if (isSubmitting) return; // Prevent double submission
+    
     console.log("ProfileForm handleFormSubmit called");
+    setIsSubmitting(true);
+    
     try {
       const result = await handleSubmit();
       console.log("ProfileForm handleSubmit result:", result);
@@ -90,6 +96,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     } catch (error) {
       console.error("ProfileForm handleSubmit error:", error);
       return false;
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -185,24 +193,27 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 
       <Separator />
 
-      {/* Privacy Settings */}
-      <EnhancedPrivacySettings
-        userId={userEmail || ''}
-        privacySettings={privacySettings}
-        blockedUsers={blockedUsers}
-        isAccountVisible={isAccountVisible}
-        onPrivacyChange={handlePrivacySettingsChangeWrapper}
-        onToggleAccountVisibility={handleToggleAccountVisibilityAsync}
-        onUnblockUser={handleUnblockUserAsync}
-      />
+      {/* Privacy Settings - Only show if userEmail exists and can be used as userId */}
+      {userEmail && (
+        <EnhancedPrivacySettings
+          userId={userEmail}
+          privacySettings={privacySettings}
+          blockedUsers={blockedUsers}
+          isAccountVisible={isAccountVisible}
+          onPrivacyChange={handlePrivacySettingsChangeWrapper}
+          onToggleAccountVisibility={handleToggleAccountVisibilityAsync}
+          onUnblockUser={handleUnblockUserAsync}
+        />
+      )}
 
       <div className="flex justify-center pt-6">
         <Button 
           onClick={handleFormSubmit}
+          disabled={isSubmitting}
           size="lg"
-          className="bg-rose-600 hover:bg-rose-700 dark:bg-rose-500 dark:hover:bg-rose-600 text-white px-8"
+          className="bg-rose-600 hover:bg-rose-700 dark:bg-rose-500 dark:hover:bg-rose-600 text-white px-8 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Sauvegarder le profil
+          {isSubmitting ? "Sauvegarde en cours..." : "Sauvegarder le profil"}
         </Button>
       </div>
     </div>

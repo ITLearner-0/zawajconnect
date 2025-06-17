@@ -45,7 +45,7 @@ export const useProfile = () => {
     initialPrivacySettings: privacySettings,
     initialBlockedUsers: blockedUsers,
     initialIsVisible: isAccountVisible,
-    userId
+    userId // Pass the actual userId instead of userEmail
   });
 
   return {

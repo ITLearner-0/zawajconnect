@@ -41,7 +41,7 @@ const Profile = () => {
     unblockUser
   } = useProfile();
 
-  // Analytics and recommendations
+  // Analytics and recommendations - use userId instead of userEmail
   const { analytics, loading: analyticsLoading } = useProfileAnalytics(userId);
   const { 
     recommendations, 
