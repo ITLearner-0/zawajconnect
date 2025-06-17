@@ -1,13 +1,12 @@
-
 import { useState, useEffect } from 'react';
-import { ProfileFormData, PrivacySettings, VerificationStatus } from '@/types/profile';
-import { useToast } from '@/hooks/use-toast';
-import { DEFAULT_PRIVACY_SETTINGS } from './constants/defaultSettings';
+import { supabase } from '@/integrations/supabase/client';
+import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
 import { fetchProfileFromDb, createNewProfile, getUserEmail } from './utils/profileDbUtils';
-import { ProfileFetcherResult, ProfileFetcherOptions } from './types/profileFetcher';
+import { DEFAULT_PRIVACY_SETTINGS } from './constants/defaultSettings';
+import { validateUuid } from '@/utils/security/inputValidation';
+import { useToast } from '@/hooks/use-toast';
 
-export const useProfileFetcher = (userId?: string | null): ProfileFetcherResult => {
-  const { toast } = useToast();
+export const useProfileFetcher = (userId?: string | null) => {
   const [profileData, setProfileData] = useState<ProfileFormData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -16,87 +15,65 @@ export const useProfileFetcher = (userId?: string | null): ProfileFetcherResult 
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>({
     email: false,
     phone: false,
-    id: false
+    id: false,
+    wali: false
   });
   const [privacySettings, setPrivacySettings] = useState<PrivacySettings>(DEFAULT_PRIVACY_SETTINGS);
   const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
   const [isAccountVisible, setIsAccountVisible] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const fetchProfileData = async () => {
+    const fetchProfile = async () => {
       if (!userId) {
         setLoading(false);
         return;
       }
 
-      setLoading(true);
-      setError(null);
+      // Critical security fix: Validate UUID before database query
+      if (!validateUuid(userId)) {
+        console.error("Invalid UUID provided for user profile fetch:", userId);
+        setError("Invalid user identifier");
+        toast({
+          title: "Security Error",
+          description: "Invalid user identifier provided",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
 
       try {
-        // Get user email from auth session
+        setLoading(true);
+        setError(null);
+
+        // Get user email
         const email = await getUserEmail();
         setUserEmail(email);
 
-        // Get profile data
-        const { data, error } = await fetchProfileFromDb(userId);
+        // Fetch profile data with validated UUID
+        const { data: profile, error: profileError } = await fetchProfileFromDb(userId);
 
-        if (error) {
-          setError(error.message);
-          console.error("Supabase error fetching profile:", error);
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error("Error fetching profile:", profileError);
+          setError(profileError.message);
           return;
         }
 
-        // Check if we have data before proceeding
-        if (data && data.length > 0) {
-          const profile = data[0];
+        if (!profile || profile.length === 0) {
+          // New user - create default profile
+          console.log("No profile found, creating new profile for user:", userId);
+          setIsNewUser(true);
           
-          // Map database fields to ProfileFormData, preserving all existing data
-          const profileFormData: ProfileFormData = {
-            fullName: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
-            age: profile.birth_date || '',
-            gender: profile.gender || '',
-            location: profile.location || '',
-            education: profile.education_level || '',
-            occupation: profile.occupation || '',
-            religiousLevel: profile.religious_practice_level || '',
-            familyBackground: profile.about_me || '',
-            aboutMe: profile.about_me || '',
-            prayerFrequency: profile.prayer_frequency || '',
-            waliName: profile.wali_name || '',
-            waliRelationship: profile.wali_relationship || '',
-            waliContact: profile.wali_contact || '',
-            profilePicture: profile.profile_picture || '',
-            gallery: profile.gallery || []
-          };
-          setProfileData(profileFormData);
+          const { error: createError } = await createNewProfile(userId);
           
-          // Set verification status
-          setVerificationStatus({
-            email: !!profile.is_verified,
-            phone: !!profile.phone_verified,
-            id: !!profile.id_verified,
-          });
-          
-          // Set privacy settings with fallback to default
-          setPrivacySettings(profile.privacy_settings as PrivacySettings || DEFAULT_PRIVACY_SETTINGS);
-          
-          // Set blocked users
-          setBlockedUsers(profile.blocked_users || []);
-          
-          // Set account visibility
-          setIsAccountVisible(profile.is_visible !== false);
-          
-          // Determine if user is new based on data completeness
-          setIsNewUser(!profile.first_name || !profile.last_name || !profile.gender);
-        } else {
-          // Create a new profile if none exists
-          const { error: insertError } = await createNewProfile(userId);
-            
-          if (insertError) {
-            console.error("Error creating new profile:", insertError);
+          if (createError) {
+            console.error("Error creating new profile:", createError);
+            setError(createError.message);
+            return;
           }
-          
-          // Set default empty profile data
+
+          // Set default data for new user
           setProfileData({
             fullName: '',
             age: '',
@@ -108,23 +85,75 @@ export const useProfileFetcher = (userId?: string | null): ProfileFetcherResult 
             familyBackground: '',
             aboutMe: '',
             prayerFrequency: '',
+            polygamyStance: '',
             waliName: '',
             waliRelationship: '',
             waliContact: '',
             profilePicture: '',
             gallery: []
           });
-          setIsNewUser(true);
+          
+          setPrivacySettings(DEFAULT_PRIVACY_SETTINGS);
+          setBlockedUsers([]);
+          setIsAccountVisible(true);
+        } else {
+          // Existing user - map database data to form data
+          const profileRecord = profile[0];
+          
+          const mappedData: ProfileFormData = {
+            fullName: `${profileRecord.first_name || ''} ${profileRecord.last_name || ''}`.trim(),
+            age: profileRecord.birth_date || '',
+            gender: profileRecord.gender || '',
+            location: profileRecord.location || '',
+            education: profileRecord.education_level || '',
+            occupation: profileRecord.occupation || '',
+            religiousLevel: profileRecord.religious_practice_level || '',
+            familyBackground: '',
+            aboutMe: profileRecord.about_me || '',
+            prayerFrequency: profileRecord.prayer_frequency || '',
+            polygamyStance: profileRecord.polygamy_stance || '',
+            waliName: profileRecord.wali_name || '',
+            waliRelationship: profileRecord.wali_relationship || '',
+            waliContact: profileRecord.wali_contact || '',
+            profilePicture: profileRecord.profile_picture || '',
+            gallery: profileRecord.gallery || []
+          };
+
+          setProfileData(mappedData);
+          setIsNewUser(false);
+
+          // Set verification status
+          setVerificationStatus({
+            email: profileRecord.email_verified || false,
+            phone: profileRecord.phone_verified || false,
+            id: profileRecord.id_verified || false,
+            wali: profileRecord.wali_verified || false
+          });
+
+          // Set privacy settings with fallback to defaults
+          const privacyData = profileRecord.privacy_settings as PrivacySettings || DEFAULT_PRIVACY_SETTINGS;
+          setPrivacySettings(privacyData);
+
+          // Set blocked users
+          setBlockedUsers(profileRecord.blocked_users || []);
+          
+          // Set account visibility
+          setIsAccountVisible(profileRecord.is_visible !== false);
         }
       } catch (err: any) {
+        console.error("Error in profile fetch:", err);
         setError(err.message);
-        console.error("Error fetching profile:", err);
+        toast({
+          title: "Error",
+          description: "Failed to load profile data",
+          variant: "destructive",
+        });
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfileData();
+    fetchProfile();
   }, [userId, toast]);
 
   return {
@@ -136,6 +165,6 @@ export const useProfileFetcher = (userId?: string | null): ProfileFetcherResult 
     verificationStatus,
     privacySettings,
     blockedUsers,
-    isAccountVisible,
+    isAccountVisible
   };
 };

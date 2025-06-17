@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
+import { validateUuid, validateProfileUpdate, sanitizeInput } from '@/utils/security/inputValidation';
 
 export const useProfileUpdater = (userId?: string | null) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Function to update profile data
   const updateProfileData = async (newProfileData: ProfileFormData) => {
     if (!userId) {
       toast({
@@ -19,35 +19,60 @@ export const useProfileUpdater = (userId?: string | null) => {
       });
       return false;
     }
+
+    // Critical security fix: Validate UUID before database operation
+    if (!validateUuid(userId)) {
+      console.error("Invalid UUID provided for profile update:", userId);
+      toast({
+        title: "Security Error",
+        description: "Invalid user identifier provided",
+        variant: "destructive",
+      });
+      return false;
+    }
     
     setLoading(true);
     setError(null);
 
     try {
-      // Destructure fullName into first_name and last_name
-      const [first_name, ...lastNameParts] = newProfileData.fullName.split(' ');
+      // Destructure and sanitize fullName into first_name and last_name
+      const sanitizedFullName = sanitizeInput(newProfileData.fullName);
+      const [first_name, ...lastNameParts] = sanitizedFullName.split(' ');
       const last_name = lastNameParts.join(' ');
 
-      // Prepare update data, preserving existing values
-      const updateData: any = {
-        first_name: first_name || '',
-        last_name: last_name || '',
+      // Prepare update data with validation and sanitization
+      const updateData = {
+        first_name: sanitizeInput(first_name || ''),
+        last_name: sanitizeInput(last_name || ''),
         birth_date: newProfileData.age || null,
         gender: newProfileData.gender || null,
-        location: newProfileData.location || null,
-        education_level: newProfileData.education || null,
-        occupation: newProfileData.occupation || null,
+        location: sanitizeInput(newProfileData.location || ''),
+        education_level: sanitizeInput(newProfileData.education || ''),
+        occupation: sanitizeInput(newProfileData.occupation || ''),
         religious_practice_level: newProfileData.religiousLevel || null,
-        about_me: newProfileData.aboutMe || null,
+        about_me: sanitizeInput(newProfileData.aboutMe || ''),
         prayer_frequency: newProfileData.prayerFrequency || null,
-        wali_name: newProfileData.waliName || null,
-        wali_relationship: newProfileData.waliRelationship || null,
-        wali_contact: newProfileData.waliContact || null,
+        polygamy_stance: newProfileData.polygamyStance || null,
+        wali_name: sanitizeInput(newProfileData.waliName || ''),
+        wali_relationship: sanitizeInput(newProfileData.waliRelationship || ''),
+        wali_contact: sanitizeInput(newProfileData.waliContact || ''),
         profile_picture: newProfileData.profilePicture || null,
         gallery: newProfileData.gallery || []
       };
 
-      // Use upsert to handle both insert and update
+      // Validate the update data
+      const validation = validateProfileUpdate(updateData);
+      if (!validation.success) {
+        console.error("Profile validation failed:", validation.error);
+        toast({
+          title: "Validation Error",
+          description: "Invalid profile data provided",
+          variant: "destructive",
+        });
+        return false;
+      }
+
+      // Use upsert to handle both insert and update with validated UUID
       const { data, error } = await supabase
         .from('profiles')
         .upsert({ id: userId, ...updateData }, { 
