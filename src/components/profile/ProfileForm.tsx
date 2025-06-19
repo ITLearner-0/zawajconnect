@@ -1,18 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
-import BasicInformationSection from './sections/BasicInfoSection';
-import AboutSection from './sections/AboutSection';
-import EducationSection from './sections/EducationSection';
-import ReligiousSection from './sections/ReligiousSection';
-import WaliSection from './sections/WaliSection';
-import VerificationPanel from './VerificationPanel';
-import EnhancedPrivacySettings from './EnhancedPrivacySettings';
-import ProfilePictureUpload from './ProfilePictureUpload';
-import ProfileGallery from './ProfileGallery';
+import ProfileFormSections from './form/ProfileFormSections';
+import ProfileFormActions from './form/ProfileFormActions';
 
 interface ProfileFormProps {
   formData: ProfileFormData;
@@ -43,48 +33,10 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   onToggleAccountVisibility,
   onUnblockUser,
 }) => {
-  const handleProfilePictureChange = (imageUrl: string | null) => {
-    handleChange('profilePicture', imageUrl || '');
-  };
-
-  const handleGalleryChange = (gallery: string[]) => {
-    handleChange('gallery', gallery);
-  };
-
-  // Create wrapper function for verification change to match expected signature
-  const handleVerificationFieldChange = (newStatus: VerificationStatus) => {
-    // Convert the new status object back to individual field calls
-    Object.entries(newStatus).forEach(([field, value]) => {
-      if (verificationStatus[field as keyof VerificationStatus] !== value) {
-        handleVerificationChange(field, value);
-      }
-    });
-  };
-
-  // Create wrapper function for privacy settings change to match expected signature
-  const handlePrivacySettingsChangeWrapper = (newSettings: PrivacySettings) => {
-    // Convert the settings object to individual field calls
-    Object.entries(newSettings).forEach(([field, value]) => {
-      if (privacySettings[field as keyof PrivacySettings] !== value) {
-        handlePrivacySettingsChange(field, value);
-      }
-    });
-  };
-
-  // Create wrapper functions to return promises
-  const handleToggleAccountVisibilityAsync = async () => {
-    onToggleAccountVisibility();
-  };
-
-  const handleUnblockUserAsync = async (userId: string) => {
-    onUnblockUser(userId);
-  };
-
-  // Handle form submission with proper async handling and loading state
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   
   const handleFormSubmit = async () => {
-    if (isSubmitting) return; // Prevent double submission
+    if (isSubmitting) return false;
     
     console.log("ProfileForm handleFormSubmit called");
     setIsSubmitting(true);
@@ -103,119 +55,24 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Profile Picture Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-rose-800 dark:text-rose-200">Photo de profil</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ProfilePictureUpload
-            currentPicture={formData.profilePicture}
-            fullName={formData.fullName}
-            onPictureChange={handleProfilePictureChange}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Photo Gallery Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-rose-800 dark:text-rose-200">Galerie de photos</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <ProfileGallery
-            gallery={formData.gallery || []}
-            onGalleryChange={handleGalleryChange}
-          />
-        </CardContent>
-      </Card>
-
-      {/* Basic Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-rose-800 dark:text-rose-200">Informations de base</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <BasicInformationSection formData={formData} handleChange={handleChange} />
-        </CardContent>
-      </Card>
-
-      {/* About Me */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-rose-800 dark:text-rose-200">À propos de moi</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AboutSection formData={formData} handleChange={handleChange} />
-        </CardContent>
-      </Card>
-
-      {/* Education & Career */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-rose-800 dark:text-rose-200">Éducation et carrière</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <EducationSection formData={formData} handleChange={handleChange} />
-        </CardContent>
-      </Card>
-
-      {/* Religious Background */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-rose-800 dark:text-rose-200">Contexte religieux</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <ReligiousSection formData={formData} handleChange={handleChange} />
-        </CardContent>
-      </Card>
-
-      {/* Wali Information */}
-      {formData.gender === 'female' && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-rose-800 dark:text-rose-200">Informations du Wali</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <WaliSection formData={formData} handleChange={handleChange} />
-          </CardContent>
-        </Card>
-      )}
-
-      <Separator />
-
-      {/* Verification Panel */}
-      <VerificationPanel
+      <ProfileFormSections
+        formData={formData}
+        handleChange={handleChange}
         verificationStatus={verificationStatus}
-        userEmail={userEmail || ''}
-        onVerificationChange={handleVerificationFieldChange}
+        userEmail={userEmail}
+        handleVerificationChange={handleVerificationChange}
+        privacySettings={privacySettings}
+        blockedUsers={blockedUsers}
+        isAccountVisible={isAccountVisible}
+        handlePrivacySettingsChange={handlePrivacySettingsChange}
+        onToggleAccountVisibility={onToggleAccountVisibility}
+        onUnblockUser={onUnblockUser}
       />
-
-      <Separator />
-
-      {/* Privacy Settings - Only show if userEmail exists and can be used as userId */}
-      {userEmail && (
-        <EnhancedPrivacySettings
-          userId={userEmail}
-          privacySettings={privacySettings}
-          blockedUsers={blockedUsers}
-          isAccountVisible={isAccountVisible}
-          onPrivacyChange={handlePrivacySettingsChangeWrapper}
-          onToggleAccountVisibility={handleToggleAccountVisibilityAsync}
-          onUnblockUser={handleUnblockUserAsync}
-        />
-      )}
-
-      <div className="flex justify-center pt-6">
-        <Button 
-          onClick={handleFormSubmit}
-          disabled={isSubmitting}
-          size="lg"
-          className="bg-rose-600 hover:bg-rose-700 dark:bg-rose-500 dark:hover:bg-rose-600 text-white px-8 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {isSubmitting ? "Sauvegarde en cours..." : "Sauvegarder le profil"}
-        </Button>
-      </div>
+      
+      <ProfileFormActions 
+        onSubmit={handleFormSubmit}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 };
