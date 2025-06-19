@@ -39,47 +39,51 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { validation, validateField, hasErrors } = useTypeValidation<ProfileFormData>();
   
-  // Type-safe field change handler
-  const handleTypedChange = React.useCallback(<K extends keyof ProfileFormData>(
-    field: K,
-    value: ProfileFormData[K]
-  ) => {
+  // Convert field-based handler to React event handler for section components
+  const handleSectionChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    
     // Validate the field based on its type
     let isValid = true;
     
-    switch (field) {
+    switch (name as keyof ProfileFormData) {
       case 'fullName':
-        isValid = validateField(field, value, (val) => 
+        isValid = validateField(name as keyof ProfileFormData, value, (val) => 
           typeof val === 'string' && val.length >= 2 ? null : 'Name must be at least 2 characters'
         );
         break;
       case 'age':
-        isValid = validateField(field, value, (val) => {
+        isValid = validateField(name as keyof ProfileFormData, value, (val) => {
           const age = parseInt(val as string);
           return (age >= 18 && age <= 100) ? null : 'Age must be between 18 and 100';
         });
         break;
       case 'gender':
-        isValid = validateField(field, value, (val) => 
+        isValid = validateField(name as keyof ProfileFormData, value, (val) => 
           (val === 'male' || val === 'female') ? null : 'Please select a valid gender'
         );
         break;
       case 'aboutMe':
-        isValid = validateField(field, value, (val) => 
+        isValid = validateField(name as keyof ProfileFormData, value, (val) => 
           typeof val === 'string' && val.length >= 10 ? null : 'Please write at least 10 characters about yourself'
         );
         break;
       default:
         // For other fields, just check they're not empty if required
         if (typeof value === 'string' && value.trim().length === 0) {
-          isValid = validateField(field, value, () => `${String(field)} is required`);
+          isValid = validateField(name as keyof ProfileFormData, value, () => `${name} is required`);
         }
     }
     
     if (isValid) {
-      handleChange(field, value);
+      handleChange(name as keyof ProfileFormData, value);
     }
   }, [handleChange, validateField]);
+
+  // Handle select changes (for components that use onValueChange)
+  const handleSelectChange = React.useCallback((field: keyof ProfileFormData, value: string) => {
+    handleChange(field, value);
+  }, [handleChange]);
   
   const handleFormSubmit = async (): Promise<boolean> => {
     if (isSubmitting || hasErrors) return false;
@@ -104,7 +108,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
       <div className="space-y-6">
         <ProfileFormSections
           formData={formData}
-          handleChange={handleTypedChange}
+          handleChange={handleSectionChange}
+          handleSelectChange={handleSelectChange}
           verificationStatus={verificationStatus}
           userEmail={userEmail}
           handleVerificationChange={handleVerificationChange}

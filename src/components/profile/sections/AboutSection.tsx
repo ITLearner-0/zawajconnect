@@ -2,17 +2,14 @@
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { ProfileFormData } from "@/types/profile";
 
 interface AboutSectionProps {
-  formData: any;
-  handleChange: (field: string, value: any) => void;
+  formData: ProfileFormData;
+  handleChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 const AboutSection: React.FC<AboutSectionProps> = ({ formData, handleChange }) => {
-  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    handleChange(e.target.name, e.target.value);
-  };
-
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -21,7 +18,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ formData, handleChange }) =
           id="aboutMe"
           name="aboutMe"
           value={formData.aboutMe || ""}
-          onChange={handleInputChange}
+          onChange={handleChange}
           placeholder="Parlez-nous de vous..."
           rows={4}
           className="min-h-[150px]"

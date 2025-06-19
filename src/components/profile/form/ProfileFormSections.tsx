@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
 import { StrictFormValidation } from '@/types/strictTypes';
@@ -11,7 +12,8 @@ import PrivacySettingsComponent from '../PrivacySettings';
 
 interface ProfileFormSectionsProps {
   formData: ProfileFormData;
-  handleChange: <K extends keyof ProfileFormData>(field: K, value: ProfileFormData[K]) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  handleSelectChange: (field: keyof ProfileFormData, value: string) => void;
   verificationStatus: VerificationStatus;
   userEmail: string | null;
   handleVerificationChange: (field: keyof VerificationStatus, value: boolean) => void;
@@ -27,6 +29,7 @@ interface ProfileFormSectionsProps {
 const ProfileFormSections: React.FC<ProfileFormSectionsProps> = ({
   formData,
   handleChange,
+  handleSelectChange,
   verificationStatus,
   userEmail,
   handleVerificationChange,
@@ -40,26 +43,33 @@ const ProfileFormSections: React.FC<ProfileFormSectionsProps> = ({
 }) => {
   // Convert the field-based verification handler to the expected format
   const handleVerificationStatusChange = (newStatus: VerificationStatus) => {
-    // This would need to be handled by comparing the new status with the old one
-    // For now, we'll keep the existing pattern but need to update the VerificationPanel
-    console.log('Verification status changed:', newStatus);
+    // Compare new status with old and trigger changes for each field that changed
+    Object.keys(newStatus).forEach(key => {
+      const field = key as keyof VerificationStatus;
+      if (newStatus[field] !== verificationStatus[field]) {
+        handleVerificationChange(field, newStatus[field]);
+      }
+    });
   };
 
   return (
     <>
       <BasicInfoSection 
         formData={formData} 
-        handleChange={handleChange} 
+        handleChange={handleChange}
+        handleSelectChange={handleSelectChange}
       />
       
       <EducationSection 
         formData={formData} 
-        handleChange={handleChange} 
+        handleChange={handleChange}
+        handleSelectChange={handleSelectChange}
       />
       
       <ReligiousSection 
         formData={formData} 
-        handleChange={handleChange} 
+        handleChange={handleChange}
+        handleSelectChange={handleSelectChange}
       />
       
       <AboutSection 
@@ -69,7 +79,8 @@ const ProfileFormSections: React.FC<ProfileFormSectionsProps> = ({
       
       <WaliSection 
         formData={formData} 
-        handleChange={handleChange} 
+        handleChange={handleChange}
+        handleSelectChange={handleSelectChange}
       />
       
       <VerificationPanel

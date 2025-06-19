@@ -3,21 +3,15 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ProfileFormData } from "@/types/profile";
 
 interface BasicInfoSectionProps {
-  formData: any;
-  handleChange: (field: string, value: any) => void;
+  formData: ProfileFormData;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleSelectChange: (field: keyof ProfileFormData, value: string) => void;
 }
 
-const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleChange }) => {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    handleChange(e.target.name, e.target.value);
-  };
-
-  const handleSelectChange = (field: string, value: string) => {
-    handleChange(field, value);
-  };
-
+const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleChange, handleSelectChange }) => {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -27,7 +21,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
             id="fullName"
             name="fullName"
             value={formData.fullName || ""}
-            onChange={handleInputChange}
+            onChange={handleChange}
             placeholder="Entrez votre nom complet"
           />
         </div>
@@ -39,7 +33,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
             name="age"
             type="number"
             value={formData.age || ""}
-            onChange={handleInputChange}
+            onChange={handleChange}
             placeholder="Votre âge"
             min="18"
             max="120"
@@ -65,7 +59,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
             id="location"
             name="location"
             value={formData.location || ""}
-            onChange={handleInputChange}
+            onChange={handleChange}
             placeholder="Ville, Pays"
           />
         </div>

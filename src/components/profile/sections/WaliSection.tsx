@@ -3,21 +3,15 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ProfileFormData } from "@/types/profile";
 
 interface WaliSectionProps {
-  formData: any;
-  handleChange: (field: string, value: any) => void;
+  formData: ProfileFormData;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSelectChange: (field: keyof ProfileFormData, value: string) => void;
 }
 
-const WaliSection: React.FC<WaliSectionProps> = ({ formData, handleChange }) => {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleChange(e.target.name, e.target.value);
-  };
-
-  const handleSelectChange = (field: string, value: string) => {
-    handleChange(field, value);
-  };
-
+const WaliSection: React.FC<WaliSectionProps> = ({ formData, handleChange, handleSelectChange }) => {
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -26,7 +20,7 @@ const WaliSection: React.FC<WaliSectionProps> = ({ formData, handleChange }) => 
           id="waliName"
           name="waliName"
           value={formData.waliName || ""}
-          onChange={handleInputChange}
+          onChange={handleChange}
           placeholder="Entrez le nom de votre wali"
         />
       </div>
@@ -53,7 +47,7 @@ const WaliSection: React.FC<WaliSectionProps> = ({ formData, handleChange }) => 
           id="waliContact"
           name="waliContact"
           value={formData.waliContact || ""}
-          onChange={handleInputChange}
+          onChange={handleChange}
           placeholder="Numéro de contact du wali"
         />
       </div>

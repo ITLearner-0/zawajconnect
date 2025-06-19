@@ -3,21 +3,15 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ProfileFormData } from "@/types/profile";
 
 interface EducationSectionProps {
-  formData: any;
-  handleChange: (field: string, value: any) => void;
+  formData: ProfileFormData;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSelectChange: (field: keyof ProfileFormData, value: string) => void;
 }
 
-const EducationSection: React.FC<EducationSectionProps> = ({ formData, handleChange }) => {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleChange(e.target.name, e.target.value);
-  };
-
-  const handleSelectChange = (value: string) => {
-    handleChange("education", value);
-  };
-
+const EducationSection: React.FC<EducationSectionProps> = ({ formData, handleChange, handleSelectChange }) => {
   const educationLevels = [
     { value: "brevet", label: "Brevet des collèges" },
     { value: "cap_bep", label: "CAP/BEP" },
@@ -35,7 +29,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ formData, handleCha
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="education">Niveau d'Éducation</Label>
-          <Select value={formData.education || ""} onValueChange={handleSelectChange}>
+          <Select value={formData.education || ""} onValueChange={(value) => handleSelectChange("education", value)}>
             <SelectTrigger>
               <SelectValue placeholder="Sélectionnez votre niveau d'éducation" />
             </SelectTrigger>
@@ -55,7 +49,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ formData, handleCha
             id="occupation"
             name="occupation"
             value={formData.occupation || ""}
-            onChange={handleInputChange}
+            onChange={handleChange}
             placeholder="Entrez votre profession"
           />
         </div>
