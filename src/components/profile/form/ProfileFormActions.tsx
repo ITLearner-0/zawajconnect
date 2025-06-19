@@ -1,36 +1,51 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Save, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface ProfileFormActionsProps {
   onSubmit: () => Promise<boolean>;
   isSubmitting: boolean;
+  hasErrors?: boolean;
 }
 
-const ProfileFormActions: React.FC<ProfileFormActionsProps> = ({ onSubmit, isSubmitting }) => {
-  const handleFormSubmit = async () => {
-    if (isSubmitting) return;
-    
-    try {
-      const result = await onSubmit();
-      return result;
-    } catch (error) {
-      console.error("ProfileFormActions handleSubmit error:", error);
-      return false;
-    }
+const ProfileFormActions: React.FC<ProfileFormActionsProps> = ({
+  onSubmit,
+  isSubmitting,
+  hasErrors = false
+}) => {
+  const handleSubmitClick = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await onSubmit();
   };
 
   return (
-    <div className="flex justify-center pt-6">
-      <Button 
-        onClick={handleFormSubmit}
-        disabled={isSubmitting}
-        size="lg"
-        className="bg-rose-600 hover:bg-rose-700 dark:bg-rose-500 dark:hover:bg-rose-600 text-white px-8 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {isSubmitting ? "Sauvegarde en cours..." : "Sauvegarder le profil"}
-      </Button>
-    </div>
+    <Card>
+      <CardContent className="pt-6">
+        {hasErrors && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              Please fix the errors above before saving your profile.
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        <div className="flex justify-end">
+          <Button 
+            onClick={handleSubmitClick}
+            disabled={isSubmitting || hasErrors}
+            className="flex items-center gap-2"
+            size="lg"
+          >
+            <Save className="h-4 w-4" />
+            {isSubmitting ? 'Saving...' : 'Save Profile'}
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
