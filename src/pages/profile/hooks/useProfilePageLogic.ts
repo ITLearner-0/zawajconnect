@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -7,6 +6,7 @@ import { useProfile } from "@/hooks/useProfile";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { useProfileAnalytics } from "@/hooks/profile/useProfileAnalytics";
 import { useProfileRecommendations } from "@/hooks/profile/useProfileRecommendations";
+import { ProfileFormData, VerificationStatus, PrivacySettings } from "@/types/profile";
 
 export const useProfilePageLogic = () => {
   const navigate = useNavigate();
@@ -146,26 +146,13 @@ export const useProfilePageLogic = () => {
     }
   };
   
-  // Create a wrapper for handleChange to match expected signature
-  const handleFieldChange = (field: string, value: any) => {
-    // Convert to the event-based signature that handleChange expects
-    const event = {
-      target: {
-        name: field,
-        value: value
-      }
-    } as React.ChangeEvent<HTMLInputElement>;
-    
-    handleChange(event);
-  };
-
-  // Create a wrapper for verification change to match expected signature - FIXED
-  const handleVerificationFieldChange = (field: string, value: boolean) => {
-    handleVerificationChange(field as keyof typeof verificationStatus, value);
+  // Create a wrapper for verification change to match expected signature
+  const handleVerificationFieldChange = (field: keyof VerificationStatus, value: boolean) => {
+    handleVerificationChange(field, value);
   };
 
   // Create a wrapper for privacy settings change
-  const handlePrivacyFieldChange = (field: string, value: any) => {
+  const handlePrivacyFieldChange = (field: keyof PrivacySettings, value: any) => {
     const newSettings = { ...privacySettings, [field]: value };
     handlePrivacySettingsChange(newSettings);
   };
@@ -196,8 +183,8 @@ export const useProfilePageLogic = () => {
     isAccountVisible,
     hasCompatibilityResults,
     
-    // Handlers
-    handleFieldChange,
+    // Handlers - keep handleChange as is (React event handler)
+    handleChange,
     handleVerificationFieldChange,
     handlePrivacyFieldChange,
     handleSaveProfile,

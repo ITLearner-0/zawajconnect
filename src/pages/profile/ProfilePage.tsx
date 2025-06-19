@@ -24,7 +24,7 @@ const ProfilePage = () => {
     hasCompatibilityResults,
     
     // Handlers
-    handleFieldChange,
+    handleChange,
     handleVerificationFieldChange,
     handlePrivacyFieldChange,
     handleSaveProfile,
@@ -52,6 +52,19 @@ const ProfilePage = () => {
     // Visibility settings
     visibilitySettings
   } = useProfilePageLogic();
+
+  // Create a wrapper that converts field-based changes to the expected format
+  const handleFieldChange = (field: keyof typeof formData, value: any) => {
+    // Create a synthetic event that matches the expected signature
+    const syntheticEvent = {
+      target: {
+        name: field,
+        value: value
+      }
+    } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
+    
+    handleChange(syntheticEvent);
+  };
 
   if (isOnboarding) {
     return (
