@@ -67,6 +67,24 @@ const ProfilePage = () => {
     handleChange(syntheticEvent);
   };
 
+  // Create a wrapper that converts the field-based handler to an event-based handler for ProfileForm
+  const handleEventChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    handleChange(e);
+  };
+
+  // Create a wrapper that converts event-based handler to field-based handler for ProfileForm
+  const handleProfileFormChange = (field: keyof typeof formData, value: any) => {
+    const syntheticEvent = {
+      target: {
+        name: field,
+        value: value
+      }
+    } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
+    
+    handleChange(syntheticEvent);
+  };
+
   if (isOnboarding) {
     return (
       <AccessibilityProvider>
@@ -108,7 +126,7 @@ const ProfilePage = () => {
                 <TabsContent value="profile" className="mt-6">
                   <ProfileForm
                     formData={formData}
-                    handleChange={handleChange}
+                    handleChange={handleProfileFormChange}
                     handleSubmit={handleSaveProfile}
                     verificationStatus={verificationStatus}
                     userEmail={userEmail}
