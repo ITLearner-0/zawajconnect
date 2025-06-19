@@ -11,8 +11,11 @@ export const useProfileVerification = ({
 }: UseProfileVerificationProps) => {
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>(initialVerificationStatus);
 
-  const handleVerificationChange = (newStatus: VerificationStatus) => {
-    setVerificationStatus(newStatus);
+  const handleVerificationChange = (field: keyof VerificationStatus, value: boolean) => {
+    setVerificationStatus(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   return {

@@ -13,33 +13,27 @@ interface PrivacySettingsProps {
   privacySettings: PrivacySettingsType;
   blockedUsers: string[];
   isAccountVisible: boolean;
-  onPrivacyChange: (settings: PrivacySettingsType) => void;
-  onToggleAccountVisibility: () => Promise<void>;
-  onUnblockUser: (userId: string) => Promise<void>;
+  onPrivacySettingsChange: (field: keyof PrivacySettingsType, value: any) => void;
+  onToggleAccountVisibility: () => void;
+  onUnblockUser: (userId: string) => void;
 }
 
 const PrivacySettings = ({
   privacySettings,
   blockedUsers,
   isAccountVisible,
-  onPrivacyChange,
+  onPrivacySettingsChange,
   onToggleAccountVisibility,
   onUnblockUser
 }: PrivacySettingsProps) => {
   const { toast } = useToast();
 
   const handleSettingChange = (settingName: keyof PrivacySettingsType, value: boolean) => {
-    onPrivacyChange({
-      ...privacySettings,
-      [settingName]: value
-    });
+    onPrivacySettingsChange(settingName, value);
   };
 
   const handleProfileVisibilityChange = (value: number[]) => {
-    onPrivacyChange({
-      ...privacySettings,
-      profileVisibilityLevel: value[0]
-    });
+    onPrivacySettingsChange('profileVisibilityLevel', value[0]);
   };
 
   const getVisibilityLevelText = (level: number) => {
@@ -133,7 +127,7 @@ const PrivacySettings = ({
               variant={isAccountVisible ? "outline" : "default"}
               className={`mt-2 ${!isAccountVisible ? "bg-green-600 hover:bg-green-700" : ""}`}
               onClick={async () => {
-                await onToggleAccountVisibility();
+                onToggleAccountVisibility();
                 toast({
                   title: isAccountVisible ? "Account Hidden" : "Account Visible",
                   description: isAccountVisible 
@@ -164,7 +158,7 @@ const PrivacySettings = ({
                       variant="ghost" 
                       size="sm"
                       onClick={async () => {
-                        await onUnblockUser(userId);
+                        onUnblockUser(userId);
                         toast({
                           title: "User Unblocked",
                           description: "You can now interact with this user again.",

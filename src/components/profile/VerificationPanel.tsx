@@ -8,7 +8,7 @@ import IdVerification from "./verification/IdVerification";
 interface VerificationPanelProps {
   verificationStatus: VerificationStatus;
   onVerificationChange: (newStatus: VerificationStatus) => void;
-  userEmail: string;
+  userEmail: string | null;
 }
 
 const VerificationPanel = ({
@@ -30,7 +30,7 @@ const VerificationPanel = ({
         {/* Email Verification */}
         <EmailVerification 
           isVerified={verificationStatus.email} 
-          userEmail={userEmail} 
+          userEmail={userEmail || ''} 
         />
 
         {/* Phone Verification */}
