@@ -8,6 +8,7 @@ import ProfileOnboarding from "@/components/profile/ProfileOnboarding";
 import ProfileAnalytics from "@/components/profile/ProfileAnalytics";
 import ProfileRecommendations from "@/components/profile/ProfileRecommendations";
 import ProfileVisibilityManager from "@/components/profile/ProfileVisibilityManager";
+import StandardLoadingState from "@/components/ui/StandardLoadingState";
 import { useProfilePageLogic } from "./hooks/useProfilePageLogic";
 
 const ProfilePage = () => {
@@ -122,26 +123,32 @@ const ProfilePage = () => {
                 </TabsContent>
 
                 <TabsContent value="analytics" className="mt-6">
-                  {analyticsLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin h-8 w-8 border-t-2 border-rose-600 rounded-full"></div>
-                    </div>
-                  ) : (
+                  <StandardLoadingState
+                    loading={analyticsLoading}
+                    loadingText="Loading analytics..."
+                    emptyState={{
+                      title: "No Analytics Data",
+                      description: "Analytics data will appear here once you start using the platform."
+                    }}
+                  >
                     <ProfileAnalytics analytics={analytics} />
-                  )}
+                  </StandardLoadingState>
                 </TabsContent>
 
                 <TabsContent value="recommendations" className="mt-6">
-                  {recommendationsLoading ? (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin h-8 w-8 border-t-2 border-rose-600 rounded-full"></div>
-                    </div>
-                  ) : (
+                  <StandardLoadingState
+                    loading={recommendationsLoading}
+                    loadingText="Loading recommendations..."
+                    emptyState={{
+                      title: "No Recommendations",
+                      description: "Profile recommendations will appear here based on your activity."
+                    }}
+                  >
                     <ProfileRecommendations 
                       recommendations={recommendations}
                       onActionClick={handleRecommendationAction}
                     />
-                  )}
+                  </StandardLoadingState>
                 </TabsContent>
 
                 <TabsContent value="visibility" className="mt-6">

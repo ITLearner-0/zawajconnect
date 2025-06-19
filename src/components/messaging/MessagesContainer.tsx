@@ -1,8 +1,9 @@
 
 import { Conversation } from '@/types/profile';
-import { Loader, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import ConversationList from './ConversationList';
 import EmptyConversation from './EmptyConversation';
+import StandardLoadingState from '@/components/ui/StandardLoadingState';
 import { Alert, AlertDescription } from '../ui/alert';
 import MessageSearch from './MessageSearch';
 
@@ -84,16 +85,22 @@ const MessagesContainer = ({
         
         {/* Chat window or placeholder */}
         <div className={`w-full md:w-2/3 ${!conversationId ? 'hidden md:flex' : 'flex'} flex-col`}>
-          {loading && conversationId ? (
-            <div className="flex items-center justify-center h-full">
-              <Loader className="animate-spin mr-2" />
-              <p>Loading conversation...</p>
-            </div>
-          ) : conversationId && currentConversation ? (
-            <div className="flex flex-col h-full">
-              {children}
-            </div>
-          ) : (
+          <StandardLoadingState
+            loading={loading && !!conversationId}
+            loadingText="Loading conversation..."
+            emptyState={!conversationId ? {
+              title: "Select a conversation",
+              description: "Choose a conversation from the list to start messaging."
+            } : undefined}
+          >
+            {conversationId && currentConversation && (
+              <div className="flex flex-col h-full">
+                {children}
+              </div>
+            )}
+          </StandardLoadingState>
+          
+          {!conversationId && (
             <EmptyConversation />
           )}
         </div>

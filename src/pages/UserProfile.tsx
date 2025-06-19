@@ -13,6 +13,7 @@ import ProfileHeader from '@/components/profile/ProfileHeader';
 import ProfileCard from '@/components/profile/ProfileCard';
 import ProfileDetails from '@/components/profile/ProfileDetails';
 import ProfileQuote from '@/components/profile/ProfileQuote';
+import StandardLoadingState from '@/components/ui/StandardLoadingState';
 
 const UserProfile = () => {
   const { id } = useParams<{ id: string }>();
@@ -150,47 +151,6 @@ const UserProfile = () => {
     navigate('/profile');
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
-        <div className="animate-spin h-12 w-12 border-t-2 border-rose-600 dark:border-rose-300 rounded-full"></div>
-      </div>
-    );
-  }
-
-  if (!profile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950">
-        <Card className="w-full max-w-md bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm border-rose-200 dark:border-rose-700">
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <h2 className="text-xl font-semibold text-rose-800 dark:text-rose-200">Profile Not Found</h2>
-              <p className="text-rose-600 dark:text-rose-300 mt-2">
-                We couldn't find the profile you're looking for. It may have been removed or is no longer visible.
-              </p>
-              <div className="flex gap-2 mt-4 justify-center">
-                <Button 
-                  className="bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white" 
-                  onClick={() => navigate(-1)}
-                  variant="default"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
-                </Button>
-                <Button 
-                  variant="outline"
-                  onClick={() => navigate('/nearby')}
-                  className="border-rose-300 text-rose-700 hover:bg-rose-100"
-                >
-                  Browse Matches
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   const handleSignOut = () => {
     navigate('/');
     toast({
@@ -205,31 +165,49 @@ const UserProfile = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
-        <ProfileHeader onSignOut={handleSignOut} />
-        
-        {/* Add Edit Profile button if viewing own profile */}
-        {isOwnProfile && (
-          <div className="mb-6 text-center">
-            <Button
-              onClick={handleEditMyProfile}
-              className="bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white"
-            >
-              <User className="mr-2 h-4 w-4" />
-              Edit My Profile
-            </Button>
-          </div>
-        )}
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="md:col-span-1">
-            <ProfileCard profile={profile} />
-          </div>
+        <StandardLoadingState
+          loading={loading}
+          loadingText="Loading profile..."
+          error={!profile && !loading ? "Profile not found" : null}
+          emptyState={!profile && !loading ? {
+            title: "Profile Not Found",
+            description: "We couldn't find the profile you're looking for. It may have been removed or is no longer visible.",
+            action: {
+              label: "Browse Matches",
+              onClick: () => navigate('/nearby')
+            }
+          } : undefined}
+        >
+          {profile && (
+            <>
+              <ProfileHeader onSignOut={handleSignOut} />
+              
+              {/* Add Edit Profile button if viewing own profile */}
+              {isOwnProfile && (
+                <div className="mb-6 text-center">
+                  <Button
+                    onClick={handleEditMyProfile}
+                    className="bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white"
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    Edit My Profile
+                  </Button>
+                </div>
+              )}
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="md:col-span-1">
+                  <ProfileCard profile={profile} />
+                </div>
 
-          <div className="md:col-span-2">
-            <ProfileDetails profile={profile} />
-            <ProfileQuote />
-          </div>
-        </div>
+                <div className="md:col-span-2">
+                  <ProfileDetails profile={profile} />
+                  <ProfileQuote />
+                </div>
+              </div>
+            </>
+          )}
+        </StandardLoadingState>
       </div>
     </div>
   );

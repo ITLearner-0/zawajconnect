@@ -8,7 +8,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CircleOff, Clock, Radio, Loader2 } from "lucide-react";
+import { CircleOff, Clock, Radio } from "lucide-react";
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface AvailabilityControlsProps {
   availabilityStatus: string;
@@ -73,7 +74,7 @@ const AvailabilityControls: React.FC<AvailabilityControlsProps> = ({
           
           {loading && (
             <div className="absolute right-10 top-3">
-              <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              <LoadingSpinner size="sm" />
             </div>
           )}
         </div>
