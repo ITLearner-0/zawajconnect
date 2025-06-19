@@ -54,7 +54,7 @@ const ProfilePage = () => {
     visibilitySettings
   } = useProfilePageLogic();
 
-  // Create a wrapper that converts field-based changes to the expected format
+  // Create a wrapper that converts field-based changes to the expected format for onboarding
   const handleFieldChange = (field: keyof typeof formData, value: any) => {
     // Create a synthetic event that matches the expected signature
     const syntheticEvent = {
@@ -108,7 +108,7 @@ const ProfilePage = () => {
                 <TabsContent value="profile" className="mt-6">
                   <ProfileForm
                     formData={formData}
-                    handleChange={handleFieldChange}
+                    handleChange={handleChange}
                     handleSubmit={handleSaveProfile}
                     verificationStatus={verificationStatus}
                     userEmail={userEmail}
