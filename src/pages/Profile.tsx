@@ -168,10 +168,9 @@ const Profile = () => {
     handleChange(event);
   };
 
-  // Create a wrapper for verification change to match expected signature
+  // Create a wrapper for verification change to match expected signature - FIXED
   const handleVerificationFieldChange = (field: string, value: boolean) => {
-    const newStatus = { ...verificationStatus, [field]: value };
-    handleVerificationChange(newStatus);
+    handleVerificationChange(field as keyof typeof verificationStatus, value);
   };
 
   // Create a wrapper for privacy settings change
