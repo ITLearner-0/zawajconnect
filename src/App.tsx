@@ -17,45 +17,109 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import AuthProvider from './contexts/AuthContext';
 import { LazyLoadingProvider } from './hooks/useLazyLoading/context/LazyLoadingContext';
+import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary';
+import RouteErrorBoundary from './components/ui/RouteErrorBoundary';
 
 function App() {
   return (
-    <ThemeProvider>
-      <AccessibilityProvider>
-        <LazyLoadingProvider
-          initialConfig={{
-            enableAnalytics: true,
-            enableDebug: process.env.NODE_ENV === 'development',
-            batchSize: 8,
-            preloadDistance: 300,
-            networkOptimization: true,
-            memoryOptimization: true,
-          }}
-        >
-          <Router>
-            <AuthProvider>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/profile/:id" element={<UserProfile />} />
-                <Route path="/compatibility" element={<Compatibility />} />
-                <Route path="/nearby" element={<NearbyMatches />} />
-                <Route path="/messages" element={<Messages />} />
-                <Route path="/messages/:conversationId" element={<Messages />} />
-                <Route path="/admin/moderation" element={<AdminModeration />} />
-                <Route path="/wali" element={<WaliDashboard />} />
-                <Route path="/resources" element={<Resources />} />
-                <Route path="/resources/:resourceId" element={<Resources />} />
-                <Route path="/demo" element={<Demo />} />
-                <Route path="/subscription" element={<Subscription />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AuthProvider>
-          </Router>
-        </LazyLoadingProvider>
-      </AccessibilityProvider>
-    </ThemeProvider>
+    <GlobalErrorBoundary showHome={true}>
+      <ThemeProvider>
+        <AccessibilityProvider>
+          <LazyLoadingProvider
+            initialConfig={{
+              enableAnalytics: true,
+              enableDebug: process.env.NODE_ENV === 'development',
+              batchSize: 8,
+              preloadDistance: 300,
+              networkOptimization: true,
+              memoryOptimization: true,
+            }}
+          >
+            <Router>
+              <AuthProvider>
+                <Routes>
+                  <Route path="/" element={
+                    <RouteErrorBoundary routeName="Home">
+                      <Index />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/auth" element={
+                    <RouteErrorBoundary routeName="Auth">
+                      <Auth />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/profile" element={
+                    <RouteErrorBoundary routeName="Profile">
+                      <Profile />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/profile/:id" element={
+                    <RouteErrorBoundary routeName="UserProfile">
+                      <UserProfile />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/compatibility" element={
+                    <RouteErrorBoundary routeName="Compatibility">
+                      <Compatibility />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/nearby" element={
+                    <RouteErrorBoundary routeName="NearbyMatches">
+                      <NearbyMatches />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/messages" element={
+                    <RouteErrorBoundary routeName="Messages">
+                      <Messages />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/messages/:conversationId" element={
+                    <RouteErrorBoundary routeName="Messages">
+                      <Messages />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/admin/moderation" element={
+                    <RouteErrorBoundary routeName="AdminModeration">
+                      <AdminModeration />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/wali" element={
+                    <RouteErrorBoundary routeName="WaliDashboard">
+                      <WaliDashboard />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/resources" element={
+                    <RouteErrorBoundary routeName="Resources">
+                      <Resources />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/resources/:resourceId" element={
+                    <RouteErrorBoundary routeName="Resources">
+                      <Resources />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/demo" element={
+                    <RouteErrorBoundary routeName="Demo">
+                      <Demo />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/subscription" element={
+                    <RouteErrorBoundary routeName="Subscription">
+                      <Subscription />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="*" element={
+                    <RouteErrorBoundary routeName="NotFound">
+                      <NotFound />
+                    </RouteErrorBoundary>
+                  } />
+                </Routes>
+              </AuthProvider>
+            </Router>
+          </LazyLoadingProvider>
+        </AccessibilityProvider>
+      </ThemeProvider>
+    </GlobalErrorBoundary>
   );
 }
 

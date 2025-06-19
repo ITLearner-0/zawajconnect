@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
 import ProfileFormSections from './form/ProfileFormSections';
 import ProfileFormActions from './form/ProfileFormActions';
+import FormErrorBoundary from '@/components/ui/FormErrorBoundary';
 
 interface ProfileFormProps {
   formData: ProfileFormData;
@@ -54,26 +54,28 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   };
 
   return (
-    <div className="space-y-6">
-      <ProfileFormSections
-        formData={formData}
-        handleChange={handleChange}
-        verificationStatus={verificationStatus}
-        userEmail={userEmail}
-        handleVerificationChange={handleVerificationChange}
-        privacySettings={privacySettings}
-        blockedUsers={blockedUsers}
-        isAccountVisible={isAccountVisible}
-        handlePrivacySettingsChange={handlePrivacySettingsChange}
-        onToggleAccountVisibility={onToggleAccountVisibility}
-        onUnblockUser={onUnblockUser}
-      />
-      
-      <ProfileFormActions 
-        onSubmit={handleFormSubmit}
-        isSubmitting={isSubmitting}
-      />
-    </div>
+    <FormErrorBoundary>
+      <div className="space-y-6">
+        <ProfileFormSections
+          formData={formData}
+          handleChange={handleChange}
+          verificationStatus={verificationStatus}
+          userEmail={userEmail}
+          handleVerificationChange={handleVerificationChange}
+          privacySettings={privacySettings}
+          blockedUsers={blockedUsers}
+          isAccountVisible={isAccountVisible}
+          handlePrivacySettingsChange={handlePrivacySettingsChange}
+          onToggleAccountVisibility={onToggleAccountVisibility}
+          onUnblockUser={onUnblockUser}
+        />
+        
+        <ProfileFormActions 
+          onSubmit={handleFormSubmit}
+          isSubmitting={isSubmitting}
+        />
+      </div>
+    </FormErrorBoundary>
   );
 };
 
