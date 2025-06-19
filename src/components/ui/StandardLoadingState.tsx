@@ -1,9 +1,10 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import { AlertTriangle, WifiOff, RefreshCw } from 'lucide-react';
 import { Button } from './button';
 import { cn } from '@/lib/utils';
+import { logger } from '@/services/logging/LoggingService';
 
 interface StandardLoadingStateProps {
   loading?: boolean;
@@ -21,6 +22,7 @@ interface StandardLoadingStateProps {
     };
   };
   children?: React.ReactNode;
+  componentName?: string; // For logging purposes
 }
 
 const StandardLoadingState: React.FC<StandardLoadingStateProps> = ({
@@ -31,8 +33,44 @@ const StandardLoadingState: React.FC<StandardLoadingStateProps> = ({
   className,
   loadingText = "Loading...",
   emptyState,
-  children
+  children,
+  componentName = 'StandardLoadingState'
 }) => {
+  // Log state changes for monitoring
+  useEffect(() => {
+    if (loading) {
+      logger.debug(`Loading started in ${componentName}`, { loadingText });
+    }
+  }, [loading, componentName, loadingText]);
+
+  useEffect(() => {
+    if (error) {
+      logger.warn(`Error state in ${componentName}`, { error }, { component: componentName });
+    }
+  }, [error, componentName]);
+
+  useEffect(() => {
+    if (offline) {
+      logger.warn(`Offline state detected in ${componentName}`, {}, { component: componentName });
+    }
+  }, [offline, componentName]);
+
+  const handleRetry = () => {
+    logger.info(`Retry action triggered in ${componentName}`, {}, { 
+      component: componentName,
+      action: 'retry'
+    });
+    retry?.();
+  };
+
+  const handleEmptyAction = () => {
+    logger.info(`Empty state action triggered in ${componentName}`, {}, { 
+      component: componentName,
+      action: 'empty_state_action'
+    });
+    emptyState?.action?.onClick();
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -49,7 +87,7 @@ const StandardLoadingState: React.FC<StandardLoadingStateProps> = ({
         <WifiOff className="h-8 w-8 text-orange-500 mb-2" />
         <p className="text-sm text-orange-600">No internet connection</p>
         {retry && (
-          <Button variant="outline" size="sm" onClick={retry} className="mt-2">
+          <Button variant="outline" size="sm" onClick={handleRetry} className="mt-2">
             <RefreshCw className="h-4 w-4 mr-2" />
             Try Again
           </Button>
@@ -65,7 +103,7 @@ const StandardLoadingState: React.FC<StandardLoadingStateProps> = ({
         <AlertTriangle className="h-8 w-8 text-destructive mb-2" />
         <p className="text-sm text-destructive mb-2">{error}</p>
         {retry && (
-          <Button variant="outline" size="sm" onClick={retry}>
+          <Button variant="outline" size="sm" onClick={handleRetry}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Try Again
           </Button>
@@ -83,7 +121,7 @@ const StandardLoadingState: React.FC<StandardLoadingStateProps> = ({
           <p className="text-sm text-muted-foreground mb-4">{emptyState.description}</p>
         )}
         {emptyState.action && (
-          <Button onClick={emptyState.action.onClick}>
+          <Button onClick={handleEmptyAction}>
             {emptyState.action.label}
           </Button>
         )}
@@ -91,7 +129,13 @@ const StandardLoadingState: React.FC<StandardLoadingStateProps> = ({
     );
   }
 
-  // Content state
+  // Content state - log successful render
+  useEffect(() => {
+    if (children && !loading && !error && !offline) {
+      logger.debug(`Content successfully rendered in ${componentName}`, {}, { component: componentName });
+    }
+  }, [children, loading, error, offline, componentName]);
+
   return children || null;
 };
 
