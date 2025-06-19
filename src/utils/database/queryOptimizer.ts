@@ -1,181 +1,219 @@
 
+import { supabase } from '@/integrations/supabase/client';
+
 /**
- * Query optimizer utilities for database performance monitoring and optimization
+ * Query optimizer that leverages database indexes for better performance
  */
+export class QueryOptimizer {
+  
+  /**
+   * Optimized profile search using composite indexes
+   */
+  static async searchProfiles(filters: {
+    gender?: string;
+    location?: string;
+    minAge?: number;
+    maxAge?: number;
+    religiousPractice?: string;
+    educationLevel?: string;
+    verified?: boolean;
+  }, limit: number = 20) {
+    let query = supabase
+      .from('profiles')
+      .select('*')
+      .eq('is_visible', true); // Uses idx_profiles_visible_gender/location
 
-export interface QueryPerformanceMetrics {
-  queryType: string;
-  executionTime: number;
-  recordsReturned: number;
-  indexesUsed: string[];
-  timestamp: Date;
-}
-
-class QueryPerformanceMonitor {
-  private metrics: QueryPerformanceMetrics[] = [];
-  private isEnabled: boolean = process.env.NODE_ENV === 'development';
-
-  enable() {
-    this.isEnabled = true;
-  }
-
-  disable() {
-    this.isEnabled = false;
-  }
-
-  async measureQuery<T>(
-    queryType: string,
-    queryFn: () => Promise<{ data: T | null; error: any }>,
-    expectedIndexes: string[] = []
-  ): Promise<{ data: T | null; error: any; metrics?: QueryPerformanceMetrics }> {
-    if (!this.isEnabled) {
-      return await queryFn();
+    // Apply filters in order of index selectivity
+    if (filters.gender) {
+      query = query.eq('gender', filters.gender);
     }
 
-    const startTime = performance.now();
-    const result = await queryFn();
-    const endTime = performance.now();
-
-    const metrics: QueryPerformanceMetrics = {
-      queryType,
-      executionTime: endTime - startTime,
-      recordsReturned: Array.isArray(result.data) ? result.data.length : result.data ? 1 : 0,
-      indexesUsed: expectedIndexes,
-      timestamp: new Date()
-    };
-
-    this.metrics.push(metrics);
-
-    // Log slow queries (> 100ms)
-    if (metrics.executionTime > 100) {
-      console.warn(`Slow query detected: ${queryType} took ${metrics.executionTime.toFixed(2)}ms`);
+    if (filters.location) {
+      query = query.eq('location', filters.location);
     }
 
-    // Log queries returning many records without pagination
-    if (metrics.recordsReturned > 100) {
-      console.warn(`Large result set: ${queryType} returned ${metrics.recordsReturned} records`);
+    if (filters.verified) {
+      query = query.eq('email_verified', true).eq('phone_verified', true);
     }
 
-    return { ...result, metrics };
-  }
+    if (filters.religiousPractice) {
+      query = query.eq('religious_practice_level', filters.religiousPractice);
+    }
 
-  getMetrics(): QueryPerformanceMetrics[] {
-    return [...this.metrics];
-  }
+    if (filters.educationLevel) {
+      query = query.eq('education_level', filters.educationLevel);
+    }
 
-  getSlowQueries(threshold: number = 100): QueryPerformanceMetrics[] {
-    return this.metrics.filter(m => m.executionTime > threshold);
-  }
-
-  getAverageExecutionTime(queryType?: string): number {
-    const relevantMetrics = queryType 
-      ? this.metrics.filter(m => m.queryType === queryType)
-      : this.metrics;
-
-    if (relevantMetrics.length === 0) return 0;
-
-    const totalTime = relevantMetrics.reduce((sum, m) => sum + m.executionTime, 0);
-    return totalTime / relevantMetrics.length;
-  }
-
-  clearMetrics() {
-    this.metrics = [];
-  }
-
-  getPerformanceReport(): {
-    totalQueries: number;
-    averageExecutionTime: number;
-    slowQueries: number;
-    queryTypes: { [key: string]: { count: number; avgTime: number } };
-  } {
-    const totalQueries = this.metrics.length;
-    const averageExecutionTime = this.getAverageExecutionTime();
-    const slowQueries = this.getSlowQueries().length;
-
-    const queryTypes: { [key: string]: { count: number; avgTime: number } } = {};
-    
-    this.metrics.forEach(metric => {
-      if (!queryTypes[metric.queryType]) {
-        queryTypes[metric.queryType] = { count: 0, avgTime: 0 };
+    // Age filtering using birth_date index
+    if (filters.minAge || filters.maxAge) {
+      const currentDate = new Date();
+      
+      if (filters.maxAge) {
+        const minBirthDate = new Date(currentDate.getFullYear() - filters.maxAge, 0, 1);
+        query = query.gte('birth_date', minBirthDate.toISOString().split('T')[0]);
       }
-      queryTypes[metric.queryType].count++;
-    });
+      
+      if (filters.minAge) {
+        const maxBirthDate = new Date(currentDate.getFullYear() - filters.minAge, 11, 31);
+        query = query.lte('birth_date', maxBirthDate.toISOString().split('T')[0]);
+      }
+    }
 
-    Object.keys(queryTypes).forEach(type => {
-      queryTypes[type].avgTime = this.getAverageExecutionTime(type);
-    });
+    return await query
+      .order('created_at', { ascending: false })
+      .limit(limit);
+  }
 
-    return {
-      totalQueries,
-      averageExecutionTime,
-      slowQueries,
-      queryTypes
-    };
+  /**
+   * Optimized compatibility matches using score index
+   */
+  static async getCompatibilityMatches(userId: string, minScore: number = 70, limit: number = 20) {
+    // Uses idx_compatibility_results_score index
+    return await supabase
+      .from('compatibility_results')
+      .select('user_id, score, answers, preferences')
+      .neq('user_id', userId)
+      .gte('score', minScore)
+      .order('score', { ascending: false })
+      .limit(limit);
+  }
+
+  /**
+   * Optimized conversation messages with pagination
+   */
+  static async getConversationMessages(conversationId: string, limit: number = 50, before?: string) {
+    let query = supabase
+      .from('messages')
+      .select('*')
+      .eq('conversation_id', conversationId) // Uses idx_messages_conversation_id
+      .order('created_at', { ascending: false }); // Uses idx_messages_conversation_created
+
+    if (before) {
+      query = query.lt('created_at', before);
+    }
+
+    return await query.limit(limit);
+  }
+
+  /**
+   * Optimized user conversations with latest message
+   */
+  static async getUserConversations(userId: string) {
+    // Uses idx_conversations_participants GIN index
+    return await supabase
+      .from('conversations')
+      .select(`
+        id,
+        participants,
+        wali_supervised,
+        encryption_enabled,
+        created_at,
+        messages!inner(
+          id,
+          content,
+          created_at,
+          sender_id,
+          is_read
+        )
+      `)
+      .contains('participants', [userId])
+      .order('created_at', { ascending: false }); // Uses idx_conversations_created_at
+  }
+
+  /**
+   * Optimized unread notifications
+   */
+  static async getUnreadNotifications(userId: string, limit: number = 20) {
+    // Uses idx_match_notifications_user_unread composite index
+    return await supabase
+      .from('match_notifications')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('is_read', false)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+  }
+
+  /**
+   * Optimized chat requests for recipients
+   */
+  static async getPendingChatRequests(recipientId: string) {
+    // Uses idx_chat_requests_recipient_id and idx_chat_requests_status
+    return await supabase
+      .from('chat_requests')
+      .select('*')
+      .eq('recipient_id', recipientId)
+      .eq('status', 'pending')
+      .order('requested_at', { ascending: false }); // Uses idx_chat_requests_requested_at
+  }
+
+  /**
+   * Optimized wali chat requests
+   */
+  static async getWaliChatRequests(waliId: string) {
+    // Uses idx_chat_requests_wali_id
+    return await supabase
+      .from('chat_requests')
+      .select('*')
+      .eq('wali_id', waliId)
+      .order('requested_at', { ascending: false })
+      .limit(50);
+  }
+
+  /**
+   * Optimized content moderation queries
+   */
+  static async getUnresolvedFlags(limit: number = 100) {
+    // Uses idx_content_flags_resolved
+    return await supabase
+      .from('content_flags')
+      .select('*')
+      .eq('resolved', false)
+      .order('created_at', { ascending: false }) // Uses idx_content_flags_created_at
+      .limit(limit);
+  }
+
+  /**
+   * Optimized video call history
+   */
+  static async getUserVideoCallHistory(userId: string, limit: number = 20) {
+    // Uses idx_video_calls_initiator_id and idx_video_calls_receiver_id
+    const [initiatedCalls, receivedCalls] = await Promise.all([
+      supabase
+        .from('video_calls')
+        .select('*')
+        .eq('initiator_id', userId)
+        .order('started_at', { ascending: false })
+        .limit(limit),
+      supabase
+        .from('video_calls')
+        .select('*')
+        .eq('receiver_id', userId)
+        .order('started_at', { ascending: false })
+        .limit(limit)
+    ]);
+
+    if (initiatedCalls.error || receivedCalls.error) {
+      return { data: null, error: initiatedCalls.error || receivedCalls.error };
+    }
+
+    // Combine and sort by started_at
+    const allCalls = [...(initiatedCalls.data || []), ...(receivedCalls.data || [])]
+      .sort((a, b) => new Date(b.started_at || '').getTime() - new Date(a.started_at || '').getTime())
+      .slice(0, limit);
+
+    return { data: allCalls, error: null };
+  }
+
+  /**
+   * Optimized verified walis query
+   */
+  static async getVerifiedWalis() {
+    // Uses idx_wali_profiles_is_verified
+    return await supabase
+      .from('wali_profiles')
+      .select('*')
+      .eq('is_verified', true)
+      .order('last_active', { ascending: false }); // Uses idx_wali_profiles_last_active
   }
 }
-
-export const queryPerformanceMonitor = new QueryPerformanceMonitor();
-
-// Query optimization hints
-export const QueryOptimizationHints = {
-  // Use these hints when constructing queries to ensure optimal performance
-  PROFILE_SEARCH: {
-    expectedIndexes: ['idx_profiles_visible_gender', 'idx_profiles_visible_location', 'idx_profiles_verified_visible'],
-    recommendations: [
-      'Always filter by is_visible = true first',
-      'Use specific filters (gender, location) before general ones',
-      'Limit results to reasonable pagination sizes'
-    ]
-  },
-  
-  COMPATIBILITY_MATCHING: {
-    expectedIndexes: ['idx_compatibility_results_user_score', 'idx_compatibility_results_score'],
-    recommendations: [
-      'Order by score DESC for best matches first',
-      'Use score thresholds to filter low compatibility',
-      'Consider pagination for large result sets'
-    ]
-  },
-  
-  MESSAGE_HISTORY: {
-    expectedIndexes: ['idx_messages_conversation_created', 'idx_messages_conversation_id'],
-    recommendations: [
-      'Always include conversation_id in WHERE clause',
-      'Use created_at for pagination (before/after)',
-      'Limit message batches to 50-100 messages'
-    ]
-  },
-  
-  CONVERSATION_LIST: {
-    expectedIndexes: ['idx_conversations_participants', 'idx_conversations_created_at'],
-    recommendations: [
-      'Use GIN index for participants array lookups',
-      'Order by created_at for recent conversations',
-      'Consider using contains() for participant filtering'
-    ]
-  },
-  
-  NOTIFICATION_QUERIES: {
-    expectedIndexes: ['idx_match_notifications_user_unread', 'idx_match_notifications_user_id'],
-    recommendations: [
-      'Filter by user_id and is_read for unread notifications',
-      'Use created_at ordering for chronological display',
-      'Batch mark-as-read operations'
-    ]
-  }
-};
-
-// Helper function to create optimized query builders
-export const createOptimizedQuery = (tableName: string, hint: keyof typeof QueryOptimizationHints) => {
-  const optimizationHint = QueryOptimizationHints[hint];
-  
-  return {
-    hint: optimizationHint,
-    monitor: (queryFn: () => Promise<any>) => 
-      queryPerformanceMonitor.measureQuery(
-        `${tableName}_${hint}`,
-        queryFn,
-        optimizationHint.expectedIndexes
-      )
-  };
-};

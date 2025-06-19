@@ -10,3 +10,9 @@ export { setupRLSPolicies, checkRLSPolicies } from './rls';
 
 // Re-export additional utility functions from schema handling
 export * from './schema';
+
+// Export new optimized query utilities
+export { QueryOptimizer } from './queryOptimizer';
+
+// Export all optimized query functions
+export * from './optimizedQueries';

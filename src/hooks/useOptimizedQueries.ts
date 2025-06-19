@@ -1,10 +1,11 @@
 
 import { useState, useCallback } from 'react';
 import { useToast } from '@/components/ui/use-toast';
-import * as optimizedQueries from '@/utils/database/optimizedQueries';
+import { QueryOptimizer } from '@/utils/database/queryOptimizer';
+import { queryCache } from '@/services/caching/queryCache';
 
 /**
- * Hook for using optimized database queries with proper error handling and loading states
+ * Hook for using optimized database queries with caching
  */
 export const useOptimizedQueries = () => {
   const [loading, setLoading] = useState(false);
@@ -13,8 +14,18 @@ export const useOptimizedQueries = () => {
 
   const executeQuery = useCallback(async <T>(
     queryFn: () => Promise<{ data: T | null; error: any }>,
+    cacheKey?: string,
+    cacheTTL?: number,
     errorMessage: string = 'Query failed'
   ): Promise<T | null> => {
+    // Check cache first
+    if (cacheKey) {
+      const cachedResult = queryCache.get(cacheKey);
+      if (cachedResult) {
+        return cachedResult;
+      }
+    }
+
     setLoading(true);
     setError(null);
 
@@ -32,6 +43,11 @@ export const useOptimizedQueries = () => {
         return null;
       }
 
+      // Cache the result
+      if (cacheKey && data) {
+        queryCache.set(cacheKey, data, cacheTTL);
+      }
+
       return data;
     } catch (err: any) {
       console.error('Unexpected error:', err);
@@ -47,150 +63,93 @@ export const useOptimizedQueries = () => {
     }
   }, [toast]);
 
-  // Compatibility queries
+  // Optimized profile search
+  const searchProfiles = useCallback((
+    filters: Parameters<typeof QueryOptimizer.searchProfiles>[0],
+    limit?: number
+  ) => {
+    const cacheKey = queryCache.generateKey('profiles', { ...filters, limit });
+    return executeQuery(
+      () => QueryOptimizer.searchProfiles(filters, limit),
+      cacheKey,
+      2 * 60 * 1000, // 2 minutes cache
+      'Failed to search profiles'
+    );
+  }, [executeQuery]);
+
+  // Optimized compatibility matches
   const getCompatibilityMatches = useCallback((
     userId: string,
     minScore?: number,
     limit?: number
-  ) => executeQuery(
-    () => optimizedQueries.getCompatibilityMatches(userId, minScore, limit),
-    'Failed to fetch compatibility matches'
-  ), [executeQuery]);
+  ) => {
+    const cacheKey = queryCache.generateKey('compatibility', { userId, minScore, limit });
+    return executeQuery(
+      () => QueryOptimizer.getCompatibilityMatches(userId, minScore, limit),
+      cacheKey,
+      5 * 60 * 1000, // 5 minutes cache
+      'Failed to fetch compatibility matches'
+    );
+  }, [executeQuery]);
 
-  // Profile queries
-  const getVisibleProfiles = useCallback((
-    filters?: Parameters<typeof optimizedQueries.getVisibleProfiles>[0],
-    limit?: number
-  ) => executeQuery(
-    () => optimizedQueries.getVisibleProfiles(filters, limit),
-    'Failed to fetch profiles'
-  ), [executeQuery]);
-
-  // Message queries
+  // Optimized conversation messages
   const getConversationMessages = useCallback((
     conversationId: string,
     limit?: number,
     before?: string
-  ) => executeQuery(
-    () => optimizedQueries.getConversationMessages(conversationId, limit, before),
-    'Failed to fetch messages'
-  ), [executeQuery]);
+  ) => {
+    const cacheKey = queryCache.generateKey('messages', { conversationId, limit, before });
+    return executeQuery(
+      () => QueryOptimizer.getConversationMessages(conversationId, limit, before),
+      cacheKey,
+      1 * 60 * 1000, // 1 minute cache for messages
+      'Failed to fetch messages'
+    );
+  }, [executeQuery]);
 
-  const getUserConversations = useCallback((
-    userId: string
-  ) => executeQuery(
-    () => optimizedQueries.getUserConversations(userId),
-    'Failed to fetch conversations'
-  ), [executeQuery]);
+  // Optimized user conversations
+  const getUserConversations = useCallback((userId: string) => {
+    const cacheKey = queryCache.generateKey('conversations', { userId });
+    return executeQuery(
+      () => QueryOptimizer.getUserConversations(userId),
+      cacheKey,
+      2 * 60 * 1000, // 2 minutes cache
+      'Failed to fetch conversations'
+    );
+  }, [executeQuery]);
 
-  // Notification queries
+  // Optimized unread notifications
   const getUnreadNotifications = useCallback((
     userId: string,
     limit?: number
-  ) => executeQuery(
-    () => optimizedQueries.getUnreadNotifications(userId, limit),
-    'Failed to fetch unread notifications'
-  ), [executeQuery]);
+  ) => {
+    const cacheKey = queryCache.generateKey('notifications', { userId, limit });
+    return executeQuery(
+      () => QueryOptimizer.getUnreadNotifications(userId, limit),
+      cacheKey,
+      30 * 1000, // 30 seconds cache for notifications
+      'Failed to fetch notifications'
+    );
+  }, [executeQuery]);
 
-  const getRecentNotifications = useCallback((
-    userId: string,
-    limit?: number
-  ) => executeQuery(
-    () => optimizedQueries.getRecentNotifications(userId, limit),
-    'Failed to fetch notifications'
-  ), [executeQuery]);
-
-  // Chat request queries
-  const getPendingChatRequests = useCallback((
-    recipientId: string
-  ) => executeQuery(
-    () => optimizedQueries.getPendingChatRequests(recipientId),
-    'Failed to fetch chat requests'
-  ), [executeQuery]);
-
-  const getWaliChatRequests = useCallback((
-    waliId: string
-  ) => executeQuery(
-    () => optimizedQueries.getWaliChatRequests(waliId),
-    'Failed to fetch wali chat requests'
-  ), [executeQuery]);
-
-  // Content moderation queries
-  const getUnresolvedFlags = useCallback((
-    limit?: number
-  ) => executeQuery(
-    () => optimizedQueries.getUnresolvedFlags(limit),
-    'Failed to fetch unresolved flags'
-  ), [executeQuery]);
-
-  const getFlagsByContentId = useCallback((
-    contentId: string
-  ) => executeQuery(
-    () => optimizedQueries.getFlagsByContentId(contentId),
-    'Failed to fetch content flags'
-  ), [executeQuery]);
-
-  // Video call queries
-  const getConversationVideoCalls = useCallback((
-    conversationId: string
-  ) => executeQuery(
-    () => optimizedQueries.getConversationVideoCalls(conversationId),
-    'Failed to fetch video calls'
-  ), [executeQuery]);
-
-  const getUserVideoCallHistory = useCallback((
-    userId: string,
-    limit?: number
-  ) => executeQuery(
-    () => optimizedQueries.getUserVideoCallHistory(userId, limit),
-    'Failed to fetch video call history'
-  ), [executeQuery]);
-
-  // Wali queries
-  const getVerifiedWalis = useCallback(() => executeQuery(
-    () => optimizedQueries.getVerifiedWalis(),
-    'Failed to fetch verified walis'
-  ), [executeQuery]);
-
-  const getWaliByUserId = useCallback((
-    userId: string
-  ) => executeQuery(
-    () => optimizedQueries.getWaliByUserId(userId),
-    'Failed to fetch wali profile'
-  ), [executeQuery]);
+  // Clear cache for a specific prefix
+  const clearCache = useCallback((prefix?: string) => {
+    if (prefix) {
+      // Clear specific cache entries (simplified implementation)
+      queryCache.clear();
+    } else {
+      queryCache.clear();
+    }
+  }, []);
 
   return {
     loading,
     error,
-    
-    // Compatibility
+    searchProfiles,
     getCompatibilityMatches,
-    
-    // Profiles
-    getVisibleProfiles,
-    
-    // Messages
     getConversationMessages,
     getUserConversations,
-    
-    // Notifications
     getUnreadNotifications,
-    getRecentNotifications,
-    
-    // Chat requests
-    getPendingChatRequests,
-    getWaliChatRequests,
-    
-    // Content moderation
-    getUnresolvedFlags,
-    getFlagsByContentId,
-    
-    // Video calls
-    getConversationVideoCalls,
-    getUserVideoCallHistory,
-    
-    // Wali
-    getVerifiedWalis,
-    getWaliByUserId
+    clearCache
   };
 };
