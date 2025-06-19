@@ -3,21 +3,15 @@ import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ProfileFormData } from "@/types/profile";
 
 interface ReligiousSectionProps {
-  formData: any;
-  handleChange: (field: string, value: any) => void;
+  formData: ProfileFormData;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  handleSelectChange: (field: keyof ProfileFormData, value: string) => void;
 }
 
-const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleChange }) => {
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleChange(e.target.name, e.target.value);
-  };
-
-  const handleSelectChange = (field: string) => (value: string) => {
-    handleChange(field, value);
-  };
-
+const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleChange, handleSelectChange }) => {
   const religiousLevels = [
     { value: "tres_pratiquant", label: "Très pratiquant" },
     { value: "pratiquant", label: "Pratiquant" },
@@ -51,7 +45,7 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="religiousLevel">Niveau de Pratique Religieuse</Label>
-          <Select value={formData.religiousLevel || ""} onValueChange={handleSelectChange("religiousLevel")}>
+          <Select value={formData.religiousLevel || ""} onValueChange={(value) => handleSelectChange("religiousLevel", value)}>
             <SelectTrigger>
               <SelectValue placeholder="Sélectionnez votre niveau de pratique" />
             </SelectTrigger>
@@ -67,7 +61,7 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
 
         <div className="space-y-2">
           <Label htmlFor="prayerFrequency">Fréquence de Prière</Label>
-          <Select value={formData.prayerFrequency || ""} onValueChange={handleSelectChange("prayerFrequency")}>
+          <Select value={formData.prayerFrequency || ""} onValueChange={(value) => handleSelectChange("prayerFrequency", value)}>
             <SelectTrigger>
               <SelectValue placeholder="Sélectionnez votre fréquence de prière" />
             </SelectTrigger>
@@ -90,7 +84,7 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
               ? "Souhaitez-vous pratiquer la polygamie ?" 
               : "Acceptez-vous la polygamie ?"}
           </Label>
-          <Select value={formData.polygamyStance || ""} onValueChange={handleSelectChange("polygamyStance")}>
+          <Select value={formData.polygamyStance || ""} onValueChange={(value) => handleSelectChange("polygamyStance", value)}>
             <SelectTrigger>
               <SelectValue placeholder={
                 formData.gender === "male" 
@@ -115,7 +109,7 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
           id="familyBackground"
           name="familyBackground"
           value={formData.familyBackground || ""}
-          onChange={handleInputChange}
+          onChange={handleChange}
           placeholder="Décrivez votre contexte familial"
         />
       </div>
