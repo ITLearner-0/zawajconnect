@@ -37,9 +37,9 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <AuthProvider>
-          <SecurityProvider>
-            <Router>
+        <Router>
+          <AuthProvider>
+            <SecurityProvider>
               <div className="min-h-screen bg-background">
                 <Routes>
                   <Route path="/" element={<Index />} />
@@ -108,9 +108,9 @@ function App() {
                 </Routes>
                 <Toaster />
               </div>
-            </Router>
-          </SecurityProvider>
-        </AuthProvider>
+            </SecurityProvider>
+          </AuthProvider>
+        </Router>
       </ThemeProvider>
     </QueryClientProvider>
   );
