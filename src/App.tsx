@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Index from './pages/Index';
 import Auth from './pages/Auth';
@@ -8,6 +7,7 @@ import NearbyMatches from './pages/NearbyMatches';
 import Messages from './pages/Messages';
 import AdminModeration from './pages/AdminModeration';
 import WaliDashboard from './pages/WaliDashboard';
+import WaliSetup from './pages/WaliSetup';
 import Resources from './pages/Resources';
 import Demo from './pages/Demo';
 import UserProfile from './pages/UserProfile';
@@ -48,6 +48,11 @@ function App() {
                   <Route path="/auth" element={
                     <RouteErrorBoundary routeName="Auth">
                       <Auth />
+                    </RouteErrorBoundary>
+                  } />
+                  <Route path="/wali/setup" element={
+                    <RouteErrorBoundary routeName="WaliSetup">
+                      <WaliSetup />
                     </RouteErrorBoundary>
                   } />
                   <Route path="/profile" element={

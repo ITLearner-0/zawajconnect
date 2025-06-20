@@ -444,12 +444,15 @@ export type Database = {
           chat_preferences: Json | null
           contact_information: string
           created_at: string | null
+          email: string | null
           first_name: string
           id: string
           is_verified: boolean | null
           last_active: string | null
           last_name: string
           managed_users: string[] | null
+          phone: string | null
+          registration_id: string | null
           relationship: string
           user_id: string
           verification_date: string | null
@@ -459,12 +462,15 @@ export type Database = {
           chat_preferences?: Json | null
           contact_information: string
           created_at?: string | null
+          email?: string | null
           first_name: string
           id?: string
           is_verified?: boolean | null
           last_active?: string | null
           last_name: string
           managed_users?: string[] | null
+          phone?: string | null
+          registration_id?: string | null
           relationship: string
           user_id: string
           verification_date?: string | null
@@ -474,15 +480,71 @@ export type Database = {
           chat_preferences?: Json | null
           contact_information?: string
           created_at?: string | null
+          email?: string | null
           first_name?: string
           id?: string
           is_verified?: boolean | null
           last_active?: string | null
           last_name?: string
           managed_users?: string[] | null
+          phone?: string | null
+          registration_id?: string | null
           relationship?: string
           user_id?: string
           verification_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wali_profiles_registration_id_fkey"
+            columns: ["registration_id"]
+            isOneToOne: false
+            referencedRelation: "wali_registrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wali_registrations: {
+        Row: {
+          contact_phone: string
+          created_at: string | null
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          managed_user_emails: string[] | null
+          notes: string | null
+          password_hash: string
+          relationship_type: string
+          verification_status: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          contact_phone: string
+          created_at?: string | null
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          managed_user_emails?: string[] | null
+          notes?: string | null
+          password_hash: string
+          relationship_type: string
+          verification_status?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          contact_phone?: string
+          created_at?: string | null
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          managed_user_emails?: string[] | null
+          notes?: string | null
+          password_hash?: string
+          relationship_type?: string
+          verification_status?: string | null
+          verified_at?: string | null
         }
         Relationships: []
       }
@@ -502,6 +564,10 @@ export type Database = {
           _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
         }
+        Returns: boolean
+      }
+      link_wali_to_user: {
+        Args: { wali_user_id: string; managed_user_email: string }
         Returns: boolean
       }
     }

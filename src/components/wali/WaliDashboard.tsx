@@ -1,142 +1,121 @@
 
-import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Users, Bell, MessageCircle, Activity } from "lucide-react";
+import React from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import WaliHeader from './WaliHeader';
+import WaliStats from './WaliStats';
 import ChatRequestsPanel from './ChatRequestsPanel';
 import ActiveConversationsPanel from './ActiveConversationsPanel';
 import MonitoringPanel from './MonitoringPanel';
 import AvailabilityControls from './AvailabilityControls';
-import WaliStats from './WaliStats';
-import StandardLoadingState from '@/components/ui/StandardLoadingState';
+import WaliManagement from './WaliManagement';
 import { useWaliDashboard } from '@/hooks/useWaliDashboard';
-import { SupervisedConversation } from '@/types/wali';
-import FormErrorBoundary from '@/components/ui/FormErrorBoundary';
+import { Card, CardContent } from '@/components/ui/card';
+import { Users, MessageSquare, Shield, Settings } from 'lucide-react';
 
 const WaliDashboard: React.FC = () => {
   const {
-    userId,
-    isLoading, 
     waliProfile,
-    updateAvailabilityStatus,
+    isLoading,
     chatRequests,
     handleApproveRequest,
     handleRejectRequest,
-    totalPendingRequests,
     addWaliNote,
     activeConversations,
     startSupervision,
     endSupervision,
-    totalActiveConversations,
     flaggedContent,
     resolveFlaggedContent,
-    totalFlaggedItems,
     statistics,
+    updateAvailabilityStatus,
     handleSignOut,
     error
   } = useWaliDashboard();
-  
-  const [activeTab, setActiveTab] = useState('chat-requests');
-  
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-10">
+        <Card>
+          <CardContent className="text-center py-8">
+            <h2 className="text-xl font-semibold text-red-600 mb-2">Error Loading Dashboard</h2>
+            <p className="text-muted-foreground">{error}</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <StandardLoadingState
-      loading={isLoading}
-      error={!waliProfile && error ? error : null}
-      loadingText="Loading Wali Dashboard..."
-      emptyState={!waliProfile && !error ? {
-        title: "Wali Profile Not Found",
-        description: "You don't have a Wali profile set up. Please contact support."
-      } : undefined}
-    >
-      <FormErrorBoundary>
-        <div className="container mx-auto py-6 max-w-7xl">
-          <WaliHeader 
-            profile={waliProfile!} 
-            statistics={statistics}
-            onSignOut={handleSignOut}
+    <div className="container mx-auto py-6 space-y-6">
+      <WaliHeader 
+        waliProfile={waliProfile} 
+        onSignOut={handleSignOut}
+      />
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <WaliStats statistics={statistics} />
+        <AvailabilityControls 
+          currentStatus={waliProfile?.availability_status || 'offline'}
+          onStatusChange={updateAvailabilityStatus}
+        />
+      </div>
+
+      <Tabs defaultValue="supervision" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="supervision" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Supervision
+          </TabsTrigger>
+          <TabsTrigger value="requests" className="flex items-center gap-2">
+            <MessageSquare className="h-4 w-4" />
+            Requests
+          </TabsTrigger>
+          <TabsTrigger value="management" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            Management
+          </TabsTrigger>
+          <TabsTrigger value="monitoring" className="flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Monitoring
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="supervision">
+          <ActiveConversationsPanel
+            conversations={activeConversations}
+            onStartSupervision={startSupervision}
+            onEndSupervision={endSupervision}
           />
-          
-          {error && waliProfile && (
-            <Card className="mb-6 border-red-200 bg-red-50">
-              <CardContent className="p-4">
-                <p className="text-red-600">Warning: {error}</p>
-                <p className="text-sm text-red-500">Some functionality may be limited.</p>
-              </CardContent>
-            </Card>
-          )}
-          
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
-            <div className="md:col-span-1">
-              <FormErrorBoundary>
-                <AvailabilityControls 
-                  availabilityStatus={waliProfile!.availability_status}
-                  onUpdateAvailability={updateAvailabilityStatus}
-                />
-              </FormErrorBoundary>
-              <FormErrorBoundary>
-                <WaliStats statistics={statistics} className="mt-6" />
-              </FormErrorBoundary>
-            </div>
-            
-            <div className="md:col-span-3">
-              <FormErrorBoundary>
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                  <TabsList className="grid grid-cols-3 mb-6">
-                    <TabsTrigger value="chat-requests" className="flex items-center">
-                      <MessageCircle className="h-4 w-4 mr-2" />
-                      Chat Requests
-                      {totalPendingRequests > 0 && (
-                        <span className="ml-2 bg-primary text-primary-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                          {totalPendingRequests}
-                        </span>
-                      )}
-                    </TabsTrigger>
-                    <TabsTrigger value="active-supervision" className="flex items-center">
-                      <Users className="h-4 w-4 mr-2" />
-                      Active Supervision
-                    </TabsTrigger>
-                    <TabsTrigger value="monitoring" className="flex items-center">
-                      <Activity className="h-4 w-4 mr-2" />
-                      Detailed Monitoring
-                    </TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="chat-requests">
-                    <FormErrorBoundary>
-                      <ChatRequestsPanel 
-                        chatRequests={chatRequests}
-                        onApprove={(id) => handleApproveRequest(id)}
-                        onReject={(id) => handleRejectRequest(id)}
-                        onAddNote={addWaliNote}
-                      />
-                    </FormErrorBoundary>
-                  </TabsContent>
-                  
-                  <TabsContent value="active-supervision">
-                    <FormErrorBoundary>
-                      <ActiveConversationsPanel 
-                        conversations={activeConversations as SupervisedConversation[]}
-                        onStartSupervision={startSupervision}
-                        onEndSupervision={endSupervision}
-                      />
-                    </FormErrorBoundary>
-                  </TabsContent>
-                  
-                  <TabsContent value="monitoring">
-                    <FormErrorBoundary>
-                      <MonitoringPanel 
-                        flaggedContent={flaggedContent}
-                      />
-                    </FormErrorBoundary>
-                  </TabsContent>
-                </Tabs>
-              </FormErrorBoundary>
-            </div>
-          </div>
-        </div>
-      </FormErrorBoundary>
-    </StandardLoadingState>
+        </TabsContent>
+
+        <TabsContent value="requests">
+          <ChatRequestsPanel
+            requests={chatRequests}
+            onApprove={handleApproveRequest}
+            onReject={handleRejectRequest}
+            onAddNote={addWaliNote}
+          />
+        </TabsContent>
+
+        <TabsContent value="management">
+          <WaliManagement />
+        </TabsContent>
+
+        <TabsContent value="monitoring">
+          <MonitoringPanel 
+            flaggedContent={flaggedContent}
+            onResolve={resolveFlaggedContent}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 

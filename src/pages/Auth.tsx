@@ -1,91 +1,75 @@
 
-import { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { useAuthActions } from "@/hooks/auth/useAuthActions";
-import { useAuthRedirect } from "@/hooks/auth/useAuthRedirect";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import SignUpForm from "@/components/auth/SignUpForm";
 import SignInForm from "@/components/auth/SignInForm";
 import AuthLayout from "@/components/auth/AuthLayout";
-import { toast } from "sonner";
-import { SignInData, SignUpData } from "@/types/auth";
+import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { Shield } from "lucide-react";
 
-const Auth = () => {
-  const [searchParams] = useSearchParams();
-  const shouldSignUp = searchParams.get('signup') === 'true';
-  const preselectedGender = searchParams.get('gender');
-  
-  const [isSignUp, setIsSignUp] = useState(shouldSignUp);
-  const { t } = useTranslation();
-  const { loading, signUp, signIn } = useAuthActions();
-  const { user, loading: authLoading } = useAuth();
-  
-  // Handle auth redirects
-  useAuthRedirect({ user, loading: authLoading });
+const Auth: React.FC = () => {
+  const [isSignUp, setIsSignUp] = useState(false);
+  const { loading, signUp, signIn } = useAuth();
 
-  // Set signup mode based on URL parameters
-  useEffect(() => {
-    if (shouldSignUp) {
-      setIsSignUp(true);
-    }
-  }, [shouldSignUp]);
-
-  const handleSignIn = async (data: SignInData) => {
+  const handleSignUp = async (data: any) => {
     try {
-      const success = await signIn(data);
-      if (!success) {
-        console.log("Sign in failed");
+      const result = await signUp(data);
+      if (result) {
+        console.log("Sign up successful");
       }
     } catch (error) {
-      console.error("Unexpected error during sign in:", error);
-      toast.error("Erreur de connexion", {
-        description: "Une erreur inattendue s'est produite"
-      });
+      console.error("Sign up error:", error);
     }
   };
 
-  const handleSignUp = async (data: SignUpData) => {
+  const handleSignIn = async (data: any) => {
     try {
-      const success = await signUp(data);
-      if (success) {
-        setIsSignUp(false);
-        toast.success("Inscription réussie", {
-          description: "Vous pouvez maintenant vous connecter"
-        });
+      const result = await signIn(data);
+      if (result) {
+        console.log("Sign in successful");
       }
     } catch (error) {
-      console.error("Unexpected error during registration:", error);
-      toast.error("Erreur d'inscription", {
-        description: "Une erreur inattendue s'est produite"
-      });
+      console.error("Sign in error:", error);
     }
   };
 
   return (
     <AuthLayout isSignUp={isSignUp}>
-      {isSignUp ? (
-        <SignUpForm
-          loading={loading}
-          onSubmit={handleSignUp}
-          preselectedGender={preselectedGender}
-        />
-      ) : (
-        <SignInForm
-          loading={loading}
-          onSubmit={handleSignIn}
-        />
-      )}
-      <div className="text-center mt-4">
-        <button
-          type="button"
-          onClick={() => setIsSignUp(!isSignUp)}
-          className="text-sm text-rose-600 dark:text-rose-300 hover:underline transition-colors"
-        >
-          {isSignUp
-            ? "Vous avez déjà un compte ? Se connecter"
-            : "Pas encore de compte ? S'inscrire"}
-        </button>
+      <div className="space-y-6">
+        {isSignUp ? (
+          <SignUpForm loading={loading} onSubmit={handleSignUp} />
+        ) : (
+          <SignInForm loading={loading} onSubmit={handleSignIn} />
+        )}
+
+        <div className="text-center space-y-4">
+          <Button
+            variant="ghost"
+            onClick={() => setIsSignUp(!isSignUp)}
+            className="text-rose-600 dark:text-rose-300 hover:text-rose-700 dark:hover:text-rose-200"
+          >
+            {isSignUp
+              ? "Already have an account? Sign in"
+              : "Don't have an account? Sign up"}
+          </Button>
+
+          <div className="border-t pt-4">
+            <p className="text-sm text-muted-foreground mb-2">
+              Are you a guardian or wali?
+            </p>
+            <Button
+              asChild
+              variant="outline"
+              className="w-full border-islamic-gold text-islamic-gold hover:bg-islamic-gold hover:text-white"
+            >
+              <Link to="/wali/setup" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Register as Wali/Guardian
+              </Link>
+            </Button>
+          </div>
+        </div>
       </div>
     </AuthLayout>
   );
