@@ -13,7 +13,7 @@ export const useRateLimitedMessaging = () => {
     
     try {
       // Check rate limit before sending message
-      const allowed = await checkRateLimit('api/messages', { content, conversationId });
+      const allowed = checkRateLimit('message');
       
       if (!allowed) {
         setLoading(false);
@@ -56,7 +56,12 @@ export const useRateLimitedMessaging = () => {
     setLoading(true);
     
     try {
-      const allowed = await checkRateLimit('api/upload', { fileName: file.name, fileSize: file.size });
+      // Check rate limit with custom config for file uploads
+      const allowed = checkRateLimit('fileUpload', { 
+        maxRequests: 10, 
+        windowMs: 60000, // 1 minute
+        blockDuration: 300000 // 5 minutes
+      });
       
       if (!allowed) {
         setLoading(false);

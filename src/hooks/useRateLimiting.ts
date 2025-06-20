@@ -15,6 +15,12 @@ interface RateLimitState {
   blockedUntil?: number;
 }
 
+interface BlockInfo {
+  isBlocked: boolean;
+  blockedUntil?: number;
+  reason?: string;
+}
+
 const defaultConfigs: Record<string, RateLimitConfig> = {
   login: { maxRequests: 5, windowMs: 15 * 60 * 1000, blockDuration: 15 * 60 * 1000 }, // 5 attempts per 15 min
   signup: { maxRequests: 3, windowMs: 60 * 60 * 1000 }, // 3 attempts per hour
@@ -99,6 +105,44 @@ export const useRateLimiting = () => {
     return Math.max(0, config.maxRequests - current.count);
   }, []);
 
+  const isBlocked = useCallback((action: string): boolean => {
+    const current = rateLimits.current.get(action);
+    if (!current || !current.blocked) return false;
+    
+    if (current.blockedUntil && Date.now() >= current.blockedUntil) {
+      // Block has expired, reset it
+      rateLimits.current.set(action, {
+        ...current,
+        blocked: false,
+        blockedUntil: undefined
+      });
+      return false;
+    }
+    
+    return current.blocked;
+  }, []);
+
+  const blockInfo = useCallback((action: string): BlockInfo => {
+    const current = rateLimits.current.get(action);
+    if (!current || !current.blocked) {
+      return { isBlocked: false };
+    }
+    
+    return {
+      isBlocked: true,
+      blockedUntil: current.blockedUntil,
+      reason: 'Rate limit exceeded'
+    };
+  }, []);
+
+  const getRemainingBlockTime = useCallback((action: string): number => {
+    const current = rateLimits.current.get(action);
+    if (!current || !current.blocked || !current.blockedUntil) return 0;
+    
+    const remaining = current.blockedUntil - Date.now();
+    return Math.max(0, Math.ceil(remaining / 1000));
+  }, []);
+
   const resetRateLimit = useCallback((action: string) => {
     rateLimits.current.delete(action);
   }, []);
@@ -106,6 +150,9 @@ export const useRateLimiting = () => {
   return {
     checkRateLimit,
     getRemainingRequests,
-    resetRateLimit
+    resetRateLimit,
+    isBlocked,
+    blockInfo,
+    getRemainingBlockTime
   };
 };
