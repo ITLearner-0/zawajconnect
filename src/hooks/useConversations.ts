@@ -8,18 +8,24 @@ export const useConversations = (userId: string | null) => {
   const { toast } = useToast();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch all conversations for the current user
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      setConversations([]);
+      setLoading(false);
+      return;
+    }
 
     const fetchConversations = async () => {
       setLoading(true);
       setError(null);
       
       try {
+        console.log('Fetching conversations for user:', userId);
+        
         // First, get conversations without trying to join messages
         const { data: conversationsData, error: convError } = await supabase
           .from('conversations')
@@ -31,72 +37,77 @@ export const useConversations = (userId: string | null) => {
           throw convError;
         }
 
+        console.log('Found conversations:', conversationsData?.length || 0);
+
         // Process conversations and get profile data for each
         const processedConversations: Conversation[] = [];
         
-        for (const conv of conversationsData || []) {
-          const otherParticipantId = conv.participants.find(p => p !== userId);
-          
-          if (otherParticipantId) {
-            try {
-              // Get other participant's profile details
-              const { data: profileData, error: profileError } = await supabase
-                .from('profiles')
-                .select('first_name, last_name')
-                .eq('id', otherParticipantId)
-                .single();
-              
-              if (profileError) {
-                console.warn('Profile not found for participant:', otherParticipantId);
+        if (conversationsData && conversationsData.length > 0) {
+          for (const conv of conversationsData) {
+            const otherParticipantId = conv.participants.find(p => p !== userId);
+            
+            if (otherParticipantId) {
+              try {
+                // Get other participant's profile details
+                const { data: profileData, error: profileError } = await supabase
+                  .from('profiles')
+                  .select('first_name, last_name')
+                  .eq('id', otherParticipantId)
+                  .single();
+                
+                if (profileError) {
+                  console.warn('Profile not found for participant:', otherParticipantId);
+                }
+                
+                // Get the most recent message for this conversation
+                const { data: messagesData, error: msgError } = await supabase
+                  .from('messages')
+                  .select('id, content, created_at, sender_id, is_read, conversation_id, is_wali_visible')
+                  .eq('conversation_id', conv.id)
+                  .order('created_at', { ascending: false })
+                  .limit(1);
+                
+                if (msgError) {
+                  console.warn('Messages fetch error for conversation:', conv.id, msgError);
+                }
+                
+                // Create properly typed Message object
+                const lastMessage: Message | undefined = messagesData && messagesData.length > 0 ? {
+                  id: messagesData[0].id,
+                  content: messagesData[0].content,
+                  created_at: messagesData[0].created_at,
+                  sender_id: messagesData[0].sender_id,
+                  is_read: messagesData[0].is_read,
+                  conversation_id: messagesData[0].conversation_id,
+                  is_wali_visible: messagesData[0].is_wali_visible
+                } : undefined;
+                
+                processedConversations.push({
+                  id: conv.id,
+                  created_at: conv.created_at,
+                  participants: conv.participants,
+                  last_message: lastMessage,
+                  profile: profileData || undefined,
+                  wali_supervised: conv.wali_supervised
+                });
+              } catch (profileError: any) {
+                console.warn('Error loading profile for conversation:', conv.id, profileError);
+                
+                // Still add the conversation even if profile loading fails
+                processedConversations.push({
+                  id: conv.id,
+                  created_at: conv.created_at,
+                  participants: conv.participants,
+                  last_message: undefined,
+                  profile: undefined,
+                  wali_supervised: conv.wali_supervised
+                });
               }
-              
-              // Get the most recent message for this conversation
-              const { data: messagesData, error: msgError } = await supabase
-                .from('messages')
-                .select('id, content, created_at, sender_id, is_read, conversation_id, is_wali_visible')
-                .eq('conversation_id', conv.id)
-                .order('created_at', { ascending: false })
-                .limit(1);
-              
-              if (msgError) {
-                console.warn('Messages fetch error for conversation:', conv.id, msgError);
-              }
-              
-              // Create properly typed Message object
-              const lastMessage: Message | undefined = messagesData && messagesData.length > 0 ? {
-                id: messagesData[0].id,
-                content: messagesData[0].content,
-                created_at: messagesData[0].created_at,
-                sender_id: messagesData[0].sender_id,
-                is_read: messagesData[0].is_read,
-                conversation_id: messagesData[0].conversation_id,
-                is_wali_visible: messagesData[0].is_wali_visible
-              } : undefined;
-              
-              processedConversations.push({
-                id: conv.id,
-                created_at: conv.created_at,
-                participants: conv.participants,
-                last_message: lastMessage,
-                profile: profileData || undefined,
-                wali_supervised: conv.wali_supervised
-              });
-            } catch (profileError: any) {
-              console.warn('Error loading profile for conversation:', conv.id, profileError);
-              
-              // Still add the conversation even if profile loading fails
-              processedConversations.push({
-                id: conv.id,
-                created_at: conv.created_at,
-                participants: conv.participants,
-                last_message: undefined,
-                profile: undefined,
-                wali_supervised: conv.wali_supervised
-              });
             }
           }
         }
         
+        console.log('Processed conversations:', processedConversations.length);
         setConversations(processedConversations);
       } catch (err: any) {
         setError(err.message);
@@ -118,6 +129,7 @@ export const useConversations = (userId: string | null) => {
   const loadCurrentConversation = async (conversationId: string) => {
     if (!userId) return null;
     
+    console.log('Loading current conversation:', conversationId);
     setLoading(true);
     setError(null);
     
@@ -130,8 +142,11 @@ export const useConversations = (userId: string | null) => {
         .single();
 
       if (convError) {
-        throw convError;
+        console.error('Conversation not found:', convError);
+        throw new Error('Conversation not found');
       }
+
+      console.log('Found conversation:', convData);
 
       // Set current conversation
       const otherParticipantId = convData.participants.find(p => p !== userId);
@@ -154,6 +169,7 @@ export const useConversations = (userId: string | null) => {
           wali_supervised: convData.wali_supervised
         };
         
+        console.log('Setting current conversation:', conversation);
         setCurrentConversation(conversation);
         return conversation;
       }
