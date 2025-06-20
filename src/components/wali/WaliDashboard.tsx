@@ -112,7 +112,7 @@ const WaliDashboard: React.FC = () => {
         <TabsContent value="monitoring">
           <MonitoringPanel 
             flaggedContent={flaggedContent}
-            resolveFlaggedContent={resolveFlaggedContent}
+            onResolveFlag={resolveFlaggedContent}
           />
         </TabsContent>
       </Tabs>
