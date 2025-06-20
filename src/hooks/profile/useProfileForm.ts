@@ -1,12 +1,12 @@
 
 import { ProfileFormData, VerificationStatus, PrivacySettings } from "@/types/profile";
-import { useProfileFormState } from "./profile/useProfileFormState";
-import { useProfileVerification } from "./profile/useProfileVerification";
-import { usePrivacyManagement } from "./profile/usePrivacyManagement";
-import { useAccountVisibility } from "./profile/useAccountVisibility";
-import { useBlockedUsers } from "./profile/useBlockedUsers";
-import { useProfileSubmission } from "./profile/useProfileSubmission";
-import { useAuthSignOut } from "./profile/useAuthSignOut";
+import { useProfileFormState } from "./useProfileFormState";
+import { useProfileVerification } from "./useProfileVerification";
+import { usePrivacyManagement } from "./usePrivacyManagement";
+import { useAccountVisibility } from "./useAccountVisibility";
+import { useBlockedUsers } from "./useBlockedUsers";
+import { useProfileSubmission } from "./useProfileSubmission";
+import { useAuthSignOut } from "./useAuthSignOut";
 import { useEffect } from "react";
 
 interface UseProfileFormProps {
