@@ -161,8 +161,10 @@ export const useEnhancedAuth = () => {
     return new Date() < securityState.lockedUntil;
   }, [securityState.lockedUntil]);
 
-  // Log security events
+  // Log security events to the new table
   const logSecurityEvent = useCallback(async (eventType: string, details: any = {}) => {
+    if (!currentUserId) return;
+    
     try {
       const { error } = await supabase
         .from('security_events')

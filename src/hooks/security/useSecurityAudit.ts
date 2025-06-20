@@ -21,15 +21,21 @@ export const useSecurityAudit = () => {
 
     setLogging(true);
     try {
-      const { error } = await supabase.rpc('log_security_event', {
-        _user_id: user.id,
-        _action_type: event.actionType,
-        _resource_type: event.resourceType,
-        _resource_id: event.resourceId || null,
-        _success: event.success,
-        _error_message: event.errorMessage || null,
-        _metadata: event.metadata ? JSON.stringify(event.metadata) : null
-      });
+      const { error } = await supabase
+        .from('security_events')
+        .insert({
+          user_id: user.id,
+          event_type: event.actionType,
+          details: {
+            resource_type: event.resourceType,
+            resource_id: event.resourceId,
+            success: event.success,
+            error_message: event.errorMessage,
+            metadata: event.metadata,
+            timestamp: new Date().toISOString(),
+            user_agent: navigator.userAgent
+          }
+        });
 
       if (error) {
         console.error('Failed to log security event:', error);
