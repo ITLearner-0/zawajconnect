@@ -30,7 +30,7 @@ const Messages = () => {
   // Use messages hook with stable parameters
   const messagesHookResult = useMessages(conversationId, currentUserId);
   
-  // Destructure with defaults to prevent undefined issues - ensure proper error structure
+  // Destructure with safe defaults
   const {
     conversations = [],
     currentConversation = null,
@@ -53,29 +53,7 @@ const Messages = () => {
     toggleEncryption = () => {},
     retentionPolicy = {},
     updateRetentionPolicy = () => {}
-  } = messagesHookResult || {
-    conversations: [],
-    currentConversation: null,
-    messages: [],
-    loading: false,
-    sendingMessage: false,
-    errors: { conversations: null, messages: null, videoCall: null, monitoring: null },
-    messageInput: "",
-    setMessageInput: () => {},
-    videoCallStatus: { isActive: false, waliPresent: false },
-    sendMessage: () => Promise.resolve(),
-    startVideoCall: () => {},
-    endVideoCall: () => {},
-    violations: [],
-    latestReport: null,
-    monitoringEnabled: false,
-    toggleMonitoring: () => {},
-    monitoringLoading: false,
-    encryptionEnabled: false,
-    toggleEncryption: () => {},
-    retentionPolicy: {},
-    updateRetentionPolicy: () => {}
-  };
+  } = messagesHookResult || {};
 
   // Debug logs - only when conversation changes
   useEffect(() => {
@@ -91,10 +69,10 @@ const Messages = () => {
     }
   }, [conversationId, loading, userLoading]);
 
-  // Handle errors - only show once per unique error
+  // Handle errors - only show once per unique error with proper safety checks
   useEffect(() => {
-    // Ensure errors is properly structured
-    const currentError = errors && typeof errors === 'object' && 'messages' in errors ? errors.messages : null;
+    // Safely access the messages error
+    const currentError = errors?.messages || null;
     
     if (currentError && 
         currentError !== prevErrorRef.current && 
@@ -119,7 +97,7 @@ const Messages = () => {
       prevErrorRef.current = null;
       toastShownRef.current = false;
     }
-  }, [errors]);
+  }, [errors?.messages, toast]);
 
   // Loading state
   if (userLoading) {

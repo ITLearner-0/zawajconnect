@@ -20,37 +20,26 @@ export const useConversations = (userId: string | null) => {
       setError(null);
       
       try {
-        const { data, error } = await supabase
+        // First, get conversations without trying to join messages
+        const { data: conversationsData, error: convError } = await supabase
           .from('conversations')
-          .select(`
-            id,
-            created_at,
-            participants,
-            wali_supervised,
-            messages!messages(
-              id,
-              content,
-              created_at,
-              sender_id,
-              is_read
-            )
-          `)
+          .select('id, created_at, participants, wali_supervised')
           .contains('participants', [userId])
           .order('created_at', { ascending: false });
 
-        if (error) {
-          throw error;
+        if (convError) {
+          throw convError;
         }
 
-        // Process data to get conversations with last message
+        // Process conversations and get profile data for each
         const processedConversations: Conversation[] = [];
         
-        for (const conv of data || []) {
+        for (const conv of conversationsData || []) {
           const otherParticipantId = conv.participants.find(p => p !== userId);
           
-          // Get other participant's profile details
           if (otherParticipantId) {
             try {
+              // Get other participant's profile details
               const { data: profileData, error: profileError } = await supabase
                 .from('profiles')
                 .select('first_name, last_name')
@@ -58,19 +47,22 @@ export const useConversations = (userId: string | null) => {
                 .single();
               
               if (profileError) {
-                throw profileError;
+                console.warn('Profile not found for participant:', otherParticipantId);
               }
               
-              // Find the last message
-              let lastMessage = null;
-              if (conv.messages && conv.messages.length > 0) {
-                // Fix: Properly type the messages to avoid TypeScript errors
-                const messages = conv.messages as unknown as Message[];
-                const sortedMessages = [...messages].sort(
-                  (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-                );
-                lastMessage = sortedMessages[0];
+              // Get the most recent message for this conversation
+              const { data: messagesData, error: msgError } = await supabase
+                .from('messages')
+                .select('id, content, created_at, sender_id, is_read')
+                .eq('conversation_id', conv.id)
+                .order('created_at', { ascending: false })
+                .limit(1);
+              
+              if (msgError) {
+                console.warn('Messages fetch error for conversation:', conv.id, msgError);
               }
+              
+              const lastMessage = messagesData && messagesData.length > 0 ? messagesData[0] : null;
               
               processedConversations.push({
                 id: conv.id,
@@ -81,10 +73,16 @@ export const useConversations = (userId: string | null) => {
                 wali_supervised: conv.wali_supervised
               });
             } catch (profileError: any) {
-              toast({
-                title: "Error loading profile",
-                description: profileError.message,
-                variant: "destructive"
+              console.warn('Error loading profile for conversation:', conv.id, profileError);
+              
+              // Still add the conversation even if profile loading fails
+              processedConversations.push({
+                id: conv.id,
+                created_at: conv.created_at,
+                participants: conv.participants,
+                last_message: null,
+                profile: undefined,
+                wali_supervised: conv.wali_supervised
               });
             }
           }
@@ -93,6 +91,7 @@ export const useConversations = (userId: string | null) => {
         setConversations(processedConversations);
       } catch (err: any) {
         setError(err.message);
+        console.error('Error loading conversations:', err);
         toast({
           title: "Error loading conversations",
           description: err.message,
@@ -135,7 +134,7 @@ export const useConversations = (userId: string | null) => {
           .single();
           
         if (profileError) {
-          throw profileError;
+          console.warn('Profile not found for participant:', otherParticipantId);
         }
         
         const conversation = {
@@ -153,6 +152,7 @@ export const useConversations = (userId: string | null) => {
       return null;
     } catch (err: any) {
       setError(err.message);
+      console.error('Error loading conversation:', err);
       toast({
         title: "Error loading conversation",
         description: err.message,

@@ -1,5 +1,5 @@
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Conversation } from '@/types/profile';
 import { useConversations } from './useConversations';
 import { useMessageHandling } from './useMessageHandling';
@@ -15,10 +15,12 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
   const prevCurrentUserId = useRef(currentUserId);
   const errorsRef = useRef<{ 
     conversations: string | null; 
+    messages: string | null;
     videoCall: string | null; 
     monitoring?: string | null 
   }>({
     conversations: null,
+    messages: null,
     videoCall: null,
     monitoring: null
   });
@@ -38,6 +40,7 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
     currentConversation, 
     setCurrentConversation,
     loadCurrentConversation,
+    loading: conversationsLoading,
     error: conversationsError
   } = useConversations(currentUserId || null);
   
@@ -48,7 +51,7 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
   
   const {
     messages,
-    loading,
+    loading: messagesLoading,
     errors: messageErrors,
     fetchMessages,
     sendingMessage,
@@ -59,10 +62,20 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
 
   const { violations } = useMessageModeration(conversationId, messages, currentUserId);
 
+  // Load current conversation when conversationId changes
+  useEffect(() => {
+    if (conversationId && conversationId !== prevConversationId.current) {
+      prevConversationId.current = conversationId;
+      loadCurrentConversation(conversationId);
+    }
+  }, [conversationId, loadCurrentConversation]);
+
   // Update errors only when they actually change
-  if (conversationsError && conversationsError !== errorsRef.current.conversations) {
-    updateErrors({ conversations: conversationsError });
-  }
+  useEffect(() => {
+    if (conversationsError && conversationsError !== errorsRef.current.conversations) {
+      updateErrors({ conversations: conversationsError });
+    }
+  }, [conversationsError, updateErrors]);
 
   // Stable send message function
   const sendMessage = useCallback(async () => {
@@ -77,6 +90,9 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
   const stableFetchMessages = useCallback(() => {
     return fetchMessages(encryptionEnabled);
   }, [fetchMessages, encryptionEnabled]);
+
+  // Combine loading states
+  const loading = conversationsLoading || messagesLoading;
 
   return {
     // Conversations
@@ -95,8 +111,10 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
     
     // Combined errors
     errors: {
-      ...errors,
-      messages: messageErrors.messages
+      conversations: errorsRef.current.conversations,
+      messages: messageErrors.messages,
+      videoCall: errorsRef.current.videoCall,
+      monitoring: errorsRef.current.monitoring
     },
     
     // Video call
