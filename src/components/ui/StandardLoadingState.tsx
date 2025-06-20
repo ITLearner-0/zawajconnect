@@ -36,24 +36,24 @@ const StandardLoadingState: React.FC<StandardLoadingStateProps> = ({
   children,
   componentName = 'StandardLoadingState'
 }) => {
-  // Log state changes for monitoring
+  // Consolidate all logging effects into a single useEffect to maintain hook order
   useEffect(() => {
     if (loading) {
       logger.debug(`Loading started in ${componentName}`, { loadingText });
     }
-  }, [loading, componentName, loadingText]);
-
-  useEffect(() => {
+    
     if (error) {
       logger.warn(`Error state in ${componentName}`, { error }, { component: componentName });
     }
-  }, [error, componentName]);
-
-  useEffect(() => {
+    
     if (offline) {
       logger.warn(`Offline state detected in ${componentName}`, {}, { component: componentName });
     }
-  }, [offline, componentName]);
+    
+    if (children && !loading && !error && !offline) {
+      logger.debug(`Content successfully rendered in ${componentName}`, {}, { component: componentName });
+    }
+  }, [loading, error, offline, children, componentName, loadingText]);
 
   const handleRetry = () => {
     logger.info(`Retry action triggered in ${componentName}`, {}, { 
@@ -128,13 +128,6 @@ const StandardLoadingState: React.FC<StandardLoadingStateProps> = ({
       </div>
     );
   }
-
-  // Content state - log successful render
-  useEffect(() => {
-    if (children && !loading && !error && !offline) {
-      logger.debug(`Content successfully rendered in ${componentName}`, {}, { component: componentName });
-    }
-  }, [children, loading, error, offline, componentName]);
 
   return children || null;
 };
