@@ -1,137 +1,111 @@
 
-import { useState, useCallback } from 'react';
-import { rateLimitingService, RateLimitResult, AbuseDetectionResult } from '@/services/rateLimiting/rateLimitingService';
-import { useToast } from '@/components/ui/use-toast';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useCallback, useRef } from 'react';
+import { useToast } from './use-toast';
+
+interface RateLimitConfig {
+  maxRequests: number;
+  windowMs: number;
+  blockDuration?: number;
+}
+
+interface RateLimitState {
+  count: number;
+  resetTime: number;
+  blocked: boolean;
+  blockedUntil?: number;
+}
+
+const defaultConfigs: Record<string, RateLimitConfig> = {
+  login: { maxRequests: 5, windowMs: 15 * 60 * 1000, blockDuration: 15 * 60 * 1000 }, // 5 attempts per 15 min
+  signup: { maxRequests: 3, windowMs: 60 * 60 * 1000 }, // 3 attempts per hour
+  message: { maxRequests: 60, windowMs: 60 * 1000 }, // 60 messages per minute
+  profileUpdate: { maxRequests: 10, windowMs: 60 * 60 * 1000 }, // 10 updates per hour
+  passwordReset: { maxRequests: 3, windowMs: 60 * 60 * 1000, blockDuration: 60 * 60 * 1000 }, // 3 per hour
+  reportContent: { maxRequests: 10, windowMs: 60 * 60 * 1000 } // 10 reports per hour
+};
 
 export const useRateLimiting = () => {
-  const [isBlocked, setIsBlocked] = useState(false);
-  const [blockInfo, setBlockInfo] = useState<{ until: number; reason: string } | null>(null);
   const { toast } = useToast();
+  const rateLimits = useRef<Map<string, RateLimitState>>(new Map());
 
-  const checkRateLimit = useCallback(async (endpoint: string, requestData?: any): Promise<boolean> => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast({
-          title: "Authentication Required",
-          description: "Please sign in to continue",
-          variant: "destructive"
-        });
-        return false;
-      }
+  const checkRateLimit = useCallback((action: string, customConfig?: RateLimitConfig): boolean => {
+    const config = customConfig || defaultConfigs[action];
+    if (!config) return true; // No limit configured
 
-      const userId = session.user.id;
+    const now = Date.now();
+    const key = action;
+    const current = rateLimits.current.get(key);
 
-      // Check rate limit
-      const rateLimitResult: RateLimitResult = await rateLimitingService.checkRateLimit(userId, endpoint);
+    // Check if currently blocked
+    if (current?.blocked && current.blockedUntil && now < current.blockedUntil) {
+      const remainingTime = Math.ceil((current.blockedUntil - now) / 1000);
+      toast({
+        title: "Rate Limited",
+        description: `Action blocked. Try again in ${remainingTime} seconds.`,
+        variant: "destructive"
+      });
+      return false;
+    }
 
-      if (!rateLimitResult.allowed) {
-        if (rateLimitResult.blocked && rateLimitResult.blockUntil) {
-          setIsBlocked(true);
-          setBlockInfo({
-            until: rateLimitResult.blockUntil,
-            reason: 'Rate limit exceeded'
-          });
-
-          const blockDuration = Math.ceil((rateLimitResult.blockUntil - Date.now()) / (60 * 1000));
-          toast({
-            title: "Rate Limit Exceeded",
-            description: `You've been temporarily blocked for ${blockDuration} minutes due to excessive requests.`,
-            variant: "destructive"
-          });
-        } else {
-          const resetTime = new Date(rateLimitResult.resetTime);
-          toast({
-            title: "Rate Limit Reached",
-            description: `Please wait until ${resetTime.toLocaleTimeString()} before making more requests.`,
-            variant: "destructive"
-          });
-        }
-        return false;
-      }
-
-      // Check for abuse
-      const abuseResult: AbuseDetectionResult = await rateLimitingService.detectAbuse(userId, endpoint, requestData);
-
-      if (abuseResult.isAbusive) {
-        console.warn('Abuse detected:', abuseResult);
-
-        switch (abuseResult.recommendedAction) {
-          case 'block':
-            await rateLimitingService.blockUser(userId, 60 * 60 * 1000, abuseResult.reason); // 1 hour block
-            setIsBlocked(true);
-            setBlockInfo({
-              until: Date.now() + 60 * 60 * 1000,
-              reason: abuseResult.reason
-            });
-            toast({
-              title: "Account Temporarily Suspended",
-              description: `Your account has been suspended for suspicious activity: ${abuseResult.reason}`,
-              variant: "destructive"
-            });
-            return false;
-
-          case 'throttle':
-            toast({
-              title: "Usage Warning",
-              description: `Suspicious activity detected: ${abuseResult.reason}. Please slow down your requests.`,
-              variant: "destructive"
-            });
-            break;
-
-          case 'warn':
-            toast({
-              title: "Usage Notice",
-              description: abuseResult.reason,
-            });
-            break;
-        }
-      }
-
-      // Show remaining requests if getting close to limit
-      if (rateLimitResult.remaining <= 5 && rateLimitResult.remaining > 0) {
-        toast({
-          title: "Rate Limit Warning",
-          description: `You have ${rateLimitResult.remaining} requests remaining in this time window.`,
-        });
-      }
-
+    // Initialize or reset if window expired
+    if (!current || now > current.resetTime) {
+      rateLimits.current.set(key, {
+        count: 1,
+        resetTime: now + config.windowMs,
+        blocked: false
+      });
       return true;
-    } catch (error) {
-      console.error('Rate limiting check failed:', error);
-      return true; // Allow request if rate limiting fails
     }
+
+    // Check if limit exceeded
+    if (current.count >= config.maxRequests) {
+      const blockedUntil = config.blockDuration ? now + config.blockDuration : undefined;
+      rateLimits.current.set(key, {
+        ...current,
+        blocked: true,
+        blockedUntil
+      });
+
+      const message = blockedUntil 
+        ? `Too many attempts. Blocked for ${config.blockDuration! / 60000} minutes.`
+        : `Rate limit exceeded. Try again in ${Math.ceil((current.resetTime - now) / 1000)} seconds.`;
+
+      toast({
+        title: "Rate Limited",
+        description: message,
+        variant: "destructive"
+      });
+      return false;
+    }
+
+    // Increment count
+    rateLimits.current.set(key, {
+      ...current,
+      count: current.count + 1
+    });
+
+    return true;
   }, [toast]);
 
-  const clearBlock = useCallback(async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        await rateLimitingService.unblockUser(session.user.id);
-        setIsBlocked(false);
-        setBlockInfo(null);
-        toast({
-          title: "Block Cleared",
-          description: "Your account access has been restored.",
-        });
-      }
-    } catch (error) {
-      console.error('Failed to clear block:', error);
-    }
-  }, [toast]);
+  const getRemainingRequests = useCallback((action: string): number => {
+    const config = defaultConfigs[action];
+    if (!config) return Infinity;
 
-  const getRemainingBlockTime = useCallback((): number => {
-    if (!blockInfo) return 0;
-    const remaining = blockInfo.until - Date.now();
-    return Math.max(0, remaining);
-  }, [blockInfo]);
+    const current = rateLimits.current.get(action);
+    if (!current || Date.now() > current.resetTime) {
+      return config.maxRequests;
+    }
+
+    return Math.max(0, config.maxRequests - current.count);
+  }, []);
+
+  const resetRateLimit = useCallback((action: string) => {
+    rateLimits.current.delete(action);
+  }, []);
 
   return {
     checkRateLimit,
-    isBlocked,
-    blockInfo,
-    clearBlock,
-    getRemainingBlockTime
+    getRemainingRequests,
+    resetRateLimit
   };
 };

@@ -1,132 +1,118 @@
+
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Index from './pages/Index';
-import Auth from './pages/Auth';
-import Profile from './pages/Profile';
-import NotFound from './pages/NotFound';
-import NearbyMatches from './pages/NearbyMatches';
-import Messages from './pages/Messages';
-import AdminModeration from './pages/AdminModeration';
-import WaliDashboard from './pages/WaliDashboard';
-import WaliSetup from './pages/WaliSetup';
-import Resources from './pages/Resources';
-import Demo from './pages/Demo';
-import UserProfile from './pages/UserProfile';
-import Compatibility from './pages/Compatibility';
-import Subscription from './pages/Subscription';
-import Navigation from './components/layout/Navigation';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { AccessibilityProvider } from './contexts/AccessibilityContext';
-import AuthProvider from './contexts/AuthContext';
-import { LazyLoadingProvider } from './hooks/useLazyLoading/context/LazyLoadingContext';
-import GlobalErrorBoundary from './components/ui/GlobalErrorBoundary';
-import RouteErrorBoundary from './components/ui/RouteErrorBoundary';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/toaster';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { SecurityProvider } from '@/components/security/SecurityProvider';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import ProtectedRoute from '@/components/auth/ProtectedRoute';
+import AdminRoute from '@/components/auth/AdminRoute';
+import Index from '@/pages/Index';
+import Auth from '@/pages/Auth';
+import Profile from '@/pages/Profile';
+import UserProfile from '@/pages/UserProfile';
+import Compatibility from '@/pages/Compatibility';
+import NearbyMatches from '@/pages/NearbyMatches';
+import Messages from '@/pages/Messages';
+import Resources from '@/pages/Resources';
+import Demo from '@/pages/Demo';
+import WaliDashboard from '@/pages/WaliDashboard';
+import WaliSetup from '@/pages/WaliSetup';
+import AdminModeration from '@/pages/AdminModeration';
+import Subscription from '@/pages/Subscription';
+import NotFound from '@/pages/NotFound';
+import './App.css';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
+    },
+  },
+});
 
 function App() {
   return (
-    <GlobalErrorBoundary showHome={true}>
+    <QueryClientProvider client={queryClient}>
       <ThemeProvider>
-        <AccessibilityProvider>
-          <LazyLoadingProvider
-            initialConfig={{
-              enableAnalytics: true,
-              enableDebug: process.env.NODE_ENV === 'development',
-              batchSize: 8,
-              preloadDistance: 300,
-              networkOptimization: true,
-              memoryOptimization: true,
-            }}
-          >
+        <AuthProvider>
+          <SecurityProvider>
             <Router>
-              <AuthProvider>
-                <Navigation />
+              <div className="min-h-screen bg-background">
                 <Routes>
-                  <Route path="/" element={
-                    <RouteErrorBoundary routeName="Home">
-                      <Index />
-                    </RouteErrorBoundary>
-                  } />
-                  <Route path="/auth" element={
-                    <RouteErrorBoundary routeName="Auth">
-                      <Auth />
-                    </RouteErrorBoundary>
-                  } />
-                  <Route path="/wali/setup" element={
-                    <RouteErrorBoundary routeName="WaliSetup">
-                      <WaliSetup />
-                    </RouteErrorBoundary>
-                  } />
+                  <Route path="/" element={<Index />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/demo" element={<Demo />} />
+                  <Route path="/resources" element={<Resources />} />
+                  
+                  {/* Protected Routes */}
                   <Route path="/profile" element={
-                    <RouteErrorBoundary routeName="Profile">
+                    <ProtectedRoute>
                       <Profile />
-                    </RouteErrorBoundary>
+                    </ProtectedRoute>
                   } />
-                  <Route path="/profile/:id" element={
-                    <RouteErrorBoundary routeName="UserProfile">
+                  <Route path="/profile/:userId" element={
+                    <ProtectedRoute>
                       <UserProfile />
-                    </RouteErrorBoundary>
+                    </ProtectedRoute>
                   } />
                   <Route path="/compatibility" element={
-                    <RouteErrorBoundary routeName="Compatibility">
+                    <ProtectedRoute>
                       <Compatibility />
-                    </RouteErrorBoundary>
+                    </ProtectedRoute>
                   } />
                   <Route path="/nearby" element={
-                    <RouteErrorBoundary routeName="NearbyMatches">
+                    <ProtectedRoute>
                       <NearbyMatches />
-                    </RouteErrorBoundary>
+                    </ProtectedRoute>
                   } />
                   <Route path="/messages" element={
-                    <RouteErrorBoundary routeName="Messages">
+                    <ProtectedRoute>
                       <Messages />
-                    </RouteErrorBoundary>
+                    </ProtectedRoute>
                   } />
                   <Route path="/messages/:conversationId" element={
-                    <RouteErrorBoundary routeName="Messages">
+                    <ProtectedRoute>
                       <Messages />
-                    </RouteErrorBoundary>
-                  } />
-                  <Route path="/admin/moderation" element={
-                    <RouteErrorBoundary routeName="AdminModeration">
-                      <AdminModeration />
-                    </RouteErrorBoundary>
-                  } />
-                  <Route path="/wali" element={
-                    <RouteErrorBoundary routeName="WaliDashboard">
-                      <WaliDashboard />
-                    </RouteErrorBoundary>
-                  } />
-                  <Route path="/resources" element={
-                    <RouteErrorBoundary routeName="Resources">
-                      <Resources />
-                    </RouteErrorBoundary>
-                  } />
-                  <Route path="/resources/:resourceId" element={
-                    <RouteErrorBoundary routeName="Resources">
-                      <Resources />
-                    </RouteErrorBoundary>
-                  } />
-                  <Route path="/demo" element={
-                    <RouteErrorBoundary routeName="Demo">
-                      <Demo />
-                    </RouteErrorBoundary>
+                    </ProtectedRoute>
                   } />
                   <Route path="/subscription" element={
-                    <RouteErrorBoundary routeName="Subscription">
+                    <ProtectedRoute>
                       <Subscription />
-                    </RouteErrorBoundary>
+                    </ProtectedRoute>
                   } />
-                  <Route path="*" element={
-                    <RouteErrorBoundary routeName="NotFound">
-                      <NotFound />
-                    </RouteErrorBoundary>
+                  
+                  {/* Wali Routes */}
+                  <Route path="/wali/setup" element={
+                    <ProtectedRoute>
+                      <WaliSetup />
+                    </ProtectedRoute>
                   } />
+                  <Route path="/wali/dashboard" element={
+                    <ProtectedRoute>
+                      <WaliDashboard />
+                    </ProtectedRoute>
+                  } />
+                  
+                  {/* Admin Routes */}
+                  <Route path="/admin/moderation" element={
+                    <AdminRoute>
+                      <AdminModeration />
+                    </AdminRoute>
+                  } />
+                  
+                  {/* 404 Route */}
+                  <Route path="*" element={<NotFound />} />
                 </Routes>
-              </AuthProvider>
+                <Toaster />
+              </div>
             </Router>
-          </LazyLoadingProvider>
-        </AccessibilityProvider>
+          </SecurityProvider>
+        </AuthProvider>
       </ThemeProvider>
-    </GlobalErrorBoundary>
+    </QueryClientProvider>
   );
 }
 

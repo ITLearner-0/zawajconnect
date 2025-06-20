@@ -4,10 +4,11 @@ import { useProfileData } from '@/hooks/useProfileData';
 import { useMessages } from '@/hooks/useMessages';
 import { useUserSession } from '@/hooks/useUserSession';
 import { useDemoMessages } from '@/hooks/useDemoMessages';
+import { useSecurity } from '@/components/security/SecurityProvider';
 import DemoConversation from '@/components/messaging/demo/DemoConversation';
 import RegularConversation from '@/components/messaging/regular/RegularConversation';
 import { toast } from '@/hooks/use-toast';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 const Messages = () => {
