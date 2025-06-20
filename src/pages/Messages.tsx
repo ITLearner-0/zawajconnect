@@ -7,84 +7,94 @@ import { useDemoMessages } from '@/hooks/useDemoMessages';
 import DemoConversation from '@/components/messaging/demo/DemoConversation';
 import RegularConversation from '@/components/messaging/regular/RegularConversation';
 import { toast } from '@/hooks/use-toast';
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef } from 'react';
 
 const Messages = () => {
   const { conversationId } = useParams<{ conversationId: string }>();
   
-  // Use ref to track initial render and prevent excessive logging
+  // Use refs to prevent re-renders
   const initialRenderDone = useRef(false);
   const prevConversationId = useRef(conversationId);
   const prevErrorRef = useRef<string | null>(null);
+  const toastShownRef = useRef(false);
   
   // Get current user session
   const { currentUserId, loading: userLoading } = useUserSession();
   
-  // Handle demo conversation detection and messages - memoize to prevent re-renders
+  // Handle demo conversation detection and messages
   const { isDemoConversation, demoMessages, setDemoMessages } = useDemoMessages(conversationId);
   
   // Get user profile data
   const { profileData: userData } = useProfileData(currentUserId);
   
-  // Memoize the messages options to prevent re-renders
-  const messagesOptions = useMemo(() => ({
-    conversationId: conversationId || undefined,
-    currentUserId: currentUserId || undefined
-  }), [conversationId, currentUserId]);
+  // Use messages hook with stable parameters
+  const messagesHookResult = useMessages(conversationId, currentUserId);
   
+  // Destructure with defaults to prevent undefined issues
   const {
-    conversations,
-    currentConversation,
-    messages,
-    loading,
-    sendingMessage,
-    errors,
-    messageInput,
-    setMessageInput,
-    videoCallStatus,
-    sendMessage,
-    startVideoCall,
-    endVideoCall,
-    // AI monitoring states
-    violations,
-    latestReport,
-    monitoringEnabled,
-    toggleMonitoring,
-    monitoringLoading,
-    // Encryption and retention states
-    encryptionEnabled,
-    toggleEncryption,
-    retentionPolicy,
-    updateRetentionPolicy
-  } = useMessages(messagesOptions.conversationId, messagesOptions.currentUserId);
+    conversations = [],
+    currentConversation = null,
+    messages = [],
+    loading = false,
+    sendingMessage = false,
+    errors = {},
+    messageInput = "",
+    setMessageInput = () => {},
+    videoCallStatus = { isActive: false, waliPresent: false },
+    sendMessage = () => Promise.resolve(),
+    startVideoCall = () => {},
+    endVideoCall = () => {},
+    violations = [],
+    latestReport = null,
+    monitoringEnabled = false,
+    toggleMonitoring = () => {},
+    monitoringLoading = false,
+    encryptionEnabled = false,
+    toggleEncryption = () => {},
+    retentionPolicy = {},
+    updateRetentionPolicy = () => {}
+  } = messagesHookResult || {};
 
-  // Debug logs and error handling - only log when necessary
+  // Debug logs - only when conversation changes
   useEffect(() => {
     const conversationChanged = prevConversationId.current !== conversationId;
-    prevConversationId.current = conversationId;
     
-    if (!initialRenderDone.current || conversationChanged) {
-      if (!loading && !userLoading) {
+    if (conversationChanged) {
+      prevConversationId.current = conversationId;
+      
+      if (!loading && !userLoading && !initialRenderDone.current) {
         initialRenderDone.current = true;
-        
-        console.log("Current conversation ID:", conversationId);
-        console.log("Current user ID:", currentUserId);
-        console.log("Is demo conversation:", isDemoConversation);
+        console.log("Messages component initialized with conversation:", conversationId);
       }
     }
-  }, [conversationId, currentUserId, isDemoConversation, loading, userLoading]);
+  }, [conversationId, loading, userLoading]);
 
-  // Handle errors separately to prevent render loops - only show toast once per error
+  // Handle errors - only show once per unique error
   useEffect(() => {
-    if (errors?.messages && errors.messages !== prevErrorRef.current) {
-      console.error("Message error:", errors.messages);
-      prevErrorRef.current = errors.messages;
+    const currentError = errors?.messages;
+    
+    if (currentError && 
+        currentError !== prevErrorRef.current && 
+        !toastShownRef.current) {
+      
+      console.error("Message error:", currentError);
+      prevErrorRef.current = currentError;
+      toastShownRef.current = true;
       
       toast({
         variant: "destructive",
         title: "Error loading messages",
-        description: errors.messages
+        description: currentError
       });
+      
+      // Reset toast flag after a delay
+      setTimeout(() => {
+        toastShownRef.current = false;
+      }, 5000);
+    } else if (!currentError) {
+      // Reset refs when error is cleared
+      prevErrorRef.current = null;
+      toastShownRef.current = false;
     }
   }, [errors?.messages]);
 
@@ -102,7 +112,7 @@ const Messages = () => {
     return (
       <DemoConversation
         conversationId={conversationId}
-        currentUserId={currentUserId || 'current-user'} // Default to 'current-user' for demo
+        currentUserId={currentUserId || 'current-user'}
         demoMessages={demoMessages}
         setDemoMessages={setDemoMessages}
       />
@@ -113,12 +123,12 @@ const Messages = () => {
     <RegularConversation
       conversationId={conversationId}
       currentUserId={currentUserId || ''}
-      conversations={conversations || []}
+      conversations={conversations}
       currentConversation={currentConversation}
-      messages={messages || []}
+      messages={messages}
       loading={loading}
       sendingMessage={sendingMessage}
-      errors={errors || {}}
+      errors={errors}
       messageInput={messageInput}
       setMessageInput={setMessageInput}
       videoCallStatus={videoCallStatus}

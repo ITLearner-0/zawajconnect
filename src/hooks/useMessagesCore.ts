@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Conversation } from '@/types/profile';
 import { useConversations } from './useConversations';
 import { useMessageHandling } from './useMessageHandling';
@@ -10,7 +10,10 @@ import { useAIMonitoring } from './useAIMonitoring';
 import { useVideoCall } from './useVideoCall';
 
 export const useMessagesCore = (conversationId?: string, currentUserId?: string | null) => {
-  const [errors, setErrors] = useState<{ 
+  // Use refs to track previous values and prevent unnecessary updates
+  const prevConversationId = useRef(conversationId);
+  const prevCurrentUserId = useRef(currentUserId);
+  const errorsRef = useRef<{ 
     conversations: string | null; 
     videoCall: string | null; 
     monitoring?: string | null 
@@ -20,7 +23,16 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
     monitoring: null
   });
 
-  // Import all required hooks
+  const [errors, setErrors] = useState(errorsRef.current);
+
+  // Stable function to update errors
+  const updateErrors = useCallback((newErrors: Partial<typeof errors>) => {
+    const updatedErrors = { ...errorsRef.current, ...newErrors };
+    errorsRef.current = updatedErrors;
+    setErrors(updatedErrors);
+  }, []);
+
+  // Import all required hooks with stable parameters
   const { 
     conversations, 
     currentConversation, 
@@ -47,15 +59,24 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
 
   const { violations } = useMessageModeration(conversationId, messages, currentUserId);
 
-  // Update errors from different parts
-  if (conversationsError) {
-    setErrors(prev => ({ ...prev, conversations: conversationsError }));
+  // Update errors only when they actually change
+  if (conversationsError && conversationsError !== errorsRef.current.conversations) {
+    updateErrors({ conversations: conversationsError });
   }
 
-  // Combine and integrate the functionality
-  const sendMessage = async () => {
-    await sendMessageBase();
-  };
+  // Stable send message function
+  const sendMessage = useCallback(async () => {
+    try {
+      await sendMessageBase();
+    } catch (error) {
+      console.error('Error sending message:', error);
+    }
+  }, [sendMessageBase]);
+
+  // Stable fetch messages function  
+  const stableFetchMessages = useCallback(() => {
+    return fetchMessages(encryptionEnabled);
+  }, [fetchMessages, encryptionEnabled]);
 
   return {
     // Conversations
@@ -66,7 +87,7 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
     // Messages
     messages,
     loading,
-    fetchMessages: () => fetchMessages(encryptionEnabled),
+    fetchMessages: stableFetchMessages,
     sendingMessage,
     messageInput,
     setMessageInput,

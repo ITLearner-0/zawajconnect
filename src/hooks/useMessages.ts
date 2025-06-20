@@ -1,16 +1,32 @@
 
 import { useMessagesCore } from './useMessagesCore';
-import { useMemo } from 'react';
+import { useMemo, useRef } from 'react';
 
 export const useMessages = (conversationId?: string, currentUserId?: string | null) => {
-  // Memoize inputs to prevent excessive re-renders
-  const inputs = useMemo(() => ({ conversationId, currentUserId }), [conversationId, currentUserId]);
+  // Use refs to stabilize inputs and prevent excessive re-renders
+  const conversationIdRef = useRef(conversationId);
+  const currentUserIdRef = useRef(currentUserId);
   
-  // Delegate to the core implementation with better error handling
-  const messagesData = useMessagesCore(inputs.conversationId, inputs.currentUserId);
+  // Only update refs when values actually change
+  if (conversationIdRef.current !== conversationId) {
+    conversationIdRef.current = conversationId;
+  }
+  
+  if (currentUserIdRef.current !== currentUserId) {
+    currentUserIdRef.current = currentUserId;
+  }
+  
+  // Memoize inputs with stable references
+  const stableInputs = useMemo(() => ({
+    conversationId: conversationIdRef.current,
+    currentUserId: currentUserIdRef.current
+  }), [conversationIdRef.current, currentUserIdRef.current]);
+  
+  // Delegate to the core implementation with stabilized inputs
+  const messagesData = useMessagesCore(stableInputs.conversationId, stableInputs.currentUserId);
   
   // Return with defaulted values to prevent undefined issues
-  return {
+  return useMemo(() => ({
     ...messagesData,
     conversations: messagesData.conversations || [],
     messages: messagesData.messages || [],
@@ -33,5 +49,5 @@ export const useMessages = (conversationId?: string, currentUserId?: string | nu
     latestReport: messagesData.latestReport || null,
     fetchMessages: messagesData.fetchMessages || (() => Promise.resolve()),
     setMessageInput: messagesData.setMessageInput || (() => {}),
-  };
+  }), [messagesData]);
 };
