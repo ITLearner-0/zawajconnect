@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CustomButton from "@/components/CustomButton";
@@ -16,6 +15,19 @@ interface ManagedUser {
   last_name: string;
   is_verified: boolean;
   wali_verified: boolean;
+}
+
+interface ProfileData {
+  id: string;
+  first_name: string;
+  last_name: string;
+  is_verified: boolean;
+  wali_verified: boolean;
+}
+
+interface AuthUser {
+  id: string;
+  email?: string;
 }
 
 const WaliManagement: React.FC = () => {
@@ -59,21 +71,25 @@ const WaliManagement: React.FC = () => {
         }
 
         // Get auth users to get emails
-        const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+        const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
         
         if (authError) {
           console.error('Error fetching auth users:', authError);
           return;
         }
 
-        // Combine profile and auth data
-        const combinedUsers = profiles?.map(profile => {
-          const authUser = authUsers.users.find(u => u.id === profile.id);
+        // Combine profile and auth data with proper typing
+        const combinedUsers: ManagedUser[] = (profiles || []).map((profile: ProfileData) => {
+          const authUser = authData.users.find((u: AuthUser) => u.id === profile.id);
           return {
-            ...profile,
+            id: profile.id,
+            first_name: profile.first_name,
+            last_name: profile.last_name,
+            is_verified: profile.is_verified,
+            wali_verified: profile.wali_verified,
             email: authUser?.email || ''
           };
-        }) || [];
+        });
 
         setManagedUsers(combinedUsers);
       }
