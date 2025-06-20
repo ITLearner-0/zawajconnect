@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CustomButton from "@/components/CustomButton";
@@ -15,19 +16,6 @@ interface ManagedUser {
   last_name: string;
   is_verified: boolean;
   wali_verified: boolean;
-}
-
-interface ProfileData {
-  id: string;
-  first_name: string;
-  last_name: string;
-  is_verified: boolean;
-  wali_verified: boolean;
-}
-
-interface AuthUser {
-  id: string;
-  email?: string;
 }
 
 const WaliManagement: React.FC = () => {
@@ -59,7 +47,7 @@ const WaliManagement: React.FC = () => {
       }
 
       if (waliProfile?.managed_users?.length) {
-        // Fetch profiles of managed users
+        // Fetch profiles of managed users with basic info
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
           .select('id, first_name, last_name, is_verified, wali_verified')
@@ -70,28 +58,18 @@ const WaliManagement: React.FC = () => {
           return;
         }
 
-        // Get auth users to get emails
-        const { data: authData, error: authError } = await supabase.auth.admin.listUsers();
-        
-        if (authError) {
-          console.error('Error fetching auth users:', authError);
-          return;
-        }
+        // For now, we'll use placeholder emails since we can't access auth.users from frontend
+        // In a real implementation, you'd need to store email in profiles table or use an edge function
+        const managedUsersData: ManagedUser[] = (profiles || []).map((profile) => ({
+          id: profile.id,
+          first_name: profile.first_name || '',
+          last_name: profile.last_name || '',
+          is_verified: profile.is_verified || false,
+          wali_verified: profile.wali_verified || false,
+          email: `user-${profile.id.slice(0, 8)}@example.com` // Placeholder email
+        }));
 
-        // Combine profile and auth data with proper typing
-        const combinedUsers: ManagedUser[] = (profiles || []).map((profile: ProfileData) => {
-          const authUser = authData.users.find((u: AuthUser) => u.id === profile.id);
-          return {
-            id: profile.id,
-            first_name: profile.first_name,
-            last_name: profile.last_name,
-            is_verified: profile.is_verified,
-            wali_verified: profile.wali_verified,
-            email: authUser?.email || ''
-          };
-        });
-
-        setManagedUsers(combinedUsers);
+        setManagedUsers(managedUsersData);
       }
     } catch (error) {
       console.error('Error in fetchManagedUsers:', error);
