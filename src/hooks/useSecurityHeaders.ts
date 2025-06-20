@@ -33,11 +33,9 @@ export const useSecurityHeaders = () => {
 
     setSecurityMeta();
 
-    // Prevent clickjacking
-    if (window.self !== window.top) {
-      window.top!.location = window.self.location;
-    }
-
+    // Remove the clickjacking protection as it's causing security errors in iframe contexts
+    // This would normally check if (window.self !== window.top) but that's not secure in iframes
+    
     // Disable right-click context menu on sensitive areas (optional)
     const handleContextMenu = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
