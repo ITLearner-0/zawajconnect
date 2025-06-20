@@ -14,30 +14,42 @@ export const useProfileInteractions = (profile: DatabaseProfile) => {
   const hasWali = profile.wali_name && profile.wali_contact;
   
   const handleMessage = async () => {
+    console.log("handleMessage called for profile:", profile.id, "gender:", profile.gender, "hasWali:", hasWali);
+    
     if (profile.gender === 'Female' && hasWali) {
       // For female profiles with wali, show the request dialog
+      console.log("Showing wali request dialog for messaging");
       setRequestType('message');
       setWaliRequestDialogOpen(true);
     } else {
       // For male profiles or females without wali, direct message
-      // Check if this is a demo profile (ID starts with 'user-')
-      console.log("Navigating to messages with profile ID:", profile.id);
-      navigate(`/messages/${profile.id}`);
-      toast({
-        title: "Starting conversation",
-        description: `You're about to message ${profile.first_name}.`,
-      });
+      console.log("Navigating directly to messages with profile ID:", profile.id);
+      try {
+        navigate(`/messages/${profile.id}`);
+        toast({
+          title: "Starting conversation",
+          description: `You're about to message ${profile.first_name}.`,
+        });
+      } catch (error) {
+        console.error("Navigation error:", error);
+        toast({
+          title: "Navigation Error",
+          description: "Failed to start conversation. Please try again.",
+          variant: "destructive"
+        });
+      }
     }
   };
   
   const handleVideoCall = async () => {
+    console.log("handleVideoCall called for profile:", profile.id);
+    
     if (profile.gender === 'Female' && hasWali) {
       // For female profiles with wali, show the request dialog
       setRequestType('video');
       setWaliRequestDialogOpen(true);
     } else {
       // For male profiles or females without wali, direct video call
-      // First navigate to messages and then initiate a video call
       console.log("Starting video call with profile ID:", profile.id);
       navigate(`/messages/${profile.id}`);
       toast({
