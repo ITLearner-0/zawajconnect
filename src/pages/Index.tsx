@@ -9,6 +9,7 @@ import Footer from "@/components/home/Footer";
 import Divider from "@/components/home/Divider";
 import SectionTransition from "@/components/home/SectionTransition";
 import PerformanceMonitor from "@/components/ui/PerformanceMonitor";
+import PerformanceWidget from "@/components/monitoring/PerformanceWidget";
 import { useTranslation } from "react-i18next";
 
 const Index = () => {
@@ -58,6 +59,7 @@ const Index = () => {
 
       <Footer />
       <PerformanceMonitor />
+      <PerformanceWidget />
     </div>
   );
 };
