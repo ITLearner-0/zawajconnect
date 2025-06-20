@@ -53,7 +53,7 @@ const ProfileFormSections: React.FC<ProfileFormSectionsProps> = ({
   };
 
   return (
-    <>
+    <div className="space-y-8">
       <BasicInfoSection 
         formData={formData} 
         handleChange={handleChange}
@@ -97,7 +97,7 @@ const ProfileFormSections: React.FC<ProfileFormSectionsProps> = ({
         onToggleAccountVisibility={onToggleAccountVisibility}
         onUnblockUser={onUnblockUser}
       />
-    </>
+    </div>
   );
 };
 

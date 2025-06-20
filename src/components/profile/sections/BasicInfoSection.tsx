@@ -14,6 +14,7 @@ interface BasicInfoSectionProps {
 const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleChange, handleSelectChange }) => {
   return (
     <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Informations de Base</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="fullName">Nom Complet</Label>
@@ -23,6 +24,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
             value={formData.fullName || ""}
             onChange={handleChange}
             placeholder="Entrez votre nom complet"
+            className="w-full"
           />
         </div>
         
@@ -37,16 +39,17 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
             placeholder="Votre âge"
             min="18"
             max="120"
+            className="w-full"
           />
         </div>
         
         <div className="space-y-2">
           <Label htmlFor="gender">Genre</Label>
           <Select value={formData.gender || ""} onValueChange={(value) => handleSelectChange("gender", value)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Sélectionnez votre genre" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-gray-800 border shadow-lg z-50">
               <SelectItem value="male">Homme</SelectItem>
               <SelectItem value="female">Femme</SelectItem>
             </SelectContent>
@@ -61,6 +64,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
             value={formData.location || ""}
             onChange={handleChange}
             placeholder="Ville, Pays"
+            className="w-full"
           />
         </div>
       </div>

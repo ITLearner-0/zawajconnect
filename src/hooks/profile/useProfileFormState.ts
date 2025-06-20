@@ -13,15 +13,25 @@ export const useProfileFormState = ({ initialFormData }: UseProfileFormStateProp
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+    console.log(`Form field changed: ${name} = ${value}`);
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
+  const handleSelectChange = (field: keyof ProfileFormData, value: string) => {
+    console.log(`Select field changed: ${field} = ${value}`);
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   return {
     formData,
     handleChange,
+    handleSelectChange,
     setFormData
   };
 };

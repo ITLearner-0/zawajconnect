@@ -42,14 +42,15 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
 
   return (
     <div className="space-y-4">
+      <h3 className="text-lg font-semibold">Pratique Religieuse</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="religiousLevel">Niveau de Pratique Religieuse</Label>
           <Select value={formData.religiousLevel || ""} onValueChange={(value) => handleSelectChange("religiousLevel", value)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Sélectionnez votre niveau de pratique" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-gray-800 border shadow-lg z-50">
               {religiousLevels.map((level) => (
                 <SelectItem key={level.value} value={level.value}>
                   {level.label}
@@ -62,10 +63,10 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
         <div className="space-y-2">
           <Label htmlFor="prayerFrequency">Fréquence de Prière</Label>
           <Select value={formData.prayerFrequency || ""} onValueChange={(value) => handleSelectChange("prayerFrequency", value)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Sélectionnez votre fréquence de prière" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-gray-800 border shadow-lg z-50">
               {prayerFrequencies.map((frequency) => (
                 <SelectItem key={frequency.value} value={frequency.value}>
                   {frequency.label}
@@ -85,14 +86,14 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
               : "Acceptez-vous la polygamie ?"}
           </Label>
           <Select value={formData.polygamyStance || ""} onValueChange={(value) => handleSelectChange("polygamyStance", value)}>
-            <SelectTrigger>
+            <SelectTrigger className="w-full">
               <SelectValue placeholder={
                 formData.gender === "male" 
                   ? "Sélectionnez votre position sur la polygamie" 
                   : "Sélectionnez votre position sur la polygamie"
               } />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white dark:bg-gray-800 border shadow-lg z-50">
               {(formData.gender === "male" ? polygamyOptionsForMen : polygamyOptionsForWomen).map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -111,6 +112,7 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
           value={formData.familyBackground || ""}
           onChange={handleChange}
           placeholder="Décrivez votre contexte familial"
+          className="w-full"
         />
       </div>
     </div>
