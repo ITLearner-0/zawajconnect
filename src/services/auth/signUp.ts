@@ -70,19 +70,19 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     // The profile will be automatically created by the handle_new_user trigger
     // We don't need to manually create it here since the trigger handles it
 
-    // Enhanced success message with clear email verification instructions
-    toast.success("Compte créé avec succès !", {
-      description: "Un email de validation vient d'être envoyé à votre adresse. Veuillez vérifier votre boîte de réception et cliquer sur le lien de confirmation pour activer votre compte.",
-      duration: 8000, // Show longer to ensure user reads it
+    // Clear success message about account creation and email verification
+    toast.success("🎉 Compte créé avec succès !", {
+      description: "Votre compte a été créé. Un email de confirmation a été envoyé à votre adresse.",
+      duration: 6000,
     });
 
-    // Additional info toast for clarity
+    // Important follow-up message about email verification requirement
     setTimeout(() => {
-      toast.info("Vérification requise", {
-        description: "Vous devez confirmer votre email avant de pouvoir vous connecter. Vérifiez aussi vos spams si vous ne trouvez pas l'email.",
+      toast.info("📧 Vérification requise", {
+        description: "Veuillez vérifier votre boîte email et cliquer sur le lien de confirmation pour activer votre compte. Vérifiez aussi vos spams si nécessaire.",
         duration: 10000,
       });
-    }, 2000);
+    }, 1500);
 
     return true;
   } catch (error: any) {
