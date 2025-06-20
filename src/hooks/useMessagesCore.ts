@@ -17,7 +17,7 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
     conversations: string | null; 
     messages: string | null;
     videoCall: string | null; 
-    monitoring?: string | null 
+    monitoring: string | null 
   }>({
     conversations: null,
     messages: null,
@@ -47,7 +47,7 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
   const { encryptionEnabled, toggleEncryption } = useMessageEncryption(conversationId);
   const { retentionPolicy, updateRetentionPolicy } = useMessageRetention(conversationId);
   const { videoCallStatus, startVideoCall, endVideoCall } = useVideoCall(conversationId, currentUserId);
-  const { latestReport, monitoringEnabled, toggleMonitoring, loading: monitoringLoading } = useAIMonitoring(conversationId);
+  const { latestReport, monitoringEnabled, toggleMonitoring, loading: monitoringLoading, error: monitoringError } = useAIMonitoring(conversationId);
   
   const {
     messages,
@@ -76,6 +76,13 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
       updateErrors({ conversations: conversationsError });
     }
   }, [conversationsError, updateErrors]);
+
+  // Update monitoring errors
+  useEffect(() => {
+    if (monitoringError && monitoringError !== errorsRef.current.monitoring) {
+      updateErrors({ monitoring: monitoringError });
+    }
+  }, [monitoringError, updateErrors]);
 
   // Stable send message function
   const sendMessage = useCallback(async () => {
@@ -109,7 +116,7 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
     setMessageInput,
     sendMessage,
     
-    // Combined errors
+    // Combined errors with proper typing
     errors: {
       conversations: errorsRef.current.conversations,
       messages: messageErrors.messages,

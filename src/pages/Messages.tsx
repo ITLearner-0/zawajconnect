@@ -30,7 +30,7 @@ const Messages = () => {
   // Use messages hook with stable parameters
   const messagesHookResult = useMessages(conversationId, currentUserId);
   
-  // Destructure with safe defaults
+  // Destructure with safe defaults and proper error handling
   const {
     conversations = [],
     currentConversation = null,

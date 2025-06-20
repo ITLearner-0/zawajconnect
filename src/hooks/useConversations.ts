@@ -53,7 +53,7 @@ export const useConversations = (userId: string | null) => {
               // Get the most recent message for this conversation
               const { data: messagesData, error: msgError } = await supabase
                 .from('messages')
-                .select('id, content, created_at, sender_id, is_read')
+                .select('id, content, created_at, sender_id, is_read, conversation_id, is_wali_visible')
                 .eq('conversation_id', conv.id)
                 .order('created_at', { ascending: false })
                 .limit(1);
@@ -62,7 +62,16 @@ export const useConversations = (userId: string | null) => {
                 console.warn('Messages fetch error for conversation:', conv.id, msgError);
               }
               
-              const lastMessage = messagesData && messagesData.length > 0 ? messagesData[0] : null;
+              // Create properly typed Message object
+              const lastMessage: Message | undefined = messagesData && messagesData.length > 0 ? {
+                id: messagesData[0].id,
+                content: messagesData[0].content,
+                created_at: messagesData[0].created_at,
+                sender_id: messagesData[0].sender_id,
+                is_read: messagesData[0].is_read,
+                conversation_id: messagesData[0].conversation_id,
+                is_wali_visible: messagesData[0].is_wali_visible
+              } : undefined;
               
               processedConversations.push({
                 id: conv.id,
@@ -80,7 +89,7 @@ export const useConversations = (userId: string | null) => {
                 id: conv.id,
                 created_at: conv.created_at,
                 participants: conv.participants,
-                last_message: null,
+                last_message: undefined,
                 profile: undefined,
                 wali_supervised: conv.wali_supervised
               });
