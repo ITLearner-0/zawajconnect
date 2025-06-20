@@ -7,13 +7,14 @@ import { useDemoMessages } from '@/hooks/useDemoMessages';
 import DemoConversation from '@/components/messaging/demo/DemoConversation';
 import RegularConversation from '@/components/messaging/regular/RegularConversation';
 import { toast } from '@/hooks/use-toast';
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo, useCallback } from 'react';
 
 const Messages = () => {
   const { conversationId } = useParams<{ conversationId: string }>();
   
   // Use ref to track initial render and prevent excessive logging
   const initialRenderDone = useRef(false);
+  const prevConversationId = useRef(conversationId);
   
   // Get current user session
   const { currentUserId, loading: userLoading } = useUserSession();
@@ -24,10 +25,10 @@ const Messages = () => {
   // Get user profile data
   const { profileData: userData } = useProfileData(currentUserId);
   
-  // Use conversationId from useParams for real conversations - memoize options to prevent re-renders
+  // Memoize the messages options to prevent re-renders
   const messagesOptions = useMemo(() => ({
-    conversationId,
-    currentUserId
+    conversationId: conversationId || undefined,
+    currentUserId: currentUserId || undefined
   }), [conversationId, currentUserId]);
   
   const {
@@ -56,28 +57,38 @@ const Messages = () => {
     updateRetentionPolicy
   } = useMessages(messagesOptions.conversationId, messagesOptions.currentUserId);
 
-  // Debug logs and error handling - only log on first render or when key values change
+  // Stable error handler to prevent re-renders
+  const handleError = useCallback((error: string) => {
+    toast({
+      variant: "destructive",
+      title: "Error loading messages",
+      description: error
+    });
+  }, [toast]);
+
+  // Debug logs and error handling - only log when necessary
   useEffect(() => {
-    if (!initialRenderDone.current && !loading && !userLoading) {
-      // Set ref to true to prevent future logs unless errors change
-      initialRenderDone.current = true;
-      
-      // Only log once to prevent console spam
-      console.log("Current conversation ID:", conversationId);
-      console.log("Current user ID:", currentUserId);
-      console.log("Is demo conversation:", isDemoConversation);
-    }
+    const conversationChanged = prevConversationId.current !== conversationId;
+    prevConversationId.current = conversationId;
     
-    // Log errors separately so they're always reported
-    if (errors?.messages) {
-      console.error("Message error:", errors.messages);
-      toast({
-        variant: "destructive",
-        title: "Error loading messages",
-        description: errors.messages
-      });
+    if (!initialRenderDone.current || conversationChanged) {
+      if (!loading && !userLoading) {
+        initialRenderDone.current = true;
+        
+        console.log("Current conversation ID:", conversationId);
+        console.log("Current user ID:", currentUserId);
+        console.log("Is demo conversation:", isDemoConversation);
+      }
     }
-  }, [conversationId, currentUserId, isDemoConversation, errors?.messages, loading, userLoading]);
+  }, [conversationId, currentUserId, isDemoConversation, loading, userLoading]);
+
+  // Handle errors separately to prevent render loops
+  useEffect(() => {
+    if (errors?.messages && errors.messages !== prevConversationId.current) {
+      console.error("Message error:", errors.messages);
+      handleError(errors.messages);
+    }
+  }, [errors?.messages, handleError]);
 
   // Loading state
   if (userLoading) {
