@@ -12,6 +12,8 @@ interface BasicInfoSectionProps {
 }
 
 const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleChange, handleSelectChange }) => {
+  console.log("BasicInfoSection rendering with formData:", formData);
+  
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Informations de Base</h3>

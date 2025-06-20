@@ -10,6 +10,8 @@ interface AboutSectionProps {
 }
 
 const AboutSection: React.FC<AboutSectionProps> = ({ formData, handleChange }) => {
+  console.log("AboutSection rendering with aboutMe:", formData.aboutMe);
+  
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">À Propos de Moi</h3>

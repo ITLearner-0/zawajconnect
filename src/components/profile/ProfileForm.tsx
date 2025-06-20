@@ -43,6 +43,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   const handleSectionChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     
+    console.log(`Form field change event: ${name} = ${value}`);
+    
     // Validate the field based on its type
     let isValid = true;
     
@@ -75,13 +77,13 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
         }
     }
     
-    if (isValid) {
-      handleChange(name as keyof ProfileFormData, value);
-    }
+    // Always call handleChange regardless of validation for real-time updates
+    handleChange(name as keyof ProfileFormData, value);
   }, [handleChange, validateField]);
 
   // Handle select changes (for components that use onValueChange)
   const handleSelectChange = React.useCallback((field: keyof ProfileFormData, value: string) => {
+    console.log(`Form select change: ${field} = ${value}`);
     handleChange(field, value);
   }, [handleChange]);
   
