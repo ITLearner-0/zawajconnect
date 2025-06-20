@@ -13,6 +13,7 @@ import Demo from './pages/Demo';
 import UserProfile from './pages/UserProfile';
 import Compatibility from './pages/Compatibility';
 import Subscription from './pages/Subscription';
+import Navigation from './components/layout/Navigation';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import AuthProvider from './contexts/AuthContext';
@@ -37,6 +38,7 @@ function App() {
           >
             <Router>
               <AuthProvider>
+                <Navigation />
                 <Routes>
                   <Route path="/" element={
                     <RouteErrorBoundary routeName="Home">
