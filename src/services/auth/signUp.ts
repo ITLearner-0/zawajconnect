@@ -129,9 +129,19 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
       }
     }
 
-    toast.success("Inscription réussie", {
-      description: "Veuillez vérifier votre email pour confirmer votre compte avant de vous connecter"
+    // Enhanced success message with clear email verification instructions
+    toast.success("Compte créé avec succès !", {
+      description: "Un email de validation vient d'être envoyé à votre adresse. Veuillez vérifier votre boîte de réception et cliquer sur le lien de confirmation pour activer votre compte.",
+      duration: 8000, // Show longer to ensure user reads it
     });
+
+    // Additional info toast for clarity
+    setTimeout(() => {
+      toast.info("Vérification requise", {
+        description: "Vous devez confirmer votre email avant de pouvoir vous connecter. Vérifiez aussi vos spams si vous ne trouvez pas l'email.",
+        duration: 10000,
+      });
+    }, 2000);
 
     return true;
   } catch (error: any) {
