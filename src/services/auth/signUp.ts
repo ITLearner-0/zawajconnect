@@ -52,13 +52,13 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
         toast.error("Email déjà utilisé", {
           description: "Un compte existe déjà avec cette adresse email"
         });
-      } else if (error.message.includes("rate limit")) {
+      } else if (error.message.includes("rate limit") || error.code === "over_email_send_rate_limit") {
         toast.error("Limite de fréquence atteinte", {
-          description: "Trop de tentatives d'inscription. Veuillez attendre quelques minutes avant de réessayer."
+          description: "Trop de tentatives d'inscription récentes. Veuillez attendre quelques minutes avant de réessayer."
         });
       } else {
         toast.error("Erreur d'inscription", {
-          description: "Veuillez vérifier vos informations et réessayer"
+          description: error.message || "Veuillez vérifier vos informations et réessayer"
         });
       }
       
@@ -67,28 +67,28 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
 
     console.log("Signup successful, user data:", userData);
 
-    // The profile will be automatically created by the handle_new_user trigger
-    // We don't need to manually create it here since the trigger handles it
-
-    // Clear success message about account creation and email verification
-    toast.success("🎉 Compte créé avec succès !", {
-      description: "Votre compte a été créé. Un email de confirmation a été envoyé à votre adresse.",
-      duration: 6000,
-    });
-
-    // Important follow-up message about email verification requirement
-    setTimeout(() => {
-      toast.info("📧 Vérification requise", {
-        description: "Veuillez vérifier votre boîte email et cliquer sur le lien de confirmation pour activer votre compte. Vérifiez aussi vos spams si nécessaire.",
-        duration: 10000,
+    // Show success messages only when signup actually succeeds
+    if (userData?.user) {
+      // Clear success message about account creation and email verification
+      toast.success("🎉 Compte créé avec succès !", {
+        description: "Votre compte a été créé. Un email de confirmation a été envoyé à votre adresse.",
+        duration: 6000,
       });
-    }, 1500);
+
+      // Important follow-up message about email verification requirement
+      setTimeout(() => {
+        toast.info("📧 Vérification requise", {
+          description: "Veuillez vérifier votre boîte email et cliquer sur le lien de confirmation pour activer votre compte. Vérifiez aussi vos spams si nécessaire.",
+          duration: 10000,
+        });
+      }, 1500);
+    }
 
     return true;
   } catch (error: any) {
     console.error("Authentication error:", error);
     toast.error("Erreur inattendue", {
-      description: "Veuillez réessayer"
+      description: "Une erreur inattendue s'est produite. Veuillez réessayer."
     });
     return false;
   }
