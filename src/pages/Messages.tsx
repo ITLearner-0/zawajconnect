@@ -7,7 +7,7 @@ import { useDemoMessages } from '@/hooks/useDemoMessages';
 import DemoConversation from '@/components/messaging/demo/DemoConversation';
 import RegularConversation from '@/components/messaging/regular/RegularConversation';
 import { toast } from '@/hooks/use-toast';
-import { useEffect, useRef, useMemo, useCallback } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 
 const Messages = () => {
   const { conversationId } = useParams<{ conversationId: string }>();
@@ -15,6 +15,7 @@ const Messages = () => {
   // Use ref to track initial render and prevent excessive logging
   const initialRenderDone = useRef(false);
   const prevConversationId = useRef(conversationId);
+  const prevErrorRef = useRef<string | null>(null);
   
   // Get current user session
   const { currentUserId, loading: userLoading } = useUserSession();
@@ -57,15 +58,6 @@ const Messages = () => {
     updateRetentionPolicy
   } = useMessages(messagesOptions.conversationId, messagesOptions.currentUserId);
 
-  // Stable error handler to prevent re-renders
-  const handleError = useCallback((error: string) => {
-    toast({
-      variant: "destructive",
-      title: "Error loading messages",
-      description: error
-    });
-  }, [toast]);
-
   // Debug logs and error handling - only log when necessary
   useEffect(() => {
     const conversationChanged = prevConversationId.current !== conversationId;
@@ -82,13 +74,19 @@ const Messages = () => {
     }
   }, [conversationId, currentUserId, isDemoConversation, loading, userLoading]);
 
-  // Handle errors separately to prevent render loops
+  // Handle errors separately to prevent render loops - only show toast once per error
   useEffect(() => {
-    if (errors?.messages && errors.messages !== prevConversationId.current) {
+    if (errors?.messages && errors.messages !== prevErrorRef.current) {
       console.error("Message error:", errors.messages);
-      handleError(errors.messages);
+      prevErrorRef.current = errors.messages;
+      
+      toast({
+        variant: "destructive",
+        title: "Error loading messages",
+        description: errors.messages
+      });
     }
-  }, [errors?.messages, handleError]);
+  }, [errors?.messages]);
 
   // Loading state
   if (userLoading) {
