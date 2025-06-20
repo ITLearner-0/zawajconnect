@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
@@ -47,6 +48,8 @@ export const useProfileFetcher = (userId?: string | null) => {
         setLoading(true);
         setError(null);
 
+        console.log("Fetching profile for user:", userId);
+
         // Get user email
         const email = await getUserEmail();
         setUserEmail(email);
@@ -74,7 +77,7 @@ export const useProfileFetcher = (userId?: string | null) => {
           }
 
           // Set default data for new user
-          setProfileData({
+          const defaultFormData: ProfileFormData = {
             fullName: '',
             age: '',
             gender: '',
@@ -91,14 +94,17 @@ export const useProfileFetcher = (userId?: string | null) => {
             waliContact: '',
             profilePicture: '',
             gallery: []
-          });
+          };
           
+          console.log("Setting default form data for new user:", defaultFormData);
+          setProfileData(defaultFormData);
           setPrivacySettings(DEFAULT_PRIVACY_SETTINGS);
           setBlockedUsers([]);
           setIsAccountVisible(true);
         } else {
           // Existing user - map database data to form data
           const profileRecord = profile[0];
+          console.log("Found existing profile:", profileRecord);
           
           const mappedData: ProfileFormData = {
             fullName: `${profileRecord.first_name || ''} ${profileRecord.last_name || ''}`.trim(),
@@ -119,6 +125,7 @@ export const useProfileFetcher = (userId?: string | null) => {
             gallery: profileRecord.gallery || []
           };
 
+          console.log("Mapped profile data:", mappedData);
           setProfileData(mappedData);
           setIsNewUser(false);
 

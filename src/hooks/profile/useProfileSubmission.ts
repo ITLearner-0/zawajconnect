@@ -59,7 +59,8 @@ export const useProfileSubmission = () => {
         first_name: firstName,
         last_name: lastName,
         privacy_settings: privacySettings,
-        is_visible: true
+        is_visible: true,
+        updated_at: new Date().toISOString()
       };
 
       // Add all other fields, preserving existing values
@@ -111,6 +112,7 @@ export const useProfileSubmission = () => {
 
       // Call the success callback with the original profile data to maintain form state
       if (onSuccess) {
+        console.log("Calling onSuccess callback with profile data");
         onSuccess(profileData);
       }
 
