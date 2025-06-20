@@ -29,24 +29,6 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
       waliContact
     });
     
-    // Check if user already exists
-    const { data: existingUsers, error: checkError } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("id", email)
-      .maybeSingle();
-      
-    if (checkError) {
-      console.error("Error checking existing user:", checkError);
-    }
-
-    if (existingUsers) {
-      toast.error("Email déjà utilisé", {
-        description: "Un compte existe déjà avec cette adresse email"
-      });
-      return false;
-    }
-    
     // Register the user with proper redirect URL and email confirmation required
     const redirectUrl = `${window.location.origin}/profile`;
     
@@ -66,9 +48,13 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     if (error) {
       console.error("Signup error:", error);
       
-      if (error.message.includes("already registered")) {
+      if (error.message.includes("already registered") || error.message.includes("already exists")) {
         toast.error("Email déjà utilisé", {
           description: "Un compte existe déjà avec cette adresse email"
+        });
+      } else if (error.message.includes("rate limit")) {
+        toast.error("Limite de fréquence atteinte", {
+          description: "Trop de tentatives d'inscription. Veuillez attendre quelques minutes avant de réessayer."
         });
       } else {
         toast.error("Erreur d'inscription", {
@@ -81,53 +67,8 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
 
     console.log("Signup successful, user data:", userData);
 
-    if (userData.user) {
-      console.log("Creating profile for user:", userData.user.id);
-      
-      // Extract first and last name from sanitized fullName
-      const nameParts = (sanitizedData.fullName || fullName).split(' ');
-      const sanitizedFirstName = nameParts[0] || firstName;
-      const sanitizedLastName = nameParts.slice(1).join(' ') || lastName;
-      
-      // Create profile data object with sanitized input
-      const profileInsert = {
-        id: userData.user.id,
-        first_name: sanitizedFirstName,
-        last_name: sanitizedLastName,
-        gender: gender || null,
-        birth_date: new Date().toISOString().split('T')[0], 
-        location: "Not specified",
-        prayer_frequency: "Not specified", 
-        religious_practice_level: "Not specified",
-        about_me: "",
-        education_level: "",
-        occupation: "",
-        is_visible: true,
-        email_verified: false,
-        phone_verified: false,
-        id_verified: false,
-        wali_verified: false,
-        wali_name: gender === "female" ? (sanitizedData.waliName || null) : null,
-        wali_relationship: gender === "female" ? (sanitizedData.waliRelationship || null) : null,
-        wali_contact: gender === "female" ? (sanitizedData.waliContact || null) : null
-      };
-      
-      console.log("Inserting profile data:", profileInsert);
-
-      // Create initial profile
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert(profileInsert);
-
-      if (profileError) {
-        console.error("Error creating initial profile:", profileError);
-        toast.error("Erreur de création du profil", {
-          description: profileError.message
-        });
-      } else {
-        console.log("Profile created successfully");
-      }
-    }
+    // The profile will be automatically created by the handle_new_user trigger
+    // We don't need to manually create it here since the trigger handles it
 
     // Enhanced success message with clear email verification instructions
     toast.success("Compte créé avec succès !", {
