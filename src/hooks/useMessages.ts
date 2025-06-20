@@ -30,7 +30,7 @@ export const useMessages = (conversationId?: string, currentUserId?: string | nu
     ...messagesData,
     conversations: messagesData.conversations || [],
     messages: messagesData.messages || [],
-    errors: messagesData.errors || { conversations: null, messages: null, videoCall: null },
+    errors: messagesData.errors || { conversations: null, messages: null, videoCall: null, monitoring: null },
     messageInput: messagesData.messageInput || "",
     loading: messagesData.loading || false,
     sendingMessage: messagesData.sendingMessage || false,
