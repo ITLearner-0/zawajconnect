@@ -55,15 +55,16 @@ const WaliDashboard: React.FC = () => {
   return (
     <div className="container mx-auto py-6 space-y-6">
       <WaliHeader 
-        waliProfile={waliProfile} 
+        profile={waliProfile} 
+        statistics={statistics}
         onSignOut={handleSignOut}
       />
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <WaliStats statistics={statistics} />
         <AvailabilityControls 
-          currentStatus={waliProfile?.availability_status || 'offline'}
-          onStatusChange={updateAvailabilityStatus}
+          availabilityStatus={waliProfile?.availability_status || 'offline'}
+          onUpdateAvailability={updateAvailabilityStatus}
         />
       </div>
 
@@ -97,7 +98,7 @@ const WaliDashboard: React.FC = () => {
 
         <TabsContent value="requests">
           <ChatRequestsPanel
-            requests={chatRequests}
+            chatRequests={chatRequests}
             onApprove={handleApproveRequest}
             onReject={handleRejectRequest}
             onAddNote={addWaliNote}
@@ -111,7 +112,7 @@ const WaliDashboard: React.FC = () => {
         <TabsContent value="monitoring">
           <MonitoringPanel 
             flaggedContent={flaggedContent}
-            onResolve={resolveFlaggedContent}
+            resolveFlaggedContent={resolveFlaggedContent}
           />
         </TabsContent>
       </Tabs>

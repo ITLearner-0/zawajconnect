@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import CustomButton from "@/components/CustomButton";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
@@ -141,13 +141,13 @@ const WaliManagement: React.FC = () => {
               placeholder="Enter user's email address"
               type="email"
             />
-            <Button 
+            <CustomButton 
               onClick={linkUserToWali}
               disabled={loading || !newUserEmail.trim()}
               isLoading={loading}
             >
               Link User
-            </Button>
+            </CustomButton>
           </div>
           <p className="text-sm text-muted-foreground mt-2">
             Enter the email address of a user you want to supervise
@@ -196,14 +196,14 @@ const WaliManagement: React.FC = () => {
                   </div>
                   <div className="flex gap-2">
                     {!managedUser.is_verified && (
-                      <Button
+                      <CustomButton
                         size="sm"
                         variant="outline"
                         onClick={() => sendVerificationReminder(managedUser.email)}
                       >
                         <Mail className="h-4 w-4 mr-1" />
                         Remind
-                      </Button>
+                      </CustomButton>
                     )}
                   </div>
                 </div>
