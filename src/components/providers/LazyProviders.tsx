@@ -1,6 +1,6 @@
 
 import React, { lazy, Suspense } from 'react';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 import { ProviderErrorBoundary } from './ProviderErrorBoundary';
 
 // Lazy load heavy providers

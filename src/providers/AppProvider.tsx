@@ -1,4 +1,3 @@
-
 import React, { Suspense } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -9,7 +8,7 @@ import AuthProvider from '@/contexts/AuthContext';
 import { SecurityProvider } from '@/components/security/SecurityProvider';
 import { MonitoringProvider } from '@/components/monitoring/MonitoringProvider';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 // Create a stable query client instance
 const queryClient = new QueryClient({
