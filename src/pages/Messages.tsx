@@ -30,14 +30,14 @@ const Messages = () => {
   // Use messages hook with stable parameters
   const messagesHookResult = useMessages(conversationId, currentUserId);
   
-  // Destructure with defaults to prevent undefined issues
+  // Destructure with defaults to prevent undefined issues - ensure proper error structure
   const {
     conversations = [],
     currentConversation = null,
     messages = [],
     loading = false,
     sendingMessage = false,
-    errors = {},
+    errors = { conversations: null, messages: null, videoCall: null, monitoring: null },
     messageInput = "",
     setMessageInput = () => {},
     videoCallStatus = { isActive: false, waliPresent: false },
@@ -53,7 +53,29 @@ const Messages = () => {
     toggleEncryption = () => {},
     retentionPolicy = {},
     updateRetentionPolicy = () => {}
-  } = messagesHookResult || {};
+  } = messagesHookResult || {
+    conversations: [],
+    currentConversation: null,
+    messages: [],
+    loading: false,
+    sendingMessage: false,
+    errors: { conversations: null, messages: null, videoCall: null, monitoring: null },
+    messageInput: "",
+    setMessageInput: () => {},
+    videoCallStatus: { isActive: false, waliPresent: false },
+    sendMessage: () => Promise.resolve(),
+    startVideoCall: () => {},
+    endVideoCall: () => {},
+    violations: [],
+    latestReport: null,
+    monitoringEnabled: false,
+    toggleMonitoring: () => {},
+    monitoringLoading: false,
+    encryptionEnabled: false,
+    toggleEncryption: () => {},
+    retentionPolicy: {},
+    updateRetentionPolicy: () => {}
+  };
 
   // Debug logs - only when conversation changes
   useEffect(() => {
@@ -71,7 +93,8 @@ const Messages = () => {
 
   // Handle errors - only show once per unique error
   useEffect(() => {
-    const currentError = errors?.messages;
+    // Ensure errors is properly structured
+    const currentError = errors && typeof errors === 'object' && 'messages' in errors ? errors.messages : null;
     
     if (currentError && 
         currentError !== prevErrorRef.current && 
@@ -96,7 +119,7 @@ const Messages = () => {
       prevErrorRef.current = null;
       toastShownRef.current = false;
     }
-  }, [errors?.messages]);
+  }, [errors]);
 
   // Loading state
   if (userLoading) {
