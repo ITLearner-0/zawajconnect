@@ -2,18 +2,17 @@
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProfileFormData } from "@/types/profile";
 
 interface BasicInfoSectionProps {
   formData: ProfileFormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
+  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleSelectChange: (field: keyof ProfileFormData, value: string) => void;
 }
 
 const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleChange, handleSelectChange }) => {
-  console.log("BasicInfoSection rendering with formData:", formData);
-  
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Informations de Base</h3>
@@ -25,11 +24,11 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
             name="fullName"
             value={formData.fullName || ""}
             onChange={handleChange}
-            placeholder="Entrez votre nom complet"
+            placeholder="Votre nom complet"
             className="w-full"
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="age">Âge</Label>
           <Input
@@ -39,12 +38,10 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
             value={formData.age || ""}
             onChange={handleChange}
             placeholder="Votre âge"
-            min="18"
-            max="120"
             className="w-full"
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="gender">Genre</Label>
           <Select value={formData.gender || ""} onValueChange={(value) => handleSelectChange("gender", value)}>
@@ -57,7 +54,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
             </SelectContent>
           </Select>
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="location">Localisation</Label>
           <Input
@@ -65,10 +62,26 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
             name="location"
             value={formData.location || ""}
             onChange={handleChange}
-            placeholder="Ville, Pays"
+            placeholder="Votre ville/région"
             className="w-full"
           />
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="familyBackground">Contexte Familial</Label>
+        <Textarea
+          id="familyBackground"
+          name="familyBackground"
+          value={formData.familyBackground || ""}
+          onChange={handleChange}
+          placeholder="Décrivez votre contexte familial"
+          rows={6}
+          className="min-h-[200px] w-full resize-vertical"
+        />
+        <p className="text-sm text-muted-foreground">
+          Décrivez votre famille, vos valeurs familiales et votre environnement
+        </p>
       </div>
     </div>
   );
