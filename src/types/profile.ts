@@ -1,8 +1,10 @@
 
+
 export interface VerificationStatus {
   email: boolean;
   phone: boolean;
   id: boolean;
+  wali: boolean;
 }
 
 export interface PrivacySettings {
@@ -61,6 +63,9 @@ export interface DatabaseProfile {
   is_visible: boolean;
   is_verified: boolean;
   blocked_users?: string[];
+  content_flags?: any[];
+  moderation_status?: string;
+  last_moderation_date?: string;
   photo_blur_settings?: {
     blur_profile_picture: boolean;
     blur_gallery_photos: boolean;
@@ -109,6 +114,7 @@ export interface VideoCallStatus {
   isActive: boolean;
   participantId?: string;
   waliPresent?: boolean;
+  startTime?: Date;
 }
 
 // Retention policy
@@ -146,3 +152,4 @@ export interface ContentReport {
   reviewed_by?: string;
   moderator_notes?: string;
 }
+
