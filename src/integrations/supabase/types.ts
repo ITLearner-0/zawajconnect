@@ -158,6 +158,53 @@ export type Database = {
         }
         Relationships: []
       }
+      document_verifications: {
+        Row: {
+          created_at: string | null
+          document_type: string
+          document_url: string
+          id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_notes: string | null
+          status: string | null
+          submitted_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          document_type: string
+          document_url: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          document_type?: string
+          document_url?: string
+          id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_notes?: string | null
+          status?: string | null
+          submitted_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_verifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_notifications: {
         Row: {
           created_at: string | null
@@ -250,6 +297,12 @@ export type Database = {
           birth_date: string | null
           blocked_users: string[] | null
           created_at: string | null
+          document_verification_notes: string | null
+          document_verification_reviewed_at: string | null
+          document_verification_reviewed_by: string | null
+          document_verification_status: string | null
+          document_verification_submitted_at: string | null
+          document_verification_type: string | null
           education_level: string | null
           email_verified: boolean | null
           first_name: string | null
@@ -261,8 +314,10 @@ export type Database = {
           is_visible: boolean | null
           last_name: string | null
           location: string | null
+          madhab: string | null
           occupation: string | null
           phone_verified: boolean | null
+          photo_blur_settings: Json | null
           polygamy_stance: string | null
           prayer_frequency: string | null
           privacy_settings: Json | null
@@ -280,6 +335,12 @@ export type Database = {
           birth_date?: string | null
           blocked_users?: string[] | null
           created_at?: string | null
+          document_verification_notes?: string | null
+          document_verification_reviewed_at?: string | null
+          document_verification_reviewed_by?: string | null
+          document_verification_status?: string | null
+          document_verification_submitted_at?: string | null
+          document_verification_type?: string | null
           education_level?: string | null
           email_verified?: boolean | null
           first_name?: string | null
@@ -291,8 +352,10 @@ export type Database = {
           is_visible?: boolean | null
           last_name?: string | null
           location?: string | null
+          madhab?: string | null
           occupation?: string | null
           phone_verified?: boolean | null
+          photo_blur_settings?: Json | null
           polygamy_stance?: string | null
           prayer_frequency?: string | null
           privacy_settings?: Json | null
@@ -310,6 +373,12 @@ export type Database = {
           birth_date?: string | null
           blocked_users?: string[] | null
           created_at?: string | null
+          document_verification_notes?: string | null
+          document_verification_reviewed_at?: string | null
+          document_verification_reviewed_by?: string | null
+          document_verification_status?: string | null
+          document_verification_submitted_at?: string | null
+          document_verification_type?: string | null
           education_level?: string | null
           email_verified?: boolean | null
           first_name?: string | null
@@ -321,8 +390,10 @@ export type Database = {
           is_visible?: boolean | null
           last_name?: string | null
           location?: string | null
+          madhab?: string | null
           occupation?: string | null
           phone_verified?: boolean | null
+          photo_blur_settings?: Json | null
           polygamy_stance?: string | null
           prayer_frequency?: string | null
           privacy_settings?: Json | null
@@ -427,6 +498,39 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          created_at: string | null
+          device_info: Json | null
+          expires_at: string | null
+          id: string
+          ip_address: unknown | null
+          last_activity: string | null
+          session_token: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          device_info?: Json | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          last_activity?: string | null
+          session_token: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          device_info?: Json | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          last_activity?: string | null
+          session_token?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -651,6 +755,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_expired_sessions: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       confirm_wali_invitation: {
         Args: { token: string; confirming_user_id: string }
         Returns: boolean
@@ -677,6 +785,10 @@ export type Database = {
       }
       link_wali_to_user: {
         Args: { wali_user_id: string; managed_user_email: string }
+        Returns: boolean
+      }
+      update_session_activity: {
+        Args: { session_token: string }
         Returns: boolean
       }
     }

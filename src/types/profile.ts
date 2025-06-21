@@ -1,3 +1,4 @@
+
 export interface ProfileFormData {
   fullName: string;
   age: string;
@@ -15,6 +16,7 @@ export interface ProfileFormData {
   waliContact?: string;
   profilePicture?: string;
   gallery?: string[];
+  madhab?: string; // New field for Islamic school of jurisprudence
 }
 
 export interface DatabaseProfile {
@@ -47,6 +49,19 @@ export interface DatabaseProfile {
   role?: 'user' | 'admin' | 'moderator';
   created_at: string;
   updated_at: string;
+  madhab?: string; // New field
+  document_verification_status?: string; // New field
+  document_verification_type?: string; // New field
+  document_verification_submitted_at?: string; // New field
+  document_verification_reviewed_at?: string; // New field
+  document_verification_reviewed_by?: string; // New field
+  document_verification_notes?: string; // New field
+  photo_blur_settings?: {
+    blur_profile_picture: boolean;
+    blur_gallery_photos: boolean;
+    blur_until_approved: boolean;
+    blur_for_non_matches: boolean;
+  }; // New field
 }
 
 export interface PrivacySettings {

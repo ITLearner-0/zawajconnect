@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
+import { PhotoBlurSettings } from '@/types/documents';
 import BasicInformation from './BasicInformation';
 import EducationCareer from './EducationCareer';
 import ReligiousBackground from './ReligiousBackground';
@@ -8,8 +9,11 @@ import AboutMe from './AboutMe';
 import WaliInformation from './WaliInformation';
 import VerificationPanel from './VerificationPanel';
 import EnhancedPrivacySettings from './EnhancedPrivacySettings';
+import PhotoBlurSettings from './PhotoBlurSettings';
+import DocumentVerification from './DocumentVerification';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
+import { useDocumentVerification } from '@/hooks/useDocumentVerification';
 
 interface ProfileFormWithEnhancedPrivacyProps {
   formData: ProfileFormData;
@@ -25,6 +29,8 @@ interface ProfileFormWithEnhancedPrivacyProps {
   onToggleAccountVisibility: () => Promise<void>;
   onUnblockUser: (userId: string) => Promise<void>;
   userId?: string;
+  photoBlurSettings?: PhotoBlurSettings;
+  onPhotoBlurSettingsChange?: (settings: PhotoBlurSettings) => Promise<void>;
 }
 
 const ProfileFormWithEnhancedPrivacy = ({
@@ -40,8 +46,19 @@ const ProfileFormWithEnhancedPrivacy = ({
   handlePrivacySettingsChange,
   onToggleAccountVisibility,
   onUnblockUser,
-  userId
+  userId,
+  photoBlurSettings,
+  onPhotoBlurSettingsChange
 }: ProfileFormWithEnhancedPrivacyProps) => {
+  const { verifications, refetchVerifications } = useDocumentVerification(userId);
+
+  const defaultPhotoBlurSettings: PhotoBlurSettings = {
+    blur_profile_picture: false,
+    blur_gallery_photos: false,
+    blur_until_approved: false,
+    blur_for_non_matches: true
+  };
+
   return (
     <div className="space-y-6">
       <form className="space-y-6">
@@ -90,6 +107,23 @@ const ProfileFormWithEnhancedPrivacy = ({
           onPrivacyChange={handlePrivacySettingsChange}
           onToggleAccountVisibility={onToggleAccountVisibility}
           onUnblockUser={onUnblockUser}
+        />
+      )}
+
+      {/* Photo Blur Settings */}
+      {userId && onPhotoBlurSettingsChange && (
+        <PhotoBlurSettings
+          settings={photoBlurSettings || defaultPhotoBlurSettings}
+          onChange={onPhotoBlurSettingsChange}
+        />
+      )}
+
+      {/* Document Verification */}
+      {userId && (
+        <DocumentVerification
+          userId={userId}
+          verifications={verifications}
+          onVerificationSubmitted={refetchVerifications}
         />
       )}
     </div>
