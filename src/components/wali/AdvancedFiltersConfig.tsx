@@ -9,16 +9,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Filter, 
   Plus, 
+  Edit, 
   Trash2, 
-  Settings, 
-  MessageSquare,
-  Clock,
-  Users,
+  Save, 
   Shield,
+  Clock,
+  MessageSquare,
+  Users,
+  CheckCircle,
   AlertTriangle
 } from 'lucide-react';
 import { AdvancedFiltersService, WaliFilter, FilterConfig } from '@/services/wali/advancedFilters';
@@ -28,13 +29,11 @@ interface AdvancedFiltersConfigProps {
   wali_id: string;
 }
 
-const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({
-  wali_id
-}) => {
+const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }) => {
   const { toast } = useToast();
   const [filters, setFilters] = useState<WaliFilter[]>([]);
-  const [selectedFilter, setSelectedFilter] = useState<WaliFilter | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [editingFilter, setEditingFilter] = useState<WaliFilter | null>(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     filter_name: '',
@@ -87,11 +86,11 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({
       if (result.success) {
         toast({
           title: "Filtre créé",
-          description: "Le filtre a été créé avec succès",
+          description: "Le nouveau filtre a été créé avec succès",
         });
         setShowCreateForm(false);
-        loadFilters();
         resetForm();
+        loadFilters();
       } else {
         toast({
           title: "Erreur",
@@ -108,37 +107,23 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({
     }
   };
 
-  const handleToggleFilter = async (filter: WaliFilter) => {
+  const handleToggleFilter = async (filterId: string, isActive: boolean) => {
     try {
-      const result = await AdvancedFiltersService.updateFilter(filter.id, {
-        is_active: !filter.is_active
-      });
-
+      const result = await AdvancedFiltersService.updateFilter(filterId, { is_active: isActive });
       if (result.success) {
-        setFilters(prev => prev.map(f => 
-          f.id === filter.id ? { ...f, is_active: !f.is_active } : f
-        ));
         toast({
-          title: "Filtre mis à jour",
-          description: `Filtre ${filter.is_active ? 'désactivé' : 'activé'}`,
+          title: isActive ? "Filtre activé" : "Filtre désactivé",
+          description: "Le statut du filtre a été mis à jour",
         });
+        loadFilters();
       }
     } catch (error) {
       toast({
         title: "Erreur",
-        description: "Impossible de mettre à jour le filtre",
+        description: "Impossible de modifier le filtre",
         variant: "destructive"
       });
     }
-  };
-
-  const loadTemplate = (template: Partial<WaliFilter>) => {
-    setFormData({
-      filter_name: template.filter_name || '',
-      filter_type: template.filter_type || '',
-      filter_config: template.filter_config || {}
-    });
-    setShowCreateForm(true);
   };
 
   const resetForm = () => {
@@ -147,36 +132,23 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({
       filter_type: '',
       filter_config: {}
     });
+    setEditingFilter(null);
   };
 
-  const updateConfigField = (field: string, value: any) => {
+  const loadTemplate = (template: Partial<WaliFilter>) => {
+    setFormData({
+      filter_name: template.filter_name || '',
+      filter_type: template.filter_type || '',
+      filter_config: template.filter_config || {}
+    });
+  };
+
+  const updateFilterConfig = (key: string, value: any) => {
     setFormData(prev => ({
       ...prev,
       filter_config: {
         ...prev.filter_config,
-        [field]: value
-      }
-    }));
-  };
-
-  const addToArrayField = (field: string, value: string) => {
-    if (!value.trim()) return;
-    
-    setFormData(prev => ({
-      ...prev,
-      filter_config: {
-        ...prev.filter_config,
-        [field]: [...(prev.filter_config[field as keyof FilterConfig] as string[] || []), value]
-      }
-    }));
-  };
-
-  const removeFromArrayField = (field: string, index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      filter_config: {
-        ...prev.filter_config,
-        [field]: (prev.filter_config[field as keyof FilterConfig] as string[] || []).filter((_, i) => i !== index)
+        [key]: value
       }
     }));
   };
@@ -191,57 +163,36 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({
     }
   };
 
-  const renderConfigForm = () => {
+  const getFilterTypeLabel = (type: string) => {
+    switch (type) {
+      case 'content': return 'Contenu';
+      case 'behavior': return 'Comportement';
+      case 'time': return 'Temporel';
+      case 'contact': return 'Contact';
+      default: return type;
+    }
+  };
+
+  const renderFilterConfigForm = () => {
     switch (formData.filter_type) {
       case 'content':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Mots Interdits</Label>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Ajouter un mot interdit"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addToArrayField('blocked_words', e.currentTarget.value);
-                      e.currentTarget.value = '';
-                    }
-                  }}
-                />
-                <Button type="button" size="sm">Ajouter</Button>
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {(formData.filter_config.blocked_words || []).map((word, index) => (
-                  <Badge key={index} variant="secondary" className="cursor-pointer" onClick={() => removeFromArrayField('blocked_words', index)}>
-                    {word} ×
-                  </Badge>
-                ))}
-              </div>
+            <div>
+              <Label>Mots Interdits (séparés par des virgules)</Label>
+              <Textarea
+                value={formData.filter_config.blocked_words?.join(', ') || ''}
+                onChange={(e) => updateFilterConfig('blocked_words', e.target.value.split(',').map(w => w.trim()).filter(Boolean))}
+                placeholder="mot1, mot2, mot3..."
+              />
             </div>
-
-            <div className="space-y-2">
-              <Label>Phrases Interdites</Label>
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Ajouter une phrase interdite"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addToArrayField('blocked_phrases', e.currentTarget.value);
-                      e.currentTarget.value = '';
-                    }
-                  }}
-                />
-                <Button type="button" size="sm">Ajouter</Button>
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {(formData.filter_config.blocked_phrases || []).map((phrase, index) => (
-                  <Badge key={index} variant="secondary" className="cursor-pointer" onClick={() => removeFromArrayField('blocked_phrases', index)}>
-                    {phrase} ×
-                  </Badge>
-                ))}
-              </div>
+            <div>
+              <Label>Phrases Interdites (séparées par des virgules)</Label>
+              <Textarea
+                value={formData.filter_config.blocked_phrases?.join(', ') || ''}
+                onChange={(e) => updateFilterConfig('blocked_phrases', e.target.value.split(',').map(p => p.trim()).filter(Boolean))}
+                placeholder="phrase1, phrase2..."
+              />
             </div>
           </div>
         );
@@ -249,21 +200,21 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({
       case 'behavior':
         return (
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Messages Maximum par Heure</Label>
+            <div>
+              <Label>Nombre maximum de messages par heure</Label>
               <Input
                 type="number"
                 value={formData.filter_config.max_messages_per_hour || ''}
-                onChange={(e) => updateConfigField('max_messages_per_hour', parseInt(e.target.value))}
+                onChange={(e) => updateFilterConfig('max_messages_per_hour', parseInt(e.target.value) || 0)}
                 placeholder="10"
               />
             </div>
-            <div className="space-y-2">
-              <Label>Messages Consécutifs Maximum</Label>
+            <div>
+              <Label>Messages consécutifs maximum</Label>
               <Input
                 type="number"
                 value={formData.filter_config.max_consecutive_messages || ''}
-                onChange={(e) => updateConfigField('max_consecutive_messages', parseInt(e.target.value))}
+                onChange={(e) => updateFilterConfig('max_consecutive_messages', parseInt(e.target.value) || 0)}
                 placeholder="3"
               />
             </div>
@@ -274,20 +225,20 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({
         return (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Heure de Début</Label>
+              <div>
+                <Label>Heure de début autorisée</Label>
                 <Input
                   type="time"
                   value={formData.filter_config.allowed_hours_start || ''}
-                  onChange={(e) => updateConfigField('allowed_hours_start', e.target.value)}
+                  onChange={(e) => updateFilterConfig('allowed_hours_start', e.target.value)}
                 />
               </div>
-              <div className="space-y-2">
-                <Label>Heure de Fin</Label>
+              <div>
+                <Label>Heure de fin autorisée</Label>
                 <Input
                   type="time"
                   value={formData.filter_config.allowed_hours_end || ''}
-                  onChange={(e) => updateConfigField('allowed_hours_end', e.target.value)}
+                  onChange={(e) => updateFilterConfig('allowed_hours_end', e.target.value)}
                 />
               </div>
             </div>
@@ -300,16 +251,16 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({
             <div className="flex items-center space-x-2">
               <Switch
                 checked={formData.filter_config.require_wali_approval || false}
-                onCheckedChange={(checked) => updateConfigField('require_wali_approval', checked)}
+                onCheckedChange={(checked) => updateFilterConfig('require_wali_approval', checked)}
               />
-              <Label>Approbation Wali Requise</Label>
+              <Label>Nécessite l'approbation du wali</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Switch
                 checked={formData.filter_config.auto_approve_known_contacts || false}
-                onCheckedChange={(checked) => updateConfigField('auto_approve_known_contacts', checked)}
+                onCheckedChange={(checked) => updateFilterConfig('auto_approve_known_contacts', checked)}
               />
-              <Label>Approuver Automatiquement les Contacts Connus</Label>
+              <Label>Approuver automatiquement les contacts connus</Label>
             </div>
           </div>
         );
@@ -337,9 +288,9 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Filter className="h-6 w-6" />
-            Filtres Avancés de Gestion
+            Filtres Avancés
           </h2>
-          <p className="text-muted-foreground">Configurez des filtres personnalisés pour la supervision</p>
+          <p className="text-muted-foreground">Configurez des filtres automatiques pour la modération</p>
         </div>
         <Button onClick={() => setShowCreateForm(true)}>
           <Plus className="mr-2 h-4 w-4" />
@@ -347,143 +298,142 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({
         </Button>
       </div>
 
-      <Tabs defaultValue="active" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="active">Filtres Actifs</TabsTrigger>
-          <TabsTrigger value="templates">Modèles</TabsTrigger>
-          <TabsTrigger value="create" disabled={!showCreateForm}>Créer</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="active" className="space-y-4">
-          {filters.length === 0 ? (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <Filter className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="font-medium mb-2">Aucun Filtre Configuré</h3>
-                <p className="text-muted-foreground mb-4">
-                  Créez des filtres personnalisés pour automatiser la supervision
-                </p>
-                <Button onClick={() => setShowCreateForm(true)}>
-                  Créer Votre Premier Filtre
+      {/* Templates */}
+      {!showCreateForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Modèles de Filtres</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {AdvancedFiltersService.getFilterTemplates().map((template, index) => (
+                <Button
+                  key={index}
+                  variant="outline"
+                  className="h-auto p-4 flex flex-col items-start"
+                  onClick={() => {
+                    loadTemplate(template);
+                    setShowCreateForm(true);
+                  }}
+                >
+                  {getFilterIcon(template.filter_type || '')}
+                  <span className="font-medium mt-2">{template.filter_name}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {getFilterTypeLabel(template.filter_type || '')}
+                  </span>
                 </Button>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="grid gap-4">
-              {filters.map((filter) => (
-                <Card key={filter.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        {getFilterIcon(filter.filter_type)}
-                        <div>
-                          <h3 className="font-medium">{filter.filter_name}</h3>
-                          <p className="text-sm text-muted-foreground capitalize">
-                            Filtre {filter.filter_type}
-                          </p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <Badge variant={filter.is_active ? "default" : "secondary"}>
-                          {filter.is_active ? 'Actif' : 'Inactif'}
-                        </Badge>
-                        <Switch
-                          checked={filter.is_active}
-                          onCheckedChange={() => handleToggleFilter(filter)}
-                        />
-                        <Button size="sm" variant="ghost">
-                          <Settings className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
               ))}
             </div>
-          )}
-        </TabsContent>
+          </CardContent>
+        </Card>
+      )}
 
-        <TabsContent value="templates" className="space-y-4">
-          <div className="grid gap-4">
-            {AdvancedFiltersService.getFilterTemplates().map((template, index) => (
-              <Card key={index}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
+      {/* Create/Edit Form */}
+      {showCreateForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {editingFilter ? 'Modifier le Filtre' : 'Créer un Nouveau Filtre'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleCreateFilter} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Nom du Filtre *</Label>
+                  <Input
+                    value={formData.filter_name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, filter_name: e.target.value }))}
+                    placeholder="Nom descriptif du filtre"
+                  />
+                </div>
+                <div>
+                  <Label>Type de Filtre *</Label>
+                  <Select
+                    value={formData.filter_type}
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, filter_type: value, filter_config: {} }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionnez le type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="content">Contenu</SelectItem>
+                      <SelectItem value="behavior">Comportement</SelectItem>
+                      <SelectItem value="time">Temporel</SelectItem>
+                      <SelectItem value="contact">Contact</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {formData.filter_type && renderFilterConfigForm()}
+
+              <div className="flex gap-2">
+                <Button type="submit">
+                  <Save className="mr-2 h-4 w-4" />
+                  {editingFilter ? 'Modifier' : 'Créer'}
+                </Button>
+                <Button type="button" variant="outline" onClick={() => {
+                  setShowCreateForm(false);
+                  resetForm();
+                }}>
+                  Annuler
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Active Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Filtres Actifs
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {filters.length === 0 ? (
+            <p className="text-center text-muted-foreground py-4">
+              Aucun filtre configuré
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {filters.map((filter) => (
+                <div key={filter.id} className="border rounded-lg p-4">
+                  <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      {getFilterIcon(template.filter_type || '')}
+                      {getFilterIcon(filter.filter_type)}
                       <div>
-                        <h3 className="font-medium">{template.filter_name}</h3>
-                        <p className="text-sm text-muted-foreground capitalize">
-                          Modèle de filtre {template.filter_type}
+                        <h3 className="font-medium">{filter.filter_name}</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Type: {getFilterTypeLabel(filter.filter_type)}
                         </p>
                       </div>
                     </div>
-                    <Button onClick={() => loadTemplate(template)} size="sm">
-                      Utiliser ce Modèle
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={filter.is_active}
+                        onCheckedChange={(checked) => handleToggleFilter(filter.id, checked)}
+                      />
+                      <Button size="sm" variant="outline">
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        {showCreateForm && (
-          <TabsContent value="create">
-            <Card>
-              <CardHeader>
-                <CardTitle>Créer un Nouveau Filtre</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleCreateFilter} className="space-y-4">
-                  <Alert>
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription>
-                      Les filtres s'appliquent automatiquement à toutes les conversations supervisées.
-                    </AlertDescription>
-                  </Alert>
-
-                  <div className="space-y-2">
-                    <Label>Nom du Filtre *</Label>
-                    <Input
-                      value={formData.filter_name}
-                      onChange={(e) => setFormData(prev => ({ ...prev, filter_name: e.target.value }))}
-                      placeholder="Nom descriptif du filtre"
-                    />
+                  
+                  <div className="text-sm">
+                    <Badge variant={filter.is_active ? "default" : "secondary"}>
+                      {filter.is_active ? "Actif" : "Inactif"}
+                    </Badge>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label>Type de Filtre *</Label>
-                    <Select value={formData.filter_type} onValueChange={(value) => setFormData(prev => ({ ...prev, filter_type: value, filter_config: {} }))}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Sélectionnez le type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="content">Filtrage de Contenu</SelectItem>
-                        <SelectItem value="behavior">Comportement Utilisateur</SelectItem>
-                        <SelectItem value="time">Restrictions Temporelles</SelectItem>
-                        <SelectItem value="contact">Gestion des Contacts</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {renderConfigForm()}
-
-                  <div className="flex gap-2 pt-4">
-                    <Button type="button" variant="outline" onClick={() => { setShowCreateForm(false); resetForm(); }}>
-                      Annuler
-                    </Button>
-                    <Button type="submit">
-                      Créer le Filtre
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        )}
-      </Tabs>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 };

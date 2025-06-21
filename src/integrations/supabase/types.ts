@@ -205,6 +205,65 @@ export type Database = {
           },
         ]
       }
+      family_relationship_verifications: {
+        Row: {
+          community_references: string[] | null
+          created_at: string
+          documents_submitted: string[] | null
+          id: string
+          managed_user_id: string
+          relationship_type: string
+          updated_at: string
+          verification_method: string
+          verification_notes: string
+          verification_status: string
+          verified_at: string | null
+          verified_by: string | null
+          wali_id: string
+          witness_contacts: string[] | null
+        }
+        Insert: {
+          community_references?: string[] | null
+          created_at?: string
+          documents_submitted?: string[] | null
+          id?: string
+          managed_user_id: string
+          relationship_type: string
+          updated_at?: string
+          verification_method: string
+          verification_notes?: string
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          wali_id: string
+          witness_contacts?: string[] | null
+        }
+        Update: {
+          community_references?: string[] | null
+          created_at?: string
+          documents_submitted?: string[] | null
+          id?: string
+          managed_user_id?: string
+          relationship_type?: string
+          updated_at?: string
+          verification_method?: string
+          verification_notes?: string
+          verification_status?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          wali_id?: string
+          witness_contacts?: string[] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_relationship_verifications_wali_id_fkey"
+            columns: ["wali_id"]
+            isOneToOne: false
+            referencedRelation: "wali_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_notifications: {
         Row: {
           created_at: string | null
@@ -575,6 +634,110 @@ export type Database = {
           },
         ]
       }
+      wali_delegations: {
+        Row: {
+          activated_at: string | null
+          created_at: string
+          delegate_wali_id: string
+          delegation_type: string
+          end_date: string
+          id: string
+          managed_user_id: string
+          permissions: Json
+          primary_wali_id: string
+          reason: string
+          revoked_at: string | null
+          start_date: string
+          status: string
+        }
+        Insert: {
+          activated_at?: string | null
+          created_at?: string
+          delegate_wali_id: string
+          delegation_type: string
+          end_date: string
+          id?: string
+          managed_user_id: string
+          permissions?: Json
+          primary_wali_id: string
+          reason: string
+          revoked_at?: string | null
+          start_date: string
+          status?: string
+        }
+        Update: {
+          activated_at?: string | null
+          created_at?: string
+          delegate_wali_id?: string
+          delegation_type?: string
+          end_date?: string
+          id?: string
+          managed_user_id?: string
+          permissions?: Json
+          primary_wali_id?: string
+          reason?: string
+          revoked_at?: string | null
+          start_date?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wali_delegations_delegate_wali_id_fkey"
+            columns: ["delegate_wali_id"]
+            isOneToOne: false
+            referencedRelation: "wali_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wali_delegations_primary_wali_id_fkey"
+            columns: ["primary_wali_id"]
+            isOneToOne: false
+            referencedRelation: "wali_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wali_filters: {
+        Row: {
+          created_at: string
+          filter_config: Json
+          filter_name: string
+          filter_type: string
+          id: string
+          is_active: boolean
+          updated_at: string
+          wali_id: string
+        }
+        Insert: {
+          created_at?: string
+          filter_config?: Json
+          filter_name: string
+          filter_type: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          wali_id: string
+        }
+        Update: {
+          created_at?: string
+          filter_config?: Json
+          filter_name?: string
+          filter_type?: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+          wali_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wali_filters_wali_id_fkey"
+            columns: ["wali_id"]
+            isOneToOne: false
+            referencedRelation: "wali_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wali_invitations: {
         Row: {
           confirmed_at: string | null
@@ -616,6 +779,56 @@ export type Database = {
           {
             foreignKeyName: "wali_invitations_wali_profile_id_fkey"
             columns: ["wali_profile_id"]
+            isOneToOne: false
+            referencedRelation: "wali_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wali_onboarding_progress: {
+        Row: {
+          attempts: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          module_id: string
+          progress_percentage: number
+          quiz_score: number | null
+          started_at: string | null
+          status: string
+          updated_at: string
+          wali_id: string
+        }
+        Insert: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module_id: string
+          progress_percentage?: number
+          quiz_score?: number | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          wali_id: string
+        }
+        Update: {
+          attempts?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          module_id?: string
+          progress_percentage?: number
+          quiz_score?: number | null
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+          wali_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wali_onboarding_progress_wali_id_fkey"
+            columns: ["wali_id"]
             isOneToOne: false
             referencedRelation: "wali_profiles"
             referencedColumns: ["id"]
