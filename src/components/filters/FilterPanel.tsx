@@ -7,6 +7,7 @@ import AgeRangeFilter from './AgeRangeFilter';
 import PracticeLevelFilter from './PracticeLevelFilter';
 import EducationFilter from './EducationFilter';
 import AdvancedFilterPanel from './AdvancedFilterPanel';
+import EnhancedAdvancedFilterPanel from './EnhancedAdvancedFilterPanel';
 import SavedFilters from './SavedFilters';
 import FilterActions from './FilterActions';
 import SaveFilterForm from './SaveFilterForm';
@@ -67,9 +68,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ onApplyFilters }) => {
       <h3 className="text-lg font-semibold">{t('nearby.filterMatches')}</h3>
       
       <Tabs defaultValue="basic" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="basic">{t('nearby.basicFilters')}</TabsTrigger>
-          <TabsTrigger value="advanced">{t('nearby.advancedFilters')}</TabsTrigger>
+          <TabsTrigger value="advanced">Avancés</TabsTrigger>
+          <TabsTrigger value="enhanced">Complets</TabsTrigger>
         </TabsList>
         
         <TabsContent value="basic" className="space-y-4">
@@ -107,6 +109,27 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ onApplyFilters }) => {
           <AdvancedFilterPanel 
             filters={filters.advanced || {}}
             onFiltersChange={(advanced) => handleFilterChange('advanced', advanced)}
+          />
+          
+          <FilterActions 
+            onApply={handleApplyFilters}
+            onReset={handleResetFilters}
+            onShowSaveForm={handleShowSaveForm}
+            showSaveForm={showSaveForm}
+          />
+          
+          {showSaveForm && (
+            <SaveFilterForm 
+              onSave={handleSaveFilter}
+              onCancel={() => setShowSaveForm(false)}
+            />
+          )}
+        </TabsContent>
+
+        <TabsContent value="enhanced" className="space-y-4">
+          <EnhancedAdvancedFilterPanel 
+            filters={filters.enhanced || {}}
+            onFiltersChange={(enhanced) => handleFilterChange('enhanced', enhanced)}
           />
           
           <FilterActions 

@@ -33,6 +33,10 @@ export interface ProfileFormData {
   gallery: string[];
   polygamyStance?: string;
   profilePicture?: string;
+  languages?: string[];
+  maritalStatus?: string;
+  spokenLanguages?: string[];
+  preferredLanguages?: string[];
 }
 
 // Database profile interface
@@ -55,6 +59,10 @@ export interface DatabaseProfile {
   profile_picture?: string;
   gallery?: string[];
   polygamy_stance?: string;
+  languages?: string[];
+  marital_status?: string;
+  spoken_languages?: string[];
+  preferred_languages?: string[];
   email_verified: boolean;
   phone_verified: boolean;
   id_verified: boolean;

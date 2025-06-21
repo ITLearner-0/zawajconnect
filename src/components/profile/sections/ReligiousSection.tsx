@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ProfileFormData } from "@/types/profile";
+import { Badge } from "@/components/ui/badge";
 
 interface ReligiousSectionProps {
   formData: ProfileFormData;
@@ -40,6 +41,30 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
     { value: "refuse", label: "Je refuse la polygamie" }
   ];
 
+  const madhabOptions = [
+    { value: "hanafi", label: "Hanafi" },
+    { value: "maliki", label: "Maliki" },
+    { value: "shafii", label: "Shafi'i" },
+    { value: "hanbali", label: "Hanbali" },
+    { value: "jafari", label: "Ja'fari" },
+    { value: "autre", label: "Autre" }
+  ];
+
+  const languageOptions = [
+    "Français", "Arabe", "Anglais", "Turc", "Ourdou", "Bengali", "Indonésien", "Malais", "Espagnol", "Allemand"
+  ];
+
+  const [selectedLanguages, setSelectedLanguages] = React.useState<string[]>(formData.languages || []);
+
+  const toggleLanguage = (language: string) => {
+    const newLanguages = selectedLanguages.includes(language)
+      ? selectedLanguages.filter(l => l !== language)
+      : [...selectedLanguages, language];
+    
+    setSelectedLanguages(newLanguages);
+    handleSelectChange('languages', newLanguages.join(','));
+  };
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Pratique Religieuse</h3>
@@ -61,6 +86,22 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
         </div>
 
         <div className="space-y-2">
+          <Label htmlFor="madhab">École Juridique (Madhab)</Label>
+          <Select value={formData.madhab || ""} onValueChange={(value) => handleSelectChange("madhab", value)}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Sélectionnez votre madhab" />
+            </SelectTrigger>
+            <SelectContent className="bg-white dark:bg-gray-800 border shadow-lg z-50">
+              {madhabOptions.map((madhab) => (
+                <SelectItem key={madhab.value} value={madhab.value}>
+                  {madhab.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
           <Label htmlFor="prayerFrequency">Fréquence de Prière</Label>
           <Select value={formData.prayerFrequency || ""} onValueChange={(value) => handleSelectChange("prayerFrequency", value)}>
             <SelectTrigger className="w-full">
@@ -75,6 +116,26 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
             </SelectContent>
           </Select>
         </div>
+      </div>
+
+      {/* Langues parlées */}
+      <div className="space-y-2">
+        <Label>Langues parlées</Label>
+        <div className="flex flex-wrap gap-2">
+          {languageOptions.map(language => (
+            <Badge
+              key={language}
+              variant={selectedLanguages.includes(language) ? "default" : "outline"}
+              className="cursor-pointer"
+              onClick={() => toggleLanguage(language)}
+            >
+              {language}
+            </Badge>
+          ))}
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Cliquez sur les langues que vous parlez couramment
+        </p>
       </div>
 
       {/* Question sur la polygamie selon le genre */}
