@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -163,6 +162,7 @@ const UserProfile = () => {
             id_verified: profileData.id_verified || false,
             wali_verified: profileData.wali_verified || false,
             is_visible: profileData.is_visible || false,
+            is_verified: profileData.is_verified || false,
             privacy_settings: profileData.privacy_settings || {
               profileVisibilityLevel: 1,
               showAge: true,

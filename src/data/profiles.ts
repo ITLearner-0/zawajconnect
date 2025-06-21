@@ -23,6 +23,7 @@ export const dummyProfiles: DatabaseProfile[] = [
     wali_contact: null,
     wali_verified: false,
     is_visible: true,
+    is_verified: true,
     profile_picture: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952',
     gallery: [],
     privacy_settings: {
@@ -59,6 +60,7 @@ export const dummyProfiles: DatabaseProfile[] = [
     wali_contact: '+1234567890',
     wali_verified: true,
     is_visible: true,
+    is_verified: true,
     profile_picture: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
     gallery: [],
     privacy_settings: {
@@ -95,6 +97,7 @@ export const dummyProfiles: DatabaseProfile[] = [
     wali_contact: null,
     wali_verified: false,
     is_visible: true,
+    is_verified: true,
     profile_picture: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952',
     gallery: [],
     privacy_settings: {
@@ -131,6 +134,7 @@ export const dummyProfiles: DatabaseProfile[] = [
     wali_contact: '+1987654321',
     wali_verified: true,
     is_visible: true,
+    is_verified: true,
     profile_picture: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
     gallery: [],
     privacy_settings: {
@@ -167,6 +171,7 @@ export const dummyProfiles: DatabaseProfile[] = [
     wali_contact: null,
     wali_verified: false,
     is_visible: true,
+    is_verified: true,
     profile_picture: 'https://images.unsplash.com/photo-1581092795360-fd1ca04f0952',
     gallery: [],
     privacy_settings: {
