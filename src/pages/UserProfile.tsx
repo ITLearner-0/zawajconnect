@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,6 +29,7 @@ const UserProfile = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.id) {
         setCurrentUserId(session.user.id);
+        console.log("Current user ID:", session.user.id);
       }
     };
     
@@ -37,14 +39,15 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!id) {
+        console.log("No profile ID provided");
         setLoading(false);
         return;
       }
 
       setLoading(true);
+      console.log("Fetching profile with ID:", id);
+      
       try {
-        console.log("Fetching profile with ID:", id);
-        
         // First check if this is a demo profile
         const demoProfile = dummyProfiles.find(p => p.id === id);
         
@@ -55,9 +58,68 @@ const UserProfile = () => {
           return;
         }
 
-        // If not a demo profile, try to fetch from database
-        console.log("Not a demo profile, fetching from database...");
+        console.log("Not a demo profile, checking database...");
         
+        // Check if the UUID is valid format
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        if (!uuidRegex.test(id)) {
+          console.error("Invalid UUID format:", id);
+          toast({
+            title: "Erreur",
+            description: "Format d'identifiant de profil invalide.",
+            variant: "destructive",
+          });
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
+
+        // First, let's check if the profile exists at all (ignoring visibility)
+        console.log("Checking if profile exists in database...");
+        const { data: profileCheck, error: checkError } = await supabase
+          .from('profiles')
+          .select('id, is_visible, first_name, last_name')
+          .eq('id', id)
+          .single();
+
+        if (checkError) {
+          console.error("Error checking profile existence:", checkError);
+          if (checkError.code === 'PGRST116') {
+            console.log("Profile does not exist in database");
+            toast({
+              title: "Profil introuvable",
+              description: "Ce profil n'existe pas ou a été supprimé.",
+              variant: "destructive",
+            });
+          } else {
+            console.error("Database error:", checkError);
+            toast({
+              title: "Erreur",
+              description: "Erreur lors de la vérification du profil.",
+              variant: "destructive",
+            });
+          }
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
+
+        console.log("Profile check result:", profileCheck);
+
+        if (!profileCheck.is_visible) {
+          console.log("Profile exists but is not visible");
+          toast({
+            title: "Profil non disponible",
+            description: "Ce profil n'est pas visible publiquement.",
+            variant: "destructive",
+          });
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
+
+        // Now fetch the full profile data
+        console.log("Fetching full profile data...");
         const { data: profileData, error } = await supabase
           .from('profiles')
           .select('*')
@@ -66,24 +128,12 @@ const UserProfile = () => {
           .single();
 
         if (error) {
-          console.error("Error fetching profile from database:", error);
-          
-          // If it's a "not found" error, show appropriate message
-          if (error.code === 'PGRST116') {
-            toast({
-              title: "Profile not found",
-              description: "This profile may have been removed or is no longer visible.",
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Error",
-              description: "There was a problem loading this profile.",
-              variant: "destructive",
-            });
-          }
-          
-          // Don't redirect immediately, let user decide
+          console.error("Error fetching full profile data:", error);
+          toast({
+            title: "Erreur",
+            description: "Erreur lors de la récupération des données du profil.",
+            variant: "destructive",
+          });
           setProfile(null);
           setLoading(false);
           return;
@@ -128,17 +178,21 @@ const UserProfile = () => {
             updated_at: profileData.updated_at || ''
           };
           
-          console.log("Found database profile:", formattedProfile);
+          console.log("Successfully formatted profile:", formattedProfile);
           setProfile(formattedProfile);
+        } else {
+          console.log("No profile data returned");
+          setProfile(null);
         }
         
       } catch (error) {
-        console.error("Error fetching profile:", error);
+        console.error("Unexpected error fetching profile:", error);
         toast({
-          title: "Error",
-          description: "There was a problem loading this profile.",
+          title: "Erreur",
+          description: "Une erreur inattendue s'est produite lors du chargement du profil.",
           variant: "destructive",
         });
+        setProfile(null);
       } finally {
         setLoading(false);
       }
@@ -154,8 +208,8 @@ const UserProfile = () => {
   const handleSignOut = () => {
     navigate('/');
     toast({
-      title: "Signed Out",
-      description: "You have been successfully signed out.",
+      title: "Déconnecté",
+      description: "Vous avez été déconnecté avec succès.",
     });
   };
 
@@ -167,13 +221,13 @@ const UserProfile = () => {
       <div className="container mx-auto px-4 max-w-4xl">
         <StandardLoadingState
           loading={loading}
-          loadingText="Loading profile..."
-          error={!profile && !loading ? "Profile not found" : null}
+          loadingText="Chargement du profil..."
+          error={!profile && !loading ? "Profil introuvable" : null}
           emptyState={!profile && !loading ? {
-            title: "Profile Not Found",
-            description: "We couldn't find the profile you're looking for. It may have been removed or is no longer visible.",
+            title: "Profil Introuvable",
+            description: "Nous n'avons pas pu trouver le profil que vous recherchez. Il a peut-être été supprimé ou n'est plus visible.",
             action: {
-              label: "Browse Matches",
+              label: "Parcourir les Profils",
               onClick: () => navigate('/nearby')
             }
           } : undefined}
@@ -190,7 +244,7 @@ const UserProfile = () => {
                     className="bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white"
                   >
                     <User className="mr-2 h-4 w-4" />
-                    Edit My Profile
+                    Modifier Mon Profil
                   </Button>
                 </div>
               )}
