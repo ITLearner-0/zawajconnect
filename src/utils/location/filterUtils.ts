@@ -1,5 +1,6 @@
 
 import { AdvancedFilters } from "@/hooks/compatibility/types/advancedFilterTypes";
+import { EnhancedAdvancedFilters } from "@/types/filters";
 
 // Define extended filter criteria type
 export interface FilterCriteria {
@@ -7,6 +8,7 @@ export interface FilterCriteria {
   practiceLevel?: string[];
   education?: string[];
   advanced?: AdvancedFilters;
+  enhanced?: EnhancedAdvancedFilters;
 }
 
 // Apply filters to the profiles
@@ -34,7 +36,7 @@ export const applyFilters = (profiles: any[], filters: FilterCriteria): any[] =>
       }
     }
     
-    // Note: Advanced filters are handled separately in the compatibility matching service
+    // Note: Advanced and enhanced filters are handled separately in the compatibility matching service
     
     return true;
   });

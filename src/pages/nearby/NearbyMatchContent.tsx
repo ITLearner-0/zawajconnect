@@ -67,7 +67,7 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
     <div className={isMobile ? "w-full" : "lg:col-span-2"}>
       <DailyLimitBanner onLimitCheck={handleLimitCheck} />
       
-      <IslamicPattern variant="card" color="rose" className="overflow-hidden">
+      <IslamicPattern variant="card" color="teal" className="overflow-hidden">
         <div className="bg-gradient-to-r from-rose-400 to-pink-400 text-white p-3 sm:p-4 flex items-center justify-between">
           <div className="flex items-center">
             <Heart className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
