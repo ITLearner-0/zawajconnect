@@ -16,7 +16,7 @@ export const useOnboarding = (formData: ProfileFormData, isNewUser: boolean) => 
       "About Me"
     ];
     
-    // Add Wali Information step for female users
+    // Add Wali Information step only for female users
     if (formData.gender === "female") {
       baseSteps.push("Wali Information");
     }
@@ -36,9 +36,9 @@ export const useOnboarding = (formData: ProfileFormData, isNewUser: boolean) => 
       4: formData.gender === "female" ? ["waliName", "waliRelationship", "waliContact"] : []
     };
 
-    return requiredFieldsByStep[currentStep].every(
+    return requiredFieldsByStep[currentStep]?.every(
       (field) => formData[field as keyof ProfileFormData]
-    );
+    ) ?? true;
   };
 
   const handleNext = () => {
@@ -59,11 +59,10 @@ export const useOnboarding = (formData: ProfileFormData, isNewUser: boolean) => 
 
   // Update steps when gender changes
   useEffect(() => {
-    if (formData.gender === "female" && currentStep === 4) {
-      // If we're already on step 4 and it's a female user, don't do anything
-    } else if (formData.gender !== "female" && currentStep === 4) {
-      // If we're on step 4 but gender changed from female to something else, go back to step 3
-      setCurrentStep(3);
+    const newSteps = getSteps();
+    // If user changed from female to male and we're on the Wali step, go back to About Me
+    if (formData.gender !== "female" && currentStep >= newSteps.length) {
+      setCurrentStep(newSteps.length - 1);
     }
   }, [formData.gender, currentStep]);
 

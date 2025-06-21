@@ -12,6 +12,11 @@ interface WaliSectionProps {
 }
 
 const WaliSection: React.FC<WaliSectionProps> = ({ formData, handleChange, handleSelectChange }) => {
+  // Only show Wali section for female users
+  if (formData.gender !== "female") {
+    return null;
+  }
+
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Informations du Wali</h3>

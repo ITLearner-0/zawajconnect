@@ -13,9 +13,8 @@ interface WaliInformationProps {
 }
 
 const WaliInformation = ({ formData, handleChange, showRequired = false }: WaliInformationProps) => {
-  const isWomanUser = formData.gender === "female";
-  
-  if (!isWomanUser) {
+  // Only show for female users
+  if (formData.gender !== "female") {
     return null;
   }
 
@@ -23,7 +22,7 @@ const WaliInformation = ({ formData, handleChange, showRequired = false }: WaliI
     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
       <div className="flex justify-between items-center mb-4">
         <h3 id="wali-heading" className="text-lg font-semibold">
-          Wali Information
+          Informations du Wali
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -31,8 +30,8 @@ const WaliInformation = ({ formData, handleChange, showRequired = false }: WaliI
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-xs">
-                  In accordance with Islamic values, women are required to designate a wali 
-                  (guardian). This could be your father, brother, uncle, or another male relative.
+                  Conformément aux valeurs islamiques, les femmes doivent désigner un wali 
+                  (tuteur). Il peut s'agir de votre père, frère, oncle ou d'un autre parent masculin.
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -43,24 +42,24 @@ const WaliInformation = ({ formData, handleChange, showRequired = false }: WaliI
       <div className="space-y-4">
         <div>
           <Label htmlFor="waliName" className="flex items-center">
-            Wali Name 
-            {showRequired && isWomanUser && <span className="text-red-500 ml-1">*</span>}
+            Nom du Wali 
+            {showRequired && <span className="text-red-500 ml-1">*</span>}
           </Label>
           <Input
             id="waliName"
             name="waliName"
             value={formData.waliName || ""}
             onChange={handleChange}
-            placeholder="Full name of your wali"
-            required={showRequired && isWomanUser}
+            placeholder="Nom complet de votre wali"
+            required={showRequired}
             className="mt-1"
           />
         </div>
 
         <div>
           <Label htmlFor="waliRelationship" className="flex items-center">
-            Relationship 
-            {showRequired && isWomanUser && <span className="text-red-500 ml-1">*</span>}
+            Relation 
+            {showRequired && <span className="text-red-500 ml-1">*</span>}
           </Label>
           <Select 
             name="waliRelationship" 
@@ -72,37 +71,37 @@ const WaliInformation = ({ formData, handleChange, showRequired = false }: WaliI
             }}
           >
             <SelectTrigger id="waliRelationship" className="mt-1">
-              <SelectValue placeholder="Select relationship" />
+              <SelectValue placeholder="Sélectionnez la relation" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="father">Father</SelectItem>
-              <SelectItem value="brother">Brother</SelectItem>
-              <SelectItem value="uncle">Uncle</SelectItem>
-              <SelectItem value="grandfather">Grandfather</SelectItem>
-              <SelectItem value="other">Other Male Relative</SelectItem>
+              <SelectItem value="father">Père</SelectItem>
+              <SelectItem value="brother">Frère</SelectItem>
+              <SelectItem value="uncle">Oncle</SelectItem>
+              <SelectItem value="grandfather">Grand-père</SelectItem>
+              <SelectItem value="other">Autre parent masculin</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div>
           <Label htmlFor="waliContact" className="flex items-center">
-            Wali Contact Number
-            {showRequired && isWomanUser && <span className="text-red-500 ml-1">*</span>}
+            Numéro de contact du Wali
+            {showRequired && <span className="text-red-500 ml-1">*</span>}
           </Label>
           <Input
             id="waliContact"
             name="waliContact"
             value={formData.waliContact || ""}
             onChange={handleChange}
-            placeholder="Contact number of your wali"
-            required={showRequired && isWomanUser}
+            placeholder="Numéro de contact du wali"
+            required={showRequired}
             className="mt-1"
           />
         </div>
 
-        {showRequired && isWomanUser && (
+        {showRequired && (
           <div className="text-sm text-gray-500 mt-4">
-            <p>Note: Your wali will be contacted to verify this information.</p>
+            <p>Note: Votre wali sera contacté pour vérifier ces informations.</p>
           </div>
         )}
       </div>
