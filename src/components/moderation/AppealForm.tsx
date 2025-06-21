@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -278,7 +277,7 @@ const AppealForm: React.FC<AppealFormProps> = ({
             <Checkbox
               id="guidelines-read"
               checked={hasReadGuidelines}
-              onCheckedChange={setHasReadGuidelines}
+              onCheckedChange={(checked) => setHasReadGuidelines(checked === true)}
             />
             <Label htmlFor="guidelines-read" className="text-sm">
               J'ai lu et compris les directives d'appel et je certifie que les informations fournies sont exactes.
