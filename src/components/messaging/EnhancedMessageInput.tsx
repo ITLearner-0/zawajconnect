@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +28,7 @@ interface CallScheduleData {
   timezone?: string;
 }
 
-interface TemporaryMessageSettings {
+interface TempMessageSettings {
   enabled: boolean;
   defaultDuration: number;
   allowCustomDuration: boolean;
@@ -48,8 +47,8 @@ interface EnhancedMessageInputProps {
   onShareIslamicContent: (content: IslamicContent) => void;
   onScheduleCall: (scheduleData: CallScheduleData) => void;
   isWaliRequired?: boolean;
-  temporaryMessageSettings: TemporaryMessageSettings;
-  onTemporarySettingsChange: (settings: TemporaryMessageSettings) => void;
+  temporaryMessageSettings: TempMessageSettings;
+  onTemporarySettingsChange: (settings: TempMessageSettings) => void;
 }
 
 const TEMP_DURATION_OPTIONS = [

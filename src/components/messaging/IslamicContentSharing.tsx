@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -42,11 +41,16 @@ const SAMPLE_VERSES: IslamicContent[] = [
 
 const IslamicContentSharing: React.FC<IslamicContentSharingProps> = ({ onShareContent }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [customContent, setCustomContent] = useState({
+  const [customContent, setCustomContent] = useState<{
+    arabic: string;
+    translation: string;
+    reference: string;
+    type: 'quran' | 'hadith';
+  }>({
     arabic: '',
     translation: '',
     reference: '',
-    type: 'quran' as const
+    type: 'quran'
   });
   const [favorites] = useState<string[]>([]);
 
@@ -152,8 +156,8 @@ const IslamicContentSharing: React.FC<IslamicContentSharingProps> = ({ onShareCo
                 <label className="text-sm font-medium">Type</label>
                 <Tabs
                   value={customContent.type}
-                  onValueChange={(value) => 
-                    setCustomContent(prev => ({ ...prev, type: value as 'quran' | 'hadith' }))
+                  onValueChange={(value: 'quran' | 'hadith') => 
+                    setCustomContent(prev => ({ ...prev, type: value }))
                   }
                 >
                   <TabsList className="grid w-full grid-cols-2">
