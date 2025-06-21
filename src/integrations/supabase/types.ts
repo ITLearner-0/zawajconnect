@@ -471,15 +471,66 @@ export type Database = {
           },
         ]
       }
+      wali_invitations: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string | null
+          email: string
+          expires_at: string | null
+          id: string
+          invitation_token: string
+          managed_user_id: string
+          sent_at: string | null
+          status: string | null
+          wali_profile_id: string | null
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string | null
+          email: string
+          expires_at?: string | null
+          id?: string
+          invitation_token: string
+          managed_user_id: string
+          sent_at?: string | null
+          status?: string | null
+          wali_profile_id?: string | null
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string | null
+          email?: string
+          expires_at?: string | null
+          id?: string
+          invitation_token?: string
+          managed_user_id?: string
+          sent_at?: string | null
+          status?: string | null
+          wali_profile_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wali_invitations_wali_profile_id_fkey"
+            columns: ["wali_profile_id"]
+            isOneToOne: false
+            referencedRelation: "wali_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       wali_profiles: {
         Row: {
           availability_status: string | null
           chat_preferences: Json | null
+          confirmed_at: string | null
           contact_information: string
           created_at: string | null
           email: string | null
           first_name: string
           id: string
+          invitation_sent_at: string | null
+          invitation_status: string | null
+          invitation_token: string | null
           is_verified: boolean | null
           last_active: string | null
           last_name: string
@@ -487,17 +538,23 @@ export type Database = {
           phone: string | null
           registration_id: string | null
           relationship: string
+          supervision_level: string | null
+          supervision_settings: Json | null
           user_id: string
           verification_date: string | null
         }
         Insert: {
           availability_status?: string | null
           chat_preferences?: Json | null
+          confirmed_at?: string | null
           contact_information: string
           created_at?: string | null
           email?: string | null
           first_name: string
           id?: string
+          invitation_sent_at?: string | null
+          invitation_status?: string | null
+          invitation_token?: string | null
           is_verified?: boolean | null
           last_active?: string | null
           last_name: string
@@ -505,17 +562,23 @@ export type Database = {
           phone?: string | null
           registration_id?: string | null
           relationship: string
+          supervision_level?: string | null
+          supervision_settings?: Json | null
           user_id: string
           verification_date?: string | null
         }
         Update: {
           availability_status?: string | null
           chat_preferences?: Json | null
+          confirmed_at?: string | null
           contact_information?: string
           created_at?: string | null
           email?: string | null
           first_name?: string
           id?: string
+          invitation_sent_at?: string | null
+          invitation_status?: string | null
+          invitation_token?: string | null
           is_verified?: boolean | null
           last_active?: string | null
           last_name?: string
@@ -523,6 +586,8 @@ export type Database = {
           phone?: string | null
           registration_id?: string | null
           relationship?: string
+          supervision_level?: string | null
+          supervision_settings?: Json | null
           user_id?: string
           verification_date?: string | null
         }
@@ -586,6 +651,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      confirm_wali_invitation: {
+        Args: { token: string; confirming_user_id: string }
+        Returns: boolean
+      }
+      generate_wali_invitation: {
+        Args: { wali_user_id: string; managed_user_email: string }
+        Returns: {
+          invitation_token: string
+          invitation_id: string
+        }[]
+      }
       get_user_roles: {
         Args: { _user_id: string }
         Returns: {

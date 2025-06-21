@@ -1,34 +1,37 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client'; 
-import { WaliProfile } from '@/types/wali';
+import { WaliProfileExtended, SupervisionSettings } from '@/types/waliInvitation';
 import { useToast } from '../use-toast';
 
-// Helper function to safely parse chat preferences
-const parseChatPreferences = (preferences: any) => {
-  if (!preferences) {
+// Helper function to safely parse chat preferences and supervision settings
+const parseSupervisionSettings = (settings: any): SupervisionSettings => {
+  if (!settings) {
     return {
-      auto_approve_known_contacts: false,
-      notification_level: 'important' as const,
-      keyword_alerts: [],
-      supervision_level: 'passive' as const
+      require_approval_for_new_conversations: true,
+      receive_all_messages: false,
+      can_end_conversations: true,
+      notification_frequency: 'immediate',
+      auto_approve_known_contacts: false
     };
   }
   
-  if (typeof preferences === 'object') {
+  if (typeof settings === 'object') {
     return {
-      auto_approve_known_contacts: preferences.auto_approve_known_contacts || false,
-      notification_level: preferences.notification_level || 'important',
-      keyword_alerts: preferences.keyword_alerts || [],
-      supervision_level: preferences.supervision_level || 'passive'
+      require_approval_for_new_conversations: settings.require_approval_for_new_conversations || true,
+      receive_all_messages: settings.receive_all_messages || false,
+      can_end_conversations: settings.can_end_conversations || true,
+      notification_frequency: settings.notification_frequency || 'immediate',
+      auto_approve_known_contacts: settings.auto_approve_known_contacts || false
     };
   }
   
   return {
-    auto_approve_known_contacts: false,
-    notification_level: 'important' as const,
-    keyword_alerts: [],
-    supervision_level: 'passive' as const
+    require_approval_for_new_conversations: true,
+    receive_all_messages: false,
+    can_end_conversations: true,
+    notification_frequency: 'immediate',
+    auto_approve_known_contacts: false
   };
 };
 
@@ -45,12 +48,12 @@ const parseAvailabilityStatus = (status: string | null): 'online' | 'away' | 'bu
 };
 
 export const useWaliProfile = (userId: string) => {
-  const [waliProfile, setWaliProfile] = useState<WaliProfile | null>(null);
+  const [waliProfile, setWaliProfile] = useState<WaliProfileExtended | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
-  // Fetch wali profile data
+  // Fetch wali profile data with extended information
   useEffect(() => {
     const fetchWaliProfile = async () => {
       if (!userId) {
@@ -72,11 +75,13 @@ export const useWaliProfile = (userId: string) => {
           throw fetchError;
         }
 
-        // Convert the database record to WaliProfile with proper type handling
-        const waliProfile: WaliProfile = {
+        // Convert the database record to WaliProfileExtended with proper type handling
+        const waliProfile: WaliProfileExtended = {
           ...data,
           availability_status: parseAvailabilityStatus(data.availability_status),
-          chat_preferences: parseChatPreferences(data.chat_preferences)
+          supervision_settings: parseSupervisionSettings(data.supervision_settings),
+          supervision_level: data.supervision_level || 'moderate',
+          invitation_status: data.invitation_status || 'pending'
         };
 
         setWaliProfile(waliProfile);
@@ -132,10 +137,42 @@ export const useWaliProfile = (userId: string) => {
     }
   };
 
+  // Update supervision settings
+  const updateSupervisionSettings = async (settings: SupervisionSettings, level: string) => {
+    if (!userId || !waliProfile) return false;
+
+    try {
+      const { error: updateError } = await supabase
+        .from('wali_profiles')
+        .update({ 
+          supervision_settings: settings,
+          supervision_level: level 
+        })
+        .eq('user_id', userId);
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      setWaliProfile({
+        ...waliProfile,
+        supervision_settings: settings,
+        supervision_level: level as any
+      });
+
+      return true;
+    } catch (err: any) {
+      console.error('Error updating supervision settings:', err);
+      setError(err.message || 'Failed to update supervision settings');
+      return false;
+    }
+  };
+
   return {
     waliProfile,
     loading,
     error,
-    updateAvailability
+    updateAvailability,
+    updateSupervisionSettings
   };
 };

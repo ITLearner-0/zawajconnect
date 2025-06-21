@@ -8,9 +8,11 @@ import ActiveConversationsPanel from './ActiveConversationsPanel';
 import MonitoringPanel from './MonitoringPanel';
 import AvailabilityControls from './AvailabilityControls';
 import WaliManagement from './WaliManagement';
+import SupervisionSettings from './SupervisionSettings';
+import WaliInvitationManager from './WaliInvitationManager';
 import { useWaliDashboard } from '@/hooks/useWaliDashboard';
 import { Card, CardContent } from '@/components/ui/card';
-import { Users, MessageSquare, Shield, Settings } from 'lucide-react';
+import { Users, MessageSquare, Shield, Settings, Mail, UserPlus } from 'lucide-react';
 
 const WaliDashboard: React.FC = () => {
   const {
@@ -69,7 +71,7 @@ const WaliDashboard: React.FC = () => {
       </div>
 
       <Tabs defaultValue="supervision" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="supervision" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
             Supervision
@@ -82,8 +84,16 @@ const WaliDashboard: React.FC = () => {
             <Users className="h-4 w-4" />
             Management
           </TabsTrigger>
-          <TabsTrigger value="monitoring" className="flex items-center gap-2">
+          <TabsTrigger value="invitations" className="flex items-center gap-2">
+            <Mail className="h-4 w-4" />
+            Invitations
+          </TabsTrigger>
+          <TabsTrigger value="settings" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
+            Paramètres
+          </TabsTrigger>
+          <TabsTrigger value="monitoring" className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4" />
             Monitoring
           </TabsTrigger>
         </TabsList>
@@ -107,6 +117,20 @@ const WaliDashboard: React.FC = () => {
 
         <TabsContent value="management">
           <WaliManagement />
+        </TabsContent>
+
+        <TabsContent value="invitations">
+          <WaliInvitationManager />
+        </TabsContent>
+
+        <TabsContent value="settings">
+          {waliProfile && (
+            <SupervisionSettings
+              waliUserId={waliProfile.user_id}
+              currentSettings={waliProfile.supervision_settings}
+              currentLevel={waliProfile.supervision_level}
+            />
+          )}
         </TabsContent>
 
         <TabsContent value="monitoring">
