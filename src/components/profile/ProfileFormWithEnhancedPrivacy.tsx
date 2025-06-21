@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
-import { PhotoBlurSettings } from '@/types/documents';
+import { PhotoBlurSettings as PhotoBlurSettingsType } from '@/types/documents';
 import BasicInformation from './BasicInformation';
 import EducationCareer from './EducationCareer';
 import ReligiousBackground from './ReligiousBackground';
@@ -9,7 +9,7 @@ import AboutMe from './AboutMe';
 import WaliInformation from './WaliInformation';
 import VerificationPanel from './VerificationPanel';
 import EnhancedPrivacySettings from './EnhancedPrivacySettings';
-import PhotoBlurSettings from './PhotoBlurSettings';
+import PhotoBlurSettingsComponent from './PhotoBlurSettings';
 import DocumentVerification from './DocumentVerification';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
@@ -29,8 +29,8 @@ interface ProfileFormWithEnhancedPrivacyProps {
   onToggleAccountVisibility: () => Promise<void>;
   onUnblockUser: (userId: string) => Promise<void>;
   userId?: string;
-  photoBlurSettings?: PhotoBlurSettings;
-  onPhotoBlurSettingsChange?: (settings: PhotoBlurSettings) => Promise<void>;
+  photoBlurSettings?: PhotoBlurSettingsType;
+  onPhotoBlurSettingsChange?: (settings: PhotoBlurSettingsType) => Promise<void>;
 }
 
 const ProfileFormWithEnhancedPrivacy = ({
@@ -52,7 +52,7 @@ const ProfileFormWithEnhancedPrivacy = ({
 }: ProfileFormWithEnhancedPrivacyProps) => {
   const { verifications, refetchVerifications } = useDocumentVerification(userId);
 
-  const defaultPhotoBlurSettings: PhotoBlurSettings = {
+  const defaultPhotoBlurSettings: PhotoBlurSettingsType = {
     blur_profile_picture: false,
     blur_gallery_photos: false,
     blur_until_approved: false,
@@ -112,7 +112,7 @@ const ProfileFormWithEnhancedPrivacy = ({
 
       {/* Photo Blur Settings */}
       {userId && onPhotoBlurSettingsChange && (
-        <PhotoBlurSettings
+        <PhotoBlurSettingsComponent
           settings={photoBlurSettings || defaultPhotoBlurSettings}
           onChange={onPhotoBlurSettingsChange}
         />
