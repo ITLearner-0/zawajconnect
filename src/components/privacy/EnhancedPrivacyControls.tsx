@@ -1,17 +1,26 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Eye, EyeOff, Settings, Lock, UserX } from 'lucide-react';
-import { EnhancedPrivacySettings, ProgressiveRevealSettings, IncognitoSettings } from '@/types/enhancedPrivacy';
-import { useToast } from '@/components/ui/use-toast';
-import { incognitoService } from '@/hooks/privacy/services/incognitoService';
+import { 
+  Eye, 
+  EyeOff, 
+  Shield, 
+  Clock, 
+  MapPin, 
+  Image,
+  Settings,
+  UserX,
+  Pause,
+  Play
+} from 'lucide-react';
+import { EnhancedPrivacySettings } from '@/types/enhancedPrivacy';
 
 interface EnhancedPrivacyControlsProps {
   userId: string;
@@ -19,302 +28,354 @@ interface EnhancedPrivacyControlsProps {
   onSettingsChange: (settings: EnhancedPrivacySettings) => void;
 }
 
-const EnhancedPrivacyControls = ({
+const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
   userId,
   currentSettings,
   onSettingsChange
-}: EnhancedPrivacyControlsProps) => {
-  const { toast } = useToast();
-  const [isIncognito, setIsIncognito] = useState(false);
-  const [settings, setSettings] = useState<EnhancedPrivacySettings>(currentSettings);
+}) => {
+  const [localSettings, setLocalSettings] = useState<EnhancedPrivacySettings>(currentSettings);
+  const [isAccountPaused, setIsAccountPaused] = useState(false);
 
-  useEffect(() => {
-    const checkIncognitoStatus = async () => {
-      const status = await incognitoService.checkIncognitoStatus(userId);
-      setIsIncognito(status);
-    };
-    checkIncognitoStatus();
-  }, [userId]);
-
-  const handleProgressiveRevealChange = (field: keyof ProgressiveRevealSettings, value: any) => {
-    const newSettings = {
-      ...settings,
-      progressiveReveal: {
-        ...settings.progressiveReveal,
-        [field]: value
-      }
-    };
-    setSettings(newSettings);
-    onSettingsChange(newSettings);
+  const updateSettings = (newSettings: Partial<EnhancedPrivacySettings>) => {
+    const updated = { ...localSettings, ...newSettings };
+    setLocalSettings(updated);
+    onSettingsChange(updated);
   };
 
-  const handleIncognitoToggle = async () => {
-    const newIncognitoState = !isIncognito;
-    
-    const success = newIncognitoState 
-      ? await incognitoService.enableIncognito(userId)
-      : await incognitoService.disableIncognito(userId);
+  const updateProgressiveReveal = (key: string, value: any) => {
+    updateSettings({
+      progressiveReveal: {
+        ...localSettings.progressiveReveal,
+        [key]: value
+      }
+    });
+  };
 
-    if (success) {
-      setIsIncognito(newIncognitoState);
-      toast({
-        title: newIncognitoState ? "Incognito Mode Enabled" : "Incognito Mode Disabled",
-        description: newIncognitoState 
-          ? "Your browsing activity is now private and you're hidden from search results." 
-          : "You're now visible in search results and your activity is tracked normally.",
-      });
-    } else {
-      toast({
-        title: "Error",
-        description: "Failed to toggle incognito mode. Please try again.",
-        variant: "destructive"
+  const updateIncognito = (key: string, value: any) => {
+    updateSettings({
+      incognito: {
+        ...localSettings.incognito,
+        [key]: value
+      }
+    });
+  };
+
+  const updateProfileVisibility = (key: string, value: any) => {
+    updateSettings({
+      profileVisibility: {
+        ...localSettings.profileVisibility,
+        [key]: value
+      }
+    });
+  };
+
+  const toggleAccountPause = () => {
+    const newPauseState = !isAccountPaused;
+    setIsAccountPaused(newPauseState);
+    
+    if (newPauseState) {
+      updateSettings({
+        profileVisibility: {
+          ...localSettings.profileVisibility,
+          whoCanSeeProfile: 'custom',
+          showInSearchResults: false
+        },
+        incognito: {
+          ...localSettings.incognito,
+          enabled: true,
+          hideFromSearch: true
+        }
       });
     }
   };
 
-  const handleProfileVisibilityChange = (field: string, value: any) => {
-    const newSettings = {
-      ...settings,
-      profileVisibility: {
-        ...settings.profileVisibility,
-        [field]: value
-      }
-    };
-    setSettings(newSettings);
-    onSettingsChange(newSettings);
-  };
-
   return (
     <div className="space-y-6">
+      {/* Photo Blur Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Image className="h-5 w-5" />
+            Paramètres de Floutage des Photos
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Photo de profil floutée par défaut</Label>
+              <p className="text-sm text-muted-foreground">
+                Flouter votre photo de profil jusqu'à approbation
+              </p>
+            </div>
+            <Switch
+              checked={localSettings.progressiveReveal.enabled}
+              onCheckedChange={(checked) => updateProgressiveReveal('enabled', checked)}
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Flouter pour les non-matchs</Label>
+              <p className="text-sm text-muted-foreground">
+                Masquer les photos pour les utilisateurs sans compatibilité élevée
+              </p>
+            </div>
+            <Switch
+              checked={localSettings.progressiveReveal.revealStages.personal}
+              onCheckedChange={(checked) => 
+                updateProgressiveReveal('revealStages', {
+                  ...localSettings.progressiveReveal.revealStages,
+                  personal: checked
+                })
+              }
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Score de compatibilité requis pour révéler les photos</Label>
+            <Slider
+              value={[localSettings.progressiveReveal.requiresCompatibilityScore]}
+              onValueChange={([value]) => updateProgressiveReveal('requiresCompatibilityScore', value)}
+              max={100}
+              min={0}
+              step={5}
+              className="w-full"
+            />
+            <div className="flex justify-between text-sm text-muted-foreground">
+              <span>0%</span>
+              <span>{localSettings.progressiveReveal.requiresCompatibilityScore}%</span>
+              <span>100%</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Progressive Reveal Settings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Eye className="h-5 w-5" />
+            Révélation Progressive des Informations
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-3">
+            {Object.entries(localSettings.progressiveReveal.revealStages).map(([stage, enabled]) => (
+              <div key={stage} className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label className="capitalize">
+                    {stage === 'basic' && 'Informations de base'}
+                    {stage === 'education' && 'Éducation et profession'}
+                    {stage === 'religious' && 'Pratique religieuse'}
+                    {stage === 'personal' && 'À propos de moi'}
+                    {stage === 'contact' && 'Informations de contact'}
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    {stage === 'basic' && 'Nom, âge, localisation générale'}
+                    {stage === 'education' && 'Niveau d\'études, occupation'}
+                    {stage === 'religious' && 'Niveau de pratique, madhab'}
+                    {stage === 'personal' && 'Description personnelle, famille'}
+                    {stage === 'contact' && 'Informations du wali'}
+                  </p>
+                </div>
+                <Switch
+                  checked={enabled}
+                  onCheckedChange={(checked) =>
+                    updateProgressiveReveal('revealStages', {
+                      ...localSettings.progressiveReveal.revealStages,
+                      [stage]: checked
+                    })
+                  }
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Auto-révélation après (jours)</Label>
+            <Input
+              type="number"
+              value={localSettings.progressiveReveal.autoRevealAfterDays}
+              onChange={(e) => updateProgressiveReveal('autoRevealAfterDays', parseInt(e.target.value) || 7)}
+              min={1}
+              max={30}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Incognito Mode */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <EyeOff className="h-5 w-5" />
-            Incognito Browsing Mode
-            {isIncognito && <Badge variant="secondary">Active</Badge>}
+            Mode Invisible
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <Label>Enable Incognito Mode</Label>
+            <div className="space-y-0.5">
+              <Label>Activer le mode invisible</Label>
               <p className="text-sm text-muted-foreground">
-                Browse privately, limit profile views, and hide from search results
+                Naviguez sans laisser de traces de visite
               </p>
             </div>
-            <Switch 
-              checked={isIncognito} 
-              onCheckedChange={handleIncognitoToggle}
+            <Switch
+              checked={localSettings.incognito.enabled}
+              onCheckedChange={(checked) => updateIncognito('enabled', checked)}
             />
           </div>
 
-          {isIncognito && (
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-center gap-2 mb-2">
-                <Lock className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-medium text-blue-800">Incognito Features Active:</span>
+          {localSettings.incognito.enabled && (
+            <>
+              <div className="flex items-center justify-between">
+                <Label>Masquer dans les résultats de recherche</Label>
+                <Switch
+                  checked={localSettings.incognito.hideFromSearch}
+                  onCheckedChange={(checked) => updateIncognito('hideFromSearch', checked)}
+                />
               </div>
-              <ul className="text-sm text-blue-700 space-y-1">
-                <li>• Hidden from search results</li>
-                <li>• Last active time is hidden</li>
-                <li>• View history is not tracked</li>
-                <li>• Limited to 5 profile views per day</li>
-              </ul>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
-      {/* Progressive Profile Reveal */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Eye className="h-5 w-5" />
-            Progressive Profile Reveal
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="space-y-2">
-              <Label>Enable Progressive Reveal</Label>
-              <p className="text-sm text-muted-foreground">
-                Gradually reveal more profile information as compatibility increases
-              </p>
-            </div>
-            <Switch 
-              checked={settings.progressiveReveal?.enabled || false}
-              onCheckedChange={(checked) => handleProgressiveRevealChange('enabled', checked)}
-            />
-          </div>
+              <div className="flex items-center justify-between">
+                <Label>Masquer la dernière activité</Label>
+                <Switch
+                  checked={localSettings.incognito.hideLastActive}
+                  onCheckedChange={(checked) => updateIncognito('hideLastActive', checked)}
+                />
+              </div>
 
-          {settings.progressiveReveal?.enabled && (
-            <div className="space-y-6 mt-6">
-              <div>
-                <Label>Minimum Compatibility Score for Full Reveal</Label>
-                <div className="mt-2">
-                  <Slider
-                    value={[settings.progressiveReveal.requiresCompatibilityScore || 70]}
-                    onValueChange={(value) => handleProgressiveRevealChange('requiresCompatibilityScore', value[0])}
-                    max={100}
-                    min={50}
-                    step={5}
-                    className="w-full"
+              <div className="flex items-center justify-between">
+                <Label>Masquer l'historique des visites</Label>
+                <Switch
+                  checked={localSettings.incognito.hideViewHistory}
+                  onCheckedChange={(checked) => updateIncognito('hideViewHistory', checked)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Limiter les vues de profil par jour</Label>
+                  <Switch
+                    checked={localSettings.incognito.limitProfileViews}
+                    onCheckedChange={(checked) => updateIncognito('limitProfileViews', checked)}
                   />
-                  <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                    <span>50%</span>
-                    <span className="font-medium">{settings.progressiveReveal.requiresCompatibilityScore || 70}%</span>
-                    <span>100%</span>
-                  </div>
                 </div>
-              </div>
-
-              <div>
-                <Label>Auto-reveal after conversation (days)</Label>
-                <div className="mt-2">
-                  <Slider
-                    value={[settings.progressiveReveal.autoRevealAfterDays || 7]}
-                    onValueChange={(value) => handleProgressiveRevealChange('autoRevealAfterDays', value[0])}
-                    max={30}
+                {localSettings.incognito.limitProfileViews && (
+                  <Input
+                    type="number"
+                    value={localSettings.incognito.maxProfileViewsPerDay}
+                    onChange={(e) => updateIncognito('maxProfileViewsPerDay', parseInt(e.target.value) || 5)}
                     min={1}
-                    step={1}
-                    className="w-full"
+                    max={50}
                   />
-                  <div className="flex justify-between text-sm text-muted-foreground mt-1">
-                    <span>1 day</span>
-                    <span className="font-medium">{settings.progressiveReveal.autoRevealAfterDays || 7} days</span>
-                    <span>30 days</span>
-                  </div>
-                </div>
+                )}
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <h4 className="font-medium">Reveal Stages</h4>
-                  {Object.entries(settings.progressiveReveal.revealStages || {}).map(([stage, enabled]) => (
-                    <div key={stage} className="flex items-center justify-between">
-                      <Label className="capitalize">{stage.replace('_', ' ')}</Label>
-                      <Switch
-                        checked={enabled}
-                        onCheckedChange={(checked) => {
-                          const newStages = {
-                            ...settings.progressiveReveal.revealStages,
-                            [stage]: checked
-                          };
-                          handleProgressiveRevealChange('revealStages', newStages);
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+            </>
           )}
         </CardContent>
       </Card>
 
-      {/* Profile Visibility Controls */}
+      {/* Distance Privacy */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5" />
-            Profile Visibility Controls
+            <MapPin className="h-5 w-5" />
+            Confidentialité de Localisation
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label>Who can see your profile</Label>
+          <div className="space-y-2">
+            <Label>Précision de la localisation affichée</Label>
             <Select
-              value={settings.profileVisibility?.whoCanSeeProfile || 'everyone'}
-              onValueChange={(value) => handleProfileVisibilityChange('whoCanSeeProfile', value)}
+              value={localSettings.profileVisibility.customCriteria.allowedLocations.length > 0 ? 'city' : 'approximate'}
+              onValueChange={(value) => {
+                if (value === 'approximate') {
+                  updateProfileVisibility('customCriteria', {
+                    ...localSettings.profileVisibility.customCriteria,
+                    allowedLocations: []
+                  });
+                }
+              }}
             >
-              <SelectTrigger className="mt-2">
+              <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="everyone">Everyone</SelectItem>
-                <SelectItem value="matches_only">Matches Only</SelectItem>
-                <SelectItem value="verified_only">Verified Users Only</SelectItem>
-                <SelectItem value="custom">Custom Criteria</SelectItem>
+                <SelectItem value="exact">Distance exacte</SelectItem>
+                <SelectItem value="approximate">Distance approximative (±5km)</SelectItem>
+                <SelectItem value="city">Ville uniquement</SelectItem>
+                <SelectItem value="region">Région uniquement</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {settings.profileVisibility?.whoCanSeeProfile === 'custom' && (
-            <div className="space-y-4 mt-4 p-4 border rounded-lg">
-              <h4 className="font-medium">Custom Visibility Criteria</h4>
-              
-              <div>
-                <Label>Minimum Compatibility Score</Label>
-                <Slider
-                  value={[settings.profileVisibility.customCriteria?.minCompatibilityScore || 60]}
-                  onValueChange={(value) => {
-                    const newCriteria = {
-                      ...settings.profileVisibility.customCriteria,
-                      minCompatibilityScore: value[0]
-                    };
-                    handleProfileVisibilityChange('customCriteria', newCriteria);
-                  }}
-                  max={100}
-                  min={0}
-                  step={5}
-                  className="w-full mt-2"
-                />
-              </div>
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Masquer la localisation exacte</Label>
+              <p className="text-sm text-muted-foreground">
+                Afficher uniquement une zone générale
+              </p>
+            </div>
+            <Switch
+              checked={!localSettings.showLocation}
+              onCheckedChange={(checked) => updateSettings({ showLocation: !checked })}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
-              <div className="flex items-center justify-between">
-                <Label>Require Verification</Label>
-                <Switch
-                  checked={settings.profileVisibility.customCriteria?.requireVerification || false}
-                  onCheckedChange={(checked) => {
-                    const newCriteria = {
-                      ...settings.profileVisibility.customCriteria,
-                      requireVerification: checked
-                    };
-                    handleProfileVisibilityChange('customCriteria', newCriteria);
-                  }}
-                />
-              </div>
+      {/* Account Pause */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            {isAccountPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
+            Pause de Compte
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label>Mettre le compte en pause</Label>
+              <p className="text-sm text-muted-foreground">
+                {isAccountPaused 
+                  ? "Votre profil est actuellement masqué" 
+                  : "Masquer temporairement votre profil de tous les utilisateurs"
+                }
+              </p>
+            </div>
+            <Button
+              variant={isAccountPaused ? "default" : "outline"}
+              onClick={toggleAccountPause}
+              className={isAccountPaused ? "bg-green-600 hover:bg-green-700" : ""}
+            >
+              {isAccountPaused ? (
+                <>
+                  <Play className="mr-2 h-4 w-4" />
+                  Réactiver
+                </>
+              ) : (
+                <>
+                  <Pause className="mr-2 h-4 w-4" />
+                  Mettre en pause
+                </>
+              )}
+            </Button>
+          </div>
 
-              <div className="flex items-center justify-between">
-                <Label>Require Wali Approval</Label>
-                <Switch
-                  checked={settings.profileVisibility.customCriteria?.requireWaliApproval || false}
-                  onCheckedChange={(checked) => {
-                    const newCriteria = {
-                      ...settings.profileVisibility.customCriteria,
-                      requireWaliApproval: checked
-                    };
-                    handleProfileVisibilityChange('customCriteria', newCriteria);
-                  }}
-                />
+          {isAccountPaused && (
+            <div className="bg-yellow-50 p-3 rounded-lg">
+              <div className="flex items-start gap-2">
+                <Clock className="h-4 w-4 text-yellow-600 mt-0.5" />
+                <div className="text-sm">
+                  <p className="font-medium text-yellow-800">Compte en pause</p>
+                  <p className="text-yellow-700">
+                    Votre profil est masqué et vous n'apparaissez plus dans les recherches.
+                    Vous pouvez réactiver votre compte à tout moment.
+                  </p>
+                </div>
               </div>
             </div>
           )}
-
-          <Separator />
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label>Show in search results</Label>
-              <p className="text-sm text-muted-foreground">Allow others to find you in search</p>
-            </div>
-            <Switch
-              checked={settings.profileVisibility?.showInSearchResults !== false}
-              onCheckedChange={(checked) => handleProfileVisibilityChange('showInSearchResults', checked)}
-            />
-          </div>
-
-          <div className="flex items-center justify-between">
-            <div>
-              <Label>Allow profile screenshots</Label>
-              <p className="text-sm text-muted-foreground">Prevent others from taking screenshots</p>
-            </div>
-            <Switch
-              checked={settings.profileVisibility?.allowProfileScreenshots !== false}
-              onCheckedChange={(checked) => handleProfileVisibilityChange('allowProfileScreenshots', checked)}
-            />
-          </div>
         </CardContent>
       </Card>
 
@@ -322,61 +383,94 @@ const EnhancedPrivacyControls = ({
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Data Retention Settings
+            <Settings className="h-5 w-5" />
+            Rétention des Données
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <Label>Delete view history after (days)</Label>
-            <Slider
-              value={[settings.dataRetention?.deleteViewHistoryAfterDays || 30]}
-              onValueChange={(value) => {
-                const newRetention = {
-                  ...settings.dataRetention,
-                  deleteViewHistoryAfterDays: value[0]
-                };
-                setSettings({
-                  ...settings,
-                  dataRetention: newRetention
-                });
-                onSettingsChange({
-                  ...settings,
-                  dataRetention: newRetention
-                });
-              }}
+          <div className="space-y-2">
+            <Label>Supprimer l'historique des vues après (jours)</Label>
+            <Input
+              type="number"
+              value={localSettings.dataRetention.deleteViewHistoryAfterDays}
+              onChange={(e) => updateSettings({
+                dataRetention: {
+                  ...localSettings.dataRetention,
+                  deleteViewHistoryAfterDays: parseInt(e.target.value) || 30
+                }
+              })}
+              min={1}
               max={365}
-              min={7}
-              step={7}
-              className="w-full mt-2"
             />
-            <div className="text-sm text-muted-foreground mt-1">
-              Currently: {settings.dataRetention?.deleteViewHistoryAfterDays || 30} days
-            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Supprimer les conversations après (jours)</Label>
+            <Input
+              type="number"
+              value={localSettings.dataRetention.deleteConversationsAfterDays}
+              onChange={(e) => updateSettings({
+                dataRetention: {
+                  ...localSettings.dataRetention,
+                  deleteConversationsAfterDays: parseInt(e.target.value) || 365
+                }
+              })}
+              min={1}
+              max={3650}
+            />
           </div>
 
           <div className="flex items-center justify-between">
-            <div>
-              <Label>Auto-delete rejected matches</Label>
-              <p className="text-sm text-muted-foreground">Remove data from users you've rejected</p>
+            <div className="space-y-0.5">
+              <Label>Supprimer automatiquement les matchs rejetés</Label>
+              <p className="text-sm text-muted-foreground">
+                Effacer les données des profils que vous avez rejetés
+              </p>
             </div>
             <Switch
-              checked={settings.dataRetention?.autoDeleteRejectedMatches || false}
-              onCheckedChange={(checked) => {
-                const newRetention = {
-                  ...settings.dataRetention,
+              checked={localSettings.dataRetention.autoDeleteRejectedMatches}
+              onCheckedChange={(checked) => updateSettings({
+                dataRetention: {
+                  ...localSettings.dataRetention,
                   autoDeleteRejectedMatches: checked
-                };
-                setSettings({
-                  ...settings,
-                  dataRetention: newRetention
-                });
-                onSettingsChange({
-                  ...settings,
-                  dataRetention: newRetention
-                });
-              }}
+                }
+              })}
             />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Résumé des Paramètres de Confidentialité</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-2">
+            {localSettings.progressiveReveal.enabled && (
+              <Badge variant="secondary">
+                <Eye className="mr-1 h-3 w-3" />
+                Révélation progressive activée
+              </Badge>
+            )}
+            {localSettings.incognito.enabled && (
+              <Badge variant="secondary">
+                <EyeOff className="mr-1 h-3 w-3" />
+                Mode invisible activé
+              </Badge>
+            )}
+            {isAccountPaused && (
+              <Badge variant="destructive">
+                <Pause className="mr-1 h-3 w-3" />
+                Compte en pause
+              </Badge>
+            )}
+            {!localSettings.showLocation && (
+              <Badge variant="secondary">
+                <MapPin className="mr-1 h-3 w-3" />
+                Localisation masquée
+              </Badge>
+            )}
           </div>
         </CardContent>
       </Card>

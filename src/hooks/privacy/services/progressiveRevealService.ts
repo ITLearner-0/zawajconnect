@@ -1,55 +1,140 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { ProgressiveRevealSettings, ProfileViewEvent } from "@/types/enhancedPrivacy";
-import { DatabaseProfile } from "@/types/profile";
+import { ProfileViewEvent, ProgressiveRevealSettings } from "@/types/enhancedPrivacy";
 
 export class ProgressiveRevealService {
+  private viewHistory = new Map<string, ProfileViewEvent[]>();
+
   async getRevealLevel(
-    viewerId: string,
-    targetUserId: string,
+    viewerId: string, 
+    targetUserId: string, 
     compatibilityScore?: number
   ): Promise<keyof ProgressiveRevealSettings['revealStages']> {
     try {
-      // Get the target user's progressive reveal settings
-      const { data: profile } = await supabase
+      // Get target user's progressive reveal settings
+      const { data: targetProfile } = await supabase
         .from('profiles')
         .select('privacy_settings')
         .eq('id', targetUserId)
         .single();
 
-      if (!profile?.privacy_settings) {
-        return 'basic';
+      if (!targetProfile?.privacy_settings?.progressiveReveal?.enabled) {
+        return 'contact'; // Full reveal if not enabled
       }
 
-      const settings = profile.privacy_settings as any;
-      const progressiveReveal = settings.progressiveReveal as ProgressiveRevealSettings;
+      const settings = targetProfile.privacy_settings.progressiveReveal;
 
-      if (!progressiveReveal?.enabled) {
-        return 'contact'; // Full reveal if progressive reveal is disabled
+      // Check compatibility score requirement
+      if (compatibilityScore && compatibilityScore >= settings.requiresCompatibilityScore) {
+        return 'contact'; // Full reveal for high compatibility
       }
 
-      // Check if users have been chatting and for how long
-      const conversationDays = await this.getConversationDays(viewerId, targetUserId);
+      // Check conversation duration
+      const conversationDays = await this.getConversationDuration(viewerId, targetUserId);
+      if (conversationDays >= settings.autoRevealAfterDays) {
+        return 'contact'; // Full reveal after conversation duration
+      }
+
+      // Progressive reveal based on interaction level
+      if (conversationDays >= 3) return 'personal';
+      if (conversationDays >= 1) return 'religious';
+      if (compatibilityScore && compatibilityScore >= 50) return 'education';
       
-      if (conversationDays >= progressiveReveal.autoRevealAfterDays) {
-        return 'contact'; // Full reveal after extended conversation
-      }
-
-      // Determine reveal level based on compatibility score
-      if (!compatibilityScore || compatibilityScore < progressiveReveal.requiresCompatibilityScore) {
-        return 'basic';
-      }
-
-      if (compatibilityScore >= 90) return 'contact';
-      if (compatibilityScore >= 80) return 'personal';
-      if (compatibilityScore >= 70) return 'religious';
-      if (compatibilityScore >= 60) return 'education';
-      
-      return 'basic';
+      return 'basic'; // Minimum reveal level
     } catch (error) {
       console.error('Error determining reveal level:', error);
       return 'basic';
     }
+  }
+
+  async getConversationDuration(userId1: string, userId2: string): Promise<number> {
+    try {
+      const { data: conversation } = await supabase
+        .from('conversations')
+        .select('created_at')
+        .contains('participants', [userId1])
+        .contains('participants', [userId2])
+        .single();
+
+      if (!conversation) return 0;
+
+      const createdAt = new Date(conversation.created_at);
+      const now = new Date();
+      const diffTime = Math.abs(now.getTime() - createdAt.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      return diffDays;
+    } catch (error) {
+      console.error('Error getting conversation duration:', error);
+      return 0;
+    }
+  }
+
+  filterProfileData(profile: any, revealLevel: keyof ProgressiveRevealSettings['revealStages']) {
+    const filtered = { ...profile };
+
+    switch (revealLevel) {
+      case 'basic':
+        // Only show basic info
+        return {
+          id: filtered.id,
+          first_name: filtered.first_name,
+          birth_date: filtered.birth_date,
+          location: this.obfuscateLocation(filtered.location),
+          profile_picture: this.blurImage(filtered.profile_picture),
+          gallery: filtered.gallery?.map((img: string) => this.blurImage(img)) || []
+        };
+
+      case 'education':
+        // Add education and work info
+        return {
+          ...this.filterProfileData(profile, 'basic'),
+          education_level: filtered.education_level,
+          occupation: filtered.occupation
+        };
+
+      case 'religious':
+        // Add religious practice info
+        return {
+          ...this.filterProfileData(profile, 'education'),
+          religious_practice_level: filtered.religious_practice_level,
+          prayer_frequency: filtered.prayer_frequency,
+          madhab: filtered.madhab
+        };
+
+      case 'personal':
+        // Add personal details
+        return {
+          ...this.filterProfileData(profile, 'religious'),
+          about_me: filtered.about_me,
+          profile_picture: filtered.profile_picture, // Unblur photos
+          gallery: filtered.gallery || []
+        };
+
+      case 'contact':
+        // Full profile access
+        return filtered;
+
+      default:
+        return this.filterProfileData(profile, 'basic');
+    }
+  }
+
+  private obfuscateLocation(location: string): string {
+    if (!location) return '';
+    
+    // Remove specific addresses, keep only city/region
+    const parts = location.split(',');
+    if (parts.length > 1) {
+      return parts.slice(-2).join(',').trim(); // Keep last 2 parts (city, country)
+    }
+    return location;
+  }
+
+  private blurImage(imageUrl: string): string {
+    if (!imageUrl) return '';
+    
+    // Add blur filter parameter (this would be handled by your image service)
+    return `${imageUrl}?blur=15&brightness=80`;
   }
 
   async logProfileView(
@@ -59,7 +144,8 @@ export class ProgressiveRevealService {
     compatibilityScore?: number
   ): Promise<void> {
     try {
-      const viewEvent: Partial<ProfileViewEvent> = {
+      const viewEvent: ProfileViewEvent = {
+        id: crypto.randomUUID(),
         viewerId,
         viewedUserId,
         timestamp: new Date(),
@@ -67,93 +153,23 @@ export class ProgressiveRevealService {
         compatibilityScore
       };
 
-      // Store in a hypothetical profile_views table
-      console.log('Profile view logged:', viewEvent);
-      // In a real implementation, you'd store this in Supabase
+      // Store in memory (in production, you'd store in database)
+      const userViews = this.viewHistory.get(viewerId) || [];
+      userViews.push(viewEvent);
+      this.viewHistory.set(viewerId, userViews);
+
+      console.log(`Profile view logged: ${viewerId} viewed ${viewedUserId} at level ${revealLevel}`);
     } catch (error) {
       console.error('Error logging profile view:', error);
     }
   }
 
-  filterProfileData(
-    profile: DatabaseProfile,
-    revealLevel: keyof ProgressiveRevealSettings['revealStages']
-  ): Partial<DatabaseProfile> {
-    const baseProfile = {
-      id: profile.id,
-      first_name: profile.first_name
-    };
-
-    switch (revealLevel) {
-      case 'basic':
-        return {
-          ...baseProfile,
-          first_name: profile.first_name,
-          birth_date: profile.birth_date,
-          location: profile.location,
-          gender: profile.gender
-        };
-
-      case 'education':
-        return {
-          ...baseProfile,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          birth_date: profile.birth_date,
-          location: profile.location,
-          gender: profile.gender,
-          education_level: profile.education_level,
-          occupation: profile.occupation
-        };
-
-      case 'religious':
-        return {
-          ...baseProfile,
-          first_name: profile.first_name,
-          last_name: profile.last_name,
-          birth_date: profile.birth_date,
-          location: profile.location,
-          gender: profile.gender,
-          education_level: profile.education_level,
-          occupation: profile.occupation,
-          religious_practice_level: profile.religious_practice_level,
-          prayer_frequency: profile.prayer_frequency
-        };
-
-      case 'personal':
-        return {
-          ...profile,
-          wali_name: undefined,
-          wali_contact: undefined,
-          wali_relationship: undefined
-        };
-
-      case 'contact':
-      default:
-        return profile;
-    }
+  async getUserViewHistory(userId: string): Promise<ProfileViewEvent[]> {
+    return this.viewHistory.get(userId) || [];
   }
 
-  private async getConversationDays(userId1: string, userId2: string): Promise<number> {
-    try {
-      const { data: conversation } = await supabase
-        .from('conversations')
-        .select('created_at')
-        .contains('participants', [userId1, userId2])
-        .single();
-
-      if (!conversation) return 0;
-
-      const conversationStart = new Date(conversation.created_at);
-      const now = new Date();
-      const diffTime = Math.abs(now.getTime() - conversationStart.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-      return diffDays;
-    } catch (error) {
-      console.error('Error getting conversation days:', error);
-      return 0;
-    }
+  async clearViewHistory(userId: string): Promise<void> {
+    this.viewHistory.delete(userId);
   }
 }
 

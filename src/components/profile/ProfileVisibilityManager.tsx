@@ -1,15 +1,29 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
-import { Eye, EyeOff, Settings, Clock } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { 
+  Eye, 
+  EyeOff, 
+  Shield, 
+  MapPin, 
+  Clock, 
+  Settings,
+  Users,
+  Lock,
+  Unlock,
+  Info
+} from 'lucide-react';
 
 interface VisibilitySettings {
   isVisible: boolean;
-  visibilityLevel: number; // 0-100
+  visibilityLevel: number;
   showOnlyToMatches: boolean;
   hideFromSearch: boolean;
   temporaryHide: boolean;
@@ -21,170 +35,376 @@ interface ProfileVisibilityManagerProps {
   onSettingsChange: (settings: VisibilitySettings) => void;
 }
 
-const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({ 
-  settings, 
-  onSettingsChange 
+const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
+  settings,
+  onSettingsChange
 }) => {
   const [localSettings, setLocalSettings] = useState<VisibilitySettings>(settings);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const handleSettingChange = (key: keyof VisibilitySettings, value: any) => {
+  const updateSetting = (key: keyof VisibilitySettings, value: any) => {
     const newSettings = { ...localSettings, [key]: value };
     setLocalSettings(newSettings);
     onSettingsChange(newSettings);
   };
 
-  const getVisibilityStatusText = () => {
-    if (!localSettings.isVisible) return "Profil masqué";
-    if (localSettings.temporaryHide) return "Masqué temporairement";
-    if (localSettings.showOnlyToMatches) return "Visible aux correspondances seulement";
-    if (localSettings.hideFromSearch) return "Masqué de la recherche";
-    return "Entièrement visible";
+  const getVisibilityDescription = (level: number) => {
+    switch (level) {
+      case 0:
+        return "Profil complètement privé - Invisible pour tous";
+      case 25:
+        return "Très privé - Visible uniquement pour les matchs vérifiés";
+      case 50:
+        return "Privé - Visible pour les matchs et utilisateurs compatibles";
+      case 75:
+        return "Modéré - Visible avec informations limitées";
+      case 100:
+        return "Public - Toutes les informations visibles";
+      default:
+        return "Niveau de visibilité personnalisé";
+    }
   };
 
-  const getStatusColor = () => {
-    if (!localSettings.isVisible || localSettings.temporaryHide) return "bg-red-100 text-red-800";
-    if (localSettings.showOnlyToMatches || localSettings.hideFromSearch) return "bg-yellow-100 text-yellow-800";
-    return "bg-green-100 text-green-800";
+  const setTemporaryHide = (hours: number) => {
+    const hideUntil = new Date();
+    hideUntil.setHours(hideUntil.getHours() + hours);
+    
+    updateSetting('temporaryHide', true);
+    updateSetting('temporaryHideUntil', hideUntil);
+  };
+
+  const clearTemporaryHide = () => {
+    updateSetting('temporaryHide', false);
+    updateSetting('temporaryHideUntil', undefined);
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-rose-800">
-            <Eye className="w-5 h-5" />
-            Gestion de la visibilité
-          </div>
-          <Badge className={`text-xs ${getStatusColor()}`}>
-            {getVisibilityStatusText()}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Main Visibility Toggle */}
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <h4 className="font-medium">Profil visible</h4>
-            <p className="text-sm text-gray-600">
-              Rendre votre profil visible aux autres utilisateurs
-            </p>
-          </div>
-          <Switch
-            checked={localSettings.isVisible}
-            onCheckedChange={(checked) => handleSettingChange('isVisible', checked)}
-          />
-        </div>
-
-        {localSettings.isVisible && (
-          <>
-            {/* Visibility Level */}
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="font-medium">Niveau de visibilité</h4>
-                <span className="text-sm text-gray-600">{localSettings.visibilityLevel}%</span>
-              </div>
-              <Slider
-                value={[localSettings.visibilityLevel]}
-                onValueChange={([value]) => handleSettingChange('visibilityLevel', value)}
-                max={100}
-                step={10}
-                className="w-full"
-              />
-              <p className="text-xs text-gray-500">
-                Plus le niveau est élevé, plus votre profil apparaîtra dans les résultats de recherche
+    <div className="space-y-6">
+      {/* Main Visibility Toggle */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            {localSettings.isVisible ? (
+              <Eye className="h-5 w-5 text-green-600" />
+            ) : (
+              <EyeOff className="h-5 w-5 text-red-600" />
+            )}
+            Visibilité du Profil
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <Label className="text-base font-medium">
+                Profil {localSettings.isVisible ? 'Visible' : 'Masqué'}
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                {localSettings.isVisible 
+                  ? "Votre profil apparaît dans les recherches et peut être vu par d'autres utilisateurs"
+                  : "Votre profil est complètement masqué de tous les utilisateurs"
+                }
               </p>
             </div>
+            <Switch
+              checked={localSettings.isVisible}
+              onCheckedChange={(checked) => updateSetting('isVisible', checked)}
+              className="data-[state=checked]:bg-green-600"
+            />
+          </div>
 
-            {/* Quick Settings */}
-            <div className="space-y-4">
+          {!localSettings.isVisible && (
+            <Alert>
+              <EyeOff className="h-4 w-4" />
+              <AlertDescription>
+                Votre profil est actuellement masqué. Vous n'apparaissez dans aucune recherche 
+                et ne recevrez aucune nouvelle connexion.
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Visibility Level Control */}
+      {localSettings.isVisible && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="h-5 w-5" />
+              Niveau de Visibilité
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <Label>Niveau de confidentialité</Label>
+                <Badge variant="outline">
+                  {localSettings.visibilityLevel}%
+                </Badge>
+              </div>
+              
+              <Slider
+                value={[localSettings.visibilityLevel]}
+                onValueChange={([value]) => updateSetting('visibilityLevel', value)}
+                max={100}
+                min={0}
+                step={25}
+                className="w-full"
+              />
+              
+              <div className="grid grid-cols-5 text-xs text-muted-foreground">
+                <span>Privé</span>
+                <span>Très privé</span>
+                <span>Modéré</span>
+                <span>Ouvert</span>
+                <span>Public</span>
+              </div>
+              
+              <p className="text-sm text-muted-foreground mt-2">
+                {getVisibilityDescription(localSettings.visibilityLevel)}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Advanced Visibility Options */}
+      {localSettings.isVisible && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Options Avancées
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowAdvanced(!showAdvanced)}
+              >
+                {showAdvanced ? 'Masquer' : 'Afficher'}
+              </Button>
+            </CardTitle>
+          </CardHeader>
+          {showAdvanced && (
+            <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <h4 className="font-medium">Visible uniquement aux correspondances</h4>
-                  <p className="text-sm text-gray-600">
-                    Seules vos correspondances peuvent voir votre profil
+                <div className="space-y-0.5">
+                  <Label>Visible uniquement pour les matchs</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Seuls les utilisateurs avec qui vous avez une compatibilité élevée peuvent voir votre profil
                   </p>
                 </div>
                 <Switch
                   checked={localSettings.showOnlyToMatches}
-                  onCheckedChange={(checked) => handleSettingChange('showOnlyToMatches', checked)}
+                  onCheckedChange={(checked) => updateSetting('showOnlyToMatches', checked)}
                 />
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <h4 className="font-medium">Masquer de la recherche</h4>
-                  <p className="text-sm text-gray-600">
-                    Votre profil n'apparaîtra pas dans les résultats de recherche
+                <div className="space-y-0.5">
+                  <Label>Masquer des résultats de recherche</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Votre profil n'apparaîtra pas dans les recherches générales
                   </p>
                 </div>
                 <Switch
                   checked={localSettings.hideFromSearch}
-                  onCheckedChange={(checked) => handleSettingChange('hideFromSearch', checked)}
+                  onCheckedChange={(checked) => updateSetting('hideFromSearch', checked)}
                 />
               </div>
-            </div>
+            </CardContent>
+          )}
+        </Card>
+      )}
 
-            {/* Advanced Settings */}
-            <div className="space-y-4">
-              <Button 
-                variant="outline" 
-                size="sm" 
-                onClick={() => setShowAdvanced(!showAdvanced)}
-                className="w-full"
-              >
-                <Settings className="w-4 h-4 mr-2" />
-                {showAdvanced ? 'Masquer' : 'Afficher'} les options avancées
-              </Button>
-
-              {showAdvanced && (
-                <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div className="space-y-1">
-                      <h4 className="font-medium">Masquage temporaire</h4>
-                      <p className="text-sm text-gray-600">
-                        Masquer temporairement votre profil
-                      </p>
-                    </div>
-                    <Switch
-                      checked={localSettings.temporaryHide}
-                      onCheckedChange={(checked) => handleSettingChange('temporaryHide', checked)}
-                    />
-                  </div>
-
-                  {localSettings.temporaryHide && (
-                    <div className="ml-4 p-3 bg-yellow-50 rounded border">
-                      <div className="flex items-center gap-2 text-yellow-800">
-                        <Clock className="w-4 h-4" />
-                        <span className="text-sm font-medium">
-                          Profil masqué temporairement
-                        </span>
-                      </div>
-                      <p className="text-xs text-yellow-700 mt-1">
-                        Votre profil ne sera visible à personne jusqu'à ce que vous le réactiviez
-                      </p>
-                    </div>
-                  )}
+      {/* Temporary Hide Options */}
+      {localSettings.isVisible && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Masquage Temporaire
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {localSettings.temporaryHide ? (
+              <div className="space-y-3">
+                <Alert>
+                  <Clock className="h-4 w-4" />
+                  <AlertDescription>
+                    Votre profil est temporairement masqué jusqu'au{' '}
+                    {localSettings.temporaryHideUntil?.toLocaleString('fr-FR')}
+                  </AlertDescription>
+                </Alert>
+                <Button 
+                  variant="outline" 
+                  onClick={clearTemporaryHide}
+                  className="w-full"
+                >
+                  <Unlock className="mr-2 h-4 w-4" />
+                  Réactiver Maintenant
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Masquez temporairement votre profil pendant une durée définie
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setTemporaryHide(1)}
+                  >
+                    1 heure
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setTemporaryHide(6)}
+                  >
+                    6 heures
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setTemporaryHide(24)}
+                  >
+                    1 jour
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setTemporaryHide(168)}
+                  >
+                    1 semaine
+                  </Button>
                 </div>
-              )}
-            </div>
-          </>
-        )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
-        {!localSettings.isVisible && (
-          <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-            <div className="flex items-center gap-2 text-red-800">
-              <EyeOff className="w-4 h-4" />
-              <span className="font-medium">Profil masqué</span>
-            </div>
-            <p className="text-sm text-red-700 mt-1">
-              Votre profil n'est visible à aucun autre utilisateur. 
-              Activez la visibilité pour recommencer à recevoir des correspondances.
-            </p>
+      {/* Location Privacy */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Confidentialité de Localisation
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label>Précision de la localisation</Label>
+            <Select defaultValue="approximate">
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="exact">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    <div>
+                      <div>Distance exacte</div>
+                      <div className="text-xs text-muted-foreground">Affiche la distance précise</div>
+                    </div>
+                  </div>
+                </SelectItem>
+                <SelectItem value="approximate">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    <div>
+                      <div>Distance approximative</div>
+                      <div className="text-xs text-muted-foreground">±5km de votre position</div>
+                    </div>
+                  </div>
+                </SelectItem>
+                <SelectItem value="city">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    <div>
+                      <div>Ville uniquement</div>
+                      <div className="text-xs text-muted-foreground">Affiche seulement votre ville</div>
+                    </div>
+                  </div>
+                </SelectItem>
+                <SelectItem value="region">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    <div>
+                      <div>Région uniquement</div>
+                      <div className="text-xs text-muted-foreground">Affiche seulement votre région</div>
+                    </div>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-        )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+
+      {/* Privacy Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Info className="h-5 w-5" />
+            Résumé de la Confidentialité
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Statut du profil</span>
+              <Badge variant={localSettings.isVisible ? "default" : "destructive"}>
+                {localSettings.isVisible ? "Visible" : "Masqué"}
+              </Badge>
+            </div>
+            
+            {localSettings.isVisible && (
+              <>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">Niveau de visibilité</span>
+                  <Badge variant="outline">
+                    {localSettings.visibilityLevel}%
+                  </Badge>
+                </div>
+                
+                {localSettings.showOnlyToMatches && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Restriction</span>
+                    <Badge variant="secondary">
+                      <Users className="mr-1 h-3 w-3" />
+                      Matchs uniquement
+                    </Badge>
+                  </div>
+                )}
+                
+                {localSettings.hideFromSearch && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm">Recherche</span>
+                    <Badge variant="secondary">
+                      <EyeOff className="mr-1 h-3 w-3" />
+                      Masqué
+                    </Badge>
+                  </div>
+                )}
+              </>
+            )}
+            
+            {localSettings.temporaryHide && (
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Masquage temporaire</span>
+                <Badge variant="outline">
+                  <Clock className="mr-1 h-3 w-3" />
+                  Actif
+                </Badge>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

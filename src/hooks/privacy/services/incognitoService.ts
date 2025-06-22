@@ -4,6 +4,7 @@ import { IncognitoSettings } from "@/types/enhancedPrivacy";
 
 export class IncognitoService {
   private incognitoUsers = new Set<string>();
+  private dailyViewCounts = new Map<string, { date: string; count: number }>();
 
   async enableIncognito(userId: string): Promise<boolean> {
     try {
@@ -73,10 +74,6 @@ export class IncognitoService {
     }
   }
 
-  isIncognito(userId: string): boolean {
-    return this.incognitoUsers.has(userId);
-  }
-
   async checkIncognitoStatus(userId: string): Promise<boolean> {
     try {
       const { data: profile } = await supabase
@@ -85,72 +82,128 @@ export class IncognitoService {
         .eq('id', userId)
         .single();
 
-      if (!profile?.privacy_settings) return false;
-
-      const settings = profile.privacy_settings as any;
-      const incognitoEnabled = settings.incognito?.enabled || false;
-
-      if (incognitoEnabled) {
-        this.incognitoUsers.add(userId);
-      } else {
-        this.incognitoUsers.delete(userId);
-      }
-
-      return incognitoEnabled;
+      return profile?.privacy_settings?.incognito?.enabled || false;
     } catch (error) {
       console.error('Error checking incognito status:', error);
       return false;
     }
   }
 
-  filterSearchResults(profiles: any[], viewerId: string): any[] {
-    return profiles.filter(profile => {
-      // Don't show incognito users in search results
-      if (this.isIncognito(profile.id)) {
-        return false;
-      }
-
-      // Check if the profile has incognito settings that would hide them
-      const settings = profile.privacy_settings;
-      if (settings?.incognito?.hideFromSearch) {
-        return false;
-      }
-
-      return true;
-    });
-  }
-
-  maskUserActivity(userId: string, lastActive: Date): Date | null {
-    if (this.isIncognito(userId)) {
-      return null; // Hide last active time for incognito users
-    }
-    return lastActive;
-  }
-
   async checkDailyViewLimit(viewerId: string, targetUserId: string): Promise<boolean> {
-    if (!this.isIncognito(viewerId)) {
-      return true; // No limit for non-incognito users
-    }
-
     try {
-      // Check today's view count (this would require a profile_views table)
-      // For now, we'll implement a simple in-memory check
-      const today = new Date().toDateString();
-      const key = `${viewerId}_${today}`;
-      
-      // In a real implementation, you'd store this in Supabase or Redis
-      const viewCount = parseInt(localStorage.getItem(key) || '0');
-      const maxViews = 5; // Default limit for incognito users
+      const { data: viewerProfile } = await supabase
+        .from('profiles')
+        .select('privacy_settings')
+        .eq('id', viewerId)
+        .single();
 
-      if (viewCount >= maxViews) {
-        return false;
+      const incognitoSettings = viewerProfile?.privacy_settings?.incognito;
+      
+      if (!incognitoSettings?.limitProfileViews) {
+        return true; // No limit set
       }
 
-      localStorage.setItem(key, (viewCount + 1).toString());
+      const today = new Date().toISOString().split('T')[0];
+      const userViewData = this.dailyViewCounts.get(viewerId);
+
+      if (!userViewData || userViewData.date !== today) {
+        // Reset count for new day
+        this.dailyViewCounts.set(viewerId, { date: today, count: 1 });
+        return true;
+      }
+
+      if (userViewData.count >= incognitoSettings.maxProfileViewsPerDay) {
+        return false; // Limit exceeded
+      }
+
+      // Increment count
+      userViewData.count++;
+      this.dailyViewCounts.set(viewerId, userViewData);
       return true;
     } catch (error) {
       console.error('Error checking daily view limit:', error);
+      return true; // Allow view on error
+    }
+  }
+
+  async hideFromSearchResults(userId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_visible: false })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Error hiding from search results:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error hiding from search results:', error);
       return false;
+    }
+  }
+
+  async showInSearchResults(userId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ is_visible: true })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Error showing in search results:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error showing in search results:', error);
+      return false;
+    }
+  }
+
+  getIncognitoUsers(): string[] {
+    return Array.from(this.incognitoUsers);
+  }
+
+  isUserIncognito(userId: string): boolean {
+    return this.incognitoUsers.has(userId);
+  }
+
+  async obfuscateLastActive(userId: string): Promise<string> {
+    const isIncognito = await this.checkIncognitoStatus(userId);
+    
+    if (isIncognito) {
+      return "Actif récemment"; // Generic message
+    }
+
+    // Return actual last active time
+    try {
+      const { data: session } = await supabase
+        .from('user_sessions')
+        .select('last_activity')
+        .eq('user_id', userId)
+        .order('last_activity', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (session?.last_activity) {
+        const lastActive = new Date(session.last_activity);
+        const now = new Date();
+        const diffMinutes = Math.floor((now.getTime() - lastActive.getTime()) / (1000 * 60));
+
+        if (diffMinutes < 5) return "En ligne";
+        if (diffMinutes < 60) return `Actif il y a ${diffMinutes} minutes`;
+        if (diffMinutes < 1440) return `Actif il y a ${Math.floor(diffMinutes / 60)} heures`;
+        return `Actif il y a ${Math.floor(diffMinutes / 1440)} jours`;
+      }
+
+      return "Actif récemment";
+    } catch (error) {
+      console.error('Error getting last active time:', error);
+      return "Actif récemment";
     }
   }
 }
