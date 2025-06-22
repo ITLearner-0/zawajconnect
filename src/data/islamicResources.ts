@@ -1,4 +1,3 @@
-
 import { IslamicResource, ResourceCategory } from "@/types/resources";
 
 export const resourceCategories: ResourceCategory[] = [
@@ -230,6 +229,62 @@ export const islamicResources: IslamicResource[] = [
     imageUrl: "/placeholder.svg",
     tags: ["défis numériques", "réseaux sociaux", "problèmes modernes"],
     createdAt: "2024-03-01"
+  },
+  
+  //Add new resources for enhanced resource center
+  {
+    id: "17",
+    title: "Les Étapes de la Rencontre Islamique",
+    description: "Guide étape par étape pour une approche islamique de la rencontre, des premiers contacts au mariage.",
+    category: "compatibility",
+    author: "Sheikh Abdul Rahman Al-Sudais",
+    contentType: "guide",
+    content: "La rencontre islamique suit des principes clairs qui protègent la dignité des deux parties tout en permettant une connaissance mutuelle appropriée. Ce guide détaille chaque étape : la niyyah (intention), la consultation familiale, les rencontres supervisées, l'évaluation de la compatibilité, et la prise de décision. Chaque étape est accompagnée de conseils pratiques et de références religieuses pour vous guider dans ce parcours béni...",
+    imageUrl: "/placeholder.svg",
+    tags: ["rencontre", "étapes", "supervision", "intention"],
+    createdAt: "2024-03-10",
+    difficulty: "beginner",
+    readingTime: 25
+  },
+  {
+    id: "18",
+    title: "FAQ Complète du Mariage Islamique",
+    description: "Réponses aux questions les plus fréquentes sur le mariage en Islam, basées sur les sources authentiques.",
+    category: "fiqh",
+    author: "Comité des Savants",
+    contentType: "faq",
+    content: "Cette FAQ complète répond aux questions essentielles sur le mariage islamique : conditions de validité, droits et devoirs, résolution de conflits, questions financières, et bien plus. Chaque réponse est basée sur le Coran, la Sunna et les avis des savants reconnus...",
+    imageUrl: "/placeholder.svg",
+    tags: ["faq", "questions", "réponses", "fiqh"],
+    createdAt: "2024-02-20",
+    featured: true
+  },
+  {
+    id: "19",
+    title: "Préparer sa Famille au Mariage",
+    description: "Guide pour impliquer et préparer les familles des deux côtés pour un mariage harmonieux.",
+    category: "family",
+    author: "Dr. Tariq Ramadan",
+    contentType: "guide",
+    content: "Le mariage islamique unit non seulement deux personnes mais aussi deux familles. Ce guide explore comment préparer et impliquer les familles de manière positive : communication inter-familiale, gestion des différences culturelles, préparation des cérémonies, et construction de relations durables. Des conseils pratiques pour naviguer les dynamiques familiales complexes tout en respectant les valeurs islamiques...",
+    imageUrl: "/placeholder.svg",
+    tags: ["famille", "préparation", "harmonie", "communication"],
+    createdAt: "2024-03-05",
+    difficulty: "intermediate",
+    readingTime: 40
+  },
+  {
+    id: "20",
+    title: "La Dot (Mahr) : Droits et Pratiques",
+    description: "Guide complet sur le mahr en Islam : signification, calcul, modalités et droits de l'épouse.",
+    category: "fiqh",
+    author: "Sheikh Yusuf Al-Qaradawi",
+    contentType: "article",
+    content: "Le mahr est un droit fondamental de l'épouse en Islam, mais sa compréhension est souvent confuse. Cet article clarifie tous les aspects du mahr : sa signification spirituelle et juridique, les différents types (muqaddam et muakhar), les modalités de paiement, et la sagesse derrière cette institution. Il aborde aussi les pratiques contemporaines et les déviations à éviter, avec des exemples concrets et des conseils pratiques pour les couples modernes...",
+    imageUrl: "/placeholder.svg",
+    tags: ["mahr", "dot", "droits épouse", "fiqh"],
+    createdAt: "2024-02-28",
+    featured: true
   }
 ];
 
