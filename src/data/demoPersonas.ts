@@ -1,0 +1,264 @@
+
+import { DatabaseProfile } from '@/types/profile';
+
+// Limited representative personas for demo mode
+export const demoPersonas: DatabaseProfile[] = [
+  {
+    id: 'demo-user-1',
+    first_name: 'Ahmed',
+    last_name: 'Al-Rashid',
+    birth_date: '1990-03-15',
+    gender: 'Male',
+    location: 'Paris, France',
+    education_level: 'Masters',
+    occupation: 'Ingénieur informatique',
+    religious_practice_level: 'Practicing',
+    prayer_frequency: 'Five times daily',
+    about_me: 'Je suis un musulman pratiquant à la recherche d\'une épouse pieuse qui partage mes valeurs islamiques. J\'aime lire le Coran, faire du sport et passer du temps en famille.',
+    email_verified: true,
+    phone_verified: true,
+    id_verified: true,
+    wali_name: null,
+    wali_relationship: null,
+    wali_contact: null,
+    wali_verified: false,
+    is_visible: true,
+    is_verified: true,
+    profile_picture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+    gallery: [],
+    privacy_settings: {
+      profileVisibilityLevel: 1,
+      showAge: true,
+      showLocation: true,
+      showOccupation: true,
+      allowNonMatchMessages: true
+    },
+    blocked_users: [],
+    content_flags: [],
+    moderation_status: 'approved',
+    last_moderation_date: '2024-01-15',
+    created_at: '2024-01-01T10:00:00Z',
+    updated_at: '2024-01-15T15:30:00Z'
+  },
+  {
+    id: 'demo-user-2',
+    first_name: 'Fatima',
+    last_name: 'Benali',
+    birth_date: '1992-07-22',
+    gender: 'Female',
+    location: 'Lyon, France',
+    education_level: 'Bachelors',
+    occupation: 'Professeure',
+    religious_practice_level: 'Very Practicing',
+    prayer_frequency: 'Five times daily',
+    about_me: 'Enseignante passionnée et musulmane pratiquante. Je cherche un époux qui comprend l\'importance de l\'éducation islamique des enfants et qui souhaite construire une famille unie.',
+    email_verified: true,
+    phone_verified: true,
+    id_verified: true,
+    wali_name: 'Ibrahim Benali',
+    wali_relationship: 'Father',
+    wali_contact: '+33123456789',
+    wali_verified: true,
+    is_visible: true,
+    is_verified: true,
+    profile_picture: 'https://images.unsplash.com/photo-1494790108755-2616c15c8cc5?w=400&h=400&fit=crop',
+    gallery: [],
+    privacy_settings: {
+      profileVisibilityLevel: 2,
+      showAge: false,
+      showLocation: true,
+      showOccupation: true,
+      allowNonMatchMessages: false
+    },
+    blocked_users: [],
+    content_flags: [],
+    moderation_status: 'approved',
+    last_moderation_date: '2024-01-12',
+    created_at: '2024-01-02T09:15:00Z',
+    updated_at: '2024-01-12T14:20:00Z'
+  },
+  {
+    id: 'demo-user-3',
+    first_name: 'Youssef',
+    last_name: 'Amrani',
+    birth_date: '1988-11-08',
+    gender: 'Male',
+    location: 'Marseille, France',
+    education_level: 'PhD',
+    occupation: 'Médecin',
+    religious_practice_level: 'Practicing',
+    prayer_frequency: 'Five times daily',
+    about_me: 'Médecin dévoué et musulman engagé. Je crois en l\'importance de servir la communauté tout en maintenant un équilibre spirituel fort.',
+    email_verified: true,
+    phone_verified: true,
+    id_verified: true,
+    wali_name: null,
+    wali_relationship: null,
+    wali_contact: null,
+    wali_verified: false,
+    is_visible: true,
+    is_verified: true,
+    profile_picture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop',
+    gallery: [],
+    privacy_settings: {
+      profileVisibilityLevel: 1,
+      showAge: true,
+      showLocation: true,
+      showOccupation: true,
+      allowNonMatchMessages: true
+    },
+    blocked_users: [],
+    content_flags: [],
+    moderation_status: 'approved',
+    last_moderation_date: '2024-01-10',
+    created_at: '2023-12-15T11:30:00Z',
+    updated_at: '2024-01-10T16:45:00Z'
+  },
+  {
+    id: 'demo-user-4',
+    first_name: 'Khadija',
+    last_name: 'Toumi',
+    birth_date: '1994-05-30',
+    gender: 'Female',
+    location: 'Toulouse, France',
+    education_level: 'Masters',
+    occupation: 'Architecte',
+    religious_practice_level: 'Moderately Practicing',
+    prayer_frequency: 'Five times daily',
+    about_me: 'Architecte créative avec une forte connexion à ma foi. J\'aime voyager, découvrir de nouvelles cultures tout en respectant les valeurs islamiques.',
+    email_verified: true,
+    phone_verified: true,
+    id_verified: true,
+    wali_name: 'Samir Toumi',
+    wali_relationship: 'Brother',
+    wali_contact: '+33987654321',
+    wali_verified: true,
+    is_visible: true,
+    is_verified: true,
+    profile_picture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
+    gallery: [],
+    privacy_settings: {
+      profileVisibilityLevel: 1,
+      showAge: true,
+      showLocation: true,
+      showOccupation: true,
+      allowNonMatchMessages: true
+    },
+    blocked_users: [],
+    content_flags: [],
+    moderation_status: 'approved',
+    last_moderation_date: '2024-01-08',
+    created_at: '2023-12-20T08:20:00Z',
+    updated_at: '2024-01-08T13:10:00Z'
+  }
+];
+
+// Demo conversations with more realistic Islamic context
+export const demoConversations = {
+  'demo-conv-1': [
+    {
+      id: 'demo-msg-1',
+      conversation_id: 'demo-conv-1',
+      sender_id: 'current-user',
+      content: 'As-salamu alaykum wa rahmatullahi wa barakatuh. J\'ai lu votre profil et j\'aimerais faire votre connaissance dans le cadre d\'un mariage halal.',
+      created_at: '2024-01-20T10:00:00Z',
+      is_read: true,
+      is_wali_visible: false
+    },
+    {
+      id: 'demo-msg-2',
+      conversation_id: 'demo-conv-1',
+      sender_id: 'demo-user-1',
+      content: 'Wa alaykum as-salam wa rahmatullahi wa barakatuh. Barakallahu fik pour votre message respectueux. Pouvez-vous me parler de votre pratique religieuse ?',
+      created_at: '2024-01-20T10:15:00Z',
+      is_read: true,
+      is_wali_visible: false
+    },
+    {
+      id: 'demo-msg-3',
+      conversation_id: 'demo-conv-1',
+      sender_id: 'current-user',
+      content: 'Alhamdulillah, j\'essaie de maintenir mes 5 prières quotidiennes et je lis le Coran régulièrement. Qu\'est-ce qui est important pour vous dans un futur conjoint ?',
+      created_at: '2024-01-20T14:30:00Z',
+      is_read: true,
+      is_wali_visible: false
+    },
+    {
+      id: 'demo-msg-4',
+      conversation_id: 'demo-conv-1',
+      sender_id: 'demo-user-1',
+      content: 'SubhanAllah, c\'est merveilleux. Pour moi, la taqwa et le bon caractère sont essentiels. Souhaiteriez-vous avoir une conversation avec nos familles présentes ?',
+      created_at: '2024-01-20T16:45:00Z',
+      is_read: false,
+      is_wali_visible: false
+    }
+  ],
+  'demo-conv-2': [
+    {
+      id: 'demo-msg-5',
+      conversation_id: 'demo-conv-2',
+      sender_id: 'demo-user-2',
+      content: 'As-salamu alaykum. Mon wali m\'a autorisée à vous contacter après avoir consulté votre profil. Pourriez-vous nous en dire plus sur vos intentions concernant le mariage ?',
+      created_at: '2024-01-19T15:00:00Z',
+      is_read: true,
+      is_wali_visible: true
+    },
+    {
+      id: 'demo-msg-6',
+      conversation_id: 'demo-conv-2',
+      sender_id: 'current-user',
+      content: 'Wa alaykum as-salam. Je cherche une épouse pieuse avec qui construire une famille basée sur les valeurs islamiques. L\'éducation des enfants selon l\'Islam est très importante pour moi.',
+      created_at: '2024-01-19T15:30:00Z',
+      is_read: true,
+      is_wali_visible: true
+    },
+    {
+      id: 'demo-msg-7',
+      conversation_id: 'demo-conv-2',
+      sender_id: 'demo-user-2',
+      content: 'MashaAllah, nos visions semblent alignées. Comment envisagez-vous l\'équilibre entre vie professionnelle et vie familiale ?',
+      created_at: '2024-01-19T18:00:00Z',
+      is_read: true,
+      is_wali_visible: true
+    }
+  ]
+};
+
+// Demo tutorial steps
+export const demoTutorialSteps = [
+  {
+    id: 'welcome',
+    title: 'Bienvenue dans le Mode Démo',
+    content: 'Découvrez toutes les fonctionnalités de notre plateforme de mariage islamique dans un environnement sécurisé.',
+    action: 'Commencer',
+    target: null
+  },
+  {
+    id: 'profiles',
+    title: 'Parcourir les Profils',
+    content: 'Explorez des profils représentatifs créés spécialement pour la démonstration. Toutes les données sont fictives.',
+    action: 'Voir les profils',
+    target: '.demo-profiles'
+  },
+  {
+    id: 'messaging',
+    title: 'Messagerie Sécurisée',
+    content: 'Testez notre système de messagerie avec supervision wali et chiffrement end-to-end.',
+    action: 'Essayer la messagerie',
+    target: '.demo-messaging'
+  },
+  {
+    id: 'compatibility',
+    title: 'Test de Compatibilité',
+    content: 'Découvrez comment notre algorithme évalue la compatibilité selon les critères islamiques.',
+    action: 'Faire le test',
+    target: '.demo-compatibility'
+  },
+  {
+    id: 'resources',
+    title: 'Ressources Islamiques',
+    content: 'Accédez à nos guides, articles et FAQ sur le mariage en Islam.',
+    action: 'Explorer les ressources',
+    target: '.demo-resources'
+  }
+];
