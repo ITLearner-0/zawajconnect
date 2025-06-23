@@ -2,7 +2,7 @@
 import React from 'react';
 import AuthProvider from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
-import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
+import { AccessibilityProvider } from '@/contexts/AccessibilityProvider';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import SessionTimeoutProvider from '@/components/SessionTimeoutProvider';

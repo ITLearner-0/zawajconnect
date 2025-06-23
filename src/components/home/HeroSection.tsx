@@ -15,7 +15,7 @@ const HeroSection = () => {
       </div>
       
       {/* Navigation */}
-      <nav className="absolute top-0 left-0 right-0 z-20 p-6">
+      <nav id="main-navigation" className="absolute top-0 left-0 right-0 z-20 p-6" aria-label="Navigation principale">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="relative">
             <div className="text-4xl md:text-5xl font-bold text-rose-800 dark:text-rose-100 font-serif tracking-wide">

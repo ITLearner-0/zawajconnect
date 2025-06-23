@@ -10,6 +10,7 @@ import Divider from "@/components/home/Divider";
 import SectionTransition from "@/components/home/SectionTransition";
 import PerformanceMonitor from "@/components/ui/PerformanceMonitor";
 import PerformanceWidget from "@/components/monitoring/PerformanceWidget";
+import { SkipNavigation } from "@/components/accessibility";
 import { useTranslation } from "react-i18next";
 
 const Index = () => {
@@ -17,9 +18,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-rose-300 via-pink-200 to-rose-100 dark:from-rose-900 dark:via-rose-800 dark:to-pink-900 text-foreground">
+      <SkipNavigation />
+      
       <EnhancedHeroSection />
 
-      <main className="relative bg-gradient-to-b from-rose-50 to-pink-50 dark:from-rose-950 dark:to-pink-950">
+      <main id="main-content" className="relative bg-gradient-to-b from-rose-50 to-pink-50 dark:from-rose-950 dark:to-pink-950">
         {/* Trust Badges Section */}
         <SectionTransition id="trust" delay={100}>
           <section className="py-16 md:py-20 px-4">
