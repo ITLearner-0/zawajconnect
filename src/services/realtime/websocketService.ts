@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface WebSocketMessage {
@@ -29,7 +28,7 @@ class WebSocketService {
   private heartbeatInterval?: NodeJS.Timeout;
   private reconnectAttempts = 0;
   private maxReconnectAttempts = 5;
-  private reconnectDelay = 1000; // Start with 1 second
+  private reconnectDelay = 1000;
 
   // Message handling
   subscribeToConversation(
@@ -98,7 +97,13 @@ class WebSocketService {
       })
       .on('presence', { event: 'sync' }, () => {
         const state = channel.presenceState();
-        const presenceList = Object.values(state).flat() as UserPresence[];
+        // Fix the type conversion issue
+        const presenceList = Object.values(state).flat().map((presence: any) => ({
+          userId: presence.userId || userId,
+          status: presence.status || 'online',
+          lastSeen: presence.lastSeen || Date.now(),
+          location: presence.location
+        })) as UserPresence[];
         onPresenceUpdate(presenceList);
       })
       .on('presence', { event: 'join' }, ({ key, newPresences }) => {
@@ -189,7 +194,6 @@ class WebSocketService {
       if (channel) {
         channel.unsubscribe();
         this.channels.delete(channelName);
-        // Re-subscribe logic would need to be implemented based on the original subscription
       }
     }, delay);
   }
@@ -206,7 +210,7 @@ class WebSocketService {
           });
         }
       });
-    }, 30000); // Heartbeat every 30 seconds
+    }, 30000);
   }
 
   stopHeartbeat() {

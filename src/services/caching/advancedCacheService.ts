@@ -1,4 +1,3 @@
-
 export interface CacheConfig {
   ttl: number; // Time to live in milliseconds
   maxSize: number; // Maximum cache size
@@ -92,7 +91,7 @@ class AdvancedCacheService {
       this.cacheStats.totalHits++;
       this.updateHitRate();
       return memoryItem.compressed 
-        ? this.decompress(memoryItem.data)
+        ? this.decompress(memoryItem.data as string)
         : memoryItem.data;
     }
 
@@ -106,7 +105,7 @@ class AdvancedCacheService {
           this.cacheStats.totalHits++;
           this.updateHitRate();
           return persistentItem.compressed
-            ? this.decompress(persistentItem.data)
+            ? this.decompress(persistentItem.data as string)
             : persistentItem.data;
         }
       } catch (error) {
@@ -136,15 +135,15 @@ class AdvancedCacheService {
     const size = this.calculateSize(data);
     
     // Compression si activée et si la taille le justifie
-    let processedData = data;
+    let processedData: T | string = data;
     let compressed = false;
     
     if (finalConfig.compression && size > 1024) { // Compresser si > 1KB
-      processedData = this.compress(data) as T;
+      processedData = this.compress(data);
       compressed = true;
     }
 
-    const cacheItem: CacheItem<T> = {
+    const cacheItem: CacheItem<T | string> = {
       data: processedData,
       timestamp: Date.now(),
       ttl: finalConfig.ttl,

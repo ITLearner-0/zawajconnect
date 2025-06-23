@@ -22,9 +22,23 @@ export interface PerformanceMetrics {
   resourceLoadTimes: Record<string, number>;
   memoryUsage: number;
   connectionType: string;
+  
+  // Additional metrics for PerformanceWidget
+  componentMetrics: Map<string, any>;
+  apiMetrics: Array<any>;
+}
+
+export interface MetricsState {
+  pageMetrics: any;
+  componentMetrics: Map<string, any>;
+  apiMetrics: Array<any>;
+  userInteractions: Array<any>;
+  memoryUsage: number;
+  isTracking: boolean;
 }
 
 export const usePerformanceMetrics = () => {
+  const [isTracking, setIsTracking] = useState(false);
   const [metrics, setMetrics] = useState<PerformanceMetrics>({
     lcp: 0,
     fid: 0,
@@ -36,10 +50,59 @@ export const usePerformanceMetrics = () => {
     userInteractions: [],
     resourceLoadTimes: {},
     memoryUsage: 0,
-    connectionType: 'unknown'
+    connectionType: 'unknown',
+    componentMetrics: new Map(),
+    apiMetrics: []
+  });
+
+  const [metricsState, setMetricsState] = useState<MetricsState>({
+    pageMetrics: null,
+    componentMetrics: new Map(),
+    apiMetrics: [],
+    userInteractions: [],
+    memoryUsage: 0,
+    isTracking: false
   });
 
   const [interactionStart, setInteractionStart] = useState<number>(0);
+
+  // Start tracking
+  const startTracking = useCallback(() => {
+    setIsTracking(true);
+    setMetricsState(prev => ({ ...prev, isTracking: true }));
+  }, []);
+
+  // Stop tracking
+  const stopTracking = useCallback(() => {
+    setIsTracking(false);
+    setMetricsState(prev => ({ ...prev, isTracking: false }));
+  }, []);
+
+  // Clear metrics
+  const clearMetrics = useCallback(() => {
+    setMetrics({
+      lcp: 0,
+      fid: 0,
+      cls: 0,
+      fcp: 0,
+      ttfb: 0,
+      componentRenderTime: {},
+      apiResponseTimes: {},
+      userInteractions: [],
+      resourceLoadTimes: {},
+      memoryUsage: 0,
+      connectionType: 'unknown',
+      componentMetrics: new Map(),
+      apiMetrics: []
+    });
+    setMetricsState(prev => ({
+      ...prev,
+      componentMetrics: new Map(),
+      apiMetrics: [],
+      userInteractions: [],
+      memoryUsage: 0
+    }));
+  }, []);
 
   // Mesurer les Core Web Vitals
   useEffect(() => {
@@ -78,6 +141,10 @@ export const usePerformanceMetrics = () => {
       if (navigation) {
         const ttfb = navigation.responseStart - navigation.fetchStart;
         setMetrics(prev => ({ ...prev, ttfb }));
+        setMetricsState(prev => ({
+          ...prev,
+          pageMetrics: { loadTime: navigation.loadEventEnd - navigation.fetchStart, ttfb }
+        }));
       }
     };
 
@@ -87,10 +154,9 @@ export const usePerformanceMetrics = () => {
     const measureMemory = () => {
       if ('memory' in performance) {
         const memory = (performance as any).memory;
-        setMetrics(prev => ({
-          ...prev,
-          memoryUsage: memory.usedJSHeapSize / memory.totalJSHeapSize
-        }));
+        const memoryUsage = memory.usedJSHeapSize / memory.totalJSHeapSize;
+        setMetrics(prev => ({ ...prev, memoryUsage }));
+        setMetricsState(prev => ({ ...prev, memoryUsage: memory.usedJSHeapSize }));
       }
     };
 
@@ -123,11 +189,23 @@ export const usePerformanceMetrics = () => {
       componentRenderTime: {
         ...prev.componentRenderTime,
         [componentName]: [
-          ...(prev.componentRenderTime[componentName] || []).slice(-9), // Garder 10 dernières mesures
+          ...(prev.componentRenderTime[componentName] || []).slice(-9),
           renderTime
         ]
       }
     }));
+
+    // Update component metrics for PerformanceWidget
+    setMetricsState(prev => {
+      const newComponentMetrics = new Map(prev.componentMetrics);
+      newComponentMetrics.set(componentName, {
+        componentName,
+        renderTime,
+        updateCount: (newComponentMetrics.get(componentName)?.updateCount || 0) + 1,
+        lastUpdate: Date.now()
+      });
+      return { ...prev, componentMetrics: newComponentMetrics };
+    });
   }, []);
 
   // Tracker les temps de réponse API
@@ -142,6 +220,20 @@ export const usePerformanceMetrics = () => {
         ]
       }
     }));
+
+    // Update API metrics for PerformanceWidget
+    setMetricsState(prev => ({
+      ...prev,
+      apiMetrics: [
+        ...prev.apiMetrics.slice(-99),
+        {
+          endpoint,
+          duration: responseTime,
+          status: 200,
+          timestamp: Date.now()
+        }
+      ]
+    }));
   }, []);
 
   // Démarrer le tracking d'une interaction
@@ -153,17 +245,22 @@ export const usePerformanceMetrics = () => {
   const endInteraction = useCallback((type: string, details?: string) => {
     if (interactionStart > 0) {
       const duration = performance.now() - interactionStart;
+      const interaction = {
+        type: details ? `${type}:${details}` : type,
+        timestamp: Date.now(),
+        duration
+      };
+      
       setMetrics(prev => ({
         ...prev,
-        userInteractions: [
-          ...prev.userInteractions.slice(-99), // Garder 100 dernières interactions
-          {
-            type: details ? `${type}:${details}` : type,
-            timestamp: Date.now(),
-            duration
-          }
-        ]
+        userInteractions: [...prev.userInteractions.slice(-99), interaction]
       }));
+      
+      setMetricsState(prev => ({
+        ...prev,
+        userInteractions: [...prev.userInteractions.slice(-99), interaction]
+      }));
+      
       setInteractionStart(0);
     }
   }, [interactionStart]);
@@ -178,6 +275,34 @@ export const usePerformanceMetrics = () => {
     const times = metrics.apiResponseTimes[endpoint] || [];
     return times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0;
   }, [metrics.apiResponseTimes]);
+
+  // Get performance summary for PerformanceWidget
+  const getPerformanceSummary = useCallback(() => {
+    return {
+      page: metricsState.pageMetrics,
+      memory: metricsState.memoryUsage,
+      components: {
+        total: metricsState.componentMetrics.size,
+        slowest: Array.from(metricsState.componentMetrics.values()).sort((a, b) => b.renderTime - a.renderTime)[0],
+        mostUpdated: Array.from(metricsState.componentMetrics.values()).sort((a, b) => b.updateCount - a.updateCount)[0],
+      },
+      api: {
+        total: metricsState.apiMetrics.length,
+        averageResponseTime: metricsState.apiMetrics.length > 0 
+          ? metricsState.apiMetrics.reduce((sum, metric) => sum + metric.duration, 0) / metricsState.apiMetrics.length 
+          : 0,
+        errorRate: metricsState.apiMetrics.length > 0 
+          ? (metricsState.apiMetrics.filter(metric => metric.status >= 400).length / metricsState.apiMetrics.length) * 100 
+          : 0,
+      },
+      interactions: {
+        total: metricsState.userInteractions.length,
+        averageResponseTime: metricsState.userInteractions
+          .filter(i => i.duration)
+          .reduce((sum, i, _, arr) => sum + (i.duration! / arr.length), 0),
+      },
+    };
+  }, [metricsState]);
 
   // Identifier les goulots d'étranglement
   const getPerformanceIssues = useCallback(() => {
@@ -222,18 +347,6 @@ export const usePerformanceMetrics = () => {
       });
     }
 
-    // Vérifier les temps de rendu des composants
-    Object.entries(metrics.componentRenderTime).forEach(([component, times]) => {
-      const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
-      if (avgTime > 100) {
-        issues.push({
-          type: 'component',
-          severity: avgTime > 200 ? 'high' : 'medium',
-          description: `Rendu lent du composant ${component}: ${avgTime.toFixed(1)}ms`
-        });
-      }
-    });
-
     return issues;
   }, [metrics]);
 
@@ -262,7 +375,7 @@ export const usePerformanceMetrics = () => {
         averageResponseTime: times.reduce((a, b) => a + b, 0) / times.length,
         measurements: times.length
       })),
-      interactions: metrics.userInteractions.slice(-20), // 20 dernières interactions
+      interactions: metrics.userInteractions.slice(-20),
       system: {
         memoryUsage: metrics.memoryUsage,
         connectionType: metrics.connectionType
@@ -271,7 +384,8 @@ export const usePerformanceMetrics = () => {
   }, [metrics, getPerformanceIssues]);
 
   return {
-    metrics,
+    metrics: metricsState,
+    isTracking,
     trackComponentRender,
     trackApiResponse,
     startInteraction,
@@ -279,7 +393,11 @@ export const usePerformanceMetrics = () => {
     getAverageRenderTime,
     getAverageApiResponseTime,
     getPerformanceIssues,
-    getPerformanceReport
+    getPerformanceReport,
+    getPerformanceSummary,
+    clearMetrics,
+    startTracking,
+    stopTracking
   };
 };
 
@@ -287,19 +405,15 @@ export const usePerformanceMetrics = () => {
 function calculateWebVitalsScore(metrics: PerformanceMetrics): number {
   let score = 100;
   
-  // LCP penalty
   if (metrics.lcp > 4000) score -= 30;
   else if (metrics.lcp > 2500) score -= 15;
   
-  // CLS penalty
   if (metrics.cls > 0.25) score -= 25;
   else if (metrics.cls > 0.1) score -= 10;
   
-  // FCP penalty
   if (metrics.fcp > 3000) score -= 20;
   else if (metrics.fcp > 1800) score -= 10;
   
-  // TTFB penalty
   if (metrics.ttfb > 800) score -= 15;
   else if (metrics.ttfb > 600) score -= 8;
   
