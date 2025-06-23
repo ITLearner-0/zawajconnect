@@ -175,7 +175,7 @@ const SecurityDashboard: React.FC = () => {
         <CardContent>
           {auditStats?.byType ? (
             <div className="space-y-2">
-              {Object.entries(auditStats.byType as Record<string, number>).map(([eventType, count]) => (
+              {Object.entries(auditStats.byType).map(([eventType, count]) => (
                 <div key={eventType} className="flex items-center justify-between p-2 border rounded">
                   <span className="font-medium">{eventType.replace(/_/g, ' ').toUpperCase()}</span>
                   <Badge variant="outline">{count}</Badge>

@@ -11,8 +11,6 @@ export interface AuditEvent {
   details?: Record<string, any>;
   ip?: string;
   userAgent?: string;
-  timestamp?: string;
-  sessionId?: string;
 }
 
 export class SecurityAuditLogger {

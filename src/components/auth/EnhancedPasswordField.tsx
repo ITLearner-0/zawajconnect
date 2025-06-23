@@ -30,7 +30,7 @@ export const EnhancedPasswordField: React.FC<EnhancedPasswordFieldProps> = ({
   
   const getStrengthColor = () => {
     if (!value) return 'bg-gray-200';
-    const strength = passwordValidation.feedback.length;
+    const strength = passwordValidation.errors.length;
     if (strength === 0) return 'bg-green-500';
     if (strength <= 2) return 'bg-yellow-500';
     return 'bg-red-500';
@@ -38,7 +38,7 @@ export const EnhancedPasswordField: React.FC<EnhancedPasswordFieldProps> = ({
 
   const getStrengthText = () => {
     if (!value) return 'No password';
-    const strength = passwordValidation.feedback.length;
+    const strength = passwordValidation.errors.length;
     if (strength === 0) return 'Strong';
     if (strength <= 2) return 'Medium';
     return 'Weak';
@@ -84,7 +84,7 @@ export const EnhancedPasswordField: React.FC<EnhancedPasswordFieldProps> = ({
             <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
               <div 
                 className={`h-full transition-all duration-300 ${getStrengthColor()}`}
-                style={{ width: `${Math.max(20, 100 - (passwordValidation.feedback.length * 20))}%` }}
+                style={{ width: `${Math.max(20, 100 - (passwordValidation.errors.length * 20))}%` }}
               />
             </div>
             <span className="text-sm font-medium">{getStrengthText()}</span>
