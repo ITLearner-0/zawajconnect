@@ -5,7 +5,8 @@ import App from './App.tsx'
 import './index.css'
 import './i18n';
 
-// Import performance monitoring components
+// Import PWA components
+import PWAHandler from '@/components/pwa/PWAHandler';
 import PerformanceMonitor from '@/components/ui/PerformanceMonitor';
 
 // Initialize advanced cache
@@ -56,6 +57,7 @@ if (typeof window !== 'undefined') {
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
+    <PWAHandler />
     <App />
     <PerformanceMonitor />
   </BrowserRouter>
