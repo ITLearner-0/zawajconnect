@@ -18,8 +18,8 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <AccessibilityProvider>
           <AuthProvider>
             <SessionTimeoutProvider>
-              <PWAHandler />
               {children}
+              <PWAHandler />
               <Toaster />
               <SonnerToaster />
             </SessionTimeoutProvider>
