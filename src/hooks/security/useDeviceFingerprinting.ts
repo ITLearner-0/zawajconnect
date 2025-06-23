@@ -34,7 +34,7 @@ export const useDeviceFingerprinting = () => {
 
     // WebGL fingerprinting
     const webglCanvas = document.createElement('canvas');
-    const webgl = webglCanvas.getContext('webgl') || webglCanvas.getContext('experimental-webgl');
+    const webgl = webglCanvas.getContext('webgl') || webglCanvas.getContext('experimental-webgl') as WebGLRenderingContext | null;
     let webglInfo = '';
     
     if (webgl) {
