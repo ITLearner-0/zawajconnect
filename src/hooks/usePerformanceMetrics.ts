@@ -1,148 +1,307 @@
 
 import { useState, useEffect, useCallback } from 'react';
-import { logger } from '@/services/logging/LoggingService';
-import { PerformanceTracker, PerformanceMetricsState } from '@/services/performance/performanceTracker';
-import { PageMetrics } from '@/services/performance/pageMetricsService';
+
+export interface PerformanceMetrics {
+  // Core Web Vitals
+  lcp: number; // Largest Contentful Paint
+  fid: number; // First Input Delay
+  cls: number; // Cumulative Layout Shift
+  fcp: number; // First Contentful Paint
+  ttfb: number; // Time to First Byte
+  
+  // Custom metrics
+  componentRenderTime: Record<string, number[]>;
+  apiResponseTimes: Record<string, number[]>;
+  userInteractions: Array<{
+    type: string;
+    timestamp: number;
+    duration: number;
+  }>;
+  
+  // Resource metrics
+  resourceLoadTimes: Record<string, number>;
+  memoryUsage: number;
+  connectionType: string;
+}
 
 export const usePerformanceMetrics = () => {
-  const [metrics, setMetrics] = useState<PerformanceMetricsState>({
-    pageMetrics: null,
-    componentMetrics: new Map(),
-    apiMetrics: [],
+  const [metrics, setMetrics] = useState<PerformanceMetrics>({
+    lcp: 0,
+    fid: 0,
+    cls: 0,
+    fcp: 0,
+    ttfb: 0,
+    componentRenderTime: {},
+    apiResponseTimes: {},
     userInteractions: [],
+    resourceLoadTimes: {},
     memoryUsage: 0,
-    isTracking: false,
+    connectionType: 'unknown'
   });
 
-  const [performanceTracker] = useState(() => new PerformanceTracker());
+  const [interactionStart, setInteractionStart] = useState<number>(0);
 
-  // Start performance tracking
-  const startTracking = useCallback(() => {
-    setMetrics(prev => ({ ...prev, isTracking: true }));
-    
-    // Track page load metrics
-    if (typeof window !== 'undefined' && 'performance' in window) {
-      const pageMetrics = performanceTracker.measurePageMetrics();
-      if (pageMetrics) {
-        setMetrics(prev => ({ ...prev, pageMetrics }));
+  // Mesurer les Core Web Vitals
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const measureWebVitals = () => {
+      // LCP - Largest Contentful Paint
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          setMetrics(prev => ({ ...prev, lcp: entry.startTime }));
+        }
+      }).observe({ entryTypes: ['largest-contentful-paint'] });
+
+      // FCP - First Contentful Paint
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (entry.name === 'first-contentful-paint') {
+            setMetrics(prev => ({ ...prev, fcp: entry.startTime }));
+          }
+        }
+      }).observe({ entryTypes: ['paint'] });
+
+      // CLS - Cumulative Layout Shift
+      let clsValue = 0;
+      new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (!(entry as any).hadRecentInput) {
+            clsValue += (entry as any).value;
+            setMetrics(prev => ({ ...prev, cls: clsValue }));
+          }
+        }
+      }).observe({ entryTypes: ['layout-shift'] });
+
+      // TTFB - Time to First Byte
+      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      if (navigation) {
+        const ttfb = navigation.responseStart - navigation.fetchStart;
+        setMetrics(prev => ({ ...prev, ttfb }));
       }
+    };
 
-      performanceTracker.setupPerformanceObserver((updatedMetrics) => {
+    measureWebVitals();
+
+    // Mesurer l'utilisation mémoire
+    const measureMemory = () => {
+      if ('memory' in performance) {
+        const memory = (performance as any).memory;
         setMetrics(prev => ({
           ...prev,
-          pageMetrics: prev.pageMetrics ? { ...prev.pageMetrics, ...updatedMetrics } : null
+          memoryUsage: memory.usedJSHeapSize / memory.totalJSHeapSize
         }));
-      });
+      }
+    };
 
-      updateMemoryUsage();
-    }
-    
-    logger.info('Performance metrics tracking started');
-  }, [performanceTracker]);
+    // Détecter le type de connexion
+    const detectConnection = () => {
+      if ('connection' in navigator) {
+        const connection = (navigator as any).connection;
+        setMetrics(prev => ({
+          ...prev,
+          connectionType: connection.effectiveType || 'unknown'
+        }));
+      }
+    };
 
-  // Stop performance tracking
-  const stopTracking = useCallback(() => {
-    setMetrics(prev => ({ ...prev, isTracking: false }));
-    performanceTracker.disconnectObserver();
-    logger.info('Performance metrics tracking stopped');
-  }, [performanceTracker]);
+    measureMemory();
+    detectConnection();
 
-  // Update memory usage
-  const updateMemoryUsage = useCallback(() => {
-    const memoryUsage = performanceTracker.trackMemoryUsage();
-    setMetrics(prev => ({ ...prev, memoryUsage }));
-  }, [performanceTracker]);
+    // Mesurer périodiquement
+    const interval = setInterval(() => {
+      measureMemory();
+    }, 5000);
 
-  // Track component render performance
+    return () => clearInterval(interval);
+  }, []);
+
+  // Tracker le temps de rendu des composants
   const trackComponentRender = useCallback((componentName: string, renderTime: number) => {
-    performanceTracker.trackComponentRender(componentName, renderTime);
     setMetrics(prev => ({
       ...prev,
-      componentMetrics: performanceTracker.getComponentMetrics()
+      componentRenderTime: {
+        ...prev.componentRenderTime,
+        [componentName]: [
+          ...(prev.componentRenderTime[componentName] || []).slice(-9), // Garder 10 dernières mesures
+          renderTime
+        ]
+      }
     }));
-  }, [performanceTracker]);
+  }, []);
 
-  // Track API call performance
-  const trackAPICall = useCallback((endpoint: string, method: string, duration: number, status: number) => {
-    performanceTracker.trackAPICall(endpoint, method, duration, status);
+  // Tracker les temps de réponse API
+  const trackApiResponse = useCallback((endpoint: string, responseTime: number) => {
     setMetrics(prev => ({
       ...prev,
-      apiMetrics: performanceTracker.getAPIMetrics()
+      apiResponseTimes: {
+        ...prev.apiResponseTimes,
+        [endpoint]: [
+          ...(prev.apiResponseTimes[endpoint] || []).slice(-9),
+          responseTime
+        ]
+      }
     }));
-  }, [performanceTracker]);
+  }, []);
 
-  // Track user interactions
-  const trackUserInteraction = useCallback((action: string, element: string, duration?: number) => {
-    performanceTracker.trackUserInteraction(action, element, duration);
-    setMetrics(prev => ({
-      ...prev,
-      userInteractions: performanceTracker.getUserInteractions()
-    }));
-  }, [performanceTracker]);
-
-  // Start interaction timing
+  // Démarrer le tracking d'une interaction
   const startInteraction = useCallback(() => {
-    performanceTracker.startInteraction();
-  }, [performanceTracker]);
+    setInteractionStart(performance.now());
+  }, []);
 
-  // End interaction timing
-  const endInteraction = useCallback((action: string, element: string) => {
-    performanceTracker.endInteraction(action, element);
-    setMetrics(prev => ({
-      ...prev,
-      userInteractions: performanceTracker.getUserInteractions()
-    }));
-  }, [performanceTracker]);
+  // Terminer le tracking d'une interaction
+  const endInteraction = useCallback((type: string, details?: string) => {
+    if (interactionStart > 0) {
+      const duration = performance.now() - interactionStart;
+      setMetrics(prev => ({
+        ...prev,
+        userInteractions: [
+          ...prev.userInteractions.slice(-99), // Garder 100 dernières interactions
+          {
+            type: details ? `${type}:${details}` : type,
+            timestamp: Date.now(),
+            duration
+          }
+        ]
+      }));
+      setInteractionStart(0);
+    }
+  }, [interactionStart]);
 
-  // Get performance summary
-  const getPerformanceSummary = useCallback(() => {
-    const summary = performanceTracker.getPerformanceSummary();
-    return {
-      page: metrics.pageMetrics,
-      ...summary,
-      memory: metrics.memoryUsage,
-    };
-  }, [metrics, performanceTracker]);
+  // Calculer les moyennes
+  const getAverageRenderTime = useCallback((componentName: string): number => {
+    const times = metrics.componentRenderTime[componentName] || [];
+    return times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0;
+  }, [metrics.componentRenderTime]);
 
-  // Clear metrics
-  const clearMetrics = useCallback(() => {
-    performanceTracker.clearAllMetrics();
-    setMetrics({
-      pageMetrics: null,
-      componentMetrics: new Map(),
-      apiMetrics: [],
-      userInteractions: [],
-      memoryUsage: 0,
-      isTracking: metrics.isTracking,
+  const getAverageApiResponseTime = useCallback((endpoint: string): number => {
+    const times = metrics.apiResponseTimes[endpoint] || [];
+    return times.length > 0 ? times.reduce((a, b) => a + b, 0) / times.length : 0;
+  }, [metrics.apiResponseTimes]);
+
+  // Identifier les goulots d'étranglement
+  const getPerformanceIssues = useCallback(() => {
+    const issues: Array<{ type: string; severity: 'low' | 'medium' | 'high'; description: string }> = [];
+
+    // Vérifier LCP
+    if (metrics.lcp > 4000) {
+      issues.push({
+        type: 'lcp',
+        severity: 'high',
+        description: `LCP élevé: ${metrics.lcp.toFixed(0)}ms (objectif: <2500ms)`
+      });
+    } else if (metrics.lcp > 2500) {
+      issues.push({
+        type: 'lcp',
+        severity: 'medium',
+        description: `LCP modéré: ${metrics.lcp.toFixed(0)}ms`
+      });
+    }
+
+    // Vérifier CLS
+    if (metrics.cls > 0.25) {
+      issues.push({
+        type: 'cls',
+        severity: 'high',
+        description: `CLS élevé: ${metrics.cls.toFixed(3)} (objectif: <0.1)`
+      });
+    } else if (metrics.cls > 0.1) {
+      issues.push({
+        type: 'cls',
+        severity: 'medium',
+        description: `CLS modéré: ${metrics.cls.toFixed(3)}`
+      });
+    }
+
+    // Vérifier l'utilisation mémoire
+    if (metrics.memoryUsage > 0.8) {
+      issues.push({
+        type: 'memory',
+        severity: 'high',
+        description: `Utilisation mémoire élevée: ${(metrics.memoryUsage * 100).toFixed(1)}%`
+      });
+    }
+
+    // Vérifier les temps de rendu des composants
+    Object.entries(metrics.componentRenderTime).forEach(([component, times]) => {
+      const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
+      if (avgTime > 100) {
+        issues.push({
+          type: 'component',
+          severity: avgTime > 200 ? 'high' : 'medium',
+          description: `Rendu lent du composant ${component}: ${avgTime.toFixed(1)}ms`
+        });
+      }
     });
-    
-    logger.info('Performance metrics cleared');
-  }, [metrics.isTracking, performanceTracker]);
 
-  // Auto-start tracking on mount
-  useEffect(() => {
-    startTracking();
-    
-    // Update memory usage periodically
-    const memoryInterval = setInterval(updateMemoryUsage, 30000); // Every 30 seconds
-    
-    return () => {
-      stopTracking();
-      clearInterval(memoryInterval);
+    return issues;
+  }, [metrics]);
+
+  // Générer un rapport de performance
+  const getPerformanceReport = useCallback(() => {
+    return {
+      summary: {
+        webVitalsScore: calculateWebVitalsScore(metrics),
+        performanceIssues: getPerformanceIssues(),
+        totalMetrics: Object.keys(metrics.componentRenderTime).length + Object.keys(metrics.apiResponseTimes).length
+      },
+      coreWebVitals: {
+        lcp: metrics.lcp,
+        fid: metrics.fid,
+        cls: metrics.cls,
+        fcp: metrics.fcp,
+        ttfb: metrics.ttfb
+      },
+      components: Object.entries(metrics.componentRenderTime).map(([name, times]) => ({
+        name,
+        averageRenderTime: times.reduce((a, b) => a + b, 0) / times.length,
+        measurements: times.length
+      })),
+      apis: Object.entries(metrics.apiResponseTimes).map(([endpoint, times]) => ({
+        endpoint,
+        averageResponseTime: times.reduce((a, b) => a + b, 0) / times.length,
+        measurements: times.length
+      })),
+      interactions: metrics.userInteractions.slice(-20), // 20 dernières interactions
+      system: {
+        memoryUsage: metrics.memoryUsage,
+        connectionType: metrics.connectionType
+      }
     };
-  }, [startTracking, stopTracking, updateMemoryUsage]);
+  }, [metrics, getPerformanceIssues]);
 
   return {
     metrics,
-    startTracking,
-    stopTracking,
     trackComponentRender,
-    trackAPICall,
-    trackUserInteraction,
+    trackApiResponse,
     startInteraction,
     endInteraction,
-    getPerformanceSummary,
-    clearMetrics,
-    isTracking: metrics.isTracking,
+    getAverageRenderTime,
+    getAverageApiResponseTime,
+    getPerformanceIssues,
+    getPerformanceReport
   };
 };
+
+// Calculer le score Web Vitals
+function calculateWebVitalsScore(metrics: PerformanceMetrics): number {
+  let score = 100;
+  
+  // LCP penalty
+  if (metrics.lcp > 4000) score -= 30;
+  else if (metrics.lcp > 2500) score -= 15;
+  
+  // CLS penalty
+  if (metrics.cls > 0.25) score -= 25;
+  else if (metrics.cls > 0.1) score -= 10;
+  
+  // FCP penalty
+  if (metrics.fcp > 3000) score -= 20;
+  else if (metrics.fcp > 1800) score -= 10;
+  
+  // TTFB penalty
+  if (metrics.ttfb > 800) score -= 15;
+  else if (metrics.ttfb > 600) score -= 8;
+  
+  return Math.max(0, score);
+}

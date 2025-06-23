@@ -7,19 +7,104 @@
     <title>Nikah Connect - Mariage Islamique</title>
     <meta name="description" content="Plateforme de mariage islamique construite sur les valeurs islamiques" />
     <meta name="author" content="Nikah Connect" />
+    
+    <!-- PWA Metadata -->
+    <meta name="theme-color" content="#e11d48" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="NikahConnect" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="NikahConnect" />
+    
+    <!-- Open Graph -->
     <meta property="og:title" content="Nikah Connect - Mariage Islamique" />
     <meta property="og:description" content="Une plateforme de mariage construite sur les valeurs islamiques" />
     <meta property="og:image" content="/og-image.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Nikah Connect" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Nikah Connect - Mariage Islamique" />
+    <meta name="twitter:description" content="Une plateforme de mariage construite sur les valeurs islamiques" />
+    <meta name="twitter:image" content="/og-image.png" />
+    
+    <!-- Icons -->
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://huozosbrlxayjkvakptu.supabase.co">
+    
+    <!-- DNS prefetch -->
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://huozosbrlxayjkvakptu.supabase.co">
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Performance hints -->
+    <link rel="preload" href="/src/main.tsx" as="script">
+    <link rel="preload" href="/src/index.css" as="style">
+    
+    <!-- Security headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
   </head>
 
   <body>
     <div id="root"></div>
+    
+    <!-- Critical inline styles for PWA -->
+    <style>
+      /* Loading state for PWA */
+      #root:empty::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+        z-index: 9999;
+      }
+      
+      #root:empty::after {
+        content: 'Chargement...';
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: 'Segoe UI', sans-serif;
+        color: #be185d;
+        font-size: 18px;
+        z-index: 10000;
+      }
+    </style>
+    
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Service Worker registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+              console.log('SW registered: ', registration);
+            })
+            .catch(registrationError => {
+              console.log('SW registration failed: ', registrationError);
+            });
+        });
+      }
+    </script>
   </body>
 </html>

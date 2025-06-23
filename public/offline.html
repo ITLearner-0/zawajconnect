@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hors ligne - Nikah Connect</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #881337;
+        }
+        
+        .offline-container {
+            text-align: center;
+            max-width: 400px;
+            padding: 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .offline-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            background: #fecdd3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        h1 {
+            margin: 0 0 1rem;
+            font-size: 1.5rem;
+            color: #be185d;
+        }
+        
+        p {
+            margin: 0 0 1.5rem;
+            color: #9f1239;
+            line-height: 1.6;
+        }
+        
+        .retry-btn {
+            background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(244, 63, 94, 0.3);
+        }
+        
+        .islamic-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <div class="islamic-pattern">
+        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="islamic" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <circle cx="10" cy="10" r="3" fill="currentColor"/>
+                    <path d="M10,2 L14,6 L18,2 L18,8 L14,12 L10,8 L6,12 L2,8 L2,2 L6,6 Z" fill="none" stroke="currentColor" stroke-width="0.5"/>
+                </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#islamic)"/>
+        </svg>
+    </div>
+    
+    <div class="offline-container">
+        <div class="offline-icon">
+            📡
+        </div>
+        <h1>Vous êtes hors ligne</h1>
+        <p>
+            Pas de connexion internet détectée. Certaines fonctionnalités peuvent être limitées. 
+            Vérifiez votre connexion et réessayez.
+        </p>
+        <button class="retry-btn" onclick="window.location.reload()">
+            Réessayer
+        </button>
+    </div>
+    
+    <script>
+        // Vérifier la connexion
+        window.addEventListener('online', () => {
+            window.location.reload();
+        });
+        
+        // Afficher un message si l'utilisateur revient en ligne
+        if (navigator.onLine) {
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
