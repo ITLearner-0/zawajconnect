@@ -6,6 +6,7 @@ import { AccessibilityProvider } from '@/contexts/AccessibilityProvider';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as SonnerToaster } from '@/components/ui/sonner';
 import SessionTimeoutProvider from '@/components/SessionTimeoutProvider';
+import PWAHandler from '@/components/pwa/PWAHandler';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
@@ -17,6 +18,7 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <AccessibilityProvider>
           <AuthProvider>
             <SessionTimeoutProvider>
+              <PWAHandler />
               {children}
               <Toaster />
               <SonnerToaster />
