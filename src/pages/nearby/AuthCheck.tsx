@@ -1,210 +1,138 @@
-// __tests__/AuthCheck.test.tsx
-import { render, screen, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
-import { vi } from 'vitest';
-import AuthCheck from '@/components/AuthCheck';
-import { supabase } from '@/integrations/supabase/client';
 
-// Mocks
-vi.mock('@/integrations/supabase/client', () => ({
-  supabase: {
-    auth: {
-      getSession: vi.fn(),
-      onAuthStateChange: vi.fn(() => ({
-        data: { subscription: { unsubscribe: vi.fn() } }
-      }))
-    },
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          maybeSingle: vi.fn()
-        }))
-      }))
-    }))
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
+import { useRLSSetup } from "@/hooks/useRLSSetup";
+import CustomButton from "@/components/CustomButton";
+import { Card, CardContent } from "@/components/ui/card";
+import { TestTube, User } from "lucide-react";
+
+interface AuthCheckProps {
+  children: React.ReactNode;
+}
+
+const AuthCheck = ({ children }: AuthCheckProps) => {
+  const { isSetup: rlsSetup, isLoading: rlsLoading } = useRLSSetup();
+  const navigate = useNavigate();
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [hasCompatibilityTest, setHasCompatibilityTest] = useState<boolean | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Check authentication status and compatibility test
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      
+      if (!session) {
+        toast({
+          title: "Authentication required",
+          description: "You need to sign in to view matches near you.",
+          variant: "destructive",
+        });
+        navigate("/auth");
+        return;
+      }
+      
+      // Check if user has taken compatibility test
+      const { data, error } = await supabase
+        .from('compatibility_results')
+        .select('id')
+        .eq('user_id', session.user.id)
+        .limit(1);
+
+      if (error) {
+        console.error("Error checking compatibility results:", error);
+        return;
+      }
+
+      setHasCompatibilityTest(data && data.length > 0);
+    };
+
+    checkAuth();
+  }, [navigate, toast]);
+
+  if (isAuthenticated === false) {
+    return null; // Will redirect to auth page
   }
-}));
 
-vi.mock('@/hooks/useRLSSetup', () => ({
-  useRLSSetup: vi.fn(() => ({ isSetup: true, isLoading: false }))
-}));
-
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate
-  };
-});
-
-const mockToast = vi.fn();
-vi.mock('@/components/ui/use-toast', () => ({
-  useToast: () => ({ toast: mockToast })
-}));
-
-describe('AuthCheck', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  const renderAuthCheck = () => {
-    return render(
-      <BrowserRouter>
-        <AuthCheck>
-          <div>Protected Content</div>
-        </AuthCheck>
-      </BrowserRouter>
+  if (isAuthenticated === null || rlsLoading || hasCompatibilityTest === null) {
+    // Loading state
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
     );
-  };
+  }
 
-  it('should show loading spinner initially', () => {
-    vi.mocked(supabase.auth.getSession).mockImplementation(() => 
-      new Promise(() => {}) // Never resolves to keep loading state
+  if (rlsSetup === false) {
+    return (
+      <div className="flex justify-center items-center min-h-screen flex-col gap-4">
+        <div className="text-xl font-bold text-red-500">Database Security Issue</div>
+        <p className="text-center max-w-md">
+          There was a problem setting up database security. Please contact the administrator.
+        </p>
+        <CustomButton onClick={() => navigate("/")}>
+          Return to Home
+        </CustomButton>
+      </div>
     );
+  }
 
-    renderAuthCheck();
-    expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
-  });
+  // Show compatibility test requirement if not completed
+  if (!hasCompatibilityTest) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm border-rose-200 dark:border-rose-700">
+          <CardContent className="pt-6">
+            <div className="text-center space-y-6">
+              <div className="flex justify-center">
+                <TestTube className="h-16 w-16 text-rose-600 dark:text-rose-300" />
+              </div>
+              
+              <div>
+                <h2 className="text-xl font-semibold text-rose-800 dark:text-rose-200 mb-2">
+                  Compatibility Test Required
+                </h2>
+                <p className="text-rose-600 dark:text-rose-300 text-sm">
+                  To view profiles with compatibility percentages and find meaningful matches, you need to complete the compatibility test first.
+                </p>
+              </div>
 
-  it('should redirect to auth page when not authenticated', async () => {
-    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
-      data: { session: null },
-      error: null
-    });
+              <div className="bg-rose-50 dark:bg-rose-900/50 p-4 rounded-lg border border-rose-200 dark:border-rose-700">
+                <p className="text-xs text-rose-700 dark:text-rose-300">
+                  This test helps us match you with people who share similar Islamic values and life goals.
+                </p>
+              </div>
 
-    renderAuthCheck();
+              <div className="flex flex-col gap-3">
+                <CustomButton
+                  onClick={() => navigate("/compatibility")}
+                  variant="gold"
+                  className="w-full flex items-center gap-2"
+                >
+                  <TestTube className="h-4 w-4" />
+                  Take Compatibility Test
+                </CustomButton>
+                
+                <CustomButton
+                  onClick={() => navigate("/profile")}
+                  variant="outline"
+                  className="w-full flex items-center gap-2"
+                >
+                  <User className="h-4 w-4" />
+                  Back to Profile
+                </CustomButton>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/auth');
-      expect(mockToast).toHaveBeenCalledWith({
-        title: "Authentication required",
-        description: "You need to sign in to view matches near you.",
-        variant: "destructive",
-      });
-    });
-  });
+  return <>{children}</>;
+};
 
-  it('should show compatibility test required when authenticated but no test', async () => {
-    const mockSession = {
-      user: { id: 'user-123' },
-      access_token: 'token'
-    };
-
-    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
-      data: { session: mockSession },
-      error: null
-    });
-
-    const fromMock = vi.mocked(supabase.from);
-    fromMock.mockReturnValueOnce({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          maybeSingle: vi.fn().mockResolvedValueOnce({
-            data: null,
-            error: null
-          })
-        }))
-      }))
-    } as any);
-
-    renderAuthCheck();
-
-    await waitFor(() => {
-      expect(screen.getByText('Compatibility Test Required')).toBeInTheDocument();
-      expect(screen.getByText('Take Compatibility Test')).toBeInTheDocument();
-    });
-  });
-
-  it('should show protected content when authenticated and has compatibility test', async () => {
-    const mockSession = {
-      user: { id: 'user-123' },
-      access_token: 'token'
-    };
-
-    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
-      data: { session: mockSession },
-      error: null
-    });
-
-    const fromMock = vi.mocked(supabase.from);
-    fromMock.mockReturnValueOnce({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          maybeSingle: vi.fn().mockResolvedValueOnce({
-            data: { id: 'test-123' },
-            error: null
-          })
-        }))
-      }))
-    } as any);
-
-    renderAuthCheck();
-
-    await waitFor(() => {
-      expect(screen.getByText('Protected Content')).toBeInTheDocument();
-    });
-  });
-
-  it('should handle database errors gracefully', async () => {
-    const mockSession = {
-      user: { id: 'user-123' },
-      access_token: 'token'
-    };
-
-    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
-      data: { session: mockSession },
-      error: null
-    });
-
-    const fromMock = vi.mocked(supabase.from);
-    fromMock.mockReturnValueOnce({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          maybeSingle: vi.fn().mockResolvedValueOnce({
-            data: null,
-            error: new Error('Database error')
-          })
-        }))
-      }))
-    } as any);
-
-    renderAuthCheck();
-
-    await waitFor(() => {
-      expect(mockToast).toHaveBeenCalledWith({
-        title: "Warning",
-        description: "Could not verify compatibility test status. Please try again.",
-        variant: "destructive",
-      });
-    });
-  });
-
-  it('should handle auth state changes', async () => {
-    const mockSession = {
-      user: { id: 'user-123' },
-      access_token: 'token'
-    };
-
-    vi.mocked(supabase.auth.getSession).mockResolvedValueOnce({
-      data: { session: mockSession },
-      error: null
-    });
-
-    let authChangeCallback: any;
-    vi.mocked(supabase.auth.onAuthStateChange).mockImplementation((callback) => {
-      authChangeCallback = callback;
-      return {
-        data: { subscription: { unsubscribe: vi.fn() } }
-      };
-    });
-
-    renderAuthCheck();
-
-    // Simuler une déconnexion
-    await waitFor(() => {
-      authChangeCallback('SIGNED_OUT', null);
-    });
-
-    expect(mockNavigate).toHaveBeenCalledWith('/auth');
-  });
-});
+export default AuthCheck;
