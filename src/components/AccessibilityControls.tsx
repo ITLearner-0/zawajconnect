@@ -1,5 +1,6 @@
 
 import { useAccessibility } from "@/contexts/AccessibilityContext";
+import { useAccessibilityContext } from "@/contexts/AccessibilityProvider";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -8,6 +9,18 @@ import { Settings } from "lucide-react";
 
 export default function AccessibilityControls() {
   const { highContrast, toggleHighContrast, textSize, setTextSize } = useAccessibility();
+  const { fontSize, setFontSize, announce } = useAccessibilityContext();
+
+  const handleFontSizeChange = (size: 'normal' | 'large' | 'larger') => {
+    setFontSize(size);
+    setTextSize(size === 'larger' ? 'x-large' : size);
+    announce(`Taille de police changée à ${size === 'normal' ? 'normale' : size === 'large' ? 'grande' : 'très grande'}`);
+  };
+
+  const handleContrastToggle = () => {
+    toggleHighContrast();
+    announce(`Contraste élevé ${!highContrast ? 'activé' : 'désactivé'}`);
+  };
 
   return (
     <Popover>
@@ -15,60 +28,74 @@ export default function AccessibilityControls() {
         <Button 
           variant="outline" 
           size="icon" 
-          className="rounded-full" 
-          aria-label="Accessibility settings"
+          className="rounded-full focus:ring-2 focus:ring-primary focus:ring-offset-2" 
+          aria-label="Paramètres d'accessibilité"
+          aria-expanded="false"
+          aria-haspopup="true"
         >
           <Settings className="h-4 w-4" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80" align="end">
+      <PopoverContent 
+        className="w-80 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700" 
+        align="end"
+        role="dialog"
+        aria-label="Paramètres d'accessibilité"
+      >
         <div className="space-y-4">
-          <h3 className="font-medium text-lg" id="accessibility-heading">Accessibility Settings</h3>
+          <h3 className="font-medium text-lg" id="accessibility-heading">
+            Paramètres d'accessibilité
+          </h3>
           
           <div className="flex items-center justify-between">
             <div>
-              <Label htmlFor="high-contrast" className="font-medium">High Contrast</Label>
-              <p className="text-sm text-muted-foreground">
-                Increases contrast for better visibility
+              <Label htmlFor="high-contrast" className="font-medium">
+                Contraste élevé
+              </Label>
+              <p className="text-sm text-muted-foreground" id="high-contrast-description">
+                Augmente le contraste pour une meilleure visibilité
               </p>
             </div>
             <Switch 
               id="high-contrast" 
               checked={highContrast} 
-              onCheckedChange={toggleHighContrast}
+              onCheckedChange={handleContrastToggle}
               aria-describedby="high-contrast-description"
             />
           </div>
           
           <div>
-            <Label className="font-medium mb-2 block">Text Size</Label>
-            <div className="flex gap-2">
+            <Label className="font-medium mb-2 block">Taille du texte</Label>
+            <div className="flex gap-2" role="radiogroup" aria-label="Taille du texte">
               <Button 
                 size="sm"
-                variant={textSize === "normal" ? "default" : "outline"}
-                onClick={() => setTextSize("normal")}
-                aria-pressed={textSize === "normal"}
+                variant={fontSize === "normal" ? "default" : "outline"}
+                onClick={() => handleFontSizeChange("normal")}
+                role="radio"
+                aria-checked={fontSize === "normal"}
                 className="flex-1"
               >
-                Normal
+                Normale
               </Button>
               <Button 
                 size="sm"
-                variant={textSize === "large" ? "default" : "outline"}
-                onClick={() => setTextSize("large")}
-                aria-pressed={textSize === "large"}
+                variant={fontSize === "large" ? "default" : "outline"}
+                onClick={() => handleFontSizeChange("large")}
+                role="radio"
+                aria-checked={fontSize === "large"}
                 className="flex-1"
               >
-                Large
+                Grande
               </Button>
               <Button 
                 size="sm"
-                variant={textSize === "x-large" ? "default" : "outline"}
-                onClick={() => setTextSize("x-large")}
-                aria-pressed={textSize === "x-large"}
+                variant={fontSize === "larger" ? "default" : "outline"}
+                onClick={() => handleFontSizeChange("larger")}
+                role="radio"
+                aria-checked={fontSize === "larger"}
                 className="flex-1"
               >
-                X-Large
+                Très grande
               </Button>
             </div>
           </div>
