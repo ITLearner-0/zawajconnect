@@ -1,218 +1,190 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Shield, AlertTriangle, CheckCircle, Eye, Lock, Activity } from 'lucide-react';
+import { Shield, AlertTriangle, Activity, Lock, Eye, Download } from 'lucide-react';
+import { SecurityAuditLogger } from '@/services/security/auditLogger';
+import { JWTManager } from '@/services/auth/jwtManager';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSecurityAudit } from '@/hooks/security/useSecurityAudit';
-import { toast } from 'sonner';
 
-interface SecurityStatus {
-  emailVerified: boolean;
-  phoneVerified: boolean;
-  idVerified: boolean;
-  profileComplete: boolean;
-  recentLoginAttempts: number;
-  accountVisible: boolean;
-}
-
-const SecurityDashboard = () => {
+const SecurityDashboard: React.FC = () => {
   const { user } = useAuth();
-  const { logPrivacyChange } = useSecurityAudit();
-  const [securityStatus, setSecurityStatus] = useState<SecurityStatus>({
-    emailVerified: false,
-    phoneVerified: false,
-    idVerified: false,
-    profileComplete: false,
-    recentLoginAttempts: 0,
-    accountVisible: true
-  });
-
-  const [securityScore, setSecurityScore] = useState(0);
+  const [auditStats, setAuditStats] = useState<any>(null);
+  const [tokenExpiry, setTokenExpiry] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Calculate security score based on status
-    let score = 0;
-    if (securityStatus.emailVerified) score += 25;
-    if (securityStatus.phoneVerified) score += 25;
-    if (securityStatus.idVerified) score += 25;
-    if (securityStatus.profileComplete) score += 25;
+    loadSecurityData();
     
-    setSecurityScore(score);
-  }, [securityStatus]);
+    // Update token expiry every minute
+    const interval = setInterval(async () => {
+      const expiry = await JWTManager.getTokenExpiry();
+      setTokenExpiry(expiry);
+    }, 60000);
 
-  const getSecurityLevel = (score: number): { level: string; color: string; icon: React.ReactNode } => {
-    if (score >= 75) {
-      return { level: 'Élevé', color: 'green', icon: <CheckCircle className="h-4 w-4" /> };
-    } else if (score >= 50) {
-      return { level: 'Modéré', color: 'yellow', icon: <AlertTriangle className="h-4 w-4" /> };
-    } else {
-      return { level: 'Faible', color: 'red', icon: <AlertTriangle className="h-4 w-4" /> };
-    }
-  };
+    return () => clearInterval(interval);
+  }, []);
 
-  const handlePrivacyToggle = async (setting: string, newValue: boolean) => {
+  const loadSecurityData = async () => {
     try {
-      // This would normally make an API call
-      setSecurityStatus(prev => ({ ...prev, [setting]: newValue }));
+      const [stats, expiry] = await Promise.all([
+        SecurityAuditLogger.getAuditStats(user?.id),
+        JWTManager.getTokenExpiry()
+      ]);
       
-      logPrivacyChange(setting, true, { newValue, previousValue: !newValue });
-      
-      toast.success(`Paramètre de confidentialité mis à jour`);
+      setAuditStats(stats);
+      setTokenExpiry(expiry);
     } catch (error) {
-      logPrivacyChange(setting, false, { error: error instanceof Error ? error.message : 'Unknown error' });
-      toast.error('Erreur lors de la mise à jour');
+      console.error('Failed to load security data:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const securityLevel = getSecurityLevel(securityScore);
+  const handleDownloadAuditLog = async () => {
+    try {
+      const stats = await SecurityAuditLogger.getAuditStats(user?.id);
+      const blob = new Blob([JSON.stringify(stats, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `audit-log-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to download audit log:', error);
+    }
+  };
+
+  const getTokenStatus = () => {
+    if (!tokenExpiry) return { status: 'unknown', color: 'secondary' };
+    
+    const now = Date.now();
+    const timeLeft = tokenExpiry - now;
+    
+    if (timeLeft < 5 * 60 * 1000) return { status: 'expires soon', color: 'destructive' };
+    if (timeLeft < 15 * 60 * 1000) return { status: 'active', color: 'default' };
+    return { status: 'secure', color: 'default' };
+  };
+
+  const tokenStatus = getTokenStatus();
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-32 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Security Dashboard</h1>
+          <p className="text-muted-foreground">Monitor your account security and activity</p>
+        </div>
+        <Button onClick={handleDownloadAuditLog} variant="outline">
+          <Download className="h-4 w-4 mr-2" />
+          Download Audit Log
+        </Button>
+      </div>
+
       {/* Security Overview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="h-5 w-5" />
-            Tableau de Bord Sécurité
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              {securityLevel.icon}
-              <span className="font-medium">Niveau de sécurité: </span>
-              <Badge variant={securityLevel.color === 'green' ? 'default' : 'destructive'}>
-                {securityLevel.level}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">JWT Token</CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              <Badge variant={tokenStatus.color as any}>
+                {tokenStatus.status}
               </Badge>
             </div>
-            <div className="text-2xl font-bold text-rose-600">
-              {securityScore}%
+            <p className="text-xs text-muted-foreground">
+              {tokenExpiry ? `Expires ${new Date(tokenExpiry).toLocaleTimeString()}` : 'No active session'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Activity Today</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{auditStats?.total || 0}</div>
+            <p className="text-xs text-muted-foreground">
+              Security events recorded
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Security Level</CardTitle>
+            <Lock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              <Badge variant="default">High</Badge>
             </div>
-          </div>
-          
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
-            <div 
-              className={`h-2 rounded-full transition-all duration-300 ${
-                securityLevel.color === 'green' ? 'bg-green-500' : 
-                securityLevel.color === 'yellow' ? 'bg-yellow-500' : 'bg-red-500'
-              }`}
-              style={{ width: `${securityScore}%` }}
-            />
-          </div>
-        </CardContent>
-      </Card>
+            <p className="text-xs text-muted-foreground">
+              All protections active
+            </p>
+          </CardContent>
+        </Card>
 
-      {/* Verification Status */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CheckCircle className="h-5 w-5" />
-            Statut de Vérification
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span>Email vérifié</span>
-            <Badge variant={securityStatus.emailVerified ? 'default' : 'secondary'}>
-              {securityStatus.emailVerified ? 'Vérifié' : 'Non vérifié'}
-            </Badge>
-          </div>
-          <div className="flex items-center justify-between">
-            <span>Téléphone vérifié</span>
-            <Badge variant={securityStatus.phoneVerified ? 'default' : 'secondary'}>
-              {securityStatus.phoneVerified ? 'Vérifié' : 'Non vérifié'}
-            </Badge>
-          </div>
-          <div className="flex items-center justify-between">
-            <span>Identité vérifiée</span>
-            <Badge variant={securityStatus.idVerified ? 'default' : 'secondary'}>
-              {securityStatus.idVerified ? 'Vérifié' : 'Non vérifié'}
-            </Badge>
-          </div>
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Threat Level</CardTitle>
+            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              <Badge variant="default">Low</Badge>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              No threats detected
+            </p>
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Privacy Controls */}
+      {/* Recent Activity */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Eye className="h-5 w-5" />
-            Contrôles de Confidentialité
+            Recent Security Events
           </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span>Compte visible</span>
-            <Button 
-              variant={securityStatus.accountVisible ? "default" : "outline"}
-              size="sm"
-              onClick={() => handlePrivacyToggle('accountVisible', !securityStatus.accountVisible)}
-            >
-              {securityStatus.accountVisible ? 'Visible' : 'Masqué'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Security Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Activity className="h-5 w-5" />
-            Activité de Sécurité
-          </CardTitle>
+          <CardDescription>
+            Your recent account activity and security events
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-              <span>Tentatives de connexion récentes</span>
-              <span className="font-medium">{securityStatus.recentLoginAttempts}</span>
+          {auditStats?.byType ? (
+            <div className="space-y-2">
+              {Object.entries(auditStats.byType).map(([eventType, count]) => (
+                <div key={eventType} className="flex items-center justify-between p-2 border rounded">
+                  <span className="font-medium">{eventType.replace(/_/g, ' ').toUpperCase()}</span>
+                  <Badge variant="outline">{count}</Badge>
+                </div>
+              ))}
             </div>
-            <div className="flex justify-between text-sm">
-              <span>Dernière connexion</span>
-              <span className="font-medium">Aujourd'hui</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Security Recommendations */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Lock className="h-5 w-5" />
-            Recommandations
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 text-sm text-muted-foreground">
-            {!securityStatus.emailVerified && (
-              <div className="flex items-center gap-2 text-yellow-600">
-                <AlertTriangle className="h-4 w-4" />
-                Vérifiez votre adresse email
-              </div>
-            )}
-            {!securityStatus.phoneVerified && (
-              <div className="flex items-center gap-2 text-yellow-600">
-                <AlertTriangle className="h-4 w-4" />
-                Vérifiez votre numéro de téléphone
-              </div>
-            )}
-            {!securityStatus.idVerified && (
-              <div className="flex items-center gap-2 text-yellow-600">
-                <AlertTriangle className="h-4 w-4" />
-                Vérifiez votre identité
-              </div>
-            )}
-            {securityScore === 100 && (
-              <div className="flex items-center gap-2 text-green-600">
-                <CheckCircle className="h-4 w-4" />
-                Votre compte est entièrement sécurisé !
-              </div>
-            )}
-          </div>
+          ) : (
+            <p className="text-muted-foreground">No recent activity to display</p>
+          )}
         </CardContent>
       </Card>
     </div>

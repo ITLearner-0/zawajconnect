@@ -1,32 +1,78 @@
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+
+interface DeviceFingerprint {
+  userAgent: string;
+  screen: string;
+  timezone: string;
+  language: string;
+  platform: string;
+  cookieEnabled: boolean;
+  doNotTrack: string;
+  hardwareConcurrency: number;
+  maxTouchPoints: number;
+  colorDepth: number;
+  deviceMemory?: number;
+  hash: string;
+}
 
 export const useDeviceFingerprinting = () => {
   const [deviceFingerprint, setDeviceFingerprint] = useState<string>('');
 
-  // Generate device fingerprint
-  const generateDeviceFingerprint = useCallback(() => {
+  const generateDeviceFingerprint = useCallback(async (): Promise<string> => {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
-    ctx?.fillText('fingerprint', 0, 0);
-    const canvasFingerprint = canvas.toDataURL();
     
-    const fingerprint = btoa(JSON.stringify({
+    // Canvas fingerprinting
+    if (ctx) {
+      ctx.textBaseline = 'top';
+      ctx.font = '14px Arial';
+      ctx.fillText('Device fingerprint canvas', 2, 2);
+    }
+    
+    const canvasFingerprint = canvas.toDataURL();
+
+    // WebGL fingerprinting
+    const webglCanvas = document.createElement('canvas');
+    const webgl = webglCanvas.getContext('webgl') || webglCanvas.getContext('experimental-webgl');
+    let webglInfo = '';
+    
+    if (webgl) {
+      const debugInfo = webgl.getExtension('WEBGL_debug_renderer_info');
+      if (debugInfo) {
+        webglInfo = webgl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) + 
+                   webgl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+      }
+    }
+
+    const fingerprint: DeviceFingerprint = {
       userAgent: navigator.userAgent,
+      screen: `${screen.width}x${screen.height}x${screen.colorDepth}`,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       language: navigator.language,
       platform: navigator.platform,
-      screen: `${screen.width}x${screen.height}`,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      canvas: canvasFingerprint.slice(-50)
-    }));
+      cookieEnabled: navigator.cookieEnabled,
+      doNotTrack: navigator.doNotTrack || 'unknown',
+      hardwareConcurrency: navigator.hardwareConcurrency || 0,
+      maxTouchPoints: navigator.maxTouchPoints || 0,
+      colorDepth: screen.colorDepth,
+      deviceMemory: (navigator as any).deviceMemory,
+      hash: ''
+    };
+
+    // Create hash from all fingerprint data
+    const fingerprintString = JSON.stringify(fingerprint) + canvasFingerprint + webglInfo;
+    const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(fingerprintString));
+    const hashArray = Array.from(new Uint8Array(hash));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     
-    return fingerprint;
+    fingerprint.hash = hashHex;
+    
+    return hashHex;
   }, []);
 
-  // Initialize device fingerprint
   useEffect(() => {
-    const fingerprint = generateDeviceFingerprint();
-    setDeviceFingerprint(fingerprint);
+    generateDeviceFingerprint().then(setDeviceFingerprint);
   }, [generateDeviceFingerprint]);
 
   return {

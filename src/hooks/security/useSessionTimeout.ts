@@ -1,7 +1,8 @@
 
 import { useEffect, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '../use-toast';
+import { useAuth } from '@/contexts/AuthContext';
+import { JWTManager } from '@/services/auth/jwtManager';
+import { toast } from 'sonner';
 
 interface UseSessionTimeoutProps {
   currentUserId: string | null;
@@ -9,49 +10,68 @@ interface UseSessionTimeoutProps {
   updateLastActivity: () => void;
 }
 
-export const useSessionTimeout = ({ 
-  currentUserId, 
-  sessionTimeout, 
-  updateLastActivity 
-}: UseSessionTimeoutProps) => {
-  const { toast } = useToast();
+export const useSessionTimeout = ({ currentUserId, sessionTimeout, updateLastActivity }: UseSessionTimeoutProps) => {
+  const { signOut } = useAuth();
 
-  // Session timeout monitoring
+  // Reset activity timer
+  const resetActivityTimer = useCallback(() => {
+    updateLastActivity();
+  }, [updateLastActivity]);
+
+  // Handle session timeout
+  const handleSessionTimeout = useCallback(async () => {
+    toast.error('Session expired', {
+      description: 'You have been logged out due to inactivity.'
+    });
+    
+    await JWTManager.forceLogout('Session timeout');
+    await signOut();
+  }, [signOut]);
+
   useEffect(() => {
     if (!currentUserId) return;
 
     let timeoutId: NodeJS.Timeout;
+    let warningId: NodeJS.Timeout;
 
     const resetTimeout = () => {
       clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        toast({
-          title: "Session Expired",
-          description: "For your security, you have been logged out due to inactivity.",
-          variant: "destructive"
+      clearTimeout(warningId);
+
+      // Show warning 5 minutes before timeout
+      warningId = setTimeout(() => {
+        toast.warning('Session expiring soon', {
+          description: 'Your session will expire in 5 minutes. Please save your work.',
+          duration: 10000
         });
-        supabase.auth.signOut();
-      }, sessionTimeout);
+      }, sessionTimeout - 5 * 60 * 1000);
+
+      // Set main timeout
+      timeoutId = setTimeout(handleSessionTimeout, sessionTimeout);
     };
 
-    const updateActivity = () => {
-      updateLastActivity();
+    // Activity events to track
+    const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+
+    const handleActivity = () => {
+      resetActivityTimer();
       resetTimeout();
     };
 
-    // Listen for user activity
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
-    events.forEach(event => {
-      document.addEventListener(event, updateActivity, true);
+    // Add event listeners
+    activityEvents.forEach(event => {
+      document.addEventListener(event, handleActivity, true);
     });
 
+    // Initial timeout setup
     resetTimeout();
 
     return () => {
       clearTimeout(timeoutId);
-      events.forEach(event => {
-        document.removeEventListener(event, updateActivity, true);
+      clearTimeout(warningId);
+      activityEvents.forEach(event => {
+        document.removeEventListener(event, handleActivity, true);
       });
     };
-  }, [currentUserId, sessionTimeout, toast, updateLastActivity]);
+  }, [currentUserId, sessionTimeout, resetActivityTimer, handleSessionTimeout]);
 };
