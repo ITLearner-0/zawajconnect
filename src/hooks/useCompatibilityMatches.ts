@@ -23,7 +23,7 @@ export function useCompatibilityMatches() {
           return;
         }
 
-        // Pour l'instant, créer des données de test pour afficher quelque chose
+        // Créer des données de test
         const mockMatches: CompatibilityMatch[] = [
           {
             userId: "mock-user-1",
@@ -32,24 +32,21 @@ export function useCompatibilityMatches() {
               id: "mock-user-1",
               first_name: "Amina",
               last_name: "K.",
-              gender: "female",
               location: "Paris, France",
-              birth_date: "1995-03-15", 
               religious_practice_level: "Pratiquant",
               education_level: "Master",
               email_verified: true,
               phone_verified: true,
-              id_verified: false,
-              is_visible: true
+              id_verified: false
             },
             matchDetails: {
               strengths: ["Pratique religieuse", "Valeurs familiales"],
               differences: ["Localisation"],
               categoryScores: {
-                religious: 90,
-                lifestyle: 80,
-                family: 85,
-                personal: 82
+                religious: { score: 90, weight: 1.0 },
+                lifestyle: { score: 80, weight: 0.8 },
+                family: { score: 85, weight: 0.9 },
+                personal: { score: 82, weight: 0.7 }
               }
             }
           },
@@ -60,24 +57,21 @@ export function useCompatibilityMatches() {
               id: "mock-user-2",
               first_name: "Khadija",
               last_name: "M.",
-              gender: "female",
               location: "Lyon, France",
-              birth_date: "1992-07-22",
               religious_practice_level: "Très pratiquant",
               education_level: "Licence",
               email_verified: true,
               phone_verified: false,
-              id_verified: true,
-              is_visible: true
+              id_verified: true
             },
             matchDetails: {
               strengths: ["Éducation", "Objectifs de vie"],
               differences: ["Niveau de pratique"],
               categoryScores: {
-                religious: 75,
-                lifestyle: 82,
-                family: 80,
-                personal: 75
+                religious: { score: 75, weight: 1.0 },
+                lifestyle: { score: 82, weight: 0.8 },
+                family: { score: 80, weight: 0.9 },
+                personal: { score: 75, weight: 0.7 }
               }
             }
           },
@@ -88,24 +82,21 @@ export function useCompatibilityMatches() {
               id: "mock-user-3",
               first_name: "Fatima",
               last_name: "B.",
-              gender: "female", 
               location: "Marseille, France",
-              birth_date: "1994-11-08",
               religious_practice_level: "Modéré",
               education_level: "Doctorat",
               email_verified: true,
               phone_verified: true,
-              id_verified: false,
-              is_visible: true
+              id_verified: false
             },
             matchDetails: {
               strengths: ["Ambition professionnelle", "Communication"],
               differences: ["Pratique religieuse"],
               categoryScores: {
-                religious: 65,
-                lifestyle: 78,
-                family: 75,
-                personal: 70
+                religious: { score: 65, weight: 1.0 },
+                lifestyle: { score: 78, weight: 0.8 },
+                family: { score: 75, weight: 0.9 },
+                personal: { score: 70, weight: 0.7 }
               }
             }
           }
