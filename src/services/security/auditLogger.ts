@@ -11,6 +11,7 @@ export interface AuditEvent {
   details?: Record<string, any>;
   ip?: string;
   userAgent?: string;
+  timestamp?: string;
 }
 
 export class SecurityAuditLogger {
@@ -178,7 +179,7 @@ export class SecurityAuditLogger {
       // Process statistics
       const stats = {
         total: data.length,
-        byType: {},
+        byType: {} as Record<string, number>,
         byHour: Array(24).fill(0)
       };
 

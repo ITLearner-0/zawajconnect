@@ -34,14 +34,14 @@ export const useDeviceFingerprinting = () => {
 
     // WebGL fingerprinting
     const webglCanvas = document.createElement('canvas');
-    const webgl = webglCanvas.getContext('webgl') || webglCanvas.getContext('experimental-webgl');
+    const gl = webglCanvas.getContext('webgl') || webglCanvas.getContext('experimental-webgl');
     let webglInfo = '';
     
-    if (webgl) {
-      const debugInfo = webgl.getExtension('WEBGL_debug_renderer_info');
+    if (gl) {
+      const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
       if (debugInfo) {
-        webglInfo = webgl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) + 
-                   webgl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        webglInfo = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) + 
+                   gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
       }
     }
 

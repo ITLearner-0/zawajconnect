@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Eye, EyeOff, Shield, X, Check } from 'lucide-react';
-import { useSecurity } from '@/components/security/SecurityProvider';
 
 interface EnhancedPasswordFieldProps {
   value: string;
@@ -15,6 +14,28 @@ interface EnhancedPasswordFieldProps {
   showStrengthIndicator?: boolean;
 }
 
+interface PasswordValidation {
+  isValid: boolean;
+  errors: string[];
+  score: number;
+}
+
+const validatePasswordStrength = (password: string): PasswordValidation => {
+  const errors: string[] = [];
+  
+  if (password.length < 8) errors.push('At least 8 characters');
+  if (!/[A-Z]/.test(password)) errors.push('One uppercase letter');
+  if (!/[a-z]/.test(password)) errors.push('One lowercase letter');
+  if (!/\d/.test(password)) errors.push('One number');
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) errors.push('One special character');
+  
+  return {
+    isValid: errors.length === 0,
+    errors,
+    score: Math.max(0, 100 - (errors.length * 20))
+  };
+};
+
 export const EnhancedPasswordField: React.FC<EnhancedPasswordFieldProps> = ({
   value,
   onChange,
@@ -24,23 +45,22 @@ export const EnhancedPasswordField: React.FC<EnhancedPasswordFieldProps> = ({
   showStrengthIndicator = false
 }) => {
   const [showPassword, setShowPassword] = useState(false);
-  const { enhancedAuth } = useSecurity();
 
-  const passwordValidation = enhancedAuth.validatePasswordStrength(value);
+  const passwordValidation = validatePasswordStrength(value);
   
   const getStrengthColor = () => {
     if (!value) return 'bg-gray-200';
-    const strength = passwordValidation.errors.length;
-    if (strength === 0) return 'bg-green-500';
-    if (strength <= 2) return 'bg-yellow-500';
+    const errorCount = passwordValidation.errors.length;
+    if (errorCount === 0) return 'bg-green-500';
+    if (errorCount <= 2) return 'bg-yellow-500';
     return 'bg-red-500';
   };
 
   const getStrengthText = () => {
     if (!value) return 'No password';
-    const strength = passwordValidation.errors.length;
-    if (strength === 0) return 'Strong';
-    if (strength <= 2) return 'Medium';
+    const errorCount = passwordValidation.errors.length;
+    if (errorCount === 0) return 'Strong';
+    if (errorCount <= 2) return 'Medium';
     return 'Weak';
   };
 
@@ -84,7 +104,7 @@ export const EnhancedPasswordField: React.FC<EnhancedPasswordFieldProps> = ({
             <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
               <div 
                 className={`h-full transition-all duration-300 ${getStrengthColor()}`}
-                style={{ width: `${Math.max(20, 100 - (passwordValidation.errors.length * 20))}%` }}
+                style={{ width: `${Math.max(20, passwordValidation.score)}%` }}
               />
             </div>
             <span className="text-sm font-medium">{getStrengthText()}</span>

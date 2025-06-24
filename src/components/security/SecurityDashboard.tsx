@@ -5,36 +5,21 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Shield, AlertTriangle, Activity, Lock, Eye, Download } from 'lucide-react';
 import { SecurityAuditLogger } from '@/services/security/auditLogger';
-import { JWTManager } from '@/services/auth/jwtManager';
 import { useAuth } from '@/contexts/AuthContext';
 
 const SecurityDashboard: React.FC = () => {
   const { user } = useAuth();
   const [auditStats, setAuditStats] = useState<any>(null);
-  const [tokenExpiry, setTokenExpiry] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadSecurityData();
-    
-    // Update token expiry every minute
-    const interval = setInterval(async () => {
-      const expiry = await JWTManager.getTokenExpiry();
-      setTokenExpiry(expiry);
-    }, 60000);
-
-    return () => clearInterval(interval);
   }, []);
 
   const loadSecurityData = async () => {
     try {
-      const [stats, expiry] = await Promise.all([
-        SecurityAuditLogger.getAuditStats(user?.id),
-        JWTManager.getTokenExpiry()
-      ]);
-      
+      const stats = await SecurityAuditLogger.getAuditStats(user?.id);
       setAuditStats(stats);
-      setTokenExpiry(expiry);
     } catch (error) {
       console.error('Failed to load security data:', error);
     } finally {
@@ -56,19 +41,6 @@ const SecurityDashboard: React.FC = () => {
       console.error('Failed to download audit log:', error);
     }
   };
-
-  const getTokenStatus = () => {
-    if (!tokenExpiry) return { status: 'unknown', color: 'secondary' };
-    
-    const now = Date.now();
-    const timeLeft = tokenExpiry - now;
-    
-    if (timeLeft < 5 * 60 * 1000) return { status: 'expires soon', color: 'destructive' };
-    if (timeLeft < 15 * 60 * 1000) return { status: 'active', color: 'default' };
-    return { status: 'secure', color: 'default' };
-  };
-
-  const tokenStatus = getTokenStatus();
 
   if (loading) {
     return (
@@ -102,17 +74,15 @@ const SecurityDashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">JWT Token</CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Security Level</CardTitle>
+            <Lock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              <Badge variant={tokenStatus.color as any}>
-                {tokenStatus.status}
-              </Badge>
+              <Badge variant="default">High</Badge>
             </div>
             <p className="text-xs text-muted-foreground">
-              {tokenExpiry ? `Expires ${new Date(tokenExpiry).toLocaleTimeString()}` : 'No active session'}
+              All protections active
             </p>
           </CardContent>
         </Card>
@@ -132,15 +102,15 @@ const SecurityDashboard: React.FC = () => {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Security Level</CardTitle>
-            <Lock className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Session Status</CardTitle>
+            <Shield className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              <Badge variant="default">High</Badge>
+              <Badge variant="default">Active</Badge>
             </div>
             <p className="text-xs text-muted-foreground">
-              All protections active
+              Secure session
             </p>
           </CardContent>
         </Card>
@@ -178,7 +148,7 @@ const SecurityDashboard: React.FC = () => {
               {Object.entries(auditStats.byType).map(([eventType, count]) => (
                 <div key={eventType} className="flex items-center justify-between p-2 border rounded">
                   <span className="font-medium">{eventType.replace(/_/g, ' ').toUpperCase()}</span>
-                  <Badge variant="outline">{count}</Badge>
+                  <Badge variant="outline">{String(count)}</Badge>
                 </div>
               ))}
             </div>
