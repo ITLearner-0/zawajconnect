@@ -38,10 +38,11 @@ export const useDeviceFingerprinting = () => {
     let webglInfo = '';
     
     if (gl) {
-      const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      const webglContext = gl as WebGLRenderingContext;
+      const debugInfo = webglContext.getExtension('WEBGL_debug_renderer_info');
       if (debugInfo) {
-        webglInfo = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) + 
-                   gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+        webglInfo = webglContext.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) + 
+                   webglContext.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
       }
     }
 
