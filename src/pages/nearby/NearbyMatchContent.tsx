@@ -9,8 +9,6 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import EnhancedMatchCard from "@/components/compatibility/EnhancedMatchCard";
-import DailyLimitBanner from "@/components/compatibility/DailyLimitBanner";
-import { DailyLimitsService } from "@/services/dailyLimitsService";
 import { supabase } from "@/integrations/supabase/client";
 
 interface NearbyMatchContentProps {
@@ -28,11 +26,6 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
   const isMobile = useIsMobile();
   const { t } = useTranslation();
 
-  const handleLimitCheck = (canShow: boolean, remaining: number) => {
-    setCanShowSuggestions(canShow);
-    setRemainingCount(remaining);
-  };
-
   const handleRefreshMatches = async () => {
     if (!canShowSuggestions) return;
     
@@ -40,13 +33,11 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        const success = await DailyLimitsService.incrementSuggestionCount(session.user.id);
-        if (success) {
-          setDisplayedMatches(matchScores.slice(0, 5)); // Montrer 5 nouvelles suggestions
-          const newRemaining = await DailyLimitsService.getRemainingCount(session.user.id);
-          setRemainingCount(newRemaining);
-          setCanShowSuggestions(newRemaining > 0);
-        }
+        // Simuler un rafraîchissement des correspondances
+        setDisplayedMatches(matchScores.slice(0, 5));
+        const newRemaining = Math.max(0, remainingCount - 1);
+        setRemainingCount(newRemaining);
+        setCanShowSuggestions(newRemaining > 0);
       }
     } catch (error) {
       console.error('Error refreshing matches:', error);
@@ -56,6 +47,9 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
   };
 
   useEffect(() => {
+    console.log("NearbyMatchContent - matchScores:", matchScores.length);
+    console.log("NearbyMatchContent - canShowSuggestions:", canShowSuggestions);
+    
     if (canShowSuggestions && matchScores.length > 0) {
       setDisplayedMatches(matchScores.slice(0, 5));
     }
@@ -63,10 +57,15 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
 
   const filteredMatches = displayedMatches;
 
+  console.log("NearbyMatchContent - Rendering with:", {
+    loading,
+    filteredMatches: filteredMatches.length,
+    canShowSuggestions,
+    showCompatibility
+  });
+
   return (
     <div className={isMobile ? "w-full" : "lg:col-span-2"}>
-      <DailyLimitBanner onLimitCheck={handleLimitCheck} />
-      
       <IslamicPattern variant="card" color="teal" className="overflow-hidden">
         <div className="bg-gradient-to-r from-rose-400 to-pink-400 text-white p-3 sm:p-4 flex items-center justify-between">
           <div className="flex items-center">
@@ -90,22 +89,7 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
         </div>
 
         <div className="p-4 sm:p-6">
-          {!showCompatibility ? (
-            <Card className="bg-rose-50 border-rose-200">
-              <CardContent className="p-6 text-center">
-                <Users className="h-12 w-12 text-rose-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-rose-700 mb-2">
-                  {t('nearby.takeCompatibilityTest')}
-                </h3>
-                <p className="text-rose-600 mb-4">
-                  {t('nearby.compatibilityTestDescription')}
-                </p>
-                <Button className="bg-rose-500 hover:bg-rose-600 text-white">
-                  {t('nearby.startTest')}
-                </Button>
-              </CardContent>
-            </Card>
-          ) : loading ? (
+          {loading ? (
             <div className="flex items-center justify-center py-12">
               <Loader className="h-8 w-8 animate-spin text-rose-400" />
               <span className="ml-2 text-rose-600">{t('nearby.loadingMatches')}</span>
@@ -130,7 +114,6 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
                   key={match.userId} 
                   match={match}
                   onMessageClick={() => {
-                    // Logique pour envoyer un message
                     console.log('Message to:', match.userId);
                   }}
                 />

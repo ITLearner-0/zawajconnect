@@ -57,7 +57,8 @@
     "practiceLevel": "Niveau de pratique",
     "showCompatibility": "Afficher la compatibilité",
     "takeCompatibilityTest": "Passer le test de compatibilité",
-    "compatibilityTestDescription": "Ce test nous aide à vous jumeler avec des personnes qui partagent des valeurs islamiques et des objectifs de vie similaires."
+    "compatibilityTestDescription": "Ce test nous aide à vous jumeler avec des personnes qui partagent des valeurs islamiques et des objectifs de vie similaires.",
+    "startTest": "Commencer le test"
   },
   "compatibility": {
     "title": "Test de compatibilité",
