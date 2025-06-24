@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { FilterCriteria } from "@/utils/location";
 import { useCompatibilityMatches } from "@/hooks/useCompatibilityMatches";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { IslamicPattern } from "@/components/ui/islamic-pattern";
 import { Heart, Users, Loader, RefreshCw } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -47,18 +47,22 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
   };
 
   useEffect(() => {
-    console.log("NearbyMatchContent - matchScores:", matchScores.length);
+    console.log("NearbyMatchContent - Real matchScores from database:", matchScores.length);
     console.log("NearbyMatchContent - canShowSuggestions:", canShowSuggestions);
     
     if (canShowSuggestions && matchScores.length > 0) {
+      console.log("Setting displayed matches:", matchScores.slice(0, 5));
       setDisplayedMatches(matchScores.slice(0, 5));
+    } else {
+      console.log("No matches to display or suggestions disabled");
     }
   }, [matchScores, canShowSuggestions]);
 
   const filteredMatches = displayedMatches;
 
-  console.log("NearbyMatchContent - Rendering with:", {
+  console.log("NearbyMatchContent - Rendering with real data:", {
     loading,
+    totalMatches: matchScores.length,
     filteredMatches: filteredMatches.length,
     canShowSuggestions,
     showCompatibility
@@ -71,7 +75,7 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
           <div className="flex items-center">
             <Heart className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
             <h2 className="text-lg sm:text-xl font-medium">
-              {t('nearby.compatibleMatches')} {canShowSuggestions && `(${remainingCount} restantes)`}
+              Correspondances compatibles {canShowSuggestions && `(${remainingCount} restantes)`}
             </h2>
           </div>
           
@@ -92,7 +96,7 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <Loader className="h-8 w-8 animate-spin text-rose-400" />
-              <span className="ml-2 text-rose-600">{t('nearby.loadingMatches')}</span>
+              <span className="ml-2 text-rose-600">Chargement des correspondances réelles...</span>
             </div>
           ) : !canShowSuggestions ? (
             <Card className="bg-red-50 border-red-200">
@@ -109,12 +113,15 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
             </Card>
           ) : filteredMatches.length > 0 ? (
             <div className="space-y-4">
+              <div className="text-sm text-gray-600 mb-2">
+                Affichage de {filteredMatches.length} correspondance(s) réelle(s) sur {matchScores.length} total
+              </div>
               {filteredMatches.map((match) => (
                 <EnhancedMatchCard 
                   key={match.userId} 
                   match={match}
                   onMessageClick={() => {
-                    console.log('Message to:', match.userId);
+                    console.log('Message to user:', match.userId);
                   }}
                 />
               ))}
@@ -124,10 +131,13 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
               <CardContent className="p-6 text-center">
                 <Users className="h-12 w-12 text-blue-400 mx-auto mb-4" />
                 <h3 className="text-lg font-semibold text-blue-700 mb-2">
-                  {t('nearby.noMatches')}
+                  Aucune correspondance trouvée
                 </h3>
-                <p className="text-blue-600">
-                  {t('nearby.adjustFilters')}
+                <p className="text-blue-600 mb-2">
+                  Aucune correspondance compatible n'a été trouvée dans la base de données.
+                </p>
+                <p className="text-blue-500 text-sm">
+                  Assurez-vous que d'autres utilisateurs ont complété le test de compatibilité.
                 </p>
               </CardContent>
             </Card>
