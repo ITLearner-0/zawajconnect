@@ -29,7 +29,6 @@ export function useCompatibilityMatches() {
             userId: "mock-user-1",
             score: 85,
             profileData: {
-              id: "mock-user-1",
               first_name: "Amina",
               last_name: "K.",
               location: "Paris, France",
@@ -54,7 +53,6 @@ export function useCompatibilityMatches() {
             userId: "mock-user-2", 
             score: 78,
             profileData: {
-              id: "mock-user-2",
               first_name: "Khadija",
               last_name: "M.",
               location: "Lyon, France",
@@ -79,7 +77,6 @@ export function useCompatibilityMatches() {
             userId: "mock-user-3",
             score: 72,
             profileData: {
-              id: "mock-user-3",
               first_name: "Fatima",
               last_name: "B.",
               location: "Marseille, France",
