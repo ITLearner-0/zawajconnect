@@ -35,106 +35,137 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
 
   // Load compatibility matches
   const loadCompatibilityMatches = async () => {
+    console.log("Loading compatibility matches...");
     try {
       setLoading(true);
       const matches = await findMatches({
         minCompatibilityScore: 70,
         verifiedOnly: false
       });
+      console.log("Compatibility matches loaded:", matches.length);
       setCompatibilityMatches(matches);
     } catch (error) {
       console.error("Error loading compatibility matches:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les correspondances compatibles.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load nearby profiles
+  const loadNearbyProfiles = async (userSession: any) => {
+    console.log("Loading nearby profiles for user:", userSession.user.id);
+    try {
+      setLoading(true);
+      
+      // Try to get user location first
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            console.log("User location obtained:", latitude, longitude);
+            setUserCoordinates([longitude, latitude]);
+            
+            try {
+              const nearbyProfiles = await findNearbyProfiles(userSession.user.id, maxDistance, filters);
+              console.log("Nearby profiles loaded:", nearbyProfiles.length);
+              setProfiles(nearbyProfiles);
+              
+              if (nearbyProfiles.length === 0) {
+                console.log("No nearby profiles found, showing compatibility matches instead");
+                setShowLocationMode(false);
+                await loadCompatibilityMatches();
+              }
+            } catch (profileError) {
+              console.error("Error loading nearby profiles:", profileError);
+              // Fallback to compatibility matches
+              setShowLocationMode(false);
+              await loadCompatibilityMatches();
+            }
+          },
+          async (geoError) => {
+            console.log("Geolocation failed:", geoError.message);
+            setLocationError("Impossible d'obtenir votre position. Affichage des correspondances compatibles.");
+            setShowLocationMode(false);
+            await loadCompatibilityMatches();
+          },
+          {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000
+          }
+        );
+      } else {
+        console.log("Geolocation not supported, using compatibility matches");
+        setLocationError("La géolocalisation n'est pas supportée par votre navigateur.");
+        setShowLocationMode(false);
+        await loadCompatibilityMatches();
+      }
+    } catch (error) {
+      console.error("General error in loadNearbyProfiles:", error);
+      setShowLocationMode(false);
+      await loadCompatibilityMatches();
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Function to load the map
-    const loadMapData = async () => {
-      setLoading(true);
-      setLocationError(null);
+    const initializeData = async () => {
+      console.log("Initializing LocationMap data...");
       
       try {
-        // Get current user
-        const { data: { session } } = await supabase.auth.getSession();
+        // Get current user session
+        const { data: { session }, error } = await supabase.auth.getSession();
         
-        if (!session) {
+        if (error) {
+          console.error("Auth error:", error);
           toast({
-            title: "Authentication required",
-            description: "Please sign in to view matches in your area.",
+            title: "Erreur d'authentification",
+            description: "Veuillez vous reconnecter.",
             variant: "destructive",
           });
-          setLoading(false);
+          navigate("/auth");
           return;
         }
         
-        // If user wants compatibility mode, load those matches
-        if (!showLocationMode) {
-          await loadCompatibilityMatches();
+        if (!session) {
+          console.log("No session found, redirecting to auth");
+          toast({
+            title: "Authentification requise",
+            description: "Veuillez vous connecter pour voir les profils près de vous.",
+            variant: "destructive",
+          });
+          navigate("/auth");
           return;
         }
 
-        // Check if we can get the user's current location
-        if (!navigator.geolocation) {
-          setLocationError("Geolocation is not supported by your browser.");
-          // Fallback to compatibility matches
-          setShowLocationMode(false);
+        console.log("User authenticated:", session.user.id);
+        
+        // Load data based on mode
+        if (showLocationMode) {
+          await loadNearbyProfiles(session);
+        } else {
           await loadCompatibilityMatches();
-          return;
         }
         
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            setUserCoordinates([longitude, latitude]);
-            
-            try {
-              console.log("User coordinates:", longitude, latitude);
-              
-              const nearbyProfiles = await findNearbyProfiles(session.user.id, maxDistance, filters);
-              console.log("Retrieved profiles:", nearbyProfiles);
-              setProfiles(nearbyProfiles);
-              setLoading(false);
-            } catch (innerError) {
-              console.error("Error in map initialization:", innerError);
-              toast({
-                title: "Error",
-                description: "There was a problem loading the map data.",
-                variant: "destructive",
-              });
-              setLoading(false);
-            }
-          },
-          async (error) => {
-            console.error("Error getting location:", error);
-            setLocationError("Unable to get your location. Showing compatibility matches instead.");
-            
-            // Fallback to compatibility matches
-            setShowLocationMode(false);
-            await loadCompatibilityMatches();
-            
-            toast({
-              title: "Location not available",
-              description: "Showing compatibility-based matches instead.",
-            });
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          }
-        );
       } catch (error) {
-        console.error("General error:", error);
-        // Fallback to compatibility matches
-        setShowLocationMode(false);
-        await loadCompatibilityMatches();
+        console.error("Error in initializeData:", error);
+        setLoading(false);
+        toast({
+          title: "Erreur",
+          description: "Une erreur est survenue lors du chargement des données.",
+          variant: "destructive",
+        });
       }
     };
 
-    loadMapData();
-  }, [maxDistance, filters, showCompatibility, userId, showLocationMode]);
+    initializeData();
+  }, [maxDistance, filters, showLocationMode, navigate, toast]);
 
   // Add custom styling for map
   useEffect(() => {
@@ -158,65 +189,85 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
     }
   };
 
-  // Toggle between location and compatibility mode
-  const toggleMode = () => {
-    setShowLocationMode(!showLocationMode);
-  };
-
   // Function to retry loading with location
   const handleRetryLocation = () => {
+    console.log("Retrying with location...");
     setLocationError(null);
     setShowLocationMode(true);
     window.location.reload();
   };
+
+  const handleToggleMode = () => {
+    console.log("Toggling mode from", showLocationMode ? "location" : "compatibility");
+    setShowLocationMode(!showLocationMode);
+    setProfiles([]);
+    setCompatibilityMatches([]);
+    setLocationError(null);
+  };
+
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Chargement des profils...</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <Skeleton className="h-[400px] w-full rounded-md" />
+            <div className="space-y-2">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="h-16 w-full rounded-md" />
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full">
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>
-            {showLocationMode ? t('nearby.matchesNearYou') : 'Compatible Matches'}
+            {showLocationMode ? 'Profils à proximité' : 'Correspondances compatibles'}
           </CardTitle>
           <div className="flex gap-2">
             <CustomButton
               variant={showLocationMode ? "default" : "outline"}
               size="sm"
-              onClick={() => setShowLocationMode(true)}
+              onClick={() => handleToggleMode()}
             >
-              Location
+              Proximité
             </CustomButton>
             <CustomButton
               variant={!showLocationMode ? "default" : "outline"}
               size="sm"
-              onClick={() => setShowLocationMode(false)}
+              onClick={() => handleToggleMode()}
             >
-              Compatibility
+              Compatibilité
             </CustomButton>
           </div>
         </div>
       </CardHeader>
       <CardContent>
-        {loading ? (
-          <div className="space-y-2">
-            <Skeleton className="h-[400px] w-full rounded-md" />
-          </div>
-        ) : showLocationMode ? (
+        {showLocationMode ? (
           // Location-based view
           locationError ? (
             <div className="h-[400px] flex flex-col items-center justify-center bg-gray-100 rounded-md p-6 text-center">
               <p className="mb-4 text-orange-600">{locationError}</p>
               <div className="flex gap-2">
                 <CustomButton onClick={handleRetryLocation} variant="outline">
-                  Retry with Location
+                  Réessayer avec la localisation
                 </CustomButton>
                 <CustomButton onClick={() => setShowLocationMode(false)}>
-                  View Compatible Matches
+                  Voir les correspondances compatibles
                 </CustomButton>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
-              {userCoordinates && (
+              {userCoordinates && profiles.length > 0 && (
                 <MapContainer
                   ref={mapContainerRef}
                   profiles={profiles}
@@ -228,8 +279,23 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
               )}
               
               <div className="space-y-2 mt-4">
-                <h3 className="text-lg font-medium">{t('nearby.matchesNearYou')} ({profiles.length})</h3>
-                <ProfileList profiles={profiles} onNavigateToProfile={navigateToProfile} />
+                <h3 className="text-lg font-medium">
+                  Profils à proximité ({profiles.length})
+                </h3>
+                {profiles.length > 0 ? (
+                  <ProfileList profiles={profiles} onNavigateToProfile={navigateToProfile} />
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>Aucun profil trouvé dans votre région.</p>
+                    <CustomButton 
+                      onClick={() => setShowLocationMode(false)} 
+                      className="mt-4"
+                      variant="outline"
+                    >
+                      Voir les correspondances compatibles
+                    </CustomButton>
+                  </div>
+                )}
               </div>
             </div>
           )
@@ -237,11 +303,28 @@ const LocationMap = ({ maxDistance = 50, filters = {}, showCompatibility = false
           // Compatibility-based view
           <div className="space-y-4">
             <div className="space-y-2">
-              <h3 className="text-lg font-medium">Compatible Matches ({compatibilityMatches.length})</h3>
-              <CompatibilityProfileList 
-                matches={compatibilityMatches} 
-                onNavigateToProfile={navigateToProfile} 
-              />
+              <h3 className="text-lg font-medium">
+                Correspondances compatibles ({compatibilityMatches.length})
+              </h3>
+              {compatibilityMatches.length > 0 ? (
+                <CompatibilityProfileList 
+                  matches={compatibilityMatches} 
+                  onNavigateToProfile={navigateToProfile} 
+                />
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>Aucune correspondance compatible trouvée.</p>
+                  <p className="text-sm mt-2">
+                    Assurez-vous d'avoir complété le test de compatibilité.
+                  </p>
+                  <CustomButton 
+                    onClick={() => navigate("/compatibility")} 
+                    className="mt-4"
+                  >
+                    Faire le test de compatibilité
+                  </CustomButton>
+                </div>
+              )}
             </div>
           </div>
         )}
