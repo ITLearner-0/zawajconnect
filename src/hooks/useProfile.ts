@@ -9,9 +9,13 @@ export const useProfile = () => {
   
   useEffect(() => {
     const getUserId = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user?.id) {
-        setUserId(session.user.id);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.id) {
+          setUserId(session.user.id);
+        }
+      } catch (error) {
+        console.error("Error getting user session:", error);
       }
     };
     
@@ -45,11 +49,13 @@ export const useProfile = () => {
     initialPrivacySettings: privacySettings,
     initialBlockedUsers: blockedUsers,
     initialIsVisible: isAccountVisible,
-    userId // Pass the actual userId instead of userEmail
+    userId
   });
 
   return {
     formData,
+    loading,
+    error,
     isNewUser,
     userEmail,
     userId,

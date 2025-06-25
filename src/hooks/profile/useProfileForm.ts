@@ -48,9 +48,11 @@ export const useProfileForm = ({
       familyBackground: '',
       aboutMe: '',
       prayerFrequency: '',
+      polygamyStance: '',
       waliName: '',
       waliRelationship: '',
       waliContact: '',
+      profilePicture: '',
       gallery: []
     }
   });

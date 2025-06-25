@@ -84,6 +84,11 @@ const ProfilePage = () => {
     handleChange(e);
   };
 
+  // Show loading state if data is not ready
+  if (!formData) {
+    return <StandardLoadingState message="Chargement du profil..." />;
+  }
+
   if (isOnboarding) {
     return (
       <AccessibilityProvider>
@@ -106,23 +111,26 @@ const ProfilePage = () => {
     <AccessibilityProvider>
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-12" role="main" aria-labelledby="profile-heading">
         <div className="container max-w-4xl mx-auto px-4">
-          <Card className="shadow-lg border-rose-200 dark:border-rose-700 bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm">
-            <CardHeader>
-              <ProfileHeader onSignOut={handleSignOut} />
-              <p className="text-center text-rose-600 dark:text-rose-300">
-                Manage your profile and privacy settings
-              </p>
+          <Card className="shadow-lg border-rose-200 dark:border-rose-800">
+            <CardHeader className="bg-gradient-to-r from-rose-400 to-pink-400 text-white">
+              <ProfileHeader
+                userEmail={userEmail}
+                userId={userId}
+                hasCompatibilityResults={hasCompatibilityResults}
+                onSignOut={handleSignOut}
+              />
             </CardHeader>
-            <CardContent>
+
+            <CardContent className="p-6">
               <Tabs defaultValue="profile" className="w-full">
                 <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="profile">Profile</TabsTrigger>
-                  <TabsTrigger value="analytics">Analytics</TabsTrigger>
-                  <TabsTrigger value="recommendations">Tips</TabsTrigger>
-                  <TabsTrigger value="visibility">Visibility</TabsTrigger>
+                  <TabsTrigger value="profile">Profil</TabsTrigger>
+                  <TabsTrigger value="analytics">Statistiques</TabsTrigger>
+                  <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
+                  <TabsTrigger value="visibility">Visibilité</TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="profile" className="mt-6">
+                <TabsContent value="profile" className="space-y-6">
                   <ProfileForm
                     formData={formData}
                     handleChange={handleProfileFormChange}
@@ -139,40 +147,35 @@ const ProfilePage = () => {
                   />
                 </TabsContent>
 
-                <TabsContent value="analytics" className="mt-6">
-                  <StandardLoadingState
-                    loading={analyticsLoading}
-                    loadingText="Loading analytics..."
-                    emptyState={{
-                      title: "No Analytics Data",
-                      description: "Analytics data will appear here once you start using the platform."
-                    }}
-                  >
-                    <ProfileAnalytics analytics={analytics} />
-                  </StandardLoadingState>
-                </TabsContent>
-
-                <TabsContent value="recommendations" className="mt-6">
-                  <StandardLoadingState
-                    loading={recommendationsLoading}
-                    loadingText="Loading recommendations..."
-                    emptyState={{
-                      title: "No Recommendations",
-                      description: "Profile recommendations will appear here based on your activity."
-                    }}
-                  >
-                    <ProfileRecommendations 
-                      recommendations={recommendations}
-                      onActionClick={handleRecommendationAction}
+                <TabsContent value="analytics" className="space-y-6">
+                  {userId && (
+                    <ProfileAnalytics
+                      userId={userId}
+                      analytics={analytics}
+                      loading={analyticsLoading}
                     />
-                  </StandardLoadingState>
+                  )}
                 </TabsContent>
 
-                <TabsContent value="visibility" className="mt-6">
-                  <ProfileVisibilityManager
-                    settings={visibilitySettings}
-                    onSettingsChange={handleVisibilitySettingsChange}
-                  />
+                <TabsContent value="recommendations" className="space-y-6">
+                  {userId && (
+                    <ProfileRecommendations
+                      userId={userId}
+                      recommendations={recommendations}
+                      loading={recommendationsLoading}
+                      onRecommendationAction={handleRecommendationAction}
+                    />
+                  )}
+                </TabsContent>
+
+                <TabsContent value="visibility" className="space-y-6">
+                  {userId && (
+                    <ProfileVisibilityManager
+                      userId={userId}
+                      settings={visibilitySettings}
+                      onSettingsChange={handleVisibilitySettingsChange}
+                    />
+                  )}
                 </TabsContent>
               </Tabs>
             </CardContent>

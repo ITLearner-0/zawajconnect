@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
@@ -55,7 +54,11 @@ export const useProfileFetcher = (userId?: string | null) => {
         setUserEmail(email);
 
         // Fetch profile data with validated UUID
-        const { data: profile, error: profileError } = await fetchProfileFromDb(userId);
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', userId)
+          .maybeSingle();
 
         if (profileError && profileError.code !== 'PGRST116') {
           console.error("Error fetching profile:", profileError);
@@ -63,12 +66,20 @@ export const useProfileFetcher = (userId?: string | null) => {
           return;
         }
 
-        if (!profile || profile.length === 0) {
+        if (!profile) {
           // New user - create default profile
           console.log("No profile found, creating new profile for user:", userId);
           setIsNewUser(true);
           
-          const { error: createError } = await createNewProfile(userId);
+          const { error: createError } = await supabase
+            .from('profiles')
+            .insert({
+              id: userId,
+              first_name: '',
+              last_name: '',
+              privacy_settings: DEFAULT_PRIVACY_SETTINGS,
+              is_visible: true
+            });
           
           if (createError) {
             console.error("Error creating new profile:", createError);
@@ -103,26 +114,25 @@ export const useProfileFetcher = (userId?: string | null) => {
           setIsAccountVisible(true);
         } else {
           // Existing user - map database data to form data
-          const profileRecord = profile[0];
-          console.log("Found existing profile:", profileRecord);
+          console.log("Found existing profile:", profile);
           
           const mappedData: ProfileFormData = {
-            fullName: `${profileRecord.first_name || ''} ${profileRecord.last_name || ''}`.trim(),
-            age: profileRecord.birth_date || '',
-            gender: profileRecord.gender || '',
-            location: profileRecord.location || '',
-            education: profileRecord.education_level || '',
-            occupation: profileRecord.occupation || '',
-            religiousLevel: profileRecord.religious_practice_level || '',
+            fullName: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
+            age: profile.birth_date || '',
+            gender: profile.gender || '',
+            location: profile.location || '',
+            education: profile.education_level || '',
+            occupation: profile.occupation || '',
+            religiousLevel: profile.religious_practice_level || '',
             familyBackground: '',
-            aboutMe: profileRecord.about_me || '',
-            prayerFrequency: profileRecord.prayer_frequency || '',
-            polygamyStance: profileRecord.polygamy_stance || '',
-            waliName: profileRecord.wali_name || '',
-            waliRelationship: profileRecord.wali_relationship || '',
-            waliContact: profileRecord.wali_contact || '',
-            profilePicture: profileRecord.profile_picture || '',
-            gallery: profileRecord.gallery || []
+            aboutMe: profile.about_me || '',
+            prayerFrequency: profile.prayer_frequency || '',
+            polygamyStance: profile.polygamy_stance || '',
+            waliName: profile.wali_name || '',
+            waliRelationship: profile.wali_relationship || '',
+            waliContact: profile.wali_contact || '',
+            profilePicture: profile.profile_picture || '',
+            gallery: profile.gallery || []
           };
 
           console.log("Mapped profile data:", mappedData);
@@ -131,21 +141,21 @@ export const useProfileFetcher = (userId?: string | null) => {
 
           // Set verification status
           setVerificationStatus({
-            email: profileRecord.email_verified || false,
-            phone: profileRecord.phone_verified || false,
-            id: profileRecord.id_verified || false,
-            wali: profileRecord.wali_verified || false
+            email: profile.email_verified || false,
+            phone: profile.phone_verified || false,
+            id: profile.id_verified || false,
+            wali: profile.wali_verified || false
           });
 
           // Set privacy settings with fallback to defaults
-          const privacyData = profileRecord.privacy_settings as PrivacySettings || DEFAULT_PRIVACY_SETTINGS;
+          const privacyData = profile.privacy_settings as PrivacySettings || DEFAULT_PRIVACY_SETTINGS;
           setPrivacySettings(privacyData);
 
           // Set blocked users
-          setBlockedUsers(profileRecord.blocked_users || []);
+          setBlockedUsers(profile.blocked_users || []);
           
           // Set account visibility
-          setIsAccountVisible(profileRecord.is_visible !== false);
+          setIsAccountVisible(profile.is_visible !== false);
         }
       } catch (err: any) {
         console.error("Error in profile fetch:", err);
