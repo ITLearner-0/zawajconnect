@@ -41,17 +41,6 @@ const ProfileFormSections: React.FC<ProfileFormSectionsProps> = ({
   onUnblockUser,
   validation,
 }) => {
-  // Convert the field-based verification handler to the expected format
-  const handleVerificationStatusChange = (newStatus: VerificationStatus) => {
-    // Compare new status with old and trigger changes for each field that changed
-    Object.keys(newStatus).forEach(key => {
-      const field = key as keyof VerificationStatus;
-      if (newStatus[field] !== verificationStatus[field]) {
-        handleVerificationChange(field, newStatus[field]);
-      }
-    });
-  };
-
   return (
     <div className="space-y-8">
       <BasicInfoSection 
@@ -86,7 +75,7 @@ const ProfileFormSections: React.FC<ProfileFormSectionsProps> = ({
       <VerificationPanel
         verificationStatus={verificationStatus}
         userEmail={userEmail}
-        onVerificationChange={handleVerificationStatusChange}
+        onVerificationChange={handleVerificationChange}
       />
       
       <PrivacySettingsComponent

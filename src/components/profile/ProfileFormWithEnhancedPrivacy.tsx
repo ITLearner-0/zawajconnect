@@ -21,7 +21,7 @@ interface ProfileFormWithEnhancedPrivacyProps {
   handleSubmit: () => Promise<boolean>;
   verificationStatus: VerificationStatus;
   userEmail: string | null;
-  handleVerificationChange: (newStatus: VerificationStatus) => void;
+  handleVerificationChange: (field: keyof VerificationStatus, value: boolean) => void;
   privacySettings: PrivacySettings;
   blockedUsers: string[];
   isAccountVisible: boolean;
