@@ -146,17 +146,6 @@ export const useProfilePageLogic = () => {
     }
   };
   
-  // Create a wrapper for verification change to match expected signature
-  const handleVerificationFieldChange = (field: keyof VerificationStatus, value: boolean) => {
-    handleVerificationChange(field, value);
-  };
-
-  // Create a wrapper for privacy settings change
-  const handlePrivacyFieldChange = (field: keyof PrivacySettings, value: any) => {
-    const newSettings = { ...privacySettings, [field]: value };
-    handlePrivacySettingsChange(newSettings);
-  };
-  
   // Wrapper functions to convert boolean returns to void
   const handleToggleVisibility = async () => {
     await toggleAccountVisibility();
@@ -185,8 +174,8 @@ export const useProfilePageLogic = () => {
     
     // Handlers - keep handleChange as is (React event handler)
     handleChange,
-    handleVerificationFieldChange,
-    handlePrivacyFieldChange,
+    handleVerificationChange, // This is already the correct signature from useProfile
+    handlePrivacySettingsChange,
     handleSaveProfile,
     handleSignOut,
     handleToggleVisibility,

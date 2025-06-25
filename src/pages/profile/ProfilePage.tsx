@@ -26,8 +26,8 @@ const ProfilePage = () => {
     
     // Handlers
     handleChange,
-    handleVerificationFieldChange,
-    handlePrivacyFieldChange,
+    handleVerificationChange,
+    handlePrivacySettingsChange,
     handleSaveProfile,
     handleSignOut,
     handleToggleVisibility,
@@ -86,7 +86,7 @@ const ProfilePage = () => {
 
   // Show loading state if data is not ready
   if (!formData) {
-    return <StandardLoadingState message="Chargement du profil..." />;
+    return <StandardLoadingState loading={true} loadingText="Chargement du profil..." />;
   }
 
   if (isOnboarding) {
@@ -137,11 +137,11 @@ const ProfilePage = () => {
                     handleSubmit={handleSaveProfile}
                     verificationStatus={verificationStatus}
                     userEmail={userEmail}
-                    handleVerificationChange={handleVerificationFieldChange}
+                    handleVerificationChange={handleVerificationChange}
                     privacySettings={privacySettings}
                     blockedUsers={blockedUsers}
                     isAccountVisible={isAccountVisible}
-                    handlePrivacySettingsChange={handlePrivacyFieldChange}
+                    handlePrivacySettingsChange={handlePrivacySettingsChange}
                     onToggleAccountVisibility={handleToggleVisibility}
                     onUnblockUser={handleUnblockUser}
                   />
