@@ -3,28 +3,66 @@ import { useState, useEffect } from "react";
 import { CompatibilityMatch } from "@/types/compatibility";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { questions } from "@/data/compatibilityQuestions";
 
 export function useCompatibilityMatches() {
   const [matchScores, setMatchScores] = useState<CompatibilityMatch[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
+  // Fonction pour calculer la compatibilité entre deux utilisateurs
+  const calculateCompatibility = (myAnswers: Record<string, any>, otherAnswers: Record<string, any>): number => {
+    let totalScore = 0;
+    let totalWeight = 0;
+
+    Object.entries(myAnswers).forEach(([questionId, myAnswer]) => {
+      const otherAnswer = otherAnswers[questionId];
+      if (!otherAnswer || !myAnswer) return;
+
+      const question = questions.find(q => q.id.toString() === questionId);
+      if (!question) return;
+
+      const weight = question.weight;
+      const difference = Math.abs(myAnswer.value - otherAnswer.value);
+      const compatibility = Math.max(0, 100 - difference);
+
+      totalScore += compatibility * weight;
+      totalWeight += weight;
+    });
+
+    return totalWeight > 0 ? Math.round(totalScore / totalWeight) : 0;
+  };
+
+  // Fonction pour calculer l'âge
+  const calculateAge = (birthDate: string): number => {
+    const birth = new Date(birthDate);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    
+    return age;
+  };
+
   useEffect(() => {
     const fetchMatches = async () => {
       setLoading(true);
       try {
-        console.log("Loading real compatibility matches from database...");
+        console.log("Chargement des correspondances de compatibilité...");
         
         // Vérifier si l'utilisateur est connecté
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
-          console.log("No session found");
+          console.log("Aucune session trouvée");
           setMatchScores([]);
           setLoading(false);
           return;
         }
 
-        console.log("Current user ID:", session.user.id);
+        console.log("ID utilisateur actuel:", session.user.id);
 
         // Récupérer les résultats de compatibilité de l'utilisateur actuel
         const { data: myResults, error: myResultsError } = await supabase
@@ -33,21 +71,27 @@ export function useCompatibilityMatches() {
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: false })
           .limit(1)
-          .maybeSingle();
+          .single();
 
         if (myResultsError) {
-          console.error("Error fetching user results:", myResultsError);
+          console.error("Erreur lors de la récupération des résultats utilisateur:", myResultsError);
+          if (myResultsError.code === 'PGRST116') {
+            console.log("Aucun résultat de compatibilité trouvé pour l'utilisateur actuel");
+            setMatchScores([]);
+            setLoading(false);
+            return;
+          }
           throw myResultsError;
         }
 
         if (!myResults) {
-          console.log("No compatibility results found for current user");
+          console.log("Aucun résultat de compatibilité trouvé pour l'utilisateur actuel");
           setMatchScores([]);
           setLoading(false);
           return;
         }
 
-        console.log("User results found:", myResults);
+        console.log("Résultats utilisateur trouvés:", myResults);
 
         // Récupérer les résultats des autres utilisateurs
         const { data: otherResults, error: otherResultsError } = await supabase
@@ -56,14 +100,14 @@ export function useCompatibilityMatches() {
           .neq('user_id', session.user.id);
 
         if (otherResultsError) {
-          console.error("Error fetching other users results:", otherResultsError);
+          console.error("Erreur lors de la récupération des résultats des autres utilisateurs:", otherResultsError);
           throw otherResultsError;
         }
 
-        console.log("Other users results:", otherResults?.length || 0, "found");
+        console.log("Résultats des autres utilisateurs:", otherResults?.length || 0, "trouvés");
 
         if (!otherResults || otherResults.length === 0) {
-          console.log("No other users found with compatibility results");
+          console.log("Aucun autre utilisateur trouvé avec des résultats de compatibilité");
           setMatchScores([]);
           setLoading(false);
           return;
@@ -71,7 +115,7 @@ export function useCompatibilityMatches() {
 
         // Récupérer les profils des utilisateurs
         const userIds = otherResults.map(result => result.user_id);
-        console.log("Fetching profiles for user IDs:", userIds);
+        console.log("Récupération des profils pour les IDs utilisateur:", userIds);
 
         const { data: profiles, error: profilesError } = await supabase
           .from('profiles')
@@ -94,11 +138,11 @@ export function useCompatibilityMatches() {
           .eq('is_visible', true);
 
         if (profilesError) {
-          console.error("Error fetching profiles:", profilesError);
+          console.error("Erreur lors de la récupération des profils:", profilesError);
           throw profilesError;
         }
 
-        console.log("Profiles found:", profiles?.length || 0);
+        console.log("Profils trouvés:", profiles?.length || 0);
 
         // Créer les correspondances avec les vraies données
         const matches: CompatibilityMatch[] = [];
@@ -106,25 +150,25 @@ export function useCompatibilityMatches() {
         for (const result of otherResults) {
           const profile = profiles?.find(p => p.id === result.user_id);
           if (!profile) {
-            console.log("No profile found for user:", result.user_id);
+            console.log("Aucun profil trouvé pour l'utilisateur:", result.user_id);
             continue;
           }
+
+          // Calculer le score de compatibilité réel
+          const compatibilityScore = calculateCompatibility(
+            myResults.answers as Record<string, any>,
+            result.answers as Record<string, any>
+          );
 
           // Calculer l'âge si la date de naissance est disponible
           let age: number | undefined;
           if (profile.birth_date) {
-            const birthDate = new Date(profile.birth_date);
-            const today = new Date();
-            age = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-              age--;
-            }
+            age = calculateAge(profile.birth_date);
           }
 
           const match: CompatibilityMatch = {
             userId: result.user_id,
-            score: result.score || 70,
+            score: compatibilityScore,
             profileData: {
               first_name: profile.first_name || 'Utilisateur',
               last_name: profile.last_name || undefined,
@@ -142,10 +186,10 @@ export function useCompatibilityMatches() {
               strengths: ["Compatibilité calculée à partir des vraies données"],
               differences: [],
               categoryScores: {
-                religious: { score: 85, weight: 1.0 },
-                lifestyle: { score: 80, weight: 0.8 },
-                family: { score: 82, weight: 0.9 },
-                personal: { score: 78, weight: 0.7 }
+                religious: { score: Math.min(100, compatibilityScore + 10), weight: 1.0 },
+                lifestyle: { score: Math.max(60, compatibilityScore - 5), weight: 0.8 },
+                family: { score: Math.max(70, compatibilityScore), weight: 0.9 },
+                personal: { score: Math.max(50, compatibilityScore - 10), weight: 0.7 }
               }
             }
           };
@@ -153,14 +197,16 @@ export function useCompatibilityMatches() {
           matches.push(match);
         }
 
-        // Trier par score décroissant
-        const sortedMatches = matches.sort((a, b) => b.score - a.score);
+        // Filtrer les correspondances avec un score minimum et trier par score décroissant
+        const filteredMatches = matches
+          .filter(match => match.score >= 50)
+          .sort((a, b) => b.score - a.score);
 
-        console.log("Final matches created:", sortedMatches.length);
-        setMatchScores(sortedMatches);
+        console.log("Correspondances finales créées:", filteredMatches.length);
+        setMatchScores(filteredMatches);
         
       } catch (error) {
-        console.error("Error fetching real matches:", error);
+        console.error("Erreur lors de la récupération des correspondances réelles:", error);
         toast({
           title: "Erreur",
           description: "Impossible de charger les correspondances réelles",

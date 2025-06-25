@@ -32,6 +32,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ onApplyFilters }) => {
   };
 
   const handleApplyFilters = () => {
+    console.log('Application des filtres:', filters);
     onApplyFilters(filters);
   };
 
@@ -41,9 +42,13 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ onApplyFilters }) => {
   };
 
   const handleSaveFilter = (name: string) => {
-    saveFilter(name, filters);
-    setSavedFilters(getSavedFilters());
-    setShowSaveForm(false);
+    try {
+      saveFilter(name, filters);
+      setSavedFilters(getSavedFilters());
+      setShowSaveForm(false);
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde du filtre:', error);
+    }
   };
 
   const handleLoadFilter = (name: string) => {
@@ -55,8 +60,12 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ onApplyFilters }) => {
   };
 
   const handleDeleteFilter = (name: string) => {
-    deleteSavedFilter(name);
-    setSavedFilters(getSavedFilters());
+    try {
+      deleteSavedFilter(name);
+      setSavedFilters(getSavedFilters());
+    } catch (error) {
+      console.error('Erreur lors de la suppression du filtre:', error);
+    }
   };
 
   const handleShowSaveForm = () => {
