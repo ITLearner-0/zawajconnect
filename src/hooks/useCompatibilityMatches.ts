@@ -101,59 +101,63 @@ export function useCompatibilityMatches() {
         console.log("Profiles found:", profiles?.length || 0);
 
         // Créer les correspondances avec les vraies données
-        const matches: CompatibilityMatch[] = otherResults
-          .map(result => {
-            const profile = profiles?.find(p => p.id === result.user_id);
-            if (!profile) {
-              console.log("No profile found for user:", result.user_id);
-              return null;
-            }
+        const matches: CompatibilityMatch[] = [];
+        
+        for (const result of otherResults) {
+          const profile = profiles?.find(p => p.id === result.user_id);
+          if (!profile) {
+            console.log("No profile found for user:", result.user_id);
+            continue;
+          }
 
-            // Calculer l'âge si la date de naissance est disponible
-            let age: number | undefined;
-            if (profile.birth_date) {
-              const birthDate = new Date(profile.birth_date);
-              const today = new Date();
-              age = today.getFullYear() - birthDate.getFullYear();
-              const monthDiff = today.getMonth() - birthDate.getMonth();
-              if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-                age--;
+          // Calculer l'âge si la date de naissance est disponible
+          let age: number | undefined;
+          if (profile.birth_date) {
+            const birthDate = new Date(profile.birth_date);
+            const today = new Date();
+            age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+              age--;
+            }
+          }
+
+          const match: CompatibilityMatch = {
+            userId: result.user_id,
+            score: result.score || 70,
+            profileData: {
+              first_name: profile.first_name || 'Utilisateur',
+              last_name: profile.last_name || undefined,
+              age,
+              location: profile.location || undefined,
+              religious_practice_level: profile.religious_practice_level || undefined,
+              education_level: profile.education_level || undefined,
+              occupation: profile.occupation || undefined,
+              email_verified: profile.email_verified || false,
+              phone_verified: profile.phone_verified || false,
+              id_verified: profile.id_verified || false,
+              profile_picture: profile.profile_picture || undefined
+            },
+            matchDetails: {
+              strengths: ["Compatibilité calculée à partir des vraies données"],
+              differences: [],
+              categoryScores: {
+                religious: { score: 85, weight: 1.0 },
+                lifestyle: { score: 80, weight: 0.8 },
+                family: { score: 82, weight: 0.9 },
+                personal: { score: 78, weight: 0.7 }
               }
             }
+          };
 
-            return {
-              userId: result.user_id,
-              score: result.score || 70, // Utiliser le score calculé ou un score par défaut
-              profileData: {
-                first_name: profile.first_name || 'Utilisateur',
-                last_name: profile.last_name || undefined,
-                age,
-                location: profile.location || undefined,
-                religious_practice_level: profile.religious_practice_level || undefined,
-                education_level: profile.education_level || undefined,
-                occupation: profile.occupation || undefined,
-                email_verified: profile.email_verified || false,
-                phone_verified: profile.phone_verified || false,
-                id_verified: profile.id_verified || false,
-                profile_picture: profile.profile_picture || undefined
-              },
-              matchDetails: {
-                strengths: ["Compatibilité calculée à partir des vraies données"],
-                differences: [],
-                categoryScores: {
-                  religious: { score: 85, weight: 1.0 },
-                  lifestyle: { score: 80, weight: 0.8 },
-                  family: { score: 82, weight: 0.9 },
-                  personal: { score: 78, weight: 0.7 }
-                }
-              }
-            };
-          })
-          .filter((match): match is CompatibilityMatch => match !== null)
-          .sort((a, b) => b.score - a.score); // Trier par score décroissant
+          matches.push(match);
+        }
 
-        console.log("Final matches created:", matches.length);
-        setMatchScores(matches);
+        // Trier par score décroissant
+        const sortedMatches = matches.sort((a, b) => b.score - a.score);
+
+        console.log("Final matches created:", sortedMatches.length);
+        setMatchScores(sortedMatches);
         
       } catch (error) {
         console.error("Error fetching real matches:", error);
