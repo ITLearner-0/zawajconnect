@@ -7,7 +7,7 @@ import IdVerification from "./verification/IdVerification";
 
 interface VerificationPanelProps {
   verificationStatus: VerificationStatus;
-  onVerificationChange: (newStatus: VerificationStatus) => void;
+  onVerificationChange: (field: keyof VerificationStatus, value: boolean) => void;
   userEmail: string | null;
 }
 
@@ -16,6 +16,10 @@ const VerificationPanel = ({
   onVerificationChange,
   userEmail,
 }: VerificationPanelProps) => {
+  const handleIdVerificationChange = (verified: boolean) => {
+    onVerificationChange('id', verified);
+  };
+
   return (
     <Card className="mt-6">
       <CardHeader>
@@ -40,7 +44,8 @@ const VerificationPanel = ({
 
         {/* ID Verification */}
         <IdVerification 
-          isVerified={verificationStatus.id} 
+          isVerified={verificationStatus.id}
+          onVerificationChange={handleIdVerificationChange}
         />
       </CardContent>
     </Card>

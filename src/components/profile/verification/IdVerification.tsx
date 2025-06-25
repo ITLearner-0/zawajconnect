@@ -8,9 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface IdVerificationProps {
   isVerified: boolean;
+  onVerificationChange?: (verified: boolean) => void;
 }
 
-const IdVerification = ({ isVerified }: IdVerificationProps) => {
+const IdVerification = ({ isVerified, onVerificationChange }: IdVerificationProps) => {
   const { toast } = useToast();
 
   const startIdVerification = async () => {
@@ -39,8 +40,10 @@ const IdVerification = ({ isVerified }: IdVerificationProps) => {
         description: "Your ID has been successfully verified",
       });
       
-      // Refresh to update UI
-      window.location.reload();
+      // Notify parent component of the verification change instead of reloading
+      if (onVerificationChange) {
+        onVerificationChange(true);
+      }
     } catch (error) {
       toast({
         title: "Error",
