@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData, PrivacySettings } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
-import { sanitizeProfileData } from '@/utils/security/inputSanitization';
 
 export const useProfileSubmission = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -27,11 +26,7 @@ export const useProfileSubmission = () => {
 
     try {
       console.log("Starting profile submission for user:", userId);
-      console.log("Profile data before sanitization:", profileData);
-      
-      // Sanitize the profile data
-      const sanitizedData = sanitizeProfileData(profileData);
-      console.log("Sanitized data:", sanitizedData);
+      console.log("Profile data:", profileData);
       
       // Extract first and last name from full name
       const nameParts = (profileData.fullName || '').split(' ');
@@ -53,7 +48,7 @@ export const useProfileSubmission = () => {
         }
       }
 
-      // Prepare update data - preserve all existing data and update only what's provided
+      // Prepare update data - allow all fields to be saved
       const updateData: any = {
         id: userId,
         first_name: firstName,
@@ -63,7 +58,7 @@ export const useProfileSubmission = () => {
         updated_at: new Date().toISOString()
       };
 
-      // Add all other fields, preserving existing values
+      // Add all profile fields without strict validation
       if (birthDate) updateData.birth_date = birthDate;
       if (profileData.gender) updateData.gender = profileData.gender;
       if (profileData.location) updateData.location = profileData.location;
@@ -76,8 +71,17 @@ export const useProfileSubmission = () => {
       if (profileData.waliName) updateData.wali_name = profileData.waliName;
       if (profileData.waliRelationship) updateData.wali_relationship = profileData.waliRelationship;
       if (profileData.waliContact) updateData.wali_contact = profileData.waliContact;
+      if (profileData.madhab) updateData.madhab = profileData.madhab;
+      if (profileData.languages) {
+        // Handle languages as array or string
+        if (typeof profileData.languages === 'string') {
+          updateData.languages = profileData.languages.split(',').map(lang => lang.trim());
+        } else if (Array.isArray(profileData.languages)) {
+          updateData.languages = profileData.languages;
+        }
+      }
 
-      // Handle profile picture and gallery - preserve existing values if not provided
+      // Handle profile picture and gallery
       if (profileData.profilePicture !== undefined) {
         updateData.profile_picture = profileData.profilePicture || null;
       }
@@ -117,8 +121,8 @@ export const useProfileSubmission = () => {
       }
 
       toast({
-        title: "Profil Mis à Jour",
-        description: "Votre profil a été mis à jour avec succès.",
+        title: "Profil Sauvegardé",
+        description: "Votre profil a été sauvegardé avec succès.",
       });
       return true;
     } catch (err: any) {

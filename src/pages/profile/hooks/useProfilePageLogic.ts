@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -96,6 +95,7 @@ export const useProfilePageLogic = () => {
     console.log("Save profile button clicked");
     console.log("User ID:", userId);
     console.log("Has compatibility results:", hasCompatibilityResults);
+    console.log("Form data:", formData);
     
     try {
       const success = await handleSubmit();
@@ -104,28 +104,23 @@ export const useProfilePageLogic = () => {
       if (success) {
         console.log("Profile saved successfully");
         
-        // Check if user has taken compatibility test
+        toast({
+          title: "Profil Sauvegardé!",
+          description: "Votre profil a été sauvegardé avec succès.",
+        });
+        
+        // Check if user has taken compatibility test for navigation
         if (hasCompatibilityResults === false) {
-          toast({
-            title: "Profil Sauvegardé!",
-            description: "Maintenant, complétez votre test de compatibilité pour trouver de meilleurs matches.",
-          });
-          
           // Small delay to let the user see the success message
           setTimeout(() => {
             console.log("Redirecting to compatibility test");
             navigate("/compatibility");
           }, 2000);
-        } else {
-          toast({
-            title: "Profil Mis à Jour",
-            description: "Votre profil a été mis à jour avec succès.",
-          });
-          
-          // If user has already taken the test, redirect to nearby matches
+        } else if (hasCompatibilityResults === true) {
+          // If user has already taken the test, they can access nearby matches
           setTimeout(() => {
-            console.log("Redirecting to nearby matches");
-            navigate("/nearby");
+            console.log("User can now access nearby matches");
+            // Don't automatically redirect, let user navigate manually
           }, 2000);
         }
       } else {

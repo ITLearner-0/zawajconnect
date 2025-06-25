@@ -45,39 +45,32 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     
     console.log(`Form field change event: ${name} = ${value}`);
     
-    // Validate the field based on its type
-    let isValid = true;
-    
+    // Optional validation - don't block form submission
     switch (name as keyof ProfileFormData) {
       case 'fullName':
-        isValid = validateField(name as keyof ProfileFormData, value, (val) => 
-          typeof val === 'string' && val.length >= 2 ? null : 'Name must be at least 2 characters'
-        );
+        if (value && typeof value === 'string' && value.length >= 2) {
+          validateField(name as keyof ProfileFormData, value, () => null);
+        }
         break;
       case 'age':
-        isValid = validateField(name as keyof ProfileFormData, value, (val) => {
-          const age = parseInt(val as string);
-          return (age >= 18 && age <= 100) ? null : 'Age must be between 18 and 100';
-        });
-        break;
-      case 'gender':
-        isValid = validateField(name as keyof ProfileFormData, value, (val) => 
-          (val === 'male' || val === 'female') ? null : 'Please select a valid gender'
-        );
+        if (value) {
+          const age = parseInt(value as string);
+          if (age >= 18 && age <= 100) {
+            validateField(name as keyof ProfileFormData, value, () => null);
+          }
+        }
         break;
       case 'aboutMe':
-        isValid = validateField(name as keyof ProfileFormData, value, (val) => 
-          typeof val === 'string' && val.length >= 10 ? null : 'Please write at least 10 characters about yourself'
-        );
+        if (value && typeof value === 'string' && value.length >= 10) {
+          validateField(name as keyof ProfileFormData, value, () => null);
+        }
         break;
       default:
-        // For other fields, just check they're not empty if required
-        if (typeof value === 'string' && value.trim().length === 0) {
-          isValid = validateField(name as keyof ProfileFormData, value, () => `${name} is required`);
-        }
+        // No validation required for other fields
+        break;
     }
     
-    // Always call handleChange regardless of validation for real-time updates
+    // Always call handleChange regardless of validation
     handleChange(name as keyof ProfileFormData, value);
   }, [handleChange, validateField]);
 
@@ -88,7 +81,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   }, [handleChange]);
   
   const handleFormSubmit = async (): Promise<boolean> => {
-    if (isSubmitting || hasErrors) return false;
+    if (isSubmitting) return false;
     
     console.log("ProfileForm handleFormSubmit called");
     setIsSubmitting(true);
@@ -127,7 +120,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
         <ProfileFormActions 
           onSubmit={handleFormSubmit}
           isSubmitting={isSubmitting}
-          hasErrors={hasErrors}
+          hasErrors={false}
         />
       </div>
     </FormErrorBoundary>
