@@ -8,10 +8,13 @@ import { IslamicPattern } from "@/components/ui/islamic-pattern";
 import { LogOut, User, Settings, Home, ArrowLeft } from "lucide-react";
 
 interface ProfileHeaderProps {
-  onSignOut: () => void;
+  userEmail?: string | null;
+  userId?: string | null;
+  hasCompatibilityResults?: boolean;
+  onSignOut: () => void | Promise<void>;
 }
 
-const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
+const ProfileHeader = ({ userEmail, userId, hasCompatibilityResults, onSignOut }: ProfileHeaderProps) => {
   return (
     <IslamicPattern variant="background" intensity="light" className="mb-6 rounded-lg bg-islamic-cream/30 dark:bg-islamic-darkCard/30">
       <div className="flex flex-col gap-4 p-4">
@@ -51,6 +54,9 @@ const ProfileHeader = ({ onSignOut }: ProfileHeaderProps) => {
             </h1>
             <p className="text-sm text-muted-foreground dark:text-islamic-cream/70">
               Update your information and privacy settings
+              {userEmail && (
+                <span className="block text-xs opacity-75">{userEmail}</span>
+              )}
             </p>
           </div>
         </div>

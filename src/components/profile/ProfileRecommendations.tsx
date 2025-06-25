@@ -15,13 +15,17 @@ interface Recommendation {
 }
 
 interface ProfileRecommendationsProps {
+  userId?: string;
   recommendations: Recommendation[];
-  onActionClick: (recommendationId: string) => void;
+  loading?: boolean;
+  onRecommendationAction: (recommendationId: string) => void;
 }
 
 const ProfileRecommendations: React.FC<ProfileRecommendationsProps> = ({ 
+  userId,
   recommendations, 
-  onActionClick 
+  loading,
+  onRecommendationAction 
 }) => {
   const getIcon = (type: string) => {
     switch (type) {
@@ -48,6 +52,18 @@ const ProfileRecommendations: React.FC<ProfileRecommendationsProps> = ({
         return 'bg-gray-100 text-gray-800';
     }
   };
+
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center h-32">
+            <div className="text-muted-foreground">Chargement des recommandations...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full">
@@ -83,7 +99,7 @@ const ProfileRecommendations: React.FC<ProfileRecommendationsProps> = ({
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => onActionClick(recommendation.id)}
+                onClick={() => onRecommendationAction(recommendation.id)}
                 className="w-full"
               >
                 {recommendation.actionText}

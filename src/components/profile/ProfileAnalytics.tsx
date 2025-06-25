@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { TrendingUp, Users, MessageCircle, Star } from 'lucide-react';
 
 interface ProfileAnalyticsProps {
+  userId?: string;
   analytics: {
     profileViews: number;
     profileViewsThisWeek: number;
@@ -15,9 +16,22 @@ interface ProfileAnalyticsProps {
     popularTimes: string[];
     topMatchingCategories: string[];
   };
+  loading?: boolean;
 }
 
-const ProfileAnalytics: React.FC<ProfileAnalyticsProps> = ({ analytics }) => {
+const ProfileAnalytics: React.FC<ProfileAnalyticsProps> = ({ userId, analytics, loading }) => {
+  if (loading) {
+    return (
+      <Card className="w-full">
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center h-32">
+            <div className="text-muted-foreground">Chargement des statistiques...</div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="w-full">
       <CardHeader>

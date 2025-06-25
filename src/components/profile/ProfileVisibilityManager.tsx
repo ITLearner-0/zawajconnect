@@ -31,11 +31,13 @@ interface VisibilitySettings {
 }
 
 interface ProfileVisibilityManagerProps {
+  userId?: string;
   settings: VisibilitySettings;
   onSettingsChange: (settings: VisibilitySettings) => void;
 }
 
 const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
+  userId,
   settings,
   onSettingsChange
 }) => {
