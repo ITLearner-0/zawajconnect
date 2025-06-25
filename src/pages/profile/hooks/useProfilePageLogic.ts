@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
@@ -24,7 +25,7 @@ export const useProfilePageLogic = () => {
     isAccountVisible,
     handleChange, 
     handleVerificationChange,
-    handlePrivacySettingsChange,
+    handlePrivacySettingsChange: originalHandlePrivacySettingsChange,
     handleSubmit, 
     handleSignOut,
     toggleAccountVisibility,
@@ -145,6 +146,12 @@ export const useProfilePageLogic = () => {
       return false;
     }
   };
+
+  // Create a wrapper for privacy settings change to match expected signature
+  const handlePrivacySettingsChange = (field: keyof PrivacySettings, value: any) => {
+    const newSettings = { ...privacySettings, [field]: value };
+    originalHandlePrivacySettingsChange(newSettings);
+  };
   
   // Wrapper functions to convert boolean returns to void
   const handleToggleVisibility = async () => {
@@ -175,7 +182,7 @@ export const useProfilePageLogic = () => {
     // Handlers - keep handleChange as is (React event handler)
     handleChange,
     handleVerificationChange, // This is already the correct signature from useProfile
-    handlePrivacySettingsChange,
+    handlePrivacySettingsChange, // Now using the wrapper function
     handleSaveProfile,
     handleSignOut,
     handleToggleVisibility,
