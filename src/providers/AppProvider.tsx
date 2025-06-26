@@ -16,6 +16,7 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
     },
   },
 });
@@ -25,19 +26,21 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <Suspense fallback={<LoadingSpinner size="lg" text="Initialisation..." centered />}>
+      <Suspense fallback={<LoadingSpinner size="lg" text="Initialisation des thèmes..." centered />}>
         <ThemeProvider>
-          <Suspense fallback={<LoadingSpinner size="lg" text="Chargement de l'authentification..." centered />}>
+          <Suspense fallback={<LoadingSpinner size="lg" text="Configuration de l'accessibilité..." centered />}>
             <AccessibilityProvider>
-              <AuthProvider>
-                <Suspense fallback={<LoadingSpinner size="md" text="Configuration de la session..." centered />}>
-                  <SessionTimeoutProvider>
-                    {children}
-                    <Toaster />
-                    <SonnerToaster />
-                  </SessionTimeoutProvider>
-                </Suspense>
-              </AuthProvider>
+              <Suspense fallback={<LoadingSpinner size="lg" text="Chargement de l'authentification..." centered />}>
+                <AuthProvider>
+                  <Suspense fallback={<LoadingSpinner size="md" text="Configuration de la session..." centered />}>
+                    <SessionTimeoutProvider>
+                      {children}
+                      <Toaster />
+                      <SonnerToaster />
+                    </SessionTimeoutProvider>
+                  </Suspense>
+                </AuthProvider>
+              </Suspense>
             </AccessibilityProvider>
           </Suspense>
         </ThemeProvider>

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AppProvider } from '@/providers';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import AdminRoute from '@/components/auth/AdminRoute';
@@ -26,77 +26,79 @@ function App() {
   console.log("App component rendering");
   
   return (
-    <AppProvider>
-      <div className="min-h-screen bg-background">
-        <Suspense fallback={<LoadingSpinner size="lg" text="Chargement de l'application..." centered />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/demo" element={<Demo />} />
-            <Route path="/resources" element={<Resources />} />
-            
-            {/* Protected Routes */}
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile/:userId" element={
-              <ProtectedRoute>
-                <UserProfile />
-              </ProtectedRoute>
-            } />
-            <Route path="/compatibility" element={
-              <ProtectedRoute>
-                <Compatibility />
-              </ProtectedRoute>
-            } />
-            <Route path="/nearby" element={
-              <ProtectedRoute>
-                <NearbyMatches />
-              </ProtectedRoute>
-            } />
-            <Route path="/messages" element={
-              <ProtectedRoute>
-                <Messages />
-              </ProtectedRoute>
-            } />
-            <Route path="/messages/:conversationId" element={
-              <ProtectedRoute>
-                <Messages />
-              </ProtectedRoute>
-            } />
-            <Route path="/subscription" element={
-              <ProtectedRoute>
-                <Subscription />
-              </ProtectedRoute>
-            } />
-            
-            {/* Wali Routes */}
-            <Route path="/wali/setup" element={
-              <ProtectedRoute>
-                <WaliSetup />
-              </ProtectedRoute>
-            } />
-            <Route path="/wali/dashboard" element={
-              <ProtectedRoute>
-                <WaliDashboard />
-              </ProtectedRoute>
-            } />
-            
-            {/* Admin Routes */}
-            <Route path="/admin/moderation" element={
-              <AdminRoute>
-                <AdminModeration />
-              </AdminRoute>
-            } />
-            
-            {/* 404 Route */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </div>
-    </AppProvider>
+    <BrowserRouter>
+      <AppProvider>
+        <div className="min-h-screen bg-background">
+          <Suspense fallback={<LoadingSpinner size="lg" text="Chargement de l'application..." centered />}>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/demo" element={<Demo />} />
+              <Route path="/resources" element={<Resources />} />
+              
+              {/* Protected Routes */}
+              <Route path="/profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>
+              } />
+              <Route path="/profile/:userId" element={
+                <ProtectedRoute>
+                  <UserProfile />
+                </ProtectedRoute>
+              } />
+              <Route path="/compatibility" element={
+                <ProtectedRoute>
+                  <Compatibility />
+                </ProtectedRoute>
+              } />
+              <Route path="/nearby" element={
+                <ProtectedRoute>
+                  <NearbyMatches />
+                </ProtectedRoute>
+              } />
+              <Route path="/messages" element={
+                <ProtectedRoute>
+                  <Messages />
+                </ProtectedRoute>
+              } />
+              <Route path="/messages/:conversationId" element={
+                <ProtectedRoute>
+                  <Messages />
+                </ProtectedRoute>
+              } />
+              <Route path="/subscription" element={
+                <ProtectedRoute>
+                  <Subscription />
+                </ProtectedRoute>
+              } />
+              
+              {/* Wali Routes */}
+              <Route path="/wali/setup" element={
+                <ProtectedRoute>
+                  <WaliSetup />
+                </ProtectedRoute>
+              } />
+              <Route path="/wali/dashboard" element={
+                <ProtectedRoute>
+                  <WaliDashboard />
+                </ProtectedRoute>
+              } />
+              
+              {/* Admin Routes */}
+              <Route path="/admin/moderation" element={
+                <AdminRoute>
+                  <AdminModeration />
+                </AdminRoute>
+              } />
+              
+              {/* 404 Route */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </div>
+      </AppProvider>
+    </BrowserRouter>
   );
 }
 
