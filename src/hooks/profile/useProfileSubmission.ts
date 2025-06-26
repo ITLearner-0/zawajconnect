@@ -72,8 +72,9 @@ export const useProfileSubmission = () => {
       if (profileData.waliRelationship) updateData.wali_relationship = profileData.waliRelationship;
       if (profileData.waliContact) updateData.wali_contact = profileData.waliContact;
       if (profileData.madhab) updateData.madhab = profileData.madhab;
+      
+      // Handle languages with proper type checking
       if (profileData.languages) {
-        // Handle languages as array or string
         if (typeof profileData.languages === 'string') {
           updateData.languages = profileData.languages.split(',').map(lang => lang.trim());
         } else if (Array.isArray(profileData.languages)) {
