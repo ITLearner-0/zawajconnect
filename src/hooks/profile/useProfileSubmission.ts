@@ -75,10 +75,12 @@ export const useProfileSubmission = () => {
       
       // Handle languages with proper type checking
       if (profileData.languages) {
-        if (typeof profileData.languages === 'string') {
-          updateData.languages = profileData.languages.split(',').map(lang => lang.trim());
-        } else if (Array.isArray(profileData.languages)) {
-          updateData.languages = profileData.languages;
+        // Cast to unknown first to handle the type issue, then check the actual type
+        const languagesField = profileData.languages as unknown;
+        if (typeof languagesField === 'string') {
+          updateData.languages = (languagesField as string).split(',').map(lang => lang.trim());
+        } else if (Array.isArray(languagesField)) {
+          updateData.languages = languagesField as string[];
         }
       }
 
