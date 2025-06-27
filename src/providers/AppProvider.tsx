@@ -31,10 +31,10 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <ThemeProvider>
           <Suspense fallback={<LoadingSpinner size="lg" text="Configuration de l'accessibilité..." centered />}>
             <AccessibilityProvider>
-              <Suspense fallback={<LoadingSpinner size="lg" text="Configuration de la sécurité..." centered />}>
-                <SecurityProvider>
-                  <Suspense fallback={<LoadingSpinner size="lg" text="Chargement de l'authentification..." centered />}>
-                    <AuthProvider>
+              <Suspense fallback={<LoadingSpinner size="lg" text="Chargement de l'authentification..." centered />}>
+                <AuthProvider>
+                  <Suspense fallback={<LoadingSpinner size="lg" text="Configuration de la sécurité..." centered />}>
+                    <SecurityProvider>
                       <Suspense fallback={<LoadingSpinner size="md" text="Configuration de la session..." centered />}>
                         <SessionTimeoutProvider>
                           {children}
@@ -42,9 +42,9 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
                           <SonnerToaster />
                         </SessionTimeoutProvider>
                       </Suspense>
-                    </AuthProvider>
+                    </SecurityProvider>
                   </Suspense>
-                </SecurityProvider>
+                </AuthProvider>
               </Suspense>
             </AccessibilityProvider>
           </Suspense>
