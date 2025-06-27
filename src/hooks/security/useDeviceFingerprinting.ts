@@ -1,6 +1,13 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+// Extend Navigator interface to include deviceMemory
+declare global {
+  interface Navigator {
+    deviceMemory?: number;
+  }
+}
+
 export const useDeviceFingerprinting = () => {
   const [deviceFingerprint, setDeviceFingerprint] = useState<string>('');
 

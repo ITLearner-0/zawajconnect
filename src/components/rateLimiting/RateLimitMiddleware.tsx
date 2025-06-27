@@ -15,9 +15,9 @@ interface BlockInfo {
 }
 
 interface RateLimitContextType {
-  checkRateLimit: (action: string, customConfig?: RateLimitConfig) => boolean;
+  checkRateLimit: (action: string, customConfig?: RateLimitConfig) => Promise<boolean>;
   getRemainingRequests: (action: string) => number;
-  resetRateLimit: (action: string) => void;
+  resetRateLimit: (action: string) => Promise<void>;
   isBlocked: (action: string) => boolean;
   blockInfo: (action: string) => BlockInfo;
   getRemainingBlockTime: (action: string) => number;
