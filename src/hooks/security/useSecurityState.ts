@@ -1,83 +1,114 @@
 
-import { useState, useCallback } from 'react';
-import { useToast } from '../use-toast';
+import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SecuritySettings {
-  sessionTimeout: number;
   maxFailedAttempts: number;
-  lockoutDuration: number;
-  requireStrongPassword: boolean;
+  lockoutDuration: number; // in minutes
+  sessionTimeout: number; // in minutes
+  requireMFA: boolean;
+  passwordExpiryDays: number;
 }
 
-interface AuthSecurityState {
+interface SecurityState {
   failedAttempts: number;
-  lockedUntil: Date | null;
+  isLocked: boolean;
+  lockoutUntil: Date | null;
   lastActivity: Date;
   deviceFingerprint: string;
+  sessionValid: boolean;
 }
 
+const DEFAULT_SECURITY_SETTINGS: SecuritySettings = {
+  maxFailedAttempts: 5,
+  lockoutDuration: 30,
+  sessionTimeout: 60,
+  requireMFA: false,
+  passwordExpiryDays: 90
+};
+
 export const useSecurityState = () => {
-  const { toast } = useToast();
-  
-  const [securityState, setSecurityState] = useState<AuthSecurityState>({
+  const [securityState, setSecurityState] = useState<SecurityState>({
     failedAttempts: 0,
-    lockedUntil: null,
+    isLocked: false,
+    lockoutUntil: null,
     lastActivity: new Date(),
-    deviceFingerprint: ''
+    deviceFingerprint: '',
+    sessionValid: true
   });
 
-  const [securitySettings] = useState<SecuritySettings>({
-    sessionTimeout: 30 * 60 * 1000, // 30 minutes
-    maxFailedAttempts: 5,
-    lockoutDuration: 15 * 60 * 1000, // 15 minutes
-    requireStrongPassword: true
-  });
+  const [securitySettings] = useState<SecuritySettings>(DEFAULT_SECURITY_SETTINGS);
 
-  // Track failed login attempts
-  const recordFailedAttempt = useCallback(() => {
-    setSecurityState(prev => {
-      const newFailedAttempts = prev.failedAttempts + 1;
-      
-      if (newFailedAttempts >= securitySettings.maxFailedAttempts) {
-        const lockoutUntil = new Date(Date.now() + securitySettings.lockoutDuration);
-        toast({
-          title: "Account Temporarily Locked",
-          description: `Too many failed attempts. Try again after ${securitySettings.lockoutDuration / 60000} minutes.`,
-          variant: "destructive"
-        });
+  const recordFailedAttempt = useCallback(async (userId?: string) => {
+    if (!userId) return;
+
+    try {
+      // Log the failed attempt
+      await supabase.rpc('log_security_event', {
+        p_user_id: userId,
+        p_action: 'failed_login_attempt',
+        p_resource_type: 'authentication',
+        p_success: false,
+        p_risk_level: 'medium'
+      });
+
+      setSecurityState(prev => {
+        const newFailedAttempts = prev.failedAttempts + 1;
+        const shouldLock = newFailedAttempts >= securitySettings.maxFailedAttempts;
         
         return {
           ...prev,
           failedAttempts: newFailedAttempts,
-          lockedUntil: lockoutUntil
+          isLocked: shouldLock,
+          lockoutUntil: shouldLock 
+            ? new Date(Date.now() + securitySettings.lockoutDuration * 60000)
+            : null
         };
-      }
-      
-      return { ...prev, failedAttempts: newFailedAttempts };
-    });
-  }, [securitySettings, toast]);
+      });
+    } catch (error) {
+      console.error('Failed to record security event:', error);
+    }
+  }, [securitySettings.maxFailedAttempts, securitySettings.lockoutDuration]);
 
-  // Reset failed attempts on successful login
   const resetFailedAttempts = useCallback(() => {
     setSecurityState(prev => ({
       ...prev,
       failedAttempts: 0,
-      lockedUntil: null
+      isLocked: false,
+      lockoutUntil: null
     }));
   }, []);
 
-  // Check if account is currently locked
   const isAccountLocked = useCallback(() => {
-    if (!securityState.lockedUntil) return false;
-    return new Date() < securityState.lockedUntil;
-  }, [securityState.lockedUntil]);
+    if (!securityState.isLocked || !securityState.lockoutUntil) return false;
+    
+    const now = new Date();
+    if (now > securityState.lockoutUntil) {
+      // Auto-unlock if lockout period has passed
+      setSecurityState(prev => ({
+        ...prev,
+        isLocked: false,
+        lockoutUntil: null,
+        failedAttempts: 0
+      }));
+      return false;
+    }
+    
+    return true;
+  }, [securityState.isLocked, securityState.lockoutUntil]);
 
   const updateDeviceFingerprint = useCallback((fingerprint: string) => {
-    setSecurityState(prev => ({ ...prev, deviceFingerprint: fingerprint }));
+    setSecurityState(prev => ({
+      ...prev,
+      deviceFingerprint: fingerprint
+    }));
   }, []);
 
   const updateLastActivity = useCallback(() => {
-    setSecurityState(prev => ({ ...prev, lastActivity: new Date() }));
+    setSecurityState(prev => ({
+      ...prev,
+      lastActivity: new Date()
+    }));
   }, []);
 
   return {

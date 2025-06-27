@@ -3,51 +3,46 @@ import { useEffect } from 'react';
 
 export const useSecurityHeaders = () => {
   useEffect(() => {
-    // Set additional security headers via meta tags where possible
-    const setSecurityMeta = () => {
-      const securityMetas = [
-        { name: 'referrer', content: 'strict-origin-when-cross-origin' },
-        { httpEquiv: 'X-Content-Type-Options', content: 'nosniff' },
-        { httpEquiv: 'X-Frame-Options', content: 'DENY' },
-        { httpEquiv: 'X-XSS-Protection', content: '1; mode=block' },
-        { httpEquiv: 'Strict-Transport-Security', content: 'max-age=31536000; includeSubDomains; preload' },
-        { httpEquiv: 'Permissions-Policy', content: 'camera=(), microphone=(), geolocation=(self), payment=()' }
-      ];
+    // Set up Content Security Policy
+    const cspMeta = document.createElement('meta');
+    cspMeta.httpEquiv = 'Content-Security-Policy';
+    cspMeta.content = [
+      "default-src 'self'",
+      "script-src 'self' 'unsafe-inline' https://js.stripe.com https://fonts.googleapis.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' https://fonts.gstatic.com",
+      "img-src 'self' data: https: blob:",
+      "media-src 'self' blob:",
+      "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.ipify.org",
+      "frame-src 'none'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'"
+    ].join('; ');
 
-      securityMetas.forEach(meta => {
-        let element = document.querySelector(`meta[${meta.httpEquiv ? 'http-equiv' : 'name'}="${meta.httpEquiv || meta.name}"]`);
-        
-        if (!element) {
-          element = document.createElement('meta');
-          if (meta.httpEquiv) {
-            (element as HTMLMetaElement).httpEquiv = meta.httpEquiv;
-          } else {
-            (element as HTMLMetaElement).name = meta.name!;
-          }
-          document.head.appendChild(element);
-        }
-        
-        (element as HTMLMetaElement).content = meta.content;
-      });
-    };
+    if (!document.querySelector('meta[http-equiv="Content-Security-Policy"]')) {
+      document.head.appendChild(cspMeta);
+    }
 
-    setSecurityMeta();
+    // Set up other security headers via meta tags
+    const headers = [
+      { name: 'X-Content-Type-Options', content: 'nosniff' },
+      { name: 'X-Frame-Options', content: 'DENY' },
+      { name: 'X-XSS-Protection', content: '1; mode=block' },
+      { name: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' }
+    ];
 
-    // Remove the clickjacking protection as it's causing security errors in iframe contexts
-    // This would normally check if (window.self !== window.top) but that's not secure in iframes
-    
-    // Disable right-click context menu on sensitive areas (optional)
-    const handleContextMenu = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest('.sensitive-content')) {
-        e.preventDefault();
+    headers.forEach(header => {
+      if (!document.querySelector(`meta[name="${header.name}"]`)) {
+        const meta = document.createElement('meta');
+        meta.name = header.name;
+        meta.content = header.content;
+        document.head.appendChild(meta);
       }
-    };
+    });
 
-    document.addEventListener('contextmenu', handleContextMenu);
-    
     return () => {
-      document.removeEventListener('contextmenu', handleContextMenu);
+      // Cleanup is handled by the browser when the page unloads
     };
   }, []);
 };

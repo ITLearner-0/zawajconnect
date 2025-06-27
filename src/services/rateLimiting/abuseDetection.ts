@@ -2,33 +2,56 @@
 import { AbuseDetectionResult, UserPatterns, RateLimitStateEntry } from './types';
 
 export class AbuseDetectionService {
-  async analyzeUserPatterns(userId: string, rateLimitStore: Map<string, RateLimitStateEntry>): Promise<UserPatterns> {
+  detectAbuse(
+    userId: string, 
+    endpoint: string, 
+    requestData: any,
+    rateLimitState: Map<string, RateLimitStateEntry>
+  ): AbuseDetectionResult {
+    const patterns = this.analyzeUserPatterns(userId, rateLimitState);
+    
+    // Check for various abuse patterns
+    const checks = [
+      this.checkRapidFireRequests(patterns),
+      this.checkDistributedAttack(patterns),
+      this.checkSuspiciousContent(requestData),
+      this.checkTimeBasedPatterns(patterns)
+    ];
+
+    // Find the highest severity issue
+    const highestSeverity = checks.reduce((highest, current) => {
+      const severityOrder = { low: 0, medium: 1, high: 2 };
+      return severityOrder[current.severity] > severityOrder[highest.severity] ? current : highest;
+    });
+
+    return highestSeverity;
+  }
+
+  private analyzeUserPatterns(userId: string, rateLimitState: Map<string, RateLimitStateEntry>): UserPatterns {
     const now = Date.now();
-    const oneMinuteAgo = now - 60 * 1000;
-    const oneHourAgo = now - 60 * 60 * 1000;
+    const oneMinute = 60 * 1000;
+    const oneHour = 60 * 60 * 1000;
 
     let requestsInLastMinute = 0;
     let requestsInLastHour = 0;
     let distinctEndpoints = new Set<string>();
     let failedAuthAttempts = 0;
 
-    // Analyze in-memory data
-    for (const [key, data] of rateLimitStore.entries()) {
-      if (key.startsWith(`${userId}:`)) {
-        const endpoint = key.split(':')[1];
-        distinctEndpoints.add(endpoint);
+    for (const [key, entry] of rateLimitState.entries()) {
+      if (!key.startsWith(`${userId}:`)) continue;
 
-        if (data.windowStart >= oneMinuteAgo) {
-          requestsInLastMinute += data.count;
-        }
-        if (data.windowStart >= oneHourAgo) {
-          requestsInLastHour += data.count;
-        }
+      const endpoint = key.split(':')[1];
+      distinctEndpoints.add(endpoint);
 
-        // Count failed auth attempts
-        if (endpoint.includes('auth') && data.blockedUntil) {
-          failedAuthAttempts++;
-        }
+      if (now - entry.windowStart < oneMinute) {
+        requestsInLastMinute += entry.count;
+      }
+      if (now - entry.windowStart < oneHour) {
+        requestsInLastHour += entry.count;
+      }
+
+      if (endpoint.includes('auth') && entry.count > 3) {
+        failedAuthAttempts += entry.count;
       }
     }
 
@@ -40,73 +63,115 @@ export class AbuseDetectionService {
     };
   }
 
-  async detectAbuse(userId: string, endpoint: string, requestData: any, rateLimitStore: Map<string, RateLimitStateEntry>): Promise<AbuseDetectionResult> {
-    const patterns = await this.analyzeUserPatterns(userId, rateLimitStore);
-    
-    // Check for various abuse patterns
-    if (patterns.requestsInLastHour > 500) {
+  private checkRapidFireRequests(patterns: UserPatterns): AbuseDetectionResult {
+    if (patterns.requestsInLastMinute > 100) {
       return {
         isAbusive: true,
         severity: 'high',
-        reason: 'Excessive API usage detected',
+        reason: 'Rapid fire requests detected',
         recommendedAction: 'block'
       };
     }
-
-    if (patterns.distinctEndpointsHit > 20 && patterns.requestsInLastMinute > 50) {
+    
+    if (patterns.requestsInLastMinute > 50) {
       return {
         isAbusive: true,
         severity: 'medium',
-        reason: 'Suspicious automation detected',
+        reason: 'High request rate detected',
         recommendedAction: 'throttle'
-      };
-    }
-
-    if (patterns.failedAuthAttempts > 10) {
-      return {
-        isAbusive: true,
-        severity: 'medium',
-        reason: 'Multiple authentication failures',
-        recommendedAction: 'block'
-      };
-    }
-
-    // Check for content-specific abuse
-    if (requestData && this.detectSuspiciousContent(requestData)) {
-      return {
-        isAbusive: true,
-        severity: 'low',
-        reason: 'Suspicious content patterns',
-        recommendedAction: 'warn'
       };
     }
 
     return {
       isAbusive: false,
       severity: 'low',
-      reason: 'Normal usage pattern',
+      reason: 'Normal request pattern',
       recommendedAction: 'warn'
     };
   }
 
-  private detectSuspiciousContent(data: any): boolean {
-    if (typeof data === 'string') {
-      // Check for suspicious patterns in text
-      const suspiciousPatterns = [
-        /script|javascript|eval|function/i,
-        /select.*from|insert.*into|delete.*from/i,
-        /\<\s*script|\<\s*iframe/i
-      ];
-
-      return suspiciousPatterns.some(pattern => pattern.test(data));
+  private checkDistributedAttack(patterns: UserPatterns): AbuseDetectionResult {
+    if (patterns.distinctEndpointsHit > 10 && patterns.requestsInLastMinute > 30) {
+      return {
+        isAbusive: true,
+        severity: 'high',
+        reason: 'Distributed attack pattern detected',
+        recommendedAction: 'block'
+      };
     }
 
-    if (typeof data === 'object' && data !== null) {
-      // Check for suspicious object patterns
-      const jsonString = JSON.stringify(data);
-      return this.detectSuspiciousContent(jsonString);
+    return {
+      isAbusive: false,
+      severity: 'low',
+      reason: 'Normal endpoint usage',
+      recommendedAction: 'warn'
+    };
+  }
+
+  private checkSuspiciousContent(requestData: any): AbuseDetectionResult {
+    if (!requestData) {
+      return {
+        isAbusive: false,
+        severity: 'low',
+        reason: 'No request data to analyze',
+        recommendedAction: 'warn'
+      };
     }
 
-    return false;
+    const suspiciousPatterns = [
+      /<script/i,
+      /javascript:/i,
+      /on\w+\s*=/i,
+      /eval\s*\(/i,
+      /union\s+select/i,
+      /drop\s+table/i
+    ];
+
+    const content = JSON.stringify(requestData).toLowerCase();
+    const foundPattern = suspiciousPatterns.some(pattern => pattern.test(content));
+
+    if (foundPattern) {
+      return {
+        isAbusive: true,
+        severity: 'high',
+        reason: 'Suspicious content detected in request',
+        recommendedAction: 'block'
+      };
+    }
+
+    return {
+      isAbusive: false,
+      severity: 'low',
+      reason: 'Content appears normal',
+      recommendedAction: 'warn'
+    };
+  }
+
+  private checkTimeBasedPatterns(patterns: UserPatterns): AbuseDetectionResult {
+    // Check for failed authentication attempts
+    if (patterns.failedAuthAttempts > 10) {
+      return {
+        isAbusive: true,
+        severity: 'high',
+        reason: 'Multiple failed authentication attempts',
+        recommendedAction: 'block'
+      };
+    }
+
+    if (patterns.failedAuthAttempts > 5) {
+      return {
+        isAbusive: true,
+        severity: 'medium',
+        reason: 'Suspicious authentication pattern',
+        recommendedAction: 'throttle'
+      };
+    }
+
+    return {
+      isAbusive: false,
+      severity: 'low',
+      reason: 'Normal authentication pattern',
+      recommendedAction: 'warn'
+    };
   }
 }

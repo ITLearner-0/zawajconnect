@@ -1,18 +1,12 @@
 
-import { useState, useCallback, useRef } from 'react';
-import { useToast } from './use-toast';
+import { useState, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { rateLimitingService } from '@/services/rateLimiting/rateLimitingService';
 
 interface RateLimitConfig {
   maxRequests: number;
   windowMs: number;
   blockDuration?: number;
-}
-
-interface RateLimitState {
-  count: number;
-  resetTime: number;
-  blocked: boolean;
-  blockedUntil?: number;
 }
 
 interface BlockInfo {
@@ -21,131 +15,84 @@ interface BlockInfo {
   reason?: string;
 }
 
-const defaultConfigs: Record<string, RateLimitConfig> = {
-  login: { maxRequests: 5, windowMs: 15 * 60 * 1000, blockDuration: 15 * 60 * 1000 }, // 5 attempts per 15 min
-  signup: { maxRequests: 3, windowMs: 60 * 60 * 1000 }, // 3 attempts per hour
-  message: { maxRequests: 60, windowMs: 60 * 1000 }, // 60 messages per minute
-  profileUpdate: { maxRequests: 10, windowMs: 60 * 60 * 1000 }, // 10 updates per hour
-  passwordReset: { maxRequests: 3, windowMs: 60 * 60 * 1000, blockDuration: 60 * 60 * 1000 }, // 3 per hour
-  reportContent: { maxRequests: 10, windowMs: 60 * 60 * 1000 } // 10 reports per hour
-};
-
 export const useRateLimiting = () => {
-  const { toast } = useToast();
-  const rateLimits = useRef<Map<string, RateLimitState>>(new Map());
+  const [rateLimitData, setRateLimitData] = useState<Map<string, any>>(new Map());
 
-  const checkRateLimit = useCallback((action: string, customConfig?: RateLimitConfig): boolean => {
-    const config = customConfig || defaultConfigs[action];
-    if (!config) return true; // No limit configured
+  const checkRateLimit = useCallback(async (action: string, customConfig?: RateLimitConfig): Promise<boolean> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
 
-    const now = Date.now();
-    const key = action;
-    const current = rateLimits.current.get(key);
+      const result = await rateLimitingService.checkRateLimit(user.id, action);
+      
+      if (!result.allowed) {
+        // Log rate limit violation
+        await supabase.rpc('log_security_event', {
+          p_user_id: user.id,
+          p_action: 'rate_limit_exceeded',
+          p_resource_type: 'rate_limit',
+          p_resource_id: action,
+          p_success: false,
+          p_risk_level: 'medium',
+          p_details: {
+            action,
+            remaining: result.remaining,
+            reset_time: result.resetTime,
+            blocked: result.blocked
+          }
+        });
+      }
 
-    // Check if currently blocked
-    if (current?.blocked && current.blockedUntil && now < current.blockedUntil) {
-      const remainingTime = Math.ceil((current.blockedUntil - now) / 1000);
-      toast({
-        title: "Rate Limited",
-        description: `Action blocked. Try again in ${remainingTime} seconds.`,
-        variant: "destructive"
-      });
-      return false;
+      return result.allowed;
+    } catch (error) {
+      console.error('Rate limit check failed:', error);
+      return true; // Allow by default if check fails
     }
-
-    // Initialize or reset if window expired
-    if (!current || now > current.resetTime) {
-      rateLimits.current.set(key, {
-        count: 1,
-        resetTime: now + config.windowMs,
-        blocked: false
-      });
-      return true;
-    }
-
-    // Check if limit exceeded
-    if (current.count >= config.maxRequests) {
-      const blockedUntil = config.blockDuration ? now + config.blockDuration : undefined;
-      rateLimits.current.set(key, {
-        ...current,
-        blocked: true,
-        blockedUntil
-      });
-
-      const message = blockedUntil 
-        ? `Too many attempts. Blocked for ${config.blockDuration! / 60000} minutes.`
-        : `Rate limit exceeded. Try again in ${Math.ceil((current.resetTime - now) / 1000)} seconds.`;
-
-      toast({
-        title: "Rate Limited",
-        description: message,
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    // Increment count
-    rateLimits.current.set(key, {
-      ...current,
-      count: current.count + 1
-    });
-
-    return true;
-  }, [toast]);
+  }, []);
 
   const getRemainingRequests = useCallback((action: string): number => {
-    const config = defaultConfigs[action];
-    if (!config) return Infinity;
+    const data = rateLimitData.get(action);
+    return data?.remaining || 0;
+  }, [rateLimitData]);
 
-    const current = rateLimits.current.get(action);
-    if (!current || Date.now() > current.resetTime) {
-      return config.maxRequests;
+  const resetRateLimit = useCallback(async (action: string): Promise<void> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      await rateLimitingService.unblockUser(user.id);
+      setRateLimitData(prev => {
+        const newData = new Map(prev);
+        newData.delete(action);
+        return newData;
+      });
+    } catch (error) {
+      console.error('Rate limit reset failed:', error);
     }
-
-    return Math.max(0, config.maxRequests - current.count);
   }, []);
 
   const isBlocked = useCallback((action: string): boolean => {
-    const current = rateLimits.current.get(action);
-    if (!current || !current.blocked) return false;
-    
-    if (current.blockedUntil && Date.now() >= current.blockedUntil) {
-      // Block has expired, reset it
-      rateLimits.current.set(action, {
-        ...current,
-        blocked: false,
-        blockedUntil: undefined
-      });
-      return false;
-    }
-    
-    return current.blocked;
-  }, []);
+    const data = rateLimitData.get(action);
+    return data?.blocked || false;
+  }, [rateLimitData]);
 
   const blockInfo = useCallback((action: string): BlockInfo => {
-    const current = rateLimits.current.get(action);
-    if (!current || !current.blocked) {
-      return { isBlocked: false };
-    }
-    
+    const data = rateLimitData.get(action);
     return {
-      isBlocked: true,
-      blockedUntil: current.blockedUntil,
-      reason: 'Rate limit exceeded'
+      isBlocked: data?.blocked || false,
+      blockedUntil: data?.blockUntil,
+      reason: data?.reason
     };
-  }, []);
+  }, [rateLimitData]);
 
   const getRemainingBlockTime = useCallback((action: string): number => {
-    const current = rateLimits.current.get(action);
-    if (!current || !current.blocked || !current.blockedUntil) return 0;
+    const data = rateLimitData.get(action);
+    if (!data?.blocked || !data?.blockUntil) return 0;
     
-    const remaining = current.blockedUntil - Date.now();
-    return Math.max(0, Math.ceil(remaining / 1000));
-  }, []);
-
-  const resetRateLimit = useCallback((action: string) => {
-    rateLimits.current.delete(action);
-  }, []);
+    const now = Date.now();
+    const remaining = data.blockUntil - now;
+    return Math.max(0, remaining);
+  }, [rateLimitData]);
 
   return {
     checkRateLimit,

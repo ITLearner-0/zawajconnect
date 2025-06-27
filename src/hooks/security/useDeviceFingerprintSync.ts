@@ -1,66 +1,42 @@
 
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface UseDeviceFingerprintSyncProps {
   deviceFingerprint: string;
   updateDeviceFingerprint: (fingerprint: string) => void;
 }
 
-export const useDeviceFingerprintSync = ({ deviceFingerprint, updateDeviceFingerprint }: UseDeviceFingerprintSyncProps) => {
-  const { user } = useAuth();
-
+export const useDeviceFingerprintSync = ({
+  deviceFingerprint,
+  updateDeviceFingerprint
+}: UseDeviceFingerprintSyncProps) => {
   useEffect(() => {
-    if (!user || !deviceFingerprint) return;
+    const syncDeviceFingerprint = async () => {
+      if (!deviceFingerprint) return;
 
-    const syncFingerprint = async () => {
       try {
-        // Check if this device fingerprint is already associated with the user
-        const { data: existingSession } = await supabase
-          .from('user_sessions')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('device_info->fingerprint', deviceFingerprint)
-          .single();
+        const { data: { user } } = await supabase.auth.getUser();
+        
+        if (!user) return;
 
-        if (!existingSession) {
-          // This is a new device, log it
-          await supabase.from('security_events').insert({
-            user_id: user.id,
-            event_type: 'new_device_detected',
+        // Store device fingerprint in security events for tracking
+        await supabase.rpc('log_security_event', {
+          p_user_id: user.id,
+          p_action: 'device_fingerprint_sync',
+          p_resource_type: 'device',
+          p_success: true,
+          p_risk_level: 'low',
+          p_details: {
             device_fingerprint: deviceFingerprint,
-            details: {
-              fingerprint: deviceFingerprint,
-              timestamp: new Date().toISOString(),
-              user_agent: navigator.userAgent
-            }
-          });
-
-          // Create new session record
-          await supabase.from('user_sessions').insert({
-            user_id: user.id,
-            session_token: crypto.randomUUID(),
-            device_info: {
-              fingerprint: deviceFingerprint,
-              user_agent: navigator.userAgent,
-              platform: navigator.platform
-            }
-          });
-        } else {
-          // Update existing session
-          await supabase
-            .from('user_sessions')
-            .update({ last_activity: new Date().toISOString() })
-            .eq('id', existingSession.id);
-        }
-
-        updateDeviceFingerprint(deviceFingerprint);
+            timestamp: new Date().toISOString()
+          }
+        });
       } catch (error) {
         console.error('Failed to sync device fingerprint:', error);
       }
     };
 
-    syncFingerprint();
-  }, [user, deviceFingerprint, updateDeviceFingerprint]);
+    syncDeviceFingerprint();
+  }, [deviceFingerprint]);
 };

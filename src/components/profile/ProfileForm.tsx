@@ -3,6 +3,8 @@ import React from 'react';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
 import { StrictFormValidation } from '@/types/strictTypes';
 import { useTypeValidation } from '@/hooks/validation/useTypeValidation';
+import { useRateLimiting } from '@/hooks/useRateLimiting';
+import { useToast } from '@/hooks/use-toast';
 import ProfileFormSections from './form/ProfileFormSections';
 import ProfileFormActions from './form/ProfileFormActions';
 import FormErrorBoundary from '@/components/ui/FormErrorBoundary';
@@ -38,6 +40,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
 }) => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const { validation, validateField, hasErrors } = useTypeValidation<ProfileFormData>();
+  const { checkRateLimit } = useRateLimiting();
+  const { toast } = useToast();
   
   // Convert field-based handler to React event handler for section components
   const handleSectionChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -84,6 +88,18 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
     if (isSubmitting) return false;
     
     console.log("ProfileForm handleFormSubmit called");
+    
+    // Check rate limiting for profile updates
+    const rateLimitAllowed = await checkRateLimit('api/profile');
+    if (!rateLimitAllowed) {
+      toast({
+        title: "Rate Limit Exceeded",
+        description: "Too many profile updates. Please wait before trying again.",
+        variant: "destructive",
+      });
+      return false;
+    }
+    
     setIsSubmitting(true);
     
     try {

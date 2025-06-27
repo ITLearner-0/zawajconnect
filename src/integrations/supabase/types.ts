@@ -89,6 +89,36 @@ export type Database = {
         }
         Relationships: []
       }
+      compatibility_scores: {
+        Row: {
+          calculated_at: string | null
+          compatibility_factors: Json | null
+          created_at: string | null
+          id: string
+          score: number
+          user1_id: string
+          user2_id: string
+        }
+        Insert: {
+          calculated_at?: string | null
+          compatibility_factors?: Json | null
+          created_at?: string | null
+          id?: string
+          score: number
+          user1_id: string
+          user2_id: string
+        }
+        Update: {
+          calculated_at?: string | null
+          compatibility_factors?: Json | null
+          created_at?: string | null
+          id?: string
+          score?: number
+          user1_id?: string
+          user2_id?: string
+        }
+        Relationships: []
+      }
       content_flags: {
         Row: {
           content_id: string
@@ -464,6 +494,81 @@ export type Database = {
           wali_name?: string | null
           wali_relationship?: string | null
           wali_verified?: boolean | null
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          action_type: string
+          attempt_count: number | null
+          blocked_until: string | null
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          user_id: string | null
+          window_start: string | null
+        }
+        Insert: {
+          action_type: string
+          attempt_count?: number | null
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+          window_start?: string | null
+        }
+        Update: {
+          action_type?: string
+          attempt_count?: number | null
+          blocked_until?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string | null
+          window_start?: string | null
+        }
+        Relationships: []
+      }
+      security_audit_log: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: Json | null
+          id: string
+          ip_address: unknown | null
+          resource_id: string | null
+          resource_type: string
+          risk_level: string | null
+          success: boolean | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type: string
+          risk_level?: string | null
+          success?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: Json | null
+          id?: string
+          ip_address?: unknown | null
+          resource_id?: string | null
+          resource_type?: string
+          risk_level?: string | null
+          success?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -1000,9 +1105,25 @@ export type Database = {
         Args: { wali_user_id: string; managed_user_email: string }
         Returns: boolean
       }
+      log_security_event: {
+        Args: {
+          p_user_id: string
+          p_action: string
+          p_resource_type: string
+          p_resource_id?: string
+          p_success?: boolean
+          p_risk_level?: string
+          p_details?: Json
+        }
+        Returns: undefined
+      }
       update_session_activity: {
         Args: { session_token: string }
         Returns: boolean
+      }
+      validate_password_strength: {
+        Args: { password: string }
+        Returns: Json
       }
     }
     Enums: {

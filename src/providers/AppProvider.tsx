@@ -10,6 +10,7 @@ const AuthProvider = React.lazy(() => import('@/contexts/AuthContext'));
 const ThemeProvider = React.lazy(() => import('@/contexts/ThemeContext').then(module => ({ default: module.ThemeProvider })));
 const AccessibilityProvider = React.lazy(() => import('@/contexts/AccessibilityContext').then(module => ({ default: module.AccessibilityProvider })));
 const SessionTimeoutProvider = React.lazy(() => import('@/components/SessionTimeoutProvider'));
+const SecurityProvider = React.lazy(() => import('@/components/security/SecurityProvider').then(module => ({ default: module.SecurityProvider })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -30,16 +31,20 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <ThemeProvider>
           <Suspense fallback={<LoadingSpinner size="lg" text="Configuration de l'accessibilité..." centered />}>
             <AccessibilityProvider>
-              <Suspense fallback={<LoadingSpinner size="lg" text="Chargement de l'authentification..." centered />}>
-                <AuthProvider>
-                  <Suspense fallback={<LoadingSpinner size="md" text="Configuration de la session..." centered />}>
-                    <SessionTimeoutProvider>
-                      {children}
-                      <Toaster />
-                      <SonnerToaster />
-                    </SessionTimeoutProvider>
+              <Suspense fallback={<LoadingSpinner size="lg" text="Configuration de la sécurité..." centered />}>
+                <SecurityProvider>
+                  <Suspense fallback={<LoadingSpinner size="lg" text="Chargement de l'authentification..." centered />}>
+                    <AuthProvider>
+                      <Suspense fallback={<LoadingSpinner size="md" text="Configuration de la session..." centered />}>
+                        <SessionTimeoutProvider>
+                          {children}
+                          <Toaster />
+                          <SonnerToaster />
+                        </SessionTimeoutProvider>
+                      </Suspense>
+                    </AuthProvider>
                   </Suspense>
-                </AuthProvider>
+                </SecurityProvider>
               </Suspense>
             </AccessibilityProvider>
           </Suspense>
