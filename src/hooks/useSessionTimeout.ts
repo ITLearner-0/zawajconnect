@@ -1,173 +1,96 @@
 
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useToast } from '@/hooks/use-toast';
-import { SessionTimeoutConfig } from '@/types/session';
+
+interface SessionTimeoutConfig {
+  timeoutMinutes: number;
+  warningMinutes: number;
+  checkIntervalSeconds: number;
+}
 
 const DEFAULT_CONFIG: SessionTimeoutConfig = {
   timeoutMinutes: 30,
   warningMinutes: 5,
-  checkIntervalSeconds: 60
+  checkIntervalSeconds: 60,
 };
 
-export const useSessionTimeout = (config: Partial<SessionTimeoutConfig> = {}) => {
+export const useSessionTimeout = () => {
   const { user, signOut } = useAuth();
-  const { toast } = useToast();
   const [showWarning, setShowWarning] = useState(false);
   const [remainingTime, setRemainingTime] = useState(0);
-  const sessionToken = useRef<string | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
-  const warningRef = useRef<NodeJS.Timeout>();
-  const checkIntervalRef = useRef<NodeJS.Timeout>();
+  const [lastActivity, setLastActivity] = useState(Date.now());
 
-  const finalConfig = { ...DEFAULT_CONFIG, ...config };
+  const config = DEFAULT_CONFIG;
 
-  // Generate session token
-  const generateSessionToken = useCallback(() => {
-    return `${user?.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }, [user?.id]);
+  const resetActivity = useCallback(() => {
+    setLastActivity(Date.now());
+    setShowWarning(false);
+  }, []);
 
-  // Update session activity
-  const updateActivity = useCallback(async () => {
-    if (!user || !sessionToken.current) return;
+  const extendSession = useCallback(() => {
+    resetActivity();
+  }, [resetActivity]);
 
-    try {
-      await supabase.rpc('update_session_activity', {
-        session_token: sessionToken.current
-      });
-    } catch (error) {
-      console.error('Error updating session activity:', error);
-    }
-  }, [user]);
-
-  // Initialize session
-  const initializeSession = useCallback(async () => {
+  const checkSessionTimeout = useCallback(() => {
     if (!user) return;
 
-    const token = generateSessionToken();
-    sessionToken.current = token;
+    const now = Date.now();
+    const timeSinceActivity = now - lastActivity;
+    const timeoutMs = config.timeoutMinutes * 60 * 1000;
+    const warningMs = config.warningMinutes * 60 * 1000;
 
-    try {
-      const deviceInfo = {
-        userAgent: navigator.userAgent,
-        platform: navigator.platform,
-        language: navigator.language
-      };
-
-      await supabase.from('user_sessions').insert({
-        user_id: user.id,
-        session_token: token,
-        device_info: deviceInfo
-      });
-    } catch (error) {
-      console.error('Error initializing session:', error);
+    if (timeSinceActivity >= timeoutMs) {
+      // Session expired, sign out
+      signOut();
+      return;
     }
-  }, [user, generateSessionToken]);
 
-  // Handle session timeout
-  const handleTimeout = useCallback(async () => {
-    setShowWarning(false);
-    toast({
-      title: "Session expirée",
-      description: "Vous avez été déconnecté pour inactivité",
-      variant: "destructive"
-    });
-    await signOut();
-  }, [toast, signOut]);
+    if (timeSinceActivity >= timeoutMs - warningMs) {
+      // Show warning
+      const remaining = Math.ceil((timeoutMs - timeSinceActivity) / 1000);
+      setRemainingTime(remaining);
+      setShowWarning(true);
+    } else {
+      setShowWarning(false);
+    }
+  }, [user, lastActivity, config, signOut]);
 
-  // Show timeout warning
-  const showTimeoutWarning = useCallback(() => {
-    setShowWarning(true);
-    setRemainingTime(finalConfig.warningMinutes * 60);
-
-    const countdown = setInterval(() => {
-      setRemainingTime(prev => {
-        if (prev <= 1) {
-          clearInterval(countdown);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  }, [finalConfig.warningMinutes]);
-
-  // Reset timeout timers
-  const resetTimers = useCallback(() => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    if (warningRef.current) clearTimeout(warningRef.current);
-    
-    setShowWarning(false);
-    
-    // Set warning timer
-    warningRef.current = setTimeout(
-      showTimeoutWarning,
-      (finalConfig.timeoutMinutes - finalConfig.warningMinutes) * 60 * 1000
-    );
-    
-    // Set timeout timer
-    timeoutRef.current = setTimeout(
-      handleTimeout,
-      finalConfig.timeoutMinutes * 60 * 1000
-    );
-  }, [finalConfig, showTimeoutWarning, handleTimeout]);
-
-  // Handle user activity
-  const handleActivity = useCallback(() => {
-    updateActivity();
-    resetTimers();
-  }, [updateActivity, resetTimers]);
-
-  // Extend session
-  const extendSession = useCallback(() => {
-    handleActivity();
-    setShowWarning(false);
-  }, [handleActivity]);
-
-  // Setup activity listeners
+  // Set up activity listeners
   useEffect(() => {
     if (!user) return;
 
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
     
-    events.forEach(event => {
-      document.addEventListener(event, handleActivity, true);
-    });
+    const handleActivity = () => {
+      resetActivity();
+    };
 
-    // Check session periodically
-    checkIntervalRef.current = setInterval(() => {
-      updateActivity();
-    }, finalConfig.checkIntervalSeconds * 1000);
+    events.forEach(event => {
+      document.addEventListener(event, handleActivity, { passive: true });
+    });
 
     return () => {
       events.forEach(event => {
-        document.removeEventListener(event, handleActivity, true);
+        document.removeEventListener(event, handleActivity);
       });
-      
-      if (checkIntervalRef.current) {
-        clearInterval(checkIntervalRef.current);
-      }
     };
-  }, [user, handleActivity, updateActivity, finalConfig.checkIntervalSeconds]);
+  }, [user, resetActivity]);
 
-  // Initialize session on mount
+  // Set up timeout checking interval
   useEffect(() => {
-    if (user) {
-      initializeSession();
-      resetTimers();
-    }
+    if (!user) return;
+
+    const interval = setInterval(checkSessionTimeout, config.checkIntervalSeconds * 1000);
 
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      if (warningRef.current) clearTimeout(warningRef.current);
-      if (checkIntervalRef.current) clearInterval(checkIntervalRef.current);
+      clearInterval(interval);
     };
-  }, [user, initializeSession, resetTimers]);
+  }, [user, checkSessionTimeout, config.checkIntervalSeconds]);
 
   return {
     showWarning,
     remainingTime,
     extendSession,
-    handleActivity
+    resetActivity
   };
 };
