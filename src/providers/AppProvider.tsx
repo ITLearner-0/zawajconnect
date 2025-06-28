@@ -54,4 +54,4 @@ const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   );
 };
 
-export default AppProvider;
+export { AppProvider };

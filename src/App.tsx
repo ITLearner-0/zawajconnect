@@ -27,9 +27,9 @@ function App() {
   
   return (
     <BrowserRouter>
-      <AppProvider>
-        <div className="min-h-screen bg-background">
-          <Suspense fallback={<LoadingSpinner size="lg" text="Chargement de l'application..." centered />}>
+      <div className="min-h-screen bg-background">
+        <Suspense fallback={<LoadingSpinner size="lg" text="Chargement de l'application..." centered />}>
+          <AppProvider>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
@@ -95,9 +95,9 @@ function App() {
               {/* 404 Route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
-          </Suspense>
-        </div>
-      </AppProvider>
+          </AppProvider>
+        </Suspense>
+      </div>
     </BrowserRouter>
   );
 }
