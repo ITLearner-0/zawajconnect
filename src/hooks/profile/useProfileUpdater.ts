@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
-import { validateUuid, validateProfileUpdate, sanitizeInput } from '@/utils/security/inputValidation';
 
 export const useProfileUpdater = (userId?: string | null) => {
   const [loading, setLoading] = useState(false);
@@ -20,8 +19,9 @@ export const useProfileUpdater = (userId?: string | null) => {
       return false;
     }
 
-    // Critical security fix: Validate UUID before database operation
-    if (!validateUuid(userId)) {
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(userId)) {
       console.error("Invalid UUID provided for profile update:", userId);
       toast({
         title: "Security Error",
@@ -36,49 +36,44 @@ export const useProfileUpdater = (userId?: string | null) => {
 
     try {
       // Destructure and sanitize fullName into first_name and last_name
-      const sanitizedFullName = sanitizeInput(newProfileData.fullName);
-      const [first_name, ...lastNameParts] = sanitizedFullName.split(' ');
+      const fullName = newProfileData.fullName || '';
+      const [first_name, ...lastNameParts] = fullName.split(' ');
       const last_name = lastNameParts.join(' ');
 
-      // Prepare update data with validation and sanitization
-      const updateData = {
-        first_name: sanitizeInput(first_name || ''),
-        last_name: sanitizeInput(last_name || ''),
+      // Prepare update data with proper validation
+      const updateData: any = {
+        first_name: first_name || null,
+        last_name: last_name || null,
         birth_date: newProfileData.age || null,
         gender: newProfileData.gender || null,
-        location: sanitizeInput(newProfileData.location || ''),
-        education_level: sanitizeInput(newProfileData.education || ''),
-        occupation: sanitizeInput(newProfileData.occupation || ''),
+        location: newProfileData.location || null,
+        education_level: newProfileData.education || null,
+        occupation: newProfileData.occupation || null,
         religious_practice_level: newProfileData.religiousLevel || null,
-        about_me: sanitizeInput(newProfileData.aboutMe || ''),
+        about_me: newProfileData.aboutMe || null,
         prayer_frequency: newProfileData.prayerFrequency || null,
         polygamy_stance: newProfileData.polygamyStance || null,
-        wali_name: sanitizeInput(newProfileData.waliName || ''),
-        wali_relationship: sanitizeInput(newProfileData.waliRelationship || ''),
-        wali_contact: sanitizeInput(newProfileData.waliContact || ''),
+        wali_name: newProfileData.waliName || null,
+        wali_relationship: newProfileData.waliRelationship || null,
+        wali_contact: newProfileData.waliContact || null,
         profile_picture: newProfileData.profilePicture || null,
-        gallery: newProfileData.gallery || []
+        gallery: newProfileData.gallery || [],
+        updated_at: new Date().toISOString()
       };
 
-      // Validate the update data
-      const validation = validateProfileUpdate(updateData);
-      if (!validation.success) {
-        console.error("Profile validation failed:", validation.error);
-        toast({
-          title: "Validation Error",
-          description: "Invalid profile data provided",
-          variant: "destructive",
-        });
-        return false;
-      }
+      // Remove null/empty values to avoid overwriting with nulls
+      Object.keys(updateData).forEach(key => {
+        if (updateData[key] === null || updateData[key] === '') {
+          delete updateData[key];
+        }
+      });
 
-      // Use upsert to handle both insert and update with validated UUID
+      console.log("Updating profile with data:", updateData);
+
       const { data, error } = await supabase
         .from('profiles')
-        .upsert({ id: userId, ...updateData }, { 
-          onConflict: 'id',
-          ignoreDuplicates: false 
-        })
+        .update(updateData)
+        .eq('id', userId)
         .select()
         .single();
 

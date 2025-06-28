@@ -21,12 +21,21 @@ export const useProfileSubmission = () => {
       privacySettings
     });
 
+    if (!userId) {
+      console.error("No user ID provided");
+      toast({
+        title: "Erreur",
+        description: "Identifiant utilisateur manquant. Veuillez vous reconnecter.",
+        variant: "destructive",
+      });
+      return false;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
       console.log("Starting profile submission for user:", userId);
-      console.log("Profile data:", profileData);
       
       // Extract first and last name from full name
       const nameParts = (profileData.fullName || '').split(' ');
@@ -48,78 +57,104 @@ export const useProfileSubmission = () => {
         }
       }
 
-      // Prepare update data - allow all fields to be saved
+      // Prepare update data with proper validation
       const updateData: any = {
         id: userId,
-        first_name: firstName,
-        last_name: lastName,
-        privacy_settings: privacySettings,
+        first_name: firstName || null,
+        last_name: lastName || null,
+        privacy_settings: privacySettings || {
+          profileVisibilityLevel: 1,
+          showAge: true,
+          showLocation: true,
+          showOccupation: true,
+          allowNonMatchMessages: true
+        },
         is_visible: true,
         updated_at: new Date().toISOString()
       };
 
-      // Add all profile fields without strict validation
+      // Add fields only if they have valid values
       if (birthDate) updateData.birth_date = birthDate;
-      if (profileData.gender) updateData.gender = profileData.gender;
-      if (profileData.location) updateData.location = profileData.location;
-      if (profileData.education) updateData.education_level = profileData.education;
-      if (profileData.occupation) updateData.occupation = profileData.occupation;
-      if (profileData.religiousLevel) updateData.religious_practice_level = profileData.religiousLevel;
-      if (profileData.prayerFrequency) updateData.prayer_frequency = profileData.prayerFrequency;
-      if (profileData.polygamyStance) updateData.polygamy_stance = profileData.polygamyStance;
-      if (profileData.aboutMe) updateData.about_me = profileData.aboutMe;
-      if (profileData.waliName) updateData.wali_name = profileData.waliName;
-      if (profileData.waliRelationship) updateData.wali_relationship = profileData.waliRelationship;
-      if (profileData.waliContact) updateData.wali_contact = profileData.waliContact;
-      if (profileData.madhab) updateData.madhab = profileData.madhab;
+      if (profileData.gender && profileData.gender.trim()) updateData.gender = profileData.gender.trim();
+      if (profileData.location && profileData.location.trim()) updateData.location = profileData.location.trim();
+      if (profileData.education && profileData.education.trim()) updateData.education_level = profileData.education.trim();
+      if (profileData.occupation && profileData.occupation.trim()) updateData.occupation = profileData.occupation.trim();
+      if (profileData.religiousLevel && profileData.religiousLevel.trim()) updateData.religious_practice_level = profileData.religiousLevel.trim();
+      if (profileData.prayerFrequency && profileData.prayerFrequency.trim()) updateData.prayer_frequency = profileData.prayerFrequency.trim();
+      if (profileData.polygamyStance && profileData.polygamyStance.trim()) updateData.polygamy_stance = profileData.polygamyStance.trim();
+      if (profileData.aboutMe && profileData.aboutMe.trim()) updateData.about_me = profileData.aboutMe.trim();
+      if (profileData.waliName && profileData.waliName.trim()) updateData.wali_name = profileData.waliName.trim();
+      if (profileData.waliRelationship && profileData.waliRelationship.trim()) updateData.wali_relationship = profileData.waliRelationship.trim();
+      if (profileData.waliContact && profileData.waliContact.trim()) updateData.wali_contact = profileData.waliContact.trim();
+      if (profileData.madhab && profileData.madhab.trim()) updateData.madhab = profileData.madhab.trim();
       
-      // Handle languages with proper type checking
+      // Handle arrays properly
       if (profileData.languages) {
-        // Cast to unknown first to handle the type issue, then check the actual type
-        const languagesField = profileData.languages as unknown;
-        if (typeof languagesField === 'string') {
-          updateData.languages = (languagesField as string).split(',').map(lang => lang.trim());
-        } else if (Array.isArray(languagesField)) {
-          updateData.languages = languagesField as string[];
+        if (typeof profileData.languages === 'string') {
+          updateData.languages = profileData.languages.split(',').map(lang => lang.trim()).filter(lang => lang.length > 0);
+        } else if (Array.isArray(profileData.languages)) {
+          updateData.languages = profileData.languages.filter(lang => lang && lang.trim().length > 0);
         }
       }
 
       // Handle profile picture and gallery
-      if (profileData.profilePicture !== undefined) {
-        updateData.profile_picture = profileData.profilePicture || null;
+      if (profileData.profilePicture) {
+        updateData.profile_picture = profileData.profilePicture;
       }
-      if (profileData.gallery !== undefined) {
-        updateData.gallery = profileData.gallery || [];
+      if (profileData.gallery && Array.isArray(profileData.gallery)) {
+        updateData.gallery = profileData.gallery.filter(url => url && url.trim().length > 0);
       }
 
       console.log("Final update data:", updateData);
       
-      // Update the profile using upsert to handle both insert and update cases
-      const { data, error } = await supabase
+      // First check if profile exists
+      const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
-        .upsert(updateData, { 
-          onConflict: 'id',
-          ignoreDuplicates: false 
-        })
-        .select()
-        .single();
+        .select('id')
+        .eq('id', userId)
+        .maybeSingle();
 
-      if (error) {
-        console.error("Error updating profile:", error);
-        setError(error.message);
-        toast({
-          title: "Erreur",
-          description: "Échec de la mise à jour du profil. Veuillez réessayer.",
-          variant: "destructive",
-        });
-        return false;
+      if (checkError) {
+        console.error("Error checking existing profile:", checkError);
+        throw new Error("Erreur lors de la vérification du profil existant");
       }
 
-      console.log("Profile updated successfully:", data);
+      let result;
+      if (existingProfile) {
+        // Update existing profile
+        console.log("Updating existing profile");
+        result = await supabase
+          .from('profiles')
+          .update(updateData)
+          .eq('id', userId)
+          .select()
+          .single();
+      } else {
+        // Insert new profile
+        console.log("Creating new profile");
+        result = await supabase
+          .from('profiles')
+          .insert(updateData)
+          .select()
+          .single();
+      }
+
+      const { data, error } = result;
+
+      if (error) {
+        console.error("Supabase error:", error);
+        throw new Error(`Erreur de base de données: ${error.message}`);
+      }
+
+      if (!data) {
+        throw new Error("Aucune donnée retournée après la sauvegarde");
+      }
+
+      console.log("Profile saved successfully:", data);
 
       // Call the success callback with the original profile data to maintain form state
       if (onSuccess) {
-        console.log("Calling onSuccess callback with profile data");
+        console.log("Calling onSuccess callback");
         onSuccess(profileData);
       }
 
@@ -127,15 +162,19 @@ export const useProfileSubmission = () => {
         title: "Profil Sauvegardé",
         description: "Votre profil a été sauvegardé avec succès.",
       });
+      
       return true;
     } catch (err: any) {
-      console.error("Unexpected error updating profile:", err);
-      setError(err.message);
+      console.error("Error in submitProfile:", err);
+      const errorMessage = err.message || "Une erreur inattendue s'est produite";
+      setError(errorMessage);
+      
       toast({
-        title: "Erreur",
-        description: "Une erreur inattendue s'est produite. Veuillez réessayer.",
+        title: "Erreur de Sauvegarde",
+        description: errorMessage,
         variant: "destructive",
       });
+      
       return false;
     } finally {
       setIsLoading(false);
