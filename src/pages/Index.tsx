@@ -1,96 +1,68 @@
 
-import React, { Suspense } from "react";
-import LoadingSpinner from "@/components/ui/LoadingSpinner";
-import { useTranslation } from "react-i18next";
-
-// Lazy load components to improve initial load time
-const EnhancedHeroSection = React.lazy(() => import("@/components/home/EnhancedHeroSection"));
-const FeaturesSection = React.lazy(() => import("@/components/home/FeaturesSection"));
-const DemoSection = React.lazy(() => import("@/components/home/DemoSection"));
-const ResourcesSection = React.lazy(() => import("@/components/home/ResourcesSection"));
-const EnhancedTestimonialsSection = React.lazy(() => import("@/components/home/EnhancedTestimonialsSection"));
-const TrustBadges = React.lazy(() => import("@/components/home/TrustBadges"));
-const Footer = React.lazy(() => import("@/components/home/Footer"));
-const Divider = React.lazy(() => import("@/components/home/Divider"));
-const SectionTransition = React.lazy(() => import("@/components/home/SectionTransition"));
-const PerformanceMonitor = React.lazy(() => import("@/components/ui/PerformanceMonitor"));
-const PerformanceWidget = React.lazy(() => import("@/components/monitoring/PerformanceWidget"));
+import React from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import Navigation from '@/components/layout/Navigation';
+import EnhancedHeroSection from '@/components/home/EnhancedHeroSection';
+import FeaturesSection from '@/components/home/FeaturesSection';
+import TestimonialsSection from '@/components/home/TestimonialsSection';
+import ResourcesSection from '@/components/home/ResourcesSection';
+import Footer from '@/components/home/Footer';
+import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 const Index = () => {
-  const { t } = useTranslation();
-  
-  console.log("Index page rendering");
+  const { user, loading } = useAuth();
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-rose-300 via-pink-200 to-rose-100 dark:from-rose-900 dark:via-rose-800 dark:to-pink-900 text-foreground">
-      <Suspense fallback={<LoadingSpinner size="lg" text="Chargement de la page..." centered />}>
-        <EnhancedHeroSection />
-      </Suspense>
+  if (loading) {
+    return <LoadingSpinner size="lg" text="Chargement..." centered />;
+  }
 
-      <main className="relative bg-gradient-to-b from-rose-50 to-pink-50 dark:from-rose-950 dark:to-pink-950">
-        {/* Trust Badges Section */}
-        <Suspense fallback={<LoadingSpinner size="md" centered />}>
-          <SectionTransition id="trust" delay={100}>
-            <section className="py-16 md:py-20 px-4">
-              <div className="max-w-7xl mx-auto text-center">
-                <h3 className="text-2xl md:text-3xl font-bold mb-12 text-rose-800 dark:text-rose-200">
-                  {t('home.trustBadges.title', 'Faites-nous confiance')}
-                </h3>
-                <TrustBadges />
+  // Si l'utilisateur est connecté, afficher la navigation et une version simplifiée de la page
+  if (user) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="container mx-auto px-4 py-8">
+          <div className="text-center space-y-6">
+            <h1 className="text-4xl font-bold text-primary">
+              Bienvenue sur Nikah Connect
+            </h1>
+            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              Vous êtes maintenant connecté(e). Utilisez la navigation ci-dessus pour accéder aux différentes fonctionnalités.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+              <div className="p-6 bg-card rounded-lg border">
+                <h3 className="text-xl font-semibold mb-3">Mon Profil</h3>
+                <p className="text-muted-foreground">
+                  Complétez et gérez votre profil personnel
+                </p>
               </div>
-            </section>
-          </SectionTransition>
-        </Suspense>
+              <div className="p-6 bg-card rounded-lg border">
+                <h3 className="text-xl font-semibold mb-3">Compatibilité</h3>
+                <p className="text-muted-foreground">
+                  Découvrez vos compatibilités basées sur les valeurs islamiques
+                </p>
+              </div>
+              <div className="p-6 bg-card rounded-lg border">
+                <h3 className="text-xl font-semibold mb-3">Messages</h3>
+                <p className="text-muted-foreground">
+                  Communiquez de manière respectueuse et supervisée
+                </p>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
-        <Suspense fallback={<LoadingSpinner size="md" centered />}>
-          <Divider />
-        </Suspense>
-
-        <Suspense fallback={<LoadingSpinner size="md" centered />}>
-          <SectionTransition id="features" delay={200}>
-            <FeaturesSection />
-          </SectionTransition>
-        </Suspense>
-
-        <Suspense fallback={<LoadingSpinner size="md" centered />}>
-          <Divider />
-        </Suspense>
-
-        <Suspense fallback={<LoadingSpinner size="md" centered />}>
-          <SectionTransition id="demo" delay={300}>
-            <DemoSection />
-          </SectionTransition>
-        </Suspense>
-
-        <Suspense fallback={<LoadingSpinner size="md" centered />}>
-          <Divider variant="pink" />
-        </Suspense>
-
-        <Suspense fallback={<LoadingSpinner size="md" centered />}>
-          <SectionTransition id="resources" delay={400}>
-            <ResourcesSection />
-          </SectionTransition>
-        </Suspense>
-
-        <Suspense fallback={<LoadingSpinner size="md" centered />}>
-          <Divider />
-        </Suspense>
-
-        <Suspense fallback={<LoadingSpinner size="md" centered />}>
-          <SectionTransition id="testimonials" delay={500}>
-            <EnhancedTestimonialsSection />
-          </SectionTransition>
-        </Suspense>
-      </main>
-
-      <Suspense fallback={<LoadingSpinner size="md" centered />}>
-        <Footer />
-      </Suspense>
-      
-      <Suspense fallback={null}>
-        <PerformanceMonitor />
-        <PerformanceWidget />
-      </Suspense>
+  // Si l'utilisateur n'est pas connecté, afficher la page d'accueil normale
+  return (
+    <div className="min-h-screen bg-background">
+      <EnhancedHeroSection />
+      <FeaturesSection />
+      <TestimonialsSection />
+      <ResourcesSection />
+      <Footer />
     </div>
   );
 };
