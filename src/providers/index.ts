@@ -1,2 +1,2 @@
 
-export { default as AppProvider } from './AppProvider';
+export { AppProvider } from './AppProvider';
