@@ -26,8 +26,11 @@ export const mapProfileDataToDatabase = (
   firstName: string,
   lastName: string,
   birthDate: string | null
-) => {
-  const updateData: any = {
+): Record<string, any> => {
+  console.log('Mapping profile data to database:', { userId, profileData, firstName, lastName, birthDate });
+  
+  // Base required fields
+  const updateData: Record<string, any> = {
     id: userId,
     first_name: firstName || null,
     last_name: lastName || null,
@@ -43,9 +46,11 @@ export const mapProfileDataToDatabase = (
   };
 
   // Add birth date if available
-  if (birthDate) updateData.birth_date = birthDate;
+  if (birthDate) {
+    updateData.birth_date = birthDate;
+  }
 
-  // Handle string fields with explicit type checking
+  // Handle string fields with explicit validation
   const stringFields = [
     'gender', 'location', 'education', 'occupation', 'religiousLevel', 
     'prayerFrequency', 'polygamyStance', 'aboutMe', 'waliName', 
@@ -54,11 +59,15 @@ export const mapProfileDataToDatabase = (
 
   stringFields.forEach(field => {
     const value = profileData[field as keyof ProfileFormData];
-    if (value && typeof value === 'string' && value.trim()) {
-      const dbField = getDbFieldName(field);
-      updateData[dbField] = value.trim();
+    if (value && typeof value === 'string') {
+      const trimmedValue = value.trim();
+      if (trimmedValue.length > 0) {
+        const dbField = getDbFieldName(field);
+        updateData[dbField] = trimmedValue;
+      }
     }
   });
 
+  console.log('Final mapped data:', updateData);
   return updateData;
 };

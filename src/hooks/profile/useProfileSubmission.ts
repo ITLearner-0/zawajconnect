@@ -17,17 +17,17 @@ export const useProfileSubmission = () => {
     privacySettings: PrivacySettings,
     onSuccess?: (savedData: ProfileFormData) => void
   ) => {
-    console.log("submitProfile function called with:", {
-      userId,
-      profileData,
-      privacySettings
-    });
+    console.log("=== PROFILE SUBMISSION STARTED ===");
+    console.log("User ID:", userId);
+    console.log("Profile data:", JSON.stringify(profileData, null, 2));
+    console.log("Privacy settings:", JSON.stringify(privacySettings, null, 2));
 
     if (!userId) {
-      console.error("No user ID provided");
+      const errorMsg = "Identifiant utilisateur manquant. Veuillez vous reconnecter.";
+      console.error("ERROR:", errorMsg);
       toast({
         title: "Erreur",
-        description: "Identifiant utilisateur manquant. Veuillez vous reconnecter.",
+        description: errorMsg,
         variant: "destructive",
       });
       return false;
@@ -37,11 +37,14 @@ export const useProfileSubmission = () => {
     setError(null);
 
     try {
-      console.log("Starting profile submission for user:", userId);
+      console.log("=== PROCESSING DATA ===");
       
       // Process name and birth date
       const { firstName, lastName } = processFullName(profileData.fullName);
       const birthDate = processBirthDate(profileData.age);
+      
+      console.log("Processed name:", { firstName, lastName });
+      console.log("Processed birth date:", birthDate);
 
       // Prepare base update data
       const updateData = mapProfileDataToDatabase(
@@ -61,25 +64,30 @@ export const useProfileSubmission = () => {
         allowNonMatchMessages: true
       };
 
-      // Process arrays and optional fields
+      // Process and add languages
       const processedLanguages = processLanguages(profileData.languages);
-      if (processedLanguages) {
+      if (processedLanguages.length > 0) {
         updateData.languages = processedLanguages;
       }
 
       // Handle profile picture
-      const profilePictureValue = profileData.profilePicture;
-      if (profilePictureValue && typeof profilePictureValue === 'string') {
-        updateData.profile_picture = profilePictureValue;
+      if (profileData.profilePicture && typeof profileData.profilePicture === 'string') {
+        const trimmedPicture = profileData.profilePicture.trim();
+        if (trimmedPicture) {
+          updateData.profile_picture = trimmedPicture;
+        }
       }
       
       // Handle gallery
       const processedGallery = processGallery(profileData.gallery);
-      if (processedGallery) {
+      if (processedGallery.length > 0) {
         updateData.gallery = processedGallery;
       }
 
-      console.log("Final update data:", updateData);
+      console.log("=== FINAL UPDATE DATA ===");
+      console.log(JSON.stringify(updateData, null, 2));
+      
+      console.log("=== DATABASE OPERATIONS ===");
       
       // Check if profile exists and perform appropriate operation
       const existingProfile = await checkProfileExists(userId);
@@ -91,18 +99,19 @@ export const useProfileSubmission = () => {
         result = await insertProfile(updateData);
       }
 
-      const { data, error } = result;
+      const { data, error: dbError } = result;
 
-      if (error) {
-        console.error("Supabase error:", error);
-        throw new Error(`Erreur de base de données: ${error.message}`);
+      if (dbError) {
+        console.error("Database error:", dbError);
+        throw new Error(`Erreur de base de données: ${dbError.message}`);
       }
 
       if (!data) {
         throw new Error("Aucune donnée retournée après la sauvegarde");
       }
 
-      console.log("Profile saved successfully:", data);
+      console.log("=== PROFILE SAVED SUCCESSFULLY ===");
+      console.log("Saved data:", JSON.stringify(data, null, 2));
 
       // Call the success callback with the original profile data to maintain form state
       if (onSuccess) {
@@ -117,8 +126,12 @@ export const useProfileSubmission = () => {
       
       return true;
     } catch (err: any) {
-      console.error("Error in submitProfile:", err);
-      const errorMessage = err.message || "Une erreur inattendue s'est produite";
+      console.error("=== ERROR IN SUBMIT PROFILE ===");
+      console.error("Error object:", err);
+      console.error("Error message:", err?.message);
+      console.error("Error stack:", err?.stack);
+      
+      const errorMessage = err?.message || "Une erreur inattendue s'est produite lors de la sauvegarde";
       setError(errorMessage);
       
       toast({
@@ -130,6 +143,7 @@ export const useProfileSubmission = () => {
       return false;
     } finally {
       setIsLoading(false);
+      console.log("=== PROFILE SUBMISSION ENDED ===");
     }
   };
 

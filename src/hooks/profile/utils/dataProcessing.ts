@@ -1,74 +1,81 @@
 
 import { ProfileFormData } from '@/types/profile';
 
-export const processFullName = (fullName: string | undefined) => {
-  const name = fullName || '';
-  const nameParts = name.split(' ');
+export const processFullName = (fullName: string | undefined): { firstName: string; lastName: string } => {
+  const name = fullName?.trim() || '';
+  const nameParts = name.split(' ').filter(part => part.length > 0);
   const firstName = nameParts[0] || '';
   const lastName = nameParts.slice(1).join(' ') || '';
   return { firstName, lastName };
 };
 
-export const processBirthDate = (age: string | undefined) => {
-  let birthDate = null;
-  const ageValue = age;
+export const processBirthDate = (age: string | undefined): string | null => {
+  if (!age || typeof age !== 'string') return null;
   
-  if (ageValue && typeof ageValue === 'string' && ageValue.trim() !== '') {
-    const trimmedAge = ageValue.trim();
-    if (trimmedAge.includes('-')) {
-      // If age is already a date format, use it directly
-      birthDate = trimmedAge;
-    } else if (!isNaN(Number(trimmedAge))) {
-      // If age is a number, convert to a birth year
-      const currentYear = new Date().getFullYear();
-      const birthYear = currentYear - parseInt(trimmedAge, 10);
-      birthDate = `${birthYear}-01-01`;
-    }
+  const ageValue = age.trim();
+  if (!ageValue) return null;
+  
+  // If age is already a date format, use it directly
+  if (ageValue.includes('-')) {
+    return ageValue;
   }
   
-  return birthDate;
+  // If age is a number, convert to a birth year
+  const ageNumber = parseInt(ageValue, 10);
+  if (!isNaN(ageNumber) && ageNumber > 0 && ageNumber < 150) {
+    const currentYear = new Date().getFullYear();
+    const birthYear = currentYear - ageNumber;
+    return `${birthYear}-01-01`;
+  }
+  
+  return null;
 };
 
-export const processLanguages = (languages: string | string[] | undefined): string[] | undefined => {
-  if (!languages) return undefined;
+export const processLanguages = (languages: string | string[] | undefined): string[] => {
+  console.log('Processing languages:', languages, 'Type:', typeof languages);
   
-  if (typeof languages === 'string') {
-    const trimmed = languages.trim();
-    if (trimmed) {
-      const languageList = trimmed.split(',');
-      const processedLanguages: string[] = [];
-      
-      for (const lang of languageList) {
-        if (typeof lang === 'string') {
-          const trimmedLang = lang.trim();
-          if (trimmedLang.length > 0) {
-            processedLanguages.push(trimmedLang);
+  if (!languages) {
+    console.log('No languages provided, returning empty array');
+    return [];
+  }
+  
+  let processedLanguages: string[] = [];
+  
+  try {
+    if (typeof languages === 'string') {
+      const trimmed = languages.trim();
+      if (trimmed) {
+        const languageList = trimmed.split(',');
+        for (const lang of languageList) {
+          const cleanLang = lang.trim();
+          if (cleanLang.length > 0) {
+            processedLanguages.push(cleanLang);
           }
         }
       }
-      
-      return processedLanguages.length > 0 ? processedLanguages : undefined;
-    }
-  } else if (Array.isArray(languages)) {
-    const processedLanguages: string[] = [];
-    
-    for (const lang of languages) {
-      if (typeof lang === 'string' && lang != null) {
-        const trimmedLang = lang.trim();
-        if (trimmedLang.length > 0) {
-          processedLanguages.push(trimmedLang);
+    } else if (Array.isArray(languages)) {
+      for (const lang of languages) {
+        if (lang && typeof lang === 'string') {
+          const cleanLang = lang.trim();
+          if (cleanLang.length > 0) {
+            processedLanguages.push(cleanLang);
+          }
         }
       }
     }
-    
-    return processedLanguages.length > 0 ? processedLanguages : undefined;
+  } catch (error) {
+    console.error('Error processing languages:', error);
+    return [];
   }
   
-  return undefined;
+  console.log('Processed languages:', processedLanguages);
+  return processedLanguages;
 };
 
-export const processGallery = (gallery: string[] | undefined) => {
-  if (!gallery || !Array.isArray(gallery)) return undefined;
+export const processGallery = (gallery: string[] | undefined): string[] => {
+  if (!gallery || !Array.isArray(gallery)) {
+    return [];
+  }
   
   return gallery.filter((url): url is string => {
     return url != null && typeof url === 'string' && url.trim().length > 0;
