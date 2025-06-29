@@ -37,8 +37,9 @@ export const useProfileSubmission = () => {
     try {
       console.log("Starting profile submission for user:", userId);
       
-      // Extract first and last name from full name
-      const nameParts = (profileData.fullName || '').split(' ');
+      // Extract first and last name from full name with proper null checking
+      const fullName = profileData.fullName || '';
+      const nameParts = fullName.split(' ');
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';
 
