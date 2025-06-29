@@ -75,36 +75,88 @@ export const useProfileSubmission = () => {
         updated_at: new Date().toISOString()
       };
 
-      // Add fields only if they have valid values
+      // Add fields only if they have valid values with proper type checking
       if (birthDate) updateData.birth_date = birthDate;
-      if (profileData.gender && profileData.gender.trim()) updateData.gender = profileData.gender.trim();
-      if (profileData.location && profileData.location.trim()) updateData.location = profileData.location.trim();
-      if (profileData.education && profileData.education.trim()) updateData.education_level = profileData.education.trim();
-      if (profileData.occupation && profileData.occupation.trim()) updateData.occupation = profileData.occupation.trim();
-      if (profileData.religiousLevel && profileData.religiousLevel.trim()) updateData.religious_practice_level = profileData.religiousLevel.trim();
-      if (profileData.prayerFrequency && profileData.prayerFrequency.trim()) updateData.prayer_frequency = profileData.prayerFrequency.trim();
-      if (profileData.polygamyStance && profileData.polygamyStance.trim()) updateData.polygamy_stance = profileData.polygamyStance.trim();
-      if (profileData.aboutMe && profileData.aboutMe.trim()) updateData.about_me = profileData.aboutMe.trim();
-      if (profileData.waliName && profileData.waliName.trim()) updateData.wali_name = profileData.waliName.trim();
-      if (profileData.waliRelationship && profileData.waliRelationship.trim()) updateData.wali_relationship = profileData.waliRelationship.trim();
-      if (profileData.waliContact && profileData.waliContact.trim()) updateData.wali_contact = profileData.waliContact.trim();
-      if (profileData.madhab && profileData.madhab.trim()) updateData.madhab = profileData.madhab.trim();
+      
+      const gender = profileData.gender;
+      if (gender && typeof gender === 'string' && gender.trim()) {
+        updateData.gender = gender.trim();
+      }
+      
+      const location = profileData.location;
+      if (location && typeof location === 'string' && location.trim()) {
+        updateData.location = location.trim();
+      }
+      
+      const education = profileData.education;
+      if (education && typeof education === 'string' && education.trim()) {
+        updateData.education_level = education.trim();
+      }
+      
+      const occupation = profileData.occupation;
+      if (occupation && typeof occupation === 'string' && occupation.trim()) {
+        updateData.occupation = occupation.trim();
+      }
+      
+      const religiousLevel = profileData.religiousLevel;
+      if (religiousLevel && typeof religiousLevel === 'string' && religiousLevel.trim()) {
+        updateData.religious_practice_level = religiousLevel.trim();
+      }
+      
+      const prayerFrequency = profileData.prayerFrequency;
+      if (prayerFrequency && typeof prayerFrequency === 'string' && prayerFrequency.trim()) {
+        updateData.prayer_frequency = prayerFrequency.trim();
+      }
+      
+      const polygamyStance = profileData.polygamyStance;
+      if (polygamyStance && typeof polygamyStance === 'string' && polygamyStance.trim()) {
+        updateData.polygamy_stance = polygamyStance.trim();
+      }
+      
+      const aboutMe = profileData.aboutMe;
+      if (aboutMe && typeof aboutMe === 'string' && aboutMe.trim()) {
+        updateData.about_me = aboutMe.trim();
+      }
+      
+      const waliName = profileData.waliName;
+      if (waliName && typeof waliName === 'string' && waliName.trim()) {
+        updateData.wali_name = waliName.trim();
+      }
+      
+      const waliRelationship = profileData.waliRelationship;
+      if (waliRelationship && typeof waliRelationship === 'string' && waliRelationship.trim()) {
+        updateData.wali_relationship = waliRelationship.trim();
+      }
+      
+      const waliContact = profileData.waliContact;
+      if (waliContact && typeof waliContact === 'string' && waliContact.trim()) {
+        updateData.wali_contact = waliContact.trim();
+      }
+      
+      const madhab = profileData.madhab;
+      if (madhab && typeof madhab === 'string' && madhab.trim()) {
+        updateData.madhab = madhab.trim();
+      }
       
       // Handle arrays properly
-      if (profileData.languages) {
-        if (typeof profileData.languages === 'string') {
-          updateData.languages = profileData.languages.split(',').map(lang => lang.trim()).filter(lang => lang.length > 0);
-        } else if (Array.isArray(profileData.languages)) {
-          updateData.languages = profileData.languages.filter(lang => lang && lang.trim().length > 0);
+      const languages = profileData.languages;
+      if (languages) {
+        if (typeof languages === 'string') {
+          updateData.languages = languages.split(',').map(lang => lang.trim()).filter(lang => lang.length > 0);
+        } else if (Array.isArray(languages)) {
+          updateData.languages = languages.filter(lang => lang && typeof lang === 'string' && lang.trim().length > 0);
         }
       }
 
       // Handle profile picture and gallery
-      if (profileData.profilePicture) {
-        updateData.profile_picture = profileData.profilePicture;
+      const profilePicture = profileData.profilePicture;
+      if (profilePicture && typeof profilePicture === 'string') {
+        updateData.profile_picture = profilePicture;
       }
-      if (profileData.gallery && Array.isArray(profileData.gallery)) {
-        updateData.gallery = profileData.gallery.filter(url => url && url.trim().length > 0);
+      
+      const gallery = profileData.gallery;
+      if (gallery && Array.isArray(gallery)) {
+        updateData.gallery = gallery.filter(url => url && typeof url === 'string' && url.trim().length > 0);
       }
 
       console.log("Final update data:", updateData);
