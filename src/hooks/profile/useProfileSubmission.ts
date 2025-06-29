@@ -1,8 +1,10 @@
 
 import { useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData, PrivacySettings } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
+import { processFullName, processBirthDate, processLanguages, processGallery } from './utils/dataProcessing';
+import { mapProfileDataToDatabase } from './utils/fieldMapping';
+import { checkProfileExists, updateProfile, insertProfile } from './utils/databaseOperations';
 
 export const useProfileSubmission = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,126 +39,56 @@ export const useProfileSubmission = () => {
     try {
       console.log("Starting profile submission for user:", userId);
       
-      // Extract first and last name from full name with proper null checking
-      const fullName = profileData.fullName || '';
-      const nameParts = fullName.split(' ');
-      const firstName = nameParts[0] || '';
-      const lastName = nameParts.slice(1).join(' ') || '';
+      // Process name and birth date
+      const { firstName, lastName } = processFullName(profileData.fullName);
+      const birthDate = processBirthDate(profileData.age);
 
-      // Handle birth date conversion - only process if age is provided and valid
-      let birthDate = null;
-      const ageValue = profileData.age;
-      if (ageValue && typeof ageValue === 'string' && ageValue.trim() !== '') {
-        const trimmedAge = ageValue.trim();
-        if (typeof trimmedAge === 'string' && trimmedAge.includes('-')) {
-          // If age is already a date format, use it directly
-          birthDate = trimmedAge;
-        } else if (typeof trimmedAge === 'string' && !isNaN(Number(trimmedAge))) {
-          // If age is a number, convert to a birth year
-          const currentYear = new Date().getFullYear();
-          const birthYear = currentYear - parseInt(trimmedAge, 10);
-          birthDate = `${birthYear}-01-01`;
-        }
-      }
+      // Prepare base update data
+      const updateData = mapProfileDataToDatabase(
+        userId,
+        profileData,
+        firstName,
+        lastName,
+        birthDate
+      );
 
-      // Prepare update data with proper validation
-      const updateData: any = {
-        id: userId,
-        first_name: firstName || null,
-        last_name: lastName || null,
-        privacy_settings: privacySettings || {
-          profileVisibilityLevel: 1,
-          showAge: true,
-          showLocation: true,
-          showOccupation: true,
-          allowNonMatchMessages: true
-        },
-        is_visible: true,
-        updated_at: new Date().toISOString()
+      // Add privacy settings
+      updateData.privacy_settings = privacySettings || {
+        profileVisibilityLevel: 1,
+        showAge: true,
+        showLocation: true,
+        showOccupation: true,
+        allowNonMatchMessages: true
       };
 
-      // Add fields only if they have valid values with proper type checking
-      if (birthDate) updateData.birth_date = birthDate;
-      
-      // Handle string fields with explicit type checking
-      const stringFields = [
-        'gender', 'location', 'education', 'occupation', 'religiousLevel', 
-        'prayerFrequency', 'polygamyStance', 'aboutMe', 'waliName', 
-        'waliRelationship', 'waliContact', 'madhab'
-      ] as const;
-
-      stringFields.forEach(field => {
-        const value = profileData[field as keyof ProfileFormData];
-        if (value && typeof value === 'string' && value.trim()) {
-          const dbField = getDbFieldName(field);
-          updateData[dbField] = value.trim();
-        }
-      });
-
-      // Handle arrays properly with explicit type checking
-      const languagesValue = profileData.languages;
-      if (languagesValue) {
-        if (typeof languagesValue === 'string') {
-          const trimmedLanguages = languagesValue.trim();
-          if (trimmedLanguages) {
-            // Add explicit type assertion for split result
-            const languageArray: string[] = trimmedLanguages.split(',');
-            updateData.languages = languageArray
-              .map((lang: string) => lang.trim())
-              .filter((lang: string) => lang.length > 0);
-          }
-        } else if (Array.isArray(languagesValue)) {
-          updateData.languages = languagesValue.filter((lang: unknown): lang is string => {
-            return lang != null && typeof lang === 'string' && lang.trim().length > 0;
-          });
-        }
+      // Process arrays and optional fields
+      const processedLanguages = processLanguages(profileData.languages);
+      if (processedLanguages) {
+        updateData.languages = processedLanguages;
       }
 
-      // Handle profile picture and gallery
+      // Handle profile picture
       const profilePictureValue = profileData.profilePicture;
       if (profilePictureValue && typeof profilePictureValue === 'string') {
         updateData.profile_picture = profilePictureValue;
       }
       
-      const galleryValue = profileData.gallery;
-      if (galleryValue && Array.isArray(galleryValue)) {
-        updateData.gallery = galleryValue.filter((url: unknown): url is string => {
-          return url != null && typeof url === 'string' && url.trim().length > 0;
-        });
+      // Handle gallery
+      const processedGallery = processGallery(profileData.gallery);
+      if (processedGallery) {
+        updateData.gallery = processedGallery;
       }
 
       console.log("Final update data:", updateData);
       
-      // First check if profile exists
-      const { data: existingProfile, error: checkError } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('id', userId)
-        .maybeSingle();
-
-      if (checkError) {
-        console.error("Error checking existing profile:", checkError);
-        throw new Error("Erreur lors de la vérification du profil existant");
-      }
-
+      // Check if profile exists and perform appropriate operation
+      const existingProfile = await checkProfileExists(userId);
+      
       let result;
       if (existingProfile) {
-        // Update existing profile
-        console.log("Updating existing profile");
-        result = await supabase
-          .from('profiles')
-          .update(updateData)
-          .eq('id', userId)
-          .select()
-          .single();
+        result = await updateProfile(userId, updateData);
       } else {
-        // Insert new profile
-        console.log("Creating new profile");
-        result = await supabase
-          .from('profiles')
-          .insert(updateData)
-          .select()
-          .single();
+        result = await insertProfile(updateData);
       }
 
       const { data, error } = result;
@@ -199,25 +131,6 @@ export const useProfileSubmission = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  // Helper function to map form field names to database field names
-  const getDbFieldName = (field: string): string => {
-    const fieldMap: Record<string, string> = {
-      gender: 'gender',
-      location: 'location',
-      education: 'education_level',
-      occupation: 'occupation',
-      religiousLevel: 'religious_practice_level',
-      prayerFrequency: 'prayer_frequency',
-      polygamyStance: 'polygamy_stance',
-      aboutMe: 'about_me',
-      waliName: 'wali_name',
-      waliRelationship: 'wali_relationship',
-      waliContact: 'wali_contact',
-      madhab: 'madhab'
-    };
-    return fieldMap[field] || field;
   };
 
   return {
