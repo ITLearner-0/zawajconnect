@@ -78,88 +78,40 @@ export const useProfileSubmission = () => {
       // Add fields only if they have valid values with proper type checking
       if (birthDate) updateData.birth_date = birthDate;
       
-      const gender = profileData.gender;
-      if (gender && typeof gender === 'string' && gender.trim()) {
-        updateData.gender = gender.trim();
-      }
-      
-      const location = profileData.location;
-      if (location && typeof location === 'string' && location.trim()) {
-        updateData.location = location.trim();
-      }
-      
-      const education = profileData.education;
-      if (education && typeof education === 'string' && education.trim()) {
-        updateData.education_level = education.trim();
-      }
-      
-      const occupation = profileData.occupation;
-      if (occupation && typeof occupation === 'string' && occupation.trim()) {
-        updateData.occupation = occupation.trim();
-      }
-      
-      const religiousLevel = profileData.religiousLevel;
-      if (religiousLevel && typeof religiousLevel === 'string' && religiousLevel.trim()) {
-        updateData.religious_practice_level = religiousLevel.trim();
-      }
-      
-      const prayerFrequency = profileData.prayerFrequency;
-      if (prayerFrequency && typeof prayerFrequency === 'string' && prayerFrequency.trim()) {
-        updateData.prayer_frequency = prayerFrequency.trim();
-      }
-      
-      const polygamyStance = profileData.polygamyStance;
-      if (polygamyStance && typeof polygamyStance === 'string' && polygamyStance.trim()) {
-        updateData.polygamy_stance = polygamyStance.trim();
-      }
-      
-      const aboutMe = profileData.aboutMe;
-      if (aboutMe && typeof aboutMe === 'string' && aboutMe.trim()) {
-        updateData.about_me = aboutMe.trim();
-      }
-      
-      const waliName = profileData.waliName;
-      if (waliName && typeof waliName === 'string' && waliName.trim()) {
-        updateData.wali_name = waliName.trim();
-      }
-      
-      const waliRelationship = profileData.waliRelationship;
-      if (waliRelationship && typeof waliRelationship === 'string' && waliRelationship.trim()) {
-        updateData.wali_relationship = waliRelationship.trim();
-      }
-      
-      const waliContact = profileData.waliContact;
-      if (waliContact && typeof waliContact === 'string' && waliContact.trim()) {
-        updateData.wali_contact = waliContact.trim();
-      }
-      
-      const madhab = profileData.madhab;
-      if (madhab && typeof madhab === 'string' && madhab.trim()) {
-        updateData.madhab = madhab.trim();
-      }
-      
-      // Handle arrays properly with proper type checking
-      const languages = profileData.languages;
-      if (languages) {
-        if (typeof languages === 'string') {
-          const languagesStr = languages as string;
-          if (languagesStr.trim()) {
-            updateData.languages = languagesStr.split(',').map(lang => lang.trim()).filter(lang => lang.length > 0);
-          }
-        } else if (Array.isArray(languages)) {
-          updateData.languages = languages.filter(lang => lang && typeof lang === 'string' && lang.trim().length > 0);
+      // Handle string fields with explicit type checking
+      const stringFields = [
+        'gender', 'location', 'education', 'occupation', 'religiousLevel', 
+        'prayerFrequency', 'polygamyStance', 'aboutMe', 'waliName', 
+        'waliRelationship', 'waliContact', 'madhab'
+      ] as const;
+
+      stringFields.forEach(field => {
+        const value = profileData[field as keyof ProfileFormData];
+        if (value && typeof value === 'string' && value.trim()) {
+          const dbField = getDbFieldName(field);
+          updateData[dbField] = value.trim();
+        }
+      });
+
+      // Handle arrays properly with explicit type checking
+      const languagesValue = profileData.languages;
+      if (languagesValue) {
+        if (typeof languagesValue === 'string' && languagesValue.trim()) {
+          updateData.languages = languagesValue.split(',').map(lang => lang.trim()).filter(lang => lang.length > 0);
+        } else if (Array.isArray(languagesValue)) {
+          updateData.languages = languagesValue.filter(lang => lang && typeof lang === 'string' && lang.trim().length > 0);
         }
       }
 
       // Handle profile picture and gallery
-      const profilePicture = profileData.profilePicture;
-      if (profilePicture && typeof profilePicture === 'string') {
-        updateData.profile_picture = profilePicture;
+      const profilePictureValue = profileData.profilePicture;
+      if (profilePictureValue && typeof profilePictureValue === 'string') {
+        updateData.profile_picture = profilePictureValue;
       }
       
-      const gallery = profileData.gallery;
-      if (gallery && Array.isArray(gallery)) {
-        updateData.gallery = gallery.filter(url => url && typeof url === 'string' && url.trim().length > 0);
+      const galleryValue = profileData.gallery;
+      if (galleryValue && Array.isArray(galleryValue)) {
+        updateData.gallery = galleryValue.filter(url => url && typeof url === 'string' && url.trim().length > 0);
       }
 
       console.log("Final update data:", updateData);
@@ -236,6 +188,25 @@ export const useProfileSubmission = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Helper function to map form field names to database field names
+  const getDbFieldName = (field: string): string => {
+    const fieldMap: Record<string, string> = {
+      gender: 'gender',
+      location: 'location',
+      education: 'education_level',
+      occupation: 'occupation',
+      religiousLevel: 'religious_practice_level',
+      prayerFrequency: 'prayer_frequency',
+      polygamyStance: 'polygamy_stance',
+      aboutMe: 'about_me',
+      waliName: 'wali_name',
+      waliRelationship: 'wali_relationship',
+      waliContact: 'wali_contact',
+      madhab: 'madhab'
+    };
+    return fieldMap[field] || field;
   };
 
   return {
