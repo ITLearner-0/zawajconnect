@@ -99,10 +99,12 @@ export const useProfileSubmission = () => {
         if (typeof languagesValue === 'string') {
           const trimmedLanguages = languagesValue.trim();
           if (trimmedLanguages) {
-            updateData.languages = trimmedLanguages.split(',').map(lang => lang.trim()).filter(lang => lang.length > 0);
+            updateData.languages = trimmedLanguages.split(',').map((lang: string) => lang.trim()).filter((lang: string) => lang.length > 0);
           }
         } else if (Array.isArray(languagesValue)) {
-          updateData.languages = languagesValue.filter(lang => lang && typeof lang === 'string' && lang.trim().length > 0);
+          updateData.languages = languagesValue.filter((lang: unknown): lang is string => {
+            return lang != null && typeof lang === 'string' && lang.trim().length > 0;
+          });
         }
       }
 
@@ -114,7 +116,9 @@ export const useProfileSubmission = () => {
       
       const galleryValue = profileData.gallery;
       if (galleryValue && Array.isArray(galleryValue)) {
-        updateData.gallery = galleryValue.filter(url => url && typeof url === 'string' && url.trim().length > 0);
+        updateData.gallery = galleryValue.filter((url: unknown): url is string => {
+          return url != null && typeof url === 'string' && url.trim().length > 0;
+        });
       }
 
       console.log("Final update data:", updateData);
