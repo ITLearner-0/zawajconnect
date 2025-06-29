@@ -39,23 +39,44 @@ export const useProfileSubmission = () => {
     try {
       console.log("=== PROCESSING DATA ===");
       
-      // Process name and birth date
-      const { firstName, lastName } = processFullName(profileData.fullName);
-      const birthDate = processBirthDate(profileData.age);
+      // Process name and birth date with better error handling
+      let firstName = '', lastName = '', birthDate = null;
       
-      console.log("Processed name:", { firstName, lastName });
-      console.log("Processed birth date:", birthDate);
+      try {
+        const nameResult = processFullName(profileData.fullName);
+        firstName = nameResult.firstName;
+        lastName = nameResult.lastName;
+        console.log("Processed name:", { firstName, lastName });
+      } catch (nameError) {
+        console.error("Error processing name:", nameError);
+        // Continue with empty names rather than failing
+      }
 
-      // Prepare base update data
-      const updateData = mapProfileDataToDatabase(
-        userId,
-        profileData,
-        firstName,
-        lastName,
-        birthDate
-      );
+      try {
+        birthDate = processBirthDate(profileData.age);
+        console.log("Processed birth date:", birthDate);
+      } catch (dateError) {
+        console.error("Error processing birth date:", dateError);
+        // Continue with null birth date
+      }
 
-      // Add privacy settings
+      // Prepare base update data with safer processing
+      let updateData;
+      try {
+        updateData = mapProfileDataToDatabase(
+          userId,
+          profileData,
+          firstName,
+          lastName,
+          birthDate
+        );
+        console.log("Base update data created successfully");
+      } catch (mappingError) {
+        console.error("Error mapping profile data:", mappingError);
+        throw new Error(`Erreur lors du mapping des données: ${mappingError instanceof Error ? mappingError.message : 'Erreur inconnue'}`);
+      }
+
+      // Add privacy settings with fallback
       updateData.privacy_settings = privacySettings || {
         profileVisibilityLevel: 1,
         showAge: true,
@@ -64,24 +85,40 @@ export const useProfileSubmission = () => {
         allowNonMatchMessages: true
       };
 
-      // Process and add languages
-      const processedLanguages = processLanguages(profileData.languages);
-      if (processedLanguages.length > 0) {
-        updateData.languages = processedLanguages;
+      // Process languages with better error handling
+      try {
+        const processedLanguages = processLanguages(profileData.languages);
+        if (processedLanguages && processedLanguages.length > 0) {
+          updateData.languages = processedLanguages;
+          console.log("Languages processed:", processedLanguages);
+        }
+      } catch (langError) {
+        console.error("Error processing languages (continuing without):", langError);
+        // Continue without languages rather than failing
       }
 
-      // Handle profile picture
-      if (profileData.profilePicture && typeof profileData.profilePicture === 'string') {
-        const trimmedPicture = profileData.profilePicture.trim();
-        if (trimmedPicture) {
-          updateData.profile_picture = trimmedPicture;
+      // Handle profile picture safely
+      try {
+        if (profileData.profilePicture && typeof profileData.profilePicture === 'string') {
+          const trimmedPicture = profileData.profilePicture.trim();
+          if (trimmedPicture) {
+            updateData.profile_picture = trimmedPicture;
+            console.log("Profile picture added");
+          }
         }
+      } catch (picError) {
+        console.error("Error processing profile picture (continuing without):", picError);
       }
       
-      // Handle gallery
-      const processedGallery = processGallery(profileData.gallery);
-      if (processedGallery.length > 0) {
-        updateData.gallery = processedGallery;
+      // Handle gallery safely
+      try {
+        const processedGallery = processGallery(profileData.gallery);
+        if (processedGallery && processedGallery.length > 0) {
+          updateData.gallery = processedGallery;
+          console.log("Gallery processed:", processedGallery.length, "items");
+        }
+      } catch (galleryError) {
+        console.error("Error processing gallery (continuing without):", galleryError);
       }
 
       console.log("=== FINAL UPDATE DATA ===");
@@ -89,24 +126,40 @@ export const useProfileSubmission = () => {
       
       console.log("=== DATABASE OPERATIONS ===");
       
-      // Check if profile exists and perform appropriate operation
-      const existingProfile = await checkProfileExists(userId);
+      // Check if profile exists with better error handling
+      let existingProfile;
+      try {
+        existingProfile = await checkProfileExists(userId);
+        console.log("Profile existence check completed:", !!existingProfile);
+      } catch (checkError) {
+        console.error("Error checking profile existence:", checkError);
+        // Try to continue by assuming it's a new profile
+        existingProfile = null;
+      }
       
       let result;
-      if (existingProfile) {
-        result = await updateProfile(userId, updateData);
-      } else {
-        result = await insertProfile(updateData);
+      try {
+        if (existingProfile) {
+          console.log("Updating existing profile...");
+          result = await updateProfile(userId, updateData);
+        } else {
+          console.log("Creating new profile...");
+          result = await insertProfile(updateData);
+        }
+      } catch (dbError) {
+        console.error("Database operation failed:", dbError);
+        throw new Error(`Erreur lors de l'opération base de données: ${dbError instanceof Error ? dbError.message : 'Erreur inconnue'}`);
       }
 
       const { data, error: dbError } = result;
 
       if (dbError) {
-        console.error("Database error:", dbError);
-        throw new Error(`Erreur de base de données: ${dbError.message}`);
+        console.error("Database returned error:", dbError);
+        throw new Error(`Erreur de base de données: ${dbError.message || 'Erreur inconnue'}`);
       }
 
       if (!data) {
+        console.error("No data returned from database operation");
         throw new Error("Aucune donnée retournée après la sauvegarde");
       }
 
@@ -125,13 +178,28 @@ export const useProfileSubmission = () => {
       });
       
       return true;
+
     } catch (err: any) {
       console.error("=== ERROR IN SUBMIT PROFILE ===");
       console.error("Error object:", err);
       console.error("Error message:", err?.message);
       console.error("Error stack:", err?.stack);
       
-      const errorMessage = err?.message || "Une erreur inattendue s'est produite lors de la sauvegarde";
+      // More specific error messages
+      let errorMessage = "Une erreur inattendue s'est produite lors de la sauvegarde";
+      
+      if (err?.message) {
+        if (err.message.includes('JWT')) {
+          errorMessage = "Session expirée. Veuillez vous reconnecter.";
+        } else if (err.message.includes('network') || err.message.includes('fetch')) {
+          errorMessage = "Problème de connexion. Vérifiez votre connexion internet.";
+        } else if (err.message.includes('validation') || err.message.includes('required')) {
+          errorMessage = "Données du profil invalides. Vérifiez les champs obligatoires.";
+        } else {
+          errorMessage = err.message;
+        }
+      }
+      
       setError(errorMessage);
       
       toast({
