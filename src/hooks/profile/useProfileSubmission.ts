@@ -99,7 +99,11 @@ export const useProfileSubmission = () => {
         if (typeof languagesValue === 'string') {
           const trimmedLanguages = languagesValue.trim();
           if (trimmedLanguages) {
-            updateData.languages = trimmedLanguages.split(',').map((lang: string) => lang.trim()).filter((lang: string) => lang.length > 0);
+            // Add explicit type assertion for split result
+            const languageArray: string[] = trimmedLanguages.split(',');
+            updateData.languages = languageArray
+              .map((lang: string) => lang.trim())
+              .filter((lang: string) => lang.length > 0);
           }
         } else if (Array.isArray(languagesValue)) {
           updateData.languages = languagesValue.filter((lang: unknown): lang is string => {
