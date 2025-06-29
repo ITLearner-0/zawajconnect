@@ -29,21 +29,39 @@ export const processBirthDate = (age: string | undefined) => {
   return birthDate;
 };
 
-export const processLanguages = (languages: string | string[] | undefined) => {
+export const processLanguages = (languages: string | string[] | undefined): string[] | undefined => {
   if (!languages) return undefined;
   
   if (typeof languages === 'string') {
     const trimmed = languages.trim();
     if (trimmed) {
-      return trimmed.split(',')
-        .map((lang: string) => lang.trim())
-        .filter((lang: string) => lang.length > 0);
+      const languageList = trimmed.split(',');
+      const processedLanguages: string[] = [];
+      
+      for (const lang of languageList) {
+        if (typeof lang === 'string') {
+          const trimmedLang = lang.trim();
+          if (trimmedLang.length > 0) {
+            processedLanguages.push(trimmedLang);
+          }
+        }
+      }
+      
+      return processedLanguages.length > 0 ? processedLanguages : undefined;
     }
   } else if (Array.isArray(languages)) {
-    return languages
-      .filter((lang): lang is string => typeof lang === 'string' && lang != null)
-      .map((lang: string) => lang.trim())
-      .filter((lang: string) => lang.length > 0);
+    const processedLanguages: string[] = [];
+    
+    for (const lang of languages) {
+      if (typeof lang === 'string' && lang != null) {
+        const trimmedLang = lang.trim();
+        if (trimmedLang.length > 0) {
+          processedLanguages.push(trimmedLang);
+        }
+      }
+    }
+    
+    return processedLanguages.length > 0 ? processedLanguages : undefined;
   }
   
   return undefined;
