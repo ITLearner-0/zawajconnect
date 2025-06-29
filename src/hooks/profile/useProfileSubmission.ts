@@ -48,10 +48,10 @@ export const useProfileSubmission = () => {
       const ageValue = profileData.age;
       if (ageValue && typeof ageValue === 'string' && ageValue.trim() !== '') {
         const trimmedAge = ageValue.trim();
-        if (trimmedAge.includes('-')) {
+        if (typeof trimmedAge === 'string' && trimmedAge.includes('-')) {
           // If age is already a date format, use it directly
           birthDate = trimmedAge;
-        } else if (!isNaN(Number(trimmedAge))) {
+        } else if (typeof trimmedAge === 'string' && !isNaN(Number(trimmedAge))) {
           // If age is a number, convert to a birth year
           const currentYear = new Date().getFullYear();
           const birthYear = currentYear - parseInt(trimmedAge, 10);
@@ -138,10 +138,10 @@ export const useProfileSubmission = () => {
         updateData.madhab = madhab.trim();
       }
       
-      // Handle arrays properly
+      // Handle arrays properly with proper type checking
       const languages = profileData.languages;
       if (languages) {
-        if (typeof languages === 'string') {
+        if (typeof languages === 'string' && languages.trim()) {
           updateData.languages = languages.split(',').map(lang => lang.trim()).filter(lang => lang.length > 0);
         } else if (Array.isArray(languages)) {
           updateData.languages = languages.filter(lang => lang && typeof lang === 'string' && lang.trim().length > 0);
