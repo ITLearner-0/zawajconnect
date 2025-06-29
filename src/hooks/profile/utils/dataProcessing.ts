@@ -36,13 +36,14 @@ export const processLanguages = (languages: string | string[] | undefined) => {
     const trimmed = languages.trim();
     if (trimmed) {
       return trimmed.split(',')
-        .map(lang => lang.trim())
-        .filter(lang => lang.length > 0);
+        .map((lang: string) => lang.trim())
+        .filter((lang: string) => lang.length > 0);
     }
   } else if (Array.isArray(languages)) {
-    return languages.filter((lang): lang is string => {
-      return lang != null && typeof lang === 'string' && lang.trim().length > 0;
-    });
+    return languages
+      .filter((lang): lang is string => typeof lang === 'string' && lang != null)
+      .map((lang: string) => lang.trim())
+      .filter((lang: string) => lang.length > 0);
   }
   
   return undefined;
