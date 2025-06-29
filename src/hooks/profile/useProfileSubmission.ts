@@ -141,8 +141,11 @@ export const useProfileSubmission = () => {
       // Handle arrays properly with proper type checking
       const languages = profileData.languages;
       if (languages) {
-        if (typeof languages === 'string' && languages.trim()) {
-          updateData.languages = languages.split(',').map(lang => lang.trim()).filter(lang => lang.length > 0);
+        if (typeof languages === 'string') {
+          const languagesStr = languages as string;
+          if (languagesStr.trim()) {
+            updateData.languages = languagesStr.split(',').map(lang => lang.trim()).filter(lang => lang.length > 0);
+          }
         } else if (Array.isArray(languages)) {
           updateData.languages = languages.filter(lang => lang && typeof lang === 'string' && lang.trim().length > 0);
         }
