@@ -46,14 +46,15 @@ export const useProfileSubmission = () => {
       // Handle birth date conversion - only process if age is provided and valid
       let birthDate = null;
       const ageValue = profileData.age;
-      if (ageValue && ageValue.trim() !== '') {
-        if (ageValue.includes('-')) {
+      if (ageValue && typeof ageValue === 'string' && ageValue.trim() !== '') {
+        const trimmedAge = ageValue.trim();
+        if (trimmedAge.includes('-')) {
           // If age is already a date format, use it directly
-          birthDate = ageValue;
-        } else if (!isNaN(Number(ageValue))) {
+          birthDate = trimmedAge;
+        } else if (!isNaN(Number(trimmedAge))) {
           // If age is a number, convert to a birth year
           const currentYear = new Date().getFullYear();
-          const birthYear = currentYear - parseInt(ageValue, 10);
+          const birthYear = currentYear - parseInt(trimmedAge, 10);
           birthDate = `${birthYear}-01-01`;
         }
       }
