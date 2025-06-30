@@ -20,7 +20,6 @@ export const useProfileSubmission = () => {
     console.log("=== PROFILE SUBMISSION STARTED ===");
     console.log("User ID:", userId);
     console.log("Profile data:", JSON.stringify(profileData, null, 2));
-    console.log("Privacy settings:", JSON.stringify(privacySettings, null, 2));
 
     if (!userId) {
       const errorMsg = "Identifiant utilisateur manquant. Veuillez vous reconnecter.";
@@ -39,136 +38,80 @@ export const useProfileSubmission = () => {
     try {
       console.log("=== PROCESSING DATA ===");
       
-      // Process name and birth date with better error handling
-      let firstName = '', lastName = '', birthDate = null;
+      // Process name and birth date
+      const nameResult = processFullName(profileData.fullName);
+      const birthDate = processBirthDate(profileData.age);
       
-      try {
-        const nameResult = processFullName(profileData.fullName);
-        firstName = nameResult.firstName;
-        lastName = nameResult.lastName;
-        console.log("Processed name:", { firstName, lastName });
-      } catch (nameError) {
-        console.error("Error processing name:", nameError);
-        // Continue with empty names rather than failing
-      }
+      console.log("Processed name:", nameResult);
+      console.log("Processed birth date:", birthDate);
 
-      try {
-        birthDate = processBirthDate(profileData.age);
-        console.log("Processed birth date:", birthDate);
-      } catch (dateError) {
-        console.error("Error processing birth date:", dateError);
-        // Continue with null birth date
-      }
+      // Prepare base update data
+      const updateData = mapProfileDataToDatabase(
+        userId,
+        profileData,
+        nameResult.firstName,
+        nameResult.lastName,
+        birthDate
+      );
 
-      // Prepare base update data with safer processing
-      let updateData;
-      try {
-        updateData = mapProfileDataToDatabase(
-          userId,
-          profileData,
-          firstName,
-          lastName,
-          birthDate
-        );
-        console.log("Base update data created successfully");
-      } catch (mappingError) {
-        console.error("Error mapping profile data:", mappingError);
-        throw new Error(`Erreur lors du mapping des données: ${mappingError instanceof Error ? mappingError.message : 'Erreur inconnue'}`);
-      }
+      // Add privacy settings
+      updateData.privacy_settings = privacySettings;
 
-      // Add privacy settings with fallback
-      updateData.privacy_settings = privacySettings || {
-        profileVisibilityLevel: 1,
-        showAge: true,
-        showLocation: true,
-        showOccupation: true,
-        allowNonMatchMessages: true
-      };
-
-      // Process languages with better error handling
-      try {
+      // Process languages if provided
+      if (profileData.languages) {
         const processedLanguages = processLanguages(profileData.languages);
-        if (processedLanguages && processedLanguages.length > 0) {
+        if (processedLanguages.length > 0) {
           updateData.languages = processedLanguages;
           console.log("Languages processed:", processedLanguages);
         }
-      } catch (langError) {
-        console.error("Error processing languages (continuing without):", langError);
-        // Continue without languages rather than failing
       }
 
-      // Handle profile picture safely
-      try {
-        if (profileData.profilePicture && typeof profileData.profilePicture === 'string') {
-          const trimmedPicture = profileData.profilePicture.trim();
-          if (trimmedPicture) {
-            updateData.profile_picture = trimmedPicture;
-            console.log("Profile picture added");
-          }
+      // Handle profile picture
+      if (profileData.profilePicture && typeof profileData.profilePicture === 'string') {
+        const trimmedPicture = profileData.profilePicture.trim();
+        if (trimmedPicture) {
+          updateData.profile_picture = trimmedPicture;
         }
-      } catch (picError) {
-        console.error("Error processing profile picture (continuing without):", picError);
       }
       
-      // Handle gallery safely
-      try {
-        const processedGallery = processGallery(profileData.gallery);
-        if (processedGallery && processedGallery.length > 0) {
-          updateData.gallery = processedGallery;
-          console.log("Gallery processed:", processedGallery.length, "items");
-        }
-      } catch (galleryError) {
-        console.error("Error processing gallery (continuing without):", galleryError);
+      // Handle gallery
+      const processedGallery = processGallery(profileData.gallery);
+      if (processedGallery.length > 0) {
+        updateData.gallery = processedGallery;
       }
 
       console.log("=== FINAL UPDATE DATA ===");
       console.log(JSON.stringify(updateData, null, 2));
       
-      console.log("=== DATABASE OPERATIONS ===");
-      
-      // Check if profile exists with better error handling
-      let existingProfile;
-      try {
-        existingProfile = await checkProfileExists(userId);
-        console.log("Profile existence check completed:", !!existingProfile);
-      } catch (checkError) {
-        console.error("Error checking profile existence:", checkError);
-        // Try to continue by assuming it's a new profile
-        existingProfile = null;
-      }
+      // Check if profile exists
+      const existingProfile = await checkProfileExists(userId);
+      console.log("Profile exists:", !!existingProfile);
       
       let result;
-      try {
-        if (existingProfile) {
-          console.log("Updating existing profile...");
-          result = await updateProfile(userId, updateData);
-        } else {
-          console.log("Creating new profile...");
-          result = await insertProfile(updateData);
-        }
-      } catch (dbError) {
-        console.error("Database operation failed:", dbError);
-        throw new Error(`Erreur lors de l'opération base de données: ${dbError instanceof Error ? dbError.message : 'Erreur inconnue'}`);
+      if (existingProfile) {
+        console.log("Updating existing profile...");
+        result = await updateProfile(userId, updateData);
+      } else {
+        console.log("Creating new profile...");
+        result = await insertProfile(updateData);
       }
 
       const { data, error: dbError } = result;
 
       if (dbError) {
-        console.error("Database returned error:", dbError);
-        throw new Error(`Erreur de base de données: ${dbError.message || 'Erreur inconnue'}`);
+        console.error("Database error:", dbError);
+        throw new Error(`Erreur de base de données: ${dbError.message}`);
       }
 
       if (!data) {
-        console.error("No data returned from database operation");
+        console.error("No data returned from database");
         throw new Error("Aucune donnée retournée après la sauvegarde");
       }
 
       console.log("=== PROFILE SAVED SUCCESSFULLY ===");
       console.log("Saved data:", JSON.stringify(data, null, 2));
 
-      // Call the success callback with the original profile data to maintain form state
       if (onSuccess) {
-        console.log("Calling onSuccess callback");
         onSuccess(profileData);
       }
 
@@ -181,20 +124,15 @@ export const useProfileSubmission = () => {
 
     } catch (err: any) {
       console.error("=== ERROR IN SUBMIT PROFILE ===");
-      console.error("Error object:", err);
-      console.error("Error message:", err?.message);
-      console.error("Error stack:", err?.stack);
+      console.error("Error:", err);
       
-      // More specific error messages
-      let errorMessage = "Une erreur inattendue s'est produite lors de la sauvegarde";
+      let errorMessage = "Une erreur s'est produite lors de la sauvegarde";
       
       if (err?.message) {
-        if (err.message.includes('JWT')) {
+        if (err.message.includes('JWT') || err.message.includes('session')) {
           errorMessage = "Session expirée. Veuillez vous reconnecter.";
         } else if (err.message.includes('network') || err.message.includes('fetch')) {
           errorMessage = "Problème de connexion. Vérifiez votre connexion internet.";
-        } else if (err.message.includes('validation') || err.message.includes('required')) {
-          errorMessage = "Données du profil invalides. Vérifiez les champs obligatoires.";
         } else {
           errorMessage = err.message;
         }
