@@ -1,4 +1,3 @@
-
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
@@ -88,14 +87,16 @@ const ProfilePage = () => {
   };
 
   // Enhanced save handler with navigation
-  const handleEnhancedSaveProfile = async () => {
+  const handleEnhancedSaveProfile = async (): Promise<boolean> => {
     const result = await handleSaveProfile();
     if (result && result.success && result.shouldNavigateToCompatibility) {
       // Navigate to compatibility test if needed
       setTimeout(() => {
         navigate("/compatibility");
       }, 2000);
+      return true;
     }
+    return result ? result.success : false;
   };
 
   // Show loading state if data is not ready
