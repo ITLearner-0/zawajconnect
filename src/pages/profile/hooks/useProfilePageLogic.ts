@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useProfile } from "@/hooks/useProfile";
@@ -9,7 +8,6 @@ import { useProfileRecommendations } from "@/hooks/profile/useProfileRecommendat
 import { ProfileFormData, VerificationStatus, PrivacySettings } from "@/types/profile";
 
 export const useProfilePageLogic = () => {
-  const navigate = useNavigate();
   const { toast } = useToast();
   const [hasCompatibilityResults, setHasCompatibilityResults] = useState<boolean | null>(null);
   
@@ -90,7 +88,7 @@ export const useProfilePageLogic = () => {
     checkCompatibilityResults();
   }, [userId]);
 
-  // Wrapper function to handle the save process and redirect
+  // Wrapper function to handle the save process
   const handleSaveProfile = async () => {
     console.log("Save profile button clicked");
     console.log("User ID:", userId);
@@ -109,28 +107,22 @@ export const useProfilePageLogic = () => {
           description: "Votre profil a été sauvegardé avec succès.",
         });
         
-        // Check if user has taken compatibility test for navigation
-        if (hasCompatibilityResults === false) {
-          // Small delay to let the user see the success message
-          setTimeout(() => {
-            console.log("Redirecting to compatibility test");
-            navigate("/compatibility");
-          }, 2000);
-        } else if (hasCompatibilityResults === true) {
-          // If user has already taken the test, they can access nearby matches
-          setTimeout(() => {
-            console.log("User can now access nearby matches");
-            // Don't automatically redirect, let user navigate manually
-          }, 2000);
-        }
+        // Return navigation suggestion instead of navigating directly
+        return {
+          success: true,
+          shouldNavigateToCompatibility: hasCompatibilityResults === false,
+          message: hasCompatibilityResults === false ? 
+            "Vous pouvez maintenant passer au test de compatibilité." : 
+            "Profil sauvegardé avec succès."
+        };
       } else {
         toast({
           title: "Erreur",
           description: "Impossible de sauvegarder le profil. Veuillez réessayer.",
           variant: "destructive",
         });
+        return { success: false };
       }
-      return success;
     } catch (error) {
       console.error("Error saving profile:", error);
       toast({
@@ -138,7 +130,7 @@ export const useProfilePageLogic = () => {
         description: "Une erreur inattendue s'est produite. Veuillez réessayer.",
         variant: "destructive",
       });
-      return false;
+      return { success: false };
     }
   };
 

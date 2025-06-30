@@ -2,6 +2,7 @@
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
+import { useNavigate } from "react-router-dom";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileOnboarding from "@/components/profile/ProfileOnboarding";
@@ -12,6 +13,8 @@ import StandardLoadingState from "@/components/ui/StandardLoadingState";
 import { useProfilePageLogic } from "./hooks/useProfilePageLogic";
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
+  
   const {
     // Profile data
     formData,
@@ -84,6 +87,17 @@ const ProfilePage = () => {
     handleChange(e);
   };
 
+  // Enhanced save handler with navigation
+  const handleEnhancedSaveProfile = async () => {
+    const result = await handleSaveProfile();
+    if (result && result.success && result.shouldNavigateToCompatibility) {
+      // Navigate to compatibility test if needed
+      setTimeout(() => {
+        navigate("/compatibility");
+      }, 2000);
+    }
+  };
+
   // Show loading state if data is not ready
   if (!formData) {
     return <StandardLoadingState loading={true} loadingText="Chargement du profil..." />;
@@ -134,7 +148,7 @@ const ProfilePage = () => {
                   <ProfileForm
                     formData={formData}
                     handleChange={handleProfileFormChange}
-                    handleSubmit={handleSaveProfile}
+                    handleSubmit={handleEnhancedSaveProfile}
                     verificationStatus={verificationStatus}
                     userEmail={userEmail}
                     handleVerificationChange={handleVerificationChange}
