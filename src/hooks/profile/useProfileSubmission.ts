@@ -32,6 +32,40 @@ export const useProfileSubmission = () => {
       return false;
     }
 
+    // Validate essential fields
+    if (!profileData.fullName || !profileData.fullName.trim()) {
+      const errorMsg = "Le nom complet est requis pour sauvegarder le profil.";
+      console.error("ERROR:", errorMsg);
+      toast({
+        title: "Erreur de Validation",
+        description: errorMsg,
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (!profileData.age || !profileData.age.trim()) {
+      const errorMsg = "L'âge est requis pour sauvegarder le profil.";
+      console.error("ERROR:", errorMsg);
+      toast({
+        title: "Erreur de Validation",
+        description: errorMsg,
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    if (!profileData.gender || !profileData.gender.trim()) {
+      const errorMsg = "Le genre est requis pour sauvegarder le profil.";
+      console.error("ERROR:", errorMsg);
+      toast({
+        title: "Erreur de Validation",
+        description: errorMsg,
+        variant: "destructive",
+      });
+      return false;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -133,6 +167,8 @@ export const useProfileSubmission = () => {
           errorMessage = "Session expirée. Veuillez vous reconnecter.";
         } else if (err.message.includes('network') || err.message.includes('fetch')) {
           errorMessage = "Problème de connexion. Vérifiez votre connexion internet.";
+        } else if (err.message.includes('validation')) {
+          errorMessage = "Certains champs ne sont pas valides. Veuillez vérifier vos données.";
         } else {
           errorMessage = err.message;
         }

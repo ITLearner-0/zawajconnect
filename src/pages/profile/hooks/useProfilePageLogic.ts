@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -90,14 +91,36 @@ export const useProfilePageLogic = () => {
 
   // Wrapper function to handle the save process
   const handleSaveProfile = async () => {
+    console.log("=== PROFILE SAVE PROCESS STARTED ===");
     console.log("Save profile button clicked");
     console.log("User ID:", userId);
     console.log("Has compatibility results:", hasCompatibilityResults);
     console.log("Form data:", formData);
     
+    if (!userId) {
+      console.error("No user ID available for profile save");
+      toast({
+        title: "Erreur",
+        description: "Identifiant utilisateur manquant. Veuillez vous reconnecter.",
+        variant: "destructive",
+      });
+      return { success: false };
+    }
+
+    if (!formData) {
+      console.error("No form data available for profile save");
+      toast({
+        title: "Erreur",
+        description: "Données de profil manquantes. Veuillez rafraîchir la page.",
+        variant: "destructive",
+      });
+      return { success: false };
+    }
+    
     try {
+      console.log("Calling handleSubmit with form data:", formData);
       const success = await handleSubmit();
-      console.log("Profile save result:", success);
+      console.log("handleSubmit returned:", success);
       
       if (success) {
         console.log("Profile saved successfully");
@@ -116,6 +139,7 @@ export const useProfilePageLogic = () => {
             "Profil sauvegardé avec succès."
         };
       } else {
+        console.error("handleSubmit returned false - profile save failed");
         toast({
           title: "Erreur",
           description: "Impossible de sauvegarder le profil. Veuillez réessayer.",
@@ -124,13 +148,32 @@ export const useProfilePageLogic = () => {
         return { success: false };
       }
     } catch (error) {
+      console.error("=== ERROR IN PROFILE SAVE PROCESS ===");
       console.error("Error saving profile:", error);
+      
+      let errorMessage = "Une erreur inattendue s'est produite lors de la sauvegarde.";
+      
+      if (error instanceof Error) {
+        if (error.message.includes('JWT') || error.message.includes('session')) {
+          errorMessage = "Session expirée. Veuillez vous reconnecter.";
+        } else if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = "Problème de connexion. Vérifiez votre connexion internet.";
+        } else if (error.message.includes('validation')) {
+          errorMessage = "Certains champs du profil ne sont pas valides. Veuillez vérifier vos données.";
+        } else {
+          errorMessage = `Erreur: ${error.message}`;
+        }
+      }
+      
       toast({
-        title: "Erreur",
-        description: "Une erreur inattendue s'est produite. Veuillez réessayer.",
+        title: "Erreur de Sauvegarde",
+        description: errorMessage,
         variant: "destructive",
       });
-      return { success: false };
+      
+      return { success: false, error: errorMessage };
+    } finally {
+      console.log("=== PROFILE SAVE PROCESS ENDED ===");
     }
   };
 
