@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { ProfileFormData, PrivacySettings } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
-import { processFullName, processBirthDate, processLanguages, processGallery } from './utils/dataProcessing';
+import { processFullName, processBirthDate, processGallery } from './utils/dataProcessing';
 import { mapProfileDataToDatabase } from './utils/fieldMapping';
 import { checkProfileExists, updateProfile, insertProfile } from './utils/databaseOperations';
 
@@ -90,15 +90,6 @@ export const useProfileSubmission = () => {
 
       // Add privacy settings
       updateData.privacy_settings = privacySettings;
-
-      // Process languages if provided
-      if (profileData.languages) {
-        const processedLanguages = processLanguages(profileData.languages);
-        if (processedLanguages.length > 0) {
-          updateData.languages = processedLanguages;
-          console.log("Languages processed:", processedLanguages);
-        }
-      }
 
       // Handle profile picture
       if (profileData.profilePicture && typeof profileData.profilePicture === 'string') {
