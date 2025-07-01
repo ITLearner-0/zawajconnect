@@ -8,7 +8,7 @@ import StandardLoadingState from "@/components/ui/StandardLoadingState";
 // Lazy load providers to improve initial load performance
 const ThemeProvider = React.lazy(() => import('../contexts/ThemeContext').then(module => ({ default: module.ThemeProvider })));
 const AccessibilityProvider = React.lazy(() => import('../contexts/AccessibilityContext').then(module => ({ default: module.AccessibilityProvider })));
-const AuthProvider = React.lazy(() => import('../contexts/AuthContext').then(module => ({ default: module.AuthProvider })));
+const AuthProvider = React.lazy(() => import('../contexts/AuthContext').then(module => ({ default: module.default })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
