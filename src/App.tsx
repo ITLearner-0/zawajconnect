@@ -16,7 +16,7 @@ import Subscription from "./pages/Subscription";
 import Auth from "./pages/Auth";
 import UserProfile from "./pages/UserProfile";
 import StandardLoadingState from "./components/ui/StandardLoadingState";
-import AppProvider from "./providers/AppProvider";
+import { AppProvider } from "./providers";
 import "./App.css";
 
 console.log("App component rendering");
