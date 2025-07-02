@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -9,8 +8,12 @@ import { useProfileRecommendations } from "@/hooks/profile/useProfileRecommendat
 import { ProfileFormData, VerificationStatus, PrivacySettings } from "@/types/profile";
 
 export const useProfilePageLogic = () => {
+  console.log("useProfilePageLogic: Hook started");
+  
   const { toast } = useToast();
   const [hasCompatibilityResults, setHasCompatibilityResults] = useState<boolean | null>(null);
+  
+  console.log("useProfilePageLogic: About to call useProfile");
   
   const { 
     formData, 
@@ -27,8 +30,17 @@ export const useProfilePageLogic = () => {
     handleSubmit, 
     handleSignOut,
     toggleAccountVisibility,
-    unblockUser
+    unblockUser,
+    loading,
+    error
   } = useProfile();
+
+  console.log("useProfilePageLogic: useProfile returned:", {
+    formData: !!formData,
+    userId,
+    loading,
+    error
+  });
 
   // Analytics and recommendations - use userId instead of userEmail
   const { analytics, loading: analyticsLoading } = useProfileAnalytics(userId);
@@ -197,6 +209,13 @@ export const useProfilePageLogic = () => {
     // Here you could also sync with backend if needed
   };
 
+  console.log("useProfilePageLogic: Returning final data:", {
+    formData: !!formData,
+    userId,
+    loading,
+    error
+  });
+
   return {
     // Profile data
     formData,
@@ -208,6 +227,8 @@ export const useProfilePageLogic = () => {
     blockedUsers,
     isAccountVisible,
     hasCompatibilityResults,
+    loading,
+    error,
     
     // Handlers - keep handleChange as is (React event handler)
     handleChange,

@@ -4,6 +4,8 @@ import { useProfileUpdater } from './useProfileUpdater';
 import { ProfileFormData } from '@/types/profile';
 
 export const useProfileData = (userId?: string | null) => {
+  console.log("useProfileData: Hook started with userId:", userId);
+  
   // Use the profile fetcher hook to get profile data
   const {
     profileData,
@@ -17,6 +19,13 @@ export const useProfileData = (userId?: string | null) => {
     isAccountVisible
   } = useProfileFetcher(userId);
 
+  console.log("useProfileData: useProfileFetcher returned:", {
+    profileData: !!profileData,
+    loading,
+    error,
+    isNewUser
+  });
+
   // Use the profile updater hook to update profile data
   const { 
     updateProfileData, 
@@ -24,7 +33,7 @@ export const useProfileData = (userId?: string | null) => {
     error: updateError 
   } = useProfileUpdater(userId);
 
-  return {
+  const finalData = {
     profileData,
     loading: loading || updateLoading,
     error: error || updateError,
@@ -38,4 +47,12 @@ export const useProfileData = (userId?: string | null) => {
     blockedUsers,
     isAccountVisible
   };
+
+  console.log("useProfileData: Returning final data:", {
+    profileData: !!finalData.profileData,
+    loading: finalData.loading,
+    error: finalData.error
+  });
+
+  return finalData;
 };

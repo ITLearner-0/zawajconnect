@@ -1,3 +1,4 @@
+
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
@@ -12,7 +13,11 @@ import StandardLoadingState from "@/components/ui/StandardLoadingState";
 import { useProfilePageLogic } from "./hooks/useProfilePageLogic";
 
 const ProfilePage = () => {
+  console.log("ProfilePage: Component rendering started");
+  
   const navigate = useNavigate();
+  
+  console.log("ProfilePage: About to call useProfilePageLogic");
   
   const {
     // Profile data
@@ -25,6 +30,8 @@ const ProfilePage = () => {
     blockedUsers,
     isAccountVisible,
     hasCompatibilityResults,
+    loading,
+    error,
     
     // Handlers
     handleChange,
@@ -55,6 +62,14 @@ const ProfilePage = () => {
     // Visibility settings
     visibilitySettings
   } = useProfilePageLogic();
+
+  console.log("ProfilePage: useProfilePageLogic returned:", {
+    formData: !!formData,
+    userId,
+    loading,
+    error,
+    isOnboarding
+  });
 
   // Create a wrapper that converts field-based changes to the expected format for onboarding
   const handleFieldChange = (field: keyof typeof formData, value: any) => {
@@ -100,11 +115,42 @@ const ProfilePage = () => {
   };
 
   // Show loading state if data is not ready
-  if (!formData) {
+  if (loading) {
+    console.log("ProfilePage: Showing loading state");
     return <StandardLoadingState loading={true} loadingText="Chargement du profil..." />;
   }
 
+  // Show error state if there's an error
+  if (error) {
+    console.log("ProfilePage: Showing error state:", error);
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 flex items-center justify-center">
+        <Card className="max-w-md mx-auto">
+          <CardContent className="p-6">
+            <h2 className="text-xl font-semibold text-red-600 mb-4">Erreur de chargement</h2>
+            <p className="text-gray-600 mb-4">{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="w-full bg-rose-500 text-white py-2 px-4 rounded hover:bg-rose-600"
+            >
+              Réessayer
+            </button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Show loading state if data is not ready
+  if (!formData) {
+    console.log("ProfilePage: No form data available, showing loading state");
+    return <StandardLoadingState loading={true} loadingText="Chargement des données..." />;
+  }
+
+  console.log("ProfilePage: About to render main content");
+
   if (isOnboarding) {
+    console.log("ProfilePage: Rendering onboarding");
     return (
       <AccessibilityProvider>
         <ProfileOnboarding
@@ -121,6 +167,8 @@ const ProfilePage = () => {
       </AccessibilityProvider>
     );
   }
+
+  console.log("ProfilePage: Rendering main profile page");
 
   return (
     <AccessibilityProvider>

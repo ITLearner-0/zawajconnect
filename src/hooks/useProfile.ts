@@ -7,20 +7,27 @@ import { supabase } from "@/integrations/supabase/client";
 export const useProfile = () => {
   const [userId, setUserId] = useState<string | null>(null);
   
+  console.log("useProfile: Hook started");
+  
   useEffect(() => {
+    console.log("useProfile: Getting user session");
     const getUserId = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        console.log("useProfile: Session retrieved", !!session?.user?.id);
         if (session?.user?.id) {
           setUserId(session.user.id);
+          console.log("useProfile: User ID set", session.user.id);
         }
       } catch (error) {
-        console.error("Error getting user session:", error);
+        console.error("useProfile: Error getting user session:", error);
       }
     };
     
     getUserId();
   }, []);
+  
+  console.log("useProfile: About to call useProfileData with userId:", userId);
   
   const { 
     profileData,
@@ -33,6 +40,14 @@ export const useProfile = () => {
     blockedUsers,
     isAccountVisible
   } = useProfileData(userId);
+
+  console.log("useProfile: useProfileData returned:", {
+    profileData: !!profileData,
+    loading,
+    error,
+    isNewUser,
+    userEmail
+  });
 
   const {
     formData,
@@ -49,6 +64,13 @@ export const useProfile = () => {
     initialPrivacySettings: privacySettings,
     initialBlockedUsers: blockedUsers,
     initialIsVisible: isAccountVisible,
+    userId
+  });
+
+  console.log("useProfile: Returning data:", {
+    formData: !!formData,
+    loading,
+    error,
     userId
   });
 
