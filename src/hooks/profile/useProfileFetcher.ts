@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
 import { fetchProfileFromDb, createNewProfile, getUserEmail } from './utils/profileDbUtils';
@@ -22,14 +23,15 @@ export const useProfileFetcher = (userId?: string | null) => {
   const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
   const [isAccountVisible, setIsAccountVisible] = useState(true);
   const { toast } = useToast();
+  
+  // Use ref to track if we've already fetched for this userId
+  const fetchedUserIdRef = useRef<string | null>(null);
 
   useEffect(() => {
+    // Skip if no userId or already fetched for this userId
+    if (!userId || fetchedUserIdRef.current === userId) return;
+    
     const fetchProfile = async () => {
-      if (!userId) {
-        setLoading(false);
-        return;
-      }
-
       // Critical security fix: Validate UUID before database query
       if (!validateUuid(userId)) {
         console.error("Invalid UUID provided for user profile fetch:", userId);
@@ -46,6 +48,7 @@ export const useProfileFetcher = (userId?: string | null) => {
       try {
         setLoading(true);
         setError(null);
+        fetchedUserIdRef.current = userId; // Mark as fetched
 
         console.log("Fetching profile for user:", userId);
 

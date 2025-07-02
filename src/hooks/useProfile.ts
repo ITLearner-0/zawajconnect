@@ -1,15 +1,18 @@
 
-import { useProfileData } from "./useProfileData";
-import { useProfileForm } from "./useProfileForm";
+import { useProfileData } from "./profile/useProfileData";
+import { useProfileForm } from "./profile/useProfileForm";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useProfile = () => {
   const [userId, setUserId] = useState<string | null>(null);
+  const [sessionChecked, setSessionChecked] = useState(false);
   
   console.log("useProfile: Hook started");
   
   useEffect(() => {
+    if (sessionChecked) return; // Prevent multiple session checks
+    
     console.log("useProfile: Getting user session");
     const getUserId = async () => {
       try {
@@ -21,11 +24,13 @@ export const useProfile = () => {
         }
       } catch (error) {
         console.error("useProfile: Error getting user session:", error);
+      } finally {
+        setSessionChecked(true);
       }
     };
     
     getUserId();
-  }, []);
+  }, [sessionChecked]);
   
   console.log("useProfile: About to call useProfileData with userId:", userId);
   
