@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useProfile } from "@/hooks/useProfile";
+import { useSimpleProfile } from "@/hooks/profile/useSimpleProfile";
 import { useOnboarding } from "@/hooks/useOnboarding";
 import { useProfileAnalytics } from "@/hooks/profile/useProfileAnalytics";
 import { useProfileRecommendations } from "@/hooks/profile/useProfileRecommendations";
@@ -13,7 +13,7 @@ export const useProfilePageLogic = () => {
   const { toast } = useToast();
   const [hasCompatibilityResults, setHasCompatibilityResults] = useState<boolean | null>(null);
   
-  console.log("useProfilePageLogic: About to call useProfile");
+  console.log("useProfilePageLogic: About to call useSimpleProfile");
   
   const { 
     formData, 
@@ -33,9 +33,9 @@ export const useProfilePageLogic = () => {
     unblockUser,
     loading,
     error
-  } = useProfile();
+  } = useSimpleProfile();
 
-  console.log("useProfilePageLogic: useProfile returned:", {
+  console.log("useProfilePageLogic: useSimpleProfile returned:", {
     formData: !!formData,
     userId,
     loading,

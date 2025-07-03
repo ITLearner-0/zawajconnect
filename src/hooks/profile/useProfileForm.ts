@@ -63,7 +63,7 @@ export const useProfileForm = ({
       console.log("Updating form data with initial data:", initialFormData);
       setFormData(initialFormData);
     }
-  }, [initialFormData, setFormData]);
+  }, [initialFormData, setFormData, formData]);
 
   // Verification status
   const { verificationStatus, handleVerificationChange } = useProfileVerification({
