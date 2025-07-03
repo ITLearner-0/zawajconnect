@@ -1101,6 +1101,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin: {
+        Args: { user_id: string }
+        Returns: boolean
+      }
       link_wali_to_user: {
         Args: { wali_user_id: string; managed_user_email: string }
         Returns: boolean
