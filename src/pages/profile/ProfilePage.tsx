@@ -104,10 +104,10 @@ const ProfilePage = () => {
   // Enhanced save handler with navigation
   const handleEnhancedSaveProfile = async (): Promise<boolean> => {
     const result = await handleSaveProfile();
-    if (result && result.success && result.shouldNavigateToCompatibility) {
-      // Navigate to compatibility test if needed
+    if (result && result.success && result.shouldNavigateToMatches) {
+      // Navigate to nearby matches page
       setTimeout(() => {
-        navigate("/compatibility");
+        navigate("/nearby");
       }, 2000);
       return true;
     }

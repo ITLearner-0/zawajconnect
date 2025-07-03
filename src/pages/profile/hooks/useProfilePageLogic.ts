@@ -145,10 +145,8 @@ export const useProfilePageLogic = () => {
         // Return navigation suggestion instead of navigating directly
         return {
           success: true,
-          shouldNavigateToCompatibility: hasCompatibilityResults === false,
-          message: hasCompatibilityResults === false ? 
-            "Vous pouvez maintenant passer au test de compatibilité." : 
-            "Profil sauvegardé avec succès."
+          shouldNavigateToMatches: true,
+          message: "Profil sauvegardé avec succès. Redirection vers les matchs..."
         };
       } else {
         console.error("handleSubmit returned false - profile save failed");
