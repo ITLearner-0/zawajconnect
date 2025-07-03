@@ -65,7 +65,12 @@ export const useSimpleProfile = () => {
         }
 
         if (!session?.user?.id) {
-          throw new Error("No authenticated user found");
+          console.log("No authenticated user found");
+          if (mounted) {
+            setLoading(false);
+            setError("No authenticated user found");
+          }
+          return;
         }
 
         if (!mounted) return;

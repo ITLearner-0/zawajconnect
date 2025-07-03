@@ -123,6 +123,28 @@ const ProfilePage = () => {
   // Show error state if there's an error
   if (error) {
     console.log("ProfilePage: Showing error state:", error);
+    
+    // If user is not authenticated, redirect to auth page
+    if (error.includes("No authenticated user found")) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 flex items-center justify-center">
+          <Card className="max-w-md mx-auto">
+            <CardContent className="p-6">
+              <h2 className="text-xl font-semibold text-red-600 mb-4">Authentification requise</h2>
+              <p className="text-gray-600 mb-4">Vous devez être connecté pour accéder à votre profil.</p>
+              <button 
+                onClick={() => navigate("/auth")} 
+                className="w-full bg-rose-500 text-white py-2 px-4 rounded hover:bg-rose-600"
+              >
+                Se connecter
+              </button>
+            </CardContent>
+          </Card>
+        </div>
+      );
+    }
+    
+    // Other errors
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 flex items-center justify-center">
         <Card className="max-w-md mx-auto">
