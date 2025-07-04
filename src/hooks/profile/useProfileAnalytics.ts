@@ -25,7 +25,10 @@ export const useProfileAnalytics = (userId?: string) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
 
     const fetchAnalytics = async () => {
       try {
@@ -59,11 +62,16 @@ export const useProfileAnalytics = (userId?: string) => {
 
   const calculateProfileCompleteness = async (userId: string): Promise<number> => {
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .single();
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching profile for completeness:', error);
+        return 0;
+      }
 
       if (!profile) return 0;
 

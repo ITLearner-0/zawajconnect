@@ -16,17 +16,25 @@ export const useProfileRecommendations = (userId?: string) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
 
     const generateRecommendations = async () => {
       try {
         setLoading(true);
 
-        const { data: profile } = await supabase
+        const { data: profile, error } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error fetching profile for recommendations:', error);
+          return;
+        }
 
         if (!profile) return;
 
