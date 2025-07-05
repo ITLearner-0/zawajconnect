@@ -44,19 +44,19 @@ const Auth: React.FC = () => {
         )}
 
         <div className="text-center space-y-4">
-          <Button
-            variant="ghost"
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="text-rose-600 dark:text-rose-300 hover:text-rose-700 dark:hover:text-rose-200"
-          >
-            {isSignUp
-              ? "Already have an account? Sign in"
-              : "Don't have an account? Sign up"}
-          </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setIsSignUp(!isSignUp)}
+              className="text-rose-600 dark:text-rose-300 hover:text-rose-700 dark:hover:text-rose-200"
+            >
+              {isSignUp
+                ? "Vous avez déjà un compte ? Connectez-vous"
+                : "Pas de compte ? Inscrivez-vous"}
+            </Button>
 
           <div className="border-t pt-4">
             <p className="text-sm text-muted-foreground mb-2">
-              Are you a guardian or wali?
+              Êtes-vous un tuteur ou wali ?
             </p>
             <Button
               asChild
@@ -65,7 +65,7 @@ const Auth: React.FC = () => {
             >
               <Link to="/wali/setup" className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
-                Register as Wali/Guardian
+                S'inscrire comme Wali/Tuteur
               </Link>
             </Button>
           </div>

@@ -1081,6 +1081,13 @@ export type Database = {
         Args: { token: string; confirming_user_id: string }
         Returns: boolean
       }
+      ensure_user_has_role: {
+        Args: {
+          user_uuid: string
+          user_role?: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
       generate_wali_invitation: {
         Args: { wali_user_id: string; managed_user_email: string }
         Returns: {
