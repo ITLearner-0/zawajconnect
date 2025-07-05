@@ -2,7 +2,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { SignInData } from "@/types/auth";
 import { toast } from "sonner";
-import { enforceEmailVerification } from "./securityEnforcement";
 
 export const signIn = async (data: SignInData, t: (key: string) => string) => {
   const { email, password } = data;
@@ -48,14 +47,6 @@ export const signIn = async (data: SignInData, t: (key: string) => string) => {
     
     if (sessionData?.session && sessionData?.user) {
       console.log("Login successful");
-      
-      // Enforce email verification for new security policy
-      const emailVerified = await enforceEmailVerification();
-      if (!emailVerified) {
-        // Sign out the user if email is not verified
-        await supabase.auth.signOut();
-        return false;
-      }
       
       toast.success("Connexion réussie", {
         description: "Bienvenue !"
