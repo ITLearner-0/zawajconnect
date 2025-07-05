@@ -1,16 +1,28 @@
 
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import SignUpForm from "@/components/auth/SignUpForm";
 import SignInForm from "@/components/auth/SignInForm";
 import AuthLayout from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { Shield } from "lucide-react";
+import { toast } from "sonner";
 
 const Auth: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const { loading, signUp, signIn } = useAuth();
+  const [searchParams] = useSearchParams();
+
+  // Show signup success message
+  useEffect(() => {
+    if (searchParams.get('success') === 'signup') {
+      toast.success("🎉 Inscription réussie !", {
+        description: "Votre compte a été créé. Vous pouvez maintenant vous connecter après avoir vérifié votre email.",
+        duration: 8000,
+      });
+    }
+  }, [searchParams]);
 
   const handleSignUp = async (data: any) => {
     try {

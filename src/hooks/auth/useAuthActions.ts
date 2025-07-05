@@ -16,6 +16,10 @@ export const useAuthActions = () => {
     setLoading(true);
     try {
       const result = await signUp(data, t);
+      if (result) {
+        // Redirect to auth page with success message after successful signup
+        navigate("/auth?success=signup");
+      }
       setLoading(false);
       return result;
     } catch (error) {
