@@ -19,19 +19,25 @@ const EmailVerification = ({ isVerified, userEmail }: EmailVerificationProps) =>
   const sendEmailVerification = async () => {
     setLoading(true);
     try {
-      await supabase.auth.resend({
+      const { error } = await supabase.auth.resend({
         type: "signup",
         email: userEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/profile`
+        }
       });
       
+      if (error) throw error;
+      
       toast({
-        title: "Verification email sent",
-        description: "Please check your inbox and click the verification link",
+        title: "Email de vérification envoyé",
+        description: "Veuillez vérifier votre boîte mail et cliquer sur le lien de vérification",
       });
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Email verification error:", error);
       toast({
-        title: "Error",
-        description: "Could not send verification email. Please try again.",
+        title: "Erreur",
+        description: error.message || "Impossible d'envoyer l'email. Veuillez réessayer.",
         variant: "destructive",
       });
     } finally {

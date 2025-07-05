@@ -16,6 +16,8 @@ import Subscription from "./pages/Subscription";
 import Auth from "./pages/Auth";
 import UserProfile from "./pages/UserProfile";
 import StandardLoadingState from "./components/ui/StandardLoadingState";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AdminRoute from "./components/auth/AdminRoute";
 import { AppProvider } from "./providers";
 import "./App.css";
 
@@ -29,17 +31,19 @@ function App() {
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/user/:userId" element={<UserProfile />} />
-            <Route path="/compatibility" element={<Compatibility />} />
-            <Route path="/messages" element={<Messages />} />
-            <Route path="/nearby" element={<NearbyMatches />} />
-            <Route path="/resources" element={<Resources />} />
+            <Route path="/wali/setup" element={<WaliSetup />} />
             <Route path="/demo" element={<Demo />} />
-            <Route path="/wali-dashboard" element={<WaliDashboard />} />
-            <Route path="/wali-setup" element={<WaliSetup />} />
-            <Route path="/admin" element={<AdminModeration />} />
-            <Route path="/subscription" element={<Subscription />} />
+            <Route path="/resources" element={<Resources />} />
+            {/* Protected Routes */}
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/user/:userId" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+            <Route path="/compatibility" element={<ProtectedRoute><Compatibility /></ProtectedRoute>} />
+            <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+            <Route path="/nearby" element={<ProtectedRoute><NearbyMatches /></ProtectedRoute>} />
+            <Route path="/wali" element={<ProtectedRoute><WaliDashboard /></ProtectedRoute>} />
+            <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminRoute><AdminModeration /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>

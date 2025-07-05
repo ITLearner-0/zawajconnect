@@ -27,14 +27,16 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <AccessibilityProvider>
-            <AuthProvider>
-              {children}
-              <Toaster />
-            </AuthProvider>
-          </AccessibilityProvider>
-        </ThemeProvider>
+        <Suspense fallback={<StandardLoadingState loading={true} loadingText="Initialisation..." />}>
+          <ThemeProvider>
+            <AccessibilityProvider>
+              <AuthProvider>
+                {children}
+                <Toaster />
+              </AuthProvider>
+            </AccessibilityProvider>
+          </ThemeProvider>
+        </Suspense>
       </QueryClientProvider>
     </BrowserRouter>
   );

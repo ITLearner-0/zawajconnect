@@ -28,19 +28,21 @@ const IdVerification = ({ isVerified, onVerificationChange }: IdVerificationProp
       const { error } = await supabase
         .from("profiles")
         .update({ 
+          id_verified: true,
           is_verified: true,
-          verification_document_url: "id:verified" // Store verification method
+          verification_document_url: "id:verified",
+          document_verification_status: "approved"
         })
         .eq("id", user.id);
       
       if (error) throw error;
       
       toast({
-        title: "ID Verification",
-        description: "Your ID has been successfully verified",
+        title: "Vérification d'identité",
+        description: "Votre identité a été vérifiée avec succès",
       });
       
-      // Notify parent component of the verification change instead of reloading
+      // Notify parent component of the verification change
       if (onVerificationChange) {
         onVerificationChange(true);
       }

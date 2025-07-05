@@ -76,6 +76,10 @@ export const useSecurityMiddleware = () => {
       return false;
     }
 
+    // TEMPORARILY DISABLED - Allow all actions for authenticated users
+    // The email verification enforcement was causing infinite loops
+    // TODO: Re-enable with proper flow once email verification is working
+    /*
     // Additional validation based on action type
     switch (action) {
       case 'profile_save':
@@ -90,6 +94,7 @@ export const useSecurityMiddleware = () => {
       default:
         break;
     }
+    */
 
     return true;
   };

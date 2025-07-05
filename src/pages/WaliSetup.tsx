@@ -26,9 +26,9 @@ const WaliSetup: React.FC = () => {
         email: data.email,
         password: data.password,
         options: {
-          emailRedirectTo: redirectUrl,
+          emailRedirectTo: `${window.location.origin}/wali`,
           data: {
-            user_type: 'wali', // This triggers the wali profile creation
+            user_type: 'wali',
             first_name: data.firstName,
             last_name: data.lastName,
             relationship_type: data.relationshipType,
@@ -43,26 +43,8 @@ const WaliSetup: React.FC = () => {
       }
 
       if (authData.user) {
-        // Store registration information
-        const { error: regError } = await supabase
-          .from('wali_registrations')
-          .insert({
-            email: data.email,
-            password_hash: 'handled_by_auth', // Placeholder since auth handles passwords
-            first_name: data.firstName,
-            last_name: data.lastName,
-            relationship_type: data.relationshipType,
-            contact_phone: data.contactPhone,
-            managed_user_emails: managedEmails,
-            verification_status: 'pending'
-          });
-
-        if (regError) {
-          console.error('Registration storage error:', regError);
-        }
-
-        toast.success("Wali Account Created Successfully", {
-          description: "Please check your email to verify your account before signing in."
+        toast.success("Compte Wali créé avec succès", {
+          description: "Veuillez vérifier votre email pour activer votre compte."
         });
 
         navigate('/auth');
@@ -82,10 +64,10 @@ const WaliSetup: React.FC = () => {
       <div className="space-y-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-primary mb-2">
-            Register as a Wali (Guardian)
+            Inscription en tant que Wali (Tuteur)
           </h2>
           <p className="text-muted-foreground">
-            Create your account to supervise and guide Muslim matrimonial conversations
+            Créez votre compte pour superviser et guider les conversations matrimoniales islamiques
           </p>
         </div>
         
@@ -93,12 +75,12 @@ const WaliSetup: React.FC = () => {
         
         <div className="text-center">
           <p className="text-sm text-muted-foreground">
-            Already have an account?{" "}
+            Vous avez déjà un compte ?{" "}
             <button
               onClick={() => navigate('/auth')}
               className="text-primary hover:underline"
             >
-              Sign in here
+              Connectez-vous ici
             </button>
           </p>
         </div>

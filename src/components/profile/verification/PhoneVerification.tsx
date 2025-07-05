@@ -60,8 +60,9 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
         const { error } = await supabase
           .from("profiles")
           .update({ 
+            phone_verified: true,
             is_verified: true,
-            verification_document_url: `phone:${phoneNumber}` // Store verification method and data
+            verification_document_url: `phone:${phoneNumber}`
           })
           .eq("id", user.id);
         
