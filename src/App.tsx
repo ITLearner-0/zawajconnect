@@ -14,6 +14,7 @@ import Privacy from "./pages/Privacy";
 import Family from "./pages/Family";
 import Guidance from "./pages/Guidance";
 import Admin from "./pages/Admin";
+import FAQ from "./pages/FAQ";
 import NotFound from "./pages/NotFound";
 
 // Create QueryClient with simple configuration
@@ -49,6 +50,7 @@ const App: React.FC = () => {
               <Route path="/family" element={<Family />} />
               <Route path="/guidance" element={<Guidance />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/faq" element={<FAQ />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
