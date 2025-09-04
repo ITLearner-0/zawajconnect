@@ -3,12 +3,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Heart, X, MapPin, GraduationCap, Briefcase, Filter, Search } from 'lucide-react';
+import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import VerificationBadge from '@/components/VerificationBadge';
+import AdvancedSearch from '@/components/AdvancedSearch';
+import ReportModal from '@/components/ReportModal';
+import { useToast } from '@/hooks/use-toast';
 
 interface Profile {
   id: string;
@@ -23,36 +24,20 @@ interface Profile {
   looking_for: string;
   interests: string[];
   avatar_url: string;
-  islamic_preferences?: {
-    prayer_frequency: string;
-    quran_reading: string;
-    sect: string;
-    importance_of_religion: string;
-  };
-  verification?: {
-    verification_score: number;
-    email_verified: boolean;
-    phone_verified: boolean;
-    id_verified: boolean;
-    family_verified: boolean;
-  };
+  verification_score: number;
 }
 
 const Browse = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    ageMin: '',
-    ageMax: '',
-    location: '',
-    sect: '',
-    education: '',
-    profession: ''
-  });
-  const [searchTerm, setSearchTerm] = useState('');
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -63,47 +48,33 @@ const Browse = () => {
   }, [user]);
 
   useEffect(() => {
-    applyFilters();
-  }, [profiles, filters, searchTerm]);
+    setFilteredProfiles(profiles);
+  }, [profiles]);
 
   const fetchProfiles = async () => {
     if (!user) return;
 
     try {
-      // First get profiles
-      const { data: profilesData } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select(`
+          *,
+          user_verifications!inner (
+            verification_score
+          )
+        `)
         .neq('user_id', user.id)
+        .order('created_at', { ascending: false })
         .limit(50);
 
-      if (profilesData) {
-        // Get Islamic preferences and verification for each profile
-        const profilesWithPrefs = await Promise.all(
-          profilesData.map(async (profile) => {
-            const [prefsResult, verificationResult] = await Promise.all([
-              supabase
-                .from('islamic_preferences')
-                .select('prayer_frequency, quran_reading, sect, importance_of_religion')
-                .eq('user_id', profile.user_id)
-                .single(),
-              supabase
-                .from('user_verifications')
-                .select('verification_score, email_verified, phone_verified, id_verified, family_verified')
-                .eq('user_id', profile.user_id)
-                .single()
-            ]);
+      if (error) throw error;
 
-            return {
-              ...profile,
-              islamic_preferences: prefsResult.data || undefined,
-              verification: verificationResult.data || undefined
-            };
-          })
-        );
+      const profilesWithVerification = data?.map((profile: any) => ({
+        ...profile,
+        verification_score: profile.user_verifications?.verification_score || 0
+      })) || [];
 
-        setProfiles(profilesWithPrefs);
-      }
+      setProfiles(profilesWithVerification);
     } catch (error) {
       console.error('Error fetching profiles:', error);
     } finally {
@@ -111,55 +82,84 @@ const Browse = () => {
     }
   };
 
-  const applyFilters = () => {
-    let filtered = profiles;
+  const handleSearch = (filters: any) => {
+    let filtered = [...profiles];
 
-    // Search filter
-    if (searchTerm) {
+    // Apply age filter
+    if (filters.ageRange) {
       filtered = filtered.filter(profile => 
-        profile.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        profile.location?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        profile.profession?.toLowerCase().includes(searchTerm.toLowerCase())
+        profile.age >= filters.ageRange[0] && profile.age <= filters.ageRange[1]
       );
     }
 
-    // Age filters
-    if (filters.ageMin) {
-      filtered = filtered.filter(profile => profile.age >= parseInt(filters.ageMin));
-    }
-    if (filters.ageMax) {
-      filtered = filtered.filter(profile => profile.age <= parseInt(filters.ageMax));
-    }
-
-    // Location filter
+    // Apply location filter
     if (filters.location) {
-      filtered = filtered.filter(profile => 
+      filtered = filtered.filter(profile =>
         profile.location?.toLowerCase().includes(filters.location.toLowerCase())
       );
     }
 
-    // Sect filter
-    if (filters.sect) {
-      filtered = filtered.filter(profile => 
-        profile.islamic_preferences?.sect === filters.sect
-      );
-    }
-
-    // Education filter
+    // Apply education filter
     if (filters.education) {
-      filtered = filtered.filter(profile => 
+      filtered = filtered.filter(profile =>
         profile.education?.toLowerCase().includes(filters.education.toLowerCase())
       );
     }
 
-    // Profession filter
+    // Apply profession filter
     if (filters.profession) {
-      filtered = filtered.filter(profile => 
+      filtered = filtered.filter(profile =>
         profile.profession?.toLowerCase().includes(filters.profession.toLowerCase())
       );
     }
 
+    // Apply verified filter
+    if (filters.verifiedOnly) {
+      filtered = filtered.filter(profile => profile.verification_score >= 50);
+    }
+
+    // Apply photo filter
+    if (filters.withPhoto) {
+      filtered = filtered.filter(profile => profile.avatar_url);
+    }
+
+    // Apply interests filter
+    if (filters.interests.length > 0) {
+      filtered = filtered.filter(profile =>
+        profile.interests?.some(interest =>
+          filters.interests.includes(interest)
+        )
+      );
+    }
+
     setFilteredProfiles(filtered);
+    setCurrentIndex(0);
+
+    toast({
+      title: "Recherche appliquée",
+      description: `${filtered.length} profil(s) trouvé(s)`,
+    });
+  };
+
+  const handleResetSearch = () => {
+    setFilteredProfiles(profiles);
+    setCurrentIndex(0);
+    toast({
+      title: "Filtres réinitialisés",
+      description: "Tous les profils sont maintenant affichés",
+    });
+  };
+
+  const nextProfile = () => {
+    if (currentIndex < filteredProfiles.length - 1) {
+      setCurrentIndex(currentIndex + 1);
+    }
+  };
+
+  const previousProfile = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(currentIndex - 1);
+    }
   };
 
   const handleLike = async (profileId: string) => {
@@ -195,7 +195,15 @@ const Browse = () => {
           .eq('id', existingMatch.id);
 
         if (isMutual) {
-          alert('C\'est un match ! 🎉');
+          toast({
+            title: "C'est un match ! 🎉",
+            description: "Vous pouvez maintenant discuter ensemble",
+          });
+        } else {
+          toast({
+            title: "Profil liké",
+            description: "Votre intérêt a été envoyé",
+          });
         }
       } else {
         // Create new match
@@ -207,224 +215,299 @@ const Browse = () => {
             user1_liked: true,
             match_score: Math.floor(Math.random() * 40) + 60 // Random score between 60-100
           });
+
+        toast({
+          title: "Profil liké",
+          description: "Votre intérêt a été envoyé",
+        });
       }
 
-      // Remove profile from current view
-      setFilteredProfiles(prev => prev.filter(p => p.id !== profileId));
+      nextProfile();
     } catch (error) {
       console.error('Error handling like:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de liker ce profil",
+        variant: "destructive"
+      });
     }
   };
 
-  const handlePass = (profileId: string) => {
-    // Simply remove from current view
-    setFilteredProfiles(prev => prev.filter(p => p.id !== profileId));
+  const handlePass = () => {
+    nextProfile();
   };
 
-  const viewProfile = (profileId: string) => {
-    navigate(`/profile/${profileId}`);
-  };
+  const currentProfile = filteredProfiles[currentIndex];
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald border-t-transparent mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Recherche de profils compatibles...</p>
+      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <Card className="h-96 animate-pulse">
+                <CardContent className="p-6">
+                  <div className="h-full bg-muted rounded"></div>
+                </CardContent>
+              </Card>
+            </div>
+            <div className="space-y-4">
+              <Card className="h-48 animate-pulse">
+                <CardContent className="p-6">
+                  <div className="h-full bg-muted rounded"></div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentProfile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <AdvancedSearch onSearch={handleSearch} onReset={handleResetSearch} />
+            </div>
+            <div>
+              <Card>
+                <CardContent className="p-8 text-center">
+                  <User className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">Aucun profil trouvé</h3>
+                  <p className="text-muted-foreground">
+                    {filteredProfiles.length === 0 && profiles.length > 0 
+                      ? "Aucun profil ne correspond à vos critères de recherche."
+                      : "Il n'y a pas de nouveaux profils à découvrir pour le moment."
+                    }
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="py-8 px-4">
-      <div className="container mx-auto">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-              <Search className="h-6 w-6 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Découvrir des Profils</h1>
-              <p className="text-muted-foreground">Trouvez votre partenaire idéal selon vos critères islamiques</p>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
+      <div className="container mx-auto max-w-6xl">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Advanced Search - Toggle on mobile */}
+          <div className="lg:hidden">
+            <Button
+              onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
+              variant="outline"
+              className="w-full mb-4 border-emerald text-emerald hover:bg-emerald hover:text-white"
+            >
+              {showAdvancedSearch ? 'Masquer la recherche' : 'Recherche avancée'}
+            </Button>
+            {showAdvancedSearch && (
+              <div className="mb-6">
+                <AdvancedSearch onSearch={handleSearch} onReset={handleResetSearch} />
+              </div>
+            )}
           </div>
 
-          {/* Filters */}
-          <Card className="mb-8">
-            <CardHeader>
-              <div className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                <h3 className="text-lg font-medium">Filtres de recherche</h3>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <div>
-                  <Input
-                    placeholder="Rechercher..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+          {/* Main Profile Card */}
+          <div className="lg:col-span-2">
+            <Card className="overflow-hidden shadow-lg">
+              <div className="relative">
+                {/* Profile Image */}
+                <div className="h-80 md:h-96 bg-gradient-to-br from-emerald/10 to-gold/10 flex items-center justify-center">
+                  {currentProfile.avatar_url ? (
+                    <img 
+                      src={currentProfile.avatar_url} 
+                      alt={currentProfile.full_name || 'Photo de profil'} 
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <User className="h-24 w-24 text-muted-foreground" />
+                  )}
                 </div>
-                <div>
-                  <Input
-                    placeholder="Âge min"
-                    type="number"
-                    value={filters.ageMin}
-                    onChange={(e) => setFilters(prev => ({...prev, ageMin: e.target.value}))}
-                  />
-                </div>
-                <div>
-                  <Input
-                    placeholder="Âge max"
-                    type="number"
-                    value={filters.ageMax}
-                    onChange={(e) => setFilters(prev => ({...prev, ageMax: e.target.value}))}
-                  />
-                </div>
-                <div>
-                  <Input
-                    placeholder="Localisation"
-                    value={filters.location}
-                    onChange={(e) => setFilters(prev => ({...prev, location: e.target.value}))}
-                  />
-                </div>
-                <div>
-                  <Select value={filters.sect} onValueChange={(value) => setFilters(prev => ({...prev, sect: value}))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Secte" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="">Tous</SelectItem>
-                      <SelectItem value="sunni">Sunnite</SelectItem>
-                      <SelectItem value="shia">Chiite</SelectItem>
-                      <SelectItem value="other">Autre</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Button 
-                    variant="outline" 
-                    onClick={() => setFilters({ageMin: '', ageMax: '', location: '', sect: '', education: '', profession: ''})}
-                    className="w-full"
-                  >
-                    Réinitialiser
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* Profiles Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProfiles.map((profile) => (
-              <Card key={profile.id} className="group hover:shadow-lg transition-all duration-300 animate-fade-in">
-                <CardHeader className="pb-4">
-                  <div className="relative">
-                    <div className="h-48 bg-gradient-to-br from-emerald/20 to-gold/20 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
-                      {profile.avatar_url ? (
-                        <img 
-                          src={profile.avatar_url} 
-                          alt={`Photo de ${profile.full_name}`}
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <div className="h-16 w-16 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-                          <span className="text-2xl text-primary-foreground font-bold">
-                            {profile.full_name?.charAt(0) || '?'}
-                          </span>
-                        </div>
+                {/* Navigation Arrows */}
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 rounded-full p-2 shadow-lg"
+                  onClick={previousProfile}
+                  disabled={currentIndex === 0}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full p-2 shadow-lg"
+                  onClick={nextProfile}
+                  disabled={currentIndex === filteredProfiles.length - 1}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+
+                {/* Profile Counter */}
+                <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                  {currentIndex + 1} / {filteredProfiles.length}
+                </div>
+
+                {/* Verification Badge */}
+                <div className="absolute top-4 left-4">
+                  <VerificationBadge verificationScore={currentProfile.verification_score} />
+                </div>
+              </div>
+
+              <CardContent className="p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-foreground mb-1">
+                      {currentProfile.full_name || 'Nom non renseigné'}
+                    </h2>
+                    <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
+                      {currentProfile.age && (
+                        <span className="text-lg">{currentProfile.age} ans</span>
+                      )}
+                      {currentProfile.location && (
+                        <>
+                          <span>•</span>
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            <span>{currentProfile.location}</span>
+                          </div>
+                        </>
                       )}
                     </div>
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-2 mb-1">
-                        <h3 className="text-xl font-bold text-foreground">{profile.full_name}</h3>
-                        {profile.verification && (
-                          <VerificationBadge
-                            verificationScore={profile.verification.verification_score}
-                            emailVerified={profile.verification.email_verified}
-                            phoneVerified={profile.verification.phone_verified}
-                            idVerified={profile.verification.id_verified}
-                            familyVerified={profile.verification.family_verified}
-                          />
-                        )}
-                      </div>
-                      <p className="text-muted-foreground text-sm mb-2">{profile.age} ans</p>
+                  </div>
+                </div>
+
+                {/* Bio */}
+                {currentProfile.bio && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold mb-2">À propos</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {currentProfile.bio}
+                    </p>
+                  </div>
+                )}
+
+                {/* Details */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  {currentProfile.education && (
+                    <div>
+                      <span className="text-sm font-medium text-muted-foreground">Éducation</span>
+                      <p className="font-medium">{currentProfile.education}</p>
+                    </div>
+                  )}
+                  {currentProfile.profession && (
+                    <div>
+                      <span className="text-sm font-medium text-muted-foreground">Profession</span>
+                      <p className="font-medium">{currentProfile.profession}</p>
+                    </div>
+                  )}
+                  {currentProfile.looking_for && (
+                    <div className="sm:col-span-2">
+                      <span className="text-sm font-medium text-muted-foreground">Recherche</span>
+                      <p className="font-medium">{currentProfile.looking_for}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Interests */}
+                {currentProfile.interests && currentProfile.interests.length > 0 && (
+                  <div className="mb-6">
+                    <h3 className="font-semibold mb-2">Centres d'intérêt</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {currentProfile.interests.map((interest: string) => (
+                        <Badge key={interest} variant="secondary" className="text-sm">
+                          {interest}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <MapPin className="h-4 w-4" />
-                    <span>{profile.location || 'Non spécifié'}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Briefcase className="h-4 w-4" />
-                    <span>{profile.profession || 'Non spécifié'}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <GraduationCap className="h-4 w-4" />
-                    <span>{profile.education || 'Non spécifié'}</span>
-                  </div>
+                )}
 
-                  {profile.islamic_preferences?.sect && (
-                    <Badge variant="secondary" className="text-xs">
-                      {profile.islamic_preferences.sect === 'sunni' ? 'Sunnite' : 
-                       profile.islamic_preferences.sect === 'shia' ? 'Chiite' : 
-                       'Autre'}
-                    </Badge>
-                  )}
+        {/* Enhanced Mobile Navigation */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+          <Button
+            onClick={handlePass}
+            variant="outline"
+            className="flex-1 border-muted-foreground text-muted-foreground hover:bg-muted order-1 sm:order-none"
+          >
+            <X className="h-4 w-4 mr-2" />
+            Passer
+          </Button>
+          <Button
+            onClick={() => handleLike(currentProfile.user_id)}
+            className="flex-1 bg-emerald hover:bg-emerald-dark text-primary-foreground order-0 sm:order-none"
+          >
+            <Heart className="h-4 w-4 mr-2" />
+            J'aime ce profil
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => navigate(`/profile/${currentProfile.user_id}`)}
+            className="flex-1 border-emerald text-emerald hover:bg-emerald hover:text-white order-2 sm:order-none"
+          >
+            Voir le profil complet
+          </Button>
+        </div>
 
-                  <p className="text-sm text-muted-foreground line-clamp-3">
-                    {profile.bio || 'Aucune description disponible.'}
-                  </p>
-
-                  <div className="flex gap-2 pt-4">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePass(profile.id)}
-                      className="flex-1"
-                    >
-                      <X className="h-4 w-4 mr-1" />
-                      Passer
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => viewProfile(profile.id)}
-                      className="flex-1"
-                    >
-                      Voir profil
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={() => handleLike(profile.id)}
-                      className="flex-1 bg-emerald hover:bg-emerald-dark text-primary-foreground"
-                    >
-                      <Heart className="h-4 w-4 mr-1" />
-                      Aimer
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                <div className="flex justify-center pt-3">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedProfile(currentProfile);
+                      setReportModalOpen(true);
+                    }}
+                    className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+                  >
+                    Signaler ce profil
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
-          {filteredProfiles.length === 0 && (
-            <div className="text-center py-12">
-              <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-medium text-foreground mb-2">Aucun profil trouvé</h3>
-              <p className="text-muted-foreground">Essayez d'ajuster vos filtres de recherche</p>
-            </div>
-          )}
+          {/* Sidebar - Desktop only */}
+          <div className="hidden lg:block space-y-6">
+            <AdvancedSearch onSearch={handleSearch} onReset={handleResetSearch} />
+
+            <Card>
+              <CardHeader>
+                <div className="text-lg font-semibold">Navigation</div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/matches')}
+                  className="w-full justify-start border-emerald text-emerald hover:bg-emerald hover:text-white"
+                >
+                  Voir mes matches
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/dashboard')}
+                  className="w-full justify-start"
+                >
+                  Mon profil
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        reportedUserId={selectedProfile?.user_id || ''}
+        reportedUserName={selectedProfile?.full_name || 'Utilisateur'}
+      />
     </div>
   );
 };
