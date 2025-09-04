@@ -2,8 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Heart, Shield, Users } from "lucide-react";
 import heroPattern from "@/assets/hero-pattern.jpg";
 import RegistrationModal from "./RegistrationModal";
+import { useState } from "react";
 
 const Hero = () => {
+  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background */}
@@ -39,12 +41,15 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in">
-            <RegistrationModal>
-              <Button variant="gradient" size="lg" className="animate-pulse-gentle">
-                <Heart className="mr-2 h-5 w-5" />
-                Commencer mon parcours
-              </Button>
-            </RegistrationModal>
+            <Button 
+              variant="gradient" 
+              size="lg" 
+              className="animate-pulse-gentle"
+              onClick={() => setIsRegistrationOpen(true)}
+            >
+              <Heart className="mr-2 h-5 w-5" />
+              Commencer mon parcours
+            </Button>
             <Button variant="outline" size="lg" className="border-emerald text-emerald hover:bg-emerald hover:text-white">
               Découvrir nos valeurs
             </Button>
@@ -78,6 +83,12 @@ const Hero = () => {
           </div>
         </div>
       </div>
+      
+      {/* Registration Modal */}
+      <RegistrationModal 
+        isOpen={isRegistrationOpen} 
+        onClose={() => setIsRegistrationOpen(false)} 
+      />
     </section>
   );
 };

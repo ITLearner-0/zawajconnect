@@ -15,35 +15,35 @@ interface Testimonial {
 const testimonials: Testimonial[] = [
   {
     id: 1,
-    name: "Fatima A.",
-    location: "London, UK",
-    content: "Alhamdulillah, I found my perfect match through NikahNoor. The platform's emphasis on Islamic values and family involvement made me feel safe and confident in my search.",
+    name: "Amina & Omar",
+    location: "Paris, France",
+    content: "Nous nous sommes rencontrés sur cette plateforme il y a 2 ans. L'approche respectueuse des valeurs islamiques nous a tout de suite séduits. Aujourd'hui, nous sommes mariés et parents d'un petit garçon.",
     rating: 5,
-    matchedWith: "Ahmed M."
+    matchedWith: "Omar"
   },
   {
     id: 2,
-    name: "Omar K.",
-    location: "Toronto, Canada", 
-    content: "The verification process gave me peace of mind knowing I was connecting with genuine people. Met my wife here 6 months ago, and we couldn't be happier!",
+    name: "Sarah & Youssef",
+    location: "Lyon, France", 
+    content: "La fonctionnalité de compatibilité religieuse nous a permis de trouver exactement ce que nous cherchions. Nos familles ont été impliquées dès le début, comme le veut notre tradition.",
     rating: 5,
-    matchedWith: "Khadija S."
+    matchedWith: "Youssef"
   },
   {
     id: 3,
-    name: "Aisha R.",
-    location: "Sydney, Australia",
-    content: "What I loved most was the Islamic guidance section and the respectful approach to matrimony. It felt like a community where my values were understood and respected.",
+    name: "Khadija & Ahmed",
+    location: "Marseille, France",
+    content: "Grâce aux filtres détaillés et à l'accompagnement personnalisé, nous avons pu nous concentrer sur l'essentiel : construire une relation basée sur nos valeurs communes.",
     rating: 5,
-    matchedWith: "Yusuf A."
+    matchedWith: "Ahmed"
   },
   {
     id: 4,
-    name: "Ibrahim H.",
-    location: "Dubai, UAE",
-    content: "The family involvement feature was perfect for our traditional approach to marriage. Both families were able to connect and get to know each other properly.",
+    name: "Fatima & Karim",
+    location: "Toulouse, France",
+    content: "L'approche halal de cette plateforme nous a rassurés. Nous avons pu apprendre à nous connaître dans le respect et la transparence. Aujourd'hui, nous préparons notre nikah.",
     rating: 5,
-    matchedWith: "Mariam L."
+    matchedWith: "Karim"
   }
 ];
 
@@ -53,11 +53,10 @@ const Testimonials = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-emerald-600 to-sage-700 bg-clip-text text-transparent">
-            Success Stories
+            Témoignages de Bonheur
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Alhamdulillah, thousands have found their life partners through NikahNoor. 
-            Here are some of their beautiful stories.
+            Découvrez les histoires inspirantes de couples qui ont trouvé l'amour et construit leur famille grâce à notre plateforme
           </p>
         </div>
 
@@ -102,7 +101,7 @@ const Testimonials = () => {
 
                 <div className="border-t border-emerald-100 pt-4 animate-fade-in" style={{ animationDelay: `${index * 0.2 + 0.3}s` }}>
                   <p className="text-sm text-emerald-600 font-medium">
-                    Married to {testimonial.matchedWith} • Alhamdulillah
+                    Mariés • Alhamdulillah
                   </p>
                 </div>
               </CardContent>
@@ -114,7 +113,7 @@ const Testimonials = () => {
           <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-50 to-sage-50 px-6 py-3 rounded-full border border-emerald-200">
             <Star className="w-5 h-5 text-amber-400 fill-current" />
             <span className="font-semibold text-emerald-700">
-              4.9/5 • Over 2,000+ Happy Couples
+              4.9/5 • Plus de 2,000 couples heureux
             </span>
           </div>
         </div>
