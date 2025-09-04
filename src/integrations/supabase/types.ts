@@ -328,6 +328,7 @@ export type Database = {
           interests: string[] | null
           location: string | null
           looking_for: string | null
+          phone: string | null
           profession: string | null
           updated_at: string
           user_id: string
@@ -344,6 +345,7 @@ export type Database = {
           interests?: string[] | null
           location?: string | null
           looking_for?: string | null
+          phone?: string | null
           profession?: string | null
           updated_at?: string
           user_id: string
@@ -360,6 +362,7 @@ export type Database = {
           interests?: string[] | null
           location?: string | null
           looking_for?: string | null
+          phone?: string | null
           profession?: string | null
           updated_at?: string
           user_id?: string
@@ -402,6 +405,51 @@ export type Database = {
           resolved_at?: string | null
           resolved_by?: string | null
           status?: string | null
+        }
+        Relationships: []
+      }
+      user_settings: {
+        Row: {
+          age_max: number | null
+          age_min: number | null
+          auto_accept_matches: boolean | null
+          created_at: string
+          email_notifications: boolean | null
+          id: string
+          match_notifications: boolean | null
+          message_notifications: boolean | null
+          profile_visibility: string | null
+          search_distance: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age_max?: number | null
+          age_min?: number | null
+          auto_accept_matches?: boolean | null
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          match_notifications?: boolean | null
+          message_notifications?: boolean | null
+          profile_visibility?: string | null
+          search_distance?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age_max?: number | null
+          age_min?: number | null
+          auto_accept_matches?: boolean | null
+          created_at?: string
+          email_notifications?: boolean | null
+          id?: string
+          match_notifications?: boolean | null
+          message_notifications?: boolean | null
+          profile_visibility?: string | null
+          search_distance?: number | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

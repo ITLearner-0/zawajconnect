@@ -6,18 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { 
   Settings as SettingsIcon, 
-  Bell, 
-  Shield, 
   User, 
-  Mail, 
-  Phone,
-  MapPin,
   Save,
   Trash2,
   AlertTriangle
@@ -25,23 +19,11 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 
-interface UserSettings {
-  email_notifications: boolean;
-  match_notifications: boolean;
-  message_notifications: boolean;
-  profile_visibility: string;
-  search_distance: number;
-  age_min: number;
-  age_max: number;
-  auto_accept_matches: boolean;
-}
-
 interface Profile {
   full_name: string;
   age: number;
   gender: string;
   location: string;
-  phone: string;
   bio: string;
   profession: string;
   education: string;
@@ -53,22 +35,11 @@ const Settings = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [settings, setSettings] = useState<UserSettings>({
-    email_notifications: true,
-    match_notifications: true,
-    message_notifications: true,
-    profile_visibility: 'public',
-    search_distance: 50,
-    age_min: 18,
-    age_max: 50,
-    auto_accept_matches: false
-  });
   const [profile, setProfile] = useState<Profile>({
     full_name: '',
     age: 18,
     gender: '',
     location: '',
-    phone: '',
     bio: '',
     profession: '',
     education: '',
@@ -104,32 +75,11 @@ const Settings = () => {
           age: profileData.age || 18,
           gender: profileData.gender || '',
           location: profileData.location || '',
-          phone: profileData.phone || '',
           bio: profileData.bio || '',
           profession: profileData.profession || '',
           education: profileData.education || '',
           looking_for: profileData.looking_for || '',
           interests: profileData.interests || []
-        });
-      }
-
-      // Fetch user settings
-      const { data: settingsData } = await supabase
-        .from('user_settings')
-        .select('*')
-        .eq('user_id', user.id)
-        .single();
-
-      if (settingsData) {
-        setSettings({
-          email_notifications: settingsData.email_notifications ?? true,
-          match_notifications: settingsData.match_notifications ?? true,
-          message_notifications: settingsData.message_notifications ?? true,
-          profile_visibility: settingsData.profile_visibility || 'public',
-          search_distance: settingsData.search_distance || 50,
-          age_min: settingsData.age_min || 18,
-          age_max: settingsData.age_max || 50,
-          auto_accept_matches: settingsData.auto_accept_matches ?? false
         });
       }
     } catch (error) {
@@ -155,17 +105,6 @@ const Settings = () => {
 
       if (profileError) throw profileError;
 
-      // Update settings
-      const { error: settingsError } = await supabase
-        .from('user_settings')
-        .upsert({
-          user_id: user.id,
-          ...settings,
-          updated_at: new Date().toISOString()
-        });
-
-      if (settingsError) throw settingsError;
-
       toast({
         title: "Paramètres sauvegardés",
         description: "Vos modifications ont été enregistrées avec succès.",
@@ -186,10 +125,11 @@ const Settings = () => {
     if (!user) return;
 
     try {
-      // Delete user data (Supabase will handle cascading deletes)
-      const { error } = await supabase.auth.admin.deleteUser(user.id);
-      
-      if (error) throw error;
+      // Delete user profile first
+      await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', user.id);
 
       await signOut();
       navigate('/');
@@ -244,7 +184,7 @@ const Settings = () => {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-foreground">Paramètres</h1>
-            <p className="text-muted-foreground">Gérez vos informations personnelles et préférences</p>
+            <p className="text-muted-foreground">Gérez vos informations personnelles</p>
           </div>
         </div>
 
@@ -360,126 +300,6 @@ const Settings = () => {
                       e.currentTarget.value = '';
                     }
                   }}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Notifications */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Bell className="h-5 w-5" />
-                Notifications
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="emailNotif">Notifications par email</Label>
-                  <p className="text-sm text-muted-foreground">Recevoir les mises à jour par email</p>
-                </div>
-                <Switch
-                  id="emailNotif"
-                  checked={settings.email_notifications}
-                  onCheckedChange={(checked) => setSettings(prev => ({ ...prev, email_notifications: checked }))}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="matchNotif">Notifications de match</Label>
-                  <p className="text-sm text-muted-foreground">Être averti des nouveaux matches</p>
-                </div>
-                <Switch
-                  id="matchNotif"
-                  checked={settings.match_notifications}
-                  onCheckedChange={(checked) => setSettings(prev => ({ ...prev, match_notifications: checked }))}
-                />
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="messageNotif">Notifications de message</Label>
-                  <p className="text-sm text-muted-foreground">Être averti des nouveaux messages</p>
-                </div>
-                <Switch
-                  id="messageNotif"
-                  checked={settings.message_notifications}
-                  onCheckedChange={(checked) => setSettings(prev => ({ ...prev, message_notifications: checked }))}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Privacy & Search */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Confidentialité et Recherche
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="visibility">Visibilité du profil</Label>
-                <Select value={settings.profile_visibility} onValueChange={(value) => setSettings(prev => ({ ...prev, profile_visibility: value }))}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="public">Public - Visible par tous</SelectItem>
-                    <SelectItem value="matches">Matches uniquement</SelectItem>
-                    <SelectItem value="private">Privé - Invisible</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="distance">Distance de recherche (km)</Label>
-                  <Input
-                    id="distance"
-                    type="number"
-                    min="1"
-                    max="500"
-                    value={settings.search_distance}
-                    onChange={(e) => setSettings(prev => ({ ...prev, search_distance: parseInt(e.target.value) || 50 }))}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="ageMin">Âge minimum</Label>
-                  <Input
-                    id="ageMin"
-                    type="number"
-                    min="18"
-                    max="100"
-                    value={settings.age_min}
-                    onChange={(e) => setSettings(prev => ({ ...prev, age_min: parseInt(e.target.value) || 18 }))}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="ageMax">Âge maximum</Label>
-                  <Input
-                    id="ageMax"
-                    type="number"
-                    min="18"
-                    max="100"
-                    value={settings.age_max}
-                    onChange={(e) => setSettings(prev => ({ ...prev, age_max: parseInt(e.target.value) || 50 }))}
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label htmlFor="autoAccept">Acceptation automatique des matches</Label>
-                  <p className="text-sm text-muted-foreground">Les matches seront automatiquement acceptés</p>
-                </div>
-                <Switch
-                  id="autoAccept"
-                  checked={settings.auto_accept_matches}
-                  onCheckedChange={(checked) => setSettings(prev => ({ ...prev, auto_accept_matches: checked }))}
                 />
               </div>
             </CardContent>

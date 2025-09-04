@@ -324,9 +324,11 @@ const Navigation = ({ isOpen = true, onClose }: NavigationProps) => {
               Famille
             </Link>
           </Button>
-          <Button variant="ghost" className="w-full justify-start gap-3" disabled>
-            <Settings className="h-4 w-4" />
-            Paramètres
+          <Button variant="ghost" className="w-full justify-start gap-3" asChild>
+            <Link to="/settings" onClick={handleLinkClick}>
+              <Settings className="h-4 w-4" />
+              Paramètres
+            </Link>
           </Button>
           <Button 
             variant="ghost" 
