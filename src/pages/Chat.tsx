@@ -6,8 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Heart } from 'lucide-react';
+import { Send, Heart, Video, Phone } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import VideoCall from '@/components/VideoCall';
 
 interface Match {
   id: string;
@@ -40,6 +41,7 @@ const Chat = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showVideoCall, setShowVideoCall] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -238,60 +240,82 @@ const Chat = () => {
                     {selectedMatch.profiles.full_name?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                <div>
+                <div className="flex-1">
                   <h3 className="font-semibold">{selectedMatch.profiles.full_name}</h3>
                   <p className="text-sm text-muted-foreground">Online</p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowVideoCall(true)}
+                    className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+                  >
+                    <Video className="h-4 w-4 mr-1" />
+                    Appel Vidéo
+                  </Button>
                 </div>
               </div>
             </div>
 
-            {/* Messages */}
-            <ScrollArea className="flex-1 p-4">
-              <div className="space-y-4">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${
-                      message.sender_id === user?.id ? 'justify-end' : 'justify-start'
-                    }`}
-                  >
+            {/* Messages or Video Call */}
+            {showVideoCall ? (
+              <div className="flex-1 p-4">
+                <VideoCall 
+                  matchId={selectedMatch.id}
+                  onCallEnd={() => setShowVideoCall(false)}
+                />
+              </div>
+            ) : (
+              <ScrollArea className="flex-1 p-4">
+                <div className="space-y-4">
+                  {messages.map((message) => (
                     <div
-                      className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        message.sender_id === user?.id
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted'
+                      key={message.id}
+                      className={`flex ${
+                        message.sender_id === user?.id ? 'justify-end' : 'justify-start'
                       }`}
                     >
-                      <p>{message.content}</p>
-                      <p className={`text-xs mt-1 ${
-                        message.sender_id === user?.id
-                          ? 'text-primary-foreground/70'
-                          : 'text-muted-foreground'
-                      }`}>
-                        {new Date(message.created_at).toLocaleTimeString()}
-                      </p>
+                      <div
+                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                          message.sender_id === user?.id
+                            ? 'bg-primary text-primary-foreground'
+                            : 'bg-muted'
+                        }`}
+                      >
+                        <p>{message.content}</p>
+                        <p className={`text-xs mt-1 ${
+                          message.sender_id === user?.id
+                            ? 'text-primary-foreground/70'
+                            : 'text-muted-foreground'
+                        }`}>
+                          {new Date(message.created_at).toLocaleTimeString()}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
-                <div ref={messagesEndRef} />
-              </div>
-            </ScrollArea>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              </ScrollArea>
+            )}
 
             {/* Message Input */}
-            <div className="p-4 border-t border-border">
-              <div className="flex gap-2">
-                <Input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type your message..."
-                  className="flex-1"
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                />
-                <Button onClick={sendMessage} size="icon">
-                  <Send className="w-4 h-4" />
-                </Button>
+            {!showVideoCall && (
+              <div className="p-4 border-t border-border">
+                <div className="flex gap-2">
+                  <Input
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Type your message..."
+                    className="flex-1"
+                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  />
+                  <Button onClick={sendMessage} size="icon">
+                    <Send className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
-            </div>
+            )}
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center text-muted-foreground">
