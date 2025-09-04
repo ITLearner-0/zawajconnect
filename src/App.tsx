@@ -16,6 +16,7 @@ import Guidance from "./pages/Guidance";
 import Admin from "./pages/Admin";
 import FAQ from "./pages/FAQ";
 import Settings from "./pages/Settings";
+import IslamicTools from "./pages/IslamicTools";
 import NotFound from "./pages/NotFound";
 
 // Create QueryClient with simple configuration
@@ -53,6 +54,7 @@ const App: React.FC = () => {
             <Route path="/admin" element={<Admin />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/islamic-tools" element={<IslamicTools />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

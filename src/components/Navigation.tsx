@@ -168,6 +168,7 @@ const Navigation = ({ isOpen = true, onClose }: NavigationProps) => {
     { path: '/browse', icon: Search, label: 'Découvrir' },
     { path: '/matches', icon: Heart, label: 'Mes Matches' },
     { path: '/guidance', icon: BookOpen, label: 'Guide islamique' },
+    { path: '/islamic-tools', icon: Clock, label: 'Outils islamiques' },
   ];
 
   return (
