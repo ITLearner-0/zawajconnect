@@ -74,7 +74,7 @@ const Auth = () => {
               </div>
             </div>
             <CardTitle className="text-2xl font-bold text-foreground">
-              Bienvenue sur Halal Match
+              Bienvenue sur NikahConnect
             </CardTitle>
             <CardDescription className="text-muted-foreground">
               Votre plateforme de rencontres islamiques
