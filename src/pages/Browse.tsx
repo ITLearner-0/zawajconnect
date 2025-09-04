@@ -221,8 +221,8 @@ const Browse = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
-      <div className="container mx-auto py-8 px-4">
+    <div className="py-8 px-4">
+      <div className="container mx-auto">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
@@ -306,12 +306,20 @@ const Browse = () => {
               <Card key={profile.id} className="group hover:shadow-lg transition-all duration-300 animate-fade-in">
                 <CardHeader className="pb-4">
                   <div className="relative">
-                    <div className="h-48 bg-gradient-to-br from-emerald/20 to-gold/20 rounded-lg flex items-center justify-center mb-4">
-                      <div className="h-16 w-16 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-                        <span className="text-2xl text-primary-foreground font-bold">
-                          {profile.full_name?.charAt(0) || '?'}
-                        </span>
-                      </div>
+                    <div className="h-48 bg-gradient-to-br from-emerald/20 to-gold/20 rounded-lg flex items-center justify-center mb-4 overflow-hidden">
+                      {profile.avatar_url ? (
+                        <img 
+                          src={profile.avatar_url} 
+                          alt={`Photo de ${profile.full_name}`}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-16 w-16 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
+                          <span className="text-2xl text-primary-foreground font-bold">
+                            {profile.full_name?.charAt(0) || '?'}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <div className="text-center">
                       <h3 className="text-xl font-bold text-foreground mb-1">{profile.full_name}</h3>

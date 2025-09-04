@@ -110,8 +110,8 @@ const Matches = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
-      <div className="container mx-auto py-8 px-4">
+    <div className="py-8 px-4">
+      <div className="container mx-auto">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">

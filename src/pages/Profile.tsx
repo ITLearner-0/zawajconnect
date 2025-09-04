@@ -20,6 +20,7 @@ interface ProfileData {
   bio: string;
   looking_for: string;
   interests: string[];
+  avatar_url?: string;
   created_at: string;
   islamic_preferences?: {
     prayer_frequency: string;
@@ -243,8 +244,8 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
-      <div className="container mx-auto py-8 px-4">
+    <div className="py-8 px-4">
+      <div className="container mx-auto">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <Button
@@ -268,10 +269,18 @@ const Profile = () => {
             <div className="lg:col-span-2 space-y-6">
               <Card className="animate-fade-in">
                 <CardHeader className="text-center">
-                  <div className="h-32 w-32 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-4xl text-primary-foreground font-bold">
-                      {profile.full_name?.charAt(0) || '?'}
-                    </span>
+                  <div className="h-32 w-32 rounded-full overflow-hidden mx-auto mb-4 bg-gradient-to-br from-emerald to-emerald-light flex items-center justify-center">
+                    {profile.avatar_url ? (
+                      <img 
+                        src={profile.avatar_url} 
+                        alt={`Photo de ${profile.full_name}`}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-4xl text-primary-foreground font-bold">
+                        {profile.full_name?.charAt(0) || '?'}
+                      </span>
+                    )}
                   </div>
                   <CardTitle className="text-2xl">{profile.full_name}</CardTitle>
                   <p className="text-muted-foreground">{profile.age} ans</p>

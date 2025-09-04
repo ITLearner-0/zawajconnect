@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Heart, Settings, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import PhotoUpload from '@/components/PhotoUpload';
 
 interface Profile {
   id: string;
@@ -141,8 +142,8 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
-      <div className="container mx-auto py-8 px-4">
+    <div className="py-8 px-4">
+      <div className="container mx-auto">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
@@ -258,6 +259,11 @@ const Dashboard = () => {
                       rows={3}
                     />
                   </div>
+
+                  <PhotoUpload 
+                    currentPhotoUrl={profile?.avatar_url}
+                    onPhotoUpdate={(url) => setProfile(prev => prev ? {...prev, avatar_url: url} : null)}
+                  />
 
                   <Button 
                     onClick={saveProfile} 
