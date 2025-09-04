@@ -51,6 +51,7 @@ interface FamilyMember {
   relationship: string;
   is_wali: boolean;
   can_communicate: boolean;
+  email?: string;
 }
 
 interface FamilyReview {
@@ -152,52 +153,45 @@ const ParentalApprovalWorkflow = () => {
     }
   };
 
-  const handleReview = async (matchId: string, status: 'approved' | 'rejected', notes?: string) => {
+  const handleApproval = async (requestId: string, status: 'approved' | 'rejected', notes?: string) => {
     try {
-      // For now, we'll use notifications to track family reviews
-      const { error } = await supabase.rpc('create_notification', {
-        target_user_id: matches.find(m => m.id === matchId)?.user1_id,
-        notification_type: 'family_review',
-        notification_title: `Avis familial: ${status === 'approved' ? 'Approuvé' : 'Non approuvé'}`,
-        notification_content: notes || `La famille a ${status === 'approved' ? 'approuvé' : 'exprimé des réserves sur'} ce match.`,
-        sender_user_id: user?.id
-      });
+      // Insert into family_reviews table
+      const { error } = await supabase
+        .from('family_reviews')
+        .insert({
+          match_id: requestId,
+          family_member_id: familyMembers.find(fm => fm.email === user?.email)?.id,
+          status,
+          notes: notes || null
+        });
 
       if (error) throw error;
 
+      // Update the overall match status if this is from a Wali
+      const familyMember = familyMembers.find(fm => fm.email === user?.email);
+      if (familyMember?.is_wali) {
+        await supabase
+          .from('matches')
+          .update({
+            family_approved: status === 'approved',
+            family_notes: notes,
+            family_reviewed_at: new Date().toISOString(),
+            family_reviewer_id: familyMember.id
+          })
+          .eq('id', requestId);
+      }
+
       toast({
-        title: status === 'approved' ? "Match approuvé" : "Réserves exprimées",
-        description: `Votre avis a été transmis à la famille.`
+        title: status === 'approved' ? "Approuvé" : "Réserves exprimées",
+        description: `Votre avis a été enregistré avec succès.`
       });
 
-      // Update local state
-      setReviews(prev => ({
-        ...prev,
-        [matchId]: [
-          ...(prev[matchId] || []),
-          {
-            id: Date.now().toString(),
-            match_id: matchId,
-            family_member_id: user?.id || '',
-            status: status,
-            notes: notes,
-            reviewed_at: new Date().toISOString(),
-            family_member: {
-              id: user?.id || '',
-              full_name: user?.email || '',
-              relationship: 'famille',
-              is_wali: false,
-              can_communicate: true
-            }
-          }
-        ]
-      }));
-
+      fetchMatches();
     } catch (error) {
-      console.error('Error recording family review:', error);
+      console.error('Error recording approval decision:', error);
       toast({
         title: "Erreur",
-        description: "Impossible d'enregistrer votre avis",
+        description: "Impossible d'enregistrer votre décision",
         variant: "destructive"
       });
     }
@@ -332,8 +326,8 @@ const ParentalApprovalWorkflow = () => {
               <MatchReviewCard
                 key={match.id}
                 match={match}
-                onApprove={(notes) => handleReview(match.id, 'approved', notes)}
-                onReject={(notes) => handleReview(match.id, 'rejected', notes)}
+                onApprove={(notes) => handleApproval(match.id, 'approved', notes)}
+                onReject={(notes) => handleApproval(match.id, 'rejected', notes)}
                 onScheduleDiscussion={() => scheduleDiscussion(match.id)}
                 showActions={true}
               />
