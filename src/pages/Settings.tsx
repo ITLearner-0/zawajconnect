@@ -62,7 +62,6 @@ const Settings = () => {
     if (!user) return;
 
     try {
-      // Fetch profile
       const { data: profileData } = await supabase
         .from('profiles')
         .select('*')
@@ -94,7 +93,6 @@ const Settings = () => {
     setSaving(true);
 
     try {
-      // Update profile
       const { error: profileError } = await supabase
         .from('profiles')
         .upsert({
@@ -125,7 +123,6 @@ const Settings = () => {
     if (!user) return;
 
     try {
-      // Delete user profile first
       await supabase
         .from('profiles')
         .delete()
@@ -136,7 +133,7 @@ const Settings = () => {
       
       toast({
         title: "Compte supprimé",
-        description: "Votre compte a été supprimé définitivement.",
+        description: "Votre profil a été supprimé définitivement.",
       });
     } catch (error) {
       console.error('Error deleting account:', error);
@@ -183,7 +180,7 @@ const Settings = () => {
             <SettingsIcon className="h-6 w-6 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Paramètres</h1>
+            <h1 className="text-3xl font-bold text-foreground">Paramètres du profil</h1>
             <p className="text-muted-foreground">Gérez vos informations personnelles</p>
           </div>
         </div>
@@ -272,7 +269,7 @@ const Settings = () => {
               </div>
 
               <div>
-                <Label htmlFor="lookingFor">Recherche</Label>
+                <Label htmlFor="lookingFor">Ce que je recherche</Label>
                 <Textarea
                   id="lookingFor"
                   value={profile.looking_for}
@@ -296,11 +293,15 @@ const Settings = () => {
                   className="mt-2"
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
-                      addInterest(e.currentTarget.value);
-                      e.currentTarget.value = '';
+                      const target = e.target as HTMLInputElement;
+                      addInterest(target.value);
+                      target.value = '';
                     }
                   }}
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Cliquez sur un centre d'intérêt avec × pour le supprimer
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -317,7 +318,7 @@ const Settings = () => {
               ) : (
                 <Save className="h-4 w-4 mr-2" />
               )}
-              Sauvegarder
+              Sauvegarder les modifications
             </Button>
             <Button
               variant="outline"
@@ -330,27 +331,30 @@ const Settings = () => {
 
           <Separator />
 
-          {/* Danger Zone */}
+          {/* Account Management */}
           <Card className="border-destructive/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-destructive">
                 <AlertTriangle className="h-5 w-5" />
-                Zone dangereuse
+                Gestion du compte
               </CardTitle>
             </CardHeader>
             <CardContent>
+              <p className="text-sm text-muted-foreground mb-4">
+                Actions irréversibles concernant votre compte
+              </p>
               {!showDeleteConfirm ? (
                 <Button
                   variant="destructive"
                   onClick={() => setShowDeleteConfirm(true)}
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
-                  Supprimer mon compte
+                  Supprimer mon profil
                 </Button>
               ) : (
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    ⚠️ Cette action est irréversible. Toutes vos données seront définitivement supprimées.
+                    ⚠️ Cette action supprimera définitivement votre profil et toutes vos données associées.
                   </p>
                   <div className="flex gap-2">
                     <Button
