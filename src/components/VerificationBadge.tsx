@@ -1,71 +1,49 @@
+import { Shield, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
+
 interface VerificationBadgeProps {
   verificationScore: number;
-  emailVerified?: boolean;
-  phoneVerified?: boolean;
-  idVerified?: boolean;
-  familyVerified?: boolean;
   className?: string;
 }
 
-import { Badge } from '@/components/ui/badge';
-import { Shield, CheckCircle, Mail, Phone, CreditCard, Users } from 'lucide-react';
-
-const VerificationBadge = ({ 
-  verificationScore, 
-  emailVerified, 
-  phoneVerified, 
-  idVerified, 
-  familyVerified,
-  className 
-}: VerificationBadgeProps) => {
-  const getVerificationLevel = () => {
-    if (verificationScore >= 80) return { level: 'premium', color: 'bg-gold/10 text-gold-dark border-gold/20', icon: Shield };
-    if (verificationScore >= 60) return { level: 'verified', color: 'bg-emerald/10 text-emerald border-emerald/20', icon: CheckCircle };
-    if (verificationScore >= 40) return { level: 'partial', color: 'bg-blue/10 text-blue-dark border-blue/20', icon: Shield };
-    return { level: 'basic', color: 'bg-muted text-muted-foreground', icon: Shield };
+const VerificationBadge = ({ verificationScore, className }: VerificationBadgeProps) => {
+  const getVerificationStatus = (score: number) => {
+    if (score >= 80) {
+      return {
+        label: 'Vérifié',
+        icon: ShieldCheck,
+        variant: 'default' as const,
+        className: 'bg-emerald/10 text-emerald border-emerald/20'
+      };
+    } else if (score >= 50) {
+      return {
+        label: 'Partiellement vérifié',
+        icon: Shield,
+        variant: 'secondary' as const,
+        className: 'bg-gold/10 text-gold border-gold/20'
+      };
+    } else {
+      return {
+        label: 'Non vérifié',
+        icon: ShieldAlert,
+        variant: 'outline' as const,
+        className: 'bg-muted/10 text-muted-foreground border-muted-foreground/20'
+      };
+    }
   };
 
-  const verification = getVerificationLevel();
-  const Icon = verification.icon;
-
-  const getVerificationText = () => {
-    if (verification.level === 'premium') return 'Profil Premium';
-    if (verification.level === 'verified') return 'Vérifié';
-    if (verification.level === 'partial') return 'Partiellement vérifié';
-    return 'Non vérifié';
-  };
+  const status = getVerificationStatus(verificationScore);
+  const Icon = status.icon;
 
   return (
-    <div className={`flex items-center gap-2 ${className}`}>
-      <Badge className={verification.color}>
-        <Icon className="h-3 w-3 mr-1" />
-        {getVerificationText()}
-      </Badge>
-      
-      {/* Individual verification indicators */}
-      <div className="flex gap-1">
-        {emailVerified && (
-          <div className="h-4 w-4 rounded-full bg-emerald/20 flex items-center justify-center" title="Email vérifié">
-            <Mail className="h-2 w-2 text-emerald" />
-          </div>
-        )}
-        {phoneVerified && (
-          <div className="h-4 w-4 rounded-full bg-emerald/20 flex items-center justify-center" title="Téléphone vérifié">
-            <Phone className="h-2 w-2 text-emerald" />
-          </div>
-        )}
-        {idVerified && (
-          <div className="h-4 w-4 rounded-full bg-emerald/20 flex items-center justify-center" title="Identité vérifiée">
-            <CreditCard className="h-2 w-2 text-emerald" />
-          </div>
-        )}
-        {familyVerified && (
-          <div className="h-4 w-4 rounded-full bg-emerald/20 flex items-center justify-center" title="Famille vérifiée">
-            <Users className="h-2 w-2 text-emerald" />
-          </div>
-        )}
-      </div>
-    </div>
+    <Badge 
+      variant={status.variant}
+      className={cn(status.className, 'text-xs font-medium', className)}
+    >
+      <Icon className="h-3 w-3 mr-1" />
+      {status.label}
+    </Badge>
   );
 };
 
