@@ -14,6 +14,146 @@ export type Database = {
   }
   public: {
     Tables: {
+      islamic_preferences: {
+        Row: {
+          beard_preference: string | null
+          created_at: string
+          desired_partner_sect: string | null
+          halal_diet: boolean | null
+          hijab_preference: string | null
+          id: string
+          importance_of_religion: string | null
+          madhab: string | null
+          prayer_frequency: string | null
+          quran_reading: string | null
+          sect: string | null
+          smoking: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          beard_preference?: string | null
+          created_at?: string
+          desired_partner_sect?: string | null
+          halal_diet?: boolean | null
+          hijab_preference?: string | null
+          id?: string
+          importance_of_religion?: string | null
+          madhab?: string | null
+          prayer_frequency?: string | null
+          quran_reading?: string | null
+          sect?: string | null
+          smoking?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          beard_preference?: string | null
+          created_at?: string
+          desired_partner_sect?: string | null
+          halal_diet?: boolean | null
+          hijab_preference?: string | null
+          id?: string
+          importance_of_religion?: string | null
+          madhab?: string | null
+          prayer_frequency?: string | null
+          quran_reading?: string | null
+          sect?: string | null
+          smoking?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      matches: {
+        Row: {
+          created_at: string
+          id: string
+          is_mutual: boolean | null
+          match_score: number | null
+          user1_id: string
+          user1_liked: boolean | null
+          user2_id: string
+          user2_liked: boolean | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_mutual?: boolean | null
+          match_score?: number | null
+          user1_id: string
+          user1_liked?: boolean | null
+          user2_id: string
+          user2_liked?: boolean | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_mutual?: boolean | null
+          match_score?: number | null
+          user1_id?: string
+          user1_liked?: boolean | null
+          user2_id?: string
+          user2_liked?: boolean | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_read: boolean | null
+          match_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          match_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          match_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_views: {
+        Row: {
+          created_at: string
+          id: string
+          viewed_id: string
+          viewer_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          viewed_id: string
+          viewer_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          viewed_id?: string
+          viewer_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null

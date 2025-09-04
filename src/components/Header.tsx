@@ -68,14 +68,10 @@ const Header = () => {
                   <Link to="/auth">Se connecter</Link>
                 </Button>
                 <Button 
-                  size="sm"
-                  className="bg-gradient-to-r from-emerald to-emerald-light hover:from-emerald-dark hover:to-emerald text-primary-foreground"
+                  className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
                   asChild
                 >
-                  <Link to="/auth">
-                    <User className="mr-2 h-4 w-4" />
-                    S'inscrire
-                  </Link>
+                  <Link to="/dashboard">Mon Profil</Link>
                 </Button>
               </>
             )}
