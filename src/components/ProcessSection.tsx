@@ -14,73 +14,73 @@ const processSteps: ProcessStep[] = [
   {
     id: 1,
     icon: <UserPlus className="w-8 h-8 text-emerald-500" />,
-    title: "Create Your Profile",
-    description: "Set up your detailed profile with Islamic preferences and family information.",
+    title: "Créez Votre Profil",
+    description: "Configurez votre profil détaillé avec les préférences islamiques et les informations familiales.",
     details: [
-      "Add your Islamic practices and preferences",
-      "Upload verified photos with privacy controls",
-      "Include family background and expectations",
-      "Set your matrimonial preferences"
+      "Ajoutez vos pratiques et préférences islamiques",
+      "Téléchargez des photos vérifiées avec contrôles de confidentialité",
+      "Incluez le contexte familial et les attentes",
+      "Définissez vos préférences matrimoniales"
     ]
   },
   {
     id: 2,
     icon: <CheckCircle className="w-8 h-8 text-blue-500" />,
-    title: "Get Verified",
-    description: "Complete our multi-step verification process for a trusted community.",
+    title: "Faites-vous Vérifier",
+    description: "Complétez notre processus de vérification multi-étapes pour une communauté de confiance.",
     details: [
-      "Verify your identity documents",
-      "Confirm your phone and email",
-      "Family verification (optional)",
-      "Increase your profile credibility"
+      "Vérifiez vos documents d'identité",
+      "Confirmez votre téléphone et email",
+      "Vérification familiale (optionnelle)",
+      "Augmentez la crédibilité de votre profil"
     ]
   },
   {
     id: 3,
     icon: <Search className="w-8 h-8 text-purple-500" />,
-    title: "Browse & Search",
-    description: "Use our advanced filters to find compatible matches based on Islamic criteria.",
+    title: "Parcourir & Rechercher",
+    description: "Utilisez nos filtres avancés pour trouver des matches compatibles basés sur des critères islamiques.",
     details: [
-      "Filter by Islamic practices and sect",
-      "Location and education preferences",
-      "Family background matching",
-      "Lifestyle and value alignment"
+      "Filtrez par pratiques islamiques et secte",
+      "Préférences de lieu et d'éducation",
+      "Correspondance du contexte familial",
+      "Alignement du mode de vie et des valeurs"
     ]
   },
   {
     id: 4,
     icon: <Heart className="w-8 h-8 text-rose-500" />,
-    title: "Express Interest",
-    description: "Show interest in profiles that align with your preferences respectfully.",
+    title: "Exprimer l'Intérêt",
+    description: "Montrez votre intérêt pour des profils qui correspondent à vos préférences de manière respectueuse.",
     details: [
-      "Send respectful interest notifications",
-      "View who's interested in you", 
-      "Mutual matches unlock communication",
-      "Family can also express interest"
+      "Envoyez des notifications d'intérêt respectueuses",
+      "Voyez qui s'intéresse à vous", 
+      "Les matches mutuels débloquent la communication",
+      "La famille peut aussi exprimer son intérêt"
     ]
   },
   {
     id: 5,
     icon: <MessageCircle className="w-8 h-8 text-amber-500" />,
-    title: "Communicate Respectfully",
-    description: "Start meaningful conversations with your matches in a monitored environment.",
+    title: "Communiquer Respectueusement",
+    description: "Commencez des conversations significatives avec vos matches dans un environnement surveillé.",
     details: [
-      "Islamic guidelines for communication",
-      "Family member can join conversations",
-      "Report inappropriate behavior",
-      "Focus on getting to know each other"
+      "Directives islamiques pour la communication",
+      "Un membre de la famille peut rejoindre les conversations",
+      "Signalez les comportements inappropriés",
+      "Concentrez-vous sur l'apprentissage mutuel"
     ]
   },
   {
     id: 6,
     icon: <Users className="w-8 h-8 text-indigo-500" />,
-    title: "Meet Families",
-    description: "Involve families in the process leading to a blessed union, In Sha Allah.",
+    title: "Rencontrer les Familles",
+    description: "Impliquez les familles dans le processus menant à une union bénie, In Sha Allah.",
     details: [
-      "Arrange family introductions",
-      "Traditional matrimonial meetings",
-      "Islamic marriage counseling",
-      "Wedding planning assistance"
+      "Organisez des présentations familiales",
+      "Rencontres matrimoniales traditionnelles",
+      "Conseil matrimonial islamique",
+      "Assistance à la planification du mariage"
     ]
   }
 ];
@@ -91,11 +91,11 @@ const ProcessSection = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-sage-700 bg-clip-text text-transparent">
-            Your Journey to Marriage
+            Votre Parcours vers le Mariage
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Follow our Islamic approach to finding your life partner. Every step is designed 
-            with respect, privacy, and Islamic values at its core.
+            Suivez notre approche islamique pour trouver votre partenaire de vie. Chaque étape est conçue 
+            avec respect, confidentialité et valeurs islamiques au cœur.
           </p>
         </div>
 
@@ -152,16 +152,16 @@ const ProcessSection = () => {
         <div className="text-center mt-16">
           <div className="bg-gradient-to-r from-emerald-50 to-sage-50 rounded-2xl p-8 border border-emerald-200 max-w-4xl mx-auto">
             <h3 className="text-2xl font-bold text-emerald-700 mb-4">
-              Ready to Start Your Journey?
+              Prêt à Commencer Votre Parcours ?
             </h3>
             <p className="text-emerald-600 mb-6">
-              Join thousands of Muslims who have found their life partners through our platform.
+              Rejoignez des milliers de musulmans qui ont trouvé leurs partenaires de vie grâce à notre plateforme.
             </p>
             <Button 
               size="lg" 
               className="bg-gradient-to-r from-emerald-600 to-sage-600 hover:from-emerald-700 hover:to-sage-700 text-white px-8 py-3"
             >
-              Create Your Profile Today
+              Créez Votre Profil Aujourd'hui
             </Button>
           </div>
         </div>
