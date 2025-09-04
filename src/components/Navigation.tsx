@@ -14,7 +14,10 @@ import {
   Clock, 
   Home, 
   LogOut,
-  Settings
+  Settings,
+  Shield,
+  Users,
+  BookOpen
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
@@ -150,6 +153,7 @@ const Navigation = () => {
     { path: '/dashboard', icon: User, label: 'Mon Profil' },
     { path: '/browse', icon: Search, label: 'Découvrir' },
     { path: '/matches', icon: Heart, label: 'Mes Matches' },
+    { path: '/guidance', icon: BookOpen, label: 'Guide islamique' },
   ];
 
   return (
@@ -272,6 +276,18 @@ const Navigation = () => {
 
       {/* User Actions */}
       <div className="space-y-2">
+        <Button variant="ghost" className="w-full justify-start gap-3" asChild>
+          <Link to="/privacy">
+            <Shield className="h-4 w-4" />
+            Confidentialité
+          </Link>
+        </Button>
+        <Button variant="ghost" className="w-full justify-start gap-3" asChild>
+          <Link to="/family">
+            <Users className="h-4 w-4" />
+            Famille
+          </Link>
+        </Button>
         <Button variant="ghost" className="w-full justify-start gap-3" disabled>
           <Settings className="h-4 w-4" />
           Paramètres

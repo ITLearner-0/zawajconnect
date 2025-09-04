@@ -14,6 +14,81 @@ export type Database = {
   }
   public: {
     Tables: {
+      family_members: {
+        Row: {
+          can_communicate: boolean | null
+          can_view_profile: boolean | null
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          is_wali: boolean | null
+          phone: string | null
+          relationship: string
+          user_id: string
+        }
+        Insert: {
+          can_communicate?: boolean | null
+          can_view_profile?: boolean | null
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          is_wali?: boolean | null
+          phone?: string | null
+          relationship: string
+          user_id: string
+        }
+        Update: {
+          can_communicate?: boolean | null
+          can_view_profile?: boolean | null
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_wali?: boolean | null
+          phone?: string | null
+          relationship?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      islamic_guidance: {
+        Row: {
+          author: string | null
+          category: string
+          content: string
+          created_at: string
+          featured: boolean | null
+          id: string
+          published: boolean | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string | null
+          category: string
+          content: string
+          created_at?: string
+          featured?: boolean | null
+          id?: string
+          published?: boolean | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string | null
+          category?: string
+          content?: string
+          created_at?: string
+          featured?: boolean | null
+          id?: string
+          published?: boolean | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       islamic_preferences: {
         Row: {
           beard_preference: string | null
@@ -177,6 +252,48 @@ export type Database = {
           },
         ]
       }
+      privacy_settings: {
+        Row: {
+          allow_family_involvement: boolean | null
+          allow_messages_from: string | null
+          allow_profile_views: boolean | null
+          contact_visibility: string | null
+          created_at: string
+          id: string
+          last_seen_visibility: string | null
+          photo_visibility: string | null
+          profile_visibility: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allow_family_involvement?: boolean | null
+          allow_messages_from?: string | null
+          allow_profile_views?: boolean | null
+          contact_visibility?: string | null
+          created_at?: string
+          id?: string
+          last_seen_visibility?: string | null
+          photo_visibility?: string | null
+          profile_visibility?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allow_family_involvement?: boolean | null
+          allow_messages_from?: string | null
+          allow_profile_views?: boolean | null
+          contact_visibility?: string | null
+          created_at?: string
+          id?: string
+          last_seen_visibility?: string | null
+          photo_visibility?: string | null
+          profile_visibility?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile_views: {
         Row: {
           created_at: string
@@ -246,6 +363,93 @@ export type Database = {
           profession?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          description: string
+          id: string
+          report_type: string
+          reported_user_id: string
+          reporter_id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          status: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          report_type: string
+          reported_user_id: string
+          reporter_id: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          report_type?: string
+          reported_user_id?: string
+          reporter_id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
+      user_verifications: {
+        Row: {
+          created_at: string
+          email_verified: boolean | null
+          family_verified: boolean | null
+          id: string
+          id_verified: boolean | null
+          phone_verified: boolean | null
+          updated_at: string
+          user_id: string
+          verification_documents: string[] | null
+          verification_notes: string | null
+          verification_score: number | null
+          verified_at: string | null
+          verified_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_verified?: boolean | null
+          family_verified?: boolean | null
+          id?: string
+          id_verified?: boolean | null
+          phone_verified?: boolean | null
+          updated_at?: string
+          user_id: string
+          verification_documents?: string[] | null
+          verification_notes?: string | null
+          verification_score?: number | null
+          verified_at?: string | null
+          verified_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_verified?: boolean | null
+          family_verified?: boolean | null
+          id?: string
+          id_verified?: boolean | null
+          phone_verified?: boolean | null
+          updated_at?: string
+          user_id?: string
+          verification_documents?: string[] | null
+          verification_notes?: string | null
+          verification_score?: number | null
+          verified_at?: string | null
+          verified_by?: string | null
         }
         Relationships: []
       }

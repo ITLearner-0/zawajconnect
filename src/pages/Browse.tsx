@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Heart, X, MapPin, GraduationCap, Briefcase, Filter, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import VerificationBadge from '@/components/VerificationBadge';
 
 interface Profile {
   id: string;
@@ -27,6 +28,13 @@ interface Profile {
     quran_reading: string;
     sect: string;
     importance_of_religion: string;
+  };
+  verification?: {
+    verification_score: number;
+    email_verified: boolean;
+    phone_verified: boolean;
+    id_verified: boolean;
+    family_verified: boolean;
   };
 }
 
@@ -70,18 +78,26 @@ const Browse = () => {
         .limit(50);
 
       if (profilesData) {
-        // Get Islamic preferences for each profile
+        // Get Islamic preferences and verification for each profile
         const profilesWithPrefs = await Promise.all(
           profilesData.map(async (profile) => {
-            const { data: prefs } = await supabase
-              .from('islamic_preferences')
-              .select('prayer_frequency, quran_reading, sect, importance_of_religion')
-              .eq('user_id', profile.user_id)
-              .single();
+            const [prefsResult, verificationResult] = await Promise.all([
+              supabase
+                .from('islamic_preferences')
+                .select('prayer_frequency, quran_reading, sect, importance_of_religion')
+                .eq('user_id', profile.user_id)
+                .single(),
+              supabase
+                .from('user_verifications')
+                .select('verification_score, email_verified, phone_verified, id_verified, family_verified')
+                .eq('user_id', profile.user_id)
+                .single()
+            ]);
 
             return {
               ...profile,
-              islamic_preferences: prefs || undefined
+              islamic_preferences: prefsResult.data || undefined,
+              verification: verificationResult.data || undefined
             };
           })
         );
@@ -322,7 +338,18 @@ const Browse = () => {
                       )}
                     </div>
                     <div className="text-center">
-                      <h3 className="text-xl font-bold text-foreground mb-1">{profile.full_name}</h3>
+                      <div className="flex items-center justify-center gap-2 mb-1">
+                        <h3 className="text-xl font-bold text-foreground">{profile.full_name}</h3>
+                        {profile.verification && (
+                          <VerificationBadge
+                            verificationScore={profile.verification.verification_score}
+                            emailVerified={profile.verification.email_verified}
+                            phoneVerified={profile.verification.phone_verified}
+                            idVerified={profile.verification.id_verified}
+                            familyVerified={profile.verification.family_verified}
+                          />
+                        )}
+                      </div>
                       <p className="text-muted-foreground text-sm mb-2">{profile.age} ans</p>
                     </div>
                   </div>

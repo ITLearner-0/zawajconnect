@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, MapPin, GraduationCap, Briefcase, Heart, User, MessageCircle, Eye, Calendar } from 'lucide-react';
+import { ArrowLeft, MapPin, GraduationCap, Briefcase, Heart, User, MessageCircle, Eye, Calendar, Flag } from 'lucide-react';
+import VerificationBadge from '@/components/VerificationBadge';
+import ReportModal from '@/components/ReportModal';
 
 interface ProfileData {
   id: string;
@@ -42,6 +44,8 @@ const Profile = () => {
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
+  const [verification, setVerification] = useState<any>(null);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -55,6 +59,7 @@ const Profile = () => {
     fetchProfile();
     checkIfLiked();
     recordProfileView();
+    fetchVerificationStatus();
   }, [user, userId]);
 
   const fetchProfile = async () => {
@@ -105,6 +110,22 @@ const Profile = () => {
       }
     } catch (error) {
       // No match found, that's ok
+    }
+  };
+
+  const fetchVerificationStatus = async () => {
+    if (!userId) return;
+
+    try {
+      const { data } = await supabase
+        .from('user_verifications')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+
+      setVerification(data);
+    } catch (error) {
+      console.error('Error fetching verification status:', error);
     }
   };
 
@@ -447,12 +468,30 @@ const Profile = () => {
                   <p className="text-sm text-muted-foreground">
                     Score de compatibilité basé sur vos préférences communes
                   </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowReportModal(true)}
+                    className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Flag className="h-4 w-4 mr-2" />
+                    Signaler ce profil
+                  </Button>
                 </CardContent>
               </Card>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <ReportModal
+          isOpen={showReportModal}
+          onClose={() => setShowReportModal(false)}
+          reportedUserId={userId!}
+          reportedUserName={profile?.full_name || 'Utilisateur'}
+        />
+      )}
     </div>
   );
 };
