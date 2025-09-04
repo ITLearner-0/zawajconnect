@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { useMobileNav } from '@/hooks/useMobileNav';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,7 +18,8 @@ import {
   Settings,
   Shield,
   Users,
-  BookOpen
+  BookOpen,
+  X
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
@@ -36,7 +38,12 @@ interface PrayerTime {
   next?: boolean;
 }
 
-const Navigation = () => {
+interface NavigationProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+const Navigation = ({ isOpen = true, onClose }: NavigationProps) => {
   const { user, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -141,9 +148,16 @@ const Navigation = () => {
     }
   };
 
+  const handleLinkClick = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
+    if (onClose) onClose();
   };
 
   if (!user) return null;
@@ -157,39 +171,61 @@ const Navigation = () => {
   ];
 
   return (
-    <div className="fixed top-0 left-0 h-full w-64 bg-card/95 backdrop-blur-sm border-r border-border/40 z-40 p-4 space-y-6">
-      {/* Logo */}
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-          <Heart className="h-5 w-5 text-primary-foreground fill-current" />
-        </div>
-        <div>
-          <h2 className="font-bold text-foreground">NikahConnect</h2>
-          <p className="text-xs text-muted-foreground">Matrimonial islamique</p>
-        </div>
-      </div>
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={onClose}
+        />
+      )}
+      
+      {/* Navigation Sidebar */}
+      <div className={`fixed top-0 left-0 h-full w-64 bg-card/95 backdrop-blur-sm border-r border-border/40 z-40 p-4 space-y-6 transition-transform duration-300 ${
+        isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      }`}>
+        {/* Mobile Close Button */}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onClose}
+          className="absolute top-4 right-4 lg:hidden"
+        >
+          <X className="h-4 w-4" />
+        </Button>
 
-      <Separator />
+        {/* Logo */}
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
+            <Heart className="h-5 w-5 text-primary-foreground fill-current" />
+          </div>
+          <div>
+            <h2 className="font-bold text-foreground">NikahConnect</h2>
+            <p className="text-xs text-muted-foreground">Matrimonial islamique</p>
+          </div>
+        </div>
 
-      {/* Navigation */}
-      <nav className="space-y-2">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location.pathname === item.path;
-          
-          return (
-            <Link key={item.path} to={item.path}>
-              <Button
-                variant={isActive ? "secondary" : "ghost"}
-                className="w-full justify-start gap-3"
-              >
-                <Icon className="h-4 w-4" />
-                {item.label}
-              </Button>
-            </Link>
-          );
-        })}
-      </nav>
+        <Separator />
+
+        {/* Navigation */}
+        <nav className="space-y-2">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = location.pathname === item.path;
+            
+            return (
+              <Link key={item.path} to={item.path} onClick={handleLinkClick}>
+                <Button
+                  variant={isActive ? "secondary" : "ghost"}
+                  className="w-full justify-start gap-3"
+                >
+                  <Icon className="h-4 w-4" />
+                  {item.label}
+                </Button>
+              </Link>
+            );
+          })}
+        </nav>
 
       <Separator />
 
@@ -274,53 +310,54 @@ const Navigation = () => {
 
       <Separator />
 
-      {/* User Actions */}
-      <div className="space-y-2">
-        <Button variant="ghost" className="w-full justify-start gap-3" asChild>
-          <Link to="/privacy">
-            <Shield className="h-4 w-4" />
-            Confidentialité
-          </Link>
-        </Button>
-        <Button variant="ghost" className="w-full justify-start gap-3" asChild>
-          <Link to="/family">
-            <Users className="h-4 w-4" />
-            Famille
-          </Link>
-        </Button>
-        <Button variant="ghost" className="w-full justify-start gap-3" disabled>
-          <Settings className="h-4 w-4" />
-          Paramètres
-        </Button>
-        <Button 
-          variant="ghost" 
-          onClick={handleSignOut}
-          className="w-full justify-start gap-3 text-destructive hover:text-destructive hover:bg-destructive/10"
-        >
-          <LogOut className="h-4 w-4" />
-          Déconnexion
-        </Button>
-      </div>
+        {/* User Actions */}
+        <div className="space-y-2">
+          <Button variant="ghost" className="w-full justify-start gap-3" asChild>
+            <Link to="/privacy" onClick={handleLinkClick}>
+              <Shield className="h-4 w-4" />
+              Confidentialité
+            </Link>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start gap-3" asChild>
+            <Link to="/family" onClick={handleLinkClick}>
+              <Users className="h-4 w-4" />
+              Famille
+            </Link>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start gap-3" disabled>
+            <Settings className="h-4 w-4" />
+            Paramètres
+          </Button>
+          <Button 
+            variant="ghost" 
+            onClick={handleSignOut}
+            className="w-full justify-start gap-3 text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <LogOut className="h-4 w-4" />
+            Déconnexion
+          </Button>
+        </div>
 
-      {/* User Info */}
-      <div className="absolute bottom-4 left-4 right-4">
-        <div className="flex items-center gap-3 p-2 rounded-md bg-accent/50">
-          <div className="h-8 w-8 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-            <span className="text-xs text-primary-foreground font-bold">
-              {user.user_metadata?.full_name?.charAt(0) || user.email?.charAt(0) || '?'}
-            </span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-foreground truncate">
-              {user.user_metadata?.full_name || 'Utilisateur'}
+        {/* User Info */}
+        <div className="absolute bottom-4 left-4 right-4">
+          <div className="flex items-center gap-3 p-2 rounded-md bg-accent/50">
+            <div className="h-8 w-8 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
+              <span className="text-xs text-primary-foreground font-bold">
+                {user.user_metadata?.full_name?.charAt(0) || user.email?.charAt(0) || '?'}
+              </span>
             </div>
-            <div className="text-xs text-muted-foreground truncate">
-              {user.email}
+            <div className="flex-1 min-w-0">
+              <div className="text-sm font-medium text-foreground truncate">
+                {user.user_metadata?.full_name || 'Utilisateur'}
+              </div>
+              <div className="text-xs text-muted-foreground truncate">
+                {user.email}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
