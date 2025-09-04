@@ -8,7 +8,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Heart, Mail, Phone, MapPin, Book, Users } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
 const RegistrationModal = ({ children }: { children: React.ReactNode }) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -42,8 +41,6 @@ const RegistrationModal = ({ children }: { children: React.ReactNode }) => {
     termsAccepted: false
   });
 
-  const { toast } = useToast();
-
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -61,10 +58,8 @@ const RegistrationModal = ({ children }: { children: React.ReactNode }) => {
   };
 
   const handleSubmit = () => {
-    toast({
-      title: "Inscription soumise ✨",
-      description: "Votre profil sera examiné sous 24h. Nous vous contacterons bientôt incha'Allah.",
-    });
+    // Simple alert instead of toast for now
+    alert("Inscription soumise ✨\nVotre profil sera examiné sous 24h. Nous vous contacterons bientôt incha'Allah.");
   };
 
   return (
