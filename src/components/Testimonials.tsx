@@ -41,7 +41,7 @@ const Testimonials = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="shadow-soft hover:shadow-lg transition-all duration-300 border-0 relative overflow-hidden">
+            <Card key={index} className="shadow-soft hover:shadow-lg transition-all duration-300 border-0 relative overflow-hidden animate-scale-in" style={{ animationDelay: `${index * 0.2}s` }}>
               <div className="absolute top-4 right-4 opacity-10">
                 <Quote className="h-12 w-12 text-emerald" />
               </div>

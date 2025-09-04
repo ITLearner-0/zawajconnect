@@ -73,7 +73,7 @@ const IslamicValues = () => {
           {values.map((value, index) => {
             const IconComponent = value.icon;
             return (
-              <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-0 shadow-soft">
+              <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-0 shadow-soft animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
                 <CardContent className="p-6 text-center">
                   <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br ${value.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
                     <IconComponent className="h-8 w-8 text-white" />

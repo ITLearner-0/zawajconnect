@@ -53,13 +53,13 @@ const ProcessSection = () => {
             const isEven = index % 2 === 1;
             
             return (
-              <div key={index} className={`flex ${isEven ? 'lg:flex-row-reverse' : 'flex-row'} gap-6`}>
+              <div key={index} className={`flex ${isEven ? 'lg:flex-row-reverse' : 'flex-row'} gap-6 animate-slide-up`} style={{ animationDelay: `${index * 0.15}s` }}>
                 <div className="flex-shrink-0">
                   <div className="relative">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald to-emerald-light flex items-center justify-center shadow-lg">
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald to-emerald-light flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300">
                       <IconComponent className="h-8 w-8 text-white" />
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-gold text-white text-sm font-bold flex items-center justify-center">
+                    <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-gold text-white text-sm font-bold flex items-center justify-center animate-pulse-gentle">
                       {step.number}
                     </div>
                   </div>

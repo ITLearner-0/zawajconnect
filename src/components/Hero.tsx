@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Shield, Users } from "lucide-react";
 import heroPattern from "@/assets/hero-pattern.jpg";
+import RegistrationModal from "./RegistrationModal";
 
 const Hero = () => {
   return (
@@ -38,10 +39,12 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <Button size="lg" className="bg-gradient-to-r from-emerald to-emerald-light hover:from-emerald-dark hover:to-emerald text-white shadow-lg hover:shadow-xl transition-all duration-300">
-              <Heart className="mr-2 h-5 w-5" />
-              Commencer mon parcours
-            </Button>
+            <RegistrationModal>
+              <Button size="lg" className="bg-gradient-to-r from-emerald to-emerald-light hover:from-emerald-dark hover:to-emerald text-white shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse-gentle">
+                <Heart className="mr-2 h-5 w-5" />
+                Commencer mon parcours
+              </Button>
+            </RegistrationModal>
             <Button variant="outline" size="lg" className="border-emerald text-emerald hover:bg-emerald hover:text-white transition-all duration-300">
               Découvrir nos valeurs
             </Button>
