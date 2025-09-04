@@ -11,6 +11,7 @@ import Matches from "./pages/Matches";
 import Chat from "./pages/Chat";
 import Profile from "./pages/Profile";
 import Privacy from "./pages/Privacy";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Family from "./pages/Family";
 import Guidance from "./pages/Guidance";
 import Admin from "./pages/Admin";
@@ -49,6 +50,7 @@ const App: React.FC = () => {
               <Route path="/chat/:matchId" element={<Chat />} />
               <Route path="/profile/:userId" element={<Profile />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/family" element={<Family />} />
               <Route path="/guidance" element={<Guidance />} />
             <Route path="/admin" element={<Admin />} />
