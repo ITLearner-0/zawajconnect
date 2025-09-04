@@ -1,399 +1,290 @@
-import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Heart, Mail, Phone, MapPin, Book, Users } from "lucide-react";
+import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
+import { Loader2, Mail, Lock, User } from 'lucide-react';
 
-const RegistrationModal = ({ children }: { children: React.ReactNode }) => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [formData, setFormData] = useState({
-    // Informations personnelles
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    age: "",
-    location: "",
-    
-    // Informations religieuses
-    practiceLevel: "",
-    prayerFrequency: "",
-    quranKnowledge: "",
-    islamicEducation: "",
-    
-    // Préférences matrimoniales
-    agePreference: "",
-    locationPreference: "",
-    partnerPracticeLevel: "",
-    
-    // Informations familiales
-    waliName: "",
-    waliPhone: "",
-    familyApproval: false,
-    
-    // Engagement
-    intentionDeclaration: false,
-    termsAccepted: false
-  });
+interface RegistrationModalProps {
+  children: React.ReactNode;
+}
 
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+const RegistrationModal = ({ children }: RegistrationModalProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('signin');
+  const { signIn, signUp } = useAuth();
+  const { toast } = useToast();
 
-  const handleNext = () => {
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1);
+  // Sign In form state
+  const [signInEmail, setSignInEmail] = useState('');
+  const [signInPassword, setSignInPassword] = useState('');
+
+  // Sign Up form state
+  const [signUpEmail, setSignUpEmail] = useState('');
+  const [signUpPassword, setSignUpPassword] = useState('');
+  const [signUpFullName, setSignUpFullName] = useState('');
+  const [signUpConfirmPassword, setSignUpConfirmPassword] = useState('');
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { error } = await signIn(signInEmail, signInPassword);
+      
+      if (error) {
+        toast({
+          title: "Sign In Failed",
+          description: error.message || "Please check your credentials and try again.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "Welcome back!",
+        description: "You have been successfully signed in.",
+      });
+      
+      setIsOpen(false);
+      // Reset form
+      setSignInEmail('');
+      setSignInPassword('');
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handlePrevious = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const handleSubmit = () => {
-    // Simple alert instead of toast for now
-    alert("Inscription soumise ✨\nVotre profil sera examiné sous 24h. Nous vous contacterons bientôt incha'Allah.");
+    if (signUpPassword !== signUpConfirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "Please ensure both password fields match.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (signUpPassword.length < 6) {
+      toast({
+        title: "Weak Password",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const { error } = await signUp(signUpEmail, signUpPassword, signUpFullName);
+      
+      if (error) {
+        toast({
+          title: "Sign Up Failed",
+          description: error.message || "Please try again with different credentials.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      toast({
+        title: "Account Created!",
+        description: "Please check your email to verify your account.",
+      });
+
+      // Reset form
+      setSignUpEmail('');
+      setSignUpPassword('');
+      setSignUpFullName('');
+      setSignUpConfirmPassword('');
+      
+      // Switch to sign in tab
+      setActiveTab('signin');
+      
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-2xl text-center mb-4">
-            Inscription Respectueuse
+          <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-emerald-600 to-sage-700 bg-clip-text text-transparent">
+            Join NikahNoor
           </DialogTitle>
-          
-          {/* Progress Steps */}
-          <div className="flex justify-center space-x-2 mb-6">
-            {[1, 2, 3, 4].map((step) => (
-              <div
-                key={step}
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  step === currentStep 
-                    ? 'bg-emerald text-white' 
-                    : step < currentStep 
-                    ? 'bg-emerald-light text-white' 
-                    : 'bg-muted text-muted-foreground'
-                }`}
-              >
-                {step}
-              </div>
-            ))}
-          </div>
         </DialogHeader>
-
-        {/* Step 1: Informations Personnelles */}
-        {currentStep === 1 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-emerald">
-                <User className="mr-2 h-5 w-5" />
-                Informations Personnelles
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="firstName">Prénom *</Label>
-                  <Input
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    placeholder="Votre prénom"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="lastName">Nom *</Label>
-                  <Input
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    placeholder="Votre nom"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  placeholder="votre.email@example.com"
-                />
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="phone">Téléphone</Label>
-                  <Input
-                    id="phone"
-                    value={formData.phone}
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    placeholder="+33 1 23 45 67 89"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="age">Âge *</Label>
-                  <Select value={formData.age} onValueChange={(value) => handleInputChange('age', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Votre âge" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {Array.from({ length: 50 }, (_, i) => i + 18).map((age) => (
-                        <SelectItem key={age} value={age.toString()}>{age} ans</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor="location">Localisation *</Label>
-                <Input
-                  id="location"
-                  value={formData.location}
-                  onChange={(e) => handleInputChange('location', e.target.value)}
-                  placeholder="Ville, Pays"
-                />
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step 2: Informations Religieuses */}
-        {currentStep === 2 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-emerald">
-                <Book className="mr-2 h-5 w-5" />
-                Pratique Religieuse
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>Niveau de pratique *</Label>
-                <Select value={formData.practiceLevel} onValueChange={(value) => handleInputChange('practiceLevel', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez votre niveau" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="debutant">Débutant - J'apprends</SelectItem>
-                    <SelectItem value="pratiquant">Pratiquant régulier</SelectItem>
-                    <SelectItem value="assidu">Très pratiquant</SelectItem>
-                    <SelectItem value="savant">Étudiant en sciences islamiques</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label>Fréquence des prières *</Label>
-                <Select value={formData.prayerFrequency} onValueChange={(value) => handleInputChange('prayerFrequency', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Vos habitudes de prière" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="5-daily">5 prières quotidiennes</SelectItem>
-                    <SelectItem value="most-daily">La plupart des prières</SelectItem>
-                    <SelectItem value="friday">Prière du vendredi régulièrement</SelectItem>
-                    <SelectItem value="occasional">Occasionnellement</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label>Connaissance du Coran</Label>
-                <Select value={formData.quranKnowledge} onValueChange={(value) => handleInputChange('quranKnowledge', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Votre niveau" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="hafiz">Hafiz/Hafiza (mémorisation complète)</SelectItem>
-                    <SelectItem value="several-surahs">Plusieurs sourates</SelectItem>
-                    <SelectItem value="basic-surahs">Sourates de base</SelectItem>
-                    <SelectItem value="learning">En apprentissage</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label>Éducation islamique</Label>
-                <Textarea
-                  value={formData.islamicEducation}
-                  onChange={(e) => handleInputChange('islamicEducation', e.target.value)}
-                  placeholder="Décrivez brièvement votre parcours d'apprentissage religieux..."
-                  rows={3}
-                />
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step 3: Préférences Matrimoniales */}
-        {currentStep === 3 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-emerald">
-                <Heart className="mr-2 h-5 w-5" />
-                Recherche de Conjoint
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label>Tranche d'âge souhaitée</Label>
-                <Select value={formData.agePreference} onValueChange={(value) => handleInputChange('agePreference', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Âge préféré pour votre conjoint" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="18-25">18-25 ans</SelectItem>
-                    <SelectItem value="25-30">25-30 ans</SelectItem>
-                    <SelectItem value="30-35">30-35 ans</SelectItem>
-                    <SelectItem value="35-40">35-40 ans</SelectItem>
-                    <SelectItem value="40+">40 ans et plus</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div>
-                <Label>Localisation préférée</Label>
-                <Input
-                  value={formData.locationPreference}
-                  onChange={(e) => handleInputChange('locationPreference', e.target.value)}
-                  placeholder="Même ville, même pays, peu importe..."
-                />
-              </div>
-              
-              <div>
-                <Label>Niveau de pratique souhaité *</Label>
-                <Select value={formData.partnerPracticeLevel} onValueChange={(value) => handleInputChange('partnerPracticeLevel', value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Niveau religieux recherché" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="similar">Similaire au mien</SelectItem>
-                    <SelectItem value="more-practicing">Plus pratiquant que moi</SelectItem>
-                    <SelectItem value="learning-together">Apprendre ensemble</SelectItem>
-                    <SelectItem value="flexible">Flexible</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Step 4: Informations Familiales & Engagement */}
-        {currentStep === 4 && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center text-emerald">
-                <Users className="mr-2 h-5 w-5" />
-                Famille & Engagement
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="waliName">Nom du Wali *</Label>
-                  <Input
-                    id="waliName"
-                    value={formData.waliName}
-                    onChange={(e) => handleInputChange('waliName', e.target.value)}
-                    placeholder="Prénom et nom"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="waliPhone">Téléphone du Wali *</Label>
-                  <Input
-                    id="waliPhone"
-                    value={formData.waliPhone}
-                    onChange={(e) => handleInputChange('waliPhone', e.target.value)}
-                    placeholder="+33 1 23 45 67 89"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-4 pt-4">
-                <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="familyApproval"
-                    checked={formData.familyApproval}
-                    onCheckedChange={(checked) => handleInputChange('familyApproval', checked as boolean)}
-                  />
-                  <label htmlFor="familyApproval" className="text-sm leading-5">
-                    Ma famille est au courant et approuve ma recherche matrimoniale sur cette plateforme
-                  </label>
-                </div>
-                
-                <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="intentionDeclaration"
-                    checked={formData.intentionDeclaration}
-                    onCheckedChange={(checked) => handleInputChange('intentionDeclaration', checked as boolean)}
-                  />
-                  <label htmlFor="intentionDeclaration" className="text-sm leading-5">
-                    J'atteste sur l'honneur que mon intention (Niyyah) est pure et que je recherche uniquement le mariage halal
-                  </label>
-                </div>
-                
-                <div className="flex items-start space-x-2">
-                  <Checkbox
-                    id="termsAccepted"
-                    checked={formData.termsAccepted}
-                    onCheckedChange={(checked) => handleInputChange('termsAccepted', checked as boolean)}
-                  />
-                  <label htmlFor="termsAccepted" className="text-sm leading-5">
-                    J'accepte les conditions d'utilisation et m'engage à respecter les valeurs islamiques de la plateforme
-                  </label>
-                </div>
-              </div>
-              
-              {/* Islamic Quote */}
-              <div className="mt-6 p-4 bg-cream rounded-lg border-l-4 border-emerald">
-                <p className="text-sm text-muted-foreground italic mb-2">
-                  "Et parmi Ses signes Il a créé de vous, pour vous, des épouses pour que vous viviez en tranquillité avec elles"
-                </p>
-                <p className="text-xs text-emerald font-medium">- Sourate Ar-Rum, verset 21</p>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-6">
-          <Button
-            variant="outline"
-            onClick={handlePrevious}
-            disabled={currentStep === 1}
-          >
-            Précédent
-          </Button>
+        
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="signin">Sign In</TabsTrigger>
+            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+          </TabsList>
           
-          {currentStep < 4 ? (
-            <Button onClick={handleNext} className="bg-emerald hover:bg-emerald-dark">
-              Suivant
-            </Button>
-          ) : (
-            <Button 
-              onClick={handleSubmit}
-              className="bg-gradient-to-r from-emerald to-emerald-light hover:from-emerald-dark hover:to-emerald"
-              disabled={!formData.familyApproval || !formData.intentionDeclaration || !formData.termsAccepted}
-            >
-              Soumettre l'inscription
-            </Button>
-          )}
-        </div>
+          <TabsContent value="signin">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Welcome Back</CardTitle>
+                <CardDescription>
+                  Sign in to your NikahNoor account to continue your journey.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input
+                        id="signin-email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={signInEmail}
+                        onChange={(e) => setSignInEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signin-password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input
+                        id="signin-password"
+                        type="password"
+                        placeholder="Your password"
+                        value={signInPassword}
+                        onChange={(e) => setSignInPassword(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing In...
+                      </>
+                    ) : (
+                      'Sign In'
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="signup">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Create Account</CardTitle>
+                <CardDescription>
+                  Start your journey to find your perfect match, In Sha Allah.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-name">Full Name</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input
+                        id="signup-name"
+                        type="text"
+                        placeholder="Your full name"
+                        value={signUpFullName}
+                        onChange={(e) => setSignUpFullName(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input
+                        id="signup-email"
+                        type="email"
+                        placeholder="your@email.com"
+                        value={signUpEmail}
+                        onChange={(e) => setSignUpEmail(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input
+                        id="signup-password"
+                        type="password"
+                        placeholder="Create a password (min. 6 characters)"
+                        value={signUpPassword}
+                        onChange={(e) => setSignUpPassword(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-confirm">Confirm Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                      <Input
+                        id="signup-confirm"
+                        type="password"
+                        placeholder="Confirm your password"
+                        value={signUpConfirmPassword}
+                        onChange={(e) => setSignUpConfirmPassword(e.target.value)}
+                        className="pl-10"
+                        required
+                      />
+                    </div>
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Creating Account...
+                      </>
+                    ) : (
+                      'Create Account'
+                    )}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

@@ -1,102 +1,169 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { UserCheck, Search, MessageSquare, Heart } from "lucide-react";
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { CheckCircle, UserPlus, Search, Heart, MessageCircle, Users } from 'lucide-react';
 
-const steps = [
+interface ProcessStep {
+  id: number;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  details: string[];
+}
+
+const processSteps: ProcessStep[] = [
   {
-    icon: UserCheck,
-    number: "01",
-    title: "Inscription Respectueuse",
-    description: "Créez votre profil avec vos informations religieuses, personnelles et familiales. Chaque profil est vérifié pour garantir des intentions sincères.",
-    features: ["Vérification d'identité", "Validation religieuse", "Approbation familiale"]
+    id: 1,
+    icon: <UserPlus className="w-8 h-8 text-emerald-500" />,
+    title: "Create Your Profile",
+    description: "Set up your detailed profile with Islamic preferences and family information.",
+    details: [
+      "Add your Islamic practices and preferences",
+      "Upload verified photos with privacy controls",
+      "Include family background and expectations",
+      "Set your matrimonial preferences"
+    ]
   },
   {
-    icon: Search,
-    number: "02", 
-    title: "Recherche Guidée",
-    description: "Trouvez des profils compatibles selon vos critères islamiques : niveau de pratique, origines, projets de vie et valeurs partagées.",
-    features: ["Critères religieux", "Compatibilité familiale", "Objectifs matrimoniaux"]
+    id: 2,
+    icon: <CheckCircle className="w-8 h-8 text-blue-500" />,
+    title: "Get Verified",
+    description: "Complete our multi-step verification process for a trusted community.",
+    details: [
+      "Verify your identity documents",
+      "Confirm your phone and email",
+      "Family verification (optional)",
+      "Increase your profile credibility"
+    ]
   },
   {
-    icon: MessageSquare,
-    number: "03",
-    title: "Communication Halal",
-    description: "Échangez dans le respect avec possibilité d'inclure un Wali ou un membre de la famille dans les conversations importantes.",
-    features: ["Messages supervisés", "Inclusion du Wali", "Respect de la Haya"]
+    id: 3,
+    icon: <Search className="w-8 h-8 text-purple-500" />,
+    title: "Browse & Search",
+    description: "Use our advanced filters to find compatible matches based on Islamic criteria.",
+    details: [
+      "Filter by Islamic practices and sect",
+      "Location and education preferences",
+      "Family background matching",
+      "Lifestyle and value alignment"
+    ]
   },
   {
-    icon: Heart,
-    number: "04",
-    title: "Union Bénie",
-    description: "Progressez vers le mariage avec l'accompagnement de vos familles et le respect complet des traditions islamiques.",  
-    features: ["Accompagnement familial", "Préparation au mariage", "Suivi post-union"]
+    id: 4,
+    icon: <Heart className="w-8 h-8 text-rose-500" />,
+    title: "Express Interest",
+    description: "Show interest in profiles that align with your preferences respectfully.",
+    details: [
+      "Send respectful interest notifications",
+      "View who's interested in you", 
+      "Mutual matches unlock communication",
+      "Family can also express interest"
+    ]
+  },
+  {
+    id: 5,
+    icon: <MessageCircle className="w-8 h-8 text-amber-500" />,
+    title: "Communicate Respectfully",
+    description: "Start meaningful conversations with your matches in a monitored environment.",
+    details: [
+      "Islamic guidelines for communication",
+      "Family member can join conversations",
+      "Report inappropriate behavior",
+      "Focus on getting to know each other"
+    ]
+  },
+  {
+    id: 6,
+    icon: <Users className="w-8 h-8 text-indigo-500" />,
+    title: "Meet Families",
+    description: "Involve families in the process leading to a blessed union, In Sha Allah.",
+    details: [
+      "Arrange family introductions",
+      "Traditional matrimonial meetings",
+      "Islamic marriage counseling",
+      "Wedding planning assistance"
+    ]
   }
 ];
 
 const ProcessSection = () => {
   return (
-    <section id="processus" className="py-20 bg-background">
+    <section className="py-20 bg-gradient-to-br from-cream/10 via-background to-sage/5">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-            Un Processus <span className="text-emerald">Respectueux</span>
+          <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-sage-700 bg-clip-text text-transparent">
+            Your Journey to Marriage
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Chaque étape de votre parcours matrimonial est conçue pour honorer 
-            les valeurs islamiques et impliquer votre famille.
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+            Follow our Islamic approach to finding your life partner. Every step is designed 
+            with respect, privacy, and Islamic values at its core.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
-          {steps.map((step, index) => {
-            const IconComponent = step.icon;
-            const isEven = index % 2 === 1;
-            
-            return (
-              <div key={index} className={`flex ${isEven ? 'lg:flex-row-reverse' : 'flex-row'} gap-6 animate-slide-up`} style={{ animationDelay: `${index * 0.15}s` }}>
-                <div className="flex-shrink-0">
-                  <div className="relative">
-                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald to-emerald-light flex items-center justify-center shadow-lg hover:scale-105 transition-transform duration-300">
-                      <IconComponent className="h-8 w-8 text-white" />
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-gold text-white text-sm font-bold flex items-center justify-center animate-pulse-gentle">
-                      {step.number}
-                    </div>
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {processSteps.map((step, index) => (
+            <Card key={step.id} className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+              <CardContent className="p-8">
+                {/* Step Number */}
+                <div className="absolute top-4 right-4 w-8 h-8 bg-gradient-to-r from-emerald-500 to-sage-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                  {step.id}
                 </div>
-                
-                <Card className="flex-1 shadow-soft hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-6">
-                    <h3 className="text-xl font-bold mb-3 text-foreground">{step.title}</h3>
-                    <p className="text-muted-foreground mb-4 leading-relaxed">{step.description}</p>
-                    
-                    <div className="space-y-2">
-                      {step.features.map((feature, featureIndex) => (
-                        <div key={featureIndex} className="flex items-center text-sm">
-                          <div className="w-2 h-2 rounded-full bg-emerald mr-3"></div>
-                          <span className="text-muted-foreground">{feature}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            );
-          })}
+
+                {/* Icon */}
+                <div className="mb-6 p-4 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md group-hover:shadow-lg transition-shadow duration-300 w-fit">
+                  {step.icon}
+                </div>
+
+                {/* Title */}
+                <h3 className="text-xl font-bold mb-4 text-foreground">
+                  {step.title}
+                </h3>
+
+                {/* Description */}
+                <p className="text-muted-foreground leading-relaxed mb-6">
+                  {step.description}
+                </p>
+
+                {/* Details */}
+                <ul className="space-y-2 mb-6">
+                  {step.details.map((detail, detailIndex) => (
+                    <li key={detailIndex} className="flex items-start gap-3 text-sm">
+                      <CheckCircle className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-muted-foreground">{detail}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Connection Line (for larger screens) */}
+                {index < processSteps.length - 1 && (
+                  <div className="hidden xl:block absolute -right-4 top-1/2 transform -translate-y-1/2 z-10">
+                    <div className="w-8 h-px bg-gradient-to-r from-emerald-300 to-sage-400"></div>
+                    <div className="absolute -right-1 -top-1 w-2 h-2 bg-emerald-400 rounded-full"></div>
+                  </div>
+                )}
+              </CardContent>
+
+              {/* Hover gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-emerald-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            </Card>
+          ))}
         </div>
 
         {/* Call to Action */}
-        <div className="text-center bg-gradient-to-r from-cream to-sage/20 rounded-2xl p-8">
-          <h3 className="text-2xl font-bold mb-4 text-foreground">
-            Prêt à commencer votre parcours ?
-          </h3>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-            Rejoignez des milliers de musulmans qui ont trouvé leur moitié dans le respect des valeurs islamiques.
-          </p>
-          <Button size="lg" className="bg-gradient-to-r from-emerald to-emerald-light hover:from-emerald-dark hover:to-emerald text-white">
-            <Heart className="mr-2 h-5 w-5" />
-            Créer mon profil
-          </Button>
+        <div className="text-center mt-16">
+          <div className="bg-gradient-to-r from-emerald-50 to-sage-50 rounded-2xl p-8 border border-emerald-200 max-w-4xl mx-auto">
+            <h3 className="text-2xl font-bold text-emerald-700 mb-4">
+              Ready to Start Your Journey?
+            </h3>
+            <p className="text-emerald-600 mb-6">
+              Join thousands of Muslims who have found their life partners through our platform.
+            </p>
+            <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-emerald-600 to-sage-600 hover:from-emerald-700 hover:to-sage-700 text-white px-8 py-3"
+            >
+              Create Your Profile Today
+            </Button>
+          </div>
         </div>
       </div>
     </section>

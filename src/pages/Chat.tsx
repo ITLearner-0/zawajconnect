@@ -1,305 +1,303 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Send, ArrowLeft, Phone, Video, MoreVertical } from 'lucide-react';
-import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
-
-interface Message {
-  id: string;
-  content: string;
-  sender_id: string;
-  created_at: string;
-  is_read: boolean;
-}
+import { Button } from '@/components/ui/button';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Send, Heart } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface Match {
   id: string;
   user1_id: string;
   user2_id: string;
   is_mutual: boolean;
-  other_user: {
-    id: string;
+  created_at: string;
+  profiles: {
     full_name: string;
-    age: number;
-    location: string;
+    avatar_url?: string;
+  };
+}
+
+interface Message {
+  id: string;
+  content: string;
+  sender_id: string;
+  created_at: string;
+  sender: {
+    full_name: string;
+    avatar_url?: string;
   };
 }
 
 const Chat = () => {
-  const { matchId } = useParams();
   const { user } = useAuth();
-  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [match, setMatch] = useState<Match | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!user) {
-      navigate('/auth');
-      return;
+    if (user) {
+      fetchMatches();
     }
-    if (!matchId) {
-      navigate('/matches');
-      return;
+  }, [user]);
+
+  useEffect(() => {
+    if (selectedMatch) {
+      fetchMessages();
+      subscribeToMessages();
     }
-    fetchMatchAndMessages();
-    setupRealTimeSubscription();
-  }, [user, matchId]);
+  }, [selectedMatch]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const fetchMatchAndMessages = async () => {
-    if (!user || !matchId) return;
+  const fetchMatches = async () => {
+    const { data, error } = await supabase
+      .from('matches')
+      .select('*')
+      .or(`user1_id.eq.${user?.id},user2_id.eq.${user?.id}`)
+      .eq('is_mutual', true)
+      .order('created_at', { ascending: false });
 
-    try {
-      // Fetch match details
-      const { data: matchData } = await supabase
-        .from('matches')
-        .select('*')
-        .eq('id', matchId)
+    if (error) {
+      console.error('Error fetching matches:', error);
+      return;
+    }
+
+    // Fetch profiles separately
+    const formattedMatches = [];
+    for (const match of data || []) {
+      const otherUserId = match.user1_id === user?.id ? match.user2_id : match.user1_id;
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url')
+        .eq('user_id', otherUserId)
         .single();
 
-      if (matchData) {
-        const otherUserId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
-        
-        const { data: otherUserProfile } = await supabase
-          .from('profiles')
-          .select('id, full_name, age, location, user_id')
-          .eq('user_id', otherUserId)
-          .single();
-
-        const processedMatch = {
-          ...matchData,
-          other_user: otherUserProfile || {
-            id: otherUserId,
-            full_name: 'Utilisateur inconnu',
-            age: 0,
-            location: 'Non spécifié'
-          }
-        };
-        
-        setMatch(processedMatch);
-
-        // Only allow messaging if it's a mutual match
-        if (!matchData.is_mutual) {
-          navigate('/matches');
-          return;
-        }
-      }
-
-      // Fetch messages
-      const { data: messagesData } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('match_id', matchId)
-        .order('created_at', { ascending: true });
-
-      setMessages(messagesData || []);
-
-      // Mark messages as read
-      await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .eq('match_id', matchId)
-        .neq('sender_id', user.id);
-
-    } catch (error) {
-      console.error('Error fetching match and messages:', error);
-    } finally {
-      setLoading(false);
+      formattedMatches.push({
+        ...match,
+        profiles: profile || { full_name: 'Unknown User', avatar_url: null }
+      });
     }
+
+    setMatches(formattedMatches);
+    setLoading(false);
   };
 
-  const setupRealTimeSubscription = () => {
-    if (!matchId) return;
+  const fetchMessages = async () => {
+    if (!selectedMatch) return;
 
-    const channel = supabase
-      .channel('messages')
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .eq('match_id', selectedMatch.id)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching messages:', error);
+      return;
+    }
+
+    // Format messages with sender info
+    const formattedMessages = (data || []).map(message => ({
+      ...message,
+      sender: { full_name: 'User', avatar_url: null }
+    }));
+
+    setMessages(formattedMessages);
+  };
+
+  const subscribeToMessages = () => {
+    if (!selectedMatch) return;
+
+    const subscription = supabase
+      .channel(`messages_${selectedMatch.id}`)
       .on('postgres_changes', 
-        {
-          event: 'INSERT',
-          schema: 'public',
+        { 
+          event: 'INSERT', 
+          schema: 'public', 
           table: 'messages',
-          filter: `match_id=eq.${matchId}`
+          filter: `match_id=eq.${selectedMatch.id}`
         }, 
         (payload) => {
-          setMessages(prev => [...prev, payload.new as Message]);
+          fetchMessages();
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      subscription.unsubscribe();
     };
   };
 
-  const sendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !user || !matchId || sending) return;
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !selectedMatch) return;
 
-    setSending(true);
-    try {
-      const { error } = await supabase
-        .from('messages')
-        .insert({
-          match_id: matchId,
-          sender_id: user.id,
-          content: newMessage.trim()
-        });
+    const { error } = await supabase
+      .from('messages')
+      .insert({
+        match_id: selectedMatch.id,
+        sender_id: user?.id,
+        content: newMessage.trim()
+      });
 
-      if (!error) {
-        setNewMessage('');
-      }
-    } catch (error) {
-      console.error('Error sending message:', error);
-    } finally {
-      setSending(false);
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive"
+      });
+      return;
     }
+
+    setNewMessage('');
   };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  if (loading) {
+  if (!user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald border-t-transparent mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Chargement de la conversation...</p>
-        </div>
+      <div className="flex items-center justify-center h-screen">
+        <p>Please log in to access chat.</p>
       </div>
     );
   }
 
-  if (!match) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-bold text-foreground mb-2">Conversation introuvable</h2>
-          <Button onClick={() => navigate('/matches')} className="bg-emerald hover:bg-emerald-dark text-primary-foreground">
-            Retour aux matches
-          </Button>
-        </div>
+      <div className="flex items-center justify-center h-screen">
+        <p>Loading conversations...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
-      <div className="container mx-auto h-screen flex flex-col">
-        {/* Header */}
-        <div className="bg-card/95 backdrop-blur-sm border-b border-border/40 px-4 py-4">
-          <div className="flex items-center justify-between max-w-4xl mx-auto">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/matches')}
-                className="p-2"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              <div className="h-10 w-10 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-                <span className="text-sm text-primary-foreground font-bold">
-                  {match.other_user?.full_name?.charAt(0) || '?'}
-                </span>
-              </div>
-              <div>
-                <h2 className="font-bold text-foreground">{match.other_user?.full_name}</h2>
-                <p className="text-sm text-muted-foreground">
-                  {match.other_user?.age} ans • {match.other_user?.location}
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="ghost" size="sm" disabled>
-                <Phone className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" disabled>
-                <Video className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm" disabled>
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
+    <div className="flex h-screen bg-background">
+      {/* Matches List */}
+      <div className="w-1/3 border-r border-border">
+        <div className="p-4 border-b border-border">
+          <h2 className="text-xl font-semibold flex items-center gap-2">
+            <Heart className="w-5 h-5 text-primary" />
+            Your Matches
+          </h2>
         </div>
-
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto px-4 py-6">
-          <div className="max-w-4xl mx-auto space-y-4">
-            {messages.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Send className="h-8 w-8 text-muted-foreground" />
+        <ScrollArea className="h-full">
+          {matches.length === 0 ? (
+            <div className="p-4 text-center text-muted-foreground">
+              No matches yet. Keep browsing!
+            </div>
+          ) : (
+            matches.map((match) => (
+              <div
+                key={match.id}
+                className={`p-4 border-b border-border cursor-pointer hover:bg-muted/50 transition-colors ${
+                  selectedMatch?.id === match.id ? 'bg-muted' : ''
+                }`}
+                onClick={() => setSelectedMatch(match)}
+              >
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-12 h-12">
+                    <AvatarImage src={match.profiles.avatar_url} />
+                    <AvatarFallback>
+                      {match.profiles.full_name?.charAt(0) || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h3 className="font-medium">{match.profiles.full_name}</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Matched on {new Date(match.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="text-lg font-medium text-foreground mb-2">Commencez la conversation</h3>
-                <p className="text-muted-foreground">Envoyez votre premier message pour briser la glace</p>
               </div>
-            ) : (
-              messages.map((message) => {
-                const isMyMessage = message.sender_id === user?.id;
-                return (
+            ))
+          )}
+        </ScrollArea>
+      </div>
+
+      {/* Chat Area */}
+      <div className="flex-1 flex flex-col">
+        {selectedMatch ? (
+          <>
+            {/* Chat Header */}
+            <div className="p-4 border-b border-border bg-card">
+              <div className="flex items-center gap-3">
+                <Avatar className="w-10 h-10">
+                  <AvatarImage src={selectedMatch.profiles.avatar_url} />
+                  <AvatarFallback>
+                    {selectedMatch.profiles.full_name?.charAt(0) || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-semibold">{selectedMatch.profiles.full_name}</h3>
+                  <p className="text-sm text-muted-foreground">Online</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Messages */}
+            <ScrollArea className="flex-1 p-4">
+              <div className="space-y-4">
+                {messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}
+                    className={`flex ${
+                      message.sender_id === user?.id ? 'justify-end' : 'justify-start'
+                    }`}
                   >
                     <div
                       className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                        isMyMessage
-                          ? 'bg-emerald text-primary-foreground'
-                          : 'bg-card border border-border'
-                      } animate-fade-in`}
+                        message.sender_id === user?.id
+                          ? 'bg-primary text-primary-foreground'
+                          : 'bg-muted'
+                      }`}
                     >
-                      <p className="text-sm">{message.content}</p>
-                      <p
-                        className={`text-xs mt-1 ${
-                          isMyMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                        }`}
-                      >
-                        {format(new Date(message.created_at), 'HH:mm', { locale: fr })}
+                      <p>{message.content}</p>
+                      <p className={`text-xs mt-1 ${
+                        message.sender_id === user?.id
+                          ? 'text-primary-foreground/70'
+                          : 'text-muted-foreground'
+                      }`}>
+                        {new Date(message.created_at).toLocaleTimeString()}
                       </p>
                     </div>
                   </div>
-                );
-              })
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+            </ScrollArea>
 
-        {/* Message Input */}
-        <div className="bg-card/95 backdrop-blur-sm border-t border-border/40 px-4 py-4">
-          <div className="max-w-4xl mx-auto">
-            <form onSubmit={sendMessage} className="flex gap-2">
-              <Input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Tapez votre message..."
-                className="flex-1"
-                disabled={sending}
-              />
-              <Button
-                type="submit"
-                disabled={!newMessage.trim() || sending}
-                className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
+            {/* Message Input */}
+            <div className="p-4 border-t border-border">
+              <div className="flex gap-2">
+                <Input
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  placeholder="Type your message..."
+                  className="flex-1"
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                />
+                <Button onClick={sendMessage} size="icon">
+                  <Send className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-muted-foreground">
+            Select a match to start chatting
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

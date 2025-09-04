@@ -1,95 +1,123 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { Star, Eye, HandHeart, Users, MessageCircle, Lock } from "lucide-react";
+import { Card, CardContent } from '@/components/ui/card';
+import { Building2, Heart, Shield, Users, Book, Star } from 'lucide-react';
 
-const values = [
+interface Value {
+  id: number;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  verse?: string;
+}
+
+const islamicValues: Value[] = [
   {
-    icon: Star,
-    title: "Niyyah",
-    subtitle: "Intention Pure",
-    description: "Chaque membre s'engage avec une intention sincère de mariage halal et durable.",
-    color: "from-emerald to-emerald-light"
+    id: 1,
+    icon: <Heart className="w-8 h-8 text-rose-500" />,
+    title: "Love & Compassion",
+    description: "Marriage is built on mutual love, respect, and compassion as taught by our beloved Prophet (PBUH).",
+    verse: "And among His signs is that He created for you mates from among yourselves, that you may dwell in tranquility with them, and He has put love and mercy between your hearts." 
   },
   {
-    icon: Eye,
-    title: "Haya",
-    subtitle: "Modestie",
-    description: "Préservation de la pudeur dans toutes les interactions et communications.",
-    color: "from-gold to-gold-light"
+    id: 2,
+    icon: <Shield className="w-8 h-8 text-emerald-500" />,
+    title: "Protection & Chastity",
+    description: "We prioritize protecting your privacy and maintaining Islamic principles of modest interaction.",
+    verse: "Marriage is half of faith, for it protects you from sins and helps you walk on the path of righteousness."
   },
   {
-    icon: HandHeart,
-    title: "Transparence",
-    subtitle: "Honnêteté",
-    description: "Vérité totale concernant la situation personnelle et religieuse.",
-    color: "from-sage-dark to-sage"
+    id: 3,
+    icon: <Users className="w-8 h-8 text-blue-500" />,
+    title: "Family Involvement",
+    description: "We encourage family participation in the matrimonial process, following Islamic traditions.",
+    verse: "When someone whose religion and character you are pleased with proposes to you, then marry him."
   },
   {
-    icon: Users,
-    title: "Implication Familiale",
-    subtitle: "Respect du Wali",
-    description: "Reconnaissance du rôle essentiel de la famille dans le processus matrimonial.",
-    color: "from-emerald-light to-gold-light"
+    id: 4,
+    icon: <Book className="w-8 h-8 text-amber-500" />,
+    title: "Islamic Guidance",
+    description: "Access authentic Islamic advice on marriage, relationships, and family life from qualified scholars.",
+    verse: "The best of people are those who benefit others, and marriage is a means to benefit each other."
   },
   {
-    icon: MessageCircle,
-    title: "Communication Halal",
-    subtitle: "Respect Mutuel",
-    description: "Échanges respectueux sans flirt, focalisés sur la compatibilité matrimoniale.",
-    color: "from-gold-light to-emerald-light"
+    id: 5,
+    icon: <Building2 className="w-8 h-8 text-indigo-500" />,
+    title: "Faith-Centered Approach",
+    description: "Every feature is designed with Islamic principles in mind, helping you find a compatible life partner.",
+    verse: "A righteous wife is the best treasure a man can have."
   },
   {
-    icon: Lock,
-    title: "Protection Privacy",
-    subtitle: "Confidentialité",
-    description: "Sécurité maximale des données personnelles et religieuses des utilisateurs.",
-    color: "from-sage to-emerald"
+    id: 6,
+    icon: <Star className="w-8 h-8 text-purple-500" />,
+    title: "Verified Community",
+    description: "Our verification process ensures you connect with genuine, practicing Muslims seeking marriage.",
+    verse: "Seek a spouse who will help you in this life and the hereafter."
   }
 ];
 
 const IslamicValues = () => {
   return (
-    <section id="valeurs" className="py-20 bg-gradient-to-b from-background to-cream">
+    <section className="py-20 bg-gradient-to-br from-background via-sage/5 to-cream/10">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
-            Nos Valeurs <span className="text-emerald">Islamiques</span>
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Chaque aspect de notre plateforme est conçu pour respecter et honorer 
-            les principes fondamentaux de l'Islam.
-          </p>
-          
-          {/* Hadith Quote */}
-          <div className="mt-8 p-6 bg-card rounded-lg shadow-soft max-w-3xl mx-auto border-l-4 border-emerald">
-            <p className="text-muted-foreground italic mb-2">
-              "Quand quelqu'un dont vous agréez la religion et le comportement demande votre fille en mariage, 
-              mariez-la à lui. Si vous ne le faites pas, il y aura des troubles sur terre et une grande corruption."
-            </p>
-            <p className="text-sm text-emerald font-medium">- Hadith rapporté par At-Tirmidhi</p>
+          <div className="inline-flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-200 mb-6">
+            <Building2 className="w-5 h-5 text-emerald-600" />
+            <span className="text-emerald-700 font-medium">Islamic Foundation</span>
           </div>
+          
+          <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-sage-700 bg-clip-text text-transparent">
+            Built on Islamic Values
+          </h2>
+          
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            NikahNoor is more than just a matrimonial platform. We're a community built on the 
+            beautiful teachings of Islam, helping Muslims find their perfect match while maintaining 
+            the highest standards of faith, respect, and family values.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {values.map((value, index) => {
-            const IconComponent = value.icon;
-            return (
-              <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-0 shadow-soft animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
-                <CardContent className="p-6 text-center">
-                  <div className={`w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br ${value.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-                    <IconComponent className="h-8 w-8 text-white" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {islamicValues.map((value) => (
+            <Card key={value.id} className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group bg-card/80 backdrop-blur-sm">
+              <CardContent className="p-8">
+                <div className="flex flex-col items-center text-center">
+                  <div className="mb-6 p-4 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md group-hover:shadow-lg transition-shadow duration-300">
+                    {value.icon}
                   </div>
-                  <h3 className="text-xl font-bold mb-1 text-foreground">{value.title}</h3>
-                  <p className="text-emerald font-medium mb-3">{value.subtitle}</p>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{value.description}</p>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  
+                  <h3 className="text-xl font-bold mb-4 text-foreground">
+                    {value.title}
+                  </h3>
+                  
+                  <p className="text-muted-foreground leading-relaxed mb-6">
+                    {value.description}
+                  </p>
+                  
+                  {value.verse && (
+                    <blockquote className="text-sm text-emerald-600 font-medium italic text-center border-t border-emerald-100 pt-4 leading-relaxed">
+                      "{value.verse}"
+                    </blockquote>
+                  )}
+                </div>
+              </CardContent>
+              
+              {/* Decorative gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-emerald-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            </Card>
+          ))}
         </div>
 
-        {/* Islamic Pattern Decoration */}
-        <div className="flex justify-center mt-16">
-          <div className="w-32 h-1 bg-gradient-to-r from-transparent via-emerald to-transparent rounded-full"></div>
+        <div className="text-center mt-16">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-gradient-to-r from-emerald-50 to-sage-50 rounded-2xl p-8 border border-emerald-200">
+              <Building2 className="w-12 h-12 text-emerald-600 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-emerald-700 mb-4">
+                "And Allah has made for you from yourselves mates"
+              </h3>
+              <p className="text-emerald-600 font-medium">
+                Quran 16:72 • Join us in following Allah's guidance for marriage
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>
