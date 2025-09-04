@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      family_meetings: {
+        Row: {
+          created_at: string
+          id: string
+          match_id: string
+          meeting_link: string | null
+          meeting_type: string
+          notes: string | null
+          organizer_id: string
+          scheduled_datetime: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_id: string
+          meeting_link?: string | null
+          meeting_type?: string
+          notes?: string | null
+          organizer_id: string
+          scheduled_datetime: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_id?: string
+          meeting_link?: string | null
+          meeting_type?: string
+          notes?: string | null
+          organizer_id?: string
+          scheduled_datetime?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_meetings_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_members: {
         Row: {
           can_communicate: boolean | null
@@ -52,6 +99,54 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      family_reviews: {
+        Row: {
+          created_at: string
+          family_member_id: string
+          id: string
+          match_id: string
+          notes: string | null
+          reviewed_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          family_member_id: string
+          id?: string
+          match_id: string
+          notes?: string | null
+          reviewed_at?: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          family_member_id?: string
+          id?: string
+          match_id?: string
+          notes?: string | null
+          reviewed_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_reviews_family_member_id_fkey"
+            columns: ["family_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_reviews_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       islamic_guidance: {
         Row: {
@@ -143,6 +238,10 @@ export type Database = {
       matches: {
         Row: {
           created_at: string
+          family_approved: boolean | null
+          family_notes: string | null
+          family_reviewed_at: string | null
+          family_reviewer_id: string | null
           id: string
           is_mutual: boolean | null
           match_score: number | null
@@ -153,6 +252,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          family_approved?: boolean | null
+          family_notes?: string | null
+          family_reviewed_at?: string | null
+          family_reviewer_id?: string | null
           id?: string
           is_mutual?: boolean | null
           match_score?: number | null
@@ -163,6 +266,10 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          family_approved?: boolean | null
+          family_notes?: string | null
+          family_reviewed_at?: string | null
+          family_reviewer_id?: string | null
           id?: string
           is_mutual?: boolean | null
           match_score?: number | null
@@ -408,6 +515,33 @@ export type Database = {
         }
         Relationships: []
       }
+      supervision_logs: {
+        Row: {
+          action_type: string
+          created_at: string
+          details: Json | null
+          family_member_id: string
+          id: string
+          supervised_user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          details?: Json | null
+          family_member_id: string
+          id?: string
+          supervised_user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          details?: Json | null
+          family_member_id?: string
+          id?: string
+          supervised_user_id?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           age_max: number | null
@@ -516,6 +650,14 @@ export type Database = {
           target_user_id: string
         }
         Returns: string
+      }
+      get_family_approval_status: {
+        Args: { match_uuid: string }
+        Returns: string
+      }
+      has_family_supervision: {
+        Args: { user_uuid: string }
+        Returns: boolean
       }
     }
     Enums: {
