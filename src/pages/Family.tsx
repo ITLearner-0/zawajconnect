@@ -10,6 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import FamilyDashboard from '@/components/FamilyDashboard';
+import ParentalApprovalWorkflow from '@/components/ParentalApprovalWorkflow';
 import { 
   Users, 
   UserPlus, 
@@ -22,7 +24,9 @@ import {
   Eye,
   MessageCircle,
   Heart,
-  Settings
+  Settings,
+  CheckCircle,
+  Calendar
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
@@ -311,11 +315,21 @@ const Family = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="members" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="members">Membres de la famille</TabsTrigger>
-            <TabsTrigger value="privacy">Paramètres de confidentialité</TabsTrigger>
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
+            <TabsTrigger value="approval">Approbations</TabsTrigger>
+            <TabsTrigger value="members">Membres famille</TabsTrigger>
+            <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="dashboard" className="space-y-6">
+            <FamilyDashboard />
+          </TabsContent>
+
+          <TabsContent value="approval" className="space-y-6">
+            <ParentalApprovalWorkflow />
+          </TabsContent>
 
           <TabsContent value="members" className="space-y-6">
             {/* Family Members */}
