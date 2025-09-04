@@ -163,36 +163,50 @@ const FamilyDashboard = () => {
     try {
       const { data, error } = await supabase
         .from('matches')
-        .select(`
-          *,
-          profiles!matches_user2_id_fkey(
-            id,
-            full_name,
-            age,
-            location,
-            profession,
-            education,
-            bio,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('user1_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
       const matchData = data || [];
-      setMatches(matchData);
+      
+      // Fetch profiles for each match
+      const matchesWithProfiles = await Promise.all(
+        matchData.map(async (match) => {
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', match.user2_id)
+            .single();
+
+          return {
+            ...match,
+            profiles: profileData || {
+              id: '',
+              full_name: 'Utilisateur',
+              age: 0,
+              location: '',
+              profession: '',
+              education: '',
+              bio: '',
+              avatar_url: undefined
+            }
+          };
+        })
+      );
+
+      setMatches(matchesWithProfiles);
 
       // Calculate stats
       const now = new Date();
       const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
       
       setStats({
-        totalMatches: matchData.length,
-        recentMatches: matchData.filter(m => new Date(m.created_at) > oneWeekAgo).length,
-        mutualMatches: matchData.filter(m => m.is_mutual).length,
-        activeConversations: matchData.filter(m => m.is_mutual).length
+        totalMatches: matchesWithProfiles.length,
+        recentMatches: matchesWithProfiles.filter(m => new Date(m.created_at) > oneWeekAgo).length,
+        mutualMatches: matchesWithProfiles.filter(m => m.is_mutual).length,
+        activeConversations: matchesWithProfiles.filter(m => m.is_mutual).length
       });
 
     } catch (error) {

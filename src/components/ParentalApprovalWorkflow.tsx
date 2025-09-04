@@ -97,23 +97,37 @@ const ParentalApprovalWorkflow = () => {
         
         const { data: matchesData, error: matchesError } = await supabase
           .from('matches')
-          .select(`
-            *,
-            profiles!matches_user2_id_fkey(
-              full_name,
-              age,
-              location,
-              profession,
-              avatar_url,
-              bio
-            )
-          `)
+          .select('*')
           .in('user1_id', userIds)
           .eq('is_mutual', true)
           .order('created_at', { ascending: false });
 
         if (matchesError) throw matchesError;
-        setMatches(matchesData || []);
+
+        // Fetch profiles for each match
+        const matchesWithProfiles = await Promise.all(
+          (matchesData || []).map(async (match) => {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('user_id', match.user2_id)
+              .single();
+
+            return {
+              ...match,
+              profiles: profileData || {
+                full_name: 'Utilisateur',
+                age: 0,
+                location: '',
+                profession: '',
+                avatar_url: undefined,
+                bio: ''
+              }
+            };
+          })
+        );
+
+        setMatches(matchesWithProfiles);
       }
     } catch (error) {
       console.error('Error fetching matches:', error);
