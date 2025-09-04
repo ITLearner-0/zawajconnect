@@ -59,7 +59,7 @@ const Browse = () => {
         .from('profiles')
         .select(`
           *,
-          user_verifications!inner (
+          user_verifications (
             verification_score
           )
         `)
@@ -77,6 +77,27 @@ const Browse = () => {
       setProfiles(profilesWithVerification);
     } catch (error) {
       console.error('Error fetching profiles:', error);
+      // Fallback to basic profiles if relationship query fails
+      try {
+        const { data: basicProfiles, error: basicError } = await supabase
+          .from('profiles')
+          .select('*')
+          .neq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(50);
+
+        if (basicError) throw basicError;
+
+        const profilesWithDefaultVerification = basicProfiles?.map((profile: any) => ({
+          ...profile,
+          verification_score: 0
+        })) || [];
+
+        setProfiles(profilesWithDefaultVerification);
+      } catch (fallbackError) {
+        console.error('Error fetching basic profiles:', fallbackError);
+        setProfiles([]);
+      }
     } finally {
       setLoading(false);
     }

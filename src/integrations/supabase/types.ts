@@ -633,7 +633,15 @@ export type Database = {
           verified_at?: string | null
           verified_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "fk_user_verifications_profiles"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
     }
     Views: {
