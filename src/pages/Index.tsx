@@ -6,6 +6,8 @@ import CompatibilitySection from "@/components/CompatibilitySection";
 import IslamicQuotes from "@/components/IslamicQuotes";
 import SuccessStories from "@/components/SuccessStories";
 import PrayerTimes from "@/components/PrayerTimes";
+import QiblaDirection from "@/components/QiblaDirection";
+import IslamicCalendar from "@/components/IslamicCalendar";
 import Testimonials from "@/components/Testimonials";
 import Footer from "@/components/Footer";
 
@@ -21,17 +23,25 @@ const Index = () => {
       <SuccessStories />
       <section className="py-16 px-4 bg-gradient-to-br from-emerald/5 via-cream/20 to-sage/10">
         <div className="container mx-auto">
-          <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-8 animate-fade-in">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-12 animate-fade-in">
               <h2 className="text-3xl font-bold text-foreground mb-4">
-                Horaires de Prière du Jour
+                Outils Islamiques du Quotidien
               </h2>
               <p className="text-muted-foreground">
                 Restez connecté à votre foi pendant votre recherche du partenaire idéal
               </p>
             </div>
-            <div className="animate-slide-up">
-              <PrayerTimes />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-slide-up">
+              <div className="animate-fade-in">
+                <PrayerTimes />
+              </div>
+              <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                <QiblaDirection />
+              </div>
+              <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                <IslamicCalendar />
+              </div>
             </div>
           </div>
         </div>
