@@ -1,7 +1,17 @@
 import { Button } from "@/components/ui/button";
-import { Heart, User, Menu } from "lucide-react";
+import { Heart, User, Menu, LogOut } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Link, useNavigate } from "react-router-dom";
 
 const Header = () => {
+  const { user, signOut, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -28,13 +38,48 @@ const Header = () => {
         </nav>
 
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" className="hidden md:flex">
-            Se connecter
-          </Button>
-          <Button size="sm" className="bg-gradient-to-r from-emerald to-emerald-light hover:from-emerald-dark hover:to-emerald text-white">
-            <User className="mr-2 h-4 w-4" />
-            S'inscrire
-          </Button>
+          {/* Auth buttons */}
+          <div className="hidden md:flex gap-2">
+            {loading ? (
+              <div className="h-9 w-20 bg-muted animate-pulse rounded-md" />
+            ) : user ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">
+                  Bonjour, {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="text-foreground hover:text-emerald"
+                >
+                  <LogOut className="h-4 w-4 mr-1" />
+                  Déconnexion
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="text-foreground hover:text-emerald"
+                  asChild
+                >
+                  <Link to="/auth">Se connecter</Link>
+                </Button>
+                <Button 
+                  size="sm"
+                  className="bg-gradient-to-r from-emerald to-emerald-light hover:from-emerald-dark hover:to-emerald text-primary-foreground"
+                  asChild
+                >
+                  <Link to="/auth">
+                    <User className="mr-2 h-4 w-4" />
+                    S'inscrire
+                  </Link>
+                </Button>
+              </>
+            )}
+          </div>
           <Button variant="ghost" size="sm" className="md:hidden">
             <Menu className="h-4 w-4" />
           </Button>
