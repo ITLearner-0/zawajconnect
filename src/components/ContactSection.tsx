@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Mail, Phone, MapPin, Send, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -231,30 +232,38 @@ const ContactSection = () => {
             Questions fréquentes
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Button variant="outline" className="h-auto p-4 text-left border-sage/30 hover:border-emerald">
-              <div>
-                <div className="font-medium text-foreground">Comment s'inscrire ?</div>
-                <div className="text-sm text-muted-foreground mt-1">Guide d'inscription</div>
-              </div>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 text-left border-sage/30 hover:border-emerald">
-              <div>
-                <div className="font-medium text-foreground">Sécurité & Confidentialité</div>
-                <div className="text-sm text-muted-foreground mt-1">Vos données protégées</div>
-              </div>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 text-left border-sage/30 hover:border-emerald">
-              <div>
-                <div className="font-medium text-foreground">Processus de matching</div>
-                <div className="text-sm text-muted-foreground mt-1">Comment ça marche</div>
-              </div>
-            </Button>
-            <Button variant="outline" className="h-auto p-4 text-left border-sage/30 hover:border-emerald">
-              <div>
-                <div className="font-medium text-foreground">Rôle de la famille</div>
-                <div className="text-sm text-muted-foreground mt-1">Implication familiale</div>
-              </div>
-            </Button>
+            <Link to="/faq" className="block">
+              <Button variant="outline" className="w-full h-auto p-4 text-left border-sage/30 hover:border-emerald">
+                <div>
+                  <div className="font-medium text-foreground">Comment s'inscrire ?</div>
+                  <div className="text-sm text-muted-foreground mt-1">Guide d'inscription</div>
+                </div>
+              </Button>
+            </Link>
+            <Link to="/faq" className="block">
+              <Button variant="outline" className="w-full h-auto p-4 text-left border-sage/30 hover:border-emerald">
+                <div>
+                  <div className="font-medium text-foreground">Sécurité & Confidentialité</div>
+                  <div className="text-sm text-muted-foreground mt-1">Vos données protégées</div>
+                </div>
+              </Button>
+            </Link>
+            <Link to="/faq" className="block">
+              <Button variant="outline" className="w-full h-auto p-4 text-left border-sage/30 hover:border-emerald">
+                <div>
+                  <div className="font-medium text-foreground">Processus de matching</div>
+                  <div className="text-sm text-muted-foreground mt-1">Comment ça marche</div>
+                </div>
+              </Button>
+            </Link>
+            <Link to="/faq" className="block">
+              <Button variant="outline" className="w-full h-auto p-4 text-left border-sage/30 hover:border-emerald">
+                <div>
+                  <div className="font-medium text-foreground">Rôle de la famille</div>
+                  <div className="text-sm text-muted-foreground mt-1">Implication familiale</div>
+                </div>
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
