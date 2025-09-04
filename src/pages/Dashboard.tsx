@@ -8,9 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { User, Heart, Settings, Eye } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { User, Heart, Settings, Eye, Save, Camera, MapPin, Briefcase, GraduationCap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useToast } from '@/hooks/use-toast';
 import PhotoUpload from '@/components/PhotoUpload';
+import VerificationBadge from '@/components/VerificationBadge';
 
 interface Profile {
   id: string;
@@ -42,8 +46,10 @@ interface IslamicPreferences {
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [islamicPrefs, setIslamicPrefs] = useState<IslamicPreferences | null>(null);
+  const [verification, setVerification] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -73,10 +79,23 @@ const Dashboard = () => {
         .eq('user_id', user.id)
         .single();
 
+      // Fetch verification status
+      const { data: verificationData } = await supabase
+        .from('user_verifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
       setProfile(profileData);
       setIslamicPrefs(prefsData);
+      setVerification(verificationData);
     } catch (error) {
       console.error('Error fetching profile data:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les données du profil",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -87,7 +106,7 @@ const Dashboard = () => {
 
     setSaving(true);
     try {
-      await supabase
+      const { error } = await supabase
         .from('profiles')
         .update({
           full_name: profile.full_name,
@@ -102,10 +121,19 @@ const Dashboard = () => {
         })
         .eq('user_id', user.id);
 
-      alert('Profil mis à jour avec succès !');
+      if (error) throw error;
+
+      toast({
+        title: "Profil sauvegardé",
+        description: "Vos informations personnelles ont été mises à jour avec succès",
+      });
     } catch (error) {
       console.error('Error updating profile:', error);
-      alert('Erreur lors de la mise à jour du profil');
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder le profil",
+        variant: "destructive"
+      });
     } finally {
       setSaving(false);
     }
@@ -116,17 +144,44 @@ const Dashboard = () => {
 
     setSaving(true);
     try {
-      await supabase
+      const { error } = await supabase
         .from('islamic_preferences')
         .update(islamicPrefs)
         .eq('user_id', user.id);
 
-      alert('Préférences islamiques mises à jour avec succès !');
+      if (error) throw error;
+
+      toast({
+        title: "Préférences sauvegardées",
+        description: "Vos préférences islamiques ont été mises à jour avec succès",
+      });
     } catch (error) {
       console.error('Error updating Islamic preferences:', error);
-      alert('Erreur lors de la mise à jour des préférences');
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les préférences",
+        variant: "destructive"
+      });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const addInterest = (interest: string) => {
+    if (interest && profile && !profile.interests.includes(interest)) {
+      setProfile(prev => prev ? {
+        ...prev,
+        interests: [...prev.interests, interest]
+      } : null);
+    }
+  };
+
+  const removeInterest = (interest: string) => {
+    if (profile) {
+      setProfile(prev => prev ? {
+        ...prev,
+        interests: prev.interests.filter(i => i !== interest)
+      } : null);
     }
   };
 
@@ -145,15 +200,106 @@ const Dashboard = () => {
     <div className="py-8 px-4">
       <div className="container mx-auto">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-              <User className="h-6 w-6 text-primary-foreground" />
+          {/* Header with Profile Overview */}
+          <div className="flex flex-col lg:flex-row items-start gap-6 mb-8">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="h-20 w-20 rounded-full overflow-hidden bg-gradient-to-br from-emerald to-emerald-light flex items-center justify-center">
+                  {profile?.avatar_url ? (
+                    <img 
+                      src={profile.avatar_url} 
+                      alt="Photo de profil"
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <User className="h-10 w-10 text-primary-foreground" />
+                  )}
+                </div>
+                <div className="absolute -bottom-1 -right-1">
+                  <VerificationBadge verificationScore={verification?.verification_score || 0} />
+                </div>
+              </div>
+              
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">
+                  {profile?.full_name || 'Votre Profil'}
+                </h1>
+                <div className="flex items-center gap-4 text-muted-foreground mt-1">
+                  {profile?.age && (
+                    <span className="flex items-center gap-1">
+                      <User className="h-4 w-4" />
+                      {profile.age} ans
+                    </span>
+                  )}
+                  {profile?.location && (
+                    <span className="flex items-center gap-1">
+                      <MapPin className="h-4 w-4" />
+                      {profile.location}
+                    </span>
+                  )}
+                  {profile?.profession && (
+                    <span className="flex items-center gap-1">
+                      <Briefcase className="h-4 w-4" />
+                      {profile.profession}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Mon Profil</h1>
-              <p className="text-muted-foreground">Gérez votre profil matrimonial islamique</p>
+            
+            <div className="flex gap-2 ml-auto">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/browse')}
+                className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                Découvrir
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate('/matches')}
+                className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+              >
+                <Heart className="h-4 w-4 mr-2" />
+                Mes matches
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate('/settings')}
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Paramètres
+              </Button>
             </div>
           </div>
+
+          {/* Completion Progress */}
+          {profile && (
+            <Card className="mb-6">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-foreground">Complétude du profil</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Complétez votre profil pour améliorer vos chances de match
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-emerald">
+                      {Math.round(((profile.full_name ? 1 : 0) +
+                        (profile.age ? 1 : 0) +
+                        (profile.location ? 1 : 0) +
+                        (profile.bio ? 1 : 0) +
+                        (profile.avatar_url ? 1 : 0) +
+                        (profile.profession ? 1 : 0)) / 6 * 100)}%
+                    </div>
+                    <p className="text-xs text-muted-foreground">Complet</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <Tabs defaultValue="profile" className="space-y-6">
             <TabsList className="grid w-full grid-cols-3">
@@ -265,11 +411,48 @@ const Dashboard = () => {
                     onPhotoUpdate={(url) => setProfile(prev => prev ? {...prev, avatar_url: url} : null)}
                   />
 
+                  <div>
+                    <Label>Centres d'intérêt</Label>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {profile?.interests.map((interest) => (
+                        <Badge 
+                          key={interest} 
+                          variant="secondary" 
+                          className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" 
+                          onClick={() => removeInterest(interest)}
+                        >
+                          {interest} ×
+                        </Badge>
+                      ))}
+                    </div>
+                    <Input
+                      placeholder="Ajouter un centre d'intérêt (appuyez sur Entrée)"
+                      className="mt-2"
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          const target = e.target as HTMLInputElement;
+                          addInterest(target.value);
+                          target.value = '';
+                        }
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Cliquez sur un centre d'intérêt avec × pour le supprimer
+                    </p>
+                  </div>
+
+                  <Separator />
+
                   <Button 
                     onClick={saveProfile} 
                     disabled={saving}
-                    className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                    className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
                   >
+                    {saving ? (
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-2" />
+                    )}
                     {saving ? 'Sauvegarde...' : 'Sauvegarder les modifications'}
                   </Button>
                 </CardContent>
@@ -360,11 +543,18 @@ const Dashboard = () => {
                     </div>
                   </div>
 
+                  <Separator />
+
                   <Button 
                     onClick={saveIslamicPreferences} 
                     disabled={saving}
-                    className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                    className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
                   >
+                    {saving ? (
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-2" />
+                    )}
                     {saving ? 'Sauvegarde...' : 'Sauvegarder les préférences'}
                   </Button>
                 </CardContent>
