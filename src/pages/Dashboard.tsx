@@ -117,7 +117,7 @@ const Dashboard = () => {
           profession: profile.profession,
           bio: profile.bio,
           looking_for: profile.looking_for,
-          interests: profile.interests,
+          interests: profile.interests || [],
         })
         .eq('user_id', user.id);
 
@@ -168,10 +168,10 @@ const Dashboard = () => {
   };
 
   const addInterest = (interest: string) => {
-    if (interest && profile && !profile.interests.includes(interest)) {
+    if (interest && profile && !(profile.interests || []).includes(interest)) {
       setProfile(prev => prev ? {
         ...prev,
-        interests: [...prev.interests, interest]
+        interests: [...(prev.interests || []), interest]
       } : null);
     }
   };
@@ -180,7 +180,7 @@ const Dashboard = () => {
     if (profile) {
       setProfile(prev => prev ? {
         ...prev,
-        interests: prev.interests.filter(i => i !== interest)
+        interests: (prev.interests || []).filter(i => i !== interest)
       } : null);
     }
   };
@@ -414,7 +414,7 @@ const Dashboard = () => {
                   <div>
                     <Label>Centres d'intérêt</Label>
                     <div className="flex flex-wrap gap-2 mt-2">
-                      {profile?.interests.map((interest) => (
+                      {(profile?.interests || []).map((interest) => (
                         <Badge 
                           key={interest} 
                           variant="secondary" 
