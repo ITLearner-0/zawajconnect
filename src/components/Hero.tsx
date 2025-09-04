@@ -38,38 +38,38 @@ const Hero = () => {
             où chaque rencontre est guidée par la Niyyah et le respect mutuel.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12 animate-fade-in">
             <RegistrationModal>
-              <Button size="lg" className="bg-gradient-to-r from-emerald to-emerald-light hover:from-emerald-dark hover:to-emerald text-white shadow-lg hover:shadow-xl transition-all duration-300 animate-pulse-gentle">
+              <Button variant="gradient" size="lg" className="animate-pulse-gentle">
                 <Heart className="mr-2 h-5 w-5" />
                 Commencer mon parcours
               </Button>
             </RegistrationModal>
-            <Button variant="outline" size="lg" className="border-emerald text-emerald hover:bg-emerald hover:text-white transition-all duration-300">
+            <Button variant="outline" size="lg" className="border-emerald text-emerald hover:bg-emerald hover:text-white">
               Découvrir nos valeurs
             </Button>
           </div>
 
           {/* Features */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-            <div className="text-center p-6 rounded-lg bg-card shadow-soft hover:shadow-lg transition-all duration-300">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-light to-emerald flex items-center justify-center">
+            <div className="text-center p-6 rounded-lg bg-card shadow-soft card-hover animate-fade-in group">
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-br from-emerald-light to-emerald flex items-center justify-center group-hover:animate-float">
                 <Shield className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold mb-2">100% Halal</h3>
               <p className="text-muted-foreground text-sm">Communication respectueuse selon les principes islamiques</p>
             </div>
             
-            <div className="text-center p-6 rounded-lg bg-card shadow-soft hover:shadow-lg transition-all duration-300">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-br from-gold-light to-gold flex items-center justify-center">
+            <div className="text-center p-6 rounded-lg bg-card shadow-soft card-hover animate-fade-in group" style={{animationDelay: '0.1s'}}>
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-br from-gold-light to-gold flex items-center justify-center group-hover:animate-float">
                 <Users className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Implication Familiale</h3>
               <p className="text-muted-foreground text-sm">Respect du rôle du Wali et de la famille</p>
             </div>
             
-            <div className="text-center p-6 rounded-lg bg-card shadow-soft hover:shadow-lg transition-all duration-300">
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-br from-sage-dark to-sage flex items-center justify-center">
+            <div className="text-center p-6 rounded-lg bg-card shadow-soft card-hover animate-fade-in group" style={{animationDelay: '0.2s'}}>
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-gradient-to-br from-sage-dark to-sage flex items-center justify-center group-hover:animate-float">
                 <Heart className="h-6 w-6 text-white" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Intention Pure</h3>

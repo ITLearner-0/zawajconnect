@@ -314,18 +314,18 @@ const Browse = () => {
 
           {/* Main Profile Card */}
           <div className="lg:col-span-2">
-            <Card className="overflow-hidden shadow-lg">
+            <Card className="overflow-hidden shadow-lg animate-scale-in card-hover">
               <div className="relative">
                 {/* Profile Image */}
-                <div className="h-80 md:h-96 bg-gradient-to-br from-emerald/10 to-gold/10 flex items-center justify-center">
+                <div className="h-80 md:h-96 bg-gradient-to-br from-emerald/10 to-gold/10 flex items-center justify-center overflow-hidden">
                   {currentProfile.avatar_url ? (
                     <img 
                       src={currentProfile.avatar_url} 
                       alt={currentProfile.full_name || 'Photo de profil'} 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-smooth hover:scale-110"
                     />
                   ) : (
-                    <User className="h-24 w-24 text-muted-foreground" />
+                    <User className="h-24 w-24 text-muted-foreground animate-pulse-gentle" />
                   )}
                 </div>
 
@@ -333,7 +333,7 @@ const Browse = () => {
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 rounded-full p-2 shadow-lg"
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 rounded-full p-2 shadow-lg hover-scale"
                   onClick={previousProfile}
                   disabled={currentIndex === 0}
                 >
@@ -342,7 +342,7 @@ const Browse = () => {
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full p-2 shadow-lg"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full p-2 shadow-lg hover-scale"
                   onClick={nextProfile}
                   disabled={currentIndex === filteredProfiles.length - 1}
                 >
@@ -430,18 +430,19 @@ const Browse = () => {
                 )}
 
         {/* Enhanced Mobile Navigation */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t animate-fade-in">
           <Button
             onClick={handlePass}
             variant="outline"
-            className="flex-1 border-muted-foreground text-muted-foreground hover:bg-muted order-1 sm:order-none"
+            className="flex-1 border-muted-foreground text-muted-foreground hover:bg-muted order-1 sm:order-none transition-smooth"
           >
             <X className="h-4 w-4 mr-2" />
             Passer
           </Button>
           <Button
             onClick={() => handleLike(currentProfile.user_id)}
-            className="flex-1 bg-emerald hover:bg-emerald-dark text-primary-foreground order-0 sm:order-none"
+            variant="gradient"
+            className="flex-1 order-0 sm:order-none animate-pulse-gentle"
           >
             <Heart className="h-4 w-4 mr-2" />
             J'aime ce profil
@@ -449,7 +450,7 @@ const Browse = () => {
           <Button
             variant="outline"
             onClick={() => navigate(`/profile/${currentProfile.user_id}`)}
-            className="flex-1 border-emerald text-emerald hover:bg-emerald hover:text-white order-2 sm:order-none"
+            className="flex-1 border-emerald text-emerald hover:bg-emerald hover:text-white order-2 sm:order-none hover-scale"
           >
             Voir le profil complet
           </Button>

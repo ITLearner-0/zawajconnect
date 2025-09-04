@@ -62,13 +62,17 @@ const Testimonials = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {testimonials.map((testimonial) => (
-            <Card key={testimonial.id} className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-card/80 backdrop-blur-sm">
+          {testimonials.map((testimonial, index) => (
+            <Card 
+              key={testimonial.id} 
+              className="relative overflow-hidden border-0 shadow-lg card-hover animate-slide-up bg-card/80 backdrop-blur-sm group"
+              style={{ animationDelay: `${index * 0.2}s` }}
+            >
               <CardContent className="p-8">
-                <Quote className="absolute top-4 right-4 w-8 h-8 text-emerald-200 opacity-50" />
+                <Quote className="absolute top-4 right-4 w-8 h-8 text-emerald-200 opacity-50 group-hover:animate-float" />
                 
-                <div className="flex items-center gap-4 mb-6">
-                  <Avatar className="w-16 h-16 ring-2 ring-emerald-100">
+                <div className="flex items-center gap-4 mb-6 animate-fade-in" style={{ animationDelay: `${index * 0.2 + 0.1}s` }}>
+                  <Avatar className="w-16 h-16 ring-2 ring-emerald-100 hover-scale">
                     <AvatarImage src={testimonial.avatar} />
                     <AvatarFallback className="bg-gradient-to-br from-emerald-100 to-sage-100 text-emerald-700 text-lg font-semibold">
                       {testimonial.name.charAt(0)}
@@ -81,7 +85,7 @@ const Testimonials = () => {
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`w-4 h-4 ${
+                          className={`w-4 h-4 transition-smooth hover-scale ${
                             i < testimonial.rating
                               ? 'text-amber-400 fill-current'
                               : 'text-gray-300'
@@ -92,11 +96,11 @@ const Testimonials = () => {
                   </div>
                 </div>
 
-                <blockquote className="text-muted-foreground leading-relaxed mb-4 text-lg italic">
+                <blockquote className="text-muted-foreground leading-relaxed mb-4 text-lg italic animate-fade-in" style={{ animationDelay: `${index * 0.2 + 0.2}s` }}>
                   "{testimonial.content}"
                 </blockquote>
 
-                <div className="border-t border-emerald-100 pt-4">
+                <div className="border-t border-emerald-100 pt-4 animate-fade-in" style={{ animationDelay: `${index * 0.2 + 0.3}s` }}>
                   <p className="text-sm text-emerald-600 font-medium">
                     Married to {testimonial.matchedWith} • Alhamdulillah
                   </p>

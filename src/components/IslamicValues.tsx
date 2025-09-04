@@ -76,11 +76,15 @@ const IslamicValues = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {islamicValues.map((value) => (
-            <Card key={value.id} className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group bg-card/80 backdrop-blur-sm">
+          {islamicValues.map((value, index) => (
+            <Card 
+              key={value.id} 
+              className="relative overflow-hidden border-0 shadow-lg card-hover animate-fade-in group bg-card/80 backdrop-blur-sm"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
               <CardContent className="p-8">
                 <div className="flex flex-col items-center text-center">
-                  <div className="mb-6 p-4 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md group-hover:shadow-lg transition-shadow duration-300">
+                  <div className="mb-6 p-4 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md group-hover:shadow-lg transition-smooth group-hover:animate-float">
                     {value.icon}
                   </div>
                   
@@ -93,7 +97,7 @@ const IslamicValues = () => {
                   </p>
                   
                   {value.verse && (
-                    <blockquote className="text-sm text-emerald-600 font-medium italic text-center border-t border-emerald-100 pt-4 leading-relaxed">
+                    <blockquote className="text-sm text-emerald-600 font-medium italic text-center border-t border-emerald-100 pt-4 leading-relaxed animate-fade-in" style={{ animationDelay: `${index * 0.1 + 0.3}s` }}>
                       "{value.verse}"
                     </blockquote>
                   )}
@@ -101,7 +105,7 @@ const IslamicValues = () => {
               </CardContent>
               
               {/* Decorative gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-emerald-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-emerald-50/20 opacity-0 group-hover:opacity-100 transition-smooth pointer-events-none" />
             </Card>
           ))}
         </div>
