@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
+import SecurityPrivacyPanel from '@/components/SecurityPrivacyPanel';
+import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import { 
   Users, 
   Heart, 
@@ -24,7 +26,8 @@ import {
   BarChart3,
   Settings,
   UserCheck,
-  Search
+  Search,
+  Lock
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -347,10 +350,12 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
 
       {/* Admin Tabs */}
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="users">Utilisateurs</TabsTrigger>
           <TabsTrigger value="roles">Rôles</TabsTrigger>
           <TabsTrigger value="reports">Rapports</TabsTrigger>
+          <TabsTrigger value="security">Sécurité</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
           <TabsTrigger value="settings">Paramètres</TabsTrigger>
         </TabsList>
 
@@ -523,6 +528,16 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
               </Table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Security & Privacy Tab */}
+        <TabsContent value="security" className="space-y-4">
+          <SecurityPrivacyPanel />
+        </TabsContent>
+
+        {/* Analytics Tab */}
+        <TabsContent value="analytics" className="space-y-4">
+          <AnalyticsDashboard />
         </TabsContent>
 
         {/* Settings Tab */}
