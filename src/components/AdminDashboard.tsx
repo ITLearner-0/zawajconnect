@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import SecurityPrivacyPanel from '@/components/SecurityPrivacyPanel';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
+import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { 
   Users, 
   Heart, 
@@ -350,8 +351,9 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
 
       {/* Admin Tabs */}
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+          <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
           <TabsTrigger value="roles">Rôles</TabsTrigger>
           <TabsTrigger value="reports">Rapports</TabsTrigger>
           <TabsTrigger value="security">Sécurité</TabsTrigger>
@@ -419,6 +421,11 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
               </Table>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Subscriptions Tab */}
+        <TabsContent value="subscriptions" className="space-y-4">
+          <SubscriptionManagement />
         </TabsContent>
 
         {/* Roles Tab */}
