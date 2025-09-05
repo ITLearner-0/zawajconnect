@@ -33,13 +33,11 @@ interface AdminDashboardProps {
 
 interface User {
   id: string;
-  email: string;
+  user_id: string;
+  full_name: string;
+  age: number;
+  location: string;
   created_at: string;
-  profiles: {
-    full_name: string;
-    age: number;
-    location: string;
-  } | null;
   user_roles: {
     role: string;
   }[] | null;
@@ -107,32 +105,59 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
         verifiedUsers: verifiedCount.count || 0
       });
 
-      // Load users with profiles and roles
+      // Load users with profiles (separate from roles)
       const { data: usersData, error: usersError } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          user_roles (role)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
 
       if (usersError) throw usersError;
-      setUsers(usersData as any || []);
 
-      // Load reports
+      // Load user roles separately
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      // Combine users with their roles
+      const usersWithRoles = (usersData || []).map(user => {
+        const userRole = rolesData?.find(role => role.user_id === user.user_id);
+        return {
+          ...user,
+          user_roles: userRole ? [{ role: userRole.role }] : [{ role: 'user' }]
+        };
+      });
+
+      setUsers(usersWithRoles as any);
+
+      // Load reports with manual profile lookups
       const { data: reportsData, error: reportsError } = await supabase
         .from('reports')
-        .select(`
-          *,
-          reporter:reporter_id (full_name),
-          reported_user:reported_user_id (full_name)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(20);
 
       if (reportsError) throw reportsError;
-      setReports(reportsData as any || []);
+
+      // Get profile names for reporters and reported users
+      const reportsWithProfiles = await Promise.all(
+        (reportsData || []).map(async (report) => {
+          const [reporterProfile, reportedProfile] = await Promise.all([
+            supabase.from('profiles').select('full_name').eq('user_id', report.reporter_id).single(),
+            supabase.from('profiles').select('full_name').eq('user_id', report.reported_user_id).single()
+          ]);
+
+          return {
+            ...report,
+            reporter: reporterProfile.data,
+            reported_user: reportedProfile.data
+          };
+        })
+      );
+
+      setReports(reportsWithProfiles as any);
 
     } catch (error) {
       console.error('Error loading admin data:', error);
@@ -233,8 +258,8 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
   };
 
   const filteredUsers = users.filter(user => 
-    user.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.user_id?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -353,7 +378,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nom</TableHead>
-                    <TableHead>Email</TableHead>
+                    <TableHead>User ID</TableHead>
                     <TableHead>Âge</TableHead>
                     <TableHead>Localisation</TableHead>
                     <TableHead>Rôle</TableHead>
@@ -368,11 +393,11 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                     return (
                       <TableRow key={user.id}>
                         <TableCell className="font-medium">
-                          {user.profiles?.full_name || 'N/A'}
+                          {user.full_name || 'N/A'}
                         </TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.profiles?.age || 'N/A'}</TableCell>
-                        <TableCell>{user.profiles?.location || 'N/A'}</TableCell>
+                        <TableCell>{user.user_id || 'N/A'}</TableCell>
+                        <TableCell>{user.age || 'N/A'}</TableCell>
+                        <TableCell>{user.location || 'N/A'}</TableCell>
                         <TableCell>
                           <Badge variant={getRoleBadgeVariant(role)} className="capitalize">
                             <RoleIcon className="h-3 w-3 mr-1" />
@@ -408,8 +433,8 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                     </SelectTrigger>
                     <SelectContent>
                       {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id}>
-                          {user.profiles?.full_name || user.email}
+                        <SelectItem key={user.id} value={user.user_id}>
+                          {user.full_name || user.user_id}
                         </SelectItem>
                       ))}
                     </SelectContent>
