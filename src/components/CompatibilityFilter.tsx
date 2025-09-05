@@ -14,7 +14,8 @@ interface CompatibilityFilterProps {
 interface CompatibilityFilters {
   minCompatibilityScore: number;
   religiousImportance: string[];
-  lifestylePreferences: string[];
+  economicAutonomy: string[];
+  careerFamily: string[];
   familyOriented: boolean | null;
 }
 
@@ -22,7 +23,8 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
   const [filters, setFilters] = useState<CompatibilityFilters>({
     minCompatibilityScore: 50,
     religiousImportance: [],
-    lifestylePreferences: [],
+    economicAutonomy: [],
+    careerFamily: [],
     familyOriented: null
   });
 
@@ -32,11 +34,16 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
     { value: 'somewhat_important', label: 'Assez important' }
   ];
 
-  const lifestyleOptions = [
-    { value: 'no_alcohol', label: 'Pas d\'alcool' },
-    { value: 'no_smoking', label: 'Non-fumeur' },
-    { value: 'halal_diet', label: 'Régime halal' },
-    { value: 'regular_prayer', label: 'Prière régulière' }
+  const economicAutonomyOptions = [
+    { value: 'financial_independence', label: 'Indépendance financière' },
+    { value: 'shared_finances', label: 'Finances partagées' },
+    { value: 'traditional_roles', label: 'Rôles traditionnels' }
+  ];
+
+  const careerFamilyOptions = [
+    { value: 'career_focused', label: 'Axé sur la carrière' },
+    { value: 'family_focused', label: 'Axé sur la famille' },
+    { value: 'balanced_approach', label: 'Approche équilibrée' }
   ];
 
   useEffect(() => {
@@ -52,12 +59,21 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
     }));
   };
 
-  const handleLifestyleChange = (value: string, checked: boolean) => {
+  const handleEconomicAutonomyChange = (value: string, checked: boolean) => {
     setFilters(prev => ({
       ...prev,
-      lifestylePreferences: checked 
-        ? [...prev.lifestylePreferences, value]
-        : prev.lifestylePreferences.filter(item => item !== value)
+      economicAutonomy: checked 
+        ? [...prev.economicAutonomy, value]
+        : prev.economicAutonomy.filter(item => item !== value)
+    }));
+  };
+
+  const handleCareerFamilyChange = (value: string, checked: boolean) => {
+    setFilters(prev => ({
+      ...prev,
+      careerFamily: checked 
+        ? [...prev.careerFamily, value]
+        : prev.careerFamily.filter(item => item !== value)
     }));
   };
 
@@ -65,7 +81,8 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
     setFilters({
       minCompatibilityScore: 50,
       religiousImportance: [],
-      lifestylePreferences: [],
+      economicAutonomy: [],
+      careerFamily: [],
       familyOriented: null
     });
   };
@@ -135,21 +152,45 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
           </div>
         </div>
 
-        {/* Lifestyle Preferences */}
+        {/* Economic Autonomy */}
         <div className="space-y-3">
-          <Label>Préférences de style de vie</Label>
+          <Label>Autonomie économique</Label>
           <div className="space-y-2">
-            {lifestyleOptions.map(option => (
+            {economicAutonomyOptions.map(option => (
               <div key={option.value} className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  id={`lifestyle-${option.value}`}
-                  checked={filters.lifestylePreferences.includes(option.value)}
-                  onChange={(e) => handleLifestyleChange(option.value, e.target.checked)}
+                  id={`economic-${option.value}`}
+                  checked={filters.economicAutonomy.includes(option.value)}
+                  onChange={(e) => handleEconomicAutonomyChange(option.value, e.target.checked)}
                   className="rounded border-gray-300"
                 />
                 <label 
-                  htmlFor={`lifestyle-${option.value}`}
+                  htmlFor={`economic-${option.value}`}
+                  className="text-sm cursor-pointer"
+                >
+                  {option.label}
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Career vs Family */}
+        <div className="space-y-3">
+          <Label>Carrière vs Famille</Label>
+          <div className="space-y-2">
+            {careerFamilyOptions.map(option => (
+              <div key={option.value} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id={`career-${option.value}`}
+                  checked={filters.careerFamily.includes(option.value)}
+                  onChange={(e) => handleCareerFamilyChange(option.value, e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <label 
+                  htmlFor={`career-${option.value}`}
                   className="text-sm cursor-pointer"
                 >
                   {option.label}
@@ -182,7 +223,8 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
 
         {/* Active Filters Summary */}
         {(filters.religiousImportance.length > 0 || 
-          filters.lifestylePreferences.length > 0 || 
+          filters.economicAutonomy.length > 0 || 
+          filters.careerFamily.length > 0 ||
           filters.minCompatibilityScore > 50 ||
           filters.familyOriented !== null) && (
           <div className="space-y-2">
@@ -198,9 +240,14 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
                   {religiousOptions.find(opt => opt.value === item)?.label}
                 </Badge>
               ))}
-              {filters.lifestylePreferences.map(item => (
+              {filters.economicAutonomy.map(item => (
                 <Badge key={item} variant="secondary" className="text-xs">
-                  {lifestyleOptions.find(opt => opt.value === item)?.label}
+                  {economicAutonomyOptions.find(opt => opt.value === item)?.label}
+                </Badge>
+              ))}
+              {filters.careerFamily.map(item => (
+                <Badge key={item} variant="secondary" className="text-xs">
+                  {careerFamilyOptions.find(opt => opt.value === item)?.label}
                 </Badge>
               ))}
               {filters.familyOriented !== null && (
