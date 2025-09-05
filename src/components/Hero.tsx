@@ -50,7 +50,12 @@ const Hero = () => {
               <Heart className="mr-2 h-5 w-5" />
               Commencer mon parcours
             </Button>
-            <Button variant="outline" size="lg" className="border-emerald text-emerald hover:bg-emerald hover:text-white">
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+              onClick={() => document.getElementById('valeurs')?.scrollIntoView({ behavior: 'smooth' })}
+            >
               Découvrir nos valeurs
             </Button>
           </div>
