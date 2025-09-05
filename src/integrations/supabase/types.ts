@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      conversation_participants: {
+        Row: {
+          can_read_messages: boolean | null
+          can_send_messages: boolean | null
+          created_at: string | null
+          family_member_id: string | null
+          id: string
+          is_active: boolean | null
+          joined_at: string | null
+          match_id: string
+          participant_id: string
+          participant_type: string
+          user_id: string
+        }
+        Insert: {
+          can_read_messages?: boolean | null
+          can_send_messages?: boolean | null
+          created_at?: string | null
+          family_member_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string | null
+          match_id: string
+          participant_id: string
+          participant_type: string
+          user_id: string
+        }
+        Update: {
+          can_read_messages?: boolean | null
+          can_send_messages?: boolean | null
+          created_at?: string | null
+          family_member_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          joined_at?: string | null
+          match_id?: string
+          participant_id?: string
+          participant_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_family_member_id_fkey"
+            columns: ["family_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "conversation_participants_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_meetings: {
         Row: {
           created_at: string
@@ -284,7 +341,9 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          family_member_id: string | null
           id: string
+          is_family_supervised: boolean | null
           is_read: boolean | null
           match_id: string
           sender_id: string
@@ -292,7 +351,9 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
+          family_member_id?: string | null
           id?: string
+          is_family_supervised?: boolean | null
           is_read?: boolean | null
           match_id: string
           sender_id: string
@@ -300,12 +361,21 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
+          family_member_id?: string | null
           id?: string
+          is_family_supervised?: boolean | null
           is_read?: boolean | null
           match_id?: string
           sender_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "messages_family_member_id_fkey"
+            columns: ["family_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "messages_match_id_fkey"
             columns: ["match_id"]
