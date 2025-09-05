@@ -87,7 +87,7 @@ const processSteps: ProcessStep[] = [
 
 const ProcessSection = () => {
   return (
-    <section className="py-20 bg-gradient-to-br from-cream/10 via-background to-sage/5">
+    <section id="processus" className="py-20 bg-gradient-to-br from-cream/10 via-background to-sage/5">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-sage-700 bg-clip-text text-transparent">
