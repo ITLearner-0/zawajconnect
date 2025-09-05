@@ -4,12 +4,17 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import AdminDashboard from '@/components/AdminDashboard';
 import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Shield, Crown } from 'lucide-react';
 
 const Admin = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkAdminAccess();
@@ -22,12 +27,79 @@ const Admin = () => {
     }
 
     try {
-      // Check if user has admin role (you would implement this logic)
-      // For now, we'll check if user email matches admin emails
-      const adminEmails = ['admin@nikahhalal.com', 'support@nikahhalal.com'];
-      
-      if (adminEmails.includes(user.email || '')) {
+      // Check user's role in the database
+      const { data: roleData, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .single();
+
+      if (roleError && roleError.code !== 'PGRST116') {
+        console.error('Error checking user role:', roleError);
+        setIsAdmin(false);
+        setLoading(false);
+        return;
+      }
+
+      if (roleData) {
+        const role = roleData.role;
+        setUserRole(role);
+        
+        if (['super_admin', 'admin', 'moderator'].includes(role)) {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      } else {
+        // No role found, check if this is the first time setup
+        await setupFirstSuperAdmin();
+      }
+    } catch (error) {
+      console.error('Error in admin access check:', error);
+      setIsAdmin(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const setupFirstSuperAdmin = async () => {
+    try {
+      // Check if any super admin exists
+      const { data: existingSuperAdmin, error: checkError } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('role', 'super_admin')
+        .limit(1);
+
+      if (checkError) {
+        console.error('Error checking for existing super admin:', checkError);
+        setIsAdmin(false);
+        return;
+      }
+
+      // If no super admin exists, make current user super admin
+      if (!existingSuperAdmin || existingSuperAdmin.length === 0) {
+        const { error: insertError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: user!.id,
+            role: 'super_admin',
+            assigned_by: user!.id
+          });
+
+        if (insertError) {
+          console.error('Error assigning super admin role:', insertError);
+          setIsAdmin(false);
+          return;
+        }
+
+        setUserRole('super_admin');
         setIsAdmin(true);
+        
+        toast({
+          title: "Super Admin créé!",
+          description: "Vous avez été désigné comme Super Administrateur du système.",
+        });
       } else {
         setIsAdmin(false);
         toast({
@@ -35,16 +107,53 @@ const Admin = () => {
           description: "Vous n'avez pas les permissions d'administrateur",
           variant: "destructive"
         });
-        navigate('/dashboard');
       }
     } catch (error) {
-      console.error('Error checking admin access:', error);
+      console.error('Error in first super admin setup:', error);
       setIsAdmin(false);
-      navigate('/dashboard');
     }
   };
 
-  if (isAdmin === null) {
+  const grantSuperAdminAccess = async () => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_roles')
+        .upsert({
+          user_id: user.id,
+          role: 'super_admin',
+          assigned_by: user.id
+        });
+
+      if (error) {
+        console.error('Error granting super admin access:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible d'accorder les privilèges Super Admin",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setUserRole('super_admin');
+      setIsAdmin(true);
+      
+      toast({
+        title: "Accès accordé!",
+        description: "Vous disposez maintenant de tous les privilèges Super Admin",
+      });
+    } catch (error) {
+      console.error('Error granting super admin access:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de l'attribution des privilèges",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -58,17 +167,59 @@ const Admin = () => {
   if (!isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-2">Accès Refusé</h1>
-          <p className="text-muted-foreground">Vous n'avez pas les permissions requises.</p>
-        </div>
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center">
+              <Shield className="h-6 w-6 text-destructive" />
+            </div>
+            <CardTitle className="text-destructive">Accès Administrateur Requis</CardTitle>
+            <CardDescription>
+              Vous devez être administrateur pour accéder à cette section.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-sm text-muted-foreground">
+              <p>Si vous êtes le propriétaire de cette application, vous pouvez vous accorder les privilèges Super Admin.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button 
+                onClick={grantSuperAdminAccess}
+                className="w-full"
+                variant="default"
+              >
+                <Crown className="h-4 w-4 mr-2" />
+                Devenir Super Admin
+              </Button>
+              <Button 
+                onClick={() => navigate('/dashboard')}
+                variant="outline"
+                className="w-full"
+              >
+                Retour au tableau de bord
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto py-6">
-      <AdminDashboard />
+      <div className="mb-6">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-emerald to-gold flex items-center justify-center">
+            <Crown className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">Administration</h1>
+            <p className="text-muted-foreground">
+              Rôle: <span className="font-medium capitalize">{userRole?.replace('_', ' ')}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <AdminDashboard userRole={userRole} />
     </div>
   );
 };

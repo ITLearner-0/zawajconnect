@@ -1,169 +1,144 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Users, 
   Heart, 
-  MessageSquare, 
-  Shield, 
+  MessageCircle, 
   AlertTriangle, 
-  CheckCircle, 
-  XCircle,
-  Search,
-  Filter,
-  MoreVertical,
-  Ban,
-  UserCheck,
+  Shield, 
+  Crown,
   Eye,
-  TrendingUp,
-  TrendingDown
+  Ban,
+  CheckCircle,
+  XCircle,
+  BarChart3,
+  Settings,
+  UserCheck,
+  Search
 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
-interface UserStats {
-  totalUsers: number;
-  activeUsers: number;
-  verifiedUsers: number;
-  newUsersToday: number;
+interface AdminDashboardProps {
+  userRole?: string | null;
 }
 
-interface MatchStats {
-  totalMatches: number;
-  mutualMatches: number;
-  todaysMatches: number;
-}
-
-interface ReportData {
+interface User {
   id: string;
-  reporter_name: string;
-  reported_name: string;
-  type: string;
+  email: string;
+  created_at: string;
+  profiles: {
+    full_name: string;
+    age: number;
+    location: string;
+  } | null;
+  user_roles: {
+    role: string;
+  }[] | null;
+}
+
+interface Report {
+  id: string;
+  report_type: string;
   description: string;
   status: string;
   created_at: string;
+  reporter: {
+    full_name: string;
+  } | null;
+  reported_user: {
+    full_name: string;
+  } | null;
 }
 
-const AdminDashboard = () => {
-  const { toast } = useToast();
-  const [userStats, setUserStats] = useState<UserStats>({
-    totalUsers: 0,
-    activeUsers: 0,
-    verifiedUsers: 0,
-    newUsersToday: 0
-  });
-  
-  const [matchStats, setMatchStats] = useState<MatchStats>({
-    totalMatches: 0,
-    mutualMatches: 0,
-    todaysMatches: 0
-  });
+interface Stats {
+  totalUsers: number;
+  activeMatches: number;
+  totalMessages: number;
+  pendingReports: number;
+  verifiedUsers: number;
+}
 
-  const [reports, setReports] = useState<ReportData[]>([]);
+const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [stats, setStats] = useState<Stats>({
+    totalUsers: 0,
+    activeMatches: 0,
+    totalMessages: 0,
+    pendingReports: 0,
+    verifiedUsers: 0
+  });
+  const [users, setUsers] = useState<User[]>([]);
+  const [reports, setReports] = useState<Report[]>([]);
+  const [selectedUser, setSelectedUser] = useState<string>('');
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    loadDashboardData();
+    loadAdminData();
   }, []);
 
-  const loadDashboardData = async () => {
+  const loadAdminData = async () => {
     try {
-      setLoading(true);
-      
-      // Load user statistics
-      const { data: profiles } = await supabase
+      // Load statistics
+      const [usersCount, matchesCount, messagesCount, reportsCount, verifiedCount] = await Promise.all([
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+        supabase.from('matches').select('*', { count: 'exact', head: true }).eq('is_mutual', true),
+        supabase.from('messages').select('*', { count: 'exact', head: true }),
+        supabase.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+        supabase.from('user_verifications').select('*', { count: 'exact', head: true }).gte('verification_score', 80)
+      ]);
+
+      setStats({
+        totalUsers: usersCount.count || 0,
+        activeMatches: matchesCount.count || 0,
+        totalMessages: messagesCount.count || 0,
+        pendingReports: reportsCount.count || 0,
+        verifiedUsers: verifiedCount.count || 0
+      });
+
+      // Load users with profiles and roles
+      const { data: usersData, error: usersError } = await supabase
         .from('profiles')
-        .select('created_at, user_id');
-      
-      const { data: verifications } = await supabase
-        .from('user_verifications')
-        .select('user_id, email_verified, phone_verified, id_verified');
+        .select(`
+          *,
+          user_roles (role)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(50);
 
-      // Load match statistics
-      const { data: matches } = await supabase
-        .from('matches')
-        .select('created_at, is_mutual');
+      if (usersError) throw usersError;
+      setUsers(usersData as any || []);
 
-      // Load reports with manual joins
-      const { data: reportsData } = await supabase
+      // Load reports
+      const { data: reportsData, error: reportsError } = await supabase
         .from('reports')
         .select(`
-          id,
-          report_type,
-          description,
-          status,
-          created_at,
-          reporter_id,
-          reported_user_id
-        `);
+          *,
+          reporter:reporter_id (full_name),
+          reported_user:reported_user_id (full_name)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(20);
 
-      // Get reporter and reported user names separately
-      const reporterIds = reportsData?.map(r => r.reporter_id).filter(Boolean) || [];
-      const reportedIds = reportsData?.map(r => r.reported_user_id).filter(Boolean) || [];
-      const allUserIds = [...new Set([...reporterIds, ...reportedIds])];
-
-      const { data: reportProfiles } = await supabase
-        .from('profiles')
-        .select('user_id, full_name')
-        .in('user_id', allUserIds);
-
-      // Calculate user stats
-      const today = new Date().toDateString();
-      const newUsersToday = profiles?.filter(p => 
-        new Date(p.created_at).toDateString() === today
-      ).length || 0;
-
-      const verifiedCount = verifications?.filter(v => 
-        v.email_verified || v.phone_verified || v.id_verified
-      ).length || 0;
-
-      setUserStats({
-        totalUsers: profiles?.length || 0,
-        activeUsers: profiles?.length || 0, // Simplified - would need last_seen data
-        verifiedUsers: verifiedCount,
-        newUsersToday
-      });
-
-      // Calculate match stats
-      const todaysMatches = matches?.filter(m => 
-        new Date(m.created_at).toDateString() === today
-      ).length || 0;
-
-      const mutualMatches = matches?.filter(m => m.is_mutual).length || 0;
-
-      setMatchStats({
-        totalMatches: matches?.length || 0,
-        mutualMatches,
-        todaysMatches
-      });
-
-      // Format reports
-      const formattedReports: ReportData[] = reportsData?.map(r => {
-        const reporter = reportProfiles?.find(p => p.user_id === r.reporter_id);
-        const reported = reportProfiles?.find(p => p.user_id === r.reported_user_id);
-        
-        return {
-          id: r.id,
-          reporter_name: reporter?.full_name || 'Utilisateur supprimé',
-          reported_name: reported?.full_name || 'Utilisateur supprimé',
-          type: r.report_type,
-          description: r.description,
-          status: r.status,
-          created_at: r.created_at
-        };
-      }) || [];
-
-      setReports(formattedReports);
+      if (reportsError) throw reportsError;
+      setReports(reportsData as any || []);
 
     } catch (error) {
-      console.error('Error loading dashboard data:', error);
+      console.error('Error loading admin data:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de charger les données du tableau de bord",
+        description: "Impossible de charger les données administrateur",
         variant: "destructive"
       });
     } finally {
@@ -171,261 +146,394 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleReportAction = async (reportId: string, action: 'approve' | 'reject') => {
+  const assignRole = async () => {
+    if (!selectedUser || !selectedRole) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner un utilisateur et un rôle",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
-      const status = action === 'approve' ? 'resolved' : 'dismissed';
-      
       const { error } = await supabase
-        .from('reports')
-        .update({ 
-          status,
-          resolved_at: new Date().toISOString(),
-          resolved_by: (await supabase.auth.getUser()).data.user?.id
-        })
-        .eq('id', reportId);
+        .from('user_roles')
+        .upsert({
+          user_id: selectedUser,
+          role: selectedRole as 'super_admin' | 'admin' | 'moderator' | 'user',
+          assigned_by: user?.id
+        });
 
       if (error) throw error;
 
-      setReports(prev => 
-        prev.map(r => r.id === reportId ? { ...r, status } : r)
-      );
-
       toast({
-        title: "Action effectuée",
-        description: `Signalement ${action === 'approve' ? 'approuvé' : 'rejeté'}`
+        title: "Succès",
+        description: "Rôle attribué avec succès"
       });
 
+      loadAdminData();
+      setSelectedUser('');
+      setSelectedRole('');
     } catch (error) {
-      console.error('Error handling report:', error);
+      console.error('Error assigning role:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de traiter le signalement",
+        description: "Impossible d'attribuer le rôle",
         variant: "destructive"
       });
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return <Badge variant="secondary">En attente</Badge>;
-      case 'resolved':
-        return <Badge className="bg-green-100 text-green-800">Résolu</Badge>;
-      case 'dismissed':
-        return <Badge variant="destructive">Rejeté</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
+  const updateReportStatus = async (reportId: string, status: string) => {
+    try {
+      const { error } = await supabase
+        .from('reports')
+        .update({ 
+          status,
+          resolved_at: new Date().toISOString(),
+          resolved_by: user?.id
+        })
+        .eq('id', reportId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: `Rapport ${status === 'resolved' ? 'résolu' : 'rejeté'}`
+      });
+
+      loadAdminData();
+    } catch (error) {
+      console.error('Error updating report:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le rapport",
+        variant: "destructive"
+      });
     }
   };
 
-  const getReportTypeLabel = (type: string) => {
-    const types: Record<string, string> = {
-      'inappropriate_content': 'Contenu inapproprié',
-      'fake_profile': 'Faux profil',
-      'harassment': 'Harcèlement',
-      'spam': 'Spam',
-      'other': 'Autre'
-    };
-    return types[type] || type;
+  const getRoleBadgeVariant = (role: string) => {
+    switch (role) {
+      case 'super_admin': return 'default';
+      case 'admin': return 'secondary';
+      case 'moderator': return 'outline';
+      default: return 'outline';
+    }
   };
 
-  const filteredReports = reports.filter(report => 
-    report.reporter_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.reported_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    report.type.toLowerCase().includes(searchTerm.toLowerCase())
+  const getRoleIcon = (role: string) => {
+    switch (role) {
+      case 'super_admin': return Crown;
+      case 'admin': return Shield;
+      case 'moderator': return Eye;
+      default: return Users;
+    }
+  };
+
+  const filteredUsers = users.filter(user => 
+    user.profiles?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
-    return <div className="flex items-center justify-center h-96">Chargement...</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Chargement des données...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold">Tableau de Bord Admin</h1>
-        <p className="text-muted-foreground">
-          Gérez la plateforme matrimoniale islamique
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Tableau de Bord Admin</h1>
+          <p className="text-muted-foreground">Gérez votre plateforme matrimoniale islamique</p>
+        </div>
+        <Badge variant="default" className="text-lg px-4 py-2">
+          <Crown className="h-4 w-4 mr-2" />
+          {userRole?.replace('_', ' ').toUpperCase()}
+        </Badge>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Utilisateurs Total</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{userStats.totalUsers}</div>
-            <p className="text-xs text-muted-foreground">
-              +{userStats.newUsersToday} aujourd'hui
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Utilisateurs Vérifiés</CardTitle>
-            <Shield className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{userStats.verifiedUsers}</div>
-            <p className="text-xs text-muted-foreground">
-              {((userStats.verifiedUsers / userStats.totalUsers) * 100).toFixed(1)}% du total
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Matches Mutuels</CardTitle>
-            <Heart className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{matchStats.mutualMatches}</div>
-            <p className="text-xs text-muted-foreground">
-              +{matchStats.todaysMatches} aujourd'hui
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Signalements</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {reports.filter(r => r.status === 'pending').length}
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Users className="h-5 w-5 text-primary" />
+              <div>
+                <p className="text-sm text-muted-foreground">Utilisateurs</p>
+                <p className="text-2xl font-bold">{stats.totalUsers}</p>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              En attente de traitement
-            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <Heart className="h-5 w-5 text-emerald" />
+              <div>
+                <p className="text-sm text-muted-foreground">Matches actifs</p>
+                <p className="text-2xl font-bold">{stats.activeMatches}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-gold" />
+              <div>
+                <p className="text-sm text-muted-foreground">Messages</p>
+                <p className="text-2xl font-bold">{stats.totalMessages}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-destructive" />
+              <div>
+                <p className="text-sm text-muted-foreground">Rapports</p>
+                <p className="text-2xl font-bold">{stats.pendingReports}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-emerald" />
+              <div>
+                <p className="text-sm text-muted-foreground">Vérifiés</p>
+                <p className="text-2xl font-bold">{stats.verifiedUsers}</p>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Content */}
-      <Tabs defaultValue="reports" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="reports">Signalements</TabsTrigger>
+      {/* Admin Tabs */}
+      <Tabs defaultValue="users" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="users">Utilisateurs</TabsTrigger>
-          <TabsTrigger value="analytics">Analyses</TabsTrigger>
+          <TabsTrigger value="roles">Rôles</TabsTrigger>
+          <TabsTrigger value="reports">Rapports</TabsTrigger>
+          <TabsTrigger value="settings">Paramètres</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="reports">
+        {/* Users Tab */}
+        <TabsContent value="users" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5" />
-                  Signalements
-                </span>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                    <Input 
-                      placeholder="Rechercher signalement..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 w-64"
-                    />
-                  </div>
-                  <Button variant="outline" size="sm">
-                    <Filter className="h-4 w-4" />
+              <CardTitle>Gestion des Utilisateurs</CardTitle>
+              <CardDescription>Gérez les comptes utilisateurs de la plateforme</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                  <Input
+                    placeholder="Rechercher par nom ou email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nom</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Âge</TableHead>
+                    <TableHead>Localisation</TableHead>
+                    <TableHead>Rôle</TableHead>
+                    <TableHead>Inscrit le</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers.map((user) => {
+                    const role = user.user_roles?.[0]?.role || 'user';
+                    const RoleIcon = getRoleIcon(role);
+                    
+                    return (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">
+                          {user.profiles?.full_name || 'N/A'}
+                        </TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.profiles?.age || 'N/A'}</TableCell>
+                        <TableCell>{user.profiles?.location || 'N/A'}</TableCell>
+                        <TableCell>
+                          <Badge variant={getRoleBadgeVariant(role)} className="capitalize">
+                            <RoleIcon className="h-3 w-3 mr-1" />
+                            {role.replace('_', ' ')}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(user.created_at).toLocaleDateString('fr-FR')}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Roles Tab */}
+        <TabsContent value="roles" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Attribution des Rôles</CardTitle>
+              <CardDescription>Attribuez des rôles administratifs aux utilisateurs</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="user-select">Utilisateur</Label>
+                  <Select value={selectedUser} onValueChange={setSelectedUser}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un utilisateur" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {users.map((user) => (
+                        <SelectItem key={user.id} value={user.id}>
+                          {user.profiles?.full_name || user.email}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="role-select">Rôle</Label>
+                  <Select value={selectedRole} onValueChange={setSelectedRole}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un rôle" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {userRole === 'super_admin' && (
+                        <SelectItem value="super_admin">Super Admin</SelectItem>
+                      )}
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="moderator">Modérateur</SelectItem>
+                      <SelectItem value="user">Utilisateur</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-end">
+                  <Button onClick={assignRole} className="w-full">
+                    Attribuer le rôle
                   </Button>
                 </div>
-              </CardTitle>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Reports Tab */}
+        <TabsContent value="reports" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestion des Rapports</CardTitle>
+              <CardDescription>Traitez les rapports et signalements d'utilisateurs</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Rapporteur</TableHead>
+                    <TableHead>Utilisateur signalé</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {reports.map((report) => (
+                    <TableRow key={report.id}>
+                      <TableCell className="capitalize">{report.report_type}</TableCell>
+                      <TableCell>{report.reporter?.full_name || 'N/A'}</TableCell>
+                      <TableCell>{report.reported_user?.full_name || 'N/A'}</TableCell>
+                      <TableCell className="max-w-xs truncate">{report.description}</TableCell>
+                      <TableCell>
+                        <Badge variant={report.status === 'pending' ? 'destructive' : 'default'}>
+                          {report.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {report.status === 'pending' && (
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateReportStatus(report.id, 'resolved')}
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateReportStatus(report.id, 'rejected')}
+                            >
+                              <XCircle className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Settings Tab */}
+        <TabsContent value="settings" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Paramètres Système</CardTitle>
+              <CardDescription>Configuration avancée de la plateforme</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {filteredReports.map((report) => (
-                  <div 
-                    key={report.id} 
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">
-                          {getReportTypeLabel(report.type)}
-                        </Badge>
-                        {getStatusBadge(report.status)}
-                      </div>
-                      <p className="text-sm font-medium">
-                        <span className="text-red-600">{report.reported_name}</span> signalé par{' '}
-                        <span className="text-blue-600">{report.reporter_name}</span>
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {report.description}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(report.created_at).toLocaleString('fr-FR')}
-                      </p>
-                    </div>
-
-                    {report.status === 'pending' && (
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleReportAction(report.id, 'approve')}
-                          className="text-green-600 hover:text-green-700"
-                        >
-                          <CheckCircle className="h-4 w-4" />
-                          Approuver
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleReportAction(report.id, 'reject')}
-                          className="text-red-600 hover:text-red-700"
-                        >
-                          <XCircle className="h-4 w-4" />
-                          Rejeter
-                        </Button>
-                      </div>
+                <div className="p-4 border rounded-lg">
+                  <h4 className="font-medium mb-2">Rôle actuel</h4>
+                  <div className="flex items-center gap-2">
+                    {userRole === 'super_admin' && <Crown className="h-5 w-5 text-gold" />}
+                    {userRole === 'admin' && <Shield className="h-5 w-5 text-emerald" />}
+                    {userRole === 'moderator' && <Eye className="h-5 w-5 text-blue-500" />}
+                    <span className="capitalize font-medium">
+                      {userRole?.replace('_', ' ')}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="p-4 border rounded-lg">
+                  <h4 className="font-medium mb-2">Privilèges</h4>
+                  <ul className="space-y-1 text-sm text-muted-foreground">
+                    <li>✅ Gestion complète des utilisateurs</li>
+                    <li>✅ Attribution des rôles administratifs</li>
+                    <li>✅ Modération des rapports</li>
+                    <li>✅ Accès aux statistiques avancées</li>
+                    <li>✅ Configuration système</li>
+                    {userRole === 'super_admin' && (
+                      <li>✅ Privilèges Super Administrateur</li>
                     )}
-                  </div>
-                ))}
-
-                {filteredReports.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    Aucun signalement trouvé
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="users">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Gestion des Utilisateurs
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                Interface de gestion des utilisateurs en cours de développement
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="analytics">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Analyses et Statistiques
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                Tableau de bord analytique en cours de développement
+                  </ul>
+                </div>
               </div>
             </CardContent>
           </Card>
