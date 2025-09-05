@@ -11,18 +11,24 @@ import {
   Bell, 
   User,
   LogOut,
-  ArrowLeft
+  ArrowLeft,
+  Crown
 } from 'lucide-react';
 import PrivacySettingsForm from '@/components/PrivacySettingsForm';
 import FamilySupervisionPanel from '@/components/FamilySupervisionPanel';
 import VerificationCenter from '@/components/VerificationCenter';
 import IslamicCalendarWidget from '@/components/IslamicCalendarWidget';
 import NotificationSystem from '@/components/NotificationSystem';
+import PremiumSubscription from '@/components/PremiumSubscription';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('privacy');
+  
+  // Check for premium tab in URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const tabFromUrl = urlParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabFromUrl || 'privacy');
 
   const handleSignOut = async () => {
     await signOut();
@@ -67,7 +73,7 @@ const Settings = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-4">
+              <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="privacy" className="flex items-center gap-2">
                   <Shield className="h-4 w-4" />
                   <span className="hidden sm:inline">Confidentialité</span>
@@ -79,6 +85,10 @@ const Settings = () => {
                 <TabsTrigger value="verification" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   <span className="hidden sm:inline">Vérification</span>
+                </TabsTrigger>
+                <TabsTrigger value="premium" className="flex items-center gap-2">
+                  <Crown className="h-4 w-4" />
+                  <span className="hidden sm:inline">Premium</span>
                 </TabsTrigger>
                 <TabsTrigger value="notifications" className="flex items-center gap-2">
                   <Bell className="h-4 w-4" />
@@ -97,6 +107,10 @@ const Settings = () => {
 
                 <TabsContent value="verification" className="space-y-6">
                   <VerificationCenter />
+                </TabsContent>
+
+                <TabsContent value="premium" className="space-y-6">
+                  <PremiumSubscription />
                 </TabsContent>
 
                 <TabsContent value="notifications" className="space-y-6">
