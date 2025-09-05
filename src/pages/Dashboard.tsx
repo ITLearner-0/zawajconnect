@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import PhotoUpload from '@/components/PhotoUpload';
 import VerificationBadge from '@/components/VerificationBadge';
 import CompatibilityCard from '@/components/CompatibilityCard';
+import CompatibilityPrompt from '@/components/CompatibilityPrompt';
 
 interface Profile {
   id: string;
@@ -225,6 +226,9 @@ const Dashboard = () => {
             )}
           </div>
         </div>
+
+        {/* Compatibility Prompt for incomplete questionnaires */}
+        <CompatibilityPrompt />
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
