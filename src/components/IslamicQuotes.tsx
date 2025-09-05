@@ -1,159 +1,297 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Quote, BookOpen, Heart, Users } from 'lucide-react';
+import { 
+  BookOpen, 
+  RefreshCw, 
+  Heart, 
+  Share2, 
+  Copy,
+  Star,
+  Quote
+} from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface IslamicQuote {
+  id: string;
   text: string;
-  source: string;
   arabic?: string;
-  category: 'marriage' | 'love' | 'family' | 'faith';
+  source: string;
+  category: string;
+  author?: string;
+  reference?: string;
 }
 
 const IslamicQuotes = () => {
-  const [currentQuote, setCurrentQuote] = useState(0);
-  
+  const { toast } = useToast();
+  const [currentQuote, setCurrentQuote] = useState<IslamicQuote | null>(null);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Sample Islamic quotes database
   const quotes: IslamicQuote[] = [
     {
-      text: "Et parmi Ses signes Il a créé de vous, pour vous, des épouses pour que vous viviez en tranquillité avec elles et Il a mis entre vous de l'affection et de la bonté.",
-      arabic: "وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً",
-      source: "Coran 30:21",
-      category: 'marriage'
+      id: '1',
+      text: "Et c'est en Allah qu'il faut placer sa confiance, si vous êtes croyants.",
+      arabic: "وَعَلَى اللَّهِ فَتَوَكَّلُوا إِن كُنتُم مُّؤْمِنِينَ",
+      source: "Coran",
+      category: "Tawakkul",
+      reference: "Sourate Al-Ma'idah (5:23)"
     },
     {
-      text: "Le monde entier est une provision, et la meilleure provision de ce monde est la femme vertueuse.",
-      source: "Hadith - Sahih Muslim",
-      category: 'marriage'
+      id: '2',
+      text: "Celui qui fait un pas vers Allah, Allah fait dix pas vers lui. Celui qui marche vers Allah, Allah court vers lui.",
+      source: "Hadith",
+      category: "Spiritualité",
+      author: "Prophète Muhammad ﷺ",
+      reference: "Hadith Qudsi"
     },
     {
-      text: "Celui qui se marie accomplit la moitié de sa religion, qu'il craigne Allah pour l'autre moitié.",
-      source: "Hadith - Al-Bayhaqi",
-      category: 'faith'
+      id: '3',
+      text: "La patience est la moitié de la foi.",
+      arabic: "الصَّبْرُ نِصْفُ الْإِيمَانِ",
+      source: "Hadith",
+      category: "Sabr",
+      author: "Prophète Muhammad ﷺ"
     },
     {
-      text: "Les croyants qui ont la foi la plus parfaite sont ceux qui ont le meilleur comportement, et les meilleurs d'entre vous sont ceux qui sont les meilleurs avec leurs épouses.",
-      source: "Hadith - At-Tirmidhi",
-      category: 'love'
+      id: '4',
+      text: "Et quiconque craint Allah, Il lui donnera une issue favorable.",
+      arabic: "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا",
+      source: "Coran",
+      category: "Taqwa",
+      reference: "Sourate At-Talaq (65:2)"
     },
     {
-      text: "Ô vous qui avez cru ! Il vous est interdit d'hériter des femmes contre leur gré. Ne les empêchez pas de se remarier dans le but de vous approprier une partie de ce que vous leur aviez donné.",
-      source: "Coran 4:19",
-      category: 'family'
-    },
-    {
-      text: "Et comportez-vous convenablement envers elles. Si vous avez de l'aversion envers elles durant la vie commune, il se peut que vous ayez de l'aversion pour une chose où Allah a déposé un grand bien.",
-      source: "Coran 4:19",
-      category: 'love'
+      id: '5',
+      text: "Le meilleur des hommes est celui qui est utile aux autres.",
+      arabic: "خَيْرُ النَّاسِ أَنْفَعُهُمْ لِلنَّاسِ",
+      source: "Hadith",
+      category: "Service",
+      author: "Prophète Muhammad ﷺ"
     }
   ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentQuote((prev) => (prev + 1) % quotes.length);
-    }, 8000); // Change quote every 8 seconds
+    // Load favorites from localStorage
+    const savedFavorites = localStorage.getItem('islamic_quotes_favorites');
+    if (savedFavorites) {
+      setFavorites(JSON.parse(savedFavorites));
+    }
+    
+    // Set initial quote
+    getRandomQuote();
+  }, []);
 
-    return () => clearInterval(interval);
-  }, [quotes.length]);
-
-  const currentQuoteData = quotes[currentQuote];
-  const categoryColors = {
-    marriage: 'bg-emerald/10 text-emerald border-emerald/20',
-    love: 'bg-gold/10 text-gold-dark border-gold/20', 
-    family: 'bg-sage/10 text-sage-dark border-sage/30',
-    faith: 'bg-cream-dark/10 text-foreground border-cream-dark/20'
+  const getRandomQuote = () => {
+    setLoading(true);
+    
+    // Simulate loading delay
+    setTimeout(() => {
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      setCurrentQuote(quotes[randomIndex]);
+      setLoading(false);
+    }, 500);
   };
 
-  const categoryIcons = {
-    marriage: Heart,
-    love: Heart,
-    family: Users,
-    faith: BookOpen
+  const toggleFavorite = (quoteId: string) => {
+    const newFavorites = favorites.includes(quoteId)
+      ? favorites.filter(id => id !== quoteId)
+      : [...favorites, quoteId];
+    
+    setFavorites(newFavorites);
+    localStorage.setItem('islamic_quotes_favorites', JSON.stringify(newFavorites));
+    
+    toast({
+      title: favorites.includes(quoteId) ? "Retiré des favoris" : "Ajouté aux favoris",
+      description: "Citation sauvegardée"
+    });
   };
 
-  const CategoryIcon = categoryIcons[currentQuoteData.category];
+  const copyQuote = async () => {
+    if (!currentQuote) return;
+    
+    const text = `"${currentQuote.text}"
+
+${currentQuote.arabic ? `${currentQuote.arabic}\n\n` : ''}Source: ${currentQuote.source}${currentQuote.reference ? ` - ${currentQuote.reference}` : ''}`;
+    
+    try {
+      await navigator.clipboard.writeText(text);
+      toast({
+        title: "Citation copiée",
+        description: "La citation a été copiée dans le presse-papiers"
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de copier la citation",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const shareQuote = async () => {
+    if (!currentQuote) return;
+    
+    const text = `"${currentQuote.text}" - ${currentQuote.source}${currentQuote.reference ? ` (${currentQuote.reference})` : ''}`;
+    
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Citation Islamique',
+          text: text,
+        });
+      } catch (error) {
+        // Fallback to copy if sharing fails
+        copyQuote();
+      }
+    } else {
+      copyQuote();
+    }
+  };
+
+  const getCategoryColor = (category: string) => {
+    const colors: Record<string, string> = {
+      'Tawakkul': 'bg-blue-100 text-blue-800',
+      'Spiritualité': 'bg-purple-100 text-purple-800',
+      'Sabr': 'bg-green-100 text-green-800',
+      'Taqwa': 'bg-yellow-100 text-yellow-800',
+      'Service': 'bg-orange-100 text-orange-800'
+    };
+    return colors[category] || 'bg-gray-100 text-gray-800';
+  };
+
+  if (!currentQuote) {
+    return <div className="flex items-center justify-center h-96">Chargement...</div>;
+  }
 
   return (
-    <section className="py-16 px-4 bg-gradient-to-br from-cream/40 via-sage/10 to-emerald/5">
-      <div className="container mx-auto">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12 animate-fade-in">
-            <div className="h-14 w-14 bg-gradient-to-br from-emerald to-gold rounded-full flex items-center justify-center mx-auto mb-6">
-              <Quote className="h-7 w-7 text-white" />
-            </div>
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              Sagesse Islamique sur le Mariage
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
-              Laissez-vous inspirer par les enseignements du Coran et de la Sunnah concernant l'union sacrée
-            </p>
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <BookOpen className="h-6 w-6" />
+              Citations Islamiques
+            </span>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={getRandomQuote}
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            </Button>
+          </CardTitle>
+        </CardHeader>
+      </Card>
 
-          <Card className="animate-slide-up card-hover bg-gradient-to-br from-white/80 to-cream/30 border-none shadow-lg">
-            <CardContent className="p-8 lg:p-12">
-              <div className="text-center space-y-6">
-                {/* Arabic Text */}
-                {currentQuoteData.arabic && (
-                  <div className="animate-fade-in" key={`arabic-${currentQuote}`}>
-                    <p className="text-2xl lg:text-3xl text-gold font-arabic leading-relaxed mb-4 opacity-90">
-                      {currentQuoteData.arabic}
-                    </p>
-                  </div>
-                )}
+      {/* Main Quote Card */}
+      <Card className="relative overflow-hidden">
+        <div className="absolute top-4 right-4">
+          <Quote className="h-16 w-16 text-primary/10" />
+        </div>
+        
+        <CardContent className="p-8">
+          <div className="space-y-6">
+            {/* Category Badge */}
+            <div className="flex items-center justify-between">
+              <Badge className={getCategoryColor(currentQuote.category)}>
+                {currentQuote.category}
+              </Badge>
+              
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => toggleFavorite(currentQuote.id)}
+                  className={favorites.includes(currentQuote.id) ? 'text-red-500' : ''}
+                >
+                  <Heart className={`h-4 w-4 ${favorites.includes(currentQuote.id) ? 'fill-current' : ''}`} />
+                </Button>
                 
-                {/* French Translation */}
-                <div className="animate-fade-in" key={`text-${currentQuote}`} style={{ animationDelay: '0.2s' }}>
-                  <blockquote className="text-lg lg:text-xl text-foreground leading-relaxed italic mb-6">
-                    "{currentQuoteData.text}"
-                  </blockquote>
-                </div>
+                <Button variant="ghost" size="sm" onClick={shareQuote}>
+                  <Share2 className="h-4 w-4" />
+                </Button>
+                
+                <Button variant="ghost" size="sm" onClick={copyQuote}>
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
 
-                {/* Source and Category */}
-                <div className="flex items-center justify-center gap-4 flex-wrap animate-fade-in" key={`source-${currentQuote}`} style={{ animationDelay: '0.4s' }}>
-                  <Badge className={`${categoryColors[currentQuoteData.category]} flex items-center gap-2 px-3 py-1`}>
-                    <CategoryIcon className="h-4 w-4" />
-                    {currentQuoteData.category.charAt(0).toUpperCase() + currentQuoteData.category.slice(1)}
-                  </Badge>
-                  <p className="text-muted-foreground font-medium">
-                    - {currentQuoteData.source}
+            {/* Quote Text */}
+            <div className="space-y-4">
+              <blockquote className="text-xl md:text-2xl font-medium leading-relaxed text-foreground">
+                "{currentQuote.text}"
+              </blockquote>
+              
+              {/* Arabic Text */}
+              {currentQuote.arabic && (
+                <div className="text-right">
+                  <p className="text-lg md:text-xl font-arabic text-primary/80 leading-loose">
+                    {currentQuote.arabic}
                   </p>
                 </div>
+              )}
+            </div>
 
-                {/* Quote Navigation Dots */}
-                <div className="flex justify-center gap-2 mt-8">
-                  {quotes.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentQuote(index)}
-                      className={`h-3 w-3 rounded-full transition-all duration-300 ${
-                        index === currentQuote 
-                          ? 'bg-emerald scale-125' 
-                          : 'bg-muted-foreground/30 hover:bg-muted-foreground/60'
-                      }`}
-                      aria-label={`Quote ${index + 1}`}
-                    />
-                  ))}
+            {/* Source Information */}
+            <div className="border-t pt-4">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                <div className="space-y-1">
+                  <p className="font-medium text-primary">
+                    {currentQuote.source}
+                    {currentQuote.author && (
+                      <span className="text-muted-foreground ml-2">
+                        - {currentQuote.author}
+                      </span>
+                    )}
+                  </p>
+                  
+                  {currentQuote.reference && (
+                    <p className="text-sm text-muted-foreground">
+                      {currentQuote.reference}
+                    </p>
+                  )}
                 </div>
+                
+                {favorites.includes(currentQuote.id) && (
+                  <Badge variant="outline" className="w-fit">
+                    <Star className="h-3 w-3 mr-1" />
+                    Favori
+                  </Badge>
+                )}
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Call to Action */}
-          <div className="text-center mt-12 animate-fade-in" style={{ animationDelay: '0.6s' }}>
-            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-              Rejoignez notre communauté et trouvez votre partenaire de vie dans le respect des valeurs islamiques
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-gradient-to-r from-emerald to-emerald-light text-white px-8 py-3 rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all">
-                Commencer Ma Recherche
-              </button>
-              <button className="border border-emerald text-emerald px-8 py-3 rounded-lg font-semibold hover:bg-emerald/10 transition-all">
-                En Savoir Plus
-              </button>
             </div>
           </div>
-        </div>
+        </CardContent>
+      </Card>
+
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-3">
+        <Button onClick={getRandomQuote} className="flex-1" disabled={loading}>
+          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          Nouvelle Citation
+        </Button>
+        
+        <Button variant="outline" onClick={shareQuote} className="flex-1">
+          <Share2 className="h-4 w-4 mr-2" />
+          Partager
+        </Button>
+        
+        <Button 
+          variant="outline" 
+          onClick={() => toggleFavorite(currentQuote.id)}
+          className="flex-1"
+        >
+          <Heart className={`h-4 w-4 mr-2 ${favorites.includes(currentQuote.id) ? 'fill-current text-red-500' : ''}`} />
+          {favorites.includes(currentQuote.id) ? 'Favoris' : 'Ajouter'}
+        </Button>
       </div>
-    </section>
+    </div>
   );
 };
 

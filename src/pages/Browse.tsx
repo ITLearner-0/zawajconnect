@@ -477,19 +477,20 @@ const Browse = () => {
           </Button>
         </div>
 
-                <div className="flex justify-center pt-3">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSelectedProfile(currentProfile);
-                      setReportModalOpen(true);
-                    }}
-                    className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
-                  >
-                    Signaler ce profil
-                  </Button>
-                </div>
+        <div className="flex justify-center pt-3">
+          <ReportModal
+            reportedUserId={currentProfile.user_id}
+            reportedUserName={currentProfile.full_name || 'Utilisateur'}
+          >
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+            >
+              Signaler ce profil
+            </Button>
+          </ReportModal>
+        </div>
               </CardContent>
             </Card>
           </div>
@@ -523,13 +524,7 @@ const Browse = () => {
         </div>
       </div>
 
-      {/* Report Modal */}
-      <ReportModal
-        isOpen={reportModalOpen}
-        onClose={() => setReportModalOpen(false)}
-        reportedUserId={selectedProfile?.user_id || ''}
-        reportedUserName={selectedProfile?.full_name || 'Utilisateur'}
-      />
+      {/* Report Modal - Remove if not needed */}
     </div>
   );
 };

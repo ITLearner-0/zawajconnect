@@ -1,52 +1,25 @@
 import { useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AlertTriangle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ReportModalProps {
-  isOpen: boolean;
-  onClose: () => void;
   reportedUserId: string;
-  reportedUserName: string;
+  reportedUserName?: string;
+  children: React.ReactNode;
 }
 
-const ReportModal = ({ isOpen, onClose, reportedUserId, reportedUserName }: ReportModalProps) => {
-  const { user } = useAuth();
+const ReportModal = ({ reportedUserId, reportedUserName, children }: ReportModalProps) => {
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
   const [reportType, setReportType] = useState('');
   const [description, setDescription] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !reportType || !description.trim()) return;
-
-    setSubmitting(true);
-    try {
-      await supabase
-        .from('reports')
-        .insert({
-          reporter_id: user.id,
-          reported_user_id: reportedUserId,
-          report_type: reportType,
-          description: description.trim()
-        });
-
-      alert('Signalement envoyé avec succès. Notre équipe va examiner votre rapport.');
-      onClose();
-      setReportType('');
-      setDescription('');
-    } catch (error) {
-      console.error('Error submitting report:', error);
-      alert('Erreur lors de l\'envoi du signalement. Veuillez réessayer.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const [loading, setLoading] = useState(false);
 
   const reportTypes = [
     { value: 'inappropriate_content', label: 'Contenu inapproprié' },
@@ -56,25 +29,71 @@ const ReportModal = ({ isOpen, onClose, reportedUserId, reportedUserName }: Repo
     { value: 'other', label: 'Autre' }
   ];
 
+  const handleSubmit = async () => {
+    if (!reportType || !description.trim()) {
+      toast({
+        title: "Informations manquantes",
+        description: "Veuillez sélectionner un type et décrire le problème",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) throw new Error('Non authentifié');
+
+      const { error } = await supabase
+        .from('reports')
+        .insert({
+          reporter_id: user.user.id,
+          reported_user_id: reportedUserId,
+          report_type: reportType,
+          description: description.trim()
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Signalement envoyé",
+        description: "Merci, nous examinerons votre signalement"
+      });
+
+      setOpen(false);
+      setReportType('');
+      setDescription('');
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer le signalement",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-destructive" />
-            Signaler {reportedUserName}
+            <AlertTriangle className="h-5 w-5 text-red-500" />
+            Signaler {reportedUserName || 'cet utilisateur'}
           </DialogTitle>
         </DialogHeader>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="report-type">Type de signalement</Label>
-            <Select value={reportType} onValueChange={setReportType} required>
+        
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Type de problème</Label>
+            <Select value={reportType} onValueChange={setReportType}>
               <SelectTrigger>
-                <SelectValue placeholder="Sélectionnez le type de problème" />
+                <SelectValue placeholder="Sélectionner le type" />
               </SelectTrigger>
               <SelectContent>
-                {reportTypes.map((type) => (
+                {reportTypes.map(type => (
                   <SelectItem key={type.value} value={type.value}>
                     {type.label}
                   </SelectItem>
@@ -83,38 +102,25 @@ const ReportModal = ({ isOpen, onClose, reportedUserId, reportedUserName }: Repo
             </Select>
           </div>
 
-          <div>
-            <Label htmlFor="description">Description détaillée</Label>
+          <div className="space-y-2">
+            <Label>Description détaillée</Label>
             <Textarea
-              id="description"
+              placeholder="Décrivez le problème en détail..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Décrivez le problème en détail..."
               rows={4}
-              required
             />
           </div>
 
-          <div className="bg-muted/50 p-4 rounded-md">
-            <p className="text-sm text-muted-foreground">
-              <strong>Note importante :</strong> Les signalements abusifs peuvent entraîner des sanctions sur votre compte. 
-              Assurez-vous que votre signalement est justifié et basé sur des faits réels.
-            </p>
-          </div>
-
           <div className="flex gap-2 pt-4">
-            <Button
-              type="submit"
-              disabled={submitting || !reportType || !description.trim()}
-              className="flex-1 bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-            >
-              {submitting ? 'Envoi...' : 'Envoyer le signalement'}
+            <Button onClick={handleSubmit} disabled={loading} className="flex-1">
+              {loading ? "Envoi..." : "Envoyer le signalement"}
             </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={() => setOpen(false)}>
               Annuler
             </Button>
           </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

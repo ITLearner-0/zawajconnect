@@ -486,11 +486,13 @@ const Profile = () => {
       {/* Report Modal */}
       {showReportModal && (
         <ReportModal
-          isOpen={showReportModal}
-          onClose={() => setShowReportModal(false)}
           reportedUserId={userId!}
           reportedUserName={profile?.full_name || 'Utilisateur'}
-        />
+        >
+          <Button variant="destructive" size="sm">
+            Signaler ce profil
+          </Button>
+        </ReportModal>
       )}
     </div>
   );

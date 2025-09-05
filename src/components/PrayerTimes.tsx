@@ -1,205 +1,383 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Clock, MapPin, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { 
+  Sun, 
+  Sunrise, 
+  Clock, 
+  Sunset, 
+  Moon, 
+  MapPin,
+  RefreshCw,
+  Settings,
+  Bell,
+  BellOff
+} from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 interface PrayerTime {
   name: string;
-  arabicName: string;
   time: string;
-  isPassed: boolean;
-  isNext: boolean;
+  arabic: string;
+  icon: React.ComponentType<{ className?: string }>;
+  passed: boolean;
+}
+
+interface PrayerTimesData {
+  fajr: string;
+  sunrise: string;
+  dhuhr: string;
+  asr: string;
+  maghrib: string;
+  isha: string;
 }
 
 const PrayerTimes = () => {
-  const [prayerTimes, setPrayerTimes] = useState<PrayerTime[]>([]);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const { toast } = useToast();
+  const [prayerTimes, setPrayerTimes] = useState<PrayerTimesData>({
+    fajr: '05:30',
+    sunrise: '07:15',
+    dhuhr: '12:45',
+    asr: '16:20',
+    maghrib: '19:05',
+    isha: '20:30'
+  });
+  
   const [location, setLocation] = useState('Paris, France');
-  const [islamicDate, setIslamicDate] = useState('');
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [nextPrayer, setNextPrayer] = useState<string>('');
+  const [timeToNext, setTimeToNext] = useState<string>('');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  // Update current time every minute
   useEffect(() => {
-    // Simulate prayer times (in a real app, you'd fetch from an API like Aladhan API)
-    const times = [
-      { name: 'Fajr', arabicName: 'الفجر', time: '05:30', isPassed: false, isNext: false },
-      { name: 'Dhuhr', arabicName: 'الظهر', time: '13:15', isPassed: false, isNext: false },
-      { name: 'Asr', arabicName: 'العصر', time: '16:45', isPassed: false, isNext: false },
-      { name: 'Maghrib', arabicName: 'المغرب', time: '19:20', isPassed: false, isNext: false },
-      { name: 'Isha', arabicName: 'العشاء', time: '21:00', isPassed: false, isNext: false }
-    ];
-
-    // Calculate which prayers have passed and which is next
-    const now = new Date();
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    
-    let nextPrayerFound = false;
-    const updatedTimes = times.map(prayer => {
-      const [hours, minutes] = prayer.time.split(':').map(Number);
-      const prayerMinutes = hours * 60 + minutes;
-      
-      const isPassed = currentMinutes > prayerMinutes;
-      const isNext = !nextPrayerFound && !isPassed;
-      
-      if (isNext) nextPrayerFound = true;
-      
-      return { ...prayer, isPassed, isNext };
-    });
-
-    // If no next prayer found, Fajr is next (next day)
-    if (!nextPrayerFound) {
-      updatedTimes[0].isNext = true;
-    }
-
-    setPrayerTimes(updatedTimes);
-
-    // Simulate Islamic date
-    setIslamicDate('15 Rajab 1446');
-  }, [currentTime]);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
+    const interval = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000); // Update every minute
 
-    return () => clearInterval(timer);
+    return () => clearInterval(interval);
   }, []);
 
-  const nextPrayer = prayerTimes.find(p => p.isNext);
-  const timeUntilNext = nextPrayer ? calculateTimeUntil(nextPrayer.time) : '';
+  // Calculate next prayer and time remaining
+  useEffect(() => {
+    calculateNextPrayer();
+  }, [currentTime, prayerTimes]);
 
-  function calculateTimeUntil(prayerTime: string): string {
-    const now = new Date();
-    const [hours, minutes] = prayerTime.split(':').map(Number);
+  const calculateNextPrayer = () => {
+    const now = currentTime;
+    const currentTimeString = now.toTimeString().slice(0, 5);
     
-    let prayerDate = new Date();
-    prayerDate.setHours(hours, minutes, 0, 0);
+    const prayers = [
+      { name: 'Fajr', time: prayerTimes.fajr },
+      { name: 'Dhuhr', time: prayerTimes.dhuhr },
+      { name: 'Asr', time: prayerTimes.asr },
+      { name: 'Maghrib', time: prayerTimes.maghrib },
+      { name: 'Isha', time: prayerTimes.isha }
+    ];
+
+    let nextPrayerName = '';
+    let nextPrayerTime = '';
     
-    // If prayer time has passed today, it's tomorrow
-    if (prayerDate <= now) {
-      prayerDate.setDate(prayerDate.getDate() + 1);
+    for (const prayer of prayers) {
+      if (prayer.time > currentTimeString) {
+        nextPrayerName = prayer.name;
+        nextPrayerTime = prayer.time;
+        break;
+      }
     }
     
-    const diff = prayerDate.getTime() - now.getTime();
-    const hoursUntil = Math.floor(diff / (1000 * 60 * 60));
-    const minutesUntil = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
-    if (hoursUntil > 0) {
-      return `${hoursUntil}h ${minutesUntil}min`;
+    // If no prayer found for today, next prayer is Fajr tomorrow
+    if (!nextPrayerName) {
+      nextPrayerName = 'Fajr';
+      nextPrayerTime = prayerTimes.fajr;
     }
-    return `${minutesUntil}min`;
-  }
+    
+    setNextPrayer(nextPrayerName);
+    
+    // Calculate time remaining
+    const [hours, minutes] = nextPrayerTime.split(':').map(Number);
+    const nextPrayerDate = new Date(now);
+    nextPrayerDate.setHours(hours, minutes, 0, 0);
+    
+    // If the prayer time has passed today, it's tomorrow's prayer
+    if (nextPrayerDate <= now) {
+      nextPrayerDate.setDate(nextPrayerDate.getDate() + 1);
+    }
+    
+    const timeDiff = nextPrayerDate.getTime() - now.getTime();
+    const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutesLeft = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    setTimeToNext(`${hoursLeft}h ${minutesLeft}m`);
+  };
+
+  const getPrayerList = (): PrayerTime[] => {
+    const currentTimeString = currentTime.toTimeString().slice(0, 5);
+    
+    return [
+      {
+        name: 'Fajr',
+        time: prayerTimes.fajr,
+        arabic: 'الفجر',
+        icon: Moon,
+        passed: prayerTimes.fajr < currentTimeString
+      },
+      {
+        name: 'Lever du soleil',
+        time: prayerTimes.sunrise,
+        arabic: 'الشروق',
+        icon: Sunrise,
+        passed: prayerTimes.sunrise < currentTimeString
+      },
+      {
+        name: 'Dhuhr',
+        time: prayerTimes.dhuhr,
+        arabic: 'الظهر',
+        icon: Sun,
+        passed: prayerTimes.dhuhr < currentTimeString
+      },
+      {
+        name: 'Asr',
+        time: prayerTimes.asr,
+        arabic: 'العصر',
+        icon: Clock,
+        passed: prayerTimes.asr < currentTimeString
+      },
+      {
+        name: 'Maghrib',
+        time: prayerTimes.maghrib,
+        arabic: 'المغرب',
+        icon: Sunset,
+        passed: prayerTimes.maghrib < currentTimeString
+      },
+      {
+        name: 'Isha',
+        time: prayerTimes.isha,
+        arabic: 'العشاء',
+        icon: Moon,
+        passed: prayerTimes.isha < currentTimeString
+      }
+    ];
+  };
+
+  const updateLocation = async () => {
+    setLoading(true);
+    try {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            
+            // In a real app, you would call a prayer times API here
+            // For demo purposes, we'll simulate an API call
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Update location name (this would come from reverse geocoding API)
+            setLocation(`Lat: ${latitude.toFixed(2)}, Lng: ${longitude.toFixed(2)}`);
+            
+            toast({
+              title: "Localisation mise à jour",
+              description: "Heures de prière actualisées pour votre position"
+            });
+          },
+          (error) => {
+            toast({
+              title: "Erreur de localisation",
+              description: "Impossible d'obtenir votre position",
+              variant: "destructive"
+            });
+          }
+        );
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour la localisation",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleNotifications = () => {
+    setNotificationsEnabled(!notificationsEnabled);
+    
+    if (!notificationsEnabled) {
+      // Request notification permission
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().then(permission => {
+          if (permission === 'granted') {
+            toast({
+              title: "Notifications activées",
+              description: "Vous recevrez des rappels pour les prières"
+            });
+          }
+        });
+      } else {
+        toast({
+          title: "Notifications activées",
+          description: "Vous recevrez des rappels pour les prières"
+        });
+      }
+    } else {
+      toast({
+        title: "Notifications désactivées",
+        description: "Les rappels de prière sont désactivés"
+      });
+    }
+  };
+
+  const formatDate = () => {
+    return currentTime.toLocaleDateString('fr-FR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-emerald" />
-            Horaires de Prière
-          </div>
-          <Badge variant="secondary" className="text-xs">
-            <MapPin className="h-3 w-3 mr-1" />
-            {location}
-          </Badge>
-        </CardTitle>
-        
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Calendar className="h-4 w-4" />
-            {currentTime.toLocaleDateString('fr-FR', { 
-              weekday: 'long', 
-              day: 'numeric', 
-              month: 'long', 
-              year: 'numeric' 
-            })}
-          </div>
-          <div className="text-gold">
-            {islamicDate}
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-4">
-        {/* Next Prayer Highlight */}
-        {nextPrayer && (
-          <div className="bg-gradient-to-r from-emerald/10 to-gold/10 rounded-lg p-4 border border-emerald/20">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold text-emerald">Prochaine prière</h3>
-              <Badge className="bg-emerald hover:bg-emerald-dark text-white">
-                {timeUntilNext}
-              </Badge>
+    <div className="space-y-6">
+      {/* Header with current time and next prayer */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <Clock className="h-6 w-6" />
+              Heures de Prière
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={toggleNotifications}
+              >
+                {notificationsEnabled ? (
+                  <Bell className="h-4 w-4" />
+                ) : (
+                  <BellOff className="h-4 w-4" />
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={updateLocation}
+                disabled={loading}
+              >
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              </Button>
             </div>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <span className="text-lg font-semibold">{nextPrayer.name}</span>
-                <span className="text-gold font-arabic text-xl">{nextPrayer.arabicName}</span>
-              </div>
-              <span className="text-2xl font-mono font-bold text-emerald">
-                {nextPrayer.time}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* All Prayer Times */}
-        <div className="space-y-2">
-          {prayerTimes.map((prayer, index) => (
-            <div 
-              key={prayer.name}
-              className={`flex items-center justify-between p-3 rounded-lg transition-all ${
-                prayer.isNext 
-                  ? 'bg-emerald/5 border border-emerald/20' 
-                  : prayer.isPassed 
-                    ? 'bg-muted/50 opacity-60' 
-                    : 'bg-card hover:bg-muted/30'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-2 h-2 rounded-full ${
-                  prayer.isPassed 
-                    ? 'bg-muted-foreground' 
-                    : prayer.isNext 
-                      ? 'bg-emerald' 
-                      : 'bg-gold'
-                }`} />
-                <div className="flex items-center gap-3">
-                  <span className={`font-medium ${
-                    prayer.isNext ? 'text-emerald' : ''
-                  }`}>
-                    {prayer.name}
-                  </span>
-                  <span className="text-muted-foreground font-arabic">
-                    {prayer.arabicName}
-                  </span>
+              <div>
+                <p className="text-sm text-muted-foreground">{formatDate()}</p>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
+                  <MapPin className="h-4 w-4" />
+                  {location}
                 </div>
               </div>
-              
-              <div className="flex items-center gap-2">
-                {prayer.isPassed && (
-                  <Badge variant="secondary" className="text-xs">
-                    Terminée
-                  </Badge>
-                )}
-                <span className={`font-mono text-lg ${
-                  prayer.isNext ? 'font-bold text-emerald' : ''
-                }`}>
-                  {prayer.time}
-                </span>
+              <div className="text-right">
+                <p className="text-2xl font-bold">
+                  {currentTime.toTimeString().slice(0, 5)}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Heure actuelle
+                </p>
               </div>
             </div>
-          ))}
-        </div>
+            
+            {nextPrayer && (
+              <div className="bg-primary/10 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Prochaine prière</p>
+                    <p className="text-lg font-bold text-primary">{nextPrayer}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm text-muted-foreground">Dans</p>
+                    <p className="text-lg font-bold">{timeToNext}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Islamic Quote */}
-        <div className="bg-gradient-to-r from-gold/10 to-emerald/10 rounded-lg p-4 mt-6">
-          <p className="text-sm text-center italic text-muted-foreground mb-2">
-            "La prière est le pilier de la religion"
-          </p>
-          <p className="text-xs text-center text-gold">
-            - Hadith du Prophète ﷺ
-          </p>
-        </div>
-      </CardContent>
-    </Card>
+      {/* Prayer Times List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Horaires du Jour</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {getPrayerList().map((prayer, index) => {
+              const Icon = prayer.icon;
+              return (
+                <div 
+                  key={index}
+                  className={`flex items-center justify-between p-3 rounded-lg border ${
+                    prayer.passed 
+                      ? 'bg-gray-50 opacity-60' 
+                      : prayer.name.toLowerCase() === nextPrayer.toLowerCase()
+                        ? 'bg-primary/10 border-primary/30'
+                        : 'bg-background'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Icon className={`h-5 w-5 ${
+                      prayer.passed ? 'text-muted-foreground' : 'text-primary'
+                    }`} />
+                    <div>
+                      <p className={`font-medium ${
+                        prayer.passed ? 'text-muted-foreground' : ''
+                      }`}>
+                        {prayer.name}
+                      </p>
+                      <p className={`text-sm ${
+                        prayer.passed ? 'text-muted-foreground' : 'text-muted-foreground'
+                      }`}>
+                        {prayer.arabic}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Badge 
+                      variant={
+                        prayer.name.toLowerCase() === nextPrayer.toLowerCase() 
+                          ? "default" 
+                          : prayer.passed 
+                            ? "outline" 
+                            : "secondary"
+                      }
+                    >
+                      {prayer.time}
+                    </Badge>
+                    {prayer.passed && (
+                      <Badge variant="outline" className="text-xs">
+                        Passé
+                      </Badge>
+                    )}
+                    {prayer.name.toLowerCase() === nextPrayer.toLowerCase() && (
+                      <Badge className="text-xs">
+                        Suivant
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
