@@ -41,7 +41,13 @@ const categoryConfig = {
   relationship: { title: 'Dynamiques Relationnelles', icon: Handshake, color: 'text-indigo-600' },
   family: { title: 'Relations Familiales', icon: Users, color: 'text-teal-600' },
   financial: { title: 'Aspects Financiers', icon: Coins, color: 'text-yellow-600' },
-  personality: { title: 'Personnalité', icon: Brain, color: 'text-violet-600' }
+  personality: { title: 'Personnalité', icon: Brain, color: 'text-violet-600' },
+  economic_autonomy: { title: 'Autonomie Économique', icon: Coins, color: 'text-amber-600' },
+  domestic_responsibilities: { title: 'Responsabilités Domestiques', icon: Home, color: 'text-orange-500' },
+  decision_making: { title: 'Prise de Décision', icon: Brain, color: 'text-purple-500' },
+  career_family: { title: 'Carrière vs Famille', icon: Activity, color: 'text-blue-500' },
+  marriage_vision: { title: 'Vision du Mariage', icon: Heart, color: 'text-pink-500' },
+  intimacy_consent: { title: 'Intimité & Consentement', icon: Handshake, color: 'text-red-500' }
 };
 
 const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: CompatibilityQuestionnaireProps) => {
