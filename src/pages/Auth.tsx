@@ -421,15 +421,15 @@ const Auth = () => {
           </Card>
         )}
         
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          En vous inscrivant, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
-        </p>
-      </div>
+            <p className="text-center text-sm text-muted-foreground mt-4">
+              En vous inscrivant, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
+            </p>
+          </div>
 
-      {/* Preview Section */}
-      <div className="hidden lg:block w-full max-w-md mx-auto">
-        <AuthPreview />
-      </div>
+          {/* Preview Section */}
+          <div className="hidden lg:block w-full">
+            <AuthPreview />
+          </div>
         </div>
       </div>
     </div>
