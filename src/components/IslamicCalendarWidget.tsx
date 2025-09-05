@@ -179,6 +179,11 @@ const IslamicCalendarWidget = () => {
   };
 
   const getNextPrayer = () => {
+    // Return null if prayer times are not loaded yet
+    if (!prayerTimes || prayerTimes.length === 0) {
+      return null;
+    }
+    
     const now = new Date();
     const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
     
@@ -289,7 +294,7 @@ const IslamicCalendarWidget = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          {nextPrayer && (
+          {nextPrayer ? (
             <div className="text-center">
               <div className="text-3xl font-bold text-emerald mb-1">
                 {nextPrayer.time}
@@ -297,6 +302,10 @@ const IslamicCalendarWidget = () => {
               <div className="text-lg font-semibold mb-1">
                 {nextPrayer.name} - {nextPrayer.arabicName}
               </div>
+            </div>
+          ) : (
+            <div className="text-center text-muted-foreground">
+              Chargement des horaires de prière...
             </div>
           )}
         </CardContent>
