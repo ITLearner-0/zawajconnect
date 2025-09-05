@@ -214,7 +214,7 @@ const Dashboard = () => {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <VerificationBadge verified={verification?.email_verified} />
+            <VerificationBadge verificationScore={verification?.verification_score || 0} />
             {profile && (
               <Badge 
                 variant={profile.bio && profile.looking_for ? "default" : "secondary"}

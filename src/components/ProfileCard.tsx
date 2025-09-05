@@ -53,7 +53,7 @@ const ProfileCard = ({
                 {profile.full_name}
               </h3>
               {verification?.email_verified && (
-                <VerificationBadge verified size="sm" />
+                <VerificationBadge verificationScore={verification.email_verified ? 80 : 0} className="h-4" />
               )}
             </div>
             

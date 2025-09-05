@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import VerificationBadge from '@/components/VerificationBadge';
 import AdvancedSearch from '@/components/AdvancedSearch';
 import ReportModal from '@/components/ReportModal';
+import { useToast } from '@/hooks/use-toast';
 import ProfileCard from '@/components/ProfileCard';
 import CompatibilityScore from '@/components/CompatibilityScore';
 
