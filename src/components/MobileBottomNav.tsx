@@ -9,7 +9,8 @@ import {
   User, 
   Settings,
   Bell,
-  Crown
+  Crown,
+  Clock
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -50,17 +51,16 @@ const MobileBottomNav = () => {
       badge: unreadMessages
     },
     {
+      id: 'islamic-tools',
+      label: 'Outils',
+      icon: Clock,
+      path: '/islamic-tools'
+    },
+    {
       id: 'profile',
       label: 'Profil',
       icon: User,
       path: '/dashboard'
-    },
-    {
-      id: 'premium',
-      label: 'Premium',
-      icon: Crown,
-      path: '/settings?tab=premium',
-      premium: true
     }
   ];
 
@@ -88,19 +88,13 @@ const MobileBottomNav = () => {
                 onClick={() => navigate(item.path)}
                 className={`relative flex flex-col items-center justify-center h-14 px-2 py-1 ${
                   active 
-                    ? item.premium 
-                      ? 'text-gold bg-gold/10' 
-                      : 'text-emerald bg-emerald/10'
+                    ? 'text-emerald bg-emerald/10'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <div className="relative">
                   <Icon className={`h-5 w-5 ${
-                    active 
-                      ? item.premium 
-                        ? 'text-gold' 
-                        : 'text-emerald'
-                      : ''
+                    active ? 'text-emerald' : ''
                   }`} />
                   
                   {/* Badge for notifications/messages */}
@@ -109,28 +103,17 @@ const MobileBottomNav = () => {
                       {item.badge > 9 ? '9+' : item.badge}
                     </Badge>
                   )}
-                  
-                  {/* Premium indicator */}
-                  {item.premium && (
-                    <div className="absolute -top-1 -right-1 h-2 w-2 bg-gold rounded-full"></div>
-                  )}
                 </div>
                 
                 <span className={`text-xs mt-1 font-medium ${
-                  active 
-                    ? item.premium 
-                      ? 'text-gold' 
-                      : 'text-emerald'
-                    : 'text-muted-foreground'
+                  active ? 'text-emerald' : 'text-muted-foreground'
                 }`}>
                   {item.label}
                 </span>
                 
                 {/* Active indicator */}
                 {active && (
-                  <div className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 w-6 rounded-full ${
-                    item.premium ? 'bg-gold' : 'bg-emerald'
-                  }`}></div>
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 w-6 rounded-full bg-emerald"></div>
                 )}
               </Button>
             );
