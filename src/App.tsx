@@ -19,6 +19,7 @@ import FAQ from "./pages/FAQ";
 import Settings from "./pages/Settings";
 import IslamicTools from "./pages/IslamicTools";
 import FamilySupervision from "./pages/FamilySupervision";
+import CompatibilityTest from "./pages/CompatibilityTest";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -61,6 +62,7 @@ function App() {
               <Route path="/settings" element={<Settings />} />
               <Route path="/islamic-tools" element={<IslamicTools />} />
               <Route path="/family-supervision" element={<FamilySupervision />} />
+              <Route path="/compatibility-test" element={<CompatibilityTest />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { User, Heart, Briefcase, GraduationCap, MapPin, Image, CheckCircle } from 'lucide-react';
 import PhotoUpload from '@/components/PhotoUpload';
+import CompatibilityQuestionnaire from '@/components/CompatibilityQuestionnaire';
 
 interface WizardStep {
   id: string;
@@ -124,6 +125,13 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
       description: 'Décrivez-vous et ce que vous recherchez',
       icon: Briefcase,
       completed: Boolean(profileData.bio && profileData.looking_for)
+    },
+    {
+      id: 'compatibility',
+      title: 'Questionnaire de compatibilité',
+      description: 'Questions détaillées pour un meilleur matching',
+      icon: CheckCircle,
+      completed: false // This will be updated based on compatibility responses
     }
   ];
 
@@ -421,6 +429,19 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
                 rows={4}
               />
             </div>
+          </div>
+        );
+
+      case 'compatibility':
+        return (
+          <div className="space-y-4">
+            <div className="text-center mb-4">
+              <p className="text-muted-foreground">
+                Ce questionnaire détaillé nous aide à trouver les partenaires les plus compatibles avec vos valeurs et préférences.
+                Vous pouvez le compléter maintenant ou plus tard depuis votre profil.
+              </p>
+            </div>
+            <CompatibilityQuestionnaire embedded />
           </div>
         );
 

@@ -47,6 +47,45 @@ export type Database = {
         }
         Relationships: []
       }
+      compatibility_questions: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          options: Json | null
+          question_key: string
+          question_text: string
+          question_type: string
+          updated_at: string
+          weight: number | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          options?: Json | null
+          question_key: string
+          question_text: string
+          question_type?: string
+          updated_at?: string
+          weight?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          options?: Json | null
+          question_key?: string
+          question_text?: string
+          question_type?: string
+          updated_at?: string
+          weight?: number | null
+        }
+        Relationships: []
+      }
       conversation_participants: {
         Row: {
           can_read_messages: boolean | null
@@ -687,6 +726,33 @@ export type Database = {
           family_member_id?: string
           id?: string
           supervised_user_id?: string
+        }
+        Relationships: []
+      }
+      user_compatibility_responses: {
+        Row: {
+          created_at: string
+          id: string
+          question_key: string
+          response_value: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          question_key: string
+          response_value: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          question_key?: string
+          response_value?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
