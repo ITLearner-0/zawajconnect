@@ -26,7 +26,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     <div className="flex min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
       <MobileNavToggle onToggle={toggle} />
       <Navigation isOpen={isOpen} onClose={close} />
-      <main className="flex-1 lg:ml-64 transition-all duration-300">
+      <main className="flex-1 lg:ml-64 transition-all duration-300 mb-20 md:mb-0">
         <div className="p-4 lg:p-6">
           {children}
         </div>
