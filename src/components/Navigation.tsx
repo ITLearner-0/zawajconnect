@@ -327,6 +327,12 @@ const Navigation = ({ isOpen = true, onClose }: NavigationProps) => {
             </Link>
           </Button>
           <Button variant="ghost" className="w-full justify-start gap-3" asChild>
+            <Link to="/family-supervision" onClick={handleLinkClick}>
+              <Shield className="h-4 w-4" />
+              Supervision familiale
+            </Link>
+          </Button>
+          <Button variant="ghost" className="w-full justify-start gap-3" asChild>
             <Link to="/settings" onClick={handleLinkClick}>
               <Settings className="h-4 w-4" />
               Paramètres
