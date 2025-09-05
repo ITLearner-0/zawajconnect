@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, TrendingUp, Users, CheckCircle } from 'lucide-react';
+import { Heart, TrendingUp, Users, CheckCircle, Brain } from 'lucide-react';
 import { useCompatibility } from '@/hooks/useCompatibility';
 import { Link } from 'react-router-dom';
 
@@ -114,6 +114,18 @@ const CompatibilityCard = ({ userId, showActions = true, compact = false }: Comp
                   {isComplete ? 'Modifier réponses' : isStarted ? 'Continuer' : 'Commencer'}
                 </Button>
               </Link>
+              {isComplete && (
+                <Link to="/compatibility-insights">
+                  <Button 
+                    variant="default"
+                    size="sm"
+                    className="bg-gradient-to-r from-emerald to-emerald/80"
+                  >
+                    <Brain className="h-4 w-4 mr-1" />
+                    Insights
+                  </Button>
+                </Link>
+              )}
             </div>
           )}
         </div>

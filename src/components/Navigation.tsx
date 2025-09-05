@@ -19,6 +19,7 @@ import {
   Shield,
   Users,
   BookOpen,
+  Brain,
   X
 } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -167,6 +168,7 @@ const Navigation = ({ isOpen = true, onClose }: NavigationProps) => {
     { path: '/dashboard', icon: User, label: 'Mon Profil' },
     { path: '/browse', icon: Search, label: 'Découvrir' },
     { path: '/compatibility-test', icon: Heart, label: 'Test de Compatibilité' },
+    { path: '/compatibility-insights', icon: Brain, label: 'Mes Insights' },
     { path: '/matches', icon: Users, label: 'Mes Matches' },
     { path: '/guidance', icon: BookOpen, label: 'Guide islamique' },
     { path: '/islamic-tools', icon: Clock, label: 'Outils islamiques' },

@@ -19,14 +19,17 @@ const CompatibilityTest = () => {
     return <Navigate to="/auth" replace />;
   }
 
+  const handleComplete = () => {
+    // Redirect to compatibility insights instead of dashboard
+    window.location.href = '/compatibility-insights';
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
       <Header />
       <main className="pt-20">
         <CompatibilityQuestionnaire 
-          onComplete={() => {
-            window.location.href = '/dashboard';
-          }} 
+          onComplete={handleComplete} 
         />
       </main>
       <Footer />

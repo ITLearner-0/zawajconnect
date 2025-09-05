@@ -17,6 +17,7 @@ import PhotoUpload from '@/components/PhotoUpload';
 import VerificationBadge from '@/components/VerificationBadge';
 import CompatibilityCard from '@/components/CompatibilityCard';
 import CompatibilityPrompt from '@/components/CompatibilityPrompt';
+import InsightsPreviewCard from '@/components/InsightsPreviewCard';
 
 interface Profile {
   id: string;
@@ -266,7 +267,10 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Compatibility Card */}
           <div className="xl:col-span-1">
-            <CompatibilityCard />
+                <div className="grid gap-6 md:grid-cols-2">
+                  <CompatibilityCard />
+                  <InsightsPreviewCard />
+                </div>
           </div>
 
           {/* Main Content */}
