@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useCompatibility } from '@/hooks/useCompatibility';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -31,6 +32,7 @@ interface Profile {
 
 const Browse = () => {
   const { user } = useAuth();
+  const { calculateCompatibilityScore } = useCompatibility();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -229,6 +231,9 @@ const Browse = () => {
           });
         }
       } else {
+        // Calculate real compatibility score
+        const compatibilityScore = await calculateCompatibilityScore(profileId);
+        
         // Create new match
         await supabase
           .from('matches')
@@ -236,7 +241,7 @@ const Browse = () => {
             user1_id: user.id,
             user2_id: profileId,
             user1_liked: true,
-            match_score: Math.floor(Math.random() * 40) + 60 // Random score between 60-100
+            match_score: Math.round(compatibilityScore)
           });
 
         toast({

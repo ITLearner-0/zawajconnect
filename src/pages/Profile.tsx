@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useCompatibility } from '@/hooks/useCompatibility';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -40,6 +41,7 @@ interface ProfileData {
 const Profile = () => {
   const { userId } = useParams();
   const { user } = useAuth();
+  const { calculateCompatibilityScore } = useCompatibility();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -182,6 +184,9 @@ const Profile = () => {
           alert('Profil liké ! Si cette personne vous like en retour, vous pourrez discuter.');
         }
       } else {
+        // Calculate real compatibility score
+        const compatibilityScore = await calculateCompatibilityScore(userId);
+        
         // Create new match
         await supabase
           .from('matches')
@@ -189,7 +194,7 @@ const Profile = () => {
             user1_id: user.id,
             user2_id: userId,
             user1_liked: true,
-            match_score: Math.floor(Math.random() * 40) + 60
+            match_score: Math.round(compatibilityScore)
           });
 
         setIsLiked(true);
