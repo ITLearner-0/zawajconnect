@@ -32,12 +32,12 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
   const [filters, setFilters] = useState<SearchFilters>({
     ageRange: [18, 50],
     location: '',
-    education: '',
+    education: 'all',
     profession: '',
-    sect: '',
-    madhab: '',
-    prayerFrequency: '',
-    hijabPreference: '',
+    sect: 'all',
+    madhab: 'all',
+    prayerFrequency: 'all',
+    hijabPreference: 'no_preference',
     interests: [],
     verifiedOnly: false,
     withPhoto: false
@@ -67,12 +67,12 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
     setFilters({
       ageRange: [18, 50],
       location: '',
-      education: '',
+      education: 'all',
       profession: '',
-      sect: '',
-      madhab: '',
-      prayerFrequency: '',
-      hijabPreference: '',
+      sect: 'all',
+      madhab: 'all',
+      prayerFrequency: 'all',
+      hijabPreference: 'no_preference',
       interests: [],
       verifiedOnly: false,
       withPhoto: false
@@ -158,7 +158,7 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
                     <SelectValue placeholder="Niveau d'éducation" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Tous niveaux</SelectItem>
+                    <SelectItem value="all">Tous niveaux</SelectItem>
                     <SelectItem value="high_school">Lycée</SelectItem>
                     <SelectItem value="bachelor">Licence</SelectItem>
                     <SelectItem value="master">Master</SelectItem>
@@ -189,7 +189,7 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
                     <SelectValue placeholder="Secte islamique" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Toutes</SelectItem>
+                    <SelectItem value="all">Toutes</SelectItem>
                     <SelectItem value="sunni">Sunnite</SelectItem>
                     <SelectItem value="shia">Chiite</SelectItem>
                   </SelectContent>
@@ -206,7 +206,7 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
                     <SelectValue placeholder="École juridique" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Toutes</SelectItem>
+                    <SelectItem value="all">Toutes</SelectItem>
                     <SelectItem value="hanafi">Hanafite</SelectItem>
                     <SelectItem value="maliki">Malékite</SelectItem>
                     <SelectItem value="shafii">Chaféite</SelectItem>
@@ -227,7 +227,7 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
                     <SelectValue placeholder="Fréquence" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Toutes</SelectItem>
+                    <SelectItem value="all">Toutes</SelectItem>
                     <SelectItem value="5_times">5 fois par jour</SelectItem>
                     <SelectItem value="often">Souvent</SelectItem>
                     <SelectItem value="sometimes">Parfois</SelectItem>
@@ -246,7 +246,7 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
                     <SelectValue placeholder="Préférence" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Aucune préférence</SelectItem>
+                    <SelectItem value="no_preference">Aucune préférence</SelectItem>
                     <SelectItem value="always">Toujours</SelectItem>
                     <SelectItem value="sometimes">Parfois</SelectItem>
                     <SelectItem value="never">Jamais</SelectItem>
