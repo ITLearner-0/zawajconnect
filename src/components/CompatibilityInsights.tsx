@@ -16,6 +16,9 @@ import {
   Brain
 } from 'lucide-react';
 import { useCompatibilityInsights } from '@/hooks/useCompatibilityInsights';
+import CompatibilityScoreChart from '@/components/CompatibilityScoreChart';
+import InsightsActionPanel from '@/components/InsightsActionPanel';
+import InsightsSummaryCard from '@/components/InsightsSummaryCard';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -65,6 +68,15 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Summary Card */}
+      <InsightsSummaryCard userId={userId} />
+
+      {/* Detailed Compatibility Chart */}
+      <CompatibilityScoreChart 
+        areas={insights.compatibilityAreas} 
+        showTrends={true} 
+      />
+
       {/* Profile Summary */}
       <Card>
         <CardHeader>
@@ -97,28 +109,6 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
             <h4 className="font-semibold mb-2">Résumé de Personnalité</h4>
             <p className="text-sm">{insights.summary}</p>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Compatibility Score Distribution */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center space-x-2">
-            <TrendingUp className="h-5 w-5 text-primary" />
-            <CardTitle>Analyse de Compatibilité</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {insights.compatibilityAreas.map((area) => (
-            <div key={area.category} className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="font-medium">{area.category}</span>
-                <span className="text-muted-foreground">{area.score}%</span>
-              </div>
-              <Progress value={area.score} className="h-2" />
-              <p className="text-xs text-muted-foreground">{area.description}</p>
-            </div>
-          ))}
         </CardContent>
       </Card>
 
@@ -232,25 +222,36 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
 
       {/* Action Buttons */}
       {showActions && (
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex flex-wrap gap-3">
-              <Button 
-                onClick={() => navigate('/compatibility-test')}
-                variant="outline"
-              >
-                Modifier mes réponses
-              </Button>
-              <Button 
-                onClick={() => navigate('/browse')}
-                className="bg-gradient-to-r from-primary to-primary/80"
-              >
-                <Users className="h-4 w-4 mr-2" />
-                Découvrir des profils
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-4">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex flex-wrap gap-3">
+                  <Button 
+                    onClick={() => navigate('/compatibility-test')}
+                    variant="outline"
+                  >
+                    Modifier mes réponses
+                  </Button>
+                  <Button 
+                    onClick={() => navigate('/browse')}
+                    className="bg-gradient-to-r from-primary to-primary/80"
+                  >
+                    <Users className="h-4 w-4 mr-2" />
+                    Découvrir des profils
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="lg:col-span-1">
+            <InsightsActionPanel 
+              completionPercentage={100} 
+              insightsAvailable={true} 
+            />
+          </div>
+        </div>
       )}
     </div>
   );

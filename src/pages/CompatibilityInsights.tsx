@@ -4,6 +4,7 @@ import { Navigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CompatibilityInsights from '@/components/CompatibilityInsights';
+import CompatibilityAchievements from '@/components/CompatibilityAchievements';
 
 const CompatibilityInsightsPage = () => {
   const { user, loading } = useAuth();
@@ -35,7 +36,19 @@ const CompatibilityInsightsPage = () => {
             </p>
           </div>
           
-          <CompatibilityInsights />
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+            <div className="xl:col-span-3">
+              <CompatibilityInsights />
+            </div>
+            <div className="xl:col-span-1">
+              <CompatibilityAchievements 
+                completionPercentage={100}
+                insightsViewed={3}
+                profilesVisited={7}
+                guidanceRead={2}
+              />
+            </div>
+          </div>
         </div>
       </main>
       <Footer />
