@@ -18,6 +18,8 @@ import VerificationBadge from '@/components/VerificationBadge';
 import CompatibilityCard from '@/components/CompatibilityCard';
 import CompatibilityPrompt from '@/components/CompatibilityPrompt';
 import InsightsPreviewCard from '@/components/InsightsPreviewCard';
+import OnboardingFlow from '@/components/OnboardingFlow';
+import GamifiedInsights from '@/components/GamifiedInsights';
 
 interface Profile {
   id: string;

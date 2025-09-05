@@ -5,6 +5,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CompatibilityInsights from '@/components/CompatibilityInsights';
 import CompatibilityAchievements from '@/components/CompatibilityAchievements';
+import GamifiedInsights from '@/components/GamifiedInsights';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const CompatibilityInsightsPage = () => {
   const { user, loading } = useAuth();
@@ -38,7 +40,20 @@ const CompatibilityInsightsPage = () => {
           
           <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
             <div className="xl:col-span-3">
-              <CompatibilityInsights />
+              <Tabs defaultValue="insights" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="insights">Insights Détaillés</TabsTrigger>
+                  <TabsTrigger value="gamification">Progression & Récompenses</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="insights">
+                  <CompatibilityInsights />
+                </TabsContent>
+                
+                <TabsContent value="gamification">
+                  <GamifiedInsights />
+                </TabsContent>
+              </Tabs>
             </div>
             <div className="xl:col-span-1">
               <CompatibilityAchievements 
