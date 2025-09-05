@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,7 @@ import ChatWindow from '@/components/ChatWindow';
 const Chat = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { matchId: paramMatchId } = useParams();
   const [searchParams] = useSearchParams();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
 
@@ -19,12 +20,12 @@ const Chat = () => {
       return;
     }
 
-    // Check if we have a specific match to chat with from URL params
-    const matchId = searchParams.get('matchId');
+    // Check for matchId from route params first, then URL searchParams
+    const matchId = paramMatchId || searchParams.get('matchId');
     if (matchId) {
       setSelectedChatId(matchId);
     }
-  }, [user, searchParams]);
+  }, [user, paramMatchId, searchParams]);
 
   const handleChatSelect = (matchId: string) => {
     setSelectedChatId(matchId);
