@@ -19,6 +19,9 @@ import { useCompatibilityInsights } from '@/hooks/useCompatibilityInsights';
 import CompatibilityScoreChart from '@/components/CompatibilityScoreChart';
 import InsightsActionPanel from '@/components/InsightsActionPanel';
 import InsightsSummaryCard from '@/components/InsightsSummaryCard';
+import MobileCompatibilityCard from '@/components/MobileCompatibilityCard';
+import MobileInsightsDashboard from '@/components/MobileInsightsDashboard';
+import InteractiveInsightCard from '@/components/InteractiveInsightCard';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 
@@ -36,11 +39,16 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
 
   if (loading) {
     return (
-      <Card className="w-full">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center space-x-2">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
-            <span className="text-muted-foreground">Analyse de votre profil...</span>
+      <Card className="w-full animate-pulse">
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-2">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <span className="text-muted-foreground text-center">Analyse de votre profil...</span>
+          </div>
+          <div className="mt-6 space-y-3">
+            <div className="h-4 bg-muted rounded animate-pulse"></div>
+            <div className="h-4 bg-muted rounded animate-pulse w-3/4"></div>
+            <div className="h-4 bg-muted rounded animate-pulse w-1/2"></div>
           </div>
         </CardContent>
       </Card>
@@ -49,15 +57,20 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
 
   if (!insights) {
     return (
-      <Card className="w-full">
-        <CardContent className="p-6 text-center">
-          <Brain className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+      <Card className="w-full border-dashed border-2 hover:border-primary/50 transition-colors">
+        <CardContent className="p-4 sm:p-6 text-center">
+          <div className="animate-float">
+            <Brain className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+          </div>
           <h3 className="text-lg font-semibold mb-2">Aucune analyse disponible</h3>
-          <p className="text-muted-foreground mb-4">
+          <p className="text-muted-foreground mb-4 text-sm sm:text-base">
             Complétez le test de compatibilité pour obtenir des insights personnalisés.
           </p>
           {showActions && (
-            <Button onClick={() => navigate('/compatibility-test')}>
+            <Button 
+              onClick={() => navigate('/compatibility-test')}
+              className="animate-pulse-gentle hover:animate-none"
+            >
               Commencer le test
             </Button>
           )}
