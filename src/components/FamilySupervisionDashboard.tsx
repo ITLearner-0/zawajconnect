@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessageCircle, Users, Eye, Clock } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/hooks/use-toast';
 
 interface SupervisedConversation {
   id: string;
@@ -50,7 +50,11 @@ const FamilySupervisionDashboard = () => {
 
       if (familyError) {
         console.error('Family member error:', familyError);
-        toast.error('Vous n\'êtes pas autorisé à superviser les conversations');
+        toast({
+          title: "Erreur",
+          description: 'Vous n\'êtes pas autorisé à superviser les conversations',
+          variant: "destructive"
+        });
         return;
       }
 
@@ -120,7 +124,11 @@ const FamilySupervisionDashboard = () => {
       setConversations(conversationsWithMessages);
     } catch (error) {
       console.error('Error loading supervision data:', error);
-      toast.error('Erreur lors du chargement des données');
+      toast({
+        title: "Erreur",
+        description: 'Erreur lors du chargement des données',
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -147,7 +155,11 @@ const FamilySupervisionDashboard = () => {
       window.location.href = `/chat?matchId=${matchId}&supervision=true`;
     } catch (error) {
       console.error('Error joining conversation:', error);
-      toast.error('Erreur lors de la participation à la conversation');
+      toast({
+        title: "Erreur",
+        description: 'Erreur lors de la participation à la conversation',
+        variant: "destructive"
+      });
     }
   };
 

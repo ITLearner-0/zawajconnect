@@ -20,6 +20,7 @@ import Settings from "./pages/Settings";
 import IslamicTools from "./pages/IslamicTools";
 import FamilySupervision from "./pages/FamilySupervision";
 import NotFound from "./pages/NotFound";
+import { Toaster } from "@/components/ui/toaster";
 
 // Create QueryClient with simple configuration
 const queryClient = new QueryClient({
@@ -63,6 +64,7 @@ const App: React.FC = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AppLayout>
+          <Toaster />
         </BrowserRouter>
       </AuthProvider>
     </QueryClientProvider>
