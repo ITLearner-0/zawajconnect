@@ -137,18 +137,18 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
           </div>
 
           {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             <Button
               onClick={handleShare}
               disabled={!insightsAvailable || isSharing}
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full text-xs px-2"
             >
               {isSharing ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
               ) : (
-                <Share2 className="h-4 w-4 mr-2" />
+                <Share2 className="h-3 w-3 mr-1" />
               )}
               Partager
             </Button>
@@ -158,12 +158,12 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
               disabled={!insightsAvailable || isExporting}
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full text-xs px-2"
             >
               {isExporting ? (
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
               ) : (
-                <Download className="h-4 w-4 mr-2" />
+                <Download className="h-3 w-3 mr-1" />
               )}
               Exporter
             </Button>
@@ -207,16 +207,16 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
                     step.available ? 'text-primary' : 'text-slate-400'
                   }`} />
                 </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-medium text-sm">{step.title}</h4>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <h4 className="font-medium text-sm truncate">{step.title}</h4>
                     {!step.available && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge variant="secondary" className="text-[10px] px-1 py-0">
                         Bientôt
                       </Badge>
                     )}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                     {step.description}
                   </p>
                 </div>

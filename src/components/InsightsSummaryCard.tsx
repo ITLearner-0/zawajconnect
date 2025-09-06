@@ -93,58 +93,59 @@ const InsightsSummaryCard: React.FC<InsightsSummaryCardProps> = ({
         </div>
 
         {/* Key Insights Grid */}
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white/40 p-3 rounded-lg text-center">
-            <TrendingUp className="h-4 w-4 text-emerald-600 mx-auto mb-1" />
-            <div className="text-xs font-medium text-emerald-700">
+        <div className="grid grid-cols-2 gap-2 sm:gap-3">
+          <div className="bg-white/40 p-2 sm:p-3 rounded-lg text-center min-h-[60px] flex flex-col justify-center">
+            <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 mx-auto mb-1" />
+            <div className="text-[10px] sm:text-xs font-medium text-emerald-700 leading-tight">
               {insights.compatibilityAreas.length} Domaines
             </div>
-            <div className="text-xs text-muted-foreground">Analysés</div>
+            <div className="text-[9px] sm:text-xs text-muted-foreground">Analysés</div>
           </div>
           
-          <div className="bg-white/40 p-3 rounded-lg text-center">
-            <Target className="h-4 w-4 text-blue-600 mx-auto mb-1" />
-            <div className="text-xs font-medium text-blue-700">
+          <div className="bg-white/40 p-2 sm:p-3 rounded-lg text-center min-h-[60px] flex flex-col justify-center">
+            <Target className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600 mx-auto mb-1" />
+            <div className="text-[10px] sm:text-xs font-medium text-blue-700 leading-tight">
               {insights.idealPartner.length} Traits
             </div>
-            <div className="text-xs text-muted-foreground">Partenaire idéal</div>
+            <div className="text-[9px] sm:text-xs text-muted-foreground">Partenaire idéal</div>
           </div>
           
-          <div className="bg-white/40 p-3 rounded-lg text-center">
-            <AlertTriangle className={`h-4 w-4 mx-auto mb-1 ${
+          <div className="bg-white/40 p-2 sm:p-3 rounded-lg text-center min-h-[60px] flex flex-col justify-center">
+            <AlertTriangle className={`h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1 ${
               insights.suggestions.length > 0 ? 'text-yellow-600' : 'text-green-600'
             }`} />
-            <div className={`text-xs font-medium ${
+            <div className={`text-[10px] sm:text-xs font-medium leading-tight ${
               insights.suggestions.length > 0 ? 'text-yellow-700' : 'text-green-700'
             }`}>
               {insights.suggestions.length} Suggestions
             </div>
-            <div className="text-xs text-muted-foreground">D'amélioration</div>
+            <div className="text-[9px] sm:text-xs text-muted-foreground">D'amélioration</div>
           </div>
           
-          <div className="bg-white/40 p-3 rounded-lg text-center">
-            <BookOpen className="h-4 w-4 text-emerald-600 mx-auto mb-1" />
-            <div className="text-xs font-medium text-emerald-700">
+          <div className="bg-white/40 p-2 sm:p-3 rounded-lg text-center min-h-[60px] flex flex-col justify-center">
+            <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 mx-auto mb-1" />
+            <div className="text-[10px] sm:text-xs font-medium text-emerald-700 leading-tight">
               {insights.islamicGuidance.length} Conseils
             </div>
-            <div className="text-xs text-muted-foreground">Islamiques</div>
+            <div className="text-[9px] sm:text-xs text-muted-foreground">Islamiques</div>
           </div>
         </div>
 
-        {/* Top Priority */}
-        <div className="bg-white/40 p-3 rounded-lg">
-          <h4 className="text-sm font-medium mb-2">Votre Priorité Principale</h4>
-          <Badge variant="secondary" className="text-xs">
-            {insights.priorities[0] || 'Stabilité et respect mutuel'}
-          </Badge>
-        </div>
+        {/* Priority and Style */}
+        <div className="space-y-3">
+          <div className="bg-white/40 p-3 rounded-lg">
+            <h4 className="text-sm font-medium mb-2">Priorité Principale</h4>
+            <Badge variant="secondary" className="text-xs break-words">
+              {insights.priorities[0] || 'Stabilité et respect mutuel'}
+            </Badge>
+          </div>
 
-        {/* Relationship Style */}
-        <div className="bg-white/40 p-3 rounded-lg">
-          <h4 className="text-sm font-medium mb-2">Style Relationnel</h4>
-          <p className="text-xs text-muted-foreground">
-            {insights.relationshipStyle}
-          </p>
+          <div className="bg-white/40 p-3 rounded-lg">
+            <h4 className="text-sm font-medium mb-2">Style Relationnel</h4>
+            <p className="text-xs text-muted-foreground leading-relaxed break-words">
+              {insights.relationshipStyle}
+            </p>
+          </div>
         </div>
 
         {/* Red Flags Alert */}
