@@ -233,22 +233,23 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
         </CardContent>
       </Card>
 
-      {/* Action Buttons */}
+      {/* Action Buttons - Moved below all other content */}
       {showActions && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-4">
+        <div className="mt-8 pt-6 border-t">
+          <div className="space-y-4">
             <Card>
               <CardContent className="p-4">
-                <div className="flex flex-wrap gap-3">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
                     onClick={() => navigate('/compatibility-test')}
                     variant="outline"
+                    className="w-full sm:w-auto"
                   >
                     Modifier mes réponses
                   </Button>
                   <Button 
                     onClick={() => navigate('/browse')}
-                    className="bg-gradient-to-r from-primary to-primary/80"
+                    className="bg-gradient-to-r from-primary to-primary/80 w-full sm:w-auto"
                   >
                     <Users className="h-4 w-4 mr-2" />
                     Découvrir des profils
@@ -256,9 +257,7 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
                 </div>
               </CardContent>
             </Card>
-          </div>
-          
-          <div className="lg:col-span-1">
+            
             <InsightsActionPanel 
               completionPercentage={100} 
               insightsAvailable={true} 

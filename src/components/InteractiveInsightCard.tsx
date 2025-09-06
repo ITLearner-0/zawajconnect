@@ -84,21 +84,21 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
   };
 
   return (
-    <Card className={`w-full card-hover animate-fade-in ${getVariantStyles()} ${className}`}>
+    <Card className={`w-full transition-all duration-200 hover:shadow-lg ${getVariantStyles()} ${className}`}>
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div className="flex items-start space-x-3 flex-1">
+        <div className="flex items-start justify-between space-x-3">
+          <div className="flex items-start space-x-3 flex-1 min-w-0">
             {icon && (
-              <div className={`p-2 rounded-lg bg-background ${getIconColor()}`}>
+              <div className={`p-2 rounded-lg bg-background flex-shrink-0 ${getIconColor()}`}>
                 {icon}
               </div>
             )}
-            <div className="flex-1">
-              <CardTitle className="text-base sm:text-lg font-semibold mb-1">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-base sm:text-lg font-semibold mb-1 break-words">
                 {title}
               </CardTitle>
               {subtitle && (
-                <p className="text-xs sm:text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground break-words">
                   {subtitle}
                 </p>
               )}
@@ -110,7 +110,7 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
               variant="ghost"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="ml-2 p-1"
+              className="flex-shrink-0"
             >
               {isExpanded ? (
                 <ChevronUp className="w-4 h-4" />
@@ -123,15 +123,15 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
       </CardHeader>
       
       <CardContent className="pt-0">
-        <div className="space-y-4">
+        <div className="space-y-4 relative">
           {/* Main Content */}
-          <div className="animate-slide-up">
+          <div className="relative z-10">
             {renderContent(mainContent)}
           </div>
           
           {/* Expanded Content */}
           {isExpanded && (
-            <div className="space-y-4 animate-fade-in">
+            <div className="space-y-4 relative z-10 mt-4">
               {expandedContent && (
                 <>
                   <Separator />
@@ -153,13 +153,12 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
                       <Star className="w-4 h-4 text-gold" />
                       <span>Insights</span>
                     </h4>
-                    <div className="space-y-2">
+                    <div className="flex flex-wrap gap-2">
                       {insights.map((insight, index) => (
                         <Badge
                           key={index}
                           variant="secondary"
-                          className="mr-2 mb-2 text-xs animate-scale-in"
-                          style={{ animationDelay: `${index * 50}ms` }}
+                          className="text-xs"
                         >
                           {insight}
                         </Badge>
@@ -181,11 +180,10 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
                       {recommendations.map((rec, index) => (
                         <li
                           key={index}
-                          className="flex items-start space-x-2 text-sm text-muted-foreground animate-slide-up"
-                          style={{ animationDelay: `${index * 100}ms` }}
+                          className="flex items-start space-x-2 text-sm text-muted-foreground"
                         >
                           <TrendingUp className="w-3 h-3 text-emerald mt-1 flex-shrink-0" />
-                          <span>{rec}</span>
+                          <span className="break-words">{rec}</span>
                         </li>
                       ))}
                     </ul>
