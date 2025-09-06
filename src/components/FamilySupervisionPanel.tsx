@@ -32,6 +32,9 @@ interface SupervisionStats {
 const FamilySupervisionPanel = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  
+  console.log('FamilySupervisionPanel user:', user);
+  
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [stats, setStats] = useState<SupervisionStats>({
     total_matches: 0,
@@ -399,7 +402,10 @@ const FamilySupervisionPanel = () => {
 
                 <div className="flex gap-2">
                   <Button
-                    onClick={addFamilyMember}
+                    onClick={() => {
+                      console.log('Add family member button clicked');
+                      addFamilyMember();
+                    }}
                     disabled={saving}
                     className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
                   >
