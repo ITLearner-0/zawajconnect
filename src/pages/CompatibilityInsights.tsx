@@ -38,30 +38,36 @@ const CompatibilityInsightsPage = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-            <div className="xl:col-span-3">
+          <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-8">
+            <div className="lg:col-span-8">
               <Tabs defaultValue="insights" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="insights">Insights Détaillés</TabsTrigger>
-                  <TabsTrigger value="gamification">Progression & Récompenses</TabsTrigger>
+                  <TabsTrigger value="insights" className="text-sm">
+                    Insights Détaillés
+                  </TabsTrigger>
+                  <TabsTrigger value="gamification" className="text-sm">
+                    Progression & Récompenses
+                  </TabsTrigger>
                 </TabsList>
                 
-                <TabsContent value="insights">
+                <TabsContent value="insights" className="mt-6">
                   <CompatibilityInsights />
                 </TabsContent>
                 
-                <TabsContent value="gamification">
+                <TabsContent value="gamification" className="mt-6">
                   <GamifiedInsights />
                 </TabsContent>
               </Tabs>
             </div>
-            <div className="xl:col-span-1">
-              <CompatibilityAchievements 
-                completionPercentage={100}
-                insightsViewed={3}
-                profilesVisited={7}
-                guidanceRead={2}
-              />
+            <div className="lg:col-span-4">
+              <div className="sticky top-24">
+                <CompatibilityAchievements 
+                  completionPercentage={100}
+                  insightsViewed={3}
+                  profilesVisited={7}
+                  guidanceRead={2}
+                />
+              </div>
             </div>
           </div>
         </div>
