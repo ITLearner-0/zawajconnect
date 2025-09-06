@@ -24,16 +24,17 @@ import CompatibilityInsightsPage from "./pages/CompatibilityInsights";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 
-function App() {
-  // Create QueryClient inside component to handle hot reloads
-  const [queryClient] = React.useState(() => new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-        staleTime: 5 * 60 * 1000,
-      },
+// Create QueryClient outside component to avoid hook issues
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      staleTime: 5 * 60 * 1000,
     },
-  }));
+  },
+});
+
+function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
