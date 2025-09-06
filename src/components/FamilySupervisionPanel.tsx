@@ -127,7 +127,10 @@ const FamilySupervisionPanel = () => {
   };
 
   const addFamilyMember = async () => {
+    console.log('addFamilyMember called', { user, newMember });
+    
     if (!user || !newMember.full_name.trim() || !newMember.relationship) {
+      console.log('Validation failed:', { user: !!user, fullName: newMember.full_name.trim(), relationship: newMember.relationship });
       toast({
         title: "Erreur",
         description: "Veuillez remplir tous les champs obligatoires",
@@ -138,6 +141,17 @@ const FamilySupervisionPanel = () => {
 
     setSaving(true);
     try {
+      console.log('Attempting to insert family member:', {
+        user_id: user.id,
+        full_name: newMember.full_name.trim(),
+        relationship: newMember.relationship,
+        email: newMember.email.trim() || null,
+        phone: newMember.phone.trim() || null,
+        can_communicate: newMember.can_communicate,
+        can_view_profile: newMember.can_view_profile,
+        is_wali: newMember.is_wali
+      });
+      
       const { data, error } = await supabase
         .from('family_members')
         .insert({
@@ -153,6 +167,7 @@ const FamilySupervisionPanel = () => {
         .select()
         .single();
 
+      console.log('Supabase response:', { data, error });
       if (error) throw error;
 
       setFamilyMembers(prev => [...prev, data]);
