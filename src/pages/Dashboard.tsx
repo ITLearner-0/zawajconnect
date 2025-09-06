@@ -120,6 +120,9 @@ const Dashboard = () => {
 
       if (error) throw error;
 
+      // Refresh the profile data to update UI
+      await fetchProfileData();
+
       toast({
         title: "Profil sauvegardé",
         description: "Vos modifications ont été enregistrées avec succès."
