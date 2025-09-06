@@ -51,8 +51,10 @@ const Admin = () => {
           setIsAdmin(false);
         }
       } else {
-        // No role found, check if this is the first time setup
-        await setupFirstSuperAdmin();
+        // No role found - user should have 'user' role by default
+        // Don't automatically grant admin privileges
+        setUserRole('user');
+        setIsAdmin(false);
       }
     } catch (error) {
       console.error('Error in admin access check:', error);
