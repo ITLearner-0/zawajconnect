@@ -554,7 +554,11 @@ const Dashboard = () => {
                         <h3 className="font-medium">Visibilité du profil</h3>
                         <p className="text-sm text-muted-foreground">Qui peut voir votre profil complet</p>
                       </div>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => navigate('/settings?tab=privacy')}
+                      >
                         <Eye className="h-4 w-4 mr-2" />
                         Gérer
                       </Button>
@@ -565,7 +569,11 @@ const Dashboard = () => {
                         <h3 className="font-medium">Photos</h3>
                         <p className="text-sm text-muted-foreground">Gérer la visibilité de vos photos</p>
                       </div>
-                      <Button variant="outline" size="sm">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => navigate('/settings?tab=privacy')}
+                      >
                         <Settings className="h-4 w-4 mr-2" />
                         Configurer
                       </Button>
