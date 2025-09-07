@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useIslamicModeration } from '@/hooks/useIslamicModeration';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,6 +42,7 @@ interface ChatWindowProps {
 const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { moderateContent } = useIslamicModeration();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [match, setMatch] = useState<Match | null>(null);
@@ -195,6 +197,18 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
     setSending(true);
     
     try {
+      // First, moderate the content using Islamic values
+      const moderationResult = await moderateContent(newMessage.trim(), user.id, 'chat');
+      
+      // Handle moderation result
+      if (!moderationResult.approved) {
+        if (moderationResult.action === 'blocked') {
+          setSending(false);
+          return; // Message is blocked, don't send
+        }
+        // For 'warned' and 'escalated', we allow sending but log the action
+      }
+
       const { error } = await supabase
         .from('messages')
         .insert({

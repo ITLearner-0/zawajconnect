@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import IslamicModerationPanel from './IslamicModerationPanel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -547,7 +548,10 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
           <AnalyticsDashboard />
         </TabsContent>
 
-        {/* Settings Tab */}
+        {/* Moderation Tab */}
+        <TabsContent value="moderation" className="space-y-4">
+          <IslamicModerationPanel />
+        </TabsContent>
         <TabsContent value="settings" className="space-y-4">
           <Card>
             <CardHeader>

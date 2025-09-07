@@ -313,6 +313,48 @@ export type Database = {
         }
         Relationships: []
       }
+      islamic_moderation_rules: {
+        Row: {
+          action: string
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          islamic_value: string
+          keywords: Json
+          rule_description: string
+          rule_name: string
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          action?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          islamic_value: string
+          keywords?: Json
+          rule_description: string
+          rule_name: string
+          severity?: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          islamic_value?: string
+          keywords?: Json
+          rule_description?: string
+          rule_name?: string
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       islamic_preferences: {
         Row: {
           beard_preference: string | null
@@ -409,6 +451,39 @@ export type Database = {
         }
         Relationships: []
       }
+      message_suggestions: {
+        Row: {
+          created_at: string
+          id: string
+          improvement_reason: string
+          islamic_guidance: string | null
+          original_message: string
+          suggested_message: string
+          used: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          improvement_reason: string
+          islamic_guidance?: string | null
+          original_message: string
+          suggested_message: string
+          used?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          improvement_reason?: string
+          islamic_guidance?: string | null
+          original_message?: string
+          suggested_message?: string
+          used?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -453,6 +528,59 @@ export type Database = {
             columns: ["match_id"]
             isOneToOne: false
             referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      moderation_logs: {
+        Row: {
+          action_taken: string
+          ai_analysis: Json
+          confidence_score: number
+          content_analyzed: string
+          created_at: string
+          human_decision: string | null
+          human_reviewed: boolean
+          human_reviewer_id: string | null
+          id: string
+          message_id: string | null
+          rules_triggered: Json
+          user_id: string
+        }
+        Insert: {
+          action_taken: string
+          ai_analysis?: Json
+          confidence_score?: number
+          content_analyzed: string
+          created_at?: string
+          human_decision?: string | null
+          human_reviewed?: boolean
+          human_reviewer_id?: string | null
+          id?: string
+          message_id?: string | null
+          rules_triggered?: Json
+          user_id: string
+        }
+        Update: {
+          action_taken?: string
+          ai_analysis?: Json
+          confidence_score?: number
+          content_analyzed?: string
+          created_at?: string
+          human_decision?: string | null
+          human_reviewed?: boolean
+          human_reviewer_id?: string | null
+          id?: string
+          message_id?: string | null
+          rules_triggered?: Json
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "moderation_logs_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
         ]
