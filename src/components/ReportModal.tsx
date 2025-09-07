@@ -44,6 +44,22 @@ const ReportModal = ({ reportedUserId, reportedUserName, children }: ReportModal
       const { data: user } = await supabase.auth.getUser();
       if (!user.user) throw new Error('Non authentifié');
 
+      // Verify the reported user exists before creating the report
+      const { data: reportedProfile } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('user_id', reportedUserId)
+        .maybeSingle();
+
+      if (!reportedProfile) {
+        toast({
+          title: "Utilisateur non trouvé",
+          description: "Cet utilisateur n'existe plus",
+          variant: "destructive"
+        });
+        return;
+      }
+
       const { error } = await supabase
         .from('reports')
         .insert({

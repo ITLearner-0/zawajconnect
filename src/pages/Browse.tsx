@@ -191,6 +191,22 @@ const Browse = () => {
     if (!user) return;
 
     try {
+      // Verify the target profile exists before creating any matches
+      const { data: targetProfile } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('user_id', profileId)
+        .maybeSingle();
+
+      if (!targetProfile) {
+        toast({
+          title: "Profil non trouvé",
+          description: "Ce profil n'existe plus",
+          variant: "destructive"
+        });
+        return;
+      }
+
       // Check if match already exists
       const { data: existingMatch } = await supabase
         .from('matches')
