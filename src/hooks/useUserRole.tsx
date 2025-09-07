@@ -27,22 +27,35 @@ export const useUserRole = (): UserRole => {
 
   const checkUserRole = async () => {
     try {
+      console.log('🔍 Checking user role for:', user?.id);
+      
       // Vérifier si l'utilisateur a un profil complet (indique qu'il cherche un partenaire)
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('full_name, age, gender, bio')
         .eq('user_id', user?.id)
         .maybeSingle();
 
+      console.log('👤 Profile data:', profile, 'Error:', profileError);
+
       // Vérifier si l'utilisateur est invité comme membre de famille
-      const { data: invitedAs } = await supabase
+      const { data: invitedAs, error: familyError } = await supabase
         .from('family_members')
-        .select('invited_user_id, is_wali, relationship')
+        .select('invited_user_id, is_wali, relationship, invitation_status')
         .eq('invited_user_id', user?.id)
         .eq('invitation_status', 'accepted');
 
+      console.log('👨‍👩‍👧‍👦 Family member data:', invitedAs, 'Error:', familyError);
+
       const isInvitedWali = invitedAs && invitedAs.length > 0;
       const hasCompleteProfile = profile && profile.age && profile.gender && Boolean(profile.bio);
+
+      console.log('🏷️ Role analysis:', {
+        isInvitedWali,
+        hasCompleteProfile,
+        willBeWaliOnly: isInvitedWali && !hasCompleteProfile,
+        willBeRegularUser: hasCompleteProfile || (!isInvitedWali && !hasCompleteProfile)
+      });
 
       setRole({
         isWaliOnly: isInvitedWali && !hasCompleteProfile,
@@ -50,7 +63,7 @@ export const useUserRole = (): UserRole => {
         loading: false
       });
     } catch (error) {
-      console.error('Error checking user role:', error);
+      console.error('❌ Error checking user role:', error);
       setRole({ isWaliOnly: false, isRegularUser: true, loading: false });
     }
   };
