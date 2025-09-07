@@ -219,9 +219,11 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   };
 
   const handleVideoCall = () => {
-    console.log('handleVideoCall called'); // Debug log
-    alert('Appel vidéo cliqué!'); // Simple test
+    console.log('Démarrage appel vidéo avec', match?.other_user.full_name);
+    console.log('Match disponible:', !!match);
+    console.log('État vidéo avant:', isVideoCallActive);
     setIsVideoCallActive(true);
+    console.log('État vidéo défini à true');
     toast({
       title: "Appel vidéo",
       description: `Démarrage de l'appel vidéo avec ${match?.other_user.full_name}...`
@@ -229,9 +231,11 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   };
 
   const handleAudioCall = () => {
-    console.log('handleAudioCall called'); // Debug log
-    alert('Appel audio cliqué!'); // Simple test  
+    console.log('Démarrage appel audio avec', match?.other_user.full_name);
+    console.log('Match disponible:', !!match);
+    console.log('État audio avant:', isAudioCallActive);
     setIsAudioCallActive(true);
+    console.log('État audio défini à true');
     toast({
       title: "Appel audio",
       description: `Démarrage de l'appel audio avec ${match?.other_user.full_name}...`
@@ -251,6 +255,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   };
 
   if (isVideoCallActive && match) {
+    console.log('Affichage VideoCall pour appel vidéo');
     return (
       <VideoCall
         matchId={matchId}
@@ -262,6 +267,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   }
 
   if (isAudioCallActive && match) {
+    console.log('Affichage VideoCall pour appel audio');
     return (
       <VideoCall
         matchId={matchId}
