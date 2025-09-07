@@ -134,25 +134,25 @@ const CompatibilityAchievements: React.FC<CompatibilityAchievementsProps> = ({
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Award className="h-5 w-5 text-primary" />
-            Réalisations
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Award className="h-4 w-4 text-primary flex-shrink-0" />
+            <span className="truncate">Réalisations</span>
           </CardTitle>
-          <Badge variant="outline" className="font-medium">
+          <Badge variant="outline" className="text-xs font-medium flex-shrink-0">
             {unlockedCount}/{totalAchievements}
           </Badge>
         </div>
-        <div className="mt-2">
+        <div className="mt-3 space-y-2">
           <Progress value={(unlockedCount / totalAchievements) * 100} className="h-2" />
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-xs text-muted-foreground leading-tight">
             {Math.round((unlockedCount / totalAchievements) * 100)}% des réalisations débloquées
           </p>
         </div>
       </CardHeader>
       
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 pt-0">
         {achievements.map((achievement) => {
           const Icon = achievement.icon;
           const progressPercentage = (achievement.progress / achievement.maxProgress) * 100;
@@ -160,46 +160,46 @@ const CompatibilityAchievements: React.FC<CompatibilityAchievementsProps> = ({
           return (
             <div
               key={achievement.id}
-              className={`p-4 rounded-lg border transition-all ${
+              className={`p-3 rounded-lg border transition-all ${
                 achievement.unlocked 
                   ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-200' 
                   : 'bg-slate-50 border-slate-200'
               }`}
             >
-              <div className="flex items-start space-x-3">
-                <div className={`p-2 rounded-full ${
+              <div className="flex items-start gap-3">
+                <div className={`p-1.5 rounded-full flex-shrink-0 ${
                   achievement.unlocked 
                     ? 'bg-emerald-100 text-emerald-600' 
                     : 'bg-slate-200 text-slate-400'
                 }`}>
                   {achievement.unlocked ? (
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-4 w-4" />
                   ) : (
-                    <Lock className="h-5 w-5" />
+                    <Lock className="h-4 w-4" />
                   )}
                 </div>
                 
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <h4 className={`font-medium ${
+                <div className="flex-1 min-w-0 space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0 flex-1">
+                      <h4 className={`font-medium text-sm truncate ${
                         achievement.unlocked ? 'text-foreground' : 'text-muted-foreground'
                       }`}>
                         {achievement.title}
                       </h4>
                       {achievement.unlocked && (
-                        <CheckCircle className="h-4 w-4 text-emerald-600" />
+                        <CheckCircle className="h-3 w-3 text-emerald-600 flex-shrink-0" />
                       )}
                     </div>
                     <Badge 
                       variant="secondary" 
-                      className={`text-xs ${getCategoryColor(achievement.category)}`}
+                      className={`text-xs flex-shrink-0 ${getCategoryColor(achievement.category)}`}
                     >
                       {getCategoryLabel(achievement.category)}
                     </Badge>
                   </div>
                   
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground leading-tight">
                     {achievement.description}
                   </p>
                   
@@ -207,16 +207,16 @@ const CompatibilityAchievements: React.FC<CompatibilityAchievementsProps> = ({
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs">
                         <span>Progression</span>
-                        <span>{achievement.progress}/{achievement.maxProgress}</span>
+                        <span className="font-medium">{achievement.progress}/{achievement.maxProgress}</span>
                       </div>
                       <Progress value={progressPercentage} className="h-1" />
                     </div>
                   )}
                   
                   {achievement.reward && achievement.unlocked && (
-                    <div className="flex items-center space-x-1 text-xs text-emerald-600">
-                      <Star className="h-3 w-3" />
-                      <span>Récompense: {achievement.reward}</span>
+                    <div className="flex items-center gap-1 text-xs text-emerald-600">
+                      <Star className="h-3 w-3 flex-shrink-0" />
+                      <span className="truncate">Récompense: {achievement.reward}</span>
                     </div>
                   )}
                 </div>

@@ -38,14 +38,14 @@ const CompatibilityInsightsPage = () => {
             </p>
           </div>
           
-          <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-12 lg:gap-8">
-            <div className="lg:col-span-8">
+          <div className="space-y-6 xl:space-y-0 xl:grid xl:grid-cols-12 xl:gap-8">
+            <div className="xl:col-span-8">
               <Tabs defaultValue="insights" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="insights" className="text-sm">
+                  <TabsTrigger value="insights" className="text-xs sm:text-sm px-2 sm:px-4">
                     Insights Détaillés
                   </TabsTrigger>
-                  <TabsTrigger value="gamification" className="text-sm">
+                  <TabsTrigger value="gamification" className="text-xs sm:text-sm px-2 sm:px-4">
                     Progression & Récompenses
                   </TabsTrigger>
                 </TabsList>
@@ -59,8 +59,8 @@ const CompatibilityInsightsPage = () => {
                 </TabsContent>
               </Tabs>
             </div>
-            <div className="lg:col-span-4">
-              <div className="sticky top-24">
+            <div className="xl:col-span-4">
+              <div className="xl:sticky xl:top-24">
                 <CompatibilityAchievements 
                   completionPercentage={100}
                   insightsViewed={3}
