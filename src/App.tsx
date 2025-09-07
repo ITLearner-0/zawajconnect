@@ -14,6 +14,7 @@ import Privacy from "./pages/Privacy";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Family from "./pages/Family";
 import Guidance from "./pages/Guidance";
+import ModerationTest from "./pages/ModerationTest";
 import Admin from "./pages/Admin";
 import FAQ from "./pages/FAQ";
 import Settings from "./pages/Settings";
@@ -60,6 +61,7 @@ function App() {
               <Route path="/family" element={<Family />} />
               <Route path="/guidance" element={<Guidance />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/moderation-test" element={<ModerationTest />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/islamic-tools" element={<IslamicTools />} />
