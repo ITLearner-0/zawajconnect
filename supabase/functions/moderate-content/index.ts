@@ -55,40 +55,41 @@ serve(async (req) => {
       throw rulesError;
     }
 
-    // Create AI prompt for Islamic values moderation
+    // Create AI prompt for Islamic values moderation with strict supervision rules
     const moderationPrompt = `
-Tu es un modérateur IA spécialisé dans les valeurs islamiques pour une application de rencontre musulmane. 
+Tu es un modérateur IA ULTRA-STRICT spécialisé dans les valeurs islamiques pour une application de rencontre musulmane respectant INTÉGRALEMENT la Sharia.
 
-Analyse le message suivant selon les valeurs islamiques fondamentales :
-- RESPECT (Ihtiram) : Le message montre-t-il du respect envers autrui ?
-- PUDEUR (Haya) : Le contenu est-il modeste et approprié ?
-- VÉRACITÉ (Sidq) : Le message semble-t-il honnête et sincère ?
-- ABSENCE DE VULGARITÉ : Le langage est-il propre et respectueux ?
-- GENTILLESSE (Husn al-khuluq) : Le ton est-il bienveillant ?
+RÈGLES ABSOLUES - AUCUNE EXCEPTION :
+1. INTERDICTION TOTALE de partager des informations de contact (numéro de téléphone, email, adresse, réseaux sociaux, Snapchat, Instagram, WhatsApp, Telegram, etc.)
+2. INTERDICTION de proposer des rencontres privées sans supervision familiale (café, restaurant, promenade, cinéma, etc.)
+3. INTERDICTION de tout langage contraire à la pudeur islamique (Haya)
+4. SUPERVISION FAMILIALE OBLIGATOIRE pour tous les échanges entre personnes non-mariées de sexes opposés
 
 MESSAGE À ANALYSER : "${content}"
 
-RÈGLES ACTIVES :
+DÉTECTION STRICTE - Si le message contient :
+- Des numéros (même partiels) : 06, 07, +33, etc. → BLOCKED IMMÉDIATEMENT
+- Des mots comme "numéro", "téléphone", "appeler", "SMS" → BLOCKED
+- Des emails ou mentions d'email → BLOCKED  
+- Des propositions de rendez-vous → BLOCKED
+- Des références à des apps de messagerie → BLOCKED
+
+RÈGLES SYSTÈME :
 ${rules?.map(rule => `- ${rule.rule_name}: ${rule.rule_description} (Sévérité: ${rule.severity})`).join('\n')}
 
-Réponds UNIQUEMENT en format JSON avec cette structure exacte :
+RÉPONSE JSON STRICTE :
 {
-  "approved": boolean,
-  "action": "approved|blocked|escalated|warned",
-  "confidence": number (0-1),
-  "rulesTriggered": ["nom_règle1", "nom_règle2"],
-  "suggestion": "version améliorée du message si nécessaire",
-  "islamicGuidance": "conseil basé sur les valeurs islamiques",
-  "reason": "explication de la décision",
-  "severity": "low|medium|high"
+  "approved": boolean (false si MOINDRE violation),
+  "action": "blocked|warned|escalated|approved",
+  "confidence": number (0.9+ pour détections claires),
+  "rulesTriggered": ["partage_informations_personnelles", "contraire à la pudeur", etc.],
+  "suggestion": "reformulation islamiquement appropriée",
+  "islamicGuidance": "rappel des principes islamiques sur la pudeur et la supervision",
+  "reason": "explication détaillée de la violation",
+  "severity": "critical|high|medium|low"
 }
 
-Critères de décision :
-- approved: true si le message respecte toutes les valeurs islamiques
-- action: "blocked" pour vulgarité/immodestie grave, "warned" pour manque de respect mineur, "escalated" pour cas complexes, "approved" si tout va bien
-- confidence: niveau de certitude de l'analyse (0.0 à 1.0)
-- suggestion: reformulation respectueuse si le message est problématique
-- islamicGuidance: conseil tiré des enseignements islamiques sur la communication
+IMPORTANT: En cas de doute, TOUJOURS privilégier le blocage pour respecter la pudeur islamique. Mieux vaut être trop strict que pas assez.
 `;
 
     // Call OpenAI API for content moderation

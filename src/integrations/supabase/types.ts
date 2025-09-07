@@ -229,6 +229,63 @@ export type Database = {
         }
         Relationships: []
       }
+      family_notifications: {
+        Row: {
+          action_required: boolean
+          content: string
+          created_at: string
+          family_member_id: string
+          id: string
+          is_read: boolean
+          match_id: string
+          notification_type: string
+          original_message: string | null
+          read_at: string | null
+          severity: string
+        }
+        Insert: {
+          action_required?: boolean
+          content: string
+          created_at?: string
+          family_member_id: string
+          id?: string
+          is_read?: boolean
+          match_id: string
+          notification_type: string
+          original_message?: string | null
+          read_at?: string | null
+          severity?: string
+        }
+        Update: {
+          action_required?: boolean
+          content?: string
+          created_at?: string
+          family_member_id?: string
+          id?: string
+          is_read?: boolean
+          match_id?: string
+          notification_type?: string
+          original_message?: string | null
+          read_at?: string | null
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_notifications_family_member_id_fkey"
+            columns: ["family_member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "family_notifications_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_reviews: {
         Row: {
           created_at: string
@@ -276,6 +333,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      family_supervision_rules: {
+        Row: {
+          blocking: boolean
+          created_at: string
+          id: string
+          is_active: boolean
+          notify_family: boolean
+          rule_description: string
+          rule_name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          blocking?: boolean
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          notify_family?: boolean
+          rule_description: string
+          rule_name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          blocking?: boolean
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          notify_family?: boolean
+          rule_description?: string
+          rule_name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       islamic_guidance: {
         Row: {
@@ -408,42 +501,57 @@ export type Database = {
       }
       matches: {
         Row: {
+          can_communicate: boolean
           created_at: string
           family_approved: boolean | null
           family_notes: string | null
           family_reviewed_at: string | null
           family_reviewer_id: string | null
+          family_supervision_required: boolean
+          family1_approved: boolean | null
+          family2_approved: boolean | null
           id: string
           is_mutual: boolean | null
           match_score: number | null
+          supervision_started_at: string | null
           user1_id: string
           user1_liked: boolean | null
           user2_id: string
           user2_liked: boolean | null
         }
         Insert: {
+          can_communicate?: boolean
           created_at?: string
           family_approved?: boolean | null
           family_notes?: string | null
           family_reviewed_at?: string | null
           family_reviewer_id?: string | null
+          family_supervision_required?: boolean
+          family1_approved?: boolean | null
+          family2_approved?: boolean | null
           id?: string
           is_mutual?: boolean | null
           match_score?: number | null
+          supervision_started_at?: string | null
           user1_id: string
           user1_liked?: boolean | null
           user2_id: string
           user2_liked?: boolean | null
         }
         Update: {
+          can_communicate?: boolean
           created_at?: string
           family_approved?: boolean | null
           family_notes?: string | null
           family_reviewed_at?: string | null
           family_reviewer_id?: string | null
+          family_supervision_required?: boolean
+          family1_approved?: boolean | null
+          family2_approved?: boolean | null
           id?: string
           is_mutual?: boolean | null
           match_score?: number | null
+          supervision_started_at?: string | null
           user1_id?: string
           user1_liked?: boolean | null
           user2_id?: string
@@ -1020,6 +1128,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_family_supervision_setup: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
       create_notification: {
         Args: {
           match_id?: string

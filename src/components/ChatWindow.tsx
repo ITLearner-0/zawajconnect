@@ -12,6 +12,7 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import VideoCall from '@/components/VideoCall';
 import MessageModerationWrapper from '@/components/MessageModerationWrapper';
+import FamilySupervisionGuard from '@/components/FamilySupervisionGuard';
 
 interface Message {
   id: string;
@@ -329,7 +330,8 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   }
 
   return (
-    <MessageModerationWrapper matchId={matchId}>
+    <FamilySupervisionGuard matchId={matchId}>
+      <MessageModerationWrapper matchId={matchId}>
       <div className="flex flex-col h-full max-h-[600px] bg-background rounded-lg border shadow-lg">
         {/* Chat Header */}
         <div className="border-b bg-gradient-to-r from-emerald/5 to-gold/5">
@@ -472,7 +474,8 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
           </div>
         </div>
       </div>
-    </MessageModerationWrapper>
+      </MessageModerationWrapper>
+    </FamilySupervisionGuard>
   );
 };
 
