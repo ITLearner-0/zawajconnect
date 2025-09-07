@@ -16,6 +16,8 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
+import MobileBottomNav from '@/components/MobileBottomNav';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -24,6 +26,7 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const handleSignOut = async () => {
     await signOut();
@@ -87,11 +90,14 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         <AppSidebar />
 
         <main className="flex-1 pt-16">
-          <div className="p-4 lg:p-6">
+          <div className="p-4 lg:p-6 mb-20 lg:mb-0">
             {children}
           </div>
         </main>
       </div>
+      
+      {/* Mobile Bottom Navigation */}
+      {isMobile && <MobileBottomNav />}
     </SidebarProvider>
   );
 };

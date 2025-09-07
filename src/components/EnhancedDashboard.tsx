@@ -22,7 +22,6 @@ import {
   Zap
 } from 'lucide-react';
 import MobileProfileHeader from './MobileProfileHeader';
-import MobileBottomNav from './MobileBottomNav';
 import SuccessStoriesShowcase from './SuccessStoriesShowcase';
 import PremiumSubscription from './PremiumSubscription';
 import IslamicCalendarWidget from './IslamicCalendarWidget';
@@ -456,9 +455,6 @@ const EnhancedDashboard = () => {
           </div>
         </div>
       </div>
-
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav />
     </div>
   );
 };
