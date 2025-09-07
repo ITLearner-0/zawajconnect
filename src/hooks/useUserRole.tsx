@@ -17,11 +17,14 @@ export const useUserRole = (): UserRole => {
   });
 
   useEffect(() => {
+    console.log('🚀 useUserRole effect triggered, user:', user?.id);
     if (!user) {
+      console.log('❌ No user found, setting defaults');
       setRole({ isWaliOnly: false, isRegularUser: false, loading: false });
       return;
     }
 
+    console.log('✅ User found, checking role...');
     checkUserRole();
   }, [user]);
 
