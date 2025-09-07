@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Users, Plus, Mail, Phone, Shield, Heart, UserCheck, AlertCircle } from 'lucide-react';
+import { Users, Plus, Mail, Phone, Shield, Heart, UserCheck, AlertCircle, Trash2, Send } from 'lucide-react';
 
 interface FamilyMember {
   id: string;
@@ -20,6 +20,9 @@ interface FamilyMember {
   can_communicate: boolean;
   can_view_profile: boolean;
   is_wali: boolean;
+  invitation_status?: string;
+  invitation_sent_at?: string;
+  invitation_token?: string;
 }
 
 interface SupervisionStats {
@@ -208,6 +211,60 @@ const FamilySupervisionPanel = () => {
       toast({
         title: "Erreur",
         description: "Impossible de mettre à jour les permissions",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const deleteFamilyMember = async (memberId: string, memberName: string) => {
+    try {
+      const { error } = await supabase
+        .from('family_members')
+        .delete()
+        .eq('id', memberId);
+
+      if (error) throw error;
+
+      setFamilyMembers(prev => prev.filter(member => member.id !== memberId));
+
+      toast({
+        title: "Membre supprimé",
+        description: `${memberName} a été retiré de votre famille`,
+      });
+    } catch (error) {
+      console.error('Error deleting family member:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer le membre de famille",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const sendFamilyInvitation = async (memberId: string, memberName: string, memberEmail: string) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('send-family-invitation', {
+        body: {
+          family_member_id: memberId,
+          email: memberEmail,
+          full_name: memberName
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Invitation envoyée",
+        description: `Une invitation a été envoyée à ${memberName}`,
+      });
+
+      // Refresh family data to update status
+      loadFamilyData();
+    } catch (error) {
+      console.error('Error sending invitation:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer l'invitation",
         variant: "destructive"
       });
     }
@@ -415,10 +472,10 @@ const FamilySupervisionPanel = () => {
               {familyMembers.map((member) => (
                 <Card key={member.id} className="border-border/50">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <div>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
                         <h4 className="font-semibold text-lg">{member.full_name}</h4>
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
                           <Badge variant="secondary">{member.relationship}</Badge>
                           {member.is_wali && (
                             <Badge className="bg-gold/10 text-gold-dark border-gold/20">
@@ -426,22 +483,55 @@ const FamilySupervisionPanel = () => {
                               Wali
                             </Badge>
                           )}
+                          {member.invitation_status && (
+                            <Badge 
+                              variant={
+                                member.invitation_status === 'accepted' ? 'default' : 
+                                member.invitation_status === 'pending' ? 'secondary' : 'destructive'
+                              }
+                            >
+                              {member.invitation_status === 'accepted' ? 'Acceptée' : 
+                               member.invitation_status === 'pending' ? 'En attente' : 'Expirée'}
+                            </Badge>
+                          )}
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                        {member.email && (
-                          <div className="flex items-center gap-1">
-                            <Mail className="h-4 w-4" />
-                            <span>{member.email}</span>
-                          </div>
+                      <div className="flex items-center gap-2">
+                        {member.invitation_status === 'pending' && member.email && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => sendFamilyInvitation(member.id, member.full_name, member.email)}
+                            className="text-emerald border-emerald hover:bg-emerald/10"
+                          >
+                            <Send className="h-4 w-4 mr-1" />
+                            Renvoyer
+                          </Button>
                         )}
-                        {member.phone && (
-                          <div className="flex items-center gap-1">
-                            <Phone className="h-4 w-4" />
-                            <span>{member.phone}</span>
-                          </div>
-                        )}
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteFamilyMember(member.id, member.full_name)}
+                          className="text-destructive border-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                      {member.email && (
+                        <div className="flex items-center gap-1">
+                          <Mail className="h-4 w-4" />
+                          <span>{member.email}</span>
+                        </div>
+                      )}
+                      {member.phone && (
+                        <div className="flex items-center gap-1">
+                          <Phone className="h-4 w-4" />
+                          <span>{member.phone}</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
