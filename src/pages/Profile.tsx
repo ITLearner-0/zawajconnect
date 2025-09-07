@@ -59,21 +59,32 @@ const Profile = () => {
       return;
     }
     fetchProfile();
-    checkIfLiked();
-    recordProfileView();
-    fetchVerificationStatus();
   }, [user, userId]);
+
+  useEffect(() => {
+    // Only run these after profile is loaded
+    if (profile && userId) {
+      checkIfLiked();
+      recordProfileView();
+      fetchVerificationStatus();
+    }
+  }, [profile, userId]);
 
   const fetchProfile = async () => {
     if (!userId) return;
 
     try {
       // Get profile
-      const { data: profileData } = await supabase
+      const { data: profileData, error: profileError } = await supabase
         .from('profiles')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('Error fetching profile:', profileError);
+        return;
+      }
 
       if (profileData) {
         // Get Islamic preferences
@@ -81,29 +92,33 @@ const Profile = () => {
           .from('islamic_preferences')
           .select('*')
           .eq('user_id', userId)
-          .single();
+          .maybeSingle();
 
         setProfile({
           ...profileData,
           islamic_preferences: prefsData || undefined
         });
+      } else {
+        // Profile doesn't exist
+        setProfile(null);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
+      setProfile(null);
     } finally {
       setLoading(false);
     }
   };
 
   const checkIfLiked = async () => {
-    if (!user || !userId) return;
+    if (!user || !userId || !profile) return;
 
     try {
       const { data: match } = await supabase
         .from('matches')
         .select('*')
         .or(`and(user1_id.eq.${user.id},user2_id.eq.${userId}),and(user1_id.eq.${userId},user2_id.eq.${user.id})`)
-        .single();
+        .maybeSingle();
 
       if (match) {
         const userLiked = (match.user1_id === user.id && match.user1_liked) || 
@@ -111,28 +126,32 @@ const Profile = () => {
         setIsLiked(userLiked);
       }
     } catch (error) {
-      // No match found, that's ok
+      // No match found or error, that's ok
+      console.warn('Could not check like status:', error);
     }
   };
 
   const fetchVerificationStatus = async () => {
-    if (!userId) return;
+    if (!userId || !profile) return;
 
     try {
       const { data } = await supabase
         .from('user_verifications')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       setVerification(data);
     } catch (error) {
-      console.error('Error fetching verification status:', error);
+      console.warn('Could not fetch verification status:', error);
     }
   };
 
   const recordProfileView = async () => {
     if (!user || !userId || user.id === userId) return;
+
+    // Only record view if we have a valid profile (avoid foreign key violations)
+    if (!profile) return;
 
     try {
       await supabase
@@ -142,7 +161,8 @@ const Profile = () => {
           viewed_id: userId
         }, { onConflict: 'viewer_id,viewed_id' });
     } catch (error) {
-      console.error('Error recording profile view:', error);
+      // Silently handle errors - profile views are not critical
+      console.warn('Could not record profile view:', error);
     }
   };
 
