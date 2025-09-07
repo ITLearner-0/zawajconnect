@@ -270,16 +270,8 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
-          {/* Compatibility Card */}
-          <div className="xl:col-span-1">
-                <div className="grid gap-6 md:grid-cols-2">
-                  <CompatibilityCard />
-                  <InsightsPreviewCard />
-                </div>
-          </div>
-
           {/* Main Content */}
-          <div className="xl:col-span-3">
+          <div className="xl:col-span-3 order-2 xl:order-1">
             <Tabs defaultValue="profile" className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="profile">Profil Personnel</TabsTrigger>
@@ -582,6 +574,14 @@ const Dashboard = () => {
                 </Card>
               </TabsContent>
             </Tabs>
+          </div>
+
+          {/* Compatibility Card */}
+          <div className="xl:col-span-1 order-1 xl:order-2">
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-1">
+              <CompatibilityCard />
+              <InsightsPreviewCard />
+            </div>
           </div>
         </div>
       </div>
