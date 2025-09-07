@@ -75,8 +75,28 @@ const FamilySupervisionGuard: React.FC<FamilySupervisionGuardProps> = ({
     );
   }
 
-  // Check if user has no wali configured
-  if (!supervisionStatus.hasWali) {
+  // Check supervision requirements based on Islamic principles (women need supervision)
+  const [userProfile, setUserProfile] = React.useState<any>(null);
+  
+  React.useEffect(() => {
+    const getUserProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('gender')
+          .eq('user_id', user.id)
+          .single();
+        setUserProfile(profile);
+      }
+    };
+    getUserProfile();
+  }, []);
+
+  // Only women need mandatory family supervision in Islam
+  const needsSupervision = userProfile?.gender === 'female' || userProfile?.gender === 'femme';
+  
+  if (needsSupervision && !supervisionStatus.hasWali) {
     return (
       <Card className="border-red-200 bg-red-50/50 dark:bg-red-900/10">
         <CardHeader>
@@ -89,8 +109,8 @@ const FamilySupervisionGuard: React.FC<FamilySupervisionGuardProps> = ({
           <Alert>
             <Shield className="h-4 w-4" />
             <AlertDescription>
-              <strong>Principe islamique :</strong> Selon la Sharia, les communications entre personnes 
-              non-mariées de sexes opposés doivent être supervisées par un tuteur (Wali).
+              <strong>Principe islamique :</strong> Selon la Sharia, les femmes musulmanes doivent 
+              avoir un tuteur (Wali) pour superviser les communications dans le cadre du mariage.
             </AlertDescription>
           </Alert>
           
@@ -118,8 +138,8 @@ const FamilySupervisionGuard: React.FC<FamilySupervisionGuardProps> = ({
     );
   }
 
-  // Check if family approval is pending
-  if (!supervisionStatus.familyApproved) {
+  // Check if family approval is pending (only for women)
+  if (needsSupervision && !supervisionStatus.familyApproved) {
     return (
       <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-900/10">
         <CardHeader>
@@ -161,8 +181,8 @@ const FamilySupervisionGuard: React.FC<FamilySupervisionGuardProps> = ({
     );
   }
 
-  // If supervision is not required or all checks pass, show the chat
-  if (!supervisionStatus.supervisionRequired || supervisionStatus.canCommunicate) {
+  // If supervision is not required (for men) or all checks pass, show the chat
+  if (!needsSupervision || supervisionStatus.canCommunicate) {
     return <>{children}</>;
   }
 
