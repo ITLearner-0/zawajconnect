@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import FamilyDashboard from '@/components/FamilyDashboard';
+import FamilyInvitationForm from '@/components/FamilyInvitationForm';
 import ParentalApprovalWorkflow from '@/components/ParentalApprovalWorkflow';
 import { 
   Users, 
@@ -570,6 +571,9 @@ const Family = () => {
                 )}
               </CardContent>
             </Card>
+            
+            {/* Family Invitation Form */}
+            <FamilyInvitationForm />
           </TabsContent>
 
           <TabsContent value="privacy" className="space-y-6">

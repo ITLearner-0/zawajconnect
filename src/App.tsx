@@ -21,6 +21,8 @@ import Settings from "./pages/Settings";
 import IslamicTools from "./pages/IslamicTools";
 import FamilySupervision from './pages/FamilySupervision';
 import FamilyNotifications from './pages/FamilyNotifications';
+import InvitationAuth from './pages/InvitationAuth';
+import FamilyAccess from './pages/FamilyAccess';
 import CompatibilityTest from "./pages/CompatibilityTest";
 import CompatibilityInsightsPage from "./pages/CompatibilityInsights";
 import NotFound from "./pages/NotFound";
@@ -66,8 +68,10 @@ function App() {
               <Route path="/faq" element={<FAQ />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/islamic-tools" element={<IslamicTools />} />
-          <Route path="/family-supervision" element={<FamilySupervision />} />
-          <Route path="/family-notifications" element={<FamilyNotifications />} />
+           <Route path="/family-supervision" element={<FamilySupervision />} />
+           <Route path="/family-notifications" element={<FamilyNotifications />} />
+           <Route path="/invitation" element={<InvitationAuth />} />
+           <Route path="/family-access" element={<FamilyAccess />} />
               <Route path="/compatibility-test" element={<CompatibilityTest />} />
               <Route path="/compatibility-insights" element={<CompatibilityInsightsPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

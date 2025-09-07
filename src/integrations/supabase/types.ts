@@ -198,6 +198,11 @@ export type Database = {
           email: string | null
           full_name: string
           id: string
+          invitation_accepted_at: string | null
+          invitation_sent_at: string | null
+          invitation_status: string | null
+          invitation_token: string | null
+          invited_user_id: string | null
           is_wali: boolean | null
           phone: string | null
           relationship: string
@@ -210,6 +215,11 @@ export type Database = {
           email?: string | null
           full_name: string
           id?: string
+          invitation_accepted_at?: string | null
+          invitation_sent_at?: string | null
+          invitation_status?: string | null
+          invitation_token?: string | null
+          invited_user_id?: string | null
           is_wali?: boolean | null
           phone?: string | null
           relationship: string
@@ -222,6 +232,11 @@ export type Database = {
           email?: string | null
           full_name?: string
           id?: string
+          invitation_accepted_at?: string | null
+          invitation_sent_at?: string | null
+          invitation_status?: string | null
+          invitation_token?: string | null
+          invited_user_id?: string | null
           is_wali?: boolean | null
           phone?: string | null
           relationship?: string
@@ -1128,9 +1143,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      accept_family_invitation: {
+        Args: { p_invitation_token: string; p_invited_user_id: string }
+        Returns: boolean
+      }
       check_family_supervision_setup: {
         Args: { user_uuid: string }
         Returns: boolean
+      }
+      create_family_invitation: {
+        Args: {
+          p_email: string
+          p_full_name: string
+          p_is_wali?: boolean
+          p_relationship: string
+          p_user_id: string
+        }
+        Returns: string
       }
       create_notification: {
         Args: {
