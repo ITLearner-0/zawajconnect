@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, Users, AlertTriangle, Clock, UserCheck } from 'lucide-react';
 import { useFamilySupervision } from '@/hooks/useFamilySupervision';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FamilySupervisionGuardProps {
   matchId: string;
