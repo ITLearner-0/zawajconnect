@@ -68,7 +68,7 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
             .from('profiles')
             .select('user_id, full_name, avatar_url')
             .eq('user_id', otherUserId)
-            .single();
+            .maybeSingle();
 
           // Get last message
           const { data: lastMessage } = await supabase
@@ -77,7 +77,7 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
             .eq('match_id', match.id)
             .order('created_at', { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle();
 
           // Get unread count
           const { count: unreadCount } = await supabase

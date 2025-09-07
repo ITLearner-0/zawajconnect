@@ -78,7 +78,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
         .from('matches')
         .select('*')
         .eq('id', matchId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -89,7 +89,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
           .from('profiles')
           .select('id, full_name, avatar_url, user_id')
           .eq('user_id', otherUserId)
-          .single();
+          .maybeSingle();
 
         setMatch({
           ...data,

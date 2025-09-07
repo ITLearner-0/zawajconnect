@@ -75,21 +75,21 @@ const Dashboard = () => {
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       // Fetch Islamic preferences
       const { data: prefsData } = await supabase
         .from('islamic_preferences')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       // Fetch verification status
       const { data: verificationData } = await supabase
         .from('user_verifications')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       setProfile(profileData);
       setIslamicPrefs(prefsData);

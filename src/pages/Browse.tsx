@@ -196,7 +196,7 @@ const Browse = () => {
         .from('matches')
         .select('*')
         .or(`and(user1_id.eq.${user.id},user2_id.eq.${profileId}),and(user1_id.eq.${profileId},user2_id.eq.${user.id})`)
-        .single();
+        .maybeSingle();
 
       if (existingMatch) {
         // Update existing match
