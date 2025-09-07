@@ -25,6 +25,7 @@ interface VideoCallProps {
   partnerName?: string;
   onCallEnd?: () => void;
   isIncoming?: boolean;
+  autoStart?: boolean;
 }
 
 const VideoCall = ({ 
@@ -32,7 +33,8 @@ const VideoCall = ({
   partnerId, 
   partnerName = "Partenaire",
   onCallEnd,
-  isIncoming = false 
+  isIncoming = false,
+  autoStart = false
 }: VideoCallProps) => {
   const { toast } = useToast();
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -57,6 +59,13 @@ const VideoCall = ({
     }
     return () => clearInterval(interval);
   }, [isCallActive]);
+
+  // Auto-start call if requested
+  useEffect(() => {
+    if (autoStart && !isCallActive) {
+      startCall();
+    }
+  }, [autoStart]);
 
   // Initialize media devices
   useEffect(() => {

@@ -262,6 +262,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
         partnerId={match.other_user.id}
         partnerName={match.other_user.full_name}
         onCallEnd={handleCallEnd}
+        autoStart={true}
       />
     );
   }
@@ -274,6 +275,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
         partnerId={match.other_user.id}
         partnerName={match.other_user.full_name}
         onCallEnd={handleCallEnd}
+        autoStart={true}
       />
     );
   }
