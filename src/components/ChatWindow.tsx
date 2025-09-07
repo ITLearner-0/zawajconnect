@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Send, Paperclip, MoreVertical, Phone, Video, Heart, User } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import VideoCall from '@/components/VideoCall';
 
 interface Message {
   id: string;
@@ -45,6 +46,8 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   const [match, setMatch] = useState<Match | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [isVideoCallActive, setIsVideoCallActive] = useState(false);
+  const [isAudioCallActive, setIsAudioCallActive] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -215,12 +218,55 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
     }
   };
 
+  const handleVideoCall = () => {
+    setIsVideoCallActive(true);
+    toast({
+      title: "Appel vidéo",
+      description: `Démarrage de l'appel vidéo avec ${match?.other_user.full_name}...`
+    });
+  };
+
+  const handleAudioCall = () => {
+    setIsAudioCallActive(true);
+    toast({
+      title: "Appel audio",
+      description: `Démarrage de l'appel audio avec ${match?.other_user.full_name}...`
+    });
+  };
+
+  const handleCallEnd = () => {
+    setIsVideoCallActive(false);
+    setIsAudioCallActive(false);
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   };
+
+  if (isVideoCallActive && match) {
+    return (
+      <VideoCall
+        matchId={matchId}
+        partnerId={match.other_user.id}
+        partnerName={match.other_user.full_name}
+        onCallEnd={handleCallEnd}
+      />
+    );
+  }
+
+  if (isAudioCallActive && match) {
+    return (
+      <VideoCall
+        matchId={matchId}
+        partnerId={match.other_user.id}
+        partnerName={match.other_user.full_name}
+        onCallEnd={handleCallEnd}
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -275,10 +321,22 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="text-emerald hover:bg-emerald/10">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-emerald hover:bg-emerald/10"
+              onClick={handleAudioCall}
+              title="Appel audio"
+            >
               <Phone className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm" className="text-emerald hover:bg-emerald/10">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-emerald hover:bg-emerald/10"
+              onClick={handleVideoCall}
+              title="Appel vidéo"
+            >
               <Video className="h-4 w-4" />
             </Button>
             <Button variant="ghost" size="sm">
