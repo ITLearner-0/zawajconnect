@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Users, Plus, Mail, Phone, Shield, Heart, UserCheck, AlertCircle, Trash2, Send } from 'lucide-react';
 
@@ -55,6 +56,12 @@ const FamilySupervisionPanel = () => {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [emailTemplate, setEmailTemplate] = useState({
+    subject: '',
+    body: '',
+    to: ''
+  });
 
   const relationshipOptions = [
     'Père', 'Mère', 'Frère', 'Sœur', 'Oncle', 'Tante', 
@@ -241,34 +248,113 @@ const FamilySupervisionPanel = () => {
     }
   };
 
-  const sendFamilyInvitation = async (member: FamilyMember) => {
+  const generateInvitationLink = async (member: FamilyMember) => {
+    if (!user) return;
+
+    setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('send-family-invitation', {
-        body: {
-          fullName: member.full_name,
-          email: member.email,
-          relationship: member.relationship,
-          isWali: member.is_wali
-        }
-      });
+      // Generate invitation token and create family member record
+      const { data: invitationToken, error } = await supabase
+        .rpc('create_family_invitation', {
+          p_user_id: user.id,
+          p_full_name: member.full_name,
+          p_email: member.email,
+          p_relationship: member.relationship,
+          p_is_wali: member.is_wali
+        });
 
       if (error) throw error;
 
-      toast({
-        title: "Invitation envoyée",
-        description: `Une invitation a été envoyée à ${member.full_name}`,
-      });
+      // Get user profile for invitation
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('user_id', user.id)
+        .single();
 
-      // Refresh family data to update status
-      loadFamilyData();
-    } catch (error) {
-      console.error('Error sending invitation:', error);
+      const inviterName = profile?.full_name || 'Un membre de famille';
+      const invitationUrl = `${window.location.origin}/invitation?token=${invitationToken}`;
+      
+      // Create email template
+      const emailSubject = "Invitation à superviser sur NikahConnect";
+      const emailBody = `Assalamu Alaikum ${member.full_name},
+
+${inviterName} vous invite à devenir ${member.is_wali ? 'tuteur (Wali)' : 'membre de famille'} sur NikahConnect pour superviser leurs interactions selon les principes islamiques.
+
+Votre rôle : ${member.relationship}
+${member.is_wali ? 'Vous aurez le statut de Wali (tuteur)' : ''}
+
+Vous pourrez :
+- Superviser les conversations
+- Consulter les profils des correspondants
+- Recevoir des alertes de modération
+- Participer aux discussions si nécessaire
+
+Pour accepter cette invitation, cliquez sur le lien suivant :
+${invitationUrl}
+
+Cette invitation expire dans 7 jours. Si vous n'avez pas demandé cette invitation, vous pouvez ignorer cet email.
+
+Cordialement,
+NikahConnect - Plateforme de rencontres islamiques avec supervision familiale`;
+
+      // Show email options dialog
+      setEmailTemplate({
+        subject: emailSubject,
+        body: emailBody,
+        to: member.email || ''
+      });
+      setShowEmailDialog(true);
+
+      toast({
+        title: "Lien d'invitation généré",
+        description: "Choisissez votre solution email pour envoyer l'invitation.",
+      });
+      
+    } catch (error: any) {
+      console.error('Error generating invitation:', error);
       toast({
         title: "Erreur",
-        description: "Impossible d'envoyer l'invitation",
-        variant: "destructive"
+        description: "Impossible de générer l'invitation. Veuillez réessayer.",
+        variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const openEmailClient = (client: string) => {
+    const { subject, body, to } = emailTemplate;
+    const encodedSubject = encodeURIComponent(subject);
+    const encodedBody = encodeURIComponent(body);
+    const encodedTo = encodeURIComponent(to);
+
+    let url = '';
+    
+    switch (client) {
+      case 'gmail':
+        url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSubject}&body=${encodedBody}`;
+        break;
+      case 'outlook':
+        url = `https://outlook.live.com/owa/?path=/mail/action/compose&to=${encodedTo}&subject=${encodedSubject}&body=${encodedBody}`;
+        break;
+      case 'yahoo':
+        url = `https://compose.mail.yahoo.com/?to=${encodedTo}&subject=${encodedSubject}&body=${encodedBody}`;
+        break;
+      case 'mailto':
+        url = `mailto:${to}?subject=${encodedSubject}&body=${encodedBody}`;
+        break;
+      default:
+        return;
+    }
+
+    window.open(url, '_blank');
+    setShowEmailDialog(false);
+    
+    toast({
+      title: "Email ouvert",
+      description: "L'invitation a été préparée dans votre client email.",
+    });
   };
 
   if (loading) {
@@ -498,15 +584,15 @@ const FamilySupervisionPanel = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        {member.invitation_status === 'pending' && member.email && (
+                        {member.email && member.invitation_status !== 'accepted' && (
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => sendFamilyInvitation(member)}
+                            onClick={() => generateInvitationLink(member)}
                             className="text-emerald border-emerald hover:bg-emerald/10"
                           >
                             <Send className="h-4 w-4 mr-1" />
-                            Renvoyer
+                            {member.invitation_status === 'pending' ? 'Renvoyer' : 'Inviter'}
                           </Button>
                         )}
                         <Button
@@ -599,6 +685,60 @@ const FamilySupervisionPanel = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Email Client Selection Dialog */}
+      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Choisissez votre solution email</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Sélectionnez votre client email préféré pour envoyer l'invitation :
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                variant="outline"
+                onClick={() => openEmailClient('gmail')}
+                className="flex items-center gap-2 h-12"
+              >
+                <Mail className="h-4 w-4" />
+                Gmail
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => openEmailClient('outlook')}
+                className="flex items-center gap-2 h-12"
+              >
+                <Mail className="h-4 w-4" />
+                Outlook
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => openEmailClient('yahoo')}
+                className="flex items-center gap-2 h-12"
+              >
+                <Mail className="h-4 w-4" />
+                Yahoo
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => openEmailClient('mailto')}
+                className="flex items-center gap-2 h-12"
+              >
+                <Mail className="h-4 w-4" />
+                Autre
+              </Button>
+            </div>
+            <div className="mt-4 p-3 bg-muted rounded-lg">
+              <p className="text-xs text-muted-foreground">
+                <strong>Destinataire :</strong> {emailTemplate.to}<br />
+                <strong>Objet :</strong> {emailTemplate.subject}
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
