@@ -64,7 +64,7 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     const inviterName = profile?.full_name || 'Un membre de famille';
-    const invitationUrl = `${supabaseUrl.replace('supabase.co', 'lovable.app')}/auth?invitation=${invitationToken}`;
+    const invitationUrl = `https://959ea671-18d4-4cc0-89ee-e9aef23ed956.sandbox.lovable.dev/invitation?token=${invitationToken}`;
 
     // Send invitation email
     const emailResponse = await resend.emails.send({

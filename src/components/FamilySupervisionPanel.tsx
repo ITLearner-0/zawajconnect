@@ -241,13 +241,14 @@ const FamilySupervisionPanel = () => {
     }
   };
 
-  const sendFamilyInvitation = async (memberId: string, memberName: string, memberEmail: string) => {
+  const sendFamilyInvitation = async (member: FamilyMember) => {
     try {
       const { data, error } = await supabase.functions.invoke('send-family-invitation', {
         body: {
-          family_member_id: memberId,
-          email: memberEmail,
-          full_name: memberName
+          fullName: member.full_name,
+          email: member.email,
+          relationship: member.relationship,
+          isWali: member.is_wali
         }
       });
 
@@ -255,7 +256,7 @@ const FamilySupervisionPanel = () => {
 
       toast({
         title: "Invitation envoyée",
-        description: `Une invitation a été envoyée à ${memberName}`,
+        description: `Une invitation a été envoyée à ${member.full_name}`,
       });
 
       // Refresh family data to update status
@@ -501,7 +502,7 @@ const FamilySupervisionPanel = () => {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => sendFamilyInvitation(member.id, member.full_name, member.email)}
+                            onClick={() => sendFamilyInvitation(member)}
                             className="text-emerald border-emerald hover:bg-emerald/10"
                           >
                             <Send className="h-4 w-4 mr-1" />
