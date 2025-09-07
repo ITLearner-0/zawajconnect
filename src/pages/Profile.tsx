@@ -73,6 +73,8 @@ const Profile = () => {
   const fetchProfile = async () => {
     if (!userId) return;
 
+    console.log('Fetching profile for userId:', userId);
+
     try {
       // Get profile
       const { data: profileData, error: profileError } = await supabase
@@ -83,8 +85,11 @@ const Profile = () => {
 
       if (profileError) {
         console.error('Error fetching profile:', profileError);
+        setProfile(null);
         return;
       }
+
+      console.log('Profile fetch result:', { profileData, exists: !!profileData });
 
       if (profileData) {
         // Get Islamic preferences
@@ -94,12 +99,15 @@ const Profile = () => {
           .eq('user_id', userId)
           .maybeSingle();
 
+        console.log('Islamic preferences fetch result:', { prefsData });
+
         setProfile({
           ...profileData,
           islamic_preferences: prefsData || undefined
         });
       } else {
         // Profile doesn't exist
+        console.log('Profile not found for userId:', userId);
         setProfile(null);
       }
     } catch (error) {
@@ -151,15 +159,34 @@ const Profile = () => {
     if (!user || !userId || user.id === userId) return;
 
     // Only record view if we have a valid profile (avoid foreign key violations)
-    if (!profile) return;
+    if (!profile) {
+      console.log('Profile view not recorded: profile does not exist', { userId, profile });
+      return;
+    }
 
+    // Double-check that the viewed user actually exists in profiles table
     try {
+      const { data: targetProfile } = await supabase
+        .from('profiles')
+        .select('user_id')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (!targetProfile) {
+        console.log('Profile view not recorded: target user not found in profiles table', { userId });
+        return;
+      }
+
+      console.log('Recording profile view', { viewer_id: user.id, viewed_id: userId, targetExists: !!targetProfile });
+
       await supabase
         .from('profile_views')
         .upsert({
           viewer_id: user.id,
           viewed_id: userId
         }, { onConflict: 'viewer_id,viewed_id' });
+      
+      console.log('Profile view recorded successfully');
     } catch (error) {
       // Silently handle errors - profile views are not critical
       console.warn('Could not record profile view:', error);
