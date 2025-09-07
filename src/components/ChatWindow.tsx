@@ -219,6 +219,8 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   };
 
   const handleVideoCall = () => {
+    console.log('handleVideoCall called'); // Debug log
+    alert('Appel vidéo cliqué!'); // Simple test
     setIsVideoCallActive(true);
     toast({
       title: "Appel vidéo",
@@ -227,6 +229,8 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   };
 
   const handleAudioCall = () => {
+    console.log('handleAudioCall called'); // Debug log
+    alert('Appel audio cliqué!'); // Simple test  
     setIsAudioCallActive(true);
     toast({
       title: "Appel audio",
