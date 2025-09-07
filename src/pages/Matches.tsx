@@ -63,7 +63,7 @@ const Matches = () => {
               .from('profiles')
               .select('id, full_name, age, location, profession, bio, user_id')
               .eq('user_id', otherUserId)
-              .single();
+              .maybeSingle();
 
             return {
               ...match,

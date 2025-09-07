@@ -71,7 +71,7 @@ const SecurityPrivacyPanel = () => {
         .from('privacy_settings')
         .select('*')
         .eq('user_id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (privacyError && privacyError.code !== 'PGRST116') {
         console.warn('Privacy settings not found, will create default');

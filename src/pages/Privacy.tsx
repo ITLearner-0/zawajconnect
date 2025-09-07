@@ -42,7 +42,7 @@ const Privacy = () => {
         .from('privacy_settings')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       setSettings(data);
     } catch (error) {

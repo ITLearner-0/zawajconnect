@@ -116,7 +116,7 @@ const PremiumSubscription = () => {
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       // Simulate subscription check - in real app this would come from Stripe
       setUserSubscription(null); // Default to no subscription
