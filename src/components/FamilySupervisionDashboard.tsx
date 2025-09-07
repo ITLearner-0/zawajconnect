@@ -41,82 +41,85 @@ const FamilySupervisionDashboard = () => {
 
   const loadSupervisionData = async () => {
     try {
-      // First, check if current user is a family member
+      // First, check if current user is a family member (invited as wali)
       const { data: familyMemberData, error: familyError } = await supabase
         .from('family_members')
         .select('*')
-        .eq('email', user?.email)
-        .single();
+        .eq('invited_user_id', user?.id)
+        .eq('invitation_status', 'accepted')
+        .maybeSingle();
 
-      if (familyError) {
+      if (familyError || !familyMemberData) {
         console.error('Family member error:', familyError);
         toast({
           title: "Erreur",
           description: 'Vous n\'êtes pas autorisé à superviser les conversations',
           variant: "destructive"
         });
+        setLoading(false);
         return;
       }
 
       setFamilyRole(familyMemberData);
 
-      // Get supervised conversations
-      const { data: participantsData, error: participantsError } = await supabase
-        .from('conversation_participants')
+      // Get matches for the supervised user (person that this wali supervises)
+      const { data: matchesData, error: matchesError } = await supabase
+        .from('matches')
         .select(`
-          *,
-          matches!inner (
-            id,
-            user1_id,
-            user2_id
-          )
+          id,
+          user1_id,
+          user2_id,
+          is_mutual,
+          can_communicate,
+          created_at
         `)
-        .eq('family_member_id', familyMemberData.id)
-        .eq('is_active', true);
+        .or(`user1_id.eq.${familyMemberData.user_id},user2_id.eq.${familyMemberData.user_id}`)
+        .eq('is_mutual', true);
 
-      if (participantsError) {
-        console.error('Participants error:', participantsError);
+      if (matchesError) {
+        console.error('Matches error:', matchesError);
+        setLoading(false);
         return;
       }
 
-      // Get last messages for each conversation
+      // Get conversation details for each match
       const conversationsWithMessages = await Promise.all(
-        participantsData?.map(async (participant) => {
+        (matchesData || []).map(async (match) => {
           // Get profiles for both users
           const { data: user1Profile } = await supabase
             .from('profiles')
             .select('full_name, avatar_url')
-            .eq('user_id', participant.matches.user1_id)
-            .single();
+            .eq('user_id', match.user1_id)
+            .maybeSingle();
 
           const { data: user2Profile } = await supabase
             .from('profiles')
             .select('full_name, avatar_url')
-            .eq('user_id', participant.matches.user2_id)
-            .single();
+            .eq('user_id', match.user2_id)
+            .maybeSingle();
 
           const { data: lastMessage } = await supabase
             .from('messages')
             .select('content, created_at')
-            .eq('match_id', participant.match_id)
+            .eq('match_id', match.id)
             .order('created_at', { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle();
 
           const { count: unreadCount } = await supabase
             .from('messages')
             .select('*', { count: 'exact', head: true })
-            .eq('match_id', participant.match_id)
+            .eq('match_id', match.id)
             .eq('is_read', false);
 
           return {
-            id: participant.id,
-            match_id: participant.match_id,
+            id: match.id,
+            match_id: match.id,
             user1_profile: user1Profile || { full_name: 'Utilisateur inconnu', avatar_url: undefined },
             user2_profile: user2Profile || { full_name: 'Utilisateur inconnu', avatar_url: undefined },
             last_message: lastMessage || { content: 'Aucun message', created_at: new Date().toISOString() },
             unread_count: unreadCount || 0,
-            is_active: participant.is_active
+            is_active: match.can_communicate
           };
         }) || []
       );
