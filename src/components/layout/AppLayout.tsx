@@ -19,6 +19,8 @@ import {
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { useIsMobile } from '@/hooks/use-mobile';
 
+// Force refresh to clear cache
+
 interface AppLayoutProps {
   children: ReactNode;
 }
