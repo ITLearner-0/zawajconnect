@@ -45,12 +45,15 @@ export const useUserRole = (): UserRole => {
       const { data: invitedAs, error: familyError } = await supabase
         .from('family_members')
         .select('invited_user_id, is_wali, relationship, invitation_status')
-        .eq('invited_user_id', user?.id)
-        .eq('invitation_status', 'accepted');
+        .eq('invited_user_id', user?.id);
 
-      console.log('👨‍👩‍👧‍👦 Family member data:', invitedAs, 'Error:', familyError);
+      console.log('👨‍👩‍👧‍👦 Family member data (all statuses):', invitedAs, 'Error:', familyError);
 
-      const isInvitedWali = invitedAs && invitedAs.length > 0;
+      // Filtrer les invitations acceptées
+      const acceptedInvitations = invitedAs?.filter(invite => invite.invitation_status === 'accepted') || [];
+      console.log('✅ Accepted invitations:', acceptedInvitations);
+
+      const isInvitedWali = acceptedInvitations && acceptedInvitations.length > 0;
       const hasCompleteProfile = profile && profile.age && profile.gender && Boolean(profile.bio);
 
       console.log('🏷️ Role analysis:', {
