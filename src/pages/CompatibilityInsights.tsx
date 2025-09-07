@@ -38,8 +38,8 @@ const CompatibilityInsightsPage = () => {
             </p>
           </div>
           
-          <div className="space-y-6 xl:space-y-0 xl:grid xl:grid-cols-12 xl:gap-8">
-            <div className="xl:col-span-8">
+          <div className="space-y-6 xl:space-y-0 xl:grid xl:grid-cols-12 xl:gap-6">
+            <div className="xl:col-span-7">
               <Tabs defaultValue="insights" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6">
                   <TabsTrigger value="insights" className="text-xs sm:text-sm px-2 sm:px-4">
@@ -59,8 +59,8 @@ const CompatibilityInsightsPage = () => {
                 </TabsContent>
               </Tabs>
             </div>
-            <div className="xl:col-span-4">
-              <div className="xl:sticky xl:top-24">
+            <div className="xl:col-span-5">
+              <div className="xl:sticky xl:top-24 xl:pl-2">
                 <CompatibilityAchievements 
                   completionPercentage={100}
                   insightsViewed={3}
