@@ -41,6 +41,8 @@ const FamilySupervisionDashboard = () => {
 
   const loadSupervisionData = async () => {
     try {
+      console.log('🔍 Checking supervision for user:', user?.id);
+      
       // First, check if current user is a family member (invited as wali)
       const { data: familyMemberData, error: familyError } = await supabase
         .from('family_members')
@@ -49,8 +51,11 @@ const FamilySupervisionDashboard = () => {
         .eq('invitation_status', 'accepted')
         .maybeSingle();
 
+      console.log('👨‍👩‍👧‍👦 Family member query result:', { familyMemberData, familyError });
+
       if (familyError || !familyMemberData) {
-        console.error('Family member error:', familyError);
+        console.error('❌ Family member error:', familyError);
+        console.log('❌ No family member data found for user:', user?.id);
         toast({
           title: "Erreur",
           description: 'Vous n\'êtes pas autorisé à superviser les conversations',
@@ -60,7 +65,10 @@ const FamilySupervisionDashboard = () => {
         return;
       }
 
+      console.log('✅ Family role set:', familyMemberData);
       setFamilyRole(familyMemberData);
+
+      console.log('🔍 Looking for matches for supervised user:', familyMemberData.user_id);
 
       // Get matches for the supervised user (person that this wali supervises)
       const { data: matchesData, error: matchesError } = await supabase
@@ -76,11 +84,15 @@ const FamilySupervisionDashboard = () => {
         .or(`user1_id.eq.${familyMemberData.user_id},user2_id.eq.${familyMemberData.user_id}`)
         .eq('is_mutual', true);
 
+      console.log('💕 Matches query result:', { matchesData, matchesError });
+
       if (matchesError) {
-        console.error('Matches error:', matchesError);
+        console.error('❌ Matches error:', matchesError);
         setLoading(false);
         return;
       }
+
+      console.log('📊 Processing conversations for', (matchesData || []).length, 'matches');
 
       // Get conversation details for each match
       const conversationsWithMessages = await Promise.all(
