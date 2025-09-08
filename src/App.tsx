@@ -32,6 +32,7 @@ import FamilyAccessPortal from './components/FamilyAccessPortal';
 import FamilySupervisionPanel from './components/FamilySupervisionPanel';
 import CompatibilityTest from "./pages/CompatibilityTest";
 import CompatibilityInsightsPage from "./pages/CompatibilityInsights";
+import EnhancedProfile from "./pages/EnhancedProfile";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -68,6 +69,7 @@ function App() {
               <RoleBasedLayout>
                 <Routes>
                   <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/enhanced-profile" element={<EnhancedProfile />} />
                   <Route path="/browse" element={<Browse />} />
                   <Route path="/matches" element={<Matches />} />
                   <Route path="/chat" element={<Chat />} />

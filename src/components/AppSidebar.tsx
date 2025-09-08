@@ -67,6 +67,7 @@ export function AppSidebar() {
   const baseNavItems = [
     { path: '/', icon: Home, label: 'Accueil', group: 'main' },
     { path: '/dashboard', icon: User, label: 'Mon Profil', group: 'main' },
+    { path: '/enhanced-profile', icon: Settings, label: 'Profil Enhanced', group: 'main' },
     { path: '/browse', icon: Search, label: 'Découvrir', group: 'main' },
     { path: '/compatibility-test', icon: Heart, label: 'Test de Compatibilité', group: 'compatibility' },
     { path: '/compatibility-insights', icon: Brain, label: 'Mes Insights', group: 'compatibility' },
