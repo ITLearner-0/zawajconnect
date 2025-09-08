@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Bell, Shield, AlertTriangle, MessageSquare, CheckCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -19,6 +20,7 @@ interface WaliNotification {
 const WaliNotificationCenter: React.FC = () => {
   const [notifications, setNotifications] = useState<WaliNotification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -143,64 +145,74 @@ const WaliNotificationCenter: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed top-20 right-4 z-40">
-      <Card className="w-80 max-h-96 overflow-hidden shadow-lg border border-border/50 bg-card/95 backdrop-blur-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell className="h-5 w-5" />
+          {unreadCount > 0 && (
+            <Badge 
+              variant="destructive" 
+              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+            >
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </Badge>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0" align="end">
+        <Card className="border-0 shadow-none">
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2">
               <Bell className="h-5 w-5" />
               Notifications Wali
-            </div>
-            {unreadCount > 0 && (
-              <Badge variant="destructive">{unreadCount}</Badge>
-            )}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="max-h-80 overflow-y-auto">
-            {notifications.length === 0 ? (
-              <div className="p-4 text-center text-muted-foreground">
-                <Shield className="h-8 w-8 mx-auto mb-2" />
-                <p>Aucune notification</p>
-              </div>
-            ) : (
-              notifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={`p-3 border-b cursor-pointer hover:bg-muted/50 ${
-                    !notification.is_read ? 'bg-primary/5 border-l-4 border-l-primary' : ''
-                  }`}
-                  onClick={() => markAsRead(notification.id)}
-                >
-                  <div className="flex items-start gap-2">
-                    {getSeverityIcon(notification.severity)}
-                    <div className="flex-1 text-sm">
-                      <div className="flex items-center gap-2 mb-1">
-                        <Badge variant={getSeverityColor(notification.severity)} className="text-xs">
-                          {notification.severity.toUpperCase()}
-                        </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(notification.created_at).toLocaleTimeString('fr-FR')}
-                        </span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="max-h-80 overflow-y-auto">
+              {notifications.length === 0 ? (
+                <div className="p-4 text-center text-muted-foreground">
+                  <Shield className="h-8 w-8 mx-auto mb-2" />
+                  <p>Aucune notification</p>
+                </div>
+              ) : (
+                notifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={`p-3 border-b cursor-pointer hover:bg-muted/50 ${
+                      !notification.is_read ? 'bg-primary/5 border-l-4 border-l-primary' : ''
+                    }`}
+                    onClick={() => markAsRead(notification.id)}
+                  >
+                    <div className="flex items-start gap-2">
+                      {getSeverityIcon(notification.severity)}
+                      <div className="flex-1 text-sm">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Badge variant={getSeverityColor(notification.severity)} className="text-xs">
+                            {notification.severity.toUpperCase()}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(notification.created_at).toLocaleTimeString('fr-FR')}
+                          </span>
+                        </div>
+                        <p className="text-sm">{notification.content}</p>
+                        {notification.action_required && (
+                          <Badge variant="outline" className="mt-1 text-xs">
+                            Action requise
+                          </Badge>
+                        )}
                       </div>
-                      <p className="text-sm">{notification.content}</p>
-                      {notification.action_required && (
-                        <Badge variant="outline" className="mt-1 text-xs">
-                          Action requise
-                        </Badge>
+                      {!notification.is_read && (
+                        <div className="w-2 h-2 bg-primary rounded-full"></div>
                       )}
                     </div>
-                    {!notification.is_read && (
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
-                    )}
                   </div>
-                </div>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </PopoverContent>
+    </Popover>
   );
 };
 
