@@ -35,19 +35,6 @@ interface IslamicPreferences {
   importance_of_religion: string;
   desired_partner_sect: string;
   smoking: string;
-  // Enhanced preferences
-  islamic_education_level: string;
-  hajj_umrah_status: string;
-  charity_involvement: string;
-  islamic_finance_preference: boolean;
-  family_islamic_values: string;
-  community_involvement: string;
-  islamic_role_model: string;
-  marriage_islamic_approach: string;
-  children_islamic_education: string;
-  interfaith_tolerance: string;
-  religious_discussions: string;
-  islamic_events_participation: string;
 }
 
 interface EnhancedIslamicPreferencesProps {
@@ -68,19 +55,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
     halal_diet: true,
     importance_of_religion: '',
     desired_partner_sect: '',
-    smoking: '',
-    islamic_education_level: '',
-    hajj_umrah_status: '',
-    charity_involvement: '',
-    islamic_finance_preference: true,
-    family_islamic_values: '',
-    community_involvement: '',
-    islamic_role_model: '',
-    marriage_islamic_approach: '',
-    children_islamic_education: '',
-    interfaith_tolerance: '',
-    religious_discussions: '',
-    islamic_events_participation: ''
+    smoking: ''
   });
   
   const [loading, setLoading] = useState(true);
@@ -186,22 +161,10 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
       fields: ['halal_diet', 'smoking', 'hijab_preference', 'beard_preference']
     },
     { 
-      id: 'education', 
-      title: 'Éducation & Pratique', 
-      icon: Book,
-      fields: ['islamic_education_level', 'hajj_umrah_status', 'charity_involvement', 'islamic_finance_preference']
-    },
-    { 
       id: 'family', 
       title: 'Famille & Mariage', 
       icon: Home,
-      fields: ['family_islamic_values', 'marriage_islamic_approach', 'children_islamic_education', 'desired_partner_sect']
-    },
-    { 
-      id: 'community', 
-      title: 'Communauté', 
-      icon: Users,
-      fields: ['community_involvement', 'islamic_events_participation', 'interfaith_tolerance', 'religious_discussions']
+      fields: ['desired_partner_sect']
     }
   ];
 
@@ -457,6 +420,29 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                         </SelectContent>
                       </Select>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {currentSection === 'family' && (
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <Label className="flex items-center gap-2">
+                      <Home className="h-4 w-4 text-emerald" />
+                      Préférence de Confession du Partenaire
+                    </Label>
+                    <Select value={preferences.desired_partner_sect} onValueChange={(value) => updatePreference('desired_partner_sect', value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choisir..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="same_sect">Même confession que moi</SelectItem>
+                        <SelectItem value="sunni">Sunnite</SelectItem>
+                        <SelectItem value="shia">Chiite</SelectItem>
+                        <SelectItem value="any">Peu importe</SelectItem>
+                        <SelectItem value="open_discussion">Ouvert à la discussion</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               )}
