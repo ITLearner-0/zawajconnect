@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -9,9 +9,10 @@ interface UserRole {
   loading: boolean;
 }
 
-// Cache pour éviter les appels répétés
+// Cache global pour éviter les appels répétés
 const roleCache = new Map<string, { role: UserRole; timestamp: number }>();
-const CACHE_DURATION = 30000; // 30 secondes
+const CACHE_DURATION = 60000; // 1 minute
+const activeRequests = new Map<string, Promise<UserRole>>();
 
 export const useUserRole = (): UserRole => {
   const { user } = useAuth();
@@ -21,78 +22,96 @@ export const useUserRole = (): UserRole => {
     isWali: false,
     loading: true
   });
+  
+  // Ref pour éviter les appels multiples
+  const isInitialized = useRef(false);
+  const lastUserId = useRef<string | null>(null);
 
-  // Stable reference pour user.id pour éviter les boucles infinies
+  // Stable reference pour user.id
   const userId = useMemo(() => user?.id, [user?.id]);
 
-  const checkUserRole = useCallback(async () => {
-    if (!userId) return;
+  const checkUserRole = useCallback(async (targetUserId: string): Promise<UserRole> => {
+    // Vérifier s'il y a déjà une requête en cours pour cet utilisateur
+    if (activeRequests.has(targetUserId)) {
+      return activeRequests.get(targetUserId)!;
+    }
 
     // Vérifier le cache
-    const cached = roleCache.get(userId);
+    const cached = roleCache.get(targetUserId);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      setRole(cached.role);
-      return;
+      console.log('🎯 Using cached role for user:', targetUserId);
+      return cached.role;
     }
 
-    try {
-      console.log('🔍 Fetching role for user:', userId);
-      
-      // Faire les deux requêtes en parallèle pour optimiser
-      const [profileResult, familyResult] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('full_name, age, gender, bio')
-          .eq('user_id', userId)
-          .maybeSingle(),
-        supabase
-          .from('family_members')
-          .select('invited_user_id, is_wali, relationship, invitation_status')
-          .eq('invited_user_id', userId)
-      ]);
+    // Créer une nouvelle requête
+    const rolePromise = (async (): Promise<UserRole> => {
+      try {
+        console.log('🔍 Fetching role for user:', targetUserId);
+        
+        const [profileResult, familyResult] = await Promise.all([
+          supabase
+            .from('profiles')
+            .select('full_name, age, gender, bio')
+            .eq('user_id', targetUserId)
+            .maybeSingle(),
+          supabase
+            .from('family_members')
+            .select('invited_user_id, is_wali, relationship, invitation_status')
+            .eq('invited_user_id', targetUserId)
+        ]);
 
-      const profile = profileResult.data;
-      const invitedAs = familyResult.data;
+        const profile = profileResult.data;
+        const invitedAs = familyResult.data;
 
-      // Filtrer les invitations acceptées
-      const acceptedInvitations = invitedAs?.filter(invite => invite.invitation_status === 'accepted') || [];
-      const isInvitedWali = acceptedInvitations.length > 0;
-      const hasCompleteProfile = profile && profile.age && profile.gender && Boolean(profile.bio);
+        const acceptedInvitations = invitedAs?.filter(invite => invite.invitation_status === 'accepted') || [];
+        const isInvitedWali = acceptedInvitations.length > 0;
+        const hasCompleteProfile = profile && profile.age && profile.gender && Boolean(profile.bio);
 
-      const finalRole = {
-        isWaliOnly: false,
-        isRegularUser: hasCompleteProfile || isInvitedWali,
-        isWali: isInvitedWali,
-        loading: false
-      };
+        const finalRole = {
+          isWaliOnly: false,
+          isRegularUser: hasCompleteProfile || isInvitedWali,
+          isWali: isInvitedWali,
+          loading: false
+        };
 
-      // Mettre en cache le résultat
-      roleCache.set(userId, {
-        role: finalRole,
-        timestamp: Date.now()
-      });
+        // Mettre en cache
+        roleCache.set(targetUserId, {
+          role: finalRole,
+          timestamp: Date.now()
+        });
 
-      setRole(finalRole);
-    } catch (error) {
-      console.error('Error checking user role:', error);
-      const errorRole = { isWaliOnly: false, isRegularUser: true, isWali: false, loading: false };
-      setRole(errorRole);
-    }
-  }, [userId]);
+        return finalRole;
+      } catch (error) {
+        console.error('Error checking user role:', error);
+        return { isWaliOnly: false, isRegularUser: true, isWali: false, loading: false };
+      } finally {
+        // Nettoyer la requête active
+        activeRequests.delete(targetUserId);
+      }
+    })();
+
+    // Stocker la requête active
+    activeRequests.set(targetUserId, rolePromise);
+    
+    return rolePromise;
+  }, []);
 
   useEffect(() => {
     if (!user) {
       setRole({ isWaliOnly: false, isRegularUser: false, isWali: false, loading: false });
+      isInitialized.current = false;
+      lastUserId.current = null;
       return;
     }
 
-    // Debounce pour éviter les appels trop rapides
-    const timeoutId = setTimeout(() => {
-      checkUserRole();
-    }, 100);
-
-    return () => clearTimeout(timeoutId);
-  }, [user, checkUserRole]);
+    // Éviter les appels répétés pour le même utilisateur
+    if (userId && (userId !== lastUserId.current || !isInitialized.current)) {
+      lastUserId.current = userId;
+      isInitialized.current = true;
+      
+      checkUserRole(userId).then(setRole);
+    }
+  }, [user, userId, checkUserRole]);
 
   return role;
 };
