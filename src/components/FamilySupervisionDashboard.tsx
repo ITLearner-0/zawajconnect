@@ -124,8 +124,6 @@ const FamilySupervisionDashboard = () => {
         }) || []
       );
 
-      console.log('🔍 Debug - Matches found:', matchesData);
-      console.log('🔍 Debug - Conversations with messages:', conversationsWithMessages);
       setConversations(conversationsWithMessages);
     } catch (error) {
       console.error('Error loading supervision data:', error);
