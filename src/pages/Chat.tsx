@@ -8,11 +8,15 @@ import ChatList from '@/components/ChatList';
 import ChatWindow from '@/components/ChatWindow';
 
 const Chat = () => {
+  console.log('🎬 Chat component mounting');
   const { user } = useAuth();
+  console.log('👤 Chat - user:', user?.id);
   const navigate = useNavigate();
   const { matchId: paramMatchId } = useParams();
   const [searchParams] = useSearchParams();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  
+  console.log('🔗 Chat - paramMatchId:', paramMatchId, 'searchParams matchId:', searchParams.get('matchId'));
 
   useEffect(() => {
     if (!user) {

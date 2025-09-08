@@ -42,7 +42,9 @@ interface ChatWindowProps {
 }
 
 const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
+  console.log('🎬 ChatWindow mounting for matchId:', matchId);
   const { user } = useAuth();
+  console.log('👤 ChatWindow - user:', user?.id);
   const { toast } = useToast();
   const { moderateContent } = useIslamicModeration();
   const [messages, setMessages] = useState<Message[]>([]);

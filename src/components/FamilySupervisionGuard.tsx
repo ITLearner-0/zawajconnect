@@ -15,14 +15,18 @@ const FamilySupervisionGuard: React.FC<FamilySupervisionGuardProps> = ({
   matchId,
   children
 }) => {
+  console.log('🛡️ FamilySupervisionGuard mounting for matchId:', matchId);
   const { 
     supervisionStatus, 
     loading, 
     requestFamilyApproval,
     getCriticalNotifications 
   } = useFamilySupervision();
+  
+  console.log('🛡️ FamilySupervisionGuard - loading:', loading, 'supervisionStatus:', supervisionStatus);
 
   const criticalNotifications = getCriticalNotifications();
+  console.log('🚨 Critical notifications:', criticalNotifications.length);
 
   if (loading) {
     return (

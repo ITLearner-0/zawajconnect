@@ -30,6 +30,7 @@ interface SupervisionStatus {
 }
 
 export const useFamilySupervision = () => {
+  console.log('🔗 useFamilySupervision hook init');
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [notifications, setNotifications] = useState<FamilyNotification[]>([]);
   const [supervisionStatus, setSupervisionStatus] = useState<SupervisionStatus>({
@@ -72,8 +73,10 @@ export const useFamilySupervision = () => {
   }, []);
 
   const loadFamilyData = async () => {
+    console.log('📊 loadFamilyData starting');
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      console.log('👤 loadFamilyData - user:', user?.id);
       if (!user) return;
 
       const { data: familyData, error } = await supabase
@@ -82,12 +85,15 @@ export const useFamilySupervision = () => {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
+      console.log('👨‍👩‍👧‍👦 loadFamilyData - family data:', familyData, 'error:', error);
+
       if (error) throw error;
 
       setFamilyMembers(familyData || []);
       
       // Check supervision status
       const hasWali = familyData?.some(member => member.is_wali) || false;
+      console.log('🛡️ loadFamilyData - hasWali:', hasWali);
       
       setSupervisionStatus(prev => ({
         ...prev,
@@ -97,13 +103,14 @@ export const useFamilySupervision = () => {
       }));
 
     } catch (error) {
-      console.error('Error loading family data:', error);
+      console.error('❌ Error loading family data:', error);
       toast({
         title: "Erreur",
         description: "Impossible de charger les données familiales",
         variant: "destructive"
       });
     } finally {
+      console.log('✅ loadFamilyData completed');
       setLoading(false);
     }
   };
