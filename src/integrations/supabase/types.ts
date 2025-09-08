@@ -574,6 +574,78 @@ export type Database = {
         }
         Relationships: []
       }
+      matching_history: {
+        Row: {
+          avg_compatibility_score: number | null
+          created_at: string
+          id: string
+          matched_profiles: Json
+          preferences_used: Json
+          search_timestamp: string
+          total_matches: number
+          user_id: string
+        }
+        Insert: {
+          avg_compatibility_score?: number | null
+          created_at?: string
+          id?: string
+          matched_profiles?: Json
+          preferences_used?: Json
+          search_timestamp?: string
+          total_matches?: number
+          user_id: string
+        }
+        Update: {
+          avg_compatibility_score?: number | null
+          created_at?: string
+          id?: string
+          matched_profiles?: Json
+          preferences_used?: Json
+          search_timestamp?: string
+          total_matches?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      matching_preferences: {
+        Row: {
+          created_at: string
+          family_approval_required: boolean
+          id: string
+          min_compatibility: number
+          updated_at: string
+          use_ai_scoring: boolean
+          user_id: string
+          weight_cultural: number
+          weight_islamic: number
+          weight_personality: number
+        }
+        Insert: {
+          created_at?: string
+          family_approval_required?: boolean
+          id?: string
+          min_compatibility?: number
+          updated_at?: string
+          use_ai_scoring?: boolean
+          user_id: string
+          weight_cultural?: number
+          weight_islamic?: number
+          weight_personality?: number
+        }
+        Update: {
+          created_at?: string
+          family_approval_required?: boolean
+          id?: string
+          min_compatibility?: number
+          updated_at?: string
+          use_ai_scoring?: boolean
+          user_id?: string
+          weight_cultural?: number
+          weight_islamic?: number
+          weight_personality?: number
+        }
+        Relationships: []
+      }
       message_suggestions: {
         Row: {
           created_at: string
