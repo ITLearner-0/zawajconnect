@@ -328,7 +328,10 @@ const FamilySupervisionDashboard = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => joinConversation(conversation.match_id)}
+                      onClick={() => {
+                        console.log('🖱️ Voir button clicked for match:', conversation.match_id);
+                        joinConversation(conversation.match_id);
+                      }}
                       disabled={!familyRole.can_view_profile}
                     >
                       <Eye className="h-4 w-4 mr-1" />
@@ -337,7 +340,10 @@ const FamilySupervisionDashboard = () => {
                     {familyRole.can_communicate && (
                       <Button
                         size="sm"
-                        onClick={() => joinConversation(conversation.match_id)}
+                        onClick={() => {
+                          console.log('🖱️ Participer button clicked for match:', conversation.match_id);
+                          joinConversation(conversation.match_id);
+                        }}
                       >
                         <MessageCircle className="h-4 w-4 mr-1" />
                         Participer
@@ -385,7 +391,10 @@ const FamilySupervisionDashboard = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => joinConversation(conversation.match_id)}
+                      onClick={() => {
+                        console.log('🖱️ Voir button clicked (all tab) for match:', conversation.match_id);
+                        joinConversation(conversation.match_id);
+                      }}
                       disabled={!familyRole.can_view_profile}
                     >
                       <Eye className="h-4 w-4 mr-1" />
@@ -394,7 +403,10 @@ const FamilySupervisionDashboard = () => {
                     {familyRole.can_communicate && conversation.is_active && (
                       <Button
                         size="sm"
-                        onClick={() => joinConversation(conversation.match_id)}
+                        onClick={() => {
+                          console.log('🖱️ Participer button clicked (all tab) for match:', conversation.match_id);
+                          joinConversation(conversation.match_id);
+                        }}
                       >
                         <MessageCircle className="h-4 w-4 mr-1" />
                         Participer
