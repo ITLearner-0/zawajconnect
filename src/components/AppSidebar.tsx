@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,7 +16,8 @@ import {
   Settings,
   Users,
   BookOpen,
-  Brain
+  Brain,
+  Shield
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -47,6 +49,7 @@ interface PrayerTime {
 
 export function AppSidebar() {
   const { user } = useAuth();
+  const { isWali } = useUserRole();
   const { state } = useSidebar();
   const location = useLocation();
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -61,7 +64,7 @@ export function AppSidebar() {
   const currentPath = location.pathname;
   const isCollapsed = state === 'collapsed';
 
-  const navItems = [
+  const baseNavItems = [
     { path: '/', icon: Home, label: 'Accueil', group: 'main' },
     { path: '/dashboard', icon: User, label: 'Mon Profil', group: 'main' },
     { path: '/browse', icon: Search, label: 'Découvrir', group: 'main' },
@@ -73,10 +76,16 @@ export function AppSidebar() {
     { path: '/settings', icon: Settings, label: 'Paramètres', group: 'main' },
   ];
 
+  // Ajouter le lien de supervision familiale pour les walis
+  const navItems = isWali 
+    ? [...baseNavItems, { path: '/family-supervision', icon: Shield, label: 'Supervision Familiale', group: 'family' }]
+    : baseNavItems;
+
   const groupedNavItems = {
     main: navItems.filter(item => item.group === 'main'),
     compatibility: navItems.filter(item => item.group === 'compatibility'),
     social: navItems.filter(item => item.group === 'social'),
+    family: navItems.filter(item => item.group === 'family'),
     resources: navItems.filter(item => item.group === 'resources')
   };
 
@@ -192,6 +201,30 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+        {/* Family Section (Walis only) */}
+        {isWali && groupedNavItems.family.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Supervision Familiale</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {groupedNavItems.family.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <SidebarMenuItem key={item.path}>
+                      <SidebarMenuButton asChild>
+                        <NavLink to={item.path} className={getNavCls}>
+                          <Icon className="h-4 w-4" />
+                          {!isCollapsed && <span>{item.label}</span>}
+                        </NavLink>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {/* Resources Section */}
         <SidebarGroup>

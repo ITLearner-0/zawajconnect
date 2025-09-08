@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface UserRole {
   isWaliOnly: boolean;
   isRegularUser: boolean;
+  isWali: boolean;
   loading: boolean;
 }
 
@@ -14,12 +15,13 @@ export const useUserRole = (): UserRole => {
   const [role, setRole] = useState<UserRole>({
     isWaliOnly: false,
     isRegularUser: false,
+    isWali: false,
     loading: true
   });
 
   useEffect(() => {
     if (!user) {
-      setRole({ isWaliOnly: false, isRegularUser: false, loading: false });
+      setRole({ isWaliOnly: false, isRegularUser: false, isWali: false, loading: false });
       return;
     }
 
@@ -64,8 +66,9 @@ export const useUserRole = (): UserRole => {
       });
 
       const finalRole = {
-        isWaliOnly: false, // Les walis peuvent accéder au layout principal pour supervision
-        isRegularUser: true, // Donner accès au layout principal
+        isWaliOnly: isInvitedWali && !hasCompleteProfile, // Seuls les walis sans profil complet vont vers FamilyAccessPortal
+        isRegularUser: hasCompleteProfile || !isInvitedWali, // Utilisateurs avec profil complet ou non-walis
+        isWali: isInvitedWali, // Flag pour identifier les walis (peu importe leur profil)
         loading: false
       };
 
@@ -74,7 +77,7 @@ export const useUserRole = (): UserRole => {
       setRole(finalRole);
     } catch (error) {
       console.error('Error checking user role:', error);
-      setRole({ isWaliOnly: false, isRegularUser: true, loading: false });
+      setRole({ isWaliOnly: false, isRegularUser: true, isWali: false, loading: false });
     }
   };
 
