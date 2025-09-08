@@ -103,6 +103,9 @@ const FamilySupervisionGuard: React.FC<FamilySupervisionGuardProps> = ({
   // Only women need mandatory family supervision in Islam
   const needsSupervision = userProfile?.gender === 'female' || userProfile?.gender === 'femme';
   
+  console.log('🚺 User profile gender:', userProfile?.gender, 'needsSupervision:', needsSupervision);
+  console.log('🛡️ Final render check - needsSupervision:', needsSupervision, 'canCommunicate:', supervisionStatus.canCommunicate);
+  
   if (needsSupervision && !supervisionStatus.hasWali) {
     return (
       <Card className="border-red-200 bg-red-50/50 dark:bg-red-900/10">
@@ -190,10 +193,12 @@ const FamilySupervisionGuard: React.FC<FamilySupervisionGuardProps> = ({
 
   // If supervision is not required (for men) or all checks pass, show the chat
   if (!needsSupervision || supervisionStatus.canCommunicate) {
+    console.log('✅ FamilySupervisionGuard - Rendering children');
     return <>{children}</>;
   }
 
   // Default fallback
+  console.log('❌ FamilySupervisionGuard - Rendering fallback - this should not happen');
   return (
     <Card className="border-red-200 bg-red-50/50 dark:bg-red-900/10">
       <CardContent className="p-8">
