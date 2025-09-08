@@ -335,6 +335,10 @@ const WaliDashboard: React.FC = () => {
         .eq('id', matchId);
 
       setMatchesForApproval(prev => prev.filter(m => m.id !== matchId));
+      setStats(prev => ({
+        ...prev,
+        pendingApprovals: prev.pendingApprovals - 1
+      }));
       
       toast({
         title: "Match approuvé",
@@ -361,6 +365,10 @@ const WaliDashboard: React.FC = () => {
         .eq('id', matchId);
 
       setMatchesForApproval(prev => prev.filter(m => m.id !== matchId));
+      setStats(prev => ({
+        ...prev,
+        pendingApprovals: prev.pendingApprovals - 1
+      }));
       
       toast({
         title: "Match rejeté",
