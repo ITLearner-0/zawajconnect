@@ -107,6 +107,17 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
       if (error) throw error;
 
       if (data) {
+        // Verify user has access to this match
+        if (data.user1_id !== user.id && data.user2_id !== user.id) {
+          console.error('User does not have access to this match');
+          toast({
+            title: "Accès refusé",
+            description: "Vous n'avez pas accès à cette conversation",
+            variant: "destructive"
+          });
+          if (onClose) onClose();
+          return;
+        }
         const otherUserId = data.user1_id === user.id ? data.user2_id : data.user1_id;
         
         const { data: otherUserProfile } = await supabase
