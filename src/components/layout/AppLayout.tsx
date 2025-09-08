@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import Header from '@/components/Header';
 import { AppSidebar } from '@/components/AppSidebar';
 import WaliNotificationCenter from '@/components/WaliNotificationCenter';
@@ -30,6 +31,7 @@ interface AppLayoutProps {
 const AppLayout = ({ children }: AppLayoutProps) => {
   const { user, signOut } = useAuth();
   const { isWali } = useUserRole();
+  const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -75,10 +77,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                   <User className="h-4 w-4 mr-2" />
                   Mon Profil
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate('/admin')}>
-                  <Crown className="h-4 w-4 mr-2" />
-                  Administration
-                </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem onClick={() => navigate('/admin')}>
+                    <Crown className="h-4 w-4 mr-2" />
+                    Administration
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem 
                   onClick={handleSignOut}
