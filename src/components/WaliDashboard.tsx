@@ -347,7 +347,7 @@ const WaliDashboard: React.FC = () => {
               <div className="space-y-4">
                 {matchesForApproval.length === 0 ? (
                   <div className="text-center py-8">
-                    <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                    <CheckCircle className="h-12 w-12 text-emerald mx-auto mb-4" />
                     <p className="text-muted-foreground">Aucune approbation en attente</p>
                     <p className="text-sm text-muted-foreground">
                       Tous les matches ont été traités
@@ -355,12 +355,12 @@ const WaliDashboard: React.FC = () => {
                   </div>
                 ) : (
                   matchesForApproval.map((match) => (
-                    <Card key={match.id} className="border-l-4 border-l-yellow-500">
+                    <Card key={match.id} className="border-l-4 border-l-gold">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className="p-2 bg-yellow-100 rounded-full">
-                              <Heart className="h-6 w-6 text-yellow-600" />
+                            <div className="p-2 bg-gold-light rounded-full">
+                              <Heart className="h-6 w-6 text-gold-dark" />
                             </div>
                             <div>
                               <p className="font-medium">Nouveau Match</p>
@@ -377,7 +377,7 @@ const WaliDashboard: React.FC = () => {
                               variant="outline"
                               size="sm"
                               onClick={() => rejectMatch(match.id)}
-                              className="border-red-200 text-red-600 hover:bg-red-50"
+                              className="border-destructive/30 text-destructive hover:bg-destructive/10"
                             >
                               <XCircle className="h-4 w-4 mr-1" />
                               Rejeter
@@ -385,7 +385,7 @@ const WaliDashboard: React.FC = () => {
                             <Button
                               size="sm"
                               onClick={() => approveMatch(match.id)}
-                              className="bg-green-600 hover:bg-green-700"
+                              className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
                             >
                               <CheckCircle className="h-4 w-4 mr-1" />
                               Approuver
@@ -423,8 +423,8 @@ const WaliDashboard: React.FC = () => {
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className="p-2 bg-emerald-100 rounded-full">
-                              <Users className="h-6 w-6 text-emerald-600" />
+                            <div className="p-2 bg-emerald/10 rounded-full">
+                              <Users className="h-6 w-6 text-emerald" />
                             </div>
                             <div>
                               <p className="font-medium">{user.full_name}</p>
@@ -466,7 +466,7 @@ const WaliDashboard: React.FC = () => {
                     <CardContent className="p-4">
                       <div className="space-y-2">
                         <p className="text-sm font-medium">Activité cette semaine</p>
-                        <p className="text-2xl font-bold text-emerald-600">
+                        <p className="text-2xl font-bold text-emerald">
                           {notifications.filter(n => 
                             new Date(n.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
                           ).length}
@@ -480,7 +480,7 @@ const WaliDashboard: React.FC = () => {
                     <CardContent className="p-4">
                       <div className="space-y-2">
                         <p className="text-sm font-medium">Taux d'intervention</p>
-                        <p className="text-2xl font-bold text-blue-600">
+                        <p className="text-2xl font-bold text-primary">
                           {stats.criticalAlerts > 0 ? Math.round((stats.criticalAlerts / notifications.length) * 100) : 0}%
                         </p>
                         <p className="text-xs text-muted-foreground">Messages modérés</p>

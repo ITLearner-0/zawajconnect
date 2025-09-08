@@ -47,9 +47,9 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
-      case 'critical': return <AlertTriangle className="h-4 w-4 text-red-600" />;
-      case 'high': return <AlertTriangle className="h-4 w-4 text-orange-600" />;
-      default: return <MessageSquare className="h-4 w-4 text-blue-600" />;
+     case 'critical': return <AlertTriangle className="h-4 w-4 text-destructive" />;
+     case 'high': return <AlertTriangle className="h-4 w-4 text-destructive" />;
+     default: return <MessageSquare className="h-4 w-4 text-primary" />;
     }
   };
 

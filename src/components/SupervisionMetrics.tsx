@@ -45,7 +45,7 @@ const SupervisionMetrics: React.FC<MetricsProps> = ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Messages Analysés</CardTitle>
-          <MessageSquare className="h-4 w-4 text-blue-600" />
+          <MessageSquare className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-foreground">{totalMessages}</div>
@@ -58,7 +58,7 @@ const SupervisionMetrics: React.FC<MetricsProps> = ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Alertes de Modération</CardTitle>
-          <AlertTriangle className="h-4 w-4 text-orange-600" />
+          <AlertTriangle className="h-4 w-4 text-destructive" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-foreground">{moderationAlerts}</div>
@@ -103,10 +103,10 @@ const SupervisionMetrics: React.FC<MetricsProps> = ({
                 <CheckCircle className="h-4 w-4 text-emerald" />
                 <span className="text-sm">Système Actif</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Shield className="h-4 w-4 text-blue-600" />
-                <span className="text-sm">Conforme Sharia</span>
-              </div>
+               <div className="flex items-center gap-2">
+                 <Shield className="h-4 w-4 text-primary" />
+                 <span className="text-sm">Conforme Sharia</span>
+               </div>
             </div>
           </div>
         </CardContent>
