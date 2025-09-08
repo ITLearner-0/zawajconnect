@@ -51,6 +51,9 @@ interface MatchForApproval {
   match_score: number;
   created_at: string;
   can_communicate: boolean;
+  candidate_name?: string;
+  candidate_id?: string;
+  supervised_user_name?: string;
 }
 
 interface WaliStats {
@@ -152,7 +155,35 @@ const WaliDashboard: React.FC = () => {
 
         matchData = data;
         if (matchData) {
-          setMatchesForApproval(matchData);
+          // Récupérer les profils des candidats et utilisateurs supervisés
+          const enrichedMatches = await Promise.all(
+            matchData.map(async (match) => {
+              const supervisedUserId = userIds.find(id => id === match.user1_id || id === match.user2_id);
+              const candidateId = supervisedUserId === match.user1_id ? match.user2_id : match.user1_id;
+              
+              // Récupérer le profil du candidat
+              const { data: candidateProfile } = await supabase
+                .from('profiles')
+                .select('full_name')
+                .eq('user_id', candidateId)
+                .single();
+
+              // Récupérer le profil de l'utilisateur supervisé
+              const { data: supervisedProfile } = await supabase
+                .from('profiles')
+                .select('full_name')
+                .eq('user_id', supervisedUserId)
+                .single();
+
+              return {
+                ...match,
+                candidate_name: candidateProfile?.full_name || 'Candidat inconnu',
+                candidate_id: candidateId,
+                supervised_user_name: supervisedProfile?.full_name || 'Utilisateur supervisé'
+              };
+            })
+          );
+          setMatchesForApproval(enrichedMatches);
         }
       }
 
@@ -379,39 +410,47 @@ const WaliDashboard: React.FC = () => {
                     <Card key={match.id} className="border-l-4 border-l-gold">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className="p-2 bg-gold-light rounded-full">
-                              <Heart className="h-6 w-6 text-gold-dark" />
-                            </div>
-                            <div>
-                              <p className="font-medium">Nouveau Match</p>
-                              <p className="text-sm text-muted-foreground">
-                                Score de compatibilité: {match.match_score}%
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {new Date(match.created_at).toLocaleDateString('fr-FR')}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => rejectMatch(match.id)}
-                              className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                            >
-                              <XCircle className="h-4 w-4 mr-1" />
-                              Rejeter
-                            </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => approveMatch(match.id)}
-                              className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
-                            >
-                              <CheckCircle className="h-4 w-4 mr-1" />
-                              Approuver
-                            </Button>
-                          </div>
+                           <div className="flex items-center gap-4">
+                             <div className="p-2 bg-gold-light rounded-full">
+                               <Heart className="h-6 w-6 text-gold-dark" />
+                             </div>
+                             <div>
+                               <p className="font-medium">{match.candidate_name}</p>
+                               <p className="text-sm text-muted-foreground">
+                                 Match avec {match.supervised_user_name} • Score: {match.match_score}%
+                               </p>
+                               <p className="text-xs text-muted-foreground">
+                                 {new Date(match.created_at).toLocaleDateString('fr-FR')}
+                               </p>
+                             </div>
+                           </div>
+                           <div className="flex gap-2">
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               onClick={() => handleViewProfile(match.candidate_id!)}
+                             >
+                               <Eye className="h-4 w-4 mr-1" />
+                               Voir Profil
+                             </Button>
+                             <Button
+                               variant="outline"
+                               size="sm"
+                               onClick={() => rejectMatch(match.id)}
+                               className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                             >
+                               <XCircle className="h-4 w-4 mr-1" />
+                               Rejeter
+                             </Button>
+                             <Button
+                               size="sm"
+                               onClick={() => approveMatch(match.id)}
+                               className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                             >
+                               <CheckCircle className="h-4 w-4 mr-1" />
+                               Approuver
+                             </Button>
+                           </div>
                         </div>
                       </CardContent>
                     </Card>
