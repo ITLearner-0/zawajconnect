@@ -49,9 +49,14 @@ interface PrayerTime {
 
 export function AppSidebar() {
   const { user } = useAuth();
-  const { isWali } = useUserRole();
+  const { isWali, loading: roleLoading } = useUserRole();
   const { state } = useSidebar();
   const location = useLocation();
+  
+  // Don't render sidebar if still loading roles to prevent errors
+  if (roleLoading) {
+    return null;
+  }
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [prayerTimes] = useState<PrayerTime[]>([
     { name: 'Fajr', time: '05:30' },

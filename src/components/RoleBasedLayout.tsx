@@ -4,12 +4,21 @@ import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import FamilyAccessPortal from '@/components/FamilyAccessPortal';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface RoleBasedLayoutProps {
   children: React.ReactNode;
 }
 
 const RoleBasedLayout: React.FC<RoleBasedLayoutProps> = ({ children }) => {
+  return (
+    <ErrorBoundary>
+      <RoleBasedLayoutContent>{children}</RoleBasedLayoutContent>
+    </ErrorBoundary>
+  );
+};
+
+const RoleBasedLayoutContent: React.FC<RoleBasedLayoutProps> = ({ children }) => {
   const { user, loading: authLoading } = useAuth();
   const { isWaliOnly, isRegularUser, loading: roleLoading } = useUserRole();
 
