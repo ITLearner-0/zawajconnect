@@ -425,7 +425,7 @@ const AdvancedIslamicFiltering = () => {
               <div>
                 <label className="text-sm font-medium mb-2 block">École juridique (Madhab)</label>
                 <div className="space-y-2">
-                  {['hanafi', 'maliki', 'shafi', 'hanbali', 'jafari', 'other'].map(madhab => (
+                  {['hanafi', 'maliki', 'shafi', 'hanbali', 'jafari', 'salafi', 'other'].map(madhab => (
                     <div key={madhab} className="flex items-center space-x-2">
                       <Checkbox
                         id={`madhab-${madhab}`}

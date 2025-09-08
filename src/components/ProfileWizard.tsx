@@ -349,6 +349,7 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
                     <SelectItem value="shafii">Shafi'i</SelectItem>
                     <SelectItem value="hanbali">Hanbali</SelectItem>
                     <SelectItem value="jafari">Ja'fari</SelectItem>
+                    <SelectItem value="salafi">Salafi</SelectItem>
                     <SelectItem value="autre">Autre</SelectItem>
                   </SelectContent>
                 </Select>

@@ -211,6 +211,7 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
                     <SelectItem value="maliki">Malékite</SelectItem>
                     <SelectItem value="shafii">Chaféite</SelectItem>
                     <SelectItem value="hanbali">Hanbalite</SelectItem>
+                    <SelectItem value="salafi">Salafi</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

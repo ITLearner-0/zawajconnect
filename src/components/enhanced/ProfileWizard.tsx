@@ -469,6 +469,7 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
               <SelectItem value="shafii">Chaféite</SelectItem>
               <SelectItem value="hanbali">Hanbalite</SelectItem>
               <SelectItem value="jafari">Jafarite</SelectItem>
+              <SelectItem value="salafi">Salafi</SelectItem>
               <SelectItem value="other">Autre</SelectItem>
             </SelectContent>
           </Select>

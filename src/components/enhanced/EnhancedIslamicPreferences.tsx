@@ -318,6 +318,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                           <SelectItem value="shafii">Shafi'i</SelectItem>
                           <SelectItem value="hanbali">Hanbali</SelectItem>
                           <SelectItem value="jafari">Jafari (Chiite)</SelectItem>
+                          <SelectItem value="salafi">Salafi</SelectItem>
                           <SelectItem value="other">Autre</SelectItem>
                           <SelectItem value="not_specific">Pas spécifique</SelectItem>
                         </SelectContent>

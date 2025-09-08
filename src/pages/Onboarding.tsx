@@ -478,6 +478,7 @@ const Onboarding = () => {
                     <SelectItem value="maliki">Maliki</SelectItem>
                     <SelectItem value="shafi">Shafi'i</SelectItem>
                     <SelectItem value="hanbali">Hanbali</SelectItem>
+                    <SelectItem value="salafi">Salafi</SelectItem>
                     <SelectItem value="other">Autre</SelectItem>
                   </SelectContent>
                 </Select>
