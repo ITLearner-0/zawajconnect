@@ -416,9 +416,9 @@ const WaliDashboard: React.FC = () => {
                              </div>
                              <div>
                                <p className="font-medium">{match.candidate_name}</p>
-                               <p className="text-sm text-muted-foreground">
-                                 Match avec {match.supervised_user_name} • Score: {match.match_score}%
-                               </p>
+                                <p className="text-sm text-muted-foreground">
+                                  Match avec {match.supervised_user_name} • Score: {match.match_score || 0}%
+                                </p>
                                <p className="text-xs text-muted-foreground">
                                  {new Date(match.created_at).toLocaleDateString('fr-FR')}
                                </p>
