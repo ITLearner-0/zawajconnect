@@ -97,9 +97,19 @@ const FamilySupervisionDashboard = () => {
 
       console.log('📊 Processing conversations for', (matchesData || []).length, 'matches');
 
+      // If no matches, set empty conversations but don't show error
+      if (!matchesData || matchesData.length === 0) {
+        console.log('ℹ️ No matches found for supervised user');
+        setConversations([]);
+        setLoading(false);
+        return;
+      }
+
       // Get conversation details for each match
       const conversationsWithMessages = await Promise.all(
         (matchesData || []).map(async (match) => {
+          console.log('🔄 Processing match:', match.id, 'between users:', match.user1_id, 'and', match.user2_id);
+          
           // Get profiles for both users
           const { data: user1Profile } = await supabase
             .from('profiles')
@@ -112,6 +122,8 @@ const FamilySupervisionDashboard = () => {
             .select('full_name, avatar_url')
             .eq('user_id', match.user2_id)
             .maybeSingle();
+
+          console.log('👥 Profile data:', { user1Profile, user2Profile });
 
           const { data: lastMessage } = await supabase
             .from('messages')
@@ -127,6 +139,8 @@ const FamilySupervisionDashboard = () => {
             .eq('match_id', match.id)
             .eq('is_read', false);
 
+          console.log('💬 Message data for match', match.id, ':', { lastMessage, unreadCount });
+
           return {
             id: match.id,
             match_id: match.id,
@@ -139,6 +153,7 @@ const FamilySupervisionDashboard = () => {
         }) || []
       );
 
+      console.log('📋 Final conversations:', conversationsWithMessages);
       setConversations(conversationsWithMessages);
     } catch (error) {
       console.error('Error loading supervision data:', error);
