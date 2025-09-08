@@ -141,7 +141,7 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
           })
         );
         
-        setMeetings(enrichedMeetings);
+        setMeetings(enrichedMeetings as FamilyMeeting[]);
       }
 
       // Load available matches for scheduling
