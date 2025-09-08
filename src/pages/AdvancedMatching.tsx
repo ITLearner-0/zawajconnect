@@ -7,7 +7,9 @@ import AdvancedMatchingEngine from '@/components/matching/AdvancedMatchingEngine
 import IslamicCompatibilityCalculator from '@/components/matching/IslamicCompatibilityCalculator';
 import AdvancedIslamicFiltering from '@/components/matching/AdvancedIslamicFiltering';
 import SmartRecommendationEngine from '@/components/matching/SmartRecommendationEngine';
-import { Brain, Filter, Calculator, Sparkles, Shield, Target } from 'lucide-react';
+import FamilyApprovalWorkflow from '@/components/matching/FamilyApprovalWorkflow';
+import CulturalRegionalPreferences from '@/components/matching/CulturalRegionalPreferences';
+import { Brain, Filter, Calculator, Sparkles, Shield, Target, Globe } from 'lucide-react';
 
 const AdvancedMatching = () => {
   const { user, loading } = useAuth();
@@ -44,7 +46,7 @@ const AdvancedMatching = () => {
 
           {/* Advanced Matching Tabs */}
           <Tabs defaultValue="ai-engine" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
+            <TabsList className="grid w-full grid-cols-2 md:grid-cols-6">
               <TabsTrigger value="ai-engine" className="flex items-center gap-2">
                 <Brain className="h-4 w-4" />
                 <span className="hidden sm:inline">Moteur IA</span>
@@ -60,6 +62,14 @@ const AdvancedMatching = () => {
               <TabsTrigger value="smart-recommendations" className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4" />
                 <span className="hidden sm:inline">Recommandations</span>
+              </TabsTrigger>
+              <TabsTrigger value="family-approval" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Famille</span>
+              </TabsTrigger>
+              <TabsTrigger value="cultural-preferences" className="flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                <span className="hidden sm:inline">Culture</span>
               </TabsTrigger>
             </TabsList>
 
@@ -113,6 +123,32 @@ const AdvancedMatching = () => {
                 </p>
               </div>
               <SmartRecommendationEngine />
+            </TabsContent>
+
+            <TabsContent value="family-approval" className="space-y-6">
+              <div className="text-center space-y-2 mb-6">
+                <div className="flex items-center justify-center gap-2">
+                  <Shield className="h-6 w-6 text-primary" />
+                  <h2 className="text-2xl font-semibold">Approbation Familiale</h2>
+                </div>
+                <p className="text-muted-foreground">
+                  Workflow d'approbation des matches par la famille selon les valeurs islamiques
+                </p>
+              </div>
+              <FamilyApprovalWorkflow />
+            </TabsContent>
+
+            <TabsContent value="cultural-preferences" className="space-y-6">
+              <div className="text-center space-y-2 mb-6">
+                <div className="flex items-center justify-center gap-2">
+                  <Globe className="h-6 w-6 text-primary" />
+                  <h2 className="text-2xl font-semibold">Préférences Culturelles</h2>
+                </div>
+                <p className="text-muted-foreground">
+                  Trouvez des personnes partageant vos origines culturelles et régionales
+                </p>
+              </div>
+              <CulturalRegionalPreferences />
             </TabsContent>
           </Tabs>
         </div>
