@@ -66,9 +66,9 @@ export const useUserRole = (): UserRole => {
       });
 
       const finalRole = {
-        isWaliOnly: isInvitedWali && !hasCompleteProfile, // Seuls les walis sans profil complet vont vers FamilyAccessPortal
-        isRegularUser: hasCompleteProfile || !isInvitedWali, // Utilisateurs avec profil complet ou non-walis
-        isWali: isInvitedWali, // Flag pour identifier les walis (peu importe leur profil)
+        isWaliOnly: false, // Les walis ont accès au layout principal pour supervision
+        isRegularUser: hasCompleteProfile || isInvitedWali, // Profil complet OU wali
+        isWali: isInvitedWali, // Flag pour identifier les walis
         loading: false
       };
 
