@@ -1,7 +1,9 @@
 import { ReactNode } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRole } from '@/hooks/useUserRole';
 import Header from '@/components/Header';
 import { AppSidebar } from '@/components/AppSidebar';
+import WaliNotificationCenter from '@/components/WaliNotificationCenter';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -27,6 +29,7 @@ interface AppLayoutProps {
 
 const AppLayout = ({ children }: AppLayoutProps) => {
   const { user, signOut } = useAuth();
+  const { isWali } = useUserRole();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
 
@@ -97,6 +100,9 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           </div>
         </main>
       </div>
+      
+      {/* Wali Notification Center */}
+      {isWali && !isMobile && <WaliNotificationCenter />}
       
       {/* Mobile Bottom Navigation */}
       {isMobile && <MobileBottomNav />}

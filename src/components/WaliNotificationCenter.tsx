@@ -143,8 +143,8 @@ const WaliNotificationCenter: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed top-4 right-4 z-50">
-      <Card className="w-80 max-h-96 overflow-hidden shadow-lg">
+    <div className="fixed top-20 right-4 z-40">
+      <Card className="w-80 max-h-96 overflow-hidden shadow-lg border border-border/50 bg-card/95 backdrop-blur-sm">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center gap-2">

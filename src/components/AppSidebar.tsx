@@ -76,9 +76,17 @@ export function AppSidebar() {
     { path: '/settings', icon: Settings, label: 'Paramètres', group: 'main' },
   ];
 
-  // Ajouter le lien de supervision familiale pour les walis
+  // Add family supervision items for walis
+  const waliNavItems = [
+    { path: '/wali-dashboard', icon: Shield, label: 'Tableau de Bord Wali', group: 'family' },
+    { path: '/match-approval', icon: Heart, label: 'Approbation Matches', group: 'family' },
+    { path: '/family-analytics', icon: Brain, label: 'Analytics Famille', group: 'family' },
+    { path: '/moderation-tests', icon: Settings, label: 'Tests Modération', group: 'family' },
+    { path: '/family-supervision', icon: Users, label: 'Supervision Familiale', group: 'family' }
+  ];
+
   const navItems = isWali 
-    ? [...baseNavItems, { path: '/family-supervision', icon: Shield, label: 'Supervision Familiale', group: 'family' }]
+    ? [...baseNavItems, ...waliNavItems]
     : baseNavItems;
 
   const groupedNavItems = {
