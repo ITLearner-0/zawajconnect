@@ -52,6 +52,7 @@ function App() {
         >
           <Routes>
             {/* Public routes - no authentication required */}
+            <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/invitation" element={<InvitationAuth />} />
@@ -60,7 +61,6 @@ function App() {
             <Route path="/*" element={
               <RoleBasedLayout>
                 <Routes>
-                  <Route path="/" element={<Index />} />
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/browse" element={<Browse />} />
                   <Route path="/matches" element={<Matches />} />
