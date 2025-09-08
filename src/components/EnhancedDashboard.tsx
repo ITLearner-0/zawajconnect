@@ -224,11 +224,11 @@ const EnhancedDashboard = () => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'like':
-        return <Heart className="h-4 w-4 text-red-500" />;
+                        return <Heart className="h-4 w-4 text-destructive" />;
       case 'match':
         return <Star className="h-4 w-4 text-gold" />;
       case 'message':
-        return <MessageCircle className="h-4 w-4 text-blue-500" />;
+        return <MessageCircle className="h-4 w-4 text-primary" />;
       case 'view':
         return <Eye className="h-4 w-4 text-emerald" />;
       default:
@@ -320,19 +320,19 @@ const EnhancedDashboard = () => {
                     </Card>
                     
                     <Card className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-4 text-center">
-                        <MessageCircle className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-blue-500">{stats.messages_count}</div>
-                        <div className="text-sm text-muted-foreground">Messages Envoyés</div>
-                      </CardContent>
+                       <CardContent className="p-4 text-center">
+                         <MessageCircle className="h-8 w-8 text-primary mx-auto mb-2" />
+                         <div className="text-2xl font-bold text-primary">{stats.messages_count}</div>
+                         <div className="text-sm text-muted-foreground">Messages Envoyés</div>
+                       </CardContent>
                     </Card>
                     
                     <Card className="hover:shadow-md transition-shadow">
-                      <CardContent className="p-4 text-center">
-                        <Eye className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-purple-500">{stats.profile_views}</div>
-                        <div className="text-sm text-muted-foreground">Vues de Profil</div>
-                      </CardContent>
+                       <CardContent className="p-4 text-center">
+                         <Eye className="h-8 w-8 text-secondary mx-auto mb-2" />
+                         <div className="text-2xl font-bold text-secondary">{stats.profile_views}</div>
+                         <div className="text-sm text-muted-foreground">Vues de Profil</div>
+                       </CardContent>
                     </Card>
                     
                     <Card className="hover:shadow-md transition-shadow">
@@ -383,7 +383,7 @@ const EnhancedDashboard = () => {
                           onClick={() => navigate('/chat')}
                           className="justify-start h-auto p-4 flex-col items-start"
                         >
-                          <MessageCircle className="h-6 w-6 text-blue-500 mb-2" />
+                          <MessageCircle className="h-6 w-6 text-primary mb-2" />
                           <div>
                             <div className="font-semibold">Messages</div>
                             <div className="text-sm text-muted-foreground">Conversations</div>

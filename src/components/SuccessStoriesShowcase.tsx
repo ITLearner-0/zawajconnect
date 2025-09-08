@@ -223,8 +223,8 @@ const SuccessStoriesShowcase = () => {
         
         <Card className="text-center">
           <CardContent className="p-4">
-            <MapPin className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-purple-600">{stats.countries_represented}</div>
+             <MapPin className="h-8 w-8 text-accent mx-auto mb-2" />
+             <div className="text-2xl font-bold text-accent">{stats.countries_represented}</div>
             <div className="text-sm text-muted-foreground">Pays Représentés</div>
           </CardContent>
         </Card>

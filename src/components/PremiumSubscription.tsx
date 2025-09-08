@@ -367,9 +367,9 @@ const PremiumSubscription = () => {
             </div>
             
             <div className="text-center space-y-3">
-              <div className="h-12 w-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto">
-                <MessageCircle className="h-6 w-6 text-purple-600" />
-              </div>
+             <div className="h-12 w-12 bg-secondary/10 rounded-full flex items-center justify-center mx-auto">
+               <MessageCircle className="h-6 w-6 text-secondary" />
+             </div>
               <h3 className="font-semibold">Messages Prioritaires</h3>
               <p className="text-sm text-muted-foreground">
                 Vos messages arrivent en premier dans la boîte de réception
