@@ -35,9 +35,9 @@ export const useFamilySupervision = () => {
   const [notifications, setNotifications] = useState<FamilyNotification[]>([]);
   const [supervisionStatus, setSupervisionStatus] = useState<SupervisionStatus>({
     hasWali: false,
-    canCommunicate: false,
-    familyApproved: false,
-    supervisionRequired: true
+    canCommunicate: true, // Default to true, will be set to false only for females without wali
+    familyApproved: true, // Default to true, will be set to false only for females without wali
+    supervisionRequired: false // Default to false, will be set to true only for females without wali
   });
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
