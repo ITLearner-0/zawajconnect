@@ -28,12 +28,15 @@ interface FamilyMember {
 }
 
 const FamilySupervisionDashboard = () => {
+  console.log('🎯 Component render started');
   const { user } = useAuth();
+  console.log('👤 User from auth:', user);
   const [conversations, setConversations] = useState<SupervisedConversation[]>([]);
   const [familyRole, setFamilyRole] = useState<FamilyMember | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('🚀 FamilySupervisionDashboard mounted, user:', user);
     if (user) {
       loadSupervisionData();
     }
