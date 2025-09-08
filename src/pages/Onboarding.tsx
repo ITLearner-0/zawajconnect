@@ -156,6 +156,8 @@ const Onboarding = () => {
         .upsert({
           user_id: user.id,
           ...profileData
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) throw error;
@@ -170,11 +172,21 @@ const Onboarding = () => {
     if (!user) return false;
     
     try {
+      // Filter out empty strings and replace with null for database constraints
+      const cleanPrefs = Object.fromEntries(
+        Object.entries(islamicPrefs).map(([key, value]) => [
+          key,
+          value === '' ? null : value
+        ])
+      );
+
       const { error } = await supabase
         .from('islamic_preferences')
         .upsert({
           user_id: user.id,
-          ...islamicPrefs
+          ...cleanPrefs
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) throw error;
