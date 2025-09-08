@@ -52,11 +52,6 @@ export function AppSidebar() {
   const { isWali, loading: roleLoading } = useUserRole();
   const { state } = useSidebar();
   const location = useLocation();
-  
-  // Don't render sidebar if still loading roles to prevent errors
-  if (roleLoading) {
-    return null;
-  }
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [prayerTimes] = useState<PrayerTime[]>([
     { name: 'Fajr', time: '05:30' },
@@ -129,7 +124,8 @@ export function AppSidebar() {
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted/50";
 
-  if (!user) return null;
+  // Don't render sidebar if still loading roles to prevent errors
+  if (!user || roleLoading) return null;
 
   return (
     <Sidebar collapsible="icon">
