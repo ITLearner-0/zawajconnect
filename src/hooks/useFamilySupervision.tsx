@@ -125,17 +125,31 @@ export const useFamilySupervision = () => {
       console.log('📋 Combined family data:', allFamilyData);
       setFamilyMembers(allFamilyData);
       
+      // Check user's gender to determine if family supervision is needed
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('gender')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      // Only women need family supervision according to Islamic principles
+      const isUserFemale = userProfile?.gender === 'female';
+      
       // Check supervision status - user is a wali if they appear in invited_user_id
       const isWali = (familyDataAsWali || []).length > 0;
       const hasWali = isWali || (familyDataAsUser || []).some(member => member.is_wali);
       
-      console.log('🛡️ loadFamilyData - isWali:', isWali, 'hasWali:', hasWali);
+      console.log('🛡️ loadFamilyData - isWali:', isWali, 'hasWali:', hasWali, 'isUserFemale:', isUserFemale);
       
       const newStatus = {
         ...supervisionStatus,
         hasWali,
-        canCommunicate: hasWali || isWali, // Can communicate if has wali OR is wali
-        familyApproved: hasWali || isWali
+        // For men: can always communicate (no family supervision required)
+        // For women: can communicate if has wali OR is a wali herself
+        // For walis: can always communicate
+        canCommunicate: !isUserFemale || hasWali || isWali,
+        familyApproved: !isUserFemale || hasWali || isWali,
+        supervisionRequired: isUserFemale && !hasWali && !isWali
       };
       
       console.log('🔄 Setting new supervision status:', newStatus);
