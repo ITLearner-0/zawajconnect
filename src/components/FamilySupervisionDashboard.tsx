@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,7 @@ interface FamilyMember {
 const FamilySupervisionDashboard = () => {
   console.log('🎯 Component render started');
   const { user } = useAuth();
+  const navigate = useNavigate();
   console.log('👤 User from auth:', user);
   const [conversations, setConversations] = useState<SupervisedConversation[]>([]);
   const [familyRole, setFamilyRole] = useState<FamilyMember | null>(null);
@@ -196,8 +198,8 @@ const FamilySupervisionDashboard = () => {
 
       console.log('✅ Successfully joined conversation');
       
-      // Navigate to chat with supervision
-      window.location.href = `/chat?matchId=${matchId}&supervision=true`;
+      // Navigate to chat with supervision using React Router
+      navigate(`/chat?matchId=${matchId}&supervision=true`);
     } catch (error) {
       console.error('💥 Error joining conversation:', error);
       toast({
