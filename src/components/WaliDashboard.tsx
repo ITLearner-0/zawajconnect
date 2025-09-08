@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
+import SupervisionMetrics from '@/components/SupervisionMetrics';
+import NotificationCenter from '@/components/NotificationCenter';
 import { 
   Shield, 
   Users, 
@@ -15,8 +17,8 @@ import {
   Clock,
   Eye,
   Heart,
-  TrendingUp,
-  Calendar
+  Calendar,
+  TrendingUp
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -48,35 +50,24 @@ interface MatchForApproval {
   match_score: number;
   created_at: string;
   can_communicate: boolean;
-  family_approved?: boolean;
-  other_user: {
-    full_name: string;
-    age?: number;
-    profession?: string;
-    location?: string;
-  };
 }
 
 interface WaliStats {
   totalSupervised: number;
-  activeMatches: number;
-  pendingApprovals: number;
   criticalAlerts: number;
-  messagesModerated: number;
+  pendingApprovals: number;
   approvalRate: number;
 }
 
 const WaliDashboard: React.FC = () => {
-  const [notifications, setNotifications] = useState<FamilyNotification[]>([]);
   const [supervisedUsers, setSupervisedUsers] = useState<SupervisedUser[]>([]);
+  const [notifications, setNotifications] = useState<FamilyNotification[]>([]);
   const [matchesForApproval, setMatchesForApproval] = useState<MatchForApproval[]>([]);
   const [stats, setStats] = useState<WaliStats>({
     totalSupervised: 0,
-    activeMatches: 0,
-    pendingApprovals: 0,
     criticalAlerts: 0,
-    messagesModerated: 0,
-    approvalRate: 0
+    pendingApprovals: 0,
+    approvalRate: 85
   });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -128,55 +119,38 @@ const WaliDashboard: React.FC = () => {
       }
 
       // Charger les matches en attente d'approbation
-      if (familyMembers && familyMembers.length > 0) {
-        const userIds = familyMembers.map(fm => fm.user_id);
-        const { data: matches } = await supabase
+      const userIds = familyMembers?.map(fm => fm.user_id) || [];
+      let matchData = null;
+      if (userIds.length > 0) {
+        const { data } = await supabase
           .from('matches')
-          .select(`
-            id,
-            user1_id,
-            user2_id,
-            match_score,
-            created_at,
-            can_communicate,
-            family_approved
-          `)
-          .in('user1_id', userIds)
-          .eq('is_mutual', true)
-          .is('family_approved', null);
+          .select('*')
+          .or(`user1_id.in.(${userIds.join(',')}),user2_id.in.(${userIds.join(',')})`)
+          .eq('family_supervision_required', true)
+          .is('family1_approved', null);
 
-        if (matches) {
-          const formattedMatches = matches.map(match => ({
-            ...match,
-            other_user: {
-              full_name: 'Utilisateur',
-              age: undefined,
-              profession: undefined,
-              location: undefined
-            }
-          }));
-          setMatchesForApproval(formattedMatches);
+        matchData = data;
+        if (matchData) {
+          setMatchesForApproval(matchData);
         }
       }
 
-      // Calculer les statistiques
-      const criticalAlerts = notificationData?.filter(n => n.severity === 'critical' && !n.is_read).length || 0;
-      const pendingApprovals = matchesForApproval.length;
-      
+      // Calculer les stats
+      const criticalCount = notificationData?.filter(n => n.severity === 'critical').length || 0;
+      const pendingCount = matchData?.length || 0;
+
       setStats({
         totalSupervised: familyMembers?.length || 0,
-        activeMatches: 0, // À calculer
-        pendingApprovals,
-        criticalAlerts,
-        messagesModerated: 0, // À calculer depuis moderation_logs
-        approvalRate: 85 // À calculer réellement
+        criticalAlerts: criticalCount,
+        pendingApprovals: pendingCount,
+        approvalRate: 85
       });
 
     } catch (error) {
-      console.error('Error loading Wali data:', error);
+      console.error('Error loading wali data:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de charger les données de supervision",
+        description: "Impossible de charger les données",
         variant: "destructive"
       });
     } finally {
@@ -192,12 +166,13 @@ const WaliDashboard: React.FC = () => {
         schema: 'public',
         table: 'family_notifications'
       }, (payload) => {
-        setNotifications(prev => [payload.new as FamilyNotification, ...prev]);
+        const newNotification = payload.new as FamilyNotification;
+        setNotifications(prev => [newNotification, ...prev]);
         
-        if (payload.new.severity === 'critical') {
+        if (newNotification.severity === 'critical') {
           toast({
             title: "🚨 Alerte Critique",
-            description: payload.new.content,
+            description: newNotification.content,
             variant: "destructive"
           });
         }
@@ -207,50 +182,16 @@ const WaliDashboard: React.FC = () => {
     return () => supabase.removeChannel(channel);
   };
 
-  const handleApproveMatch = async (matchId: string, approved: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('matches')
-        .update({ 
-          family_approved: approved,
-          can_communicate: approved,
-          family_reviewed_at: new Date().toISOString()
-        })
-        .eq('id', matchId);
-
-      if (error) throw error;
-
-      setMatchesForApproval(prev => prev.filter(match => match.id !== matchId));
-      
-      toast({
-        title: approved ? "Match approuvé" : "Match refusé",
-        description: approved 
-          ? "La communication est maintenant autorisée" 
-          : "Le match a été refusé selon vos directives",
-        variant: approved ? "default" : "destructive"
-      });
-    } catch (error) {
-      console.error('Error approving match:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de traiter l'approbation",
-        variant: "destructive"
-      });
-    }
-  };
-
-  const markNotificationAsRead = async (notificationId: string) => {
+  const markNotificationAsRead = async (id: string) => {
     try {
       await supabase
         .from('family_notifications')
         .update({ is_read: true, read_at: new Date().toISOString() })
-        .eq('id', notificationId);
+        .eq('id', id);
 
       setNotifications(prev => 
         prev.map(notif => 
-          notif.id === notificationId 
-            ? { ...notif, is_read: true }
-            : notif
+          notif.id === id ? { ...notif, is_read: true } : notif
         )
       );
     } catch (error) {
@@ -258,21 +199,75 @@ const WaliDashboard: React.FC = () => {
     }
   };
 
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'critical': return 'destructive';
-      case 'high': return 'destructive';
-      case 'medium': return 'secondary';
-      case 'low': return 'outline';
-      default: return 'secondary';
+  const markAllNotificationsAsRead = async () => {
+    try {
+      const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id);
+      
+      if (unreadIds.length > 0) {
+        await supabase
+          .from('family_notifications')
+          .update({ is_read: true, read_at: new Date().toISOString() })
+          .in('id', unreadIds);
+
+        setNotifications(prev => 
+          prev.map(notif => ({ ...notif, is_read: true }))
+        );
+      }
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
     }
   };
 
-  const getSeverityIcon = (severity: string) => {
-    switch (severity) {
-      case 'critical': return <AlertTriangle className="h-4 w-4" />;
-      case 'high': return <AlertTriangle className="h-4 w-4" />;
-      default: return <MessageSquare className="h-4 w-4" />;
+  const approveMatch = async (matchId: string) => {
+    try {
+      await supabase
+        .from('matches')
+        .update({ 
+          family1_approved: true,
+          can_communicate: true,
+          family_reviewed_at: new Date().toISOString()
+        })
+        .eq('id', matchId);
+
+      setMatchesForApproval(prev => prev.filter(m => m.id !== matchId));
+      
+      toast({
+        title: "Match approuvé",
+        description: "Le match a été approuvé avec succès"
+      });
+    } catch (error) {
+      console.error('Error approving match:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'approuver le match",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const rejectMatch = async (matchId: string) => {
+    try {
+      await supabase
+        .from('matches')
+        .update({ 
+          family1_approved: false,
+          family_reviewed_at: new Date().toISOString()
+        })
+        .eq('id', matchId);
+
+      setMatchesForApproval(prev => prev.filter(m => m.id !== matchId));
+      
+      toast({
+        title: "Match rejeté",
+        description: "Le match a été rejeté"
+      });
+    } catch (error) {
+      console.error('Error rejecting match:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de rejeter le match",
+        variant: "destructive"
+      });
     }
   };
 
@@ -302,56 +297,13 @@ const WaliDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Supervisés</p>
-                <p className="text-2xl font-bold">{stats.totalSupervised}</p>
-              </div>
-              <Users className="h-8 w-8 text-primary" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Alertes Critiques</p>
-                <p className="text-2xl font-bold text-red-600">{stats.criticalAlerts}</p>
-              </div>
-              <AlertTriangle className="h-8 w-8 text-red-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">En Attente</p>
-                <p className="text-2xl font-bold text-yellow-600">{stats.pendingApprovals}</p>
-              </div>
-              <Clock className="h-8 w-8 text-yellow-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Taux Approbation</p>
-                <p className="text-2xl font-bold text-green-600">{stats.approvalRate}%</p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Métriques de supervision avec le nouveau composant */}
+      <SupervisionMetrics
+        activeSupervisions={stats.totalSupervised}
+        totalMessages={notifications.filter(n => n.notification_type === 'inappropriate_content').length}
+        moderationAlerts={stats.criticalAlerts}
+        approvalsPending={stats.pendingApprovals}
+      />
 
       {/* Main Content */}
       <Tabs defaultValue="notifications" className="space-y-6">
@@ -378,64 +330,11 @@ const WaliDashboard: React.FC = () => {
 
         {/* Notifications Tab */}
         <TabsContent value="notifications" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Notifications Récentes</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {notifications.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Shield className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <p className="text-muted-foreground">Aucune notification pour le moment</p>
-                    <p className="text-sm text-muted-foreground">
-                      Vous serez alerté en cas de contenu inapproprié
-                    </p>
-                  </div>
-                ) : (
-                  notifications.map((notification) => (
-                    <Alert 
-                      key={notification.id}
-                      className={`${!notification.is_read ? 'border-primary bg-primary/5' : ''}`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-start gap-3">
-                          {getSeverityIcon(notification.severity)}
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge variant={getSeverityColor(notification.severity)}>
-                                {notification.severity.toUpperCase()}
-                              </Badge>
-                              <span className="text-sm text-muted-foreground">
-                                {new Date(notification.created_at).toLocaleString('fr-FR')}
-                              </span>
-                            </div>
-                            <AlertDescription className="text-sm">
-                              {notification.content}
-                            </AlertDescription>
-                            {notification.original_message && (
-                              <div className="mt-2 p-2 bg-muted rounded text-sm">
-                                <strong>Message original:</strong> {notification.original_message}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        {!notification.is_read && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => markNotificationAsRead(notification.id)}
-                          >
-                            Marquer lu
-                          </Button>
-                        )}
-                      </div>
-                    </Alert>
-                  ))
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          <NotificationCenter
+            notifications={notifications}
+            onMarkAsRead={markNotificationAsRead}
+            onMarkAllAsRead={markAllNotificationsAsRead}
+          />
         </TabsContent>
 
         {/* Approvals Tab */}
@@ -460,37 +359,35 @@ const WaliDashboard: React.FC = () => {
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <div className="p-2 bg-primary/10 rounded-full">
-                              <Heart className="h-6 w-6 text-primary" />
+                            <div className="p-2 bg-yellow-100 rounded-full">
+                              <Heart className="h-6 w-6 text-yellow-600" />
                             </div>
                             <div>
-                              <h4 className="font-semibold">{match.other_user.full_name}</h4>
+                              <p className="font-medium">Nouveau Match</p>
                               <p className="text-sm text-muted-foreground">
-                                {match.other_user.profession && `${match.other_user.profession} • `}
-                                {match.other_user.location}
+                                Score de compatibilité: {match.match_score}%
                               </p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <Badge variant="outline">
-                                  Compatibilité: {match.match_score}%
-                                </Badge>
-                                <span className="text-sm text-muted-foreground">
-                                  {new Date(match.created_at).toLocaleDateString('fr-FR')}
-                                </span>
-                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(match.created_at).toLocaleDateString('fr-FR')}
+                              </p>
                             </div>
                           </div>
                           <div className="flex gap-2">
                             <Button
                               variant="outline"
-                              onClick={() => handleApproveMatch(match.id, false)}
+                              size="sm"
+                              onClick={() => rejectMatch(match.id)}
+                              className="border-red-200 text-red-600 hover:bg-red-50"
                             >
-                              <XCircle className="h-4 w-4 mr-2" />
-                              Refuser
+                              <XCircle className="h-4 w-4 mr-1" />
+                              Rejeter
                             </Button>
                             <Button
-                              onClick={() => handleApproveMatch(match.id, true)}
+                              size="sm"
+                              onClick={() => approveMatch(match.id)}
+                              className="bg-green-600 hover:bg-green-700"
                             >
-                              <CheckCircle className="h-4 w-4 mr-2" />
+                              <CheckCircle className="h-4 w-4 mr-1" />
                               Approuver
                             </Button>
                           </div>
@@ -511,24 +408,46 @@ const WaliDashboard: React.FC = () => {
               <CardTitle>Utilisateurs Supervisés</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {supervisedUsers.map((user) => (
-                  <Card key={user.id}>
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                          <Users className="h-5 w-5 text-primary" />
+              <div className="space-y-4">
+                {supervisedUsers.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">Aucun utilisateur supervisé</p>
+                    <p className="text-sm text-muted-foreground">
+                      Les invitations en attente apparaîtront ici
+                    </p>
+                  </div>
+                ) : (
+                  supervisedUsers.map((user) => (
+                    <Card key={user.id} className="border">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="p-2 bg-emerald-100 rounded-full">
+                              <Users className="h-6 w-6 text-emerald-600" />
+                            </div>
+                            <div>
+                              <p className="font-medium">{user.full_name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Relation: {user.relationship}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4 mr-1" />
+                              Voir Profil
+                            </Button>
+                            <Button variant="outline" size="sm">
+                              <MessageSquare className="h-4 w-4 mr-1" />
+                              Conversations
+                            </Button>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-semibold">{user.full_name}</h4>
-                          <p className="text-sm text-muted-foreground capitalize">
-                            {user.relationship}
-                          </p>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
@@ -536,64 +455,77 @@ const WaliDashboard: React.FC = () => {
 
         {/* Reports Tab */}
         <TabsContent value="reports" className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Activité Cette Semaine</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>Messages modérés</span>
-                      <span>12/20</span>
-                    </div>
-                    <Progress value={60} />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>Matches approuvés</span>
-                      <span>3/5</span>
-                    </div>
-                    <Progress value={60} />
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>Alertes traitées</span>
-                      <span>8/8</span>
-                    </div>
-                    <Progress value={100} />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Rapports de Supervision</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Activité cette semaine</p>
+                        <p className="text-2xl font-bold text-emerald-600">
+                          {notifications.filter(n => 
+                            new Date(n.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                          ).length}
+                        </p>
+                        <p className="text-xs text-muted-foreground">Nouvelles notifications</p>
+                      </div>
+                    </CardContent>
+                  </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Résumé Mensuel</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Total matches supervisés</span>
-                    <Badge variant="secondary">15</Badge>
+                  <Card>
+                    <CardContent className="p-4">
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium">Taux d'intervention</p>
+                        <p className="text-2xl font-bold text-blue-600">
+                          {stats.criticalAlerts > 0 ? Math.round((stats.criticalAlerts / notifications.length) * 100) : 0}%
+                        </p>
+                        <p className="text-xs text-muted-foreground">Messages modérés</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">Tendances de Modération</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Contenu Inapproprié</span>
+                      <span className="text-sm font-medium">
+                        {notifications.filter(n => n.notification_type === 'inappropriate_content').length}
+                      </span>
+                    </div>
+                    <Progress 
+                      value={notifications.length > 0 ? 
+                        (notifications.filter(n => n.notification_type === 'inappropriate_content').length / notifications.length) * 100 
+                        : 0
+                      } 
+                      className="h-2" 
+                    />
                   </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Taux d'approbation</span>
-                    <Badge variant="outline">85%</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Contenus modérés</span>
-                    <Badge variant="destructive">23</Badge>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Temps de réponse moyen</span>
-                    <Badge variant="outline">2h 15m</Badge>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm">Alertes Critiques</span>
+                      <span className="text-sm font-medium">
+                        {notifications.filter(n => n.severity === 'critical').length}
+                      </span>
+                    </div>
+                    <Progress 
+                      value={notifications.length > 0 ? 
+                        (notifications.filter(n => n.severity === 'critical').length / notifications.length) * 100 
+                        : 0
+                      } 
+                      className="h-2" 
+                    />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
