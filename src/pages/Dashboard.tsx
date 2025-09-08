@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { User, Heart, Settings, Eye, Save, Camera, MapPin, Briefcase, GraduationCap } from 'lucide-react';
+import { User, Heart, Settings, Eye, Save, Camera, MapPin, Briefcase, GraduationCap, Brain, Target, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import PhotoUpload from '@/components/PhotoUpload';
@@ -237,7 +237,7 @@ const Dashboard = () => {
         <CompatibilityPrompt />
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
@@ -266,8 +266,72 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
+          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/advanced-matching')}>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <Brain className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-sm font-medium">Matching IA</p>
+                  <p className="text-xs text-muted-foreground">
+                    Système avancé
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           <CompatibilityCard compact />
         </div>
+
+        {/* Advanced Matching Features */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Brain className="h-5 w-5 text-primary" />
+              Système de Matching Avancé
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Découvrez vos compatibilités avec notre IA spécialisée dans les valeurs islamiques
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="border-2 border-primary/20 hover:border-primary/40 transition-colors cursor-pointer" onClick={() => navigate('/advanced-matching?tab=ai-engine')}>
+                <CardContent className="p-4 text-center">
+                  <Brain className="h-8 w-8 text-primary mx-auto mb-2" />
+                  <h3 className="font-semibold">Moteur IA</h3>
+                  <p className="text-xs text-muted-foreground">Analyse de compatibilité intelligente</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-2 border-emerald/20 hover:border-emerald/40 transition-colors cursor-pointer" onClick={() => navigate('/advanced-matching?tab=islamic-filters')}>
+                <CardContent className="p-4 text-center">
+                  <Target className="h-8 w-8 text-emerald mx-auto mb-2" />
+                  <h3 className="font-semibold">Filtres Islamiques</h3>
+                  <p className="text-xs text-muted-foreground">Critères religieux avancés</p>
+                </CardContent>
+              </Card>
+              
+              <Card className="border-2 border-gold/20 hover:border-gold/40 transition-colors cursor-pointer" onClick={() => navigate('/advanced-matching?tab=smart-recommendations')}>
+                <CardContent className="p-4 text-center">
+                  <Sparkles className="h-8 w-8 text-gold mx-auto mb-2" />
+                  <h3 className="font-semibold">Recommandations IA</h3>
+                  <p className="text-xs text-muted-foreground">Suggestions personnalisées</p>
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div className="flex justify-center pt-2">
+              <Button 
+                onClick={() => navigate('/advanced-matching')}
+                className="bg-gradient-to-r from-primary via-primary-glow to-emerald-600 hover:from-primary-dark hover:via-primary hover:to-emerald-700 text-white"
+              >
+                <Brain className="h-4 w-4 mr-2" />
+                Accéder au Matching Avancé
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
 
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
           {/* Main Content */}
