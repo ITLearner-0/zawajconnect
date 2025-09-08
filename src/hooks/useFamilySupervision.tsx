@@ -80,27 +80,42 @@ export const useFamilySupervision = () => {
       console.log('👤 loadFamilyData - user:', user?.id);
       if (!user) return;
 
-      const { data: familyData, error } = await supabase
+      // Check if user is a family member (invited as wali) OR has family members
+      const { data: familyDataAsWali, error: waliError } = await supabase
+        .from('family_members')
+        .select('*')
+        .eq('invited_user_id', user.id)
+        .eq('invitation_status', 'accepted')
+        .order('created_at', { ascending: false });
+
+      const { data: familyDataAsUser, error: userError } = await supabase
         .from('family_members')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      console.log('👨‍👩‍👧‍👦 loadFamilyData - family data:', familyData, 'error:', error);
+      console.log('👨‍👩‍👧‍👦 loadFamilyData - wali data:', familyDataAsWali, 'user data:', familyDataAsUser);
+      console.log('❓ Errors:', { waliError, userError });
 
-      if (error) throw error;
+      if (waliError || userError) {
+        throw waliError || userError;
+      }
 
-      setFamilyMembers(familyData || []);
+      // Combine both results
+      const allFamilyData = [...(familyDataAsWali || []), ...(familyDataAsUser || [])];
+      setFamilyMembers(allFamilyData);
       
-      // Check supervision status
-      const hasWali = familyData?.some(member => member.is_wali) || false;
-      console.log('🛡️ loadFamilyData - hasWali:', hasWali);
+      // Check supervision status - user is a wali if they appear in invited_user_id
+      const isWali = (familyDataAsWali || []).length > 0;
+      const hasWali = isWali || (familyDataAsUser || []).some(member => member.is_wali);
+      
+      console.log('🛡️ loadFamilyData - isWali:', isWali, 'hasWali:', hasWali);
       
       setSupervisionStatus(prev => ({
         ...prev,
         hasWali,
-        canCommunicate: hasWali, // Can only communicate if has wali
-        familyApproved: hasWali
+        canCommunicate: hasWali || isWali, // Can communicate if has wali OR is wali
+        familyApproved: hasWali || isWali
       }));
 
     } catch (error) {
