@@ -281,7 +281,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
     
     try {
       // First, moderate the content using Islamic values
-      const moderationResult = await moderateContent(newMessage.trim(), user.id, 'chat');
+      const moderationResult = await moderateContent(newMessage.trim(), user.id, 'chat', matchId);
       
       // Handle moderation result
       if (!moderationResult.approved) {

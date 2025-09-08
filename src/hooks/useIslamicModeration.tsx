@@ -29,7 +29,8 @@ export const useIslamicModeration = () => {
   const moderateContent = async (
     content: string,
     userId: string,
-    context?: string
+    context?: string,
+    matchId?: string
   ): Promise<ModerationResult> => {
     setIsChecking(true);
     
@@ -40,6 +41,7 @@ export const useIslamicModeration = () => {
         body: {
           content,
           userId,
+          matchId,
           context
         }
       });

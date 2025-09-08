@@ -1,26 +1,20 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.0';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface ModerationRequest {
-  content: string;
-  userId: string;
-  context?: string;
-}
-
 interface ModerationResult {
   approved: boolean;
-  action: 'approved' | 'blocked' | 'escalated' | 'warned';
+  action: 'approved' | 'blocked' | 'escalated';
   confidence: number;
   rulesTriggered: string[];
+  reason: string;
   suggestion?: string;
   islamicGuidance?: string;
-  reason: string;
+  severity?: string;
 }
 
 serve(async (req) => {
@@ -30,73 +24,60 @@ serve(async (req) => {
   }
 
   try {
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-    if (!openAIApiKey) {
-      throw new Error('OPENAI_API_KEY is not set');
-    }
-
     // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
-    const { content, userId, context = 'message' }: ModerationRequest = await req.json();
+    const { content, userId, matchId } = await req.json();
+
+    if (!content || !userId) {
+      return new Response(
+        JSON.stringify({ error: 'Content and userId are required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     console.log(`Moderating content for user ${userId}: "${content}"`);
 
-    // Get active moderation rules
-    const { data: rules, error: rulesError } = await supabase
-      .from('islamic_moderation_rules')
-      .select('*')
-      .eq('is_active', true);
-
-    if (rulesError) {
-      console.error('Error fetching moderation rules:', rulesError);
-      throw rulesError;
-    }
-
-    // Create AI prompt for Islamic values moderation with strict supervision rules
+    // Prepare moderation prompt
     const moderationPrompt = `
-Tu es un modérateur IA ULTRA-STRICT spécialisé dans les valeurs islamiques pour une application de rencontre musulmane respectant INTÉGRALEMENT la Sharia.
+Analyse ce message selon les principes islamiques stricts pour une application de rencontre musulmane:
 
-RÈGLES ABSOLUES - AUCUNE EXCEPTION :
-1. INTERDICTION TOTALE de partager des informations de contact (numéro de téléphone, email, adresse, réseaux sociaux, Snapchat, Instagram, WhatsApp, Telegram, etc.)
-2. INTERDICTION de proposer des rencontres privées sans supervision familiale (café, restaurant, promenade, cinéma, etc.)
-3. INTERDICTION de tout langage contraire à la pudeur islamique (Haya)
-4. SUPERVISION FAMILIALE OBLIGATOIRE pour tous les échanges entre personnes non-mariées de sexes opposés
+Message: "${content}"
 
-MESSAGE À ANALYSER : "${content}"
+Règles de modération islamique:
+1. "partage_informations_personnelles" - Interdiction de partager numéros de téléphone, adresses, réseaux sociaux
+2. "demande_rencontre_privee" - Interdiction de proposer des rencontres sans supervision familiale
+3. "contraire à la pudeur" - Tout contenu sexuel, romantique explicite ou immodeste
+4. "vulgarité et grossièreté" - Langage inapproprié, insultant ou vulgaire
+5. "pression et harcèlement" - Insistance excessive ou comportement inapproprié
 
-DÉTECTION STRICTE - Si le message contient :
-- Des numéros (même partiels) : 06, 07, +33, etc. → BLOCKED IMMÉDIATEMENT
-- Des mots comme "numéro", "téléphone", "appeler", "SMS" → BLOCKED
-- Des emails ou mentions d'email → BLOCKED  
-- Des propositions de rendez-vous → BLOCKED
-- Des références à des apps de messagerie → BLOCKED
-
-RÈGLES SYSTÈME :
-${rules?.map(rule => `- ${rule.rule_name}: ${rule.rule_description} (Sévérité: ${rule.severity})`).join('\n')}
-
-RÉPONSE JSON STRICTE :
+Réponds UNIQUEMENT en JSON valide avec cette structure exacte:
 {
-  "approved": boolean (false si MOINDRE violation),
-  "action": "blocked|warned|escalated|approved",
-  "confidence": number (0.9+ pour détections claires),
-  "rulesTriggered": ["partage_informations_personnelles", "contraire à la pudeur", etc.],
-  "suggestion": "reformulation islamiquement appropriée",
-  "islamicGuidance": "rappel des principes islamiques sur la pudeur et la supervision",
-  "reason": "explication détaillée de la violation",
-  "severity": "critical|high|medium|low"
+  "approved": boolean,
+  "action": "approved" | "blocked" | "escalated",
+  "confidence": number (0.0-1.0),
+  "rulesTriggered": ["règle1", "règle2"],
+  "reason": "explication claire",
+  "suggestion": "message amélioré respectueux (optionnel si bloqué)",
+  "islamicGuidance": "conseil islamique approprié",
+  "severity": "low" | "medium" | "high" | "critical"
 }
 
-IMPORTANT: En cas de doute, TOUJOURS privilégier le blocage pour respecter la pudeur islamique. Mieux vaut être trop strict que pas assez.
-`;
+Sois strict sur la pudeur (haya) et la supervision familiale selon la Sharia.`;
 
-    // Call OpenAI API for content moderation
+    // Call OpenAI API
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    if (!openaiApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'Authorization': `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -129,41 +110,36 @@ IMPORTANT: En cas de doute, TOUJOURS privilégier le blocage pour respecter la p
     try {
       moderationResult = JSON.parse(aiAnalysis);
     } catch (parseError) {
-      console.error('Error parsing AI response:', parseError);
-      // Fallback to safe moderation
+      console.error('Failed to parse AI response:', parseError);
+      
+      // Fallback to safe rejection
       moderationResult = {
         approved: false,
         action: 'escalated',
         confidence: 0.5,
-        rulesTriggered: ['parsing_error'],
-        reason: 'Erreur d\'analyse IA - escaladé par sécurité',
-        suggestion: content,
-        islamicGuidance: 'En cas de doute, privilégions toujours la prudence et le respect mutuel.'
+        rulesTriggered: ['system_error'],
+        reason: 'Erreur de parsing - contenu escaladé par sécurité',
+        islamicGuidance: 'En cas de doute, nous privilégions la prudence selon les principes islamiques.',
+        severity: 'medium'
       };
     }
 
-    // Log moderation decision
-    const { error: logError } = await supabase
-      .from('moderation_logs')
-      .insert({
-        user_id: userId,
-        content_analyzed: content,
-        ai_analysis: {
-          raw_response: aiAnalysis,
-          model: 'gpt-4.1-2025-04-14',
-          rules_applied: rules?.map(r => r.rule_name) || []
-        },
-        rules_triggered: moderationResult.rulesTriggered,
-        action_taken: moderationResult.action,
-        confidence_score: moderationResult.confidence,
-      });
-
-    if (logError) {
-      console.error('Error logging moderation decision:', logError);
+    // Ensure required fields exist
+    if (typeof moderationResult.approved !== 'boolean') {
+      moderationResult.approved = false;
+    }
+    if (!moderationResult.action) {
+      moderationResult.action = 'escalated';
+    }
+    if (typeof moderationResult.confidence !== 'number') {
+      moderationResult.confidence = 0.5;
+    }
+    if (!Array.isArray(moderationResult.rulesTriggered)) {
+      moderationResult.rulesTriggered = ['unknown'];
     }
 
-    // Create suggestion if content needs improvement
-    if (!moderationResult.approved && moderationResult.suggestion && moderationResult.suggestion !== content) {
+    // Save message suggestion if content was improved
+    if (moderationResult.suggestion && moderationResult.approved === false) {
       const { error: suggestionError } = await supabase
         .from('message_suggestions')
         .insert({
@@ -180,6 +156,30 @@ IMPORTANT: En cas de doute, TOUJOURS privilégier le blocage pour respecter la p
     }
 
     console.log('Moderation result:', moderationResult);
+
+    // Sauvegarder le log de modération pour déclencher les notifications familiales si nécessaire
+    try {
+      const { error: logError } = await supabase
+        .from('moderation_logs')
+        .insert({
+          user_id: userId,
+          match_id: matchId, // Nécessaire pour les notifications familiales
+          content_analyzed: content,
+          ai_analysis: moderationResult,
+          rules_triggered: moderationResult.rulesTriggered,
+          action_taken: moderationResult.action,
+          confidence_score: moderationResult.confidence,
+          human_reviewed: false
+        });
+
+      if (logError) {
+        console.error('Error logging moderation decision:', logError);
+      } else {
+        console.log('Moderation log saved successfully');
+      }
+    } catch (error) {
+      console.error('Error logging moderation decision:', error);
+    }
 
     return new Response(JSON.stringify(moderationResult), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

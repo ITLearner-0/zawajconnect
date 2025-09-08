@@ -666,6 +666,7 @@ export type Database = {
           human_reviewed: boolean
           human_reviewer_id: string | null
           id: string
+          match_id: string | null
           message_id: string | null
           rules_triggered: Json
           user_id: string
@@ -680,6 +681,7 @@ export type Database = {
           human_reviewed?: boolean
           human_reviewer_id?: string | null
           id?: string
+          match_id?: string | null
           message_id?: string | null
           rules_triggered?: Json
           user_id: string
@@ -694,11 +696,19 @@ export type Database = {
           human_reviewed?: boolean
           human_reviewer_id?: string | null
           id?: string
+          match_id?: string | null
           message_id?: string | null
           rules_triggered?: Json
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "moderation_logs_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "moderation_logs_message_id_fkey"
             columns: ["message_id"]
