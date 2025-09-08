@@ -28,6 +28,8 @@ import FamilySupervision from './pages/FamilySupervision';
 import FamilyNotifications from './pages/FamilyNotifications';
 import InvitationAuth from './pages/InvitationAuth';
 import FamilyAccess from './pages/FamilyAccess';
+import FamilyAccessPortal from './components/FamilyAccessPortal';
+import FamilySupervisionPanel from './components/FamilySupervisionPanel';
 import CompatibilityTest from "./pages/CompatibilityTest";
 import CompatibilityInsightsPage from "./pages/CompatibilityInsights";
 import NotFound from "./pages/NotFound";
@@ -86,6 +88,8 @@ function App() {
                   <Route path="/family-supervision" element={<FamilySupervision />} />
                   <Route path="/family-notifications" element={<FamilyNotifications />} />
                   <Route path="/family-access" element={<FamilyAccess />} />
+                  <Route path="/family-portal" element={<FamilyAccessPortal />} />
+                  <Route path="/family-supervision-panel" element={<FamilySupervisionPanel />} />
                   <Route path="/compatibility-test" element={<CompatibilityTest />} />
                   <Route path="/compatibility-insights" element={<CompatibilityInsightsPage />} />
                   <Route path="*" element={<NotFound />} />
