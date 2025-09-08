@@ -16,6 +16,10 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Family from "./pages/Family";
 import Guidance from "./pages/Guidance";
 import ModerationTest from "./pages/ModerationTest";
+import WaliDashboard from "./components/WaliDashboard";
+import MatchApprovalWorkflow from "./components/MatchApprovalWorkflow";
+import FamilyAnalytics from "./components/FamilyAnalytics";
+import ModerationTestSuite from "./components/ModerationTestSuite";
 import Admin from "./pages/Admin";
 import FAQ from "./pages/FAQ";
 import Settings from "./pages/Settings";
@@ -72,6 +76,10 @@ function App() {
                   <Route path="/guidance" element={<Guidance />} />
                   <Route path="/admin" element={<Admin />} />
                   <Route path="/moderation-test" element={<ModerationTest />} />
+                  <Route path="/wali-dashboard" element={<WaliDashboard />} />
+                  <Route path="/match-approval" element={<MatchApprovalWorkflow />} />
+                  <Route path="/family-analytics" element={<FamilyAnalytics />} />
+                  <Route path="/moderation-tests" element={<ModerationTestSuite />} />
                   <Route path="/faq" element={<FAQ />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/islamic-tools" element={<IslamicTools />} />
