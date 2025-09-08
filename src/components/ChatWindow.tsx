@@ -107,16 +107,31 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
       if (error) throw error;
 
       if (data) {
-        // Verify user has access to this match
-        if (data.user1_id !== user.id && data.user2_id !== user.id) {
-          console.error('User does not have access to this match');
-          toast({
-            title: "Accès refusé",
-            description: "Vous n'avez pas accès à cette conversation",
-            variant: "destructive"
-          });
-          if (onClose) onClose();
-          return;
+        // Check if user is participant or family supervisor
+        const isParticipant = data.user1_id === user.id || data.user2_id === user.id;
+        
+        if (!isParticipant) {
+          // Check if user is a family supervisor
+          const { data: familyData } = await supabase
+            .from('family_members')
+            .select('*')
+            .eq('invited_user_id', user.id)
+            .eq('invitation_status', 'accepted')
+            .eq('can_communicate', true)
+            .eq('is_wali', true)
+            .or(`user_id.eq.${data.user1_id},user_id.eq.${data.user2_id}`)
+            .maybeSingle();
+            
+          if (!familyData) {
+            console.error('User does not have access to this match');
+            toast({
+              title: "Accès refusé", 
+              description: "Vous n'avez pas accès à cette conversation",
+              variant: "destructive"
+            });
+            if (onClose) onClose();
+            return;
+          }
         }
         const otherUserId = data.user1_id === user.id ? data.user2_id : data.user1_id;
         
