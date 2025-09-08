@@ -134,7 +134,8 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
       if (error) throw error;
       if (data) {
         const otherUserId = data.user1_id === user.id ? data.user2_id : data.user1_id;
-        const otherProfile = data.user1_id === user.id ? data.user2_profile : data.user1_profile;
+        const otherProfile = data.user1_id === user.id ? 
+          (data.user2_profile as any) : (data.user1_profile as any);
         
         setMatch({
           ...data,

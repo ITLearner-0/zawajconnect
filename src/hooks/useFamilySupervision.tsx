@@ -4,11 +4,14 @@ import { useToast } from '@/hooks/use-toast';
 
 interface FamilyMember {
   id: string;
+  user_id: string;
+  invited_user_id?: string;
   full_name: string;
   relationship: string;
   is_wali: boolean;
   can_communicate: boolean;
   can_view_profile: boolean;
+  invitation_status: string;
 }
 
 interface FamilyNotification {

@@ -81,7 +81,7 @@ const ChatEnhancementHub: React.FC<ChatEnhancementHubProps> = ({ matchId, onClos
   const determineUserRole = () => {
     // Check if current user is a family supervisor
     const isSupervising = familyMembers.some(fm => 
-      fm.user_id === user?.id && 
+      (fm.user_id === user?.id || fm.invited_user_id === user?.id) && 
       fm.is_wali && 
       fm.can_view_profile
     );

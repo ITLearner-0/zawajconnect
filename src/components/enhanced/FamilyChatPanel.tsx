@@ -111,7 +111,7 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
           user1_profile:profiles!matches_user1_id_fkey(full_name),
           user2_profile:profiles!matches_user2_id_fkey(full_name)
         `)
-        .in('user1_id', familyMembers.map(fm => fm.user_id))
+        .in('user1_id', familyMembers.map(fm => fm.user_id || fm.id))
         .eq('family_supervision_required', true);
 
       if (error) throw error;
@@ -145,11 +145,11 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
           return {
             id: match.id,
             match_id: match.id,
-            supervised_user_name: match.user1_profile?.full_name || 'Utilisateur',
-            candidate_name: match.user2_profile?.full_name || 'Candidat',
+            supervised_user_name: (match.user1_profile as any)?.full_name || 'Utilisateur',
+            candidate_name: (match.user2_profile as any)?.full_name || 'Candidat',
             last_message: lastMessage || {
               content: 'Aucun message',
-              created_at: match.created_at,
+              created_at: (match as any).created_at || new Date().toISOString(),
               sender_id: ''
             },
             message_count: messageCount || 0,
@@ -209,7 +209,7 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
 
     try {
       // Find current user's family member record
-      const currentFamilyMember = familyMembers.find(fm => fm.invited_user_id === user.id);
+      const currentFamilyMember = familyMembers.find(fm => fm.invited_user_id === user.id || fm.user_id === user.id);
       if (!currentFamilyMember) {
         toast({
           title: "Erreur",
