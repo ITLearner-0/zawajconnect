@@ -6,6 +6,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Heart, Star, MapPin, Users, Sparkles, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { MatchProfile } from '@/hooks/useMatchingHistory';
 
 interface MatchCardProps {
@@ -16,6 +18,7 @@ interface MatchCardProps {
 const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const getCompatibilityColor = (score: number) => {
     if (score >= 85) return 'text-emerald-600 bg-emerald-50 border-emerald-200';
@@ -47,13 +50,41 @@ const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
     // TODO: Implement actual interest logic with database
   };
 
-  const handleFamilyApproval = () => {
-    toast({
-      title: "Demande d'approbation envoyée",
-      description: `Votre famille a été notifiée pour examiner ce match`,
-    });
-    
-    // TODO: Implement family approval workflow
+  const handleFamilyApproval = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('family-approval-request', {
+        body: {
+          user_id: user?.id,
+          match_user_id: match.user_id,
+          compatibility_score: match.compatibility_score,
+          islamic_score: match.islamic_score,
+          cultural_score: match.cultural_score,
+          personality_score: match.personality_score,
+          matching_reasons: match.matching_reasons,
+          potential_concerns: match.potential_concerns
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+      
+      if (data?.success) {
+        toast({
+          title: "Demande envoyée avec succès",
+          description: `${data.notifications_sent} membre(s) de famille notifié(s)${data.ai_analysis_included ? ' avec analyse IA' : ''}`,
+        });
+      } else {
+        throw new Error(data?.error || 'Erreur inconnue');
+      }
+    } catch (error) {
+      console.error('Error requesting family approval:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'envoyer la demande d'approbation",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

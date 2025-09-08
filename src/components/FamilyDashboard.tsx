@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
+import FamilyApprovalDashboard from '@/components/FamilyApprovalDashboard';
 import {
   Users,
   Heart,
@@ -273,13 +274,18 @@ const FamilyDashboard = () => {
 
   return (
     <div className="space-y-6">
+      {/* Family Approval Dashboard */}
+      <FamilyApprovalDashboard />
+      
+      <Separator className="my-8" />
+      
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="h-12 w-12 bg-gradient-to-br from-gold to-emerald rounded-full flex items-center justify-center">
           <Shield className="h-6 w-6 text-white" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-foreground">Supervision Familiale</h2>
+          <h2 className="text-2xl font-bold text-foreground">Supervision Continue</h2>
           <p className="text-muted-foreground">
             Supervisez et guidez les matches de votre famille
           </p>
