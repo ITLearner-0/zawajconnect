@@ -88,10 +88,10 @@ const WaliDashboard: React.FC = () => {
         .select(`
           id,
           full_name,
-          invited_user_id,
+          user_id,
           relationship
         `)
-        .eq('user_id', user.id)
+        .eq('invited_user_id', user.id)
         .eq('invitation_status', 'accepted')
         .eq('is_wali', true);
 
@@ -99,7 +99,7 @@ const WaliDashboard: React.FC = () => {
         const supervised = familyMembers.map(member => ({
           id: member.id,
           full_name: member.full_name,
-          user_id: member.invited_user_id,
+          user_id: member.user_id, // L'ID de la personne supervisée (Sarah)
           relationship: member.relationship,
           avatar_url: undefined
         }));
@@ -119,7 +119,7 @@ const WaliDashboard: React.FC = () => {
       }
 
       // Charger les matches en attente d'approbation
-      const userIds = familyMembers?.map(fm => fm.invited_user_id) || [];
+      const userIds = familyMembers?.map(fm => fm.user_id) || [];
       let matchData = null;
       if (userIds.length > 0) {
         const { data } = await supabase
