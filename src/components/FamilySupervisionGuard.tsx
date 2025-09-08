@@ -16,6 +16,10 @@ const FamilySupervisionGuard: React.FC<FamilySupervisionGuardProps> = ({
   children
 }) => {
   console.log('🛡️ FamilySupervisionGuard mounting for matchId:', matchId);
+  
+  // Hooks must always be called in the same order - move useState to the top
+  const [userProfile, setUserProfile] = React.useState<any>(null);
+  
   const { 
     supervisionStatus, 
     loading, 
@@ -81,8 +85,6 @@ const FamilySupervisionGuard: React.FC<FamilySupervisionGuardProps> = ({
   }
 
   // Check supervision requirements based on Islamic principles (women need supervision)
-  const [userProfile, setUserProfile] = React.useState<any>(null);
-  
   React.useEffect(() => {
     const getUserProfile = async () => {
       const { data: { user } } = await supabase.auth.getUser();
