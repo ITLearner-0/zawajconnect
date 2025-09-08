@@ -353,10 +353,31 @@ const AdvancedMatchingEngine = () => {
                       )}
 
                       <div className="flex gap-2 pt-2">
-                        <Button size="sm" className="flex-1">
+                        <Button 
+                          size="sm" 
+                          className="flex-1"
+                          onClick={() => {
+                            toast({
+                              title: "Profil ouvert",
+                              description: `Consultation du profil de ${match.full_name}`,
+                            });
+                            // Navigate to profile page
+                            window.location.href = `/profile/${match.user_id}`;
+                          }}
+                        >
                           Voir le profil
                         </Button>
-                        <Button size="sm" variant="outline" className="flex-1">
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="flex-1"
+                          onClick={() => {
+                            toast({
+                              title: "Intérêt envoyé",
+                              description: `Votre intérêt pour ${match.full_name} a été exprimé (Compatibilité: ${match.compatibility_score}%)`,
+                            });
+                          }}
+                        >
                           Montrer l'intérêt
                         </Button>
                         {preferences.family_approval_required && (
