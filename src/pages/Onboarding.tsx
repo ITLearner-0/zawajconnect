@@ -151,16 +151,33 @@ const Onboarding = () => {
     if (!user) return false;
     
     try {
-      const { error } = await supabase
+      // Check if profile exists first
+      const { data: existingProfile } = await supabase
         .from('profiles')
-        .upsert({
-          user_id: user.id,
-          ...profileData
-        }, {
-          onConflict: 'user_id'
-        });
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (existingProfile) {
+        // Update existing profile
+        const { error } = await supabase
+          .from('profiles')
+          .update(profileData)
+          .eq('user_id', user.id);
+        
+        if (error) throw error;
+      } else {
+        // Insert new profile
+        const { error } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: user.id,
+            ...profileData
+          });
+        
+        if (error) throw error;
+      }
+      
       return true;
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -172,24 +189,43 @@ const Onboarding = () => {
     if (!user) return false;
     
     try {
-      // Filter out empty strings and replace with null for database constraints
+      // Filter out empty strings and replace with null, remove undefined values
       const cleanPrefs = Object.fromEntries(
-        Object.entries(islamicPrefs).map(([key, value]) => [
-          key,
-          value === '' ? null : value
-        ])
+        Object.entries(islamicPrefs)
+          .filter(([_, value]) => value !== undefined)
+          .map(([key, value]) => [
+            key,
+            value === '' || value === null ? null : value
+          ])
       );
 
-      const { error } = await supabase
+      // Check if preferences exist first
+      const { data: existingPrefs } = await supabase
         .from('islamic_preferences')
-        .upsert({
-          user_id: user.id,
-          ...cleanPrefs
-        }, {
-          onConflict: 'user_id'
-        });
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-      if (error) throw error;
+      if (existingPrefs) {
+        // Update existing preferences
+        const { error } = await supabase
+          .from('islamic_preferences')
+          .update(cleanPrefs)
+          .eq('user_id', user.id);
+        
+        if (error) throw error;
+      } else {
+        // Insert new preferences
+        const { error } = await supabase
+          .from('islamic_preferences')
+          .insert({
+            user_id: user.id,
+            ...cleanPrefs
+          });
+        
+        if (error) throw error;
+      }
+
       return true;
     } catch (error) {
       console.error('Error saving Islamic preferences:', error);
