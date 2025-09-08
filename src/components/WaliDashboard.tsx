@@ -95,15 +95,26 @@ const WaliDashboard: React.FC = () => {
         .eq('invitation_status', 'accepted')
         .eq('is_wali', true);
 
-      if (familyMembers) {
-        const supervised = familyMembers.map(member => ({
-          id: member.id,
-          full_name: member.full_name,
-          user_id: member.user_id, // L'ID de la personne supervisée (Sarah)
-          relationship: member.relationship,
-          avatar_url: undefined
-        }));
-        setSupervisedUsers(supervised);
+      if (familyMembers && familyMembers.length > 0) {
+        // Pour chaque membre de famille, récupérer le profil de la personne supervisée
+        const supervisedProfiles = await Promise.all(
+          familyMembers.map(async (member) => {
+            const { data: profile } = await supabase
+              .from('profiles')
+              .select('full_name, avatar_url')
+              .eq('user_id', member.user_id)
+              .single();
+
+            return {
+              id: member.id,
+              full_name: profile?.full_name || 'Utilisateur',
+              user_id: member.user_id, // L'ID de la personne supervisée (Sarah)
+              relationship: member.relationship,
+              avatar_url: profile?.avatar_url
+            };
+          })
+        );
+        setSupervisedUsers(supervisedProfiles);
       }
 
       // Charger les notifications
