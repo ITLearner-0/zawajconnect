@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -9,15 +9,73 @@ interface UserRole {
   loading: boolean;
 }
 
+// Cache pour éviter les appels répétés
+const roleCache = new Map<string, { role: UserRole; timestamp: number }>();
+const CACHE_DURATION = 30000; // 30 secondes
+
 export const useUserRole = (): UserRole => {
   const { user } = useAuth();
-  console.log('🔑 useUserRole - checking role for user:', user?.id);
   const [role, setRole] = useState<UserRole>({
     isWaliOnly: false,
     isRegularUser: false,
     isWali: false,
     loading: true
   });
+
+  const checkUserRole = useCallback(async () => {
+    if (!user?.id) return;
+
+    // Vérifier le cache
+    const cached = roleCache.get(user.id);
+    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+      setRole(cached.role);
+      return;
+    }
+
+    try {
+      console.log('🔍 Fetching role for user:', user.id);
+      
+      // Faire les deux requêtes en parallèle pour optimiser
+      const [profileResult, familyResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('full_name, age, gender, bio')
+          .eq('user_id', user.id)
+          .maybeSingle(),
+        supabase
+          .from('family_members')
+          .select('invited_user_id, is_wali, relationship, invitation_status')
+          .eq('invited_user_id', user.id)
+      ]);
+
+      const profile = profileResult.data;
+      const invitedAs = familyResult.data;
+
+      // Filtrer les invitations acceptées
+      const acceptedInvitations = invitedAs?.filter(invite => invite.invitation_status === 'accepted') || [];
+      const isInvitedWali = acceptedInvitations.length > 0;
+      const hasCompleteProfile = profile && profile.age && profile.gender && Boolean(profile.bio);
+
+      const finalRole = {
+        isWaliOnly: false,
+        isRegularUser: hasCompleteProfile || isInvitedWali,
+        isWali: isInvitedWali,
+        loading: false
+      };
+
+      // Mettre en cache le résultat
+      roleCache.set(user.id, {
+        role: finalRole,
+        timestamp: Date.now()
+      });
+
+      setRole(finalRole);
+    } catch (error) {
+      console.error('Error checking user role:', error);
+      const errorRole = { isWaliOnly: false, isRegularUser: true, isWali: false, loading: false };
+      setRole(errorRole);
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     if (!user) {
@@ -26,60 +84,7 @@ export const useUserRole = (): UserRole => {
     }
 
     checkUserRole();
-  }, [user]);
-
-  const checkUserRole = async () => {
-    try {
-      console.log('🔍 checkUserRole starting for user:', user?.id);
-      
-      // Vérifier si l'utilisateur a un profil complet (indique qu'il cherche un partenaire)
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('full_name, age, gender, bio')
-        .eq('user_id', user?.id)
-        .maybeSingle();
-
-      console.log('👤 Profile data:', profile);
-
-      // Vérifier si l'utilisateur est invité comme membre de famille
-      const { data: invitedAs } = await supabase
-        .from('family_members')
-        .select('invited_user_id, is_wali, relationship, invitation_status')
-        .eq('invited_user_id', user?.id);
-
-      console.log('👨‍👩‍👧‍👦 Invited as data:', invitedAs);
-
-      // Filtrer les invitations acceptées
-      const acceptedInvitations = invitedAs?.filter(invite => invite.invitation_status === 'accepted') || [];
-
-      const isInvitedWali = acceptedInvitations && acceptedInvitations.length > 0;
-      const hasCompleteProfile = profile && profile.age && profile.gender && Boolean(profile.bio);
-
-      console.log('🔧 Role calculation:', {
-        isInvitedWali,
-        hasCompleteProfile,
-        profileDetails: {
-          hasAge: !!profile?.age,
-          hasGender: !!profile?.gender,
-          hasBio: Boolean(profile?.bio)
-        }
-      });
-
-      const finalRole = {
-        isWaliOnly: false, // Les walis ont accès au layout principal pour supervision
-        isRegularUser: hasCompleteProfile || isInvitedWali, // Profil complet OU wali
-        isWali: isInvitedWali, // Flag pour identifier les walis
-        loading: false
-      };
-
-      console.log('✅ Final role assignment:', finalRole);
-
-      setRole(finalRole);
-    } catch (error) {
-      console.error('Error checking user role:', error);
-      setRole({ isWaliOnly: false, isRegularUser: true, isWali: false, loading: false });
-    }
-  };
+  }, [user, checkUserRole]);
 
   return role;
 };
