@@ -1,18 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIslamicModeration } from '@/hooks/useIslamicModeration';
+import { useFamilySupervision } from '@/hooks/useFamilySupervision';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Send, Paperclip, MoreVertical, Phone, Video, Heart, User } from 'lucide-react';
+import { Send, Paperclip, MoreVertical, Phone, Video, Heart, User, Shield, MessageCircle, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import VideoCall from '@/components/VideoCall';
 import MessageModerationWrapper from '@/components/MessageModerationWrapper';
-import FamilySupervisionGuard from '@/components/FamilySupervisionGuard';
 
 interface Message {
   id: string;
@@ -55,6 +55,9 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   const [isVideoCallActive, setIsVideoCallActive] = useState(false);
   const [isAudioCallActive, setIsAudioCallActive] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
+  // Add supervision status
+  const { supervisionStatus } = useFamilySupervision();
 
   // Listen for suggested messages
   useEffect(() => {
@@ -332,152 +335,168 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   }
 
   return (
-    <FamilySupervisionGuard matchId={matchId}>
-      <MessageModerationWrapper matchId={matchId}>
+    <MessageModerationWrapper matchId={matchId}>
       <div className="flex flex-col h-full max-h-[600px] bg-background rounded-lg border shadow-lg">
-        {/* Chat Header */}
-        <div className="border-b bg-gradient-to-r from-emerald/5 to-gold/5">
-          <div className="flex items-center justify-between p-4">
-            <div className="flex items-center gap-3">
-              <div className="relative">
-                {match.other_user.avatar_url ? (
-                  <img 
-                    src={match.other_user.avatar_url} 
-                    alt={match.other_user.full_name}
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="h-10 w-10 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-                    <User className="h-5 w-5 text-primary-foreground" />
+        {/* Simple supervision check */}
+        {!supervisionStatus.canCommunicate ? (
+          <div className="flex-1 flex items-center justify-center p-8">
+            <div className="text-center max-w-md">
+              <Shield className="h-16 w-16 text-amber-500 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Supervision Familiale Requise</h3>
+              <p className="text-muted-foreground mb-4">
+                Vous devez configurer votre famille selon les principes islamiques pour communiquer.
+              </p>
+              <Button onClick={() => window.location.href = '/family'}>
+                Configurer ma Famille
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Chat Header */}
+            <div className="border-b bg-gradient-to-r from-emerald/5 to-gold/5">
+              <div className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    {match.other_user.avatar_url ? (
+                      <img 
+                        src={match.other_user.avatar_url} 
+                        alt={match.other_user.full_name}
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
+                        <User className="h-5 w-5 text-primary-foreground" />
+                      </div>
+                    )}
+                    <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-emerald rounded-full border-2 border-background"></div>
                   </div>
-                )}
-                <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-emerald rounded-full border-2 border-background"></div>
-              </div>
-              <div>
-                <h3 className="font-semibold text-foreground">{match.other_user.full_name}</h3>
+                  <div>
+                    <h3 className="font-semibold text-foreground">{match.other_user.full_name}</h3>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="text-xs bg-emerald/10 text-emerald">
+                        {match.match_score}% compatible
+                      </Badge>
+                      <span className="text-xs text-muted-foreground">En ligne</span>
+                    </div>
+                  </div>
+                </div>
+                
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="text-xs bg-emerald/10 text-emerald">
-                    {match.match_score}% compatible
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">En ligne</span>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-emerald hover:bg-emerald/10"
+                    onClick={handleAudioCall}
+                    title="Appel audio"
+                  >
+                    <Phone className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-emerald hover:bg-emerald/10"
+                    onClick={handleVideoCall}
+                    title="Appel vidéo"
+                  >
+                    <Video className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                  {onClose && (
+                    <Button variant="ghost" size="sm" onClick={onClose}>
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
-            
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-emerald hover:bg-emerald/10"
-                onClick={handleAudioCall}
-                title="Appel audio"
-              >
-                <Phone className="h-4 w-4" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-emerald hover:bg-emerald/10"
-                onClick={handleVideoCall}
-                title="Appel vidéo"
-              >
-                <Video className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="sm">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-              {onClose && (
-                <Button variant="ghost" size="sm" onClick={onClose}>
-                  ×
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
 
-        {/* Messages Area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-          {messages.length === 0 ? (
-            <div className="text-center py-8">
-              <Heart className="h-12 w-12 mx-auto text-emerald/50 mb-4" />
-              <p className="text-muted-foreground">
-                C'est le début de votre conversation ! 
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">
-                Présentez-vous et commencez à faire connaissance de manière respectueuse.
-              </p>
-            </div>
-          ) : (
-            messages.map((message) => {
-              const isMyMessage = message.sender_id === user?.id;
-              return (
-                <div
-                  key={message.id}
-                  className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      isMyMessage
-                        ? 'bg-emerald text-primary-foreground'
-                        : 'bg-muted text-foreground'
-                    }`}
-                  >
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-                    <p className={`text-xs mt-1 ${
-                      isMyMessage ? 'text-emerald-light' : 'text-muted-foreground'
-                    }`}>
-                      {format(new Date(message.created_at), 'HH:mm', { locale: fr })}
-                      {isMyMessage && (
-                        <span className="ml-2">
-                          {message.is_read ? '✓✓' : '✓'}
-                        </span>
-                      )}
-                    </p>
-                  </div>
+            {/* Messages Area */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.length === 0 ? (
+                <div className="text-center py-8">
+                  <Heart className="h-12 w-12 mx-auto text-emerald/50 mb-4" />
+                  <p className="text-muted-foreground">
+                    C'est le début de votre conversation ! 
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Présentez-vous et commencez à faire connaissance de manière respectueuse.
+                  </p>
                 </div>
-              );
-            })
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Islamic Reminder */}
-        <div className="px-4 py-2 bg-gradient-to-r from-gold/10 to-emerald/10 border-t border-border/50">
-          <p className="text-xs text-center text-muted-foreground">
-            💝 Rappel : Communiquez avec respect et selon les valeurs islamiques
-          </p>
-        </div>
-
-        {/* Message Input */}
-        <div className="border-t p-4">
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
-              <Paperclip className="h-4 w-4" />
-            </Button>
-            <Input
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyPress={handleKeyPress}
-              placeholder="Écrivez votre message..."
-              disabled={sending}
-              className="flex-1"
-            />
-            <Button 
-              onClick={sendMessage}
-              disabled={!newMessage.trim() || sending}
-              className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
-            >
-              {sending ? (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
               ) : (
-                <Send className="h-4 w-4" />
+                messages.map((message) => {
+                  const isMyMessage = message.sender_id === user?.id;
+                  return (
+                    <div
+                      key={message.id}
+                      className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                          isMyMessage
+                            ? 'bg-emerald text-primary-foreground'
+                            : 'bg-muted text-foreground'
+                        }`}
+                      >
+                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                        <p className={`text-xs mt-1 ${
+                          isMyMessage ? 'text-emerald-light' : 'text-muted-foreground'
+                        }`}>
+                          {format(new Date(message.created_at), 'HH:mm', { locale: fr })}
+                          {isMyMessage && (
+                            <span className="ml-2">
+                              {message.is_read ? '✓✓' : '✓'}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })
               )}
-            </Button>
-          </div>
-        </div>
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Islamic Reminder */}
+            <div className="px-4 py-2 bg-gradient-to-r from-gold/10 to-emerald/10 border-t border-border/50">
+              <p className="text-xs text-center text-muted-foreground">
+                💝 Rappel : Communiquez avec respect et selon les valeurs islamiques
+              </p>
+            </div>
+
+            {/* Message Input */}
+            <div className="border-t p-4">
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" className="text-muted-foreground">
+                  <Paperclip className="h-4 w-4" />
+                </Button>
+                <Input
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Écrivez votre message..."
+                  disabled={sending}
+                  className="flex-1"
+                />
+                <Button 
+                  onClick={sendMessage}
+                  disabled={!newMessage.trim() || sending}
+                  className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                >
+                  {sending ? (
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
       </div>
-      </MessageModerationWrapper>
-    </FamilySupervisionGuard>
+    </MessageModerationWrapper>
   );
 };
 
