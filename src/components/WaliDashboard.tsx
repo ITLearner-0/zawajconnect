@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useCompatibility } from '@/hooks/useCompatibility';
 
 interface FamilyNotification {
   id: string;
@@ -76,6 +77,54 @@ const WaliDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // Fonction helper pour calculer la compatibilité entre deux utilisateurs spécifiques
+  const calculateCompatibilityBetweenUsers = async (user1Id: string, user2Id: string): Promise<number> => {
+    try {
+      // Récupérer les réponses des deux utilisateurs
+      const { data: user1Responses } = await supabase
+        .from('user_compatibility_responses')
+        .select('question_key, response_value')
+        .eq('user_id', user1Id);
+
+      const { data: user2Responses } = await supabase
+        .from('user_compatibility_responses')
+        .select('question_key, response_value')
+        .eq('user_id', user2Id);
+
+      const { data: questions } = await supabase
+        .from('compatibility_questions')
+        .select('question_key, weight')
+        .eq('is_active', true);
+
+      if (!user1Responses || !user2Responses || !questions) {
+        return 0;
+      }
+
+      let totalWeight = 0;
+      let matchedWeight = 0;
+
+      questions.forEach(question => {
+        const user1Response = user1Responses.find(r => r.question_key === question.question_key);
+        const user2Response = user2Responses.find(r => r.question_key === question.question_key);
+
+        if (user1Response && user2Response) {
+          totalWeight += question.weight;
+          
+          // Simple matching - exact match scores full weight
+          if (user1Response.response_value === user2Response.response_value) {
+            matchedWeight += question.weight;
+          }
+        }
+      });
+
+      return totalWeight > 0 ? (matchedWeight / totalWeight) * 100 : 0;
+
+    } catch (error) {
+      console.error('Error calculating compatibility score:', error);
+      return 0;
+    }
+  };
 
   const handleViewProfile = (userId: string) => {
     navigate(`/profile/${userId}`);
@@ -175,11 +224,15 @@ const WaliDashboard: React.FC = () => {
                 .eq('user_id', supervisedUserId)
                 .single();
 
+              // Calculer le score de compatibilité réel
+              const compatibilityScore = await calculateCompatibilityBetweenUsers(supervisedUserId, candidateId);
+
               return {
                 ...match,
                 candidate_name: candidateProfile?.full_name || 'Candidat inconnu',
                 candidate_id: candidateId,
-                supervised_user_name: supervisedProfile?.full_name || 'Utilisateur supervisé'
+                supervised_user_name: supervisedProfile?.full_name || 'Utilisateur supervisé',
+                match_score: Math.round(compatibilityScore)
               };
             })
           );
