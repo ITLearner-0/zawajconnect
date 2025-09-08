@@ -14,6 +14,9 @@ const roleCache = new Map<string, { role: UserRole; timestamp: number }>();
 const CACHE_DURATION = 60000; // 1 minute
 const activeRequests = new Map<string, Promise<UserRole>>();
 
+// Global flag pour éviter les appels simultanés
+let isAnyRequestInProgress = false;
+
 export const useUserRole = (): UserRole => {
   const { user } = useAuth();
   const [role, setRole] = useState<UserRole>({
@@ -33,6 +36,7 @@ export const useUserRole = (): UserRole => {
   const checkUserRole = useCallback(async (targetUserId: string): Promise<UserRole> => {
     // Vérifier s'il y a déjà une requête en cours pour cet utilisateur
     if (activeRequests.has(targetUserId)) {
+      console.log('🔄 Reusing active request for user:', targetUserId);
       return activeRequests.get(targetUserId)!;
     }
 
@@ -43,8 +47,17 @@ export const useUserRole = (): UserRole => {
       return cached.role;
     }
 
+    // Éviter les requêtes simultanées globales
+    if (isAnyRequestInProgress) {
+      console.log('⏳ Another request in progress, waiting...');
+      // Attendre un peu et réessayer
+      await new Promise(resolve => setTimeout(resolve, 100));
+      return checkUserRole(targetUserId);
+    }
+
     // Créer une nouvelle requête
     const rolePromise = (async (): Promise<UserRole> => {
+      isAnyRequestInProgress = true;
       try {
         console.log('🔍 Fetching role for user:', targetUserId);
         
@@ -74,6 +87,8 @@ export const useUserRole = (): UserRole => {
           loading: false
         };
 
+        console.log('✅ Role fetched for user:', targetUserId, finalRole);
+
         // Mettre en cache
         roleCache.set(targetUserId, {
           role: finalRole,
@@ -85,7 +100,8 @@ export const useUserRole = (): UserRole => {
         console.error('Error checking user role:', error);
         return { isWaliOnly: false, isRegularUser: true, isWali: false, loading: false };
       } finally {
-        // Nettoyer la requête active
+        // Nettoyer les flags et requêtes actives
+        isAnyRequestInProgress = false;
         activeRequests.delete(targetUserId);
       }
     })();
