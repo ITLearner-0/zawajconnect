@@ -22,30 +22,33 @@ export const useUserRole = (): UserRole => {
     loading: true
   });
 
+  // Stable reference pour user.id pour éviter les boucles infinies
+  const userId = useMemo(() => user?.id, [user?.id]);
+
   const checkUserRole = useCallback(async () => {
-    if (!user?.id) return;
+    if (!userId) return;
 
     // Vérifier le cache
-    const cached = roleCache.get(user.id);
+    const cached = roleCache.get(userId);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
       setRole(cached.role);
       return;
     }
 
     try {
-      console.log('🔍 Fetching role for user:', user.id);
+      console.log('🔍 Fetching role for user:', userId);
       
       // Faire les deux requêtes en parallèle pour optimiser
       const [profileResult, familyResult] = await Promise.all([
         supabase
           .from('profiles')
           .select('full_name, age, gender, bio')
-          .eq('user_id', user.id)
+          .eq('user_id', userId)
           .maybeSingle(),
         supabase
           .from('family_members')
           .select('invited_user_id, is_wali, relationship, invitation_status')
-          .eq('invited_user_id', user.id)
+          .eq('invited_user_id', userId)
       ]);
 
       const profile = profileResult.data;
@@ -64,7 +67,7 @@ export const useUserRole = (): UserRole => {
       };
 
       // Mettre en cache le résultat
-      roleCache.set(user.id, {
+      roleCache.set(userId, {
         role: finalRole,
         timestamp: Date.now()
       });
@@ -75,7 +78,7 @@ export const useUserRole = (): UserRole => {
       const errorRole = { isWaliOnly: false, isRegularUser: true, isWali: false, loading: false };
       setRole(errorRole);
     }
-  }, [user?.id]);
+  }, [userId]);
 
   useEffect(() => {
     if (!user) {
@@ -83,7 +86,12 @@ export const useUserRole = (): UserRole => {
       return;
     }
 
-    checkUserRole();
+    // Debounce pour éviter les appels trop rapides
+    const timeoutId = setTimeout(() => {
+      checkUserRole();
+    }, 100);
+
+    return () => clearTimeout(timeoutId);
   }, [user, checkUserRole]);
 
   return role;
