@@ -89,7 +89,7 @@ const Auth = () => {
       const frenchError = translateAuthError(error.message);
       setError(frenchError);
     } else {
-      setSuccess('Inscription réussie ! Vérifiez votre email pour confirmer votre compte.');
+      setSuccess('Inscription réussie ! Vérifiez votre email pour confirmer votre compte, puis vous serez redirigé vers votre tableau de bord.');
       // Clear form
       setEmail('');
       setPassword('');
