@@ -200,7 +200,7 @@ const WaliDashboard: React.FC = () => {
           .select('*')
           .or(`user1_id.in.(${userIds.join(',')}),user2_id.in.(${userIds.join(',')})`)
           .eq('family_supervision_required', true)
-          .is('family1_approved', null);
+          .or(`and(user1_id.in.(${userIds.join(',')}),family1_approved.is.null),and(user2_id.in.(${userIds.join(',')}),family2_approved.is.null)`);
 
         matchData = data;
         if (matchData) {
@@ -325,10 +325,30 @@ const WaliDashboard: React.FC = () => {
 
   const approveMatch = async (matchId: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Trouver le match pour déterminer quelle famille approuve
+      const match = matchesForApproval.find(m => m.id === matchId);
+      if (!match) return;
+
+      // Déterminer si ce wali supervise user1 ou user2
+      const { data: familyMembers } = await supabase
+        .from('family_members')
+        .select('user_id')
+        .eq('invited_user_id', user.id)
+        .eq('invitation_status', 'accepted')
+        .eq('is_wali', true);
+
+      const supervisedUserIds = familyMembers?.map(fm => fm.user_id) || [];
+      const isFamily1 = supervisedUserIds.includes(match.user1_id);
+      
+      const updateField = isFamily1 ? 'family1_approved' : 'family2_approved';
+      
       await supabase
         .from('matches')
         .update({ 
-          family1_approved: true,
+          [updateField]: true,
           can_communicate: true,
           family_reviewed_at: new Date().toISOString()
         })
@@ -356,10 +376,30 @@ const WaliDashboard: React.FC = () => {
 
   const rejectMatch = async (matchId: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Trouver le match pour déterminer quelle famille rejette
+      const match = matchesForApproval.find(m => m.id === matchId);
+      if (!match) return;
+
+      // Déterminer si ce wali supervise user1 ou user2
+      const { data: familyMembers } = await supabase
+        .from('family_members')
+        .select('user_id')
+        .eq('invited_user_id', user.id)
+        .eq('invitation_status', 'accepted')
+        .eq('is_wali', true);
+
+      const supervisedUserIds = familyMembers?.map(fm => fm.user_id) || [];
+      const isFamily1 = supervisedUserIds.includes(match.user1_id);
+      
+      const updateField = isFamily1 ? 'family1_approved' : 'family2_approved';
+      
       await supabase
         .from('matches')
         .update({ 
-          family1_approved: false,
+          [updateField]: false,
           family_reviewed_at: new Date().toISOString()
         })
         .eq('id', matchId);
