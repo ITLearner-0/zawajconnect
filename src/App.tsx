@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import AppLayout from "@/components/layout/AppLayout";
 import RoleBasedLayout from "@/components/RoleBasedLayout";
+import ProtectedRoute from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -34,6 +35,7 @@ import CompatibilityTest from "./pages/CompatibilityTest";
 import CompatibilityInsightsPage from "./pages/CompatibilityInsights";
 import EnhancedProfile from "./pages/EnhancedProfile";
 import AdvancedMatching from "./pages/AdvancedMatching";
+import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -48,7 +50,6 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -65,41 +66,232 @@ function App() {
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/invitation" element={<InvitationAuth />} />
             
-            {/* Protected routes - wrapped in RoleBasedLayout */}
-            <Route path="/*" element={
-              <RoleBasedLayout>
-                <Routes>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/enhanced-profile" element={<EnhancedProfile />} />
-                  <Route path="/advanced-matching" element={<AdvancedMatching />} />
-                  <Route path="/browse" element={<Browse />} />
-                  <Route path="/matches" element={<Matches />} />
-                  <Route path="/chat" element={<Chat />} />
-                  <Route path="/chat/:matchId" element={<Chat />} />
-                  <Route path="/profile/:userId" element={<Profile />} />
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/family" element={<Family />} />
-                  <Route path="/guidance" element={<Guidance />} />
-                  <Route path="/admin" element={<Admin />} />
-                  <Route path="/moderation-test" element={<ModerationTest />} />
-                  <Route path="/wali-dashboard" element={<WaliDashboard />} />
-                  <Route path="/match-approval" element={<MatchApproval />} />
-                  <Route path="/family-analytics" element={<FamilyAnalyticsPage />} />
-                  <Route path="/moderation-tests" element={<ModerationTests />} />
-                  <Route path="/faq" element={<FAQ />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/islamic-tools" element={<IslamicTools />} />
-                  <Route path="/family-supervision" element={<FamilySupervision />} />
-                  <Route path="/family-notifications" element={<FamilyNotifications />} />
-                  <Route path="/family-access" element={<FamilyAccess />} />
-                  <Route path="/family-portal" element={<FamilyAccessPortal />} />
-                  <Route path="/family-supervision-panel" element={<FamilySupervisionPanel />} />
-                  <Route path="/compatibility-test" element={<CompatibilityTest />} />
-                  <Route path="/compatibility-insights" element={<CompatibilityInsightsPage />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </RoleBasedLayout>
+            {/* Onboarding - protected but doesn't require complete profile */}
+            <Route path="/onboarding" element={
+              <ProtectedRoute requireOnboarding={false}>
+                <Onboarding />
+              </ProtectedRoute>
             } />
+            
+            {/* Protected routes - wrapped in ProtectedRoute and RoleBasedLayout */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <Dashboard />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/enhanced-profile" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <EnhancedProfile />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/advanced-matching" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <AdvancedMatching />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/browse" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <Browse />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/matches" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <Matches />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <Chat />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/chat/:matchId" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <Chat />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/profile/:userId" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <Profile />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/privacy" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <Privacy />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/family" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <Family />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/guidance" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <Guidance />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/admin" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <Admin />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/moderation-test" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <ModerationTest />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/wali-dashboard" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <WaliDashboard />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/match-approval" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <MatchApproval />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/family-analytics" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <FamilyAnalyticsPage />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/moderation-tests" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <ModerationTests />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/faq" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <FAQ />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <Settings />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/islamic-tools" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <IslamicTools />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/family-supervision" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <FamilySupervision />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/family-notifications" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <FamilyNotifications />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/family-access" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <FamilyAccess />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/family-portal" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <FamilyAccessPortal />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/family-supervision-panel" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <FamilySupervisionPanel />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/compatibility-test" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <CompatibilityTest />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/compatibility-insights" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <CompatibilityInsightsPage />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            
+            {/* Catch all route */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
           <Toaster />
         </BrowserRouter>
