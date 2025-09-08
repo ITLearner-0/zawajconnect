@@ -37,6 +37,7 @@ interface Match {
   isFamilySupervisor?: boolean;
   user1Profile?: any;
   user2Profile?: any;
+  supervisorProfile?: any;
 }
 
 interface ChatWindowProps {
@@ -139,11 +140,17 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
         }
 
         if (isFamilySupervisor) {
-          // For family supervisors, get both user profiles
+          // For family supervisors, get both user profiles and supervisor profile
           const { data: bothProfiles } = await supabase
             .from('profiles')
             .select('id, full_name, avatar_url, user_id')
             .in('user_id', [data.user1_id, data.user2_id]);
+
+          const { data: supervisorProfile } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url, user_id')
+            .eq('user_id', user.id)
+            .maybeSingle();
 
           const user1Profile = bothProfiles?.find(p => p.user_id === data.user1_id);
           const user2Profile = bothProfiles?.find(p => p.user_id === data.user2_id);
@@ -157,7 +164,8 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
             },
             isFamilySupervisor: true,
             user1Profile,
-            user2Profile
+            user2Profile,
+            supervisorProfile
           });
         } else {
           // For participants, show the other user
@@ -486,8 +494,11 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
                   const isMyMessage = message.sender_id === user?.id;
                   // For family supervisors, get sender name
                   let senderName = '';
-                  if (match?.isFamilySupervisor && !isMyMessage) {
-                    if (message.sender_id === match.user1_id) {
+                  if (match?.isFamilySupervisor) {
+                    if (isMyMessage) {
+                      // Current user is the family supervisor
+                      senderName = `${match.supervisorProfile?.full_name || 'Tuteur'} (Tuteur)`;
+                    } else if (message.sender_id === match.user1_id) {
                       senderName = match.user1Profile?.full_name || 'User1';
                     } else if (message.sender_id === match.user2_id) {
                       senderName = match.user2Profile?.full_name || 'User2';
@@ -508,7 +519,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
                       >
                         {/* Show sender name for family supervisors */}
                         {match?.isFamilySupervisor && senderName && (
-                          <p className="text-xs font-semibold text-emerald mb-1">
+                          <p className="text-xs font-semibold text-primary mb-1">
                             {senderName}
                           </p>
                         )}
