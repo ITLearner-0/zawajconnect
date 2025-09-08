@@ -43,6 +43,7 @@ export const useFamilySupervision = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    console.log('🚀 useFamilySupervision useEffect triggered');
     loadFamilyData();
     loadNotifications();
     
