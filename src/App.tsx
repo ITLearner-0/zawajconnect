@@ -33,6 +33,7 @@ import FamilySupervisionPanel from './components/FamilySupervisionPanel';
 import CompatibilityTest from "./pages/CompatibilityTest";
 import CompatibilityInsightsPage from "./pages/CompatibilityInsights";
 import EnhancedProfile from "./pages/EnhancedProfile";
+import AdvancedMatching from "./pages/AdvancedMatching";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -70,6 +71,7 @@ function App() {
                 <Routes>
                   <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="/enhanced-profile" element={<EnhancedProfile />} />
+                  <Route path="/advanced-matching" element={<AdvancedMatching />} />
                   <Route path="/browse" element={<Browse />} />
                   <Route path="/matches" element={<Matches />} />
                   <Route path="/chat" element={<Chat />} />

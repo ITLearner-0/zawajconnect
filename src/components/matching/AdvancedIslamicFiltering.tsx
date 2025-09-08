@@ -30,6 +30,29 @@ interface IslamicFilters {
   polygamy_acceptance: boolean | null;
 }
 
+interface IslamicPreferences {
+  prayer_frequency?: string;
+  quran_reading?: string;
+  sect?: string;
+  madhab?: string;
+  hijab_preference?: string;
+  beard_preference?: string;
+  halal_diet?: boolean;
+  smoking?: string;
+  importance_of_religion?: string;
+}
+
+interface ProfileWithPreferences {
+  user_id: string;
+  full_name: string;
+  age?: number;
+  location?: string;
+  profession?: string;
+  avatar_url?: string;
+  bio?: string;
+  islamic_preferences?: IslamicPreferences[];
+}
+
 interface FilteredProfile {
   user_id: string;
   full_name: string;
@@ -88,29 +111,30 @@ const AdvancedIslamicFiltering = () => {
     setLoading(true);
     
     try {
-      // Fetch all profiles with Islamic preferences
-      const { data: profiles } = await supabase
+      // Fetch all profiles 
+      const { data: profilesData } = await supabase
         .from('profiles')
-        .select(`
-          user_id,
-          full_name,
-          age,
-          location,
-          profession,
-          avatar_url,
-          islamic_preferences(
-            prayer_frequency,
-            quran_reading,
-            sect,
-            madhab,
-            hijab_preference,
-            beard_preference,
-            halal_diet,
-            smoking,
-            importance_of_religion
-          )
-        `)
+        .select('user_id, full_name, age, location, profession, avatar_url')
         .neq('user_id', user.id);
+
+      // Fetch Islamic preferences separately
+      const { data: islamicPrefsData } = await supabase
+        .from('islamic_preferences')
+        .select('*');
+
+      if (!profilesData || !islamicPrefsData) {
+        setFilteredProfiles([]);
+        return;
+      }
+
+      // Join the data manually
+      const profiles: ProfileWithPreferences[] = profilesData.map(profile => {
+        const userPrefs = islamicPrefsData.filter(pref => pref.user_id === profile.user_id);
+        return {
+          ...profile,
+          islamic_preferences: userPrefs.length > 0 ? userPrefs : undefined
+        };
+      }).filter(profile => profile.islamic_preferences && profile.islamic_preferences.length > 0);
 
       if (!profiles) {
         setFilteredProfiles([]);
@@ -119,7 +143,7 @@ const AdvancedIslamicFiltering = () => {
 
         // Apply Islamic filters
         const filtered = profiles.filter(profile => {
-          const islamicPrefs = profile.islamic_preferences?.[0];
+          const islamicPrefs = profile.islamic_preferences?.[0] as IslamicPreferences;
           if (!islamicPrefs) return false;
 
           // Age filter
@@ -184,27 +208,27 @@ const AdvancedIslamicFiltering = () => {
           return true;
         });
 
-      // Calculate Islamic compatibility score for each profile
-      const scoredProfiles: FilteredProfile[] = filtered.map(profile => {
-        const islamicPrefs = profile.islamic_preferences?.[0];
-        const islamic_score = calculateIslamicScore(islamicPrefs);
-        const matching_criteria = getMatchingCriteria(islamicPrefs);
+        // Calculate Islamic compatibility score for each profile
+        const scoredProfiles: FilteredProfile[] = filtered.map(profile => {
+          const islamicPrefs = profile.islamic_preferences?.[0] as IslamicPreferences;
+          const islamic_score = calculateIslamicScore(islamicPrefs);
+          const matching_criteria = getMatchingCriteria(islamicPrefs);
 
-        return {
-          user_id: profile.user_id,
-          full_name: profile.full_name,
-          age: profile.age,
-          location: profile.location,
-          profession: profile.profession,
-          avatar_url: profile.avatar_url,
-          islamic_score,
-          matching_criteria,
-          prayer_frequency: islamicPrefs?.prayer_frequency || '',
-          quran_reading: islamicPrefs?.quran_reading || '',
-          sect: islamicPrefs?.sect || '',
-          importance_of_religion: islamicPrefs?.importance_of_religion || ''
-        };
-      });
+          return {
+            user_id: profile.user_id,
+            full_name: profile.full_name || '',
+            age: profile.age || 0,
+            location: profile.location || '',
+            profession: profile.profession || '',
+            avatar_url: profile.avatar_url,
+            islamic_score,
+            matching_criteria,
+            prayer_frequency: islamicPrefs?.prayer_frequency || '',
+            quran_reading: islamicPrefs?.quran_reading || '',
+            sect: islamicPrefs?.sect || '',
+            importance_of_religion: islamicPrefs?.importance_of_religion || ''
+          };
+        });
 
       // Sort by Islamic compatibility score
       scoredProfiles.sort((a, b) => b.islamic_score - a.islamic_score);
@@ -228,7 +252,7 @@ const AdvancedIslamicFiltering = () => {
     }
   };
 
-  const calculateIslamicScore = (islamicPrefs: any): number => {
+  const calculateIslamicScore = (islamicPrefs: IslamicPreferences | undefined): number => {
     if (!islamicPrefs) return 0;
     
     let score = 60; // Base score
@@ -248,7 +272,7 @@ const AdvancedIslamicFiltering = () => {
     return Math.min(100, score);
   };
 
-  const getMatchingCriteria = (islamicPrefs: any): string[] => {
+  const getMatchingCriteria = (islamicPrefs: IslamicPreferences | undefined): string[] => {
     const criteria = [];
     
     if (islamicPrefs?.prayer_frequency === 'daily') criteria.push('Prière quotidienne');

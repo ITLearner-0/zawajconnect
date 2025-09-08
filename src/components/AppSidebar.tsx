@@ -70,6 +70,7 @@ export function AppSidebar() {
     { path: '/enhanced-profile', icon: Settings, label: 'Profil Enhanced', group: 'main' },
     { path: '/browse', icon: Search, label: 'Découvrir', group: 'main' },
     { path: '/compatibility-test', icon: Heart, label: 'Test de Compatibilité', group: 'compatibility' },
+    { path: '/advanced-matching', icon: Brain, label: 'Matching Avancé', group: 'compatibility' },
     { path: '/compatibility-insights', icon: Brain, label: 'Mes Insights', group: 'compatibility' },
     { path: '/matches', icon: Users, label: 'Mes Matches', group: 'social' },
     { path: '/guidance', icon: BookOpen, label: 'Guide islamique', group: 'resources' },
@@ -86,7 +87,7 @@ export function AppSidebar() {
     { path: '/family-supervision', icon: Users, label: 'Supervision Familiale', group: 'family' }
   ];
 
-  const navItems = isWali 
+  const navItems = isWali
     ? [...baseNavItems, ...waliNavItems]
     : baseNavItems;
 
