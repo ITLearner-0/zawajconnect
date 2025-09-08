@@ -40,12 +40,25 @@ export const useFamilySupervision = () => {
     supervisionRequired: true
   });
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
+    if (initialized) return; // Prevent multiple initializations
+    
     console.log('🚀 useFamilySupervision useEffect triggered');
-    loadFamilyData();
-    loadNotifications();
+    setInitialized(true);
+    
+    const initializeData = async () => {
+      try {
+        await Promise.all([loadFamilyData(), loadNotifications()]);
+      } catch (error) {
+        console.error('❌ Error initializing family supervision data:', error);
+        setLoading(false);
+      }
+    };
+
+    initializeData();
     
     // Subscribe to real-time notifications
     const subscription = supabase
@@ -71,7 +84,7 @@ export const useFamilySupervision = () => {
     return () => {
       supabase.removeChannel(subscription);
     };
-  }, []);
+  }, [initialized]);
 
   const loadFamilyData = async () => {
     console.log('📊 loadFamilyData starting');

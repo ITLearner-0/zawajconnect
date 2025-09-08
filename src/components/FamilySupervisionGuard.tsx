@@ -20,12 +20,35 @@ const FamilySupervisionGuard: React.FC<FamilySupervisionGuardProps> = ({
   // Hooks must always be called in the same order - move useState to the top
   const [userProfile, setUserProfile] = React.useState<any>(null);
   
+  // Add error boundary for the hook
+  let supervisionData;
+  try {
+    supervisionData = useFamilySupervision();
+  } catch (error) {
+    console.error('❌ Error in useFamilySupervision:', error);
+    return (
+      <Card className="border-red-200 bg-red-50/50 dark:bg-red-900/10">
+        <CardContent className="p-8">
+          <div className="text-center">
+            <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-red-800 dark:text-red-200 mb-2">
+              Erreur de Supervision
+            </h3>
+            <p className="text-red-600 dark:text-red-300">
+              Une erreur s'est produite lors du chargement de la supervision familiale.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
   const { 
     supervisionStatus, 
     loading, 
     requestFamilyApproval,
     getCriticalNotifications 
-  } = useFamilySupervision();
+  } = supervisionData;
   
   console.log('🛡️ FamilySupervisionGuard - loading:', loading, 'supervisionStatus:', supervisionStatus);
 
