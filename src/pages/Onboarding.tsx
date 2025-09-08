@@ -12,6 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import PhotoUpload from '@/components/PhotoUpload';
+import OnboardingWelcome from '@/components/onboarding/OnboardingWelcome';
+import ProfilePreview from '@/components/onboarding/ProfilePreview';
+import StepIndicator from '@/components/onboarding/StepIndicator';
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -21,7 +24,9 @@ import {
   MapPin, 
   CheckCircle,
   Sparkles,
-  Star
+  Star,
+  Target,
+  Settings
 } from 'lucide-react';
 
 interface ProfileData {
@@ -55,6 +60,7 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   
+  const [showWelcome, setShowWelcome] = useState(true);
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setSaving] = useState(false);
   const [newInterest, setNewInterest] = useState('');
@@ -89,6 +95,67 @@ const Onboarding = () => {
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
 
+  // Calculate completion percentage for preview
+  const calculateCompletionPercentage = () => {
+    let total = 0;
+    let completed = 0;
+
+    // Profile data fields (weight: 60%)
+    const profileFields = ['full_name', 'age', 'gender', 'location', 'education', 'profession', 'bio', 'looking_for'];
+    profileFields.forEach(field => {
+      total += 1;
+      if (profileData[field as keyof ProfileData]) completed += 1;
+    });
+
+    // Interests (weight: 10%)
+    total += 1;
+    if (profileData.interests.length > 0) completed += 1;
+
+    // Avatar (weight: 10%)
+    total += 1;
+    if (profileData.avatar_url) completed += 1;
+
+    // Islamic preferences (weight: 20%)
+    const islamicFields = ['prayer_frequency', 'sect', 'importance_of_religion'];
+    islamicFields.forEach(field => {
+      total += 1;
+      if (islamicPrefs[field as keyof IslamicPreferences]) completed += 1;
+    });
+
+    return Math.round((completed / total) * 100);
+  };
+
+  const steps = [
+    {
+      id: 1,
+      title: "Informations personnelles",
+      description: "Nom, âge, localisation",
+      icon: <User className="w-5 h-5" />,
+      estimatedTime: "30s"
+    },
+    {
+      id: 2,
+      title: "Profil détaillé",
+      description: "Éducation, profession, bio",
+      icon: <Settings className="w-5 h-5" />,
+      estimatedTime: "1min"
+    },
+    {
+      id: 3,
+      title: "Préférences islamiques",
+      description: "Pratiques religieuses",
+      icon: <Heart className="w-5 h-5" />,
+      estimatedTime: "1min"
+    },
+    {
+      id: 4,
+      title: "Objectifs",
+      description: "Ce que vous recherchez",
+      icon: <Target className="w-5 h-5" />,
+      estimatedTime: "30s"
+    }
+  ];
+
   useEffect(() => {
     if (!user) {
       navigate('/auth');
@@ -112,10 +179,51 @@ const Onboarding = () => {
       if (profile && profile.bio && profile.looking_for) {
         // User already has a complete profile, redirect to dashboard
         navigate('/dashboard');
+      } else if (profile) {
+        // Pre-fill existing data
+        setProfileData({
+          full_name: profile.full_name || '',
+          age: profile.age || null,
+          gender: profile.gender || '',
+          location: profile.location || '',
+          education: profile.education || '',
+          profession: profile.profession || '',
+          bio: profile.bio || '',
+          looking_for: profile.looking_for || '',
+          interests: profile.interests || [],
+          avatar_url: profile.avatar_url || ''
+        });
+        setShowWelcome(false);
+      }
+
+      // Load Islamic preferences if they exist
+      const { data: islamicData } = await supabase
+        .from('islamic_preferences')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (islamicData) {
+        setIslamicPrefs({
+          prayer_frequency: islamicData.prayer_frequency || '',
+          quran_reading: islamicData.quran_reading || '',
+          hijab_preference: islamicData.hijab_preference || '',
+          beard_preference: islamicData.beard_preference || '',
+          sect: islamicData.sect || '',
+          madhab: islamicData.madhab || '',
+          halal_diet: islamicData.halal_diet ?? true,
+          smoking: islamicData.smoking || '',
+          desired_partner_sect: islamicData.desired_partner_sect || '',
+          importance_of_religion: islamicData.importance_of_religion || ''
+        });
       }
     } catch (error) {
       console.error('Error checking existing profile:', error);
     }
+  };
+
+  const startOnboarding = () => {
+    setShowWelcome(false);
   };
 
   const nextStep = () => {
@@ -270,6 +378,23 @@ const Onboarding = () => {
         return true;
     }
   };
+
+  const handleStepClick = (step: number) => {
+    // Allow navigation to previous steps or current step
+    if (step <= currentStep) {
+      setCurrentStep(step);
+    }
+  };
+
+  // Show welcome screen first
+  if (showWelcome) {
+    return (
+      <OnboardingWelcome 
+        onStart={startOnboarding}
+        userName={user?.user_metadata?.full_name}
+      />
+    );
+  }
 
   const renderStep = () => {
     switch (currentStep) {
@@ -586,62 +711,108 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4">
-      <div className="container mx-auto max-w-2xl">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Heart className="h-8 w-8 text-primary" />
-            <h1 className="text-3xl font-bold">Configuration du profil</h1>
+    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8 animate-fade-in">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              Créez votre profil NikahConnect
+            </h1>
+            <p className="text-muted-foreground">
+              Quelques informations pour trouver votre âme sœur
+            </p>
           </div>
-          <Progress value={progress} className="w-full max-w-md mx-auto h-2" />
-          <p className="text-sm text-muted-foreground mt-2">
-            Étape {currentStep} sur {totalSteps}
-          </p>
-        </div>
 
-        {/* Main Content */}
-        <Card className="shadow-lg">
-          <CardContent className="p-8">
-            {renderStep()}
-          </CardContent>
-        </Card>
+          {/* Step Indicator */}
+          <div className="mb-8">
+            <StepIndicator
+              steps={steps}
+              currentStep={currentStep}
+              onStepClick={handleStepClick}
+            />
+          </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between items-center mt-6">
-          <Button
-            variant="outline"
-            onClick={prevStep}
-            disabled={currentStep === 1}
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Précédent
-          </Button>
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Main Form */}
+            <div className="lg:col-span-2">
+              <Card className="border-border/50 shadow-soft bg-card/95 backdrop-blur-sm animate-slide-in-right">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center space-x-3">
+                      <div className="h-10 w-10 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center text-white">
+                        {steps[currentStep - 1]?.icon}
+                      </div>
+                      <span>{steps[currentStep - 1]?.title}</span>
+                    </CardTitle>
+                    <div className="text-right">
+                      <div className="text-sm text-muted-foreground">
+                        Temps estimé: {steps[currentStep - 1]?.estimatedTime}
+                      </div>
+                      <Progress value={progress} className="h-2 w-32 animate-slide-in-right" />
+                    </div>
+                  </div>
+                </CardHeader>
 
-          {currentStep < totalSteps ? (
-            <Button
-              onClick={nextStep}
-              disabled={!isStepValid()}
-              className="flex items-center gap-2 bg-emerald hover:bg-emerald-dark"
-            >
-              Suivant
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          ) : (
-            <Button
-              onClick={completeOnboarding}
-              disabled={!isStepValid() || loading}
-              className="flex items-center gap-2 bg-gradient-to-r from-emerald to-gold hover:from-emerald-dark hover:to-gold-dark"
-            >
-              {loading ? (
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-              ) : (
-                <Star className="h-4 w-4" />
-              )}
-              {loading ? 'Finalisation...' : 'Finaliser mon profil'}
-            </Button>
-          )}
+                <CardContent className="space-y-6">
+                  {renderStep()}
+
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-between pt-6 border-t border-border/50">
+                    <Button
+                      onClick={prevStep}
+                      variant="outline"
+                      disabled={currentStep === 1}
+                      className="flex items-center space-x-2"
+                    >
+                      <ArrowLeft className="h-4 w-4" />
+                      <span>Précédent</span>
+                    </Button>
+
+                    {currentStep === totalSteps ? (
+                      <Button
+                        onClick={completeOnboarding}
+                        disabled={loading || !isStepValid()}
+                        className="bg-gradient-to-r from-emerald to-emerald-dark hover:from-emerald-dark hover:to-emerald text-white flex items-center space-x-2"
+                      >
+                        {loading ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                            <span>Finalisation...</span>
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="h-4 w-4" />
+                            <span>Terminer</span>
+                          </>
+                        )}
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={nextStep}
+                        disabled={!isStepValid()}
+                        className="bg-emerald hover:bg-emerald-dark text-white flex items-center space-x-2"
+                      >
+                        <span>Suivant</span>
+                        <ArrowRight className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Profile Preview Sidebar */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-8">
+                <ProfilePreview
+                  profileData={profileData}
+                  islamicPrefs={islamicPrefs}
+                  completionPercentage={calculateCompletionPercentage()}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
