@@ -189,22 +189,34 @@ export const useFamilySupervision = () => {
 
       if (!match) return false;
 
-      // Check if both users have wali configured
-      const { data: user1Family } = await supabase
-        .from('family_members')
-        .select('*')
-        .eq('user_id', match.user1_id)
-        .eq('is_wali', true);
+      // Get profiles to check gender - only women need family supervision
+      const { data: profiles, error: profileError } = await supabase
+        .from('profiles')
+        .select('user_id, gender')
+        .in('user_id', [match.user1_id, match.user2_id]);
 
-      const { data: user2Family } = await supabase
-        .from('family_members')
-        .select('*')
-        .eq('user_id', match.user2_id)
-        .eq('is_wali', true);
+      if (profileError) throw profileError;
 
-      const hasSupervision = (user1Family?.length || 0) > 0 && (user2Family?.length || 0) > 0;
+      // Check which users are female and need wali supervision
+      const femaleUsers = profiles?.filter(profile => profile.gender === 'female').map(p => p.user_id) || [];
       
-      return hasSupervision && match.can_communicate;
+      if (femaleUsers.length === 0) {
+        // No female users, no supervision needed
+        return match.can_communicate;
+      }
+
+      // Check if all female users have wali configured
+      const { data: femaleWalis } = await supabase
+        .from('family_members')
+        .select('user_id, is_wali')
+        .in('user_id', femaleUsers)
+        .eq('is_wali', true)
+        .eq('invitation_status', 'accepted');
+
+      const femaleUsersWithWali = new Set(femaleWalis?.map(w => w.user_id) || []);
+      const allFemalesHaveWali = femaleUsers.every(userId => femaleUsersWithWali.has(userId));
+      
+      return allFemalesHaveWali && match.can_communicate;
     } catch (error) {
       console.error('Error checking match supervision:', error);
       return false;
