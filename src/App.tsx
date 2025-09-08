@@ -50,35 +50,41 @@ function App() {
             v7_relativeSplatPath: true
           }}
         >
-          <RoleBasedLayout>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/browse" element={<Browse />} />
-              <Route path="/matches" element={<Matches />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/chat/:matchId" element={<Chat />} />
-              <Route path="/profile/:userId" element={<Profile />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-              <Route path="/family" element={<Family />} />
-              <Route path="/guidance" element={<Guidance />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/moderation-test" element={<ModerationTest />} />
-              <Route path="/faq" element={<FAQ />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/islamic-tools" element={<IslamicTools />} />
-           <Route path="/family-supervision" element={<FamilySupervision />} />
-           <Route path="/family-notifications" element={<FamilyNotifications />} />
-           <Route path="/invitation" element={<InvitationAuth />} />
-           <Route path="/family-access" element={<FamilyAccess />} />
-              <Route path="/compatibility-test" element={<CompatibilityTest />} />
-              <Route path="/compatibility-insights" element={<CompatibilityInsightsPage />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </RoleBasedLayout>
+          <Routes>
+            {/* Public routes - no authentication required */}
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/invitation" element={<InvitationAuth />} />
+            
+            {/* Protected routes - wrapped in RoleBasedLayout */}
+            <Route path="/*" element={
+              <RoleBasedLayout>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/browse" element={<Browse />} />
+                  <Route path="/matches" element={<Matches />} />
+                  <Route path="/chat" element={<Chat />} />
+                  <Route path="/chat/:matchId" element={<Chat />} />
+                  <Route path="/profile/:userId" element={<Profile />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/family" element={<Family />} />
+                  <Route path="/guidance" element={<Guidance />} />
+                  <Route path="/admin" element={<Admin />} />
+                  <Route path="/moderation-test" element={<ModerationTest />} />
+                  <Route path="/faq" element={<FAQ />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/islamic-tools" element={<IslamicTools />} />
+                  <Route path="/family-supervision" element={<FamilySupervision />} />
+                  <Route path="/family-notifications" element={<FamilyNotifications />} />
+                  <Route path="/family-access" element={<FamilyAccess />} />
+                  <Route path="/compatibility-test" element={<CompatibilityTest />} />
+                  <Route path="/compatibility-insights" element={<CompatibilityInsightsPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </RoleBasedLayout>
+            } />
+          </Routes>
           <Toaster />
         </BrowserRouter>
       </AuthProvider>
