@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -71,6 +72,15 @@ const WaliDashboard: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const handleViewProfile = (userId: string) => {
+    navigate(`/profile/${userId}`);
+  };
+
+  const handleViewConversations = (userId: string) => {
+    navigate(`/family-supervision?supervised_user=${userId}`);
+  };
 
   useEffect(() => {
     loadWaliData();
@@ -445,11 +455,19 @@ const WaliDashboard: React.FC = () => {
                             </div>
                           </div>
                           <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handleViewProfile(user.user_id)}
+                            >
                               <Eye className="h-4 w-4 mr-1" />
                               Voir Profil
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleViewConversations(user.user_id)}
+                            >
                               <MessageSquare className="h-4 w-4 mr-1" />
                               Conversations
                             </Button>
