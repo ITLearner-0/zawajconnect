@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -37,6 +38,7 @@ interface MatchingPreferences {
 const AdvancedMatchingEngine = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [matches, setMatches] = useState<MatchProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -361,8 +363,7 @@ const AdvancedMatchingEngine = () => {
                               title: "Profil ouvert",
                               description: `Consultation du profil de ${match.full_name}`,
                             });
-                            // Navigate to profile page
-                            window.location.href = `/profile/${match.user_id}`;
+                            navigate(`/profile/${match.user_id}`);
                           }}
                         >
                           Voir le profil
