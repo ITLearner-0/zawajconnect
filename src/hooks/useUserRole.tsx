@@ -9,13 +9,75 @@ interface UserRole {
   loading: boolean;
 }
 
-// Cache global pour éviter les appels répétés
-const roleCache = new Map<string, { role: UserRole; timestamp: number }>();
-const CACHE_DURATION = 60000; // 1 minute
-const activeRequests = new Map<string, Promise<UserRole>>();
+// Système de cache global sophistiqué
+class RoleCache {
+  private cache = new Map<string, { role: UserRole; timestamp: number }>();
+  private activeRequests = new Map<string, Promise<UserRole>>();
+  private requestQueue = new Set<string>();
+  private readonly CACHE_DURATION = 300000; // 5 minutes
+  
+  async getRole(userId: string, fetcher: () => Promise<UserRole>): Promise<UserRole> {
+    // 1. Vérifier le cache en premier
+    const cached = this.cache.get(userId);
+    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+      console.log('🎯 Cache hit for user:', userId);
+      return cached.role;
+    }
+    
+    // 2. Vérifier si une requête est déjà en cours
+    if (this.activeRequests.has(userId)) {
+      console.log('🔄 Request already in progress for user:', userId);
+      return this.activeRequests.get(userId)!;
+    }
+    
+    // 3. Vérifier la queue pour éviter les requêtes simultanées
+    if (this.requestQueue.has(userId)) {
+      console.log('⏳ Request queued for user:', userId);
+      // Attendre un court délai et réessayer
+      await new Promise(resolve => setTimeout(resolve, 50));
+      return this.getRole(userId, fetcher);
+    }
+    
+    // 4. Ajouter à la queue et faire la requête
+    this.requestQueue.add(userId);
+    console.log('🔍 Starting new request for user:', userId);
+    
+    const promise = this.executeRequest(userId, fetcher);
+    this.activeRequests.set(userId, promise);
+    
+    return promise;
+  }
+  
+  private async executeRequest(userId: string, fetcher: () => Promise<UserRole>): Promise<UserRole> {
+    try {
+      const role = await fetcher();
+      
+      // Mettre en cache le résultat
+      this.cache.set(userId, {
+        role,
+        timestamp: Date.now()
+      });
+      
+      console.log('✅ Role fetched and cached for user:', userId, role);
+      return role;
+    } catch (error) {
+      console.error('❌ Error fetching role for user:', userId, error);
+      return { isWaliOnly: false, isRegularUser: true, isWali: false, loading: false };
+    } finally {
+      // Nettoyer les références
+      this.activeRequests.delete(userId);
+      this.requestQueue.delete(userId);
+    }
+  }
+  
+  clearCache() {
+    this.cache.clear();
+    this.activeRequests.clear();
+    this.requestQueue.clear();
+  }
+}
 
-// Global flag pour éviter les appels simultanés
-let isAnyRequestInProgress = false;
+const globalRoleCache = new RoleCache();
 
 export const useUserRole = (): UserRole => {
   const { user } = useAuth();
@@ -33,83 +95,34 @@ export const useUserRole = (): UserRole => {
   // Stable reference pour user.id
   const userId = useMemo(() => user?.id, [user?.id]);
 
-  const checkUserRole = useCallback(async (targetUserId: string): Promise<UserRole> => {
-    // Vérifier s'il y a déjà une requête en cours pour cet utilisateur
-    if (activeRequests.has(targetUserId)) {
-      console.log('🔄 Reusing active request for user:', targetUserId);
-      return activeRequests.get(targetUserId)!;
-    }
+  const fetchUserRole = useCallback(async (targetUserId: string): Promise<UserRole> => {
+    return globalRoleCache.getRole(targetUserId, async () => {
+      const [profileResult, familyResult] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('full_name, age, gender, bio')
+          .eq('user_id', targetUserId)
+          .maybeSingle(),
+        supabase
+          .from('family_members')
+          .select('invited_user_id, is_wali, relationship, invitation_status')
+          .eq('invited_user_id', targetUserId)
+      ]);
 
-    // Vérifier le cache
-    const cached = roleCache.get(targetUserId);
-    if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
-      console.log('🎯 Using cached role for user:', targetUserId);
-      return cached.role;
-    }
+      const profile = profileResult.data;
+      const invitedAs = familyResult.data;
 
-    // Éviter les requêtes simultanées globales
-    if (isAnyRequestInProgress) {
-      console.log('⏳ Another request in progress, waiting...');
-      // Attendre un peu et réessayer
-      await new Promise(resolve => setTimeout(resolve, 100));
-      return checkUserRole(targetUserId);
-    }
+      const acceptedInvitations = invitedAs?.filter(invite => invite.invitation_status === 'accepted') || [];
+      const isInvitedWali = acceptedInvitations.length > 0;
+      const hasCompleteProfile = profile && profile.age && profile.gender && Boolean(profile.bio);
 
-    // Créer une nouvelle requête
-    const rolePromise = (async (): Promise<UserRole> => {
-      isAnyRequestInProgress = true;
-      try {
-        console.log('🔍 Fetching role for user:', targetUserId);
-        
-        const [profileResult, familyResult] = await Promise.all([
-          supabase
-            .from('profiles')
-            .select('full_name, age, gender, bio')
-            .eq('user_id', targetUserId)
-            .maybeSingle(),
-          supabase
-            .from('family_members')
-            .select('invited_user_id, is_wali, relationship, invitation_status')
-            .eq('invited_user_id', targetUserId)
-        ]);
-
-        const profile = profileResult.data;
-        const invitedAs = familyResult.data;
-
-        const acceptedInvitations = invitedAs?.filter(invite => invite.invitation_status === 'accepted') || [];
-        const isInvitedWali = acceptedInvitations.length > 0;
-        const hasCompleteProfile = profile && profile.age && profile.gender && Boolean(profile.bio);
-
-        const finalRole = {
-          isWaliOnly: false,
-          isRegularUser: hasCompleteProfile || isInvitedWali,
-          isWali: isInvitedWali,
-          loading: false
-        };
-
-        console.log('✅ Role fetched for user:', targetUserId, finalRole);
-
-        // Mettre en cache
-        roleCache.set(targetUserId, {
-          role: finalRole,
-          timestamp: Date.now()
-        });
-
-        return finalRole;
-      } catch (error) {
-        console.error('Error checking user role:', error);
-        return { isWaliOnly: false, isRegularUser: true, isWali: false, loading: false };
-      } finally {
-        // Nettoyer les flags et requêtes actives
-        isAnyRequestInProgress = false;
-        activeRequests.delete(targetUserId);
-      }
-    })();
-
-    // Stocker la requête active
-    activeRequests.set(targetUserId, rolePromise);
-    
-    return rolePromise;
+      return {
+        isWaliOnly: false,
+        isRegularUser: hasCompleteProfile || isInvitedWali,
+        isWali: isInvitedWali,
+        loading: false
+      };
+    });
   }, []);
 
   useEffect(() => {
@@ -125,9 +138,9 @@ export const useUserRole = (): UserRole => {
       lastUserId.current = userId;
       isInitialized.current = true;
       
-      checkUserRole(userId).then(setRole);
+      fetchUserRole(userId).then(setRole);
     }
-  }, [user, userId, checkUserRole]);
+  }, [user, userId, fetchUserRole]);
 
   return role;
 };
