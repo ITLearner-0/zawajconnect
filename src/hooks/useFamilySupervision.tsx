@@ -78,8 +78,12 @@ export const useFamilySupervision = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       console.log('👤 loadFamilyData - user:', user?.id);
-      if (!user) return;
+      if (!user) {
+        console.log('❌ No user found, returning');
+        return;
+      }
 
+      console.log('🔍 Querying family_members as wali...');
       // Check if user is a family member (invited as wali) OR has family members
       const { data: familyDataAsWali, error: waliError } = await supabase
         .from('family_members')
@@ -88,6 +92,7 @@ export const useFamilySupervision = () => {
         .eq('invitation_status', 'accepted')
         .order('created_at', { ascending: false });
 
+      console.log('🔍 Querying family_members as user...');
       const { data: familyDataAsUser, error: userError } = await supabase
         .from('family_members')
         .select('*')
@@ -97,12 +102,14 @@ export const useFamilySupervision = () => {
       console.log('👨‍👩‍👧‍👦 loadFamilyData - wali data:', familyDataAsWali, 'user data:', familyDataAsUser);
       console.log('❓ Errors:', { waliError, userError });
 
-      if (waliError || userError) {
+      if (waliError && userError) {
+        console.log('❌ Both queries failed');
         throw waliError || userError;
       }
 
       // Combine both results
       const allFamilyData = [...(familyDataAsWali || []), ...(familyDataAsUser || [])];
+      console.log('📋 Combined family data:', allFamilyData);
       setFamilyMembers(allFamilyData);
       
       // Check supervision status - user is a wali if they appear in invited_user_id
@@ -111,12 +118,15 @@ export const useFamilySupervision = () => {
       
       console.log('🛡️ loadFamilyData - isWali:', isWali, 'hasWali:', hasWali);
       
-      setSupervisionStatus(prev => ({
-        ...prev,
+      const newStatus = {
+        ...supervisionStatus,
         hasWali,
         canCommunicate: hasWali || isWali, // Can communicate if has wali OR is wali
         familyApproved: hasWali || isWali
-      }));
+      };
+      
+      console.log('🔄 Setting new supervision status:', newStatus);
+      setSupervisionStatus(newStatus);
 
     } catch (error) {
       console.error('❌ Error loading family data:', error);
@@ -126,7 +136,7 @@ export const useFamilySupervision = () => {
         variant: "destructive"
       });
     } finally {
-      console.log('✅ loadFamilyData completed');
+      console.log('✅ loadFamilyData completed, setting loading to false');
       setLoading(false);
     }
   };
