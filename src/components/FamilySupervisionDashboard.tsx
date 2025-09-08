@@ -169,28 +169,40 @@ const FamilySupervisionDashboard = () => {
 
   const joinConversation = async (matchId: string) => {
     try {
+      console.log('🔄 Joining conversation for match:', matchId);
+      console.log('👨‍👩‍👧‍👦 Family role:', familyRole);
+      
       // Add family member as participant if not already added
+      const participantData = {
+        match_id: matchId,
+        participant_id: familyRole!.id,
+        participant_type: 'family_member',
+        family_member_id: familyRole!.id,
+        user_id: user?.id, // Use the current authenticated user's ID (the wali)
+        can_send_messages: familyRole!.can_communicate,
+        can_read_messages: familyRole!.can_view_profile
+      };
+      
+      console.log('📋 Participant data to insert:', participantData);
+      
       const { error } = await supabase
         .from('conversation_participants')
-        .upsert({
-          match_id: matchId,
-          participant_id: familyRole!.id,
-          participant_type: 'family_member',
-          family_member_id: familyRole!.id,
-          user_id: familyRole!.user_id,
-          can_send_messages: familyRole!.can_communicate,
-          can_read_messages: familyRole!.can_view_profile
-        });
+        .upsert(participantData);
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ Database error:', error);
+        throw error;
+      }
 
+      console.log('✅ Successfully joined conversation');
+      
       // Navigate to chat with supervision
       window.location.href = `/chat?matchId=${matchId}&supervision=true`;
     } catch (error) {
-      console.error('Error joining conversation:', error);
+      console.error('💥 Error joining conversation:', error);
       toast({
         title: "Erreur",
-        description: 'Erreur lors de la participation à la conversation',
+        description: `Erreur lors de la participation à la conversation: ${error?.message || 'Erreur inconnue'}`,
         variant: "destructive"
       });
     }
