@@ -34,6 +34,9 @@ interface Match {
     avatar_url: string;
     last_seen?: string;
   };
+  isFamilySupervisor?: boolean;
+  user1Profile?: any;
+  user2Profile?: any;
 }
 
 interface ChatWindowProps {
@@ -107,8 +110,8 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
       if (error) throw error;
 
       if (data) {
-        // Check if user is participant or family supervisor
         const isParticipant = data.user1_id === user.id || data.user2_id === user.id;
+        let isFamilySupervisor = false;
         
         if (!isParticipant) {
           // Check if user is a family supervisor
@@ -132,27 +135,54 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
             if (onClose) onClose();
             return;
           }
+          isFamilySupervisor = true;
         }
-        const otherUserId = data.user1_id === user.id ? data.user2_id : data.user1_id;
-        
-        const { data: otherUserProfile } = await supabase
-          .from('profiles')
-          .select('id, full_name, avatar_url, user_id')
-          .eq('user_id', otherUserId)
-          .maybeSingle();
 
-        setMatch({
-          ...data,
-          other_user: otherUserProfile ? {
-            id: otherUserProfile.user_id,
-            full_name: otherUserProfile.full_name || 'Utilisateur',
-            avatar_url: otherUserProfile.avatar_url || ''
-          } : {
-            id: otherUserId,
-            full_name: 'Utilisateur inconnu',
-            avatar_url: ''
-          }
-        });
+        if (isFamilySupervisor) {
+          // For family supervisors, get both user profiles
+          const { data: bothProfiles } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url, user_id')
+            .in('user_id', [data.user1_id, data.user2_id]);
+
+          const user1Profile = bothProfiles?.find(p => p.user_id === data.user1_id);
+          const user2Profile = bothProfiles?.find(p => p.user_id === data.user2_id);
+          
+          setMatch({
+            ...data,
+            other_user: {
+              id: 'supervision',
+              full_name: `${user1Profile?.full_name || 'User1'} & ${user2Profile?.full_name || 'User2'}`,
+              avatar_url: ''
+            },
+            isFamilySupervisor: true,
+            user1Profile,
+            user2Profile
+          });
+        } else {
+          // For participants, show the other user
+          const otherUserId = data.user1_id === user.id ? data.user2_id : data.user1_id;
+          
+          const { data: otherUserProfile } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url, user_id')
+            .eq('user_id', otherUserId)
+            .maybeSingle();
+
+          setMatch({
+            ...data,
+            other_user: otherUserProfile ? {
+              id: otherUserProfile.user_id,
+              full_name: otherUserProfile.full_name || 'Utilisateur',
+              avatar_url: otherUserProfile.avatar_url || ''
+            } : {
+              id: otherUserId,
+              full_name: 'Utilisateur inconnu',
+              avatar_url: ''
+            },
+            isFamilySupervisor: false
+          });
+        }
       }
     } catch (error) {
       console.error('Error fetching match data:', error);
@@ -454,6 +484,16 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
               ) : (
                 messages.map((message) => {
                   const isMyMessage = message.sender_id === user?.id;
+                  // For family supervisors, get sender name
+                  let senderName = '';
+                  if (match?.isFamilySupervisor && !isMyMessage) {
+                    if (message.sender_id === match.user1_id) {
+                      senderName = match.user1Profile?.full_name || 'User1';
+                    } else if (message.sender_id === match.user2_id) {
+                      senderName = match.user2Profile?.full_name || 'User2';
+                    }
+                  }
+                  
                   return (
                     <div
                       key={message.id}
@@ -466,6 +506,12 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
                             : 'bg-muted text-foreground'
                         }`}
                       >
+                        {/* Show sender name for family supervisors */}
+                        {match?.isFamilySupervisor && senderName && (
+                          <p className="text-xs font-semibold text-emerald mb-1">
+                            {senderName}
+                          </p>
+                        )}
                         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                         <p className={`text-xs mt-1 ${
                           isMyMessage ? 'text-emerald-light' : 'text-muted-foreground'
