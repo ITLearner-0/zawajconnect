@@ -15,6 +15,10 @@ import PhotoUpload from '@/components/PhotoUpload';
 import OnboardingWelcome from '@/components/onboarding/OnboardingWelcome';
 import ProfilePreview from '@/components/onboarding/ProfilePreview';
 import StepIndicator from '@/components/onboarding/StepIndicator';
+import InterestsSelector from '@/components/onboarding/InterestsSelector';
+import StepValidation from '@/components/onboarding/StepValidation';
+import PhotoUploadStep from '@/components/onboarding/PhotoUploadStep';
+import { useOnboardingValidation } from '@/hooks/useOnboardingValidation';
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -63,7 +67,6 @@ const Onboarding = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setSaving] = useState(false);
-  const [newInterest, setNewInterest] = useState('');
 
   // Profile data states
   const [profileData, setProfileData] = useState<ProfileData>({
@@ -95,35 +98,14 @@ const Onboarding = () => {
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
 
-  // Calculate completion percentage for preview
-  const calculateCompletionPercentage = () => {
-    let total = 0;
-    let completed = 0;
+  // Use validation hook
+  const validation = useOnboardingValidation({
+    profileData,
+    islamicPrefs,
+    currentStep
+  });
 
-    // Profile data fields (weight: 60%)
-    const profileFields = ['full_name', 'age', 'gender', 'location', 'education', 'profession', 'bio', 'looking_for'];
-    profileFields.forEach(field => {
-      total += 1;
-      if (profileData[field as keyof ProfileData]) completed += 1;
-    });
-
-    // Interests (weight: 10%)
-    total += 1;
-    if (profileData.interests.length > 0) completed += 1;
-
-    // Avatar (weight: 10%)
-    total += 1;
-    if (profileData.avatar_url) completed += 1;
-
-    // Islamic preferences (weight: 20%)
-    const islamicFields = ['prayer_frequency', 'sect', 'importance_of_religion'];
-    islamicFields.forEach(field => {
-      total += 1;
-      if (islamicPrefs[field as keyof IslamicPreferences]) completed += 1;
-    });
-
-    return Math.round((completed / total) * 100);
-  };
+  const calculateCompletionPercentage = validation.getOverallProgress;
 
   const steps = [
     {
@@ -238,23 +220,6 @@ const Onboarding = () => {
     }
   };
 
-  const addInterest = () => {
-    if (newInterest.trim() && !profileData.interests.includes(newInterest.trim())) {
-      setProfileData({
-        ...profileData,
-        interests: [...profileData.interests, newInterest.trim()]
-      });
-      setNewInterest('');
-    }
-  };
-
-  const removeInterest = (interestToRemove: string) => {
-    setProfileData({
-      ...profileData,
-      interests: profileData.interests.filter(interest => interest !== interestToRemove)
-    });
-  };
-
   const saveProfile = async () => {
     if (!user) return false;
     
@@ -364,20 +329,7 @@ const Onboarding = () => {
     setSaving(false);
   };
 
-  const isStepValid = () => {
-    switch (currentStep) {
-      case 1:
-        return profileData.full_name && profileData.age && profileData.gender && profileData.location;
-      case 2:
-        return profileData.education && profileData.profession && profileData.bio;
-      case 3:
-        return islamicPrefs.prayer_frequency && islamicPrefs.sect && islamicPrefs.importance_of_religion;
-      case 4:
-        return profileData.looking_for;
-      default:
-        return true;
-    }
-  };
+  const isStepValid = () => validation.isStepValid(currentStep);
 
   const handleStepClick = (step: number) => {
     // Allow navigation to previous steps or current step
@@ -514,35 +466,15 @@ const Onboarding = () => {
               />
             </div>
 
-            <div>
-              <Label>Centres d'intérêt</Label>
-              <div className="flex flex-wrap gap-2 mt-2 mb-2">
-                {profileData.interests.map((interest) => (
-                  <span
-                    key={interest}
-                    className="bg-emerald/10 text-emerald px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-emerald/20 transition-colors"
-                    onClick={() => removeInterest(interest)}
-                  >
-                    {interest} ×
-                  </span>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  value={newInterest}
-                  onChange={(e) => setNewInterest(e.target.value)}
-                  placeholder="Ajouter un centre d'intérêt"
-                  onKeyPress={(e) => e.key === 'Enter' && addInterest()}
-                />
-                <Button type="button" onClick={addInterest} variant="outline">
-                  Ajouter
-                </Button>
-              </div>
-            </div>
+            <InterestsSelector 
+              interests={profileData.interests}
+              onInterestsChange={(interests) => setProfileData({...profileData, interests})}
+            />
 
-            <PhotoUpload 
-              currentPhotoUrl={profileData.avatar_url}
-              onPhotoUpdate={(url) => setProfileData({...profileData, avatar_url: url})}
+            <PhotoUploadStep 
+              avatarUrl={profileData.avatar_url}
+              onPhotoChange={(url) => setProfileData({...profileData, avatar_url: url})}
+              userName={profileData.full_name}
             />
           </div>
         );
@@ -756,6 +688,12 @@ const Onboarding = () => {
 
                 <CardContent className="space-y-6">
                   {renderStep()}
+                  
+                  {/* Step Validation */}
+                  <StepValidation 
+                    rules={validation.getCurrentStepRules()}
+                    stepNumber={currentStep}
+                  />
 
                   {/* Navigation Buttons */}
                   <div className="flex justify-between pt-6 border-t border-border/50">
