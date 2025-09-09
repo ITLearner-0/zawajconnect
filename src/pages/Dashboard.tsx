@@ -20,6 +20,10 @@ import CompatibilityPrompt from '@/components/CompatibilityPrompt';
 import InsightsPreviewCard from '@/components/InsightsPreviewCard';
 import OnboardingFlow from '@/components/OnboardingFlow';
 import GamifiedInsights from '@/components/GamifiedInsights';
+import SampleProfilesGenerator from '@/components/SampleProfilesGenerator';
+import SmartMatchingSuggestions from '@/components/SmartMatchingSuggestions';
+import QuickActionsPanel from '@/components/QuickActionsPanel';
+import OnboardingCompletionGuide from '@/components/OnboardingCompletionGuide';
 
 interface Profile {
   id: string;
@@ -232,6 +236,9 @@ const Dashboard = () => {
             )}
           </div>
         </div>
+
+        {/* Onboarding Guide for new users */}
+        <OnboardingCompletionGuide />
 
         {/* Compatibility Prompt for incomplete questionnaires */}
         <CompatibilityPrompt />
@@ -643,6 +650,9 @@ const Dashboard = () => {
           {/* Compatibility Card */}
           <div className="xl:col-span-1 order-1 xl:order-2">
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-1">
+              <QuickActionsPanel />
+              <SmartMatchingSuggestions />
+              <SampleProfilesGenerator />
               <CompatibilityCard />
               <InsightsPreviewCard />
             </div>
