@@ -69,9 +69,9 @@ export const useProfileSave = () => {
       console.log('Gender length:', profileUpdateData.gender?.length);
       console.log('Gender char codes:', profileUpdateData.gender?.split('').map(c => c.charCodeAt(0)));
       
-      // Validate gender specifically before sending to DB
-      if (!profileUpdateData.gender || !['male', 'female'].includes(profileUpdateData.gender)) {
-        throw new Error(`Invalid gender value: "${profileUpdateData.gender}" (type: ${typeof profileUpdateData.gender}). Must be 'male' or 'female'.`);
+      // Validate gender exists (database constraint will handle case/whitespace)
+      if (!profileUpdateData.gender || profileUpdateData.gender.trim().length === 0) {
+        throw new Error(`Gender value is required.`);
       }
       
       console.log('Sending to database:', JSON.stringify(profileUpdateData, null, 2));
