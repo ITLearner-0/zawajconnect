@@ -330,6 +330,29 @@ const Onboarding = () => {
       return;
     }
 
+    // Validate required fields before saving
+    if (!profileData.full_name || !profileData.age || !profileData.gender) {
+      toast({
+        title: "Informations manquantes",
+        description: "Veuillez remplir tous les champs obligatoires.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Ensure gender is in correct format
+    const validGenders = ['male', 'female'];
+    if (!validGenders.includes(profileData.gender)) {
+      console.error('Invalid gender value:', profileData.gender);
+      toast({
+        title: "Erreur de validation",
+        description: "Veuillez sélectionner un genre valide.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    console.log('Profile data before save:', profileData);
     setSaving(true);
     
     try {
@@ -339,6 +362,12 @@ const Onboarding = () => {
         // Clear form drafts on successful completion
         formPersistence.clearDrafts();
         navigate('/dashboard');
+      } else {
+        toast({
+          title: "Erreur de sauvegarde",
+          description: result.error || "Une erreur est survenue lors de la sauvegarde de votre profil.",
+          variant: "destructive"
+        });
       }
     } catch (error) {
       console.error('Onboarding completion error:', error);
