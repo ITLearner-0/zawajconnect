@@ -18,7 +18,10 @@ import StepIndicator from '@/components/onboarding/StepIndicator';
 import InterestsSelector from '@/components/onboarding/InterestsSelector';
 import StepValidation from '@/components/onboarding/StepValidation';
 import PhotoUploadStep from '@/components/onboarding/PhotoUploadStep';
+import IslamicPreferencesStep from '@/components/onboarding/IslamicPreferencesStep';
+import MobileStepNavigation from '@/components/onboarding/MobileStepNavigation';
 import { useOnboardingValidation } from '@/hooks/useOnboardingValidation';
+import { useFormPersistence } from '@/hooks/useFormPersistence';
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -100,6 +103,13 @@ const Onboarding = () => {
 
   // Use validation hook
   const validation = useOnboardingValidation({
+    profileData,
+    islamicPrefs,
+    currentStep
+  });
+
+  // Use form persistence hook
+  const formPersistence = useFormPersistence({
     profileData,
     islamicPrefs,
     currentStep
@@ -313,6 +323,9 @@ const Onboarding = () => {
     const prefsSaved = await saveIslamicPreferences();
     
     if (profileSaved && prefsSaved) {
+      // Clear form drafts on successful completion
+      formPersistence.clearDrafts();
+      
       toast({
         title: "Profil créé avec succès !",
         description: "Bienvenue sur NikahConnect. Vous pouvez maintenant découvrir des profils compatibles.",
@@ -481,104 +494,11 @@ const Onboarding = () => {
 
       case 3:
         return (
-          <div className="space-y-6">
-            <div className="text-center space-y-2 mb-8">
-              <div className="flex justify-center">
-                <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-                  <Heart className="h-6 w-6 text-white" />
-                </div>
-              </div>
-              <h2 className="text-2xl font-bold">Préférences islamiques</h2>
-              <p className="text-muted-foreground">Vos pratiques et valeurs religieuses</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>Fréquence de prière *</Label>
-                <Select value={islamicPrefs.prayer_frequency} onValueChange={(value) => setIslamicPrefs({...islamicPrefs, prayer_frequency: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="5_times_daily">5 fois par jour</SelectItem>
-                    <SelectItem value="sometimes">Parfois</SelectItem>
-                    <SelectItem value="fridays_only">Seulement le vendredi</SelectItem>
-                    <SelectItem value="occasionally">Occasionnellement</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Lecture du Coran</Label>
-                <Select value={islamicPrefs.quran_reading} onValueChange={(value) => setIslamicPrefs({...islamicPrefs, quran_reading: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="daily">Quotidiennement</SelectItem>
-                    <SelectItem value="weekly">Hebdomadairement</SelectItem>
-                    <SelectItem value="occasionally">Occasionnellement</SelectItem>
-                    <SelectItem value="rarely">Rarement</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label>École juridique (Madhab)</Label>
-                <Select value={islamicPrefs.madhab} onValueChange={(value) => setIslamicPrefs({...islamicPrefs, madhab: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="hanafi">Hanafi</SelectItem>
-                    <SelectItem value="maliki">Maliki</SelectItem>
-                    <SelectItem value="shafi">Shafi'i</SelectItem>
-                    <SelectItem value="hanbali">Hanbali</SelectItem>
-                    <SelectItem value="salafi">Salafi</SelectItem>
-                    <SelectItem value="other">Autre</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Secte *</Label>
-                <Select value={islamicPrefs.sect} onValueChange={(value) => setIslamicPrefs({...islamicPrefs, sect: value})}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Sélectionnez" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="sunni">Sunnite</SelectItem>
-                    <SelectItem value="shia">Chiite</SelectItem>
-                    <SelectItem value="other">Autre</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div>
-              <Label>Importance de la religion *</Label>
-              <Select value={islamicPrefs.importance_of_religion} onValueChange={(value) => setIslamicPrefs({...islamicPrefs, importance_of_religion: value})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionnez" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="very_important">Très importante</SelectItem>
-                  <SelectItem value="somewhat_important">Assez importante</SelectItem>
-                  <SelectItem value="moderate">Modérée</SelectItem>
-                  <SelectItem value="not_very_important">Peu importante</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="halal_diet"
-                checked={islamicPrefs.halal_diet}
-                onCheckedChange={(checked) => setIslamicPrefs({...islamicPrefs, halal_diet: checked === true})}
-              />
-              <Label htmlFor="halal_diet">Je suis un régime halal</Label>
-            </div>
-          </div>
+          <IslamicPreferencesStep
+            preferences={islamicPrefs}
+            onPreferencesChange={setIslamicPrefs}
+            gender={profileData.gender}
+          />
         );
 
       case 4:
@@ -643,12 +563,12 @@ const Onboarding = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
+    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 islamic-pattern pb-24 md:pb-8">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8 animate-fade-in">
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2 gradient-text">
               Créez votre profil NikahConnect
             </h1>
             <p className="text-muted-foreground">
@@ -668,7 +588,7 @@ const Onboarding = () => {
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Main Form */}
             <div className="lg:col-span-2">
-              <Card className="border-border/50 shadow-soft bg-card/95 backdrop-blur-sm animate-slide-in-right">
+              <Card className="border-border/50 shadow-soft bg-card/95 backdrop-blur-sm animate-slide-in-right card-hover">
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center space-x-3">
@@ -677,7 +597,7 @@ const Onboarding = () => {
                       </div>
                       <span>{steps[currentStep - 1]?.title}</span>
                     </CardTitle>
-                    <div className="text-right">
+                    <div className="text-right desktop-only">
                       <div className="text-sm text-muted-foreground">
                         Temps estimé: {steps[currentStep - 1]?.estimatedTime}
                       </div>
@@ -695,8 +615,8 @@ const Onboarding = () => {
                     stepNumber={currentStep}
                   />
 
-                  {/* Navigation Buttons */}
-                  <div className="flex justify-between pt-6 border-t border-border/50">
+                  {/* Desktop Navigation Buttons */}
+                  <div className="desktop-only flex justify-between pt-6 border-t border-border/50">
                     <Button
                       onClick={prevStep}
                       variant="outline"
@@ -741,7 +661,7 @@ const Onboarding = () => {
             </div>
 
             {/* Profile Preview Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 desktop-only">
               <div className="sticky top-8">
                 <ProfilePreview
                   profileData={profileData}
@@ -750,6 +670,21 @@ const Onboarding = () => {
                 />
               </div>
             </div>
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="mobile-only fixed bottom-0 left-0 right-0 z-50">
+            <MobileStepNavigation
+              currentStep={currentStep}
+              totalSteps={totalSteps}
+              isStepValid={isStepValid()}
+              canGoNext={isStepValid()}
+              canGoPrevious={currentStep > 1}
+              isLoading={loading}
+              onPrevious={prevStep}
+              onNext={nextStep}
+              onComplete={completeOnboarding}
+            />
           </div>
         </div>
       </div>
