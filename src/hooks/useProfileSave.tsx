@@ -63,12 +63,31 @@ export const useProfileSave = () => {
         updated_at: new Date().toISOString()
       };
       
+      // Validate gender specifically before sending to DB
+      if (!profileUpdateData.gender || !['male', 'female'].includes(profileUpdateData.gender)) {
+        throw new Error(`Invalid gender value: ${profileUpdateData.gender}. Must be 'male' or 'female'.`);
+      }
+      
       console.log('Sending to database:', JSON.stringify(profileUpdateData, null, 2));
       
-      // 1. Save basic profile
-      const { error: profileError } = await supabase
+      // 1. Save basic profile - first try to update, then insert if needed
+      let profileError = null;
+      
+      // Try to update first
+      const { error: updateError } = await supabase
         .from('profiles')
-        .upsert(profileUpdateData);
+        .update(profileUpdateData)
+        .eq('user_id', user.id);
+        
+      if (updateError?.code === 'PGRST116') {
+        // No rows updated, try to insert
+        const { error: insertError } = await supabase
+          .from('profiles')
+          .insert(profileUpdateData);
+        profileError = insertError;
+      } else {
+        profileError = updateError;
+      }
 
       if (profileError) {
         console.error('Profile save error:', profileError);
