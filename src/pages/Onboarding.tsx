@@ -22,6 +22,7 @@ import IslamicPreferencesStep from '@/components/onboarding/IslamicPreferencesSt
 import MobileStepNavigation from '@/components/onboarding/MobileStepNavigation';
 import { useOnboardingValidation } from '@/hooks/useOnboardingValidation';
 import { useFormPersistence } from '@/hooks/useFormPersistence';
+import { useProfileSave } from '@/hooks/useProfileSave';
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -101,19 +102,22 @@ const Onboarding = () => {
   const totalSteps = 4;
   const progress = (currentStep / totalSteps) * 100;
 
-  // Use validation hook
+  // Use hooks
   const validation = useOnboardingValidation({
     profileData,
     islamicPrefs,
     currentStep
   });
 
-  // Use form persistence hook
+  // Form persistence
   const formPersistence = useFormPersistence({
     profileData,
     islamicPrefs,
     currentStep
   });
+
+  // Profile save hook
+  const { saveProfile: saveToDatabase, uploadAvatar, saving } = useProfileSave();
 
   const calculateCompletionPercentage = validation.getOverallProgress;
 
@@ -317,29 +321,35 @@ const Onboarding = () => {
   };
 
   const completeOnboarding = async () => {
-    setSaving(true);
-    
-    const profileSaved = await saveProfile();
-    const prefsSaved = await saveIslamicPreferences();
-    
-    if (profileSaved && prefsSaved) {
-      // Clear form drafts on successful completion
-      formPersistence.clearDrafts();
-      
+    if (!user) {
       toast({
-        title: "Profil créé avec succès !",
-        description: "Bienvenue sur NikahConnect. Vous pouvez maintenant découvrir des profils compatibles.",
-      });
-      navigate('/dashboard');
-    } else {
-      toast({
-        title: "Erreur",
-        description: "Une erreur est survenue lors de la sauvegarde. Veuillez réessayer.",
+        title: "Erreur d'authentification",
+        description: "Vous devez être connecté pour finaliser votre profil.",
         variant: "destructive"
       });
+      return;
     }
+
+    setSaving(true);
     
-    setSaving(false);
+    try {
+      const result = await saveToDatabase(profileData, islamicPrefs);
+      
+      if (result.success) {
+        // Clear form drafts on successful completion
+        formPersistence.clearDrafts();
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Onboarding completion error:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue. Veuillez réessayer.",
+        variant: "destructive"
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const isStepValid = () => validation.isStepValid(currentStep);
@@ -633,7 +643,7 @@ const Onboarding = () => {
                         disabled={loading || !isStepValid()}
                         className="bg-gradient-to-r from-emerald to-emerald-dark hover:from-emerald-dark hover:to-emerald text-white flex items-center space-x-2"
                       >
-                        {loading ? (
+                        {saving ? (
                           <>
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                             <span>Finalisation...</span>
@@ -680,7 +690,7 @@ const Onboarding = () => {
               isStepValid={isStepValid()}
               canGoNext={isStepValid()}
               canGoPrevious={currentStep > 1}
-              isLoading={loading}
+              isLoading={saving}
               onPrevious={prevStep}
               onNext={nextStep}
               onComplete={completeOnboarding}

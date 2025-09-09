@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Shield, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import heroPattern from "@/assets/hero-pattern.jpg";
-import RegistrationModal from "./RegistrationModal";
-import { useState } from "react";
 
 const Hero = () => {
-  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
+  const navigate = useNavigate();
+  
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background */}
+      {/* ... keep existing code (Background) */}
       <div className="absolute inset-0 z-0">
         <img 
           src={heroPattern} 
@@ -21,7 +21,7 @@ const Hero = () => {
       {/* Content */}
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto">
-          {/* Bismillah */}
+          {/* ... keep existing code (Bismillah and title) */}
           <div className="mb-8">
             <p className="text-lg text-muted-foreground font-arabic">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
             <p className="text-sm text-muted-foreground mt-2 italic">Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux</p>
@@ -45,7 +45,7 @@ const Hero = () => {
               variant="gradient" 
               size="lg" 
               className="animate-pulse-gentle"
-              onClick={() => setIsRegistrationOpen(true)}
+              onClick={() => navigate('/auth')}
             >
               <Heart className="mr-2 h-5 w-5" />
               Commencer mon parcours
@@ -88,12 +88,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-      
-      {/* Registration Modal */}
-      <RegistrationModal 
-        isOpen={isRegistrationOpen} 
-        onClose={() => setIsRegistrationOpen(false)} 
-      />
     </section>
   );
 };
