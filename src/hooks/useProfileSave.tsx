@@ -47,23 +47,28 @@ export const useProfileSave = () => {
     setSaving(true);
 
     try {
+      // Debug log the exact data being sent to database
+      const profileUpdateData = {
+        user_id: user.id,
+        full_name: profileData.full_name,
+        age: profileData.age,
+        gender: profileData.gender,
+        location: profileData.location,
+        education: profileData.education,
+        profession: profileData.profession,
+        bio: profileData.bio,
+        looking_for: profileData.looking_for,
+        interests: profileData.interests,
+        avatar_url: profileData.avatar_url,
+        updated_at: new Date().toISOString()
+      };
+      
+      console.log('Sending to database:', JSON.stringify(profileUpdateData, null, 2));
+      
       // 1. Save basic profile
       const { error: profileError } = await supabase
         .from('profiles')
-        .upsert({
-          user_id: user.id,
-          full_name: profileData.full_name,
-          age: profileData.age,
-          gender: profileData.gender,
-          location: profileData.location,
-          education: profileData.education,
-          profession: profileData.profession,
-          bio: profileData.bio,
-          looking_for: profileData.looking_for,
-          interests: profileData.interests,
-          avatar_url: profileData.avatar_url,
-          updated_at: new Date().toISOString()
-        });
+        .upsert(profileUpdateData);
 
       if (profileError) {
         console.error('Profile save error:', profileError);

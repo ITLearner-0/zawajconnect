@@ -330,6 +330,12 @@ const Onboarding = () => {
       return;
     }
 
+    // Prevent double submission
+    if (saving) {
+      console.log('Already saving, preventing double submission');
+      return;
+    }
+
     // Validate required fields before saving
     if (!profileData.full_name || !profileData.age || !profileData.gender) {
       toast({
@@ -352,7 +358,8 @@ const Onboarding = () => {
       return;
     }
 
-    console.log('Profile data before save:', profileData);
+    console.log('Profile data before save:', JSON.stringify(profileData, null, 2));
+    console.log('Islamic preferences before save:', JSON.stringify(islamicPrefs, null, 2));
     setSaving(true);
     
     try {
