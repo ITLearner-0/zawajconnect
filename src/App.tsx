@@ -28,6 +28,7 @@ import IslamicTools from "./pages/IslamicTools";
 import FamilySupervision from './pages/FamilySupervision';
 import FamilyNotifications from './pages/FamilyNotifications';
 import InvitationAuth from './pages/InvitationAuth';
+import InvitationAccept from './pages/InvitationAccept';
 import FamilyAccess from './pages/FamilyAccess';
 import FamilyAccessPortal from './components/FamilyAccessPortal';
 import FamilySupervisionPanel from './components/FamilySupervisionPanel';
@@ -64,7 +65,9 @@ function App() {
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-            <Route path="/invitation" element={<InvitationAuth />} />
+            <Route path="/invitation-auth" element={<InvitationAuth />} />
+            <Route path="/invitation" element={<InvitationAccept />} />
+            <Route path="/invitation/accept" element={<InvitationAccept />} />
             
             {/* Onboarding - protected but doesn't require complete profile */}
             <Route path="/onboarding" element={
