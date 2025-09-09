@@ -63,9 +63,15 @@ export const useProfileSave = () => {
         updated_at: new Date().toISOString()
       };
       
+      // Debug gender value specifically
+      console.log('Raw gender value:', JSON.stringify(profileUpdateData.gender));
+      console.log('Gender type:', typeof profileUpdateData.gender);
+      console.log('Gender length:', profileUpdateData.gender?.length);
+      console.log('Gender char codes:', profileUpdateData.gender?.split('').map(c => c.charCodeAt(0)));
+      
       // Validate gender specifically before sending to DB
       if (!profileUpdateData.gender || !['male', 'female'].includes(profileUpdateData.gender)) {
-        throw new Error(`Invalid gender value: ${profileUpdateData.gender}. Must be 'male' or 'female'.`);
+        throw new Error(`Invalid gender value: "${profileUpdateData.gender}" (type: ${typeof profileUpdateData.gender}). Must be 'male' or 'female'.`);
       }
       
       console.log('Sending to database:', JSON.stringify(profileUpdateData, null, 2));
