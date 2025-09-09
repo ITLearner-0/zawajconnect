@@ -245,8 +245,8 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
                     <SelectValue placeholder="Sélectionner" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="homme">Homme</SelectItem>
-                    <SelectItem value="femme">Femme</SelectItem>
+                    <SelectItem value="male">Homme</SelectItem>
+                    <SelectItem value="female">Femme</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
