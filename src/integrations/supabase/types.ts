@@ -135,13 +135,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "conversation_participants_family_member_id_fkey"
-            columns: ["family_member_id"]
-            isOneToOne: false
-            referencedRelation: "family_members_safe"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "conversation_participants_match_id_fkey"
             columns: ["match_id"]
             isOneToOne: false
@@ -300,13 +293,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "family_notifications_family_member_id_fkey"
-            columns: ["family_member_id"]
-            isOneToOne: false
-            referencedRelation: "family_members_safe"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "family_notifications_match_id_fkey"
             columns: ["match_id"]
             isOneToOne: false
@@ -352,13 +338,6 @@ export type Database = {
             columns: ["family_member_id"]
             isOneToOne: false
             referencedRelation: "family_members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "family_reviews_family_member_id_fkey"
-            columns: ["family_member_id"]
-            isOneToOne: false
-            referencedRelation: "family_members_safe"
             referencedColumns: ["id"]
           },
           {
@@ -737,13 +716,6 @@ export type Database = {
             columns: ["family_member_id"]
             isOneToOne: false
             referencedRelation: "family_members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "messages_family_member_id_fkey"
-            columns: ["family_member_id"]
-            isOneToOne: false
-            referencedRelation: "family_members_safe"
             referencedColumns: ["id"]
           },
           {
@@ -1250,60 +1222,7 @@ export type Database = {
       }
     }
     Views: {
-      family_members_safe: {
-        Row: {
-          can_communicate: boolean | null
-          can_view_profile: boolean | null
-          created_at: string | null
-          email: string | null
-          full_name: string | null
-          id: string | null
-          invitation_accepted_at: string | null
-          invitation_sent_at: string | null
-          invitation_status: string | null
-          invitation_token: string | null
-          invited_user_id: string | null
-          is_wali: boolean | null
-          phone: string | null
-          relationship: string | null
-          user_id: string | null
-        }
-        Insert: {
-          can_communicate?: boolean | null
-          can_view_profile?: boolean | null
-          created_at?: string | null
-          email?: never
-          full_name?: string | null
-          id?: string | null
-          invitation_accepted_at?: string | null
-          invitation_sent_at?: string | null
-          invitation_status?: string | null
-          invitation_token?: never
-          invited_user_id?: never
-          is_wali?: boolean | null
-          phone?: never
-          relationship?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          can_communicate?: boolean | null
-          can_view_profile?: boolean | null
-          created_at?: string | null
-          email?: never
-          full_name?: string | null
-          id?: string | null
-          invitation_accepted_at?: string | null
-          invitation_sent_at?: string | null
-          invitation_status?: string | null
-          invitation_token?: never
-          invited_user_id?: never
-          is_wali?: boolean | null
-          phone?: never
-          relationship?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       accept_family_invitation: {
