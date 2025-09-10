@@ -124,57 +124,8 @@ export const useProfileSave = () => {
         throw prefsError;
       }
 
-      // 3. Check if user_settings exists, create only if missing
-      const { data: existingSettings } = await supabase
-        .from('user_settings')
-        .select('user_id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!existingSettings) {
-        const { error: settingsError } = await supabase
-          .from('user_settings')
-          .insert({
-            user_id: user.id,
-            email_notifications: true,
-            match_notifications: true,
-            message_notifications: true,
-            profile_visibility: 'public',
-            age_min: Math.max(18, (profileData.age || 25) - 10),
-            age_max: Math.min(70, (profileData.age || 35) + 10),
-            search_distance: 50,
-          });
-        
-        if (settingsError) {
-          console.warn('Settings creation failed:', settingsError);
-        }
-      }
-
-      // 4. Check if privacy_settings exists, create only if missing
-      const { data: existingPrivacy } = await supabase
-        .from('privacy_settings')
-        .select('user_id')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!existingPrivacy) {
-        const { error: privacyError } = await supabase
-          .from('privacy_settings')
-          .insert({
-            user_id: user.id,
-            profile_visibility: 'public',
-            photo_visibility: 'matches_only',
-            contact_visibility: 'matches_only',
-            last_seen_visibility: 'matches_only',
-            allow_messages_from: 'matches_only',
-            allow_profile_views: true,
-            allow_family_involvement: false,
-          });
-        
-        if (privacyError) {
-          console.warn('Privacy settings creation failed:', privacyError);
-        }
-      }
+      console.log('✅ Profile and Islamic preferences saved successfully');
+      console.log('⚡ User settings and privacy settings handled by database triggers');
 
       toast({
         title: "Profil sauvegardé !",
