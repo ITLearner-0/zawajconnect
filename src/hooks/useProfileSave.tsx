@@ -139,7 +139,7 @@ export const useProfileSave = () => {
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'user_id',
-          ignoreDuplicates: true
+          ignoreDuplicates: false  // Allow updates to existing records
         });
 
       if (settingsError && settingsError.code !== '23505') { // Ignore unique constraint errors
@@ -161,7 +161,7 @@ export const useProfileSave = () => {
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'user_id',
-          ignoreDuplicates: true
+          ignoreDuplicates: false  // Allow updates to existing records
         });
 
       if (privacyError && privacyError.code !== '23505') { // Ignore unique constraint errors
