@@ -771,9 +771,8 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
               <SelectValue placeholder="Que recherchez-vous ?" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="marriage">Mariage</SelectItem>
-              <SelectItem value="serious_relationship">Relation sérieuse menant au mariage</SelectItem>
-              <SelectItem value="friendship_first">Amitié d'abord, puis mariage</SelectItem>
+              <SelectItem value="monogamous_marriage">Mariage monogame</SelectItem>
+              <SelectItem value="polygamous_marriage">Mariage polygame</SelectItem>
             </SelectContent>
           </Select>
           {validationErrors.looking_for && (
