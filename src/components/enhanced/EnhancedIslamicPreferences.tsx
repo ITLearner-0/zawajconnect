@@ -301,6 +301,8 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                           <SelectItem value="5_times_daily">5 fois par jour</SelectItem>
                           <SelectItem value="often">Souvent</SelectItem>
                           <SelectItem value="sometimes">Parfois</SelectItem>
+                          <SelectItem value="fridays_only">Vendredis seulement</SelectItem>
+                          <SelectItem value="occasionally">Occasionnellement</SelectItem>
                           <SelectItem value="rarely">Rarement</SelectItem>
                           <SelectItem value="never">Jamais</SelectItem>
                         </SelectContent>
@@ -322,6 +324,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                           <SelectItem value="monthly">Mensuelle</SelectItem>
                           <SelectItem value="occasionally">Occasionnellement</SelectItem>
                           <SelectItem value="rarely">Rarement</SelectItem>
+                          <SelectItem value="learning">En apprentissage</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -336,12 +339,12 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                       <SelectTrigger>
                         <SelectValue placeholder="Choisir..." />
                       </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="very_important">Très important</SelectItem>
-                        <SelectItem value="important">Important</SelectItem>
-                        <SelectItem value="somewhat_important">Assez important</SelectItem>
-                        <SelectItem value="not_very_important">Peu important</SelectItem>
-                      </SelectContent>
+                        <SelectContent>
+                          <SelectItem value="very_important">Très important</SelectItem>
+                          <SelectItem value="important">Important</SelectItem>
+                          <SelectItem value="somewhat_important">Assez important</SelectItem>
+                          <SelectItem value="not_important">Peu important</SelectItem>
+                        </SelectContent>
                     </Select>
                   </div>
                 </div>
