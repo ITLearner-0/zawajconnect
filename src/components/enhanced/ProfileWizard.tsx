@@ -290,7 +290,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
       const { error: islamicError } = await supabase
         .from('islamic_preferences')
-        .upsert(islamicPrefsData);
+        .upsert(islamicPrefsData, {
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        });
 
       if (islamicError) throw islamicError;
 
@@ -305,7 +308,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
       const { error: privacyError } = await supabase
         .from('privacy_settings')
-        .upsert(privacyData);
+        .upsert(privacyData, {
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        });
 
       if (privacyError) throw privacyError;
 

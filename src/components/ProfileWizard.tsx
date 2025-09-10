@@ -180,6 +180,9 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
         .upsert({
           user_id: user.id,
           ...profileData
+        }, {
+          onConflict: 'user_id',
+          ignoreDuplicates: false
         });
 
       if (profileError) throw profileError;

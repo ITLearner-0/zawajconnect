@@ -189,7 +189,10 @@ const FamilySupervisionDashboard = () => {
       
       const { error } = await supabase
         .from('conversation_participants')
-        .upsert(participantData);
+        .upsert(participantData, {
+          onConflict: 'match_id,participant_id',
+          ignoreDuplicates: false
+        });
 
       if (error) {
         console.error('❌ Database error:', error);

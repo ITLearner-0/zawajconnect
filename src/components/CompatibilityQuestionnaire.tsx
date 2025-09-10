@@ -139,7 +139,10 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
 
       const { error } = await supabase
         .from('user_compatibility_responses')
-        .upsert(responseArray);
+        .upsert(responseArray, {
+          onConflict: 'user_id,question_key',
+          ignoreDuplicates: false
+        });
 
       if (error) throw error;
 

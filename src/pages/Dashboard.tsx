@@ -120,6 +120,9 @@ const Dashboard = () => {
         .upsert({
           user_id: user.id,
           ...profile
+        }, {
+          onConflict: 'user_id',
+          ignoreDuplicates: false
         });
 
       if (error) throw error;
