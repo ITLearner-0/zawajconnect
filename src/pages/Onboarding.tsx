@@ -254,12 +254,15 @@ const Onboarding = () => {
         
         if (error) throw error;
       } else {
-        // Insert new profile
+        // Insert or update profile using upsert to avoid conflicts
         const { error } = await supabase
           .from('profiles')
-          .insert({
+          .upsert({
             user_id: user.id,
             ...profileData
+          }, {
+            onConflict: 'user_id',
+            ignoreDuplicates: false
           });
         
         if (error) throw error;
