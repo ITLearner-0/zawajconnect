@@ -89,8 +89,7 @@ Sois strict sur la pudeur (haya) et la supervision familiale selon la Sharia.`;
           },
           { role: 'user', content: moderationPrompt }
         ],
-        temperature: 0.3,
-        max_tokens: 500,
+        max_completion_tokens: 500,
       }),
     });
 
