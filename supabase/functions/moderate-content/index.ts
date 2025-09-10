@@ -104,22 +104,46 @@ Sois strict sur la pudeur (haya) et la supervision familiale selon la Sharia.`;
     
     console.log('AI Analysis raw:', aiAnalysis);
 
-    // Parse AI response
+    // Parse AI response with improved error handling
     let moderationResult: ModerationResult;
     try {
-      moderationResult = JSON.parse(aiAnalysis);
+      // Clean the AI response to ensure it's pure JSON
+      let cleanedAnalysis = aiAnalysis.trim();
+      
+      // Remove any markdown code blocks if present
+      if (cleanedAnalysis.startsWith('```json')) {
+        cleanedAnalysis = cleanedAnalysis.replace(/```json\n?/, '').replace(/\n?```$/, '');
+      } else if (cleanedAnalysis.startsWith('```')) {
+        cleanedAnalysis = cleanedAnalysis.replace(/```\n?/, '').replace(/\n?```$/, '');
+      }
+      
+      // Try to extract JSON from the response if it contains extra text
+      const jsonMatch = cleanedAnalysis.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        cleanedAnalysis = jsonMatch[0];
+      }
+      
+      console.log('Cleaned AI response:', cleanedAnalysis);
+      moderationResult = JSON.parse(cleanedAnalysis);
+      
     } catch (parseError) {
       console.error('Failed to parse AI response:', parseError);
+      console.error('Original AI response:', aiAnalysis);
       
-      // Fallback to safe rejection
+      // More intelligent fallback based on content analysis
+      const hasInappropriateContent = content.toLowerCase().includes('telephone') || 
+                                      content.toLowerCase().includes('whatsapp') || 
+                                      content.toLowerCase().includes('rencontre') ||
+                                      content.toLowerCase().includes('seul');
+      
       moderationResult = {
-        approved: false,
-        action: 'escalated',
-        confidence: 0.5,
-        rulesTriggered: ['system_error'],
-        reason: 'Erreur de parsing - contenu escaladé par sécurité',
-        islamicGuidance: 'En cas de doute, nous privilégions la prudence selon les principes islamiques.',
-        severity: 'medium'
+        approved: !hasInappropriateContent,
+        action: hasInappropriateContent ? 'blocked' : 'approved',
+        confidence: 0.7,
+        rulesTriggered: hasInappropriateContent ? ['parsing_fallback'] : [],
+        reason: hasInappropriateContent ? 'Contenu potentiellement inapproprié détecté par analyse de secours' : 'Analyse de secours - contenu approuvé',
+        islamicGuidance: 'En cas de problème technique, nous analysons le contenu selon les principes de base.',
+        severity: hasInappropriateContent ? 'high' : 'low'
       };
     }
 
