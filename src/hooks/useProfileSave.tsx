@@ -36,6 +36,7 @@ export const useProfileSave = () => {
 
   const saveProfile = async (profileData: ProfileData, islamicPrefs: IslamicPreferences) => {
     if (!user) {
+      console.error('❌ No authenticated user found');
       toast({
         title: "Erreur d'authentification",
         description: "Vous devez être connecté pour sauvegarder votre profil.",
@@ -43,6 +44,9 @@ export const useProfileSave = () => {
       });
       return { success: false, error: 'User not authenticated' };
     }
+    
+    console.log('✅ Authenticated user:', user.id);
+    console.log('📊 Profile data to save:', { ...profileData, user_id: user.id });
 
     setSaving(true);
 
@@ -75,6 +79,14 @@ export const useProfileSave = () => {
       }
       
       console.log('Sending to database:', JSON.stringify(profileUpdateData, null, 2));
+      
+      // Check if user is still authenticated before database operation
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Session expired. Please log in again.');
+      }
+      
+      console.log('✅ Session valid, proceeding with upsert...');
       
       // 1. Save basic profile using UPSERT to avoid conflicts
       const { error: profileError } = await supabase
