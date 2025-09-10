@@ -282,16 +282,17 @@ const IslamicPreferencesStep = ({
                 value={preferences.beard_preference} 
                 onValueChange={(value) => updatePreference('beard_preference', value)}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Votre préférence" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="full">Barbe complète</SelectItem>
-                  <SelectItem value="trimmed">Barbe taillée</SelectItem>
-                  <SelectItem value="goatee">Bouc</SelectItem>
-                  <SelectItem value="mustache">Moustache</SelectItem>
-                  <SelectItem value="clean_shaven">Rasé de près</SelectItem>
-                </SelectContent>
+              <SelectTrigger>
+                <SelectValue placeholder="Votre préférence" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="full_beard">Barbe complète</SelectItem>
+                <SelectItem value="trimmed_beard">Barbe taillée</SelectItem>
+                <SelectItem value="goatee">Bouc</SelectItem>
+                <SelectItem value="mustache_only">Moustache seulement</SelectItem>
+                <SelectItem value="clean_shaven">Rasé de près</SelectItem>
+                <SelectItem value="not_applicable">Non applicable</SelectItem>
+              </SelectContent>
               </Select>
             </div>
           )}
