@@ -73,7 +73,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                <DropdownMenuItem onClick={() => navigate('/enhanced-profile')}>
                   <User className="h-4 w-4 mr-2" />
                   Mon Profil
                 </DropdownMenuItem>

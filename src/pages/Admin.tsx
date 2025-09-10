@@ -193,7 +193,7 @@ const Admin = () => {
                 Devenir Super Admin
               </Button>
               <Button 
-                onClick={() => navigate('/dashboard')}
+                onClick={() => navigate('/enhanced-profile')}
                 variant="outline"
                 className="w-full"
               >

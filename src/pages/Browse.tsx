@@ -536,7 +536,7 @@ const Browse = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => navigate('/enhanced-profile')}
                   className="w-full justify-start"
                 >
                   Mon profil

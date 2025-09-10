@@ -174,7 +174,7 @@ const Onboarding = () => {
 
       if (profile && profile.bio && profile.looking_for) {
         // User already has a complete profile, redirect to dashboard
-        navigate('/dashboard');
+        navigate('/enhanced-profile');
       } else if (profile) {
         // Pre-fill existing data
         setProfileData({
@@ -377,7 +377,7 @@ const Onboarding = () => {
       if (result.success) {
         // Clear form drafts on successful completion
         formPersistence.clearDrafts();
-        navigate('/dashboard');
+        navigate('/enhanced-profile');
       } else {
         toast({
           title: "Erreur de sauvegarde",

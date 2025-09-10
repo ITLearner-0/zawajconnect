@@ -97,7 +97,7 @@ const Privacy = () => {
           <div className="max-w-4xl mx-auto">
             <div className="text-center">
               <h2 className="text-xl font-bold text-foreground mb-2">Paramètres non trouvés</h2>
-              <Button onClick={() => navigate('/dashboard')} className="bg-emerald hover:bg-emerald-dark text-primary-foreground">
+              <Button onClick={() => navigate('/enhanced-profile')} className="bg-emerald hover:bg-emerald-dark text-primary-foreground">
                 Retour au profil
               </Button>
             </div>

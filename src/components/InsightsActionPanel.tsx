@@ -84,7 +84,7 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
       icon: Heart,
       title: "Améliorer votre profil",
       description: "Suivez les suggestions pour optimiser votre compatibilité",
-      action: () => navigate('/dashboard'),
+      action: () => navigate('/enhanced-profile'),
       available: insightsAvailable
     },
     {

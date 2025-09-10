@@ -80,7 +80,14 @@ function App() {
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <RoleBasedLayout>
-                  <Dashboard />
+                  <EnhancedProfile />
+                </RoleBasedLayout>
+              </ProtectedRoute>
+            } />
+            <Route path="/enhanced-profile" element={
+              <ProtectedRoute>
+                <RoleBasedLayout>
+                  <EnhancedProfile />
                 </RoleBasedLayout>
               </ProtectedRoute>
             } />

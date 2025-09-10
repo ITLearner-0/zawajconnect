@@ -94,7 +94,7 @@ const OnboardingCompletionGuide = () => {
       title: 'Complétez votre profil',
       description: 'Ajoutez vos informations personnelles et votre bio',
       icon: User,
-      action: () => navigate('/dashboard?tab=profile'),
+      action: () => navigate('/enhanced-profile?tab=profile'),
       actionText: 'Compléter le profil'
     },
     {
@@ -102,7 +102,7 @@ const OnboardingCompletionGuide = () => {
       title: 'Définissez vos préférences islamiques',
       description: 'Configurez vos critères religieux pour un meilleur matching',
       icon: Heart,
-      action: () => navigate('/dashboard?tab=islamic'),
+      action: () => navigate('/enhanced-profile?tab=islamic'),
       actionText: 'Configurer les préférences'
     },
     {
@@ -110,7 +110,7 @@ const OnboardingCompletionGuide = () => {
       title: 'Ajoutez une photo de profil',
       description: 'Une photo augmente vos chances de match de 300%',
       icon: Camera,
-      action: () => navigate('/dashboard?tab=profile'),
+      action: () => navigate('/enhanced-profile?tab=profile'),
       actionText: 'Ajouter une photo'
     },
     {

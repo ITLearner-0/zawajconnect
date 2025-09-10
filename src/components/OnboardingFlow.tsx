@@ -53,7 +53,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
       description: 'Ajoutez vos informations personnelles et votre photo',
       icon: <User className="w-5 h-5" />,
       completed: completedSteps.has('profile'),
-      route: '/dashboard',
+      route: '/enhanced-profile',
       reward: {
         type: 'points',
         value: '50',

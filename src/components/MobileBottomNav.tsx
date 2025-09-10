@@ -104,12 +104,12 @@ const MobileBottomNav = () => {
       id: 'profile',
       label: 'Profil',
       icon: User,
-      path: '/dashboard'
+      path: '/enhanced-profile'
     }
   ];
 
   const isActive = (path: string) => {
-    if (path === '/dashboard' && location.pathname === '/profile') return true;
+    if (path === '/enhanced-profile' && location.pathname === '/profile') return true;
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 

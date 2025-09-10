@@ -43,7 +43,7 @@ const Settings = () => {
           <div className="flex items-center gap-4">
             <Button
               variant="ghost"
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/enhanced-profile')}
               className="hover:bg-accent"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />

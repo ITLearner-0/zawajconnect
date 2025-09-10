@@ -73,7 +73,7 @@ const Header = () => {
                   className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
                   asChild
                 >
-                  <Link to="/dashboard">Mon Profil</Link>
+                  <Link to="/enhanced-profile">Mon Profil</Link>
                 </Button>
               </>
             )}
