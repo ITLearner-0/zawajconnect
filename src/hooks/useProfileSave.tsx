@@ -124,61 +124,9 @@ export const useProfileSave = () => {
         throw prefsError;
       }
 
-      // 3. Handle user settings - try insert first, then update if exists
-      try {
-        const { error: insertError } = await supabase
-          .from('user_settings')
-          .insert({
-            user_id: user.id,
-            email_notifications: true,
-            match_notifications: true,
-            message_notifications: true,
-            profile_visibility: 'public',
-            age_min: Math.max(18, (profileData.age || 25) - 10),
-            age_max: Math.min(70, (profileData.age || 35) + 10),
-            search_distance: 50,
-          });
-        
-        if (insertError && insertError.code === '23505') {
-          // Record exists, update it
-          await supabase
-            .from('user_settings')
-            .update({ updated_at: new Date().toISOString() })
-            .eq('user_id', user.id);
-        } else if (insertError) {
-          console.warn('Settings save warning:', insertError);
-        }
-      } catch (e) {
-        console.warn('Settings operation failed:', e);
-      }
-
-      // 4. Handle privacy settings - try insert first, then update if exists
-      try {
-        const { error: insertError } = await supabase
-          .from('privacy_settings')
-          .insert({
-            user_id: user.id,
-            profile_visibility: 'public',
-            photo_visibility: 'matches_only',
-            contact_visibility: 'matches_only',
-            last_seen_visibility: 'matches_only',
-            allow_messages_from: 'matches_only',
-            allow_profile_views: true,
-            allow_family_involvement: false,
-          });
-        
-        if (insertError && insertError.code === '23505') {
-          // Record exists, update it
-          await supabase
-            .from('privacy_settings')
-            .update({ updated_at: new Date().toISOString() })
-            .eq('user_id', user.id);
-        } else if (insertError) {
-          console.warn('Privacy settings save warning:', insertError);
-        }
-      } catch (e) {
-        console.warn('Privacy settings operation failed:', e);
-      }
+      // Skip settings creation - they are created by database triggers
+      console.log('✅ Profile and Islamic preferences saved successfully');
+      console.log('⚡ Settings will be created automatically by database triggers');
 
       toast({
         title: "Profil sauvegardé !",
