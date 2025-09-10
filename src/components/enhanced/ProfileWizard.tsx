@@ -267,7 +267,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
       const { error: profileError } = await supabase
         .from('profiles')
-        .upsert(profileUpdateData);
+        .upsert(profileUpdateData, {
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        });
 
       if (profileError) throw profileError;
 

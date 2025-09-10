@@ -76,24 +76,13 @@ export const useProfileSave = () => {
       
       console.log('Sending to database:', JSON.stringify(profileUpdateData, null, 2));
       
-      // 1. Save basic profile - first try to update, then insert if needed
-      let profileError = null;
-      
-      // Try to update first
-      const { error: updateError } = await supabase
+      // 1. Save basic profile using UPSERT to avoid conflicts
+      const { error: profileError } = await supabase
         .from('profiles')
-        .update(profileUpdateData)
-        .eq('user_id', user.id);
-        
-      if (updateError?.code === 'PGRST116') {
-        // No rows updated, try to insert
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert(profileUpdateData);
-        profileError = insertError;
-      } else {
-        profileError = updateError;
-      }
+        .upsert(profileUpdateData, {
+          onConflict: 'user_id',
+          ignoreDuplicates: false
+        });
 
       if (profileError) {
         console.error('Profile save error:', profileError);
