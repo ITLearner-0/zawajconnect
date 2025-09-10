@@ -422,6 +422,7 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="never_married">Jamais marié(e)</SelectItem>
+              <SelectItem value="married">Marié(e)</SelectItem>
               <SelectItem value="divorced">Divorcé(e)</SelectItem>
               <SelectItem value="widowed">Veuf/Veuve</SelectItem>
             </SelectContent>
