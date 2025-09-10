@@ -125,7 +125,7 @@ export const useProfileSave = () => {
       }
 
       console.log('✅ Profile and Islamic preferences saved successfully');
-      console.log('⚡ User settings and privacy settings handled by database triggers');
+      console.log('⚡ All other settings handled automatically by database triggers');
 
       toast({
         title: "Profil sauvegardé !",
