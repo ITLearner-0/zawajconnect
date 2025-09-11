@@ -253,12 +253,32 @@ const Profile = () => {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-bold text-foreground mb-2">Profil introuvable</h2>
-          <Button onClick={() => navigate('/browse')} className="bg-emerald hover:bg-emerald-dark text-primary-foreground">
-            Retour à la recherche
-          </Button>
+      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center p-4">
+        <div className="text-center max-w-md w-full">
+          <div className="h-16 w-16 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center mx-auto mb-4">
+            <User className="h-8 w-8 text-primary-foreground" />
+          </div>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Profil introuvable</h2>
+          <p className="text-muted-foreground mb-6">
+            Ce profil n'existe pas ou a été supprimé. Découvrez d'autres profils compatibles avec vous.
+          </p>
+          <div className="space-y-3">
+            <Button 
+              onClick={() => navigate('/browse')} 
+              className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              Découvrir des profils
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => navigate('/matches')} 
+              className="w-full"
+            >
+              <Heart className="h-4 w-4 mr-2" />
+              Voir mes matches
+            </Button>
+          </div>
         </div>
       </div>
     );
