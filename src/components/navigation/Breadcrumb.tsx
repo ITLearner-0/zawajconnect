@@ -1,36 +1,19 @@
 import { useLocation, Link } from 'react-router-dom';
-import { ChevronRight, Home } from 'lucide-react';
+import { ChevronRight, Home, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getRouteByPath } from '@/config/routes';
+import { useNavigation } from '@/components/navigation/NavigationProvider';
+import { Button } from '@/components/ui/button';
 
 interface BreadcrumbItem {
   label: string;
   path?: string;
 }
 
-const routeLabels: Record<string, string> = {
-  '/dashboard': 'Tableau de Bord',
-  '/enhanced-profile': 'Mon Profil',
-  '/browse': 'Découvrir',
-  '/matches': 'Mes Matches',
-  '/chat': 'Messages',
-  '/compatibility-test': 'Test de Compatibilité',
-  '/compatibility-insights': 'Mes Insights',
-  '/advanced-matching': 'Matching Avancé',
-  '/guidance': 'Guide Islamique',
-  '/islamic-tools': 'Outils Islamiques',
-  '/settings': 'Paramètres',
-  '/wali-dashboard': 'Tableau de Bord Wali',
-  '/match-approval': 'Approbation Matches',
-  '/family-analytics': 'Analytics Famille',
-  '/family-supervision': 'Supervision Familiale',
-  '/privacy': 'Confidentialité',
-  '/family': 'Famille',
-  '/admin': 'Administration',
-  '/faq': 'FAQ'
-};
 
 const Breadcrumb = () => {
   const location = useLocation();
+  const { canGoBack, goBack } = useNavigation();
   const pathnames = location.pathname.split('/').filter((x) => x);
 
   const getBreadcrumbItems = (): BreadcrumbItem[] => {
@@ -47,10 +30,10 @@ const Breadcrumb = () => {
         return;
       }
 
-      const label = routeLabels[currentPath];
-      if (label) {
+      const route = getRouteByPath(currentPath);
+      if (route) {
         items.push({
-          label,
+          label: route.label,
           path: index === pathnames.length - 1 ? undefined : currentPath
         });
       }
@@ -67,26 +50,41 @@ const Breadcrumb = () => {
   }
 
   return (
-    <nav className="flex items-center space-x-2 text-sm text-muted-foreground mb-6">
-      {breadcrumbItems.map((item, index) => (
-        <div key={index} className="flex items-center space-x-2">
-          {index > 0 && <ChevronRight className="h-4 w-4" />}
-          {item.path ? (
-            <Link
-              to={item.path}
-              className="hover:text-foreground transition-colors"
-            >
-              {index === 0 && <Home className="h-4 w-4 inline mr-1" />}
-              {item.label}
-            </Link>
-          ) : (
-            <span className="text-foreground font-medium">
-              {item.label}
-            </span>
-          )}
-        </div>
-      ))}
-    </nav>
+    <div className="flex items-center justify-between mb-6">
+      <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
+        {breadcrumbItems.map((item, index) => (
+          <div key={index} className="flex items-center space-x-2">
+            {index > 0 && <ChevronRight className="h-4 w-4" />}
+            {item.path ? (
+              <Link
+                to={item.path}
+                className="hover:text-foreground transition-colors"
+              >
+                {index === 0 && <Home className="h-4 w-4 inline mr-1" />}
+                {item.label}
+              </Link>
+            ) : (
+              <span className="text-foreground font-medium">
+                {item.label}
+              </span>
+            )}
+          </div>
+        ))}
+      </nav>
+      
+      {/* Back Button */}
+      {canGoBack && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={goBack}
+          className="gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Retour
+        </Button>
+      )}
+    </div>
   );
 };
 

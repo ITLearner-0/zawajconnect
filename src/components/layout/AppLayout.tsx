@@ -22,6 +22,7 @@ import {
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { useIsMobile } from '@/hooks/use-mobile';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
+import QuickNavigation from '@/components/navigation/QuickNavigation';
 
 // Force refresh to clear cache
 
@@ -62,6 +63,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           
           {/* User Menu */}
           <div className="flex items-center gap-4">
+            <QuickNavigation />
             <span className="text-sm text-muted-foreground hidden sm:block">
               Connecté en tant que {user.email}
             </span>

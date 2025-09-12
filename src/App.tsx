@@ -39,6 +39,8 @@ import AdvancedMatching from "./pages/AdvancedMatching";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
 import NavigationGuard from "@/components/navigation/NavigationGuard";
+import { NavigationProvider } from "@/components/navigation/NavigationProvider";
+import RouteTransition from "@/components/navigation/RouteTransition";
 import { Toaster } from "@/components/ui/toaster";
 
 // Create QueryClient outside component to avoid hook issues
@@ -61,8 +63,10 @@ function App() {
             v7_relativeSplatPath: true
           }}
         >
-          <NavigationGuard>
-            <Routes>
+          <NavigationProvider>
+            <NavigationGuard>
+              <RouteTransition>
+                <Routes>
             {/* Public routes - no authentication required */}
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -303,8 +307,10 @@ function App() {
             
             {/* Catch all route */}
             <Route path="*" element={<NotFound />} />
-          </Routes>
-          </NavigationGuard>
+                </Routes>
+              </RouteTransition>
+            </NavigationGuard>
+          </NavigationProvider>
           <Toaster />
         </BrowserRouter>
       </AuthProvider>
