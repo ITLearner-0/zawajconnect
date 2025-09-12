@@ -4,33 +4,14 @@ import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  Heart, 
-  MessageCircle, 
-  Search, 
-  User, 
-  Settings,
-  Bell,
-  Crown,
-  Clock,
-  Home
-} from 'lucide-react';
-
-interface NavItem {
-  id: string;
-  label: string;
-  icon: React.ComponentType<{ className?: string }>;
-  path: string;
-  badge?: number;
-  premium?: boolean;
-}
+import { getNavigationRoutes } from '@/config/routes';
+import { Home, Heart, MessageCircle, Search, User } from 'lucide-react';
 
 const MobileBottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
   const [unreadMessages, setUnreadMessages] = useState(0);
-  const [notifications] = useState(2);
 
   useEffect(() => {
     if (!user) return;
@@ -75,37 +56,53 @@ const MobileBottomNav = () => {
     };
   }, [user]);
 
-  const navItems: NavItem[] = [
+  // Get main navigation routes for mobile
+  const allRoutes = getNavigationRoutes();
+  const mobileRoutes = allRoutes.filter(route => 
+    ['dashboard', 'browse', 'matches', 'chat', 'enhanced-profile'].some(key => 
+      route.path.includes(key)
+    )
+  );
+
+  // Map icons
+  const iconMap: Record<string, any> = {
+    'Home': Home,
+    'User': User,
+    'Search': Search,
+    'Heart': Heart,
+    'MessageCircle': MessageCircle
+  };
+
+  const navItems = [
     {
-      id: 'dashboard',
-      label: 'Accueil',
+      path: '/dashboard',
       icon: Home,
-      path: '/dashboard'
+      label: 'Accueil',
+      badge: 0
     },
     {
-      id: 'browse',
-      label: 'Découvrir',
+      path: '/browse',
       icon: Search,
-      path: '/browse'
+      label: 'Découvrir',
+      badge: 0
     },
     {
-      id: 'matches',
-      label: 'Matches',
+      path: '/matches',
       icon: Heart,
-      path: '/matches'
+      label: 'Matches',
+      badge: 0
     },
     {
-      id: 'chat',
-      label: 'Messages',
-      icon: MessageCircle,
       path: '/chat',
+      icon: MessageCircle,
+      label: 'Messages',
       badge: unreadMessages
     },
     {
-      id: 'profile',
-      label: 'Profil',
+      path: '/enhanced-profile',
       icon: User,
-      path: '/enhanced-profile'
+      label: 'Profil',
+      badge: 0
     }
   ];
 
@@ -128,7 +125,7 @@ const MobileBottomNav = () => {
             
             return (
               <Button
-                key={item.id}
+                key={item.path}
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate(item.path)}

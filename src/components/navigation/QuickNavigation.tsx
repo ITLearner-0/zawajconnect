@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Command, Search } from 'lucide-react';
+import { Search, Home, User, Heart, MessageCircle, BookOpen, Users, Settings, Shield, CheckCircle, TrendingUp, Eye, Lock, Compass, Target, BarChart3, Crown, HelpCircle, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   CommandDialog,
@@ -51,6 +51,29 @@ const QuickNavigation = () => {
     navigate(path);
   };
 
+  // Icon mapping for the route system
+  const iconMap: Record<string, any> = {
+    'Home': Home,
+    'User': User,
+    'Search': Search,
+    'Heart': Heart,
+    'MessageCircle': MessageCircle,
+    'BookOpen': BookOpen,
+    'Users': Users,
+    'Settings': Settings,
+    'Shield': Shield,
+    'CheckCircle': CheckCircle,
+    'TrendingUp': TrendingUp,
+    'Eye': Eye,
+    'Lock': Lock,
+    'Compass': Compass,
+    'Target': Target,
+    'BarChart3': BarChart3,
+    'Crown': Crown,
+    'HelpCircle': HelpCircle,
+    'Zap': Zap
+  };
+
   if (!user) return null;
 
   return (
@@ -76,63 +99,74 @@ const QuickNavigation = () => {
           <CommandGroup heading="Navigation principale">
             {availableRoutes
               .filter(route => route.category === 'main')
-              .map((route) => (
-                <CommandItem
-                  key={route.path}
-                  onSelect={() => handleSelect(route.path)}
-                  className="flex items-center gap-2"
-                >
-                  {route.icon && (
-                    <span className="h-4 w-4">
-                      {/* Icon would be rendered here */}
-                    </span>
-                  )}
-                  <span>{route.label}</span>
-                </CommandItem>
-              ))}
+              .map((route) => {
+                const IconComponent = route.icon ? iconMap[route.icon] : null;
+                return (
+                  <CommandItem
+                    key={route.path}
+                    onSelect={() => handleSelect(route.path)}
+                    className="flex items-center gap-2"
+                  >
+                    {IconComponent && <IconComponent className="h-4 w-4" />}
+                    <span>{route.label}</span>
+                  </CommandItem>
+                );
+              })}
           </CommandGroup>
 
           <CommandGroup heading="Matching & Compatibilité">
             {availableRoutes
               .filter(route => route.category === 'matching')
-              .map((route) => (
-                <CommandItem
-                  key={route.path}
-                  onSelect={() => handleSelect(route.path)}
-                  className="flex items-center gap-2"
-                >
-                  <span>{route.label}</span>
-                </CommandItem>
-              ))}
+              .map((route) => {
+                const IconComponent = route.icon ? iconMap[route.icon] : null;
+                return (
+                  <CommandItem
+                    key={route.path}
+                    onSelect={() => handleSelect(route.path)}
+                    className="flex items-center gap-2"
+                  >
+                    {IconComponent && <IconComponent className="h-4 w-4" />}
+                    <span>{route.label}</span>
+                  </CommandItem>
+                );
+              })}
           </CommandGroup>
 
           <CommandGroup heading="Outils Islamiques">
             {availableRoutes
               .filter(route => route.category === 'tools')
-              .map((route) => (
-                <CommandItem
-                  key={route.path}
-                  onSelect={() => handleSelect(route.path)}
-                  className="flex items-center gap-2"
-                >
-                  <span>{route.label}</span>
-                </CommandItem>
-              ))}
+              .map((route) => {
+                const IconComponent = route.icon ? iconMap[route.icon] : null;
+                return (
+                  <CommandItem
+                    key={route.path}
+                    onSelect={() => handleSelect(route.path)}
+                    className="flex items-center gap-2"
+                  >
+                    {IconComponent && <IconComponent className="h-4 w-4" />}
+                    <span>{route.label}</span>
+                  </CommandItem>
+                );
+              })}
           </CommandGroup>
 
           {(isWali || isAdmin) && (
             <CommandGroup heading="Supervision Familiale">
               {availableRoutes
                 .filter(route => route.category === 'family')
-                .map((route) => (
-                  <CommandItem
-                    key={route.path}
-                    onSelect={() => handleSelect(route.path)}
-                    className="flex items-center gap-2"
-                  >
-                    <span>{route.label}</span>
-                  </CommandItem>
-                ))}
+                .map((route) => {
+                  const IconComponent = route.icon ? iconMap[route.icon] : null;
+                  return (
+                    <CommandItem
+                      key={route.path}
+                      onSelect={() => handleSelect(route.path)}
+                      className="flex items-center gap-2"
+                    >
+                      {IconComponent && <IconComponent className="h-4 w-4" />}
+                      <span>{route.label}</span>
+                    </CommandItem>
+                  );
+                })}
             </CommandGroup>
           )}
 
@@ -140,15 +174,19 @@ const QuickNavigation = () => {
             <CommandGroup heading="Administration">
               {availableRoutes
                 .filter(route => route.category === 'admin')
-                .map((route) => (
-                  <CommandItem
-                    key={route.path}
-                    onSelect={() => handleSelect(route.path)}
-                    className="flex items-center gap-2"
-                  >
-                    <span>{route.label}</span>
-                  </CommandItem>
-                ))}
+                .map((route) => {
+                  const IconComponent = route.icon ? iconMap[route.icon] : null;
+                  return (
+                    <CommandItem
+                      key={route.path}
+                      onSelect={() => handleSelect(route.path)}
+                      className="flex items-center gap-2"
+                    >
+                      {IconComponent && <IconComponent className="h-4 w-4" />}
+                      <span>{route.label}</span>
+                    </CommandItem>
+                  );
+                })}
             </CommandGroup>
           )}
         </CommandList>
