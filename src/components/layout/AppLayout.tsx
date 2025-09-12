@@ -25,6 +25,9 @@ import Breadcrumb from '@/components/navigation/Breadcrumb';
 import QuickNavigation from '@/components/navigation/QuickNavigation';
 import RouteLoadingIndicator from '@/components/navigation/RouteLoadingIndicator';
 import NavigationSuggestions from '@/components/navigation/NavigationSuggestions';
+import KeyboardShortcutsHelp from '@/components/navigation/KeyboardShortcutsHelp';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { useNavigationAnalytics } from '@/hooks/useNavigationAnalytics';
 
 // Force refresh to clear cache
 
@@ -38,6 +41,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+
+  // Enable keyboard shortcuts and analytics
+  useKeyboardShortcuts();
+  useNavigationAnalytics();
 
   const handleSignOut = async () => {
     await signOut();
@@ -65,6 +72,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           
           {/* User Menu */}
           <div className="flex items-center gap-4">
+            <KeyboardShortcutsHelp />
             <QuickNavigation />
             <span className="text-sm text-muted-foreground hidden sm:block">
               Connecté en tant que {user.email}
