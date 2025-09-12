@@ -23,6 +23,8 @@ import MobileBottomNav from '@/components/MobileBottomNav';
 import { useIsMobile } from '@/hooks/use-mobile';
 import Breadcrumb from '@/components/navigation/Breadcrumb';
 import QuickNavigation from '@/components/navigation/QuickNavigation';
+import RouteLoadingIndicator from '@/components/navigation/RouteLoadingIndicator';
+import NavigationSuggestions from '@/components/navigation/NavigationSuggestions';
 
 // Force refresh to clear cache
 
@@ -102,8 +104,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         <AppSidebar />
 
         <main className="flex-1 pt-16">
+          <RouteLoadingIndicator />
           <div className="p-4 lg:p-6 mb-20 lg:mb-0">
             <Breadcrumb />
+            <NavigationSuggestions />
             {children}
           </div>
         </main>

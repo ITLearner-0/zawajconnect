@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Home, User, Heart, MessageCircle, BookOpen, Users, Settings, Shield, CheckCircle, TrendingUp, Eye, Lock, Compass, Target, BarChart3, Crown, HelpCircle, Zap } from 'lucide-react';
+import { Search } from 'lucide-react';
+import { Icon, IconName } from '@/components/ui/icon';
 import { Button } from '@/components/ui/button';
 import {
   CommandDialog,
@@ -52,26 +53,26 @@ const QuickNavigation = () => {
   };
 
   // Icon mapping for the route system
-  const iconMap: Record<string, any> = {
-    'Home': Home,
-    'User': User,
-    'Search': Search,
-    'Heart': Heart,
-    'MessageCircle': MessageCircle,
-    'BookOpen': BookOpen,
-    'Users': Users,
-    'Settings': Settings,
-    'Shield': Shield,
-    'CheckCircle': CheckCircle,
-    'TrendingUp': TrendingUp,
-    'Eye': Eye,
-    'Lock': Lock,
-    'Compass': Compass,
-    'Target': Target,
-    'BarChart3': BarChart3,
-    'Crown': Crown,
-    'HelpCircle': HelpCircle,
-    'Zap': Zap
+  const iconMap: Record<string, IconName> = {
+    'Home': 'Home',
+    'User': 'User',
+    'Search': 'Search',
+    'Heart': 'Heart',
+    'MessageCircle': 'MessageCircle',
+    'BookOpen': 'BookOpen',
+    'Users': 'Users',
+    'Settings': 'Settings',
+    'Shield': 'Shield',
+    'CheckCircle': 'CheckCircle',
+    'TrendingUp': 'TrendingUp',
+    'Eye': 'Eye',
+    'Lock': 'Lock',
+    'Compass': 'Compass',
+    'Target': 'Target',
+    'BarChart3': 'BarChart3',
+    'Crown': 'Crown',
+    'HelpCircle': 'HelpCircle',
+    'Zap': 'Zap'
   };
 
   if (!user) return null;
@@ -100,14 +101,14 @@ const QuickNavigation = () => {
             {availableRoutes
               .filter(route => route.category === 'main')
               .map((route) => {
-                const IconComponent = route.icon ? iconMap[route.icon] : null;
+                const iconName = route.icon ? iconMap[route.icon] : null;
                 return (
                   <CommandItem
                     key={route.path}
                     onSelect={() => handleSelect(route.path)}
                     className="flex items-center gap-2"
                   >
-                    {IconComponent && <IconComponent className="h-4 w-4" />}
+                    {iconName && <Icon name={iconName} className="h-4 w-4" />}
                     <span>{route.label}</span>
                   </CommandItem>
                 );
@@ -118,14 +119,14 @@ const QuickNavigation = () => {
             {availableRoutes
               .filter(route => route.category === 'matching')
               .map((route) => {
-                const IconComponent = route.icon ? iconMap[route.icon] : null;
+                const iconName = route.icon ? iconMap[route.icon] : null;
                 return (
                   <CommandItem
                     key={route.path}
                     onSelect={() => handleSelect(route.path)}
                     className="flex items-center gap-2"
                   >
-                    {IconComponent && <IconComponent className="h-4 w-4" />}
+                    {iconName && <Icon name={iconName} className="h-4 w-4" />}
                     <span>{route.label}</span>
                   </CommandItem>
                 );
@@ -136,14 +137,14 @@ const QuickNavigation = () => {
             {availableRoutes
               .filter(route => route.category === 'tools')
               .map((route) => {
-                const IconComponent = route.icon ? iconMap[route.icon] : null;
+                const iconName = route.icon ? iconMap[route.icon] : null;
                 return (
                   <CommandItem
                     key={route.path}
                     onSelect={() => handleSelect(route.path)}
                     className="flex items-center gap-2"
                   >
-                    {IconComponent && <IconComponent className="h-4 w-4" />}
+                    {iconName && <Icon name={iconName} className="h-4 w-4" />}
                     <span>{route.label}</span>
                   </CommandItem>
                 );
@@ -155,14 +156,14 @@ const QuickNavigation = () => {
               {availableRoutes
                 .filter(route => route.category === 'family')
                 .map((route) => {
-                  const IconComponent = route.icon ? iconMap[route.icon] : null;
+                  const iconName = route.icon ? iconMap[route.icon] : null;
                   return (
                     <CommandItem
                       key={route.path}
                       onSelect={() => handleSelect(route.path)}
                       className="flex items-center gap-2"
                     >
-                      {IconComponent && <IconComponent className="h-4 w-4" />}
+                      {iconName && <Icon name={iconName} className="h-4 w-4" />}
                       <span>{route.label}</span>
                     </CommandItem>
                   );
@@ -175,14 +176,14 @@ const QuickNavigation = () => {
               {availableRoutes
                 .filter(route => route.category === 'admin')
                 .map((route) => {
-                  const IconComponent = route.icon ? iconMap[route.icon] : null;
+                  const iconName = route.icon ? iconMap[route.icon] : null;
                   return (
                     <CommandItem
                       key={route.path}
                       onSelect={() => handleSelect(route.path)}
                       className="flex items-center gap-2"
                     >
-                      {IconComponent && <IconComponent className="h-4 w-4" />}
+                      {iconName && <Icon name={iconName} className="h-4 w-4" />}
                       <span>{route.label}</span>
                     </CommandItem>
                   );
