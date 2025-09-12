@@ -38,6 +38,7 @@ import EnhancedProfile from "./pages/EnhancedProfile";
 import AdvancedMatching from "./pages/AdvancedMatching";
 import Onboarding from "./pages/Onboarding";
 import NotFound from "./pages/NotFound";
+import NavigationGuard from "@/components/navigation/NavigationGuard";
 import { Toaster } from "@/components/ui/toaster";
 
 // Create QueryClient outside component to avoid hook issues
@@ -60,7 +61,8 @@ function App() {
             v7_relativeSplatPath: true
           }}
         >
-          <Routes>
+          <NavigationGuard>
+            <Routes>
             {/* Public routes - no authentication required */}
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
@@ -80,7 +82,7 @@ function App() {
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <RoleBasedLayout>
-                  <EnhancedProfile />
+                  <Dashboard />
                 </RoleBasedLayout>
               </ProtectedRoute>
             } />
@@ -91,8 +93,7 @@ function App() {
                 </RoleBasedLayout>
               </ProtectedRoute>
             } />
-            
-            <Route path="/enhanced-profile" element={
+            <Route path="/profile" element={
               <ProtectedRoute>
                 <RoleBasedLayout>
                   <EnhancedProfile />
@@ -303,6 +304,7 @@ function App() {
             {/* Catch all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </NavigationGuard>
           <Toaster />
         </BrowserRouter>
       </AuthProvider>

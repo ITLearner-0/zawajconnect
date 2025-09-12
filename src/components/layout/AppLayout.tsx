@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/sidebar';
 import MobileBottomNav from '@/components/MobileBottomNav';
 import { useIsMobile } from '@/hooks/use-mobile';
+import Breadcrumb from '@/components/navigation/Breadcrumb';
 
 // Force refresh to clear cache
 
@@ -100,6 +101,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
 
         <main className="flex-1 pt-16">
           <div className="p-4 lg:p-6 mb-20 lg:mb-0">
+            <Breadcrumb />
             {children}
           </div>
         </main>

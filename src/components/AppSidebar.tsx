@@ -65,7 +65,7 @@ export function AppSidebar() {
   const isCollapsed = state === 'collapsed';
 
   const baseNavItems = [
-    { path: '/', icon: Home, label: 'Accueil', group: 'main' },
+    { path: '/dashboard', icon: Home, label: 'Tableau de Bord', group: 'main' },
     { path: '/enhanced-profile', icon: User, label: 'Mon Profil', group: 'main' },
     { path: '/browse', icon: Search, label: 'Découvrir', group: 'main' },
     { path: '/compatibility-test', icon: Heart, label: 'Test de Compatibilité', group: 'compatibility' },

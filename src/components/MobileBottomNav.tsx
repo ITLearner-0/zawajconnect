@@ -12,7 +12,8 @@ import {
   Settings,
   Bell,
   Crown,
-  Clock
+  Clock,
+  Home
 } from 'lucide-react';
 
 interface NavItem {
@@ -76,6 +77,12 @@ const MobileBottomNav = () => {
 
   const navItems: NavItem[] = [
     {
+      id: 'dashboard',
+      label: 'Accueil',
+      icon: Home,
+      path: '/dashboard'
+    },
+    {
       id: 'browse',
       label: 'Découvrir',
       icon: Search,
@@ -95,12 +102,6 @@ const MobileBottomNav = () => {
       badge: unreadMessages
     },
     {
-      id: 'islamic-tools',
-      label: 'Outils',
-      icon: Clock,
-      path: '/islamic-tools'
-    },
-    {
       id: 'profile',
       label: 'Profil',
       icon: User,
@@ -110,6 +111,7 @@ const MobileBottomNav = () => {
 
   const isActive = (path: string) => {
     if (path === '/enhanced-profile' && location.pathname === '/profile') return true;
+    if (path === '/dashboard' && (location.pathname === '/dashboard' || location.pathname === '/')) return true;
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
