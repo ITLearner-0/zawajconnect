@@ -20,7 +20,7 @@ const RoleBasedLayout: React.FC<RoleBasedLayoutProps> = ({ children }) => {
 
 const RoleBasedLayoutContent: React.FC<RoleBasedLayoutProps> = ({ children }) => {
   const { user, loading: authLoading } = useAuth();
-  const { isWaliOnly, isRegularUser, loading: roleLoading } = useUserRole();
+  const { isWaliOnly, isRegularUser, isWali, loading: roleLoading } = useUserRole();
 
   // Attendre que l'authentification et les rôles soient chargés
   if (authLoading || roleLoading) {
@@ -36,18 +36,19 @@ const RoleBasedLayoutContent: React.FC<RoleBasedLayoutProps> = ({ children }) =>
     return <Navigate to="/auth" replace />;
   }
 
-  // Wali-only users get the supervision portal
+  // CORRECTION: Les Walis ont maintenant accès à l'interface complète avec le menu de supervision
+  // Wali-only users (sans profil complet) ont accès au portail limité
   if (isWaliOnly) {
     return <FamilyAccessPortal />;
   }
 
-  // Regular users get the normal app layout
+  // Regular users (avec ou sans droits Wali) get the normal app layout with full menu
   if (isRegularUser) {
     return <AppLayout>{children}</AppLayout>;
   }
 
-  // Fallback - seulement si on est sûr que l'utilisateur n'a pas le bon rôle
-  return <Navigate to="/auth" replace />;
+  // Fallback - redirection vers onboarding pour compléter le profil
+  return <Navigate to="/onboarding" replace />;
 };
 
 export default RoleBasedLayout;

@@ -113,13 +113,20 @@ export const useUserRole = (): UserRole => {
       const invitedAs = familyResult.data;
 
       const acceptedInvitations = invitedAs?.filter(invite => invite.invitation_status === 'accepted') || [];
-      const isInvitedWali = acceptedInvitations.length > 0;
+      const isInvitedWali = acceptedInvitations.some(invite => invite.is_wali === true);
       const hasCompleteProfile = profile && profile.age && profile.gender && Boolean(profile.bio);
 
+      // Logic: 
+      // - isWaliOnly: true si c'est SEULEMENT un Wali (pas de profil complet)
+      // - isWali: true si a des droits de Wali (accepté invitation avec is_wali=true)
+      // - isRegularUser: true si a un profil complet OU est un Wali accepté
+      
+      const isOnlyWali = isInvitedWali && !hasCompleteProfile;
+      
       return {
-        isWaliOnly: false,
-        isRegularUser: hasCompleteProfile || isInvitedWali,
+        isWaliOnly: isOnlyWali,
         isWali: isInvitedWali,
+        isRegularUser: hasCompleteProfile || isInvitedWali,
         loading: false
       };
     });
