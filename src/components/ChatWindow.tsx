@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useIslamicModeration } from '@/hooks/useIslamicModeration';
-import { useFamilySupervision } from '@/hooks/useFamilySupervision';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,7 +48,6 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   const { user } = useAuth();
   console.log('👤 ChatWindow - user:', user?.id);
   const { toast } = useToast();
-  const { moderateContent } = useIslamicModeration();
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [match, setMatch] = useState<Match | null>(null);
@@ -58,10 +55,9 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   const [sending, setSending] = useState(false);
   const [isVideoCallActive, setIsVideoCallActive] = useState(false);
   const [isAudioCallActive, setIsAudioCallActive] = useState(false);
+  const [canCommunicate, setCanCommunicate] = useState(true);
+  const [isCheckingPermissions, setIsCheckingPermissions] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
-  // Add supervision status
-  const { supervisionStatus } = useFamilySupervision();
 
   // Listen for suggested messages
   useEffect(() => {
@@ -78,12 +74,17 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   useEffect(() => {
     if (!user || !matchId) return;
     
-    fetchMatchData();
-    fetchMessages();
-    setupRealtimeSubscription();
-    
-    // Mark messages as read when opening chat
-    markMessagesAsRead();
+    Promise.all([
+      fetchMatchData(),
+      fetchMessages(),
+      checkCommunicationPermissions()
+    ]).then(() => {
+      setupRealtimeSubscription();
+      markMessagesAsRead();
+    }).catch(error => {
+      console.error('Error initializing chat:', error);
+      setLoading(false);
+    });
 
     return () => {
       // Cleanup subscription if needed
@@ -96,6 +97,42 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const checkCommunicationPermissions = async () => {
+    if (!user) return;
+    
+    setIsCheckingPermissions(true);
+    try {
+      // Get user profile to check gender
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('gender')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      // Men can always communicate
+      if (userProfile?.gender !== 'female') {
+        setCanCommunicate(true);
+        return;
+      }
+
+      // For women, check if they have wali setup
+      const { data: familyMembers } = await supabase
+        .from('family_members')
+        .select('*')
+        .eq('user_id', user.id)
+        .or('invited_user_id.eq.' + user.id)
+        .eq('is_wali', true)
+        .eq('invitation_status', 'accepted');
+
+      setCanCommunicate((familyMembers && familyMembers.length > 0) || false);
+    } catch (error) {
+      console.error('Error checking communication permissions:', error);
+      setCanCommunicate(false);
+    } finally {
+      setIsCheckingPermissions(false);
+    }
   };
 
   const fetchMatchData = async () => {
@@ -112,7 +149,6 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
 
       if (data) {
         const isParticipant = data.user1_id === user.id || data.user2_id === user.id;
-        let isFamilySupervisor = false;
         
         if (!isParticipant) {
           // Check if user is a family supervisor
@@ -127,7 +163,6 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
             .maybeSingle();
             
           if (!familyData) {
-            console.error('User does not have access to this match');
             toast({
               title: "Accès refusé", 
               description: "Vous n'avez pas accès à cette conversation",
@@ -136,61 +171,29 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
             if (onClose) onClose();
             return;
           }
-          isFamilySupervisor = true;
         }
 
-        if (isFamilySupervisor) {
-          // For family supervisors, get both user profiles and supervisor profile
-          const { data: bothProfiles } = await supabase
-            .from('profiles')
-            .select('id, full_name, avatar_url, user_id')
-            .in('user_id', [data.user1_id, data.user2_id]);
+        // Get the other user's profile
+        const otherUserId = data.user1_id === user.id ? data.user2_id : data.user1_id;
+        
+        const { data: otherUserProfile } = await supabase
+          .from('profiles')
+          .select('id, full_name, avatar_url, user_id')
+          .eq('user_id', otherUserId)
+          .maybeSingle();
 
-          const { data: supervisorProfile } = await supabase
-            .from('profiles')
-            .select('id, full_name, avatar_url, user_id')
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-          const user1Profile = bothProfiles?.find(p => p.user_id === data.user1_id);
-          const user2Profile = bothProfiles?.find(p => p.user_id === data.user2_id);
-          
-          setMatch({
-            ...data,
-            other_user: {
-              id: 'supervision',
-              full_name: `${user1Profile?.full_name || 'User1'} & ${user2Profile?.full_name || 'User2'}`,
-              avatar_url: ''
-            },
-            isFamilySupervisor: true,
-            user1Profile,
-            user2Profile,
-            supervisorProfile
-          });
-        } else {
-          // For participants, show the other user
-          const otherUserId = data.user1_id === user.id ? data.user2_id : data.user1_id;
-          
-          const { data: otherUserProfile } = await supabase
-            .from('profiles')
-            .select('id, full_name, avatar_url, user_id')
-            .eq('user_id', otherUserId)
-            .maybeSingle();
-
-          setMatch({
-            ...data,
-            other_user: otherUserProfile ? {
-              id: otherUserProfile.user_id,
-              full_name: otherUserProfile.full_name || 'Utilisateur',
-              avatar_url: otherUserProfile.avatar_url || ''
-            } : {
-              id: otherUserId,
-              full_name: 'Utilisateur inconnu',
-              avatar_url: ''
-            },
-            isFamilySupervisor: false
-          });
-        }
+        setMatch({
+          ...data,
+          other_user: otherUserProfile ? {
+            id: otherUserProfile.user_id,
+            full_name: otherUserProfile.full_name || 'Utilisateur',
+            avatar_url: otherUserProfile.avatar_url || ''
+          } : {
+            id: otherUserId,
+            full_name: 'Utilisateur inconnu',
+            avatar_url: ''
+          }
+        });
       }
     } catch (error) {
       console.error('Error fetching match data:', error);
@@ -275,21 +278,28 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   };
 
   const sendMessage = async () => {
-    if (!newMessage.trim() || !user || !match) return;
+    if (!newMessage.trim() || !user || !match || !canCommunicate) return;
 
     setSending(true);
     
     try {
-      // First, moderate the content using Islamic values
-      const moderationResult = await moderateContent(newMessage.trim(), user.id, 'chat', matchId);
+      // Basic content validation
+      const trimmedMessage = newMessage.trim();
       
-      // Handle moderation result
-      if (!moderationResult.approved) {
-        if (moderationResult.action === 'blocked') {
-          setSending(false);
-          return; // Message is blocked, don't send
-        }
-        // For 'warned' and 'escalated', we allow sending but log the action
+      // Simple Islamic content moderation (client-side)
+      const inappropriateWords = ['haram', 'alcohol', 'dating'];
+      const hasInappropriate = inappropriateWords.some(word => 
+        trimmedMessage.toLowerCase().includes(word)
+      );
+      
+      if (hasInappropriate) {
+        toast({
+          title: "Message modéré",
+          description: "Votre message contient du contenu qui peut ne pas être approprié selon les valeurs islamiques",
+          variant: "destructive"
+        });
+        setSending(false);
+        return;
       }
 
       const { error } = await supabase
@@ -297,12 +307,16 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
         .insert({
           match_id: matchId,
           sender_id: user.id,
-          content: newMessage.trim()
+          content: trimmedMessage
         });
 
       if (error) throw error;
 
       setNewMessage('');
+      toast({
+        title: "Message envoyé",
+        description: "Votre message a été envoyé avec succès"
+      });
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -316,11 +330,16 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   };
 
   const handleVideoCall = () => {
-    console.log('Démarrage appel vidéo avec', match?.other_user.full_name);
-    console.log('Match disponible:', !!match);
-    console.log('État vidéo avant:', isVideoCallActive);
+    if (!canCommunicate) {
+      toast({
+        title: "Communication non autorisée",
+        description: "Vous devez configurer votre supervision familiale pour passer des appels",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsVideoCallActive(true);
-    console.log('État vidéo défini à true');
     toast({
       title: "Appel vidéo",
       description: `Démarrage de l'appel vidéo avec ${match?.other_user.full_name}...`
@@ -328,11 +347,16 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   };
 
   const handleAudioCall = () => {
-    console.log('Démarrage appel audio avec', match?.other_user.full_name);
-    console.log('Match disponible:', !!match);
-    console.log('État audio avant:', isAudioCallActive);
+    if (!canCommunicate) {
+      toast({
+        title: "Communication non autorisée", 
+        description: "Vous devez configurer votre supervision familiale pour passer des appels",
+        variant: "destructive"
+      });
+      return;
+    }
+    
     setIsAudioCallActive(true);
-    console.log('État audio défini à true');
     toast({
       title: "Appel audio",
       description: `Démarrage de l'appel audio avec ${match?.other_user.full_name}...`
@@ -342,6 +366,10 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   const handleCallEnd = () => {
     setIsVideoCallActive(false);
     setIsAudioCallActive(false);
+    toast({
+      title: "Appel terminé",
+      description: "L'appel a été terminé"
+    });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -351,38 +379,27 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
     }
   };
 
-  if (isVideoCallActive && match) {
-    console.log('Affichage VideoCall pour appel vidéo');
+  if ((isVideoCallActive || isAudioCallActive) && match) {
     return (
       <VideoCall
         matchId={matchId}
         partnerId={match.other_user.id}
         partnerName={match.other_user.full_name}
         onCallEnd={handleCallEnd}
+        isVideoCall={isVideoCallActive}
         autoStart={true}
       />
     );
   }
 
-  if (isAudioCallActive && match) {
-    console.log('Affichage VideoCall pour appel audio');
-    return (
-      <VideoCall
-        matchId={matchId}
-        partnerId={match.other_user.id}
-        partnerName={match.other_user.full_name}
-        onCallEnd={handleCallEnd}
-        autoStart={true}
-      />
-    );
-  }
-
-  if (loading) {
+  if (loading || isCheckingPermissions) {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald border-t-transparent mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Chargement de la conversation...</p>
+          <p className="text-muted-foreground">
+            {isCheckingPermissions ? 'Vérification des permissions...' : 'Chargement de la conversation...'}
+          </p>
         </div>
       </div>
     );
@@ -401,14 +418,14 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   return (
     <MessageModerationWrapper matchId={matchId}>
       <div className="flex flex-col h-full max-h-[600px] bg-background rounded-lg border shadow-lg">
-        {/* Simple supervision check */}
-        {!supervisionStatus.canCommunicate ? (
+        {/* Communication permission check */}
+        {!canCommunicate ? (
           <div className="flex-1 flex items-center justify-center p-8">
             <div className="text-center max-w-md">
               <Shield className="h-16 w-16 text-amber-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Supervision Familiale Requise</h3>
+              <h3 className="text-lg font-semibold mb-2">Configuration Familiale Requise</h3>
               <p className="text-muted-foreground mb-4">
-                Vous devez configurer votre famille selon les principes islamiques pour communiquer.
+                Selon les principes islamiques, vous devez configurer un Wali pour communiquer.
               </p>
               <Button onClick={() => window.location.href = '/family'}>
                 Configurer ma Famille
@@ -492,18 +509,6 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
               ) : (
                 messages.map((message) => {
                   const isMyMessage = message.sender_id === user?.id;
-                  // For family supervisors, get sender name
-                  let senderName = '';
-                  if (match?.isFamilySupervisor) {
-                    if (isMyMessage) {
-                      // Current user is the family supervisor
-                      senderName = `${match.supervisorProfile?.full_name || 'Tuteur'} (Tuteur)`;
-                    } else if (message.sender_id === match.user1_id) {
-                      senderName = match.user1Profile?.full_name || 'User1';
-                    } else if (message.sender_id === match.user2_id) {
-                      senderName = match.user2Profile?.full_name || 'User2';
-                    }
-                  }
                   
                   return (
                     <div
@@ -517,12 +522,6 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
                             : 'bg-muted text-foreground'
                         }`}
                       >
-                        {/* Show sender name for family supervisors */}
-                        {match?.isFamilySupervisor && senderName && (
-                          <p className="text-xs font-semibold text-primary mb-1">
-                            {senderName}
-                          </p>
-                        )}
                         <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                         <p className={`text-xs mt-1 ${
                           isMyMessage ? 'text-emerald-light' : 'text-muted-foreground'
@@ -559,13 +558,13 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Écrivez votre message..."
-                  disabled={sending}
+                  placeholder={canCommunicate ? "Écrivez votre message..." : "Configuration familiale requise"}
+                  disabled={sending || !canCommunicate}
                   className="flex-1"
                 />
                 <Button 
                   onClick={sendMessage}
-                  disabled={!newMessage.trim() || sending}
+                  disabled={!newMessage.trim() || sending || !canCommunicate}
                   className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
                 >
                   {sending ? (
