@@ -1,47 +1,62 @@
 import { useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { toast } from '@/hooks/use-toast';
+import { getRouteByPath } from '@/config/routes';
+import { useToast } from '@/hooks/use-toast';
 
 interface NavigationGuardProps {
   children: React.ReactNode;
 }
 
 const NavigationGuard = ({ children }: NavigationGuardProps) => {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, loading } = useAuth();
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Don't do anything while auth is loading
     if (loading) return;
 
-    // Redirect authenticated users from auth pages
-    if (user && location.pathname === '/auth') {
-      navigate('/dashboard', { replace: true });
+    const currentRoute = getRouteByPath(location.pathname);
+    
+    // Check if route requires authentication
+    if (currentRoute?.requiresAuth && !user) {
+      toast({
+        title: "Authentification requise",
+        description: "Vous devez être connecté pour accéder à cette page.",
+        variant: "destructive"
+      });
+      navigate('/auth', { 
+        state: { from: location.pathname },
+        replace: true 
+      });
       return;
     }
 
-    // Redirect authenticated users from landing page to dashboard
-    if (user && location.pathname === '/') {
-      navigate('/dashboard', { replace: true });
+    // Check if route requires onboarding completion
+    if (currentRoute?.requiresOnboarding && user && !user.user_metadata?.onboarding_completed) {
+      toast({
+        title: "Profil incomplet",
+        description: "Veuillez compléter votre profil pour continuer.",
+      });
+      navigate('/onboarding', { replace: true });
       return;
     }
 
-    // Show welcome message for new users on dashboard
-    if (user && location.pathname === '/dashboard') {
-      const hasShownWelcome = sessionStorage.getItem('welcome-shown');
-      if (!hasShownWelcome) {
-        setTimeout(() => {
-          toast({
-            title: "Bienvenue sur NikahConnect!",
-            description: "Complétez votre profil pour commencer à découvrir des matches compatibles.",
-          });
-          sessionStorage.setItem('welcome-shown', 'true');
-        }, 1000);
+    // Check role-based access
+    if (currentRoute?.roles && user) {
+      const userRole = user.user_metadata?.role || 'user';
+      if (!currentRoute.roles.includes(userRole)) {
+        toast({
+          title: "Accès refusé",
+          description: "Vous n'avez pas les permissions nécessaires pour accéder à cette page.",
+          variant: "destructive"
+        });
+        navigate('/dashboard', { replace: true });
+        return;
       }
     }
-  }, [user, loading, location.pathname, navigate]);
+  }, [location.pathname, user, loading, navigate, toast]);
 
   return <>{children}</>;
 };

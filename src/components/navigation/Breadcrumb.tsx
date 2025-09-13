@@ -3,6 +3,7 @@ import { ChevronRight, Home, ArrowLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getRouteByPath } from '@/config/routes';
 import { useNavigation } from '@/components/navigation/NavigationProvider';
+import { useNavigationAnalytics } from '@/hooks/useNavigationAnalytics';
 import { Button } from '@/components/ui/button';
 
 interface BreadcrumbItem {
@@ -14,7 +15,23 @@ interface BreadcrumbItem {
 const Breadcrumb = () => {
   const location = useLocation();
   const { canGoBack, goBack } = useNavigation();
+  const { trackAction } = useNavigationAnalytics();
   const pathnames = location.pathname.split('/').filter((x) => x);
+
+  const handleBreadcrumbClick = (path: string, label: string) => {
+    trackAction('breadcrumb_navigation', { 
+      from: location.pathname, 
+      to: path, 
+      label 
+    });
+  };
+
+  const handleBackClick = () => {
+    trackAction('back_navigation', { 
+      from: location.pathname 
+    });
+    goBack();
+  };
 
   const getBreadcrumbItems = (): BreadcrumbItem[] => {
     const items: BreadcrumbItem[] = [
@@ -59,6 +76,7 @@ const Breadcrumb = () => {
               <Link
                 to={item.path}
                 className="hover:text-foreground transition-colors"
+                onClick={() => handleBreadcrumbClick(item.path!, item.label)}
               >
                 {index === 0 && <Home className="h-4 w-4 inline mr-1" />}
                 {item.label}
@@ -77,7 +95,7 @@ const Breadcrumb = () => {
         <Button
           variant="ghost"
           size="sm"
-          onClick={goBack}
+          onClick={handleBackClick}
           className="gap-2"
         >
           <ArrowLeft className="h-4 w-4" />
