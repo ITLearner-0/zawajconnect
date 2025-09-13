@@ -40,7 +40,7 @@ const sampleProfiles = [
     islamic_prefs: {
       prayer_frequency: "5_times_daily",
       quran_reading: "daily",
-      beard_preference: "full",
+      beard_preference: "full_beard",
       sect: "sunni",
       madhab: "hanafi",
       halal_diet: true,
@@ -82,7 +82,7 @@ const sampleProfiles = [
     islamic_prefs: {
       prayer_frequency: "5_times_daily",
       quran_reading: "daily",
-      beard_preference: "trimmed",
+      beard_preference: "trimmed_beard",
       sect: "sunni",
       madhab: "hanbali",
       halal_diet: true,
