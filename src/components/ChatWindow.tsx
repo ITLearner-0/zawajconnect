@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import GoogleMeetIntegration from '@/components/enhanced/GoogleMeetIntegration';
 import { Send, Paperclip, MoreVertical, Phone, Video, Heart, User, Shield, MessageCircle, X } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';

@@ -15,7 +15,8 @@ import {
   ScreenShare,
   ScreenShareOff,
   Volume2,
-  VolumeX
+  VolumeX,
+  ExternalLink
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -27,6 +28,7 @@ interface VideoCallProps {
   isIncoming?: boolean;
   autoStart?: boolean;
   isVideoCall?: boolean;
+  showGoogleMeetOption?: boolean;
 }
 
 const VideoCall = ({ 
@@ -36,7 +38,8 @@ const VideoCall = ({
   onCallEnd,
   isIncoming = false,
   autoStart = false,
-  isVideoCall = true
+  isVideoCall = true,
+  showGoogleMeetOption = true
 }: VideoCallProps) => {
   const { toast } = useToast();
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -50,6 +53,7 @@ const VideoCall = ({
   const [callDuration, setCallDuration] = useState(0);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+  const [showCallOptions, setShowCallOptions] = useState(false);
 
   // Simulated call timer
   useEffect(() => {
@@ -111,10 +115,30 @@ const VideoCall = ({
   const startCall = () => {
     setIsCallActive(true);
     setCallDuration(0);
+    setShowCallOptions(false);
     toast({
       title: "Appel démarré",
       description: `Connexion avec ${partnerName}...`
     });
+  };
+
+  const startGoogleMeetCall = () => {
+    // Créer un lien Google Meet fictif pour la démo
+    const meetingId = `meet-${Date.now()}`;
+    const meetingLink = `https://meet.google.com/${meetingId}`;
+    
+    toast({
+      title: "Redirection vers Google Meet",
+      description: "Ouverture de la réunion dans un nouvel onglet..."
+    });
+    
+    // Ouvrir Google Meet dans un nouvel onglet
+    window.open(meetingLink, '_blank');
+    
+    // Optionnel: fermer ce composant après avoir ouvert Google Meet
+    setTimeout(() => {
+      onCallEnd?.();
+    }, 1000);
   };
 
   const endCall = () => {
@@ -246,7 +270,7 @@ const VideoCall = ({
     );
   }
 
-  if (!isCallActive) {
+  if (!isCallActive && !showCallOptions) {
     return (
       <Card className="w-full">
         <CardHeader>
@@ -262,14 +286,35 @@ const VideoCall = ({
             </div>
             <h3 className="text-xl font-semibold">{partnerName}</h3>
             <p className="text-muted-foreground">
-              Prêt pour un {isVideoCall ? 'appel vidéo' : 'appel audio'}?
+              Comment souhaitez-vous passer cet {isVideoCall ? 'appel vidéo' : 'appel audio'}?
             </p>
           </div>
 
-          <Button onClick={startCall} className="w-full" size="lg">
-            {isVideoCall ? <Video className="h-5 w-5 mr-2" /> : <Phone className="h-5 w-5 mr-2" />}
-            Démarrer l'{isVideoCall ? 'appel vidéo' : 'appel audio'}
-          </Button>
+          <div className="space-y-2">
+            <Button onClick={startCall} className="w-full" size="lg">
+              {isVideoCall ? <Video className="h-5 w-5 mr-2" /> : <Phone className="h-5 w-5 mr-2" />}
+              Appel direct (WebRTC)
+            </Button>
+            
+            {showGoogleMeetOption && (
+              <Button 
+                onClick={startGoogleMeetCall} 
+                variant="outline" 
+                className="w-full" 
+                size="lg"
+              >
+                <ExternalLink className="h-5 w-5 mr-2" />
+                Via Google Meet
+              </Button>
+            )}
+          </div>
+
+          <div className="text-xs text-muted-foreground text-center">
+            <p className="mb-1"><strong>Appel direct:</strong> Connexion P2P sécurisée</p>
+            {showGoogleMeetOption && (
+              <p><strong>Google Meet:</strong> Utilise la plateforme Google (compte requis)</p>
+            )}
+          </div>
         </CardContent>
       </Card>
     );
