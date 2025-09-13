@@ -59,6 +59,16 @@ const Browse = () => {
     if (!user) return;
 
     try {
+      // First get current user's gender
+      const { data: currentUserProfile } = await supabase
+        .from('profiles')
+        .select('gender')
+        .eq('user_id', user.id)
+        .single();
+
+      // Determine opposite gender
+      const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
+
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -68,6 +78,7 @@ const Browse = () => {
           )
         `)
         .neq('user_id', user.id)
+        .eq('gender', oppositeGender)
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -83,10 +94,20 @@ const Browse = () => {
       console.error('Error fetching profiles:', error);
       // Fallback to basic profiles if relationship query fails
       try {
+        // Get current user's gender for fallback too
+        const { data: currentUserProfile } = await supabase
+          .from('profiles')
+          .select('gender')
+          .eq('user_id', user.id)
+          .single();
+
+        const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
+
         const { data: basicProfiles, error: basicError } = await supabase
           .from('profiles')
           .select('*')
           .neq('user_id', user.id)
+          .eq('gender', oppositeGender)
           .order('created_at', { ascending: false })
           .limit(50);
 
