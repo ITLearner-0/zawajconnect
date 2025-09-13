@@ -101,27 +101,29 @@ export const useProfileSave = () => {
         throw profileError;
       }
 
-      // 2. Save Islamic preferences
+      // 2. Save Islamic preferences - Clean data before saving
+      const cleanIslamicPrefs = {
+        user_id: user.id,
+        prayer_frequency: islamicPrefs.prayer_frequency || null,
+        quran_reading: islamicPrefs.quran_reading || null,
+        hijab_preference: islamicPrefs.hijab_preference || null,
+        beard_preference: islamicPrefs.beard_preference || null,
+        sect: islamicPrefs.sect || null,
+        madhab: islamicPrefs.madhab || null,
+        halal_diet: islamicPrefs.halal_diet ?? true,
+        smoking: islamicPrefs.smoking || null,
+        desired_partner_sect: islamicPrefs.desired_partner_sect || null,
+        importance_of_religion: islamicPrefs.importance_of_religion || null,
+        updated_at: new Date().toISOString()
+      };
+
       const { error: prefsError } = await supabase
         .from('islamic_preferences')
-        .upsert({
-          user_id: user.id,
-          prayer_frequency: islamicPrefs.prayer_frequency,
-          quran_reading: islamicPrefs.quran_reading,
-          hijab_preference: islamicPrefs.hijab_preference,
-          beard_preference: islamicPrefs.beard_preference,
-          sect: islamicPrefs.sect,
-          madhab: islamicPrefs.madhab,
-          halal_diet: islamicPrefs.halal_diet,
-          smoking: islamicPrefs.smoking,
-          desired_partner_sect: islamicPrefs.desired_partner_sect,
-          importance_of_religion: islamicPrefs.importance_of_religion,
-          updated_at: new Date().toISOString()
-        });
+        .upsert(cleanIslamicPrefs);
 
       if (prefsError) {
         console.error('Islamic preferences save error:', prefsError);
-        throw prefsError;
+        throw new Error(`Erreur lors de la sauvegarde des préférences islamiques: ${prefsError.message}`);
       }
 
       console.log('✅ Profile and Islamic preferences saved successfully');
