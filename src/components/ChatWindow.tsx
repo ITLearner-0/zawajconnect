@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import GoogleMeetIntegration from '@/components/enhanced/GoogleMeetIntegration';
-import { Send, Paperclip, MoreVertical, Phone, Video, Heart, User, Shield, MessageCircle, X } from 'lucide-react';
+import { Send, Paperclip, MoreVertical, Phone, Video, Heart, User, Shield, MessageCircle, X, ExternalLink } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import VideoCall from '@/components/VideoCall';
@@ -57,6 +58,8 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   const [isAudioCallActive, setIsAudioCallActive] = useState(false);
   const [canCommunicate, setCanCommunicate] = useState(true);
   const [isCheckingPermissions, setIsCheckingPermissions] = useState(false);
+  const [showVideoCall, setShowVideoCall] = useState(false);
+  const [showGoogleMeet, setShowGoogleMeet] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Listen for suggested messages
@@ -498,18 +501,15 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.length === 0 ? (
                 <div className="text-center py-8">
-                  <Heart className="h-12 w-12 mx-auto text-emerald/50 mb-4" />
-                  <p className="text-muted-foreground">
-                    C'est le début de votre conversation ! 
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Présentez-vous et commencez à faire connaissance de manière respectueuse.
+                  <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Commencez votre conversation</h3>
+                  <p className="text-muted-foreground text-sm">
+                    Envoyez votre premier message à {match.other_user.full_name}
                   </p>
                 </div>
               ) : (
                 messages.map((message) => {
                   const isMyMessage = message.sender_id === user?.id;
-                  
                   return (
                     <div
                       key={message.id}
@@ -549,7 +549,53 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
             </div>
 
             {/* Message Input */}
-            <div className="border-t p-4">
+            <div className="border-t p-4 space-y-4">
+              {/* Video Call and Google Meet Options */}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowVideoCall(!showVideoCall)}
+                  className="flex-1"
+                >
+                  <Video className="h-4 w-4 mr-2" />
+                  {showVideoCall ? 'Masquer' : 'Appel vidéo'}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowGoogleMeet(!showGoogleMeet)}
+                  className="flex-1"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  {showGoogleMeet ? 'Masquer' : 'Google Meet'}
+                </Button>
+              </div>
+
+              {showVideoCall && (
+                <VideoCall
+                  matchId={matchId}
+                  partnerId={match.other_user.id}
+                  partnerName={match.other_user.full_name}
+                  onCallEnd={() => setShowVideoCall(false)}
+                  showGoogleMeetOption={false}
+                />
+              )}
+
+              {showGoogleMeet && (
+                <GoogleMeetIntegration
+                  matchId={matchId}
+                  partnerId={match.other_user.id}
+                  partnerName={match.other_user.full_name}
+                  onMeetingCreated={(link) => {
+                    toast({
+                      title: "Réunion créée",
+                      description: "Le lien Google Meet a été généré"
+                    });
+                  }}
+                />
+              )}
+
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" className="text-muted-foreground">
                   <Paperclip className="h-4 w-4" />

@@ -1223,6 +1223,65 @@ export type Database = {
           },
         ]
       }
+      video_calls: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          end_time: string | null
+          id: string
+          match_id: string
+          meeting_id: string
+          meeting_link: string
+          participants: string[] | null
+          platform: string
+          scheduled_end_time: string | null
+          start_time: string
+          status: string
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          match_id: string
+          meeting_id: string
+          meeting_link: string
+          participants?: string[] | null
+          platform?: string
+          scheduled_end_time?: string | null
+          start_time?: string
+          status?: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          end_time?: string | null
+          id?: string
+          match_id?: string
+          meeting_id?: string
+          meeting_link?: string
+          participants?: string[] | null
+          platform?: string
+          scheduled_end_time?: string | null
+          start_time?: string
+          status?: string
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "video_calls_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
