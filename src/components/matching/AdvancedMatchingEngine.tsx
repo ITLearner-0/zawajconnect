@@ -31,7 +31,17 @@ const AdvancedMatchingEngine = () => {
       // Simulate AI-powered matching analysis
       await new Promise(resolve => setTimeout(resolve, 3000));
       
-      // Fetch potential matches with AI scoring
+      // Get current user's profile to determine gender
+      const { data: currentUserProfile } = await supabase
+        .from('profiles')
+        .select('gender')
+        .eq('user_id', user.id)
+        .single();
+
+      // Determine opposite gender
+      const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
+      
+      // Fetch potential matches with AI scoring (opposite gender only)
       const { data: profiles } = await supabase
         .from('profiles')
         .select(`
@@ -44,6 +54,7 @@ const AdvancedMatchingEngine = () => {
           bio
         `)
         .neq('user_id', user.id)
+        .eq('gender', oppositeGender)
         .limit(20);
 
       if (profiles) {

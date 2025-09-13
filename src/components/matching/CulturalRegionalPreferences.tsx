@@ -129,11 +129,22 @@ const CulturalRegionalPreferences = () => {
       // Simulate cultural matching analysis
       await new Promise(resolve => setTimeout(resolve, 2500));
       
-      // Fetch potential matches
+      // Get current user's gender first
+      const { data: currentUserProfile } = await supabase
+        .from('profiles')
+        .select('gender')
+        .eq('user_id', user.id)
+        .single();
+
+      // Determine opposite gender
+      const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
+      
+      // Fetch potential matches (opposite gender only)
       const { data: profiles } = await supabase
         .from('profiles')
         .select('user_id, full_name, age, location, profession, avatar_url, bio')
         .neq('user_id', user.id)
+        .eq('gender', oppositeGender)
         .limit(30);
 
       if (profiles) {

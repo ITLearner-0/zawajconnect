@@ -111,11 +111,22 @@ const AdvancedIslamicFiltering = () => {
     setLoading(true);
     
     try {
-      // Fetch all profiles 
+      // Get current user's gender first
+      const { data: currentUserProfile } = await supabase
+        .from('profiles')
+        .select('gender')
+        .eq('user_id', user.id)
+        .single();
+
+      // Determine opposite gender
+      const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
+      
+      // Fetch all profiles (opposite gender only)
       const { data: profilesData } = await supabase
         .from('profiles')
         .select('user_id, full_name, age, location, profession, avatar_url')
-        .neq('user_id', user.id);
+        .neq('user_id', user.id)
+        .eq('gender', oppositeGender);
 
       // Fetch Islamic preferences separately
       const { data: islamicPrefsData } = await supabase

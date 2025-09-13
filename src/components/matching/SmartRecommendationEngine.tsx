@@ -70,7 +70,17 @@ const SmartRecommendationEngine = () => {
         .eq('user_id', user.id)
         .single();
 
-      // Get potential matches
+      // Get current user's gender first
+      const { data: currentUserProfile } = await supabase
+        .from('profiles')
+        .select('gender')
+        .eq('user_id', user.id)
+        .single();
+
+      // Determine opposite gender
+      const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
+
+      // Get potential matches (opposite gender only)
       const { data: profiles } = await supabase
         .from('profiles')
         .select(`
@@ -85,6 +95,7 @@ const SmartRecommendationEngine = () => {
           islamic_preferences(*)
         `)
         .neq('user_id', user.id)
+        .eq('gender', oppositeGender)
         .limit(50);
 
       if (profiles) {
