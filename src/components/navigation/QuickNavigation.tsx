@@ -84,6 +84,7 @@ const QuickNavigation = () => {
         size="sm"
         onClick={() => setOpen(true)}
         className="gap-2 hidden lg:flex"
+        data-quick-nav-trigger
       >
         <Search className="h-4 w-4" />
         Navigation rapide

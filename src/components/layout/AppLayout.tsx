@@ -26,8 +26,10 @@ import QuickNavigation from '@/components/navigation/QuickNavigation';
 import RouteLoadingIndicator from '@/components/navigation/RouteLoadingIndicator';
 import NavigationSuggestions from '@/components/navigation/NavigationSuggestions';
 import KeyboardShortcutsHelp from '@/components/navigation/KeyboardShortcutsHelp';
+import NavigationTour from '@/components/navigation/NavigationTour';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useNavigationAnalytics } from '@/hooks/useNavigationAnalytics';
+import { useNavigationPreferences } from '@/hooks/useNavigationPreferences';
 
 // Force refresh to clear cache
 
@@ -41,6 +43,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { preferences, shouldShowTour, completeTour } = useNavigationPreferences();
 
   // Enable keyboard shortcuts and analytics
   useKeyboardShortcuts();
@@ -72,8 +75,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           
           {/* User Menu */}
           <div className="flex items-center gap-4">
-            <KeyboardShortcutsHelp />
-            <QuickNavigation />
+            {preferences.showKeyboardShortcuts && <KeyboardShortcutsHelp />}
+            {preferences.showQuickNavigation && <QuickNavigation />}
             <span className="text-sm text-muted-foreground hidden sm:block">
               Connecté en tant que {user.email}
             </span>
@@ -112,10 +115,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         <AppSidebar />
 
         <main className="flex-1 pt-16">
-          <RouteLoadingIndicator />
+          {preferences.enableTransitions && <RouteLoadingIndicator />}
           <div className="p-4 lg:p-6 mb-20 lg:mb-0">
-            <Breadcrumb />
-            <NavigationSuggestions />
+            {preferences.showBreadcrumb && <Breadcrumb />}
+            {preferences.showNavigationSuggestions && <NavigationSuggestions />}
             {children}
           </div>
         </main>
@@ -126,6 +129,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       
       {/* Mobile Bottom Navigation */}
       {isMobile && <MobileBottomNav />}
+
+      {/* Navigation Tour */}
+      <NavigationTour 
+        show={shouldShowTour()} 
+        onComplete={completeTour} 
+      />
     </SidebarProvider>
   );
 };

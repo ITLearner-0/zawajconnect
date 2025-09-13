@@ -104,14 +104,14 @@ export const useKeyboardShortcuts = () => {
       key: '/',
       action: (e?: KeyboardEvent) => {
         e?.preventDefault();
-        // Focus search input if available
-        const searchInput = document.querySelector('input[type="search"], input[placeholder*="recherch"]') as HTMLInputElement;
-        if (searchInput) {
-          searchInput.focus();
-          trackAction('keyboard_action', { shortcut: '/', action: 'focus_search' });
+        // Trigger the existing quick navigation instead of custom search
+        const quickNavButton = document.querySelector('[data-quick-nav-trigger]') as HTMLElement;
+        if (quickNavButton) {
+          quickNavButton.click();
+          trackAction('keyboard_action', { shortcut: '/', action: 'open_quick_nav' });
         }
       },
-      description: 'Focus sur la recherche',
+      description: 'Navigation rapide',
       category: 'Actions'
     },
     {
