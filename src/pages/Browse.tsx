@@ -278,6 +278,12 @@ const Browse = () => {
           .update(updateData)
           .eq('id', existingMatch.id);
 
+        console.log('Match update successful:', { 
+          matchId: existingMatch.id, 
+          updateData, 
+          isMutual 
+        });
+
         if (isMutual) {
           toast({
             title: "C'est un match ! 🎉",
