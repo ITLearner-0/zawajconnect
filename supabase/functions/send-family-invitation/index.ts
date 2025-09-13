@@ -51,6 +51,8 @@ const handler = async (req: Request): Promise<Response> => {
         p_relationship: relationship,
         p_is_wali: isWali
       });
+    
+    console.log('Family invitation creation result:', { invitationToken, invitationError });
 
     if (invitationError) {
       throw new Error(`Failed to create invitation: ${invitationError.message}`);
