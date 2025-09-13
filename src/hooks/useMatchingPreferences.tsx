@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -27,6 +27,7 @@ export const useMatchingPreferences = () => {
   const [preferences, setPreferences] = useState<MatchingPreferences>(defaultPreferences);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load preferences from database
   useEffect(() => {
@@ -81,6 +82,8 @@ export const useMatchingPreferences = () => {
         .upsert({
           user_id: user.id,
           ...newPreferences
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) throw error;
@@ -108,13 +111,25 @@ export const useMatchingPreferences = () => {
     const newPreferences = { ...preferences, ...updates };
     setPreferences(newPreferences);
     
-    // Auto-save after a delay
-    const timeoutId = setTimeout(() => {
+    // Clear existing timeout
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    
+    // Auto-save after 1 second delay
+    saveTimeoutRef.current = setTimeout(() => {
       savePreferences(newPreferences);
     }, 1000);
-
-    return () => clearTimeout(timeoutId);
   };
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return {
     preferences,
