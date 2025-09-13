@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heart, MessageCircle, Eye, Users, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import MatchesDebugger from '@/components/MatchesDebugger';
 
 interface Match {
   id: string;
@@ -119,10 +118,7 @@ const Matches = () => {
     <div className="py-8 px-4">
       <div className="container mx-auto">
         <div className="max-w-4xl mx-auto">
-          {/* Debug component - à supprimer une fois le problème résolu */}
-          <MatchesDebugger />
-          
-          <div className="flex items-center gap-3 mb-8 mt-8">
+          <div className="flex items-center gap-3 mb-8">
             <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
               <Heart className="h-6 w-6 text-primary-foreground" />
             </div>

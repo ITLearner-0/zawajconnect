@@ -529,6 +529,7 @@ export type Database = {
           is_mutual: boolean | null
           match_score: number | null
           supervision_started_at: string | null
+          updated_at: string
           user1_id: string
           user1_liked: boolean | null
           user2_id: string
@@ -548,6 +549,7 @@ export type Database = {
           is_mutual?: boolean | null
           match_score?: number | null
           supervision_started_at?: string | null
+          updated_at?: string
           user1_id: string
           user1_liked?: boolean | null
           user2_id: string
@@ -567,6 +569,7 @@ export type Database = {
           is_mutual?: boolean | null
           match_score?: number | null
           supervision_started_at?: string | null
+          updated_at?: string
           user1_id?: string
           user1_liked?: boolean | null
           user2_id?: string
