@@ -104,13 +104,17 @@ const FamilyInvitationManager = () => {
       if (error) throw error;
 
       // Send invitation email via edge function
+      const { data: { session } } = await supabase.auth.getSession();
       await supabase.functions.invoke('send-family-invitation', {
         body: {
+          fullName: inviteForm.full_name,
           email: inviteForm.email,
-          full_name: inviteForm.full_name,
-          inviter_name: user.user_metadata?.full_name || 'Un membre de la famille',
-          relationship: inviteForm.relationship
-        }
+          relationship: inviteForm.relationship,
+          isWali: inviteForm.is_wali
+        },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
       });
 
       toast({
@@ -166,13 +170,17 @@ const FamilyInvitationManager = () => {
 
   const resendInvitation = async (memberId: string, member: FamilyMember) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
       await supabase.functions.invoke('send-family-invitation', {
         body: {
+          fullName: member.full_name,
           email: member.email,
-          full_name: member.full_name,
-          inviter_name: user?.user_metadata?.full_name || 'Un membre de la famille',
-          relationship: member.relationship
-        }
+          relationship: member.relationship,
+          isWali: member.is_wali
+        },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`,
+        },
       });
 
       await supabase

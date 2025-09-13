@@ -64,7 +64,12 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     const inviterName = profile?.full_name || 'Un membre de famille';
-    const invitationUrl = `https://959ea671-18d4-4cc0-89ee-e9aef23ed956.sandbox.lovable.dev/invitation?token=${invitationToken}`;
+    
+    // Construct invitation URL dynamically
+    const baseUrl = req.headers.get('origin') || req.headers.get('referer')?.split('/')[0] + '//' + req.headers.get('referer')?.split('/')[2] || 'https://preview--deen-dates-platform.lovable.app';
+    const invitationUrl = `${baseUrl}/invitation?token=${invitationToken}`;
+    
+    console.log(`Sending invitation to ${email} with token ${invitationToken} and URL ${invitationUrl}`);
 
     // Send invitation email
     const emailResponse = await resend.emails.send({
