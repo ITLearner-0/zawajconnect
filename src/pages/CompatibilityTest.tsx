@@ -1,6 +1,7 @@
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
 import CompatibilityQuestionnaire from '@/components/CompatibilityQuestionnaire';
+import ErrorBoundaryWrapper from '@/components/ErrorBoundaryWrapper';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
@@ -28,9 +29,11 @@ const CompatibilityTest = () => {
     <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
       <Header />
       <main className="pt-20">
-        <CompatibilityQuestionnaire 
-          onComplete={handleComplete} 
-        />
+        <ErrorBoundaryWrapper>
+          <CompatibilityQuestionnaire 
+            onComplete={handleComplete} 
+          />
+        </ErrorBoundaryWrapper>
       </main>
       <Footer />
     </div>

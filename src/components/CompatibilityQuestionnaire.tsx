@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,6 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
+import { useQuestionnaireState } from '@/hooks/useQuestionnaireState';
 import { Heart, Users, Home, Activity, Baby, Handshake, User, Coins, Brain } from 'lucide-react';
 
 interface Question {
@@ -54,17 +55,41 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
   const { user } = useAuth();
   const { toast } = useToast();
   const [questions, setQuestions] = useState<Question[]>([]);
-  const [responses, setResponses] = useState<Record<string, string>>({});
   const [currentCategory, setCurrentCategory] = useState<string>('');
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  
+  const {
+    responses,
+    updateResponse,
+    saveToDatabase,
+    loadFromDatabase,
+    saving,
+    hasUnsavedChanges
+  } = useQuestionnaireState({
+    storageKey: 'compatibility_responses',
+    autoSaveDelay: 3000
+  });
 
   useEffect(() => {
     if (user) {
       fetchQuestionsAndResponses();
     }
   }, [user]);
+
+  // Warn user before leaving with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = 'Vous avez des réponses non sauvegardées. Êtes-vous sûr de vouloir quitter?';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [hasUnsavedChanges]);
 
   const fetchQuestionsAndResponses = async () => {
     try {
@@ -93,19 +118,8 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
         setCurrentCategory(uniqueCategories[0]);
       }
 
-      // Fetch existing responses
-      const { data: responsesData, error: responsesError } = await supabase
-        .from('user_compatibility_responses')
-        .select('question_key, response_value')
-        .eq('user_id', user?.id);
-
-      if (responsesError) throw responsesError;
-
-      const existingResponses: Record<string, string> = {};
-      responsesData?.forEach(response => {
-        existingResponses[response.question_key] = response.response_value;
-      });
-      setResponses(existingResponses);
+      // Load existing responses from database
+      await loadFromDatabase();
 
     } catch (error) {
       console.error('Error fetching questions:', error);
@@ -120,32 +134,15 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
   };
 
   const handleResponseChange = (questionKey: string, value: string) => {
-    setResponses(prev => ({
-      ...prev,
-      [questionKey]: value
-    }));
+    updateResponse(questionKey, value);
   };
 
   const saveResponses = async () => {
     if (!user) return;
 
-    setSaving(true);
-    try {
-      const responseArray = Object.entries(responses).map(([questionKey, responseValue]) => ({
-        user_id: user.id,
-        question_key: questionKey,
-        response_value: responseValue
-      }));
-
-      const { error } = await supabase
-        .from('user_compatibility_responses')
-        .upsert(responseArray, {
-          onConflict: 'user_id,question_key',
-          ignoreDuplicates: false
-        });
-
-      if (error) throw error;
-
+    const success = await saveToDatabase();
+    
+    if (success) {
       toast({
         title: "Réponses sauvegardées",
         description: "Vos réponses au questionnaire ont été enregistrées avec succès."
@@ -154,16 +151,12 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
       if (onComplete) {
         onComplete();
       }
-
-    } catch (error) {
-      console.error('Error saving responses:', error);
+    } else {
       toast({
         title: "Erreur",
-        description: "Impossible de sauvegarder vos réponses.",
+        description: "Impossible de sauvegarder vos réponses. Veuillez réessayer.",
         variant: "destructive"
       });
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -219,11 +212,26 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Progression globale</span>
-                <span>{getAnsweredCount()}/{getTotalQuestions()} questions</span>
+                <div className="flex items-center gap-2">
+                  <span>{getAnsweredCount()}/{getTotalQuestions()} questions</span>
+                  {hasUnsavedChanges && (
+                    <Badge variant="outline" className="text-xs bg-yellow-50 border-yellow-200 text-yellow-800">
+                      Non sauvegardé
+                    </Badge>
+                  )}
+                  {saving && (
+                    <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-800">
+                      Sauvegarde...
+                    </Badge>
+                  )}
+                </div>
               </div>
               <Progress value={getOverallProgress()} className="w-full" />
               <p className="text-xs text-muted-foreground">
                 {Math.round(getOverallProgress())}% complété
+                {hasUnsavedChanges && (
+                  <span className="ml-2 text-yellow-600">• Sauvegarde automatique dans 3s</span>
+                )}
               </p>
             </div>
           </CardHeader>
@@ -326,7 +334,7 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
                   onClick={saveResponses}
                   disabled={saving || Object.keys(responses).length === 0}
                 >
-                  {saving ? 'Sauvegarde...' : 'Sauvegarder'}
+                  {saving ? 'Sauvegarde...' : hasUnsavedChanges ? 'Sauvegarder les changements' : 'Sauvegarder'}
                 </Button>
                 
                 {categories.indexOf(currentCategory) < categories.length - 1 ? (
