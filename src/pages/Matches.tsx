@@ -19,6 +19,7 @@ interface Match {
   created_at: string;
   other_user: {
     id: string;
+    user_id: string;
     full_name: string;
     age: number;
     location: string;
@@ -67,8 +68,12 @@ const Matches = () => {
 
             return {
               ...match,
-              other_user: otherUserProfile || {
+              other_user: otherUserProfile ? {
+                ...otherUserProfile,
+                user_id: otherUserId // Ensure we always have user_id for navigation
+              } : {
                 id: otherUserId,
+                user_id: otherUserId, // Add user_id for consistency
                 full_name: 'Utilisateur inconnu',
                 age: 0,
                 location: 'Non spécifié',
@@ -181,7 +186,7 @@ const Matches = () => {
                             </Button>
                             <Button
                               variant="outline"
-                              onClick={() => viewProfile(match.other_user.id)}
+                              onClick={() => viewProfile(match.other_user.user_id)}
                             >
                               <Eye className="h-4 w-4 mr-2" />
                               Voir profil
@@ -255,7 +260,7 @@ const Matches = () => {
                             <div className="flex flex-col gap-2">
                               <Button
                                 variant="outline"
-                                onClick={() => viewProfile(match.other_user.id)}
+                                onClick={() => viewProfile(match.other_user.user_id)}
                               >
                                 <Eye className="h-4 w-4 mr-2" />
                                 Voir profil
