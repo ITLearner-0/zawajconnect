@@ -69,6 +69,16 @@ const Browse = () => {
       // Determine opposite gender
       const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
 
+      // Get all Wali user IDs to exclude them from matching
+      const { data: waliUsers } = await supabase
+        .from('family_members')
+        .select('invited_user_id')
+        .eq('is_wali', true)
+        .eq('invitation_status', 'accepted')
+        .not('invited_user_id', 'is', null);
+
+      const waliUserIds = waliUsers?.map(w => w.invited_user_id).filter(Boolean) || [];
+
       const { data, error } = await supabase
         .from('profiles')
         .select(`
@@ -79,6 +89,7 @@ const Browse = () => {
         `)
         .neq('user_id', user.id)
         .eq('gender', oppositeGender)
+        .not('user_id', 'in', `(${waliUserIds.join(',')})`)
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -103,11 +114,22 @@ const Browse = () => {
 
         const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
 
+        // Also exclude Walis in fallback
+        const { data: waliUsers } = await supabase
+          .from('family_members')
+          .select('invited_user_id')
+          .eq('is_wali', true)
+          .eq('invitation_status', 'accepted')
+          .not('invited_user_id', 'is', null);
+
+        const waliUserIds = waliUsers?.map(w => w.invited_user_id).filter(Boolean) || [];
+
         const { data: basicProfiles, error: basicError } = await supabase
           .from('profiles')
           .select('*')
           .neq('user_id', user.id)
           .eq('gender', oppositeGender)
+          .not('user_id', 'in', waliUserIds.length > 0 ? `(${waliUserIds.join(',')})` : '()')
           .order('created_at', { ascending: false })
           .limit(50);
 

@@ -121,12 +121,29 @@ const AdvancedIslamicFiltering = () => {
       // Determine opposite gender
       const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
       
-      // Fetch all profiles (opposite gender only)
-      const { data: profilesData } = await supabase
+      // Get all Wali user IDs to exclude them from matching
+      const { data: waliUsers } = await supabase
+        .from('family_members')
+        .select('invited_user_id')
+        .eq('is_wali', true)
+        .eq('invitation_status', 'accepted')
+        .not('invited_user_id', 'is', null);
+
+      const waliUserIds = waliUsers?.map(w => w.invited_user_id).filter(Boolean) || [];
+      
+      // Fetch all profiles (opposite gender only, excluding Walis)
+      let profileQuery = supabase
         .from('profiles')
         .select('user_id, full_name, age, location, profession, avatar_url')
         .neq('user_id', user.id)
         .eq('gender', oppositeGender);
+
+      // Exclude Walis if any exist
+      if (waliUserIds.length > 0) {
+        profileQuery = profileQuery.not('user_id', 'in', `(${waliUserIds.join(',')})`);
+      }
+
+      const { data: profilesData } = await profileQuery;
 
       // Fetch Islamic preferences separately
       const { data: islamicPrefsData } = await supabase

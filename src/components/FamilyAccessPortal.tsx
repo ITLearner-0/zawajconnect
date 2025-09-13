@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import FamilyNotificationCenter from '@/components/FamilyNotificationCenter';
 import WaliInvitationTest from '@/components/WaliInvitationTest';
+import WaliExclusionTest from '@/components/WaliExclusionTest';
 import { Shield, Users, Key, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -99,9 +100,10 @@ const FamilyAccessPortal = () => {
           <div className="lg:col-span-1">
             <FamilyNotificationCenter />
             
-            {/* Test Component for Development */}
-            <div className="mt-6">
+            {/* Test Components for Development */}
+            <div className="mt-6 space-y-4">
               <WaliInvitationTest />
+              <WaliExclusionTest />
             </div>
           </div>
         </div>
