@@ -63,11 +63,7 @@ const SmartMatchingSuggestions = () => {
       
       const { data: potentialMatches } = await supabase
         .from('profiles')
-        .select(`
-          *,
-          islamic_preferences(*),
-          user_verifications(verification_score)
-        `)
+        .select('*')
         .eq('gender', targetGender)
         .neq('user_id', user.id);
 
@@ -76,8 +72,28 @@ const SmartMatchingSuggestions = () => {
         return;
       }
 
+      // Get Islamic preferences and verifications for these users
+      const userIds = potentialMatches.map(p => p.user_id);
+      
+      const { data: islamicPrefs } = await supabase
+        .from('islamic_preferences')
+        .select('*')
+        .in('user_id', userIds);
+
+      const { data: verifications } = await supabase
+        .from('user_verifications')
+        .select('user_id, verification_score')
+        .in('user_id', userIds);
+
+      // Combine the data
+      const enrichedMatches = potentialMatches.map(match => ({
+        ...match,
+        islamic_preferences: islamicPrefs?.filter(p => p.user_id === match.user_id) || [],
+        user_verifications: verifications?.find(v => v.user_id === match.user_id) || null
+      }));
+
       // Calculate compatibility for each potential match
-      const scoredMatches = potentialMatches.map(match => {
+      const scoredMatches = enrichedMatches.map(match => {
         const sharedInterests = (myProfile.interests || []).filter(interest => 
           (match.interests || []).includes(interest)
         );
@@ -148,8 +164,7 @@ const SmartMatchingSuggestions = () => {
         }
 
         // Verification score bonus
-        const verificationData = Array.isArray(match.user_verifications) ? match.user_verifications[0] : match.user_verifications;
-        const verificationScore = verificationData?.verification_score || 0;
+        const verificationScore = match.user_verifications?.verification_score || 0;
         if (verificationScore >= 70) {
           compatibilityScore += 5;
           reasons.push("Profil vérifié");

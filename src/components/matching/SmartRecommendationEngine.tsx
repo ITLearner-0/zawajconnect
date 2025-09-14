@@ -101,17 +101,29 @@ const SmartRecommendationEngine = () => {
           profession,
           avatar_url,
           bio,
-          interests,
-          islamic_preferences(*)
+          interests
         `)
         .neq('user_id', user.id)
         .eq('gender', oppositeGender)
         .not('user_id', 'in', waliUserIds.length > 0 ? `(${waliUserIds.join(',')})` : '()')
         .limit(50);
 
-      if (profiles) {
+      if (profiles && profiles.length > 0) {
+        // Get Islamic preferences for these users
+        const userIds = profiles.map(p => p.user_id);
+        const { data: islamicPrefs } = await supabase
+          .from('islamic_preferences')
+          .select('*')
+          .in('user_id', userIds);
+
+        // Combine the data
+        const enrichedProfiles = profiles.map(profile => ({
+          ...profile,
+          islamic_preferences: islamicPrefs?.filter(p => p.user_id === profile.user_id) || []
+        }));
+
         // Apply AI-powered recommendation scoring
-        const scoredRecommendations: SmartRecommendation[] = profiles.map(profile => {
+        const scoredRecommendations: SmartRecommendation[] = enrichedProfiles.map(profile => {
           const islamicPrefs = profile.islamic_preferences?.[0];
           
           // Calculate various compatibility dimensions
