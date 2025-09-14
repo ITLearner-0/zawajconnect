@@ -87,7 +87,7 @@ const InvitationAccept = () => {
         `)
         .eq('invitation_token', token)
         .eq('invitation_status', 'pending')
-        .single();
+        .maybeSingle();
 
       if (error || !data) {
         throw new Error('Invitation non trouvée ou expirée');

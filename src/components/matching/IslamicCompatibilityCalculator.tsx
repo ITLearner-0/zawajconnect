@@ -50,7 +50,7 @@ const IslamicCompatibilityCalculator = () => {
         .from('profiles')
         .select('gender')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       // Determine opposite gender
       const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
@@ -109,13 +109,13 @@ const IslamicCompatibilityCalculator = () => {
         .from('islamic_preferences')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const { data: theirPrefs } = await supabase
         .from('islamic_preferences')
         .select('*')
         .eq('user_id', selectedUserId)
-        .single();
+        .maybeSingle();
 
       // Calculate compatibility scores for each Islamic criteria
       const criteria_scores: IslamicCriteria = {

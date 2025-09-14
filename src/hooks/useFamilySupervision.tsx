@@ -200,7 +200,7 @@ export const useFamilySupervision = () => {
         .from('matches')
         .select('*')
         .eq('id', matchId)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 

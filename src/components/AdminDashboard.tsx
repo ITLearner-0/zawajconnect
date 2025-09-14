@@ -150,8 +150,8 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
       const reportsWithProfiles = await Promise.all(
         (reportsData || []).map(async (report) => {
           const [reporterProfile, reportedProfile] = await Promise.all([
-            supabase.from('profiles').select('full_name').eq('user_id', report.reporter_id).single(),
-            supabase.from('profiles').select('full_name').eq('user_id', report.reported_user_id).single()
+            supabase.from('profiles').select('full_name').eq('user_id', report.reporter_id).maybeSingle(),
+            supabase.from('profiles').select('full_name').eq('user_id', report.reported_user_id).maybeSingle()
           ]);
 
           return {

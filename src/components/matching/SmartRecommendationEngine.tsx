@@ -62,13 +62,13 @@ const SmartRecommendationEngine = () => {
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const { data: myPrefs } = await supabase
         .from('islamic_preferences')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       // Get current user's gender first
       const { data: currentUserProfile } = await supabase

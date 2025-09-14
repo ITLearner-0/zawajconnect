@@ -162,7 +162,7 @@ const FamilySupervisionPanel = () => {
           is_wali: newMember.is_wali
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -270,7 +270,7 @@ const FamilySupervisionPanel = () => {
         .from('profiles')
         .select('full_name')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const inviterName = profile?.full_name || 'Un membre de famille';
       const invitationUrl = `${window.location.origin}/invitation?token=${invitationToken}`;

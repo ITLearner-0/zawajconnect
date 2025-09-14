@@ -174,7 +174,7 @@ const EnhancedDashboard = () => {
         .from('user_verifications')
         .select('verification_score')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       setStats(prev => ({
         ...prev,

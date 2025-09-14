@@ -151,7 +151,7 @@ const FamilyDashboard = () => {
         .select('*')
         .eq('user_id', userId)
         .eq('email', user.email)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       setFamilyRole(data);

@@ -75,7 +75,7 @@ const FamilyApprovalDashboard = () => {
         .select('id')
         .eq('invited_user_id', user?.id)
         .eq('invitation_status', 'accepted')
-        .single();
+        .maybeSingle();
 
       if (!familyMember) {
         setLoading(false);
@@ -147,7 +147,7 @@ const FamilyApprovalDashboard = () => {
         .from('family_members')
         .select('id')
         .eq('invited_user_id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (!familyMember) throw new Error('Membre de famille non trouvé');
 

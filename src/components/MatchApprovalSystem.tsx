@@ -155,7 +155,7 @@ const MatchApprovalSystem = () => {
         .select('id')
         .eq('invited_user_id', user.id)
         .eq('invitation_status', 'accepted')
-        .single();
+        .maybeSingle();
 
       if (!familyMember) {
         throw new Error('Family member not found');

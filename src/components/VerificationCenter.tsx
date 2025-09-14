@@ -82,7 +82,7 @@ const VerificationCenter = () => {
             email_verified: user.email_confirmed_at !== null
           })
           .select()
-          .single();
+          .maybeSingle();
 
         if (newRecord) {
           setVerificationStatus(newRecord);

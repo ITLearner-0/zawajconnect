@@ -184,7 +184,7 @@ const Profile = () => {
         .from('matches')
         .select('*')
         .or(`and(user1_id.eq.${user.id},user2_id.eq.${userId}),and(user1_id.eq.${userId},user2_id.eq.${user.id})`)
-        .single();
+        .maybeSingle();
 
       if (existingMatch) {
         // Update existing match
