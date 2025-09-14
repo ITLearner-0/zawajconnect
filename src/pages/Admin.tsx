@@ -27,22 +27,22 @@ const Admin = () => {
     }
 
     try {
-      // Check user's role in the database
-      const { data: roleData, error: roleError } = await supabase
+      // Check user's role in the database using the same pattern as useIsAdmin
+      const { data: roles, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', user.id)
-        .single();
+        .in('role', ['super_admin', 'admin', 'moderator']);
 
-      if (roleError && roleError.code !== 'PGRST116') {
+      if (roleError) {
         console.error('Error checking user role:', roleError);
         setIsAdmin(false);
         setLoading(false);
         return;
       }
 
-      if (roleData) {
-        const role = roleData.role;
+      if (roles && roles.length > 0) {
+        const role = roles[0].role;
         setUserRole(role);
         
         if (['super_admin', 'admin', 'moderator'].includes(role)) {

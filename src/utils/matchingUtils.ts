@@ -29,7 +29,7 @@ export const getOppositeGender = async (userId: string): Promise<string | null> 
       .from('profiles')
       .select('gender')
       .eq('user_id', userId)
-      .single();
+      .maybeSingle();
 
     return currentUserProfile?.gender === 'male' ? 'female' : 'male';
   } catch (error) {
@@ -122,7 +122,7 @@ export const getUserMatchingRole = async (userId: string) => {
   try {
     const [isWali, profile] = await Promise.all([
       isUserWali(userId),
-      supabase.from('profiles').select('gender, age, bio').eq('user_id', userId).single()
+      supabase.from('profiles').select('gender, age, bio').eq('user_id', userId).maybeSingle()
     ]);
 
     const hasCompleteProfile = profile.data && profile.data.age && profile.data.gender && Boolean(profile.data.bio);
