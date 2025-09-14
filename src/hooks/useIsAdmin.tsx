@@ -16,19 +16,19 @@ export const useIsAdmin = () => {
       }
 
       try {
-        const { data: roleData, error } = await supabase
+        // Check if user has any admin role (super_admin, admin, or moderator)
+        const { data: roles, error } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.id)
-          .single();
+          .in('role', ['super_admin', 'admin', 'moderator']);
 
-        if (error && error.code !== 'PGRST116') {
+        if (error) {
           console.error('Error checking admin status:', error);
           setIsAdmin(false);
-        } else if (roleData && ['super_admin', 'admin', 'moderator'].includes(roleData.role)) {
-          setIsAdmin(true);
         } else {
-          setIsAdmin(false);
+          // User is admin if they have at least one admin role
+          setIsAdmin(roles && roles.length > 0);
         }
       } catch (error) {
         console.error('Error in admin check:', error);
