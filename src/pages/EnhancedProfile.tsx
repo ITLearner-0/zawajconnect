@@ -52,6 +52,42 @@ interface ProfileData {
   avatar_url?: string;
   bio?: string;
   location?: string;
+  education?: string;
+  profession?: string;
+  interests?: string[];
+}
+
+interface VerificationData {
+  email_verified: boolean;
+  phone_verified: boolean;
+  id_verified: boolean;
+  family_verified: boolean;
+  verification_score: number;
+  verification_documents?: string[];
+  verification_notes?: string;
+  verified_at?: string;
+}
+
+interface IslamicPreferencesData {
+  prayer_frequency?: string;
+  quran_reading?: string;
+  hijab_preference?: string;
+  beard_preference?: string;
+  sect?: string;
+  madhab?: string;
+  halal_diet?: boolean;
+  smoking?: string;
+  desired_partner_sect?: string;
+  importance_of_religion?: string;
+}
+
+interface PrivacySettingsData {
+  profile_visibility?: string;
+  photo_visibility?: string;
+  contact_visibility?: string;
+  last_seen_visibility?: string;
+  allow_messages_from?: string;
+  allow_family_involvement?: boolean;
 }
 
 const EnhancedProfile = () => {
@@ -63,7 +99,9 @@ const EnhancedProfile = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [verification, setVerification] = useState<any>(null);
+  const [verification, setVerification] = useState<VerificationData | null>(null);
+  const [islamicPrefs, setIslamicPrefs] = useState<IslamicPreferencesData | null>(null);
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettingsData | null>(null);
   const [completionStats, setCompletionStats] = useState<ProfileCompletionStats>({
     overall: 0,
     basicInfo: 0,
@@ -86,19 +124,28 @@ const EnhancedProfile = () => {
     if (profile) {
       calculateCompletionStats();
     }
-  }, [profile, compatibilityStats]);
+  }, [profile, compatibilityStats, islamicPrefs, privacySettings, verification]);
 
   const fetchProfileData = async () => {
     if (!user) return;
 
     try {
-      const [profileRes, verificationRes] = await Promise.all([
+      const [profileRes, verificationRes, islamicRes, privacyRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle(),
-        supabase.from('user_verifications').select('*').eq('user_id', user.id).maybeSingle()
+        supabase.from('user_verifications').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('islamic_preferences').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('privacy_settings').select('*').eq('user_id', user.id).maybeSingle()
       ]);
+
+      if (profileRes.error) throw profileRes.error;
+      if (verificationRes.error) throw verificationRes.error;
+      if (islamicRes.error) throw islamicRes.error;
+      if (privacyRes.error) throw privacyRes.error;
 
       setProfile(profileRes.data);
       setVerification(verificationRes.data);
+      setIslamicPrefs(islamicRes.data);
+      setPrivacySettings(privacyRes.data);
     } catch (error) {
       console.error('Error fetching profile data:', error);
       toast({
@@ -115,8 +162,11 @@ const EnhancedProfile = () => {
     if (!profile) return;
 
     // Calculate basic info completion
-    const basicFields = ['full_name', 'age', 'location', 'bio'];
-    const basicCompleted = basicFields.filter(field => profile[field as keyof ProfileData]).length;
+    const basicFields = ['full_name', 'age', 'location', 'bio', 'education', 'profession'];
+    const basicCompleted = basicFields.filter(field => {
+      const value = profile[field as keyof ProfileData];
+      return value !== null && value !== undefined && value !== '';
+    }).length;
     const basicInfo = (basicCompleted / basicFields.length) * 100;
 
     // Photos completion
@@ -125,22 +175,46 @@ const EnhancedProfile = () => {
     // Compatibility from hook
     const compatibility = compatibilityStats.completionPercentage;
 
+    // Calculate Islamic preferences completion
+    let islamicPrefsScore = 0;
+    if (islamicPrefs) {
+      const islamicFields = [
+        'prayer_frequency', 'quran_reading', 'hijab_preference', 'beard_preference',
+        'sect', 'madhab', 'importance_of_religion', 'desired_partner_sect'
+      ];
+      const islamicCompleted = islamicFields.filter(field => {
+        const value = islamicPrefs[field as keyof IslamicPreferencesData];
+        return value !== null && value !== undefined && value !== '';
+      }).length;
+      islamicPrefsScore = (islamicCompleted / islamicFields.length) * 100;
+    }
+
+    // Calculate privacy settings completion
+    let privacyScore = 0;
+    if (privacySettings) {
+      const privacyFields = [
+        'profile_visibility', 'photo_visibility', 'contact_visibility',
+        'last_seen_visibility', 'allow_messages_from'
+      ];
+      const privacyCompleted = privacyFields.filter(field => {
+        const value = privacySettings[field as keyof PrivacySettingsData];
+        return value !== null && value !== undefined && value !== '';
+      }).length;
+      privacyScore = (privacyCompleted / privacyFields.length) * 100;
+    }
+
     // Verification score
     const verificationScore = verification?.verification_score || 0;
 
-    // Estimate Islamic preferences and privacy (would need actual data)
-    const islamicPrefs = 75; // Placeholder
-    const privacy = 60; // Placeholder
-
-    const overall = (basicInfo + islamicPrefs + photos + compatibility + privacy + verificationScore) / 6;
+    const overall = (basicInfo + islamicPrefsScore + photos + compatibility + privacyScore + verificationScore) / 6;
 
     setCompletionStats({
       overall: Math.round(overall),
       basicInfo: Math.round(basicInfo),
-      islamicPrefs: Math.round(islamicPrefs),
+      islamicPrefs: Math.round(islamicPrefsScore),
       photos: Math.round(photos),
       compatibility: Math.round(compatibility),
-      privacy: Math.round(privacy),
+      privacy: Math.round(privacyScore),
       verification: Math.round(verificationScore)
     });
   };
@@ -148,8 +222,8 @@ const EnhancedProfile = () => {
   const getCompletionColor = (percentage: number) => {
     if (percentage >= 80) return 'text-emerald';
     if (percentage >= 60) return 'text-gold';
-    if (percentage >= 40) return 'text-orange-500';
-    return 'text-red-500';
+    if (percentage >= 40) return 'text-amber-600';
+    return 'text-destructive';
   };
 
   const getCompletionIcon = (percentage: number) => {
@@ -430,28 +504,46 @@ const EnhancedProfile = () => {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {completionStats.basicInfo < 80 && (
-                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <h4 className="font-medium text-blue-800 mb-2">Complétez vos informations</h4>
-                      <p className="text-sm text-blue-600">
+                    <div className="p-4 bg-accent/20 rounded-lg border border-accent/30">
+                      <h4 className="font-medium text-primary mb-2">Complétez vos informations</h4>
+                      <p className="text-sm text-muted-foreground">
                         Ajoutez plus de détails à votre profil pour de meilleurs matches.
                       </p>
                     </div>
                   )}
                   
                   {completionStats.photos < 100 && (
-                    <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                      <h4 className="font-medium text-purple-800 mb-2">Vérifiez vos photos</h4>
-                      <p className="text-sm text-purple-600">
+                    <div className="p-4 bg-secondary/50 rounded-lg border border-secondary">
+                      <h4 className="font-medium text-secondary-foreground mb-2">Vérifiez vos photos</h4>
+                      <p className="text-sm text-muted-foreground">
                         Les photos vérifiées augmentent la confiance de 300%.
                       </p>
                     </div>
                   )}
                   
                   {completionStats.compatibility < 70 && (
-                    <div className="p-4 bg-emerald-50 rounded-lg border border-emerald-200">
-                      <h4 className="font-medium text-emerald-800 mb-2">Test de compatibilité</h4>
-                      <p className="text-sm text-emerald-600">
+                    <div className="p-4 bg-emerald/5 rounded-lg border border-emerald/20">
+                      <h4 className="font-medium text-emerald mb-2">Test de compatibilité</h4>
+                      <p className="text-sm text-muted-foreground">
                         Améliorez vos matches avec notre IA avancée.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {completionStats.islamicPrefs < 70 && (
+                    <div className="p-4 bg-gold/5 rounded-lg border border-gold/20">
+                      <h4 className="font-medium text-gold mb-2">Préférences islamiques</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Configurez vos préférences religieuses pour de meilleurs matches.
+                      </p>
+                    </div>
+                  )}
+                  
+                  {completionStats.privacy < 70 && (
+                    <div className="p-4 bg-sage/20 rounded-lg border border-sage/30">
+                      <h4 className="font-medium text-sage-dark mb-2">Paramètres de confidentialité</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Personnalisez qui peut voir vos informations.
                       </p>
                     </div>
                   )}
@@ -470,7 +562,15 @@ const EnhancedProfile = () => {
                 currentPhotoUrl={profile?.avatar_url}
                 onPhotoUpdate={fetchProfileData}
               />
-              <PhotoVerificationSystem onComplete={() => toast({ title: "Photos vérifiées", description: "Vos photos ont été traitées" })} />
+              <PhotoVerificationSystem 
+                onComplete={() => {
+                  fetchProfileData();
+                  toast({ 
+                    title: "Photos vérifiées", 
+                    description: "Vos photos ont été traitées avec succès" 
+                  });
+                }} 
+              />
             </div>
           </TabsContent>
 
