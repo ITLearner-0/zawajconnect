@@ -623,7 +623,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                                     updateUserStatus(user.user_id, 'deleted', 'Utilisateur supprimé par l\'administrateur');
                                   }
                                 }}
-                                title="Supprimer définitivement"
+                                title="Suppression soft (récupérable)"
                               >
                                 <Trash2 className="h-3 w-3" />
                               </Button>
