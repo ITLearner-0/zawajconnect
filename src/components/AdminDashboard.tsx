@@ -522,6 +522,21 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                                 <CheckCircle className="h-3 w-3" />
                               </Button>
                             )}
+                            {status === 'deleted' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={isManaging}
+                                onClick={() => {
+                                  if (window.confirm('Êtes-vous sûr de vouloir restaurer cet utilisateur ?')) {
+                                    updateUserStatus(user.user_id, 'active', 'Utilisateur restauré par l\'administrateur');
+                                  }
+                                }}
+                                title="Restaurer l'utilisateur"
+                              >
+                                <CheckCircle className="h-3 w-3" />
+                              </Button>
+                            )}
                             {status === 'active' && (
                               <Button
                                 size="sm"
