@@ -165,7 +165,7 @@ const WaliDashboard: React.FC = () => {
               .from('profiles')
               .select('full_name, avatar_url')
               .eq('user_id', member.user_id)
-              .single();
+              .maybeSingle();
 
             return {
               id: member.id,
@@ -215,14 +215,14 @@ const WaliDashboard: React.FC = () => {
                 .from('profiles')
                 .select('full_name')
                 .eq('user_id', candidateId)
-                .single();
+                .maybeSingle();
 
               // Récupérer le profil de l'utilisateur supervisé
               const { data: supervisedProfile } = await supabase
                 .from('profiles')
                 .select('full_name')
                 .eq('user_id', supervisedUserId)
-                .single();
+                .maybeSingle();
 
               // Calculer le score de compatibilité réel
               const compatibilityScore = await calculateCompatibilityBetweenUsers(supervisedUserId, candidateId);

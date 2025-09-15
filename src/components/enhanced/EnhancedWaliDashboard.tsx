@@ -270,7 +270,7 @@ const EnhancedWaliDashboard: React.FC = () => {
               .from('profiles')
               .select('full_name, avatar_url')
               .eq('user_id', member.user_id)
-              .single();
+              .maybeSingle();
 
             // Get conversation stats
             const { data: matches } = await supabase
@@ -369,8 +369,8 @@ const EnhancedWaliDashboard: React.FC = () => {
               const candidateId = supervisedUserId === match.user1_id ? match.user2_id : match.user1_id;
               
               const [candidateProfile, supervisedProfile] = await Promise.all([
-                supabase.from('profiles').select('full_name').eq('user_id', candidateId).single(),
-                supabase.from('profiles').select('full_name').eq('user_id', supervisedUserId).single()
+                supabase.from('profiles').select('full_name').eq('user_id', candidateId).maybeSingle(),
+                supabase.from('profiles').select('full_name').eq('user_id', supervisedUserId).maybeSingle()
               ]);
 
               return {

@@ -114,7 +114,7 @@ const Family = () => {
         .from('privacy_settings')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       
@@ -133,7 +133,7 @@ const Family = () => {
             allow_messages_from: 'matches_only'
           })
           .select()
-          .single();
+          .maybeSingle();
 
         if (createError) throw createError;
         setPrivacySettings(newSettings);
@@ -163,7 +163,7 @@ const Family = () => {
           ...newMember
         })
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -200,7 +200,7 @@ const Family = () => {
         .update(updates)
         .eq('id', memberId)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 
@@ -256,7 +256,7 @@ const Family = () => {
         .update(updates)
         .eq('user_id', user.id)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
 

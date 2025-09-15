@@ -32,7 +32,7 @@ const WaliExclusionTest: React.FC = () => {
         .from('profiles')
         .select('gender')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
 

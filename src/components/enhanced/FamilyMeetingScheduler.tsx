@@ -117,20 +117,20 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
               .from('matches')
               .select('*')
               .eq('id', meeting.match_id)
-              .single();
+              .maybeSingle();
 
             // Get profiles separately 
             const { data: user1Profile } = await supabase
               .from('profiles')
               .select('full_name')
               .eq('user_id', matchData?.user1_id)
-              .single();
+              .maybeSingle();
               
             const { data: user2Profile } = await supabase
               .from('profiles')
               .select('full_name')
               .eq('user_id', matchData?.user2_id)
-              .single();
+              .maybeSingle();
 
             return {
               ...meeting,
@@ -225,7 +225,7 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
         .from('family_meetings')
         .insert(meetingData)
         .select()
-        .single();
+        .maybeSingle();
 
       if (error) {
         throw error;

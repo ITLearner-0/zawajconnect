@@ -116,7 +116,7 @@ const AdvancedIslamicFiltering = () => {
         .from('profiles')
         .select('gender')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       // Determine opposite gender
       const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';

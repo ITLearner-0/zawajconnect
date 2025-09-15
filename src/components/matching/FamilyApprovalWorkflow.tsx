@@ -96,7 +96,7 @@ const FamilyApprovalWorkflow = () => {
               .from('profiles')
               .select('user_id, full_name, age, location, profession, avatar_url, bio')
               .eq('user_id', otherUserId)
-              .single();
+              .maybeSingle();
 
             // Simulate compatibility details (in real app, this would come from stored analysis)
             const compatibility_details = {
@@ -203,7 +203,7 @@ const FamilyApprovalWorkflow = () => {
         .select('id')
         .eq('user_id', user.id)
         .eq('is_wali', true)
-        .single();
+        .maybeSingle();
 
       if (familyMember) {
         const { error: reviewError } = await supabase

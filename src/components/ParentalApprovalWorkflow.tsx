@@ -112,7 +112,7 @@ const ParentalApprovalWorkflow = () => {
               .from('profiles')
               .select('*')
               .eq('user_id', match.user2_id)
-              .single();
+              .maybeSingle();
 
             return {
               ...match,
