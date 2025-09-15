@@ -280,6 +280,8 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
           admin_notes: `Action effectuée par ${user?.email} le ${new Date().toLocaleDateString('fr-FR')}`,
           created_by: user?.id,
           expires_at: expiresAt || null
+        }, {
+          onConflict: 'user_id'
         });
 
       if (error) throw error;
