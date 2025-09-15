@@ -59,17 +59,32 @@ serve(async (req) => {
       .single();
 
     // Get family members who should be notified
-    const { data: familyMembers } = await supabase
+    const { data: familyMembers, error: familyError } = await supabase
       .from('family_members')
       .select('*')
       .eq('user_id', user_id)
       .eq('invitation_status', 'accepted')
       .eq('is_wali', true);
 
-    if (!familyMembers || familyMembers.length === 0) {
+    console.log('Family members found:', familyMembers?.length || 0);
+
+    if (familyError) {
+      console.error('Error fetching family members:', familyError);
       return new Response(
-        JSON.stringify({ error: 'Aucun membre de famille (wali) trouvé pour l\'approbation' }), 
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'Erreur lors de la récupération des membres de famille' }), 
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (!familyMembers || familyMembers.length === 0) {
+      console.log('No family members found for user:', user_id);
+      return new Response(
+        JSON.stringify({ 
+          error: 'no_family_members',
+          message: 'Aucun membre de famille (wali) trouvé pour l\'approbation. Veuillez d\'abord inviter et faire accepter un wali dans vos paramètres famille.',
+          user_id: user_id
+        }), 
+        { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 

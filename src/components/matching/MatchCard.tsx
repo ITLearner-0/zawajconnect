@@ -66,6 +66,18 @@ const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
       });
 
       if (error) {
+        console.error('Full error details:', error);
+        
+        // Handle specific error cases
+        if (error.message?.includes('422')) {
+          toast({
+            title: "Configuration manquante",
+            description: "Vous devez d'abord inviter un wali (tuteur) dans vos paramètres famille avant de demander une approbation.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
         throw error;
       }
       
@@ -74,14 +86,30 @@ const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
           title: "Demande envoyée avec succès",
           description: `${data.notifications_sent} membre(s) de famille notifié(s)${data.ai_analysis_included ? ' avec analyse IA' : ''}`,
         });
+      } else if (data?.error === 'no_family_members') {
+        toast({
+          title: "Configuration manquante",
+          description: data.message || "Vous devez d'abord configurer un wali dans vos paramètres famille.",
+          variant: "destructive",
+        });
       } else {
         throw new Error(data?.error || 'Erreur inconnue');
       }
     } catch (error) {
       console.error('Error requesting family approval:', error);
+      
+      // More specific error messages
+      let errorMessage = "Impossible d'envoyer la demande d'approbation";
+      
+      if (error.message?.includes('no_family_members')) {
+        errorMessage = "Aucun wali configuré. Rendez-vous dans vos paramètres famille.";
+      } else if (error.message?.includes('Edge Function returned a non-2xx status code')) {
+        errorMessage = "Erreur de service. Vérifiez votre configuration famille.";
+      }
+      
       toast({
         title: "Erreur",
-        description: "Impossible d'envoyer la demande d'approbation",
+        description: errorMessage,
         variant: "destructive",
       });
     }
