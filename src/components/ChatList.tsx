@@ -198,7 +198,7 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
               Vous n'avez pas encore de conversations actives. 
               Commencez par découvrir des profils et créer des matches mutuels.
             </p>
-            <Button className="bg-emerald hover:bg-emerald-dark">
+            <Button className="bg-primary hover:bg-primary/90">
               Découvrir des profils
             </Button>
           </CardContent>
@@ -209,7 +209,7 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
             <Card
               key={chat.match_id}
               className={`cursor-pointer transition-colors hover:bg-accent/50 ${
-                selectedChatId === chat.match_id ? 'ring-2 ring-emerald' : ''
+                selectedChatId === chat.match_id ? 'ring-2 ring-primary' : ''
               }`}
               onClick={() => onChatSelect(chat.match_id)}
             >
@@ -223,12 +223,12 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
                         className="h-12 w-12 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
+                      <div className="h-12 w-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
                         <User className="h-6 w-6 text-primary-foreground" />
                       </div>
                     )}
                     {chat.unread_count > 0 && (
-                      <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-red-500 text-white text-xs">
+                      <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-destructive text-destructive-foreground text-xs">
                         {chat.unread_count > 9 ? '9+' : chat.unread_count}
                       </Badge>
                     )}
@@ -240,7 +240,7 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
                         {chat.other_user.full_name}
                       </h4>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs bg-emerald/10 text-emerald">
+                        <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
                           {chat.match_score}%
                         </Badge>
                         {chat.last_message && (

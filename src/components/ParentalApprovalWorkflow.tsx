@@ -375,7 +375,7 @@ const ParentalApprovalWorkflow = () => {
                       <span><strong>Dīn (Religion):</strong> Piété, pratique religieuse, connaissance islamique</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <div className="h-1.5 w-1.5 bg-emerald rounded-full mt-2 flex-shrink-0"></div>
+                      <div className="h-1.5 w-1.5 bg-success rounded-full mt-2 flex-shrink-0"></div>
                       <span><strong>Akhlāq (Caractère):</strong> Comportement, éthique, respect</span>
                     </li>
                     <li className="flex items-start gap-2">

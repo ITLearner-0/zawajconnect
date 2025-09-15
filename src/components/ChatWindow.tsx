@@ -265,7 +265,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
     return (
       <div className="flex-1 flex items-center justify-center">
         <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald border-t-transparent mx-auto mb-4"></div>
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto mb-4"></div>
           <p className="text-muted-foreground">Chargement de la conversation...</p>
         </div>
       </div>
@@ -287,7 +287,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
       {!canCommunicate ? (
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="text-center max-w-md">
-            <Shield className="h-16 w-16 text-amber-500 mx-auto mb-4" />
+            <Shield className="h-16 w-16 text-warning mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Configuration Familiale Requise</h3>
             <p className="text-muted-foreground mb-4">
               Selon les principes islamiques, vous devez configurer un Wali pour communiquer.
@@ -300,7 +300,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
       ) : (
         <>
           {/* Chat Header */}
-          <div className="border-b bg-gradient-to-r from-emerald/5 to-gold/5">
+          <div className="border-b bg-gradient-to-r from-primary/5 to-secondary/5">
             <div className="flex items-center justify-between p-4">
               <div className="flex items-center gap-3">
                 <div className="relative">
@@ -311,16 +311,16 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
                       className="h-10 w-10 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="h-10 w-10 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
+                    <div className="h-10 w-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
                       <User className="h-5 w-5 text-primary-foreground" />
                     </div>
                   )}
-                  <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-emerald rounded-full border-2 border-background"></div>
+                  <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-success rounded-full border-2 border-background"></div>
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">{match.other_user.full_name}</h3>
                   <div className="flex items-center gap-2">
-                    <Badge variant="secondary" className="text-xs bg-emerald/10 text-emerald">
+                    <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
                       {match.match_score}% compatible
                     </Badge>
                     <span className="text-xs text-muted-foreground">En ligne</span>
@@ -332,7 +332,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="text-emerald hover:bg-emerald/10"
+                  className="text-primary hover:bg-primary/10"
                   onClick={() => handleCall(false)}
                   title="Appel audio"
                 >
@@ -341,7 +341,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="text-emerald hover:bg-emerald/10"
+                  className="text-primary hover:bg-primary/10"
                   onClick={() => handleCall(true)}
                   title="Appel vidéo"
                 >
@@ -360,7 +360,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.length === 0 ? (
               <div className="text-center py-8">
-                <Heart className="h-12 w-12 mx-auto text-emerald/50 mb-4" />
+                <Heart className="h-12 w-12 mx-auto text-primary/50 mb-4" />
                 <p className="text-muted-foreground">
                   C'est le début de votre conversation ! 
                 </p>
@@ -380,13 +380,13 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
                     <div
                       className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                         isMyMessage
-                          ? 'bg-emerald text-primary-foreground'
+                          ? 'bg-primary text-primary-foreground'
                           : 'bg-muted text-foreground'
                       }`}
                     >
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                       <p className={`text-xs mt-1 ${
-                        isMyMessage ? 'text-emerald-light' : 'text-muted-foreground'
+                        isMyMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
                       }`}>
                         {format(new Date(message.created_at), 'HH:mm', { locale: fr })}
                         {isMyMessage && (
@@ -404,7 +404,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
           </div>
 
           {/* Islamic Reminder */}
-          <div className="px-4 py-2 bg-gradient-to-r from-gold/10 to-emerald/10 border-t border-border/50">
+          <div className="px-4 py-2 bg-gradient-to-r from-secondary/10 to-primary/10 border-t border-border/50">
             <p className="text-xs text-center text-muted-foreground">
               💝 Rappel : Communiquez avec respect et selon les valeurs islamiques
             </p>
@@ -424,7 +424,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
               <Button 
                 onClick={sendMessage}
                 disabled={!newMessage.trim() || sending || !canCommunicate}
-                className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 {sending ? (
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
