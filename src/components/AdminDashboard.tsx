@@ -318,17 +318,20 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
     setManagingUser(userId);
 
     try {
-      // Delete user profile (this will cascade to related tables due to foreign key constraints)
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('user_id', userId);
+      // Call the edge function to permanently delete the user from auth.users
+      const { data, error } = await supabase.functions.invoke('delete-user-permanently', {
+        body: { userId }
+      });
 
       if (error) throw error;
 
+      if (!data.success) {
+        throw new Error(data.error || 'Erreur lors de la suppression');
+      }
+
       toast({
         title: "Suppression définitive",
-        description: `L'utilisateur ${userName} a été définitivement supprimé de la base de données`
+        description: `L'utilisateur ${userName} a été définitivement supprimé du système d'authentification et de la base de données`
       });
 
       loadAdminData();
@@ -336,7 +339,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
       console.error('Error permanently deleting user:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de supprimer définitivement l'utilisateur. Certaines données peuvent être liées à cet utilisateur.",
+        description: error.message || "Impossible de supprimer définitivement l'utilisateur.",
         variant: "destructive"
       });
     } finally {
