@@ -313,6 +313,37 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
     }
   };
 
+  const deleteUserPermanently = async (userId: string, userName: string) => {
+    if (managingUser === userId) return; // Prevent double-click
+    setManagingUser(userId);
+
+    try {
+      // Delete user profile (this will cascade to related tables due to foreign key constraints)
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('user_id', userId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Suppression définitive",
+        description: `L'utilisateur ${userName} a été définitivement supprimé de la base de données`
+      });
+
+      loadAdminData();
+    } catch (error) {
+      console.error('Error permanently deleting user:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer définitivement l'utilisateur. Certaines données peuvent être liées à cet utilisateur.",
+        variant: "destructive"
+      });
+    } finally {
+      setManagingUser(null);
+    }
+  };
+
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'super_admin': return 'default';
@@ -523,19 +554,42 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                               </Button>
                             )}
                             {status === 'deleted' && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                disabled={isManaging}
-                                onClick={() => {
-                                  if (window.confirm('Êtes-vous sûr de vouloir restaurer cet utilisateur ?')) {
-                                    updateUserStatus(user.user_id, 'active', 'Utilisateur restauré par l\'administrateur');
-                                  }
-                                }}
-                                title="Restaurer l'utilisateur"
-                              >
-                                <CheckCircle className="h-3 w-3" />
-                              </Button>
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  disabled={isManaging}
+                                  onClick={() => {
+                                    if (window.confirm('Êtes-vous sûr de vouloir restaurer cet utilisateur ?')) {
+                                      updateUserStatus(user.user_id, 'active', 'Utilisateur restauré par l\'administrateur');
+                                    }
+                                  }}
+                                  title="Restaurer l'utilisateur"
+                                >
+                                  <CheckCircle className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  disabled={isManaging}
+                                  onClick={() => {
+                                    if (window.confirm(`⚠️ ATTENTION ⚠️\n\nVoulez-vous DÉFINITIVEMENT supprimer ${user.full_name || 'cet utilisateur'} ?\n\nCette action est IRRÉVERSIBLE et supprimera :\n- Le profil utilisateur\n- Toutes ses données\n- Son historique\n\nTapez "SUPPRIMER" pour confirmer.`)) {
+                                      const confirmation = prompt('Pour confirmer la suppression définitive, tapez exactement "SUPPRIMER" (en majuscules) :');
+                                      if (confirmation === 'SUPPRIMER') {
+                                        deleteUserPermanently(user.user_id, user.full_name || 'Utilisateur');
+                                      } else {
+                                        toast({
+                                          title: "Suppression annulée",
+                                          description: "La confirmation n'était pas correcte."
+                                        });
+                                      }
+                                    }
+                                  }}
+                                  title="Supprimer définitivement (IRRÉVERSIBLE)"
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              </>
                             )}
                             {status === 'active' && (
                               <Button
