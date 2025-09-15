@@ -29,7 +29,8 @@ import {
   Settings,
   UserCheck,
   Search,
-  Lock
+  Lock,
+  Trash2
 } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -266,7 +267,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
     }
   };
 
-  const updateUserStatus = async (userId: string, status: 'active' | 'suspended' | 'blocked' | 'banned', reason?: string, expiresAt?: string) => {
+  const updateUserStatus = async (userId: string, status: 'active' | 'suspended' | 'blocked' | 'banned' | 'deleted', reason?: string, expiresAt?: string) => {
     if (managingUser === userId) return; // Prevent double-click
     setManagingUser(userId);
 
@@ -290,7 +291,8 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
         active: 'activé',
         suspended: 'suspendu',
         blocked: 'bloqué',
-        banned: 'banni'
+        banned: 'banni',
+        deleted: 'supprimé'
       };
 
       toast({
@@ -335,6 +337,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
       case 'suspended': return 'secondary';
       case 'blocked': return 'destructive';
       case 'banned': return 'outline';
+      case 'deleted': return 'outline';
       default: return 'outline';
     }
   };
@@ -499,6 +502,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                             {status === 'suspended' && <AlertTriangle className="h-3 w-3 mr-1" />}
                             {status === 'blocked' && <Ban className="h-3 w-3 mr-1" />}
                             {status === 'banned' && <XCircle className="h-3 w-3 mr-1" />}
+                            {status === 'deleted' && <Trash2 className="h-3 w-3 mr-1" />}
                             {status}
                           </Badge>
                         </TableCell>
@@ -507,7 +511,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
-                            {status !== 'active' && (
+                            {status !== 'active' && status !== 'deleted' && (
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -518,7 +522,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                                 <CheckCircle className="h-3 w-3" />
                               </Button>
                             )}
-                            {status !== 'suspended' && (
+                            {status === 'active' && (
                               <Button
                                 size="sm"
                                 variant="outline"
@@ -529,7 +533,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                                 <AlertTriangle className="h-3 w-3" />
                               </Button>
                             )}
-                            {status !== 'blocked' && (
+                            {status === 'active' && (
                               <Button
                                 size="sm"
                                 variant="destructive"
@@ -538,6 +542,21 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                                 title="Bloquer"
                               >
                                 <Ban className="h-3 w-3" />
+                              </Button>
+                            )}
+                            {status !== 'deleted' && (
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                disabled={isManaging}
+                                onClick={() => {
+                                  if (window.confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action ne peut pas être annulée.')) {
+                                    updateUserStatus(user.user_id, 'deleted', 'Utilisateur supprimé par l\'administrateur');
+                                  }
+                                }}
+                                title="Supprimer définitivement"
+                              >
+                                <Trash2 className="h-3 w-3" />
                               </Button>
                             )}
                           </div>
