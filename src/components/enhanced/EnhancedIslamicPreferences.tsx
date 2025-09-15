@@ -250,7 +250,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <Moon className="h-4 w-4 text-emerald" />
+                        <Moon className="h-4 w-4 text-primary" />
                         Confession Islamique
                       </Label>
                       <Select value={preferences.sect} onValueChange={(value) => updatePreference('sect', value)}>
@@ -268,7 +268,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
 
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <Book className="h-4 w-4 text-gold" />
+                        <Book className="h-4 w-4 text-secondary" />
                         École Juridique (Madhab)
                       </Label>
                       <Select value={preferences.madhab} onValueChange={(value) => updatePreference('madhab', value)}>
@@ -290,7 +290,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
 
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-emerald" />
+                        <Clock className="h-4 w-4 text-primary" />
                         Fréquence de Prière
                       </Label>
                       <Select value={preferences.prayer_frequency} onValueChange={(value) => updatePreference('prayer_frequency', value)}>
@@ -311,7 +311,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
 
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <Book className="h-4 w-4 text-gold" />
+                        <Book className="h-4 w-4 text-secondary" />
                         Lecture du Coran
                       </Label>
                       <Select value={preferences.quran_reading} onValueChange={(value) => updatePreference('quran_reading', value)}>
@@ -332,7 +332,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
 
                   <div className="space-y-3">
                     <Label className="flex items-center gap-2">
-                      <Star className="h-4 w-4 text-emerald" />
+                      <Star className="h-4 w-4 text-primary" />
                       Importance de la Religion dans votre Vie
                     </Label>
                     <Select value={preferences.importance_of_religion} onValueChange={(value) => updatePreference('importance_of_religion', value)}>
@@ -355,7 +355,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <Utensils className="h-4 w-4 text-emerald" />
+                        <Utensils className="h-4 w-4 text-primary" />
                         Régime Halal
                       </Label>
                       <div className="flex items-center space-x-2">
@@ -369,7 +369,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
 
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-gold" />
+                        <Shield className="h-4 w-4 text-secondary" />
                         Position sur le Tabac
                       </Label>
                       <Select value={preferences.smoking} onValueChange={(value) => updatePreference('smoking', value)}>
@@ -387,7 +387,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
 
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <Shirt className="h-4 w-4 text-emerald" />
+                        <Shirt className="h-4 w-4 text-primary" />
                         Préférence Hijab
                       </Label>
                       <Select value={preferences.hijab_preference} onValueChange={(value) => updatePreference('hijab_preference', value)}>
@@ -406,7 +406,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
 
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-gold" />
+                        <Users className="h-4 w-4 text-secondary" />
                         Préférence Barbe
                       </Label>
                       <Select value={preferences.beard_preference} onValueChange={(value) => updatePreference('beard_preference', value)}>
@@ -490,7 +490,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                   <Button
                     onClick={savePreferences}
                     disabled={saving}
-                    className="bg-emerald hover:bg-emerald-dark"
+                    className="bg-primary hover:bg-primary/80"
                   >
                     {saving ? 'Finalisation...' : 'Terminer'}
                   </Button>

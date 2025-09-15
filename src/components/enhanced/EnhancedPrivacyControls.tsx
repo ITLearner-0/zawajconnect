@@ -264,7 +264,7 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
             <div className="space-y-2">
               <div className="flex justify-between items-center text-sm">
                 <span className="flex items-center gap-2">
-                  <Shield className="h-4 w-4 text-emerald" />
+                  <Shield className="h-4 w-4 text-primary" />
                   Score de Confidentialité
                 </span>
                 <Badge variant={privacyScore >= 80 ? 'default' : privacyScore >= 60 ? 'secondary' : 'destructive'}>
@@ -274,9 +274,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
               <div className="w-full bg-muted rounded-full h-3">
                 <div 
                   className={`h-3 rounded-full transition-all duration-300 ${
-                    privacyScore >= 80 ? 'bg-gradient-to-r from-emerald to-emerald-light' : 
-                    privacyScore >= 60 ? 'bg-gradient-to-r from-gold to-gold-light' : 
-                    'bg-gradient-to-r from-red-500 to-red-400'
+                    privacyScore >= 80 ? 'bg-gradient-primary' : 
+                    privacyScore >= 60 ? 'bg-gradient-secondary' : 
+                    'bg-gradient-accent'
                   }`}
                   style={{ width: `${privacyScore}%` }}
                 />
@@ -317,7 +317,7 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <Globe className="h-4 w-4 text-emerald" />
+                        <Globe className="h-4 w-4 text-primary" />
                         Visibilité du Profil
                       </Label>
                       <Select 
@@ -358,7 +358,7 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
 
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <Camera className="h-4 w-4 text-gold" />
+                        <Camera className="h-4 w-4 text-secondary" />
                         Visibilité des Photos
                       </Label>
                       <Select 
@@ -379,7 +379,7 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
 
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-sage" />
+                        <Clock className="h-4 w-4 text-muted-foreground" />
                         Statut En Ligne
                       </Label>
                       <Select 
@@ -400,7 +400,7 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
 
                     <div className="space-y-3">
                       <Label className="flex items-center gap-2">
-                        <MessageCircle className="h-4 w-4 text-emerald" />
+                        <MessageCircle className="h-4 w-4 text-primary" />
                         Messages de
                       </Label>
                       <Select 
@@ -425,7 +425,7 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Eye className="h-4 w-4 text-emerald" />
+                        <Eye className="h-4 w-4 text-primary" />
                         <div>
                           <Label className="text-base font-medium">Accusés de réception</Label>
                           <p className="text-sm text-muted-foreground">
@@ -441,7 +441,7 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
 
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <MessageCircle className="h-4 w-4 text-gold" />
+                        <MessageCircle className="h-4 w-4 text-secondary" />
                         <div>
                           <Label className="text-base font-medium">Indicateurs de frappe</Label>
                           <p className="text-sm text-muted-foreground">
@@ -656,7 +656,7 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                   <Button
                     onClick={savePrivacySettings}
                     disabled={saving}
-                    className="bg-emerald hover:bg-emerald-dark"
+                    className="bg-primary hover:bg-primary/80"
                   >
                     {saving ? 'Finalisation...' : 'Terminer'}
                   </Button>
