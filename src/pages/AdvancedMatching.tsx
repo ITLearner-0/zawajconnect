@@ -17,7 +17,7 @@ const AdvancedMatching = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -27,7 +27,7 @@ const AdvancedMatching = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
+    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-primary/5">
       <Header />
       <main className="pt-20 pb-12">
         <div className="container mx-auto px-4">
@@ -35,7 +35,7 @@ const AdvancedMatching = () => {
           <div className="text-center space-y-4 mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
               <Brain className="h-8 w-8 text-primary" />
-              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-primary-glow to-emerald-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
                 Système de Matching Avancé
               </h1>
             </div>

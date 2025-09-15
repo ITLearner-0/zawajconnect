@@ -21,9 +21,9 @@ const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
   const { user } = useAuth();
 
   const getCompatibilityColor = (score: number) => {
-    if (score >= 85) return 'text-emerald-600 bg-emerald-50 border-emerald-200';
-    if (score >= 75) return 'text-gold-600 bg-gold-50 border-gold-200';
-    if (score >= 65) return 'text-sage-600 bg-sage-50 border-sage-200';
+    if (score >= 85) return 'text-success bg-success/10 border-success/20';
+    if (score >= 75) return 'text-warning bg-warning/10 border-warning/20';
+    if (score >= 65) return 'text-primary bg-primary/10 border-primary/20';
     return 'text-muted-foreground bg-muted border-border';
   };
 
@@ -158,9 +158,9 @@ const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
                 <Progress value={match.islamic_score} className="h-2" />
                 <span className="text-xs text-muted-foreground">{match.islamic_score}%</span>
               </div>
-              <div>
+              <div className="text-center">
                 <div className="flex items-center gap-1 mb-1">
-                  <Users className="h-3 w-3 text-sage-600" />
+                  <Users className="h-3 w-3 text-primary" />
                   <span className="font-medium">Culturel</span>
                 </div>
                 <Progress value={match.cultural_score} className="h-2" />
@@ -168,7 +168,7 @@ const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
               </div>
               <div>
                 <div className="flex items-center gap-1 mb-1">
-                  <Heart className="h-3 w-3 text-gold-600" />
+                  <Heart className="h-3 w-3 text-accent" />
                   <span className="font-medium">Personnalité</span>
                 </div>
                 <Progress value={match.personality_score} className="h-2" />
@@ -182,7 +182,7 @@ const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
                 <p className="text-sm font-medium text-emerald-700 mb-2">Points forts:</p>
                 <div className="flex flex-wrap gap-2">
                   {match.matching_reasons.map((reason, index) => (
-                    <Badge key={index} variant="secondary" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
+                    <Badge key={index} variant="secondary" className="text-xs bg-success/10 text-success border-success/20">
                       {reason}
                     </Badge>
                   ))}
@@ -193,10 +193,10 @@ const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
             {/* Potential Concerns */}
             {match.potential_concerns.length > 0 && (
               <div>
-                <p className="text-sm font-medium text-amber-700 mb-2">À considérer:</p>
+                <p className="text-sm font-medium text-warning mb-2">À considérer:</p>
                 <div className="flex flex-wrap gap-2">
                   {match.potential_concerns.map((concern, index) => (
-                    <Badge key={index} variant="outline" className="text-xs text-amber-700 border-amber-300">
+                    <Badge key={index} variant="outline" className="text-xs text-warning border-warning/30">
                       {concern}
                     </Badge>
                   ))}
