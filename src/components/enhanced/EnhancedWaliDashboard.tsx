@@ -110,15 +110,21 @@ const EnhancedWaliDashboard: React.FC = () => {
   // Real-time subscriptions
   useEffect(() => {
     loadWaliData();
-    setupRealtimeSubscriptions();
+    const channels = setupRealtimeSubscriptions();
     
     return () => {
-      // Cleanup subscriptions
-      supabase.removeAllChannels();
+      // Cleanup specific subscriptions only
+      channels.forEach(channel => {
+        if (channel) {
+          supabase.removeChannel(channel);
+        }
+      });
     };
   }, []);
 
   const setupRealtimeSubscriptions = () => {
+    const channels: any[] = [];
+    
     // Subscribe to family notifications
     const notificationChannel = supabase
       .channel('wali-notifications-enhanced')
@@ -146,6 +152,8 @@ const EnhancedWaliDashboard: React.FC = () => {
       })
       .subscribe();
 
+    channels.push(notificationChannel);
+
     // Subscribe to supervision logs for real-time activity
     const activityChannel = supabase
       .channel('supervision-activity')
@@ -158,10 +166,9 @@ const EnhancedWaliDashboard: React.FC = () => {
       })
       .subscribe();
 
-    return () => {
-      supabase.removeChannel(notificationChannel);
-      supabase.removeChannel(activityChannel);
-    };
+    channels.push(activityChannel);
+      
+    return channels;
   };
 
   const handleNewNotification = (notification: FamilyNotification) => {
