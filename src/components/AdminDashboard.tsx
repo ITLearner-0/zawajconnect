@@ -86,6 +86,8 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
   const [selectedRole, setSelectedRole] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [assigningRole, setAssigningRole] = useState(false);
+  const [updatingReport, setUpdatingReport] = useState<string | null>(null);
 
   useEffect(() => {
     loadAdminData();
@@ -216,6 +218,9 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
   };
 
   const updateReportStatus = async (reportId: string, status: string) => {
+    if (updatingReport === reportId) return; // Prevent double-click
+    setUpdatingReport(reportId);
+
     try {
       const { error } = await supabase
         .from('reports')
@@ -241,6 +246,8 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
         description: "Impossible de mettre à jour le rapport",
         variant: "destructive"
       });
+    } finally {
+      setUpdatingReport(null);
     }
   };
 
@@ -470,8 +477,12 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                   </Select>
                 </div>
                 <div className="flex items-end">
-                  <Button onClick={assignRole} className="w-full">
-                    Attribuer le rôle
+                  <Button 
+                    onClick={assignRole} 
+                    disabled={assigningRole || !selectedUser || !selectedRole}
+                    className="w-full"
+                  >
+                    {assigningRole ? "Attribution..." : "Attribuer le rôle"}
                   </Button>
                 </div>
               </div>

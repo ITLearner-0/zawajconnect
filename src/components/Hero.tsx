@@ -45,7 +45,13 @@ const Hero = () => {
               variant="gradient" 
               size="lg" 
               className="animate-pulse-gentle"
-              onClick={() => navigate('/auth')}
+              onClick={() => {
+                try {
+                  navigate('/auth');
+                } catch (error) {
+                  console.error('Navigation error:', error);
+                }
+              }}
             >
               <Heart className="mr-2 h-5 w-5" />
               Commencer mon parcours
@@ -54,7 +60,16 @@ const Hero = () => {
               variant="outline" 
               size="lg" 
               className="border-emerald text-emerald hover:bg-emerald hover:text-white"
-              onClick={() => document.getElementById('valeurs')?.scrollIntoView({ behavior: 'smooth' })}
+              onClick={() => {
+                try {
+                  const element = document.getElementById('valeurs');
+                  if (element) {
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }
+                } catch (error) {
+                  console.error('Scroll error:', error);
+                }
+              }}
             >
               Découvrir nos valeurs
             </Button>
