@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { getRouteByPath } from '@/config/routes';
 import { useToast } from '@/hooks/use-toast';
 
@@ -12,10 +13,11 @@ const NavigationGuard = ({ children }: NavigationGuardProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   const { toast } = useToast();
 
   useEffect(() => {
-    if (loading) return;
+    if (loading || adminLoading) return;
 
     const currentRoute = getRouteByPath(location.pathname);
     
@@ -43,20 +45,24 @@ const NavigationGuard = ({ children }: NavigationGuardProps) => {
       return;
     }
 
-    // Check role-based access
+    // Check role-based access - Use proper database role checking
     if (currentRoute?.roles && user) {
-      const userRole = user.user_metadata?.role || 'user';
-      if (!currentRoute.roles.includes(userRole)) {
-        toast({
-          title: "Accès refusé",
-          description: "Vous n'avez pas les permissions nécessaires pour accéder à cette page.",
-          variant: "destructive"
-        });
-        navigate('/dashboard', { replace: true });
-        return;
+      // Special handling for admin routes
+      if (currentRoute.roles.includes('admin')) {
+        if (!isAdmin) {
+          toast({
+            title: "Accès refusé",
+            description: "Vous n'avez pas les permissions administrateur nécessaires.",
+            variant: "destructive"
+          });
+          navigate('/enhanced-profile', { replace: true });
+          return;
+        }
       }
+      // For other roles, we can add similar logic here if needed
+      // For now, admin is the main role we're checking
     }
-  }, [location.pathname, user, loading, navigate, toast]);
+  }, [location.pathname, user, loading, adminLoading, isAdmin, navigate, toast]);
 
   return <>{children}</>;
 };
