@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Shield, Heart, Users, Clock, CheckCircle, XCircle, MessageSquare, Star, MapPin, Calendar } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface PendingMatch {
   id: string;
@@ -247,17 +247,17 @@ const FamilyApprovalWorkflow = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'approved': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
-      case 'rejected': return 'text-red-600 bg-red-50 border-red-200';
-      case 'needs_discussion': return 'text-amber-600 bg-amber-50 border-amber-200';
+      case 'approved': return 'text-success bg-success/10 border-success/20';
+      case 'rejected': return 'text-destructive bg-destructive/10 border-destructive/20';
+      case 'needs_discussion': return 'text-warning bg-warning/10 border-warning/20';
       default: return 'text-muted-foreground bg-muted border-border';
     }
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 85) return 'text-emerald-600';
-    if (score >= 75) return 'text-gold-600';
-    if (score >= 65) return 'text-sage-600';
+    if (score >= 85) return 'text-success';
+    if (score >= 75) return 'text-warning';
+    if (score >= 65) return 'text-primary';
     return 'text-muted-foreground';
   };
 
@@ -319,7 +319,7 @@ const FamilyApprovalWorkflow = () => {
                       <Heart className="h-5 w-5 text-primary" />
                       Nouveau Match - Approbation Requise
                     </CardTitle>
-                    <Badge variant="outline" className="text-amber-600 border-amber-300">
+                    <Badge variant="outline" className="text-warning border-warning/30">
                       <Clock className="h-3 w-3 mr-1" />
                       En attente
                     </Badge>
@@ -364,9 +364,9 @@ const FamilyApprovalWorkflow = () => {
                   </div>
 
                   {/* Compatibility Breakdown */}
-                  <div className="bg-sage-50 p-4 rounded-lg border border-sage-200">
+                  <div className="bg-muted/30 p-4 rounded-lg border border-border">
                     <h5 className="font-medium mb-3 flex items-center gap-2">
-                      <Star className="h-4 w-4 text-gold-600" />
+                      <Star className="h-4 w-4 text-warning" />
                       Analyse de Compatibilité
                     </h5>
                     <div className="grid grid-cols-3 gap-4 text-sm">
@@ -421,7 +421,7 @@ const FamilyApprovalWorkflow = () => {
                   <div className="flex gap-3">
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
-                        <Button className="flex-1 bg-emerald-600 hover:bg-emerald-700">
+                        <Button className="flex-1 bg-success hover:bg-success/90">
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Approuver ce Match
                         </Button>
@@ -437,7 +437,7 @@ const FamilyApprovalWorkflow = () => {
                           <AlertDialogCancel>Annuler</AlertDialogCancel>
                           <AlertDialogAction 
                             onClick={() => handleFamilyDecision(match.id, 'approved')}
-                            className="bg-emerald-600 hover:bg-emerald-700"
+                            className="bg-success hover:bg-success/90"
                           >
                             Approuver
                           </AlertDialogAction>
