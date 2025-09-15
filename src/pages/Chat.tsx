@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/card';
@@ -8,15 +8,16 @@ import ChatList from '@/components/ChatList';
 import ChatWindow from '@/components/ChatWindow';
 
 const Chat = () => {
-  console.log('🎬 Chat component mounting');
   const { user } = useAuth();
-  console.log('👤 Chat - user:', user?.id);
   const navigate = useNavigate();
-  const { matchId: paramMatchId } = useParams();
+  const { matchId: paramMatchId } = useParams<{ matchId?: string }>();
   const [searchParams] = useSearchParams();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
   
-  console.log('🔗 Chat - paramMatchId:', paramMatchId, 'searchParams matchId:', searchParams.get('matchId'));
+  // Get matchId from URL params or search params
+  const matchIdFromUrl = useMemo(() => {
+    return paramMatchId || searchParams.get('matchId') || null;
+  }, [paramMatchId, searchParams]);
 
   useEffect(() => {
     if (!user) {
@@ -24,12 +25,11 @@ const Chat = () => {
       return;
     }
 
-    // Check for matchId from route params first, then URL searchParams
-    const matchId = paramMatchId || searchParams.get('matchId');
-    if (matchId) {
-      setSelectedChatId(matchId);
+    // Set initial selected chat from URL
+    if (matchIdFromUrl) {
+      setSelectedChatId(matchIdFromUrl);
     }
-  }, [user, paramMatchId, searchParams]);
+  }, [user, matchIdFromUrl, navigate]);
 
   const handleChatSelect = (matchId: string) => {
     setSelectedChatId(matchId);
