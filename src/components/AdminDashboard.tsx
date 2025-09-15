@@ -46,6 +46,11 @@ interface User {
   user_roles: {
     role: string;
   }[] | null;
+  user_status?: {
+    status: string;
+    reason?: string;
+    expires_at?: string;
+  } | null;
 }
 
 interface Report {
@@ -88,6 +93,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
   const [loading, setLoading] = useState(true);
   const [assigningRole, setAssigningRole] = useState(false);
   const [updatingReport, setUpdatingReport] = useState<string | null>(null);
+  const [managingUser, setManagingUser] = useState<string | null>(null);
 
   useEffect(() => {
     loadAdminData();
@@ -112,7 +118,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
         verifiedUsers: verifiedCount.count || 0
       });
 
-      // Load users with profiles (separate from roles)
+      // Load users with profiles (separate from roles and status)
       const { data: usersData, error: usersError } = await supabase
         .from('profiles')
         .select('*')
@@ -128,12 +134,21 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
 
       if (rolesError) throw rolesError;
 
-      // Combine users with their roles
+      // Load user status separately
+      const { data: statusData, error: statusError } = await supabase
+        .from('user_status')
+        .select('user_id, status, reason, expires_at');
+
+      if (statusError) throw statusError;
+
+      // Combine users with their roles and status
       const usersWithRoles = (usersData || []).map(user => {
         const userRole = rolesData?.find(role => role.user_id === user.user_id);
+        const userStatus = statusData?.find(status => status.user_id === user.user_id);
         return {
           ...user,
-          user_roles: userRole ? [{ role: userRole.role }] : [{ role: 'user' }]
+          user_roles: userRole ? [{ role: userRole.role }] : [{ role: 'user' }],
+          user_status: userStatus || { status: 'active' }
         };
       });
 
@@ -251,6 +266,49 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
     }
   };
 
+  const updateUserStatus = async (userId: string, status: 'active' | 'suspended' | 'blocked' | 'banned', reason?: string, expiresAt?: string) => {
+    if (managingUser === userId) return; // Prevent double-click
+    setManagingUser(userId);
+
+    try {
+      const { error } = await supabase
+        .from('user_status')
+        .upsert({
+          user_id: userId,
+          status,
+          reason: reason || `Statut modifié par l'administrateur`,
+          admin_notes: `Action effectuée par ${user?.email} le ${new Date().toLocaleDateString('fr-FR')}`,
+          created_by: user?.id,
+          expires_at: expiresAt || null
+        });
+
+      if (error) throw error;
+
+      const statusLabels = {
+        active: 'activé',
+        suspended: 'suspendu',
+        blocked: 'bloqué',
+        banned: 'banni'
+      };
+
+      toast({
+        title: "Succès",
+        description: `Utilisateur ${statusLabels[status]} avec succès`
+      });
+
+      loadAdminData();
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour le statut utilisateur",
+        variant: "destructive"
+      });
+    } finally {
+      setManagingUser(null);
+    }
+  };
+
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
       case 'super_admin': return 'default';
@@ -266,6 +324,16 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
       case 'admin': return Shield;
       case 'moderator': return Eye;
       default: return Users;
+    }
+  };
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'active': return 'default';
+      case 'suspended': return 'secondary';
+      case 'blocked': return 'destructive';
+      case 'banned': return 'outline';
+      default: return 'outline';
     }
   };
 
@@ -389,7 +457,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                 </div>
               </div>
               
-              <Table>
+                <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nom</TableHead>
@@ -397,20 +465,24 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                     <TableHead>Âge</TableHead>
                     <TableHead>Localisation</TableHead>
                     <TableHead>Rôle</TableHead>
+                    <TableHead>Statut</TableHead>
                     <TableHead>Inscrit le</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredUsers.map((user) => {
                     const role = user.user_roles?.[0]?.role || 'user';
+                    const status = user.user_status?.status || 'active';
                     const RoleIcon = getRoleIcon(role);
+                    const isManaging = managingUser === user.user_id;
                     
                     return (
                       <TableRow key={user.id}>
                         <TableCell className="font-medium">
                           {user.full_name || 'N/A'}
                         </TableCell>
-                        <TableCell>{user.user_id || 'N/A'}</TableCell>
+                        <TableCell className="font-mono text-xs">{user.user_id || 'N/A'}</TableCell>
                         <TableCell>{user.age || 'N/A'}</TableCell>
                         <TableCell>{user.location || 'N/A'}</TableCell>
                         <TableCell>
@@ -420,7 +492,53 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                           </Badge>
                         </TableCell>
                         <TableCell>
+                          <Badge variant={getStatusBadgeVariant(status)} className="capitalize">
+                            {status === 'active' && <CheckCircle className="h-3 w-3 mr-1" />}
+                            {status === 'suspended' && <AlertTriangle className="h-3 w-3 mr-1" />}
+                            {status === 'blocked' && <Ban className="h-3 w-3 mr-1" />}
+                            {status === 'banned' && <XCircle className="h-3 w-3 mr-1" />}
+                            {status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
                           {new Date(user.created_at).toLocaleDateString('fr-FR')}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            {status !== 'active' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={isManaging}
+                                onClick={() => updateUserStatus(user.user_id, 'active')}
+                                title="Réactiver"
+                              >
+                                <CheckCircle className="h-3 w-3" />
+                              </Button>
+                            )}
+                            {status !== 'suspended' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                disabled={isManaging}
+                                onClick={() => updateUserStatus(user.user_id, 'suspended', 'Suspendu par l\'administrateur')}
+                                title="Suspendre"
+                              >
+                                <AlertTriangle className="h-3 w-3" />
+                              </Button>
+                            )}
+                            {status !== 'blocked' && (
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                disabled={isManaging}
+                                onClick={() => updateUserStatus(user.user_id, 'blocked', 'Bloqué par l\'administrateur')}
+                                title="Bloquer"
+                              >
+                                <Ban className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     );
