@@ -1334,6 +1334,13 @@ export type Database = {
         }
         Returns: boolean
       }
+      can_access_family_contact_info_secure: {
+        Args: {
+          family_member_invited_user_id: string
+          family_member_user_id: string
+        }
+        Returns: boolean
+      }
       check_family_supervision_setup: {
         Args: { user_uuid: string }
         Returns: boolean
