@@ -59,7 +59,8 @@ export const useUnifiedCompatibility = () => {
       const cultural_score = calculateCulturalCompatibility(myProfile?.data, theirProfile?.data);
       
       // Calculate personality compatibility (based on questionnaire)
-      const personality_score = Math.max(baseCompatibilityScore, 0);
+      // If no questionnaire data, give a reasonable default score
+      const personality_score = Math.max(baseCompatibilityScore, 60);
 
       // Use provided weights or defaults
       const weights = preferences || {
@@ -116,9 +117,13 @@ export const useUnifiedCompatibility = () => {
   };
 
   const calculateIslamicCompatibility = (myPrefs: any, theirPrefs: any): number => {
-    if (!myPrefs || !theirPrefs) return 50; // Neutral score if data missing
+    // If both have no data, give a neutral score
+    if (!myPrefs && !theirPrefs) return 75;
+    
+    // If only one has data, give a slightly lower but still reasonable score
+    if (!myPrefs || !theirPrefs) return 65;
 
-    let score = 50; // Base score
+    let score = 60; // Higher base score for users with Islamic preferences
 
     // Prayer frequency alignment
     if (myPrefs.prayer_frequency === theirPrefs.prayer_frequency) {
@@ -156,9 +161,9 @@ export const useUnifiedCompatibility = () => {
   };
 
   const calculateCulturalCompatibility = (myProfile: any, theirProfile: any): number => {
-    if (!myProfile || !theirProfile) return 50;
+    if (!myProfile || !theirProfile) return 70; // More optimistic for missing data
 
-    let score = 50; // Base score
+    let score = 60; // Higher base score
 
     // Location proximity
     if (myProfile.location === theirProfile.location) {
