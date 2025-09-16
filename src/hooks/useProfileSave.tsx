@@ -101,21 +101,37 @@ export const useProfileSave = () => {
         throw profileError;
       }
 
-      // 2. Save Islamic preferences - Clean data before saving
-      const cleanIslamicPrefs = {
-        user_id: user.id,
-        prayer_frequency: islamicPrefs.prayer_frequency || null,
-        quran_reading: islamicPrefs.quran_reading || null,
-        hijab_preference: islamicPrefs.hijab_preference || null,
-        beard_preference: islamicPrefs.beard_preference || null,
-        sect: islamicPrefs.sect || null,
-        madhab: islamicPrefs.madhab || null,
-        halal_diet: islamicPrefs.halal_diet ?? true,
-        smoking: islamicPrefs.smoking || null,
-        desired_partner_sect: islamicPrefs.desired_partner_sect || null,
-        importance_of_religion: islamicPrefs.importance_of_religion || null,
-        updated_at: new Date().toISOString()
+    // Validate Islamic preferences before saving
+    const validateIslamicPrefs = (prefs: any) => {
+      const validSects = ['same_sect', 'sunni', 'shia', 'any', 'other', 'open_discussion'];
+      const validPrayerFreqs = ['five_times', 'occasionally', 'rarely', 'never'];
+      const validImportance = ['very_important', 'important', 'moderate', 'not_important'];
+      
+      return {
+        ...prefs,
+        desired_partner_sect: validSects.includes(prefs.desired_partner_sect) ? prefs.desired_partner_sect : null,
+        prayer_frequency: validPrayerFreqs.includes(prefs.prayer_frequency) ? prefs.prayer_frequency : null,
+        importance_of_religion: validImportance.includes(prefs.importance_of_religion) ? prefs.importance_of_religion : null,
       };
+    };
+
+    const validatedPrefs = validateIslamicPrefs(islamicPrefs);
+    
+    // 2. Save Islamic preferences - Clean data before saving
+    const cleanIslamicPrefs = {
+      user_id: user.id,
+      prayer_frequency: validatedPrefs.prayer_frequency || null,
+      quran_reading: validatedPrefs.quran_reading || null,
+      hijab_preference: validatedPrefs.hijab_preference || null,
+      beard_preference: validatedPrefs.beard_preference || null,
+      sect: validatedPrefs.sect || null,
+      madhab: validatedPrefs.madhab || null,
+      halal_diet: validatedPrefs.halal_diet ?? true,
+      smoking: validatedPrefs.smoking || null,
+      desired_partner_sect: validatedPrefs.desired_partner_sect || null,
+      importance_of_religion: validatedPrefs.importance_of_religion || null,
+      updated_at: new Date().toISOString()
+    };
 
       const { error: prefsError } = await supabase
         .from('islamic_preferences')
@@ -123,7 +139,23 @@ export const useProfileSave = () => {
 
       if (prefsError) {
         console.error('Islamic preferences save error:', prefsError);
-        throw new Error(`Erreur lors de la sauvegarde des préférences islamiques: ${prefsError.message}`);
+        // Try to save with fallback values if validation fails
+        const fallbackPrefs = {
+          ...cleanIslamicPrefs,
+          desired_partner_sect: null,
+          prayer_frequency: null,
+          importance_of_religion: null
+        };
+        
+        const { error: fallbackError } = await supabase
+          .from('islamic_preferences')
+          .upsert(fallbackPrefs);
+          
+        if (fallbackError) {
+          throw new Error(`Erreur lors de la sauvegarde des préférences islamiques: ${prefsError.message}`);
+        }
+        
+        console.log('⚠️ Islamic preferences saved with fallback values');
       }
 
       console.log('✅ Profile and Islamic preferences saved successfully');

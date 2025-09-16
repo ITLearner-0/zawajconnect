@@ -851,7 +851,7 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="any">Peu importe</SelectItem>
-              <SelectItem value="same_as_mine">Même que la mienne</SelectItem>
+              <SelectItem value="same_sect">Même que la mienne</SelectItem>
               <SelectItem value="sunni">Sunnite</SelectItem>
               <SelectItem value="shia">Chiite</SelectItem>
             </SelectContent>
