@@ -23,6 +23,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('🔐 Auth state change:', event, session?.user?.id);
+        
+        // Handle token refresh events
+        if (event === 'TOKEN_REFRESHED') {
+          console.log('✅ Token refreshed successfully');
+        }
+        
+        // Handle session expiry with emergency backup
+        if (event === 'SIGNED_OUT' && session === null) {
+          console.log('⚠️ User signed out - triggering emergency backup');
+          // Trigger emergency backup before clearing session
+          window.dispatchEvent(new CustomEvent('auth:session-expired'));
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);

@@ -8,7 +8,9 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useQuestionnaireState } from '@/hooks/useQuestionnaireState';
-import { Heart, Users, Home, Activity, Baby, Handshake, User, Coins, Brain } from 'lucide-react';
+import { useSessionMonitor } from '@/hooks/useSessionMonitor';
+import { useEmergencyBackup } from '@/hooks/useEmergencyBackup';
+import { Heart, Users, Home, Activity, Baby, Handshake, User, Coins, Brain, AlertTriangle } from 'lucide-react';
 
 interface Question {
   id: string;
@@ -68,8 +70,20 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
     hasUnsavedChanges
   } = useQuestionnaireState({
     storageKey: 'compatibility_responses',
-    autoSaveDelay: 3000
+    autoSaveDelay: 2000 // Reduced to 2 seconds for faster saves
   });
+
+  const { isSessionNearExpiry } = useSessionMonitor();
+  
+  // Emergency backup system
+  const { saveEmergencyBackup, restoreEmergencyBackup } = useEmergencyBackup();
+
+  // Auto-save emergency backup every time responses change
+  useEffect(() => {
+    if (Object.keys(responses).length > 0) {
+      saveEmergencyBackup('compatibility', responses);
+    }
+  }, [responses, saveEmergencyBackup]);
 
   useEffect(() => {
     if (user) {
@@ -214,6 +228,12 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
                 <span>Progression globale</span>
                 <div className="flex items-center gap-2">
                   <span>{getAnsweredCount()}/{getTotalQuestions()} questions</span>
+                  {isSessionNearExpiry && (
+                    <Badge variant="destructive" className="text-xs animate-pulse">
+                      <AlertTriangle className="h-3 w-3 mr-1" />
+                      Session expire bientôt
+                    </Badge>
+                  )}
                   {hasUnsavedChanges && (
                     <Badge variant="outline" className="text-xs bg-yellow-50 border-yellow-200 text-yellow-800">
                       Non sauvegardé
