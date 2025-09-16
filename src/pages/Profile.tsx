@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, MapPin, GraduationCap, Briefcase, Heart, User, MessageCircle, Eye, Calendar, Flag } from 'lucide-react';
 import VerificationBadge from '@/components/VerificationBadge';
+import CompatibilityScore from '@/components/CompatibilityScore';
 import ReportModal from '@/components/ReportModal';
 
 interface ProfileData {
@@ -510,18 +511,18 @@ const Profile = () => {
                 </CardContent>
               </Card>
 
+              <CompatibilityScore 
+                otherUserId={userId!} 
+                showDetails={true} 
+              />
+
               <Card className="animate-fade-in">
                 <CardHeader>
-                  <CardTitle className="text-center">Compatibilité</CardTitle>
+                  <CardTitle className="text-center">Profil ouvert</CardTitle>
                 </CardHeader>
-                <CardContent className="text-center">
-                  <div className="h-20 w-20 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl text-primary-foreground font-bold">
-                      {Math.floor(Math.random() * 30) + 70}%
-                    </span>
-                  </div>
+                <CardContent className="text-center space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    Score de compatibilité basé sur vos préférences communes
+                    Consultation du profil de {profile.full_name}
                   </p>
                   <Button
                     variant="outline"
