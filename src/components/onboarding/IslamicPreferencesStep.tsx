@@ -364,7 +364,7 @@ const IslamicPreferencesStep = ({
                 <SelectItem value="any">Aucune préférence</SelectItem>
                 <SelectItem value="sunni">Sunnite</SelectItem>
                 <SelectItem value="shia">Chiite</SelectItem>
-                <SelectItem value="same_as_mine">Identique à la mienne</SelectItem>
+                <SelectItem value="same_sect">Identique à la mienne</SelectItem>
               </SelectContent>
             </Select>
           </div>

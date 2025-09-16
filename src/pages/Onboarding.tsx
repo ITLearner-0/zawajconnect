@@ -631,12 +631,12 @@ const Onboarding = () => {
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionnez" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="same">Même secte que moi</SelectItem>
-                  <SelectItem value="sunni">Sunnite</SelectItem>
-                  <SelectItem value="shia">Chiite</SelectItem>
-                  <SelectItem value="any">Peu importe</SelectItem>
-                </SelectContent>
+              <SelectContent>
+                <SelectItem value="same_sect">Même secte que moi</SelectItem>
+                <SelectItem value="sunni">Sunnite</SelectItem>
+                <SelectItem value="shia">Chiite</SelectItem>
+                <SelectItem value="any">Peu importe</SelectItem>
+              </SelectContent>
               </Select>
             </div>
 
