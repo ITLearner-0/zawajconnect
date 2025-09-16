@@ -1345,6 +1345,10 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: boolean
       }
+      check_profile_view_rate_limit: {
+        Args: { viewer_uuid: string }
+        Returns: boolean
+      }
       create_family_invitation: {
         Args: {
           p_email: string
