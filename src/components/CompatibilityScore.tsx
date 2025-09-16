@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart, TrendingUp, Users } from 'lucide-react';
-import { useCompatibility } from '@/hooks/useCompatibility';
+import { useUnifiedCompatibility } from '@/hooks/useUnifiedCompatibility';
 
 interface CompatibilityScoreProps {
   otherUserId: string;
@@ -12,20 +12,25 @@ interface CompatibilityScoreProps {
 }
 
 const CompatibilityScore = ({ otherUserId, showDetails = false, compact = false }: CompatibilityScoreProps) => {
-  const { calculateCompatibilityScore } = useCompatibility();
+  const { calculateDetailedCompatibility } = useUnifiedCompatibility();
   const [score, setScore] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getScore = async () => {
       setLoading(true);
-      const calculatedScore = await calculateCompatibilityScore(otherUserId);
-      setScore(calculatedScore);
+      try {
+        const result = await calculateDetailedCompatibility(otherUserId);
+        setScore(result.compatibility_score);
+      } catch (error) {
+        console.error('Error calculating compatibility:', error);
+        setScore(0);
+      }
       setLoading(false);
     };
 
     getScore();
-  }, [otherUserId, calculateCompatibilityScore]);
+  }, [otherUserId, calculateDetailedCompatibility]);
 
   const getScoreColor = (score: number) => {
     if (score >= 80) return 'text-emerald bg-emerald/10 border-emerald/20';
