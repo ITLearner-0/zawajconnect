@@ -143,6 +143,74 @@ export type Database = {
           },
         ]
       }
+      family_contact_audit_log: {
+        Row: {
+          access_details: Json
+          access_timestamp: string
+          accessed_by: string
+          family_member_id: string
+          id: string
+        }
+        Insert: {
+          access_details: Json
+          access_timestamp?: string
+          accessed_by: string
+          family_member_id: string
+          id?: string
+        }
+        Update: {
+          access_details?: Json
+          access_timestamp?: string
+          accessed_by?: string
+          family_member_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      family_contact_secure: {
+        Row: {
+          access_count: number | null
+          contact_visibility: string | null
+          created_at: string | null
+          encrypted_email: string | null
+          encrypted_phone: string | null
+          family_member_id: string
+          id: string
+          last_accessed_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          access_count?: number | null
+          contact_visibility?: string | null
+          created_at?: string | null
+          encrypted_email?: string | null
+          encrypted_phone?: string | null
+          family_member_id: string
+          id?: string
+          last_accessed_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          access_count?: number | null
+          contact_visibility?: string | null
+          created_at?: string | null
+          encrypted_email?: string | null
+          encrypted_phone?: string | null
+          family_member_id?: string
+          id?: string
+          last_accessed_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "family_contact_secure_family_member_id_fkey"
+            columns: ["family_member_id"]
+            isOneToOne: true
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       family_meetings: {
         Row: {
           created_at: string
@@ -1429,6 +1497,14 @@ export type Database = {
       get_family_approval_status: {
         Args: { match_uuid: string }
         Returns: string
+      }
+      get_family_contact_secure: {
+        Args: { family_member_uuid: string }
+        Returns: {
+          contact_type: string
+          contact_value: string
+          last_verified: string
+        }[]
       }
       get_user_role: {
         Args: { _user_id: string }
