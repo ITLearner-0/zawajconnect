@@ -14,18 +14,16 @@ import { useToast } from '@/hooks/use-toast';
 import ProfileCard from '@/components/ProfileCard';
 import CompatibilityScore from '@/components/CompatibilityScore';
 
-interface Profile {
-  id: string;
+interface MatchingProfile {
+  id?: string;
   user_id: string;
-  full_name: string;
   age: number;
   gender: string;
-  location: string;
-  education: string;
-  profession: string;
-  bio: string;
-  looking_for: string;
+  city_only: string; // Seulement la ville, pas l'adresse complète
+  education_level: string; // Niveau général, pas l'université spécifique
+  profession_category: string; // Catégorie générale, pas le poste spécifique
   interests: string[];
+  looking_for: string;
   avatar_url: string;
   verification_score: number;
 }
@@ -35,13 +33,13 @@ const Browse = () => {
   const { calculateDetailedCompatibility } = useUnifiedCompatibility();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [profiles, setProfiles] = useState<Profile[]>([]);
-  const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
+  const [profiles, setProfiles] = useState<MatchingProfile[]>([]);
+  const [filteredProfiles, setFilteredProfiles] = useState<MatchingProfile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [reportModalOpen, setReportModalOpen] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState<Profile | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<MatchingProfile | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -59,7 +57,7 @@ const Browse = () => {
     if (!user) return;
 
     try {
-      // First get current user's gender
+      // First get current user's gender to filter opposite gender
       const { data: currentUserProfile } = await supabase
         .from('profiles')
         .select('gender')
@@ -69,82 +67,43 @@ const Browse = () => {
       // Determine opposite gender
       const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
 
-      // Get all Wali user IDs to exclude them from matching
-      const { data: waliUsers } = await supabase
-        .from('family_members')
-        .select('invited_user_id')
-        .eq('is_wali', true)
-        .eq('invitation_status', 'accepted')
-        .not('invited_user_id', 'is', null);
-
-      const waliUserIds = waliUsers?.map(w => w.invited_user_id).filter(Boolean) || [];
-
+      // Use the secure matching data table instead of direct profile access
       const { data, error } = await supabase
-        .from('profiles')
+        .from('profile_matching_data')
         .select(`
           *,
-          user_verifications (
-            verification_score
-          )
+          user_verifications!inner(verification_score)
         `)
         .neq('user_id', user.id)
         .eq('gender', oppositeGender)
-        .not('user_id', 'in', `(${waliUserIds.join(',')})`)
+        .eq('is_visible', true)
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(20); // Reduced limit for security
 
       if (error) throw error;
 
       const profilesWithVerification = data?.map((profile: any) => ({
-        ...profile,
+        user_id: profile.user_id,
+        age: profile.age,
+        gender: profile.gender,
+        city_only: profile.city_only,
+        education_level: profile.education_level,
+        profession_category: profile.profession_category,
+        interests: profile.interests || [],
+        looking_for: profile.looking_for,
+        avatar_url: profile.avatar_url,
         verification_score: profile.user_verifications?.verification_score || 0
       })) || [];
 
       setProfiles(profilesWithVerification);
     } catch (error) {
-      console.error('Error fetching profiles:', error);
-      // Fallback to basic profiles if relationship query fails
-      try {
-        // Get current user's gender for fallback too
-        const { data: currentUserProfile } = await supabase
-          .from('profiles')
-          .select('gender')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
-
-        // Also exclude Walis in fallback
-        const { data: waliUsers } = await supabase
-          .from('family_members')
-          .select('invited_user_id')
-          .eq('is_wali', true)
-          .eq('invitation_status', 'accepted')
-          .not('invited_user_id', 'is', null);
-
-        const waliUserIds = waliUsers?.map(w => w.invited_user_id).filter(Boolean) || [];
-
-        const { data: basicProfiles, error: basicError } = await supabase
-          .from('profiles')
-          .select('*')
-          .neq('user_id', user.id)
-          .eq('gender', oppositeGender)
-          .not('user_id', 'in', waliUserIds.length > 0 ? `(${waliUserIds.join(',')})` : '()')
-          .order('created_at', { ascending: false })
-          .limit(50);
-
-        if (basicError) throw basicError;
-
-        const profilesWithDefaultVerification = basicProfiles?.map((profile: any) => ({
-          ...profile,
-          verification_score: 0
-        })) || [];
-
-        setProfiles(profilesWithDefaultVerification);
-      } catch (fallbackError) {
-        console.error('Error fetching basic profiles:', fallbackError);
-        setProfiles([]);
-      }
+      console.error('Error fetching secure matching profiles:', error);
+      setProfiles([]);
+      toast({
+        title: "Erreur de chargement",
+        description: "Impossible de charger les profils. Vérifiez votre niveau de vérification.",
+        variant: "destructive"
+      });
     } finally {
       setLoading(false);
     }
@@ -160,24 +119,24 @@ const Browse = () => {
       );
     }
 
-    // Apply location filter
+    // Apply location filter (using city_only)
     if (filters.location) {
       filtered = filtered.filter(profile =>
-        profile.location?.toLowerCase().includes(filters.location.toLowerCase())
+        profile.city_only?.toLowerCase().includes(filters.location.toLowerCase())
       );
     }
 
-    // Apply education filter
+    // Apply education filter (using education_level)
     if (filters.education) {
       filtered = filtered.filter(profile =>
-        profile.education?.toLowerCase().includes(filters.education.toLowerCase())
+        profile.education_level?.toLowerCase().includes(filters.education.toLowerCase())
       );
     }
 
-    // Apply profession filter
+    // Apply profession filter (using profession_category)
     if (filters.profession) {
       filtered = filtered.filter(profile =>
-        profile.profession?.toLowerCase().includes(filters.profession.toLowerCase())
+        profile.profession_category?.toLowerCase().includes(filters.profession.toLowerCase())
       );
     }
 
@@ -415,7 +374,7 @@ const Browse = () => {
                   {currentProfile.avatar_url ? (
                     <img 
                       src={currentProfile.avatar_url} 
-                      alt={currentProfile.full_name || 'Photo de profil'} 
+                      alt="Photo de profil anonyme" 
                       className="w-full h-full object-cover transition-smooth hover:scale-110"
                     />
                   ) : (
@@ -458,18 +417,18 @@ const Browse = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                   <div>
                     <h2 className="text-2xl font-bold text-foreground mb-1">
-                      {currentProfile.full_name || 'Nom non renseigné'}
+                      Profil Anonyme
                     </h2>
                     <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
                       {currentProfile.age && (
                         <span className="text-lg">{currentProfile.age} ans</span>
                       )}
-                      {currentProfile.location && (
+                      {currentProfile.city_only && (
                         <>
                           <span>•</span>
                           <div className="flex items-center gap-1">
                             <MapPin className="h-4 w-4" />
-                            <span>{currentProfile.location}</span>
+                            <span>{currentProfile.city_only}</span>
                           </div>
                         </>
                       )}
@@ -477,28 +436,18 @@ const Browse = () => {
                   </div>
                 </div>
 
-                {/* Bio */}
-                {currentProfile.bio && (
-                  <div className="mb-6">
-                    <h3 className="font-semibold mb-2">À propos</h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {currentProfile.bio}
-                    </p>
-                  </div>
-                )}
-
-                {/* Details */}
+                {/* Details sécurisés - données anonymisées */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                  {currentProfile.education && (
+                  {currentProfile.education_level && (
                     <div>
-                      <span className="text-sm font-medium text-muted-foreground">Éducation</span>
-                      <p className="font-medium">{currentProfile.education}</p>
+                      <span className="text-sm font-medium text-muted-foreground">Niveau d'éducation</span>
+                      <p className="font-medium">{currentProfile.education_level}</p>
                     </div>
                   )}
-                  {currentProfile.profession && (
+                  {currentProfile.profession_category && (
                     <div>
-                      <span className="text-sm font-medium text-muted-foreground">Profession</span>
-                      <p className="font-medium">{currentProfile.profession}</p>
+                      <span className="text-sm font-medium text-muted-foreground">Domaine professionnel</span>
+                      <p className="font-medium">{currentProfile.profession_category}</p>
                     </div>
                   )}
                   {currentProfile.looking_for && (
@@ -553,7 +502,7 @@ const Browse = () => {
         <div className="flex justify-center pt-3">
           <ReportModal
             reportedUserId={currentProfile.user_id}
-            reportedUserName={currentProfile.full_name || 'Utilisateur'}
+            reportedUserName="Utilisateur Anonyme"
           >
             <Button
               variant="outline"

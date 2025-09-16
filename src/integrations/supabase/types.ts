@@ -879,6 +879,62 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_matching_data: {
+        Row: {
+          age: number | null
+          avatar_url: string | null
+          city_only: string | null
+          created_at: string | null
+          education_level: string | null
+          gender: string | null
+          id: string
+          interests: string[] | null
+          is_visible: boolean | null
+          looking_for: string | null
+          profession_category: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          age?: number | null
+          avatar_url?: string | null
+          city_only?: string | null
+          created_at?: string | null
+          education_level?: string | null
+          gender?: string | null
+          id?: string
+          interests?: string[] | null
+          is_visible?: boolean | null
+          looking_for?: string | null
+          profession_category?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          age?: number | null
+          avatar_url?: string | null
+          city_only?: string | null
+          created_at?: string | null
+          education_level?: string | null
+          gender?: string | null
+          id?: string
+          interests?: string[] | null
+          is_visible?: boolean | null
+          looking_for?: string | null
+          profession_category?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_matching_data_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
       profile_views: {
         Row: {
           created_at: string
@@ -1257,13 +1313,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
-          {
-            foreignKeyName: "fk_user_verifications_profiles"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles_matching_view"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       video_calls: {
@@ -1327,45 +1376,7 @@ export type Database = {
       }
     }
     Views: {
-      profiles_matching_view: {
-        Row: {
-          age: number | null
-          avatar_url: string | null
-          city_only: string | null
-          created_at: string | null
-          education_level: string | null
-          gender: string | null
-          interests: string[] | null
-          looking_for: string | null
-          profession_category: string | null
-          user_id: string | null
-        }
-        Insert: {
-          age?: number | null
-          avatar_url?: string | null
-          city_only?: never
-          created_at?: string | null
-          education_level?: never
-          gender?: string | null
-          interests?: string[] | null
-          looking_for?: string | null
-          profession_category?: never
-          user_id?: string | null
-        }
-        Update: {
-          age?: number | null
-          avatar_url?: string | null
-          city_only?: never
-          created_at?: string | null
-          education_level?: never
-          gender?: string | null
-          interests?: string[] | null
-          looking_for?: string | null
-          profession_category?: never
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       accept_family_invitation: {
@@ -1418,25 +1429,6 @@ export type Database = {
       get_family_approval_status: {
         Args: { match_uuid: string }
         Returns: string
-      }
-      get_safe_matching_profiles: {
-        Args: {
-          max_age?: number
-          max_results?: number
-          min_age?: number
-          preferred_gender?: string
-        }
-        Returns: {
-          age: number
-          avatar_url: string
-          city_only: string
-          education_level: string
-          gender: string
-          interests: string[]
-          looking_for: string
-          profession_category: string
-          user_id: string
-        }[]
       }
       get_user_role: {
         Args: { _user_id: string }
