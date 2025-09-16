@@ -59,8 +59,8 @@ export const useUnifiedCompatibility = () => {
       const cultural_score = calculateCulturalCompatibility(myProfile?.data, theirProfile?.data);
       
       // Calculate personality compatibility (based on questionnaire)
-      // If no questionnaire data, give a reasonable default score
-      const personality_score = Math.max(baseCompatibilityScore, 60);
+      // Ensure personality score is between 0-100
+      const personality_score = Math.min(100, Math.max(baseCompatibilityScore || 60, 60));
 
       // Use provided weights or defaults
       const weights = preferences || {
@@ -69,12 +69,20 @@ export const useUnifiedCompatibility = () => {
         weight_personality: 30
       };
 
-      // Calculate weighted overall score
-      const compatibility_score = Math.floor(
-        (islamic_score * weights.weight_islamic +
-         cultural_score * weights.weight_cultural +
-         personality_score * weights.weight_personality) / 100
-      );
+      // Normalize weights to ensure they sum to 100
+      const totalWeight = weights.weight_islamic + weights.weight_cultural + weights.weight_personality;
+      const normalizedWeights = {
+        weight_islamic: (weights.weight_islamic / totalWeight) * 100,
+        weight_cultural: (weights.weight_cultural / totalWeight) * 100,
+        weight_personality: (weights.weight_personality / totalWeight) * 100
+      };
+
+      // Calculate weighted overall score and ensure it's between 0-100
+      const compatibility_score = Math.min(100, Math.max(0, Math.floor(
+        (islamic_score * normalizedWeights.weight_islamic +
+         cultural_score * normalizedWeights.weight_cultural +
+         personality_score * normalizedWeights.weight_personality) / 100
+      )));
 
       // Generate matching reasons
       const matching_reasons = generateMatchingReasons(
