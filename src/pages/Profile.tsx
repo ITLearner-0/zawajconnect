@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useCompatibility } from '@/hooks/useCompatibility';
+import { useUnifiedCompatibility } from '@/hooks/useUnifiedCompatibility';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,7 +42,7 @@ interface ProfileData {
 const Profile = () => {
   const { userId } = useParams();
   const { user } = useAuth();
-  const { calculateCompatibilityScore } = useCompatibility();
+  const { calculateDetailedCompatibility } = useUnifiedCompatibility();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -216,7 +216,8 @@ const Profile = () => {
         }
       } else {
         // Calculate real compatibility score
-        const compatibilityScore = await calculateCompatibilityScore(userId);
+        const compatibilityResult = await calculateDetailedCompatibility(userId);
+        const compatibilityScore = compatibilityResult.compatibility_score;
         
         // Create new match
         await supabase

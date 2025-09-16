@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useCompatibility } from '@/hooks/useCompatibility';
 import { supabase } from '@/integrations/supabase/client';
 
 interface UnifiedCompatibilityResult {
@@ -14,8 +13,54 @@ interface UnifiedCompatibilityResult {
 
 export const useUnifiedCompatibility = () => {
   const { user } = useAuth();
-  const { calculateCompatibilityScore } = useCompatibility();
   const [loading, setLoading] = useState(false);
+
+  const calculateQuestionnaireCompatibility = async (otherUserId: string): Promise<number> => {
+    try {
+      // Get both users' responses
+      const { data: myResponses } = await supabase
+        .from('user_compatibility_responses')
+        .select('question_key, response_value')
+        .eq('user_id', user?.id);
+
+      const { data: theirResponses } = await supabase
+        .from('user_compatibility_responses')
+        .select('question_key, response_value')
+        .eq('user_id', otherUserId);
+
+      const { data: questions } = await supabase
+        .from('compatibility_questions')
+        .select('question_key, weight')
+        .eq('is_active', true);
+
+      if (!myResponses || !theirResponses || !questions) {
+        return 60; // Default score when no data available
+      }
+
+      let totalWeight = 0;
+      let matchedWeight = 0;
+
+      questions.forEach(question => {
+        const myResponse = myResponses.find(r => r.question_key === question.question_key);
+        const theirResponse = theirResponses.find(r => r.question_key === question.question_key);
+
+        if (myResponse && theirResponse) {
+          totalWeight += question.weight;
+          
+          // Simple matching - exact match scores full weight
+          if (myResponse.response_value === theirResponse.response_value) {
+            matchedWeight += question.weight;
+          }
+        }
+      });
+
+      return totalWeight > 0 ? (matchedWeight / totalWeight) * 100 : 60;
+
+    } catch (error) {
+      console.error('Error calculating questionnaire compatibility:', error);
+      return 60;
+    }
+  };
 
   const calculateDetailedCompatibility = async (
     otherUserId: string,
@@ -37,8 +82,8 @@ export const useUnifiedCompatibility = () => {
     }
 
     try {
-      // Get real compatibility score from questionnaire responses
-      const baseCompatibilityScore = await calculateCompatibilityScore(otherUserId);
+      // Calculate base compatibility score from questionnaire responses
+      const baseCompatibilityScore = await calculateQuestionnaireCompatibility(otherUserId);
       
       // Get both profiles for detailed analysis
       const [myProfile, theirProfile] = await Promise.all([
