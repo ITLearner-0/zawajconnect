@@ -23,6 +23,9 @@ import MobileStepNavigation from '@/components/onboarding/MobileStepNavigation';
 import { useOnboardingValidation } from '@/hooks/useOnboardingValidation';
 import { useFormPersistence } from '@/hooks/useFormPersistence';
 import { useProfileSave } from '@/hooks/useProfileSave';
+import { useFormAutoSave } from '@/hooks/useFormAutoSave';
+import { useEmergencyBackup } from '@/hooks/useEmergencyBackup';
+import { SaveStatusIndicator } from '@/components/SaveStatusIndicator';
 import { 
   ArrowLeft, 
   ArrowRight, 
@@ -119,6 +122,27 @@ const Onboarding = () => {
   // Profile save hook
   const { saveProfile: saveToDatabase, uploadAvatar, saving } = useProfileSave();
 
+  // Auto-save hooks for immediate data persistence
+  useFormAutoSave({ data: profileData, key: 'profile_auto', interval: 2000 });
+  useFormAutoSave({ data: islamicPrefs, key: 'islamic_auto', interval: 2000 });
+  useFormAutoSave({ data: { currentStep }, key: 'step_auto', interval: 1000 });
+
+  // Emergency backup system
+  const { saveEmergencyBackup, restoreEmergencyBackup } = useEmergencyBackup();
+
+  // Save emergency backups on every change
+  useEffect(() => {
+    saveEmergencyBackup('profile', profileData);
+  }, [profileData, saveEmergencyBackup]);
+
+  useEffect(() => {
+    saveEmergencyBackup('islamic', islamicPrefs);
+  }, [islamicPrefs, saveEmergencyBackup]);
+
+  useEffect(() => {
+    saveEmergencyBackup('step', currentStep);
+  }, [currentStep, saveEmergencyBackup]);
+
   const calculateCompletionPercentage = validation.getOverallProgress;
 
   const steps = [
@@ -158,9 +182,29 @@ const Onboarding = () => {
       return;
     }
     
+    // Try to restore from emergency backup first
+    const emergencyProfile = restoreEmergencyBackup('profile');
+    const emergencyIslamic = restoreEmergencyBackup('islamic');
+    const emergencyStep = restoreEmergencyBackup('step');
+    
+    if (emergencyProfile && Object.keys(emergencyProfile).length > 1) {
+      setProfileData(prev => ({ ...prev, ...emergencyProfile }));
+      console.log('🚨 Emergency profile backup restored');
+    }
+    
+    if (emergencyIslamic && Object.keys(emergencyIslamic).length > 1) {
+      setIslamicPrefs(prev => ({ ...prev, ...emergencyIslamic }));
+      console.log('🚨 Emergency Islamic prefs backup restored');
+    }
+    
+    if (emergencyStep && typeof emergencyStep === 'number') {
+      setCurrentStep(emergencyStep);
+      console.log('🚨 Emergency step backup restored');
+    }
+    
     // Check if user already has a complete profile
     checkExistingProfile();
-  }, [user, navigate]);
+  }, [user, navigate, restoreEmergencyBackup]);
 
   const checkExistingProfile = async () => {
     if (!user) return;
@@ -653,10 +697,11 @@ const Onboarding = () => {
                       <span>{steps[currentStep - 1]?.title}</span>
                     </CardTitle>
                     <div className="text-right desktop-only">
-                      <div className="text-sm text-muted-foreground">
+                      <div className="text-sm text-muted-foreground mb-2">
                         Temps estimé: {steps[currentStep - 1]?.estimatedTime}
                       </div>
-                      <Progress value={progress} className="h-2 w-32 animate-slide-in-right" />
+                      <SaveStatusIndicator />
+                      <Progress value={progress} className="h-2 w-32 animate-slide-in-right mt-2" />
                     </div>
                   </div>
                 </CardHeader>

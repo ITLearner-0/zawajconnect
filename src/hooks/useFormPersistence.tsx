@@ -140,11 +140,11 @@ export const useFormPersistence = ({
     }
   }, [user]);
 
-  // Auto-save effect with debouncing
+  // Auto-save effect with more aggressive debouncing
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       saveProfileDraft(profileData);
-    }, 2000); // Save after 2 seconds of inactivity
+    }, 500); // Reduced to 500ms for faster saves
 
     return () => clearTimeout(timeoutId);
   }, [profileData, saveProfileDraft]);
@@ -152,7 +152,7 @@ export const useFormPersistence = ({
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       savePreferencesDraft(islamicPrefs);
-    }, 2000); // Save after 2 seconds of inactivity
+    }, 500); // Reduced to 500ms for faster saves
 
     return () => clearTimeout(timeoutId);
   }, [islamicPrefs, savePreferencesDraft]);

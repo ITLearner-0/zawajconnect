@@ -34,10 +34,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       .then(({ data: { session }, error }) => {
         if (error) {
           console.error('❌ Session error:', error);
-          // Clear any invalid tokens
-          localStorage.removeItem('supabase.auth.token');
-          setSession(null);
-          setUser(null);
+          // Only clear tokens for auth errors, not network errors
+          if (error.message?.includes('Invalid') || error.message?.includes('JWT')) {
+            localStorage.removeItem('supabase.auth.token');
+            setSession(null);
+            setUser(null);
+          }
         } else {
           setSession(session);
           setUser(session?.user ?? null);
@@ -46,10 +48,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       })
       .catch((error) => {
         console.error('❌ Auth initialization error:', error);
-        // Clear localStorage on auth errors
-        localStorage.removeItem('supabase.auth.token');
-        setSession(null);
-        setUser(null);
+        // Only clear on auth-specific errors, not network issues
+        if (error.message?.includes('Invalid') || error.message?.includes('JWT')) {
+          localStorage.removeItem('supabase.auth.token');
+          setSession(null);
+          setUser(null);
+        }
         setLoading(false);
       });
 
