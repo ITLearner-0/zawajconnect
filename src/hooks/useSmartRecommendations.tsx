@@ -92,7 +92,12 @@ export const useSmartRecommendations = () => {
     
     // Professional compatibility
     if (myProfile?.profession && theirProfile?.profession) {
-      score += Math.floor(Math.random() * 15) + 5;
+      // Same profession or related fields
+      if (myProfile.profession === theirProfile.profession) {
+        score += 15;
+      } else {
+        score += 5; // Some bonus for having professions
+      }
     }
     
     return Math.min(100, score);
@@ -120,10 +125,15 @@ export const useSmartRecommendations = () => {
     const ageDiff = Math.abs((myProfile?.age || 25) - (theirProfile?.age || 25));
     if (ageDiff <= 5) reasons.push("Âges compatibles");
     
-    // Add AI-generated reasons based on profiles
-    if (Math.random() > 0.5) reasons.push("Valeurs familiales alignées");
-    if (Math.random() > 0.6) reasons.push("Objectifs de vie similaires");
-    if (Math.random() > 0.7) reasons.push("Communication naturelle prévue");
+    // Add profile-based reasons
+    if (myProfile?.education && theirProfile?.education) {
+      reasons.push("Niveaux d'éducation compatibles");
+    }
+    if (myProfile?.profession && theirProfile?.profession) {
+      if (myProfile.profession === theirProfile.profession) {
+        reasons.push("Même domaine professionnel");
+      }
+    }
     
     return reasons.slice(0, 4); // Limit to top 4 reasons
   };

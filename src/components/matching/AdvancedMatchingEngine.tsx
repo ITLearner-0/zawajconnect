@@ -5,9 +5,11 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Brain, Sparkles } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { useMatchingPreferences } from '@/hooks/useMatchingPreferences';
+import { fetchMatchingProfiles } from '@/utils/matchingUtils';
 import { useMatchingHistory, MatchProfile } from '@/hooks/useMatchingHistory';
+import { useUnifiedCompatibility } from '@/hooks/useUnifiedCompatibility';
 import MatchingPreferencesPanel from './MatchingPreferencesPanel';
 import MatchResultsGrid from './MatchResultsGrid';
 import MatchingHistoryPanel from './MatchingHistoryPanel';
@@ -17,6 +19,7 @@ const AdvancedMatchingEngine = () => {
   const { toast } = useToast();
   const { preferences } = useMatchingPreferences();
   const { saveSearchToHistory } = useMatchingHistory();
+  const { batchCalculateCompatibility } = useUnifiedCompatibility();
   const [matches, setMatches] = useState<MatchProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -69,39 +72,23 @@ const AdvancedMatchingEngine = () => {
         .limit(20);
 
       if (profiles) {
-        // Simulate AI compatibility scoring
+        // Use real unified compatibility scoring
+        const userIds = profiles.map(p => p.user_id);
+        const compatibilityResults = await batchCalculateCompatibility(userIds, preferences);
+        
         const scoredMatches: MatchProfile[] = profiles.map(profile => {
-          const islamic_score = Math.floor(Math.random() * 30) + 70;
-          const cultural_score = Math.floor(Math.random() * 40) + 60;
-          const personality_score = Math.floor(Math.random() * 35) + 65;
-          
-          const compatibility_score = Math.floor(
-            (islamic_score * preferences.weight_islamic + 
-             cultural_score * preferences.weight_cultural + 
-             personality_score * preferences.weight_personality) / 100
-          );
-
-          const matching_reasons = [
-            islamic_score > 85 ? 'Forte compatibilité religieuse' : null,
-            cultural_score > 80 ? 'Valeurs culturelles partagées' : null,
-            personality_score > 85 ? 'Personnalités complémentaires' : null,
-            profile.location === 'Paris' ? 'Proximité géographique' : null
-          ].filter(Boolean) as string[];
-
-          const potential_concerns = [
-            islamic_score < 75 ? 'Différences dans la pratique religieuse' : null,
-            cultural_score < 70 ? 'Origines culturelles différentes' : null,
-            Math.abs((profile.age || 25) - 28) > 5 ? 'Écart d\'âge important' : null
-          ].filter(Boolean) as string[];
+          const compatibilityData = compatibilityResults[profile.user_id] || {
+            compatibility_score: 0,
+            islamic_score: 0,
+            cultural_score: 0,
+            personality_score: 0,
+            matching_reasons: [],
+            potential_concerns: []
+          };
 
           return {
             ...profile,
-            compatibility_score,
-            islamic_score,
-            cultural_score,
-            personality_score,
-            matching_reasons,
-            potential_concerns
+            ...compatibilityData
           };
         });
 

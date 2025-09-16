@@ -1,0 +1,299 @@
+import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { useCompatibility } from '@/hooks/useCompatibility';
+import { supabase } from '@/integrations/supabase/client';
+
+interface UnifiedCompatibilityResult {
+  compatibility_score: number;
+  islamic_score: number;
+  cultural_score: number;
+  personality_score: number;
+  matching_reasons: string[];
+  potential_concerns: string[];
+}
+
+export const useUnifiedCompatibility = () => {
+  const { user } = useAuth();
+  const { calculateCompatibilityScore } = useCompatibility();
+  const [loading, setLoading] = useState(false);
+
+  const calculateDetailedCompatibility = async (
+    otherUserId: string,
+    preferences?: {
+      weight_islamic: number;
+      weight_cultural: number;
+      weight_personality: number;
+    }
+  ): Promise<UnifiedCompatibilityResult> => {
+    if (!user) {
+      return {
+        compatibility_score: 0,
+        islamic_score: 0,
+        cultural_score: 0,
+        personality_score: 0,
+        matching_reasons: [],
+        potential_concerns: []
+      };
+    }
+
+    try {
+      // Get real compatibility score from questionnaire responses
+      const baseCompatibilityScore = await calculateCompatibilityScore(otherUserId);
+      
+      // Get both profiles for detailed analysis
+      const [myProfile, theirProfile] = await Promise.all([
+        supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('profiles').select('*').eq('user_id', otherUserId).maybeSingle()
+      ]);
+
+      // Get Islamic preferences for both users
+      const [myIslamicPrefs, theirIslamicPrefs] = await Promise.all([
+        supabase.from('islamic_preferences').select('*').eq('user_id', user.id).maybeSingle(),
+        supabase.from('islamic_preferences').select('*').eq('user_id', otherUserId).maybeSingle()
+      ]);
+
+      // Calculate Islamic compatibility
+      const islamic_score = calculateIslamicCompatibility(myIslamicPrefs?.data, theirIslamicPrefs?.data);
+      
+      // Calculate cultural compatibility
+      const cultural_score = calculateCulturalCompatibility(myProfile?.data, theirProfile?.data);
+      
+      // Calculate personality compatibility (based on questionnaire)
+      const personality_score = Math.max(baseCompatibilityScore, 0);
+
+      // Use provided weights or defaults
+      const weights = preferences || {
+        weight_islamic: 40,
+        weight_cultural: 30,
+        weight_personality: 30
+      };
+
+      // Calculate weighted overall score
+      const compatibility_score = Math.floor(
+        (islamic_score * weights.weight_islamic +
+         cultural_score * weights.weight_cultural +
+         personality_score * weights.weight_personality) / 100
+      );
+
+      // Generate matching reasons
+      const matching_reasons = generateMatchingReasons(
+        islamic_score,
+        cultural_score,
+        personality_score,
+        myProfile?.data,
+        theirProfile?.data
+      );
+
+      // Generate potential concerns
+      const potential_concerns = generatePotentialConcerns(
+        islamic_score,
+        cultural_score,
+        personality_score,
+        myProfile?.data,
+        theirProfile?.data
+      );
+
+      return {
+        compatibility_score: Math.max(compatibility_score, 0),
+        islamic_score,
+        cultural_score,
+        personality_score,
+        matching_reasons,
+        potential_concerns
+      };
+
+    } catch (error) {
+      console.error('Error calculating unified compatibility:', error);
+      return {
+        compatibility_score: 0,
+        islamic_score: 0,
+        cultural_score: 0,
+        personality_score: 0,
+        matching_reasons: [],
+        potential_concerns: ['Erreur dans le calcul de compatibilité']
+      };
+    }
+  };
+
+  const calculateIslamicCompatibility = (myPrefs: any, theirPrefs: any): number => {
+    if (!myPrefs || !theirPrefs) return 50; // Neutral score if data missing
+
+    let score = 50; // Base score
+
+    // Prayer frequency alignment
+    if (myPrefs.prayer_frequency === theirPrefs.prayer_frequency) {
+      score += 20;
+    } else if (
+      (myPrefs.prayer_frequency === '5_times_daily' && theirPrefs.prayer_frequency === 'sometimes') ||
+      (myPrefs.prayer_frequency === 'sometimes' && theirPrefs.prayer_frequency === '5_times_daily')
+    ) {
+      score += 10;
+    }
+
+    // Sect compatibility
+    if (myPrefs.sect === theirPrefs.sect) {
+      score += 15;
+    }
+
+    // Halal diet compatibility
+    if (myPrefs.halal_diet === theirPrefs.halal_diet) {
+      score += 10;
+    }
+
+    // Importance of religion alignment
+    if (myPrefs.importance_of_religion === theirPrefs.importance_of_religion) {
+      score += 15;
+    }
+
+    // Smoking compatibility
+    if (myPrefs.smoking === theirPrefs.smoking) {
+      score += 10;
+    } else if (myPrefs.smoking === 'never' && theirPrefs.smoking !== 'never') {
+      score -= 10;
+    }
+
+    return Math.min(100, Math.max(0, score));
+  };
+
+  const calculateCulturalCompatibility = (myProfile: any, theirProfile: any): number => {
+    if (!myProfile || !theirProfile) return 50;
+
+    let score = 50; // Base score
+
+    // Location proximity
+    if (myProfile.location === theirProfile.location) {
+      score += 20;
+    } else if (myProfile.location && theirProfile.location) {
+      // Same region/country logic could be added here
+      score += 5;
+    }
+
+    // Education level compatibility
+    if (myProfile.education && theirProfile.education) {
+      score += 10;
+    }
+
+    // Age compatibility
+    const ageDiff = Math.abs((myProfile.age || 25) - (theirProfile.age || 25));
+    if (ageDiff <= 3) {
+      score += 15;
+    } else if (ageDiff <= 7) {
+      score += 10;
+    } else if (ageDiff > 10) {
+      score -= 10;
+    }
+
+    // Shared interests
+    if (myProfile.interests && theirProfile.interests) {
+      const sharedInterests = myProfile.interests.filter((interest: string) =>
+        theirProfile.interests.includes(interest)
+      );
+      score += Math.min(20, sharedInterests.length * 5);
+    }
+
+    return Math.min(100, Math.max(0, score));
+  };
+
+  const generateMatchingReasons = (
+    islamic_score: number,
+    cultural_score: number,
+    personality_score: number,
+    myProfile: any,
+    theirProfile: any
+  ): string[] => {
+    const reasons: string[] = [];
+
+    if (islamic_score >= 85) reasons.push("Forte compatibilité religieuse");
+    if (cultural_score >= 80) reasons.push("Valeurs culturelles partagées");
+    if (personality_score >= 85) reasons.push("Personnalités complémentaires");
+    
+    if (myProfile && theirProfile) {
+      if (myProfile.location === theirProfile.location) {
+        reasons.push("Proximité géographique");
+      }
+      
+      const ageDiff = Math.abs((myProfile.age || 25) - (theirProfile.age || 25));
+      if (ageDiff <= 5) {
+        reasons.push("Âges compatibles");
+      }
+
+      if (myProfile.interests && theirProfile.interests) {
+        const sharedCount = myProfile.interests.filter((interest: string) =>
+          theirProfile.interests.includes(interest)
+        ).length;
+        if (sharedCount >= 2) {
+          reasons.push(`${sharedCount} centres d'intérêt partagés`);
+        }
+      }
+    }
+
+    return reasons.slice(0, 3); // Limit to top 3 reasons
+  };
+
+  const generatePotentialConcerns = (
+    islamic_score: number,
+    cultural_score: number,
+    personality_score: number,
+    myProfile: any,
+    theirProfile: any
+  ): string[] => {
+    const concerns: string[] = [];
+
+    if (islamic_score < 60) concerns.push("Différences dans la pratique religieuse");
+    if (cultural_score < 50) concerns.push("Origines culturelles différentes");
+    if (personality_score < 40) concerns.push("Personnalités potentiellement incompatibles");
+
+    if (myProfile && theirProfile) {
+      const ageDiff = Math.abs((myProfile.age || 25) - (theirProfile.age || 25));
+      if (ageDiff > 10) {
+        concerns.push("Écart d'âge important");
+      }
+
+      if (myProfile.location !== theirProfile.location) {
+        concerns.push("Distance géographique");
+      }
+    }
+
+    return concerns.slice(0, 2); // Limit to top 2 concerns
+  };
+
+  const batchCalculateCompatibility = async (
+    userIds: string[],
+    preferences?: {
+      weight_islamic: number;
+      weight_cultural: number;
+      weight_personality: number;
+    }
+  ): Promise<Record<string, UnifiedCompatibilityResult>> => {
+    setLoading(true);
+    try {
+      const results: Record<string, UnifiedCompatibilityResult> = {};
+      
+      // Process in batches to avoid overwhelming the system
+      const batchSize = 5;
+      for (let i = 0; i < userIds.length; i += batchSize) {
+        const batch = userIds.slice(i, i + batchSize);
+        const batchResults = await Promise.all(
+          batch.map(async (userId) => {
+            const result = await calculateDetailedCompatibility(userId, preferences);
+            return { userId, result };
+          })
+        );
+        
+        batchResults.forEach(({ userId, result }) => {
+          results[userId] = result;
+        });
+      }
+      
+      return results;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    calculateDetailedCompatibility,
+    batchCalculateCompatibility,
+    loading
+  };
+};

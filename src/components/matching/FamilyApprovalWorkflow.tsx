@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useUnifiedCompatibility } from '@/hooks/useUnifiedCompatibility';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -51,6 +52,7 @@ interface FamilyReview {
 const FamilyApprovalWorkflow = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const { calculateDetailedCompatibility } = useUnifiedCompatibility();
   const [pendingMatches, setPendingMatches] = useState<PendingMatch[]>([]);
   const [approvedMatches, setApprovedMatches] = useState<PendingMatch[]>([]);
   const [familyReviews, setFamilyReviews] = useState<FamilyReview[]>([]);
@@ -98,18 +100,21 @@ const FamilyApprovalWorkflow = () => {
               .eq('user_id', otherUserId)
               .maybeSingle();
 
-            // Simulate compatibility details (in real app, this would come from stored analysis)
-            const compatibility_details = {
-              islamic_score: Math.floor(Math.random() * 20) + 80,
-              cultural_score: Math.floor(Math.random() * 25) + 75,
-              personality_score: Math.floor(Math.random() * 30) + 70,
-              shared_values: ['Pratique religieuse', 'Valeurs familiales', 'Éducation']
+            // Get real compatibility details using unified compatibility
+            const { calculateDetailedCompatibility } = useUnifiedCompatibility();
+            const compatibility_details = await calculateDetailedCompatibility(otherUserId);
+            
+            const formattedDetails = {
+              islamic_score: compatibility_details.islamic_score,
+              cultural_score: compatibility_details.cultural_score,
+              personality_score: compatibility_details.personality_score,
+              shared_values: compatibility_details.matching_reasons.slice(0, 3)
             };
 
             return {
               ...match,
               other_user: profileData,
-              compatibility_details
+              compatibility_details: formattedDetails
             };
           })
         );
