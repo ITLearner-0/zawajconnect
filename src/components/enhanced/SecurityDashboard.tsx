@@ -73,20 +73,20 @@ export const SecurityDashboard = () => {
       ]);
 
       setMetrics({
-        total_users: totalUsers || 0,
-        unverified_users: unverifiedUsers?.length || 0,
+        total_users: totalUsers,
+        unverified_users: unverifiedUsers.length,
         suspicious_activities: 0, // Would be calculated from actual suspicious activity logs
-        pending_verifications: pendingDocs?.length || 0,
+        pending_verifications: pendingDocs.length,
         failed_logins_today: 0 // Would be from auth logs
       });
 
       // Load suspicious users (users with high profile view activity)
-      const viewCounts = recentViews?.reduce((acc: Record<string, number>, view: any) => {
-        acc[view.viewer_id] = (acc[view.viewer_id] || 0) + 1;
-        return acc;
-      }, {});
+      const viewCounts: Record<string, number> = {};
+      recentViews.forEach((view: any) => {
+        viewCounts[view.viewer_id] = (viewCounts[view.viewer_id] || 0) + 1;
+      });
 
-      const suspiciousUserIds = Object.entries(viewCounts || {})
+      const suspiciousUserIds = Object.entries(viewCounts)
         .filter(([_, count]) => count > 10)
         .map(([userId]) => userId);
 
@@ -113,7 +113,7 @@ export const SecurityDashboard = () => {
       }
 
       // Load pending verifications
-      if (pendingDocs?.length) {
+      if (pendingDocs.length > 0) {
         const { data: pendingData } = await supabase
           .from('profiles')
           .select(`
