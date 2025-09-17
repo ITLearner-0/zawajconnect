@@ -20,6 +20,8 @@ import VerificationCenter from '@/components/VerificationCenter';
 import IslamicCalendarWidget from '@/components/IslamicCalendarWidget';
 import NotificationSystem from '@/components/NotificationSystem';
 import PremiumSubscription from '@/components/PremiumSubscription';
+import IDVerificationSystem from '@/components/enhanced/IDVerificationSystem';
+import PasswordSecurityPanel from '@/components/enhanced/PasswordSecurityPanel';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
@@ -73,7 +75,7 @@ const Settings = () => {
           {/* Main Content */}
           <div className="lg:col-span-3">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-5">
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="privacy" className="flex items-center gap-2">
                   <Shield className="h-4 w-4" />
                   <span className="hidden sm:inline">Confidentialité</span>
@@ -85,6 +87,10 @@ const Settings = () => {
                 <TabsTrigger value="verification" className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   <span className="hidden sm:inline">Vérification</span>
+                </TabsTrigger>
+                <TabsTrigger value="security" className="flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  <span className="hidden sm:inline">Sécurité</span>
                 </TabsTrigger>
                 <TabsTrigger value="premium" className="flex items-center gap-2">
                   <Crown className="h-4 w-4" />
@@ -105,13 +111,17 @@ const Settings = () => {
                   <FamilySupervisionPanel />
                 </TabsContent>
 
-                <TabsContent value="verification" className="space-y-6">
-                  <VerificationCenter />
-                </TabsContent>
+            <TabsContent value="verification" className="space-y-6">
+              <IDVerificationSystem />
+            </TabsContent>
 
-                <TabsContent value="premium" className="space-y-6">
-                  <PremiumSubscription />
-                </TabsContent>
+            <TabsContent value="security" className="space-y-6">
+              <PasswordSecurityPanel />
+            </TabsContent>
+            
+            <TabsContent value="premium" className="space-y-6">
+              <PremiumSubscription />
+            </TabsContent>
 
                 <TabsContent value="notifications" className="space-y-6">
                   <NotificationSystem />
