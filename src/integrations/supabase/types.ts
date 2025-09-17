@@ -1001,13 +1001,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
-          {
-            foreignKeyName: "profile_matching_data_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "safe_profiles"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       profile_views: {
@@ -1388,13 +1381,6 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["user_id"]
           },
-          {
-            foreignKeyName: "fk_user_verifications_profiles"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "safe_profiles"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       video_calls: {
@@ -1458,60 +1444,7 @@ export type Database = {
       }
     }
     Views: {
-      safe_profiles: {
-        Row: {
-          age: number | null
-          avatar_url: string | null
-          bio: string | null
-          created_at: string | null
-          education: string | null
-          full_name: string | null
-          gender: string | null
-          id: string | null
-          interests: string[] | null
-          location: string | null
-          looking_for: string | null
-          phone: string | null
-          profession: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          age?: number | null
-          avatar_url?: string | null
-          bio?: never
-          created_at?: string | null
-          education?: never
-          full_name?: string | null
-          gender?: string | null
-          id?: string | null
-          interests?: string[] | null
-          location?: never
-          looking_for?: string | null
-          phone?: never
-          profession?: never
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          age?: number | null
-          avatar_url?: string | null
-          bio?: never
-          created_at?: string | null
-          education?: never
-          full_name?: string | null
-          gender?: string | null
-          id?: string | null
-          interests?: string[] | null
-          location?: never
-          looking_for?: string | null
-          phone?: never
-          profession?: never
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       accept_family_invitation: {
@@ -1530,10 +1463,6 @@ export type Database = {
           family_member_invited_user_id: string
           family_member_user_id: string
         }
-        Returns: boolean
-      }
-      can_access_sensitive_profile_data: {
-        Args: { target_user_id: string }
         Returns: boolean
       }
       check_family_supervision_setup: {
