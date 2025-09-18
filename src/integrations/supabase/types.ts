@@ -1510,6 +1510,18 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      get_user_subscription_safe: {
+        Args: { target_user_id: string }
+        Returns: {
+          created_at: string
+          expires_at: string
+          id: string
+          plan_type: string
+          status: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       has_family_supervision: {
         Args: { user_uuid: string }
         Returns: boolean
