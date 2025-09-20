@@ -27,6 +27,11 @@ const Hero = () => {
             <p className="text-sm text-muted-foreground mt-2 italic">Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux</p>
           </div>
 
+          <div className="mb-4">
+            <h2 className="text-2xl md:text-3xl font-semibold text-emerald mb-2">Zawaj Connect</h2>
+            <div className="w-24 h-1 bg-gradient-to-r from-emerald to-gold mx-auto rounded-full"></div>
+          </div>
+
           <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
             Trouvez votre
             <span className="bg-gradient-to-r from-emerald to-gold bg-clip-text text-transparent"> moitié</span>
