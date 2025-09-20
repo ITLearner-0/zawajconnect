@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.4"
+    PostgrestVersion: "13.0.5"
   }
   public: {
     Tables: {
@@ -142,6 +142,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      family_access_audit: {
+        Row: {
+          access_granted: boolean
+          access_timestamp: string
+          access_type: string
+          accessed_by: string
+          family_member_id: string
+          id: string
+          ip_address: unknown | null
+          user_agent: string | null
+        }
+        Insert: {
+          access_granted?: boolean
+          access_timestamp?: string
+          access_type: string
+          accessed_by: string
+          family_member_id: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+        }
+        Update: {
+          access_granted?: boolean
+          access_timestamp?: string
+          access_type?: string
+          accessed_by?: string
+          family_member_id?: string
+          id?: string
+          ip_address?: unknown | null
+          user_agent?: string | null
+        }
+        Relationships: []
       }
       family_contact_audit_log: {
         Row: {
@@ -1465,6 +1498,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      check_family_access_rate_limit: {
+        Args: { user_uuid: string }
+        Returns: boolean
+      }
       check_family_supervision_setup: {
         Args: { user_uuid: string }
         Returns: boolean
@@ -1504,6 +1541,15 @@ export type Database = {
           contact_type: string
           contact_value: string
           last_verified: string
+        }[]
+      }
+      get_family_member_contact_secure: {
+        Args: { member_id: string }
+        Returns: {
+          can_view_basic_info: boolean
+          full_name: string
+          id: string
+          relationship: string
         }[]
       }
       get_user_role: {
