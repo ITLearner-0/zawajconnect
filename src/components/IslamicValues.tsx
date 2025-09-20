@@ -69,7 +69,7 @@ const IslamicValues = () => {
           </h2>
           
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            NikahConnect est plus qu'une simple plateforme matrimoniale. Nous sommes une communauté construite sur les 
+            ZawajConnect est plus qu'une simple plateforme matrimoniale. Nous sommes une communauté construite sur les 
             beaux enseignements de l'Islam, aidant les musulmans à trouver leur partenaire parfait tout en maintenant 
             les plus hauts standards de foi, de respect et de valeurs familiales.
           </p>

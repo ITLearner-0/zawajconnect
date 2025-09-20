@@ -70,7 +70,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
         <header className="fixed top-0 left-0 right-0 h-16 bg-background/95 backdrop-blur border-b border-border/40 flex items-center justify-between px-4 z-50">
           <div className="flex items-center gap-4">
             <SidebarTrigger />
-            <span className="font-semibold lg:hidden">NikahConnect</span>
+            <span className="font-semibold lg:hidden">ZawajConnect</span>
           </div>
           
           {/* User Menu */}

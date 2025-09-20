@@ -151,7 +151,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
           <div className="flex items-center justify-between mb-2">
             <CardTitle className="text-xl flex items-center space-x-2">
               <Trophy className="w-5 h-5 text-gold" />
-              <span>Votre parcours NikahConnect</span>
+              <span>Votre parcours ZawajConnect</span>
             </CardTitle>
             <Badge variant="secondary" className="animate-pulse-gentle">
               {Math.round(overallProgress)}% complété

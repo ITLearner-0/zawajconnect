@@ -15,7 +15,7 @@ const FAQ = () => {
       color: "bg-emerald/10 text-emerald border-emerald/20",
       questions: [
         {
-          question: "Comment créer un compte sur NikahConnect ?",
+          question: "Comment créer un compte sur ZawajConnect ?",
           answer: "Pour créer un compte, cliquez sur 'S'inscrire' et remplissez le formulaire avec vos informations personnelles. Vous devrez confirmer votre email et compléter votre profil avec vos préférences islamiques. Notre processus respecte la confidentialité et les valeurs islamiques."
         },
         {
@@ -147,7 +147,7 @@ const FAQ = () => {
             </h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Trouvez des réponses à vos questions sur NikahConnect et le processus de mariage islamique
+            Trouvez des réponses à vos questions sur ZawajConnect et le processus de mariage islamique
           </p>
         </div>
 
@@ -272,7 +272,7 @@ const FAQ = () => {
                 Contactez-nous
               </a>
               <a 
-                href="mailto:contact@nikahconnect.fr"
+                href="mailto:contact@zawajconnect.fr"
                 className="inline-flex items-center justify-center px-6 py-3 border border-emerald text-emerald hover:bg-emerald hover:text-white rounded-lg font-medium transition-colors"
               >
                 Envoyer un Email

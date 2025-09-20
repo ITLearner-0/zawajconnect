@@ -138,7 +138,7 @@ export function AppSidebar() {
           </div>
           {!isCollapsed && (
             <div>
-              <h2 className="font-bold text-foreground">NikahConnect</h2>
+              <h2 className="font-bold text-foreground">ZawajConnect</h2>
               <p className="text-xs text-muted-foreground">Matrimonial islamique</p>
             </div>
           )}

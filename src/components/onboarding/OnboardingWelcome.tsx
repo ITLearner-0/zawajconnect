@@ -67,7 +67,7 @@ const OnboardingWelcome = ({ onStart, userName }: OnboardingWelcomeProps) => {
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Bienvenue {userName ? `${userName} ` : ''}sur{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald to-gold">
-              NikahConnect
+              ZawajConnect
             </span>
           </h1>
           

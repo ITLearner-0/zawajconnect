@@ -241,7 +241,7 @@ const PrivacyPolicy = () => {
                   <Mail className="h-5 w-5 text-emerald" />
                   <div>
                     <p className="font-medium">Email</p>
-                    <p className="text-sm text-muted-foreground">privacy@nikahconnect.fr</p>
+                    <p className="text-sm text-muted-foreground">privacy@zawajconnect.fr</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

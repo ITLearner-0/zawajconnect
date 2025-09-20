@@ -37,8 +37,8 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
     try {
       if (navigator.share) {
         await navigator.share({
-          title: 'Mes Insights de Compatibilité - NikahConnect',
-          text: 'Découvrez mes insights de compatibilité personnalisés sur NikahConnect',
+           title: 'Mes Insights de Compatibilité - ZawajConnect',
+           text: 'Découvrez mes insights de compatibilité personnalisés sur ZawajConnect',
           url: window.location.origin + '/compatibility-insights'
         });
       } else {

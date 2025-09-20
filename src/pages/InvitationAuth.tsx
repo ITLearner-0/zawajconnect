@@ -100,7 +100,7 @@ export default function InvitationAuth() {
             🕌 Invitation familiale
           </CardTitle>
           <p className="text-center text-muted-foreground">
-            Vous avez été invité(e) à superviser un membre de votre famille sur NikahConnect
+            Vous avez été invité(e) à superviser un membre de votre famille sur ZawajConnect
           </p>
         </CardHeader>
         <CardContent>

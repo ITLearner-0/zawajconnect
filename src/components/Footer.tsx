@@ -11,7 +11,7 @@ const Footer = () => {
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
                 <Heart className="h-6 w-6 text-white" />
               </div>
-              <span className="text-2xl font-bold">NikahConnect</span>
+              <span className="text-2xl font-bold">ZawajConnect</span>
             </div>
             <p className="text-white/80 mb-6 max-w-md leading-relaxed">
               Une plateforme matrimoniale moderne respectant les valeurs islamiques, 
@@ -45,7 +45,7 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 text-gold-light" />
-                <span className="text-white/80 text-sm">contact@nikahconnect.fr</span>
+                <span className="text-white/80 text-sm">contact@zawajconnect.fr</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-gold-light" />
@@ -75,7 +75,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-white/20 mt-12 pt-8 text-center">
           <p className="text-white/70 text-sm">
-            © 2024 NikahConnect. Tous droits réservés. | Développé avec ❤️ pour la Oummah
+            © 2024 ZawajConnect. Tous droits réservés. | Développé avec ❤️ pour la Oummah
           </p>
           <p className="text-white/60 text-xs mt-2">
             Qu'Allah bénisse tous nos utilisateurs et leurs familles - آمين

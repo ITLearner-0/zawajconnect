@@ -80,7 +80,7 @@ const StatusOverview = () => {
       <Card className="border-emerald/20 bg-gradient-to-r from-emerald/10 to-gold/10">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-emerald-dark">
-            NikahConnect - Statut du Projet
+            ZawajConnect - Statut du Projet
           </CardTitle>
           <p className="text-muted-foreground">
             Plateforme de rencontres matrimoniales islamiques avec supervision familiale complète
@@ -143,7 +143,7 @@ const StatusOverview = () => {
             </div>
             
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Le système NikahConnect est maintenant entièrement fonctionnel avec toutes les fonctionnalités 
+              Le système ZawajConnect est maintenant entièrement fonctionnel avec toutes les fonctionnalités 
               essentielles d'une plateforme matrimoniale islamique moderne, incluant la supervision familiale, 
               la modération basée sur les valeurs islamiques, et un système de compatibilité avancé.
             </p>

@@ -668,7 +668,7 @@ const Onboarding = () => {
           {/* Header */}
           <div className="text-center mb-8 animate-fade-in">
             <h1 className="text-3xl font-bold text-foreground mb-2 gradient-text">
-              Créez votre profil NikahConnect
+              Créez votre profil ZawajConnect
             </h1>
             <p className="text-muted-foreground">
               Quelques informations pour trouver votre âme sœur

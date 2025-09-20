@@ -129,7 +129,7 @@ const AuthPreview: React.FC = () => {
               <Heart className="w-4 h-4 text-emerald" />
             </div>
             <blockquote className="text-sm italic text-muted-foreground mb-2">
-              "Grâce à NikahConnect, j'ai trouvé mon âme sœur. Le test de compatibilité était très précis !"
+              "Grâce à ZawajConnect, j'ai trouvé mon âme sœur. Le test de compatibilité était très précis !"
             </blockquote>
             <div className="flex items-center justify-center space-x-1">
               {[...Array(5)].map((_, i) => (

@@ -276,10 +276,10 @@ const FamilySupervisionPanel = () => {
       const invitationUrl = `${window.location.origin}/invitation?token=${invitationToken}`;
       
       // Create email template
-      const emailSubject = "Invitation à superviser sur NikahConnect";
+      const emailSubject = "Invitation à superviser sur ZawajConnect";
       const emailBody = `Assalamu Alaikum ${member.full_name},
 
-${inviterName} vous invite à devenir ${member.is_wali ? 'tuteur (Wali)' : 'membre de famille'} sur NikahConnect pour superviser leurs interactions selon les principes islamiques.
+${inviterName} vous invite à devenir ${member.is_wali ? 'tuteur (Wali)' : 'membre de famille'} sur ZawajConnect pour superviser leurs interactions selon les principes islamiques.
 
 Votre rôle : ${member.relationship}
 ${member.is_wali ? 'Vous aurez le statut de Wali (tuteur)' : ''}
@@ -296,7 +296,7 @@ ${invitationUrl}
 Cette invitation expire dans 7 jours. Si vous n'avez pas demandé cette invitation, vous pouvez ignorer cet email.
 
 Cordialement,
-NikahConnect - Plateforme de rencontres islamiques avec supervision familiale`;
+ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
 
       // Show email options dialog
       setEmailTemplate({

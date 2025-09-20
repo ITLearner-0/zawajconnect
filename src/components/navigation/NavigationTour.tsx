@@ -20,7 +20,7 @@ interface TourStep {
 const tourSteps: TourStep[] = [
   {
     title: "Bienvenue dans la navigation avancée",
-    description: "Découvrez les fonctionnalités qui vous permettront de naviguer plus efficacement dans NikahConnect.",
+    description: "Découvrez les fonctionnalités qui vous permettront de naviguer plus efficacement dans ZawajConnect.",
     feature: "overview"
   },
   {

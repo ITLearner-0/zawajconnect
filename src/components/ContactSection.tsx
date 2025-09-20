@@ -169,7 +169,7 @@ const ContactSection = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Email</h3>
-                    <p className="text-muted-foreground">contact@nikahconnect.fr</p>
+                    <p className="text-muted-foreground">contact@zawajconnect.fr</p>
                     <p className="text-sm text-muted-foreground mt-1">
                       Support général et questions techniques
                     </p>
