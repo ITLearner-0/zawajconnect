@@ -1150,6 +1150,42 @@ export type Database = {
         }
         Relationships: []
       }
+      security_audit_log: {
+        Row: {
+          action_type: string
+          additional_data: Json | null
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          record_id: string | null
+          table_name: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          additional_data?: Json | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          record_id?: string | null
+          table_name: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          additional_data?: Json | null
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          record_id?: string | null
+          table_name?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -1498,6 +1534,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      can_access_match_security_definer: {
+        Args: { match_user1_id: string; match_user2_id: string }
+        Returns: boolean
+      }
       check_family_access_rate_limit: {
         Args: { user_uuid: string }
         Returns: boolean
@@ -1530,6 +1570,10 @@ export type Database = {
           target_user_id: string
         }
         Returns: string
+      }
+      get_current_user_role_secure: {
+        Args: Record<PropertyKey, never>
+        Returns: Database["public"]["Enums"]["app_role"]
       }
       get_family_approval_status: {
         Args: { match_uuid: string }
@@ -1567,6 +1611,18 @@ export type Database = {
           updated_at: string
           user_id: string
         }[]
+      }
+      get_user_verification_status_secure: {
+        Args: { target_user_id: string }
+        Returns: {
+          email_verified: boolean
+          id_verified: boolean
+          verification_score: number
+        }[]
+      }
+      has_family_relationship_security_definer: {
+        Args: { target_user_id: string }
+        Returns: boolean
       }
       has_family_supervision: {
         Args: { user_uuid: string }
