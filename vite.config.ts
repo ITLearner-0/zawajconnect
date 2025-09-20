@@ -38,13 +38,13 @@ export default defineConfig(({ mode }) => ({
     },
     // Optimize for production
     target: 'es2015',
-    minify: 'terser',
-    terserOptions: {
+    minify: mode === 'production' ? 'terser' : false,
+    terserOptions: mode === 'production' ? {
       compress: {
-        drop_console: mode === 'production',
-        drop_debugger: mode === 'production',
+        drop_console: true,
+        drop_debugger: true,
       },
-    },
+    } : undefined,
     // Ensure source maps for debugging but optimize size
     sourcemap: mode !== 'production',
     // Asset size limits
