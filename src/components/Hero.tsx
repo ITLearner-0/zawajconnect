@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Shield, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import heroPattern from "@/assets/hero-pattern.webp";
+import heroPattern from "@/assets/hero-pattern-optimized.webp";
 
 const Hero = () => {
   const navigate = useNavigate();
