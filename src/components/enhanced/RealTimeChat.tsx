@@ -114,7 +114,10 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
   }, [messages]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    // Use requestAnimationFrame to avoid forced reflow
+    requestAnimationFrame(() => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    });
   };
 
   const fetchMatchData = async () => {

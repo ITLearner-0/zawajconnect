@@ -62,10 +62,13 @@ const Hero = () => {
               className="border-emerald text-emerald hover:bg-emerald hover:text-white"
               onClick={() => {
                 try {
-                  const element = document.getElementById('valeurs');
-                  if (element) {
-                    element.scrollIntoView({ behavior: 'smooth' });
-                  }
+                  // Use requestAnimationFrame to avoid forced reflow
+                  requestAnimationFrame(() => {
+                    const element = document.getElementById('valeurs');
+                    if (element) {
+                      element.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  });
                 } catch (error) {
                   console.error('Scroll error:', error);
                 }
