@@ -6,7 +6,7 @@ import Header from '@/components/Header';
 import { AppSidebar } from '@/components/AppSidebar';
 import WaliNotificationCenter from '@/components/WaliNotificationCenter';
 import { Button } from '@/components/ui/button';
-import { LogOut, User, Crown } from 'lucide-react';
+import { LogOut, User, Crown, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   DropdownMenu,
@@ -30,6 +30,9 @@ import NavigationTour from '@/components/navigation/NavigationTour';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useNavigationAnalytics } from '@/hooks/useNavigationAnalytics';
 import { useNavigationPreferences } from '@/hooks/useNavigationPreferences';
+import SecurityStatusBadge from '@/components/security/SecurityStatusBadge';
+import { useEnhancedSessionMonitor } from '@/hooks/useEnhancedSessionMonitor';
+import { useSecurityEvents } from '@/hooks/useSecurityEvents';
 
 // Force refresh to clear cache
 
@@ -44,6 +47,8 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { preferences, shouldShowTour, completeTour } = useNavigationPreferences();
+  const { isSessionNearExpiry } = useEnhancedSessionMonitor();
+  const { events } = useSecurityEvents();
 
   // Enable keyboard shortcuts and analytics
   useKeyboardShortcuts();
@@ -75,6 +80,18 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           
           {/* User Menu */}
           <div className="flex items-center gap-4">
+            <SecurityStatusBadge variant="compact" />
+            {(isSessionNearExpiry || events.length > 0) && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/settings?tab=security')}
+                className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+              >
+                <Shield className="h-4 w-4 mr-1" />
+                Action requise
+              </Button>
+            )}
             {preferences.showKeyboardShortcuts && <KeyboardShortcutsHelp />}
             {preferences.showQuickNavigation && <QuickNavigation />}
             <span className="text-sm text-muted-foreground hidden sm:block">
@@ -92,6 +109,10 @@ const AppLayout = ({ children }: AppLayoutProps) => {
                 <DropdownMenuItem onClick={() => navigate('/enhanced-profile')}>
                   <User className="h-4 w-4 mr-2" />
                   Mon Profil
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/settings?tab=security')}>
+                  <Shield className="h-4 w-4 mr-2" />
+                  Sécurité
                 </DropdownMenuItem>
                 {isAdmin && (
                   <DropdownMenuItem onClick={() => navigate('/admin')}>
