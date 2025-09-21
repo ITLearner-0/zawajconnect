@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -22,10 +23,14 @@ import NotificationSystem from '@/components/NotificationSystem';
 import PremiumSubscription from '@/components/PremiumSubscription';
 import IDVerificationSystem from '@/components/enhanced/IDVerificationSystem';
 import PasswordSecurityPanel from '@/components/enhanced/PasswordSecurityPanel';
+import SecurityAlertPanel from '@/components/security/SecurityAlertPanel';
+import FamilyRateLimitIndicator from '@/components/security/FamilyRateLimitIndicator';
+import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { securityStatus } = useSecurityMonitor();
   
   // Check for premium tab in URL params
   const urlParams = new URLSearchParams(window.location.search);
@@ -116,7 +121,29 @@ const Settings = () => {
             </TabsContent>
 
             <TabsContent value="security" className="space-y-6">
-              <PasswordSecurityPanel />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <SecurityAlertPanel />
+                <div className="space-y-6">
+                  <FamilyRateLimitIndicator />
+                  <Card className="p-4">
+                    <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-emerald" />
+                      Sécurité du Mot de Passe
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs">Force du mot de passe</span>
+                        <Badge variant="outline">
+                          {securityStatus?.password_strength || 'Non évalué'}
+                        </Badge>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Dernière vérification: Récemment
+                      </div>
+                    </div>
+                  </Card>
+                </div>
+              </div>
             </TabsContent>
             
             <TabsContent value="premium" className="space-y-6">

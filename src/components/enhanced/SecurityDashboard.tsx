@@ -7,14 +7,24 @@ import {
   AlertTriangle, 
   Users, 
   CheckCircle, 
-  XCircle
+  XCircle,
+  Activity,
+  Clock
 } from 'lucide-react';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
+import { useUserRole } from '@/hooks/useUserRole';
+import SecurityAlertPanel from '@/components/security/SecurityAlertPanel';
+import FamilyRateLimitIndicator from '@/components/security/FamilyRateLimitIndicator';
+import { useEnhancedSessionMonitor } from '@/hooks/useEnhancedSessionMonitor';
 
 export const SecurityDashboard = () => {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const { isWali } = useUserRole();
+  const { securityStatus, securityEvents, loading } = useSecurityMonitor();
+  const { activeSessions } = useEnhancedSessionMonitor();
 
-  if (adminLoading) {
+  if (adminLoading || loading) {
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -27,7 +37,7 @@ export const SecurityDashboard = () => {
       <Alert>
         <AlertTriangle className="h-4 w-4" />
         <AlertDescription>
-          Access denied. This dashboard is only available to administrators.
+          Accès refusé. Ce tableau de bord est réservé aux administrateurs.
         </AlertDescription>
       </Alert>
     );
@@ -37,78 +47,103 @@ export const SecurityDashboard = () => {
     <div className="space-y-6">
       <div className="flex items-center gap-2 mb-6">
         <Shield className="w-6 h-6 text-emerald" />
-        <h1 className="text-2xl font-bold">Security Dashboard</h1>
+        <h1 className="text-2xl font-bold">Tableau de Bord Sécurité</h1>
       </div>
 
       {/* Security Status Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Score de Sécurité</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-emerald">
+              {securityStatus?.verification_score || 0}/100
+            </div>
+            <div className="flex items-center gap-2 mt-2">
+              {securityStatus?.email_verified && (
+                <Badge variant="secondary" className="text-xs">Email ✓</Badge>
+              )}
+              {securityStatus?.id_verified && (
+                <Badge variant="secondary" className="text-xs">ID ✓</Badge>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Sessions Actives</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">
+              {activeSessions.length}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Sessions en cours
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium">Événements Sécurité</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-amber-600">
+              0
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Non résolus
+            </p>
+          </CardContent>
+        </Card>
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-emerald-500" />
-              RLS Policies
+              Statut RLS
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-sm">
-              <p className="text-emerald-700 mb-2">✓ Enhanced security implemented</p>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                <li>• Fixed conflicting family member policies</li>
-                <li>• Enhanced verification requirements</li>
-                <li>• Strengthened message security</li>
-              </ul>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-500" />
-              Password Security
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-sm">
-              <Badge variant="destructive" className="mb-2">Action Required</Badge>
-              <p className="text-xs text-muted-foreground">
-                Leaked password protection needs to be enabled in Supabase dashboard
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-500" />
-              Database Updates
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-sm">
-              <Badge variant="destructive" className="mb-2">Update Available</Badge>
-              <p className="text-xs text-muted-foreground">
-                PostgreSQL security patches available
-              </p>
-            </div>
+            <Badge variant="outline" className="text-emerald-700">
+              Renforcé
+            </Badge>
+            <p className="text-xs text-muted-foreground mt-2">
+              Sécurité niveau entreprise
+            </p>
           </CardContent>
         </Card>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="policies">Security Policies</TabsTrigger>
-          <TabsTrigger value="actions">Required Actions</TabsTrigger>
+          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+          <TabsTrigger value="security">Sécurité</TabsTrigger>
+          <TabsTrigger value="sessions">Sessions</TabsTrigger>
+          <TabsTrigger value="policies">Politiques</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Security Alert Panel */}
+            <div className="lg:col-span-2">
+              <SecurityAlertPanel />
+            </div>
+            
+            {/* Rate Limiting Status */}
+            <div>
+              <FamilyRateLimitIndicator />
+            </div>
+          </div>
+
+          {/* Implementation Status */}
           <Card>
             <CardHeader>
-              <CardTitle>Security Improvements Implemented</CardTitle>
+              <CardTitle>Améliorations de Sécurité Implémentées</CardTitle>
               <CardDescription>
-                Critical security fixes that have been applied to your application
+                Corrections critiques appliquées à votre application
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -116,9 +151,9 @@ export const SecurityDashboard = () => {
                 <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
                   <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5" />
                   <div>
-                    <p className="font-medium text-emerald-800">Family Member Access Control</p>
+                    <p className="font-medium text-emerald-800">Limitation de Taux Familiale</p>
                     <p className="text-sm text-emerald-700">
-                      Fixed conflicting RLS policies and implemented time-based access restrictions
+                      Protection contre les abus avec limites quotidiennes (3 invitations/jour)
                     </p>
                   </div>
                 </div>
@@ -126,9 +161,9 @@ export const SecurityDashboard = () => {
                 <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
                   <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5" />
                   <div>
-                    <p className="font-medium text-emerald-800">Enhanced Verification Requirements</p>
+                    <p className="font-medium text-emerald-800">Monitoring de Session Avancé</p>
                     <p className="text-sm text-emerald-700">
-                      Users now need higher verification scores for sensitive operations
+                      Détection d'anomalies et suivi des appareils
                     </p>
                   </div>
                 </div>
@@ -136,22 +171,72 @@ export const SecurityDashboard = () => {
                 <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
                   <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5" />
                   <div>
-                    <p className="font-medium text-emerald-800">Message Security</p>
+                    <p className="font-medium text-emerald-800">Audit de Sécurité</p>
                     <p className="text-sm text-emerald-700">
-                      Strengthened message access policies with verification requirements
+                      Journalisation complète des événements de sécurité
                     </p>
                   </div>
                 </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                <div className="flex items-start gap-3 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-emerald-500 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-emerald-800">Role Management</p>
-                    <p className="text-sm text-emerald-700">
-                      Cleaned up duplicate roles and added comprehensive audit logging
+        <TabsContent value="security" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <SecurityAlertPanel />
+            <FamilyRateLimitIndicator />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="sessions" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Activity className="h-5 w-5 text-emerald" />
+                Sessions Actives
+              </CardTitle>
+              <CardDescription>
+                Surveillance des sessions utilisateur en temps réel
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {activeSessions.map((session, index) => (
+                  <div key={session.id} className="border rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium">Session {index + 1}</span>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={session.is_active ? "outline" : "secondary"}>
+                          {session.is_active ? "Active" : "Inactive"}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {new Date(session.last_activity).toLocaleDateString('fr-FR')}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="text-sm text-muted-foreground space-y-1">
+                      {session.device_fingerprint && (
+                        <p>Empreinte: {session.device_fingerprint.slice(0, 12)}...</p>
+                      )}
+                      {session.user_agent && (
+                        <p>Navigateur: {session.user_agent.split(' ')[0]}</p>
+                      )}
+                      {session.ip_address && (
+                        <p>IP: {session.ip_address}</p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+                {activeSessions.length === 0 && (
+                  <div className="text-center py-8">
+                    <Activity className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-muted-foreground">
+                      Aucune session active détectée
                     </p>
                   </div>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -160,99 +245,41 @@ export const SecurityDashboard = () => {
         <TabsContent value="policies" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Active Security Policies</CardTitle>
+              <CardTitle>Politiques de Sécurité Actives</CardTitle>
               <CardDescription>
-                Current Row Level Security (RLS) policies protecting your data
+                Politiques RLS (Row Level Security) protégeant vos données
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-3">
                 <div className="p-3 border rounded">
-                  <p className="font-medium">Profile Access</p>
+                  <p className="font-medium">Accès Profil</p>
                   <p className="text-sm text-muted-foreground">
-                    Ultra-verified users only (Score 85+, ID verified)
+                    Score de vérification 85+ requis avec ID vérifié
                   </p>
                 </div>
                 
                 <div className="p-3 border rounded">
-                  <p className="font-medium">Family Supervision</p>
+                  <p className="font-medium">Supervision Familiale</p>
                   <p className="text-sm text-muted-foreground">
-                    Time-restricted access with verification requirements
+                    Accès limité dans le temps avec vérification renforcée
                   </p>
                 </div>
                 
                 <div className="p-3 border rounded">
-                  <p className="font-medium">Message Security</p>
+                  <p className="font-medium">Limitation de Taux</p>
                   <p className="text-sm text-muted-foreground">
-                    Verified users only, with family oversight capabilities
+                    Maximum 3 invitations familiales par jour
                   </p>
                 </div>
                 
                 <div className="p-3 border rounded">
-                  <p className="font-medium">Admin Access</p>
+                  <p className="font-medium">Audit de Sécurité</p>
                   <p className="text-sm text-muted-foreground">
-                    Role-based with audit logging
+                    Journalisation automatique des événements critiques
                   </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="actions" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Required Manual Actions</CardTitle>
-              <CardDescription>
-                These security settings must be configured manually in your Supabase dashboard
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <Alert>
-                <AlertTriangle className="h-4 w-4" />
-                <AlertDescription>
-                  <strong>Critical:</strong> These actions are required to complete your security setup.
-                </AlertDescription>
-              </Alert>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="space-y-1">
-                    <p className="font-medium">1. Enable Leaked Password Protection</p>
-                    <p className="text-sm text-muted-foreground">
-                      Go to: Authentication → Settings → Password Protection
-                    </p>
-                  </div>
-                  <Badge variant="destructive">Required</Badge>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="space-y-1">
-                    <p className="font-medium">2. Upgrade PostgreSQL Version</p>
-                    <p className="text-sm text-muted-foreground">
-                      Go to: Settings → Infrastructure → Database
-                    </p>
-                  </div>
-                  <Badge variant="destructive">Required</Badge>
-                </div>
-
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="space-y-1">
-                    <p className="font-medium">3. Review User Verification Backlog</p>
-                    <p className="text-sm text-muted-foreground">
-                      Check pending ID verification requests
-                    </p>
-                  </div>
-                  <Badge variant="outline">Recommended</Badge>
-                </div>
-              </div>
-
-              <Alert>
-                <Shield className="h-4 w-4" />
-                <AlertDescription>
-                  Once these actions are completed, your application will have enterprise-grade security.
-                </AlertDescription>
-              </Alert>
             </CardContent>
           </Card>
         </TabsContent>

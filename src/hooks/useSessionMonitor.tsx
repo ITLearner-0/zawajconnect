@@ -2,16 +2,18 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useSecurityEvents } from './useSecurityEvents';
 
 export const useSessionMonitor = () => {
   const { session, user } = useAuth();
   const { toast } = useToast();
+  const { logSecurityEvent } = useSecurityEvents();
   const [sessionWarningShown, setSessionWarningShown] = useState(false);
 
   useEffect(() => {
     if (!session?.expires_at) return;
 
-    const checkSessionExpiry = () => {
+    const checkSessionExpiry = async () => {
       const expiresAt = new Date(session.expires_at! * 1000);
       const now = new Date();
       const timeUntilExpiry = expiresAt.getTime() - now.getTime();
@@ -21,6 +23,19 @@ export const useSessionMonitor = () => {
       
       if (timeUntilExpiry <= warningTime && !sessionWarningShown) {
         setSessionWarningShown(true);
+        
+        // Log security event
+        try {
+          await logSecurityEvent(
+            'session_expiry_warning',
+            'low',
+            'Session proche de l\'expiration',
+            { expires_in_minutes: Math.ceil(timeUntilExpiry / 60000) }
+          );
+        } catch (error) {
+          console.error('Failed to log security event:', error);
+        }
+        
         toast({
           title: "Session proche d'expirer",
           description: `Votre session expire dans ${Math.ceil(timeUntilExpiry / 60000)} minutes. Sauvegardez vos données !`,
@@ -39,7 +54,7 @@ export const useSessionMonitor = () => {
     checkSessionExpiry(); // Check immediately
 
     return () => clearInterval(interval);
-  }, [session, sessionWarningShown, toast]);
+  }, [session, sessionWarningShown, toast, logSecurityEvent]);
 
   // Reset warning when session changes
   useEffect(() => {
