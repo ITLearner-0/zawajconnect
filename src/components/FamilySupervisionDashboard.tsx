@@ -29,16 +29,13 @@ interface FamilyMember {
 }
 
 const FamilySupervisionDashboard = () => {
-  console.log('🎯 Component render started');
   const { user } = useAuth();
   const navigate = useNavigate();
-  console.log('👤 User from auth:', user);
   const [conversations, setConversations] = useState<SupervisedConversation[]>([]);
   const [familyRole, setFamilyRole] = useState<FamilyMember | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log('🚀 FamilySupervisionDashboard mounted, user:', user);
     if (user) {
       loadSupervisionData();
     }
@@ -46,8 +43,6 @@ const FamilySupervisionDashboard = () => {
 
   const loadSupervisionData = async () => {
     try {
-      console.log('🔍 Checking supervision for user:', user?.id);
-      
       // First, check if current user is a family member (invited as wali)
       const { data: familyMemberData, error: familyError } = await supabase
         .from('family_members')
@@ -56,11 +51,8 @@ const FamilySupervisionDashboard = () => {
         .eq('invitation_status', 'accepted')
         .maybeSingle();
 
-      console.log('👨‍👩‍👧‍👦 Family member query result:', { familyMemberData, familyError });
-
       if (familyError || !familyMemberData) {
-        console.error('❌ Family member error:', familyError);
-        console.log('❌ No family member data found for user:', user?.id);
+        console.error('Family member error:', familyError);
         toast({
           title: "Erreur",
           description: 'Vous n\'êtes pas autorisé à superviser les conversations',
@@ -70,10 +62,7 @@ const FamilySupervisionDashboard = () => {
         return;
       }
 
-      console.log('✅ Family role set:', familyMemberData);
       setFamilyRole(familyMemberData);
-
-      console.log('🔍 Looking for matches for supervised user:', familyMemberData.user_id);
 
       // Get matches for the supervised user (person that this wali supervises)
       const { data: matchesData, error: matchesError } = await supabase
@@ -89,19 +78,14 @@ const FamilySupervisionDashboard = () => {
         .or(`user1_id.eq.${familyMemberData.user_id},user2_id.eq.${familyMemberData.user_id}`)
         .eq('is_mutual', true);
 
-      console.log('💕 Matches query result:', { matchesData, matchesError });
-
       if (matchesError) {
-        console.error('❌ Matches error:', matchesError);
+        console.error('Matches error:', matchesError);
         setLoading(false);
         return;
       }
 
-      console.log('📊 Processing conversations for', (matchesData || []).length, 'matches');
-
       // If no matches, set empty conversations but don't show error
       if (!matchesData || matchesData.length === 0) {
-        console.log('ℹ️ No matches found for supervised user');
         setConversations([]);
         setLoading(false);
         return;
@@ -110,8 +94,6 @@ const FamilySupervisionDashboard = () => {
       // Get conversation details for each match
       const conversationsWithMessages = await Promise.all(
         (matchesData || []).map(async (match) => {
-          console.log('🔄 Processing match:', match.id, 'between users:', match.user1_id, 'and', match.user2_id);
-          
           // Get profiles for both users
           const { data: user1Profile } = await supabase
             .from('profiles')
@@ -124,8 +106,6 @@ const FamilySupervisionDashboard = () => {
             .select('full_name, avatar_url')
             .eq('user_id', match.user2_id)
             .maybeSingle();
-
-          console.log('👥 Profile data:', { user1Profile, user2Profile });
 
           const { data: lastMessage } = await supabase
             .from('messages')
@@ -141,8 +121,6 @@ const FamilySupervisionDashboard = () => {
             .eq('match_id', match.id)
             .eq('is_read', false);
 
-          console.log('💬 Message data for match', match.id, ':', { lastMessage, unreadCount });
-
           return {
             id: match.id,
             match_id: match.id,
@@ -155,7 +133,6 @@ const FamilySupervisionDashboard = () => {
         }) || []
       );
 
-      console.log('📋 Final conversations:', conversationsWithMessages);
       setConversations(conversationsWithMessages);
     } catch (error) {
       console.error('Error loading supervision data:', error);
@@ -171,9 +148,6 @@ const FamilySupervisionDashboard = () => {
 
   const joinConversation = async (matchId: string) => {
     try {
-      console.log('🔄 Joining conversation for match:', matchId);
-      console.log('👨‍👩‍👧‍👦 Family role:', familyRole);
-      
       // Add family member as participant if not already added
       const participantData = {
         match_id: matchId,
@@ -185,8 +159,6 @@ const FamilySupervisionDashboard = () => {
         can_read_messages: familyRole!.can_view_profile
       };
       
-      console.log('📋 Participant data to insert:', participantData);
-      
       const { error } = await supabase
         .from('conversation_participants')
         .upsert(participantData, {
@@ -195,16 +167,14 @@ const FamilySupervisionDashboard = () => {
         });
 
       if (error) {
-        console.error('❌ Database error:', error);
+        console.error('Database error:', error);
         throw error;
       }
 
-      console.log('✅ Successfully joined conversation');
-      
       // Navigate to chat with supervision using React Router
       navigate(`/chat?matchId=${matchId}&supervision=true`);
     } catch (error) {
-      console.error('💥 Error joining conversation:', error);
+      console.error('Error joining conversation:', error);
       toast({
         title: "Erreur",
         description: `Erreur lors de la participation à la conversation: ${error?.message || 'Erreur inconnue'}`,
@@ -333,10 +303,7 @@ const FamilySupervisionDashboard = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => {
-                        console.log('🖱️ Voir button clicked for match:', conversation.match_id);
-                        joinConversation(conversation.match_id);
-                      }}
+                      onClick={() => joinConversation(conversation.match_id)}
                       disabled={!familyRole.can_view_profile}
                     >
                       <Eye className="h-4 w-4 mr-1" />
@@ -345,10 +312,7 @@ const FamilySupervisionDashboard = () => {
                     {familyRole.can_communicate && (
                       <Button
                         size="sm"
-                        onClick={() => {
-                          console.log('🖱️ Participer button clicked for match:', conversation.match_id);
-                          joinConversation(conversation.match_id);
-                        }}
+                        onClick={() => joinConversation(conversation.match_id)}
                       >
                         <MessageCircle className="h-4 w-4 mr-1" />
                         Participer
@@ -396,10 +360,7 @@ const FamilySupervisionDashboard = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => {
-                        console.log('🖱️ Voir button clicked (all tab) for match:', conversation.match_id);
-                        joinConversation(conversation.match_id);
-                      }}
+                      onClick={() => joinConversation(conversation.match_id)}
                       disabled={!familyRole.can_view_profile}
                     >
                       <Eye className="h-4 w-4 mr-1" />
@@ -408,10 +369,7 @@ const FamilySupervisionDashboard = () => {
                     {familyRole.can_communicate && conversation.is_active && (
                       <Button
                         size="sm"
-                        onClick={() => {
-                          console.log('🖱️ Participer button clicked (all tab) for match:', conversation.match_id);
-                          joinConversation(conversation.match_id);
-                        }}
+                        onClick={() => joinConversation(conversation.match_id)}
                       >
                         <MessageCircle className="h-4 w-4 mr-1" />
                         Participer

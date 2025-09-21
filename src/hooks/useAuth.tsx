@@ -26,7 +26,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         
         // Handle token refresh events
         if (event === 'TOKEN_REFRESHED') {
-          console.log('✅ Token refreshed successfully');
+          // Token refreshed successfully - silent success
         }
         
         // Handle session expiry with emergency backup
