@@ -402,6 +402,33 @@ export type Database = {
           },
         ]
       }
+      family_operation_limits: {
+        Row: {
+          created_at: string | null
+          id: string
+          last_reset_at: string | null
+          operation_count: number | null
+          operation_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          last_reset_at?: string | null
+          operation_count?: number | null
+          operation_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          last_reset_at?: string | null
+          operation_count?: number | null
+          operation_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       family_reviews: {
         Row: {
           created_at: string
@@ -1186,6 +1213,45 @@ export type Database = {
         }
         Relationships: []
       }
+      security_events: {
+        Row: {
+          created_at: string | null
+          description: string
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          metadata: Json | null
+          resolved: boolean | null
+          severity: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resolved?: boolean | null
+          severity?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          metadata?: Json | null
+          resolved?: boolean | null
+          severity?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -1311,6 +1377,45 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          created_at: string | null
+          device_fingerprint: string | null
+          expires_at: string | null
+          id: string
+          ip_address: unknown | null
+          is_active: boolean | null
+          last_activity: string | null
+          session_token: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_fingerprint?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          session_token: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_fingerprint?: string | null
+          expires_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          is_active?: boolean | null
+          last_activity?: string | null
+          session_token?: string
+          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
@@ -1542,6 +1647,14 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: boolean
       }
+      check_family_operation_limit: {
+        Args: {
+          p_daily_limit?: number
+          p_operation_type: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
       check_family_supervision_setup: {
         Args: { user_uuid: string }
         Returns: boolean
@@ -1635,9 +1748,23 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_family_operation_count: {
+        Args: { p_operation_type: string; p_user_id: string }
+        Returns: undefined
+      }
       is_admin: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      log_security_event: {
+        Args: {
+          p_description: string
+          p_event_type: string
+          p_metadata?: Json
+          p_severity: string
+          p_user_id: string
+        }
+        Returns: string
       }
     }
     Enums: {
