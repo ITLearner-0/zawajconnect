@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,12 +32,20 @@ const Auth = () => {
   const { signIn, signUp, user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const isWaliMode = searchParams.get('mode') === 'wali';
 
   useEffect(() => {
     if (user) {
-      navigate('/enhanced-profile');
+      // Rediriger selon le mode (wali ou utilisateur normal)
+      if (isWaliMode) {
+        // Pour les walis, on va d'abord sur le family access portal ou family supervision
+        navigate('/family-supervision');
+      } else {
+        navigate('/enhanced-profile');
+      }
     }
-  }, [user, navigate]);
+  }, [user, navigate, isWaliMode]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -201,16 +209,34 @@ const Auth = () => {
 
             <Card className="border-border/50 shadow-soft bg-card/95 backdrop-blur-sm animate-fade-in">
               <CardHeader className="text-center">
+                {isWaliMode && (
+                  <div className="mb-4 p-3 bg-emerald/10 border border-emerald/20 rounded-lg">
+                    <div className="flex items-center justify-center gap-2 text-emerald">
+                      <Shield className="h-5 w-5" />
+                      <span className="font-medium">Mode Supervision Familiale</span>
+                    </div>
+                    <p className="text-sm text-emerald-dark mt-1">
+                      Connexion pour les membres de famille et walis
+                    </p>
+                  </div>
+                )}
                 <div className="flex justify-center mb-4">
                   <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center animate-float">
-                    <Heart className="h-6 w-6 text-primary-foreground fill-current" />
+                    {isWaliMode ? (
+                      <Shield className="h-6 w-6 text-primary-foreground" />
+                    ) : (
+                      <Heart className="h-6 w-6 text-primary-foreground fill-current" />
+                    )}
                   </div>
                 </div>
                 <CardTitle className="text-2xl font-bold text-foreground">
-                  Bienvenue sur ZawajConnect
+                  {isWaliMode ? 'Supervision Familiale' : 'Bienvenue sur ZawajConnect'}
                 </CardTitle>
                 <CardDescription className="text-muted-foreground">
-                  Votre plateforme de rencontres islamiques
+                  {isWaliMode 
+                    ? 'Accédez à votre espace de supervision et guidance islamique'
+                    : 'Votre plateforme de rencontres islamiques'
+                  }
                 </CardDescription>
               </CardHeader>
           

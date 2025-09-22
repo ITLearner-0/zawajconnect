@@ -18,6 +18,7 @@ import Family from "./pages/Family";
 import Guidance from "./pages/Guidance";
 import ModerationTest from "./pages/ModerationTest";
 import WaliDashboard from "./pages/WaliDashboard";
+import WaliAccess from "./pages/WaliAccess";
 import MatchApproval from "./pages/MatchApproval";
 import FamilyAnalyticsPage from "./pages/FamilyAnalytics";
 import ModerationTests from "./pages/ModerationTests";
@@ -70,6 +71,7 @@ function App() {
             {/* Public routes - no authentication required */}
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/wali" element={<WaliAccess />} />
             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
             <Route path="/invitation-auth" element={<InvitationAuth />} />
             <Route path="/invitation" element={<InvitationAccept />} />

@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Heart, Shield, Users } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import heroPattern from "@/assets/hero-pattern-optimized.webp";
 
 const Hero = () => {
@@ -80,6 +80,26 @@ const Hero = () => {
             >
               Découvrir nos valeurs
             </Button>
+          </div>
+
+          {/* Accès Wali */}
+          <div className="mt-8 pt-6 border-t border-emerald/20">
+            <div className="text-center">
+              <p className="text-sm text-muted-foreground mb-3">
+                Vous êtes un membre de famille invité à superviser ?
+              </p>
+                <Button 
+                  variant="ghost"
+                  size="sm"
+                  className="text-emerald hover:bg-emerald/10 hover:text-emerald-dark border border-emerald/30"
+                  asChild
+                >
+                  <Link to="/wali" className="flex items-center gap-2">
+                    <Shield className="h-4 w-4" />
+                    Accès Supervision Familiale
+                  </Link>
+                </Button>
+            </div>
           </div>
 
           {/* Features */}
