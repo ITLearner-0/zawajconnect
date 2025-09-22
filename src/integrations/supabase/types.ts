@@ -1252,6 +1252,48 @@ export type Database = {
         }
         Relationships: []
       }
+      sensitive_operations_audit: {
+        Row: {
+          created_at: string
+          id: string
+          ip_address: unknown | null
+          operation_type: string
+          record_id: string | null
+          risk_level: string
+          success: boolean
+          table_accessed: string
+          user_agent: string | null
+          user_id: string
+          verification_score: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          operation_type: string
+          record_id?: string | null
+          risk_level?: string
+          success?: boolean
+          table_accessed: string
+          user_agent?: string | null
+          user_id: string
+          verification_score?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip_address?: unknown | null
+          operation_type?: string
+          record_id?: string | null
+          risk_level?: string
+          success?: boolean
+          table_accessed?: string
+          user_agent?: string | null
+          user_id?: string
+          verification_score?: number | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
@@ -1755,6 +1797,14 @@ export type Database = {
       is_admin: {
         Args: { _user_id: string }
         Returns: boolean
+      }
+      log_profile_access: {
+        Args: {
+          p_risk_level?: string
+          p_viewed_id: string
+          p_viewer_id: string
+        }
+        Returns: undefined
       }
       log_security_event: {
         Args: {
