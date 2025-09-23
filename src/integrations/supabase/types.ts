@@ -1816,6 +1816,10 @@ export type Database = {
         }
         Returns: string
       }
+      migrate_family_contact_data_secure: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "super_admin" | "admin" | "moderator" | "user"
