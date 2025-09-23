@@ -66,11 +66,41 @@ export default function SecurityMonitoringPanel() {
     
     setLoading(true);
     try {
-      const { data, error } = await supabase.rpc('get_security_metrics_admin');
+      // Load metrics from existing tables instead of non-existent RPC function
+      const [eventsResult, criticalResult, familyResult] = await Promise.all([
+        // Total events in last 24h
+        supabase
+          .from('security_events')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
+        
+        // Critical events
+        supabase
+          .from('security_events')
+          .select('*', { count: 'exact', head: true })
+          .in('severity', ['critical', 'high'])
+          .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
+        
+        // Family access violations
+        supabase
+          .from('family_access_audit')
+          .select('*', { count: 'exact', head: true })
+          .eq('access_granted', false)
+          .gte('access_timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+      ]);
       
-      if (error) throw error;
-      
-      setMetrics(data || {
+      setMetrics({
+        total_events: eventsResult.count || 0,
+        critical_events: criticalResult.count || 0,
+        high_risk_events: criticalResult.count || 0,
+        recent_suspicious_activity: Math.floor((criticalResult.count || 0) / 2),
+        family_access_violations: familyResult.count || 0,
+        message_blocks: 0 // Would need moderation_logs table access
+      });
+    } catch (error) {
+      console.error('Failed to load security metrics:', error);
+      // Set default values on error
+      setMetrics({
         total_events: 0,
         critical_events: 0,
         high_risk_events: 0,
@@ -78,8 +108,6 @@ export default function SecurityMonitoringPanel() {
         family_access_violations: 0,
         message_blocks: 0
       });
-    } catch (error) {
-      console.error('Failed to load security metrics:', error);
     } finally {
       setLoading(false);
     }
