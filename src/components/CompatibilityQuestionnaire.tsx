@@ -107,6 +107,8 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
 
   const fetchQuestionsAndResponses = async () => {
     try {
+      console.log('🔍 Fetching questions...');
+      
       // Fetch questions
       const { data: questionsData, error: questionsError } = await supabase
         .from('compatibility_questions')
@@ -115,34 +117,80 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
         .order('category', { ascending: true })
         .order('weight', { ascending: false });
 
-      if (questionsError) throw questionsError;
+      console.log('📊 Questions raw data:', questionsData);
+      console.log('❌ Questions error:', questionsError);
+
+      if (questionsError) {
+        console.error('❌ Questions fetch error:', questionsError);
+        throw questionsError;
+      }
+
+      if (!questionsData || questionsData.length === 0) {
+        console.warn('⚠️ No questions found in database');
+        toast({
+          title: "Aucune question trouvée",
+          description: "Le questionnaire ne contient actuellement aucune question active.",
+          variant: "destructive"
+        });
+        return;
+      }
 
       // Parse options from JSONB
-      const parsedQuestions = questionsData.map(q => ({
-        ...q,
-        options: Array.isArray(q.options) ? q.options : 
-                 typeof q.options === 'string' ? JSON.parse(q.options) : []
-      }));
+      const parsedQuestions = questionsData.map(q => {
+        let options: string[] = [];
+        
+        if (Array.isArray(q.options)) {
+          options = q.options.map(opt => String(opt));
+        } else if (typeof q.options === 'string') {
+          try {
+            const parsed = JSON.parse(q.options);
+            options = Array.isArray(parsed) ? parsed.map((opt: any) => String(opt)) : [];
+          } catch (e) {
+            console.error('❌ Error parsing options for question:', q.question_key, q.options);
+            options = [];
+          }
+        } else if (q.options && typeof q.options === 'object') {
+          // Handle case where options might be stored as an object
+          const optionsObj = q.options as any;
+          if (Array.isArray(optionsObj)) {
+            options = optionsObj.map(opt => String(opt));
+          } else {
+            options = [];
+          }
+        }
 
+        return {
+          ...q,
+          options
+        };
+      });
+
+      console.log('✅ Parsed questions:', parsedQuestions);
+      console.log('📊 Total questions parsed:', parsedQuestions.length);
+      
       setQuestions(parsedQuestions);
       
       const uniqueCategories = Array.from(new Set(parsedQuestions.map(q => q.category)));
+      console.log('🏷️ Categories found:', uniqueCategories);
       setCategories(uniqueCategories);
+      
       if (uniqueCategories.length > 0) {
         setCurrentCategory(uniqueCategories[0]);
+        console.log('🎯 Set current category to:', uniqueCategories[0]);
       }
 
       // Load existing responses from database
       await loadFromDatabase();
 
     } catch (error) {
-      console.error('Error fetching questions:', error);
+      console.error('❌ Error fetching questions:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de charger le questionnaire.",
+        description: "Impossible de charger le questionnaire. Erreur: " + (error?.message || 'Inconnue'),
         variant: "destructive"
       });
     } finally {
+      console.log('✅ Setting loading to false');
       setLoading(false);
     }
   };
@@ -183,6 +231,7 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
   };
 
   const getTotalQuestions = () => {
+    console.log('📊 getTotalQuestions called, questions.length:', questions.length);
     return questions.length;
   };
 
@@ -200,9 +249,16 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
     return (
       <div className="flex items-center justify-center p-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald"></div>
+        <p className="ml-4 text-muted-foreground">Chargement des questions...</p>
       </div>
     );
   }
+
+  // Debug information
+  console.log('🔄 Component render - questions count:', questions.length);
+  console.log('🔄 Component render - categories:', categories);
+  console.log('🔄 Component render - currentCategory:', currentCategory);
+  console.log('🔄 Component render - loading:', loading);
 
   const currentCategoryConfig = categoryConfig[currentCategory as keyof typeof categoryConfig];
   const Icon = currentCategoryConfig?.icon || Heart;
