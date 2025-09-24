@@ -33,6 +33,7 @@ import CompatibilityAssessment from '@/components/enhanced/CompatibilityAssessme
 
 // Existing Components
 import VerificationBadge from '@/components/VerificationBadge';
+import SecurityStatusBadge from '@/components/security/SecurityStatusBadge';
 import PhotoUpload from '@/components/PhotoUpload';
 
 interface ProfileCompletionStats {
@@ -268,7 +269,7 @@ const EnhancedProfile = () => {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <VerificationBadge verificationScore={verification?.verification_score || 0} />
+                <SecurityStatusBadge />
                 <Badge 
                   className={`${getCompletionColor(completionStats.overall)} bg-current/10`}
                   variant="outline"
