@@ -30,7 +30,6 @@ import NavigationTour from '@/components/navigation/NavigationTour';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { useNavigationAnalytics } from '@/hooks/useNavigationAnalytics';
 import { useNavigationPreferences } from '@/hooks/useNavigationPreferences';
-import SecurityStatusBadge from '@/components/security/SecurityStatusBadge';
 import { useEnhancedSessionMonitor } from '@/hooks/useEnhancedSessionMonitor';
 import { useSecurityEvents } from '@/hooks/useSecurityEvents';
 
@@ -80,7 +79,6 @@ const AppLayout = ({ children }: AppLayoutProps) => {
           
           {/* User Menu */}
           <div className="flex items-center gap-4">
-            <SecurityStatusBadge variant="compact" />
             {(isSessionNearExpiry || events.length > 0) && (
               <Button
                 variant="ghost"

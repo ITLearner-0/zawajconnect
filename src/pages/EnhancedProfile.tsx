@@ -33,7 +33,6 @@ import CompatibilityAssessment from '@/components/enhanced/CompatibilityAssessme
 
 // Existing Components
 import VerificationBadge from '@/components/VerificationBadge';
-import SecurityStatusBadge from '@/components/security/SecurityStatusBadge';
 import PhotoUpload from '@/components/PhotoUpload';
 
 interface ProfileCompletionStats {
