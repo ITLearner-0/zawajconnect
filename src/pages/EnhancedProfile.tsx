@@ -269,7 +269,7 @@ const EnhancedProfile = () => {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <SecurityStatusBadge />
+                <VerificationBadge verificationScore={verification?.verification_score || 0} />
                 <Badge 
                   className={`${getCompletionColor(completionStats.overall)} bg-current/10`}
                   variant="outline"
