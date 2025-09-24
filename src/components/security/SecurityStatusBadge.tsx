@@ -38,21 +38,21 @@ const SecurityStatusBadge: React.FC<SecurityStatusBadgeProps> = ({
         icon: CheckCircle,
         variant: 'default' as const
       };
-    } else if (score >= 60 && emailVerified) {
+    } else if (score >= 30 || emailVerified) {
       return { 
         level: 'medium', 
-        label: 'Sécurité Moyenne', 
-        color: 'bg-amber-500', 
+        label: 'Profil Standard', 
+        color: 'bg-blue-500', 
         icon: Shield,
-        variant: 'secondary' as const
+        variant: 'outline' as const
       };
     } else {
       return { 
         level: 'low', 
-        label: 'Sécurité Faible', 
-        color: 'bg-red-500', 
+        label: 'À Compléter', 
+        color: 'bg-amber-500', 
         icon: AlertTriangle,
-        variant: 'destructive' as const
+        variant: 'secondary' as const
       };
     }
   };
@@ -71,7 +71,7 @@ const SecurityStatusBadge: React.FC<SecurityStatusBadgeProps> = ({
     return (
       <Badge variant={badgeVariant} className={`flex items-center gap-1 ${className}`}>
         <Icon className="h-3 w-3" />
-        {level === 'high' ? 'Sécurisé' : level === 'medium' ? 'Modéré' : 'Risque'}
+        {level === 'high' ? 'Vérifié' : level === 'medium' ? 'Standard' : 'Nouveau'}
         {isSessionNearExpiry && (
           <XCircle className="h-3 w-3 text-destructive" />
         )}
