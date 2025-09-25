@@ -12,9 +12,28 @@ interface NavigationGuardProps {
 const NavigationGuard = ({ children }: NavigationGuardProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, loading } = useAuth();
+  
+  // Safely get auth state with error handling
+  let user = null;
+  let loading = true;
+  let authError = false;
+  
+  try {
+    const authState = useAuth();
+    user = authState.user;
+    loading = authState.loading;
+  } catch (error) {
+    console.warn('NavigationGuard: AuthProvider not ready yet, skipping auth checks');
+    authError = true;
+  }
+  
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const { toast } = useToast();
+
+  // If auth context is not available yet, just render children
+  if (authError) {
+    return <>{children}</>;
+  }
 
   useEffect(() => {
     if (loading || adminLoading) return;

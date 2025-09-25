@@ -125,19 +125,55 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
         const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
         if (authError || !currentUser) {
           console.error('❌ Session validation failed:', authError);
+          
+          // Check for specific auth errors
+          if (authError?.message?.includes('JWT') || authError?.message?.includes('expired')) {
+            console.log('🔄 Session expired, clearing local storage and redirecting');
+            await supabase.auth.signOut();
+            localStorage.clear();
+          }
+          
           toast({
-            title: "Session expirée",
+            title: "Session expirée", 
             description: "Votre session a expiré. Veuillez vous reconnecter.",
             variant: "destructive"
           });
-          // Redirect to auth page
-          window.location.href = '/auth?redirect=/compatibility-test';
+          
+          // Force page reload to reset state
+          setTimeout(() => {
+            window.location.href = '/auth?redirect=/compatibility-test';
+          }, 1000);
           return;
         }
         console.log('✅ Session validated for user:', currentUser.id);
+        
+        // Double check with a simple query to ensure RLS works
+        const { data: testQuery, error: testError } = await supabase
+          .from('compatibility_questions')
+          .select('id')
+          .limit(1);
+          
+        if (testError) {
+          console.error('❌ RLS test failed:', testError);
+          if (testError.message?.includes('RLS') || testError.message?.includes('policy')) {
+            toast({
+              title: "Accès refusé",
+              description: "Votre compte n'a pas les permissions nécessaires pour accéder au questionnaire.",
+              variant: "destructive"
+            });
+            return;
+          }
+        } else {
+          console.log('✅ RLS test passed, user has access to questions');
+        }
+        
       } catch (error) {
         console.error('❌ Auth validation error:', error);
-        window.location.href = '/auth?redirect=/compatibility-test';
+        await supabase.auth.signOut();
+        localStorage.clear();
+        setTimeout(() => {
+          window.location.href = '/auth?redirect=/compatibility-test';
+        }, 1000);
         return;
       }
       

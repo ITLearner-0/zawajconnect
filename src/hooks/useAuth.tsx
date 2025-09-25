@@ -165,3 +165,9 @@ export function useAuth() {
   }
   return context;
 }
+
+// Safe hook for components that might be rendered before AuthProvider is ready
+export function useSafeAuth() {
+  const context = useContext(AuthContext);
+  return context || { user: null, session: null, loading: true, signIn: async () => ({ error: null }), signUp: async () => ({ error: null }), signOut: async () => {} };
+}
