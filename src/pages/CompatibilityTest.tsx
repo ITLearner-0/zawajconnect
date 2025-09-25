@@ -65,7 +65,7 @@ const CompatibilityTest = () => {
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    return <Navigate to="/auth?redirect=/compatibility-test" replace />;
   }
 
   const handleComplete = () => {

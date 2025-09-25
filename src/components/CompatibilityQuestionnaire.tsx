@@ -109,6 +109,17 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
     try {
       console.log('🔍 Fetching questions...');
       
+      // Check if user is authenticated first
+      if (!user) {
+        console.error('❌ User not authenticated');
+        toast({
+          title: "Authentification requise",
+          description: "Vous devez être connecté pour accéder au questionnaire.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       // Fetch questions
       const { data: questionsData, error: questionsError } = await supabase
         .from('compatibility_questions')
