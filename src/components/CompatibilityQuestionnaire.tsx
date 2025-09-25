@@ -119,6 +119,27 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
         });
         return;
       }
+
+      // Validate session before making requests
+      try {
+        const { data: { user: currentUser }, error: authError } = await supabase.auth.getUser();
+        if (authError || !currentUser) {
+          console.error('❌ Session validation failed:', authError);
+          toast({
+            title: "Session expirée",
+            description: "Votre session a expiré. Veuillez vous reconnecter.",
+            variant: "destructive"
+          });
+          // Redirect to auth page
+          window.location.href = '/auth?redirect=/compatibility-test';
+          return;
+        }
+        console.log('✅ Session validated for user:', currentUser.id);
+      } catch (error) {
+        console.error('❌ Auth validation error:', error);
+        window.location.href = '/auth?redirect=/compatibility-test';
+        return;
+      }
       
       // Fetch questions
       const { data: questionsData, error: questionsError } = await supabase

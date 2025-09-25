@@ -21,12 +21,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('🔐 Auth state change:', event, session?.user?.id);
         
         // Handle token refresh events
         if (event === 'TOKEN_REFRESHED') {
-          // Token refreshed successfully - silent success
+          console.log('✅ Token refreshed successfully');
         }
         
         // Handle session expiry with emergency backup
@@ -36,6 +36,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           window.dispatchEvent(new CustomEvent('auth:session-expired'));
         }
         
+        // Validate session if it exists
+        if (session) {
+          try {
+            // Test if the session is actually valid by making a simple query
+            const { error } = await supabase.auth.getUser();
+            if (error) {
+              console.error('❌ Session validation failed:', error);
+              // Force sign out if session is invalid
+              await supabase.auth.signOut();
+              return;
+            }
+          } catch (error) {
+            console.error('❌ Session validation error:', error);
+            await supabase.auth.signOut();
+            return;
+          }
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -43,32 +61,55 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
 
     // THEN check for existing session with error handling
-    supabase.auth.getSession()
-      .then(({ data: { session }, error }) => {
+    const initializeAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
         if (error) {
           console.error('❌ Session error:', error);
-          // Only clear tokens for auth errors, not network errors
-          if (error.message?.includes('Invalid') || error.message?.includes('JWT')) {
+          // Clear invalid sessions
+          if (error.message?.includes('Invalid') || 
+              error.message?.includes('JWT') || 
+              error.message?.includes('expired')) {
+            console.log('🧹 Clearing expired session');
             localStorage.removeItem('supabase.auth.token');
+            await supabase.auth.signOut();
+            setSession(null);
+            setUser(null);
+          }
+        } else if (session) {
+          // Validate the session by testing auth.uid()
+          try {
+            const { data: user, error: userError } = await supabase.auth.getUser();
+            if (userError || !user?.user) {
+              console.error('❌ User validation failed:', userError);
+              await supabase.auth.signOut();
+              setSession(null);
+              setUser(null);
+            } else {
+              setSession(session);
+              setUser(session.user);
+            }
+          } catch (error) {
+            console.error('❌ User validation error:', error);
+            await supabase.auth.signOut();
             setSession(null);
             setUser(null);
           }
         } else {
-          setSession(session);
-          setUser(session?.user ?? null);
-        }
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('❌ Auth initialization error:', error);
-        // Only clear on auth-specific errors, not network issues
-        if (error.message?.includes('Invalid') || error.message?.includes('JWT')) {
-          localStorage.removeItem('supabase.auth.token');
           setSession(null);
           setUser(null);
         }
+      } catch (error) {
+        console.error('❌ Auth initialization error:', error);
+        setSession(null);
+        setUser(null);
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    initializeAuth();
 
     return () => subscription.unsubscribe();
   }, []);
