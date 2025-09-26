@@ -120,59 +120,19 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
         return;
       }
 
-      // Test direct database query without complex validation  
-      console.log('🔒 Testing database access...');
-      try {
-        // Try a simple query first
-        const { data: testData, error: testError } = await supabase
-          .from('compatibility_questions')
-          .select('id, question_text, is_active')
-          .eq('is_active', true)
-          .limit(3);
-          
-        console.log('🔍 Database test result:', { testData, testError });
-        
-        if (testError) {
-          console.error('❌ Database access failed:', testError);
-          
-          // Check if it's an auth issue
-          if (testError.message?.includes('JWT') || testError.message?.includes('expired') || testError.message?.includes('session')) {
-            console.log('🔄 Auth issue detected, signing out and redirecting');
-            await supabase.auth.signOut();
-            localStorage.clear();
-            window.location.href = '/auth?redirect=/compatibility-test';
-            return;
-          }
-          
-          toast({
-            title: "Erreur d'accès", 
-            description: `Impossible d'accéder aux questions: ${testError.message}`,
-            variant: "destructive"
-          });
-          return;
-        }
-        
-        if (!testData || testData.length === 0) {
-          console.log('⚠️ No questions returned from database');
-          toast({
-            title: "Aucune question disponible",
-            description: "Le questionnaire n'est pas encore configuré. Veuillez réessayer plus tard.",
-            variant: "destructive"
-          });
-          return;
-        }
-        
-        console.log('✅ Database access successful, found questions:', testData.length);
-        
-      } catch (error) {
-        console.error('❌ Database test error:', error);
+      // Simple auth check without complex validation
+      if (!user) {
+        console.log('⚠️ No authenticated user found');
         toast({
-          title: "Erreur technique",
-          description: "Une erreur technique s'est produite. Veuillez rafraîchir la page.",
+          title: "Authentification requise",
+          description: "Veuillez vous connecter pour accéder au questionnaire.",
           variant: "destructive"
         });
+        window.location.href = '/auth?redirect=/compatibility-test';
         return;
       }
+      
+      console.log('✅ User authenticated:', user.id);
       
       // Fetch questions
       const { data: questionsData, error: questionsError } = await supabase
