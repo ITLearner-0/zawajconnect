@@ -11,8 +11,6 @@ const CompatibilityTest = () => {
   const { user, loading } = useAuth();
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
 
-  console.log('🔍 CompatibilityTest - Auth State:', { user: !!user, userId: user?.id, loading });
-
   // Check for session recovery on mount
   useEffect(() => {
     const handleSessionExpired = () => {
@@ -59,7 +57,6 @@ const CompatibilityTest = () => {
   }, [user, loading]);
 
   if (loading) {
-    console.log('⏳ CompatibilityTest - Still loading auth...');
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald"></div>
@@ -68,11 +65,8 @@ const CompatibilityTest = () => {
   }
 
   if (!user) {
-    console.log('❌ CompatibilityTest - No user found, redirecting to auth');
     return <Navigate to="/auth?redirect=/compatibility-test" replace />;
   }
-
-  console.log('✅ CompatibilityTest - User authenticated, rendering questionnaire');
 
   const handleComplete = () => {
     // Redirect to compatibility insights instead of dashboard
