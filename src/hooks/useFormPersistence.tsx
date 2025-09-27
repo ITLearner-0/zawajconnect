@@ -60,7 +60,7 @@ export const useFormPersistence = ({
       };
 
       localStorage.setItem(`onboarding_profile_${user.id}`, JSON.stringify(draftData));
-      console.log('Profile draft saved to localStorage');
+      
     } catch (error) {
       console.error('Error saving profile draft:', error);
     }
@@ -85,7 +85,7 @@ export const useFormPersistence = ({
       };
 
       localStorage.setItem(`onboarding_islamic_${user.id}`, JSON.stringify(draftData));
-      console.log('Islamic preferences draft saved to localStorage');
+      
     } catch (error) {
       console.error('Error saving preferences draft:', error);
     }
@@ -117,7 +117,7 @@ export const useFormPersistence = ({
       localStorage.removeItem(`onboarding_profile_${user.id}`);
       localStorage.removeItem(`onboarding_islamic_${user.id}`);
       localStorage.removeItem(`onboarding_step_${user.id}`);
-      console.log('Drafts cleared successfully');
+      
     } catch (error) {
       console.error('Error clearing drafts:', error);
     }

@@ -22,16 +22,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        console.log('🔐 Auth state change:', event, session?.user?.id);
-        
         // Handle token refresh events
         if (event === 'TOKEN_REFRESHED') {
-          console.log('✅ Token refreshed successfully');
+          // Token refreshed successfully
         }
         
         // Handle session expiry with emergency backup
         if (event === 'SIGNED_OUT' && session === null) {
-          console.log('⚠️ User signed out - triggering emergency backup');
           // Trigger emergency backup before clearing session
           window.dispatchEvent(new CustomEvent('auth:session-expired'));
         }
@@ -42,13 +39,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Test if the session is actually valid by making a simple query
             const { error } = await supabase.auth.getUser();
             if (error) {
-              console.error('❌ Session validation failed:', error);
               // Force sign out if session is invalid
               await supabase.auth.signOut();
               return;
             }
           } catch (error) {
-            console.error('❌ Session validation error:', error);
             await supabase.auth.signOut();
             return;
           }
@@ -66,12 +61,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
-          console.error('❌ Session error:', error);
           // Clear invalid sessions
           if (error.message?.includes('Invalid') || 
               error.message?.includes('JWT') || 
               error.message?.includes('expired')) {
-            console.log('🧹 Clearing expired session');
             localStorage.removeItem('supabase.auth.token');
             await supabase.auth.signOut();
             setSession(null);
@@ -82,7 +75,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           try {
             const { data: user, error: userError } = await supabase.auth.getUser();
             if (userError || !user?.user) {
-              console.error('❌ User validation failed:', userError);
               await supabase.auth.signOut();
               setSession(null);
               setUser(null);
@@ -91,7 +83,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
               setUser(session.user);
             }
           } catch (error) {
-            console.error('❌ User validation error:', error);
             await supabase.auth.signOut();
             setSession(null);
             setUser(null);
@@ -101,7 +92,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser(null);
         }
       } catch (error) {
-        console.error('❌ Auth initialization error:', error);
         setSession(null);
         setUser(null);
       } finally {

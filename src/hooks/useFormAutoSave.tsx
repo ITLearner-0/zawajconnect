@@ -38,7 +38,7 @@ export const useFormAutoSave = ({ data, key, interval = 1000 }: UseFormAutoSaveP
           localStorage.setItem(backupKey, JSON.stringify(timestampedData));
           
           lastSaveRef.current = serializedData;
-          console.log(`Auto-saved ${key} at ${new Date().toLocaleTimeString()}`);
+          
           
           // Emit save success event
           window.dispatchEvent(new CustomEvent('onboarding:save:success'));

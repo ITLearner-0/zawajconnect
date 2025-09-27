@@ -40,7 +40,7 @@ export const useEmergencyBackup = () => {
       localStorage.setItem(timeBasedKey, JSON.stringify(backupData));
       localStorage.setItem(emailKey, JSON.stringify(backupData));
       
-      console.log(`Emergency backup saved for ${key}`);
+      
     } catch (error) {
       console.error('Failed to save emergency backup:', error);
     }

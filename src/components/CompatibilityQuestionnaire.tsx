@@ -107,11 +107,8 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
 
   const fetchQuestionsAndResponses = async () => {
     try {
-      console.log('🔍 Fetching questions...');
-      
       // Check if user is authenticated first
       if (!user) {
-        console.error('❌ User not authenticated');
         toast({
           title: "Authentification requise",
           description: "Vous devez être connecté pour accéder au questionnaire.",
@@ -122,7 +119,6 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
 
       // Simple auth check without complex validation
       if (!user) {
-        console.log('⚠️ No authenticated user found');
         toast({
           title: "Authentification requise",
           description: "Veuillez vous connecter pour accéder au questionnaire.",
@@ -132,8 +128,6 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
         return;
       }
       
-      console.log('✅ User authenticated:', user.id);
-      
       // Fetch questions
       const { data: questionsData, error: questionsError } = await supabase
         .from('compatibility_questions')
@@ -142,16 +136,11 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
         .order('category', { ascending: true })
         .order('weight', { ascending: false });
 
-      console.log('📊 Questions raw data:', questionsData);
-      console.log('❌ Questions error:', questionsError);
-
       if (questionsError) {
-        console.error('❌ Questions fetch error:', questionsError);
         throw questionsError;
       }
 
       if (!questionsData || questionsData.length === 0) {
-        console.warn('⚠️ No questions found in database');
         toast({
           title: "Aucune question trouvée",
           description: "Le questionnaire ne contient actuellement aucune question active.",
@@ -171,7 +160,7 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
             const parsed = JSON.parse(q.options);
             options = Array.isArray(parsed) ? parsed.map((opt: any) => String(opt)) : [];
           } catch (e) {
-            console.error('❌ Error parsing options for question:', q.question_key, q.options);
+            console.error('Error parsing options for question:', q.question_key, q.options);
             options = [];
           }
         } else if (q.options && typeof q.options === 'object') {
@@ -190,13 +179,9 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
         };
       });
 
-      console.log('✅ Parsed questions:', parsedQuestions);
-      console.log('📊 Total questions parsed:', parsedQuestions.length);
-      
       setQuestions(parsedQuestions);
       
       const uniqueCategories = Array.from(new Set(parsedQuestions.map(q => q.category)));
-      console.log('🏷️ Categories found:', uniqueCategories);
       setCategories(uniqueCategories);
       
       if (uniqueCategories.length > 0) {
@@ -215,7 +200,7 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
         variant: "destructive"
       });
     } finally {
-      console.log('✅ Setting loading to false');
+      
       setLoading(false);
     }
   };
@@ -256,7 +241,7 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
   };
 
   const getTotalQuestions = () => {
-    console.log('📊 getTotalQuestions called, questions.length:', questions.length);
+    
     return questions.length;
   };
 
@@ -280,10 +265,6 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
   }
 
   // Debug information
-  console.log('🔄 Component render - questions count:', questions.length);
-  console.log('🔄 Component render - categories:', categories);
-  console.log('🔄 Component render - currentCategory:', currentCategory);
-  console.log('🔄 Component render - loading:', loading);
 
   const currentCategoryConfig = categoryConfig[currentCategory as keyof typeof categoryConfig];
   const Icon = currentCategoryConfig?.icon || Heart;
