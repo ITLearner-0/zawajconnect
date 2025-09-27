@@ -6,6 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { 
   CheckCircle, 
   XCircle, 
@@ -15,9 +17,12 @@ import {
   MessageCircle,
   Clock,
   Heart,
-  Loader2
+  Loader2,
+  AlertTriangle
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { invitationAuthSchema } from '@/lib/validation';
+import { z } from 'zod';
 
 interface FamilyInvitation {
   id: string;
@@ -52,6 +57,7 @@ const InvitationAccept = () => {
     confirmPassword: '',
     fullName: ''
   });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   const token = searchParams.get('token');
 
@@ -160,14 +166,26 @@ const InvitationAccept = () => {
     e.preventDefault();
     if (!invitation) return;
 
-    setProcessing(true);
-    try {
-      if (authMode === 'signup') {
-        if (authForm.password !== authForm.confirmPassword) {
-          throw new Error('Les mots de passe ne correspondent pas');
-        }
+    // Clear previous errors
+    setFormErrors({});
 
-        const { error } = await signUp(authForm.email, authForm.password, authForm.fullName || invitation.full_name);
+    // Validate form data
+    try {
+      const validatedData = invitationAuthSchema.parse({
+        email: authForm.email,
+        password: authForm.password,
+        confirmPassword: authMode === 'signup' ? authForm.confirmPassword : undefined,
+        fullName: authMode === 'signup' ? authForm.fullName : undefined
+      });
+
+      setProcessing(true);
+      
+      if (authMode === 'signup') {
+        const { error } = await signUp(
+          validatedData.email, 
+          validatedData.password, 
+          validatedData.fullName || invitation.full_name
+        );
         if (error) throw error;
 
         toast({
@@ -175,16 +193,32 @@ const InvitationAccept = () => {
           description: "Votre compte a été créé. Vérifiez votre email puis revenez accepter l'invitation.",
         });
       } else {
-        const { error } = await signIn(authForm.email, authForm.password);
+        const { error } = await signIn(validatedData.email, validatedData.password);
         if (error) throw error;
       }
     } catch (error) {
-      console.error('Auth error:', error);
-      toast({
-        title: "Erreur d'authentification",
-        description: error instanceof Error ? error.message : "Erreur lors de l'authentification",
-        variant: "destructive"
-      });
+      if (error instanceof z.ZodError) {
+        // Handle validation errors
+        const errors: Record<string, string> = {};
+        error.issues.forEach((issue) => {
+          if (issue.path.length > 0) {
+            errors[issue.path[0] as string] = issue.message;
+          }
+        });
+        setFormErrors(errors);
+        
+        toast({
+          title: "Données invalides",
+          description: "Veuillez corriger les erreurs dans le formulaire",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Erreur d'authentification",
+          description: error instanceof Error ? error.message : "Erreur lors de l'authentification",
+          variant: "destructive"
+        });
+      }
     } finally {
       setProcessing(false);
     }
@@ -269,56 +303,99 @@ const InvitationAccept = () => {
 
               <form onSubmit={handleAuth} className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Email</label>
-                  <input
+                  <Label htmlFor="email" className="text-sm font-medium">
+                    Email *
+                  </Label>
+                  <Input
+                    id="email"
                     type="email"
                     value={authForm.email}
                     onChange={(e) => setAuthForm(prev => ({ ...prev, email: e.target.value }))}
-                    className="w-full p-2 border rounded-md"
+                    className={`mt-1 ${formErrors.email ? 'border-red-500' : ''}`}
                     required
                     disabled={processing}
+                    maxLength={255}
                   />
+                  {formErrors.email && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <span className="text-sm text-red-500">{formErrors.email}</span>
+                    </div>
+                  )}
                 </div>
 
                 {authMode === 'signup' && (
                   <div>
-                    <label className="text-sm font-medium mb-1 block">Nom complet</label>
-                    <input
+                    <Label htmlFor="fullName" className="text-sm font-medium">
+                      Nom complet
+                    </Label>
+                    <Input
+                      id="fullName"
                       type="text"
                       value={authForm.fullName}
                       onChange={(e) => setAuthForm(prev => ({ ...prev, fullName: e.target.value }))}
-                      className="w-full p-2 border rounded-md"
+                      className={`mt-1 ${formErrors.fullName ? 'border-red-500' : ''}`}
                       placeholder={invitation.full_name}
                       disabled={processing}
+                      maxLength={100}
                     />
+                    {formErrors.fullName && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                        <span className="text-sm text-red-500">{formErrors.fullName}</span>
+                      </div>
+                    )}
                   </div>
                 )}
 
                 <div>
-                  <label className="text-sm font-medium mb-1 block">Mot de passe</label>
-                  <input
+                  <Label htmlFor="password" className="text-sm font-medium">
+                    Mot de passe *
+                  </Label>
+                  <Input
+                    id="password"
                     type="password"
                     value={authForm.password}
                     onChange={(e) => setAuthForm(prev => ({ ...prev, password: e.target.value }))}
-                    className="w-full p-2 border rounded-md"
-                    minLength={6}
+                    className={`mt-1 ${formErrors.password ? 'border-red-500' : ''}`}
                     required
                     disabled={processing}
+                    maxLength={128}
                   />
+                  {formErrors.password && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <span className="text-sm text-red-500">{formErrors.password}</span>
+                    </div>
+                  )}
+                  {authMode === 'signup' && !formErrors.password && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Minimum 8 caractères avec majuscule, minuscule et chiffre
+                    </p>
+                  )}
                 </div>
 
                 {authMode === 'signup' && (
                   <div>
-                    <label className="text-sm font-medium mb-1 block">Confirmer le mot de passe</label>
-                    <input
+                    <Label htmlFor="confirmPassword" className="text-sm font-medium">
+                      Confirmer le mot de passe *
+                    </Label>
+                    <Input
+                      id="confirmPassword"
                       type="password"
                       value={authForm.confirmPassword}
                       onChange={(e) => setAuthForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      className="w-full p-2 border rounded-md"
-                      minLength={6}
+                      className={`mt-1 ${formErrors.confirmPassword ? 'border-red-500' : ''}`}
                       required
                       disabled={processing}
+                      maxLength={128}
                     />
+                    {formErrors.confirmPassword && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                        <span className="text-sm text-red-500">{formErrors.confirmPassword}</span>
+                      </div>
+                    )}
                   </div>
                 )}
 

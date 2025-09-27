@@ -2,10 +2,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Send, Heart } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Heart, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
+import { contactFormSchema } from "@/lib/validation";
+import { z } from "zod";
 
 const ContactSection = () => {
   const [formData, setFormData] = useState({
@@ -14,22 +17,50 @@ const ContactSection = () => {
     subject: "",
     message: ""
   });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      toast({
-        title: "Message envoyé !",
-        description: "Nous vous répondrons dans les plus brefs délais. Barakallahu fikom.",
-      });
-      setFormData({ name: "", email: "", subject: "", message: "" });
-      setIsSubmitting(false);
-    }, 1000);
+    // Clear previous errors
+    setFormErrors({});
+    
+    // Validate form data
+    try {
+      const validatedData = contactFormSchema.parse(formData);
+      
+      setIsSubmitting(true);
+      
+      // Simulate form submission with validated data
+      setTimeout(() => {
+        toast({
+          title: "Message envoyé !",
+          description: "Nous vous répondrons dans les plus brefs délais. Barakallahu fikom.",
+        });
+        setFormData({ name: "", email: "", subject: "", message: "" });
+        setIsSubmitting(false);
+      }, 1000);
+      
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        // Handle validation errors
+        const errors: Record<string, string> = {};
+        error.issues.forEach((issue) => {
+          if (issue.path.length > 0) {
+            errors[issue.path[0] as string] = issue.message;
+          }
+        });
+        setFormErrors(errors);
+        
+        toast({
+          title: "Données invalides",
+          description: "Veuillez corriger les erreurs dans le formulaire",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -67,9 +98,9 @@ const ContactSection = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
+                    <Label htmlFor="name" className="text-sm font-medium text-foreground">
                       Nom complet *
-                    </label>
+                    </Label>
                     <Input
                       id="name"
                       type="text"
@@ -77,13 +108,20 @@ const ContactSection = () => {
                       onChange={(e) => handleInputChange("name", e.target.value)}
                       placeholder="Votre nom complet"
                       required
-                      className="border-sage/30 focus:border-emerald"
+                      maxLength={100}
+                      className={`mt-1 border-sage/30 focus:border-emerald ${formErrors.name ? 'border-red-500' : ''}`}
                     />
+                    {formErrors.name && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                        <span className="text-sm text-red-500">{formErrors.name}</span>
+                      </div>
+                    )}
                   </div>
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
+                    <Label htmlFor="email" className="text-sm font-medium text-foreground">
                       Email *
-                    </label>
+                    </Label>
                     <Input
                       id="email"
                       type="email"
@@ -91,15 +129,21 @@ const ContactSection = () => {
                       onChange={(e) => handleInputChange("email", e.target.value)}
                       placeholder="votre@email.com"
                       required
-                      className="border-sage/30 focus:border-emerald"
+                      maxLength={255}
+                      className={`mt-1 border-sage/30 focus:border-emerald ${formErrors.email ? 'border-red-500' : ''}`}
                     />
+                    {formErrors.email && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <AlertTriangle className="h-4 w-4 text-red-500" />
+                        <span className="text-sm text-red-500">{formErrors.email}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
-                
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-foreground mb-2">
+                  <Label htmlFor="subject" className="text-sm font-medium text-foreground">
                     Sujet *
-                  </label>
+                  </Label>
                   <Input
                     id="subject"
                     type="text"
@@ -107,14 +151,21 @@ const ContactSection = () => {
                     onChange={(e) => handleInputChange("subject", e.target.value)}
                     placeholder="Objet de votre message"
                     required
-                    className="border-sage/30 focus:border-emerald"
+                    maxLength={200}
+                    className={`mt-1 border-sage/30 focus:border-emerald ${formErrors.subject ? 'border-red-500' : ''}`}
                   />
+                  {formErrors.subject && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <span className="text-sm text-red-500">{formErrors.subject}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
+                  <Label htmlFor="message" className="text-sm font-medium text-foreground">
                     Message *
-                  </label>
+                  </Label>
                   <Textarea
                     id="message"
                     value={formData.message}
@@ -122,8 +173,18 @@ const ContactSection = () => {
                     placeholder="Décrivez votre demande ou question..."
                     rows={5}
                     required
-                    className="border-sage/30 focus:border-emerald resize-none"
+                    maxLength={2000}
+                    className={`mt-1 border-sage/30 focus:border-emerald resize-none ${formErrors.message ? 'border-red-500' : ''}`}
                   />
+                  {formErrors.message && (
+                    <div className="flex items-center gap-1 mt-1">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <span className="text-sm text-red-500">{formErrors.message}</span>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {formData.message.length}/2000 caractères
+                  </p>
                 </div>
 
                 <Button

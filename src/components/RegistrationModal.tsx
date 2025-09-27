@@ -6,7 +6,14 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Heart, User, BookOpen, Check } from 'lucide-react';
+import { Heart, User, BookOpen, Check, AlertTriangle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  registrationStep1Schema, 
+  registrationStep2Schema, 
+  registrationStep3Schema 
+} from '@/lib/validation';
+import { z } from 'zod';
 
 interface RegistrationModalProps {
   isOpen: boolean;
@@ -29,6 +36,8 @@ const RegistrationModal = ({ isOpen, onClose }: RegistrationModalProps) => {
     educationPreference: '',
     bio: ''
   });
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const { toast } = useToast();
 
   const totalSteps = 3;
 
@@ -37,7 +46,46 @@ const RegistrationModal = ({ isOpen, onClose }: RegistrationModalProps) => {
   };
 
   const handleNext = () => {
-    if (step < totalSteps) setStep(step + 1);
+    // Clear previous errors
+    setFormErrors({});
+    
+    // Validate current step before proceeding
+    try {
+      if (step === 1) {
+        registrationStep1Schema.parse({
+          firstName: formData.firstName,
+          age: formData.age,
+          city: formData.city,
+          profession: formData.profession
+        });
+      } else if (step === 2) {
+        registrationStep2Schema.parse({
+          practiceLevel: formData.practiceLevel,
+          prayerFrequency: formData.prayerFrequency,
+          hijabWearing: formData.hijabWearing,
+          islamicEducation: formData.islamicEducation
+        });
+      }
+      
+      if (step < totalSteps) setStep(step + 1);
+      
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.issues.forEach((issue) => {
+          if (issue.path.length > 0) {
+            errors[issue.path[0] as string] = issue.message;
+          }
+        });
+        setFormErrors(errors);
+        
+        toast({
+          title: "Données invalides",
+          description: "Veuillez corriger les erreurs avant de continuer",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const handlePrevious = () => {
@@ -45,8 +93,43 @@ const RegistrationModal = ({ isOpen, onClose }: RegistrationModalProps) => {
   };
 
   const handleSubmit = () => {
-    console.log('Form submitted:', formData);
-    onClose();
+    // Clear previous errors
+    setFormErrors({});
+    
+    // Validate final step
+    try {
+      registrationStep3Schema.parse({
+        agePreference: formData.agePreference,
+        locationPreference: formData.locationPreference,
+        educationPreference: formData.educationPreference,
+        bio: formData.bio
+      });
+      
+      // If validation passes, proceed with submission
+      toast({
+        title: "Profil créé !",
+        description: "Votre profil a été créé avec succès. Bienvenue !",
+      });
+      
+      onClose();
+      
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        const errors: Record<string, string> = {};
+        error.issues.forEach((issue) => {
+          if (issue.path.length > 0) {
+            errors[issue.path[0] as string] = issue.message;
+          }
+        });
+        setFormErrors(errors);
+        
+        toast({
+          title: "Données invalides",
+          description: "Veuillez corriger les erreurs avant de continuer",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const renderStep1 = () => (
@@ -67,13 +150,20 @@ const RegistrationModal = ({ isOpen, onClose }: RegistrationModalProps) => {
             value={formData.firstName}
             onChange={(e) => handleInputChange('firstName', e.target.value)}
             placeholder="Votre prénom"
-            className="mt-1"
+            maxLength={100}
+            className={`mt-1 ${formErrors.firstName ? 'border-red-500' : ''}`}
           />
+          {formErrors.firstName && (
+            <div className="flex items-center gap-1 mt-1">
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+              <span className="text-sm text-red-500">{formErrors.firstName}</span>
+            </div>
+          )}
         </div>
         <div>
           <Label htmlFor="age" className="text-foreground">Âge *</Label>
           <Select value={formData.age} onValueChange={(value) => handleInputChange('age', value)}>
-            <SelectTrigger className="mt-1">
+            <SelectTrigger className={`mt-1 ${formErrors.age ? 'border-red-500' : ''}`}>
               <SelectValue placeholder="Sélectionnez votre âge" />
             </SelectTrigger>
             <SelectContent>
@@ -82,6 +172,12 @@ const RegistrationModal = ({ isOpen, onClose }: RegistrationModalProps) => {
               ))}
             </SelectContent>
           </Select>
+          {formErrors.age && (
+            <div className="flex items-center gap-1 mt-1">
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+              <span className="text-sm text-red-500">{formErrors.age}</span>
+            </div>
+          )}
         </div>
       </div>
 
