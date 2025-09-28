@@ -5,9 +5,9 @@ import { AuthProvider } from "@/hooks/useAuth";
 import NavigationGuard from "@/components/navigation/NavigationGuard";
 import { NavigationProvider } from "@/components/navigation/NavigationProvider";
 import RouteTransition from "@/components/navigation/RouteTransition";
-import RouteRenderer from "@/components/routing/RouteRenderer";
 import { publicRoutes, specialRoutes, protectedRoutes, notFoundRoute } from "@/config/appRoutes";
 import { Toaster } from "@/components/ui/toaster";
+import ProtectedRouteWrapper from "@/components/routing/ProtectedRouteWrapper";
 
 // Create QueryClient outside component to avoid hook issues
 const queryClient = new QueryClient({
@@ -36,13 +36,48 @@ function App() {
               <RouteTransition>
                 <Routes>
                   {/* Public routes */}
-                  <RouteRenderer routes={publicRoutes} />
+                  {publicRoutes.map((route) => {
+                    const Component = route.component;
+                    return (
+                      <Route
+                        key={route.path}
+                        path={route.path}
+                        element={<Component />}
+                      />
+                    );
+                  })}
                   
                   {/* Special routes (protected with different requirements) */}
-                  <RouteRenderer routes={specialRoutes} />
+                  {specialRoutes.map((route) => {
+                    const Component = route.component;
+                    return (
+                      <Route
+                        key={route.path}
+                        path={route.path}
+                        element={
+                          <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
+                            <Component />
+                          </ProtectedRouteWrapper>
+                        }
+                      />
+                    );
+                  })}
                   
-                  {/* Protected routes */}
-                  <RouteRenderer routes={protectedRoutes} isProtected />
+                  {/* Protected routes */} 
+                  {protectedRoutes.map((route) => {
+                    const Component = route.component;
+                    return (
+                      <Route
+                        key={route.path}
+                        path={route.path}
+                        element={
+                          <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
+                            <Component />
+                          </ProtectedRouteWrapper>
+                        }
+                      />
+                    );
+                  })}
                   
                   {/* Catch all route */}
                   <Route path={notFoundRoute.path} element={<NotFoundComponent />} />
