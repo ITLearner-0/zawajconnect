@@ -6,17 +6,23 @@ import RoleBasedLayout from '@/components/RoleBasedLayout';
 interface ProtectedRouteWrapperProps {
   children: ReactNode;
   requireOnboarding?: boolean;
+  layout?: 'default' | 'minimal' | 'auth';
 }
 
 const ProtectedRouteWrapper: React.FC<ProtectedRouteWrapperProps> = ({ 
   children, 
-  requireOnboarding = true 
+  requireOnboarding = true,
+  layout = 'default'
 }) => {
   return (
     <ProtectedRoute requireOnboarding={requireOnboarding}>
-      <RoleBasedLayout>
-        {children}
-      </RoleBasedLayout>
+      {layout === 'minimal' ? (
+        children
+      ) : (
+        <RoleBasedLayout>
+          {children}
+        </RoleBasedLayout>
+      )}
     </ProtectedRoute>
   );
 };

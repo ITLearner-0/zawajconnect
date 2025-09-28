@@ -46,8 +46,6 @@ const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
       title: "Intérêt envoyé",
       description: `Votre intérêt pour ${match.full_name} a été exprimé (Compatibilité: ${match.compatibility_score}%)`,
     });
-    
-    // TODO: Implement actual interest logic with database
   };
 
   const handleFamilyApproval = async () => {

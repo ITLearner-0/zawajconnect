@@ -5,9 +5,9 @@ import { AuthProvider } from "@/hooks/useAuth";
 import NavigationGuard from "@/components/navigation/NavigationGuard";
 import { NavigationProvider } from "@/components/navigation/NavigationProvider";
 import RouteTransition from "@/components/navigation/RouteTransition";
+import RouteWrapper from "@/components/routing/RouteWrapper";
 import { publicRoutes, specialRoutes, protectedRoutes, notFoundRoute } from "@/config/appRoutes";
 import { Toaster } from "@/components/ui/toaster";
-import ProtectedRouteWrapper from "@/components/routing/ProtectedRouteWrapper";
 
 // Create QueryClient outside component to avoid hook issues
 const queryClient = new QueryClient({
@@ -18,6 +18,9 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Combine all routes for easier mapping
+const allRoutes = [...publicRoutes, ...specialRoutes, ...protectedRoutes];
 
 function App() {
   const NotFoundComponent = notFoundRoute.component;
@@ -35,49 +38,13 @@ function App() {
             <NavigationGuard>
               <RouteTransition>
                 <Routes>
-                  {/* Public routes */}
-                  {publicRoutes.map((route) => {
-                    const Component = route.component;
-                    return (
-                      <Route
-                        key={route.path}
-                        path={route.path}
-                        element={<Component />}
-                      />
-                    );
-                  })}
-                  
-                  {/* Special routes (protected with different requirements) */}
-                  {specialRoutes.map((route) => {
-                    const Component = route.component;
-                    return (
-                      <Route
-                        key={route.path}
-                        path={route.path}
-                        element={
-                          <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
-                            <Component />
-                          </ProtectedRouteWrapper>
-                        }
-                      />
-                    );
-                  })}
-                  
-                  {/* Protected routes */} 
-                  {protectedRoutes.map((route) => {
-                    const Component = route.component;
-                    return (
-                      <Route
-                        key={route.path}
-                        path={route.path}
-                        element={
-                          <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
-                            <Component />
-                          </ProtectedRouteWrapper>
-                        }
-                      />
-                    );
-                  })}
+                  {allRoutes.map((route) => (
+                    <Route
+                      key={route.path}
+                      path={route.path}
+                      element={<RouteWrapper route={route} />}
+                    />
+                  ))}
                   
                   {/* Catch all route */}
                   <Route path={notFoundRoute.path} element={<NotFoundComponent />} />

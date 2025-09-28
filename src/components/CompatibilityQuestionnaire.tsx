@@ -186,7 +186,7 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
       
       if (uniqueCategories.length > 0) {
         setCurrentCategory(uniqueCategories[0]);
-        console.log('🎯 Set current category to:', uniqueCategories[0]);
+        
       }
 
       // Load existing responses from database
@@ -263,8 +263,6 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
       </div>
     );
   }
-
-  // Debug information
 
   const currentCategoryConfig = categoryConfig[currentCategory as keyof typeof categoryConfig];
   const Icon = currentCategoryConfig?.icon || Heart;
