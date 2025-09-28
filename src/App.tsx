@@ -20,6 +20,8 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const NotFoundComponent = notFoundRoute.component;
+  
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
@@ -43,7 +45,7 @@ function App() {
                   <RouteRenderer routes={protectedRoutes} isProtected />
                   
                   {/* Catch all route */}
-                  <Route path={notFoundRoute.path} element={<notFoundRoute.component />} />
+                  <Route path={notFoundRoute.path} element={<NotFoundComponent />} />
                 </Routes>
               </RouteTransition>
             </NavigationGuard>
