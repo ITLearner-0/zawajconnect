@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import MobileOptimizedError from './MobileOptimizedError';
 
 interface Props {
   children: ReactNode;
@@ -12,9 +13,16 @@ interface State {
 }
 
 export class ErrorBoundary extends Component<Props, State> {
+  private isMobile: boolean = false;
+  
   public state: State = {
     hasError: false
   };
+
+  constructor(props: Props) {
+    super(props);
+    // Note: We can't use hooks in class components, so we'll detect mobile via CSS
+  }
 
   public static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
@@ -30,6 +38,18 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
+      // Check if screen width suggests mobile (fallback detection)
+      const isMobileScreen = window.innerWidth < 768;
+      
+      if (isMobileScreen) {
+        return (
+          <MobileOptimizedError 
+            error={this.state.error}
+            resetError={this.handleReset}
+          />
+        );
+      }
+
       return (
         <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center p-4">
           <div className="max-w-md w-full bg-card rounded-lg border p-6 text-center">

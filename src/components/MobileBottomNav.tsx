@@ -3,76 +3,16 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/integrations/supabase/client';
-import { getNavigationRoutes } from '@/config/routes';
 import { Home, Heart, MessageCircle, Search, User } from 'lucide-react';
+import { useOptimizedUnreadMessages } from '@/hooks/useOptimizedData';
 
 const MobileBottomNav = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
-  const [unreadMessages, setUnreadMessages] = useState(0);
+  const unreadMessages = useOptimizedUnreadMessages();
 
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchUnreadMessages = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('messages')
-          .select('id, match_id')
-          .eq('is_read', false)
-          .neq('sender_id', user.id);
-
-        if (error) throw error;
-
-        setUnreadMessages(data?.length || 0);
-      } catch (error) {
-        console.error('Error fetching unread messages:', error);
-      }
-    };
-
-    fetchUnreadMessages();
-
-    // Set up real-time subscription for new messages
-    const channel = supabase
-      .channel('unread_messages')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-          filter: `sender_id=neq.${user.id}`
-        },
-        () => {
-          fetchUnreadMessages();
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user]);
-
-  // Get main navigation routes for mobile
-  const allRoutes = getNavigationRoutes();
-  const mobileRoutes = allRoutes.filter(route => 
-    ['dashboard', 'browse', 'matches', 'chat', 'enhanced-profile'].some(key => 
-      route.path.includes(key)
-    )
-  );
-
-  // Map icons
-  const iconMap: Record<string, any> = {
-    'Home': Home,
-    'User': User,
-    'Search': Search,
-    'Heart': Heart,
-    'MessageCircle': MessageCircle
-  };
-
+  // Remove unused routes calculation
   const navItems = [
     {
       path: '/dashboard',
