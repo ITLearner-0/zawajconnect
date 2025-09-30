@@ -43,10 +43,10 @@ export const useProfileData = (): UseProfileDataReturn => {
         verificationsResult,
         matchingPrefsResult
       ] = await Promise.allSettled([
-        supabase.from('profiles').select('user_id, full_name, age, location, bio, occupation, education, interests, profile_photos, created_at').eq('user_id', user.id).maybeSingle(),
+        supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle(),
         supabase.from('islamic_preferences').select('*').eq('user_id', user.id).maybeSingle(),
         supabase.from('privacy_settings').select('*').eq('user_id', user.id).maybeSingle(),
-        supabase.from('user_verifications').select('verification_score, id_verified, phone_verified, email_verified').eq('user_id', user.id).maybeSingle(),
+        supabase.from('user_verifications').select('*').eq('user_id', user.id).maybeSingle(),
         supabase.from('matching_preferences').select('*').eq('user_id', user.id).maybeSingle()
       ]);
 

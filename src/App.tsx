@@ -2,13 +2,12 @@ import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
 import NavigationGuard from "@/components/navigation/NavigationGuard";
 import { NavigationProvider } from "@/components/navigation/NavigationProvider";
 import RouteTransition from "@/components/navigation/RouteTransition";
-import RouteWrapper from "@/components/routing/RouteWrapper";
 import { publicRoutes, specialRoutes, protectedRoutes, notFoundRoute } from "@/config/appRoutes";
 import { Toaster } from "@/components/ui/toaster";
+import ProtectedRouteWrapper from "@/components/routing/ProtectedRouteWrapper";
 
 // Create QueryClient outside component to avoid hook issues
 const queryClient = new QueryClient({
@@ -20,45 +19,76 @@ const queryClient = new QueryClient({
   },
 });
 
-// Combine all routes for easier mapping
-const allRoutes = [...publicRoutes, ...specialRoutes, ...protectedRoutes];
-
 function App() {
   const NotFoundComponent = notFoundRoute.component;
   
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true
-            }}
-          >
-            <NavigationProvider>
-              <NavigationGuard>
-                <RouteTransition>
-                  <Routes>
-                    {allRoutes.map((route) => (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true
+          }}
+        >
+          <NavigationProvider>
+            <NavigationGuard>
+              <RouteTransition>
+                <Routes>
+                  {/* Public routes */}
+                  {publicRoutes.map((route) => {
+                    const Component = route.component;
+                    return (
                       <Route
                         key={route.path}
                         path={route.path}
-                        element={<RouteWrapper route={route} />}
+                        element={<Component />}
                       />
-                    ))}
-                    
-                    {/* Catch all route */}
-                    <Route path={notFoundRoute.path} element={<NotFoundComponent />} />
-                  </Routes>
-                </RouteTransition>
-              </NavigationGuard>
-            </NavigationProvider>
-            <Toaster />
-          </BrowserRouter>
-        </AuthProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+                    );
+                  })}
+                  
+                  {/* Special routes (protected with different requirements) */}
+                  {specialRoutes.map((route) => {
+                    const Component = route.component;
+                    return (
+                      <Route
+                        key={route.path}
+                        path={route.path}
+                        element={
+                          <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
+                            <Component />
+                          </ProtectedRouteWrapper>
+                        }
+                      />
+                    );
+                  })}
+                  
+                  {/* Protected routes */} 
+                  {protectedRoutes.map((route) => {
+                    const Component = route.component;
+                    return (
+                      <Route
+                        key={route.path}
+                        path={route.path}
+                        element={
+                          <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
+                            <Component />
+                          </ProtectedRouteWrapper>
+                        }
+                      />
+                    );
+                  })}
+                  
+                  {/* Catch all route */}
+                  <Route path={notFoundRoute.path} element={<NotFoundComponent />} />
+                </Routes>
+              </RouteTransition>
+            </NavigationGuard>
+          </NavigationProvider>
+          <Toaster />
+        </BrowserRouter>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
 

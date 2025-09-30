@@ -45,9 +45,13 @@ export const useProfileSave = () => {
       return { success: false, error: 'User not authenticated' };
     }
     
+    console.log('✅ Authenticated user:', user.id);
+    console.log('📊 Profile data to save:', { ...profileData, user_id: user.id });
+
     setSaving(true);
 
     try {
+      // Debug log the exact data being sent to database
       const profileUpdateData = {
         user_id: user.id,
         full_name: profileData.full_name,
@@ -63,16 +67,26 @@ export const useProfileSave = () => {
         updated_at: new Date().toISOString()
       };
       
+      // Debug gender value specifically
+      console.log('Raw gender value:', JSON.stringify(profileUpdateData.gender));
+      console.log('Gender type:', typeof profileUpdateData.gender);
+      console.log('Gender length:', profileUpdateData.gender?.length);
+      console.log('Gender char codes:', profileUpdateData.gender?.split('').map(c => c.charCodeAt(0)));
+      
       // Validate gender exists (database constraint will handle case/whitespace)
       if (!profileUpdateData.gender || profileUpdateData.gender.trim().length === 0) {
         throw new Error(`Gender value is required.`);
       }
+      
+      console.log('Sending to database:', JSON.stringify(profileUpdateData, null, 2));
       
       // Check if user is still authenticated before database operation
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Session expired. Please log in again.');
       }
+      
+      console.log('✅ Session valid, proceeding with upsert...');
       
       // 1. Save basic profile using UPSERT to avoid conflicts
       const { error: profileError } = await supabase

@@ -122,7 +122,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
       // Load users with profiles (separate from roles and status)
       const { data: usersData, error: usersError } = await supabase
         .from('profiles')
-        .select('user_id, full_name, age, location, created_at')
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(50);
 
@@ -158,7 +158,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
       // Load reports with manual profile lookups
       const { data: reportsData, error: reportsError } = await supabase
         .from('reports')
-        .select('id, report_type, description, status, created_at, reporter_id, reported_user_id')
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(20);
 

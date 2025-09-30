@@ -405,6 +405,13 @@ const Onboarding = () => {
       return;
     }
 
+    console.log('Profile data before save:', JSON.stringify(profileData, null, 2));
+    console.log('Islamic preferences before save:', JSON.stringify(islamicPrefs, null, 2));
+    
+    // Double check gender value before calling hook
+    console.log('ONBOARDING DEBUG - Gender value before save:', JSON.stringify(profileData.gender));
+    console.log('ONBOARDING DEBUG - Gender type:', typeof profileData.gender);
+    console.log('ONBOARDING DEBUG - Is valid gender?', ['male', 'female'].includes(profileData.gender));
     
     setSaving(true);
     

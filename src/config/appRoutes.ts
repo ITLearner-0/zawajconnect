@@ -39,18 +39,17 @@ export interface AppRouteConfig {
   component: ComponentType;
   protected?: boolean;
   requiresOnboarding?: boolean;
-  layout?: 'public' | 'auth' | 'protected' | 'minimal';
 }
 
 // Public routes - no authentication required
 export const publicRoutes: AppRouteConfig[] = [
-  { path: '/', component: Index, layout: 'public' },
-  { path: '/auth', component: Auth, layout: 'auth' },
-  { path: '/wali', component: WaliAccess, layout: 'public' },
-  { path: '/privacy-policy', component: PrivacyPolicy, layout: 'public' },
-  { path: '/invitation-auth', component: InvitationAuth, layout: 'auth' },
-  { path: '/invitation', component: InvitationAccept, layout: 'minimal' },
-  { path: '/invitation/accept', component: InvitationAccept, layout: 'minimal' },
+  { path: '/', component: Index },
+  { path: '/auth', component: Auth },
+  { path: '/wali', component: WaliAccess },
+  { path: '/privacy-policy', component: PrivacyPolicy },
+  { path: '/invitation-auth', component: InvitationAuth },
+  { path: '/invitation', component: InvitationAccept },
+  { path: '/invitation/accept', component: InvitationAccept },
 ];
 
 // Special routes - protected but may have different requirements
@@ -59,41 +58,40 @@ export const specialRoutes: AppRouteConfig[] = [
     path: '/onboarding', 
     component: Onboarding, 
     protected: true, 
-    requiresOnboarding: false,
-    layout: 'minimal'
+    requiresOnboarding: false 
   },
 ];
 
 // Protected routes - require authentication and complete profile
 export const protectedRoutes: AppRouteConfig[] = [
-  { path: '/dashboard', component: Dashboard, layout: 'protected' },
-  { path: '/enhanced-profile', component: EnhancedProfile, layout: 'protected' },
-  { path: '/profile', component: EnhancedProfile, layout: 'protected' },
-  { path: '/advanced-matching', component: AdvancedMatching, layout: 'protected' },
-  { path: '/browse', component: Browse, layout: 'protected' },
-  { path: '/matches', component: Matches, layout: 'protected' },
-  { path: '/chat', component: Chat, layout: 'protected' },
-  { path: '/chat/:matchId', component: Chat, layout: 'protected' },
-  { path: '/profile/:userId', component: Profile, layout: 'protected' },
-  { path: '/privacy', component: Privacy, layout: 'protected' },
-  { path: '/family', component: Family, layout: 'protected' },
-  { path: '/guidance', component: Guidance, layout: 'protected' },
-  { path: '/admin', component: Admin, layout: 'protected' },
-  { path: '/moderation-test', component: ModerationTest, layout: 'protected' },
-  { path: '/wali-dashboard', component: WaliDashboard, layout: 'protected' },
-  { path: '/match-approval', component: MatchApproval, layout: 'protected' },
-  { path: '/family-analytics', component: FamilyAnalyticsPage, layout: 'protected' },
-  { path: '/moderation-tests', component: ModerationTests, layout: 'protected' },
-  { path: '/faq', component: FAQ, layout: 'protected' },
-  { path: '/settings', component: Settings, layout: 'protected' },
-  { path: '/islamic-tools', component: IslamicTools, layout: 'protected' },
-  { path: '/family-supervision', component: FamilySupervision, layout: 'protected' },
-  { path: '/family-notifications', component: FamilyNotifications, layout: 'protected' },
-  { path: '/family-access', component: FamilyAccess, layout: 'protected' },
-  { path: '/family-portal', component: FamilyAccessPortal, layout: 'protected' },
-  { path: '/family-supervision-panel', component: FamilySupervisionPanel, layout: 'protected' },
-  { path: '/compatibility-test', component: CompatibilityTest, layout: 'protected' },
-  { path: '/compatibility-insights', component: CompatibilityInsightsPage, layout: 'protected' },
+  { path: '/dashboard', component: Dashboard },
+  { path: '/enhanced-profile', component: EnhancedProfile },
+  { path: '/profile', component: EnhancedProfile },
+  { path: '/advanced-matching', component: AdvancedMatching },
+  { path: '/browse', component: Browse },
+  { path: '/matches', component: Matches },
+  { path: '/chat', component: Chat },
+  { path: '/chat/:matchId', component: Chat },
+  { path: '/profile/:userId', component: Profile },
+  { path: '/privacy', component: Privacy },
+  { path: '/family', component: Family },
+  { path: '/guidance', component: Guidance },
+  { path: '/admin', component: Admin },
+  { path: '/moderation-test', component: ModerationTest },
+  { path: '/wali-dashboard', component: WaliDashboard },
+  { path: '/match-approval', component: MatchApproval },
+  { path: '/family-analytics', component: FamilyAnalyticsPage },
+  { path: '/moderation-tests', component: ModerationTests },
+  { path: '/faq', component: FAQ },
+  { path: '/settings', component: Settings },
+  { path: '/islamic-tools', component: IslamicTools },
+  { path: '/family-supervision', component: FamilySupervision },
+  { path: '/family-notifications', component: FamilyNotifications },
+  { path: '/family-access', component: FamilyAccess },
+  { path: '/family-portal', component: FamilyAccessPortal },
+  { path: '/family-supervision-panel', component: FamilySupervisionPanel },
+  { path: '/compatibility-test', component: CompatibilityTest },
+  { path: '/compatibility-insights', component: CompatibilityInsightsPage },
 ];
 
 // Catch all route

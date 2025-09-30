@@ -11,6 +11,7 @@ import {
   Heart, 
   MessageCircle, 
   Star, 
+  TrendingUp,
   Calendar,
   Crown,
   Gift,
@@ -24,76 +25,201 @@ import MobileProfileHeader from './MobileProfileHeader';
 import SuccessStoriesShowcase from './SuccessStoriesShowcase';
 import PremiumSubscription from './PremiumSubscription';
 import IslamicCalendarWidget from './IslamicCalendarWidget';
-import LoadingSpinner from './LoadingSpinner';
-import ErrorMessage from './ErrorMessage';
-import { useOptimizedDashboardData } from '@/hooks/useOptimizedData';
+
+interface DashboardStats {
+  total_matches: number;
+  mutual_matches: number;
+  messages_count: number;
+  profile_views: number;
+  likes_received: number;
+  verification_score: number;
+}
+
+interface RecentActivity {
+  id: string;
+  type: 'like' | 'match' | 'message' | 'view';
+  user_name: string;
+  user_avatar?: string;
+  timestamp: string;
+  read: boolean;
+}
 
 const EnhancedDashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { stats, loading, refreshStats } = useOptimizedDashboardData();
+  const [stats, setStats] = useState<DashboardStats>({
+    total_matches: 0,
+    mutual_matches: 0,
+    messages_count: 0,
+    profile_views: 0,
+    likes_received: 0,
+    verification_score: 0
+  });
+  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     if (user) {
-      loadUserProfile();
+      loadDashboardData();
     }
   }, [user]);
 
-  const loadUserProfile = async () => {
+  const loadDashboardData = async () => {
     if (!user) return;
 
+    setLoading(true);
     try {
+      // Load user profile
       const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name, avatar_url, age, location')
+        .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
 
       if (profile) {
         setUserProfile({
           ...profile,
-          premium_status: false,
+          premium_status: false, // In real app, check subscription status
           last_seen: 'Maintenant'
         });
       }
+
+      // Load dashboard stats
+      await Promise.all([
+        loadMatches(),
+        loadMessages(), 
+        loadProfileViews(),
+        loadVerificationScore(),
+        loadRecentActivity()
+      ]);
+      
     } catch (error) {
-      console.error('Error loading user profile:', error);
+      console.error('Error loading dashboard data:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les données du tableau de bord",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const [recentActivity] = useState([
-    {
-      id: '1',
-      type: 'like',
-      user_name: 'Sarah A.',
-      timestamp: '2024-01-05T10:30:00Z',
-      read: false
-    },
-    {
-      id: '2',
-      type: 'match',
-      user_name: 'Ahmed B.',
-      timestamp: '2024-01-05T09:15:00Z',
-      read: false
-    },
-    {
-      id: '3',
-      type: 'message',
-      user_name: 'Fatima K.',
-      timestamp: '2024-01-04T18:45:00Z',
-      read: true
-    },
-    {
-      id: '4',
-      type: 'view',
-      user_name: 'Omar M.',
-      timestamp: '2024-01-04T14:20:00Z',
-      read: true
+  const loadMatches = async () => {
+    if (!user) return;
+
+    try {
+      const { data: matches } = await supabase
+        .from('matches')
+        .select('*')
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+
+      const totalMatches = matches?.length || 0;
+      const mutualMatches = matches?.filter(m => m.is_mutual)?.length || 0;
+
+      setStats(prev => ({
+        ...prev,
+        total_matches: totalMatches,
+        mutual_matches: mutualMatches
+      }));
+    } catch (error) {
+      console.error('Error loading matches:', error);
     }
-  ]);
+  };
+
+  const loadMessages = async () => {
+    if (!user) return;
+
+    try {
+      const { data: messages } = await supabase
+        .from('messages')
+        .select('*')
+        .eq('sender_id', user.id);
+
+      setStats(prev => ({
+        ...prev,
+        messages_count: messages?.length || 0
+      }));
+    } catch (error) {
+      console.error('Error loading messages:', error);
+    }
+  };
+
+  const loadProfileViews = async () => {
+    if (!user) return;
+
+    try {
+      const { count } = await supabase
+        .from('profile_views')
+        .select('*', { count: 'exact', head: true })
+        .eq('viewed_id', user.id);
+
+      setStats(prev => ({
+        ...prev,
+        profile_views: count || 0
+      }));
+    } catch (error) {
+      console.error('Error loading profile views:', error);
+    }
+  };
+
+  const loadVerificationScore = async () => {
+    if (!user) return;
+
+    try {
+      const { data } = await supabase
+        .from('user_verifications')
+        .select('verification_score')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      setStats(prev => ({
+        ...prev,
+        verification_score: data?.verification_score || 0
+      }));
+    } catch (error) {
+      console.error('Error loading verification score:', error);
+    }
+  };
+
+  const loadRecentActivity = async () => {
+    // Sample recent activity - in real app, aggregate from multiple tables
+    const sampleActivity: RecentActivity[] = [
+      {
+        id: '1',
+        type: 'like',
+        user_name: 'Sarah A.',
+        timestamp: '2024-01-05T10:30:00Z',
+        read: false
+      },
+      {
+        id: '2',
+        type: 'match',
+        user_name: 'Ahmed B.',
+        timestamp: '2024-01-05T09:15:00Z',
+        read: false
+      },
+      {
+        id: '3',
+        type: 'message',
+        user_name: 'Fatima K.',
+        timestamp: '2024-01-04T18:45:00Z',
+        read: true
+      },
+      {
+        id: '4',
+        type: 'view',
+        user_name: 'Omar M.',
+        timestamp: '2024-01-04T14:20:00Z',
+        read: true
+      }
+    ];
+
+    setRecentActivity(sampleActivity);
+  };
 
   const getActivityIcon = (type: string) => {
     switch (type) {
@@ -110,7 +236,7 @@ const EnhancedDashboard = () => {
     }
   };
 
-  const getActivityText = (activity: any) => {
+  const getActivityText = (activity: RecentActivity) => {
     switch (activity.type) {
       case 'like':
         return `${activity.user_name} a liké votre profil`;
@@ -129,7 +255,15 @@ const EnhancedDashboard = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
         <div className="container mx-auto max-w-6xl p-4">
-          <LoadingSpinner variant="skeleton" message="Chargement du tableau de bord..." />
+          <div className="space-y-6">
+            {[...Array(6)].map((_, i) => (
+              <Card key={i} className="animate-pulse">
+                <CardContent className="p-6">
+                  <div className="h-24 bg-muted rounded"></div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     );
