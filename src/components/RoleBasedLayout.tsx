@@ -26,12 +26,16 @@ const RoleBasedLayoutContent: React.FC<RoleBasedLayoutProps> = ({ children }) =>
   if (authLoading || roleLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald"></div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald"></div>
+          <p className="text-sm text-muted-foreground">Chargement de votre profil...</p>
+        </div>
       </div>
     );
   }
 
-  // Not authenticated - seulement après que l'auth loading soit terminé
+  // Not authenticated - cette condition ne devrait jamais être atteinte
+  // car ProtectedRoute redirige déjà, mais on la garde par sécurité
   if (!user) {
     return <Navigate to="/auth" replace />;
   }
