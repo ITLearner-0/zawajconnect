@@ -40,7 +40,7 @@ interface AppLayoutProps {
 }
 
 const AppLayout = ({ children }: AppLayoutProps) => {
-  const { user, signOut, loading } = useAuth();
+  const { user, signOut } = useAuth();
   const { isWali } = useUserRole();
   const { isAdmin } = useIsAdmin();
   const navigate = useNavigate();
@@ -58,13 +58,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     navigate('/');
   };
 
-  // Show loading state while auth is initializing
-  // This prevents flickering and ensures user state is properly loaded
-  if (loading || !user) {
+  if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald"></div>
-      </div>
+      <>
+        <Header />
+        {children}
+      </>
     );
   }
 

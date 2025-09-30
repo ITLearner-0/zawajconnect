@@ -196,32 +196,31 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
-      <div className="container mx-auto px-4 py-6 md:py-8">
-        {/* Back link - centered on mobile, left on desktop */}
-        <div className="flex items-center mb-6 lg:mb-8 max-w-7xl mx-auto">
-          <Link to="/" className="flex items-center gap-2 text-emerald hover:text-emerald-dark transition-colors animate-fade-in">
-            <ArrowLeft className="h-4 w-4" />
-            <span className="text-sm md:text-base">Retour à l'accueil</span>
-          </Link>
-        </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid lg:grid-cols-2 gap-8 items-start max-w-6xl mx-auto">
+          {/* Auth Form */}
+          <div className="w-full max-w-md mx-auto lg:mx-0">
+            <div className="flex items-center gap-2 mb-8 justify-center lg:justify-start">
+              <Link to="/" className="flex items-center gap-2 text-emerald hover:text-emerald-dark transition-colors animate-fade-in">
+                <ArrowLeft className="h-4 w-4" />
+                Retour à l'accueil
+              </Link>
+            </div>
 
-        <div className="grid lg:grid-cols-[minmax(400px,500px),1fr] gap-8 lg:gap-12 items-start max-w-7xl mx-auto">
-          {/* Auth Form - Constrained width */}
-          <div className="w-full max-w-md mx-auto lg:max-w-none">
             <Card className="border-border/50 shadow-soft bg-card/95 backdrop-blur-sm animate-fade-in">
-              <CardHeader className="text-center space-y-4">
+              <CardHeader className="text-center">
                 {isWaliMode && (
-                  <div className="p-3 bg-emerald/10 border border-emerald/20 rounded-lg">
+                  <div className="mb-4 p-3 bg-emerald/10 border border-emerald/20 rounded-lg">
                     <div className="flex items-center justify-center gap-2 text-emerald">
                       <Shield className="h-5 w-5" />
-                      <span className="font-medium text-sm md:text-base">Mode Supervision Familiale</span>
+                      <span className="font-medium">Mode Supervision Familiale</span>
                     </div>
-                    <p className="text-xs md:text-sm text-emerald-dark mt-1">
+                    <p className="text-sm text-emerald-dark mt-1">
                       Connexion pour les membres de famille et walis
                     </p>
                   </div>
                 )}
-                <div className="flex justify-center">
+                <div className="flex justify-center mb-4">
                   <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center animate-float">
                     {isWaliMode ? (
                       <Shield className="h-6 w-6 text-primary-foreground" />
@@ -230,17 +229,15 @@ const Auth = () => {
                     )}
                   </div>
                 </div>
-                <div>
-                  <CardTitle className="text-xl md:text-2xl font-bold text-foreground">
-                    {isWaliMode ? 'Supervision Familiale' : 'Bienvenue sur ZawajConnect'}
-                  </CardTitle>
-                  <CardDescription className="text-muted-foreground text-sm md:text-base mt-2">
-                    {isWaliMode 
-                      ? 'Accédez à votre espace de supervision et guidance islamique'
-                      : 'Votre plateforme de rencontres islamiques'
-                    }
-                  </CardDescription>
-                </div>
+                <CardTitle className="text-2xl font-bold text-foreground">
+                  {isWaliMode ? 'Supervision Familiale' : 'Bienvenue sur ZawajConnect'}
+                </CardTitle>
+                <CardDescription className="text-muted-foreground">
+                  {isWaliMode 
+                    ? 'Accédez à votre espace de supervision et guidance islamique'
+                    : 'Votre plateforme de rencontres islamiques'
+                  }
+                </CardDescription>
               </CardHeader>
           
           <CardContent className="animate-slide-up">
@@ -570,11 +567,9 @@ const Auth = () => {
             </p>
           </div>
 
-          {/* Preview Section - Properly sized on desktop */}
-          <div className="hidden lg:block">
-            <div className="sticky top-8 max-w-md xl:max-w-lg">
-              <AuthPreview />
-            </div>
+          {/* Preview Section */}
+          <div className="hidden lg:block w-full">
+            <AuthPreview />
           </div>
         </div>
       </div>
