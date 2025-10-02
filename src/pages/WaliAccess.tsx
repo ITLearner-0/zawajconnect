@@ -88,7 +88,7 @@ const WaliAccess = () => {
                   className="border-emerald text-emerald hover:bg-emerald hover:text-white"
                   asChild
                 >
-                  <Link to="/invitation-accept">
+                  <Link to="/invitation/accept">
                     Accepter une invitation
                   </Link>
                 </Button>
