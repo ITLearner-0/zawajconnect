@@ -19,87 +19,31 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    // Set up auth state listener FIRST - CRITICAL: Keep synchronous!
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        // Handle token refresh events
-        if (event === 'TOKEN_REFRESHED') {
-          // Token refreshed successfully
-        }
+      (event, session) => {
+        // CRITICAL: Only synchronous state updates here to prevent deadlocks
+        console.log('Auth state changed:', event, session?.user?.email);
         
-        // Handle session expiry with emergency backup
+        // Handle session expiry events
         if (event === 'SIGNED_OUT' && session === null) {
-          // Trigger emergency backup before clearing session
           window.dispatchEvent(new CustomEvent('auth:session-expired'));
         }
         
-        // Validate session if it exists
-        if (session) {
-          try {
-            // Test if the session is actually valid by making a simple query
-            const { error } = await supabase.auth.getUser();
-            if (error) {
-              // Force sign out if session is invalid
-              await supabase.auth.signOut();
-              return;
-            }
-          } catch (error) {
-            await supabase.auth.signOut();
-            return;
-          }
-        }
-        
+        // Update state synchronously
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
       }
     );
 
-    // THEN check for existing session with error handling
-    const initializeAuth = async () => {
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          // Clear invalid sessions
-          if (error.message?.includes('Invalid') || 
-              error.message?.includes('JWT') || 
-              error.message?.includes('expired')) {
-            localStorage.removeItem('supabase.auth.token');
-            await supabase.auth.signOut();
-            setSession(null);
-            setUser(null);
-          }
-        } else if (session) {
-          // Validate the session by testing auth.uid()
-          try {
-            const { data: user, error: userError } = await supabase.auth.getUser();
-            if (userError || !user?.user) {
-              await supabase.auth.signOut();
-              setSession(null);
-              setUser(null);
-            } else {
-              setSession(session);
-              setUser(session.user);
-            }
-          } catch (error) {
-            await supabase.auth.signOut();
-            setSession(null);
-            setUser(null);
-          }
-        } else {
-          setSession(null);
-          setUser(null);
-        }
-      } catch (error) {
-        setSession(null);
-        setUser(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initializeAuth();
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('Initial session check:', session?.user?.email);
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
     return () => subscription.unsubscribe();
   }, []);
