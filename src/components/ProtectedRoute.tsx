@@ -16,25 +16,41 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
 
   useEffect(() => {
     const checkProfile = async () => {
+      console.log('🔒 ProtectedRoute - Checking profile for user:', user?.id);
+      
       if (!user) {
+        console.log('🔒 No user, setting profileLoading to false');
         setProfileLoading(false);
         return;
       }
 
       try {
-        const { data: profile } = await supabase
+        console.log('🔒 Fetching profile data...');
+        const { data: profile, error } = await supabase
           .from('profiles')
           .select('bio, looking_for')
           .eq('user_id', user.id)
           .maybeSingle();
 
+        if (error) {
+          console.error('🔒 Error fetching profile:', error);
+          // Don't block access on error - let the page handle it
+          setHasCompleteProfile(false);
+          setProfileLoading(false);
+          return;
+        }
+
+        console.log('🔒 Profile data:', profile);
+        
         // Consider profile complete if both bio and looking_for are filled
         const isComplete = profile && profile.bio && profile.looking_for;
+        console.log('🔒 Profile complete:', isComplete);
         setHasCompleteProfile(!!isComplete);
       } catch (error) {
-        console.error('Error checking profile:', error);
+        console.error('🔒 Exception checking profile:', error);
         setHasCompleteProfile(false);
       } finally {
+        console.log('🔒 Setting profileLoading to false');
         setProfileLoading(false);
       }
     };

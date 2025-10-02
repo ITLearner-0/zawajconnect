@@ -127,9 +127,15 @@ const EnhancedProfile = () => {
   }, [profile, compatibilityStats, islamicPrefs, privacySettings, verification]);
 
   const fetchProfileData = async () => {
-    if (!user) return;
+    console.log('📊 EnhancedProfile - Fetching profile data for user:', user?.id);
+    if (!user) {
+      console.log('📊 No user, aborting fetch');
+      setLoading(false);
+      return;
+    }
 
     try {
+      console.log('📊 Starting parallel fetch...');
       const [profileRes, verificationRes, islamicRes, privacyRes] = await Promise.all([
         supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle(),
         supabase.from('user_verifications').select('*').eq('user_id', user.id).maybeSingle(),
@@ -137,23 +143,56 @@ const EnhancedProfile = () => {
         supabase.from('privacy_settings').select('*').eq('user_id', user.id).maybeSingle()
       ]);
 
-      if (profileRes.error) throw profileRes.error;
-      if (verificationRes.error) throw verificationRes.error;
-      if (islamicRes.error) throw islamicRes.error;
-      if (privacyRes.error) throw privacyRes.error;
+      console.log('📊 Fetch results:', {
+        profile: profileRes.data,
+        profileError: profileRes.error,
+        verification: verificationRes.data,
+        verificationError: verificationRes.error,
+        islamic: islamicRes.data,
+        islamicError: islamicRes.error,
+        privacy: privacyRes.data,
+        privacyError: privacyRes.error
+      });
 
-      setProfile(profileRes.data);
-      setVerification(verificationRes.data);
-      setIslamicPrefs(islamicRes.data);
-      setPrivacySettings(privacyRes.data);
+      // Don't throw on individual errors - set null data instead
+      if (profileRes.error) {
+        console.error('📊 Profile error:', profileRes.error);
+        setProfile(null);
+      } else {
+        setProfile(profileRes.data);
+      }
+
+      if (verificationRes.error) {
+        console.error('📊 Verification error:', verificationRes.error);
+        setVerification(null);
+      } else {
+        setVerification(verificationRes.data);
+      }
+
+      if (islamicRes.error) {
+        console.error('📊 Islamic prefs error:', islamicRes.error);
+        setIslamicPrefs(null);
+      } else {
+        setIslamicPrefs(islamicRes.data);
+      }
+
+      if (privacyRes.error) {
+        console.error('📊 Privacy error:', privacyRes.error);
+        setPrivacySettings(null);
+      } else {
+        setPrivacySettings(privacyRes.data);
+      }
+
+      console.log('📊 All data loaded successfully');
     } catch (error) {
-      console.error('Error fetching profile data:', error);
+      console.error('📊 Critical error fetching profile data:', error);
       toast({
         title: "Erreur",
         description: "Impossible de charger les données du profil",
         variant: "destructive"
       });
     } finally {
+      console.log('📊 Setting loading to false');
       setLoading(false);
     }
   };
