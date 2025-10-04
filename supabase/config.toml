@@ -1,1 +1,4 @@
 project_id = "dgfctwtivkqcfhwqgkya"
+
+[functions.moderate-content]
+verify_jwt = true

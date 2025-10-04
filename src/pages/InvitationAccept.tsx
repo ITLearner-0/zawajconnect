@@ -28,7 +28,6 @@ interface FamilyInvitation {
   id: string;
   user_id: string;
   full_name: string;
-  email: string;
   relationship: string;
   is_wali: boolean;
   invitation_status: string;
@@ -112,7 +111,6 @@ const InvitationAccept = () => {
         ...data,
         inviter: data.inviter || { full_name: 'Unknown', age: 0, location: 'Unknown', profession: 'Unknown' }
       } as FamilyInvitation);
-      setAuthForm(prev => ({ ...prev, email: data.email }));
 
       if (!user) {
         setNeedsAuth(true);

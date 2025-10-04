@@ -39,6 +39,35 @@ serve(async (req) => {
       );
     }
 
+    // Rate limiting: Check recent moderation calls (max 10 per minute per user)
+    const oneMinuteAgo = new Date(Date.now() - 60000).toISOString();
+    const { data: recentCalls, error: rateLimitError } = await supabase
+      .from('moderation_logs')
+      .select('id')
+      .eq('user_id', userId)
+      .gte('created_at', oneMinuteAgo);
+
+    if (rateLimitError) {
+      console.error('Rate limit check error:', rateLimitError);
+    } else if (recentCalls && recentCalls.length >= 10) {
+      console.warn(`Rate limit exceeded for user ${userId}`);
+      return new Response(
+        JSON.stringify({
+          approved: false,
+          action: 'blocked',
+          confidence: 1.0,
+          rulesTriggered: ['rate_limit_exceeded'],
+          reason: 'Trop de requêtes de modération. Veuillez patienter avant de réessayer.',
+          islamicGuidance: 'La patience est une vertu. Attendez quelques instants avant de continuer.',
+          severity: 'medium'
+        }),
+        {
+          status: 429,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        }
+      );
+    }
+
     console.log(`Moderating content for user ${userId}: "${content}"`);
 
     // Prepare moderation prompt

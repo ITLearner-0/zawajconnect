@@ -52,7 +52,6 @@ interface FamilyMember {
   relationship: string;
   is_wali: boolean;
   can_communicate: boolean;
-  email?: string;
 }
 
 interface FamilyReview {
@@ -86,11 +85,12 @@ const ParentalApprovalWorkflow = () => {
     if (!user) return;
 
     try {
-      // Fetch matches for users where current user is a family member
+      // Fetch matches for users where current user is an invited family member
       const { data: familyData, error: familyError } = await supabase
         .from('family_members')
         .select('user_id')
-        .eq('email', user.email);
+        .eq('invited_user_id', user.id)
+        .eq('invitation_status', 'accepted');
 
       if (familyError) throw familyError;
 
@@ -161,7 +161,7 @@ const ParentalApprovalWorkflow = () => {
         .from('family_reviews')
         .insert({
           match_id: requestId,
-          family_member_id: familyMembers.find(fm => fm.email === user?.email)?.id,
+          family_member_id: familyMembers.find(fm => fm.id === user?.id)?.id,
           status,
           notes: notes || null
         });
@@ -169,7 +169,7 @@ const ParentalApprovalWorkflow = () => {
       if (error) throw error;
 
       // Update the overall match status if this is from a Wali
-      const familyMember = familyMembers.find(fm => fm.email === user?.email);
+      const familyMember = familyMembers.find(fm => fm.id === user?.id);
       if (familyMember?.is_wali) {
         await supabase
           .from('matches')

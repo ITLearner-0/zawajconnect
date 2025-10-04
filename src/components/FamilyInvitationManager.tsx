@@ -28,8 +28,6 @@ import { Switch } from '@/components/ui/switch';
 interface FamilyMember {
   id: string;
   full_name: string;
-  email: string;
-  phone: string;
   relationship: string;
   invitation_status: string;
   can_view_profile: boolean;
@@ -174,7 +172,6 @@ const FamilyInvitationManager = () => {
       await supabase.functions.invoke('send-family-invitation', {
         body: {
           fullName: member.full_name,
-          email: member.email,
           relationship: member.relationship,
           isWali: member.is_wali
         },
@@ -439,13 +436,6 @@ const FamilyInvitationManager = () => {
                       </div>
                       <p className="text-sm text-muted-foreground flex items-center gap-2">
                         <span>{getRelationshipLabel(member.relationship)}</span>
-                        {member.email && (
-                          <>
-                            <span>•</span>
-                            <Mail className="h-3 w-3" />
-                            <span>{member.email}</span>
-                          </>
-                        )}
                       </p>
                       <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                         {member.can_view_profile && (

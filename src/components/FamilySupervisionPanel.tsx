@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Users, Plus, Mail, Phone, Shield, Heart, UserCheck, AlertCircle, Trash2, Send } from 'lucide-react';
+import { z } from 'zod';
 
 interface FamilyMember {
   id: string;
@@ -61,6 +62,30 @@ const FamilySupervisionPanel = () => {
     subject: '',
     body: '',
     to: ''
+  });
+
+  // Validation schema for family member input
+  const familyMemberSchema = z.object({
+    full_name: z.string()
+      .trim()
+      .min(2, 'Le nom doit contenir au moins 2 caractères')
+      .max(100, 'Le nom ne peut pas dépasser 100 caractères')
+      .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, 'Le nom contient des caractères invalides'),
+    relationship: z.string()
+      .trim()
+      .min(2, 'La relation doit être spécifiée')
+      .max(50, 'La relation ne peut pas dépasser 50 caractères'),
+    email: z.string()
+      .trim()
+      .email('Format email invalide')
+      .max(255, 'L\'email ne peut pas dépasser 255 caractères')
+      .optional()
+      .or(z.literal('')),
+    phone: z.string()
+      .trim()
+      .regex(/^\+?[1-9]\d{7,14}$/, 'Format de téléphone invalide (exemple: +33612345678)')
+      .optional()
+      .or(z.literal(''))
   });
 
   const relationshipOptions = [
@@ -138,25 +163,37 @@ const FamilySupervisionPanel = () => {
   };
 
   const addFamilyMember = async () => {
-    if (!user || !newMember.full_name.trim() || !newMember.relationship) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive"
-      });
-      return;
-    }
+    if (!user) return;
 
     setSaving(true);
     try {
+      // Validate input using zod schema
+      const validationResult = familyMemberSchema.safeParse({
+        full_name: newMember.full_name,
+        relationship: newMember.relationship,
+        email: newMember.email || '',
+        phone: newMember.phone || ''
+      });
+
+      if (!validationResult.success) {
+        const errors = validationResult.error.issues.map(e => e.message).join(', ');
+        toast({
+          title: "Erreur de validation",
+          description: errors,
+          variant: "destructive"
+        });
+        setSaving(false);
+        return;
+      }
+
+      const validatedData = validationResult.data;
+
       const { data, error } = await supabase
         .from('family_members')
         .insert({
           user_id: user.id,
-          full_name: newMember.full_name.trim(),
-          relationship: newMember.relationship,
-          email: newMember.email.trim() || null,
-          phone: newMember.phone.trim() || null,
+          full_name: validatedData.full_name,
+          relationship: validatedData.relationship,
           can_communicate: newMember.can_communicate,
           can_view_profile: newMember.can_view_profile,
           is_wali: newMember.is_wali

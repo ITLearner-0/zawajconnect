@@ -296,7 +296,6 @@ export type Database = {
           can_communicate: boolean | null
           can_view_profile: boolean | null
           created_at: string
-          email: string | null
           full_name: string
           id: string
           invitation_accepted_at: string | null
@@ -305,7 +304,6 @@ export type Database = {
           invitation_token: string | null
           invited_user_id: string | null
           is_wali: boolean | null
-          phone: string | null
           relationship: string
           user_id: string
         }
@@ -313,7 +311,6 @@ export type Database = {
           can_communicate?: boolean | null
           can_view_profile?: boolean | null
           created_at?: string
-          email?: string | null
           full_name: string
           id?: string
           invitation_accepted_at?: string | null
@@ -322,7 +319,6 @@ export type Database = {
           invitation_token?: string | null
           invited_user_id?: string | null
           is_wali?: boolean | null
-          phone?: string | null
           relationship: string
           user_id: string
         }
@@ -330,7 +326,6 @@ export type Database = {
           can_communicate?: boolean | null
           can_view_profile?: boolean | null
           created_at?: string
-          email?: string | null
           full_name?: string
           id?: string
           invitation_accepted_at?: string | null
@@ -339,7 +334,6 @@ export type Database = {
           invitation_token?: string | null
           invited_user_id?: string | null
           is_wali?: boolean | null
-          phone?: string | null
           relationship?: string
           user_id?: string
         }

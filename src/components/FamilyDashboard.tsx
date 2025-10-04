@@ -100,11 +100,12 @@ const FamilyDashboard = () => {
     if (!user) return;
 
     try {
-      // Find all users where the current user is listed as a family member
+      // Find all users where the current user is invited as a family member
       const { data: familyData, error: familyError } = await supabase
         .from('family_members')
         .select('user_id')
-        .eq('email', user.email);
+        .eq('invited_user_id', user.id)
+        .eq('invitation_status', 'accepted');
 
       if (familyError) throw familyError;
 
