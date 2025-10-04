@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -11,6 +12,18 @@ const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
+// Input validation schema
+const ApprovalRequestSchema = z.object({
+  user_id: z.string().uuid(),
+  match_user_id: z.string().uuid(),
+  compatibility_score: z.number().min(0).max(100),
+  islamic_score: z.number().min(0).max(100).optional(),
+  cultural_score: z.number().min(0).max(100).optional(),
+  personality_score: z.number().min(0).max(100).optional(),
+  matching_reasons: z.array(z.string().max(500)).optional(),
+  potential_concerns: z.array(z.string().max(500)).optional()
+});
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -19,6 +32,61 @@ serve(async (req) => {
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     
+    // Get user from auth header (JWT verified by Supabase)
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication requise' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication invalide' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Validate input
+    let validatedInput;
+    try {
+      const rawInput = await req.json();
+      validatedInput = ApprovalRequestSchema.parse(rawInput);
+    } catch (validationError) {
+      console.error('Validation error:', validationError);
+      return new Response(
+        JSON.stringify({ error: 'Données invalides' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Rate limiting: Check recent approval requests (max 10 per hour)
+    const { data: recentRequests, error: rateLimitError } = await supabase
+      .from('family_notifications')
+      .select('id')
+      .eq('notification_type', 'approval_request')
+      .gte('created_at', new Date(Date.now() - 60 * 60 * 1000).toISOString());
+
+    if (rateLimitError) {
+      console.error('Rate limit check failed:', rateLimitError);
+      return new Response(
+        JSON.stringify({ error: 'Une erreur est survenue. Veuillez réessayer.' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    if (recentRequests && recentRequests.length >= 10) {
+      console.warn(`Rate limit exceeded for approval requests`);
+      return new Response(
+        JSON.stringify({ error: 'Trop de demandes. Veuillez patienter une heure.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { 
       user_id, 
       match_user_id, 
@@ -28,22 +96,38 @@ serve(async (req) => {
       personality_score,
       matching_reasons,
       potential_concerns 
-    } = await req.json();
+    } = validatedInput;
 
-    console.log('Family approval request for:', { user_id, match_user_id });
+    // Verify requesting user owns the profile
+    if (user.id !== user_id) {
+      return new Response(
+        JSON.stringify({ error: 'Non autorisé' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log('Family approval request initiated');
 
     // Get user and match profiles
-    const { data: userProfile } = await supabase
+    const { data: userProfile, error: userError } = await supabase
       .from('profiles')
       .select('*')
       .eq('user_id', user_id)
       .single();
 
-    const { data: matchProfile } = await supabase
+    const { data: matchProfile, error: matchError } = await supabase
       .from('profiles')
       .select('*')
       .eq('user_id', match_user_id)
       .single();
+
+    if (userError || matchError) {
+      console.error('Profile fetch error:', userError || matchError);
+      return new Response(
+        JSON.stringify({ error: 'Impossible de récupérer les profils' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Get Islamic preferences for both users
     const { data: userIslamic } = await supabase
@@ -66,23 +150,20 @@ serve(async (req) => {
       .eq('invitation_status', 'accepted')
       .eq('is_wali', true);
 
-    console.log('Family members found:', familyMembers?.length || 0);
-
     if (familyError) {
       console.error('Error fetching family members:', familyError);
       return new Response(
-        JSON.stringify({ error: 'Erreur lors de la récupération des membres de famille' }), 
+        JSON.stringify({ error: 'Erreur système' }), 
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     if (!familyMembers || familyMembers.length === 0) {
-      console.log('No family members found for user:', user_id);
+      console.log('No wali found for user');
       return new Response(
         JSON.stringify({ 
           error: 'no_family_members',
-          message: 'Aucun membre de famille (wali) trouvé pour l\'approbation. Veuillez d\'abord inviter et faire accepter un wali dans vos paramètres famille.',
-          user_id: user_id
+          message: 'Aucun membre de famille (wali) trouvé. Veuillez inviter un wali.',
         }), 
         { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -150,9 +231,11 @@ Fournir une analyse respectueuse en français comprenant:
         if (response.ok) {
           const data = await response.json();
           aiAnalysis = data.choices[0].message.content;
+        } else {
+          console.error('OpenAI API error:', response.status);
         }
       } catch (error) {
-        console.error('OpenAI error:', error);
+        console.error('OpenAI request failed:', error);
       }
     }
 
@@ -177,8 +260,11 @@ Fournir une analyse respectueuse en français comprenant:
         .single();
 
       if (matchError) {
-        console.error('Error creating match:', matchError);
-        throw matchError;
+        console.error('Match creation failed:', matchError);
+        return new Response(
+          JSON.stringify({ error: 'Impossible de créer le match' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
       }
       matchRecord = newMatch;
     }
@@ -208,58 +294,13 @@ ${aiAnalysis ? `Analyse IA:\n${aiAnalysis}` : ''}
         .single();
 
       if (notifError) {
-        console.error('Error creating notification:', notifError);
+        console.error('Notification creation failed:', notifError);
       } else {
         notifications.push(notification);
       }
     }
 
-    // Send email notification if email service is available
-    try {
-      const resendApiKey = Deno.env.get('RESEND_API_KEY');
-      if (resendApiKey && familyMembers[0]?.email) {
-        const emailResponse = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${resendApiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: 'notifications@lovable.app',
-            to: [familyMembers[0].email],
-            subject: `Demande d'approbation familiale - ${userProfile?.full_name}`,
-            html: `
-              <h2>Demande d'approbation familiale</h2>
-              <p><strong>${userProfile?.full_name}</strong> demande votre approbation pour un match potentiel.</p>
-              
-              <h3>Profil du match: ${matchProfile?.full_name}</h3>
-              <ul>
-                <li>Âge: ${matchProfile?.age} ans</li>
-                <li>Localisation: ${matchProfile?.location}</li>
-                <li>Profession: ${matchProfile?.profession}</li>
-              </ul>
-              
-              <h3>Scores de compatibilité</h3>
-              <ul>
-                <li>Score global: ${compatibility_score}%</li>
-                <li>Compatibilité islamique: ${islamic_score}%</li>
-                <li>Compatibilité culturelle: ${cultural_score}%</li>
-              </ul>
-              
-              ${aiAnalysis ? `<h3>Analyse et recommandations</h3><p>${aiAnalysis.replace(/\n/g, '<br>')}</p>` : ''}
-              
-              <p>Connectez-vous à l'application pour examiner cette demande et donner votre avis.</p>
-            `
-          }),
-        });
-
-        if (!emailResponse.ok) {
-          console.error('Email sending failed:', await emailResponse.text());
-        }
-      }
-    } catch (emailError) {
-      console.error('Email error:', emailError);
-    }
+    console.log('Approval request processed successfully');
 
     return new Response(
       JSON.stringify({ 
@@ -274,7 +315,7 @@ ${aiAnalysis ? `Analyse IA:\n${aiAnalysis}` : ''}
   } catch (error) {
     console.error('Error in family-approval-request:', error);
     return new Response(
-      JSON.stringify({ error: error.message }), 
+      JSON.stringify({ error: 'Une erreur est survenue. Veuillez réessayer.' }), 
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

@@ -2,3 +2,12 @@ project_id = "dgfctwtivkqcfhwqgkya"
 
 [functions.moderate-content]
 verify_jwt = true
+
+[functions.family-approval-request]
+verify_jwt = true
+
+[functions.send-family-invitation]
+verify_jwt = true
+
+[functions.create-google-meet]
+verify_jwt = true

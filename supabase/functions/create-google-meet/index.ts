@@ -1,18 +1,20 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface MeetingRequest {
-  title?: string;
-  description?: string;
-  duration?: number;
-  matchId: string;
-  participantIds: string[];
-}
+// Input validation schema
+const MeetingRequestSchema = z.object({
+  title: z.string().trim().max(200).optional(),
+  description: z.string().trim().max(1000).optional(),
+  duration: z.number().min(15).max(240).optional().default(60),
+  matchId: z.string().uuid(),
+  participantIds: z.array(z.string().uuid()).min(1).max(10)
+});
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -26,23 +28,40 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // Get the authorization header
-    const authHeader = req.headers.get('authorization')!
+    // Get the authorization header (JWT verified by Supabase)
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication requise' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const token = authHeader.replace('Bearer ', '')
     
     // Verify the user is authenticated
     const { data: { user }, error: authError } = await supabase.auth.getUser(token)
     if (authError || !user) {
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { 
-          status: 401, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        JSON.stringify({ error: 'Authentication invalide' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    const { title, description, duration = 60, matchId, participantIds }: MeetingRequest = await req.json()
+    // Validate input
+    let validatedInput;
+    try {
+      const rawInput = await req.json();
+      validatedInput = MeetingRequestSchema.parse(rawInput);
+    } catch (validationError) {
+      console.error('Validation error:', validationError);
+      return new Response(
+        JSON.stringify({ error: 'Données invalides' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { title, description, duration, matchId, participantIds } = validatedInput;
 
     // Vérifier que l'utilisateur a accès au match
     const { data: match, error: matchError } = await supabase
@@ -53,12 +72,10 @@ serve(async (req) => {
       .single()
 
     if (matchError || !match) {
+      console.error('Match access denied:', matchError);
       return new Response(
-        JSON.stringify({ error: 'Match not found or access denied' }),
-        { 
-          status: 403, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        JSON.stringify({ error: 'Accès refusé' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
@@ -89,18 +106,14 @@ serve(async (req) => {
       .single()
 
     if (insertError) {
-      console.error('Error inserting video call:', insertError)
+      console.error('Database insert failed:', insertError)
       return new Response(
-        JSON.stringify({ error: 'Failed to create meeting record' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
+        JSON.stringify({ error: 'Impossible de créer la réunion' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // TODO: Dans une vraie implémentation, envoyer une notification aux participants
-    // et créer la réunion via l'API Google Meet
+    console.log('Meeting created successfully');
 
     return new Response(
       JSON.stringify({
@@ -115,19 +128,14 @@ serve(async (req) => {
           description: videoCall.description
         }
       }),
-      { 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
 
   } catch (error) {
     console.error('Error in create-google-meet function:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
+      JSON.stringify({ error: 'Une erreur est survenue. Veuillez réessayer.' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
