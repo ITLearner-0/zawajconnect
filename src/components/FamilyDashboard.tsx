@@ -151,7 +151,8 @@ const FamilyDashboard = () => {
         .from('family_members')
         .select('*')
         .eq('user_id', userId)
-        .eq('email', user.email)
+        .eq('invited_user_id', user.id)
+        .eq('invitation_status', 'accepted')
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;

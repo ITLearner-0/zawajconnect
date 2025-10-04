@@ -145,7 +145,8 @@ const ParentalApprovalWorkflow = () => {
       const { data, error } = await supabase
         .from('family_members')
         .select('*')
-        .eq('email', user.email);
+        .eq('invited_user_id', user.id)
+        .eq('invitation_status', 'accepted');
 
       if (error) throw error;
       setFamilyMembers(data || []);
