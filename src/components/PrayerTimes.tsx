@@ -50,6 +50,71 @@ const PrayerTimes = () => {
   const [timeToNext, setTimeToNext] = useState<string>('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [coordinates, setCoordinates] = useState<{lat: number, lon: number} | null>(null);
+
+  // Fetch prayer times from Mawaqit API
+  const fetchPrayerTimes = async (latitude: number, longitude: number) => {
+    try {
+      setLoading(true);
+      const response = await fetch(
+        `https://api.aladhan.com/v1/timings?latitude=${latitude}&longitude=${longitude}&method=3`
+      );
+      const data = await response.json();
+      
+      if (data.code === 200 && data.data.timings) {
+        const timings = data.data.timings;
+        setPrayerTimes({
+          fajr: timings.Fajr,
+          sunrise: timings.Sunrise,
+          dhuhr: timings.Dhuhr,
+          asr: timings.Asr,
+          maghrib: timings.Maghrib,
+          isha: timings.Isha
+        });
+        
+        // Update location name
+        if (data.data.meta?.timezone) {
+          setLocation(data.data.meta.timezone);
+        }
+        
+        toast({
+          title: "Heures de prière mises à jour",
+          description: "Les horaires ont été récupérés avec succès via Mawaqit"
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de récupérer les heures de prière",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get user location and fetch prayer times on mount
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCoordinates({ lat: latitude, lon: longitude });
+          fetchPrayerTimes(latitude, longitude);
+        },
+        (error) => {
+          toast({
+            title: "Localisation désactivée",
+            description: "Utilisation des heures par défaut pour Paris",
+            variant: "default"
+          });
+          // Default to Paris coordinates
+          setCoordinates({ lat: 48.8566, lon: 2.3522 });
+          fetchPrayerTimes(48.8566, 2.3522);
+        }
+      );
+    }
+  }, []);
 
   // Update current time every second using local browser time
   useEffect(() => {
@@ -167,42 +232,21 @@ const PrayerTimes = () => {
   };
 
   const updateLocation = async () => {
-    setLoading(true);
-    try {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            
-            // In a real app, you would call a prayer times API here
-            // For demo purposes, we'll simulate an API call
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            
-            // Update location name (this would come from reverse geocoding API)
-            setLocation(`Lat: ${latitude.toFixed(2)}, Lng: ${longitude.toFixed(2)}`);
-            
-            toast({
-              title: "Localisation mise à jour",
-              description: "Heures de prière actualisées pour votre position"
-            });
-          },
-          (error) => {
-            toast({
-              title: "Erreur de localisation",
-              description: "Impossible d'obtenir votre position",
-              variant: "destructive"
-            });
-          }
-        );
-      }
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour la localisation",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCoordinates({ lat: latitude, lon: longitude });
+          fetchPrayerTimes(latitude, longitude);
+        },
+        (error) => {
+          toast({
+            title: "Erreur de localisation",
+            description: "Impossible d'obtenir votre position",
+            variant: "destructive"
+          });
+        }
+      );
     }
   };
 
