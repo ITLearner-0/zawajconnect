@@ -18,7 +18,6 @@ import {
 import PrivacySettingsForm from '@/components/PrivacySettingsForm';
 import FamilySupervisionPanel from '@/components/FamilySupervisionPanel';
 import VerificationCenter from '@/components/VerificationCenter';
-import IslamicCalendarWidget from '@/components/IslamicCalendarWidget';
 import NotificationSystem from '@/components/NotificationSystem';
 import PremiumSubscription from '@/components/PremiumSubscription';
 import IDVerificationSystem from '@/components/enhanced/IDVerificationSystem';
@@ -71,15 +70,9 @@ const Settings = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar - Islamic Calendar Widget */}
-          <div className="lg:col-span-1">
-            <IslamicCalendarWidget />
-          </div>
-
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            <Tabs value={activeTab} onValueChange={setActiveTab}>
+        {/* Main Content */}
+        <div className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="privacy" className="flex items-center gap-2">
                   <Shield className="h-4 w-4" />
@@ -178,7 +171,6 @@ const Settings = () => {
                 </TabsContent>
               </div>
             </Tabs>
-          </div>
         </div>
       </div>
     </div>
