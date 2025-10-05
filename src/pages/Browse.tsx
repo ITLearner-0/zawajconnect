@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnifiedCompatibility } from '@/hooks/useUnifiedCompatibility';
+import { useConversationStatus } from '@/hooks/useConversationStatus';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -15,6 +16,7 @@ import ProfileCard from '@/components/ProfileCard';
 import CompatibilityScore from '@/components/CompatibilityScore';
 import { DailyLimitIndicator } from '@/components/DailyLimitIndicator';
 import { UpgradeToPremiumModal } from '@/components/UpgradeToPremiumModal';
+import { ActiveConversationBanner } from '@/components/ActiveConversationBanner';
 
 interface MatchingProfile {
   id?: string;
@@ -33,6 +35,7 @@ interface MatchingProfile {
 const Browse = () => {
   const { user, subscription } = useAuth();
   const { calculateDetailedCompatibility } = useUnifiedCompatibility();
+  const { checkIfInConversation } = useConversationStatus();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [profiles, setProfiles] = useState<MatchingProfile[]>([]);
@@ -44,6 +47,8 @@ const Browse = () => {
   const [selectedProfile, setSelectedProfile] = useState<MatchingProfile | null>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [dailyLimitReached, setDailyLimitReached] = useState(false);
+  const [isInActiveConversation, setIsInActiveConversation] = useState(false);
+  const [activeMatchId, setActiveMatchId] = useState<string | undefined>();
 
   useEffect(() => {
     if (!user) {
@@ -51,6 +56,7 @@ const Browse = () => {
       return;
     }
     fetchProfiles();
+    checkUserConversationStatus();
   }, [user]);
 
   useEffect(() => {
@@ -67,6 +73,30 @@ const Browse = () => {
       });
     }
   }, [filteredProfiles]);
+
+  const checkUserConversationStatus = async () => {
+    if (!user) return;
+    
+    try {
+      const isInConversation = await checkIfInConversation(user.id);
+      setIsInActiveConversation(isInConversation);
+      
+      // If in conversation, get the match ID
+      if (isInConversation) {
+        const { data: activeMatch } = await supabase
+          .from('matches')
+          .select('id')
+          .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
+          .maybeSingle();
+        
+        if (activeMatch && (activeMatch as any).conversation_status === 'active') {
+          setActiveMatchId(activeMatch.id);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking conversation status:', error);
+    }
+  };
 
   const fetchProfiles = async () => {
     if (!user) return;
@@ -280,6 +310,18 @@ const Browse = () => {
     if (!user) return;
 
     try {
+      // Check if user is already in an active conversation
+      const isInConversation = await checkIfInConversation(user.id);
+      
+      if (isInConversation) {
+        toast({
+          title: "Action non autorisée",
+          description: "Vous êtes actuellement en discussion. Vous devez d'abord terminer votre échange en cours avant de liker d'autres profils.",
+          variant: "destructive"
+        });
+        return;
+      }
+
       // Verify the target profile exists before creating any matches
       const { data: targetProfile } = await supabase
         .from('profiles')
@@ -436,6 +478,7 @@ const Browse = () => {
     <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
       <div className="container mx-auto max-w-6xl">
         <DailyLimitIndicator />
+        {isInActiveConversation && <ActiveConversationBanner matchId={activeMatchId} />}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Advanced Search - Toggle on mobile */}
           <div className="lg:hidden">
@@ -565,6 +608,7 @@ const Browse = () => {
           <Button
             onClick={handlePass}
             variant="outline"
+            disabled={isInActiveConversation}
             className="flex-1 border-muted-foreground text-muted-foreground hover:bg-muted order-1 sm:order-none transition-smooth"
           >
             <X className="h-4 w-4 mr-2" />
@@ -572,11 +616,16 @@ const Browse = () => {
           </Button>
           <Button
             onClick={() => handleLike(currentProfile.user_id)}
-            disabled={!subscription.subscribed || dailyLimitReached}
+            disabled={!subscription.subscribed || dailyLimitReached || isInActiveConversation}
             variant="gradient"
             className="flex-1 order-0 sm:order-none animate-pulse-gentle"
           >
-            {!subscription.subscribed ? (
+            {isInActiveConversation ? (
+              <>
+                <Lock className="h-4 w-4 mr-2" />
+                En discussion
+              </>
+            ) : !subscription.subscribed ? (
               <>
                 <Lock className="h-4 w-4 mr-2" />
                 Premium requis
