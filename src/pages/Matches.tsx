@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heart, MessageCircle, Eye, Users, Clock, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { ConversationStatusBadge } from '@/components/ui/ConversationStatusBadge';
 
 interface Match {
   id: string;
@@ -17,6 +18,7 @@ interface Match {
   user2_liked: boolean;
   is_mutual: boolean;
   created_at: string;
+  conversation_status?: 'not_started' | 'active' | 'ended';
   other_user: {
     id: string;
     user_id: string;
@@ -87,7 +89,7 @@ const Matches = () => {
 
       if (matchesData) {
         const processedMatches = await Promise.all(
-          matchesData.map(async (match) => {
+          matchesData.map(async (match: any) => {
             const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
             
             const { data: otherUserProfile } = await supabase
@@ -184,10 +186,11 @@ const Matches = () => {
                               </span>
                             </div>
                             <div className="flex-1">
-                              <div className="flex items-center gap-3 mb-2">
+                               <div className="flex items-center gap-3 mb-2">
                                 <h3 className="text-xl font-bold text-foreground">
                                   {match.other_user?.full_name}
                                 </h3>
+                                {match.conversation_status === 'active' && <ConversationStatusBadge />}
                                 <Badge className="bg-emerald/10 text-emerald border-emerald/20">
                                   {match.match_score}% compatible
                                 </Badge>
@@ -210,9 +213,10 @@ const Matches = () => {
                             <Button
                               onClick={() => startChat(match.id)}
                               className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                              disabled={match.conversation_status === 'ended'}
                             >
                               <MessageCircle className="h-4 w-4 mr-2" />
-                              Discuter
+                              {match.conversation_status === 'ended' ? 'Conversation terminée' : 'Discuter'}
                             </Button>
                             <Button
                               variant="outline"

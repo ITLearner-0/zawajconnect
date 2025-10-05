@@ -9,13 +9,15 @@ import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { MatchProfile } from '@/hooks/useMatchingHistory';
+import { ConversationStatusBadge } from '@/components/ui/ConversationStatusBadge';
 
 interface MatchCardProps {
   match: MatchProfile;
   familyApprovalRequired: boolean;
+  isInConversation?: boolean;
 }
 
-const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
+const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: MatchCardProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user } = useAuth();
@@ -129,7 +131,10 @@ const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
           <div className="flex-1 space-y-3">
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-semibold">{match.full_name}</h4>
+                <div className="flex items-center gap-2">
+                  <h4 className="font-semibold">{match.full_name}</h4>
+                  {isInConversation && <ConversationStatusBadge />}
+                </div>
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span>{match.age} ans</span>
                   <div className="flex items-center gap-1">
@@ -205,32 +210,40 @@ const MatchCard = ({ match, familyApprovalRequired }: MatchCardProps) => {
             )}
 
             {/* Action Buttons */}
-            <div className="flex gap-2 pt-2">
-              <Button 
-                size="sm" 
-                className="flex-1"
-                onClick={handleViewProfile}
-              >
-                Voir le profil
-              </Button>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                className="flex-1"
-                onClick={handleShowInterest}
-              >
-                Montrer l'intérêt
-              </Button>
-              {familyApprovalRequired && (
+            {isInConversation ? (
+              <div className="pt-2 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Ce profil est actuellement en discussion
+                </p>
+              </div>
+            ) : (
+              <div className="flex gap-2 pt-2">
                 <Button 
                   size="sm" 
-                  variant="secondary"
-                  onClick={handleFamilyApproval}
+                  className="flex-1"
+                  onClick={handleViewProfile}
                 >
-                  Demander approbation famille
+                  Voir le profil
                 </Button>
-              )}
-            </div>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="flex-1"
+                  onClick={handleShowInterest}
+                >
+                  Montrer l'intérêt
+                </Button>
+                {familyApprovalRequired && (
+                  <Button 
+                    size="sm" 
+                    variant="secondary"
+                    onClick={handleFamilyApproval}
+                  >
+                    Demander approbation famille
+                  </Button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </CardContent>
