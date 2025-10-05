@@ -30,7 +30,7 @@ const SubscriptionCanceled = () => {
 
           <div className="flex flex-col gap-3">
             <Button
-              onClick={() => navigate('/settings?tab=subscription')}
+              onClick={() => navigate('/settings?tab=premium')}
               variant="default"
             >
               Voir les Plans Premium

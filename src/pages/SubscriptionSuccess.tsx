@@ -69,7 +69,7 @@ const SubscriptionSuccess = () => {
 
           <Button
             variant="link"
-            onClick={() => navigate('/settings?tab=subscription')}
+            onClick={() => navigate('/settings?tab=premium')}
             className="text-sm text-muted-foreground"
           >
             Gérer mon abonnement

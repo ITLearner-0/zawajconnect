@@ -86,7 +86,7 @@ export const UpgradeToPremiumModal = ({ open, onClose, reason = 'daily_limit' }:
             <Button
               onClick={() => {
                 onClose();
-                navigate('/settings?tab=subscription');
+                navigate('/settings?tab=premium');
               }}
               className="flex-1 bg-gradient-to-r from-emerald to-emerald-light hover:opacity-90"
               size="lg"

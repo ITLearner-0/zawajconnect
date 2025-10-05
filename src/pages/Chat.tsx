@@ -30,7 +30,7 @@ const Chat = () => {
             </p>
           </div>
           <Button
-            onClick={() => navigate('/settings?tab=subscription')}
+            onClick={() => navigate('/settings?tab=premium')}
             className="w-full bg-gradient-to-r from-emerald to-emerald-light"
             size="lg"
           >

@@ -38,7 +38,7 @@ export const PremiumFeatureGuard = ({
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Button
-              onClick={() => navigate('/settings?tab=subscription')}
+              onClick={() => navigate('/settings?tab=premium')}
               className="bg-gradient-to-r from-emerald to-emerald-light hover:opacity-90"
             >
               <Crown className="h-4 w-4 mr-2" />

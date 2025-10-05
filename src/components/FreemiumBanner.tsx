@@ -21,7 +21,7 @@ export const FreemiumBanner = () => {
             </p>
           </div>
           <Button
-            onClick={() => navigate('/settings?tab=subscription')}
+            onClick={() => navigate('/settings?tab=premium')}
             size="sm"
             className="bg-gradient-to-r from-emerald to-emerald-light hover:opacity-90 flex-shrink-0"
           >
