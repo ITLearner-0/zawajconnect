@@ -61,9 +61,9 @@ serve(async (req) => {
 
     // Map price IDs to plan duration
     const priceToPlanDuration: { [key: string]: number } = {
-      'price_1SEwnr4GoRjf8T3bCx5h8rVl': 3,  // Premium 3 mois
-      'price_1SEwnu4GoRjf8T3bZk8qzxxZ': 6,  // Premium 6 mois
-      'price_1SEwnu4GoRjf8T3bYFBnTNbo': 12, // Premium 12 mois
+      'price_1SEwsJKwsHyCjkzyvQfkbzxs': 3,  // Premium 3 mois
+      'price_1SEwusKwsHyCjkzyNYF2O8Qx': 6,  // Premium 6 mois
+      'price_1SEwy7KwsHyCjkzyZpjCkIz4': 12, // Premium 12 mois
     };
 
     const planDuration = priceToPlanDuration[priceId];
