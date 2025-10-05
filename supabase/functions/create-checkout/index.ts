@@ -70,21 +70,6 @@ serve(async (req) => {
     const planStartDate = new Date().toISOString();
     
     const origin = req.headers.get("origin") || "http://localhost:3000";
-    
-    // Configure subscription with cancel_at for fixed duration
-    const subscriptionData: any = {
-      metadata: {
-        plan_duration: planDuration?.toString() || "12",
-        plan_start_date: planStartDate
-      }
-    };
-    
-    // Set cancel_at if plan duration is specified (auto-stop after X months)
-    if (planDuration) {
-      const cancelAt = Math.floor(Date.now() / 1000) + (planDuration * 30 * 24 * 60 * 60);
-      subscriptionData.cancel_at = cancelAt;
-      logStep("Subscription will auto-cancel", { cancelAt: new Date(cancelAt * 1000).toISOString() });
-    }
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -96,7 +81,12 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
-      subscription_data: subscriptionData,
+      subscription_data: {
+        metadata: {
+          plan_duration: planDuration?.toString() || "12",
+          plan_start_date: planStartDate
+        }
+      },
       success_url: `${req.headers.get("origin")}/subscription-success`,
       cancel_url: `${req.headers.get("origin")}/settings?tab=subscription&canceled=true`,
     });
