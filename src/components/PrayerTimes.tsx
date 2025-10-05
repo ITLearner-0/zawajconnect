@@ -51,11 +51,38 @@ const PrayerTimes = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Update current time every second for accurate display
+  // Fetch accurate time from internet
+  const fetchInternetTime = async () => {
+    try {
+      const response = await fetch('https://worldtimeapi.org/api/timezone/Europe/Paris');
+      const data = await response.json();
+      const internetTime = new Date(data.datetime);
+      setCurrentTime(internetTime);
+    } catch (error) {
+      // Fallback to local time if API fails
+      setCurrentTime(new Date());
+    }
+  };
+
+  // Initial time fetch
+  useEffect(() => {
+    fetchInternetTime();
+  }, []);
+
+  // Update current time every second
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentTime(new Date());
+      setCurrentTime(prevTime => new Date(prevTime.getTime() + 1000));
     }, 1000); // Update every second
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Refresh internet time every 5 minutes
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchInternetTime();
+    }, 300000); // Refresh every 5 minutes
 
     return () => clearInterval(interval);
   }, []);
