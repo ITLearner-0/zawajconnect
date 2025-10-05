@@ -42,100 +42,136 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4">
-      <div className="container mx-auto max-w-6xl">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+      <div className="container mx-auto max-w-7xl px-4 py-6">
+        {/* Header avec meilleure disposition */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/enhanced-profile')}
+                className="hover:bg-accent"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Retour
+              </Button>
+            </div>
             <Button
-              variant="ghost"
-              onClick={() => navigate('/enhanced-profile')}
-              className="hover:bg-accent"
+              variant="outline"
+              size="sm"
+              onClick={handleSignOut}
+              className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
+              <LogOut className="h-4 w-4 mr-2" />
+              Se déconnecter
             </Button>
-            <div className="flex items-center gap-2">
-              <SettingsIcon className="h-6 w-6 text-emerald" />
-              <h1 className="text-2xl font-bold text-foreground">Paramètres</h1>
+          </div>
+          
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-3 rounded-xl bg-primary/10">
+              <SettingsIcon className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-foreground">Paramètres</h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Gérez vos préférences et votre compte
+              </p>
             </div>
           </div>
-          <Button
-            variant="outline"
-            onClick={handleSignOut}
-            className="text-red-600 border-red-600 hover:bg-red-600 hover:text-white"
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Se déconnecter
-          </Button>
         </div>
 
-        {/* Main Content */}
-        <div className="w-full">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="privacy" className="flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
-                  <span className="hidden sm:inline">Confidentialité</span>
-                </TabsTrigger>
-                <TabsTrigger value="family" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  <span className="hidden sm:inline">Famille</span>
-                </TabsTrigger>
-                <TabsTrigger value="verification" className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span className="hidden sm:inline">Vérification</span>
-                </TabsTrigger>
-                <TabsTrigger value="security" className="flex items-center gap-2">
-                  <Shield className="h-4 w-4" />
-                  <span className="hidden sm:inline">Sécurité</span>
-                </TabsTrigger>
-                <TabsTrigger value="premium" className="flex items-center gap-2">
-                  <Crown className="h-4 w-4" />
-                  <span className="hidden sm:inline">Premium</span>
-                  {subscription.subscribed && (
-                    <Badge className="ml-1 bg-gold text-primary-foreground text-xs px-1">
-                      Actif
-                    </Badge>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="notifications" className="flex items-center gap-2">
-                  <Bell className="h-4 w-4" />
-                  <span className="hidden sm:inline">Notifications</span>
-                </TabsTrigger>
-              </TabsList>
+        {/* Main Content avec meilleure organisation */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-2 border shadow-sm">
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-2 bg-transparent">
+              <TabsTrigger 
+                value="privacy" 
+                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Confidentialité</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="family" 
+                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <Users className="h-4 w-4" />
+                <span className="hidden sm:inline">Famille</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="verification" 
+                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">Vérification</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="security" 
+                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <Shield className="h-4 w-4" />
+                <span className="hidden sm:inline">Sécurité</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="premium" 
+                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground relative"
+              >
+                <Crown className="h-4 w-4" />
+                <span className="hidden sm:inline">Premium</span>
+                {subscription.subscribed && (
+                  <Badge className="absolute -top-1 -right-1 bg-emerald text-white text-xs px-1.5 py-0 h-4">
+                    ✓
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger 
+                value="notifications" 
+                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+              >
+                <Bell className="h-4 w-4" />
+                <span className="hidden sm:inline">Notifications</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-              <div className="mt-6">
-                <TabsContent value="privacy" className="space-y-6">
-                  <PrivacySettingsForm />
-                </TabsContent>
+          {/* Contenu des onglets */}
+          <div className="mt-6">
+            <TabsContent value="privacy" className="space-y-6">
+              <Card className="p-6 shadow-sm">
+                <PrivacySettingsForm />
+              </Card>
+            </TabsContent>
 
-                <TabsContent value="family" className="space-y-6">
-                  <FamilySupervisionPanel />
-                </TabsContent>
+            <TabsContent value="family" className="space-y-6">
+              <Card className="p-6 shadow-sm">
+                <FamilySupervisionPanel />
+              </Card>
+            </TabsContent>
 
             <TabsContent value="verification" className="space-y-6">
               <IDVerificationSystem />
             </TabsContent>
 
             <TabsContent value="security" className="space-y-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                 <SecurityAlertPanel />
                 <div className="space-y-6">
                   <FamilyRateLimitIndicator />
-                  <Card className="p-4">
-                    <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-                      <Shield className="h-4 w-4 text-emerald" />
+                  <Card className="p-6 shadow-sm">
+                    <h4 className="text-sm font-semibold mb-4 flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-primary" />
                       Sécurité du Mot de Passe
                     </h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs">Force du mot de passe</span>
-                        <Badge variant="outline">
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-3 bg-accent/50 rounded-lg">
+                        <span className="text-sm font-medium">Force du mot de passe</span>
+                        <Badge variant="outline" className="font-medium">
                           {securityStatus?.password_strength || 'Non évalué'}
                         </Badge>
                       </div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-sm text-muted-foreground px-3">
                         Dernière vérification: Récemment
                       </div>
                     </div>
@@ -146,18 +182,20 @@ const Settings = () => {
             
             <TabsContent value="premium" className="space-y-6">
               {subscription.subscribed && (
-                <Card className="p-4 border-gold/20 bg-gradient-to-r from-gold/10 to-emerald/10">
+                <Card className="p-6 shadow-sm border-primary/20 bg-gradient-to-r from-primary/5 to-accent/10">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Crown className="h-5 w-5 text-gold" />
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-xl bg-primary/10">
+                        <Crown className="h-6 w-6 text-primary" />
+                      </div>
                       <div>
-                        <h3 className="font-semibold">Statut de l'abonnement</h3>
-                        <p className="text-sm text-muted-foreground">
+                        <h3 className="font-semibold text-lg">Statut de l'abonnement</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
                           Vous avez accès aux fonctionnalités premium
                         </p>
                       </div>
                     </div>
-                    <Badge className="bg-emerald text-primary-foreground">
+                    <Badge className="bg-emerald text-white px-4 py-1.5">
                       Actif
                     </Badge>
                   </div>
@@ -166,12 +204,13 @@ const Settings = () => {
               <PremiumSubscription />
             </TabsContent>
 
-                <TabsContent value="notifications" className="space-y-6">
-                  <NotificationSystem />
-                </TabsContent>
-              </div>
-            </Tabs>
-        </div>
+            <TabsContent value="notifications" className="space-y-6">
+              <Card className="p-6 shadow-sm">
+                <NotificationSystem />
+              </Card>
+            </TabsContent>
+          </div>
+        </Tabs>
       </div>
     </div>
   );
