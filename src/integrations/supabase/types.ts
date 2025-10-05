@@ -47,6 +47,44 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_match_pairs: {
+        Row: {
+          blocked_at: string | null
+          created_at: string | null
+          end_reason: string | null
+          id: string
+          original_match_id: string | null
+          user1_id: string
+          user2_id: string
+        }
+        Insert: {
+          blocked_at?: string | null
+          created_at?: string | null
+          end_reason?: string | null
+          id?: string
+          original_match_id?: string | null
+          user1_id: string
+          user2_id: string
+        }
+        Update: {
+          blocked_at?: string | null
+          created_at?: string | null
+          end_reason?: string | null
+          id?: string
+          original_match_id?: string | null
+          user1_id?: string
+          user2_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blocked_match_pairs_original_match_id_fkey"
+            columns: ["original_match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compatibility_questions: {
         Row: {
           category: string
@@ -639,7 +677,13 @@ export type Database = {
       matches: {
         Row: {
           can_communicate: boolean
+          conversation_ended_at: string | null
+          conversation_started_at: string | null
+          conversation_status: string | null
           created_at: string
+          end_message: string | null
+          end_reason: string | null
+          ended_by: string | null
           family_approved: boolean | null
           family_notes: string | null
           family_reviewed_at: string | null
@@ -659,7 +703,13 @@ export type Database = {
         }
         Insert: {
           can_communicate?: boolean
+          conversation_ended_at?: string | null
+          conversation_started_at?: string | null
+          conversation_status?: string | null
           created_at?: string
+          end_message?: string | null
+          end_reason?: string | null
+          ended_by?: string | null
           family_approved?: boolean | null
           family_notes?: string | null
           family_reviewed_at?: string | null
@@ -679,7 +729,13 @@ export type Database = {
         }
         Update: {
           can_communicate?: boolean
+          conversation_ended_at?: string | null
+          conversation_started_at?: string | null
+          conversation_status?: string | null
           created_at?: string
+          end_message?: string | null
+          end_reason?: string | null
+          ended_by?: string | null
           family_approved?: boolean | null
           family_notes?: string | null
           family_reviewed_at?: string | null
@@ -1809,6 +1865,10 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: boolean
       }
+      has_previous_conversation: {
+        Args: { u1_id: string; u2_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1822,6 +1882,10 @@ export type Database = {
       }
       is_admin: {
         Args: { _user_id: string }
+        Returns: boolean
+      }
+      is_user_in_active_conversation: {
+        Args: { check_user_id: string }
         Returns: boolean
       }
       log_profile_access: {
