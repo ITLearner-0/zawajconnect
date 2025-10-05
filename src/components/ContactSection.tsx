@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Mail, Phone, MapPin, Send, Heart, AlertTriangle } from "lucide-react";
+import { Mail, MapPin, Send, Heart, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 import { contactFormSchema } from "@/lib/validation";
@@ -230,22 +230,9 @@ const ContactSection = () => {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Email</h3>
-                    <p className="text-muted-foreground">contact@zawajconnect.fr</p>
+                    <p className="text-muted-foreground">contact@zawajconnect.me</p>
                     <p className="text-sm text-muted-foreground mt-1">
                       Support général et questions techniques
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start space-x-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald/10 text-emerald">
-                    <Phone className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">Téléphone</h3>
-                    <p className="text-muted-foreground">+33 1 23 45 67 89</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      Lun-Ven: 9h-18h | Sam: 9h-12h
                     </p>
                   </div>
                 </div>
