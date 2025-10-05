@@ -67,7 +67,9 @@ const PrayerTimes = () => {
 
   const calculateNextPrayer = () => {
     const now = currentTime;
-    const currentTimeString = now.toTimeString().slice(0, 5);
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
+    const currentTimeString = `${currentHours.toString().padStart(2, '0')}:${currentMinutes.toString().padStart(2, '0')}`;
     
     const prayers = [
       { name: 'Fajr', time: prayerTimes.fajr },
@@ -114,7 +116,9 @@ const PrayerTimes = () => {
   };
 
   const getPrayerList = (): PrayerTime[] => {
-    const currentTimeString = currentTime.toTimeString().slice(0, 5);
+    const currentHours = currentTime.getHours();
+    const currentMinutes = currentTime.getMinutes();
+    const currentTimeString = `${currentHours.toString().padStart(2, '0')}:${currentMinutes.toString().padStart(2, '0')}`;
     
     return [
       {
@@ -284,7 +288,11 @@ const PrayerTimes = () => {
               </div>
               <div className="text-right">
                 <p className="text-2xl font-bold">
-                  {currentTime.toTimeString().slice(0, 5)}
+                  {currentTime.toLocaleTimeString('fr-FR', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                  })}
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Heure actuelle
