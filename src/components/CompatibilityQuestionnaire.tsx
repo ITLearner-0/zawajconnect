@@ -270,26 +270,29 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
   const Icon = currentCategoryConfig?.icon || Heart;
 
   return (
-    <div className={embedded ? '' : 'min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4'}>
-      <div className={`container mx-auto ${embedded ? 'max-w-full' : 'max-w-4xl'}`}>
-        <Card className={embedded ? '' : 'shadow-lg'}>
-          <CardHeader className="text-center">
-            <div className="flex items-center justify-center mb-4">
-              <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-                <Icon className="h-6 w-6 text-primary-foreground" />
-              </div>
+    <div className={embedded ? '' : 'min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 py-8 px-4'}>
+      <div className={`container mx-auto ${embedded ? 'max-w-full' : 'max-w-7xl'}`}>
+        {/* Header Section */}
+        <div className="mb-8 text-center">
+          <div className="flex items-center justify-center mb-4">
+            <div className="h-16 w-16 bg-gradient-to-br from-primary to-primary/70 rounded-full flex items-center justify-center shadow-lg">
+              <Icon className="h-8 w-8 text-primary-foreground" />
             </div>
-            <CardTitle className="text-2xl mb-2">Questionnaire de Compatibilité</CardTitle>
-            <p className="text-muted-foreground mb-4">
-              Répondez à ces questions pour améliorer la précision de nos suggestions de partenaires
-            </p>
-            
-            {/* Overall Progress */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span>Progression globale</span>
-                <div className="flex items-center gap-2">
-                  <span>{getAnsweredCount()}/{getTotalQuestions()} questions</span>
+          </div>
+          <h1 className="text-3xl font-bold mb-2">Questionnaire de Compatibilité</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Répondez à ces questions pour améliorer la précision de nos suggestions de partenaires
+          </p>
+        </div>
+
+        {/* Progress Card */}
+        <Card className="mb-6 shadow-sm">
+          <CardContent className="pt-6">
+            <div className="space-y-3">
+              <div className="flex justify-between items-center text-sm">
+                <span className="font-medium">Progression globale</span>
+                <div className="flex items-center gap-2 flex-wrap justify-end">
+                  <span className="text-muted-foreground">{getAnsweredCount()}/{getTotalQuestions()} questions</span>
                   {isSessionNearExpiry && (
                     <Badge variant="destructive" className="text-xs animate-pulse">
                       <AlertTriangle className="h-3 w-3 mr-1" />
@@ -297,108 +300,136 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
                     </Badge>
                   )}
                   {hasUnsavedChanges && (
-                    <Badge variant="outline" className="text-xs bg-yellow-50 border-yellow-200 text-yellow-800">
+                    <Badge variant="outline" className="text-xs">
                       Non sauvegardé
                     </Badge>
                   )}
                   {saving && (
-                    <Badge variant="outline" className="text-xs bg-blue-50 border-blue-200 text-blue-800">
+                    <Badge variant="secondary" className="text-xs">
                       Sauvegarde...
                     </Badge>
                   )}
                 </div>
               </div>
-              <Progress value={getOverallProgress()} className="w-full" />
-              <p className="text-xs text-muted-foreground">
+              <Progress value={getOverallProgress()} className="h-3" />
+              <p className="text-xs text-muted-foreground text-center">
                 {Math.round(getOverallProgress())}% complété
                 {hasUnsavedChanges && (
-                  <span className="ml-2 text-yellow-600">• Sauvegarde automatique dans 3s</span>
+                  <span className="ml-2">• Sauvegarde automatique dans 3s</span>
                 )}
               </p>
             </div>
-          </CardHeader>
+          </CardContent>
+        </Card>
 
-          <CardContent>
-            {/* Category Navigation */}
-            <div className="flex flex-wrap gap-2 mb-6">
+        {/* Category Navigation */}
+        <Card className="mb-6 shadow-sm">
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
               {categories.map(category => {
                 const config = categoryConfig[category as keyof typeof categoryConfig];
                 const CategoryIcon = config?.icon || Heart;
                 const categoryQuestions = questions.filter(q => q.category === category);
                 const answeredInCategory = categoryQuestions.filter(q => responses[q.question_key]).length;
+                const isComplete = answeredInCategory === categoryQuestions.length;
                 
                 return (
                   <Button
                     key={category}
                     variant={currentCategory === category ? "default" : "outline"}
-                    size="sm"
+                    size="lg"
                     onClick={() => setCurrentCategory(category)}
-                    className="flex items-center gap-2"
+                    className={`flex flex-col items-center gap-2 h-auto py-4 ${
+                      currentCategory === category ? 'shadow-md' : ''
+                    }`}
                   >
-                    <CategoryIcon className="h-4 w-4" />
-                    <span className="hidden sm:inline">{config?.title || category}</span>
-                    <Badge variant="secondary" className="text-xs">
+                    <CategoryIcon className="h-5 w-5" />
+                    <span className="text-xs text-center leading-tight">{config?.title || category}</span>
+                    <Badge 
+                      variant={isComplete ? "default" : "secondary"} 
+                      className="text-xs"
+                    >
                       {answeredInCategory}/{categoryQuestions.length}
                     </Badge>
                   </Button>
                 );
               })}
             </div>
+          </CardContent>
+        </Card>
 
-            {/* Current Category Progress */}
-            <div className="mb-6">
-              <div className="flex items-center gap-2 mb-2">
-                <Icon className={`h-5 w-5 ${currentCategoryConfig?.color || 'text-emerald'}`} />
-                <h3 className="text-lg font-semibold">{currentCategoryConfig?.title || currentCategory}</h3>
+        {/* Current Category Section */}
+        <Card className="mb-6 shadow-sm">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                  <Icon className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-xl">{currentCategoryConfig?.title || currentCategory}</CardTitle>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {getCurrentCategoryQuestions().filter(q => responses[q.question_key]).length}/{getCurrentCategoryQuestions().length} questions répondues
+                  </p>
+                </div>
               </div>
-              <Progress value={getCategoryProgress()} className="w-full" />
-              <p className="text-sm text-muted-foreground mt-1">
-                {getCurrentCategoryQuestions().filter(q => responses[q.question_key]).length}/{getCurrentCategoryQuestions().length} questions répondues
-              </p>
+              <div className="text-right">
+                <div className="text-2xl font-bold text-primary">
+                  {Math.round(getCategoryProgress())}%
+                </div>
+              </div>
             </div>
+            <Progress value={getCategoryProgress()} className="mt-4 h-2" />
+          </CardHeader>
+        </Card>
 
-            {/* Questions */}
-            <div className="space-y-6">
-              {getCurrentCategoryQuestions().map((question, index) => (
-                <Card key={question.id} className="border-l-4 border-l-emerald/30">
-                  <CardContent className="pt-4">
-                    <div className="flex items-start gap-3">
-                      <Badge variant="outline" className="text-xs">
-                        {index + 1}
-                      </Badge>
-                      <div className="flex-1 space-y-3">
-                        <p className="font-medium">{question.question_text}</p>
-                        <Select
-                          value={responses[question.question_key] || ''}
-                          onValueChange={(value) => handleResponseChange(question.question_key, value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Choisir une réponse..." />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {question.options.map((option: string) => (
-                              <SelectItem key={option} value={option}>
-                                {option}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {question.weight > 3 && (
-                          <Badge variant="destructive" className="text-xs">
-                            Question importante
-                          </Badge>
-                        )}
-                      </div>
+        {/* Questions Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          {getCurrentCategoryQuestions().map((question, index) => (
+            <Card key={question.id} className="shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <Badge variant="outline" className="mt-1">
+                      {index + 1}
+                    </Badge>
+                    <div className="flex-1">
+                      <p className="font-medium leading-relaxed">{question.question_text}</p>
+                      {question.weight > 3 && (
+                        <Badge variant="destructive" className="text-xs mt-2">
+                          Question importante
+                        </Badge>
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  </div>
+                  <Select
+                    value={responses[question.question_key] || ''}
+                    onValueChange={(value) => handleResponseChange(question.question_key, value)}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Choisir une réponse..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {question.options.map((option: string) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
-            {/* Navigation */}
-            <div className="flex justify-between mt-8">
+        {/* Navigation Footer */}
+        <Card className="shadow-sm">
+          <CardContent className="pt-6">
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
               <Button
                 variant="outline"
+                size="lg"
                 onClick={() => {
                   const currentIndex = categories.indexOf(currentCategory);
                   if (currentIndex > 0) {
@@ -406,6 +437,7 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
                   }
                 }}
                 disabled={categories.indexOf(currentCategory) === 0}
+                className="w-full sm:w-auto"
               >
                 Catégorie précédente
               </Button>
@@ -413,46 +445,53 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
               <div className="flex gap-2">
                 <Button
                   variant="outline"
+                  size="lg"
                   onClick={saveResponses}
                   disabled={saving || Object.keys(responses).length === 0}
+                  className="flex-1 sm:flex-none"
                 >
-                  {saving ? 'Sauvegarde...' : hasUnsavedChanges ? 'Sauvegarder les changements' : 'Sauvegarder'}
+                  {saving ? 'Sauvegarde...' : hasUnsavedChanges ? 'Sauvegarder' : 'Sauvegarder'}
                 </Button>
                 
                 {categories.indexOf(currentCategory) < categories.length - 1 ? (
                   <Button
+                    size="lg"
                     onClick={() => {
                       const currentIndex = categories.indexOf(currentCategory);
                       setCurrentCategory(categories[currentIndex + 1]);
                     }}
+                    className="flex-1 sm:flex-none"
                   >
                     Catégorie suivante
                   </Button>
                 ) : (
                   <Button
+                    size="lg"
                     onClick={saveResponses}
                     disabled={saving}
-                    className="bg-emerald hover:bg-emerald-dark"
+                    className="flex-1 sm:flex-none"
                   >
                     {saving ? 'Finalisation...' : 'Terminer'}
                   </Button>
                 )}
               </div>
             </div>
-
-            {/* Completion Status */}
-            {getOverallProgress() === 100 && (
-              <div className="mt-6 p-4 bg-emerald/10 border border-emerald/20 rounded-lg text-center">
-                <p className="text-emerald-dark font-medium">
-                  ✨ Félicitations ! Vous avez terminé le questionnaire de compatibilité.
-                </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Ces informations nous aideront à vous proposer des partenaires plus compatibles.
-                </p>
-              </div>
-            )}
           </CardContent>
         </Card>
+
+        {/* Completion Status */}
+        {getOverallProgress() === 100 && (
+          <Card className="mt-6 border-primary/20 bg-primary/5 shadow-sm">
+            <CardContent className="pt-6 text-center">
+              <p className="text-primary font-medium">
+                ✨ Félicitations ! Vous avez terminé le questionnaire de compatibilité.
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">
+                Ces informations nous aideront à vous proposer des partenaires plus compatibles.
+              </p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
