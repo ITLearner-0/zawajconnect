@@ -1,7 +1,7 @@
 import React from 'react';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/hooks/useAuth';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import FamilyAccessPortal from '@/components/FamilyAccessPortal';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
@@ -21,6 +21,7 @@ const RoleBasedLayout: React.FC<RoleBasedLayoutProps> = ({ children }) => {
 const RoleBasedLayoutContent: React.FC<RoleBasedLayoutProps> = ({ children }) => {
   const { user, loading: authLoading } = useAuth();
   const { isWaliOnly, isRegularUser, isWali, loading: roleLoading } = useUserRole();
+  const location = useLocation();
 
   // Attendre que l'authentification et les rôles soient chargés
   if (authLoading || roleLoading) {
@@ -34,6 +35,11 @@ const RoleBasedLayoutContent: React.FC<RoleBasedLayoutProps> = ({ children }) =>
   // Not authenticated - seulement après que l'auth loading soit terminé
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  // IMPORTANT: Allow access to onboarding page even if user has no role yet
+  if (location.pathname === '/onboarding') {
+    return <>{children}</>;
   }
 
   // CORRECTION: Les Walis ont maintenant accès à l'interface complète avec le menu de supervision
