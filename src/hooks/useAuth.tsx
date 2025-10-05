@@ -6,6 +6,8 @@ interface SubscriptionStatus {
   subscribed: boolean;
   product_id: string | null;
   subscription_end: string | null;
+  plan_duration: number | null;
+  months_remaining: number | null;
 }
 
 interface AuthContextType {
@@ -29,11 +31,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     subscribed: false,
     product_id: null,
     subscription_end: null,
+    plan_duration: null,
+    months_remaining: null,
   });
 
   const checkSubscription = async () => {
     if (!user) {
-      setSubscription({ subscribed: false, product_id: null, subscription_end: null });
+      setSubscription({ 
+        subscribed: false, 
+        product_id: null, 
+        subscription_end: null,
+        plan_duration: null,
+        months_remaining: null
+      });
       return;
     }
 
@@ -50,6 +60,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           subscribed: data.subscribed,
           product_id: data.product_id,
           subscription_end: data.subscription_end,
+          plan_duration: data.plan_duration,
+          months_remaining: data.months_remaining,
         });
       }
     } catch (error) {
@@ -67,7 +79,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Handle session expiry events
         if (event === 'SIGNED_OUT' && session === null) {
           window.dispatchEvent(new CustomEvent('auth:session-expired'));
-          setSubscription({ subscribed: false, product_id: null, subscription_end: null });
+          setSubscription({ 
+            subscribed: false, 
+            product_id: null, 
+            subscription_end: null,
+            plan_duration: null,
+            months_remaining: null
+          });
         }
         
         // Update state synchronously
@@ -167,7 +185,13 @@ export function useSafeAuth() {
     user: null, 
     session: null, 
     loading: true, 
-    subscription: { subscribed: false, product_id: null, subscription_end: null },
+    subscription: { 
+      subscribed: false, 
+      product_id: null, 
+      subscription_end: null,
+      plan_duration: null,
+      months_remaining: null
+    },
     checkSubscription: async () => {},
     signIn: async () => ({ error: null }), 
     signUp: async () => ({ error: null }), 

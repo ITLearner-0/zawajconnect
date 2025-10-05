@@ -53,7 +53,34 @@ serve(async (req) => {
       logStep("No existing customer found");
     }
 
+    // Map price IDs to plan duration
+    const priceToPlanDuration: { [key: string]: number } = {
+      // IMPORTANT: Remplacer ces IDs par les vrais IDs Stripe après création des produits
+      'price_PREMIUM_3_MONTHS': 3,
+      'price_PREMIUM_6_MONTHS': 6,
+      'price_PREMIUM_12_MONTHS': 12,
+    };
+
+    const planDuration = priceToPlanDuration[priceId];
+    const planStartDate = new Date().toISOString();
+    
     const origin = req.headers.get("origin") || "http://localhost:3000";
+    
+    // Configure subscription with cancel_at for fixed duration
+    const subscriptionData: any = {
+      metadata: {
+        plan_duration: planDuration?.toString() || "12",
+        plan_start_date: planStartDate
+      }
+    };
+    
+    // Set cancel_at if plan duration is specified (auto-stop after X months)
+    if (planDuration) {
+      const cancelAt = Math.floor(Date.now() / 1000) + (planDuration * 30 * 24 * 60 * 60);
+      subscriptionData.cancel_at = cancelAt;
+      logStep("Subscription will auto-cancel", { cancelAt: new Date(cancelAt * 1000).toISOString() });
+    }
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -64,6 +91,7 @@ serve(async (req) => {
         },
       ],
       mode: "subscription",
+      subscription_data: subscriptionData,
       success_url: `${req.headers.get("origin")}/subscription-success`,
       cancel_url: `${req.headers.get("origin")}/settings?tab=subscription&canceled=true`,
     });

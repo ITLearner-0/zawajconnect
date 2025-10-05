@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import VerificationBadge from '@/components/VerificationBadge';
 import AdvancedSearch from '@/components/AdvancedSearch';
@@ -13,6 +13,8 @@ import ReportModal from '@/components/ReportModal';
 import { useToast } from '@/hooks/use-toast';
 import ProfileCard from '@/components/ProfileCard';
 import CompatibilityScore from '@/components/CompatibilityScore';
+import { DailyLimitIndicator } from '@/components/DailyLimitIndicator';
+import { UpgradeToPremiumModal } from '@/components/UpgradeToPremiumModal';
 
 interface MatchingProfile {
   id?: string;
@@ -29,7 +31,7 @@ interface MatchingProfile {
 }
 
 const Browse = () => {
-  const { user } = useAuth();
+  const { user, subscription } = useAuth();
   const { calculateDetailedCompatibility } = useUnifiedCompatibility();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -40,6 +42,8 @@ const Browse = () => {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<MatchingProfile | null>(null);
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+  const [dailyLimitReached, setDailyLimitReached] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -177,9 +181,51 @@ const Browse = () => {
     });
   };
 
-  const nextProfile = () => {
+  const checkDailyLimit = async () => {
+    if (subscription.subscribed) return true; // Premium users bypass check
+    
+    try {
+      const { data } = await supabase.functions.invoke('check-daily-limit');
+      if (data?.limit_reached) {
+        setDailyLimitReached(true);
+        setShowUpgradeModal(true);
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('Error checking daily limit:', error);
+      return true; // En cas d'erreur, on laisse passer
+    }
+  };
+
+  const logProfileView = async (viewedUserId: string) => {
+    if (subscription.subscribed) return; // Premium users don't need tracking
+    
+    try {
+      await supabase.functions.invoke('log-profile-view', {
+        body: { viewed_user_id: viewedUserId }
+      });
+    } catch (error) {
+      console.error('Error logging profile view:', error);
+    }
+  };
+
+  const nextProfile = async () => {
+    // Check limit BEFORE showing next profile
+    const canView = await checkDailyLimit();
+    if (!canView) return;
+    
     if (currentIndex < filteredProfiles.length - 1) {
-      setCurrentIndex(currentIndex + 1);
+      const newIndex = currentIndex + 1;
+      setCurrentIndex(newIndex);
+      
+      // Log the view
+      await logProfileView(filteredProfiles[newIndex].user_id);
+    } else {
+      toast({
+        title: "Plus de profils",
+        description: "Vous avez vu tous les profils disponibles"
+      });
     }
   };
 
@@ -348,6 +394,7 @@ const Browse = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
       <div className="container mx-auto max-w-6xl">
+        <DailyLimitIndicator />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Advanced Search - Toggle on mobile */}
           <div className="lg:hidden">
@@ -484,11 +531,21 @@ const Browse = () => {
           </Button>
           <Button
             onClick={() => handleLike(currentProfile.user_id)}
+            disabled={!subscription.subscribed || dailyLimitReached}
             variant="gradient"
             className="flex-1 order-0 sm:order-none animate-pulse-gentle"
           >
-            <Heart className="h-4 w-4 mr-2" />
-            J'aime ce profil
+            {!subscription.subscribed ? (
+              <>
+                <Lock className="h-4 w-4 mr-2" />
+                Premium requis
+              </>
+            ) : (
+              <>
+                <Heart className="h-4 w-4 mr-2" />
+                J'aime ce profil
+              </>
+            )}
           </Button>
           <Button
             variant="outline"

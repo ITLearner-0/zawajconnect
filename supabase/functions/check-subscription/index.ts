@@ -65,13 +65,33 @@ serve(async (req) => {
     const hasActiveSub = subscriptions.data.length > 0;
     let productId = null;
     let subscriptionEnd = null;
+    let planDuration = null;
+    let monthsRemaining = null;
 
     if (hasActiveSub) {
       const subscription = subscriptions.data[0];
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
       logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
       productId = subscription.items.data[0].price.product as string;
-      logStep("Determined subscription tier", { productId });
+      
+      // Get plan duration from metadata
+      planDuration = subscription.metadata?.plan_duration ? parseInt(subscription.metadata.plan_duration) : null;
+      
+      // Calculate months remaining
+      if (subscription.cancel_at) {
+        const now = Math.floor(Date.now() / 1000);
+        const secondsRemaining = subscription.cancel_at - now;
+        monthsRemaining = Math.ceil(secondsRemaining / (30 * 24 * 60 * 60));
+      } else if (planDuration) {
+        const planStart = subscription.metadata?.plan_start_date 
+          ? new Date(subscription.metadata.plan_start_date).getTime() / 1000 
+          : subscription.created;
+        const now = Math.floor(Date.now() / 1000);
+        const monthsElapsed = Math.floor((now - planStart) / (30 * 24 * 60 * 60));
+        monthsRemaining = Math.max(0, planDuration - monthsElapsed);
+      }
+      
+      logStep("Determined subscription tier", { productId, planDuration, monthsRemaining });
     } else {
       logStep("No active subscription found");
     }
@@ -79,7 +99,9 @@ serve(async (req) => {
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       product_id: productId,
-      subscription_end: subscriptionEnd
+      subscription_end: subscriptionEnd,
+      plan_duration: planDuration,
+      months_remaining: monthsRemaining
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,

@@ -2,17 +2,44 @@ import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/card';
+import { Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, MessageCircle } from 'lucide-react';
 import ChatList from '@/components/ChatList';
 import ChatWindow from '@/components/ChatWindow';
 
 const Chat = () => {
-  const { user } = useAuth();
+  const { user, subscription } = useAuth();
   const navigate = useNavigate();
   const { matchId: paramMatchId } = useParams<{ matchId?: string }>();
   const [searchParams] = useSearchParams();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+
+  // Bloquer si pas premium
+  if (!subscription.subscribed) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-primary/5 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full p-8 text-center space-y-6">
+          <div className="h-20 w-20 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center mx-auto">
+            <MessageCircle className="h-10 w-10 text-primary-foreground" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold mb-2">Messagerie Premium</h2>
+            <p className="text-muted-foreground">
+              La messagerie est réservée aux membres Premium. Passez Premium pour discuter avec vos matches.
+            </p>
+          </div>
+          <Button
+            onClick={() => navigate('/settings?tab=subscription')}
+            className="w-full bg-gradient-to-r from-emerald to-emerald-light"
+            size="lg"
+          >
+            Passer à Premium
+          </Button>
+        </Card>
+      </div>
+    );
+  }
   
   // Get matchId from URL params or search params
   const matchIdFromUrl = useMemo(() => {

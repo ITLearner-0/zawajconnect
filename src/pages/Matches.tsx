@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, MessageCircle, Eye, Users, Clock } from 'lucide-react';
+import { Heart, MessageCircle, Eye, Users, Clock, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Match {
@@ -29,12 +29,39 @@ interface Match {
 }
 
 const Matches = () => {
-  const { user } = useAuth();
+  const { user, subscription } = useAuth();
   const navigate = useNavigate();
   const [matches, setMatches] = useState<Match[]>([]);
   const [mutualMatches, setMutualMatches] = useState<Match[]>([]);
   const [pendingMatches, setPendingMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Bloquer si pas premium
+  if (!subscription.subscribed) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full p-8 text-center space-y-6">
+          <div className="h-20 w-20 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center mx-auto">
+            <Heart className="h-10 w-10 text-primary-foreground" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold mb-2">Fonctionnalité Premium</h2>
+            <p className="text-muted-foreground">
+              Accédez à vos matches, likes et mises en relation en passant à Premium.
+            </p>
+          </div>
+          <Button
+            onClick={() => navigate('/settings?tab=subscription')}
+            className="w-full bg-gradient-to-r from-emerald to-emerald-light"
+            size="lg"
+          >
+            <Crown className="h-4 w-4 mr-2" />
+            Passer à Premium
+          </Button>
+        </Card>
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (!user) {

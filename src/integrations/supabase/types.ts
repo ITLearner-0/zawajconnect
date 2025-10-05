@@ -1078,6 +1078,30 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_views_daily: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+          viewed_at: string
+          viewed_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+          viewed_at?: string
+          viewed_user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+          viewed_at?: string
+          viewed_user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           age: number | null
