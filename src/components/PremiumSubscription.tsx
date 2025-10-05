@@ -32,9 +32,9 @@ interface SubscriptionPlan {
 }
 
 const PRICE_IDS = {
-  premium_3: 'price_1SEwVk4GoRjf8T3b1G9vqRXV',
-  premium_6: 'price_1SEwVl4GoRjf8T3bvpKEiyDP',
-  premium_12: 'price_1SEwVm4GoRjf8T3bf1OymDwN',
+  premium_3: 'price_1SEwZ94GoRjf8T3bVP5cNIhS',
+  premium_6: 'price_1SEwZA4GoRjf8T3b9SY6tArJ',
+  premium_12: 'price_1SEwZA4GoRjf8T3bxXtkY8b5',
 };
 
 const PremiumSubscription = () => {
