@@ -20,3 +20,9 @@ verify_jwt = true
 
 [functions.customer-portal]
 verify_jwt = true
+
+[functions.check-daily-limit]
+verify_jwt = true
+
+[functions.log-profile-view]
+verify_jwt = true

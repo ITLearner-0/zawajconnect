@@ -31,11 +31,10 @@ interface SubscriptionPlan {
   discount?: string;
 }
 
-// IMPORTANT: Remplacer ces IDs par les vrais IDs Stripe après création des produits
 const PRICE_IDS = {
-  premium_3: 'price_PREMIUM_3_MONTHS',
-  premium_6: 'price_PREMIUM_6_MONTHS',
-  premium_12: 'price_PREMIUM_12_MONTHS',
+  premium_3: 'price_1SEnr84GoRjf8T3btB6BkkKT',
+  premium_6: 'price_1SEnrK4GoRjf8T3bGyAS6Hpd',
+  premium_12: 'price_1SEnrL4GoRjf8T3bsJ4OoiBX',
 };
 
 const PremiumSubscription = () => {

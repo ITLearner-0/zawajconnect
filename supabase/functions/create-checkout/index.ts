@@ -55,10 +55,9 @@ serve(async (req) => {
 
     // Map price IDs to plan duration
     const priceToPlanDuration: { [key: string]: number } = {
-      // IMPORTANT: Remplacer ces IDs par les vrais IDs Stripe après création des produits
-      'price_PREMIUM_3_MONTHS': 3,
-      'price_PREMIUM_6_MONTHS': 6,
-      'price_PREMIUM_12_MONTHS': 12,
+      'price_1SEnr84GoRjf8T3btB6BkkKT': 3,  // Premium 3 mois
+      'price_1SEnrK4GoRjf8T3bGyAS6Hpd': 6,  // Premium 6 mois
+      'price_1SEnrL4GoRjf8T3bsJ4OoiBX': 12, // Premium 12 mois
     };
 
     const planDuration = priceToPlanDuration[priceId];

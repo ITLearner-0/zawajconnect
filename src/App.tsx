@@ -8,6 +8,7 @@ import RouteTransition from "@/components/navigation/RouteTransition";
 import { publicRoutes, specialRoutes, protectedRoutes, notFoundRoute } from "@/config/appRoutes";
 import { Toaster } from "@/components/ui/toaster";
 import ProtectedRouteWrapper from "@/components/routing/ProtectedRouteWrapper";
+import { FreemiumBanner } from "@/components/FreemiumBanner";
 
 // Create QueryClient outside component to avoid hook issues
 const queryClient = new QueryClient({
@@ -33,6 +34,7 @@ function App() {
         >
           <NavigationProvider>
             <NavigationGuard>
+              <FreemiumBanner />
               <RouteTransition>
                 <Routes>
                   {/* Public routes */}

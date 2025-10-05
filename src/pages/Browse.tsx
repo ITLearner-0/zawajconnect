@@ -57,6 +57,17 @@ const Browse = () => {
     setFilteredProfiles(profiles);
   }, [profiles]);
 
+  // Log initial profile view for free users
+  useEffect(() => {
+    if (filteredProfiles.length > 0 && currentIndex === 0 && !subscription.subscribed) {
+      checkDailyLimit().then(canView => {
+        if (canView) {
+          logProfileView(filteredProfiles[0].user_id);
+        }
+      });
+    }
+  }, [filteredProfiles]);
+
   const fetchProfiles = async () => {
     if (!user) return;
 
@@ -601,6 +612,12 @@ const Browse = () => {
             </Card>
           </div>
         </div>
+        
+        <UpgradeToPremiumModal 
+          open={showUpgradeModal} 
+          onClose={() => setShowUpgradeModal(false)}
+          reason="daily_limit"
+        />
       </div>
 
       {/* Report Modal - Remove if not needed */}
