@@ -51,11 +51,11 @@ const PrayerTimes = () => {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Update current time every minute
+  // Update current time every second for accurate display
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentTime(new Date());
-    }, 60000); // Update every minute
+    }, 1000); // Update every second
 
     return () => clearInterval(interval);
   }, []);
