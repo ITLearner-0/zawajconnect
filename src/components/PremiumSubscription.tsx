@@ -45,8 +45,8 @@ const PremiumSubscription = () => {
   const subscriptionPlans: SubscriptionPlan[] = [
     {
       id: 'premium_3',
-      name: 'Premium 3 mois',
-      price: 29.99,
+      name: 'Premium - Engagement 3 mois',
+      price: 9.99,
       pricePerMonth: 9.99,
       duration: 3,
       currency: 'EUR',
@@ -63,8 +63,8 @@ const PremiumSubscription = () => {
     },
     {
       id: 'premium_6',
-      name: 'Premium 6 mois',
-      price: 49.99,
+      name: 'Premium - Engagement 6 mois',
+      price: 8.33,
       pricePerMonth: 8.33,
       duration: 6,
       currency: 'EUR',
@@ -84,8 +84,8 @@ const PremiumSubscription = () => {
     },
     {
       id: 'premium_12',
-      name: 'Premium 12 mois',
-      price: 79.99,
+      name: 'Premium - Engagement 12 mois',
+      price: 6.66,
       pricePerMonth: 6.66,
       duration: 12,
       currency: 'EUR',
@@ -276,17 +276,17 @@ const PremiumSubscription = () => {
                 <Star className="h-6 w-6 text-emerald" />
               </div>
               <div className="text-xs font-medium text-emerald mb-2">{plan.badge}</div>
-              <CardTitle className="text-2xl font-bold">{plan.duration} mois</CardTitle>
+              <CardTitle className="text-2xl font-bold">Engagement {plan.duration} mois</CardTitle>
               <div className="mt-4">
                 <div className="text-4xl font-bold text-emerald">
                   {plan.pricePerMonth.toFixed(2)}€
                 </div>
                 <div className="text-sm text-muted-foreground">par mois</div>
-                <div className="text-lg font-medium mt-2">
-                  {plan.price.toFixed(2)}€ total
+                <div className="text-xs text-muted-foreground mt-1">
+                  Abonnement mensuel récurrent
                 </div>
                 {plan.discount && (
-                  <div className="text-sm text-emerald font-medium mt-1">{plan.discount}</div>
+                  <div className="text-sm text-emerald font-medium mt-2">{plan.discount}</div>
                 )}
               </div>
             </CardHeader>
@@ -453,14 +453,14 @@ const PremiumSubscription = () => {
           <div>
             <h4 className="font-semibold mb-2">Comment fonctionnent les paiements mensuels ?</h4>
             <p className="text-sm text-muted-foreground">
-              Vous payez mensuellement pendant la durée choisie (3, 6 ou 12 mois), puis l'abonnement s'arrête automatiquement. Aucun renouvellement surprise !
+              Vous choisissez un engagement de 3, 6 ou 12 mois et payez mensuellement. L'abonnement se renouvelle automatiquement chaque mois jusqu'à la fin de votre engagement, puis s'arrête.
             </p>
           </div>
           
           <div>
             <h4 className="font-semibold mb-2">Puis-je annuler mon abonnement ?</h4>
             <p className="text-sm text-muted-foreground">
-              Oui, vous pouvez annuler à tout moment. Vous conserverez l'accès aux fonctionnalités premium jusqu'à la fin de votre période de facturation.
+              Oui, vous pouvez annuler à tout moment via le portail de gestion. L'abonnement restera actif jusqu'à la fin de votre mois en cours.
             </p>
           </div>
           

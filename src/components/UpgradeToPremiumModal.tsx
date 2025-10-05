@@ -57,24 +57,21 @@ export const UpgradeToPremiumModal = ({ open, onClose, reason = 'daily_limit' }:
           {/* Pricing Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <PricingCard
-              duration="3 mois"
-              pricePerMonth="€9.99"
-              totalPrice="€29.99"
+              duration="Engagement 3 mois"
+              pricePerMonth="9.99€"
               badge="Essai"
               popular={false}
             />
             <PricingCard
-              duration="6 mois"
-              pricePerMonth="€8.33"
-              totalPrice="€49.99"
+              duration="Engagement 6 mois"
+              pricePerMonth="8.33€"
               badge="⭐ Populaire"
               popular={true}
               discount="-17%"
             />
             <PricingCard
-              duration="12 mois"
-              pricePerMonth="€6.66"
-              totalPrice="€79.99"
+              duration="Engagement 12 mois"
+              pricePerMonth="6.66€"
               badge="💎 Best Value"
               popular={false}
               discount="-33%"
@@ -104,14 +101,14 @@ export const UpgradeToPremiumModal = ({ open, onClose, reason = 'daily_limit' }:
   );
 };
 
-const PricingCard = ({ duration, pricePerMonth, totalPrice, badge, popular, discount }: any) => (
+const PricingCard = ({ duration, pricePerMonth, badge, popular, discount }: any) => (
   <Card className={`p-4 ${popular ? 'border-2 border-emerald shadow-lg' : ''}`}>
     <div className="text-center space-y-2">
       <div className="text-xs font-medium text-emerald">{badge}</div>
       <div className="text-lg font-bold">{duration}</div>
       <div className="text-2xl font-bold text-emerald">{pricePerMonth}</div>
       <div className="text-xs text-muted-foreground">par mois</div>
-      <div className="text-sm font-medium">{totalPrice} total</div>
+      <div className="text-[10px] text-muted-foreground mt-1">Mensuel récurrent</div>
       {discount && <div className="text-xs text-emerald font-medium">{discount}</div>}
     </div>
   </Card>
