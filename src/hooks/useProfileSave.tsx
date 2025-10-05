@@ -108,7 +108,7 @@ export const useProfileSave = () => {
       const validImportance = ['very_important', 'important', 'moderate', 'not_important'];
       const validQuranReading = ['daily', 'weekly', 'occasionally', 'rarely'];
       const validHijab = ['always', 'sometimes', 'no', 'not_applicable'];
-      const validBeard = ['always', 'sometimes', 'no', 'not_applicable'];
+      const validBeard = ['full_beard', 'trimmed_beard', 'goatee', 'mustache_only', 'clean_shaven', 'beardless', 'not_applicable'];
       const validMadhab = ['hanafi', 'maliki', 'shafii', 'hanbali', 'jafari', 'other', 'none'];
       const validSmoking = ['never', 'occasionally', 'regularly'];
       const validDesiredPartnerSect = ['same_sect', 'sunni', 'shia', 'any', 'other', 'open_discussion'];

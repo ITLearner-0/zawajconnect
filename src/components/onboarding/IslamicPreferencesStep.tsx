@@ -291,6 +291,7 @@ const IslamicPreferencesStep = ({
                 <SelectItem value="goatee">Bouc</SelectItem>
                 <SelectItem value="mustache_only">Moustache seulement</SelectItem>
                 <SelectItem value="clean_shaven">Rasé de près</SelectItem>
+                <SelectItem value="beardless">Imberbe</SelectItem>
                 <SelectItem value="not_applicable">Non applicable</SelectItem>
               </SelectContent>
               </Select>
