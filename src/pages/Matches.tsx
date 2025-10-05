@@ -51,7 +51,10 @@ const Matches = () => {
             </p>
           </div>
           <Button
-            onClick={() => navigate('/settings?tab=subscription')}
+            onClick={() => {
+              console.log('Navigation vers Premium...');
+              navigate('/settings?tab=subscription');
+            }}
             className="w-full bg-gradient-to-r from-emerald to-emerald-light"
             size="lg"
           >
