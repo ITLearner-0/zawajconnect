@@ -49,85 +49,11 @@ const SuccessStoriesShowcase = () => {
     countries_represented: 0
   });
 
-  // Sample success stories (in a real app, these would come from your database)
-  const sampleStories: SuccessStory[] = [
-    {
-      id: '1',
-      couple_names: 'Ahmed & Fatima',
-      match_date: '2023-09-15',
-      wedding_date: '2024-02-14',
-      story_text: 'Nous nous sommes rencontrés grâce à cette merveilleuse plateforme qui respecte nos valeurs islamiques. Le processus de supervision familiale nous a mis en confiance dès le début. Après 6 mois de discussions respectueuses et de rencontres chaperonnées, nous avons décidé de nous marier. Aujourd\'hui, nous sommes heureux parents et remercions Allah pour cette belle rencontre.',
-      couple_photo: '',
-      location: 'Paris, France',
-      match_score: 92,
-      relationship_duration_months: 5,
-      tags: ['Supervision familiale', 'Mariage traditionnel', 'Paris'],
-      featured: true,
-      verification_status: 'verified',
-      testimonial_quote: 'Cette plateforme a changé notre vie. La supervision familiale et le respect des valeurs islamiques nous ont donné confiance.',
-      created_at: '2024-03-01'
-    },
-    {
-      id: '2',
-      couple_names: 'Omar & Aisha',
-      match_date: '2023-06-20',
-      wedding_date: '2023-12-10',
-      story_text: 'En tant que professionnels occupés, nous cherchions une solution moderne mais respectueuse de nos traditions. L\'algorithme de compatibilité a parfaitement fonctionné - nous partagions les mêmes valeurs, objectifs de vie et pratiques religieuses. Nos familles se sont rencontrées après seulement 3 mois et ont donné leur bénédiction. Nous organisons maintenant notre Hajj ensemble.',
-      couple_photo: '',
-      location: 'London, UK',
-      match_score: 89,
-      relationship_duration_months: 6,
-      tags: ['Professionnels', 'International', 'Hajj'],
-      featured: true,
-      verification_status: 'verified',
-      testimonial_quote: 'L\'algorithme de compatibilité est impressionnant. Nous étions faits l\'un pour l\'autre !',
-      created_at: '2024-01-15'
-    },
-    {
-      id: '3',
-      couple_names: 'Youssef & Khadija',
-      match_date: '2023-03-10',
-      wedding_date: '2023-08-25',
-      story_text: 'Après des années de recherche infructueuse, nous avions perdu espoir. Cette plateforme nous a redonné foi en notre quête. Le système de vérification nous a rassurés sur l\'authenticité des profils. Notre rencontre s\'est faite en présence de nos familles respectives, selon la Sunnah. Aujourd\'hui, nous attendons notre premier enfant, Alhamdulillah.',
-      couple_photo: '',
-      location: 'Casablanca, Maroc',
-      match_score: 95,
-      relationship_duration_months: 5,
-      tags: ['Deuxième chance', 'Famille nombreuse', 'Maroc'],
-      featured: true,
-      verification_status: 'verified',
-      testimonial_quote: 'Nous avions perdu espoir, mais cette plateforme nous a redonné foi en notre recherche.',
-      created_at: '2023-12-20'
-    },
-    {
-      id: '4',
-      couple_names: 'Ibrahim & Maryam',
-      match_date: '2023-07-05',
-      wedding_date: '2024-01-20',
-      story_text: 'Vivant dans des pays différents, nous pensions que la distance serait un obstacle. Mais notre compatibilité était si forte que nos familles ont organisé des rencontres virtuelles puis physiques. Le processus d\'immigration s\'est bien passé et nous vivons maintenant ensemble en Allemagne. La plateforme nous a permis de dépasser les frontières géographiques.',
-      couple_photo: '',
-      location: 'Berlin, Allemagne',
-      match_score: 87,
-      relationship_duration_months: 6,
-      tags: ['International', 'Immigration', 'Europe'],
-      featured: false,
-      verification_status: 'verified',
-      testimonial_quote: 'La distance n\'était plus un problème grâce aux outils de communication respectueux de la plateforme.',
-      created_at: '2024-02-10'
-    }
-  ];
-
-  useEffect(() => {
-    loadSuccessStories();
-    loadStats();
-  }, []);
-
   const loadSuccessStories = async () => {
     setLoading(true);
     try {
-      // In a real app, you would fetch from your success_stories table
-      // For demo purposes, we'll use the sample data
-      setStories(sampleStories);
+      // Fetch from success_stories table when available
+      setStories([]);
     } catch (error) {
       console.error('Error loading success stories:', error);
       toast({
@@ -142,12 +68,12 @@ const SuccessStoriesShowcase = () => {
 
   const loadStats = async () => {
     try {
-      // In a real app, you would calculate these from your database
+      // Calculate from database when available
       setStats({
-        total_marriages: 1247,
-        success_rate: 89,
-        average_time_to_match: 4.2,
-        countries_represented: 45
+        total_marriages: 0,
+        success_rate: 0,
+        average_time_to_match: 0,
+        countries_represented: 0
       });
     } catch (error) {
       console.error('Error loading stats:', error);

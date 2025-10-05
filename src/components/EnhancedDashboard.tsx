@@ -186,39 +186,8 @@ const EnhancedDashboard = () => {
   };
 
   const loadRecentActivity = async () => {
-    // Sample recent activity - in real app, aggregate from multiple tables
-    const sampleActivity: RecentActivity[] = [
-      {
-        id: '1',
-        type: 'like',
-        user_name: 'Sarah A.',
-        timestamp: '2024-01-05T10:30:00Z',
-        read: false
-      },
-      {
-        id: '2',
-        type: 'match',
-        user_name: 'Ahmed B.',
-        timestamp: '2024-01-05T09:15:00Z',
-        read: false
-      },
-      {
-        id: '3',
-        type: 'message',
-        user_name: 'Fatima K.',
-        timestamp: '2024-01-04T18:45:00Z',
-        read: true
-      },
-      {
-        id: '4',
-        type: 'view',
-        user_name: 'Omar M.',
-        timestamp: '2024-01-04T14:20:00Z',
-        read: true
-      }
-    ];
-
-    setRecentActivity(sampleActivity);
+    // Load from database when available
+    setRecentActivity([]);
   };
 
   const getActivityIcon = (type: string) => {

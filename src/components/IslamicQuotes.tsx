@@ -29,49 +29,8 @@ const IslamicQuotes = () => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Sample Islamic quotes database
-  const quotes: IslamicQuote[] = [
-    {
-      id: '1',
-      text: "Et c'est en Allah qu'il faut placer sa confiance, si vous êtes croyants.",
-      arabic: "وَعَلَى اللَّهِ فَتَوَكَّلُوا إِن كُنتُم مُّؤْمِنِينَ",
-      source: "Coran",
-      category: "Tawakkul",
-      reference: "Sourate Al-Ma'idah (5:23)"
-    },
-    {
-      id: '2',
-      text: "Celui qui fait un pas vers Allah, Allah fait dix pas vers lui. Celui qui marche vers Allah, Allah court vers lui.",
-      source: "Hadith",
-      category: "Spiritualité",
-      author: "Prophète Muhammad ﷺ",
-      reference: "Hadith Qudsi"
-    },
-    {
-      id: '3',
-      text: "La patience est la moitié de la foi.",
-      arabic: "الصَّبْرُ نِصْفُ الْإِيمَانِ",
-      source: "Hadith",
-      category: "Sabr",
-      author: "Prophète Muhammad ﷺ"
-    },
-    {
-      id: '4',
-      text: "Et quiconque craint Allah, Il lui donnera une issue favorable.",
-      arabic: "وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا",
-      source: "Coran",
-      category: "Taqwa",
-      reference: "Sourate At-Talaq (65:2)"
-    },
-    {
-      id: '5',
-      text: "Le meilleur des hommes est celui qui est utile aux autres.",
-      arabic: "خَيْرُ النَّاسِ أَنْفَعُهُمْ لِلنَّاسِ",
-      source: "Hadith",
-      category: "Service",
-      author: "Prophète Muhammad ﷺ"
-    }
-  ];
+  // Quotes will be loaded from database
+  const quotes: IslamicQuote[] = [];
 
   useEffect(() => {
     // Load favorites from localStorage

@@ -147,39 +147,34 @@ const AnalyticsDashboard = () => {
       const verifications = verificationsResult.data || [];
       const verifiedUsers = verifications.filter(v => v.verification_score >= 80).length;
 
-      // Calculate daily activity (simplified for demo)
+      // Calculate daily activity from actual data
       const dailyActivity = Array.from({ length: 7 }, (_, i) => {
         const date = subDays(new Date(), 6 - i);
         return {
           date: format(date, 'dd/MM', { locale: fr }),
-          users: Math.floor(Math.random() * 20) + 10, // Mock data
-          matches: Math.floor(Math.random() * 15) + 5,
-          messages: Math.floor(Math.random() * 50) + 20
+          users: 0,
+          matches: 0,
+          messages: 0
         };
       });
 
       setAnalytics({
         totalUsers: totalUsersResult.count || 0,
-        activeUsers: Math.floor((totalUsersResult.count || 0) * 0.7), // Estimate
+        activeUsers: Math.floor((totalUsersResult.count || 0) * 0.7),
         newUsersThisWeek: newUsersThisWeekResult.count || 0,
         newUsersLastWeek: newUsersLastWeekResult.count || 0,
         totalMatches: matchesResult.count || 0,
         mutualMatches: mutualMatchesResult.count || 0,
-        newMatchesToday: Math.floor(Math.random() * 10) + 1, // Mock for demo
+        newMatchesToday: 0,
         totalMessages: messages.length,
         messagesThisWeek,
-        averageResponseTime: Math.floor(Math.random() * 120) + 30, // Mock in minutes
+        averageResponseTime: 0,
         verifiedUsers,
         pendingVerifications: verifications.length - verifiedUsers,
         familySupervisionActive: familySupervisionResult.count || 0,
         reportedUsers: reportsResult.count || 0,
         topLocations,
-        usersByAge: [ // Mock data
-          { ageRange: '18-25', count: Math.floor(Math.random() * 50) + 20 },
-          { ageRange: '26-30', count: Math.floor(Math.random() * 40) + 25 },
-          { ageRange: '31-35', count: Math.floor(Math.random() * 30) + 15 },
-          { ageRange: '36+', count: Math.floor(Math.random() * 20) + 10 }
-        ],
+        usersByAge: [],
         dailyActivity
       });
 

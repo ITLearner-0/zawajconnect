@@ -20,7 +20,6 @@ import CompatibilityPrompt from '@/components/CompatibilityPrompt';
 import InsightsPreviewCard from '@/components/InsightsPreviewCard';
 import OnboardingFlow from '@/components/OnboardingFlow';
 import GamifiedInsights from '@/components/GamifiedInsights';
-import SampleProfilesGenerator from '@/components/SampleProfilesGenerator';
 import SmartMatchingSuggestions from '@/components/SmartMatchingSuggestions';
 import QuickActionsPanel from '@/components/QuickActionsPanel';
 import OnboardingCompletionGuide from '@/components/OnboardingCompletionGuide';
@@ -655,7 +654,6 @@ const Dashboard = () => {
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-1">
               <QuickActionsPanel />
               <SmartMatchingSuggestions />
-              <SampleProfilesGenerator />
               <CompatibilityCard />
               <InsightsPreviewCard />
             </div>
