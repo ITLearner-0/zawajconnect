@@ -101,16 +101,28 @@ export const useProfileSave = () => {
         throw profileError;
       }
 
-    // Validate Islamic preferences before saving
+    // Validate Islamic preferences before saving - comprehensive validation
     const validateIslamicPrefs = (prefs: any) => {
-      const validSects = ['same_sect', 'sunni', 'shia', 'any', 'other', 'open_discussion'];
+      const validSects = ['sunni', 'shia', 'other'];
       const validPrayerFreqs = ['five_times', 'occasionally', 'rarely', 'never'];
       const validImportance = ['very_important', 'important', 'moderate', 'not_important'];
+      const validQuranReading = ['daily', 'weekly', 'occasionally', 'rarely'];
+      const validHijab = ['always', 'sometimes', 'no', 'not_applicable'];
+      const validBeard = ['always', 'sometimes', 'no', 'not_applicable'];
+      const validMadhab = ['hanafi', 'maliki', 'shafii', 'hanbali', 'jafari', 'other', 'none'];
+      const validSmoking = ['never', 'occasionally', 'regularly'];
+      const validDesiredPartnerSect = ['same_sect', 'sunni', 'shia', 'any', 'other', 'open_discussion'];
       
       return {
-        ...prefs,
-        desired_partner_sect: validSects.includes(prefs.desired_partner_sect) ? prefs.desired_partner_sect : null,
         prayer_frequency: validPrayerFreqs.includes(prefs.prayer_frequency) ? prefs.prayer_frequency : null,
+        quran_reading: validQuranReading.includes(prefs.quran_reading) ? prefs.quran_reading : null,
+        hijab_preference: validHijab.includes(prefs.hijab_preference) ? prefs.hijab_preference : null,
+        beard_preference: validBeard.includes(prefs.beard_preference) ? prefs.beard_preference : null,
+        sect: validSects.includes(prefs.sect) ? prefs.sect : null,
+        madhab: validMadhab.includes(prefs.madhab) ? prefs.madhab : null,
+        halal_diet: prefs.halal_diet ?? true,
+        smoking: validSmoking.includes(prefs.smoking) ? prefs.smoking : null,
+        desired_partner_sect: validDesiredPartnerSect.includes(prefs.desired_partner_sect) ? prefs.desired_partner_sect : null,
         importance_of_religion: validImportance.includes(prefs.importance_of_religion) ? prefs.importance_of_religion : null,
       };
     };
