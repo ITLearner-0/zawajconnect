@@ -99,6 +99,28 @@ export const useConversationStatus = () => {
         match_id: matchId
       });
 
+      // 6. Envoyer un email de notification
+      const { data: senderProfile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      try {
+        await supabase.functions.invoke('send-conversation-ended-email', {
+          body: {
+            recipient_user_id: otherUserId,
+            sender_name: senderProfile?.full_name || 'Un membre',
+            reason: reason,
+            courtesy_message: courtesyMessage,
+            islamic_message: islamicMessage
+          }
+        });
+      } catch (emailError) {
+        // Log but don't fail the whole operation if email fails
+        console.error('Email notification failed:', emailError);
+      }
+
       toast({
         title: "Conversation terminée",
         description: "L'échange a été clôturé avec respect. Vous pouvez maintenant chercher de nouveaux profils.",

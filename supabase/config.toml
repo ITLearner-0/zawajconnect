@@ -26,3 +26,6 @@ verify_jwt = true
 
 [functions.log-profile-view]
 verify_jwt = true
+
+[functions.send-conversation-ended-email]
+verify_jwt = false
