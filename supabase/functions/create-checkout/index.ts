@@ -24,6 +24,12 @@ serve(async (req) => {
 
   try {
     logStep("Function started");
+    
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    if (!stripeKey) {
+      throw new Error("STRIPE_SECRET_KEY not configured");
+    }
+    logStep("Stripe key loaded", { keyPrefix: stripeKey.substring(0, 7) });
 
     const { priceId } = await req.json();
     if (!priceId) {
@@ -40,7 +46,7 @@ serve(async (req) => {
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { 
+    const stripe = new Stripe(stripeKey, { 
       apiVersion: "2025-08-27.basil" 
     });
 
