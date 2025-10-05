@@ -74,7 +74,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         // CRITICAL: Only synchronous state updates here to prevent deadlocks
-        console.log('Auth state changed:', event, session?.user?.email);
+        console.log('🔐 Auth state changed:', event, session?.user?.email);
         
         // Handle session expiry events
         if (event === 'SIGNED_OUT' && session === null) {
@@ -101,17 +101,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
 
     // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('Initial session check:', session?.user?.email);
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+    const initializeAuth = async () => {
+      try {
+        console.log('🔐 Initializing auth...');
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('🔐 Error getting session:', error);
+          setLoading(false);
+          return;
+        }
+        
+        console.log('🔐 Initial session check:', session?.user?.email);
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
 
-      // Check subscription after initial session load
-      if (session?.user) {
-        setTimeout(() => checkSubscription(), 0);
+        // Check subscription after initial session load
+        if (session?.user) {
+          setTimeout(() => checkSubscription(), 0);
+        }
+      } catch (error) {
+        console.error('🔐 Exception during auth initialization:', error);
+        setLoading(false);
       }
-    });
+    };
+
+    initializeAuth();
 
     return () => authSubscription.unsubscribe();
   }, []);

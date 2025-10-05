@@ -60,9 +60,13 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
 
   // Show loading spinner while checking auth/profile
   if (loading || profileLoading) {
+    console.log('🔒 ProtectedRoute - Loading state:', { loading, profileLoading, hasUser: !!user });
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald"></div>
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald mx-auto"></div>
+          <p className="text-sm text-muted-foreground">Vérification de votre session...</p>
+        </div>
       </div>
     );
   }
