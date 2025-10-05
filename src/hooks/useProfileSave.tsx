@@ -103,15 +103,15 @@ export const useProfileSave = () => {
 
     // Validate Islamic preferences before saving - comprehensive validation
     const validateIslamicPrefs = (prefs: any) => {
-      const validSects = ['sunni', 'shia', 'other'];
-      const validPrayerFreqs = ['five_times', 'occasionally', 'rarely', 'never'];
-      const validImportance = ['very_important', 'important', 'moderate', 'not_important'];
-      const validQuranReading = ['daily', 'weekly', 'occasionally', 'rarely'];
-      const validHijab = ['always', 'sometimes', 'no', 'not_applicable'];
+      const validSects = ['sunni', 'shia', 'other', 'prefer_not_say'];
+      const validPrayerFreqs = ['five_times', 'regularly', 'sometimes', 'rarely', 'never'];
+      const validImportance = ['very_important', 'important', 'somewhat', 'not_very'];
+      const validQuranReading = ['daily', 'weekly', 'monthly', 'occasionally', 'rarely'];
+      const validHijab = ['always', 'sometimes', 'planning_to', 'never'];
       const validBeard = ['full_beard', 'trimmed_beard', 'goatee', 'mustache_only', 'clean_shaven', 'beardless', 'not_applicable'];
-      const validMadhab = ['hanafi', 'maliki', 'shafii', 'hanbali', 'jafari', 'other', 'none'];
-      const validSmoking = ['never', 'occasionally', 'regularly'];
-      const validDesiredPartnerSect = ['same_sect', 'sunni', 'shia', 'any', 'other', 'open_discussion'];
+      const validMadhab = ['hanafi', 'maliki', 'shafi', 'hanbali', 'other', 'none'];
+      const validSmoking = ['never', 'socially', 'regularly'];
+      const validDesiredPartnerSect = ['any', 'sunni', 'shia', 'same_sect'];
       
       return {
         prayer_frequency: validPrayerFreqs.includes(prefs.prayer_frequency) ? prefs.prayer_frequency : null,
