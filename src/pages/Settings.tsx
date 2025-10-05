@@ -28,7 +28,7 @@ import FamilyRateLimitIndicator from '@/components/security/FamilyRateLimitIndic
 import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
 
 const Settings = () => {
-  const { user, signOut } = useAuth();
+  const { user, subscription, signOut } = useAuth();
   const navigate = useNavigate();
   const { securityStatus } = useSecurityMonitor();
   
@@ -100,6 +100,11 @@ const Settings = () => {
                 <TabsTrigger value="premium" className="flex items-center gap-2">
                   <Crown className="h-4 w-4" />
                   <span className="hidden sm:inline">Premium</span>
+                  {subscription.subscribed && (
+                    <Badge className="ml-1 bg-gold text-primary-foreground text-xs px-1">
+                      Actif
+                    </Badge>
+                  )}
                 </TabsTrigger>
                 <TabsTrigger value="notifications" className="flex items-center gap-2">
                   <Bell className="h-4 w-4" />
@@ -147,6 +152,24 @@ const Settings = () => {
             </TabsContent>
             
             <TabsContent value="premium" className="space-y-6">
+              {subscription.subscribed && (
+                <Card className="p-4 border-gold/20 bg-gradient-to-r from-gold/10 to-emerald/10">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Crown className="h-5 w-5 text-gold" />
+                      <div>
+                        <h3 className="font-semibold">Statut de l'abonnement</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Vous avez accès aux fonctionnalités premium
+                        </p>
+                      </div>
+                    </div>
+                    <Badge className="bg-emerald text-primary-foreground">
+                      Actif
+                    </Badge>
+                  </div>
+                </Card>
+              )}
               <PremiumSubscription />
             </TabsContent>
 

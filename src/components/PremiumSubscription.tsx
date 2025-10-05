@@ -47,11 +47,10 @@ const PRICE_IDS = {
 };
 
 const PremiumSubscription = () => {
-  const { user } = useAuth();
+  const { user, subscription, checkSubscription } = useAuth();
   const { toast } = useToast();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
-  const [userSubscription, setUserSubscription] = useState<UserSubscription | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [processingPayment, setProcessingPayment] = useState<string | null>(null);
 
   const subscriptionPlans: SubscriptionPlan[] = [
@@ -110,33 +109,26 @@ const PremiumSubscription = () => {
   useEffect(() => {
     if (user) {
       setPlans(subscriptionPlans);
-      loadUserSubscription();
     }
   }, [user]);
 
-  const loadUserSubscription = async () => {
-    if (!user) return;
-
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('check-subscription');
-      
-      if (error) {
-        console.error('Error checking subscription:', error);
-        setUserSubscription(null);
-        return;
-      }
-
-      if (data) {
-        setUserSubscription(data as UserSubscription);
-      }
-    } catch (error) {
-      console.error('Error loading subscription:', error);
-      setUserSubscription(null);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    // Refresh subscription when returning from Stripe
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('success') === 'true') {
+      toast({
+        title: "Paiement réussi !",
+        description: "Votre abonnement est maintenant actif",
+      });
+      setTimeout(() => checkSubscription(), 2000);
+    } else if (params.get('canceled') === 'true') {
+      toast({
+        title: "Paiement annulé",
+        description: "Votre abonnement n'a pas été activé",
+        variant: "destructive",
+      });
     }
-  };
+  }, []);
 
   const handleSubscribe = async (planId: string) => {
     if (!user) {
@@ -178,6 +170,9 @@ const PremiumSubscription = () => {
 
       if (data?.url) {
         window.open(data.url, '_blank');
+        
+        // Refresh subscription after a delay
+        setTimeout(() => checkSubscription(), 3000);
       }
 
     } catch (error) {
@@ -274,7 +269,7 @@ const PremiumSubscription = () => {
       </Card>
 
       {/* Current Subscription Status */}
-      {userSubscription?.subscribed && userSubscription.product_id && (
+      {subscription?.subscribed && subscription.product_id && (
         <Card className="border-emerald/20 bg-emerald/5">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -283,9 +278,9 @@ const PremiumSubscription = () => {
                 <div>
                   <h3 className="font-semibold">Abonnement Actuel</h3>
                   <p className="text-sm text-muted-foreground">
-                    Plan {PRODUCT_MAPPING[userSubscription.product_id as keyof typeof PRODUCT_MAPPING]?.name || 'Premium'}
-                    {userSubscription.subscription_end && (
-                      <> - Renouvelé le {new Date(userSubscription.subscription_end).toLocaleDateString('fr-FR')}</>
+                    Plan {PRODUCT_MAPPING[subscription.product_id as keyof typeof PRODUCT_MAPPING]?.name || 'Premium'}
+                    {subscription.subscription_end && (
+                      <> - Renouvelé le {new Date(subscription.subscription_end).toLocaleDateString('fr-FR')}</>
                     )}
                   </p>
                 </div>

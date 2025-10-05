@@ -32,6 +32,7 @@ import CompatibilityInsightsPage from '@/pages/CompatibilityInsights';
 import EnhancedProfile from '@/pages/EnhancedProfile';
 import AdvancedMatching from '@/pages/AdvancedMatching';
 import Onboarding from '@/pages/Onboarding';
+import SubscriptionSuccess from '@/pages/SubscriptionSuccess';
 import NotFound from '@/pages/NotFound';
 
 export interface AppRouteConfig {
@@ -57,6 +58,12 @@ export const specialRoutes: AppRouteConfig[] = [
   { 
     path: '/onboarding', 
     component: Onboarding, 
+    protected: true, 
+    requiresOnboarding: false 
+  },
+  { 
+    path: '/subscription-success', 
+    component: SubscriptionSuccess, 
     protected: true, 
     requiresOnboarding: false 
   },
