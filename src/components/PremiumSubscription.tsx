@@ -30,12 +30,21 @@ interface SubscriptionPlan {
 }
 
 interface UserSubscription {
-  id: string;
-  plan_id: string;
-  status: string;
-  current_period_end: string;
-  cancel_at_period_end: boolean;
+  subscribed: boolean;
+  product_id: string | null;
+  subscription_end: string | null;
 }
+
+// Map product IDs to plan info
+const PRODUCT_MAPPING = {
+  'prod_TB8Q6AILWjCstr': { id: 'premium', name: 'Premium', price: 19.99 },
+  'prod_TB8QPhRHOsYWAo': { id: 'family_plus', name: 'Famille+', price: 39.99 },
+};
+
+const PRICE_IDS = {
+  premium: 'price_1SEm9G4GoRjf8T3b9ZUoLuop',
+  family_plus: 'price_1SEm9v4GoRjf8T3bXqwW1dg2',
+};
 
 const PremiumSubscription = () => {
   const { user } = useAuth();
@@ -110,18 +119,20 @@ const PremiumSubscription = () => {
 
     setLoading(true);
     try {
-      // In a real app, you'd fetch from your subscriptions table
-      // For now, we'll simulate checking subscription status
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      const { data, error } = await supabase.functions.invoke('check-subscription');
+      
+      if (error) {
+        console.error('Error checking subscription:', error);
+        setUserSubscription(null);
+        return;
+      }
 
-      // Simulate subscription check - in real app this would come from Stripe
-      setUserSubscription(null); // Default to no subscription
+      if (data) {
+        setUserSubscription(data as UserSubscription);
+      }
     } catch (error) {
       console.error('Error loading subscription:', error);
+      setUserSubscription(null);
     } finally {
       setLoading(false);
     }
@@ -148,25 +159,26 @@ const PremiumSubscription = () => {
     setProcessingPayment(planId);
 
     try {
-      // In a real app, you would:
-      // 1. Call your edge function to create Stripe checkout session
-      // 2. Redirect to Stripe checkout
-      // For demo purposes, we'll simulate the flow
+      const priceId = PRICE_IDS[planId as keyof typeof PRICE_IDS];
+      
+      if (!priceId) {
+        throw new Error('Invalid plan ID');
+      }
 
       toast({
         title: "Redirection vers le paiement",
         description: "Vous allez être redirigé vers la page de paiement sécurisée",
       });
 
-      // Simulate Stripe redirect
-      setTimeout(() => {
-        // In real app: window.open(stripeCheckoutUrl, '_blank');
-        toast({
-          title: "Paiement simulé",
-          description: "Dans une vraie application, vous seriez redirigé vers Stripe",
-        });
-        setProcessingPayment(null);
-      }, 2000);
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { priceId }
+      });
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
 
     } catch (error) {
       console.error('Error processing payment:', error);
@@ -175,7 +187,34 @@ const PremiumSubscription = () => {
         description: "Impossible de traiter votre demande d'abonnement",
         variant: "destructive"
       });
+    } finally {
       setProcessingPayment(null);
+    }
+  };
+
+  const handleManageSubscription = async () => {
+    if (!user) return;
+
+    try {
+      toast({
+        title: "Chargement...",
+        description: "Redirection vers le portail de gestion",
+      });
+
+      const { data, error } = await supabase.functions.invoke('customer-portal');
+
+      if (error) throw error;
+
+      if (data?.url) {
+        window.open(data.url, '_blank');
+      }
+    } catch (error) {
+      console.error('Error opening customer portal:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'accéder au portail de gestion",
+        variant: "destructive"
+      });
     }
   };
 
@@ -235,7 +274,7 @@ const PremiumSubscription = () => {
       </Card>
 
       {/* Current Subscription Status */}
-      {userSubscription && (
+      {userSubscription?.subscribed && userSubscription.product_id && (
         <Card className="border-emerald/20 bg-emerald/5">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -244,14 +283,25 @@ const PremiumSubscription = () => {
                 <div>
                   <h3 className="font-semibold">Abonnement Actuel</h3>
                   <p className="text-sm text-muted-foreground">
-                    Plan {userSubscription.plan_id} - Renouvelé le{' '}
-                    {new Date(userSubscription.current_period_end).toLocaleDateString('fr-FR')}
+                    Plan {PRODUCT_MAPPING[userSubscription.product_id as keyof typeof PRODUCT_MAPPING]?.name || 'Premium'}
+                    {userSubscription.subscription_end && (
+                      <> - Renouvelé le {new Date(userSubscription.subscription_end).toLocaleDateString('fr-FR')}</>
+                    )}
                   </p>
                 </div>
               </div>
-              <Badge className="bg-emerald text-primary-foreground">
-                Actif
-              </Badge>
+              <div className="flex items-center gap-2">
+                <Badge className="bg-emerald text-primary-foreground">
+                  Actif
+                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleManageSubscription}
+                >
+                  Gérer
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
