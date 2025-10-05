@@ -227,19 +227,20 @@ const IslamicCalendarWidget = () => {
               <Calendar className="h-5 w-5 text-emerald" />
               <span className="text-emerald">Date Islamique</span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigateDate('prev')}
+                className="h-8 px-2 text-xs"
               >
-                ←
+                ← <span className="hidden sm:inline ml-1">Précédent</span>
               </Button>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setCurrentDate(new Date())}
-                className="text-xs"
+                className="text-xs h-8 px-2 hidden sm:inline-flex"
               >
                 Aujourd'hui
               </Button>
@@ -247,8 +248,9 @@ const IslamicCalendarWidget = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigateDate('next')}
+                className="h-8 px-2 text-xs"
               >
-                →
+                <span className="hidden sm:inline mr-1">Suivant</span> →
               </Button>
             </div>
           </CardTitle>
