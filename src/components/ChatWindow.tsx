@@ -3,13 +3,15 @@ import { useAuth } from '@/hooks/useAuth';
 import { useChatMessages } from '@/hooks/useChatMessages';
 import { useChatMatch } from '@/hooks/useChatMatch';
 import { useChatPresence } from '@/hooks/useChatPresence';
+import { useConversationStatus } from '@/hooks/useConversationStatus';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { ChatHeader } from '@/components/chat/ChatHeader';
 import { MessageBubble } from '@/components/chat/MessageBubble';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
-import { Send, Shield, Heart } from 'lucide-react';
+import { EndConversationDialog } from '@/components/chat/EndConversationDialog';
+import { Send, Shield, Heart, X } from 'lucide-react';
 
 interface ChatWindowProps {
   matchId: string;
@@ -23,8 +25,10 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   const { messages, loading: messagesLoading, sending, sendMessage } = useChatMessages(matchId);
   const { match, loading: matchLoading, canCommunicate } = useChatMatch(matchId);
   const { typingUsers, isUserOnline, startTyping, stopTyping } = useChatPresence(matchId);
+  const { endConversation, loading: endingConversation } = useConversationStatus();
   
   const [newMessage, setNewMessage] = useState('');
+  const [showEndDialog, setShowEndDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   const loading = messagesLoading || matchLoading;
@@ -78,6 +82,17 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
     }
   };
 
+  const handleEndConversation = async (
+    reason: string,
+    details: string,
+    courtesyMessage: string
+  ) => {
+    const success = await endConversation(matchId, reason, details, courtesyMessage);
+    if (success && onClose) {
+      onClose();
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -116,12 +131,23 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
         </div>
       ) : (
         <>
-          <ChatHeader
-            match={match}
-            isOnline={isUserOnline(match.other_user.id)}
-            onClose={onClose}
-            onCall={handleCall}
-          />
+          <div className="flex items-center justify-between border-b p-4">
+            <ChatHeader
+              match={match}
+              isOnline={isUserOnline(match.other_user.id)}
+              onClose={onClose}
+              onCall={handleCall}
+            />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowEndDialog(true)}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Mettre fin à l'échange
+            </Button>
+          </div>
 
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -181,6 +207,13 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
               </Button>
             </div>
           </div>
+
+          <EndConversationDialog
+            open={showEndDialog}
+            onOpenChange={setShowEndDialog}
+            onConfirm={handleEndConversation}
+            loading={endingConversation}
+          />
         </>
       )}
     </div>

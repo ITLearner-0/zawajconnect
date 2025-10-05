@@ -82,6 +82,30 @@ const Browse = () => {
       // Determine opposite gender
       const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
 
+      // Get users in active conversations to exclude them
+      const { data: activeConversations } = await supabase
+        .from('matches' as any)
+        .select('user1_id, user2_id')
+        .eq('conversation_status', 'active');
+
+      const usersInConversation = new Set<string>();
+      activeConversations?.forEach((match: any) => {
+        usersInConversation.add(match.user1_id);
+        usersInConversation.add(match.user2_id);
+      });
+
+      // Get blocked pairs to prevent showing previous matches
+      const { data: blockedPairs } = await supabase
+        .from('blocked_match_pairs' as any)
+        .select('user1_id, user2_id')
+        .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
+
+      const blockedUsers = new Set<string>();
+      blockedPairs?.forEach((pair: any) => {
+        if (pair.user1_id === user.id) blockedUsers.add(pair.user2_id);
+        if (pair.user2_id === user.id) blockedUsers.add(pair.user1_id);
+      });
+
       // Use the secure matching data table instead of direct profile access
       const { data, error } = await supabase
         .from('profile_matching_data')
@@ -93,24 +117,30 @@ const Browse = () => {
         .eq('gender', oppositeGender)
         .eq('is_visible', true)
         .order('created_at', { ascending: false })
-        .limit(20); // Reduced limit for security
+        .limit(50); // Increased to compensate for filtering
 
       if (error) throw error;
 
-      const profilesWithVerification = data?.map((profile: any) => ({
-        user_id: profile.user_id,
-        age: profile.age,
-        gender: profile.gender,
-        city_only: profile.city_only,
-        education_level: profile.education_level,
-        profession_category: profile.profession_category,
-        interests: profile.interests || [],
-        looking_for: profile.looking_for,
-        avatar_url: profile.avatar_url,
-        verification_score: profile.user_verifications?.verification_score || 0
-      })) || [];
+      const profilesWithVerification = data
+        ?.filter((profile: any) => 
+          !usersInConversation.has(profile.user_id) && 
+          !blockedUsers.has(profile.user_id)
+        )
+        .map((profile: any) => ({
+          user_id: profile.user_id,
+          age: profile.age,
+          gender: profile.gender,
+          city_only: profile.city_only,
+          education_level: profile.education_level,
+          profession_category: profile.profession_category,
+          interests: profile.interests || [],
+          looking_for: profile.looking_for,
+          avatar_url: profile.avatar_url,
+          verification_score: profile.user_verifications?.verification_score || 0,
+          is_in_conversation: false
+        })) || [];
 
-      setProfiles(profilesWithVerification);
+      setProfiles(profilesWithVerification.slice(0, 20)); // Limit to 20 after filtering
     } catch (error) {
       console.error('Error fetching secure matching profiles:', error);
       setProfiles([]);

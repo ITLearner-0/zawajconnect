@@ -6,6 +6,7 @@ import { MapPin, Heart, Eye, MessageCircle, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import VerificationBadge from '@/components/VerificationBadge';
 import CompatibilityScore from '@/components/CompatibilityScore';
+import { ConversationStatusBadge } from '@/components/ui/ConversationStatusBadge';
 
 interface ProfileCardProps {
   profile: {
@@ -26,6 +27,7 @@ interface ProfileCardProps {
   showCompatibility?: boolean;
   showActions?: boolean;
   compact?: boolean;
+  isInConversation?: boolean;
 }
 
 const ProfileCard = ({ 
@@ -33,7 +35,8 @@ const ProfileCard = ({
   verification, 
   showCompatibility = true, 
   showActions = true,
-  compact = false 
+  compact = false,
+  isInConversation = false
 }: ProfileCardProps) => {
   
   return (
@@ -54,6 +57,9 @@ const ProfileCard = ({
               </h3>
               {verification?.email_verified && (
                 <VerificationBadge verificationScore={verification.email_verified ? 80 : 0} className="h-4" />
+              )}
+              {isInConversation && (
+                <ConversationStatusBadge className="ml-2" />
               )}
             </div>
             
@@ -113,7 +119,7 @@ const ProfileCard = ({
         )}
 
         {/* Actions */}
-        {showActions && (
+        {showActions && !isInConversation && (
           <div className={`flex gap-2 ${compact ? 'flex-col' : ''}`}>
             <Link to={`/profile/${profile.user_id}`} className="flex-1">
               <Button variant="outline" size="sm" className="w-full">
@@ -126,6 +132,13 @@ const ProfileCard = ({
               <Heart className="h-4 w-4 mr-2" />
               {compact ? 'J\'aime' : 'Montrer intérêt'}
             </Button>
+          </div>
+        )}
+
+        {/* Message pour les profils en conversation */}
+        {isInConversation && (
+          <div className="text-sm text-muted-foreground text-center py-2 bg-secondary/20 rounded">
+            Ce profil est actuellement en discussion
           </div>
         )}
 
