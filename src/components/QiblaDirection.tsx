@@ -262,7 +262,7 @@ const QiblaDirection = () => {
           <CardTitle className="text-center">Boussole Qibla</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="relative w-80 h-80 mx-auto">
+          <div className="relative w-64 h-64 mx-auto">
             {/* Compass Circle */}
             <div className="absolute inset-0 border-4 border-primary/20 rounded-full">
               {/* Compass Markings */}
@@ -270,7 +270,7 @@ const QiblaDirection = () => {
                 {[0, 90, 180, 270].map((degree) => (
                   <div
                     key={degree}
-                    className="absolute w-0.5 h-6 bg-primary/40"
+                    className="absolute w-0.5 h-4 bg-primary/40"
                     style={{
                       top: degree === 0 ? '0' : degree === 180 ? 'auto' : '50%',
                       bottom: degree === 180 ? '0' : 'auto',
@@ -283,10 +283,10 @@ const QiblaDirection = () => {
               </div>
 
               {/* Direction Labels */}
-              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 font-bold text-primary">N</div>
-              <div className="absolute top-1/2 -right-8 transform -translate-y-1/2 font-bold text-primary">E</div>
-              <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 font-bold text-primary">S</div>
-              <div className="absolute top-1/2 -left-8 transform -translate-y-1/2 font-bold text-primary">W</div>
+              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 font-bold text-primary">N</div>
+              <div className="absolute top-1/2 -right-6 transform -translate-y-1/2 font-bold text-primary">E</div>
+              <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 font-bold text-primary">S</div>
+              <div className="absolute top-1/2 -left-6 transform -translate-y-1/2 font-bold text-primary">W</div>
 
               {/* Qibla Indicator */}
               <div
@@ -297,14 +297,14 @@ const QiblaDirection = () => {
               >
                 <div className="relative">
                   {/* Qibla Arrow */}
-                  <div className="w-1 h-32 bg-gradient-to-t from-transparent via-green-500 to-green-600 transform -translate-x-1/2">
+                  <div className="w-1 h-24 bg-gradient-to-t from-transparent via-green-500 to-green-600 transform -translate-x-1/2">
                     <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
                       <Target className="h-4 w-4 text-green-600" />
                     </div>
                   </div>
                   
                   {/* Center Dot */}
-                  <div className="absolute top-16 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-green-600 rounded-full" />
+                  <div className="absolute top-12 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-green-600 rounded-full" />
                 </div>
               </div>
 
