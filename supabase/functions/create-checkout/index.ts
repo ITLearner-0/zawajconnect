@@ -87,6 +87,14 @@ serve(async (req) => {
           plan_start_date: planStartDate
         }
       },
+      // Enable automatic tax calculation with Stripe Tax
+      automatic_tax: {
+        enabled: true,
+      },
+      // Allow customers to provide VAT number for B2B transactions
+      tax_id_collection: {
+        enabled: true,
+      },
       success_url: `${req.headers.get("origin")}/subscription-success`,
       cancel_url: `${req.headers.get("origin")}/settings?tab=subscription&canceled=true`,
     });

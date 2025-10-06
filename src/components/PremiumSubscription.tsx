@@ -281,9 +281,12 @@ const PremiumSubscription = () => {
                 <div className="text-4xl font-bold text-emerald">
                   {plan.pricePerMonth.toFixed(2)}€
                 </div>
-                <div className="text-sm text-muted-foreground">par mois</div>
+                <div className="text-sm text-muted-foreground">par mois HT</div>
                 <div className="text-xs text-muted-foreground mt-1">
                   Abonnement mensuel récurrent
+                </div>
+                <div className="text-xs text-emerald/80 mt-1">
+                  TVA calculée automatiquement
                 </div>
                 {plan.discount && (
                   <div className="text-sm text-emerald font-medium mt-2">{plan.discount}</div>
