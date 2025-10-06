@@ -179,3 +179,30 @@ export const sanitizeHtml = (html: string): string => {
 export const encodeForExternalUrl = (text: string): string => {
   return encodeURIComponent(text.slice(0, 200)); // Limit length for URLs
 };
+
+// Family member validation schema
+const validRelationships = ['father', 'mother', 'brother', 'sister', 'uncle', 'aunt', 'grandfather', 'grandmother', 'guardian'] as const;
+
+export const familyMemberSchema = z.object({
+  full_name: z
+    .string()
+    .trim()
+    .min(2, { message: "Le nom doit contenir au moins 2 caractères" })
+    .max(100, { message: "Le nom ne peut pas dépasser 100 caractères" })
+    .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, {
+      message: "Le nom ne peut contenir que des lettres, espaces, apostrophes et tirets"
+    }),
+  email: emailSchema,
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\+?[1-9]\d{7,14}$/, { message: "Format de téléphone invalide (ex: +33612345678)" })
+    .optional()
+    .or(z.literal('')),
+  relationship: z
+    .string()
+    .refine((val) => validRelationships.includes(val as any), {
+      message: "Veuillez sélectionner une relation valide"
+    }),
+  isWali: z.boolean().optional()
+});

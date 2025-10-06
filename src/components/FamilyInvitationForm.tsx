@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { UserPlus, Mail, Send } from 'lucide-react';
+import { UserPlus, Mail, Send, AlertCircle } from 'lucide-react';
+import { familyMemberSchema } from '@/lib/validation';
 
 interface FamilyInvitationFormProps {
   onInvitationSent?: () => void;
@@ -19,10 +20,38 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
   const [relationship, setRelationship] = useState('');
   const [isWali, setIsWali] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+
+    // Validate with Zod
+    const validationResult = familyMemberSchema.safeParse({
+      full_name: fullName,
+      email: email,
+      relationship: relationship,
+      isWali: isWali
+    });
+
+    if (!validationResult.success) {
+      // Extract and display errors
+      const fieldErrors: Record<string, string> = {};
+      validationResult.error.issues.forEach(issue => {
+        if (issue.path[0]) {
+          fieldErrors[issue.path[0].toString()] = issue.message;
+        }
+      });
+      setErrors(fieldErrors);
+      toast({
+        title: "Erreur de validation",
+        description: "Veuillez corriger les erreurs dans le formulaire",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -86,10 +115,21 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
             <Input
               id="fullName"
               value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
+              onChange={(e) => {
+                setFullName(e.target.value);
+                if (errors.full_name) {
+                  setErrors(prev => ({ ...prev, full_name: '' }));
+                }
+              }}
               placeholder="Ex: Ahmed Ben Ali"
-              required
+              className={errors.full_name ? 'border-destructive' : ''}
             />
+            {errors.full_name && (
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.full_name}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -98,16 +138,35 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
               id="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (errors.email) {
+                  setErrors(prev => ({ ...prev, email: '' }));
+                }
+              }}
               placeholder="ahmed@example.com"
-              required
+              className={errors.email ? 'border-destructive' : ''}
             />
+            {errors.email && (
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.email}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="relationship">Relation familiale</Label>
-            <Select value={relationship} onValueChange={setRelationship} required>
-              <SelectTrigger>
+            <Select 
+              value={relationship} 
+              onValueChange={(value) => {
+                setRelationship(value);
+                if (errors.relationship) {
+                  setErrors(prev => ({ ...prev, relationship: '' }));
+                }
+              }}
+            >
+              <SelectTrigger className={errors.relationship ? 'border-destructive' : ''}>
                 <SelectValue placeholder="Choisir la relation" />
               </SelectTrigger>
               <SelectContent>
@@ -122,6 +181,12 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
                 <SelectItem value="guardian">Tuteur légal</SelectItem>
               </SelectContent>
             </Select>
+            {errors.relationship && (
+              <p className="text-sm text-destructive flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />
+                {errors.relationship}
+              </p>
+            )}
           </div>
 
           <div className="flex items-center space-x-2">

@@ -24,6 +24,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
+import { familyMemberSchema } from '@/lib/validation';
 
 interface FamilyMember {
   id: string;
@@ -43,6 +46,7 @@ const FamilyInvitationManager = () => {
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [inviteForm, setInviteForm] = useState({
     full_name: '',
     email: '',
@@ -84,6 +88,32 @@ const FamilyInvitationManager = () => {
   const sendInvitation = async () => {
     if (!user) return;
 
+    // Validate with Zod
+    setValidationErrors({});
+    const validationResult = familyMemberSchema.safeParse({
+      full_name: inviteForm.full_name,
+      email: inviteForm.email,
+      phone: inviteForm.phone || '',
+      relationship: inviteForm.relationship,
+      isWali: inviteForm.is_wali
+    });
+
+    if (!validationResult.success) {
+      const fieldErrors: Record<string, string> = {};
+      validationResult.error.issues.forEach(issue => {
+        if (issue.path[0]) {
+          fieldErrors[issue.path[0].toString()] = issue.message;
+        }
+      });
+      setValidationErrors(fieldErrors);
+      toast({
+        title: "Erreur de validation",
+        description: "Veuillez corriger les erreurs dans le formulaire",
+        variant: "destructive"
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase
         .from('family_members')
@@ -121,6 +151,7 @@ const FamilyInvitationManager = () => {
       });
 
       setInviteModalOpen(false);
+      setValidationErrors({});
       setInviteForm({
         full_name: '',
         email: '',
@@ -293,14 +324,31 @@ const FamilyInvitationManager = () => {
                   <DialogTitle>Inviter un membre de la famille</DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
+                  {Object.keys(validationErrors).length > 0 && (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertDescription>
+                        Veuillez corriger les erreurs dans le formulaire
+                      </AlertDescription>
+                    </Alert>
+                  )}
                   <div>
                     <Label htmlFor="full_name">Nom complet</Label>
                     <Input
                       id="full_name"
                       value={inviteForm.full_name}
-                      onChange={(e) => setInviteForm(prev => ({ ...prev, full_name: e.target.value }))}
+                      onChange={(e) => {
+                        setInviteForm(prev => ({ ...prev, full_name: e.target.value }));
+                        if (validationErrors.full_name) {
+                          setValidationErrors(prev => ({ ...prev, full_name: '' }));
+                        }
+                      }}
                       placeholder="Nom du membre de la famille"
+                      className={validationErrors.full_name ? 'border-destructive' : ''}
                     />
+                    {validationErrors.full_name && (
+                      <p className="text-sm text-destructive mt-1">{validationErrors.full_name}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="email">Email</Label>
@@ -308,23 +356,49 @@ const FamilyInvitationManager = () => {
                       id="email"
                       type="email"
                       value={inviteForm.email}
-                      onChange={(e) => setInviteForm(prev => ({ ...prev, email: e.target.value }))}
+                      onChange={(e) => {
+                        setInviteForm(prev => ({ ...prev, email: e.target.value }));
+                        if (validationErrors.email) {
+                          setValidationErrors(prev => ({ ...prev, email: '' }));
+                        }
+                      }}
                       placeholder="email@exemple.com"
+                      className={validationErrors.email ? 'border-destructive' : ''}
                     />
+                    {validationErrors.email && (
+                      <p className="text-sm text-destructive mt-1">{validationErrors.email}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="phone">Téléphone (optionnel)</Label>
                     <Input
                       id="phone"
                       value={inviteForm.phone}
-                      onChange={(e) => setInviteForm(prev => ({ ...prev, phone: e.target.value }))}
+                      onChange={(e) => {
+                        setInviteForm(prev => ({ ...prev, phone: e.target.value }));
+                        if (validationErrors.phone) {
+                          setValidationErrors(prev => ({ ...prev, phone: '' }));
+                        }
+                      }}
                       placeholder="+33 6 12 34 56 78"
+                      className={validationErrors.phone ? 'border-destructive' : ''}
                     />
+                    {validationErrors.phone && (
+                      <p className="text-sm text-destructive mt-1">{validationErrors.phone}</p>
+                    )}
                   </div>
                   <div>
                     <Label htmlFor="relationship">Relation familiale</Label>
-                    <Select value={inviteForm.relationship} onValueChange={(value) => setInviteForm(prev => ({ ...prev, relationship: value }))}>
-                      <SelectTrigger>
+                    <Select 
+                      value={inviteForm.relationship} 
+                      onValueChange={(value) => {
+                        setInviteForm(prev => ({ ...prev, relationship: value }));
+                        if (validationErrors.relationship) {
+                          setValidationErrors(prev => ({ ...prev, relationship: '' }));
+                        }
+                      }}
+                    >
+                      <SelectTrigger className={validationErrors.relationship ? 'border-destructive' : ''}>
                         <SelectValue placeholder="Choisissez la relation" />
                       </SelectTrigger>
                       <SelectContent>
@@ -334,12 +408,14 @@ const FamilyInvitationManager = () => {
                         <SelectItem value="sister">Sœur</SelectItem>
                         <SelectItem value="uncle">Oncle</SelectItem>
                         <SelectItem value="aunt">Tante</SelectItem>
-                        <SelectItem value="cousin">Cousin/Cousine</SelectItem>
-                        <SelectItem value="wali">Wali</SelectItem>
-                        <SelectItem value="family_friend">Ami de la famille</SelectItem>
-                        <SelectItem value="other">Autre</SelectItem>
+                        <SelectItem value="grandfather">Grand-père</SelectItem>
+                        <SelectItem value="grandmother">Grand-mère</SelectItem>
+                        <SelectItem value="guardian">Tuteur légal</SelectItem>
                       </SelectContent>
                     </Select>
+                    {validationErrors.relationship && (
+                      <p className="text-sm text-destructive mt-1">{validationErrors.relationship}</p>
+                    )}
                   </div>
                   
                   <Separator />
@@ -379,12 +455,19 @@ const FamilyInvitationManager = () => {
                   </div>
                   
                   <div className="flex justify-end gap-2 pt-4">
-                    <Button variant="outline" onClick={() => setInviteModalOpen(false)}>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setInviteModalOpen(false);
+                        setValidationErrors({});
+                      }}
+                    >
                       Annuler
                     </Button>
                     <Button 
                       onClick={sendInvitation}
                       disabled={!inviteForm.full_name || !inviteForm.email || !inviteForm.relationship}
+                      className="bg-emerald hover:bg-emerald-dark"
                     >
                       Envoyer l'invitation
                     </Button>
