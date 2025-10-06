@@ -29,7 +29,7 @@ serve(async (req) => {
     if (!stripeKey) {
       throw new Error("STRIPE_SECRET_KEY not configured");
     }
-    logStep("Stripe key loaded", { keyPrefix: stripeKey.substring(0, 7) });
+    logStep("Stripe key loaded");
 
     const { priceId } = await req.json();
     if (!priceId) {
@@ -44,7 +44,7 @@ serve(async (req) => {
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id, emailDomain: user.email.split('@')[1] });
 
     const stripe = new Stripe(stripeKey, { 
       apiVersion: "2025-08-27.basil" 
