@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Heart, User, BookOpen, Check, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -22,6 +23,9 @@ interface RegistrationModalProps {
 
 const RegistrationModal = ({ isOpen, onClose }: RegistrationModalProps) => {
   const [step, setStep] = useState(1);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [confirmedAge, setConfirmedAge] = useState(false);
+  const [attemptedSubmit, setAttemptedSubmit] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     age: '',
@@ -93,8 +97,18 @@ const RegistrationModal = ({ isOpen, onClose }: RegistrationModalProps) => {
   };
 
   const handleSubmit = () => {
-    // Clear previous errors
     setFormErrors({});
+    setAttemptedSubmit(true);
+    
+    // Vérifier consentement AVANT validation du formulaire
+    if (!agreedToTerms || !confirmedAge) {
+      toast({
+        title: "Consentement requis",
+        description: "Vous devez accepter les CGU et confirmer votre âge",
+        variant: "destructive"
+      });
+      return;
+    }
     
     // Validate final step
     try {
@@ -347,6 +361,50 @@ const RegistrationModal = ({ isOpen, onClose }: RegistrationModalProps) => {
             {formData.bio.length}/500 caractères
           </p>
         </div>
+
+        {/* Consentement CGU - OBLIGATOIRE */}
+        <div className="flex items-start space-x-2 mt-6 p-4 bg-emerald/5 rounded-lg border border-emerald/20">
+          <Checkbox 
+            id="terms-consent" 
+            checked={agreedToTerms}
+            onCheckedChange={(checked) => setAgreedToTerms(checked === true)}
+            required
+          />
+          <Label htmlFor="terms-consent" className="text-sm leading-relaxed cursor-pointer">
+            J'ai lu et j'accepte les{' '}
+            <a href="/terms-of-service" target="_blank" rel="noopener noreferrer" className="text-emerald underline hover:text-emerald-light font-semibold">
+              Conditions d'Utilisation
+            </a>
+            {' '}et la{' '}
+            <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-emerald underline hover:text-emerald-light font-semibold">
+              Politique de Confidentialité
+            </a>
+            . Je m'engage à respecter les valeurs islamiques de ZawajConnect et à n'utiliser cette plateforme que dans un objectif matrimonial sérieux et halal.
+          </Label>
+        </div>
+
+        {/* Confirmation âge - OBLIGATOIRE */}
+        <div className="flex items-start space-x-2 mt-4 p-4 bg-gold/5 rounded-lg border border-gold/20">
+          <Checkbox 
+            id="age-consent" 
+            checked={confirmedAge}
+            onCheckedChange={(checked) => setConfirmedAge(checked === true)}
+            required
+          />
+          <Label htmlFor="age-consent" className="text-sm leading-relaxed cursor-pointer">
+            Je confirme avoir au moins <strong>18 ans révolus</strong> et être en mesure de m'engager dans une démarche matrimoniale sérieuse.
+          </Label>
+        </div>
+
+        {/* Message d'erreur si pas accepté */}
+        {(!agreedToTerms || !confirmedAge) && attemptedSubmit && (
+          <div className="flex items-center gap-2 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <AlertTriangle className="h-5 w-5 text-red-500 flex-shrink-0" />
+            <p className="text-red-600 text-sm">
+              Vous devez accepter les Conditions d'Utilisation et confirmer votre âge pour créer un compte.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

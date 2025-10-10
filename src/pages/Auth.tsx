@@ -20,6 +20,8 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [confirmedAge, setConfirmedAge] = useState(false);
+  const [attemptedSignUp, setAttemptedSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -86,6 +88,7 @@ const Auth = () => {
     setLoading(true);
     setError(null);
     setSuccess(null);
+    setAttemptedSignUp(true);
     
     // Validation
     if (!fullName.trim()) {
@@ -106,19 +109,43 @@ const Auth = () => {
       return;
     }
     
-    if (!acceptTerms) {
-      setError('Vous devez accepter les conditions d\'utilisation');
+    if (!acceptTerms || !confirmedAge) {
+      setError('Vous devez accepter les Conditions d\'Utilisation et confirmer votre âge');
       setLoading(false);
       return;
     }
     
-    const { error } = await signUp(email, password, fullName);
+    // Utiliser directement supabase.auth.signUp pour obtenir les données utilisateur
+    const redirectUrl = `${window.location.origin}/onboarding`;
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: redirectUrl,
+        data: {
+          full_name: fullName,
+        },
+      },
+    });
     
-    if (error) {
+    if (signUpError) {
       // Translate common Supabase errors to French
-      const frenchError = translateAuthError(error.message);
+      const frenchError = translateAuthError(signUpError.message);
       setError(frenchError);
-    } else {
+    } else if (data?.user) {
+      // Enregistrer l'acceptation des CGU dans la base de données
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .update({
+          terms_accepted_at: new Date().toISOString(),
+          terms_version: '1.0'
+        })
+        .eq('user_id', data.user.id);
+      
+      if (profileError) {
+        console.error('Erreur lors de l\'enregistrement du consentement:', profileError);
+      }
+      
       setEmailVerificationSent(true);
       setSuccess('Inscription réussie ! Un email de vérification a été envoyé à votre adresse. Vérifiez votre boîte mail (y compris les spams) et cliquez sur le lien pour activer votre compte.');
       // Clear form
@@ -127,6 +154,7 @@ const Auth = () => {
       setConfirmPassword('');
       setFullName('');
       setAcceptTerms(false);
+      setConfirmedAge(false);
     }
     
     setLoading(false);
@@ -413,15 +441,35 @@ const Auth = () => {
                      />
                      <Label htmlFor="terms" className="text-sm">
                        J'accepte les{' '}
-                       <Link to="/privacy" className="text-emerald hover:underline">
-                         conditions d'utilisation
+                       <Link to="/terms-of-service" target="_blank" className="text-emerald hover:underline">
+                         Conditions d'Utilisation
                        </Link>{' '}
                        et la{' '}
-                       <Link to="/privacy" className="text-emerald hover:underline">
-                         politique de confidentialité
+                       <Link to="/privacy-policy" target="_blank" className="text-emerald hover:underline">
+                         Politique de Confidentialité
                        </Link>
                      </Label>
                    </div>
+                   
+                   <div className="flex items-center space-x-2">
+                     <Checkbox
+                       id="age-confirm"
+                       checked={confirmedAge}
+                       onCheckedChange={(checked) => setConfirmedAge(checked === true)}
+                     />
+                     <Label htmlFor="age-confirm" className="text-sm">
+                       Je confirme avoir au moins <strong>18 ans révolus</strong>
+                     </Label>
+                   </div>
+                   
+                   {(!acceptTerms || !confirmedAge) && attemptedSignUp && (
+                     <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                       <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                       <p className="text-red-600 text-sm">
+                         Vous devez accepter les CGU et confirmer votre âge.
+                       </p>
+                     </div>
+                   )}
                   {error && (
                     <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
                       {error}

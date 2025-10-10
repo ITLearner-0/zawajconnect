@@ -34,6 +34,11 @@ import AdvancedMatching from '@/pages/AdvancedMatching';
 import Onboarding from '@/pages/Onboarding';
 import SubscriptionSuccess from '@/pages/SubscriptionSuccess';
 import NotFound from '@/pages/NotFound';
+import TermsOfService from '@/pages/TermsOfService';
+import RefundPolicy from '@/pages/RefundPolicy';
+import CommunityGuidelines from '@/pages/CommunityGuidelines';
+import CookiePolicy from '@/pages/CookiePolicy';
+import SubscriptionCanceled from '@/pages/SubscriptionCanceled';
 
 export interface AppRouteConfig {
   path: string;
@@ -48,6 +53,11 @@ export const publicRoutes: AppRouteConfig[] = [
   { path: '/auth', component: Auth },
   { path: '/wali', component: WaliAccess },
   { path: '/privacy-policy', component: PrivacyPolicy },
+  { path: '/terms-of-service', component: TermsOfService },
+  { path: '/refund-policy', component: RefundPolicy },
+  { path: '/community-guidelines', component: CommunityGuidelines },
+  { path: '/cookie-policy', component: CookiePolicy },
+  { path: '/subscription-canceled', component: SubscriptionCanceled },
   { path: '/invitation-auth', component: InvitationAuth },
   { path: '/invitation', component: InvitationAccept },
   { path: '/invitation/accept', component: InvitationAccept },

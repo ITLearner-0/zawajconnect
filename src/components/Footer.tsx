@@ -35,7 +35,18 @@ const Footer = () => {
               <li><a href="#processus" className="text-white/80 hover:text-white transition-colors">Comment ça marche</a></li>
               <li><a href="#temoignages" className="text-white/80 hover:text-white transition-colors">Témoignages</a></li>
               <li><a href="/faq" className="text-white/80 hover:text-white transition-colors">FAQ</a></li>
-              <li><a href="/privacy" className="text-white/80 hover:text-white transition-colors">Politique de confidentialité</a></li>
+            </ul>
+          </div>
+
+          {/* Legal Links */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Légal</h3>
+            <ul className="space-y-2">
+              <li><a href="/terms-of-service" className="text-white/80 hover:text-white transition-colors">Conditions d'Utilisation</a></li>
+              <li><a href="/privacy-policy" className="text-white/80 hover:text-white transition-colors">Politique de Confidentialité</a></li>
+              <li><a href="/refund-policy" className="text-white/80 hover:text-white transition-colors">Remboursement</a></li>
+              <li><a href="/community-guidelines" className="text-white/80 hover:text-white transition-colors">Charte Communautaire</a></li>
+              <li><a href="/cookie-policy" className="text-white/80 hover:text-white transition-colors">Cookies</a></li>
             </ul>
           </div>
 
@@ -82,11 +93,16 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/20 mt-12 pt-8 text-center">
+        <div className="border-t border-white/20 mt-12 pt-8 text-center space-y-2">
+          <p className="text-white/70 text-sm">ZawajConnect - Auto-entrepreneur</p>
           <p className="text-white/70 text-sm">
-            © 2024 ZawajConnect. Tous droits réservés. | Développé avec ❤️ pour la Oummah
+            SIRET : 522 317 767 00039 - 91 Rue du Faubourg Saint-Honoré, 75008 Paris 08
           </p>
-          <p className="text-white/60 text-xs mt-2">
+          <p className="text-white/70 text-sm">Contact : contact@zawajconnect.me</p>
+          <p className="text-white/60 text-xs mt-4">
+            © {new Date().getFullYear()} ZawajConnect. Tous droits réservés. Plateforme matrimoniale conforme aux valeurs islamiques.
+          </p>
+          <p className="text-white/60 text-xs">
             Qu'Allah bénisse tous nos utilisateurs et leurs familles - آمين
           </p>
         </div>

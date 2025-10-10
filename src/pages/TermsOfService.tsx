@@ -558,7 +558,7 @@ const TermsOfService = () => {
                 <p><strong>13.1 Résiliation par l'utilisateur</strong></p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>Droit de supprimer votre compte à tout moment</li>
-                  <li>Procédure : Paramètres > Sécurité > Supprimer mon compte</li>
+                  <li>Procédure : Paramètres {'>'} Sécurité {'>'} Supprimer mon compte</li>
                   <li>Suppression définitive sous 30 jours (délai légal)</li>
                   <li>Pas de remboursement après 7 jours d'abonnement</li>
                 </ul>

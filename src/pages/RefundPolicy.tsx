@@ -156,7 +156,7 @@ const RefundPolicy = () => {
                 <p className="font-semibold text-foreground">Situations éligibles :</p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>
-                    <strong>Problème technique majeur</strong> imputable à ZawajConnect (panne de service >48h)
+                    <strong>Problème technique majeur</strong> imputable à ZawajConnect (panne de service {'>'}48h)
                   </li>
                   <li>
                     <strong>Suspension injustifiée</strong> de votre compte (après vérification par nos équipes)
@@ -338,7 +338,7 @@ const RefundPolicy = () => {
                   <p className="font-semibold text-foreground mb-2">Procédure d'annulation :</p>
                   <ol className="list-decimal list-inside space-y-2 ml-4">
                     <li>Connectez-vous à votre compte ZawajConnect</li>
-                    <li>Allez dans : Paramètres > Premium > Gérer mon abonnement</li>
+                    <li>Allez dans : Paramètres {'>'}  Premium {'>'} Gérer mon abonnement</li>
                     <li>Cliquez sur "Annuler l'abonnement"</li>
                     <li>Confirmez votre décision</li>
                     <li>Vous recevrez un email de confirmation</li>
