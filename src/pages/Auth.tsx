@@ -115,7 +115,7 @@ const Auth = () => {
       return;
     }
     
-    // Utiliser directement supabase.auth.signUp pour obtenir les données utilisateur
+    // Utiliser directement supabase.auth.signUp avec les métadonnées complètes
     const redirectUrl = `${window.location.origin}/onboarding`;
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
@@ -124,28 +124,16 @@ const Auth = () => {
         emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
+          terms_accepted_at: new Date().toISOString(),
+          terms_version: '1.0'
         },
       },
     });
     
     if (signUpError) {
-      // Translate common Supabase errors to French
       const frenchError = translateAuthError(signUpError.message);
       setError(frenchError);
     } else if (data?.user) {
-      // Enregistrer l'acceptation des CGU dans la base de données
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .update({
-          terms_accepted_at: new Date().toISOString(),
-          terms_version: '1.0'
-        })
-        .eq('user_id', data.user.id);
-      
-      if (profileError) {
-        console.error('Erreur lors de l\'enregistrement du consentement:', profileError);
-      }
-      
       setEmailVerificationSent(true);
       setSuccess('Inscription réussie ! Un email de vérification a été envoyé à votre adresse. Vérifiez votre boîte mail (y compris les spams) et cliquez sur le lien pour activer votre compte.');
       // Clear form
