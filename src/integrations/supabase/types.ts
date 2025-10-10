@@ -1173,6 +1173,8 @@ export type Database = {
           looking_for: string | null
           phone: string | null
           profession: string | null
+          terms_accepted_at: string | null
+          terms_version: string | null
           updated_at: string
           user_id: string
         }
@@ -1190,6 +1192,8 @@ export type Database = {
           looking_for?: string | null
           phone?: string | null
           profession?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string
           user_id: string
         }
@@ -1207,6 +1211,8 @@ export type Database = {
           looking_for?: string | null
           phone?: string | null
           profession?: string | null
+          terms_accepted_at?: string | null
+          terms_version?: string | null
           updated_at?: string
           user_id?: string
         }
