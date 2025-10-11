@@ -38,3 +38,15 @@ verify_jwt = false
 
 [functions.send-match-notifications]
 verify_jwt = false
+
+[functions.send-verification-approved-email]
+verify_jwt = false
+
+[functions.send-unread-messages-reminder]
+verify_jwt = false
+
+[functions.send-subscription-expiring-email]
+verify_jwt = false
+
+[functions.send-moderation-notification-email]
+verify_jwt = false

@@ -246,10 +246,88 @@ Consultez les logs : [Supabase Edge Functions Logs](https://supabase.com/dashboa
 - ✅ **Invitation famille** : Implémenté dans `src/components/FamilyInvitationForm.tsx` et `src/components/FamilyInvitationManager.tsx`
 
 ### Priorité moyenne :
-- ⏳ Vérification d'identité approuvée
-- ⏳ Message important non lu (rappel)
-- ⏳ Expiration abonnement Premium
-- ⏳ Notification modération (contenu bloqué)
+- ✅ **Vérification d'identité approuvée** : Edge function créée (`send-verification-approved-email`)
+- ✅ **Message important non lu (rappel)** : Edge function créée (`send-unread-messages-reminder`)
+- ✅ **Expiration abonnement Premium** : Edge function créée (`send-subscription-expiring-email`)
+- ✅ **Notification modération** : Edge function créée (`send-moderation-notification-email`)
+
+### Comment utiliser les nouveaux emails (Priorité moyenne)
+
+#### 1. Vérification d'identité approuvée
+
+**Fichier :** À intégrer dans le système de vérification
+
+```typescript
+// Quand une vérification est approuvée
+const { error: emailError } = await supabase.functions.invoke(
+  'send-verification-approved-email',
+  {
+    body: {
+      user_id: userId,
+      verification_type: 'id', // 'email' | 'phone' | 'id'
+      verification_score: 85
+    }
+  }
+);
+```
+
+#### 2. Rappel de messages non lus
+
+**Fichier :** À intégrer avec un système de cron ou trigger
+
+```typescript
+// Pour rappeler les messages non lus (après 24h par exemple)
+const { error: emailError } = await supabase.functions.invoke(
+  'send-unread-messages-reminder',
+  {
+    body: {
+      user_id: recipientUserId,
+      unread_count: 3,
+      sender_name: "Ahmed",
+      match_id: matchId
+    }
+  }
+);
+```
+
+#### 3. Expiration d'abonnement Premium
+
+**Fichier :** À intégrer avec un système de cron
+
+```typescript
+// Rappel 7, 3 et 1 jour avant expiration
+const { error: emailError } = await supabase.functions.invoke(
+  'send-subscription-expiring-email',
+  {
+    body: {
+      user_id: userId,
+      plan_type: 'premium', // 'premium' | 'vip' | 'family'
+      expires_at: subscription.expires_at,
+      days_remaining: 3
+    }
+  }
+);
+```
+
+#### 4. Notification de modération
+
+**Fichier :** À intégrer dans le système de modération automatique
+
+```typescript
+// Quand un contenu est modéré
+const { error: emailError } = await supabase.functions.invoke(
+  'send-moderation-notification-email',
+  {
+    body: {
+      user_id: userId,
+      action_taken: 'blocked', // 'warned' | 'blocked' | 'removed'
+      reason: 'Contenu inapproprié détecté',
+      severity: 'high', // 'low' | 'medium' | 'high' | 'critical'
+      details: 'Le message contenait du contenu contraire à la pudeur islamique'
+    }
+  }
+);
+```
 
 ### Priorité basse :
 - ⏳ Newsletter mensuelle
