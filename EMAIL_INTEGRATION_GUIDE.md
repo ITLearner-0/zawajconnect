@@ -133,39 +133,36 @@ const handleSignUp = async (values) => {
 
 ### 2. Dans la fonction de match
 
-**Fichier :** `src/hooks/useChatMatch.tsx` ou similaire
+**Fichiers :** `src/pages/Browse.tsx` et `src/pages/Profile.tsx`
 
 ```typescript
 // Quand un match devient mutuel
-useEffect(() => {
-  if (match?.is_mutual && !previousMutual) {
-    // Envoyer notification aux deux utilisateurs
-    const sendNotifications = async () => {
-      // User 1
-      await supabase.functions.invoke('send-match-notification', {
-        body: {
-          recipientEmail: user1.email,
-          recipientName: user1.full_name,
-          matchName: user2.full_name,
-          matchId: match.id
-        }
-      });
-
-      // User 2
-      await supabase.functions.invoke('send-match-notification', {
-        body: {
-          recipientEmail: user2.email,
-          recipientName: user2.full_name,
-          matchName: user1.full_name,
-          matchId: match.id
-        }
-      });
-    };
-
-    sendNotifications();
+const handleLike = async (userId: string) => {
+  try {
+    // ... logique de création/mise à jour du match ...
+    
+    // Si le match est devenu mutuel, envoyer les notifications
+    if (isNowMutual && match?.id) {
+      // La fonction send-match-notifications gère automatiquement
+      // l'envoi aux DEUX utilisateurs du match de manière sécurisée
+      const { error: emailError } = await supabase.functions.invoke(
+        'send-match-notifications',
+        { body: { matchId: match.id } }
+      );
+      
+      if (emailError) {
+        console.error('Erreur notification email:', emailError);
+      } else {
+        console.log('Emails de match envoyés aux deux utilisateurs');
+      }
+    }
+  } catch (err) {
+    console.error('Erreur:', err);
   }
-}, [match?.is_mutual]);
+};
 ```
+
+**Note importante :** La fonction `send-match-notifications` (avec un "s") récupère automatiquement les emails des deux utilisateurs via la service role key et envoie les notifications aux deux parties. Pas besoin d'appeler la fonction deux fois.
 
 ---
 
