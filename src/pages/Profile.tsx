@@ -209,6 +209,16 @@ const Profile = () => {
 
         if (isMutual) {
           alert('C\'est un match ! 🎉 Vous pouvez maintenant discuter.');
+          
+          // Envoyer les emails de notification de match
+          try {
+            await supabase.functions.invoke('send-match-notifications', {
+              body: { matchId: existingMatch.id }
+            });
+          } catch (emailError) {
+            console.error('Erreur envoi emails de match:', emailError);
+          }
+          
           navigate('/matches');
         } else {
           setIsLiked(true);

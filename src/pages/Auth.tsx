@@ -136,6 +136,20 @@ const Auth = () => {
     } else if (data?.user) {
       setEmailVerificationSent(true);
       setSuccess('Inscription réussie ! Un email de vérification a été envoyé à votre adresse. Vérifiez votre boîte mail (y compris les spams) et cliquez sur le lien pour activer votre compte.');
+      
+      // Envoyer l'email de bienvenue
+      try {
+        await supabase.functions.invoke('send-welcome-email', {
+          body: {
+            userId: data.user.id,
+            email: data.user.email,
+            fullName: fullName
+          }
+        });
+      } catch (emailError) {
+        console.error('Erreur envoi email de bienvenue:', emailError);
+      }
+      
       // Clear form
       setEmail('');
       setPassword('');

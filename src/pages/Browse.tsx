@@ -377,6 +377,15 @@ const Browse = () => {
             title: "C'est un match ! 🎉",
             description: "Vous pouvez maintenant discuter ensemble",
           });
+          
+          // Envoyer les emails de notification de match
+          try {
+            await supabase.functions.invoke('send-match-notifications', {
+              body: { matchId: existingMatch.id }
+            });
+          } catch (emailError) {
+            console.error('Erreur envoi emails de match:', emailError);
+          }
         } else {
           toast({
             title: "Profil liké",
