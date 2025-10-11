@@ -240,10 +240,10 @@ Consultez les logs : [Supabase Edge Functions Logs](https://supabase.com/dashboa
 ## 📧 Types d'e-mails recommandés (à implémenter)
 
 ### Priorité haute :
-- ✅ **Bienvenue** : Déjà implémenté
-- ✅ **Match mutuel** : Déjà implémenté
-- ⏳ **Fin de conversation** : Existe (`send-conversation-ended-email`)
-- ⏳ **Invitation famille** : Existe (`send-family-invitation`)
+- ✅ **Bienvenue** : Implémenté dans `src/pages/Auth.tsx`
+- ✅ **Match mutuel** : Implémenté dans `src/pages/Browse.tsx` et `src/pages/Profile.tsx`
+- ✅ **Fin de conversation** : Implémenté dans `src/hooks/useConversationStatus.tsx`
+- ✅ **Invitation famille** : Implémenté dans `src/components/FamilyInvitationForm.tsx` et `src/components/FamilyInvitationManager.tsx`
 
 ### Priorité moyenne :
 - ⏳ Vérification d'identité approuvée
