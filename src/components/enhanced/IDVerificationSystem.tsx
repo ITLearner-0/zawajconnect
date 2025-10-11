@@ -81,17 +81,23 @@ export const IDVerificationSystem = () => {
       if (uploadError) throw uploadError;
 
       // Update verification status
-      const { error: updateError } = await supabase
+      const { data: verificationData, error: updateError } = await supabase
         .from('user_verifications')
         .upsert({
           user_id: user.id,
           id_document_status: 'pending_review',
           submitted_at: new Date().toISOString(),
           verification_score: Math.max((status?.verification_score || 0), 20)
-        });
+        }, { onConflict: 'user_id' })
+        .select()
+        .single();
 
       if (updateError) throw updateError;
 
+      // If verification was approved by an admin, send email notification
+      // Note: This should typically be triggered by an admin action, not on upload
+      // This is just a placeholder showing where to add the email trigger
+      
       toast({
         title: "ID Document Uploaded",
         description: "Your ID document has been submitted for review. This may take 1-2 business days.",

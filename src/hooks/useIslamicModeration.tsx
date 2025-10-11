@@ -63,6 +63,21 @@ export const useIslamicModeration = () => {
               description: result.reason,
               variant: "destructive"
             });
+            
+            // Send email notification for blocked content
+            try {
+              await supabase.functions.invoke('send-moderation-notification-email', {
+                body: {
+                  user_id: userId,
+                  action_taken: 'blocked',
+                  reason: result.reason,
+                  severity: result.confidence > 0.8 ? 'critical' : 'high',
+                  details: result.islamicGuidance || result.rulesTriggered.join(', ')
+                }
+              });
+            } catch (emailError) {
+              console.error('Failed to send moderation email:', emailError);
+            }
             break;
           case 'warned':
             toast({
@@ -70,6 +85,23 @@ export const useIslamicModeration = () => {
               description: result.reason + (result.islamicGuidance ? `\n\n💡 ${result.islamicGuidance}` : ''),
               variant: "default"
             });
+            
+            // Send email notification for warnings (if confidence is high)
+            if (result.confidence > 0.7) {
+              try {
+                await supabase.functions.invoke('send-moderation-notification-email', {
+                  body: {
+                    user_id: userId,
+                    action_taken: 'warned',
+                    reason: result.reason,
+                    severity: 'medium',
+                    details: result.islamicGuidance
+                  }
+                });
+              } catch (emailError) {
+                console.error('Failed to send warning email:', emailError);
+              }
+            }
             break;
           case 'escalated':
             toast({

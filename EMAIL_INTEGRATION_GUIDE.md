@@ -246,88 +246,66 @@ Consultez les logs : [Supabase Edge Functions Logs](https://supabase.com/dashboa
 - ✅ **Invitation famille** : Implémenté dans `src/components/FamilyInvitationForm.tsx` et `src/components/FamilyInvitationManager.tsx`
 
 ### Priorité moyenne :
-- ✅ **Vérification d'identité approuvée** : Edge function créée (`send-verification-approved-email`)
-- ✅ **Message important non lu (rappel)** : Edge function créée (`send-unread-messages-reminder`)
-- ✅ **Expiration abonnement Premium** : Edge function créée (`send-subscription-expiring-email`)
-- ✅ **Notification modération** : Edge function créée (`send-moderation-notification-email`)
+- ✅ **Vérification d'identité approuvée** : Implémenté dans `src/hooks/useIslamicModeration.tsx` et `src/utils/verificationEmailTrigger.ts`
+- ⏳ **Message important non lu (rappel)** : Edge function créée - Configuration Cron requise (voir `CRON_JOBS_SETUP.md`)
+- ⏳ **Expiration abonnement Premium** : Edge function créée - Configuration Cron requise (voir `CRON_JOBS_SETUP.md`)
+- ✅ **Notification modération** : Implémenté dans `src/hooks/useIslamicModeration.tsx` (envoi automatique)
 
 ### Comment utiliser les nouveaux emails (Priorité moyenne)
 
-#### 1. Vérification d'identité approuvée
+#### 1. Vérification d'identité approuvée ✅
 
-**Fichier :** À intégrer dans le système de vérification
+**Implémentation automatique dans le système de modération :**
+
+L'email de vérification est déjà intégré et se déclenche automatiquement via le fichier utilitaire :
 
 ```typescript
-// Quand une vérification est approuvée
-const { error: emailError } = await supabase.functions.invoke(
-  'send-verification-approved-email',
-  {
-    body: {
-      user_id: userId,
-      verification_type: 'id', // 'email' | 'phone' | 'id'
-      verification_score: 85
-    }
-  }
+import { triggerVerificationApprovedEmail } from '@/utils/verificationEmailTrigger';
+
+// Appeler quand un admin approuve une vérification
+await triggerVerificationApprovedEmail(
+  userId,
+  'id', // 'email' | 'phone' | 'id'
+  85 // Score de vérification
 );
 ```
 
-#### 2. Rappel de messages non lus
-
-**Fichier :** À intégrer avec un système de cron ou trigger
+**Déclenchement automatique par seuils :**
 
 ```typescript
-// Pour rappeler les messages non lus (après 24h par exemple)
-const { error: emailError } = await supabase.functions.invoke(
-  'send-unread-messages-reminder',
-  {
-    body: {
-      user_id: recipientUserId,
-      unread_count: 3,
-      sender_name: "Ahmed",
-      match_id: matchId
-    }
-  }
-);
+import { checkVerificationMilestone } from '@/utils/verificationEmailTrigger';
+
+// Vérifie si un seuil a été atteint et envoie l'email approprié
+await checkVerificationMilestone(userId, oldScore, newScore);
 ```
 
-#### 3. Expiration d'abonnement Premium
+#### 2. Rappel de messages non lus ⏳
 
-**Fichier :** À intégrer avec un système de cron
+**Configuration requise :** Cron job (voir `CRON_JOBS_SETUP.md`)
 
-```typescript
-// Rappel 7, 3 et 1 jour avant expiration
-const { error: emailError } = await supabase.functions.invoke(
-  'send-subscription-expiring-email',
-  {
-    body: {
-      user_id: userId,
-      plan_type: 'premium', // 'premium' | 'vip' | 'family'
-      expires_at: subscription.expires_at,
-      days_remaining: 3
-    }
-  }
-);
-```
+Cette fonctionnalité nécessite la configuration d'une tâche programmée qui s'exécute quotidiennement.
+L'edge function est prête, il suffit de configurer le cron job décrit dans le guide.
 
-#### 4. Notification de modération
+#### 3. Expiration d'abonnement Premium ⏳
 
-**Fichier :** À intégrer dans le système de modération automatique
+**Configuration requise :** Cron job (voir `CRON_JOBS_SETUP.md`)
 
-```typescript
-// Quand un contenu est modéré
-const { error: emailError } = await supabase.functions.invoke(
-  'send-moderation-notification-email',
-  {
-    body: {
-      user_id: userId,
-      action_taken: 'blocked', // 'warned' | 'blocked' | 'removed'
-      reason: 'Contenu inapproprié détecté',
-      severity: 'high', // 'low' | 'medium' | 'high' | 'critical'
-      details: 'Le message contenait du contenu contraire à la pudeur islamique'
-    }
-  }
-);
-```
+Cette fonctionnalité nécessite la configuration d'une tâche programmée pour envoyer des rappels :
+- 7 jours avant expiration
+- 3 jours avant expiration
+- 1 jour avant expiration
+
+L'edge function est prête, il suffit de configurer le cron job décrit dans le guide.
+
+#### 4. Notification de modération ✅
+
+**Implémentation automatique :**
+
+L'email de modération est **déjà intégré** dans `src/hooks/useIslamicModeration.tsx` et s'envoie automatiquement :
+- Quand un contenu est **bloqué** (severity: critical ou high selon confidence)
+- Quand un contenu reçoit un **avertissement** avec confidence > 0.7 (severity: medium)
+
+**Aucune action requise** - Le système fonctionne automatiquement !
 
 ### Priorité basse :
 - ⏳ Newsletter mensuelle
