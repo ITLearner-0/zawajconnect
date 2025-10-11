@@ -308,10 +308,48 @@ L'email de modération est **déjà intégré** dans `src/hooks/useIslamicModera
 **Aucune action requise** - Le système fonctionne automatiquement !
 
 ### Priorité basse :
-- ⏳ Newsletter mensuelle
-- ⏳ Conseils hebdomadaires
-- ⏳ Rappel de compléter le profil
-- ⏳ Suggestions de profils compatibles
+- ✅ **Newsletter mensuelle** : Edge function créée - Configuration Cron recommandée (1er lundi du mois)
+- ✅ **Conseils hebdomadaires** : Edge function créée - Configuration Cron recommandée (tous les mercredis)
+- ✅ **Rappel de compléter le profil** : Edge function créée - Configuration Cron recommandée (tous les dimanches)
+- ✅ **Suggestions de profils compatibles** : Edge function créée - Configuration Cron recommandée (mardi et vendredi)
+
+### Comment utiliser les emails de priorité basse
+
+Ces emails sont conçus pour être envoyés automatiquement via Cron Jobs. Voir le guide complet `CRON_JOBS_SETUP.md` pour la configuration.
+
+#### Configuration rapide
+
+```sql
+-- Newsletter mensuelle (1er lundi du mois à 10h)
+SELECT cron.schedule(
+  'send-monthly-newsletter',
+  '0 10 1-7 * 1',
+  $$ SELECT send_monthly_newsletter(); $$
+);
+
+-- Conseils hebdomadaires (mercredi à 9h)
+SELECT cron.schedule(
+  'send-weekly-tips',
+  '0 9 * * 3',
+  $$ SELECT send_weekly_tips_batch(); $$
+);
+
+-- Rappel profil (dimanche à 10h)
+SELECT cron.schedule(
+  'send-profile-completion-reminders',
+  '0 10 * * 0',
+  $$ SELECT check_incomplete_profiles_and_notify(); $$
+);
+
+-- Suggestions (mardi et vendredi à 14h)
+SELECT cron.schedule(
+  'send-match-suggestions',
+  '0 14 * * 2,5',
+  $$ SELECT send_match_suggestions_batch(); $$
+);
+```
+
+Consultez `CRON_JOBS_SETUP.md` pour les fonctions SQL complètes et instructions détaillées.
 
 ---
 

@@ -50,3 +50,15 @@ verify_jwt = false
 
 [functions.send-moderation-notification-email]
 verify_jwt = false
+
+[functions.send-newsletter]
+verify_jwt = false
+
+[functions.send-weekly-tips]
+verify_jwt = false
+
+[functions.send-profile-reminder]
+verify_jwt = false
+
+[functions.send-match-suggestions]
+verify_jwt = false
