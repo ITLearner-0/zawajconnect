@@ -1,8 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { sendEmail } from "../_shared/smtp.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,9 +23,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log("Sending welcome email to:", email);
 
-    const emailResponse = await resend.emails.send({
-      from: "Mariage-Halal <onboarding@resend.dev>",
-      to: [email],
+    await sendEmail({
+      to: email,
       subject: "Bienvenue sur Mariage-Halal ! 🌙",
       html: `
         <!DOCTYPE html>
@@ -114,9 +111,9 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Welcome email sent successfully:", emailResponse);
+    console.log("Welcome email sent successfully to:", email);
 
-    return new Response(JSON.stringify({ success: true, messageId: emailResponse.id }), {
+    return new Response(JSON.stringify({ success: true, email }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
