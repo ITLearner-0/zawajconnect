@@ -14,7 +14,7 @@ CREATE EXTENSION IF NOT EXISTS pg_net;
 -- ⚠️ IMPORTANT: Remplacez YOUR_SERVICE_ROLE_KEY par votre vraie clé !
 -- Trouvez-la ici: https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/settings/api
 -- ============================================
-ALTER DATABASE postgres SET "app.settings.service_role_key" TO 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzAwNTk5NiwiZXhwIjoyMDcyNTgxOTk2fQ.aWbM0A7-_DgWA8H6jMzvSKNggfwUgl_eO20qLaq6D6c';
+ALTER DATABASE postgres SET "app.settings.service_role_key" TO 'YOUR_SERVICE_ROLE_KEY';
 
 -- ============================================
 -- ÉTAPE 3: CRÉER LES FONCTIONS SQL
