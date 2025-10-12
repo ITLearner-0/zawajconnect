@@ -10,11 +10,10 @@ CREATE EXTENSION IF NOT EXISTS pg_cron;
 CREATE EXTENSION IF NOT EXISTS pg_net;
 
 -- ============================================
--- ÉTAPE 2: CONFIGURER LA SERVICE ROLE KEY
--- ⚠️ IMPORTANT: Remplacez YOUR_SERVICE_ROLE_KEY par votre vraie clé !
--- Trouvez-la ici: https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/settings/api
+-- ÉTAPE 2: NOTE IMPORTANTE SUR LA CLÉ SERVICE ROLE
 -- ============================================
-ALTER DATABASE postgres SET "app.settings.service_role_key" TO 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzAwNTk5NiwiZXhwIjoyMDcyNTgxOTk2fQ.aWbM0A7-_DgWA8H6jMzvSKNggfwUgl_eO20qLaq6D6c';
+-- La clé service role est automatiquement disponible dans Supabase
+-- via les variables d'environnement. Pas besoin de la configurer ici.
 
 -- ============================================
 -- ÉTAPE 3: CRÉER LES FONCTIONS SQL
@@ -59,7 +58,7 @@ BEGIN
       url := 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/send-unread-messages-reminder',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key')
+        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzAwNTk5NiwiZXhwIjoyMDcyNTgxOTk2fQ.aWbM0A7-_DgWA8H6jMzvSKNggfwUgl_eO20qLaq6D6c'
       ),
       body := jsonb_build_object(
         'user_id', user_record.recipient_id,
@@ -104,7 +103,7 @@ BEGIN
       url := 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/send-subscription-expiring-email',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key')
+        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzAwNTk5NiwiZXhwIjoyMDcyNTgxOTk2fQ.aWbM0A7-_DgWA8H6jMzvSKNggfwUgl_eO20qLaq6D6c'
       ),
       body := jsonb_build_object(
         'user_id', sub_record.user_id,
@@ -199,7 +198,7 @@ BEGIN
       url := 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/send-profile-reminder',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key')
+        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzAwNTk5NiwiZXhwIjoyMDcyNTgxOTk2fQ.aWbM0A7-_DgWA8H6jMzvSKNggfwUgl_eO20qLaq6D6c'
       ),
       body := jsonb_build_object(
         'user_id', profile_record.user_id,
@@ -254,7 +253,7 @@ BEGIN
         url := 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/send-match-suggestions',
         headers := jsonb_build_object(
           'Content-Type', 'application/json',
-          'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key')
+          'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzAwNTk5NiwiZXhwIjoyMDcyNTgxOTk2fQ.aWbM0A7-_DgWA8H6jMzvSKNggfwUgl_eO20qLaq6D6c'
         ),
         body := jsonb_build_object(
           'user_id', user_record.user_id,
@@ -308,7 +307,7 @@ BEGIN
       url := 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/send-newsletter',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key')
+        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzAwNTk5NiwiZXhwIjoyMDcyNTgxOTk2fQ.aWbM0A7-_DgWA8H6jMzvSKNggfwUgl_eO20qLaq6D6c'
       ),
       body := jsonb_build_object(
         'user_id', user_record.user_id,
@@ -360,7 +359,7 @@ BEGIN
       url := 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/send-weekly-tips',
       headers := jsonb_build_object(
         'Content-Type', 'application/json',
-        'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key')
+        'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzAwNTk5NiwiZXhwIjoyMDcyNTgxOTk2fQ.aWbM0A7-_DgWA8H6jMzvSKNggfwUgl_eO20qLaq6D6c'
       ),
       body := jsonb_build_object(
         'user_id', user_record.user_id,
