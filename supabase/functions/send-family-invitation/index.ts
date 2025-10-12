@@ -1,9 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.0';
-import { Resend } from "npm:resend@2.0.0";
+import { sendEmail } from "../_shared/smtp.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -121,9 +119,8 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send invitation email
     try {
-      await resend.emails.send({
-        from: "NikahConnect <onboarding@resend.dev>",
-        to: [email],
+      await sendEmail({
+        to: email,
         subject: "🕌 Invitation Wali - NikahConnect",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">

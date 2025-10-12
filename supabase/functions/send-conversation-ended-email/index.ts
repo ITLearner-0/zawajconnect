@@ -1,8 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { sendEmail } from "../_shared/smtp.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -203,19 +201,17 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     // Send email
-    const emailResponse = await resend.emails.send({
-      from: "Plateforme Mariage Islamique <onboarding@resend.dev>",
-      to: [recipientEmail],
+    await sendEmail({
+      to: recipientEmail,
       subject: `Notification : Fin d'échange avec ${sender_name}`,
       html: emailHtml,
     });
 
-    console.log("Conversation ended email sent successfully:", emailResponse);
+    console.log("Conversation ended email sent successfully to:", recipientEmail);
 
     return new Response(
       JSON.stringify({
         success: true,
-        email_id: emailResponse.id,
       }),
       {
         status: 200,

@@ -1,7 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import { sendEmail } from "../_shared/smtp.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -75,9 +73,8 @@ const handler = async (req: Request): Promise<Response> => {
       </li>
     `).join('');
 
-    const emailResponse = await resend.emails.send({
-      from: "Mariage-Halal <profil@mariage-halal.com>",
-      to: [userEmail],
+    await sendEmail({
+      to: userEmail,
       subject: "✨ Complétez votre profil pour plus de matchs !",
       html: `
         <!DOCTYPE html>
@@ -152,9 +149,9 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Profile reminder sent successfully:", emailResponse);
+    console.log("Profile reminder sent successfully to:", userEmail);
 
-    return new Response(JSON.stringify(emailResponse), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: {
         "Content-Type": "application/json",
