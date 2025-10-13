@@ -21,6 +21,15 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const { userId, email, fullName }: WelcomeEmailRequest = await req.json();
 
+    // Validate required fields
+    if (!email) {
+      throw new Error("Email is required");
+    }
+    
+    if (!fullName) {
+      throw new Error("Full name is required");
+    }
+
     console.log("Sending welcome email to:", email);
 
     await sendEmail({
