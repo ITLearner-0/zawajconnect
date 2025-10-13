@@ -27,11 +27,13 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
   let client;
   
   try {
+    console.log(`Connecting to SMTP server: ${smtpHost}:${smtpPort}`);
+    
     client = new SMTPClient({
       connection: {
         hostname: smtpHost,
         port: smtpPort,
-        tls: smtpPort === 465, // SSL pour port 465
+        tls: smtpPort === 465,
         auth: {
           username: smtpUser,
           password: smtpPassword,
@@ -39,6 +41,8 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
       },
     });
 
+    console.log(`Sending email to: ${options.to}`);
+    
     await client.send({
       from: options.from?.email || smtpFromEmail,
       fromName: options.from?.name || smtpFromName,
@@ -49,11 +53,19 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
 
     console.log(`Email sent successfully to ${options.to}`);
   } catch (error) {
-    console.error("Failed to send email:", error);
-    throw error;
+    console.error("Failed to send email. Error details:", {
+      message: error.message,
+      name: error.name,
+      stack: error.stack
+    });
+    throw new Error(`Email sending failed: ${error.message}`);
   } finally {
     if (client) {
-      await client.close();
+      try {
+        await client.close();
+      } catch (closeError) {
+        console.error("Error closing SMTP connection:", closeError.message);
+      }
     }
   }
 }
