@@ -24,19 +24,21 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
     );
   }
 
-  const client = new SMTPClient({
-    connection: {
-      hostname: smtpHost,
-      port: smtpPort,
-      tls: smtpPort === 465, // SSL pour port 465
-      auth: {
-        username: smtpUser,
-        password: smtpPassword,
-      },
-    },
-  });
-
+  let client;
+  
   try {
+    client = new SMTPClient({
+      connection: {
+        hostname: smtpHost,
+        port: smtpPort,
+        tls: smtpPort === 465, // SSL pour port 465
+        auth: {
+          username: smtpUser,
+          password: smtpPassword,
+        },
+      },
+    });
+
     await client.send({
       from: options.from?.email || smtpFromEmail,
       fromName: options.from?.name || smtpFromName,
@@ -50,6 +52,8 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
     console.error("Failed to send email:", error);
     throw error;
   } finally {
-    await client.close();
+    if (client) {
+      await client.close();
+    }
   }
 }
