@@ -11,17 +11,44 @@ interface EmailOptions {
 }
 
 export async function sendEmail(options: EmailOptions): Promise<void> {
+  // Get SMTP configuration
   const smtpHost = Deno.env.get("SMTP_HOST");
-  const smtpPort = parseInt(Deno.env.get("SMTP_PORT") || "465");
+  const smtpPortStr = Deno.env.get("SMTP_PORT");
+  const smtpPort = smtpPortStr ? parseInt(smtpPortStr) : 465;
   const smtpUser = Deno.env.get("SMTP_USER");
   const smtpPassword = Deno.env.get("SMTP_PASSWORD");
   const smtpFromEmail = Deno.env.get("SMTP_FROM_EMAIL");
   const smtpFromName = Deno.env.get("SMTP_FROM_NAME") || "Mariage-Halal";
 
+  // Log configuration (without sensitive data)
+  console.log("SMTP Configuration check:", {
+    hasHost: !!smtpHost,
+    host: smtpHost,
+    port: smtpPort,
+    hasUser: !!smtpUser,
+    user: smtpUser,
+    hasPassword: !!smtpPassword,
+    hasFromEmail: !!smtpFromEmail,
+    fromEmail: smtpFromEmail,
+    fromName: smtpFromName,
+    recipientEmail: options.to
+  });
+
+  // Validate required fields
   if (!smtpHost || !smtpUser || !smtpPassword || !smtpFromEmail) {
+    const missing = [];
+    if (!smtpHost) missing.push("SMTP_HOST");
+    if (!smtpUser) missing.push("SMTP_USER");
+    if (!smtpPassword) missing.push("SMTP_PASSWORD");
+    if (!smtpFromEmail) missing.push("SMTP_FROM_EMAIL");
+    
     throw new Error(
-      "SMTP configuration missing. Please configure SMTP_HOST, SMTP_USER, SMTP_PASSWORD, and SMTP_FROM_EMAIL in Edge Functions secrets."
+      `SMTP configuration missing: ${missing.join(", ")}. Please configure these secrets in Edge Functions settings.`
     );
+  }
+
+  if (!options.to || options.to.trim() === "") {
+    throw new Error("Recipient email (options.to) is required");
   }
 
   let client;
