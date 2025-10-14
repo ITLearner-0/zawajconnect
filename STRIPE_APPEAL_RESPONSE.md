@@ -1,311 +1,311 @@
-# Réponse d'Appel à Stripe - ZawajConnect
+# Stripe Appeal Response - ZawajConnect
 
-## Formulaire de Demande de Révision
+## Review Request Form
 
-**Date:** [Date du jour]  
+**Date:** [Current Date]  
 **Account ID:** acct_1RaFbcKwsHyCjkzy  
-**Société:** ZawajConnect (Mariage-Halal)
+**Company:** ZawajConnect (Mariage-Halal)
 
 ---
 
-## OBJET: Clarification Importante - Service Matrimonial Musulman, PAS Site de Rencontres
+## SUBJECT: Important Clarification - Muslim Matrimonial Service, NOT Dating Service
 
-Cher(e)s Membres de l'Équipe Stripe,
+Dear Stripe Team,
 
-Nous vous contactons suite à votre notification concernant la classification de notre compte. Nous comprenons votre vigilance concernant les "dating services", mais **nous devons clarifier que ZawajConnect n'est pas un site de rencontres (dating) mais une plateforme matrimoniale musulmane**.
+We are contacting you following your notification regarding the classification of our account. We understand your vigilance concerning "dating services," but **we must clarify that ZawajConnect is not a dating site but a Muslim matrimonial platform**.
 
-Cette distinction est fondamentale et nous souhaitons vous fournir les informations détaillées ci-dessous.
-
----
-
-## 1. DIFFÉRENCES FONDAMENTALES ENTRE DATING ET MATRIMONIAL
-
-### ❌ Sites de "Dating" (Rencontres Casual)
-- **Objectif:** Rencontres casual, relations sans engagement
-- **Public:** Individus cherchant des relations diverses
-- **Supervision:** Aucune implication familiale
-- **Nature:** Relations potentiellement non-sérieuses
-
-### ✅ Plateformes Matrimoniales (Notre Service)
-- **Objectif EXCLUSIF:** Mariage (Nikah) selon les principes islamiques
-- **Public:** Musulmans et familles cherchant un conjoint pour mariage
-- **Supervision:** Implication OBLIGATOIRE des tuteurs légaux (Wali)
-- **Nature:** Engagement sérieux vers le mariage uniquement
+This distinction is fundamental and we wish to provide you with the detailed information below.
 
 ---
 
-## 2. CARACTÉRISTIQUES UNIQUES DE ZAWAJCONNECT
+## 1. FUNDAMENTAL DIFFERENCES BETWEEN DATING AND MATRIMONIAL
 
-### A) Système Wali (Tuteur Légal) Obligatoire
-- **Chaque utilisateur DOIT inviter son tuteur légal (parent/famille)**
-- Les tuteurs ont un accès complet aux profils et conversations
-- **Aucune correspondance n'est possible sans approbation familiale**
-- Dashboard dédié pour la supervision parentale
-- Notifications automatiques aux familles pour chaque match
+### ❌ "Dating" Sites (Casual Relationships)
+- **Objective:** Casual dating, relationships without commitment
+- **Audience:** Individuals seeking various types of relationships
+- **Supervision:** No family involvement
+- **Nature:** Potentially non-serious relationships
 
-### B) Conformité Islamique Stricte
-- Conversations modérées selon les principes islamiques (halal)
-- Interdiction de contenus inappropriés (photos provocantes, langage inapproprié)
-- Guidance islamique intégrée (Coran, Hadith)
-- Rappels de prière et outils islamiques
-
-### C) Modération Stricte par IA
-- Système de modération automatique alimenté par IA
-- Détection en temps réel de contenus inappropriés
-- Sanctions automatiques pour violations
-- Zero tolérance pour contenus non-matrimoniaux
-
-### D) Vérification d'Identité
-- Vérification d'identité avec pièces officielles
-- Vérification de photos pour authenticité
-- Badge de vérification visible sur profils vérifiés
-
-### E) Limitation des Fonctionnalités
-- **Pas de chat libre** : conversations limitées et supervisées
-- Nombre limité de conversations simultanées
-- Fin automatique des conversations après période d'inactivité
-- Impossibilité de partager coordonnées avant approbation familiale
+### ✅ Matrimonial Platforms (Our Service)
+- **EXCLUSIVE Objective:** Marriage (Nikah) according to Islamic principles
+- **Audience:** Muslims and families seeking a spouse for marriage
+- **Supervision:** MANDATORY involvement of legal guardians (Wali)
+- **Nature:** Serious commitment towards marriage only
 
 ---
 
-## 3. COMPARAISON AVEC SERVICES SIMILAIRES ACCEPTÉS PAR STRIPE
+## 2. UNIQUE CHARACTERISTICS OF ZAWAJCONNECT
 
-**Plateformes Matrimoniales Musulmanes Similaires :**
-- **Muzz (anciennement Muzmatch)** - Utilise Stripe
-- **SingleMuslim** - Plateforme matrimoniale établie
-- **Salams** - Service matrimonial musulman
-- **Qiran** - Plateforme de mariage islamique
+### A) Mandatory Wali (Legal Guardian) System
+- **Each user MUST invite their legal guardian (parent/family)**
+- Guardians have complete access to profiles and conversations
+- **No correspondence is possible without family approval**
+- Dedicated dashboard for parental supervision
+- Automatic notifications to families for each match
 
-**Notre service suit le même modèle que ces plateformes acceptées.**
+### B) Strict Islamic Compliance
+- Conversations moderated according to Islamic principles (halal)
+- Prohibition of inappropriate content (provocative photos, inappropriate language)
+- Integrated Islamic guidance (Quran, Hadith)
+- Prayer reminders and Islamic tools
 
----
+### C) Strict AI Moderation
+- Automatic moderation system powered by AI
+- Real-time detection of inappropriate content
+- Automatic sanctions for violations
+- Zero tolerance for non-matrimonial content
 
-## 4. CADRE LÉGAL ET DOCUMENTATION
+### D) Identity Verification
+- Identity verification with official documents
+- Photo verification for authenticity
+- Visible verification badge on verified profiles
 
-### A) Conformité Réglementaire Européenne
-- **RGPD** : Conformité totale avec protection des données
-- **DSA** (Digital Services Act) : Modération de contenu conforme
-- **LCEN** : Respect de la loi française sur les services en ligne
-- **PSD2** : Conformité paiements européens
-
-### B) Documents Légaux Publics
-Tous nos documents sont disponibles publiquement sur notre site :
-
-1. **Conditions d'Utilisation** : https://mariage-halal.lovable.app/terms
-   - Mentions explicites : "plateforme matrimoniale", "objectif de mariage"
-   - Interdictions claires des rencontres casual
-
-2. **Politique de Confidentialité** : https://mariage-halal.lovable.app/privacy
-   - Protection des données familiales
-   - Transparence sur l'implication des tuteurs
-
-3. **Politique de Remboursement** : https://mariage-halal.lovable.app/refund
-   - Garantie 7 jours "Satisfait ou Remboursé"
-   - Conformité avec droit de rétractation européen
-
-4. **Directives Communautaires** : https://mariage-halal.lovable.app/community-guidelines
-   - Règles strictes de comportement islamique
-   - Sanctions pour violations
-
-### C) Documentation Technique Détaillée
-Nous avons préparé des documents techniques complets :
-- Architecture de sécurité
-- Système de modération IA
-- Workflow d'approbation familiale
-- Mesures anti-fraude
+### E) Feature Limitations
+- **No free chat**: limited and supervised conversations
+- Limited number of simultaneous conversations
+- Automatic conversation closure after inactivity period
+- Inability to share contact details before family approval
 
 ---
 
-## 5. MODÈLE ÉCONOMIQUE TRANSPARENT
+## 3. COMPARISON WITH SIMILAR SERVICES ACCEPTED BY STRIPE
 
-### Formule Freemium avec Abonnements Récurrents
-- **Gratuit** : Accès de base limité
-- **Premium** : 29,99€/mois - Fonctionnalités avancées
-- **VIP** : 49,99€/mois - Accès prioritaire + services premium
+**Similar Muslim Matrimonial Platforms:**
+- **Muzz (formerly Muzmatch)** - Uses Stripe
+- **SingleMuslim** - Established matrimonial platform
+- **Salams** - Muslim matrimonial service
+- **Qiran** - Islamic marriage platform
 
-### Projections Financières
-- **Année 1** : 50 000€ de revenus
-- **Année 2** : 200 000€
-- **Année 3** : 500 000€
-
-### Politique de Remboursement
-- Taux de remboursement estimé : < 5%
-- Garantie "Satisfait ou Remboursé" 7 jours
-- Droit de rétractation légal 14 jours
-- Aucun litige prévu avec système transparent
+**Our service follows the same model as these accepted platforms.**
 
 ---
 
-## 6. MESURES DE SÉCURITÉ ET PRÉVENTION DE FRAUDE
+## 4. LEGAL FRAMEWORK AND DOCUMENTATION
 
-### A) Sécurité Technique
-- **Chiffrement TLS** pour toutes les communications
-- **Authentification forte** (email + 2FA disponible)
-- **Hébergement sécurisé** via Supabase (certifié SOC 2)
+### A) European Regulatory Compliance
+- **GDPR**: Full compliance with data protection
+- **DSA** (Digital Services Act): Compliant content moderation
+- **LCEN**: Compliance with French law on online services
+- **PSD2**: European payment compliance
 
-### B) Prévention des Fraudes
-- Vérification d'identité obligatoire pour accès premium
-- Détection de faux profils par IA
-- Système de signalement et sanctions
-- Limitation des actions suspectes (rate limiting)
-- Monitoring des comportements anormaux
+### B) Public Legal Documents
+All our documents are publicly available on our site:
 
-### C) Protection des Mineurs
-- **Âge minimum : 18 ans strictement**
-- Vérification d'âge à l'inscription
-- Bannissement automatique si âge falsifié
+1. **Terms of Service**: https://mariage-halal.lovable.app/terms
+   - Explicit mentions: "matrimonial platform", "marriage objective"
+   - Clear prohibitions of casual dating
 
----
+2. **Privacy Policy**: https://mariage-halal.lovable.app/privacy
+   - Protection of family data
+   - Transparency on guardian involvement
 
-## 7. MARCHÉ CIBLE ET DÉMOGRAPHIE
+3. **Refund Policy**: https://mariage-halal.lovable.app/refund
+   - 7-day "Satisfaction Guarantee"
+   - Compliance with European withdrawal rights
 
-### Public Principal
-- **Musulmans francophones** (France, Belgique, Suisse, Canada, Maghreb)
-- **Âge moyen** : 25-40 ans
-- **Niveau d'éducation** : Majoritairement diplômés
-- **Intention** : Mariage sérieux et halal
+4. **Community Guidelines**: https://mariage-halal.lovable.app/community-guidelines
+   - Strict Islamic behavior rules
+   - Sanctions for violations
 
-### Différenciation avec Dating
-Notre public ne cherche PAS :
-- ❌ Rencontres casual ou hookups
-- ❌ Relations sans engagement
-- ❌ Dating traditionnel
-
-Notre public cherche :
-- ✅ Mariage islamique (Nikah)
-- ✅ Partenaire avec valeurs partagées
-- ✅ Approbation et bénédiction familiale
-- ✅ Relation halal et respectueuse
+### C) Detailed Technical Documentation
+We have prepared comprehensive technical documents:
+- Security architecture
+- AI moderation system
+- Family approval workflow
+- Anti-fraud measures
 
 ---
 
-## 8. ROADMAP ET VISION À LONG TERME
+## 5. TRANSPARENT BUSINESS MODEL
 
-### Phase 1 (Actuelle) : Lancement MVP
-- Plateforme web responsive
-- Système de matching de base
-- Modération manuelle + IA
-- Abonnements premium
+### Freemium Model with Recurring Subscriptions
+- **Free**: Limited basic access
+- **Premium**: €29.99/month - Advanced features
+- **VIP**: €49.99/month - Priority access + premium services
 
-### Phase 2 (3-6 mois)
-- Application mobile iOS/Android
-- Appel vidéo supervisé intégré
-- Algorithme de matching avancé
-- Expansion géographique
+### Financial Projections
+- **Year 1**: €50,000 revenue
+- **Year 2**: €200,000
+- **Year 3**: €500,000
 
-### Phase 3 (6-12 mois)
-- Services premium (conseillers matrimoniaux)
-- Organisation d'événements matrimoniaux physiques
-- Partenariats avec mosquées et centres islamiques
-- Programme d'affiliation halal
-
-### Vision 5 Ans
-- Leader des plateformes matrimoniales musulmanes francophones
-- 100 000+ utilisateurs actifs
-- Expansion internationale (UK, USA, Moyen-Orient)
-- Services annexes (préparation au mariage, conseil conjugal)
+### Refund Policy
+- Estimated refund rate: < 5%
+- 7-day "Satisfaction Guarantee"
+- Legal 14-day withdrawal right
+- No disputes expected with transparent system
 
 ---
 
-## 9. SUPPORT CLIENT ET GESTION DES LITIGES
+## 6. SECURITY MEASURES AND FRAUD PREVENTION
 
-### Support Multicanal
-- Email : support@mariage-halal.lovable.app
-- Chat en direct (Premium/VIP)
-- FAQ complète en ligne
-- Temps de réponse : < 24h
+### A) Technical Security
+- **TLS Encryption** for all communications
+- **Strong Authentication** (email + 2FA available)
+- **Secure Hosting** via Supabase (SOC 2 certified)
 
-### Résolution des Litiges
-- Médiation interne gratuite
-- Process de réclamation transparent
-- Remboursements rapides si justifiés
-- Aucun litige prévu avec Stripe
+### B) Fraud Prevention
+- Mandatory identity verification for premium access
+- AI-powered fake profile detection
+- Reporting system and sanctions
+- Suspicious activity limitation (rate limiting)
+- Abnormal behavior monitoring
 
----
-
-## 10. POURQUOI NOTRE SERVICE EST CONFORME
-
-### Nous NE SOMMES PAS sur la liste des "Restricted Businesses" car :
-
-1. **Nous ne sommes pas un "dating service"** au sens de Stripe
-   - Stripe interdit les services de rencontres casual/adultes
-   - Nous sommes un service matrimonial familial et religieux
-
-2. **Nous avons un modèle éthique et transparent**
-   - Supervision familiale obligatoire
-   - Objectif exclusif : mariage
-   - Pas de contenu adulte ou inapproprié
-
-3. **Nous sommes comparables aux services acceptés**
-   - Muzz, SingleMuslim, Salams utilisent tous Stripe
-   - Notre modèle est identique voire plus strict
-
-4. **Nous respectons toutes les réglementations**
-   - RGPD, DSA, LCEN, PSD2
-   - Documentation publique complète
-   - Mesures de sécurité robustes
+### C) Minor Protection
+- **Minimum age: 18 years strictly enforced**
+- Age verification at registration
+- Automatic ban if age is falsified
 
 ---
 
-## 11. DEMANDE FORMELLE DE RÉVISION
+## 7. TARGET MARKET AND DEMOGRAPHICS
 
-**Nous demandons respectueusement la révision de la décision de fermeture de notre compte pour les raisons suivantes :**
+### Primary Audience
+- **French-speaking Muslims** (France, Belgium, Switzerland, Canada, Maghreb)
+- **Average age**: 25-40 years
+- **Education level**: Mostly graduates
+- **Intent**: Serious and halal marriage
 
-1. ✅ **Mauvaise catégorisation** : Nous sommes matrimoniaux, pas "dating"
-2. ✅ **Conformité totale** : Respect de toutes les réglementations
-3. ✅ **Modèle éthique** : Supervision familiale et valeurs islamiques
-4. ✅ **Comparabilité** : Identique aux services déjà acceptés par Stripe
-5. ✅ **Transparence** : Documentation publique complète et accessible
+### Differentiation from Dating
+Our audience is NOT seeking:
+- ❌ Casual dating or hookups
+- ❌ Relationships without commitment
+- ❌ Traditional dating
+
+Our audience is seeking:
+- ✅ Islamic marriage (Nikah)
+- ✅ Partner with shared values
+- ✅ Family approval and blessing
+- ✅ Halal and respectful relationship
 
 ---
 
-## 12. INFORMATIONS DE CONTACT
+## 8. ROADMAP AND LONG-TERM VISION
 
-**Pour toute question ou clarification supplémentaire :**
+### Phase 1 (Current): MVP Launch
+- Responsive web platform
+- Basic matching system
+- Manual + AI moderation
+- Premium subscriptions
 
-- **Site Web Principal** : https://mariage-halal.lovable.app
-- **Email** : contact@mariage-halal.lovable.app
-- **Documentation** : Tous les documents légaux sont accessibles publiquement
-- **Disponibilité** : Nous sommes disponibles pour un appel ou une visioconférence
+### Phase 2 (3-6 months)
+- iOS/Android mobile application
+- Integrated supervised video calls
+- Advanced matching algorithm
+- Geographic expansion
 
-**Contact Technique :**
-- Démonstration de la plateforme disponible sur demande
-- Accès test peut être fourni pour vérification
+### Phase 3 (6-12 months)
+- Premium services (matrimonial counselors)
+- Organization of physical matrimonial events
+- Partnerships with mosques and Islamic centers
+- Halal affiliate program
+
+### 5-Year Vision
+- Leader in French-speaking Muslim matrimonial platforms
+- 100,000+ active users
+- International expansion (UK, USA, Middle East)
+- Additional services (marriage preparation, marital counseling)
+
+---
+
+## 9. CUSTOMER SUPPORT AND DISPUTE MANAGEMENT
+
+### Multi-Channel Support
+- Email: support@mariage-halal.lovable.app
+- Live chat (Premium/VIP)
+- Comprehensive online FAQ
+- Response time: < 24h
+
+### Dispute Resolution
+- Free internal mediation
+- Transparent complaint process
+- Fast refunds when justified
+- No disputes expected with Stripe
+
+---
+
+## 10. WHY OUR SERVICE IS COMPLIANT
+
+### We are NOT on the "Restricted Businesses" list because:
+
+1. **We are not a "dating service"** in Stripe's sense
+   - Stripe prohibits casual/adult dating services
+   - We are a family-oriented and religious matrimonial service
+
+2. **We have an ethical and transparent model**
+   - Mandatory family supervision
+   - Exclusive objective: marriage
+   - No adult or inappropriate content
+
+3. **We are comparable to accepted services**
+   - Muzz, SingleMuslim, Salams all use Stripe
+   - Our model is identical or even stricter
+
+4. **We comply with all regulations**
+   - GDPR, DSA, LCEN, PSD2
+   - Complete public documentation
+   - Robust security measures
+
+---
+
+## 11. FORMAL REVIEW REQUEST
+
+**We respectfully request a review of the account closure decision for the following reasons:**
+
+1. ✅ **Miscategorization**: We are matrimonial, not "dating"
+2. ✅ **Full compliance**: Respect for all regulations
+3. ✅ **Ethical model**: Family supervision and Islamic values
+4. ✅ **Comparability**: Identical to services already accepted by Stripe
+5. ✅ **Transparency**: Complete and accessible public documentation
+
+---
+
+## 12. CONTACT INFORMATION
+
+**For any questions or additional clarification:**
+
+- **Main Website**: https://mariage-halal.lovable.app
+- **Email**: contact@mariage-halal.lovable.app
+- **Documentation**: All legal documents are publicly accessible
+- **Availability**: We are available for a call or video conference
+
+**Technical Contact:**
+- Platform demonstration available upon request
+- Test access can be provided for verification
 
 ---
 
 ## CONCLUSION
 
-ZawajConnect (Mariage-Halal) est une **plateforme matrimoniale musulmane** avec supervision familiale obligatoire, modération stricte et objectif exclusif de mariage. Nous ne sommes **pas un service de dating/rencontres casual**.
+ZawajConnect (Mariage-Halal) is a **Muslim matrimonial platform** with mandatory family supervision, strict moderation, and an exclusive marriage objective. We are **not a dating/casual dating service**.
 
-Nous respectons toutes les réglementations européennes et sommes comparables aux plateformes matrimoniales musulmanes déjà acceptées par Stripe (Muzz, SingleMuslim, Salams).
+We comply with all European regulations and are comparable to Muslim matrimonial platforms already accepted by Stripe (Muzz, SingleMuslim, Salams).
 
-**Nous demandons respectueusement la reconsidération de votre décision** et restons disponibles pour toute clarification ou documentation supplémentaire.
+**We respectfully request reconsideration of your decision** and remain available for any clarification or additional documentation.
 
-Nous avons confiance que cette clarification démontrera que notre service est conforme aux politiques de Stripe et ne relève pas de la catégorie "dating services" restreints.
+We are confident that this clarification will demonstrate that our service complies with Stripe's policies and does not fall under the restricted "dating services" category.
 
-Dans l'attente de votre réponse favorable,
+Looking forward to your favorable response,
 
-Cordialement,
+Sincerely,
 
-**L'Équipe ZawajConnect**  
+**The ZawajConnect Team**  
 Mariage-Halal  
 https://mariage-halal.lovable.app
 
 ---
 
-## ANNEXES SUGGÉRÉES
+## SUGGESTED ATTACHMENTS
 
-Si Stripe demande des documents supplémentaires, vous pouvez fournir :
+If Stripe requests additional documents, you can provide:
 
-1. ✅ Captures d'écran du système Wali
-2. ✅ Exemples de modération automatique
-3. ✅ Statistiques d'utilisation démontrant l'intention matrimoniale
-4. ✅ Témoignages d'utilisateurs (mariages réussis)
-5. ✅ Documentation technique de l'architecture de sécurité
-6. ✅ Comparaison détaillée avec Muzz/SingleMuslim
-7. ✅ Certificats de conformité RGPD si disponibles
+1. ✅ Screenshots of the Wali system
+2. ✅ Examples of automatic moderation
+3. ✅ Usage statistics demonstrating matrimonial intent
+4. ✅ User testimonials (successful marriages)
+5. ✅ Technical documentation of security architecture
+6. ✅ Detailed comparison with Muzz/SingleMuslim
+7. ✅ GDPR compliance certificates if available
 
 ---
 
-**Note :** Personnalisez les éléments entre crochets [comme ceci] avec vos informations spécifiques avant envoi.
+**Note:** Customize items in brackets [like this] with your specific information before submitting.
