@@ -31,10 +31,10 @@ interface SubscriptionPlan {
   discount?: string;
 }
 
-const PRICE_IDS = {
-  premium_3: 'price_1SEwsJKwsHyCjkzyvQfkbzxs',
-  premium_6: 'price_1SEwusKwsHyCjkzyNYF2O8Qx',
-  premium_12: 'price_1SEwy7KwsHyCjkzyZpjCkIz4',
+const PLAN_IDS = {
+  premium_3: '3_months',
+  premium_6: '6_months',
+  premium_12: '12_months',
 };
 
 const PremiumSubscription = () => {
@@ -136,19 +136,19 @@ const PremiumSubscription = () => {
     setProcessingPayment(planId);
 
     try {
-      const priceId = PRICE_IDS[planId as keyof typeof PRICE_IDS];
+      const paypalPlanId = PLAN_IDS[planId as keyof typeof PLAN_IDS];
       
-      if (!priceId) {
+      if (!paypalPlanId) {
         throw new Error('Invalid plan ID');
       }
 
       toast({
-        title: "Redirection vers le paiement",
-        description: "Vous allez être redirigé vers la page de paiement sécurisée",
+        title: "Redirection vers PayPal",
+        description: "Vous allez être redirigé vers PayPal pour finaliser votre abonnement",
       });
 
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId }
+      const { data, error } = await supabase.functions.invoke('create-paypal-subscription', {
+        body: { planId: paypalPlanId }
       });
 
       if (error) throw error;
@@ -164,7 +164,7 @@ const PremiumSubscription = () => {
       console.error('Error processing payment:', error);
       toast({
         title: "Erreur de paiement",
-        description: "Impossible de traiter votre demande d'abonnement",
+        description: "Impossible de traiter votre demande d'abonnement PayPal",
         variant: "destructive"
       });
     } finally {
@@ -177,22 +177,26 @@ const PremiumSubscription = () => {
 
     try {
       toast({
-        title: "Chargement...",
-        description: "Redirection vers le portail de gestion",
+        title: "Annulation de l'abonnement",
+        description: "Voulez-vous vraiment annuler votre abonnement ?",
       });
 
-      const { data, error } = await supabase.functions.invoke('customer-portal');
+      const { data, error } = await supabase.functions.invoke('cancel-paypal-subscription');
 
       if (error) throw error;
 
-      if (data?.url) {
-        window.open(data.url, '_blank');
+      if (data?.success) {
+        toast({
+          title: "Succès",
+          description: "Votre abonnement PayPal a été annulé",
+        });
+        checkSubscription();
       }
     } catch (error) {
-      console.error('Error opening customer portal:', error);
+      console.error('Error canceling subscription:', error);
       toast({
         title: "Erreur",
-        description: "Impossible d'accéder au portail de gestion",
+        description: "Impossible d'annuler l'abonnement",
         variant: "destructive"
       });
     }
@@ -470,7 +474,7 @@ const PremiumSubscription = () => {
           <div>
             <h4 className="font-semibold mb-2">Les paiements sont-ils sécurisés ?</h4>
             <p className="text-sm text-muted-foreground">
-              Absolument. Tous les paiements sont traités de manière sécurisée via Stripe, leader mondial du paiement en ligne.
+              Absolument. Tous les paiements sont traités de manière sécurisée via PayPal, leader mondial du paiement en ligne.
             </p>
           </div>
         </CardContent>

@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('check-subscription');
+      const { data, error } = await supabase.functions.invoke('check-paypal-subscription');
       
       if (error) {
         console.error('Error checking subscription:', error);
@@ -57,11 +57,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       if (data) {
         setSubscription({
-          subscribed: data.subscribed,
-          product_id: data.product_id,
-          subscription_end: data.subscription_end,
-          plan_duration: data.plan_duration,
-          months_remaining: data.months_remaining,
+          subscribed: data.subscribed || false,
+          product_id: data.plan_id || null,
+          subscription_end: data.subscription_end || null,
+          plan_duration: null,
+          months_remaining: null,
         });
       }
     } catch (error) {

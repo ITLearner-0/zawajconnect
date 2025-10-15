@@ -1382,6 +1382,7 @@ export type Database = {
           granted_by: string | null
           id: string
           notes: string | null
+          paypal_subscription_id: string | null
           plan_type: string
           status: string
           stripe_customer_id: string | null
@@ -1396,6 +1397,7 @@ export type Database = {
           granted_by?: string | null
           id?: string
           notes?: string | null
+          paypal_subscription_id?: string | null
           plan_type?: string
           status?: string
           stripe_customer_id?: string | null
@@ -1410,6 +1412,7 @@ export type Database = {
           granted_by?: string | null
           id?: string
           notes?: string | null
+          paypal_subscription_id?: string | null
           plan_type?: string
           status?: string
           stripe_customer_id?: string | null
@@ -1789,9 +1792,21 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: boolean
       }
+      check_incomplete_profiles_and_notify: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       check_profile_view_rate_limit: {
         Args: { viewer_uuid: string }
         Returns: boolean
+      }
+      check_subscription_expiry_and_notify: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      check_unread_messages_and_notify: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       create_family_invitation: {
         Args: {
@@ -1913,6 +1928,18 @@ export type Database = {
         Returns: string
       }
       migrate_family_contact_data_secure: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      send_match_suggestions_batch: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      send_monthly_newsletter: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
+      send_weekly_tips_batch: {
         Args: Record<PropertyKey, never>
         Returns: undefined
       }
