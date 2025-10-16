@@ -1933,6 +1933,10 @@ export type Database = {
         Args: { profile_user_id: string }
         Returns: boolean
       }
+      is_premium_user: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       is_user_in_active_conversation: {
         Args: { check_user_id: string }
         Returns: boolean
