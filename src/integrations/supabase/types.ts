@@ -1776,6 +1776,10 @@ export type Database = {
         Args: { match_user1_id: string; match_user2_id: string }
         Returns: boolean
       }
+      can_view_matching_data: {
+        Args: { target_user_id: string }
+        Returns: boolean
+      }
       can_view_public_profile: {
         Args: { profile_user_id: string }
         Returns: boolean
