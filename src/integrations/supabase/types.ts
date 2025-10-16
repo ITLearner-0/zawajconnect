@@ -1780,6 +1780,10 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: boolean
       }
+      can_view_moderation_log: {
+        Args: { log_user_id: string }
+        Returns: boolean
+      }
       can_view_public_profile: {
         Args: { profile_user_id: string }
         Returns: boolean
