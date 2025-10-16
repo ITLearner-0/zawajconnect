@@ -1776,6 +1776,10 @@ export type Database = {
         Args: { match_user1_id: string; match_user2_id: string }
         Returns: boolean
       }
+      can_view_public_profile: {
+        Args: { profile_user_id: string }
+        Returns: boolean
+      }
       check_family_access_rate_limit: {
         Args: { user_uuid: string }
         Returns: boolean
@@ -1903,6 +1907,22 @@ export type Database = {
       }
       is_admin: {
         Args: { _user_id: string }
+        Returns: boolean
+      }
+      is_family_supervised: {
+        Args: { profile_user_id: string }
+        Returns: boolean
+      }
+      is_family_wali: {
+        Args: { profile_user_id: string }
+        Returns: boolean
+      }
+      is_matched_user: {
+        Args: { profile_user_id: string }
+        Returns: boolean
+      }
+      is_own_profile: {
+        Args: { profile_user_id: string }
         Returns: boolean
       }
       is_user_in_active_conversation: {
