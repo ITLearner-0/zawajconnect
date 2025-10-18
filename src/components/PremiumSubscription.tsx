@@ -4,18 +4,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { 
   Crown, 
   Check, 
   Star, 
   Infinity, 
   MessageCircle, 
-  Eye, 
   Heart,
   Shield,
   Users,
-  Zap
+  Zap,
+  X
 } from 'lucide-react';
 
 interface SubscriptionPlan {
@@ -32,15 +32,23 @@ interface SubscriptionPlan {
 }
 
 const PLAN_IDS = {
-  premium_3: '3_months',
-  premium_6: '6_months',
-  premium_12: '12_months',
+  premium_3: 'premium_3_months',
+  premium_6: 'premium_6_months',
+  premium_12: 'premium_12_months',
 };
+
+declare global {
+  interface Window {
+    braintree: any;
+  }
+}
 
 const PremiumSubscription = () => {
   const { user, subscription, checkSubscription } = useAuth();
-  const { toast } = useToast();
   const [processingPayment, setProcessingPayment] = useState<string | null>(null);
+  const [braintreeInstance, setBraintreeInstance] = useState<any>(null);
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const subscriptionPlans: SubscriptionPlan[] = [
     {
@@ -106,67 +114,106 @@ const PremiumSubscription = () => {
   ];
 
   useEffect(() => {
-    // Refresh subscription when returning from Stripe
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('success') === 'true') {
-      toast({
-        title: "Paiement réussi !",
-        description: "Votre abonnement est maintenant actif",
-      });
-      setTimeout(() => checkSubscription(), 2000);
-    } else if (params.get('canceled') === 'true') {
-      toast({
-        title: "Paiement annulé",
-        description: "Votre abonnement n'a pas été activé",
-        variant: "destructive",
-      });
-    }
+    // Charger le script Braintree
+    const script = document.createElement('script');
+    script.src = 'https://js.braintreegateway.com/web/dropin/1.33.0/js/dropin.min.js';
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
   }, []);
 
   const handleSubscribe = async (planId: string) => {
     if (!user) {
-      toast({
-        title: "Erreur",
-        description: "Vous devez être connecté pour souscrire",
-        variant: "destructive"
-      });
+      toast.error('Vous devez être connecté pour souscrire');
       return;
     }
 
     setProcessingPayment(planId);
+    setSelectedPlan(planId);
 
     try {
-      const paypalPlanId = PLAN_IDS[planId as keyof typeof PLAN_IDS];
+      const braintreePlanId = PLAN_IDS[planId as keyof typeof PLAN_IDS];
       
-      if (!paypalPlanId) {
+      if (!braintreePlanId) {
         throw new Error('Invalid plan ID');
       }
 
-      toast({
-        title: "Redirection vers PayPal",
-        description: "Vous allez être redirigé vers PayPal pour finaliser votre abonnement",
+      toast.loading('Initialisation du paiement...');
+
+      // Obtenir le token client Braintree
+      const { data: tokenData, error: tokenError } = await supabase.functions.invoke(
+        'create-braintree-token'
+      );
+
+      if (tokenError || !tokenData?.clientToken) {
+        throw new Error('Impossible d\'initialiser le paiement');
+      }
+
+      // Créer l'interface Braintree Drop-in
+      const dropinContainer = document.getElementById('braintree-dropin-container');
+      if (!dropinContainer) {
+        throw new Error('Container Braintree introuvable');
+      }
+
+      // Nettoyer l'ancien instance si existant
+      if (braintreeInstance) {
+        await braintreeInstance.teardown();
+      }
+
+      // Créer nouvelle instance
+      const instance = await window.braintree.dropin.create({
+        authorization: tokenData.clientToken,
+        container: dropinContainer,
+        locale: 'fr_FR',
       });
 
-      const { data, error } = await supabase.functions.invoke('create-paypal-subscription', {
-        body: { planId: paypalPlanId }
-      });
+      setBraintreeInstance(instance);
+      setShowPaymentModal(true);
+      toast.dismiss();
+
+    } catch (error: any) {
+      console.error('Error processing payment:', error);
+      toast.error(error.message || 'Une erreur est survenue');
+      setProcessingPayment(null);
+    }
+  };
+
+  const completePurchase = async () => {
+    if (!braintreeInstance || !selectedPlan) return;
+
+    setProcessingPayment(selectedPlan);
+    try {
+      const { nonce } = await braintreeInstance.requestPaymentMethod();
+
+      const braintreePlanId = PLAN_IDS[selectedPlan as keyof typeof PLAN_IDS];
+
+      toast.loading('Traitement du paiement...');
+
+      const { data, error } = await supabase.functions.invoke(
+        'create-braintree-subscription',
+        {
+          body: {
+            paymentMethodNonce: nonce,
+            planId: braintreePlanId,
+          },
+        }
+      );
 
       if (error) throw error;
 
-      if (data?.url) {
-        window.open(data.url, '_blank');
-        
-        // Refresh subscription after a delay
-        setTimeout(() => checkSubscription(), 3000);
-      }
-
-    } catch (error) {
-      console.error('Error processing payment:', error);
-      toast({
-        title: "Erreur de paiement",
-        description: "Impossible de traiter votre demande d'abonnement PayPal",
-        variant: "destructive"
-      });
+      toast.dismiss();
+      toast.success('Abonnement activé avec succès !');
+      
+      setShowPaymentModal(false);
+      await checkSubscription();
+      
+    } catch (error: any) {
+      console.error('Error:', error);
+      toast.dismiss();
+      toast.error(error.message || 'Erreur lors du paiement');
     } finally {
       setProcessingPayment(null);
     }
@@ -175,30 +222,24 @@ const PremiumSubscription = () => {
   const handleManageSubscription = async () => {
     if (!user) return;
 
-    try {
-      toast({
-        title: "Annulation de l'abonnement",
-        description: "Voulez-vous vraiment annuler votre abonnement ?",
-      });
+    if (!window.confirm('Voulez-vous vraiment annuler votre abonnement ?')) {
+      return;
+    }
 
-      const { data, error } = await supabase.functions.invoke('cancel-paypal-subscription');
+    try {
+      toast.loading('Annulation en cours...');
+
+      const { error } = await supabase.functions.invoke('cancel-braintree-subscription');
 
       if (error) throw error;
 
-      if (data?.success) {
-        toast({
-          title: "Succès",
-          description: "Votre abonnement PayPal a été annulé",
-        });
-        checkSubscription();
-      }
+      toast.dismiss();
+      toast.success('Votre abonnement a été annulé');
+      await checkSubscription();
     } catch (error) {
       console.error('Error canceling subscription:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'annuler l'abonnement",
-        variant: "destructive"
-      });
+      toast.dismiss();
+      toast.error('Impossible d\'annuler l\'abonnement');
     }
   };
 
@@ -474,11 +515,57 @@ const PremiumSubscription = () => {
           <div>
             <h4 className="font-semibold mb-2">Les paiements sont-ils sécurisés ?</h4>
             <p className="text-sm text-muted-foreground">
-              Absolument. Tous les paiements sont traités de manière sécurisée via PayPal, leader mondial du paiement en ligne.
+              Absolument. Tous les paiements sont traités de manière sécurisée via Braintree (PayPal), 
+              leader mondial du paiement en ligne.
             </p>
           </div>
         </CardContent>
       </Card>
+
+      {/* Modal de paiement Braintree */}
+      {showPaymentModal && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setShowPaymentModal(false);
+            }
+          }}
+        >
+          <Card className="w-full max-w-md mx-4 relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2"
+              onClick={() => setShowPaymentModal(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <CardHeader>
+              <CardTitle>Finaliser le paiement</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div id="braintree-dropin-container" className="min-h-[300px]"></div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={completePurchase}
+                  disabled={!!processingPayment}
+                  className="flex-1"
+                >
+                  {processingPayment ? 'Traitement...' : 'Payer'}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPaymentModal(false)}
+                  disabled={!!processingPayment}
+                >
+                  Annuler
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

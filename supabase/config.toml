@@ -62,3 +62,12 @@ verify_jwt = false
 
 [functions.send-match-suggestions]
 verify_jwt = false
+
+[functions.create-braintree-token]
+verify_jwt = true
+
+[functions.create-braintree-subscription]
+verify_jwt = true
+
+[functions.cancel-braintree-subscription]
+verify_jwt = true
