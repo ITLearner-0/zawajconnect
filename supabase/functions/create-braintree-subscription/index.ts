@@ -23,22 +23,24 @@ serve(async (req) => {
       throw new Error('Authorization header manquant');
     }
 
+    // Créer le client Supabase avec la clé service role
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       { auth: { persistSession: false } }
     );
 
-    console.log('Verifying JWT token...');
-    // Extract JWT token from Authorization header
+    console.log('Verifying JWT token manually...');
+    // Extraire le JWT token
     const jwt = authHeader.replace('Bearer ', '');
     
-    // Verify the JWT token using the service role client
+    // Vérifier le token manuellement avec le service role client
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(jwt);
 
     console.log('User verification result:', { 
       hasUser: !!user, 
       userId: user?.id,
+      userEmail: user?.email,
       error: userError?.message 
     });
 
