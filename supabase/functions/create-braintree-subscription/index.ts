@@ -14,22 +14,35 @@ serve(async (req) => {
   }
 
   try {
+    // Log des headers pour debug
+    const authHeader = req.headers.get('Authorization');
+    console.log('Authorization header present:', !!authHeader);
+    console.log('Authorization header:', authHeader ? authHeader.substring(0, 20) + '...' : 'none');
+    
+    if (!authHeader) {
+      throw new Error('Authorization header manquant');
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+          headers: { Authorization: authHeader },
         },
       }
     );
 
+    console.log('Getting user from token...');
     const {
       data: { user },
+      error: userError,
     } = await supabaseClient.auth.getUser();
 
+    console.log('User retrieved:', !!user, 'Error:', userError);
+
     if (!user) {
-      throw new Error('Non authentifié');
+      throw new Error(userError?.message || 'Non authentifié');
     }
 
     const { paymentMethodNonce, planId } = await req.json();
