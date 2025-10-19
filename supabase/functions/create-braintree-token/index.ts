@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+// @deno-types="npm:@types/braintree@3.3.11"
+import braintree from "npm:braintree@3.23.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -55,34 +57,27 @@ serve(async (req) => {
       throw new Error('Configuration Braintree manquante');
     }
 
-    const auth = btoa(`${publicKey}:${privateKey}`);
+    console.log('Initializing Braintree gateway...');
     
-    // Générer le client token sans customerId pour simplifier
-    const braintreeUrl = environment === 'production'
-      ? `https://api.braintreegateway.com/merchants/${merchantId}/client_token`
-      : `https://api.sandbox.braintreegateway.com/merchants/${merchantId}/client_token`;
-
-    const response = await fetch(braintreeUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        clientToken: {}
-      }),
+    // Utiliser le SDK Braintree officiel
+    const gateway = new braintree.BraintreeGateway({
+      environment: environment === 'production' 
+        ? braintree.Environment.Production 
+        : braintree.Environment.Sandbox,
+      merchantId: merchantId,
+      publicKey: publicKey,
+      privateKey: privateKey,
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Erreur Braintree:', errorText);
-      throw new Error(`Erreur Braintree: ${response.status}`);
-    }
+    console.log('Generating client token...');
+    
+    // Générer le client token
+    const response = await gateway.clientToken.generate({});
 
-    const data = await response.json();
-
+    console.log('Client token generated successfully');
+    
     return new Response(
-      JSON.stringify({ clientToken: data.clientToken.value }),
+      JSON.stringify({ clientToken: response.clientToken }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
