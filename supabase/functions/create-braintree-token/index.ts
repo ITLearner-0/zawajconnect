@@ -20,6 +20,10 @@ serve(async (req) => {
       throw new Error('Authorization header manquant');
     }
 
+    // Extraire le token du header Bearer
+    const token = authHeader.replace('Bearer ', '');
+    console.log('Token extracted:', !!token);
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
@@ -30,10 +34,11 @@ serve(async (req) => {
       }
     );
 
+    // Passer le token explicitement à getUser()
     const {
       data: { user },
       error: userError,
-    } = await supabaseClient.auth.getUser();
+    } = await supabaseClient.auth.getUser(token);
 
     console.log('User retrieved:', !!user, 'Error:', userError);
 
