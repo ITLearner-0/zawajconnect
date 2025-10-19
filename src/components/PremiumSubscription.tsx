@@ -49,6 +49,7 @@ const PremiumSubscription = () => {
   const [braintreeInstance, setBraintreeInstance] = useState<any>(null);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [clientToken, setClientToken] = useState<string | null>(null);
 
   const subscriptionPlans: SubscriptionPlan[] = [
     {
@@ -125,6 +126,46 @@ const PremiumSubscription = () => {
     };
   }, []);
 
+  // Initialiser Braintree quand le modal s'ouvre et qu'on a un token
+  useEffect(() => {
+    const initBraintree = async () => {
+      if (!showPaymentModal || !clientToken) return;
+
+      try {
+        const dropinContainer = document.getElementById('braintree-dropin-container');
+        if (!dropinContainer) {
+          console.error('Container Braintree introuvable');
+          return;
+        }
+
+        // Nettoyer l'ancien instance si existant
+        if (braintreeInstance) {
+          await braintreeInstance.teardown();
+        }
+
+        // Attendre que le script Braintree soit chargé
+        if (!window.braintree) {
+          setTimeout(initBraintree, 100);
+          return;
+        }
+
+        // Créer nouvelle instance
+        const instance = await window.braintree.dropin.create({
+          authorization: clientToken,
+          container: dropinContainer,
+          locale: 'fr_FR',
+        });
+
+        setBraintreeInstance(instance);
+      } catch (error) {
+        console.error('Erreur initialisation Braintree:', error);
+        toast.error('Erreur lors de l\'initialisation du paiement');
+      }
+    };
+
+    initBraintree();
+  }, [showPaymentModal, clientToken]);
+
   const handleSubscribe = async (planId: string) => {
     if (!user) {
       toast.error('Vous devez être connecté pour souscrire');
@@ -168,25 +209,8 @@ const PremiumSubscription = () => {
         throw new Error('Token Braintree non reçu');
       }
 
-      // Créer l'interface Braintree Drop-in
-      const dropinContainer = document.getElementById('braintree-dropin-container');
-      if (!dropinContainer) {
-        throw new Error('Container Braintree introuvable');
-      }
-
-      // Nettoyer l'ancien instance si existant
-      if (braintreeInstance) {
-        await braintreeInstance.teardown();
-      }
-
-      // Créer nouvelle instance
-      const instance = await window.braintree.dropin.create({
-        authorization: tokenData.clientToken,
-        container: dropinContainer,
-        locale: 'fr_FR',
-      });
-
-      setBraintreeInstance(instance);
+      // Stocker le token et afficher le modal
+      setClientToken(tokenData.clientToken);
       setShowPaymentModal(true);
       toast.dismiss();
 
