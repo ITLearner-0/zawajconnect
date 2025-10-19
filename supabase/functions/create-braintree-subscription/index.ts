@@ -34,10 +34,12 @@ serve(async (req) => {
     );
 
     console.log('Getting user from token...');
+    // Extract JWT token from Authorization header
+    const token = authHeader.replace('Bearer ', '');
     const {
       data: { user },
       error: userError,
-    } = await supabaseClient.auth.getUser();
+    } = await supabaseClient.auth.getUser(token);
 
     console.log('User retrieved:', !!user, 'Error:', userError);
 
