@@ -129,26 +129,37 @@ const PremiumSubscription = () => {
   // Initialiser Braintree quand le modal s'ouvre et qu'on a un token
   useEffect(() => {
     const initBraintree = async () => {
-      if (!showPaymentModal || !clientToken) return;
+      if (!showPaymentModal || !clientToken) {
+        console.log('Braintree init skipped:', { showPaymentModal, hasToken: !!clientToken });
+        return;
+      }
 
       try {
+        console.log('Starting Braintree initialization...');
         const dropinContainer = document.getElementById('braintree-dropin-container');
         if (!dropinContainer) {
           console.error('Container Braintree introuvable');
           return;
         }
 
+        console.log('Container found, checking for window.braintree...');
+        
+        // Attendre que le script Braintree soit chargé
+        if (!window.braintree) {
+          console.log('Braintree not loaded yet, retrying...');
+          setTimeout(initBraintree, 100);
+          return;
+        }
+
+        console.log('Braintree loaded, cleaning old instance...');
+        
         // Nettoyer l'ancien instance si existant
         if (braintreeInstance) {
           await braintreeInstance.teardown();
         }
 
-        // Attendre que le script Braintree soit chargé
-        if (!window.braintree) {
-          setTimeout(initBraintree, 100);
-          return;
-        }
-
+        console.log('Creating Braintree dropin instance...');
+        
         // Créer nouvelle instance
         const instance = await window.braintree.dropin.create({
           authorization: clientToken,
@@ -156,6 +167,7 @@ const PremiumSubscription = () => {
           locale: 'fr_FR',
         });
 
+        console.log('Braintree instance created successfully');
         setBraintreeInstance(instance);
       } catch (error) {
         console.error('Erreur initialisation Braintree:', error);
@@ -222,16 +234,26 @@ const PremiumSubscription = () => {
   };
 
   const completePurchase = async () => {
-    if (!braintreeInstance || !selectedPlan) return;
+    console.log('completePurchase called', { hasBraintreeInstance: !!braintreeInstance, selectedPlan });
+    
+    if (!braintreeInstance || !selectedPlan) {
+      console.error('Missing braintreeInstance or selectedPlan');
+      toast.error('Veuillez attendre que le formulaire de paiement se charge');
+      return;
+    }
 
     setProcessingPayment(selectedPlan);
     try {
+      console.log('Requesting payment method from Braintree...');
       const { nonce } = await braintreeInstance.requestPaymentMethod();
+      console.log('Payment method nonce received');
 
       const braintreePlanId = PLAN_IDS[selectedPlan as keyof typeof PLAN_IDS];
+      console.log('Using plan ID:', braintreePlanId);
 
       toast.loading('Traitement du paiement...');
 
+      console.log('Calling create-braintree-subscription edge function...');
       const { data, error } = await supabase.functions.invoke(
         'create-braintree-subscription',
         {
@@ -242,6 +264,8 @@ const PremiumSubscription = () => {
         }
       );
 
+      console.log('Edge function response:', { data, error });
+
       if (error) throw error;
 
       toast.dismiss();
@@ -251,7 +275,7 @@ const PremiumSubscription = () => {
       await checkSubscription();
       
     } catch (error: any) {
-      console.error('Error:', error);
+      console.error('Error in completePurchase:', error);
       toast.dismiss();
       toast.error(error.message || 'Erreur lors du paiement');
     } finally {
