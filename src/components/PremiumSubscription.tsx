@@ -255,9 +255,19 @@ const PremiumSubscription = () => {
       toast.loading('Traitement du paiement...');
 
       console.log('Calling create-braintree-subscription edge function...');
+      
+      // Obtenir le token de session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Session expirée');
+      }
+
       const { data, error } = await supabase.functions.invoke(
         'create-braintree-subscription',
         {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          },
           body: {
             paymentMethodNonce: nonce,
             planId: braintreePlanId,
