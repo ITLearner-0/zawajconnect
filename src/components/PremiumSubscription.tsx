@@ -225,6 +225,7 @@ const PremiumSubscription = () => {
       setClientToken(tokenData.clientToken);
       setShowPaymentModal(true);
       toast.dismiss();
+      setProcessingPayment(null); // Réinitialiser pour permettre l'interaction avec le modal
 
     } catch (error: any) {
       console.error('Error processing payment:', error);
