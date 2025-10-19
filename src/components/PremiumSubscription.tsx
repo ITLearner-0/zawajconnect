@@ -143,13 +143,29 @@ const PremiumSubscription = () => {
 
       toast.loading('Initialisation du paiement...');
 
-      // Obtenir le token client Braintree
+      // Vérifier la session actuelle
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Session expirée. Veuillez vous reconnecter.');
+      }
+
+      // Obtenir le token client Braintree avec le token d'auth
       const { data: tokenData, error: tokenError } = await supabase.functions.invoke(
-        'create-braintree-token'
+        'create-braintree-token',
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`
+          }
+        }
       );
 
-      if (tokenError || !tokenData?.clientToken) {
-        throw new Error('Impossible d\'initialiser le paiement');
+      if (tokenError) {
+        console.error('Braintree token error:', tokenError);
+        throw new Error(tokenError.message || 'Impossible d\'initialiser le paiement');
+      }
+
+      if (!tokenData?.clientToken) {
+        throw new Error('Token Braintree non reçu');
       }
 
       // Créer l'interface Braintree Drop-in
