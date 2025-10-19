@@ -80,9 +80,54 @@ serve(async (req) => {
 
     console.log('Creating subscription with planId:', planId);
     
-    // Créer l'abonnement
+    // Étape 1: Créer ou récupérer le customer Braintree
+    console.log('Creating or finding Braintree customer...');
+    let customerId;
+    
+    // Chercher si le customer existe déjà
+    const searchResult = await gateway.customer.search((search) => {
+      search.email().is(user.email!);
+    });
+    
+    if (searchResult.length() > 0) {
+      customerId = searchResult.first().id;
+      console.log('Existing customer found:', customerId);
+    } else {
+      // Créer un nouveau customer
+      const customerResult = await gateway.customer.create({
+        email: user.email!,
+        firstName: user.user_metadata?.full_name?.split(' ')[0] || '',
+        lastName: user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
+      });
+      
+      if (!customerResult.success) {
+        console.error('Failed to create customer:', customerResult.message);
+        throw new Error('Impossible de créer le client');
+      }
+      
+      customerId = customerResult.customer.id;
+      console.log('New customer created:', customerId);
+    }
+    
+    // Étape 2: Créer le payment method à partir du nonce
+    console.log('Creating payment method from nonce...');
+    const paymentMethodResult = await gateway.paymentMethod.create({
+      customerId: customerId,
+      paymentMethodNonce: paymentMethodNonce,
+    });
+    
+    if (!paymentMethodResult.success) {
+      console.error('Failed to create payment method:', paymentMethodResult.message);
+      throw new Error('Impossible d\'enregistrer le moyen de paiement');
+    }
+    
+    const paymentMethodToken = paymentMethodResult.paymentMethod.token;
+    console.log('Payment method created:', paymentMethodToken);
+    
+    // Étape 3: Créer l'abonnement avec le payment method token
+    console.log('Creating subscription...');
     const result = await gateway.subscription.create({
-      paymentMethodNonce,
+      paymentMethodToken: paymentMethodToken,
       planId,
     });
 
