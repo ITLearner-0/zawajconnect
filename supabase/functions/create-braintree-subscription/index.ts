@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+// @deno-types="npm:@types/braintree@3.3.11"
+import braintree from "npm:braintree@3.23.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -45,34 +47,32 @@ serve(async (req) => {
       throw new Error('Configuration Braintree manquante');
     }
 
-    const braintreeUrl = environment === 'production'
-      ? `https://api.braintreegateway.com/merchants/${merchantId}/subscriptions`
-      : `https://api.sandbox.braintreegateway.com/merchants/${merchantId}/subscriptions`;
-
-    const auth = btoa(`${publicKey}:${privateKey}`);
-
-    const response = await fetch(braintreeUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        subscription: {
-          paymentMethodNonce,
-          planId,
-        },
-      }),
+    console.log('Creating Braintree gateway...');
+    
+    // Utiliser le SDK Braintree officiel
+    const gateway = new braintree.BraintreeGateway({
+      environment: environment === 'production' 
+        ? braintree.Environment.Production 
+        : braintree.Environment.Sandbox,
+      merchantId: merchantId,
+      publicKey: publicKey,
+      privateKey: privateKey,
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Erreur Braintree:', errorText);
-      throw new Error('Impossible de créer l\'abonnement');
+    console.log('Creating subscription with planId:', planId);
+    
+    // Créer l'abonnement
+    const result = await gateway.subscription.create({
+      paymentMethodNonce,
+      planId,
+    });
+
+    if (!result.success) {
+      console.error('Braintree error:', result.message);
+      throw new Error(result.message || 'Impossible de créer l\'abonnement');
     }
 
-    const data = await response.json();
-    const subscription = data.subscription;
+    const subscription = result.subscription;
 
     // Calculer la date d'expiration
     let expiresAt = new Date();
@@ -85,6 +85,7 @@ serve(async (req) => {
     }
 
     // Enregistrer l'abonnement dans Supabase
+    console.log('Saving subscription to database...');
     const { error: dbError } = await supabaseClient
       .from('subscriptions')
       .upsert({
@@ -102,6 +103,8 @@ serve(async (req) => {
       throw new Error('Erreur lors de l\'enregistrement');
     }
 
+    console.log('Subscription created successfully');
+    
     return new Response(
       JSON.stringify({ success: true, subscription }),
       {

@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+// @deno-types="npm:@types/braintree@3.3.11"
+import braintree from "npm:braintree@3.23.0";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -52,27 +54,30 @@ serve(async (req) => {
       throw new Error('Configuration Braintree manquante');
     }
 
-    const braintreeUrl = environment === 'production'
-      ? `https://api.braintreegateway.com/merchants/${merchantId}/subscriptions/${subscription.provider_subscription_id}/cancel`
-      : `https://api.sandbox.braintreegateway.com/merchants/${merchantId}/subscriptions/${subscription.provider_subscription_id}/cancel`;
-
-    const auth = btoa(`${publicKey}:${privateKey}`);
-
-    const response = await fetch(braintreeUrl, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Basic ${auth}`,
-        'Content-Type': 'application/json',
-      },
+    console.log('Creating Braintree gateway...');
+    
+    // Utiliser le SDK Braintree officiel
+    const gateway = new braintree.BraintreeGateway({
+      environment: environment === 'production' 
+        ? braintree.Environment.Production 
+        : braintree.Environment.Sandbox,
+      merchantId: merchantId,
+      publicKey: publicKey,
+      privateKey: privateKey,
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Erreur Braintree:', errorText);
-      throw new Error('Impossible d\'annuler l\'abonnement');
+    console.log('Canceling subscription:', subscription.provider_subscription_id);
+    
+    // Annuler l'abonnement
+    const result = await gateway.subscription.cancel(subscription.provider_subscription_id);
+
+    if (!result.success) {
+      console.error('Braintree error:', result.message);
+      throw new Error(result.message || 'Impossible d\'annuler l\'abonnement');
     }
 
     // Mettre à jour le statut dans Supabase
+    console.log('Updating subscription status in database...');
     const { error: updateError } = await supabaseClient
       .from('subscriptions')
       .update({ status: 'cancelled' })
@@ -83,6 +88,8 @@ serve(async (req) => {
       throw new Error('Erreur lors de la mise à jour');
     }
 
+    console.log('Subscription cancelled successfully');
+    
     return new Response(
       JSON.stringify({ success: true }),
       {
