@@ -29,19 +29,25 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    console.log('Getting user from token...');
+    console.log('Verifying JWT token...');
     // Extract JWT token from Authorization header
-    const token = authHeader.replace('Bearer ', '');
-    const {
-      data: { user },
-      error: userError,
-    } = await supabaseClient.auth.getUser(token);
+    const jwt = authHeader.replace('Bearer ', '');
+    
+    // Verify the JWT token using the service role client
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(jwt);
 
-    console.log('User retrieved:', !!user, 'Error:', userError);
+    console.log('User verification result:', { 
+      hasUser: !!user, 
+      userId: user?.id,
+      error: userError?.message 
+    });
 
-    if (!user) {
-      throw new Error(userError?.message || 'Non authentifié');
+    if (userError || !user) {
+      console.error('JWT verification failed:', userError);
+      throw new Error('Authentication invalide: ' + (userError?.message || 'Token invalide'));
     }
+    
+    console.log('User authenticated successfully:', user.email);
 
     const { paymentMethodNonce, planId } = await req.json();
 
