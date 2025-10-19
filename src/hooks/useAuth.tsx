@@ -48,7 +48,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('check-paypal-subscription');
+      const { data, error } = await supabase.functions.invoke('check-braintree-subscription');
       
       if (error) {
         console.error('Error checking subscription:', error);
