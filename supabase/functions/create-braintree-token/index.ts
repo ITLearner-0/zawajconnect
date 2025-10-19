@@ -12,22 +12,33 @@ serve(async (req) => {
   }
 
   try {
+    // Vérifier la présence du header Authorization
+    const authHeader = req.headers.get('Authorization');
+    console.log('Authorization header present:', !!authHeader);
+    
+    if (!authHeader) {
+      throw new Error('Authorization header manquant');
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
+          headers: { Authorization: authHeader },
         },
       }
     );
 
     const {
       data: { user },
+      error: userError,
     } = await supabaseClient.auth.getUser();
 
-    if (!user) {
-      throw new Error('Non authentifié');
+    console.log('User retrieved:', !!user, 'Error:', userError);
+
+    if (userError || !user) {
+      throw new Error(`Authentification échouée: ${userError?.message || 'Utilisateur non trouvé'}`);
     }
 
     const merchantId = Deno.env.get('BRAINTREE_MERCHANT_ID');
