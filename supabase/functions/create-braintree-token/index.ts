@@ -55,11 +55,39 @@ serve(async (req) => {
       throw new Error('Configuration Braintree manquante');
     }
 
+    const auth = btoa(`${publicKey}:${privateKey}`);
+    
+    // Créer le client Braintree s'il n'existe pas
+    const customerUrl = environment === 'production'
+      ? `https://api.braintreegateway.com/merchants/${merchantId}/customers`
+      : `https://api.sandbox.braintreegateway.com/merchants/${merchantId}/customers`;
+    
+    // Essayer de créer le client (ignore si déjà existant)
+    const customerResponse = await fetch(customerUrl, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        customer: {
+          id: user.id,
+          email: user.email,
+        },
+      }),
+    });
+
+    // On continue même si le client existe déjà (409)
+    if (!customerResponse.ok && customerResponse.status !== 409) {
+      const errorText = await customerResponse.text();
+      console.log('Info création client:', errorText);
+      // On continue quand même pour générer le token
+    }
+
+    // Générer le client token
     const braintreeUrl = environment === 'production'
       ? `https://api.braintreegateway.com/merchants/${merchantId}/client_token`
       : `https://api.sandbox.braintreegateway.com/merchants/${merchantId}/client_token`;
-
-    const auth = btoa(`${publicKey}:${privateKey}`);
 
     const response = await fetch(braintreeUrl, {
       method: 'POST',
