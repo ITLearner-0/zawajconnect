@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
 import { 
   Camera, 
   Upload, 
@@ -28,6 +31,8 @@ const PhotoUploadStep = ({
   userName = "User", 
   className = "" 
 }: PhotoUploadStepProps) => {
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
@@ -45,26 +50,74 @@ const PhotoUploadStep = ({
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Veuillez sélectionner une image valide');
+      toast({
+        title: "Format invalide",
+        description: "Veuillez sélectionner une image valide (JPG, PNG, WebP)",
+        variant: "destructive"
+      });
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('L\'image doit faire moins de 5MB');
+      toast({
+        title: "Fichier trop volumineux",
+        description: "L'image doit faire moins de 5MB",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!user) {
+      toast({
+        title: "Erreur",
+        description: "Vous devez être connecté pour uploader une photo",
+        variant: "destructive"
+      });
       return;
     }
 
     setIsUploading(true);
 
     try {
-      // In a real app, you would upload to Supabase storage
-      // For now, we'll create a local URL
-      const imageUrl = URL.createObjectURL(file);
-      onPhotoChange(imageUrl);
-    } catch (error) {
+      console.log('📸 Uploading avatar to Supabase Storage...');
+      
+      // Upload file to Supabase storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('profile-photos')
+        .upload(fileName, file, {
+          upsert: true,
+          contentType: file.type
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data } = supabase.storage
+        .from('profile-photos')
+        .getPublicUrl(fileName);
+
+      console.log('✅ Avatar uploaded successfully:', data.publicUrl);
+      
+      onPhotoChange(data.publicUrl);
+      
+      toast({
+        title: "Photo uploadée",
+        description: "Votre photo a été enregistrée avec succès",
+      });
+    } catch (error: any) {
       console.error('Erreur upload:', error);
-      alert('Erreur lors de l\'upload. Veuillez réessayer.');
+      toast({
+        title: "Erreur d'upload",
+        description: error.message || "Erreur lors de l'upload. Veuillez réessayer.",
+        variant: "destructive"
+      });
     } finally {
       setIsUploading(false);
     }
