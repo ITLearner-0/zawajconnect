@@ -4,7 +4,7 @@
 
 **Date:** [Current Date]  
 **Account ID:** acct_1RaFbcKwsHyCjkzy  
-**Company:** ZawajConnect (Mariage-Halal)
+**Company:** ZawajConnect
 
 ---
 
@@ -91,19 +91,19 @@ This distinction is fundamental and we wish to provide you with the detailed inf
 ### B) Public Legal Documents
 All our documents are publicly available on our site:
 
-1. **Terms of Service**: https://mariage-halal.lovable.app/terms
+1. **Terms of Service**: https://dgfctwtivkqcfhwqgkya.supabase.co/terms
    - Explicit mentions: "matrimonial platform", "marriage objective"
    - Clear prohibitions of casual dating
 
-2. **Privacy Policy**: https://mariage-halal.lovable.app/privacy
+2. **Privacy Policy**: https://dgfctwtivkqcfhwqgkya.supabase.co/privacy
    - Protection of family data
    - Transparency on guardian involvement
 
-3. **Refund Policy**: https://mariage-halal.lovable.app/refund
+3. **Refund Policy**: https://dgfctwtivkqcfhwqgkya.supabase.co/refund
    - 7-day "Satisfaction Guarantee"
    - Compliance with European withdrawal rights
 
-4. **Community Guidelines**: https://mariage-halal.lovable.app/community-guidelines
+4. **Community Guidelines**: https://dgfctwtivkqcfhwqgkya.supabase.co/community-guidelines
    - Strict Islamic behavior rules
    - Sanctions for violations
 
@@ -210,7 +210,7 @@ Our audience is seeking:
 ## 9. CUSTOMER SUPPORT AND DISPUTE MANAGEMENT
 
 ### Multi-Channel Support
-- Email: support@mariage-halal.lovable.app
+- Email: support@zawajconnect.me
 - Live chat (Premium/VIP)
 - Comprehensive online FAQ
 - Response time: < 24h
@@ -263,8 +263,8 @@ Our audience is seeking:
 
 **For any questions or additional clarification:**
 
-- **Main Website**: https://mariage-halal.lovable.app
-- **Email**: contact@mariage-halal.lovable.app
+- **Main Website**: https://dgfctwtivkqcfhwqgkya.supabase.co
+- **Email**: contact@zawajconnect.me
 - **Documentation**: All legal documents are publicly accessible
 - **Availability**: We are available for a call or video conference
 
@@ -276,7 +276,7 @@ Our audience is seeking:
 
 ## CONCLUSION
 
-ZawajConnect (Mariage-Halal) is a **Muslim matrimonial platform** with mandatory family supervision, strict moderation, and an exclusive marriage objective. We are **not a dating/casual dating service**.
+ZawajConnect is a **Muslim matrimonial platform** with mandatory family supervision, strict moderation, and an exclusive marriage objective. We are **not a dating/casual dating service**.
 
 We comply with all European regulations and are comparable to Muslim matrimonial platforms already accepted by Stripe (Muzz, SingleMuslim, Salams).
 
@@ -289,8 +289,7 @@ Looking forward to your favorable response,
 Sincerely,
 
 **The ZawajConnect Team**  
-Mariage-Halal  
-https://mariage-halal.lovable.app
+https://dgfctwtivkqcfhwqgkya.supabase.co
 
 ---
 

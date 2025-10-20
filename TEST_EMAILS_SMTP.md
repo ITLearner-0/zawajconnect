@@ -111,7 +111,7 @@ LIMIT 10;
    - `SMTP_USER`: contact@zawajconnect.me
    - `SMTP_PASSWORD`: [votre mot de passe]
    - `SMTP_FROM_EMAIL`: contact@zawajconnect.me
-   - `SMTP_FROM_NAME`: Mariage-Halal
+   - `SMTP_FROM_NAME`: Zawaj-Connect
 
 ### Problème 2: "Authentication failed"
 
@@ -190,7 +190,7 @@ Une fois les tests réussis:
 ## 📧 Contenu des Emails de Test
 
 ### Email de Bienvenue
-- **Subject**: Bienvenue sur Mariage-Halal ! 🌙
+- **Subject**: Bienvenue sur Zawaj-Connect ! 🌙
 - **Content**: Message de bienvenue + CTA "Compléter mon profil"
 - **Design**: Header violet gradient + sections claires
 

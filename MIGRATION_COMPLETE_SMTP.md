@@ -32,7 +32,7 @@
 **Serveur:** `smtp.hostinger.com`  
 **Port:** `465` (SSL)  
 **Utilisateur:** `contact@zawajconnect.me`  
-**Nom d'expéditeur:** `Mariage-Halal`
+**Nom d'expéditeur:** `Zawaj-Connect`
 
 ### Variables d'environnement configurées
 
@@ -44,7 +44,7 @@ SMTP_PORT=465
 SMTP_USER=contact@zawajconnect.me
 SMTP_PASSWORD=votre_mot_de_passe
 SMTP_FROM_EMAIL=contact@zawajconnect.me
-SMTP_FROM_NAME=Mariage-Halal
+SMTP_FROM_NAME=Zawaj-Connect
 ```
 
 ---

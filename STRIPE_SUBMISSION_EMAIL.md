@@ -4,17 +4,17 @@
 
 **À :** support@stripe.com  
 **CC :** partnerships@stripe.com  
-**Objet :** Demande d'activation des paiements - Mariage-Halal (Plateforme matrimoniale halal)
+**Objet :** Demande d'activation des paiements - Zawaj-Connect (Plateforme matrimoniale halal)
 
 ---
 
 Bonjour l'équipe Stripe,
 
-Je me permets de vous contacter concernant l'activation des paiements pour notre plateforme **Mariage-Halal**, une application de rencontres matrimoniales respectueuse des valeurs islamiques.
+Je me permets de vous contacter concernant l'activation des paiements pour notre plateforme **Zawaj-Connect**, une application de rencontres matrimoniales respectueuse des valeurs islamiques.
 
 ## 📋 Informations sur l'entreprise
 
-- **Nom commercial :** Mariage-Halal
+- **Nom commercial :** Zawaj-Connect
 - **Responsable :** Anthelme KAWA
 - **Site web :** [URL de votre site]
 - **Type d'entreprise :** SAS (Société par Actions Simplifiée)
@@ -23,7 +23,7 @@ Je me permets de vous contacter concernant l'activation des paiements pour notre
 
 ## 🎯 Description du service
 
-Mariage-Halal est une plateforme de rencontres sérieuses destinée à la communauté musulmane francophone. Notre service facilite les rencontres matrimoniales dans le respect des valeurs islamiques et des traditions familiales.
+Zawaj-Connect est une plateforme de rencontres sérieuses destinée à la communauté musulmane francophone. Notre service facilite les rencontres matrimoniales dans le respect des valeurs islamiques et des traditions familiales.
 
 ### Caractéristiques principales :
 - Vérification d'identité obligatoire
@@ -105,7 +105,7 @@ Notre plateforme intègre plusieurs mécanismes anti-fraude :
 Je reste à votre entière disposition pour toute information complémentaire ou clarification nécessaire. Je peux organiser un appel ou une visioconférence selon votre convenance.
 
 **Coordonnées :**
-- **E-mail :** [votre-email@mariage-halal.fr]
+- **E-mail :** [votre-email@zawajconnect.me]
 - **Téléphone :** [votre numéro]
 - **Disponibilité :** Lundi-Vendredi, 9h-18h CET
 
@@ -125,15 +125,15 @@ Nous nous engageons à respecter l'ensemble des conditions d'utilisation de Stri
 Dans l'attente de votre retour, je vous prie d'agréer, Madame, Monsieur, l'expression de mes salutations distinguées.
 
 **Anthelme KAWA**  
-Fondateur & CEO - Mariage-Halal  
-[votre-email@mariage-halal.fr]  
+Fondateur & CEO - Zawaj-Connect  
+[votre-email@zawajconnect.me]
 [Date]
 
 ---
 
 ## 📎 Pièces jointes :
 1. STRIPE_SUBMISSION_DOCUMENT.md (document complet)
-2. CGU_Mariage-Halal.pdf
+2. CGU_Zawaj-Connect.pdf
 3. Politique_Confidentialite.pdf
 4. Politique_Remboursement.pdf
 5. Extrait Kbis (si disponible)

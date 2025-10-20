@@ -109,7 +109,7 @@ Observation intéressante: **aucune plateforme ne divulgue publiquement son proc
 
 ---
 
-## 🎯 Recommandations pour Mariage-Halal
+## 🎯 Recommandations pour Zawaj-Connect
 
 ### Option 1: Approche Mobile (Comme Muzz)
 **Développer une application mobile** avec paiements in-app:

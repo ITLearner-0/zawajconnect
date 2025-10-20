@@ -1,7 +1,7 @@
 # Stripe Appeal - Brief Version (Under 5000 Characters)
 
 **Account ID:** acct_1RaFbcKwsHyCjkzy  
-**Company:** ZawajConnect (Mariage-Halal)
+**Company:** ZawajConnect
 
 ---
 
@@ -71,19 +71,19 @@ Similar Muslim matrimonial services using Stripe:
 
 All legal documents publicly available:
 
-1. **Terms of Service**: https://mariage-halal.lovable.app/terms
+1. **Terms of Service**: https://dgfctwtivkqcfhwqgkya.supabase.co/terms
    - Explicit "matrimonial platform" designation
    - Clear prohibition of casual dating
 
-2. **Privacy Policy**: https://mariage-halal.lovable.app/privacy
+2. **Privacy Policy**: https://dgfctwtivkqcfhwqgkya.supabase.co/privacy
    - Family data protection
    - Guardian involvement transparency
 
-3. **Refund Policy**: https://mariage-halal.lovable.app/refund
+3. **Refund Policy**: https://dgfctwtivkqcfhwqgkya.supabase.co/refund
    - 7-day satisfaction guarantee
    - EU withdrawal rights compliance
 
-4. **Community Guidelines**: https://mariage-halal.lovable.app/community-guidelines
+4. **Community Guidelines**: https://dgfctwtivkqcfhwqgkya.supabase.co/community-guidelines
    - Strict Islamic behavior rules
    - Violation sanctions
 
@@ -139,14 +139,13 @@ We believe this account closure is based on miscategorization. We are NOT a dati
 
 ### CONTACT
 
-- **Website**: https://mariage-halal.lovable.app
-- **Email**: contact@mariage-halal.lovable.app
+- **Website**: https://dgfctwtivkqcfhwqgkya.supabase.co
+- **Email**: contact@zawajconnect.me
 - **Available for**: Call, video conference, or platform demonstration
 
 Thank you for your consideration.
 
-**The ZawajConnect Team**  
-Mariage-Halal
+**The ZawajConnect Team**
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Ce guide explique comment utiliser le système d'envoi d'e-mails automatiques de Mariage-Halal, basé sur **Resend**.
+Ce guide explique comment utiliser le système d'envoi d'e-mails automatiques de Zawaj-Connect, basé sur **Resend**.
 
 ---
 
@@ -416,4 +416,4 @@ await supabase.functions.invoke('mon-nouvel-email', {
 ---
 
 **Dernière mise à jour :** 2025-01-05  
-**Auteur :** Équipe Mariage-Halal
+**Auteur :** Équipe Zawaj-Connect

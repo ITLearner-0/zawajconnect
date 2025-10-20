@@ -14,7 +14,7 @@ SMTP_PORT=465
 SMTP_USER=votre-email@votre-domaine.com
 SMTP_PASSWORD=votre-mot-de-passe-email
 SMTP_FROM_EMAIL=noreply@votre-domaine.com
-SMTP_FROM_NAME=Mariage-Halal
+SMTP_FROM_NAME=Zawaj-Connect
 ```
 
 ### Détails pour Hostinger
@@ -27,7 +27,7 @@ SMTP_FROM_NAME=Mariage-Halal
 - **SMTP_USER**: Votre adresse email complète (ex: `contact@votre-domaine.com`)
 - **SMTP_PASSWORD**: Le mot de passe de votre compte email
 - **SMTP_FROM_EMAIL**: L'adresse d'expédition (ex: `noreply@votre-domaine.com`)
-- **SMTP_FROM_NAME**: Le nom affiché comme expéditeur (ex: `Mariage-Halal`)
+- **SMTP_FROM_NAME**: Le nom affiché comme expéditeur (ex: `Zawaj-Connect`)
 
 ## 🔒 Sécurité
 

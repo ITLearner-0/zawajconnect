@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Ce guide complet explique comment configurer tous les Cron Jobs nécessaires pour les emails automatiques de Mariage-Halal.
+Ce guide complet explique comment configurer tous les Cron Jobs nécessaires pour les emails automatiques de Zawaj-Connect.
 
 **Prérequis :**
 - Extensions `pg_cron` et `pg_net` activées dans Supabase
@@ -774,4 +774,4 @@ SELECT * FROM cron.job ORDER BY jobid;
 ---
 
 **Dernière mise à jour :** 2025-01-05  
-**Auteur :** Équipe Mariage-Halal
+**Auteur :** Équipe Zawaj-Connect
