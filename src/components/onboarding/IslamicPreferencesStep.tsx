@@ -76,6 +76,8 @@ const IslamicPreferencesStep = ({
     { value: "maliki", label: "Maliki" },
     { value: "shafii", label: "Chafi'i" },
     { value: "hanbali", label: "Hanbali" },
+    { value: "jafari", label: "Jafari (Chiite)" },
+    { value: "salafi", label: "Salafi" },
     { value: "other", label: "Autre" },
     { value: "none", label: "Aucune préférence" }
   ];
