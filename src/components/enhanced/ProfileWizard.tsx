@@ -560,10 +560,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="always">Toujours</SelectItem>
-                <SelectItem value="usually">Habituellement</SelectItem>
+                <SelectItem value="most_times">La plupart du temps</SelectItem>
                 <SelectItem value="sometimes">Parfois</SelectItem>
-                <SelectItem value="planning_to">Prévoit de le porter</SelectItem>
                 <SelectItem value="never">Jamais</SelectItem>
+                <SelectItem value="prefer_not_to_say">Préfère ne pas dire</SelectItem>
               </SelectContent>
             </Select>
           </div>
