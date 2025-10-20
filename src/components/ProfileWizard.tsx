@@ -365,10 +365,11 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
                   <SelectValue placeholder="Sélectionner" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="toujours">Toujours (5 fois par jour)</SelectItem>
-                  <SelectItem value="souvent">Souvent</SelectItem>
-                  <SelectItem value="parfois">Parfois</SelectItem>
-                  <SelectItem value="rarement">Rarement</SelectItem>
+                  <SelectItem value="5_times_daily">Toujours (5 fois par jour)</SelectItem>
+                  <SelectItem value="often">Souvent</SelectItem>
+                  <SelectItem value="sometimes">Parfois</SelectItem>
+                  <SelectItem value="rarely">Rarement</SelectItem>
+                  <SelectItem value="never">Jamais</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -379,10 +380,10 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
                   <SelectValue placeholder="Sélectionner" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="très_importante">Très importante</SelectItem>
-                  <SelectItem value="importante">Importante</SelectItem>
-                  <SelectItem value="modérément_importante">Modérément importante</SelectItem>
-                  <SelectItem value="peu_importante">Peu importante</SelectItem>
+                  <SelectItem value="very_important">Très importante</SelectItem>
+                  <SelectItem value="important">Importante</SelectItem>
+                  <SelectItem value="somewhat_important">Modérément importante</SelectItem>
+                  <SelectItem value="not_important">Peu importante</SelectItem>
                 </SelectContent>
               </Select>
             </div>

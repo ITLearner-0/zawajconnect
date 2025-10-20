@@ -101,17 +101,18 @@ export const useProfileSave = () => {
         throw profileError;
       }
 
-    // Validate Islamic preferences before saving - comprehensive validation
+    // Validate Islamic preferences before saving - matches database constraints exactly
     const validateIslamicPrefs = (prefs: any) => {
-      const validSects = ['sunni', 'shia', 'other', 'prefer_not_say'];
-      const validPrayerFreqs = ['five_times', 'regularly', 'sometimes', 'rarely', 'never'];
-      const validImportance = ['very_important', 'important', 'somewhat', 'not_very'];
-      const validQuranReading = ['daily', 'weekly', 'monthly', 'occasionally', 'rarely'];
-      const validHijab = ['always', 'sometimes', 'planning_to', 'never'];
-      const validBeard = ['full_beard', 'trimmed_beard', 'goatee', 'mustache_only', 'clean_shaven', 'beardless', 'not_applicable'];
-      const validMadhab = ['hanafi', 'maliki', 'shafi', 'hanbali', 'other', 'none'];
-      const validSmoking = ['never', 'socially', 'regularly'];
-      const validDesiredPartnerSect = ['any', 'sunni', 'shia', 'same_sect'];
+      // These values MUST match the CHECK constraints in the database
+      const validSects = ['sunni', 'shia', 'other', 'prefer_not_to_say'];
+      const validPrayerFreqs = ['5_times_daily', 'often', 'sometimes', 'fridays_only', 'occasionally', 'rarely', 'never'];
+      const validImportance = ['very_important', 'important', 'somewhat_important', 'not_important', 'extremely_important'];
+      const validQuranReading = ['daily', 'weekly', 'monthly', 'occasionally', 'rarely', 'learning'];
+      const validHijab = ['always', 'most_times', 'sometimes', 'never', 'not_applicable', 'yes', 'no', 'prefer_not_to_say'];
+      const validBeard = ['full_beard', 'trimmed_beard', 'goatee', 'mustache_only', 'clean_shaven', 'not_applicable', 'yes', 'no', 'sometimes', 'prefer_not_to_say'];
+      const validMadhab = ['hanafi', 'maliki', 'shafii', 'hanbali', 'jafari', 'other', 'none', 'prefer_not_to_say'];
+      const validSmoking = ['never', 'occasionally', 'regularly', 'trying_to_quit'];
+      const validDesiredPartnerSect = ['same_sect', 'sunni', 'shia', 'any', 'other', 'open_discussion'];
       
       return {
         prayer_frequency: validPrayerFreqs.includes(prefs.prayer_frequency) ? prefs.prayer_frequency : null,

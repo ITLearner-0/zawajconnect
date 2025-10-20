@@ -49,8 +49,8 @@ const IslamicPreferencesStep = ({
   };
 
   const prayerOptions = [
-    { value: "five_times", label: "5 fois par jour", icon: "🕌" },
-    { value: "regularly", label: "Régulièrement", icon: "🤲" },
+    { value: "5_times_daily", label: "5 fois par jour", icon: "🕌" },
+    { value: "often", label: "Régulièrement", icon: "🤲" },
     { value: "sometimes", label: "Parfois", icon: "⭐" },
     { value: "rarely", label: "Rarement", icon: "🌙" },
     { value: "never", label: "Jamais", icon: "❌" }
@@ -68,13 +68,13 @@ const IslamicPreferencesStep = ({
     { value: "sunni", label: "Sunnite" },
     { value: "shia", label: "Chiite" },
     { value: "other", label: "Autre" },
-    { value: "prefer_not_say", label: "Préfère ne pas dire" }
+    { value: "prefer_not_to_say", label: "Préfère ne pas dire" }
   ];
 
   const madhabOptions = [
     { value: "hanafi", label: "Hanafi" },
     { value: "maliki", label: "Maliki" },
-    { value: "shafi", label: "Chafi'i" },
+    { value: "shafii", label: "Chafi'i" },
     { value: "hanbali", label: "Hanbali" },
     { value: "other", label: "Autre" },
     { value: "none", label: "Aucune préférence" }
@@ -83,13 +83,13 @@ const IslamicPreferencesStep = ({
   const importanceOptions = [
     { value: "very_important", label: "Très important", color: "bg-emerald" },
     { value: "important", label: "Important", color: "bg-blue-500" },
-    { value: "somewhat", label: "Assez important", color: "bg-gold" },
-    { value: "not_very", label: "Peu important", color: "bg-orange-500" }
+    { value: "somewhat_important", label: "Assez important", color: "bg-gold" },
+    { value: "not_important", label: "Peu important", color: "bg-orange-500" }
   ];
 
   const smokingOptions = [
     { value: "never", label: "Jamais", color: "bg-emerald" },
-    { value: "socially", label: "Socialement", color: "bg-gold" },
+    { value: "occasionally", label: "Socialement", color: "bg-gold" },
     { value: "regularly", label: "Régulièrement", color: "bg-orange-500" }
   ];
 

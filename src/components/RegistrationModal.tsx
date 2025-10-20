@@ -253,8 +253,8 @@ const RegistrationModal = ({ isOpen, onClose }: RegistrationModalProps) => {
               <SelectValue placeholder="Choisissez une option" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="5-times">5 fois par jour</SelectItem>
-              <SelectItem value="regularly">Régulièrement</SelectItem>
+              <SelectItem value="5_times_daily">5 fois par jour</SelectItem>
+              <SelectItem value="often">Régulièrement</SelectItem>
               <SelectItem value="sometimes">Parfois</SelectItem>
               <SelectItem value="learning">J'apprends</SelectItem>
             </SelectContent>
