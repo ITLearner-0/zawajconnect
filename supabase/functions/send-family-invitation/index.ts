@@ -121,11 +121,11 @@ const handler = async (req: Request): Promise<Response> => {
     try {
       await sendEmail({
         to: email,
-        subject: "🕌 Invitation Wali - NikahConnect",
+        subject: "🕌 Invitation Wali - Zawaj-Connect",
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #16a34a; font-size: 28px; margin: 0;">🕌 NikahConnect</h1>
+              <h1 style="color: #16a34a; font-size: 28px; margin: 0;">🕌 Zawaj-Connect</h1>
               <p style="color: #666; margin: 5px 0;">Plateforme matrimoniale islamique avec supervision familiale</p>
             </div>
             
