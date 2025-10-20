@@ -127,7 +127,7 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
 
               <div style="text-align: center; margin: 30px 0;">
-                <a href="https://mariage-halal.com/profile" style="display: inline-block; background: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">
+                <a href="https://dgfctwtivkqcfhwqgkya.supabase.co/profile" style="display: inline-block; background: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">
                   Compléter mon profil
                 </a>
               </div>
@@ -140,7 +140,7 @@ const handler = async (req: Request): Promise<Response> => {
             <!-- Footer -->
             <div style="background: #F7FAFC; padding: 30px; text-align: center; border-top: 1px solid #E2E8F0;">
               <p style="color: #718096; font-size: 13px; margin: 0 0 10px 0;">
-                © 2025 Mariage-Halal. Tous droits réservés.
+                © 2025 Zawaj-Connect. Tous droits réservés.
               </p>
             </div>
           </div>

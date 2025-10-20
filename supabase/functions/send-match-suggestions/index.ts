@@ -82,7 +82,7 @@ const handler = async (req: Request): Promise<Response> => {
           </p>
         </div>
         
-        <a href="https://mariage-halal.com/profile/${suggestion.profile_id}" style="display: inline-block; color: #7C3AED; text-decoration: none; font-weight: 600; font-size: 14px;">
+        <a href="https://dgfctwtivkqcfhwqgkya.supabase.co/profile/${suggestion.profile_id}" style="display: inline-block; color: #7C3AED; text-decoration: none; font-weight: 600; font-size: 14px;">
           Voir le profil →
         </a>
       </div>
@@ -136,14 +136,14 @@ const handler = async (req: Request): Promise<Response> => {
                 <p style="color: #4A5568; font-size: 15px; margin: 0 0 10px 0;">
                   <strong style="color: #7C3AED;">+${suggestions.length - 3} autres profils</strong> vous attendent
                 </p>
-                <a href="https://mariage-halal.com/matches" style="color: #7C3AED; text-decoration: none; font-weight: 600; font-size: 14px;">
+                <a href="https://dgfctwtivkqcfhwqgkya.supabase.co/matches" style="color: #7C3AED; text-decoration: none; font-weight: 600; font-size: 14px;">
                   Voir tous les profils →
                 </a>
               </div>
               ` : ''}
 
               <div style="text-align: center; margin: 30px 0;">
-                <a href="https://mariage-halal.com/matches" style="display: inline-block; background: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">
+                <a href="https://dgfctwtivkqcfhwqgkya.supabase.co/matches" style="display: inline-block; background: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">
                   Découvrir les profils
                 </a>
               </div>
@@ -161,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
             <!-- Footer -->
             <div style="background: white; padding: 30px; text-align: center; border-top: 1px solid #E2E8F0;">
               <p style="color: #718096; font-size: 13px; margin: 0 0 10px 0;">
-                © 2025 Mariage-Halal. Tous droits réservés.
+                © 2025 Zawaj-Connect. Tous droits réservés.
               </p>
               <p style="color: #A0AEC0; font-size: 12px; margin: 0;">
                 Ces suggestions sont basées sur vos préférences et votre profil.

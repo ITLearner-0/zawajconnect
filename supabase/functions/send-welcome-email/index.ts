@@ -34,14 +34,14 @@ const handler = async (req: Request): Promise<Response> => {
 
     await sendEmail({
       to: email,
-      subject: "Bienvenue sur Mariage-Halal ! 🌙",
+      subject: "Bienvenue sur Zawaj-Connect ! 🌙",
       html: `
         <!DOCTYPE html>
         <html>
         <head>
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Bienvenue sur Mariage-Halal</title>
+          <title>Bienvenue sur Zawaj-Connect</title>
         </head>
         <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
           <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 0;">
@@ -51,7 +51,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <!-- Header -->
                   <tr>
                     <td style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center; border-radius: 12px 12px 0 0;">
-                      <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: bold;">🌙 Mariage-Halal</h1>
+                      <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: bold;">🌙 Zawaj-Connect</h1>
                       <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 16px; opacity: 0.9;">Votre parcours commence ici</p>
                     </td>
                   </tr>
@@ -62,7 +62,7 @@ const handler = async (req: Request): Promise<Response> => {
                       <h2 style="color: #333333; margin: 0 0 20px 0; font-size: 24px;">Bienvenue ${fullName} ! 👋</h2>
                       
                       <p style="color: #666666; line-height: 1.6; margin: 0 0 20px 0;">
-                        Nous sommes ravis de vous accueillir sur Mariage-Halal, la plateforme de rencontres matrimoniales respectueuse des valeurs islamiques.
+                        Nous sommes ravis de vous accueillir sur Zawaj-Connect, la plateforme de rencontres matrimoniales respectueuse des valeurs islamiques.
                       </p>
                       
                       <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 30px 0; border-radius: 4px;">
@@ -94,7 +94,7 @@ const handler = async (req: Request): Promise<Response> => {
                       
                       <p style="color: #666666; line-height: 1.6; margin: 20px 0 0 0;">
                         Qu'Allah facilite votre recherche,<br>
-                        <strong>L'équipe Mariage-Halal</strong>
+                        <strong>L'équipe Zawaj-Connect</strong>
                       </p>
                     </td>
                   </tr>
@@ -103,7 +103,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <tr>
                     <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-radius: 0 0 12px 12px; border-top: 1px solid #e9ecef;">
                       <p style="color: #999999; font-size: 12px; margin: 0 0 10px 0;">
-                        © 2025 Mariage-Halal. Tous droits réservés.
+                        © 2025 Zawaj-Connect. Tous droits réservés.
                       </p>
                       <p style="color: #999999; font-size: 12px; margin: 0;">
                         <a href="${Deno.env.get("SUPABASE_URL")}/privacy-policy" style="color: #667eea; text-decoration: none;">Politique de confidentialité</a> | 

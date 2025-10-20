@@ -18,7 +18,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
   const smtpUser = Deno.env.get("SMTP_USER");
   const smtpPassword = Deno.env.get("SMTP_PASSWORD");
   const smtpFromEmail = Deno.env.get("SMTP_FROM_EMAIL");
-  const smtpFromName = Deno.env.get("SMTP_FROM_NAME") || "Mariage-Halal";
+  const smtpFromName = Deno.env.get("SMTP_FROM_NAME") || "Zawaj-Connect";
 
   // Log configuration (without sensitive data)
   console.log("SMTP Configuration check:", {

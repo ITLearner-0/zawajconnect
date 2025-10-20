@@ -71,7 +71,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     await sendEmail({
       to: userEmail,
-      subject: `💡 Conseils de la semaine #${week_number} - Mariage-Halal`,
+      subject: `💡 Conseils de la semaine #${week_number} - Zawaj-Connect`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -113,7 +113,7 @@ const handler = async (req: Request): Promise<Response> => {
               </div>
 
               <div style="text-align: center; margin: 30px 0;">
-                <a href="https://mariage-halal.com/guidance" style="display: inline-block; background: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">
+                <a href="https://dgfctwtivkqcfhwqgkya.supabase.co/guidance" style="display: inline-block; background: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">
                   Plus de conseils
                 </a>
               </div>
@@ -122,10 +122,10 @@ const handler = async (req: Request): Promise<Response> => {
             <!-- Footer -->
             <div style="background: white; padding: 30px; text-align: center; border-top: 1px solid #E2E8F0;">
               <p style="color: #718096; font-size: 13px; margin: 0 0 10px 0;">
-                © 2025 Mariage-Halal. Tous droits réservés.
+                © 2025 Zawaj-Connect. Tous droits réservés.
               </p>
               <p style="color: #A0AEC0; font-size: 12px; margin: 0;">
-                Vous recevez cet email car vous êtes inscrit sur Mariage-Halal.
+                Vous recevez cet email car vous êtes inscrit sur Zawaj-Connect.
               </p>
             </div>
           </div>

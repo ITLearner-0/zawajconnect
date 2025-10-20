@@ -82,7 +82,7 @@ const handler = async (req: Request): Promise<Response> => {
                       
                       <p style="color: #666666; line-height: 1.6; margin: 20px 0 0 0; font-size: 14px;">
                         Qu'Allah bénisse cette connexion et facilite votre parcours,<br>
-                        <strong>L'équipe Mariage-Halal</strong>
+                        <strong>L'équipe Zawaj-Connect</strong>
                       </p>
                     </td>
                   </tr>
@@ -91,7 +91,7 @@ const handler = async (req: Request): Promise<Response> => {
                   <tr>
                     <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-radius: 0 0 12px 12px; border-top: 1px solid #e9ecef;">
                       <p style="color: #999999; font-size: 12px; margin: 0 0 10px 0;">
-                        © 2025 Mariage-Halal. Tous droits réservés.
+                        © 2025 Zawaj-Connect. Tous droits réservés.
                       </p>
                       <p style="color: #999999; font-size: 12px; margin: 0;">
                         <a href="${Deno.env.get("SUPABASE_URL")}/settings" style="color: #10b981; text-decoration: none;">Gérer mes notifications</a>
