@@ -67,8 +67,6 @@ const Family = () => {
   const [newMember, setNewMember] = useState({
     full_name: '',
     relationship: '',
-    email: '',
-    phone: '',
     is_wali: false,
     can_communicate: false,
     can_view_profile: false
@@ -160,7 +158,12 @@ const Family = () => {
         .from('family_members')
         .insert({
           user_id: user.id,
-          ...newMember
+          full_name: newMember.full_name,
+          relationship: newMember.relationship,
+          is_wali: newMember.is_wali,
+          can_communicate: newMember.can_communicate,
+          can_view_profile: newMember.can_view_profile,
+          invitation_status: 'pending'
         })
         .select()
         .maybeSingle();
@@ -171,8 +174,6 @@ const Family = () => {
       setNewMember({
         full_name: '',
         relationship: '',
-        email: '',
-        phone: '',
         is_wali: false,
         can_communicate: false,
         can_view_profile: false
@@ -388,26 +389,10 @@ const Family = () => {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="email">Email</Label>
-                          <Input
-                            id="email"
-                            type="email"
-                            value={newMember.email}
-                            onChange={(e) => setNewMember(prev => ({ ...prev, email: e.target.value }))}
-                            placeholder="email@exemple.com"
-                          />
-                        </div>
-                        <div>
-                          <Label htmlFor="phone">Téléphone</Label>
-                          <Input
-                            id="phone"
-                            value={newMember.phone}
-                            onChange={(e) => setNewMember(prev => ({ ...prev, phone: e.target.value }))}
-                            placeholder="+33 6 12 34 56 78"
-                          />
-                        </div>
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                        <p className="text-sm text-amber-700">
+                          💡 <strong>Astuce:</strong> Utilisez l'onglet "Membres famille" puis "Inviter un membre" pour envoyer une invitation par email avec accès complet.
+                        </p>
                       </div>
 
                       <div className="space-y-3">
