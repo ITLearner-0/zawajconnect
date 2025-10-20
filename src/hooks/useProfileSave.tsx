@@ -114,7 +114,10 @@ export const useProfileSave = () => {
       const validSmoking = ['never', 'occasionally', 'regularly', 'trying_to_quit'];
       const validDesiredPartnerSect = ['same_sect', 'sunni', 'shia', 'any', 'other', 'open_discussion'];
       
-      return {
+      // Log validation for debugging
+      console.log('Validating Islamic preferences:', prefs);
+      
+      const validated = {
         prayer_frequency: validPrayerFreqs.includes(prefs.prayer_frequency) ? prefs.prayer_frequency : null,
         quran_reading: validQuranReading.includes(prefs.quran_reading) ? prefs.quran_reading : null,
         hijab_preference: validHijab.includes(prefs.hijab_preference) ? prefs.hijab_preference : null,
@@ -126,6 +129,9 @@ export const useProfileSave = () => {
         desired_partner_sect: validDesiredPartnerSect.includes(prefs.desired_partner_sect) ? prefs.desired_partner_sect : null,
         importance_of_religion: validImportance.includes(prefs.importance_of_religion) ? prefs.importance_of_religion : null,
       };
+      
+      console.log('Validated Islamic preferences:', validated);
+      return validated;
     };
 
     const validatedPrefs = validateIslamicPrefs(islamicPrefs);
@@ -152,23 +158,19 @@ export const useProfileSave = () => {
 
       if (prefsError) {
         console.error('Islamic preferences save error:', prefsError);
-        // Try to save with fallback values if validation fails
-        const fallbackPrefs = {
-          ...cleanIslamicPrefs,
-          desired_partner_sect: null,
-          prayer_frequency: null,
-          importance_of_religion: null
-        };
+        console.error('Error details:', {
+          message: prefsError.message,
+          details: prefsError.details,
+          hint: prefsError.hint,
+          code: prefsError.code
+        });
         
-        const { error: fallbackError } = await supabase
-          .from('islamic_preferences')
-          .upsert(fallbackPrefs);
-          
-        if (fallbackError) {
-          throw new Error(`Erreur lors de la sauvegarde des préférences islamiques: ${prefsError.message}`);
-        }
+        // Show user-friendly error message
+        const errorMessage = prefsError.message.includes('check constraint')
+          ? 'Certaines préférences islamiques contiennent des valeurs invalides. Veuillez vérifier vos sélections.'
+          : `Erreur lors de la sauvegarde des préférences islamiques: ${prefsError.message}`;
         
-        console.log('⚠️ Islamic preferences saved with fallback values');
+        throw new Error(errorMessage);
       }
 
       console.log('✅ Profile and Islamic preferences saved successfully');

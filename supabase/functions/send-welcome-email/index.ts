@@ -37,9 +37,10 @@ const handler = async (req: Request): Promise<Response> => {
       subject: "Bienvenue sur Zawaj-Connect ! 🌙",
       html: `
         <!DOCTYPE html>
-        <html>
+        <html lang="fr">
         <head>
-          <meta charset="utf-8">
+          <meta charset="UTF-8">
+          <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>Bienvenue sur Zawaj-Connect</title>
         </head>

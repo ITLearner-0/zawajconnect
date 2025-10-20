@@ -76,6 +76,7 @@ export async function sendEmail(options: EmailOptions): Promise<void> {
       to: options.to,
       subject: options.subject,
       html: options.html,
+      contentType: "text/html; charset=utf-8",
     });
 
     console.log(`Email sent successfully to ${options.to}`);
