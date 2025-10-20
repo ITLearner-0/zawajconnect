@@ -491,9 +491,11 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
               <SelectValue placeholder="Sélectionnez la fréquence" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="always">Toujours (5 fois par jour)</SelectItem>
-              <SelectItem value="usually">Habituellement</SelectItem>
+              <SelectItem value="5_times_daily">Toujours (5 fois par jour)</SelectItem>
+              <SelectItem value="often">Souvent</SelectItem>
               <SelectItem value="sometimes">Parfois</SelectItem>
+              <SelectItem value="fridays_only">Vendredis seulement</SelectItem>
+              <SelectItem value="occasionally">Occasionnellement</SelectItem>
               <SelectItem value="rarely">Rarement</SelectItem>
               <SelectItem value="never">Jamais</SelectItem>
             </SelectContent>
@@ -515,6 +517,7 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
               <SelectItem value="monthly">Mensuel</SelectItem>
               <SelectItem value="occasionally">Occasionnellement</SelectItem>
               <SelectItem value="rarely">Rarement</SelectItem>
+              <SelectItem value="learning">En apprentissage</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -529,7 +532,8 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
               <SelectItem value="very_important">Très importante</SelectItem>
               <SelectItem value="important">Importante</SelectItem>
               <SelectItem value="somewhat_important">Assez importante</SelectItem>
-              <SelectItem value="not_very_important">Peu importante</SelectItem>
+              <SelectItem value="not_important">Peu importante</SelectItem>
+              <SelectItem value="extremely_important">Extrêmement importante</SelectItem>
             </SelectContent>
           </Select>
           {validationErrors.importance_of_religion && (

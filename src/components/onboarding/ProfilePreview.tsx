@@ -71,26 +71,33 @@ const ProfilePreview = ({ profileData, islamicPrefs, completionPercentage }: Pro
     const labels: { [key: string]: { [value: string]: string } } = {
       prayer_frequency: {
         '5_times_daily': '5x/jour',
+        'often': 'Souvent',
         'sometimes': 'Parfois',
         'fridays_only': 'Vendredi',
-        'occasionally': 'Occasionnel'
+        'occasionally': 'Occasionnel',
+        'rarely': 'Rarement',
+        'never': 'Jamais'
       },
       quran_reading: {
         'daily': 'Quotidien',
         'weekly': 'Hebdo',
+        'monthly': 'Mensuel',
         'occasionally': 'Occasionnel',
-        'rarely': 'Rare'
+        'rarely': 'Rare',
+        'learning': 'Apprentissage'
       },
       sect: {
         'sunni': 'Sunnite',
         'shia': 'Chiite',
-        'other': 'Autre'
+        'other': 'Autre',
+        'prefer_not_to_say': 'Non précisé'
       },
       importance_of_religion: {
         'very_important': 'Très important',
         'important': 'Important',
         'somewhat_important': 'Assez important',
-        'not_very_important': 'Peu important'
+        'not_important': 'Peu important',
+        'extremely_important': 'Extrêmement important'
       }
     };
     return labels[key]?.[value] || value;

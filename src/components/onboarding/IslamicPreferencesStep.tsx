@@ -268,9 +268,10 @@ const IslamicPreferencesStep = ({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="always">Toujours</SelectItem>
+                  <SelectItem value="most_times">La plupart du temps</SelectItem>
                   <SelectItem value="sometimes">Parfois</SelectItem>
-                  <SelectItem value="planning_to">Prévoit de le porter</SelectItem>
                   <SelectItem value="never">Ne porte pas</SelectItem>
+                  <SelectItem value="not_applicable">Non applicable</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -292,7 +293,6 @@ const IslamicPreferencesStep = ({
                 <SelectItem value="goatee">Bouc</SelectItem>
                 <SelectItem value="mustache_only">Moustache seulement</SelectItem>
                 <SelectItem value="clean_shaven">Rasé de près</SelectItem>
-                <SelectItem value="beardless">Imberbe</SelectItem>
                 <SelectItem value="not_applicable">Non applicable</SelectItem>
               </SelectContent>
               </Select>

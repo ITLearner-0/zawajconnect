@@ -352,7 +352,9 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
                     <SelectItem value="shafii">Shafi'i</SelectItem>
                     <SelectItem value="hanbali">Hanbali</SelectItem>
                     <SelectItem value="salafi">Salafi</SelectItem>
-                    <SelectItem value="autre">Autre</SelectItem>
+                    <SelectItem value="other">Autre</SelectItem>
+                    <SelectItem value="none">Aucune préférence</SelectItem>
+                    <SelectItem value="prefer_not_to_say">Préfère ne pas dire</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
