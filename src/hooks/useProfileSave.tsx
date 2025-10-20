@@ -110,7 +110,7 @@ export const useProfileSave = () => {
       const validQuranReading = ['daily', 'weekly', 'monthly', 'occasionally', 'rarely', 'learning'];
       const validHijab = ['always', 'most_times', 'sometimes', 'never', 'not_applicable', 'yes', 'no', 'prefer_not_to_say'];
       const validBeard = ['full_beard', 'trimmed_beard', 'goatee', 'mustache_only', 'clean_shaven', 'not_applicable', 'yes', 'no', 'sometimes', 'prefer_not_to_say'];
-      const validMadhab = ['hanafi', 'maliki', 'shafii', 'hanbali', 'jafari', 'salafi', 'other', 'none', 'prefer_not_to_say'];
+      const validMadhab = ['hanafi', 'maliki', 'shafii', 'hanbali', 'salafi', 'other', 'none', 'prefer_not_to_say'];
       const validSmoking = ['never', 'occasionally', 'regularly', 'trying_to_quit'];
       const validDesiredPartnerSect = ['same_sect', 'sunni', 'shia', 'any', 'other', 'open_discussion'];
       
