@@ -131,8 +131,8 @@ serve(async (req) => {
         plan_type: planId.includes('12_months') ? '12_months' : 
                    planId.includes('6_months') ? '6_months' : '3_months',
         status: 'active',
-        provider: 'braintree',
-        provider_subscription_id: subscription.id,
+        braintree_customer_id: customerId,
+        braintree_subscription_id: subscription.id,
         expires_at: expiresAt.toISOString(),
       });
 

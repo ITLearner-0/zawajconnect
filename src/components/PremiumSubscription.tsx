@@ -243,6 +243,12 @@ const PremiumSubscription = () => {
       return;
     }
 
+    // Empêcher les clics multiples
+    if (processingPayment) {
+      console.log('Payment already in progress, ignoring click');
+      return;
+    }
+
     setProcessingPayment(selectedPlan);
     try {
       console.log('Requesting payment method from Braintree...');
@@ -283,12 +289,24 @@ const PremiumSubscription = () => {
       toast.success('Abonnement activé avec succès !');
       
       setShowPaymentModal(false);
+      setBraintreeInstance(null); // Réinitialiser l'instance
       await checkSubscription();
       
     } catch (error: any) {
       console.error('Error in completePurchase:', error);
       toast.dismiss();
-      toast.error(error.message || 'Erreur lors du paiement');
+      
+      // Fermer le modal et réinitialiser pour forcer une nouvelle instance
+      setShowPaymentModal(false);
+      setBraintreeInstance(null);
+      
+      // Message d'erreur plus clair
+      const errorMessage = error.message || 'Erreur lors du paiement';
+      if (errorMessage.includes('nonce')) {
+        toast.error('Erreur de paiement. Veuillez réessayer avec un nouveau moyen de paiement.');
+      } else {
+        toast.error(errorMessage);
+      }
     } finally {
       setProcessingPayment(null);
     }

@@ -1376,6 +1376,8 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          braintree_customer_id: string | null
+          braintree_subscription_id: string | null
           created_at: string
           expires_at: string | null
           granted_at: string
@@ -1391,6 +1393,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          braintree_customer_id?: string | null
+          braintree_subscription_id?: string | null
           created_at?: string
           expires_at?: string | null
           granted_at?: string
@@ -1406,6 +1410,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          braintree_customer_id?: string | null
+          braintree_subscription_id?: string | null
           created_at?: string
           expires_at?: string | null
           granted_at?: string
