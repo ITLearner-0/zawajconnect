@@ -217,15 +217,28 @@ const EnhancedProfile = () => {
     // Calculate Islamic preferences completion
     let islamicPrefsScore = 0;
     if (islamicPrefs) {
+      console.log('📊 Islamic Prefs Data:', islamicPrefs);
       const islamicFields = [
         'prayer_frequency', 'quran_reading', 'hijab_preference', 'beard_preference',
-        'sect', 'madhab', 'importance_of_religion', 'desired_partner_sect'
+        'sect', 'madhab', 'importance_of_religion', 'desired_partner_sect', 'smoking'
       ];
       const islamicCompleted = islamicFields.filter(field => {
         const value = islamicPrefs[field as keyof IslamicPreferencesData];
-        return value !== null && value !== undefined && value !== '';
+        const isCompleted = value !== null && value !== undefined && value !== '';
+        console.log(`📊 Field ${field}: ${value} (completed: ${isCompleted})`);
+        return isCompleted;
       }).length;
-      islamicPrefsScore = (islamicCompleted / islamicFields.length) * 100;
+      
+      // Count halal_diet separately (boolean field)
+      const halalDietCompleted = islamicPrefs.halal_diet !== null && islamicPrefs.halal_diet !== undefined ? 1 : 0;
+      console.log(`📊 Field halal_diet: ${islamicPrefs.halal_diet} (completed: ${halalDietCompleted > 0})`);
+      
+      const totalFields = islamicFields.length + 1; // +1 for halal_diet
+      const totalCompleted = islamicCompleted + halalDietCompleted;
+      islamicPrefsScore = (totalCompleted / totalFields) * 100;
+      console.log(`📊 Islamic Prefs Score: ${totalCompleted}/${totalFields} = ${islamicPrefsScore}%`);
+    } else {
+      console.log('📊 No Islamic Prefs data found');
     }
 
     // Calculate privacy settings completion
@@ -300,7 +313,7 @@ const EnhancedProfile = () => {
                   <User className="h-8 w-8 text-primary-foreground" />
                 </div>
                 <div>
-                  <CardTitle className="text-2xl">Profil Enhanced</CardTitle>
+                  <CardTitle className="text-2xl">Profil Détaillé</CardTitle>
                   <p className="text-muted-foreground">
                     Système de profil avancé avec IA et valeurs islamiques
                   </p>
@@ -614,7 +627,16 @@ const EnhancedProfile = () => {
           </TabsContent>
 
           <TabsContent value="islamic">
-            <EnhancedIslamicPreferences embedded />
+            <EnhancedIslamicPreferences 
+              embedded 
+              onComplete={() => {
+                fetchProfileData();
+                toast({ 
+                  title: "Préférences sauvegardées", 
+                  description: "Vos préférences islamiques ont été enregistrées avec succès" 
+                });
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="compatibility">
