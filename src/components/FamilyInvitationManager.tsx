@@ -47,6 +47,7 @@ const FamilyInvitationManager = () => {
   const [loading, setLoading] = useState(true);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [inviteForm, setInviteForm] = useState({
     full_name: '',
     email: '',
@@ -88,6 +89,12 @@ const FamilyInvitationManager = () => {
   const sendInvitation = async () => {
     if (!user) return;
 
+    // 🛡️ PROTECTION: Empêcher les doubles soumissions
+    if (isSubmitting) {
+      console.warn('⚠️ Soumission déjà en cours, requête ignorée');
+      return;
+    }
+
     // Validate with Zod
     setValidationErrors({});
     const validationResult = familyMemberSchema.safeParse({
@@ -114,10 +121,20 @@ const FamilyInvitationManager = () => {
       return;
     }
 
+    setIsSubmitting(true);
+    console.log('🚀 [INVITATION] Début envoi invitation pour:', inviteForm.full_name, '- Email:', inviteForm.email);
+
     try {
       // Send invitation email via edge function
       // The edge function will create the family_members entry via create_family_invitation RPC
       const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error('Session invalide ou expirée');
+      }
+
+      console.log('📤 [INVITATION] Appel edge function send-family-invitation...');
+      
       const { data, error } = await supabase.functions.invoke('send-family-invitation', {
         body: {
           fullName: inviteForm.full_name,
@@ -126,20 +143,20 @@ const FamilyInvitationManager = () => {
           isWali: inviteForm.is_wali
         },
         headers: {
-          Authorization: `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
 
       if (error) {
-        console.error('Edge function error:', error);
+        console.error('❌ [INVITATION] Edge function error:', error);
         throw error;
       }
       
-      console.log('Invitation response:', data);
+      console.log('✅ [INVITATION] Invitation response:', data);
 
       toast({
-        title: "Invitation envoyée",
-        description: `L'invitation a été envoyée à ${inviteForm.full_name}`,
+        title: "✅ Invitation envoyée",
+        description: `L'invitation a été envoyée à ${inviteForm.full_name} (${inviteForm.email})`,
       });
 
       setInviteModalOpen(false);
@@ -153,14 +170,21 @@ const FamilyInvitationManager = () => {
         can_view_profile: true,
         can_communicate: false
       });
-      fetchFamilyMembers();
-    } catch (error) {
-      console.error('Error sending invitation:', error);
+      
+      // Attendre 500ms avant de recharger pour laisser le temps à la DB de se mettre à jour
+      setTimeout(() => {
+        fetchFamilyMembers();
+      }, 500);
+      
+    } catch (error: any) {
+      console.error('❌ [INVITATION] Error sending invitation:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer l'invitation",
+        title: "❌ Erreur d'envoi",
+        description: error.message || "Impossible d'envoyer l'invitation",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -458,10 +482,17 @@ const FamilyInvitationManager = () => {
                     </Button>
                     <Button 
                       onClick={sendInvitation}
-                      disabled={!inviteForm.full_name || !inviteForm.email || !inviteForm.relationship}
+                      disabled={!inviteForm.full_name || !inviteForm.email || !inviteForm.relationship || isSubmitting}
                       className="bg-emerald hover:bg-emerald-dark"
                     >
-                      Envoyer l'invitation
+                      {isSubmitting ? (
+                        <div className="flex items-center gap-2">
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                          Envoi en cours...
+                        </div>
+                      ) : (
+                        'Envoyer l\'invitation'
+                      )}
                     </Button>
                   </div>
                 </div>

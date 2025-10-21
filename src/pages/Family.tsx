@@ -144,56 +144,15 @@ const Family = () => {
   };
 
   const addFamilyMember = async () => {
-    if (!user || !newMember.full_name || !newMember.relationship) {
-      toast({
-        title: "Erreur",
-        description: "Veuillez remplir les champs obligatoires",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase
-        .from('family_members')
-        .insert({
-          user_id: user.id,
-          full_name: newMember.full_name,
-          relationship: newMember.relationship,
-          is_wali: newMember.is_wali,
-          can_communicate: newMember.can_communicate,
-          can_view_profile: newMember.can_view_profile,
-          invitation_status: 'pending'
-        })
-        .select()
-        .maybeSingle();
-
-      if (error) throw error;
-
-      setNewMember({
-        full_name: '',
-        relationship: '',
-        is_wali: false,
-        can_communicate: false,
-        can_view_profile: false
-      });
-      setShowAddForm(false);
-      
-      // Refresh the list from database to avoid duplication
-      await fetchFamilyMembers();
-
-      toast({
-        title: "Membre ajouté",
-        description: "Le membre de la famille a été ajouté avec succès",
-      });
-    } catch (error) {
-      console.error('Error adding family member:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'ajouter le membre de la famille",
-        variant: "destructive"
-      });
-    }
+    // ⚠️ ATTENTION: Cette fonction est DEPRECATED
+    // Utiliser FamilyInvitationManager à la place qui envoie les invitations par email
+    console.warn('⚠️ addFamilyMember is deprecated - use FamilyInvitationManager instead');
+    
+    toast({
+      title: "⚠️ Fonction obsolète",
+      description: "Veuillez utiliser le gestionnaire d'invitations pour ajouter des membres",
+      variant: "destructive"
+    });
   };
 
   const updateFamilyMember = async (memberId: string, updates: Partial<FamilyMember>) => {
