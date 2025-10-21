@@ -115,25 +115,10 @@ const FamilyInvitationManager = () => {
     }
 
     try {
-      const { error } = await supabase
-        .from('family_members')
-        .insert({
-          user_id: user.id,
-          full_name: inviteForm.full_name,
-          email: inviteForm.email,
-          phone: inviteForm.phone,
-          relationship: inviteForm.relationship,
-          is_wali: inviteForm.is_wali,
-          can_view_profile: inviteForm.can_view_profile,
-          can_communicate: inviteForm.can_communicate,
-          invitation_sent_at: new Date().toISOString()
-        });
-
-      if (error) throw error;
-
       // Send invitation email via edge function
+      // The edge function will create the family_members entry via create_family_invitation RPC
       const { data: { session } } = await supabase.auth.getSession();
-      await supabase.functions.invoke('send-family-invitation', {
+      const { error } = await supabase.functions.invoke('send-family-invitation', {
         body: {
           fullName: inviteForm.full_name,
           email: inviteForm.email,
@@ -144,6 +129,8 @@ const FamilyInvitationManager = () => {
           Authorization: `Bearer ${session?.access_token}`,
         },
       });
+
+      if (error) throw error;
 
       toast({
         title: "Invitation envoyée",
