@@ -215,10 +215,22 @@ const FamilyInvitationManager = () => {
 
   const resendInvitation = async (memberId: string, member: FamilyMember) => {
     try {
+      console.log('📤 [RESEND] Renvoi invitation à:', member.full_name);
+      
+      toast({
+        title: "Fonctionnalité non disponible",
+        description: "Le renvoi d'invitation nécessite que l'email soit stocké",
+        variant: "destructive"
+      });
+      
+      return;
+      
+      /* TODO: Implement resend when email is available
       const { data: { session } } = await supabase.auth.getSession();
       await supabase.functions.invoke('send-family-invitation', {
         body: {
           fullName: member.full_name,
+          email: 'TODO',
           relationship: member.relationship,
           isWali: member.is_wali
         },
@@ -238,6 +250,7 @@ const FamilyInvitationManager = () => {
       });
 
       fetchFamilyMembers();
+      */
     } catch (error) {
       console.error('Error resending invitation:', error);
       toast({
