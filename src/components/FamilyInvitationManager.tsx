@@ -118,7 +118,7 @@ const FamilyInvitationManager = () => {
       // Send invitation email via edge function
       // The edge function will create the family_members entry via create_family_invitation RPC
       const { data: { session } } = await supabase.auth.getSession();
-      const { error } = await supabase.functions.invoke('send-family-invitation', {
+      const { data, error } = await supabase.functions.invoke('send-family-invitation', {
         body: {
           fullName: inviteForm.full_name,
           email: inviteForm.email,
@@ -130,7 +130,12 @@ const FamilyInvitationManager = () => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Edge function error:', error);
+        throw error;
+      }
+      
+      console.log('Invitation response:', data);
 
       toast({
         title: "Invitation envoyée",

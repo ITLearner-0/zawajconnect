@@ -170,7 +170,6 @@ const Family = () => {
 
       if (error) throw error;
 
-      setFamilyMembers(prev => [data, ...prev]);
       setNewMember({
         full_name: '',
         relationship: '',
@@ -179,6 +178,9 @@ const Family = () => {
         can_view_profile: false
       });
       setShowAddForm(false);
+      
+      // Refresh the list from database to avoid duplication
+      await fetchFamilyMembers();
 
       toast({
         title: "Membre ajouté",
