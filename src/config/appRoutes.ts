@@ -62,6 +62,7 @@ export const publicRoutes: AppRouteConfig[] = [
   { path: '/invitation-auth', component: InvitationAuth },
   { path: '/invitation', component: InvitationAccept },
   { path: '/invitation/accept', component: InvitationAccept },
+  { path: '/invitation-accept', component: InvitationAccept },
 ];
 
 // Special routes - protected but may have different requirements
