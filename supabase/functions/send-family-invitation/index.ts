@@ -113,7 +113,7 @@ const handler = async (req: Request): Promise<Response> => {
     
     // Construct invitation URL dynamically
     const baseUrl = req.headers.get('origin') || req.headers.get('referer')?.split('/')[0] + '//' + req.headers.get('referer')?.split('/')[2] || 'https://preview--deen-dates-platform.lovable.app';
-    const invitationUrl = `${baseUrl}/invitation?token=${invitationToken}`;
+    const invitationUrl = `${baseUrl}/invitation-accept?token=${invitationToken}`;
     
     console.log('Sending invitation (token redacted)');
 
