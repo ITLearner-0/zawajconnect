@@ -86,7 +86,25 @@ const InvitationAccept = () => {
     try {
       console.log('🔍 [VALIDATION] Validating invitation with token:', token);
       
-      // First, get the invitation
+      // First, check if invitation exists (any status)
+      const { data: existingInvitation, error: checkError } = await supabase
+        .from('family_members')
+        .select('invitation_status')
+        .eq('invitation_token', token)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('❌ [VALIDATION] Database error:', checkError);
+        throw new Error('Erreur lors de la récupération de l\'invitation');
+      }
+
+      // Check if invitation was already accepted
+      if (existingInvitation?.invitation_status === 'accepted') {
+        console.warn('⚠️ [VALIDATION] Invitation already accepted:', token);
+        throw new Error('Cette invitation a déjà été acceptée. Vous ne pouvez pas l\'utiliser à nouveau.');
+      }
+
+      // Now get the full pending invitation
       const { data: invitationData, error: invitationError } = await supabase
         .from('family_members')
         .select('*')
@@ -107,7 +125,7 @@ const InvitationAccept = () => {
       }
 
       if (!invitationData) {
-        console.warn('⚠️ [VALIDATION] No invitation found for token:', token);
+        console.warn('⚠️ [VALIDATION] No pending invitation found for token:', token);
         throw new Error('Invitation non trouvée ou expirée');
       }
 
