@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator';
 import FamilyDashboard from '@/components/FamilyDashboard';
 import FamilyInvitationForm from '@/components/FamilyInvitationForm';
 import ParentalApprovalWorkflow from '@/components/ParentalApprovalWorkflow';
+import FamilyInvitationManager from '@/components/FamilyInvitationManager';
 import { 
   Users, 
   UserPlus, 
@@ -282,7 +283,7 @@ const Family = () => {
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="dashboard">Tableau de bord</TabsTrigger>
             <TabsTrigger value="approval">Approbations</TabsTrigger>
-            <TabsTrigger value="members">Membres famille</TabsTrigger>
+            <TabsTrigger value="members">Invitations</TabsTrigger>
             <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
           </TabsList>
 
@@ -295,6 +296,11 @@ const Family = () => {
           </TabsContent>
 
           <TabsContent value="members" className="space-y-6">
+            {/* Use the new FamilyInvitationManager with email sending */}
+            <FamilyInvitationManager />
+          </TabsContent>
+
+          <TabsContent value="legacy-members" className="space-y-6 hidden">
             {/* Family Members */}
             <Card>
               <CardHeader>
