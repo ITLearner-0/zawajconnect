@@ -37,8 +37,8 @@ const RoleBasedLayoutContent: React.FC<RoleBasedLayoutProps> = ({ children }) =>
     return <Navigate to="/auth" replace />;
   }
 
-  // IMPORTANT: Allow access to onboarding page even if user has no role yet
-  if (location.pathname === '/onboarding') {
+  // IMPORTANT: Allow access to onboarding pages even if user has no role yet
+  if (location.pathname === '/onboarding' || location.pathname === '/wali-onboarding') {
     return <>{children}</>;
   }
 

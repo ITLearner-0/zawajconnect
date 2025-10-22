@@ -26,9 +26,21 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
 
       try {
         console.log('🔒 Fetching profile data...');
+        
+        // Check if user is a Wali (invited user)
+        const { data: familyMember } = await supabase
+          .from('family_members')
+          .select('id')
+          .eq('invited_user_id', user.id)
+          .maybeSingle();
+
+        const isWali = !!familyMember;
+        console.log('🔒 Is Wali:', isWali);
+
+        // Fetch all profile fields
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('bio, looking_for')
+          .select('full_name, bio, looking_for')
           .eq('user_id', user.id)
           .maybeSingle();
 
@@ -42,10 +54,13 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
 
         console.log('🔒 Profile data:', profile);
         
-        // Consider profile complete if both bio and looking_for are filled
-        const isComplete = profile && profile.bio && profile.looking_for;
+        // For Walis, only full_name is required
+        // For regular users, bio and looking_for are required
+        const isComplete = isWali 
+          ? !!(profile?.full_name)
+          : !!(profile?.bio && profile?.looking_for);
         console.log('🔒 Profile complete:', isComplete);
-        setHasCompleteProfile(!!isComplete);
+        setHasCompleteProfile(isComplete);
       } catch (error) {
         console.error('🔒 Exception checking profile:', error);
         setHasCompleteProfile(false);
@@ -76,8 +91,8 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
-  // Skip onboarding check for onboarding page itself
-  if (location.pathname === '/onboarding') {
+  // Skip onboarding check for onboarding pages
+  if (location.pathname === '/onboarding' || location.pathname === '/wali-onboarding') {
     return <>{children}</>;
   }
 

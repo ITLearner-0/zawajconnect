@@ -77,15 +77,15 @@ const InvitationAccept = () => {
     const handleAuthenticatedUser = async () => {
       if (!user || !invitation || !token) return;
 
-      // Check if user has completed onboarding
+      // Check if user has completed onboarding (Walis only need full_name)
       const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name, age, location')
+        .select('full_name')
         .eq('user_id', user.id)
         .single();
 
       // If profile is incomplete, redirect to Wali onboarding with token
-      if (!profile?.full_name || !profile?.age || !profile?.location) {
+      if (!profile?.full_name) {
         console.log('🔄 [ONBOARDING] Redirecting to Wali onboarding first');
         // Store token in sessionStorage to accept after onboarding
         sessionStorage.setItem('pending_invitation_token', token);
@@ -306,7 +306,8 @@ const InvitationAccept = () => {
           description: "Bienvenue ! Complétez votre profil en 3 étapes rapides.",
         });
         
-        // Will redirect to onboarding in the useEffect
+        // Redirect to Wali onboarding
+        navigate('/wali-onboarding');
       } else {
         const { error } = await signIn(validatedData.email, validatedData.password);
         if (error) throw error;
