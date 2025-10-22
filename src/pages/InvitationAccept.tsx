@@ -84,20 +84,34 @@ const InvitationAccept = () => {
     if (!token) return;
 
     try {
-      const { data, error } = await supabase
+      // First, get the invitation
+      const { data: invitationData, error: invitationError } = await supabase
         .from('family_members')
-        .select(`
-          *,
-          inviter:profiles!family_members_user_id_fkey(full_name, age, location, profession)
-        `)
+        .select('*')
         .eq('invitation_token', token)
         .eq('invitation_status', 'pending')
         .not('invitation_sent_at', 'is', null)
         .maybeSingle();
 
-      if (error || !data) {
+      if (invitationError || !invitationData) {
         throw new Error('Invitation non trouvée ou expirée');
       }
+
+      // Then get the inviter's profile
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('full_name, age, location, profession')
+        .eq('user_id', invitationData.user_id)
+        .maybeSingle();
+
+      if (profileError) {
+        console.error('Error fetching inviter profile:', profileError);
+      }
+
+      const data = {
+        ...invitationData,
+        inviter: profileData || { full_name: 'Unknown', age: 0, location: 'Unknown', profession: 'Unknown' }
+      };
 
       // Check if invitation is expired (30 days for better UX)
       if (!data.invitation_sent_at) {
