@@ -72,6 +72,7 @@ export function AppSidebar() {
     { path: '/advanced-matching', icon: Brain, label: 'Matching Avancé', group: 'compatibility' },
     { path: '/compatibility-insights', icon: Brain, label: 'Mes Insights', group: 'compatibility' },
     { path: '/matches', icon: Users, label: 'Mes Matches', group: 'social' },
+    { path: '/family', icon: Users, label: 'Famille', group: 'social' },
     { path: '/guidance', icon: BookOpen, label: 'Guide islamique', group: 'resources' },
     { path: '/islamic-tools', icon: Clock, label: 'Outils islamiques', group: 'resources' },
     { path: '/settings', icon: Settings, label: 'Paramètres', group: 'main' },
