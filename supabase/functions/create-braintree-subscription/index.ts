@@ -14,40 +14,30 @@ serve(async (req) => {
   }
 
   try {
-    // Log des headers pour debug
+    // JWT is now verified automatically by Supabase (verify_jwt = true in config.toml)
+    // Get auth header to access user context
     const authHeader = req.headers.get('Authorization');
-    console.log('Authorization header present:', !!authHeader);
-    console.log('Authorization header:', authHeader ? authHeader.substring(0, 20) + '...' : 'none');
-    
     if (!authHeader) {
       throw new Error('Authorization header manquant');
     }
 
-    // Créer le client Supabase avec la clé service role
+    // Create Supabase client with service role for database operations
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       { auth: { persistSession: false } }
     );
 
-    console.log('Verifying JWT token manually...');
-    // Extraire le JWT token
+    // Extract JWT token to get user context
     const jwt = authHeader.replace('Bearer ', '');
-    
-    // Vérifier le token manuellement avec le service role client
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(jwt);
 
-    console.log('User verification result:', { 
-      hasUser: !!user, 
-      userId: user?.id,
-      userEmail: user?.email,
-      error: userError?.message 
-    });
-
     if (userError || !user) {
-      console.error('JWT verification failed:', userError);
-      throw new Error('Authentication invalide: ' + (userError?.message || 'Token invalide'));
+      console.error('User verification failed:', userError);
+      throw new Error('Authentication invalide');
     }
+
+    console.log('Authenticated user:', user.id);
     
     console.log('User authenticated successfully:', user.email);
 
