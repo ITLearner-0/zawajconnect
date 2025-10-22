@@ -28,7 +28,8 @@ const WaliOnboarding = () => {
     avatar_url: '',
   });
 
-  const token = searchParams.get('token');
+  // Check for invitation token from URL or sessionStorage
+  const token = searchParams.get('token') || sessionStorage.getItem('pending_invitation_token');
 
   useEffect(() => {
     if (!user) {
@@ -96,6 +97,9 @@ const WaliOnboarding = () => {
             description: "Votre profil a été créé mais l'acceptation de l'invitation a échoué. Veuillez réessayer depuis votre espace de supervision.",
             variant: "default"
           });
+        } else {
+          // Clear the stored token after successful acceptance
+          sessionStorage.removeItem('pending_invitation_token');
         }
       }
 

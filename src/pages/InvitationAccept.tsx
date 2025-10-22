@@ -74,11 +74,31 @@ const InvitationAccept = () => {
   }, [token]);
 
   useEffect(() => {
-    if (user && invitation) {
-      // User is authenticated, try to accept invitation
+    const handleAuthenticatedUser = async () => {
+      if (!user || !invitation || !token) return;
+
+      // Check if user has completed onboarding
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, age, location')
+        .eq('user_id', user.id)
+        .single();
+
+      // If profile is incomplete, redirect to Wali onboarding with token
+      if (!profile?.full_name || !profile?.age || !profile?.location) {
+        console.log('🔄 [ONBOARDING] Redirecting to Wali onboarding first');
+        // Store token in sessionStorage to accept after onboarding
+        sessionStorage.setItem('pending_invitation_token', token);
+        navigate('/wali-onboarding');
+        return;
+      }
+
+      // Profile is complete, accept invitation
       acceptInvitation();
-    }
-  }, [user, invitation]);
+    };
+
+    handleAuthenticatedUser();
+  }, [user, invitation, token]);
 
   const validateInvitation = async () => {
     if (!token) return;
@@ -242,10 +262,15 @@ const InvitationAccept = () => {
         );
         if (error) throw error;
 
+        // Store token for later acceptance after onboarding
+        sessionStorage.setItem('pending_invitation_token', token || '');
+
         toast({
           title: "Compte Wali créé",
-          description: "Vérifiez votre email pour confirmer votre inscription. Vous serez ensuite redirigé vers votre espace de supervision.",
+          description: "Bienvenue ! Complétez votre profil en 3 étapes rapides.",
         });
+        
+        // Will redirect to onboarding in the useEffect
       } else {
         const { error } = await signIn(validatedData.email, validatedData.password);
         if (error) throw error;
