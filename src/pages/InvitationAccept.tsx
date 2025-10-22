@@ -92,19 +92,24 @@ const InvitationAccept = () => {
         `)
         .eq('invitation_token', token)
         .eq('invitation_status', 'pending')
+        .not('invitation_sent_at', 'is', null)
         .maybeSingle();
 
       if (error || !data) {
         throw new Error('Invitation non trouvée ou expirée');
       }
 
-      // Check if invitation is expired (7 days)
+      // Check if invitation is expired (30 days for better UX)
+      if (!data.invitation_sent_at) {
+        throw new Error('Invitation invalide - date manquante');
+      }
+      
       const sentAt = new Date(data.invitation_sent_at);
       const now = new Date();
       const diffDays = (now.getTime() - sentAt.getTime()) / (1000 * 3600 * 24);
 
-      if (diffDays > 7) {
-        throw new Error('Cette invitation a expiré');
+      if (diffDays > 30) {
+        throw new Error('Cette invitation a expiré (valide 30 jours)');
       }
 
       setInvitation({

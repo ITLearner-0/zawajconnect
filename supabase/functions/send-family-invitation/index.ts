@@ -161,7 +161,7 @@ const handler = async (req: Request): Promise<Response> => {
             
             <div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 8px; margin: 25px 0;">
               <p style="margin: 0; color: #92400e; font-size: 14px;">
-                <strong>⏰ Important :</strong> Cette invitation expire dans 7 jours. 
+                <strong>⏰ Important :</strong> Cette invitation expire dans 30 jours. 
                 Si vous n'avez pas sollicité cette invitation, vous pouvez l'ignorer en toute sécurité.
               </p>
             </div>
