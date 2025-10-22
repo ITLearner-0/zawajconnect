@@ -149,7 +149,21 @@ const FamilyInvitationManager = () => {
 
       if (error) {
         console.error('❌ [INVITATION] Edge function error:', error);
-        throw error;
+        
+        // Extract error message from response
+        let errorMessage = "Impossible d'envoyer l'invitation";
+        if (error.context?.body) {
+          try {
+            const errorBody = typeof error.context.body === 'string' 
+              ? JSON.parse(error.context.body) 
+              : error.context.body;
+            errorMessage = errorBody.error || errorMessage;
+          } catch (e) {
+            console.error('Failed to parse error body:', e);
+          }
+        }
+        
+        throw new Error(errorMessage);
       }
       
       console.log('✅ [INVITATION] Invitation response:', data);
