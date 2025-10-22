@@ -84,6 +84,8 @@ const InvitationAccept = () => {
     if (!token) return;
 
     try {
+      console.log('🔍 [VALIDATION] Validating invitation with token:', token);
+      
       // First, get the invitation
       const { data: invitationData, error: invitationError } = await supabase
         .from('family_members')
@@ -93,7 +95,19 @@ const InvitationAccept = () => {
         .not('invitation_sent_at', 'is', null)
         .maybeSingle();
 
-      if (invitationError || !invitationData) {
+      console.log('📋 [VALIDATION] Invitation query result:', { 
+        hasData: !!invitationData, 
+        error: invitationError,
+        data: invitationData 
+      });
+
+      if (invitationError) {
+        console.error('❌ [VALIDATION] Database error:', invitationError);
+        throw new Error('Erreur lors de la récupération de l\'invitation');
+      }
+
+      if (!invitationData) {
+        console.warn('⚠️ [VALIDATION] No invitation found for token:', token);
         throw new Error('Invitation non trouvée ou expirée');
       }
 
