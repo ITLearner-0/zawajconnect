@@ -14,6 +14,8 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
   const [profileLoading, setProfileLoading] = useState(true);
   const [hasCompleteProfile, setHasCompleteProfile] = useState(false);
 
+  const [isWali, setIsWali] = useState(false);
+
   useEffect(() => {
     const checkProfile = async () => {
       console.log('🔒 ProtectedRoute - Checking profile for user:', user?.id);
@@ -34,8 +36,9 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
           .eq('invited_user_id', user.id)
           .maybeSingle();
 
-        const isWali = !!familyMember;
-        console.log('🔒 Is Wali:', isWali);
+        const userIsWali = !!familyMember;
+        console.log('🔒 Is Wali:', userIsWali);
+        setIsWali(userIsWali);
 
         // Fetch all profile fields
         const { data: profile, error } = await supabase
@@ -56,7 +59,7 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
         
         // For Walis, only full_name is required
         // For regular users, bio and looking_for are required
-        const isComplete = isWali 
+        const isComplete = userIsWali 
           ? !!(profile?.full_name)
           : !!(profile?.bio && profile?.looking_for);
         console.log('🔒 Profile complete:', isComplete);
@@ -98,7 +101,9 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
 
   // Redirect to onboarding if profile is incomplete and onboarding is required
   if (requireOnboarding && !hasCompleteProfile) {
-    return <Navigate to="/onboarding" replace />;
+    // Redirect Walis to wali-onboarding, regular users to onboarding
+    const onboardingPath = isWali ? '/wali-onboarding' : '/onboarding';
+    return <Navigate to={onboardingPath} replace />;
   }
 
   return <>{children}</>;
