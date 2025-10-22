@@ -189,7 +189,7 @@ export type Database = {
           accessed_by: string
           family_member_id: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           user_agent: string | null
         }
         Insert: {
@@ -199,7 +199,7 @@ export type Database = {
           accessed_by: string
           family_member_id: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
         }
         Update: {
@@ -209,7 +209,7 @@ export type Database = {
           accessed_by?: string
           family_member_id?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           user_agent?: string | null
         }
         Relationships: []
@@ -1263,7 +1263,7 @@ export type Database = {
           additional_data: Json | null
           created_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           record_id: string | null
           table_name: string
           user_agent: string | null
@@ -1274,7 +1274,7 @@ export type Database = {
           additional_data?: Json | null
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           record_id?: string | null
           table_name: string
           user_agent?: string | null
@@ -1285,7 +1285,7 @@ export type Database = {
           additional_data?: Json | null
           created_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           record_id?: string | null
           table_name?: string
           user_agent?: string | null
@@ -1299,7 +1299,7 @@ export type Database = {
           description: string
           event_type: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           metadata: Json | null
           resolved: boolean | null
           severity: string
@@ -1311,7 +1311,7 @@ export type Database = {
           description: string
           event_type: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           resolved?: boolean | null
           severity?: string
@@ -1323,7 +1323,7 @@ export type Database = {
           description?: string
           event_type?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           metadata?: Json | null
           resolved?: boolean | null
           severity?: string
@@ -1336,7 +1336,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           operation_type: string
           record_id: string | null
           risk_level: string
@@ -1349,7 +1349,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           operation_type: string
           record_id?: string | null
           risk_level?: string
@@ -1362,7 +1362,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           operation_type?: string
           record_id?: string | null
           risk_level?: string
@@ -1526,7 +1526,7 @@ export type Database = {
           device_fingerprint: string | null
           expires_at: string | null
           id: string
-          ip_address: unknown | null
+          ip_address: unknown
           is_active: boolean | null
           last_activity: string | null
           session_token: string
@@ -1538,7 +1538,7 @@ export type Database = {
           device_fingerprint?: string | null
           expires_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           is_active?: boolean | null
           last_activity?: string | null
           session_token: string
@@ -1550,7 +1550,7 @@ export type Database = {
           device_fingerprint?: string | null
           expires_at?: string | null
           id?: string
-          ip_address?: unknown | null
+          ip_address?: unknown
           is_active?: boolean | null
           last_activity?: string | null
           session_token?: string
@@ -1810,22 +1810,13 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: boolean
       }
-      check_incomplete_profiles_and_notify: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      check_incomplete_profiles_and_notify: { Args: never; Returns: undefined }
       check_profile_view_rate_limit: {
         Args: { viewer_uuid: string }
         Returns: boolean
       }
-      check_subscription_expiry_and_notify: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      check_unread_messages_and_notify: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      check_subscription_expiry_and_notify: { Args: never; Returns: undefined }
+      check_unread_messages_and_notify: { Args: never; Returns: undefined }
       create_family_invitation: {
         Args: {
           p_email: string
@@ -1848,7 +1839,7 @@ export type Database = {
         Returns: string
       }
       get_current_user_role_secure: {
-        Args: Record<PropertyKey, never>
+        Args: never
         Returns: Database["public"]["Enums"]["app_role"]
       }
       get_family_approval_status: {
@@ -1900,10 +1891,7 @@ export type Database = {
         Args: { target_user_id: string }
         Returns: boolean
       }
-      has_family_supervision: {
-        Args: { user_uuid: string }
-        Returns: boolean
-      }
+      has_family_supervision: { Args: { user_uuid: string }; Returns: boolean }
       has_previous_conversation: {
         Args: { u1_id: string; u2_id: string }
         Returns: boolean
@@ -1919,30 +1907,15 @@ export type Database = {
         Args: { p_operation_type: string; p_user_id: string }
         Returns: undefined
       }
-      is_admin: {
-        Args: { _user_id: string }
-        Returns: boolean
-      }
+      is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_family_supervised: {
         Args: { profile_user_id: string }
         Returns: boolean
       }
-      is_family_wali: {
-        Args: { profile_user_id: string }
-        Returns: boolean
-      }
-      is_matched_user: {
-        Args: { profile_user_id: string }
-        Returns: boolean
-      }
-      is_own_profile: {
-        Args: { profile_user_id: string }
-        Returns: boolean
-      }
-      is_premium_user: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      is_family_wali: { Args: { profile_user_id: string }; Returns: boolean }
+      is_matched_user: { Args: { profile_user_id: string }; Returns: boolean }
+      is_own_profile: { Args: { profile_user_id: string }; Returns: boolean }
+      is_premium_user: { Args: never; Returns: boolean }
       is_user_in_active_conversation: {
         Args: { check_user_id: string }
         Returns: boolean
@@ -1965,22 +1938,10 @@ export type Database = {
         }
         Returns: string
       }
-      migrate_family_contact_data_secure: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      send_match_suggestions_batch: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      send_monthly_newsletter: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
-      send_weekly_tips_batch: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
-      }
+      migrate_family_contact_data_secure: { Args: never; Returns: undefined }
+      send_match_suggestions_batch: { Args: never; Returns: undefined }
+      send_monthly_newsletter: { Args: never; Returns: undefined }
+      send_weekly_tips_batch: { Args: never; Returns: undefined }
     }
     Enums: {
       app_role: "super_admin" | "admin" | "moderator" | "user"
