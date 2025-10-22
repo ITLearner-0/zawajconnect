@@ -203,12 +203,48 @@ const InvitationAccept = () => {
 
     setProcessing(true);
     try {
+      // First check if invitation is already accepted
+      const { data: existingInvitation } = await supabase
+        .from('family_members')
+        .select('invitation_status, invited_user_id')
+        .eq('invitation_token', token)
+        .single();
+
+      // If already accepted by this user, just redirect
+      if (existingInvitation?.invitation_status === 'accepted' && 
+          existingInvitation?.invited_user_id === user.id) {
+        console.log('✅ [INVITATION] Already accepted by this user, redirecting...');
+        toast({
+          title: "Invitation déjà acceptée",
+          description: "Vous avez déjà accepté cette invitation. Redirection vers votre espace...",
+        });
+        navigate('/family-supervision');
+        return;
+      }
+
+      // Try to accept the invitation
       const { data, error } = await supabase.rpc('accept_family_invitation', {
         p_invitation_token: token,
         p_invited_user_id: user.id
       });
 
       if (error || !data) {
+        // Check if it was just accepted
+        const { data: recheckInvitation } = await supabase
+          .from('family_members')
+          .select('invitation_status')
+          .eq('invitation_token', token)
+          .single();
+
+        if (recheckInvitation?.invitation_status === 'accepted') {
+          toast({
+            title: "Invitation acceptée",
+            description: "L'invitation a été acceptée avec succès",
+          });
+          navigate('/family-supervision');
+          return;
+        }
+
         throw new Error('Impossible d\'accepter l\'invitation');
       }
 
