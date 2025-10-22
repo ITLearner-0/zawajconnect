@@ -32,6 +32,7 @@ import CompatibilityInsightsPage from '@/pages/CompatibilityInsights';
 import EnhancedProfile from '@/pages/EnhancedProfile';
 import AdvancedMatching from '@/pages/AdvancedMatching';
 import Onboarding from '@/pages/Onboarding';
+import WaliOnboarding from '@/pages/WaliOnboarding';
 import SubscriptionSuccess from '@/pages/SubscriptionSuccess';
 import NotFound from '@/pages/NotFound';
 import TermsOfService from '@/pages/TermsOfService';
@@ -68,6 +69,12 @@ export const specialRoutes: AppRouteConfig[] = [
   { 
     path: '/onboarding', 
     component: Onboarding, 
+    protected: true, 
+    requiresOnboarding: false 
+  },
+  { 
+    path: '/wali-onboarding', 
+    component: WaliOnboarding, 
     protected: true, 
     requiresOnboarding: false 
   },

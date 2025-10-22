@@ -32,6 +32,14 @@ export const routes: RouteConfig[] = [
     requiresAuth: false,
     category: 'main'
   },
+  {
+    path: '/wali-onboarding',
+    component: 'WaliOnboarding',
+    label: 'Onboarding Wali',
+    requiresAuth: true,
+    requiresOnboarding: false,
+    category: 'main'
+  },
 
   // Main app routes
   {

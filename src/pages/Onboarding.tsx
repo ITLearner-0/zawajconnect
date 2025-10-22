@@ -182,6 +182,15 @@ const Onboarding = () => {
       return;
     }
     
+    // Check if this is a Wali user and redirect to Wali onboarding
+    const userType = user.user_metadata?.user_type;
+    
+    if (userType === 'wali') {
+      const token = user.user_metadata?.invitation_token;
+      navigate(`/wali-onboarding${token ? `?token=${token}` : ''}`);
+      return;
+    }
+    
     // Try to restore from emergency backup first
     const emergencyProfile = restoreEmergencyBackup('profile');
     const emergencyIslamic = restoreEmergencyBackup('islamic');

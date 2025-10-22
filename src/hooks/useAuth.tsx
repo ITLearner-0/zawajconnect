@@ -17,7 +17,11 @@ interface AuthContextType {
   subscription: SubscriptionStatus;
   checkSubscription: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, metadata?: {
+    user_type?: 'wali' | 'candidate';
+    invitation_token?: string;
+    supervised_user_id?: string;
+  }) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
 }
 
@@ -148,8 +152,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return { error };
   };
 
-  const signUp = async (email: string, password: string, fullName: string) => {
-    const redirectUrl = `${window.location.origin}/onboarding`;
+  const signUp = async (
+    email: string, 
+    password: string, 
+    fullName: string,
+    metadata?: {
+      user_type?: 'wali' | 'candidate';
+      invitation_token?: string;
+      supervised_user_id?: string;
+    }
+  ) => {
+    // Determine redirect based on user type
+    const redirectPath = metadata?.user_type === 'wali' 
+      ? `/wali-onboarding${metadata.invitation_token ? `?token=${metadata.invitation_token}` : ''}`
+      : '/onboarding';
+    
+    const redirectUrl = `${window.location.origin}${redirectPath}`;
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -158,6 +176,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
+          user_type: metadata?.user_type || 'candidate',
+          invitation_token: metadata?.invitation_token,
+          supervised_user_id: metadata?.supervised_user_id,
         },
       },
     });

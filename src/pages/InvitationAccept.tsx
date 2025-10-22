@@ -215,13 +215,18 @@ const InvitationAccept = () => {
         const { error } = await signUp(
           validatedData.email, 
           validatedData.password, 
-          validatedData.fullName || invitation.full_name
+          validatedData.fullName || invitation.full_name,
+          {
+            user_type: 'wali',
+            invitation_token: token || '',
+            supervised_user_id: invitation.user_id
+          }
         );
         if (error) throw error;
 
         toast({
-          title: "Compte créé",
-          description: "Votre compte a été créé. Vérifiez votre email puis revenez accepter l'invitation.",
+          title: "Compte Wali créé",
+          description: "Vérifiez votre email pour confirmer votre inscription. Vous serez ensuite redirigé vers votre espace de supervision.",
         });
       } else {
         const { error } = await signIn(validatedData.email, validatedData.password);
