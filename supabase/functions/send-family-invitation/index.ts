@@ -122,70 +122,93 @@ const handler = async (req: Request): Promise<Response> => {
       await sendEmail({
         to: email,
         subject: "🕌 Invitation Wali - Zawaj-Connect",
-        html: `
-          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="text-align: center; margin-bottom: 30px;">
-              <h1 style="color: #16a34a; font-size: 28px; margin: 0;">🕌 Zawaj-Connect</h1>
-              <p style="color: #666; margin: 5px 0;">Plateforme matrimoniale islamique avec supervision familiale</p>
-            </div>
-            
-            <div style="background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%); padding: 25px; border-radius: 12px; border: 2px solid #16a34a; margin: 20px 0;">
-              <h2 style="color: #16a34a; margin: 0 0 15px 0; font-size: 24px;">Assalamu Alaikum ${fullName}</h2>
-              
-              <p style="color: #333; font-size: 16px; line-height: 1.6; margin: 15px 0;">
-                ${inviterName} vous invite à devenir ${isWali ? '<strong>Wali (tuteur islamique)</strong>' : 'membre de famille'} 
-                pour superviser leurs interactions matrimoniales selon les principes de l'Islam.
-              </p>
-              
-              <div style="background-color: rgba(255,255,255,0.7); padding: 20px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0 0 10px 0;"><strong>🎯 Votre rôle :</strong> ${getRelationshipLabel(relationship)}</p>
-                ${isWali ? '<p style="margin: 10px 0; color: #16a34a;"><strong>✅ Statut Wali (Tuteur Islamique)</strong></p>' : ''}
-                
-                <p style="margin: 15px 0 10px 0; font-weight: bold;">Vos autorisations :</p>
-                <ul style="margin: 0; padding-left: 20px; color: #333;">
-                  <li>📋 <strong>Superviser les conversations</strong> - Veiller à la pudeur islamique</li>
-                  <li>👁️ <strong>Consulter les profils</strong> - Vérifier la compatibilité</li>
-                  <li>🛡️ <strong>Recevoir des alertes</strong> - Modération automatique</li>
-                  <li>💬 <strong>Guidance islamique</strong> - Conseiller selon la Sunna</li>
-                  ${isWali ? '<li>✅ <strong>Approuver les matches</strong> - Pouvoir de décision Wali</li>' : ''}
-                </ul>
-              </div>
-            </div>
-            
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${invitationUrl}" 
-                 style="display: inline-block; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; padding: 18px 35px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(22,163,74,0.3);">
-                🔗 Accepter l'Invitation
-              </a>
-            </div>
-            
-            <div style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 8px; margin: 25px 0;">
-              <p style="margin: 0; color: #92400e; font-size: 14px;">
-                <strong>⏰ Important :</strong> Cette invitation expire dans 30 jours. 
-                Si vous n'avez pas sollicité cette invitation, vous pouvez l'ignorer en toute sécurité.
-              </p>
-            </div>
-            
-            <div style="background-color: #e0f2fe; border: 1px solid #0ea5e9; padding: 15px; border-radius: 8px; margin: 20px 0;">
-              <h4 style="color: #0c4a6e; margin: 0 0 10px 0;">📚 Guidance Islamique</h4>
-              <p style="margin: 0; color: #0c4a6e; font-size: 14px;">
-                En acceptant, vous vous engagez à superviser selon les enseignements islamiques, 
-                en préservant la pudeur (Haya) et en favorisant des relations halal conformes à la Sunna.
-              </p>
-            </div>
-            
-            <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
-            
-            <div style="text-align: center;">
-              <p style="color: #888; font-size: 12px; margin: 5px 0;">
-                Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :
-              </p>
-              <p style="color: #16a34a; font-size: 12px; word-break: break-all; margin: 5px 0;">
-                ${invitationUrl}
-              </p>
-            </div>
-          </div>
-        `,
+        html: `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f3f4f6;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6;">
+<tr>
+<td style="padding: 40px 20px;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);">
+<!-- Header -->
+<tr>
+<td style="text-align: center; padding: 30px;">
+<h1 style="color: #16a34a; font-size: 28px; margin: 0;">🕌 Zawaj-Connect</h1>
+<p style="color: #666; margin: 5px 0 0 0;">Plateforme matrimoniale islamique avec supervision familiale</p>
+</td>
+</tr>
+<!-- Main Content -->
+<tr>
+<td style="padding: 0 30px 30px 30px;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+<tr>
+<td style="background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%); border: 2px solid #16a34a; padding: 25px; border-radius: 12px;">
+<h2 style="color: #16a34a; margin: 0 0 15px 0; font-size: 24px;">Assalamu Alaikum ${fullName}</h2>
+<p style="color: #333; font-size: 16px; line-height: 1.6; margin: 15px 0;">${inviterName} vous invite à devenir ${isWali ? '<strong>Wali (tuteur islamique)</strong>' : 'membre de famille'} pour superviser leurs interactions matrimoniales selon les principes de l'Islam.</p>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 20px 0;">
+<tr>
+<td style="background-color: rgba(255,255,255,0.7); padding: 20px; border-radius: 8px;">
+<p style="margin: 0 0 10px 0;"><strong>🎯 Votre rôle :</strong> ${getRelationshipLabel(relationship)}</p>
+${isWali ? '<p style="margin: 10px 0; color: #16a34a;"><strong>✅ Statut Wali (Tuteur Islamique)</strong></p>' : ''}
+<p style="margin: 15px 0 10px 0; font-weight: bold;">Vos autorisations :</p>
+<ul style="margin: 0; padding-left: 20px; color: #333;">
+<li>📋 <strong>Superviser les conversations</strong> - Veiller à la pudeur islamique</li>
+<li>👁️ <strong>Consulter les profils</strong> - Vérifier la compatibilité</li>
+<li>🛡️ <strong>Recevoir des alertes</strong> - Modération automatique</li>
+<li>💬 <strong>Guidance islamique</strong> - Conseiller selon la Sunna</li>
+${isWali ? '<li>✅ <strong>Approuver les matches</strong> - Pouvoir de décision Wali</li>' : ''}
+</ul>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+<!-- CTA Button -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+<tr>
+<td style="text-align: center; padding: 30px 0;">
+<a href="${invitationUrl}" style="display: inline-block; background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; padding: 18px 35px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 18px; box-shadow: 0 4px 15px rgba(22,163,74,0.3);">🔗 Accepter l'Invitation</a>
+</td>
+</tr>
+</table>
+<!-- Warning Box -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background-color: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 8px;">
+<p style="margin: 0; color: #92400e; font-size: 14px;"><strong>⏰ Important :</strong> Cette invitation expire dans 30 jours. Si vous n'avez pas sollicité cette invitation, vous pouvez l'ignorer en toute sécurité.</p>
+</td>
+</tr>
+</table>
+<!-- Guidance Box -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 20px 0;">
+<tr>
+<td style="background-color: #e0f2fe; border: 1px solid #0ea5e9; padding: 15px; border-radius: 8px;">
+<h4 style="color: #0c4a6e; margin: 0 0 10px 0;">📚 Guidance Islamique</h4>
+<p style="margin: 0; color: #0c4a6e; font-size: 14px;">En acceptant, vous vous engagez à superviser selon les enseignements islamiques, en préservant la pudeur (Haya) et en favorisant des relations halal conformes à la Sunna.</p>
+</td>
+</tr>
+</table>
+<div style="height: 1px; background: #ddd; margin: 30px 0;"></div>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+<tr>
+<td style="text-align: center;">
+<p style="color: #888; font-size: 12px; margin: 5px 0;">Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :</p>
+<p style="color: #16a34a; font-size: 12px; word-break: break-all; margin: 5px 0;">${invitationUrl}</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>`,
       });
     } catch (emailError) {
       console.error('Email sending failed:', emailError);

@@ -69,136 +69,88 @@ const handler = async (req: Request): Promise<Response> => {
     const reasonText = reasonTexts[reason] || reason;
 
     // Compose email HTML
-    const emailHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-            }
-            .header {
-              background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-              color: white;
-              padding: 30px;
-              border-radius: 10px 10px 0 0;
-              text-align: center;
-            }
-            .content {
-              background: #ffffff;
-              padding: 30px;
-              border: 1px solid #e5e7eb;
-              border-top: none;
-            }
-            .message-box {
-              background: #f3f4f6;
-              padding: 20px;
-              border-radius: 8px;
-              margin: 20px 0;
-              border-left: 4px solid #059669;
-            }
-            .islamic-message {
-              background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-              padding: 20px;
-              border-radius: 8px;
-              margin: 20px 0;
-              font-style: italic;
-              text-align: center;
-              border: 2px solid #f59e0b;
-            }
-            .footer {
-              background: #f9fafb;
-              padding: 20px;
-              border-radius: 0 0 10px 10px;
-              text-align: center;
-              font-size: 14px;
-              color: #6b7280;
-              border: 1px solid #e5e7eb;
-              border-top: none;
-            }
-            .button {
-              display: inline-block;
-              padding: 12px 30px;
-              background: #059669;
-              color: white;
-              text-decoration: none;
-              border-radius: 6px;
-              margin: 20px 0;
-              font-weight: bold;
-            }
-            .divider {
-              height: 1px;
-              background: #e5e7eb;
-              margin: 20px 0;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1 style="margin: 0; font-size: 28px;">🤲 Notification Importante</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Fin d'un échange</p>
-          </div>
-          
-          <div class="content">
-            <p>Assalamu alaykum ${recipientName},</p>
-            
-            <p>Nous vous informons que <strong>${sender_name}</strong> a décidé de mettre fin à votre échange en cours.</p>
-            
-            <div class="message-box">
-              <h3 style="margin-top: 0; color: #059669;">📋 Raison de la clôture :</h3>
-              <p style="margin: 10px 0;"><strong>${reasonText}</strong></p>
-            </div>
-            
-            ${courtesy_message ? `
-              <div class="message-box">
-                <h3 style="margin-top: 0; color: #059669;">💌 Message personnel :</h3>
-                <p style="margin: 10px 0; white-space: pre-wrap;">${courtesy_message}</p>
-              </div>
-            ` : ""}
-            
-            <div class="islamic-message">
-              <p style="margin: 0; font-size: 16px; color: #92400e;">
-                ${islamic_message}
-              </p>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <h3 style="color: #059669;">✨ Prochaines étapes</h3>
-            <ul style="line-height: 1.8;">
-              <li>Vous êtes maintenant libre de chercher de nouveaux profils</li>
-              <li>Vous pouvez accepter de nouvelles demandes de mise en relation</li>
-              <li>Cette personne ne vous sera plus proposée dans les résultats de recherche</li>
-            </ul>
-            
-            <div style="text-align: center;">
-              <a href="https://dgfctwtivkqcfhwqgkya.supabase.co" class="button">
-                Découvrir de nouveaux profils
-              </a>
-            </div>
-            
-            <p style="margin-top: 30px; font-size: 14px; color: #6b7280;">
-              <strong>Note :</strong> Cette décision a été prise dans le respect des principes islamiques et de la bienveillance mutuelle. Nous vous encourageons à poursuivre votre recherche avec confiance et sérénité.
-            </p>
-          </div>
-          
-          <div class="footer">
-            <p style="margin: 0;">
-              Qu'Allah facilite votre chemin vers un mariage béni 🤲
-            </p>
-            <p style="margin: 10px 0 0 0; font-size: 12px;">
-              Cet email a été envoyé automatiquement par notre plateforme de rencontre islamique
-            </p>
-          </div>
-        </body>
-      </html>
-    `;
+    const emailHtml = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6;">
+<tr>
+<td style="padding: 40px 20px;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);">
+<!-- Header -->
+<tr>
+<td style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 40px 30px; text-align: center; border-radius: 16px 16px 0 0;">
+<h1 style="margin: 0; font-size: 32px; color: #ffffff;">🤲 Notification Importante</h1>
+<p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 18px; color: #ffffff;">Fin d'un échange</p>
+</td>
+</tr>
+<!-- Content -->
+<tr>
+<td style="padding: 40px 30px;">
+<p style="font-size: 18px; margin: 0 0 20px 0;">Assalamu alaykum ${recipientName},</p>
+<p style="font-size: 16px; margin: 0 0 20px 0; color: #4a5568;">Nous vous informons que <strong>${sender_name}</strong> a décidé de mettre fin à votre échange en cours.</p>
+<!-- Reason Box -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: #f3f4f6; border-left: 4px solid #059669; padding: 20px; border-radius: 8px;">
+<h3 style="margin: 0 0 10px 0; color: #059669; font-size: 18px;">📋 Raison de la clôture :</h3>
+<p style="margin: 0; font-size: 16px; color: #1f2937;"><strong>${reasonText}</strong></p>
+</td>
+</tr>
+</table>
+${courtesy_message ? `
+<!-- Personal Message Box -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: #f3f4f6; border-left: 4px solid #059669; padding: 20px; border-radius: 8px;">
+<h3 style="margin: 0 0 10px 0; color: #059669; font-size: 18px;">💌 Message personnel :</h3>
+<p style="margin: 0; font-size: 16px; color: #1f2937; white-space: pre-wrap;">${courtesy_message}</p>
+</td>
+</tr>
+</table>
+` : ''}
+<!-- Islamic Message Box -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; padding: 20px; border-radius: 8px; text-align: center;">
+<p style="margin: 0; font-size: 16px; color: #92400e; font-style: italic;">${islamic_message}</p>
+</td>
+</tr>
+</table>
+<div style="height: 1px; background: #e5e7eb; margin: 30px 0;"></div>
+<h3 style="color: #059669; font-size: 20px; margin: 0 0 15px 0;">✨ Prochaines étapes</h3>
+<ul style="line-height: 1.8; color: #4a5568; padding-left: 20px;">
+<li>Vous êtes maintenant libre de chercher de nouveaux profils</li>
+<li>Vous pouvez accepter de nouvelles demandes de mise en relation</li>
+<li>Cette personne ne vous sera plus proposée dans les résultats de recherche</li>
+</ul>
+<!-- CTA Button -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+<tr>
+<td style="text-align: center; padding: 30px 0;">
+<a href="https://dgfctwtivkqcfhwqgkya.supabase.co" style="display: inline-block; background: #059669; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px;">Découvrir de nouveaux profils</a>
+</td>
+</tr>
+</table>
+<p style="margin-top: 30px; font-size: 14px; color: #6b7280; line-height: 1.6;"><strong>Note :</strong> Cette décision a été prise dans le respect des principes islamiques et de la bienveillance mutuelle. Nous vous encourageons à poursuivre votre recherche avec confiance et sérénité.</p>
+</td>
+</tr>
+<!-- Footer -->
+<tr>
+<td style="background: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb; border-radius: 0 0 16px 16px;">
+<p style="color: #6b7280; font-size: 14px; margin: 0;">Qu'Allah facilite votre chemin vers un mariage béni 🤲</p>
+<p style="color: #9ca3af; font-size: 12px; margin: 10px 0 0 0;">Cet email a été envoyé automatiquement par notre plateforme de rencontre islamique</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>`;
 
     // Send email
     await sendEmail({

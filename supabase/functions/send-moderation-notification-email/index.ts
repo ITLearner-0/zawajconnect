@@ -64,194 +64,118 @@ const handler = async (req: Request): Promise<Response> => {
     };
     const severityColor = severityColors[severity] || severityColors.medium;
 
-    const emailHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-            }
-            .header {
-              background: linear-gradient(135deg, ${actionInfo.color} 0%, ${severity === 'critical' ? '#7f1d1d' : actionInfo.color} 100%);
-              color: white;
-              padding: 30px;
-              border-radius: 10px 10px 0 0;
-              text-align: center;
-            }
-            .content {
-              background: #ffffff;
-              padding: 30px;
-              border: 1px solid #e5e7eb;
-              border-top: none;
-            }
-            .alert-box {
-              background: ${severity === 'critical' || severity === 'high' ? '#fee2e2' : '#fef3c7'};
-              color: ${severityColor};
-              padding: 20px;
-              border-radius: 8px;
-              text-align: center;
-              margin: 20px 0;
-              border: 2px solid ${severityColor};
-            }
-            .reason-box {
-              background: #f9fafb;
-              padding: 20px;
-              border-radius: 8px;
-              margin: 20px 0;
-              border-left: 4px solid ${severityColor};
-            }
-            .islamic-guidance {
-              background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-              padding: 20px;
-              border-radius: 8px;
-              margin: 20px 0;
-              border: 2px solid #3b82f6;
-            }
-            .guidelines-box {
-              background: #f0fdf4;
-              padding: 20px;
-              border-radius: 8px;
-              margin: 20px 0;
-              border: 1px solid #059669;
-            }
-            .guidelines-box ul {
-              margin: 10px 0;
-              padding-left: 20px;
-              color: #065f46;
-            }
-            .footer {
-              background: #f9fafb;
-              padding: 20px;
-              border-radius: 0 0 10px 10px;
-              text-align: center;
-              font-size: 14px;
-              color: #6b7280;
-              border: 1px solid #e5e7eb;
-              border-top: none;
-            }
-            .button {
-              display: inline-block;
-              padding: 15px 40px;
-              background: #059669;
-              color: white;
-              text-decoration: none;
-              border-radius: 6px;
-              margin: 20px 0;
-              font-weight: bold;
-              font-size: 18px;
-            }
-            .divider {
-              height: 1px;
-              background: #e5e7eb;
-              margin: 20px 0;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1 style="margin: 0; font-size: 32px;">${actionInfo.emoji} ${actionInfo.title}</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 18px;">Notification de modération</p>
-          </div>
-          
-          <div class="content">
-            <p style="font-size: 18px;">Assalamu alaykum ${userName},</p>
-            
-            <div class="alert-box">
-              <h3 style="margin: 0; font-size: 24px;">${actionInfo.title}</h3>
-              <p style="margin: 10px 0 0 0; font-size: 16px;">
-                Sévérité : <strong>${severity === 'critical' ? 'Critique' : 
-                                    severity === 'high' ? 'Élevée' : 
-                                    severity === 'medium' ? 'Moyenne' : 'Faible'}</strong>
-              </p>
-            </div>
-            
-            <p style="font-size: 16px;">
-              Notre système de modération automatique a détecté un contenu ne respectant pas nos principes islamiques 
-              et nos conditions d'utilisation.
-            </p>
-            
-            <div class="reason-box">
-              <h3 style="margin: 0 0 10px 0; color: ${severityColor};">📋 Raison de la modération</h3>
-              <p style="margin: 0; font-size: 16px;"><strong>${reason}</strong></p>
-              ${details ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #6b7280;">${details}</p>` : ''}
-            </div>
-            
-            ${action_taken === 'blocked' || action_taken === 'removed' ? `
-              <div style="background: #fee2e2; border: 1px solid #fca5a5; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <h4 style="margin: 0 0 10px 0; color: #991b1b;">⚠️ Conséquences :</h4>
-                <p style="margin: 0; color: #991b1b; font-size: 14px;">
-                  ${action_taken === 'blocked' 
-                    ? 'Votre contenu a été bloqué et ne peut pas être envoyé. Veuillez reformuler votre message en respectant nos principes.'
-                    : 'Votre contenu a été supprimé de la plateforme. Des violations répétées peuvent entraîner la suspension de votre compte.'}
-                </p>
-              </div>
-            ` : ''}
-            
-            <div class="islamic-guidance">
-              <h3 style="margin: 0 0 15px 0; color: #1e40af;">🕌 Guidance Islamique</h3>
-              <p style="margin: 0; color: #1e40af; font-size: 15px; font-style: italic;">
-                "Celui qui croit en Allah et au Jour Dernier, qu'il dise du bien ou qu'il se taise" 
-                - Prophète Muhammad (ﷺ)
-              </p>
-              <p style="margin: 10px 0 0 0; color: #1e40af; font-size: 14px;">
-                Notre plateforme s'engage à maintenir un environnement respectueux des valeurs islamiques 
-                de pudeur (Haya), de respect mutuel et de bienveillance.
-              </p>
-            </div>
-            
-            <div class="guidelines-box">
-              <h3 style="margin: 0 0 15px 0; color: #065f46;">✅ Rappel des bonnes pratiques :</h3>
-              <ul style="margin: 0; line-height: 1.8;">
-                <li>Respecter la pudeur islamique dans toutes les conversations</li>
-                <li>Éviter tout langage inapproprié ou vulgaire</li>
-                <li>Ne pas partager d'informations personnelles sensibles</li>
-                <li>Maintenir un ton respectueux et bienveillant</li>
-                <li>Impliquer votre Wali dans les décisions importantes</li>
-                <li>Signaler tout comportement inapproprié</li>
-              </ul>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${Deno.env.get("SUPABASE_URL") || 'https://dgfctwtivkqcfhwqgkya.supabase.co'}/community-guidelines" class="button">
-                📖 Consulter les règles complètes
-              </a>
-            </div>
-            
-            <p style="font-size: 14px; color: #6b7280; margin-top: 20px;">
-              <strong>Besoin d'aide ?</strong> Si vous pensez qu'il s'agit d'une erreur ou si vous avez des questions, 
-              n'hésitez pas à contacter notre équipe de support.
-            </p>
-            
-            ${severity === 'critical' || action_taken === 'removed' ? `
-              <div style="background: #fef2f2; border: 2px solid #dc2626; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0; color: #991b1b; font-size: 14px; font-weight: bold;">
-                  ⚠️ Avertissement important : Des violations répétées de nos règles peuvent entraîner 
-                  la suspension temporaire ou permanente de votre compte.
-                </p>
-              </div>
-            ` : ''}
-          </div>
-          
-          <div class="footer">
-            <p style="margin: 0;">
-              Qu'Allah vous guide vers le comportement exemplaire 🤲
-            </p>
-            <p style="margin: 10px 0 0 0; font-size: 12px;">
-              Notification automatique de modération • ${new Date().toLocaleDateString('fr-FR')}
-            </p>
-          </div>
-        </body>
-      </html>
-    `;
+    const emailHtml = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6;">
+<tr>
+<td style="padding: 40px 20px;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);">
+<!-- Header -->
+<tr>
+<td style="background: linear-gradient(135deg, ${actionInfo.color} 0%, ${severity === 'critical' ? '#7f1d1d' : actionInfo.color} 100%); padding: 40px 30px; text-align: center; border-radius: 16px 16px 0 0;">
+<h1 style="margin: 0; font-size: 32px; color: #ffffff;">${actionInfo.emoji} ${actionInfo.title}</h1>
+<p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 18px; color: #ffffff;">Notification de modération</p>
+</td>
+</tr>
+<!-- Content -->
+<tr>
+<td style="padding: 40px 30px;">
+<p style="font-size: 18px; margin: 0 0 20px 0;">Assalamu alaykum ${userName},</p>
+<!-- Alert Badge -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: ${severity === 'critical' || severity === 'high' ? '#fee2e2' : '#fef3c7'}; border: 2px solid ${severityColor}; padding: 20px; border-radius: 8px; text-align: center;">
+<h3 style="margin: 0; font-size: 24px; color: ${severityColor};">${actionInfo.title}</h3>
+<p style="margin: 10px 0 0 0; font-size: 16px; color: ${severityColor};">Sévérité : <strong>${severity === 'critical' ? 'Critique' : severity === 'high' ? 'Élevée' : severity === 'medium' ? 'Moyenne' : 'Faible'}</strong></p>
+</td>
+</tr>
+</table>
+<p style="font-size: 16px; margin: 0 0 20px 0; color: #4a5568;">Notre système de modération automatique a détecté un contenu ne respectant pas nos principes islamiques et nos conditions d'utilisation.</p>
+<!-- Reason Box -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: #f9fafb; border-left: 4px solid ${severityColor}; padding: 20px; border-radius: 8px;">
+<h3 style="margin: 0 0 10px 0; color: ${severityColor}; font-size: 18px;">📋 Raison de la modération</h3>
+<p style="margin: 0; font-size: 16px; color: #1f2937;"><strong>${reason}</strong></p>
+${details ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #6b7280;">${details}</p>` : ''}
+</td>
+</tr>
+</table>
+${action_taken === 'blocked' || action_taken === 'removed' ? `
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: #fee2e2; border: 1px solid #fca5a5; padding: 15px; border-radius: 8px;">
+<h4 style="margin: 0 0 10px 0; color: #991b1b;">⚠️ Conséquences :</h4>
+<p style="margin: 0; color: #991b1b; font-size: 14px;">${action_taken === 'blocked' ? 'Votre contenu a été bloqué et ne peut pas être envoyé. Veuillez reformuler votre message en respectant nos principes.' : 'Votre contenu a été supprimé de la plateforme. Des violations répétées peuvent entraîner la suspension de votre compte.'}</p>
+</td>
+</tr>
+</table>
+` : ''}
+<!-- Islamic Guidance -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); border: 2px solid #3b82f6; padding: 20px; border-radius: 8px;">
+<h3 style="margin: 0 0 15px 0; color: #1e40af; font-size: 18px;">🕌 Guidance Islamique</h3>
+<p style="margin: 0; color: #1e40af; font-size: 15px; font-style: italic;">"Celui qui croit en Allah et au Jour Dernier, qu'il dise du bien ou qu'il se taise" - Prophète Muhammad (ﷺ)</p>
+<p style="margin: 10px 0 0 0; color: #1e40af; font-size: 14px;">Notre plateforme s'engage à maintenir un environnement respectueux des valeurs islamiques de pudeur (Haya), de respect mutuel et de bienveillance.</p>
+</td>
+</tr>
+</table>
+<!-- Guidelines -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: #f0fdf4; border: 1px solid #059669; padding: 20px; border-radius: 8px;">
+<h3 style="margin: 0 0 15px 0; color: #065f46; font-size: 18px;">✅ Rappel des bonnes pratiques :</h3>
+<ul style="margin: 0; line-height: 1.8; padding-left: 20px; color: #065f46;">
+<li>Respecter la pudeur islamique dans toutes les conversations</li>
+<li>Éviter tout langage inapproprié ou vulgaire</li>
+<li>Ne pas partager d'informations personnelles sensibles</li>
+<li>Maintenir un ton respectueux et bienveillant</li>
+<li>Impliquer votre Wali dans les décisions importantes</li>
+<li>Signaler tout comportement inapproprié</li>
+</ul>
+</td>
+</tr>
+</table>
+<div style="height: 1px; background: #e5e7eb; margin: 30px 0;"></div>
+<!-- CTA Button -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+<tr>
+<td style="text-align: center; padding: 30px 0;">
+<a href="${Deno.env.get("SUPABASE_URL") || 'https://dgfctwtivkqcfhwqgkya.supabase.co'}/community-guidelines" style="display: inline-block; background: #059669; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px;">📖 Consulter les règles complètes</a>
+</td>
+</tr>
+</table>
+<p style="font-size: 14px; color: #6b7280; margin-top: 20px;"><strong>Besoin d'aide ?</strong> Si vous pensez qu'il s'agit d'une erreur ou si vous avez des questions, n'hésitez pas à contacter notre équipe de support.</p>
+${severity === 'critical' || action_taken === 'removed' ? `
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: #fef2f2; border: 2px solid #dc2626; padding: 15px; border-radius: 8px;">
+<p style="margin: 0; color: #991b1b; font-size: 14px; font-weight: bold;">⚠️ Avertissement important : Des violations répétées de nos règles peuvent entraîner la suspension temporaire ou permanente de votre compte.</p>
+</td>
+</tr>
+</table>
+` : ''}
+</td>
+</tr>
+<!-- Footer -->
+<tr>
+<td style="background: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb; border-radius: 0 0 16px 16px;">
+<p style="color: #6b7280; font-size: 14px; margin: 0;">Qu'Allah vous guide vers le comportement exemplaire 🤲</p>
+<p style="color: #9ca3af; font-size: 12px; margin: 10px 0 0 0;">Notification automatique de modération • ${new Date().toLocaleDateString('fr-FR')}</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>`;
 
     await sendEmail({
       to: userEmail,

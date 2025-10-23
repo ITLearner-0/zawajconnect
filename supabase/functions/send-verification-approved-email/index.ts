@@ -68,171 +68,93 @@ const handler = async (req: Request): Promise<Response> => {
           "✅ Confiance accrue des autres membres"
         ];
 
-    const emailHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8">
-          <style>
-            body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-            }
-            .header {
-              background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-              color: white;
-              padding: 30px;
-              border-radius: 10px 10px 0 0;
-              text-align: center;
-            }
-            .content {
-              background: #ffffff;
-              padding: 30px;
-              border: 1px solid #e5e7eb;
-              border-top: none;
-            }
-            .verification-badge {
-              background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-              padding: 20px;
-              border-radius: 8px;
-              text-align: center;
-              margin: 20px 0;
-              color: white;
-              font-size: 24px;
-              font-weight: bold;
-              box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);
-            }
-            .score-display {
-              background: #f0fdf4;
-              padding: 20px;
-              border-radius: 8px;
-              border: 2px solid #059669;
-              text-align: center;
-              margin: 20px 0;
-            }
-            .benefits-list {
-              background: #fef3c7;
-              padding: 20px;
-              border-radius: 8px;
-              margin: 20px 0;
-            }
-            .benefits-list ul {
-              margin: 10px 0;
-              padding-left: 0;
-              list-style: none;
-            }
-            .benefits-list li {
-              padding: 8px 0;
-              font-size: 16px;
-              line-height: 1.8;
-            }
-            .footer {
-              background: #f9fafb;
-              padding: 20px;
-              border-radius: 0 0 10px 10px;
-              text-align: center;
-              font-size: 14px;
-              color: #6b7280;
-              border: 1px solid #e5e7eb;
-              border-top: none;
-            }
-            .button {
-              display: inline-block;
-              padding: 15px 40px;
-              background: #059669;
-              color: white;
-              text-decoration: none;
-              border-radius: 6px;
-              margin: 20px 0;
-              font-weight: bold;
-              font-size: 18px;
-            }
-            .divider {
-              height: 1px;
-              background: #e5e7eb;
-              margin: 20px 0;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="header">
-            <h1 style="margin: 0; font-size: 32px;">🎉 Félicitations !</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 18px;">Votre vérification est approuvée</p>
-          </div>
-          
-          <div class="content">
-            <p style="font-size: 18px;">Assalamu alaykum ${userName},</p>
-            
-            <div class="verification-badge">
-              ✅ ${verificationLabel} Vérifié${verification_type === 'id' ? '(e)' : ''}
-            </div>
-            
-            <p style="font-size: 16px;">
-              Excellente nouvelle ! Votre <strong>${verificationLabel.toLowerCase()}</strong> a été vérifié${verification_type === 'email' ? '' : '(e)'} avec succès. 
-              Votre profil bénéficie maintenant d'une crédibilité accrue auprès des autres membres.
-            </p>
-            
-            <div class="score-display">
-              <h3 style="margin: 0 0 10px 0; color: #059669;">Score de vérification</h3>
-              <p style="margin: 0; font-size: 36px; font-weight: bold; color: #059669;">
-                ${verification_score}/100
-              </p>
-              <p style="margin: 10px 0 0 0; color: #6b7280; font-size: 14px;">
-                ${verification_score >= 85 ? '🏆 Profil hautement vérifié' : 
-                  verification_score >= 60 ? '⭐ Profil vérifié' : 
-                  '📈 En cours de vérification'}
-              </p>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <div class="benefits-list">
-              <h3 style="margin: 0 0 15px 0; color: #92400e;">🎁 Avantages débloqués :</h3>
-              <ul>
-                ${benefits.map(benefit => `<li>${benefit}</li>`).join('')}
-              </ul>
-            </div>
-            
-            ${verification_type !== 'id' ? `
-              <div style="background: #dbeafe; border: 1px solid #3b82f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                <p style="margin: 0; color: #1e40af; font-size: 14px;">
-                  <strong>💡 Conseil :</strong> Complétez la vérification de votre identité pour débloquer tous les avantages 
-                  et atteindre un score de 100/100.
-                </p>
-              </div>
-            ` : ''}
-            
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="${Deno.env.get("SUPABASE_URL") || 'https://dgfctwtivkqcfhwqgkya.supabase.co'}" class="button">
-                Accéder à mon profil
-              </a>
-            </div>
-            
-            <div class="divider"></div>
-            
-            <p style="font-size: 14px; color: #6b7280;">
-              <strong>Prochaines étapes :</strong><br>
-              1. Complétez votre profil à 100%<br>
-              2. ${verification_type === 'id' ? 'Commencez à parcourir les profils compatibles' : 'Vérifiez votre identité pour plus d\'avantages'}<br>
-              3. Invitez un Wali pour une supervision familiale (optionnel)
-            </p>
-          </div>
-          
-          <div class="footer">
-            <p style="margin: 0;">
-              Qu'Allah facilite votre recherche d'un mariage béni 🤲
-            </p>
-            <p style="margin: 10px 0 0 0; font-size: 12px;">
-              Cet email a été envoyé automatiquement suite à la validation de votre vérification
-            </p>
-          </div>
-        </body>
-      </html>
-    `;
+    const emailHtml = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6;">
+<tr>
+<td style="padding: 40px 20px;">
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);">
+<!-- Header -->
+<tr>
+<td style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); padding: 40px 30px; text-align: center; border-radius: 16px 16px 0 0;">
+<h1 style="margin: 0; font-size: 32px; color: #ffffff;">🎉 Félicitations !</h1>
+<p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 18px; color: #ffffff;">Votre vérification est approuvée</p>
+</td>
+</tr>
+<!-- Content -->
+<tr>
+<td style="padding: 40px 30px;">
+<p style="font-size: 18px; margin: 0 0 20px 0;">Assalamu alaykum ${userName},</p>
+<!-- Verification Badge -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 4px 15px rgba(251, 191, 36, 0.3);">
+<p style="margin: 0; font-size: 24px; font-weight: bold; color: #ffffff;">✅ ${verificationLabel} Vérifié${verification_type === 'id' ? '(e)' : ''}</p>
+</td>
+</tr>
+</table>
+<p style="font-size: 16px; margin: 0 0 20px 0; color: #4a5568;">Excellente nouvelle ! Votre <strong>${verificationLabel.toLowerCase()}</strong> a été vérifié${verification_type === 'email' ? '' : '(e)'} avec succès. Votre profil bénéficie maintenant d'une crédibilité accrue auprès des autres membres.</p>
+<!-- Score Display -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: #f0fdf4; border: 2px solid #059669; padding: 20px; border-radius: 8px; text-align: center;">
+<h3 style="margin: 0 0 10px 0; color: #059669; font-size: 18px;">Score de vérification</h3>
+<p style="margin: 0; font-size: 36px; font-weight: bold; color: #059669;">${verification_score}/100</p>
+<p style="margin: 10px 0 0 0; color: #6b7280; font-size: 14px;">${verification_score >= 85 ? '🏆 Profil hautement vérifié' : verification_score >= 60 ? '⭐ Profil vérifié' : '📈 En cours de vérification'}</p>
+</td>
+</tr>
+</table>
+<div style="height: 1px; background: #e5e7eb; margin: 30px 0;"></div>
+<!-- Benefits List -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: #fef3c7; padding: 20px; border-radius: 8px;">
+<h3 style="margin: 0 0 15px 0; color: #92400e; font-size: 18px;">🎁 Avantages débloqués :</h3>
+<ul style="margin: 0; padding-left: 20px;">
+${benefits.map(benefit => `<li style="padding: 8px 0; font-size: 16px; line-height: 1.8; color: #1f2937;">${benefit}</li>`).join('')}
+</ul>
+</td>
+</tr>
+</table>
+${verification_type !== 'id' ? `
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
+<tr>
+<td style="background: #dbeafe; border: 1px solid #3b82f6; padding: 15px; border-radius: 8px;">
+<p style="margin: 0; color: #1e40af; font-size: 14px;"><strong>💡 Conseil :</strong> Complétez la vérification de votre identité pour débloquer tous les avantages et atteindre un score de 100/100.</p>
+</td>
+</tr>
+</table>
+` : ''}
+<!-- CTA Button -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+<tr>
+<td style="text-align: center; padding: 30px 0;">
+<a href="${Deno.env.get("SUPABASE_URL") || 'https://dgfctwtivkqcfhwqgkya.supabase.co'}" style="display: inline-block; background: #059669; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px;">Accéder à mon profil</a>
+</td>
+</tr>
+</table>
+<div style="height: 1px; background: #e5e7eb; margin: 30px 0;"></div>
+<p style="font-size: 14px; color: #6b7280;"><strong>Prochaines étapes :</strong><br>1. Complétez votre profil à 100%<br>2. ${verification_type === 'id' ? 'Commencez à parcourir les profils compatibles' : 'Vérifiez votre identité pour plus d\'avantages'}<br>3. Invitez un Wali pour une supervision familiale (optionnel)</p>
+</td>
+</tr>
+<!-- Footer -->
+<tr>
+<td style="background: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb; border-radius: 0 0 16px 16px;">
+<p style="color: #6b7280; font-size: 14px; margin: 0;">Qu'Allah facilite votre recherche d'un mariage béni 🤲</p>
+<p style="color: #9ca3af; font-size: 12px; margin: 10px 0 0 0;">Cet email a été envoyé automatiquement suite à la validation de votre vérification</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>`;
 
     await sendEmail({
       to: userEmail,
