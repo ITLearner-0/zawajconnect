@@ -1,5 +1,8 @@
 project_id = "dgfctwtivkqcfhwqgkya"
 
+[functions.send-password-reset-email]
+verify_jwt = false
+
 [functions.moderate-content]
 verify_jwt = true
 

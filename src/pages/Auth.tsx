@@ -173,19 +173,28 @@ const Auth = () => {
       return;
     }
     
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: `${window.location.origin}/reset-password`
-    });
-    
-    if (error) {
-      setError(translateAuthError(error.message));
-    } else {
+    try {
+      // Appeler notre edge function personnalisée qui utilise SMTP
+      const { error: functionError } = await supabase.functions.invoke('send-password-reset-email', {
+        body: {
+          email: resetEmail,
+          redirectUrl: `${window.location.origin}/reset-password`
+        }
+      });
+      
+      if (functionError) {
+        throw functionError;
+      }
+      
       toast({
         title: "Email envoyé",
         description: "Vérifiez votre boîte email pour réinitialiser votre mot de passe",
       });
       setShowForgotPassword(false);
       setResetEmail('');
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      setError('Erreur lors de l\'envoi de l\'email. Veuillez réessayer.');
     }
     
     setLoading(false);
