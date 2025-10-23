@@ -32,14 +32,14 @@ const SubscriptionManagement = () => {
   const [loading, setLoading] = useState(true);
   const [grantDialogOpen, setGrantDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState('');
-  const [planType, setPlanType] = useState('premium');
-  const [expirationDays, setExpirationDays] = useState('30');
+  const [planType, setPlanType] = useState('premium_3_months');
+  const [expirationDays, setExpirationDays] = useState('90');
   const [notes, setNotes] = useState('');
 
   const planTypes = [
-    { value: 'free', label: 'Gratuit', color: 'bg-gray-500' },
-    { value: 'premium', label: 'Premium', color: 'bg-purple-500' },
-    { value: 'family_plus', label: 'Famille+', color: 'bg-blue-500' }
+    { value: 'premium_3_months', label: 'Premium 3 mois (9.99€/mois)', color: 'bg-emerald-600', days: 90 },
+    { value: 'premium_6_months', label: 'Premium 6 mois (8.33€/mois)', color: 'bg-emerald-700', days: 180 },
+    { value: 'premium_12_months', label: 'Premium 12 mois (6.66€/mois)', color: 'bg-emerald-800', days: 365 }
   ];
 
   useEffect(() => {
@@ -203,7 +203,16 @@ const SubscriptionManagement = () => {
               
               <div>
                 <Label htmlFor="planType">Type d'Abonnement</Label>
-                <Select value={planType} onValueChange={setPlanType}>
+                <Select 
+                  value={planType} 
+                  onValueChange={(value) => {
+                    setPlanType(value);
+                    const selectedPlan = planTypes.find(p => p.value === value);
+                    if (selectedPlan) {
+                      setExpirationDays(selectedPlan.days.toString());
+                    }
+                  }}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -222,12 +231,12 @@ const SubscriptionManagement = () => {
                 <Input
                   id="expiration"
                   type="number"
-                  placeholder="30"
+                  placeholder="90"
                   value={expirationDays}
                   onChange={(e) => setExpirationDays(e.target.value)}
                 />
                 <p className="text-sm text-muted-foreground mt-1">
-                  Laissez vide pour un abonnement illimité
+                  La durée se met à jour automatiquement selon le plan sélectionné
                 </p>
               </div>
               
@@ -281,7 +290,7 @@ const SubscriptionManagement = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {subscriptions.filter(s => s.plan_type === 'premium' && s.status === 'active').length}
+              {subscriptions.filter(s => s.plan_type.includes('premium') && s.status === 'active').length}
             </div>
           </CardContent>
         </Card>
