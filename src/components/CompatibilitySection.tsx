@@ -44,11 +44,11 @@ const CompatibilitySection = () => {
   ];
 
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-sage/10 via-cream/30 to-emerald/5">
+    <section className="py-12 px-4 bg-gradient-to-br from-sage/10 via-cream/30 to-emerald/5">
       <div className="container mx-auto">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-16 animate-fade-in">
+          <div className="text-center mb-12 animate-fade-in">
             <div className="h-16 w-16 bg-gradient-to-br from-emerald to-gold rounded-full flex items-center justify-center mx-auto mb-6">
               <Calculator className="h-8 w-8 text-white" />
             </div>
@@ -60,7 +60,7 @@ const CompatibilitySection = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             {/* Compatibility Factors */}
             <Card className="animate-slide-up card-hover">
               <CardHeader>
