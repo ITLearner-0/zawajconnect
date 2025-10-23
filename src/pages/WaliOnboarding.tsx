@@ -32,12 +32,10 @@ const WaliOnboarding = () => {
   const token = searchParams.get('token') || sessionStorage.getItem('pending_invitation_token');
 
   useEffect(() => {
-    // Store token in sessionStorage and clean URL
+    // Store token ONLY if it comes from URL
     const urlToken = searchParams.get('token');
-    if (urlToken) {
+    if (urlToken && !sessionStorage.getItem('pending_invitation_token')) {
       sessionStorage.setItem('pending_invitation_token', urlToken);
-      // Clean URL without reloading
-      window.history.replaceState({}, '', '/wali-onboarding');
     }
   }, [searchParams]);
 
@@ -47,19 +45,33 @@ const WaliOnboarding = () => {
       return;
     }
 
-    // Check if profile is already complete
+    // Check if profile is already complete - if yes, redirect immediately
     const checkExistingProfile = async () => {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('full_name')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('user_id', user.id)
+          .maybeSingle();
 
-      // If profile already has full_name and no token, redirect to family-supervision
-      if (profile?.full_name && profile.full_name.trim().length > 0 && !token) {
-        console.log('✅ Profile already complete, redirecting to family-supervision');
-        navigate('/family-supervision', { replace: true });
-        return;
+        // Check if user is already a Wali
+        const { data: familyMember } = await supabase
+          .from('family_members')
+          .select('id')
+          .eq('invited_user_id', user.id)
+          .eq('is_wali', true)
+          .eq('invitation_status', 'accepted')
+          .maybeSingle();
+
+        // If profile is complete and user is already a Wali, redirect
+        if (profile?.full_name && profile.full_name.trim().length > 0 && familyMember) {
+          console.log('✅ Profile already complete and user is Wali, clearing token and redirecting');
+          sessionStorage.removeItem('pending_invitation_token');
+          navigate('/family-supervision', { replace: true });
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking profile:', error);
       }
     };
 
