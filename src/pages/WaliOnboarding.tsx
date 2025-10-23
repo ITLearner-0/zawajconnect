@@ -89,17 +89,27 @@ const WaliOnboarding = () => {
           p_invited_user_id: user.id
         });
 
-        if (invitationError || !data) {
+        if (invitationError) {
           console.error('Error accepting invitation:', invitationError);
-          // Don't throw - profile was created successfully, just log the error
           toast({
             title: "Profil créé",
             description: "Votre profil a été créé mais l'acceptation de l'invitation a échoué. Veuillez réessayer depuis votre espace de supervision.",
             variant: "default"
           });
+        } else if (data === false) {
+          // Invitation token is invalid or expired
+          toast({
+            title: "Profil créé",
+            description: "Le lien d'invitation est invalide ou expiré. Contactez la personne qui vous a invité.",
+            variant: "default"
+          });
         } else {
-          // Clear the stored token after successful acceptance
+          // Success - clear the stored token
           sessionStorage.removeItem('pending_invitation_token');
+          toast({
+            title: "Invitation acceptée",
+            description: "Vous avez été ajouté comme Wali avec succès.",
+          });
         }
       }
 
