@@ -87,9 +87,9 @@ const processSteps: ProcessStep[] = [
 
 const ProcessSection = () => {
   return (
-    <section id="processus" className="py-20 bg-gradient-to-br from-cream/10 via-background to-sage/5">
+    <section id="processus" className="py-12 bg-gradient-to-br from-cream/10 via-background to-sage/5">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-sage-700 bg-clip-text text-transparent">
             Votre Parcours vers le Mariage
           </h2>
@@ -149,7 +149,7 @@ const ProcessSection = () => {
         </div>
 
         {/* Call to Action */}
-        <div className="text-center mt-16">
+        <div className="text-center mt-12">
           <div className="bg-gradient-to-r from-emerald-50 to-sage-50 rounded-2xl p-8 border border-emerald-200 max-w-4xl mx-auto">
             <h3 className="text-2xl font-bold text-emerald-700 mb-4">
               Prêt à Commencer Votre Parcours ?

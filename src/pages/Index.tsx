@@ -21,10 +21,10 @@ const Index = () => {
       <CompatibilitySection />
       <IslamicQuotes />
       <SuccessStories />
-      <section className="py-16 px-4 bg-gradient-to-br from-emerald/5 via-cream/20 to-sage/10">
+      <section className="py-12 px-4 bg-gradient-to-br from-emerald/5 via-cream/20 to-sage/10">
         <div className="container mx-auto">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12 animate-fade-in">
+            <div className="text-center mb-10 animate-fade-in">
               <h2 className="text-3xl font-bold text-foreground mb-4">
                 Outils Islamiques du Quotidien
               </h2>

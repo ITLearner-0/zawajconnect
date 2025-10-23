@@ -56,9 +56,9 @@ const islamicValues: Value[] = [
 
 const IslamicValues = () => {
   return (
-    <section id="valeurs" className="py-20 bg-gradient-to-br from-background via-sage/5 to-cream/10">
+    <section id="valeurs" className="py-12 bg-gradient-to-br from-background via-sage/5 to-cream/10">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-200 mb-6">
             <Building2 className="w-5 h-5 text-emerald-600" />
             <span className="text-emerald-700 font-medium">Fondation Islamique</span>
@@ -110,7 +110,7 @@ const IslamicValues = () => {
           ))}
         </div>
 
-        <div className="text-center mt-16">
+        <div className="text-center mt-12">
           <div className="max-w-4xl mx-auto">
             <div className="bg-gradient-to-r from-emerald-50 to-sage-50 rounded-2xl p-8 border border-emerald-200">
               <Building2 className="w-12 h-12 text-emerald-600 mx-auto mb-4" />
