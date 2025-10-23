@@ -32,6 +32,10 @@ const SubscriptionManagement = () => {
   const [loading, setLoading] = useState(true);
   const [grantDialogOpen, setGrantDialogOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState('');
+  const [selectedUserName, setSelectedUserName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchingUsers, setSearchingUsers] = useState(false);
   const [planType, setPlanType] = useState('premium_3_months');
   const [expirationDays, setExpirationDays] = useState('90');
   const [notes, setNotes] = useState('');
@@ -67,23 +71,42 @@ const SubscriptionManagement = () => {
     }
   };
 
-  const searchUsers = async (email: string) => {
-    if (!email.includes('@')) return [];
+  const searchUsers = async (query: string) => {
+    if (!query || query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
     
     try {
+      setSearchingUsers(true);
       const { data, error } = await supabase
         .from('profiles')
-        .select('user_id, full_name')
-        .ilike('full_name', `%${email}%`)
-        .limit(10);
+        .select('user_id, full_name, age, location')
+        .or(`full_name.ilike.%${query}%,user_id.eq.${query}`)
+        .limit(20);
 
       if (error) throw error;
-      return data || [];
+      setSearchResults(data || []);
     } catch (error) {
       console.error('Erreur lors de la recherche d\'utilisateurs:', error);
-      return [];
+      setSearchResults([]);
+    } finally {
+      setSearchingUsers(false);
     }
   };
+
+  // Debounce search
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (searchQuery) {
+        searchUsers(searchQuery);
+      } else {
+        setSearchResults([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const grantSubscription = async () => {
     if (!selectedUserId || !planType) {
@@ -113,6 +136,9 @@ const SubscriptionManagement = () => {
       toast.success(`Abonnement ${planType} accordé avec succès`);
       setGrantDialogOpen(false);
       setSelectedUserId('');
+      setSelectedUserName('');
+      setSearchQuery('');
+      setSearchResults([]);
       setNotes('');
       loadSubscriptions();
     } catch (error) {
@@ -192,13 +218,56 @@ const SubscriptionManagement = () => {
             
             <div className="space-y-4">
               <div>
-                <Label htmlFor="userId">Utilisateur (ID)</Label>
-                <Input
-                  id="userId"
-                  placeholder="ID de l'utilisateur"
-                  value={selectedUserId}
-                  onChange={(e) => setSelectedUserId(e.target.value)}
-                />
+                <Label htmlFor="userSearch">Rechercher un Utilisateur</Label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="userSearch"
+                    placeholder="Nom ou ID de l'utilisateur..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                
+                {searchingUsers && (
+                  <div className="mt-2 text-sm text-muted-foreground">
+                    Recherche en cours...
+                  </div>
+                )}
+                
+                {searchResults.length > 0 && (
+                  <div className="mt-2 border rounded-lg max-h-48 overflow-y-auto">
+                    {searchResults.map((user) => (
+                      <div
+                        key={user.user_id}
+                        onClick={() => {
+                          setSelectedUserId(user.user_id);
+                          setSelectedUserName(user.full_name || 'Utilisateur');
+                          setSearchQuery(user.full_name || user.user_id);
+                          setSearchResults([]);
+                        }}
+                        className="p-3 hover:bg-accent cursor-pointer border-b last:border-b-0"
+                      >
+                        <div className="font-medium">{user.full_name || 'Sans nom'}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {user.age && `${user.age} ans`}
+                          {user.age && user.location && ' • '}
+                          {user.location}
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          ID: {user.user_id}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {selectedUserId && (
+                  <div className="mt-2 p-2 bg-emerald-50 dark:bg-emerald-950 rounded-md text-sm">
+                    <strong>Sélectionné:</strong> {selectedUserName}
+                  </div>
+                )}
               </div>
               
               <div>
