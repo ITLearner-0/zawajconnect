@@ -13,5 +13,42 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
+    detectSessionInUrl: true,
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
+    },
+  },
+  global: {
+    headers: {
+      'x-client-info': 'supabase-js-web',
+    },
+  },
+});
+
+// Handle session expiry gracefully
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'TOKEN_REFRESHED') {
+    console.log('🔄 Token refreshed successfully');
+  }
+  
+  if (event === 'SIGNED_OUT') {
+    console.log('🚪 User signed out - cleaning up');
+    // Clean up any active realtime subscriptions
+    supabase.removeAllChannels();
   }
 });
+
+// Handle realtime connection errors
+if (typeof window !== 'undefined') {
+  window.addEventListener('online', () => {
+    console.log('📡 Network online - reconnecting realtime');
+    supabase.realtime.connect();
+  });
+
+  window.addEventListener('offline', () => {
+    console.log('📡 Network offline - pausing realtime');
+    supabase.realtime.disconnect();
+  });
+}
