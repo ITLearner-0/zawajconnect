@@ -79,11 +79,23 @@ const SubscriptionManagement = () => {
     
     try {
       setSearchingUsers(true);
-      const { data, error } = await supabase
+      
+      // Check if query is a valid UUID format
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(query);
+      
+      let supabaseQuery = supabase
         .from('profiles')
-        .select('user_id, full_name, age, location')
-        .or(`full_name.ilike.%${query}%,user_id.eq.${query}`)
-        .limit(20);
+        .select('user_id, full_name, age, location');
+      
+      if (isUUID) {
+        // If it's a UUID, search by user_id
+        supabaseQuery = supabaseQuery.eq('user_id', query);
+      } else {
+        // Otherwise, search by name only
+        supabaseQuery = supabaseQuery.ilike('full_name', `%${query}%`);
+      }
+      
+      const { data, error } = await supabaseQuery.limit(20);
 
       if (error) throw error;
       setSearchResults(data || []);
