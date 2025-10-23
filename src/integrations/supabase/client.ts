@@ -38,6 +38,12 @@ supabase.auth.onAuthStateChange((event, session) => {
     // Clean up any active realtime subscriptions
     supabase.removeAllChannels();
   }
+
+  // Gérer la récupération de mot de passe
+  if (event === 'PASSWORD_RECOVERY') {
+    console.log('🔑 Password recovery detected - redirecting to reset password page');
+    window.location.href = '/reset-password';
+  }
 });
 
 // Handle realtime connection errors
