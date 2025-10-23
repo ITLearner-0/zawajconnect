@@ -40,6 +40,7 @@ import RefundPolicy from '@/pages/RefundPolicy';
 import CommunityGuidelines from '@/pages/CommunityGuidelines';
 import CookiePolicy from '@/pages/CookiePolicy';
 import SubscriptionCanceled from '@/pages/SubscriptionCanceled';
+import ResetPassword from '@/pages/ResetPassword';
 
 export interface AppRouteConfig {
   path: string;
@@ -52,6 +53,7 @@ export interface AppRouteConfig {
 export const publicRoutes: AppRouteConfig[] = [
   { path: '/', component: Index },
   { path: '/auth', component: Auth },
+  { path: '/reset-password', component: ResetPassword },
   { path: '/wali', component: WaliAccess },
   { path: '/privacy-policy', component: PrivacyPolicy },
   { path: '/terms-of-service', component: TermsOfService },
