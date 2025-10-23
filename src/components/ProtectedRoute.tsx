@@ -32,12 +32,14 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
         // Check if user is a Wali (invited user)
         const { data: familyMember } = await supabase
           .from('family_members')
-          .select('id')
+          .select('id, invitation_status')
           .eq('invited_user_id', user.id)
+          .eq('is_wali', true)
+          .eq('invitation_status', 'accepted')
           .maybeSingle();
 
         const userIsWali = !!familyMember;
-        console.log('🔒 Is Wali:', userIsWali);
+        console.log('🔒 Is Wali:', userIsWali, 'Family member:', familyMember);
         setIsWali(userIsWali);
 
         // Fetch all profile fields
@@ -60,9 +62,9 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
         // For Walis, only full_name is required
         // For regular users, bio and looking_for are required
         const isComplete = userIsWali 
-          ? !!(profile?.full_name)
+          ? !!(profile?.full_name && profile.full_name.trim().length > 0)
           : !!(profile?.bio && profile?.looking_for);
-        console.log('🔒 Profile complete:', isComplete);
+        console.log('🔒 Profile complete:', isComplete, 'Full name:', profile?.full_name);
         setHasCompleteProfile(isComplete);
       } catch (error) {
         console.error('🔒 Exception checking profile:', error);
