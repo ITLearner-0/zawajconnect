@@ -122,7 +122,7 @@ ${currentQuote.arabic ? `${currentQuote.arabic}\n\n` : ''}Source: ${currentQuote
   };
 
   if (!currentQuote) {
-    return <div className="flex items-center justify-center h-96">Chargement...</div>;
+    return <div className="flex items-center justify-center py-8">Chargement...</div>;
   }
 
   return (
