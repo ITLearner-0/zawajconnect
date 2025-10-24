@@ -31,7 +31,7 @@ interface Match {
 }
 
 const Matches = () => {
-  const { user, subscription, checkSubscription } = useAuth();
+  const { user, subscription, checkSubscription, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [matches, setMatches] = useState<Match[]>([]);
   const [mutualMatches, setMutualMatches] = useState<Match[]>([]);
@@ -41,7 +41,19 @@ const Matches = () => {
   // Debug: afficher le statut d'abonnement
   console.log('📊 Statut abonnement Matches:', subscription);
 
-  // Bloquer si pas premium
+  // Attendre que l'authentification soit chargée avant de vérifier
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center">
+        <div className="text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald border-t-transparent mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Vérification de votre abonnement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Bloquer si pas premium (seulement après que authLoading soit false)
   if (!subscription.subscribed) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center p-4">
