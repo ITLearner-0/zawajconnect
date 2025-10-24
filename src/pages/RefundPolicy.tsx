@@ -38,9 +38,6 @@ const RefundPolicy = () => {
           <CardContent className="p-6">
             <div className="space-y-2 text-sm">
               <p><strong>ZawajConnect</strong></p>
-              <p>Auto-entrepreneur - Responsable : <strong>A.K.</strong></p>
-              <p>SIRET : 522 317 767 00039</p>
-              <p>Siège social : 91 Rue du Faubourg Saint-Honoré, 75008 Paris 08</p>
               <p>Email : <a href="mailto:contact@zawajconnect.me" className="text-emerald hover:underline">contact@zawajconnect.me</a></p>
               <p className="text-muted-foreground mt-4">Dernière mise à jour : 17 octobre 2025</p>
             </div>

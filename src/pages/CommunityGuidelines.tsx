@@ -35,7 +35,6 @@ const CommunityGuidelines = () => {
           <CardContent className="p-6">
             <div className="space-y-2 text-sm">
               <p><strong>ZawajConnect</strong></p>
-              <p>Auto-entrepreneur - Responsable : <strong>A.K.</strong></p>
               <p>Email : <a href="mailto:contact@zawajconnect.me" className="text-emerald hover:underline">contact@zawajconnect.me</a></p>
               <p className="text-muted-foreground mt-4">Dernière mise à jour : 17 octobre 2025</p>
             </div>
