@@ -37,13 +37,15 @@ serve(async (req) => {
     }
 
     // Vérifier dans Supabase si l'utilisateur a un abonnement actif
+    // On vérifie TOUS les abonnements actifs (manuels, Braintree, etc.)
     const { data: subscription, error } = await supabaseClient
       .from('subscriptions')
       .select('*')
       .eq('user_id', user.id)
       .eq('status', 'active')
-      .eq('provider', 'braintree')
-      .single();
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
 
     if (error || !subscription) {
       return new Response(
