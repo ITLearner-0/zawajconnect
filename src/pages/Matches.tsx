@@ -31,12 +31,15 @@ interface Match {
 }
 
 const Matches = () => {
-  const { user, subscription } = useAuth();
+  const { user, subscription, checkSubscription } = useAuth();
   const navigate = useNavigate();
   const [matches, setMatches] = useState<Match[]>([]);
   const [mutualMatches, setMutualMatches] = useState<Match[]>([]);
   const [pendingMatches, setPendingMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Debug: afficher le statut d'abonnement
+  console.log('📊 Statut abonnement Matches:', subscription);
 
   // Bloquer si pas premium
   if (!subscription.subscribed) {
@@ -52,17 +55,30 @@ const Matches = () => {
               Accédez à vos matches, likes et mises en relation en passant à Premium.
             </p>
           </div>
-          <Button
-            onClick={() => {
-              console.log('Navigation vers Premium...');
-              navigate('/settings?tab=premium');
-            }}
-            className="w-full bg-gradient-to-r from-emerald to-emerald-light"
-            size="lg"
-          >
-            <Crown className="h-4 w-4 mr-2" />
-            Passer à Premium
-          </Button>
+          <div className="space-y-3">
+            <Button
+              onClick={() => {
+                console.log('Navigation vers Premium...');
+                navigate('/settings?tab=premium');
+              }}
+              className="w-full bg-gradient-to-r from-emerald to-emerald-light"
+              size="lg"
+            >
+              <Crown className="h-4 w-4 mr-2" />
+              Passer à Premium
+            </Button>
+            <Button
+              onClick={async () => {
+                console.log('🔄 Vérification forcée du statut...');
+                await checkSubscription();
+                window.location.reload();
+              }}
+              variant="outline"
+              className="w-full"
+            >
+              Vérifier mon abonnement
+            </Button>
+          </div>
         </Card>
       </div>
     );

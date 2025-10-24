@@ -77,12 +77,16 @@ serve(async (req) => {
       );
     }
 
+    const response = {
+      subscribed: true,
+      plan_id: subscription.plan_type,
+      subscription_end: subscription.expires_at,
+    };
+    
+    console.log('✅ Abonnement trouvé:', response);
+    
     return new Response(
-      JSON.stringify({
-        subscribed: true,
-        plan_id: subscription.plan_type,
-        subscription_end: subscription.expires_at,
-      }),
+      JSON.stringify(response),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
