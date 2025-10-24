@@ -2,7 +2,6 @@ import Hero from "@/components/Hero";
 import IslamicValues from "@/components/IslamicValues";
 import ProcessSection from "@/components/ProcessSection";
 import CompatibilitySection from "@/components/CompatibilitySection";
-import SuccessStories from "@/components/SuccessStories";
 import PrayerTimes from "@/components/PrayerTimes";
 import QiblaDirection from "@/components/QiblaDirection";
 import IslamicCalendar from "@/components/IslamicCalendar";
@@ -17,7 +16,6 @@ const Index = () => {
       <IslamicValues />
       <ProcessSection />
       <CompatibilitySection />
-      <SuccessStories />
       <section className="py-12 px-4 bg-gradient-to-br from-emerald/5 via-cream/20 to-sage/10">
         <div className="container mx-auto">
           <div className="max-w-6xl mx-auto">
