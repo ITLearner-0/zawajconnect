@@ -12,24 +12,37 @@ serve(async (req) => {
   }
 
   try {
-    // Utiliser le SERVICE_ROLE_KEY pour avoir accès aux opérations admin
+    // Extraire le token du header Authorization
+    const authHeader = req.headers.get('Authorization');
+    console.log('🔑 Authorization header:', authHeader ? 'présent' : 'absent');
+    
+    if (!authHeader) {
+      console.log('❌ Pas de header Authorization');
+      return new Response(
+        JSON.stringify({ subscribed: false, plan_id: null, subscription_end: null }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      );
+    }
+
+    // Créer le client avec le service role key pour accéder à la DB
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser();
-
+    // Extraire le JWT token du header
+    const token = authHeader.replace('Bearer ', '');
+    
+    // Récupérer l'utilisateur à partir du token
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
+    
     console.log('🔍 Utilisateur authentifié:', user?.id, user?.email);
+    console.log('🔍 Erreur auth:', userError);
 
-    if (!user) {
+    if (!user || userError) {
       console.log('❌ Aucun utilisateur authentifié');
       return new Response(
         JSON.stringify({ subscribed: false, plan_id: null, subscription_end: null }),
