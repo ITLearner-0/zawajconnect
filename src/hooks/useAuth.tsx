@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -39,8 +39,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     months_remaining: null,
   });
 
-  const checkSubscription = async () => {
+  const checkSubscription = useCallback(async () => {
+    console.log('🔍 checkSubscription appelé, user:', user?.email);
+    
     if (!user) {
+      console.log('❌ Pas d\'utilisateur, subscription = false');
       setSubscription({ 
         subscribed: false, 
         product_id: null, 
@@ -52,26 +55,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     try {
+      console.log('📡 Appel de l\'edge function check-braintree-subscription...');
       const { data, error } = await supabase.functions.invoke('check-braintree-subscription');
       
+      console.log('📡 Réponse de l\'edge function:', { data, error });
+      
       if (error) {
-        console.error('Error checking subscription:', error);
+        console.error('❌ Erreur lors de la vérification:', error);
         return;
       }
 
       if (data) {
-        setSubscription({
+        const newSubscription = {
           subscribed: data.subscribed || false,
           product_id: data.plan_id || null,
           subscription_end: data.subscription_end || null,
           plan_duration: null,
           months_remaining: null,
-        });
+        };
+        
+        console.log('✅ Mise à jour du statut subscription:', newSubscription);
+        setSubscription(newSubscription);
       }
     } catch (error) {
-      console.error('Error in checkSubscription:', error);
+      console.error('❌ Exception dans checkSubscription:', error);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     // Set up auth state listener FIRST - CRITICAL: Keep synchronous!
@@ -134,7 +143,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     initializeAuth();
 
     return () => authSubscription.unsubscribe();
-  }, []);
+  }, [checkSubscription]);
 
   // Auto-refresh subscription every minute
   useEffect(() => {
@@ -142,7 +151,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const interval = setInterval(checkSubscription, 60000);
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, checkSubscription]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
