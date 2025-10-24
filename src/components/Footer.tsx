@@ -94,12 +94,7 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-white/20 mt-12 pt-8 text-center space-y-2">
-          <p className="text-white/70 text-sm">ZawajConnect - Auto-entrepreneur</p>
-          <p className="text-white/70 text-sm">
-            SIRET : 522 317 767 00039 - 91 Rue du Faubourg Saint-Honoré, 75008 Paris 08
-          </p>
-          <p className="text-white/70 text-sm">Contact : contact@zawajconnect.me</p>
-          <p className="text-white/60 text-xs mt-4">
+          <p className="text-white/60 text-xs">
             © {new Date().getFullYear()} ZawajConnect. Tous droits réservés. Plateforme matrimoniale conforme aux valeurs islamiques.
           </p>
           <p className="text-white/60 text-xs">
