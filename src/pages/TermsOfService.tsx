@@ -442,7 +442,7 @@ const TermsOfService = () => {
                 </p>
                 
                 <p><strong>11.1 Responsable de traitement</strong></p>
-                <p>A.K. - contact@zawajconnect.me</p>
+                <p>contact@zawajconnect.me</p>
                 
                 <p><strong>11.2 Données collectées</strong></p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
