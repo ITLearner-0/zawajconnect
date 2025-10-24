@@ -30,8 +30,10 @@ import {
   UserCheck,
   Search,
   Lock,
-  Trash2
+  Trash2,
+  ExternalLink
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface AdminDashboardProps {
   userRole?: string | null;
@@ -79,6 +81,7 @@ interface Stats {
 const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
     activeMatches: 0,
@@ -545,6 +548,14 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => navigate(`/admin/user/${user.user_id}`)}
+                              title="Voir le profil complet"
+                            >
+                              <ExternalLink className="h-3 w-3" />
+                            </Button>
                             {status !== 'active' && status !== 'deleted' && (
                               <Button
                                 size="sm"

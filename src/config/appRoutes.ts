@@ -17,6 +17,7 @@ import MatchApproval from '@/pages/MatchApproval';
 import FamilyAnalyticsPage from '@/pages/FamilyAnalytics';
 import ModerationTests from '@/pages/ModerationTests';
 import Admin from '@/pages/Admin';
+import AdminUserProfile from '@/pages/AdminUserProfile';
 import FAQ from '@/pages/FAQ';
 import Settings from '@/pages/Settings';
 import IslamicTools from '@/pages/IslamicTools';
@@ -104,6 +105,7 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/family', component: Family },
   { path: '/guidance', component: Guidance },
   { path: '/admin', component: Admin },
+  { path: '/admin/user/:userId', component: AdminUserProfile },
   { path: '/moderation-test', component: ModerationTest },
   { path: '/wali-dashboard', component: WaliDashboard },
   { path: '/match-approval', component: MatchApproval },
