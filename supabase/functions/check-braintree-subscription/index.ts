@@ -26,7 +26,10 @@ serve(async (req) => {
       data: { user },
     } = await supabaseClient.auth.getUser();
 
+    console.log('🔍 Utilisateur authentifié:', user?.id, user?.email);
+
     if (!user) {
+      console.log('❌ Aucun utilisateur authentifié');
       return new Response(
         JSON.stringify({ subscribed: false, plan_id: null, subscription_end: null }),
         {
@@ -38,6 +41,8 @@ serve(async (req) => {
 
     // Vérifier dans Supabase si l'utilisateur a un abonnement actif
     // On vérifie TOUS les abonnements actifs (manuels, Braintree, etc.)
+    console.log('🔍 Recherche d\'abonnement pour user_id:', user.id);
+    
     const { data: subscription, error } = await supabaseClient
       .from('subscriptions')
       .select('*')
@@ -47,7 +52,21 @@ serve(async (req) => {
       .limit(1)
       .maybeSingle();
 
-    if (error || !subscription) {
+    console.log('📊 Résultat de la requête:', { subscription, error });
+
+    if (error) {
+      console.error('❌ Erreur lors de la requête:', error);
+      return new Response(
+        JSON.stringify({ subscribed: false, plan_id: null, subscription_end: null }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,
+        }
+      );
+    }
+
+    if (!subscription) {
+      console.log('❌ Aucun abonnement trouvé');
       return new Response(
         JSON.stringify({ subscribed: false, plan_id: null, subscription_end: null }),
         {
