@@ -7,7 +7,6 @@ import PrayerTimes from "@/components/PrayerTimes";
 import QiblaDirection from "@/components/QiblaDirection";
 import IslamicCalendar from "@/components/IslamicCalendar";
 import IslamicReminders from "@/components/IslamicReminders";
-import Testimonials from "@/components/Testimonials";
 import ContactSection from "@/components/ContactSection";
 import Footer from "@/components/Footer";
 
@@ -45,7 +44,6 @@ const Index = () => {
         </div>
       </section>
       <IslamicReminders />
-      <Testimonials />
       <ContactSection />
       <Footer />
     </div>
