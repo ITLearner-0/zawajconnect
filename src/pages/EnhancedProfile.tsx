@@ -117,7 +117,23 @@ const EnhancedProfile = () => {
       navigate('/auth');
       return;
     }
-    fetchProfileData();
+    
+    // TIMEOUT de 10 secondes pour débloquer l'UI
+    const timeoutId = setTimeout(() => {
+      console.warn('⏰ TIMEOUT EnhancedProfile - Arrêt du chargement');
+      setLoading(false);
+      toast({
+        title: "Chargement lent",
+        description: "Certaines données n'ont pas pu être chargées. Réessayez ou contactez le support.",
+        variant: "destructive"
+      });
+    }, 10000);
+    
+    fetchProfileData().finally(() => {
+      clearTimeout(timeoutId);
+    });
+    
+    return () => clearTimeout(timeoutId);
   }, [user]);
 
   useEffect(() => {

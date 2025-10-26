@@ -55,15 +55,24 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     try {
-      console.log('📡 Appel DIRECT à la base de données...');
+      console.log('📡 Appel DIRECT à la base avec TIMEOUT de 5s...');
       
-      // APPEL DIRECT à la base - plus d'edge function !
-      const { data, error } = await supabase
+      // TIMEOUT de 5 secondes pour éviter les blocages
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 5000)
+      );
+      
+      const fetchPromise = supabase
         .from('subscriptions')
         .select('plan_type, expires_at, status')
         .eq('user_id', user.id)
         .eq('status', 'active')
         .maybeSingle();
+
+      const { data, error } = await Promise.race([
+        fetchPromise,
+        timeoutPromise
+      ]) as any;
 
       console.log('📡 Réponse de la base:', { data, error });
       
@@ -92,8 +101,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       console.log('✅ Mise à jour du statut subscription:', newSubscription);
       setSubscription(newSubscription);
-    } catch (error) {
-      console.error('❌ Exception dans checkSubscription:', error);
+    } catch (error: any) {
+      if (error.message === 'Timeout') {
+        console.warn('⏰ TIMEOUT sur checkSubscription - Fallback à non-premium');
+      } else {
+        console.error('❌ Exception dans checkSubscription:', error);
+      }
+      
+      // Fallback sécurisé : non-premium par défaut
       setSubscription({ 
         subscribed: false, 
         product_id: null, 
@@ -101,6 +116,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         plan_duration: null,
         months_remaining: null
       });
+      
+      // Réessayer en arrière-plan après 10 secondes
+      setTimeout(() => {
+        console.log('🔄 Réessai en arrière-plan...');
+        checkSubscription();
+      }, 10000);
     }
   }, [user]);
 

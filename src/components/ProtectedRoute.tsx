@@ -28,59 +28,65 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
       }
 
       try {
-        console.log('🔒 Step 1: Checking if user is a Wali...');
+        // TIMEOUT de 3 secondes pour éviter les blocages
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout')), 3000)
+        );
         
-        // Check if user is a Wali (invited user)
-        const { data: familyMember, error: familyError } = await supabase
-          .from('family_members')
-          .select('id, invitation_status, is_wali, user_id')
-          .eq('invited_user_id', user.id)
-          .eq('is_wali', true)
-          .eq('invitation_status', 'accepted')
-          .maybeSingle();
+        const fetchPromise = (async () => {
+          console.log('🔒 Step 1: Checking if user is a Wali...');
+          
+          const { data: familyMember, error: familyError } = await supabase
+            .from('family_members')
+            .select('id, invitation_status, is_wali, user_id')
+            .eq('invited_user_id', user.id)
+            .eq('is_wali', true)
+            .eq('invitation_status', 'accepted')
+            .maybeSingle();
 
-        if (familyError) {
-          console.error('🔒 Error fetching family member:', familyError);
+          if (familyError) {
+            console.error('🔒 Error fetching family member:', familyError);
+          }
+
+          const userIsWali = !!familyMember;
+          console.log('🔒 Step 1 Result - Is Wali:', userIsWali);
+          setIsWali(userIsWali);
+
+          console.log('🔒 Step 2: Fetching profile data...');
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('full_name, bio, looking_for')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          if (profileError) {
+            console.error('🔒 Error fetching profile:', profileError);
+            return { isComplete: false, userIsWali };
+          }
+
+          console.log('🔒 Step 2 Result - Profile data:', profile);
+          
+          const isComplete = userIsWali 
+            ? !!(profile?.full_name && profile.full_name.trim().length > 0)
+            : !!(profile?.bio && profile?.looking_for);
+          
+          console.log('🔒 Profile complete:', isComplete);
+          return { isComplete, userIsWali };
+        })();
+
+        const result = await Promise.race([
+          fetchPromise,
+          timeoutPromise
+        ]) as any;
+        
+        setHasCompleteProfile(result.isComplete);
+      } catch (error: any) {
+        if (error.message === 'Timeout') {
+          console.warn('⏰ TIMEOUT sur checkProfile - Fallback à profil incomplet');
+        } else {
+          console.error('🔒 Exception checking profile:', error);
         }
-
-        const userIsWali = !!familyMember;
-        console.log('🔒 Step 1 Result - Is Wali:', userIsWali, 'Family member data:', familyMember);
-        setIsWali(userIsWali);
-
-        console.log('🔒 Step 2: Fetching profile data...');
-        // Fetch all profile fields
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('full_name, bio, looking_for')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        if (profileError) {
-          console.error('🔒 Error fetching profile:', profileError);
-          setHasCompleteProfile(false);
-          setProfileLoading(false);
-          return;
-        }
-
-        console.log('🔒 Step 2 Result - Profile data:', profile);
-        
-        // For Walis, only full_name is required
-        // For regular users, bio and looking_for are required
-        const isComplete = userIsWali 
-          ? !!(profile?.full_name && profile.full_name.trim().length > 0)
-          : !!(profile?.bio && profile?.looking_for);
-        
-        console.log('🔒 Step 3: Profile completion check');
-        console.log('🔒 - Is Wali:', userIsWali);
-        console.log('🔒 - Full name:', profile?.full_name);
-        console.log('🔒 - Full name trimmed length:', profile?.full_name?.trim().length);
-        console.log('🔒 - Bio:', profile?.bio);
-        console.log('🔒 - Looking for:', profile?.looking_for);
-        console.log('🔒 - Profile complete:', isComplete);
-        
-        setHasCompleteProfile(isComplete);
-      } catch (error) {
-        console.error('🔒 Exception checking profile:', error);
+        // En cas de timeout, considérer le profil comme incomplet pour rediriger vers onboarding
         setHasCompleteProfile(false);
       } finally {
         console.log('🔒 ProtectedRoute - END - Setting profileLoading to false');
