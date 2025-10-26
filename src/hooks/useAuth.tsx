@@ -55,30 +55,52 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     try {
-      console.log('📡 Appel de l\'edge function check-braintree-subscription...');
-      const { data, error } = await supabase.functions.invoke('check-braintree-subscription');
+      console.log('📡 Appel DIRECT à la base de données...');
       
-      console.log('📡 Réponse de l\'edge function:', { data, error });
+      // APPEL DIRECT à la base - plus d'edge function !
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('plan_type, expires_at, status')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      console.log('📡 Réponse de la base:', { data, error });
       
       if (error) {
         console.error('❌ Erreur lors de la vérification:', error);
+        setSubscription({ 
+          subscribed: false, 
+          product_id: null, 
+          subscription_end: null,
+          plan_duration: null,
+          months_remaining: null
+        });
         return;
       }
 
-      if (data) {
-        const newSubscription = {
-          subscribed: data.subscribed || false,
-          product_id: data.plan_id || null,
-          subscription_end: data.subscription_end || null,
-          plan_duration: null,
-          months_remaining: null,
-        };
-        
-        console.log('✅ Mise à jour du statut subscription:', newSubscription);
-        setSubscription(newSubscription);
-      }
+      // Vérifier si l'abonnement est valide
+      const isValid = data && (!data.expires_at || new Date(data.expires_at) > new Date());
+      
+      const newSubscription = {
+        subscribed: isValid,
+        product_id: isValid ? data.plan_type : null,
+        subscription_end: isValid ? data.expires_at : null,
+        plan_duration: null,
+        months_remaining: null,
+      };
+      
+      console.log('✅ Mise à jour du statut subscription:', newSubscription);
+      setSubscription(newSubscription);
     } catch (error) {
       console.error('❌ Exception dans checkSubscription:', error);
+      setSubscription({ 
+        subscribed: false, 
+        product_id: null, 
+        subscription_end: null,
+        plan_duration: null,
+        months_remaining: null
+      });
     }
   }, [user]);
 

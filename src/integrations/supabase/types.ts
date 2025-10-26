@@ -1915,6 +1915,7 @@ export type Database = {
       is_family_wali: { Args: { profile_user_id: string }; Returns: boolean }
       is_matched_user: { Args: { profile_user_id: string }; Returns: boolean }
       is_own_profile: { Args: { profile_user_id: string }; Returns: boolean }
+      is_premium_active: { Args: { user_uuid: string }; Returns: boolean }
       is_premium_user: { Args: never; Returns: boolean }
       is_user_in_active_conversation: {
         Args: { check_user_id: string }
