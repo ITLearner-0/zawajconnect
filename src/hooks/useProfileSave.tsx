@@ -154,7 +154,9 @@ export const useProfileSave = () => {
 
       const { error: prefsError } = await supabase
         .from('islamic_preferences')
-        .upsert(cleanIslamicPrefs);
+        .upsert(cleanIslamicPrefs, {
+          onConflict: 'user_id' // Spécifier la colonne de conflit
+        });
 
       if (prefsError) {
         console.error('Islamic preferences save error:', prefsError);
