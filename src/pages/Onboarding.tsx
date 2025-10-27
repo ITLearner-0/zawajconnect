@@ -225,9 +225,18 @@ const Onboarding = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      if (profile && profile.bio && profile.looking_for) {
-        // User already has a complete profile, redirect to dashboard
-        navigate('/enhanced-profile');
+      // Check if profile is complete with more comprehensive criteria
+      const isProfileComplete = profile && 
+        profile.full_name && 
+        profile.age && 
+        profile.gender && 
+        profile.bio && 
+        profile.looking_for;
+
+      if (isProfileComplete) {
+        console.log('✅ Profil complet détecté, redirection vers dashboard...');
+        navigate('/dashboard', { replace: true });
+        return;
       } else if (profile) {
         // Pre-fill existing data
         setProfileData({

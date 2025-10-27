@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -38,6 +38,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     plan_duration: null,
     months_remaining: null,
   });
+  
+  // Compteur de tentatives pour éviter les boucles infinies
+  const retryCountRef = useRef(0);
+  const maxRetries = 3;
 
   const checkSubscription = useCallback(async () => {
     console.log('🔍 checkSubscription appelé, user:', user?.email);
@@ -101,6 +105,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       
       console.log('✅ Mise à jour du statut subscription:', newSubscription);
       setSubscription(newSubscription);
+      
+      // Réinitialiser le compteur de tentatives en cas de succès
+      retryCountRef.current = 0;
     } catch (error: any) {
       if (error.message === 'Timeout') {
         console.warn('⏰ TIMEOUT sur checkSubscription - Fallback à non-premium');
@@ -117,11 +124,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         months_remaining: null
       });
       
-      // Réessayer en arrière-plan après 10 secondes
-      setTimeout(() => {
-        console.log('🔄 Réessai en arrière-plan...');
-        checkSubscription();
-      }, 10000);
+      // Réessayer en arrière-plan uniquement si on n'a pas dépassé le nombre de tentatives
+      if (retryCountRef.current < maxRetries) {
+        retryCountRef.current += 1;
+        console.log(`🔄 Réessai ${retryCountRef.current}/${maxRetries} en arrière-plan dans 10s...`);
+        setTimeout(() => {
+          checkSubscription();
+        }, 10000);
+      } else {
+        console.log('⛔ Nombre maximum de tentatives atteint, arrêt des réessais');
+      }
     }
   }, [user]);
 
