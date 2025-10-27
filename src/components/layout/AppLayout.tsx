@@ -46,8 +46,11 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { preferences, shouldShowTour, completeTour } = useNavigationPreferences();
-  const { isSessionNearExpiry } = useEnhancedSessionMonitor();
-  const { events } = useSecurityEvents();
+  // TEMPORAIREMENT DÉSACTIVÉ - Cause tempête de requêtes réseau
+  // const { isSessionNearExpiry } = useEnhancedSessionMonitor();
+  // const { events } = useSecurityEvents();
+  const isSessionNearExpiry = false;
+  const events: any[] = [];
 
   // Enable keyboard shortcuts and analytics
   useKeyboardShortcuts();
