@@ -7,7 +7,8 @@ interface UseFormAutoSaveProps {
   interval?: number;
 }
 
-export const useFormAutoSave = ({ data, key, interval = 1000 }: UseFormAutoSaveProps) => {
+// OPTIMISÉ: Intervalle augmenté à 5 secondes pour réduire les requêtes
+export const useFormAutoSave = ({ data, key, interval = 5000 }: UseFormAutoSaveProps) => {
   const { user } = useAuth();
   const intervalRef = useRef<NodeJS.Timeout>();
   const lastSaveRef = useRef<string>('');

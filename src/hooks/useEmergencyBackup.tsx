@@ -46,9 +46,15 @@ export const useEmergencyBackup = () => {
     }
   }, [user, getSessionId]);
 
-  // Restore emergency backup
+  // Restore emergency backup - OPTIMISÉ pour ne restaurer qu'une seule fois
   const restoreEmergencyBackup = useCallback((key: string): any => {
     try {
+      // Vérifier si déjà restauré dans cette session pour éviter les boucles
+      const restoredKey = `restored_${key}`;
+      if (sessionStorage.getItem(restoredKey)) {
+        return null; // Déjà restauré, ne pas réessayer
+      }
+
       const sessionId = getSessionId();
       const userEmail = user?.email || 'anonymous';
       
@@ -69,6 +75,8 @@ export const useEmergencyBackup = () => {
           // Check if backup is recent (within 24 hours)
           if (Date.now() - parsed.timestamp < 24 * 60 * 60 * 1000) {
             console.log(`Emergency backup restored from ${backupKey}`);
+            // Marquer comme restauré pour cette session
+            sessionStorage.setItem(restoredKey, 'true');
             return parsed.data;
           }
         }

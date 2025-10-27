@@ -2,6 +2,7 @@ import React from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
+import { UserDataProvider } from "@/contexts/UserDataContext";
 import NavigationGuard from "@/components/navigation/NavigationGuard";
 import { NavigationProvider } from "@/components/navigation/NavigationProvider";
 import RouteTransition from "@/components/navigation/RouteTransition";
@@ -27,14 +28,15 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <BrowserRouter
-          future={{
-            v7_startTransition: true,
-            v7_relativeSplatPath: true
-          }}
-        >
-          <NavigationProvider>
-            <NavigationGuard>
+        <UserDataProvider>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}
+          >
+            <NavigationProvider>
+              <NavigationGuard>
               <FreemiumBanner />
               <RouteTransition>
                 <Routes>
@@ -86,11 +88,12 @@ function App() {
                   <Route path={notFoundRoute.path} element={<NotFoundComponent />} />
                 </Routes>
               </RouteTransition>
-            </NavigationGuard>
-          </NavigationProvider>
-          <CookieConsentBanner />
-          <Toaster />
-        </BrowserRouter>
+              </NavigationGuard>
+            </NavigationProvider>
+            <CookieConsentBanner />
+            <Toaster />
+          </BrowserRouter>
+        </UserDataProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
