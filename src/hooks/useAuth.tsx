@@ -85,9 +85,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [user]);
 
   useEffect(() => {
+    // PROTECTION: Ne s'exécute qu'UNE SEULE FOIS au montage
+    let mounted = true;
+    
     // Set up auth state listener FIRST - CRITICAL: Keep synchronous!
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        if (!mounted) return;
+        
         // CRITICAL: Only synchronous state updates here to prevent deadlocks
         console.log('🔐 Auth state changed:', event, session?.user?.email);
         
@@ -127,6 +132,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           return;
         }
         
+        if (!mounted) return;
+        
         console.log('🔐 Initial session check:', session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
@@ -138,22 +145,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       } catch (error) {
         console.error('🔐 Exception during auth initialization:', error);
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
 
     initializeAuth();
 
-    return () => authSubscription.unsubscribe();
-  }, [checkSubscription]);
+    return () => {
+      mounted = false;
+      authSubscription.unsubscribe();
+    };
+  }, []); // VIDE - ne s'exécute qu'au montage !
 
-  // Auto-refresh subscription every minute
+  // Auto-refresh subscription every 5 minutes (réduit de 1 min à 5 min)
   useEffect(() => {
     if (!user) return;
 
-    const interval = setInterval(checkSubscription, 60000);
+    const interval = setInterval(checkSubscription, 300000); // 5 min
     return () => clearInterval(interval);
-  }, [user, checkSubscription]);
+  }, [user?.id]); // Dépend uniquement de user.id
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({

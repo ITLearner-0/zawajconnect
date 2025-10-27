@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -18,13 +18,18 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
   const [isWali, setIsWali] = useState(false);
   const [profileComplete, setProfileComplete] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [dataFetched, setDataFetched] = useState(false);
+  const fetchingRef = useRef(false);
+  const lastUserIdRef = useRef<string | null>(null);
 
   const refreshUserData = async () => {
-    if (!user || dataFetched) {
+    // Protection contre boucle infinie
+    if (!user || fetchingRef.current || lastUserIdRef.current === user.id) {
       setLoading(false);
       return;
     }
+
+    fetchingRef.current = true;
+    lastUserIdRef.current = user.id;
 
     try {
       // Une seule requête parallèle pour toutes les données
@@ -61,28 +66,28 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
         : !!(profile?.bio && profile?.looking_for);
       
       setProfileComplete(isComplete);
-      setDataFetched(true);
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      // Silencieux en cas d'erreur pour éviter de polluer les logs
       setIsAdmin(false);
       setIsWali(false);
       setProfileComplete(false);
     } finally {
       setLoading(false);
+      fetchingRef.current = false;
     }
   };
 
   useEffect(() => {
-    if (user && !dataFetched) {
+    if (user && lastUserIdRef.current !== user.id) {
       refreshUserData();
     } else if (!user) {
       setIsAdmin(false);
       setIsWali(false);
       setProfileComplete(false);
       setLoading(false);
-      setDataFetched(false);
+      lastUserIdRef.current = null;
     }
-  }, [user]);
+  }, [user?.id]); // Dépendance sur user.id uniquement
 
   return (
     <UserDataContext.Provider value={{ isAdmin, isWali, profileComplete, loading, refreshUserData }}>
