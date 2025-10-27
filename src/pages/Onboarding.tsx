@@ -232,6 +232,24 @@ const Onboarding = () => {
         };
         setProfileData(loadedProfile);
         
+        // VÉRIFIER SI LE PROFIL EST COMPLET
+        const isProfileComplete = !!(profile.bio && profile.looking_for);
+        
+        if (isProfileComplete) {
+          // Profil complet -> Rediriger vers le dashboard
+          console.log('✅ Profil complet détecté - Redirection vers dashboard');
+          toast({
+            title: "Profil complet",
+            description: "Votre profil est déjà configuré. Redirection...",
+          });
+          setTimeout(() => navigate('/dashboard'), 1000);
+          return;
+        }
+        
+        // Si des données existent mais profil incomplet, masquer l'écran de bienvenue
+        setShowWelcome(false);
+        console.log('✅ Écran de bienvenue masqué - profil existant détecté');
+        
         // Sauvegarder dans le localStorage pour la prochaine fois
         saveEmergencyBackup('profile', loadedProfile);
       } else {
