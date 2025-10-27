@@ -215,15 +215,35 @@ const Onboarding = () => {
     checkExistingProfile();
   }, [user, navigate, restoreEmergencyBackup]);
 
-  const checkExistingProfile = async () => {
+  const checkExistingProfile = async (retryCount = 0) => {
     if (!user) return;
 
+    const maxRetries = 3;
+    const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 5000); // Backoff exponentiel max 5s
+
     try {
-      const { data: profile } = await supabase
+      console.log(`🔍 Vérification du profil existant (tentative ${retryCount + 1}/${maxRetries + 1})...`);
+      
+      // Timeout de 8 secondes pour cette requête
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 8000)
+      );
+      
+      const fetchPromise = supabase
         .from('profiles')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
+
+      const { data: profile, error } = await Promise.race([
+        fetchPromise,
+        timeoutPromise
+      ]) as any;
+
+      if (error) {
+        console.error('❌ Erreur lors de la vérification du profil:', error);
+        throw error;
+      }
 
       // Check if profile is complete with more comprehensive criteria
       const isProfileComplete = profile && 
@@ -254,12 +274,21 @@ const Onboarding = () => {
         setShowWelcome(false);
       }
 
-      // Load Islamic preferences if they exist
-      const { data: islamicData } = await supabase
+      // Load Islamic preferences if they exist (avec timeout aussi)
+      const timeoutPromise2 = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Timeout')), 8000)
+      );
+      
+      const fetchIslamicPromise = supabase
         .from('islamic_preferences')
         .select('*')
         .eq('user_id', user.id)
         .maybeSingle();
+
+      const { data: islamicData } = await Promise.race([
+        fetchIslamicPromise,
+        timeoutPromise2
+      ]) as any;
 
       if (islamicData) {
         setIslamicPrefs({
@@ -275,8 +304,27 @@ const Onboarding = () => {
           importance_of_religion: islamicData.importance_of_religion || ''
         });
       }
-    } catch (error) {
-      console.error('Error checking existing profile:', error);
+      
+      console.log('✅ Vérification du profil terminée avec succès');
+      
+    } catch (error: any) {
+      console.error(`❌ Erreur lors de la tentative ${retryCount + 1}:`, error);
+      
+      // Réessayer si on n'a pas atteint le maximum
+      if (retryCount < maxRetries && (error.message === 'Timeout' || error.message?.includes('Failed to fetch'))) {
+        console.log(`⏳ Réessai dans ${retryDelay}ms...`);
+        setTimeout(() => {
+          checkExistingProfile(retryCount + 1);
+        }, retryDelay);
+      } else {
+        // Après 3 tentatives, on affiche un message et on continue quand même
+        console.warn('⚠️ Impossible de vérifier le profil après 3 tentatives, on continue quand même');
+        toast({
+          title: "Connexion lente",
+          description: "Nous continuons le chargement, veuillez patienter...",
+          variant: "default"
+        });
+      }
     }
   };
 
