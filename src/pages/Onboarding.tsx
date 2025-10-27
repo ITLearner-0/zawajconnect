@@ -211,54 +211,30 @@ const Onboarding = () => {
       console.log('🚨 Emergency step backup restored');
     }
     
-    // Check if user already has a complete profile
-    checkExistingProfile();
+    // Charger les données existantes sans retry ni timeout
+    loadExistingData();
   }, [user, navigate, restoreEmergencyBackup]);
 
-  const checkExistingProfile = async (retryCount = 0) => {
+  const loadExistingData = async () => {
     if (!user) return;
 
-    const maxRetries = 3;
-    const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 5000); // Backoff exponentiel max 5s
-
     try {
-      console.log(`🔍 Vérification du profil existant (tentative ${retryCount + 1}/${maxRetries + 1})...`);
-      
-      // Timeout de 8 secondes pour cette requête
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), 8000)
-      );
-      
-      const fetchPromise = supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
+      // Charger le profil et les préférences en une seule fois
+      const [{ data: profile }, { data: islamicData }] = await Promise.all([
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle(),
+        supabase
+          .from('islamic_preferences')
+          .select('*')
+          .eq('user_id', user.id)
+          .maybeSingle()
+      ]);
 
-      const { data: profile, error } = await Promise.race([
-        fetchPromise,
-        timeoutPromise
-      ]) as any;
-
-      if (error) {
-        console.error('❌ Erreur lors de la vérification du profil:', error);
-        throw error;
-      }
-
-      // Check if profile is complete with more comprehensive criteria
-      const isProfileComplete = profile && 
-        profile.full_name && 
-        profile.age && 
-        profile.gender && 
-        profile.bio && 
-        profile.looking_for;
-
-      if (isProfileComplete) {
-        console.log('✅ Profil complet détecté, redirection vers dashboard...');
-        navigate('/dashboard', { replace: true });
-        return;
-      } else if (profile) {
-        // Pre-fill existing data
+      // Pré-remplir les données existantes
+      if (profile) {
         setProfileData({
           full_name: profile.full_name || '',
           age: profile.age || null,
@@ -271,24 +247,7 @@ const Onboarding = () => {
           interests: profile.interests || [],
           avatar_url: profile.avatar_url || ''
         });
-        setShowWelcome(false);
       }
-
-      // Load Islamic preferences if they exist (avec timeout aussi)
-      const timeoutPromise2 = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), 8000)
-      );
-      
-      const fetchIslamicPromise = supabase
-        .from('islamic_preferences')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      const { data: islamicData } = await Promise.race([
-        fetchIslamicPromise,
-        timeoutPromise2
-      ]) as any;
 
       if (islamicData) {
         setIslamicPrefs({
@@ -304,27 +263,9 @@ const Onboarding = () => {
           importance_of_religion: islamicData.importance_of_religion || ''
         });
       }
-      
-      console.log('✅ Vérification du profil terminée avec succès');
-      
-    } catch (error: any) {
-      console.error(`❌ Erreur lors de la tentative ${retryCount + 1}:`, error);
-      
-      // Réessayer si on n'a pas atteint le maximum
-      if (retryCount < maxRetries && (error.message === 'Timeout' || error.message?.includes('Failed to fetch'))) {
-        console.log(`⏳ Réessai dans ${retryDelay}ms...`);
-        setTimeout(() => {
-          checkExistingProfile(retryCount + 1);
-        }, retryDelay);
-      } else {
-        // Après 3 tentatives, on affiche un message et on continue quand même
-        console.warn('⚠️ Impossible de vérifier le profil après 3 tentatives, on continue quand même');
-        toast({
-          title: "Connexion lente",
-          description: "Nous continuons le chargement, veuillez patienter...",
-          variant: "default"
-        });
-      }
+    } catch (error) {
+      // Erreur silencieuse - on continue avec les données vides
+      console.error('Erreur chargement données:', error);
     }
   };
 

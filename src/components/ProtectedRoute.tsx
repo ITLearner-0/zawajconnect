@@ -18,79 +18,46 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
 
   useEffect(() => {
     const checkProfile = async () => {
-      console.log('🔒 ProtectedRoute - Vérification rapide du profil pour:', user?.id);
-      console.log('🔒 Route actuelle:', location.pathname);
-      
       if (!user) {
-        console.log('🔒 Pas d\'utilisateur, fin de la vérification');
         setProfileLoading(false);
         return;
       }
 
       try {
-        // TIMEOUT de 5 secondes (augmenté de 3s à 5s)
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Timeout')), 5000)
-        );
+        // UNE SEULE requête simple - pas de timeout, pas de retry
+        const [{ data: profile }, { data: familyMember }] = await Promise.all([
+          supabase
+            .from('profiles')
+            .select('full_name, bio, looking_for')
+            .eq('user_id', user.id)
+            .maybeSingle(),
+          supabase
+            .from('family_members')
+            .select('id, is_wali')
+            .eq('invited_user_id', user.id)
+            .eq('is_wali', true)
+            .eq('invitation_status', 'accepted')
+            .maybeSingle()
+        ]);
+
+        const userIsWali = !!familyMember;
+        setIsWali(userIsWali);
         
-        // UNE SEULE requête optimisée au lieu de deux
-        const fetchPromise = (async () => {
-          console.log('🔒 Vérification du profil...');
-          
-          // Vérifier rapidement si l'utilisateur est un Wali OU un utilisateur normal
-          const [profileResult, familyResult] = await Promise.allSettled([
-            supabase
-              .from('profiles')
-              .select('full_name, bio, looking_for')
-              .eq('user_id', user.id)
-              .maybeSingle(),
-            supabase
-              .from('family_members')
-              .select('id, is_wali')
-              .eq('invited_user_id', user.id)
-              .eq('is_wali', true)
-              .eq('invitation_status', 'accepted')
-              .maybeSingle()
-          ]);
-
-          const profile = profileResult.status === 'fulfilled' ? profileResult.value.data : null;
-          const familyMember = familyResult.status === 'fulfilled' ? familyResult.value.data : null;
-          
-          const userIsWali = !!familyMember;
-          setIsWali(userIsWali);
-
-          console.log('🔒 Profil:', profile, 'Est Wali:', userIsWali);
-          
-          const isComplete = userIsWali 
-            ? !!(profile?.full_name && profile.full_name.trim().length > 0)
-            : !!(profile?.bio && profile?.looking_for);
-          
-          console.log('🔒 Profil complet:', isComplete);
-          return isComplete;
-        })();
-
-        const isComplete = await Promise.race([
-          fetchPromise,
-          timeoutPromise
-        ]) as boolean;
+        const isComplete = userIsWali 
+          ? !!(profile?.full_name && profile.full_name.trim().length > 0)
+          : !!(profile?.bio && profile?.looking_for);
         
         setHasCompleteProfile(isComplete);
-      } catch (error: any) {
-        if (error.message === 'Timeout') {
-          console.warn('⏰ TIMEOUT sur ProtectedRoute (5s) - Continue quand même');
-        } else {
-          console.error('🔒 Erreur lors de la vérification:', error);
-        }
-        // En cas d'erreur, on considère le profil comme incomplet par sécurité
+      } catch (error) {
+        // En cas d'erreur réseau, on laisse passer (profil considéré incomplet)
         setHasCompleteProfile(false);
       } finally {
-        console.log('🔒 Fin de la vérification');
         setProfileLoading(false);
       }
     };
 
     checkProfile();
-  }, [user, location.pathname]);
+  }, [user]);
 
   // Show loading spinner while checking auth/profile
   if (loading || profileLoading) {

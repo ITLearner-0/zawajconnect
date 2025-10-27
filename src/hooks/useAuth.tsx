@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useCallback, useRef, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -38,16 +38,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     plan_duration: null,
     months_remaining: null,
   });
-  
-  // Compteur de tentatives pour éviter les boucles infinies
-  const retryCountRef = useRef(0);
-  const maxRetries = 3;
 
   const checkSubscription = useCallback(async () => {
-    console.log('🔍 checkSubscription appelé, user:', user?.email);
-    
     if (!user) {
-      console.log('❌ Pas d\'utilisateur, subscription = false');
       setSubscription({ 
         subscribed: false, 
         product_id: null, 
@@ -59,63 +52,28 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     try {
-      console.log('📡 Appel DIRECT à la base avec TIMEOUT de 5s...');
-      
-      // TIMEOUT de 5 secondes pour éviter les blocages
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Timeout')), 5000)
-      );
-      
-      const fetchPromise = supabase
+      // Requête simple - pas de timeout, pas de retry
+      const { data, error } = await supabase
         .from('subscriptions')
         .select('plan_type, expires_at, status')
         .eq('user_id', user.id)
         .eq('status', 'active')
         .maybeSingle();
-
-      const { data, error } = await Promise.race([
-        fetchPromise,
-        timeoutPromise
-      ]) as any;
-
-      console.log('📡 Réponse de la base:', { data, error });
       
-      if (error) {
-        console.error('❌ Erreur lors de la vérification:', error);
-        setSubscription({ 
-          subscribed: false, 
-          product_id: null, 
-          subscription_end: null,
-          plan_duration: null,
-          months_remaining: null
-        });
-        return;
-      }
+      if (error) throw error;
 
       // Vérifier si l'abonnement est valide
       const isValid = data && (!data.expires_at || new Date(data.expires_at) > new Date());
       
-      const newSubscription = {
+      setSubscription({
         subscribed: isValid,
         product_id: isValid ? data.plan_type : null,
         subscription_end: isValid ? data.expires_at : null,
         plan_duration: null,
         months_remaining: null,
-      };
-      
-      console.log('✅ Mise à jour du statut subscription:', newSubscription);
-      setSubscription(newSubscription);
-      
-      // Réinitialiser le compteur de tentatives en cas de succès
-      retryCountRef.current = 0;
-    } catch (error: any) {
-      if (error.message === 'Timeout') {
-        console.warn('⏰ TIMEOUT sur checkSubscription - Fallback à non-premium');
-      } else {
-        console.error('❌ Exception dans checkSubscription:', error);
-      }
-      
-      // Fallback sécurisé : non-premium par défaut
+      });
+    } catch (error) {
+      // Fallback silencieux en cas d'erreur réseau
       setSubscription({ 
         subscribed: false, 
         product_id: null, 
@@ -123,17 +81,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         plan_duration: null,
         months_remaining: null
       });
-      
-      // Réessayer en arrière-plan uniquement si on n'a pas dépassé le nombre de tentatives
-      if (retryCountRef.current < maxRetries) {
-        retryCountRef.current += 1;
-        console.log(`🔄 Réessai ${retryCountRef.current}/${maxRetries} en arrière-plan dans 10s...`);
-        setTimeout(() => {
-          checkSubscription();
-        }, 10000);
-      } else {
-        console.log('⛔ Nombre maximum de tentatives atteint, arrêt des réessais');
-      }
     }
   }, [user]);
 
