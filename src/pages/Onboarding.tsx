@@ -191,34 +191,16 @@ const Onboarding = () => {
       return;
     }
     
-    // Try to restore from emergency backup first
-    const emergencyProfile = restoreEmergencyBackup('profile');
-    const emergencyIslamic = restoreEmergencyBackup('islamic');
-    const emergencyStep = restoreEmergencyBackup('step');
-    
-    if (emergencyProfile && Object.keys(emergencyProfile).length > 1) {
-      setProfileData(prev => ({ ...prev, ...emergencyProfile }));
-      console.log('🚨 Emergency profile backup restored');
-    }
-    
-    if (emergencyIslamic && Object.keys(emergencyIslamic).length > 1) {
-      setIslamicPrefs(prev => ({ ...prev, ...emergencyIslamic }));
-      console.log('🚨 Emergency Islamic prefs backup restored');
-    }
-    
-    if (emergencyStep && typeof emergencyStep === 'number') {
-      setCurrentStep(emergencyStep);
-      console.log('🚨 Emergency step backup restored');
-    }
-    
-    // Charger les données existantes sans retry ni timeout
+    // PRIORITÉ: Charger d'abord les données de la base de données
     loadExistingData();
-  }, [user, navigate, restoreEmergencyBackup]);
+  }, [user, navigate]);
 
   const loadExistingData = async () => {
     if (!user) return;
 
     try {
+      console.log('📂 Chargement des données depuis la base de données...');
+      
       // Charger le profil et les préférences en une seule fois
       const [{ data: profile }, { data: islamicData }] = await Promise.all([
         supabase
@@ -233,9 +215,10 @@ const Onboarding = () => {
           .maybeSingle()
       ]);
 
-      // Pré-remplir les données existantes
+      // PRIORITÉ 1: Données de la base de données
       if (profile) {
-        setProfileData({
+        console.log('✅ Profil chargé depuis la base de données');
+        const loadedProfile = {
           full_name: profile.full_name || '',
           age: profile.age || null,
           gender: profile.gender || '',
@@ -246,11 +229,24 @@ const Onboarding = () => {
           looking_for: profile.looking_for || '',
           interests: profile.interests || [],
           avatar_url: profile.avatar_url || ''
-        });
+        };
+        setProfileData(loadedProfile);
+        
+        // Sauvegarder dans le localStorage pour la prochaine fois
+        saveEmergencyBackup('profile', loadedProfile);
+      } else {
+        // PRIORITÉ 2: Si pas de données en base, essayer le localStorage
+        console.log('⚠️ Pas de profil en base, tentative de restauration depuis localStorage');
+        const emergencyProfile = restoreEmergencyBackup('profile');
+        if (emergencyProfile && Object.keys(emergencyProfile).length > 1) {
+          setProfileData(prev => ({ ...prev, ...emergencyProfile }));
+          console.log('🚨 Profil restauré depuis localStorage');
+        }
       }
 
       if (islamicData) {
-        setIslamicPrefs({
+        console.log('✅ Préférences islamiques chargées depuis la base de données');
+        const loadedPrefs = {
           prayer_frequency: islamicData.prayer_frequency || '',
           quran_reading: islamicData.quran_reading || '',
           hijab_preference: islamicData.hijab_preference || '',
@@ -261,11 +257,43 @@ const Onboarding = () => {
           smoking: islamicData.smoking || '',
           desired_partner_sect: islamicData.desired_partner_sect || '',
           importance_of_religion: islamicData.importance_of_religion || ''
-        });
+        };
+        setIslamicPrefs(loadedPrefs);
+        
+        // Sauvegarder dans le localStorage pour la prochaine fois
+        saveEmergencyBackup('islamic', loadedPrefs);
+      } else {
+        // PRIORITÉ 2: Si pas de données en base, essayer le localStorage
+        console.log('⚠️ Pas de préférences en base, tentative de restauration depuis localStorage');
+        const emergencyIslamic = restoreEmergencyBackup('islamic');
+        if (emergencyIslamic && Object.keys(emergencyIslamic).length > 1) {
+          setIslamicPrefs(prev => ({ ...prev, ...emergencyIslamic }));
+          console.log('🚨 Préférences restaurées depuis localStorage');
+        }
       }
+      
+      // Restaurer l'étape sauvegardée
+      const emergencyStep = restoreEmergencyBackup('step');
+      if (emergencyStep && typeof emergencyStep === 'number') {
+        setCurrentStep(emergencyStep);
+        console.log('🚨 Étape restaurée:', emergencyStep);
+      }
+      
     } catch (error) {
-      // Erreur silencieuse - on continue avec les données vides
-      console.error('Erreur chargement données:', error);
+      console.error('❌ Erreur chargement données:', error);
+      // En cas d'erreur, essayer de restaurer depuis localStorage
+      const emergencyProfile = restoreEmergencyBackup('profile');
+      const emergencyIslamic = restoreEmergencyBackup('islamic');
+      
+      if (emergencyProfile && Object.keys(emergencyProfile).length > 1) {
+        setProfileData(prev => ({ ...prev, ...emergencyProfile }));
+        console.log('🚨 Profil restauré depuis localStorage (après erreur)');
+      }
+      
+      if (emergencyIslamic && Object.keys(emergencyIslamic).length > 1) {
+        setIslamicPrefs(prev => ({ ...prev, ...emergencyIslamic }));
+        console.log('🚨 Préférences restaurées depuis localStorage (après erreur)');
+      }
     }
   };
 
