@@ -41,68 +41,16 @@ const Matches = () => {
   // Debug: afficher le statut d'abonnement
   console.log('📊 Statut abonnement Matches:', subscription);
 
-  // Attendre que l'authentification soit chargée avant de vérifier
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center">
-        <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald border-t-transparent mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Vérification de votre abonnement...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Bloquer si pas premium (seulement après que authLoading soit false)
-  if (!subscription.subscribed) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center p-4">
-        <Card className="max-w-md w-full p-8 text-center space-y-6">
-          <div className="h-20 w-20 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center mx-auto">
-            <Heart className="h-10 w-10 text-primary-foreground" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold mb-2">Fonctionnalité Premium</h2>
-            <p className="text-muted-foreground">
-              Accédez à vos matches, likes et mises en relation en passant à Premium.
-            </p>
-          </div>
-          <div className="space-y-3">
-            <Button
-              onClick={() => {
-                console.log('Navigation vers Premium...');
-                navigate('/settings?tab=premium');
-              }}
-              className="w-full bg-gradient-to-r from-emerald to-emerald-light"
-              size="lg"
-            >
-              <Crown className="h-4 w-4 mr-2" />
-              Passer à Premium
-            </Button>
-            <Button
-              onClick={async () => {
-                console.log('🔄 Vérification forcée du statut...');
-                await checkSubscription();
-                window.location.reload();
-              }}
-              variant="outline"
-              className="w-full"
-            >
-              Vérifier mon abonnement
-            </Button>
-          </div>
-        </Card>
-      </div>
-    );
-  }
-
+  // Tous les hooks DOIVENT être appelés avant tout return conditionnel
   useEffect(() => {
     if (!user) {
       navigate('/auth');
       return;
     }
-    fetchMatches();
-  }, [user]);
+    if (!authLoading && subscription.subscribed) {
+      fetchMatches();
+    }
+  }, [user, authLoading, subscription.subscribed]);
 
   const fetchMatches = async () => {
     if (!user) return;
@@ -162,6 +110,60 @@ const Matches = () => {
   const viewProfile = (userId: string) => {
     navigate(`/profile/${userId}`);
   };
+
+  // Tous les returns conditionnels APRÈS les hooks et fonctions
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center">
+        <div className="text-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald border-t-transparent mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Vérification de votre abonnement...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!subscription.subscribed) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center p-4">
+        <Card className="max-w-md w-full p-8 text-center space-y-6">
+          <div className="h-20 w-20 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center mx-auto">
+            <Heart className="h-10 w-10 text-primary-foreground" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold mb-2">Fonctionnalité Premium</h2>
+            <p className="text-muted-foreground">
+              Accédez à vos matches, likes et mises en relation en passant à Premium.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <Button
+              onClick={() => {
+                console.log('Navigation vers Premium...');
+                navigate('/settings?tab=premium');
+              }}
+              className="w-full bg-gradient-to-r from-emerald to-emerald-light"
+              size="lg"
+            >
+              <Crown className="h-4 w-4 mr-2" />
+              Passer à Premium
+            </Button>
+            <Button
+              onClick={async () => {
+                console.log('🔄 Vérification forcée du statut...');
+                await checkSubscription();
+                window.location.reload();
+              }}
+              variant="outline"
+              className="w-full"
+            >
+              Vérifier mon abonnement
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
