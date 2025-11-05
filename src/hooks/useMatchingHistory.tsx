@@ -52,7 +52,7 @@ export const useMatchingHistory = () => {
       matched_profiles: Array.isArray(record.matched_profiles) ? record.matched_profiles : [],
       preferences_used: record.preferences_used,
       total_matches: record.total_matches,
-      avg_compatibility_score: record.avg_compatibility_score,
+      avg_compatibility_score: record.avg_compatibility_score ?? 0,
       search_timestamp: record.search_timestamp
     }));
   };
@@ -73,7 +73,16 @@ export const useMatchingHistory = () => {
 
         if (error) throw error;
 
-        const transformedData = transformHistoryData(data || []);
+        const transformedData = transformHistoryData((data || []).map(item => ({
+          id: item.id,
+          matched_profiles: item.matched_profiles,
+          preferences_used: item.preferences_used,
+          total_matches: item.total_matches,
+          avg_compatibility_score: item.avg_compatibility_score ?? 0,
+          search_timestamp: item.search_timestamp,
+          user_id: item.user_id,
+          created_at: item.created_at
+        })));
         setHistory(transformedData);
       } catch (error) {
         console.error('Error loading history:', error);
@@ -103,12 +112,11 @@ export const useMatchingHistory = () => {
       const { error } = await supabase
         .from('matching_history')
         .insert({
-          user_id: user.id,
           matched_profiles: matches as any, // Cast to any for JSON storage
           preferences_used: preferences,
           total_matches: matches.length,
           avg_compatibility_score: avgScore
-        });
+        } as any);
 
       if (error) throw error;
 
@@ -121,7 +129,16 @@ export const useMatchingHistory = () => {
         .limit(10);
 
       if (data) {
-        const transformedData = transformHistoryData(data);
+        const transformedData = transformHistoryData(data.map(item => ({
+          id: item.id,
+          matched_profiles: item.matched_profiles,
+          preferences_used: item.preferences_used,
+          total_matches: item.total_matches,
+          avg_compatibility_score: item.avg_compatibility_score ?? 0,
+          search_timestamp: item.search_timestamp,
+          user_id: item.user_id,
+          created_at: item.created_at
+        })));
         setHistory(transformedData);
       }
 

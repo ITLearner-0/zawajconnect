@@ -82,7 +82,14 @@ export const useMatchApproval = () => {
         const user2Profile = profileMap[match.user2_id];
 
         return {
-          ...match,
+          id: match.id,
+          user1_id: match.user1_id,
+          user2_id: match.user2_id,
+          match_score: match.match_score ?? 0,
+          created_at: match.created_at,
+          can_communicate: match.can_communicate,
+          family_approved: match.family_approved ?? undefined,
+          family_notes: match.family_notes ?? undefined,
           supervised_user_id: match.user1_id,
           family_member_id: familyMember?.id || '',
           user1_profile: {

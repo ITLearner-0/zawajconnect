@@ -144,7 +144,14 @@ export const useIslamicModeration = () => {
         .limit(5);
 
       if (error) throw error;
-      return data || [];
+      return (data || []).map(item => ({
+        id: item.id,
+        original_message: item.original_message,
+        suggested_message: item.suggested_message,
+        improvement_reason: item.improvement_reason,
+        islamic_guidance: item.islamic_guidance ?? '',
+        created_at: item.created_at
+      }));
     } catch (error) {
       console.error('Error fetching suggestions:', error);
       return [];
