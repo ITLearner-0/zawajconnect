@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -13,8 +12,8 @@ const Admin = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | undefined>(undefined);
+  const [userRole, setUserRole] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,11 +41,11 @@ const Admin = () => {
         return;
       }
 
-      if (roles && roles.length > 0) {
-        const role = roles[0].role;
+      if (roles && roles.length > 0 && roles[0]) {
+        const role = roles[0].role ?? undefined;
         setUserRole(role);
         
-        if (['super_admin', 'admin', 'moderator'].includes(role)) {
+        if (role && ['super_admin', 'admin', 'moderator'].includes(role)) {
           setIsAdmin(true);
         } else {
           setIsAdmin(false);

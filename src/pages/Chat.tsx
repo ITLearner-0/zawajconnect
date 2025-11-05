@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -14,11 +13,11 @@ const Chat = () => {
   const navigate = useNavigate();
   const { matchId: paramMatchId } = useParams<{ matchId?: string }>();
   const [searchParams] = useSearchParams();
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
+  const [selectedChatId, setSelectedChatId] = useState<string | undefined>(undefined);
 
   // Get matchId from URL params or search params (must be before any conditional returns)
   const matchIdFromUrl = useMemo(() => {
-    return paramMatchId || searchParams.get('matchId') || null;
+    return paramMatchId || searchParams.get('matchId') || undefined;
   }, [paramMatchId, searchParams]);
 
   useEffect(() => {

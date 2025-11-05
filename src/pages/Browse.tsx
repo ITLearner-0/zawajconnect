@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUnifiedCompatibility } from '@/hooks/useUnifiedCompatibility';
@@ -48,6 +47,9 @@ interface SearchFilters {
   education?: string;
   location?: string;
   interests?: string[];
+  profession?: string;
+  verifiedOnly?: boolean;
+  withPhoto?: boolean;
 }
 
 const Browse = () => {
@@ -62,11 +64,11 @@ const Browse = () => {
   const [loading, setLoading] = useState(true);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [reportModalOpen, setReportModalOpen] = useState(false);
-  const [selectedProfile, setSelectedProfile] = useState<MatchingProfile | null>(null);
+  const [selectedProfile, setSelectedProfile] = useState<MatchingProfile | undefined>(undefined);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [dailyLimitReached, setDailyLimitReached] = useState(false);
   const [isInActiveConversation, setIsInActiveConversation] = useState(false);
-  const [activeMatchId, setActiveMatchId] = useState<string | undefined>();
+  const [activeMatchId, setActiveMatchId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (!user) {
@@ -85,7 +87,7 @@ const Browse = () => {
   useEffect(() => {
     if (filteredProfiles.length > 0 && currentIndex === 0 && !subscription.subscribed) {
       checkDailyLimit().then(canView => {
-        if (canView) {
+        if (canView && filteredProfiles[0]) {
           logProfileView(filteredProfiles[0].user_id);
         }
       });
@@ -157,10 +159,7 @@ const Browse = () => {
       // Use the secure matching data table instead of direct profile access
       const { data, error } = await supabase
         .from('profile_matching_data')
-        .select(`
-          *,
-          user_verifications!inner(verification_score)
-        `)
+        .select('*')
         .neq('user_id', user.id)
         .eq('gender', oppositeGender)
         .eq('is_visible', true)
@@ -169,6 +168,18 @@ const Browse = () => {
 
       if (error) throw error;
 
+      // Get verification scores separately
+      const userIds = data?.map(p => p.user_id) ?? [];
+      const { data: verifications } = await supabase
+        .from('user_verifications')
+        .select('user_id, verification_score')
+        .in('user_id', userIds);
+
+      const verificationMap = (verifications ?? []).reduce((acc, v) => {
+        acc[v.user_id] = v.verification_score ?? 0;
+        return acc;
+      }, {} as Record<string, number>);
+
       const profilesWithVerification = data
         ?.filter((profile) =>
           !usersInConversation.has(profile.user_id) &&
@@ -176,16 +187,16 @@ const Browse = () => {
         )
         .map((profile): MatchingProfile => ({
           user_id: profile.user_id,
-          age: profile.age,
-          gender: profile.gender,
-          city_only: profile.city_only,
-          education_level: profile.education_level,
-          profession_category: profile.profession_category,
-          interests: profile.interests || [],
-          looking_for: profile.looking_for,
-          avatar_url: profile.avatar_url,
-          verification_score: profile.user_verifications?.verification_score || 0
-        })) || [];
+          age: profile.age ?? 0,
+          gender: profile.gender ?? '',
+          city_only: profile.city_only ?? '',
+          education_level: profile.education_level ?? '',
+          profession_category: profile.profession_category ?? '',
+          interests: (profile.interests as string[] | null) ?? [],
+          looking_for: profile.looking_for ?? '',
+          avatar_url: profile.avatar_url ?? '',
+          verification_score: verificationMap[profile.user_id] ?? 0
+        })) ?? [];
 
       setProfiles(profilesWithVerification.slice(0, 20)); // Limit to 20 after filtering
     } catch (error) {
@@ -205,30 +216,30 @@ const Browse = () => {
     let filtered = [...profiles];
 
     // Apply age filter
-    if (filters.ageRange) {
+    if (filters.ageRange && filters.ageRange[0] && filters.ageRange[1]) {
       filtered = filtered.filter(profile => 
-        profile.age >= filters.ageRange[0] && profile.age <= filters.ageRange[1]
+        profile.age >= filters.ageRange![0] && profile.age <= filters.ageRange![1]
       );
     }
 
     // Apply location filter (using city_only)
     if (filters.location) {
       filtered = filtered.filter(profile =>
-        profile.city_only?.toLowerCase().includes(filters.location.toLowerCase())
+        profile.city_only?.toLowerCase().includes(filters.location!.toLowerCase())
       );
     }
 
     // Apply education filter (using education_level)
     if (filters.education) {
       filtered = filtered.filter(profile =>
-        profile.education_level?.toLowerCase().includes(filters.education.toLowerCase())
+        profile.education_level?.toLowerCase().includes(filters.education!.toLowerCase())
       );
     }
 
     // Apply profession filter (using profession_category)
     if (filters.profession) {
       filtered = filtered.filter(profile =>
-        profile.profession_category?.toLowerCase().includes(filters.profession.toLowerCase())
+        profile.profession_category?.toLowerCase().includes(filters.profession!.toLowerCase())
       );
     }
 
@@ -243,10 +254,10 @@ const Browse = () => {
     }
 
     // Apply interests filter
-    if (filters.interests.length > 0) {
+    if (filters.interests && filters.interests.length > 0) {
       filtered = filtered.filter(profile =>
         profile.interests?.some(interest =>
-          filters.interests.includes(interest)
+          filters.interests!.includes(interest)
         )
       );
     }
@@ -308,7 +319,10 @@ const Browse = () => {
       setCurrentIndex(newIndex);
       
       // Log the view
-      await logProfileView(filteredProfiles[newIndex].user_id);
+      const profileToView = filteredProfiles[newIndex];
+      if (profileToView) {
+        await logProfileView(profileToView.user_id);
+      }
     } else {
       toast({
         title: "Plus de profils",

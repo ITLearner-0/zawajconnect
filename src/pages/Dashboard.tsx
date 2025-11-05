@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -56,9 +55,9 @@ const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [islamicPrefs, setIslamicPrefs] = useState<IslamicPreferences | null>(null);
-  const [verification, setVerification] = useState<any>(null);
+  const [profile, setProfile] = useState<Profile | undefined>(undefined);
+  const [islamicPrefs, setIslamicPrefs] = useState<IslamicPreferences | undefined>(undefined);
+  const [verification, setVerification] = useState<any>(undefined);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -95,9 +94,34 @@ const Dashboard = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      setProfile(profileData);
-      setIslamicPrefs(prefsData);
-      setVerification(verificationData);
+      setProfile(profileData ? {
+        id: profileData.id,
+        full_name: profileData.full_name ?? '',
+        age: profileData.age ?? 0,
+        gender: profileData.gender ?? '',
+        location: profileData.location ?? '',
+        education: profileData.education ?? '',
+        profession: profileData.profession ?? '',
+        bio: profileData.bio ?? '',
+        looking_for: profileData.looking_for ?? '',
+        interests: (profileData.interests as string[] | null) ?? [],
+        avatar_url: profileData.avatar_url ?? ''
+      } : undefined);
+      
+      setIslamicPrefs(prefsData ? {
+        prayer_frequency: prefsData.prayer_frequency ?? '',
+        quran_reading: prefsData.quran_reading ?? '',
+        hijab_preference: prefsData.hijab_preference ?? '',
+        beard_preference: prefsData.beard_preference ?? '',
+        sect: prefsData.sect ?? '',
+        madhab: prefsData.madhab ?? '',
+        halal_diet: !!prefsData.halal_diet,
+        smoking: prefsData.smoking ?? '',
+        desired_partner_sect: prefsData.desired_partner_sect ?? '',
+        importance_of_religion: prefsData.importance_of_religion ?? ''
+      } : undefined);
+      
+      setVerification(verificationData ?? undefined);
     } catch (error) {
       console.error('Error fetching profile data:', error);
       toast({
@@ -367,8 +391,8 @@ const Dashboard = () => {
                         <Label htmlFor="fullName">Nom complet</Label>
                         <Input
                           id="fullName"
-                          value={profile?.full_name || ''}
-                          onChange={(e) => setProfile(prev => prev ? {...prev, full_name: e.target.value} : null)}
+                          value={profile?.full_name ?? ''}
+                          onChange={(e) => setProfile(prev => prev ? {...prev, full_name: e.target.value} : undefined)}
                           placeholder="Votre nom complet"
                         />
                       </div>
@@ -377,8 +401,8 @@ const Dashboard = () => {
                         <Input
                           id="age"
                           type="number"
-                          value={profile?.age || ''}
-                          onChange={(e) => setProfile(prev => prev ? {...prev, age: parseInt(e.target.value)} : null)}
+                          value={profile?.age ?? ''}
+                          onChange={(e) => setProfile(prev => prev ? {...prev, age: parseInt(e.target.value)} : undefined)}
                           placeholder="Votre âge"
                         />
                       </div>
@@ -387,7 +411,7 @@ const Dashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="gender">Genre</Label>
-                        <Select value={profile?.gender || ''} onValueChange={(value) => setProfile(prev => prev ? {...prev, gender: value} : null)}>
+                        <Select value={profile?.gender ?? ''} onValueChange={(value) => setProfile(prev => prev ? {...prev, gender: value} : undefined)}>
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez votre genre" />
                           </SelectTrigger>
@@ -401,8 +425,8 @@ const Dashboard = () => {
                         <Label htmlFor="location">Localisation</Label>
                         <Input
                           id="location"
-                          value={profile?.location || ''}
-                          onChange={(e) => setProfile(prev => prev ? {...prev, location: e.target.value} : null)}
+                          value={profile?.location ?? ''}
+                          onChange={(e) => setProfile(prev => prev ? {...prev, location: e.target.value} : undefined)}
                           placeholder="Ville, Pays"
                         />
                       </div>
@@ -413,8 +437,8 @@ const Dashboard = () => {
                         <Label htmlFor="education">Éducation</Label>
                         <Input
                           id="education"
-                          value={profile?.education || ''}
-                          onChange={(e) => setProfile(prev => prev ? {...prev, education: e.target.value} : null)}
+                          value={profile?.education ?? ''}
+                          onChange={(e) => setProfile(prev => prev ? {...prev, education: e.target.value} : undefined)}
                           placeholder="Votre niveau d'éducation"
                         />
                       </div>
@@ -422,8 +446,8 @@ const Dashboard = () => {
                         <Label htmlFor="profession">Profession</Label>
                         <Input
                           id="profession"
-                          value={profile?.profession || ''}
-                          onChange={(e) => setProfile(prev => prev ? {...prev, profession: e.target.value} : null)}
+                          value={profile?.profession ?? ''}
+                          onChange={(e) => setProfile(prev => prev ? {...prev, profession: e.target.value} : undefined)}
                           placeholder="Votre profession"
                         />
                       </div>
@@ -433,8 +457,8 @@ const Dashboard = () => {
                       <Label htmlFor="bio">À propos de moi</Label>
                       <Textarea
                         id="bio"
-                        value={profile?.bio || ''}
-                        onChange={(e) => setProfile(prev => prev ? {...prev, bio: e.target.value} : null)}
+                        value={profile?.bio ?? ''}
+                        onChange={(e) => setProfile(prev => prev ? {...prev, bio: e.target.value} : undefined)}
                         placeholder="Décrivez-vous brièvement..."
                         rows={4}
                       />
@@ -444,8 +468,8 @@ const Dashboard = () => {
                       <Label htmlFor="lookingFor">Ce que je recherche</Label>
                       <Textarea
                         id="lookingFor"
-                        value={profile?.looking_for || ''}
-                        onChange={(e) => setProfile(prev => prev ? {...prev, looking_for: e.target.value} : null)}
+                        value={profile?.looking_for ?? ''}
+                        onChange={(e) => setProfile(prev => prev ? {...prev, looking_for: e.target.value} : undefined)}
                         placeholder="Décrivez le type de partenaire que vous recherchez..."
                         rows={3}
                       />
@@ -453,7 +477,7 @@ const Dashboard = () => {
 
                     <PhotoUpload 
                       currentPhotoUrl={profile?.avatar_url}
-                      onPhotoUpdate={(url) => setProfile(prev => prev ? {...prev, avatar_url: url} : null)}
+                      onPhotoUpdate={(url) => setProfile(prev => prev ? {...prev, avatar_url: url} : undefined)}
                     />
 
                     <div>
@@ -517,8 +541,8 @@ const Dashboard = () => {
                       <div>
                         <Label>Fréquence de prière</Label>
                         <Select 
-                          value={islamicPrefs?.prayer_frequency || ''} 
-                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, prayer_frequency: value} : null)}
+                          value={islamicPrefs?.prayer_frequency ?? ''} 
+                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, prayer_frequency: value} : undefined)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez" />
@@ -534,8 +558,8 @@ const Dashboard = () => {
                       <div>
                         <Label>Lecture du Coran</Label>
                         <Select 
-                          value={islamicPrefs?.quran_reading || ''} 
-                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, quran_reading: value} : null)}
+                          value={islamicPrefs?.quran_reading ?? ''} 
+                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, quran_reading: value} : undefined)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez" />
@@ -555,8 +579,8 @@ const Dashboard = () => {
                       <div>
                         <Label>Secte</Label>
                         <Select 
-                          value={islamicPrefs?.sect || ''} 
-                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, sect: value} : null)}
+                          value={islamicPrefs?.sect ?? ''} 
+                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, sect: value} : undefined)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez" />
@@ -572,8 +596,8 @@ const Dashboard = () => {
                       <div>
                         <Label>Importance de la religion</Label>
                         <Select 
-                          value={islamicPrefs?.importance_of_religion || ''} 
-                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, importance_of_religion: value} : null)}
+                          value={islamicPrefs?.importance_of_religion ?? ''} 
+                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, importance_of_religion: value} : undefined)}
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez" />
