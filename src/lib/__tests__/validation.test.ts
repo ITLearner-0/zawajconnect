@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { describe, it, expect } from 'vitest';
 import {
   emailSchema,
@@ -86,7 +85,7 @@ describe('Validation Schemas', () => {
       const result = passwordSchema.safeParse('Pass1');
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('8 caractères');
+        expect(result.error.issues[0]?.message).toContain('8 caractères');
       }
     });
   });

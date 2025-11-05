@@ -1,13 +1,12 @@
-// @ts-nocheck
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { logger, createNamespacedLogger } from '../logger';
 
 describe('Logger Utility', () => {
   const originalEnv = import.meta.env.DEV;
-  let consoleLogSpy: ReturnType<typeof vi.spyOn>;
-  let consoleInfoSpy: ReturnType<typeof vi.spyOn>;
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
-  let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
+  let consoleLogSpy: any;
+  let consoleInfoSpy: any;
+  let consoleErrorSpy: any;
+  let consoleWarnSpy: any;
 
   beforeEach(() => {
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -25,7 +24,6 @@ describe('Logger Utility', () => {
 
   describe('in development mode', () => {
     beforeEach(() => {
-      // @ts-expect-error - Mock DEV mode
       import.meta.env.DEV = true;
     });
 
@@ -54,7 +52,7 @@ describe('Logger Utility', () => {
       // In dev mode, should log with namespace
       if (import.meta.env.DEV) {
         expect(consoleLogSpy).toHaveBeenCalled();
-        const callArgs = consoleLogSpy.mock.calls[0][0];
+        const callArgs = consoleLogSpy.mock.calls[0]?.[0];
         expect(callArgs).toContain('[TestFeature]');
       }
     });
