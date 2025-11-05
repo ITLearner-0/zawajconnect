@@ -42,8 +42,8 @@ Impact: Critique sur toute l'application
 12. ✅ **useProfileSave.tsx** - Refactorisé (age: number | undefined, tous types normalisés avec ??)
 13. 📝 **useSecurityEvents.tsx** - Nécessite normalisation security events
 14. 📝 **useSecurityMonitor.tsx** - Nécessite normalisation monitoring
-15. 📝 **useSmartRecommendations.tsx** - Nécessite normalisation recommendations
-16. 📝 **useUnifiedCompatibility.tsx** - Nécessite normalisation compatibility
+15. ✅ **useSmartRecommendations.tsx** - Refactorisé (tous types normalisés avec ?? undefined, Record<string, unknown> | undefined | null)
+16. ✅ **useUnifiedCompatibility.tsx** - Refactorisé (tous types normalisés, Record<string, unknown> | undefined)
 
 **Estimation**: 3-4 jours (1-2 hooks par session)
 
@@ -202,12 +202,12 @@ Pour chaque fichier à refactoriser:
 - 🔵 Priorité 5 (Tests): 2 fichiers
 
 **Avancement actuel**:
-- ✅ Terminé: 7 fichiers (useAuth.tsx partiellement, useChatMatch.tsx, useChatMessages.tsx, useFamilyApproval.tsx, useFormAutosave.ts, useNavigationAnalytics.tsx, useInsightsAnalytics.tsx, useProfileSave.tsx)
+- ✅ Terminé: 9 fichiers (useAuth.tsx partiellement, useChatMatch.tsx, useChatMessages.tsx, useFamilyApproval.tsx, useFormAutosave.ts, useNavigationAnalytics.tsx, useInsightsAnalytics.tsx, useProfileSave.tsx, useUnifiedCompatibility.tsx, useSmartRecommendations.tsx)
 - 📝 Normalisé partiellement: 4 fichiers (useFamilySupervision, useIslamicModeration, useMatchApproval, useMatchingHistory)
-- ✨ Fichiers liés normalisés: 3 fichiers (useOnboardingValidation.tsx, useFormPersistence.tsx, ProfilePreview.tsx) - types ProfileData.age normalisés
-- ⚠️ Avec @ts-nocheck: 24 fichiers restants
-- ⏱️ Estimation restante: 7-10 jours de travail
-- 📊 Progression: 23% (7/31 fichiers)
+- ✨ Fichiers liés normalisés: 4 fichiers (useOnboardingValidation.tsx, useFormPersistence.tsx, ProfilePreview.tsx, RecommendationCard.tsx) - types ProfileData.age et SmartRecommendation normalisés
+- ⚠️ Avec @ts-nocheck: 22 fichiers restants
+- ⏱️ Estimation restante: 6-9 jours de travail
+- 📊 Progression: 29% (9/31 fichiers)
 
 ## Notes importantes
 
