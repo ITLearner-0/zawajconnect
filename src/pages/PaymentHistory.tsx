@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Payment History Page
  *

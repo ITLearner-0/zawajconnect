@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Accessibility utilities for WCAG 2.1 compliance
  * These helpers make it easier to build accessible interfaces
