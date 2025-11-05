@@ -52,11 +52,11 @@ Tous les hooks core ont été refactorisés avec succès:
 ### 🟠 PRIORITÉ 2 - Pages (12 fichiers) - Difficulté: Moyenne-Élevée
 Impact: Interface utilisateur et expérience
 
-1. 📝 **Admin.tsx** - Normaliser roles.role
+1. ✅ **Admin.tsx** - Refactorisé (isAdmin, userRole: undefined, roles.role normalisé)
 2. 📝 **AdminUserProfile.tsx** - Multiples types à normaliser (ProfileData, IslamicPreferences, etc.)
-3. 📝 **Browse.tsx** - Normaliser filters et profiles
-4. 📝 **Chat.tsx** - Normaliser matchId (string | null → string | undefined)
-5. 📝 **Dashboard.tsx** - Normaliser Profile et IslamicPreferences
+3. ✅ **Browse.tsx** - Refactorisé (selectedProfile, activeMatchId: undefined, verification_score normalisé, user_verifications refactorisé)
+4. ✅ **Chat.tsx** - Refactorisé (selectedChatId, matchIdFromUrl: undefined)
+5. ✅ **Dashboard.tsx** - Refactorisé (profile, islamicPrefs, verification: undefined, tous types normalisés avec ??)
 6. 📝 **EnhancedProfile.tsx** - Normaliser ProfileData, VerificationData, IslamicPreferences, Privacy
 7. 📝 **Family.tsx** - Normaliser FamilyMember (booleans), PrivacySettings
 8. 📝 **Privacy.tsx** - Déjà avec @ts-nocheck, nécessite normalisation PrivacySettings
@@ -204,12 +204,14 @@ Pour chaque fichier à refactoriser:
 - 🔵 Priorité 5 (Tests): 2 fichiers
 
 **Avancement actuel**:
-- ✅ Terminé: 15 fichiers Priority 1 (useAuth.tsx partiellement, useChatMatch.tsx, useChatMessages.tsx, useFamilyApproval.tsx, useFormAutosave.ts, useNavigationAnalytics.tsx, useInsightsAnalytics.tsx, useProfileSave.tsx, useUnifiedCompatibility.tsx, useSmartRecommendations.tsx, useSecurityEvents.tsx, useSecurityMonitor.tsx, useFamilySupervision.tsx, useIslamicModeration.tsx, useMatchApproval.tsx, useMatchingHistory.tsx)
+- ✅ Terminé Priority 1: 16 hooks (useAuth.tsx partiellement, useChatMatch.tsx, useChatMessages.tsx, useFamilyApproval.tsx, useFormAutosave.ts, useNavigationAnalytics.tsx, useInsightsAnalytics.tsx, useProfileSave.tsx, useUnifiedCompatibility.tsx, useSmartRecommendations.tsx, useSecurityEvents.tsx, useSecurityMonitor.tsx, useFamilySupervision.tsx, useIslamicModeration.tsx, useMatchApproval.tsx, useMatchingHistory.tsx)
+- ✅ Terminé Priority 2: 4 pages (Admin.tsx, Browse.tsx, Chat.tsx, Dashboard.tsx)
 - ✨ Fichiers liés normalisés: 4 fichiers (useOnboardingValidation.tsx, useFormPersistence.tsx, ProfilePreview.tsx, RecommendationCard.tsx)
-- 🎯 Priority 1 COMPLÉTÉE: 16/16 hooks refactorisés
-- ⚠️ Avec @ts-nocheck: 16 fichiers restants (Pages Priority 2, Services, Utils, Tests)
-- ⏱️ Estimation restante: 4-7 jours de travail
-- 📊 Progression: 48% (15/31 fichiers originaux)
+- 🎯 Priority 1 COMPLÉTÉE: 16/16 hooks refactorisés (100%)
+- 🎯 Priority 2 EN COURS: 4/12 pages refactorisées (33%)
+- ⚠️ Avec @ts-nocheck: 12 fichiers restants (8 pages Priority 2 + Services Priority 3 + Utils Priority 4 + Tests Priority 5)
+- ⏱️ Estimation restante: 4-6 jours de travail
+- 📊 Progression: 61% (19/31 fichiers originaux)
 
 ## Notes importantes
 
