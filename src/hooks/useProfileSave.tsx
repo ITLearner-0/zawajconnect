@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -6,7 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 
 interface ProfileData {
   full_name: string;
-  age: number | null;
+  age: number | undefined;
   gender: string;
   location: string;
   education: string;
@@ -55,16 +54,16 @@ export const useProfileSave = () => {
       // Debug log the exact data being sent to database
       const profileUpdateData = {
         user_id: user.id,
-        full_name: profileData.full_name,
-        age: profileData.age,
-        gender: profileData.gender,
-        location: profileData.location,
-        education: profileData.education,
-        profession: profileData.profession,
-        bio: profileData.bio,
-        looking_for: profileData.looking_for,
-        interests: profileData.interests,
-        avatar_url: profileData.avatar_url,
+        full_name: profileData.full_name ?? '',
+        age: profileData.age ?? undefined,
+        gender: profileData.gender ?? '',
+        location: profileData.location ?? '',
+        education: profileData.education ?? '',
+        profession: profileData.profession ?? '',
+        bio: profileData.bio ?? '',
+        looking_for: profileData.looking_for ?? '',
+        interests: profileData.interests ?? [],
+        avatar_url: profileData.avatar_url ?? '',
         updated_at: new Date().toISOString()
       };
       
@@ -119,16 +118,16 @@ export const useProfileSave = () => {
       console.log('Validating Islamic preferences:', prefs);
       
       const validated = {
-        prayer_frequency: validPrayerFreqs.includes(prefs.prayer_frequency) ? prefs.prayer_frequency : null,
-        quran_reading: validQuranReading.includes(prefs.quran_reading) ? prefs.quran_reading : null,
-        hijab_preference: validHijab.includes(prefs.hijab_preference) ? prefs.hijab_preference : null,
-        beard_preference: validBeard.includes(prefs.beard_preference) ? prefs.beard_preference : null,
-        sect: validSects.includes(prefs.sect) ? prefs.sect : null,
-        madhab: validMadhab.includes(prefs.madhab) ? prefs.madhab : null,
+        prayer_frequency: validPrayerFreqs.includes(prefs.prayer_frequency ?? '') ? prefs.prayer_frequency : undefined,
+        quran_reading: validQuranReading.includes(prefs.quran_reading ?? '') ? prefs.quran_reading : undefined,
+        hijab_preference: validHijab.includes(prefs.hijab_preference ?? '') ? prefs.hijab_preference : undefined,
+        beard_preference: validBeard.includes(prefs.beard_preference ?? '') ? prefs.beard_preference : undefined,
+        sect: validSects.includes(prefs.sect ?? '') ? prefs.sect : undefined,
+        madhab: validMadhab.includes(prefs.madhab ?? '') ? prefs.madhab : undefined,
         halal_diet: prefs.halal_diet ?? true,
-        smoking: validSmoking.includes(prefs.smoking) ? prefs.smoking : null,
-        desired_partner_sect: validDesiredPartnerSect.includes(prefs.desired_partner_sect) ? prefs.desired_partner_sect : null,
-        importance_of_religion: validImportance.includes(prefs.importance_of_religion) ? prefs.importance_of_religion : null,
+        smoking: validSmoking.includes(prefs.smoking ?? '') ? prefs.smoking : undefined,
+        desired_partner_sect: validDesiredPartnerSect.includes(prefs.desired_partner_sect ?? '') ? prefs.desired_partner_sect : undefined,
+        importance_of_religion: validImportance.includes(prefs.importance_of_religion ?? '') ? prefs.importance_of_religion : undefined,
       };
       
       console.log('Validated Islamic preferences:', validated);
@@ -140,16 +139,16 @@ export const useProfileSave = () => {
     // 2. Save Islamic preferences - Clean data before saving
     const cleanIslamicPrefs = {
       user_id: user.id,
-      prayer_frequency: validatedPrefs.prayer_frequency || null,
-      quran_reading: validatedPrefs.quran_reading || null,
-      hijab_preference: validatedPrefs.hijab_preference || null,
-      beard_preference: validatedPrefs.beard_preference || null,
-      sect: validatedPrefs.sect || null,
-      madhab: validatedPrefs.madhab || null,
+      prayer_frequency: validatedPrefs.prayer_frequency ?? undefined,
+      quran_reading: validatedPrefs.quran_reading ?? undefined,
+      hijab_preference: validatedPrefs.hijab_preference ?? undefined,
+      beard_preference: validatedPrefs.beard_preference ?? undefined,
+      sect: validatedPrefs.sect ?? undefined,
+      madhab: validatedPrefs.madhab ?? undefined,
       halal_diet: validatedPrefs.halal_diet ?? true,
-      smoking: validatedPrefs.smoking || null,
-      desired_partner_sect: validatedPrefs.desired_partner_sect || null,
-      importance_of_religion: validatedPrefs.importance_of_religion || null,
+      smoking: validatedPrefs.smoking ?? undefined,
+      desired_partner_sect: validatedPrefs.desired_partner_sect ?? undefined,
+      importance_of_religion: validatedPrefs.importance_of_religion ?? undefined,
       updated_at: new Date().toISOString()
     };
 
@@ -207,7 +206,7 @@ export const useProfileSave = () => {
         variant: "destructive"
       });
 
-      return { success: false, error: error.message };
+      return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
     } finally {
       setSaving(false);
     }

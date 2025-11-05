@@ -1,11 +1,10 @@
-// @ts-nocheck
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 
 interface InsightsAnalytics {
   viewCount: number;
-  lastViewed: string | null;
+  lastViewed: string | undefined;
   shareCount: number;
   exportCount: number;
   actionsTaken: string[];
@@ -15,7 +14,7 @@ export const useInsightsAnalytics = () => {
   const { user } = useAuth();
   const [analytics, setAnalytics] = useState<InsightsAnalytics>({
     viewCount: 0,
-    lastViewed: null,
+    lastViewed: undefined,
     shareCount: 0,
     exportCount: 0,
     actionsTaken: []
@@ -34,9 +33,8 @@ export const useInsightsAnalytics = () => {
         .from('user_settings')
         .upsert({
           user_id: user?.id,
-          // We can extend user_settings table or create a new analytics table
           updated_at: new Date().toISOString()
-        });
+        } as any);
 
       if (error) throw error;
     } catch (error) {

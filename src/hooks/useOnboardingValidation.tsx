@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 interface ProfileData {
   full_name: string;
-  age: number | null;
+  age: number | undefined;
   gender: string;
   location: string;
   education: string;
@@ -59,7 +59,7 @@ export const useOnboardingValidation = ({
         {
           field: 'age',
           label: 'Âge',
-          isValid: profileData.age !== null && profileData.age >= 18 && profileData.age <= 80,
+          isValid: profileData.age !== undefined && profileData.age >= 18 && profileData.age <= 80,
           message: 'L\'âge doit être entre 18 et 80 ans',
           isRequired: true
         },

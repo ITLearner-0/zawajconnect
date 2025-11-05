@@ -42,7 +42,7 @@ import {
 
 interface ProfileData {
   full_name: string;
-  age: number | null;
+  age: number | undefined;
   gender: string;
   location: string;
   education: string;
@@ -78,7 +78,7 @@ const Onboarding = () => {
   // Profile data states
   const [profileData, setProfileData] = useState<ProfileData>({
     full_name: '',
-    age: null,
+    age: undefined,
     gender: '',
     location: '',
     education: '',
@@ -220,7 +220,7 @@ const Onboarding = () => {
         console.log('✅ Profil chargé depuis la base de données');
         const loadedProfile = {
           full_name: profile.full_name || '',
-          age: profile.age || null,
+          age: profile.age ?? undefined,
           gender: profile.gender || '',
           location: profile.location || '',
           education: profile.education || '',
@@ -531,7 +531,7 @@ const Onboarding = () => {
                   id="age"
                   type="number"
                   value={profileData.age || ''}
-                  onChange={(e) => setProfileData({...profileData, age: parseInt(e.target.value) || null})}
+                  onChange={(e) => setProfileData({...profileData, age: parseInt(e.target.value) || undefined})}
                   placeholder="Votre âge"
                   required
                 />

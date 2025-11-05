@@ -3,7 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 interface ProfileData {
   full_name: string;
-  age: number | null;
+  age: number | undefined;
   gender: string;
   location: string;
   education: string;
@@ -46,7 +46,7 @@ export const useFormPersistence = ({
 
     // Only save if there's meaningful data
     const hasData = data.full_name.length > 0 || 
-                   data.age !== null || 
+                   data.age !== undefined || 
                    data.gender.length > 0 || 
                    data.location.length > 0;
 

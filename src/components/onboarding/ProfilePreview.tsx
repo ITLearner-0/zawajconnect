@@ -15,7 +15,7 @@ import {
 
 interface ProfileData {
   full_name: string;
-  age: number | null;
+  age: number | undefined;
   gender: string;
   location: string;
   education: string;
