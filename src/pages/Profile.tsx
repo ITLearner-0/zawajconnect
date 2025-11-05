@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -45,10 +44,10 @@ const Profile = () => {
   const { user } = useAuth();
   const { calculateDetailedCompatibility } = useUnifiedCompatibility();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [profile, setProfile] = useState<ProfileData | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
-  const [verification, setVerification] = useState<any>(null);
+  const [verification, setVerification] = useState<{ verification_score?: number } | undefined>(undefined);
   const [showReportModal, setShowReportModal] = useState(false);
 
   useEffect(() => {
@@ -85,7 +84,7 @@ const Profile = () => {
 
       if (profileError) {
         console.error('Error fetching profile:', profileError);
-        setProfile(null);
+        setProfile(undefined);
         return;
       }
 
@@ -99,15 +98,35 @@ const Profile = () => {
 
         setProfile({
           ...profileData,
-          islamic_preferences: prefsData || undefined
+          full_name: profileData.full_name ?? '',
+          age: profileData.age ?? 0,
+          gender: profileData.gender ?? '',
+          location: profileData.location ?? '',
+          education: profileData.education ?? '',
+          profession: profileData.profession ?? '',
+          bio: profileData.bio ?? '',
+          looking_for: profileData.looking_for ?? '',
+          interests: (profileData.interests ?? []).filter((i): i is string => i !== null),
+          avatar_url: profileData.avatar_url ?? undefined,
+          islamic_preferences: prefsData ? {
+            prayer_frequency: prefsData.prayer_frequency ?? '',
+            quran_reading: prefsData.quran_reading ?? '',
+            hijab_preference: prefsData.hijab_preference ?? '',
+            beard_preference: prefsData.beard_preference ?? '',
+            sect: prefsData.sect ?? '',
+            madhab: prefsData.madhab ?? '',
+            halal_diet: !!prefsData.halal_diet,
+            smoking: prefsData.smoking ?? '',
+            importance_of_religion: prefsData.importance_of_religion ?? ''
+          } : undefined
         });
       } else {
         // Profile doesn't exist
-        setProfile(null);
+        setProfile(undefined);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
-      setProfile(null);
+      setProfile(undefined);
     } finally {
       setLoading(false);
     }
@@ -124,8 +143,8 @@ const Profile = () => {
         .maybeSingle();
 
       if (match) {
-        const userLiked = (match.user1_id === user.id && match.user1_liked) || 
-                          (match.user2_id === user.id && match.user2_liked);
+        const userLiked = (match.user1_id === user.id && !!match.user1_liked) || 
+                          (match.user2_id === user.id && !!match.user2_liked);
         setIsLiked(userLiked);
       }
     } catch (error) {
@@ -144,7 +163,9 @@ const Profile = () => {
         .eq('user_id', userId)
         .maybeSingle();
 
-      setVerification(data);
+      setVerification(data ? {
+        verification_score: data.verification_score ?? 0
+      } : undefined);
     } catch (error) {
       console.warn('Could not fetch verification status:', error);
     }

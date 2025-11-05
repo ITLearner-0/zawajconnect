@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useCompatibility } from '@/hooks/useCompatibility';
@@ -99,10 +98,10 @@ const EnhancedProfile = () => {
   
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [verification, setVerification] = useState<VerificationData | null>(null);
-  const [islamicPrefs, setIslamicPrefs] = useState<IslamicPreferencesData | null>(null);
-  const [privacySettings, setPrivacySettings] = useState<PrivacySettingsData | null>(null);
+  const [profile, setProfile] = useState<ProfileData | undefined>(undefined);
+  const [verification, setVerification] = useState<VerificationData | undefined>(undefined);
+  const [islamicPrefs, setIslamicPrefs] = useState<IslamicPreferencesData | undefined>(undefined);
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettingsData | undefined>(undefined);
   const [completionStats, setCompletionStats] = useState<ProfileCompletionStats>({
     overall: 0,
     basicInfo: 0,
@@ -171,33 +170,70 @@ const EnhancedProfile = () => {
         privacyError: privacyRes.error
       });
 
-      // Don't throw on individual errors - set null data instead
+      // Don't throw on individual errors - set undefined data instead
       if (profileRes.error) {
         console.error('📊 Profile error:', profileRes.error);
-        setProfile(null);
-      } else {
-        setProfile(profileRes.data);
+        setProfile(undefined);
+      } else if (profileRes.data) {
+        setProfile({
+          ...profileRes.data,
+          full_name: profileRes.data.full_name ?? '',
+          age: profileRes.data.age ?? 0,
+          avatar_url: profileRes.data.avatar_url ?? undefined,
+          bio: profileRes.data.bio ?? undefined,
+          location: profileRes.data.location ?? undefined,
+          education: profileRes.data.education ?? undefined,
+          profession: profileRes.data.profession ?? undefined,
+          interests: (profileRes.data.interests ?? []).filter((i): i is string => i !== null)
+        } as ProfileData);
       }
 
       if (verificationRes.error) {
         console.error('📊 Verification error:', verificationRes.error);
-        setVerification(null);
-      } else {
-        setVerification(verificationRes.data);
+        setVerification(undefined);
+      } else if (verificationRes.data) {
+        setVerification({
+          email_verified: !!verificationRes.data.email_verified,
+          phone_verified: !!verificationRes.data.phone_verified,
+          id_verified: !!verificationRes.data.id_verified,
+          family_verified: !!verificationRes.data.family_verified,
+          verification_score: verificationRes.data.verification_score ?? 0,
+          verification_documents: (verificationRes.data.verification_documents ?? []).filter((d): d is string => d !== null),
+          verification_notes: verificationRes.data.verification_notes ?? undefined,
+          verified_at: verificationRes.data.verified_at ?? undefined
+        });
       }
 
       if (islamicRes.error) {
         console.error('📊 Islamic prefs error:', islamicRes.error);
-        setIslamicPrefs(null);
-      } else {
-        setIslamicPrefs(islamicRes.data);
+        setIslamicPrefs(undefined);
+      } else if (islamicRes.data) {
+        setIslamicPrefs({
+          prayer_frequency: islamicRes.data.prayer_frequency ?? undefined,
+          quran_reading: islamicRes.data.quran_reading ?? undefined,
+          hijab_preference: islamicRes.data.hijab_preference ?? undefined,
+          beard_preference: islamicRes.data.beard_preference ?? undefined,
+          sect: islamicRes.data.sect ?? undefined,
+          madhab: islamicRes.data.madhab ?? undefined,
+          halal_diet: !!islamicRes.data.halal_diet,
+          smoking: islamicRes.data.smoking ?? undefined,
+          desired_partner_sect: islamicRes.data.desired_partner_sect ?? undefined,
+          importance_of_religion: islamicRes.data.importance_of_religion ?? undefined
+        });
       }
 
       if (privacyRes.error) {
         console.error('📊 Privacy error:', privacyRes.error);
-        setPrivacySettings(null);
-      } else {
-        setPrivacySettings(privacyRes.data);
+        setPrivacySettings(undefined);
+      } else if (privacyRes.data) {
+        setPrivacySettings({
+          profile_visibility: privacyRes.data.profile_visibility ?? undefined,
+          photo_visibility: privacyRes.data.photo_visibility ?? undefined,
+          contact_visibility: privacyRes.data.contact_visibility ?? undefined,
+          last_seen_visibility: privacyRes.data.last_seen_visibility ?? undefined,
+          allow_messages_from: privacyRes.data.allow_messages_from ?? undefined,
+          allow_family_involvement: !!privacyRes.data.allow_family_involvement
+        });
       }
 
       console.log('📊 All data loaded successfully');

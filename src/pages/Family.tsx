@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -61,10 +60,10 @@ const Family = () => {
   const { toast } = useToast();
 
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
-  const [privacySettings, setPrivacySettings] = useState<PrivacySettings | null>(null);
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettings | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
-  const [editingMember, setEditingMember] = useState<FamilyMember | null>(null);
+  const [editingMember, setEditingMember] = useState<FamilyMember | undefined>(undefined);
 
   const [newMember, setNewMember] = useState({
     full_name: '',
@@ -95,7 +94,13 @@ const Family = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setFamilyMembers(data || []);
+      // Normalize family members data (email/phone removed from family_members table)
+      setFamilyMembers((data ?? []).map(member => ({
+        ...member,
+        is_wali: !!member.is_wali,
+        can_communicate: !!member.can_communicate,
+        can_view_profile: !!member.can_view_profile
+      })));
     } catch (error) {
       console.error('Error fetching family members:', error);
       toast({
@@ -119,7 +124,14 @@ const Family = () => {
       if (error && error.code !== 'PGRST116') throw error;
       
       if (data) {
-        setPrivacySettings(data);
+        setPrivacySettings({
+          ...data,
+          allow_family_involvement: !!data.allow_family_involvement,
+          profile_visibility: data.profile_visibility ?? 'public',
+          photo_visibility: data.photo_visibility ?? 'matches_only',
+          contact_visibility: data.contact_visibility ?? 'matches_only',
+          allow_messages_from: data.allow_messages_from ?? 'matches_only'
+        });
       } else {
         // Create default privacy settings
         const { data: newSettings, error: createError } = await supabase
@@ -136,7 +148,14 @@ const Family = () => {
           .maybeSingle();
 
         if (createError) throw createError;
-        setPrivacySettings(newSettings);
+        setPrivacySettings(newSettings ? {
+          ...newSettings,
+          allow_family_involvement: !!newSettings.allow_family_involvement,
+          profile_visibility: newSettings.profile_visibility ?? 'public',
+          photo_visibility: newSettings.photo_visibility ?? 'matches_only',
+          contact_visibility: newSettings.contact_visibility ?? 'matches_only',
+          allow_messages_from: newSettings.allow_messages_from ?? 'matches_only'
+        } : undefined);
       }
     } catch (error) {
       console.error('Error fetching privacy settings:', error);
@@ -168,9 +187,16 @@ const Family = () => {
 
       if (error) throw error;
 
-      setFamilyMembers(prev => 
-        prev.map(member => member.id === memberId ? data : member)
-      );
+      if (data) {
+        setFamilyMembers(prev => 
+          prev.map(member => member.id === memberId ? {
+            ...data,
+            is_wali: !!data.is_wali,
+            can_communicate: !!data.can_communicate,
+            can_view_profile: !!data.can_view_profile
+          } : member)
+        );
+      }
 
       toast({
         title: "Membre mis à jour",
@@ -224,7 +250,14 @@ const Family = () => {
 
       if (error) throw error;
 
-      setPrivacySettings(data);
+      setPrivacySettings(data ? {
+        ...data,
+        allow_family_involvement: !!data.allow_family_involvement,
+        profile_visibility: data.profile_visibility ?? 'public',
+        photo_visibility: data.photo_visibility ?? 'matches_only',
+        contact_visibility: data.contact_visibility ?? 'matches_only',
+        allow_messages_from: data.allow_messages_from ?? 'matches_only'
+      } : undefined);
 
       toast({
         title: "Paramètres mis à jour",

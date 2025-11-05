@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -77,12 +76,22 @@ const Matches = () => {
 
             return {
               ...match,
+              match_score: match.match_score ?? 0,
+              user1_liked: !!match.user1_liked,
+              user2_liked: !!match.user2_liked,
+              is_mutual: !!match.is_mutual,
+              conversation_status: (match.conversation_status ?? 'not_started') as 'not_started' | 'active' | 'ended',
               other_user: otherUserProfile ? {
                 ...otherUserProfile,
-                user_id: otherUserId // Ensure we always have user_id for navigation
+                user_id: otherUserId,
+                full_name: otherUserProfile.full_name ?? 'Utilisateur inconnu',
+                age: otherUserProfile.age ?? 0,
+                location: otherUserProfile.location ?? 'Non spécifié',
+                profession: otherUserProfile.profession ?? 'Non spécifié',
+                bio: otherUserProfile.bio ?? ''
               } : {
                 id: otherUserId,
-                user_id: otherUserId, // Add user_id for consistency
+                user_id: otherUserId,
                 full_name: 'Utilisateur inconnu',
                 age: 0,
                 location: 'Non spécifié',

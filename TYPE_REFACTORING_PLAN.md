@@ -57,13 +57,13 @@ Impact: Interface utilisateur et expérience
 3. ✅ **Browse.tsx** - Refactorisé (selectedProfile, activeMatchId: undefined, verification_score normalisé, user_verifications refactorisé)
 4. ✅ **Chat.tsx** - Refactorisé (selectedChatId, matchIdFromUrl: undefined)
 5. ✅ **Dashboard.tsx** - Refactorisé (profile, islamicPrefs, verification: undefined, tous types normalisés avec ??)
-6. 📝 **EnhancedProfile.tsx** - Normaliser ProfileData, VerificationData, IslamicPreferences, Privacy
-7. 📝 **Family.tsx** - Normaliser FamilyMember (booleans), PrivacySettings
+6. ✅ **EnhancedProfile.tsx** - Refactorisé (profile, verification, islamicPrefs, privacySettings: undefined, tous types normalisés avec ??, booléens avec !!)
+7. ✅ **Family.tsx** - Refactorisé (privacySettings, editingMember: undefined, FamilyMember booléens normalisés avec !!, email/phone retirés)
 8. 📝 **Privacy.tsx** - Déjà avec @ts-nocheck, nécessite normalisation PrivacySettings
 9. 📝 **Guidance.tsx** - Normaliser Article (author: string | null)
-10. 📝 **Matches.tsx** - Normaliser Match (match_score: number | null)
+10. ✅ **Matches.tsx** - Refactorisé (match_score normalisé avec ?? 0, conversation_status cast correct, booléens normalisés)
 11. 📝 **PaymentHistory.tsx** - Types Payment et Subscription incompatibles
-12. 📝 **Profile.tsx** - Normaliser IslamicPreferences et booléens
+12. ✅ **Profile.tsx** - Refactorisé (profile, verification: undefined, tous types normalisés avec ?? '', interests filtrés, islamic_preferences normalisé)
 
 **Estimation**: 4-5 jours (2-3 pages par session)
 
@@ -205,13 +205,13 @@ Pour chaque fichier à refactoriser:
 
 **Avancement actuel**:
 - ✅ Terminé Priority 1: 16 hooks (useAuth.tsx partiellement, useChatMatch.tsx, useChatMessages.tsx, useFamilyApproval.tsx, useFormAutosave.ts, useNavigationAnalytics.tsx, useInsightsAnalytics.tsx, useProfileSave.tsx, useUnifiedCompatibility.tsx, useSmartRecommendations.tsx, useSecurityEvents.tsx, useSecurityMonitor.tsx, useFamilySupervision.tsx, useIslamicModeration.tsx, useMatchApproval.tsx, useMatchingHistory.tsx)
-- ✅ Terminé Priority 2: 4 pages (Admin.tsx, Browse.tsx, Chat.tsx, Dashboard.tsx)
+- ✅ Terminé Priority 2: 8 pages (Admin.tsx, Browse.tsx, Chat.tsx, Dashboard.tsx, EnhancedProfile.tsx, Family.tsx, Matches.tsx, Profile.tsx)
 - ✨ Fichiers liés normalisés: 4 fichiers (useOnboardingValidation.tsx, useFormPersistence.tsx, ProfilePreview.tsx, RecommendationCard.tsx)
 - 🎯 Priority 1 COMPLÉTÉE: 16/16 hooks refactorisés (100%)
-- 🎯 Priority 2 EN COURS: 4/12 pages refactorisées (33%)
-- ⚠️ Avec @ts-nocheck: 12 fichiers restants (8 pages Priority 2 + Services Priority 3 + Utils Priority 4 + Tests Priority 5)
-- ⏱️ Estimation restante: 4-6 jours de travail
-- 📊 Progression: 61% (19/31 fichiers originaux)
+- 🎯 Priority 2 EN COURS: 8/12 pages refactorisées (67%)
+- ⚠️ Avec @ts-nocheck: 8 fichiers restants (4 pages Priority 2 + Services Priority 3 + Utils Priority 4 + Tests Priority 5)
+- ⏱️ Estimation restante: 2-4 jours de travail
+- 📊 Progression: 77% (23/31 fichiers originaux)
 
 ## Notes importantes
 
