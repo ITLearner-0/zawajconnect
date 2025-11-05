@@ -91,9 +91,20 @@ export const useFamilyApproval = () => {
       if (error) throw error;
 
       setNotifications((data || []).map(item => ({
-        ...item,
+        id: item.id,
+        match_id: item.match_id,
+        notification_type: item.notification_type,
+        content: item.content,
+        severity: item.severity,
+        action_required: item.action_required,
+        is_read: item.is_read,
+        created_at: item.created_at,
+        family_member_id: item.family_member_id,
         match: item.match ? {
-          ...item.match,
+          id: item.match.id,
+          user1_id: item.match.user1_id,
+          user2_id: item.match.user2_id,
+          match_score: item.match.match_score ?? 0,
           user1_profile: Array.isArray(item.match.user1_profile) ? item.match.user1_profile[0] : item.match.user1_profile,
           user2_profile: Array.isArray(item.match.user2_profile) ? item.match.user2_profile[0] : item.match.user2_profile
         } : null

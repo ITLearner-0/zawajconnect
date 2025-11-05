@@ -112,8 +112,18 @@ export const useFamilySupervision = () => {
         throw waliError || userError;
       }
 
-      // Combine both results
-      const allFamilyData = [...(familyDataAsWali || []), ...(familyDataAsUser || [])];
+      // Combine both results and normalize types
+      const allFamilyData = [...(familyDataAsWali || []), ...(familyDataAsUser || [])].map(member => ({
+        id: member.id,
+        user_id: member.user_id,
+        invited_user_id: member.invited_user_id ?? undefined,
+        full_name: member.full_name,
+        relationship: member.relationship,
+        is_wali: !!member.is_wali,
+        can_communicate: !!member.can_communicate,
+        can_view_profile: !!member.can_view_profile,
+        invitation_status: member.invitation_status ?? 'pending'
+      }));
       setFamilyMembers(allFamilyData);
       
       // Check user's gender to determine if family supervision is needed
@@ -172,7 +182,16 @@ export const useFamilySupervision = () => {
 
       if (error) throw error;
 
-      setNotifications(data || []);
+      setNotifications((data || []).map(notif => ({
+        id: notif.id,
+        notification_type: notif.notification_type,
+        content: notif.content,
+        original_message: notif.original_message ?? undefined,
+        severity: notif.severity,
+        is_read: notif.is_read,
+        action_required: notif.action_required,
+        created_at: notif.created_at
+      })));
     } catch (error) {
       console.error('Error loading notifications:', error);
     }
