@@ -8,12 +8,12 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 
 | Métrique | Valeur |
 |----------|--------|
-| **Warnings ESLint** | 204 → **197** ✅ |
+| **Warnings ESLint** | 204 → **196** ✅ |
 | **Type de warning** | `@typescript-eslint/no-explicit-any` |
 | **Statut actuel** | `warn` (permet la compilation) |
 | **Objectif final** | 0 warnings (règle à `error`) |
-| **Dernière migration** | `useProfileData.tsx` (-5 unknown) |
-| **Progrès total** | 7 types stricts ajoutés (2 any + 5 unknown) |
+| **Dernière migration** | `useChatMessages.tsx` (-1 any) |
+| **Progrès total** | 8 types stricts ajoutés (3 any + 5 unknown) |
 
 ---
 
@@ -89,6 +89,29 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 
 ---
 
+### ✅ Hook Messaging - `useChatMessages.tsx` (Janvier 2025)
+
+**Warnings éliminés**: 1 `any` remplacé
+
+**Changements effectués**:
+1. `channelRef`: `any` → `RealtimeChannel | null`
+   - Import du type `RealtimeChannel` depuis `@supabase/supabase-js`
+   - Pattern cohérent avec `useChatPresence.tsx`
+   - Utilisation de `null` car compatible avec le cleanup existant
+
+**Validation**:
+- ✅ Type strict pour le canal realtime
+- ✅ Comportement fonctionnel identique
+- ✅ Pattern réutilisable pour tous les hooks realtime
+- ✅ Pas de régression dans la gestion des messages
+
+**Leçons apprises**:
+- Le pattern `RealtimeChannel | null` est standard pour les refs de canaux
+- Cohérence importante entre hooks utilisant Supabase Realtime
+- Migration simple quand le code est déjà bien structuré
+
+---
+
 ## 🎯 Stratégie de Migration
 
 ### Principes Directeurs
@@ -110,20 +133,20 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 Fichiers estimés avec any:
 ✅ src/hooks/useChatPresence.tsx (COMPLÉTÉ - 2 any éliminés)
 ✅ src/hooks/useProfileData.tsx (COMPLÉTÉ - 5 unknown → types stricts)
+✅ src/hooks/useChatMessages.tsx (COMPLÉTÉ - 1 any éliminé)
 - src/hooks/useAuth.tsx (authentification - critique)
-- src/hooks/useChatMessages.tsx (messaging en temps réel)
 - src/hooks/useMatchingPreferences.tsx (algorithme matching)
 - src/hooks/useFamilyApproval.tsx (workflow famille)
 - src/hooks/useSecurityValidationEnhanced.tsx (sécurité)
 
 Estimation: ~30-40 warnings
-Complété: 7 warnings (2 any + 5 unknown)
-Restant: ~23-33 warnings
+Complété: 8 warnings (3 any + 5 unknown)
+Restant: ~22-32 warnings
 Durée estimée: 2-3 semaines
 ```
 
 **Objectif Phase 1**: Réduire de 204 à ~160-170 warnings
-**Progrès actuel**: 204 → 197 warnings (~3.4% complété, 2/8 hooks)
+**Progrès actuel**: 204 → 196 warnings (~3.9% complété, 3/8 hooks)
 
 ---
 
@@ -566,15 +589,15 @@ function analyzeFile(filePath) {
 | Phase | Début | Fin | Warnings Réduits | Fichiers Migrés | Status |
 |-------|-------|-----|------------------|-----------------|--------|
 | **Pilote** | **204** | **202** | **2** ✅ | **1 fichier** | **✅ Complété** |
-| **P1 - Hooks Core** | **202** | **197** | **5** ✅ | **1 fichier** | **🟡 En cours (2/8)** |
-| P1 - Hooks Core (suite) | 197 | ~165 | ~32 | ~5 fichiers | 🔴 À faire |
+| **P1 - Hooks Core** | **202** | **196** | **6** ✅ | **2 fichiers** | **🟡 En cours (3/8)** |
+| P1 - Hooks Core (suite) | 196 | ~165 | ~31 | ~5 fichiers | 🔴 À faire |
 | P2 - Services | ~165 | ~140 | ~25 | ~5 fichiers | 🔴 À faire |
 | P3 - Composants Core | ~140 | ~95 | ~45 | ~15 fichiers | 🔴 À faire |
 | P4 - Pages & UI | ~95 | ~30 | ~65 | ~30 fichiers | 🔴 À faire |
 | P5 - Final | ~30 | 0 | ~30 | ~15 fichiers | 🔴 À faire |
 
-**Total migrés**: 2 hooks (useChatPresence, useProfileData)  
-**Total warnings éliminés**: 7 (2 any + 5 unknown)
+**Total migrés**: 3 hooks (useChatPresence, useProfileData, useChatMessages)  
+**Total warnings éliminés**: 8 (3 any + 5 unknown)
 
 ---
 
@@ -633,11 +656,15 @@ function analyzeFile(filePath) {
    - ✅ `useProfileData.tsx` complété (5 unknown → types stricts)
    - ✅ Pattern Supabase Database types validé
 
+3. **✅ Hook messaging migré**
+   - ✅ `useChatMessages.tsx` complété (1 any → type strict)
+   - ✅ Pattern RealtimeChannel validé
+
 ### Semaine 1-2 - EN COURS
 1. **Continuer Phase 1 - Hooks suivants**
-   - [ ] `useChatMessages.tsx` (hook critique messaging)
    - [ ] `useAuth.tsx` (hook critique auth)
-   - [ ] `useMatchingPreferences.tsx`
+   - [ ] `useMatchingPreferences.tsx` (algorithme matching)
+   - [ ] `useFamilyApproval.tsx` (workflow famille)
 
 2. **Valider à chaque étape**
    - [x] Types stricts fonctionnels ✅
@@ -683,18 +710,18 @@ Mois 4 (Semaines 13-14) : Phase 5 - Final & Validation (~30 → 0)
 ---
 
 **Dernière mise à jour**: Janvier 2025  
-**Statut**: 🟡 Phase 1 en cours (2/8 hooks complétés)  
-**Warnings actuels**: 197 (↓ 7 depuis le début)  
-**Progrès**: 3.4% des 204 warnings éliminés  
+**Statut**: 🟡 Phase 1 en cours (3/8 hooks complétés)  
+**Warnings actuels**: 196 (↓ 8 depuis le début)  
+**Progrès**: 3.9% des 204 warnings éliminés  
 **Objectif final**: 0
 
 ---
 
 ## 🎯 Prochaine Migration
 
-**Hook suivant**: `useChatMessages.tsx` ou `useAuth.tsx`  
+**Hook suivant**: `useAuth.tsx`  
 **Estimation**: ~5-10 `any` à remplacer  
-**Difficulté**: Moyenne-Haute (types messages en temps réel / Supabase Auth)
+**Difficulté**: Haute (types Supabase Auth + gestion de session)
 
 ---
 

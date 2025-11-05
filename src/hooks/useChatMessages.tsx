@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from './use-toast';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface Message {
   id: string;
@@ -21,7 +22,7 @@ export const useChatMessages = (matchId: string | null) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const channelRef = useRef<any>(null);
+  const channelRef = useRef<RealtimeChannel | null>(null);
 
   const fetchMessages = useCallback(async () => {
     if (!matchId) return;
