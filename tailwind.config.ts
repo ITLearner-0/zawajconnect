@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
 	darkMode: ["class"],
@@ -171,8 +172,8 @@ export default {
 		}
 	},
 	plugins: [
-		require("tailwindcss-animate"),
-		function({ addUtilities }: any) {
+		tailwindcssAnimate,
+		function({ addUtilities }: { addUtilities: (utilities: Record<string, Record<string, unknown>>) => void }) {
 			const newUtilities = {
 				// Underline Animation
 				'.story-link': {

@@ -16,7 +16,7 @@ const SubscriptionSuccess = () => {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [checkSubscription]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center p-4">

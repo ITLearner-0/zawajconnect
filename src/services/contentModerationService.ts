@@ -161,7 +161,7 @@ class ContentModerationService {
 
       switch (rule.rule_type) {
         case 'keyword':
-        case 'pattern':
+        case 'pattern': {
           const regex = new RegExp(rule.pattern, 'gi');
           if (regex.test(content)) {
             violated = true;
@@ -172,13 +172,15 @@ class ContentModerationService {
             }
           }
           break;
+        }
 
-        case 'length':
+        case 'length': {
           const lengthRegex = new RegExp(rule.pattern);
           if (lengthRegex.test(content)) {
             violated = true;
           }
           break;
+        }
 
         case 'format':
           // Check content format (e.g., excessive caps, special characters)
@@ -192,7 +194,14 @@ class ContentModerationService {
         // Update highest severity
         if (this.severityLevel(rule.severity) > this.severityLevel(highestSeverity)) {
           highestSeverity = rule.severity;
-          actionToTake = rule.action === 'auto_moderate' ? 'auto_moderated' : rule.action;
+          // Map rule.action to actionToTake (verb → past tense)
+          const actionMap: Record<typeof rule.action, typeof actionToTake> = {
+            'warn': 'warned',
+            'block': 'blocked',
+            'escalate': 'escalated',
+            'auto_moderate': 'auto_moderated'
+          };
+          actionToTake = actionMap[rule.action];
         }
       }
     }
@@ -208,7 +217,7 @@ class ContentModerationService {
         content_type: contentType,
         rules_violated: violations,
         severity: highestSeverity || 'low',
-        action_taken: actionToTake as any,
+        action_taken: actionToTake as 'warned' | 'blocked' | 'escalated' | 'auto_moderated',
         auto_moderated_content: moderatedContent,
         created_at: new Date().toISOString()
       });
@@ -240,13 +249,15 @@ class ContentModerationService {
    */
   private checkFormat(content: string, pattern: string): boolean {
     switch (pattern) {
-      case 'excessive_caps':
+      case 'excessive_caps': {
         const capsRatio = (content.match(/[A-Z]/g) || []).length / content.length;
         return capsRatio > 0.5 && content.length > 10;
+      }
 
-      case 'excessive_punctuation':
+      case 'excessive_punctuation': {
         const punctRatio = (content.match(/[!?.,;:]/g) || []).length / content.length;
         return punctRatio > 0.3;
+      }
 
       case 'repeated_characters':
         return /(.)\1{4,}/.test(content);

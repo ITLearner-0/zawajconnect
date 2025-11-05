@@ -3,10 +3,10 @@ import { logger, createNamespacedLogger } from '../logger';
 
 describe('Logger Utility', () => {
   const originalEnv = import.meta.env.DEV;
-  let consoleLogSpy: any;
-  let consoleInfoSpy: any;
-  let consoleErrorSpy: any;
-  let consoleWarnSpy: any;
+  let consoleLogSpy: ReturnType<typeof vi.spyOn>;
+  let consoleInfoSpy: ReturnType<typeof vi.spyOn>;
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>;
+  let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
 
   beforeEach(() => {
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
@@ -24,7 +24,7 @@ describe('Logger Utility', () => {
 
   describe('in development mode', () => {
     beforeEach(() => {
-      // @ts-ignore - Mock DEV mode
+      // @ts-expect-error - Mock DEV mode
       import.meta.env.DEV = true;
     });
 
