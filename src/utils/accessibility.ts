@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Accessibility utilities for WCAG 2.1 compliance
  * These helpers make it easier to build accessible interfaces
@@ -17,8 +16,8 @@ export const generateAriaId = (prefix: string = 'aria'): string => {
  * Announces dynamic content changes without moving focus
  */
 export class LiveRegionAnnouncer {
-  private static instance: LiveRegionAnnouncer;
-  private liveRegion: HTMLDivElement | null = null;
+  private static instance: LiveRegionAnnouncer | undefined;
+  private liveRegion: HTMLDivElement | undefined;
 
   private constructor() {
     this.createLiveRegion();
@@ -81,9 +80,9 @@ export const announce = (message: string, priority?: 'polite' | 'assertive'): vo
  */
 export class FocusTrap {
   private element: HTMLElement;
-  private firstFocusableElement: HTMLElement | null = null;
-  private lastFocusableElement: HTMLElement | null = null;
-  private previousActiveElement: Element | null = null;
+  private firstFocusableElement: HTMLElement | undefined;
+  private lastFocusableElement: HTMLElement | undefined;
+  private previousActiveElement: Element | undefined;
 
   constructor(element: HTMLElement) {
     this.element = element;
@@ -101,12 +100,12 @@ export class FocusTrap {
     ].join(',');
 
     const focusableElements = this.element.querySelectorAll<HTMLElement>(focusableSelectors);
-    this.firstFocusableElement = focusableElements[0] || null;
-    this.lastFocusableElement = focusableElements[focusableElements.length - 1] || null;
+    this.firstFocusableElement = focusableElements[0] ?? undefined;
+    this.lastFocusableElement = focusableElements[focusableElements.length - 1] ?? undefined;
   }
 
   activate(): void {
-    this.previousActiveElement = document.activeElement;
+    this.previousActiveElement = document.activeElement ?? undefined;
     this.element.addEventListener('keydown', this.handleKeydown);
 
     // Focus first element
@@ -153,7 +152,7 @@ export const isAriaHidden = (element: HTMLElement): boolean => {
 /**
  * Get accessible label for an element
  */
-export const getAccessibleLabel = (element: HTMLElement): string | null => {
+export const getAccessibleLabel = (element: HTMLElement): string | undefined => {
   // Check aria-label
   const ariaLabel = element.getAttribute('aria-label');
   if (ariaLabel) return ariaLabel;
@@ -162,20 +161,20 @@ export const getAccessibleLabel = (element: HTMLElement): string | null => {
   const labelledBy = element.getAttribute('aria-labelledby');
   if (labelledBy) {
     const labelElement = document.getElementById(labelledBy);
-    if (labelElement) return labelElement.textContent?.trim() || null;
+    if (labelElement) return labelElement.textContent?.trim() ?? undefined;
   }
 
   // Check associated label
   if (element.id) {
     const label = document.querySelector(`label[for="${element.id}"]`);
-    if (label) return label.textContent?.trim() || null;
+    if (label) return label.textContent?.trim() ?? undefined;
   }
 
   // Check parent label
   const parentLabel = element.closest('label');
-  if (parentLabel) return parentLabel.textContent?.trim() || null;
+  if (parentLabel) return parentLabel.textContent?.trim() ?? undefined;
 
-  return null;
+  return undefined;
 };
 
 /**
@@ -248,7 +247,7 @@ export class RovingTabIndex {
     }
 
     this.setCurrentIndex(newIndex);
-    this.items[newIndex].focus();
+    this.items[newIndex]?.focus();
   }
 
   private setCurrentIndex(index: number): void {

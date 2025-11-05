@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -14,7 +13,9 @@ export const getWaliUserIds = async (): Promise<string[]> => {
       .eq('invitation_status', 'accepted')
       .not('invited_user_id', 'is', null);
 
-    return waliUsers?.map(w => w.invited_user_id).filter(Boolean) || [];
+    return (waliUsers ?? [])
+      .map(w => w.invited_user_id)
+      .filter((id): id is string => id !== null && id !== undefined);
   } catch (error) {
     console.error('Error fetching Wali user IDs:', error);
     return [];
@@ -24,7 +25,7 @@ export const getWaliUserIds = async (): Promise<string[]> => {
 /**
  * Utility function to get the opposite gender for matching
  */
-export const getOppositeGender = async (userId: string): Promise<string | null> => {
+export const getOppositeGender = async (userId: string): Promise<string | undefined> => {
   try {
     const { data: currentUserProfile } = await supabase
       .from('profiles')
@@ -32,10 +33,13 @@ export const getOppositeGender = async (userId: string): Promise<string | null> 
       .eq('user_id', userId)
       .maybeSingle();
 
-    return currentUserProfile?.gender === 'male' ? 'female' : 'male';
+    const gender = currentUserProfile?.gender ?? undefined;
+    if (!gender) return undefined;
+    
+    return gender === 'male' ? 'female' : 'male';
   } catch (error) {
     console.error('Error fetching user gender:', error);
-    return null;
+    return undefined;
   }
 };
 
@@ -88,7 +92,7 @@ export const fetchMatchingProfiles = async (
     const { data, error } = await query;
 
     if (error) throw error;
-    return data || [];
+    return data ?? [];
 
   } catch (error) {
     console.error('Error fetching matching profiles:', error);
@@ -109,7 +113,7 @@ export const isUserWali = async (userId: string): Promise<boolean> => {
       .eq('invitation_status', 'accepted')
       .limit(1);
 
-    return (data?.length || 0) > 0;
+    return (data?.length ?? 0) > 0;
   } catch (error) {
     console.error('Error checking Wali status:', error);
     return false;
@@ -126,13 +130,24 @@ export const getUserMatchingRole = async (userId: string) => {
       supabase.from('profiles').select('gender, age, bio').eq('user_id', userId).maybeSingle()
     ]);
 
-    const hasCompleteProfile = profile.data && profile.data.age && profile.data.gender && Boolean(profile.data.bio);
+    const profileData = profile.data ? {
+      gender: profile.data.gender ?? undefined,
+      age: profile.data.age ?? undefined,
+      bio: profile.data.bio ?? undefined
+    } : undefined;
+
+    const hasCompleteProfile = Boolean(
+      profileData && 
+      profileData.age !== undefined && 
+      profileData.gender !== undefined && 
+      profileData.bio
+    );
 
     return {
       isWali,
       hasCompleteProfile,
       canBeMatched: hasCompleteProfile && !isWali, // Only users with complete profiles who are not Walis can be matched
-      profile: profile.data
+      profile: profileData
     };
   } catch (error) {
     console.error('Error getting user matching role:', error);
@@ -140,7 +155,7 @@ export const getUserMatchingRole = async (userId: string) => {
       isWali: false,
       hasCompleteProfile: false,
       canBeMatched: false,
-      profile: null
+      profile: undefined
     };
   }
 };
