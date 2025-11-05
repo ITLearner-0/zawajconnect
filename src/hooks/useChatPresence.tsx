@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface TypingUser {
   user_id: string;
@@ -14,13 +15,30 @@ export interface OnlineUser {
   status: 'online' | 'away' | 'offline';
 }
 
+/**
+ * Broadcast payload for typing events
+ */
+interface TypingBroadcastPayload {
+  user_id: string;
+  user_name: string;
+  typing: boolean;
+}
+
+/**
+ * Wrapper for broadcast events from Supabase Realtime
+ */
+interface BroadcastEvent<T> {
+  payload: T;
+  event: string;
+}
+
 export const useChatPresence = (matchId: string | null) => {
   const { user } = useAuth();
   
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   
-  const presenceChannelRef = useRef<any>(null);
+  const presenceChannelRef = useRef<RealtimeChannel | undefined>(undefined);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
   const handleTyping = useCallback((typing: boolean) => {
@@ -91,17 +109,21 @@ export const useChatPresence = (matchId: string | null) => {
         console.log('User left:', key, leftPresences);
         setOnlineUsers(prev => prev.filter(u => u.user_id !== key));
       })
-      .on('broadcast', { event: 'typing' }, (payload: any) => {
-        if (payload.payload?.user_id && payload.payload.user_id !== user.id) {
+      .on('broadcast', { event: 'typing' }, (event: BroadcastEvent<TypingBroadcastPayload>) => {
+        const typingPayload = event.payload;
+        
+        if (typingPayload?.user_id && typingPayload.user_id !== user.id) {
           setTypingUsers(prev => {
-            const filtered = prev.filter(u => u.user_id !== payload.payload.user_id);
-            if (!!payload.payload.typing) {
+            const filtered = prev.filter(u => u.user_id !== typingPayload.user_id);
+            
+            if (typingPayload.typing) {
               return [...filtered, {
-                user_id: payload.payload.user_id,
-                user_name: payload.payload.user_name || 'Utilisateur',
+                user_id: typingPayload.user_id,
+                user_name: typingPayload.user_name || 'Utilisateur',
                 timestamp: new Date().toISOString()
               }];
             }
+            
             return filtered;
           });
         }
