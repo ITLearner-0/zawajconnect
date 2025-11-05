@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,7 +9,7 @@ interface SecurityEvent {
   event_type: string;
   severity: string;
   description: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   ip_address?: string;
   user_agent?: string;
   resolved: boolean;
@@ -28,7 +27,7 @@ export const useSecurityEvents = () => {
     eventType: string,
     severity: 'low' | 'medium' | 'high' | 'critical',
     description: string,
-    metadata: Record<string, any> = {}
+    metadata: Record<string, unknown> = {}
   ) => {
     if (!user) return null;
 
@@ -38,7 +37,7 @@ export const useSecurityEvents = () => {
         p_event_type: eventType,
         p_severity: severity,
         p_description: description,
-        p_metadata: metadata
+        p_metadata: metadata as any
       });
 
       if (error) throw error;
@@ -76,11 +75,18 @@ export const useSecurityEvents = () => {
         throw error;
       }
 
-      setEvents((data || []).map(event => ({
-        ...event,
-        metadata: event.metadata as Record<string, any> || {},
-        ip_address: event.ip_address as string || undefined,
-        user_agent: event.user_agent || undefined
+      const normalizedData = data ?? [];
+      setEvents(normalizedData.map(event => ({
+        id: event.id,
+        user_id: event.user_id ?? '',
+        event_type: event.event_type,
+        severity: event.severity,
+        description: event.description,
+        metadata: (event.metadata as Record<string, unknown> | null) ?? {},
+        ip_address: (event.ip_address as string | null) ?? undefined,
+        user_agent: event.user_agent ?? undefined,
+        resolved: !!event.resolved,
+        created_at: event.created_at ?? new Date().toISOString()
       })));
     } catch (error) {
       console.error('Failed to load security events:', error);
@@ -93,15 +99,15 @@ export const useSecurityEvents = () => {
   const checkSuspiciousActivity = async () => {
     if (!user) return;
 
-    const metadata = {
+    const metadata: Record<string, unknown> = {
       user_agent: navigator.userAgent,
       timestamp: new Date().toISOString(),
       url: window.location.href
     };
 
     // Check for rapid requests
-    const requestCount = sessionStorage.getItem('request_count') || '0';
-    const requestTimestamp = sessionStorage.getItem('request_timestamp') || '0';
+    const requestCount = sessionStorage.getItem('request_count') ?? '0';
+    const requestTimestamp = sessionStorage.getItem('request_timestamp') ?? '0';
     const now = Date.now();
     const lastRequest = parseInt(requestTimestamp);
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface SecurityEvents {
   failed_logins: number;
   password_changes: number;
-  last_login: string | null;
+  last_login: string | undefined;
   suspicious_activity: boolean;
 }
 
@@ -20,8 +19,8 @@ interface SecurityStatus {
 
 export const useSecurityMonitor = () => {
   const { user } = useAuth();
-  const [securityStatus, setSecurityStatus] = useState<SecurityStatus | null>(null);
-  const [securityEvents, setSecurityEvents] = useState<SecurityEvents | null>(null);
+  const [securityStatus, setSecurityStatus] = useState<SecurityStatus | undefined>(undefined);
+  const [securityEvents, setSecurityEvents] = useState<SecurityEvents | undefined>(undefined);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,11 +41,12 @@ export const useSecurityMonitor = () => {
         .maybeSingle();
 
       if (verification) {
+        const verificationScore = verification.verification_score ?? 0;
         setSecurityStatus({
-          verification_score: verification.verification_score || 0,
-          email_verified: verification.email_verified || false,
-          id_verified: verification.id_verified || false,
-          password_strength: getPasswordStrength(verification.verification_score || 0),
+          verification_score: verificationScore,
+          email_verified: !!verification.email_verified,
+          id_verified: !!verification.id_verified,
+          password_strength: getPasswordStrength(verificationScore),
           last_security_check: new Date().toISOString()
         });
       }
@@ -69,7 +69,7 @@ export const useSecurityMonitor = () => {
       setSecurityEvents({
         failed_logins: 0, // Would be tracked through auth logs
         password_changes: 0, // Would be tracked through user metadata
-        last_login: user.last_sign_in_at,
+        last_login: user.last_sign_in_at ?? undefined,
         suspicious_activity: false
       });
 
@@ -91,7 +91,8 @@ export const useSecurityMonitor = () => {
         .eq('viewer_id', user.id)
         .gte('created_at', new Date(Date.now() - 60 * 60 * 1000).toISOString());
 
-      if (recentViews && recentViews.length > 10) {
+      const normalizedRecentViews = recentViews ?? [];
+      if (normalizedRecentViews.length > 10) {
         return true;
       }
 
@@ -102,7 +103,8 @@ export const useSecurityMonitor = () => {
         .eq('user_id', user.id)
         .gte('invitation_sent_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
 
-      if (recentInvitations && recentInvitations.length > 5) {
+      const normalizedRecentInvitations = recentInvitations ?? [];
+      if (normalizedRecentInvitations.length > 5) {
         return true;
       }
 
