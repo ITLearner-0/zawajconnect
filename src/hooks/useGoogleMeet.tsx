@@ -155,7 +155,7 @@ export const useGoogleMeet = (): UseGoogleMeetResult => {
     } catch (err) {
       console.error('Erreur lors de la sauvegarde:', err);
     }
-  }, [toast]);
+  }, [error, toast]);
 
   return {
     isLoading,

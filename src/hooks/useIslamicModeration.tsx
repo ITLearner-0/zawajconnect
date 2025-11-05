@@ -151,7 +151,7 @@ export const useIslamicModeration = () => {
     }
   };
 
-  const useSuggestion = async (suggestionId: string) => {
+  const applySuggestion = async (suggestionId: string) => {
     try {
       const { error } = await supabase
         .from('message_suggestions')
@@ -159,7 +159,7 @@ export const useIslamicModeration = () => {
         .eq('id', suggestionId);
 
       if (error) throw error;
-      
+
       toast({
         title: "Suggestion utilisée",
         description: "Merci d'avoir amélioré votre message !",
@@ -189,7 +189,7 @@ export const useIslamicModeration = () => {
   return {
     moderateContent,
     getSuggestions,
-    useSuggestion,
+    applySuggestion,
     getModerationLogs,
     isChecking,
     lastResult

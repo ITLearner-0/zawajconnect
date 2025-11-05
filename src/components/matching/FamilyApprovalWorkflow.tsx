@@ -101,7 +101,6 @@ const FamilyApprovalWorkflow = () => {
               .maybeSingle();
 
             // Get real compatibility details using unified compatibility
-            const { calculateDetailedCompatibility } = useUnifiedCompatibility();
             const compatibility_details = await calculateDetailedCompatibility(otherUserId);
             
             const formattedDetails = {

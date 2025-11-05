@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIslamicModeration, ModerationSuggestion as ModerationSuggestionType } from '@/hooks/useIslamicModeration';
 import ModerationSuggestion from './ModerationSuggestion';
@@ -16,26 +16,26 @@ const MessageModerationWrapper: React.FC<MessageModerationWrapperProps> = ({
   matchId
 }) => {
   const { user } = useAuth();
-  const { getSuggestions, useSuggestion, isChecking, lastResult } = useIslamicModeration();
+  const { getSuggestions, applySuggestion, isChecking, lastResult } = useIslamicModeration();
   const [suggestions, setSuggestions] = useState<ModerationSuggestionType[]>([]);
+
+  const loadSuggestions = useCallback(async () => {
+    if (!user) return;
+
+    const userSuggestions = await getSuggestions(user.id);
+    setSuggestions(userSuggestions);
+  }, [user, getSuggestions]);
 
   useEffect(() => {
     if (user) {
       loadSuggestions();
     }
-  }, [user]);
-
-  const loadSuggestions = async () => {
-    if (!user) return;
-    
-    const userSuggestions = await getSuggestions(user.id);
-    setSuggestions(userSuggestions);
-  };
+  }, [user, loadSuggestions]);
 
   const handleAcceptSuggestion = async (suggestionId: string, newMessage: string) => {
-    await useSuggestion(suggestionId);
+    await applySuggestion(suggestionId);
     setSuggestions(prev => prev.filter(s => s.id !== suggestionId));
-    
+
     // Trigger event for parent component to use the suggested message
     window.dispatchEvent(new CustomEvent('useSuggestedMessage', {
       detail: { message: newMessage }

@@ -51,7 +51,7 @@ const defaultRules: Record<string, ValidationRule[]> = {
     },
     {
       name: 'characters',
-      test: (value) => !/[<>{}()\[\]\\\/]/.test(value),
+      test: (value) => !/[<>{}()[\]\\/]/.test(value),
       message: 'Caractères spéciaux non autorisés',
       severity: 'error'
     },

@@ -12,12 +12,13 @@ interface NavigationGuardProps {
 const NavigationGuard = ({ children }: NavigationGuardProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  
+  const { toast } = useToast();
+
   // Safely get auth state with error handling
   let user = null;
   let loading = true;
   let authError = false;
-  
+
   try {
     const authState = useAuth();
     user = authState.user;
@@ -26,16 +27,13 @@ const NavigationGuard = ({ children }: NavigationGuardProps) => {
     console.warn('NavigationGuard: AuthProvider not ready yet, skipping auth checks');
     authError = true;
   }
-  
+
   const { isAdmin, loading: adminLoading } = useIsAdmin();
-  const { toast } = useToast();
 
-  // If auth context is not available yet, just render children
-  if (authError) {
-    return <>{children}</>;
-  }
-
+  // All hooks must be called before any conditional returns
   useEffect(() => {
+    // If auth context is not available yet, skip navigation checks
+    if (authError) return;
     if (loading || adminLoading) return;
 
     const currentRoute = getRouteByPath(location.pathname);
