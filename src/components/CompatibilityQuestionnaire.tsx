@@ -175,7 +175,9 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
 
         return {
           ...q,
-          options
+          options,
+          weight: q.weight ?? 1,
+          is_active: q.is_active ?? true
         };
       });
 
@@ -184,8 +186,8 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
       const uniqueCategories = Array.from(new Set(parsedQuestions.map(q => q.category)));
       setCategories(uniqueCategories);
       
-      if (uniqueCategories.length > 0) {
-        setCurrentCategory(uniqueCategories[0]);
+      if (uniqueCategories.length > 0 && uniqueCategories[0]) {
+        setCurrentCategory(uniqueCategories[0] ?? '');
         console.log('🎯 Set current category to:', uniqueCategories[0]);
       }
 
@@ -432,8 +434,8 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
                 size="lg"
                 onClick={() => {
                   const currentIndex = categories.indexOf(currentCategory);
-                  if (currentIndex > 0) {
-                    setCurrentCategory(categories[currentIndex - 1]);
+                  if (currentIndex > 0 && categories[currentIndex - 1]) {
+                    setCurrentCategory(categories[currentIndex - 1] ?? '');
                   }
                 }}
                 disabled={categories.indexOf(currentCategory) === 0}
@@ -458,7 +460,9 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
                     size="lg"
                     onClick={() => {
                       const currentIndex = categories.indexOf(currentCategory);
-                      setCurrentCategory(categories[currentIndex + 1]);
+                      if (categories[currentIndex + 1]) {
+                        setCurrentCategory(categories[currentIndex + 1] ?? '');
+                      }
                     }}
                     className="flex-1 sm:flex-none"
                   >

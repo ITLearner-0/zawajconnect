@@ -47,7 +47,7 @@ const FamilySupervisionDashboard = () => {
       const { data: familyMemberData, error: familyError } = await supabase
         .from('family_members')
         .select('*')
-        .eq('invited_user_id', user?.id)
+        .eq('invited_user_id', user?.id ?? '')
         .eq('invitation_status', 'accepted')
         .maybeSingle();
 
@@ -62,7 +62,14 @@ const FamilySupervisionDashboard = () => {
         return;
       }
 
-      setFamilyRole(familyMemberData);
+      const normalizedFamilyRole = {
+        ...familyMemberData,
+        is_wali: familyMemberData.is_wali ?? false,
+        can_communicate: familyMemberData.can_communicate ?? false,
+        can_view_profile: familyMemberData.can_view_profile ?? false
+      };
+      
+      setFamilyRole(normalizedFamilyRole);
 
       // Get matches for the supervised user (person that this wali supervises)
       const { data: matchesData, error: matchesError } = await supabase
@@ -124,8 +131,14 @@ const FamilySupervisionDashboard = () => {
           return {
             id: match.id,
             match_id: match.id,
-            user1_profile: user1Profile || { full_name: 'Utilisateur inconnu', avatar_url: undefined },
-            user2_profile: user2Profile || { full_name: 'Utilisateur inconnu', avatar_url: undefined },
+            user1_profile: user1Profile ? { 
+              full_name: user1Profile.full_name || 'Utilisateur inconnu', 
+              avatar_url: user1Profile.avatar_url || undefined 
+            } : { full_name: 'Utilisateur inconnu', avatar_url: undefined },
+            user2_profile: user2Profile ? { 
+              full_name: user2Profile.full_name || 'Utilisateur inconnu', 
+              avatar_url: user2Profile.avatar_url || undefined 
+            } : { full_name: 'Utilisateur inconnu', avatar_url: undefined },
             last_message: lastMessage || { content: 'Aucun message', created_at: new Date().toISOString() },
             unread_count: unreadCount || 0,
             is_active: match.can_communicate

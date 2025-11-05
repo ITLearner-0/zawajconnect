@@ -106,17 +106,23 @@ export function AppSidebar() {
   }, [user]);
 
   const fetchNotifications = async () => {
+    if (!user?.id) return;
+    
     try {
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .eq('is_read', false)
         .order('created_at', { ascending: false })
         .limit(3);
 
       if (error) throw error;
-      setNotifications(data || []);
+      const notifications = (data || []).map(n => ({
+        ...n,
+        is_read: n.is_read ?? false
+      }));
+      setNotifications(notifications);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     }

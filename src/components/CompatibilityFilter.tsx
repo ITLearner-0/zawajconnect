@@ -114,8 +114,8 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
             </Badge>
           </div>
           <Slider
-            value={[filters.minCompatibilityScore]}
-            onValueChange={([value]) => setFilters(prev => ({ ...prev, minCompatibilityScore: value }))}
+            value={[filters.minCompatibilityScore ?? 70]}
+            onValueChange={([value]) => setFilters(prev => ({ ...prev, minCompatibilityScore: value ?? 70 }))}
             min={0}
             max={100}
             step={5}

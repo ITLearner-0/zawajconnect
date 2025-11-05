@@ -122,12 +122,16 @@ const FamilyDashboard = () => {
         const users: SupervisedUser[] = profilesData?.map(profile => ({
           id: profile.user_id,
           full_name: profile.full_name || 'Utilisateur',
-          profiles: profile
+          profiles: {
+            ...profile,
+            age: profile.age ?? 0,
+            full_name: profile.full_name || 'Utilisateur'
+          }
         })) || [];
 
         setSupervisedUsers(users);
         
-        if (users.length > 0 && !selectedUser) {
+        if (users.length > 0 && users[0]?.id) {
           setSelectedUser(users[0].id);
         }
       }
@@ -156,7 +160,14 @@ const FamilyDashboard = () => {
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
-      setFamilyRole(data);
+      if (data) {
+        setFamilyRole({
+          ...data,
+          is_wali: data.is_wali ?? false,
+          can_communicate: data.can_communicate ?? false,
+          can_view_profile: data.can_view_profile ?? false
+        });
+      }
     } catch (error) {
       console.error('Error fetching family role:', error);
     }
@@ -199,7 +210,13 @@ const FamilyDashboard = () => {
         })
       );
 
-      setMatches(matchesWithProfiles);
+      const normalizedMatches = matchesWithProfiles.map(m => ({
+        ...m,
+        is_mutual: m.is_mutual ?? false,
+        match_score: m.match_score ?? 0
+      }));
+
+      setMatches(normalizedMatches);
 
       // Calculate stats
       const now = new Date();

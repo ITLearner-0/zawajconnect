@@ -59,7 +59,7 @@ const EnhancedDashboard = () => {
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
-  const [userProfile, setUserProfile] = useState(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
     if (user) {
@@ -80,11 +80,7 @@ const EnhancedDashboard = () => {
         .maybeSingle();
 
       if (profile) {
-        setUserProfile({
-          ...profile,
-          premium_status: false, // In real app, check subscription status
-          last_seen: 'Maintenant'
-        });
+        setUserProfile(profile);
       }
 
       // Load dashboard stats
@@ -242,7 +238,7 @@ const EnhancedDashboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 pb-20 md:pb-4">
       <div className="container mx-auto max-w-6xl p-4">
         {/* Mobile Profile Header */}
-        <MobileProfileHeader profile={userProfile} />
+        <MobileProfileHeader profile={userProfile ?? undefined} />
 
         {/* Desktop Header */}
         <div className="hidden md:flex items-center justify-between mb-6">

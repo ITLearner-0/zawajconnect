@@ -73,7 +73,15 @@ const FamilyInvitationManager = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setFamilyMembers(data || []);
+      const normalizedMembers = (data || []).map(m => ({
+        ...m,
+        is_wali: m.is_wali ?? false,
+        can_communicate: m.can_communicate ?? false,
+        can_view_profile: m.can_view_profile ?? false,
+        invitation_status: m.invitation_status ?? 'pending',
+        invitation_sent_at: m.invitation_sent_at ?? ''
+      }));
+      setFamilyMembers(normalizedMembers);
     } catch (error) {
       console.error('Error fetching family members:', error);
       toast({

@@ -97,6 +97,10 @@ const FamilyAccessPortal = () => {
 
           return {
             ...member,
+            invitation_status: member.invitation_status ?? 'pending',
+            is_wali: member.is_wali ?? false,
+            can_communicate: member.can_communicate ?? false,
+            can_view_profile: member.can_view_profile ?? false,
             profile: profile || undefined,
             activeMatches: activeMatches || 0,
             pendingApprovals: pendingApprovals || 0,

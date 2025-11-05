@@ -145,7 +145,7 @@ const AnalyticsDashboard = () => {
 
       // Process verifications
       const verifications = verificationsResult.data || [];
-      const verifiedUsers = verifications.filter(v => v.verification_score >= 80).length;
+      const verifiedUsers = verifications.filter(v => (v.verification_score ?? 0) >= 80).length;
 
       // Calculate daily activity from actual data
       const dailyActivity = Array.from({ length: 7 }, (_, i) => {
