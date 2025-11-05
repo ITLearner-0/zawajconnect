@@ -1,8 +1,10 @@
 import { ComponentType, lazy } from 'react';
 
-// Lazy load all pages to reduce initial bundle size
+// Import Index directly (no lazy loading for landing page)
+import Index from '@/pages/Index';
+
+// Lazy load all other pages to reduce initial bundle size
 // Public pages (loaded on demand)
-const Index = lazy(() => import('@/pages/Index'));
 const Auth = lazy(() => import('@/pages/Auth'));
 const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
 const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
