@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from './use-toast';
-import { normalizeMessage } from '@/types/supabase';
 
 export interface Message {
   id: string;
@@ -36,7 +34,12 @@ export const useChatMessages = (matchId: string | null) => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages((data || []).map(normalizeMessage));
+      setMessages((data || []).map(msg => ({
+        ...msg,
+        is_read: msg.is_read ?? false,
+        family_member_id: msg.family_member_id ?? undefined,
+        is_family_supervised: msg.is_family_supervised ?? false
+      })));
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast({

@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Enhanced Form Autosave Hook
  *
@@ -99,12 +98,12 @@ export function useFormAutosave<T extends Record<string, any>>(
 
       try {
         const { error } = await supabase
-          .from(tableName)
+          .from(tableName as any)
           .upsert({
             user_id: userId,
-            data: data as any,
+            data: data,
             updated_at: new Date().toISOString(),
-          } as any);
+          });
 
         if (error) throw error;
 

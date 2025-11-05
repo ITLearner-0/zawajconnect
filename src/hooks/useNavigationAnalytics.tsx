@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,7 +15,7 @@ interface NavigationEvent {
 class NavigationAnalytics {
   private events: NavigationEvent[] = [];
   private sessionId: string;
-  private previousRoute: string | null = null;
+  private previousRoute: string | undefined = undefined;
 
   constructor() {
     this.sessionId = this.generateSessionId();
@@ -50,7 +49,7 @@ class NavigationAnalytics {
     }
   }
 
-  trackUserAction(action: string, details?: Record<string, any>) {
+  trackUserAction(action: string, details?: Record<string, unknown>) {
     const event = {
       action,
       timestamp: Date.now(),
