@@ -207,7 +207,7 @@ const Auth = () => {
       });
       setShowForgotPassword(false);
       setResetEmail('');
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Password reset error:', error);
       setError('Erreur lors de l\'envoi de l\'email. Veuillez réessayer.');
     }

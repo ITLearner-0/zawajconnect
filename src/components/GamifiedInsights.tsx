@@ -158,11 +158,12 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
               achievement.unlocked = true;
               if (achievement.unlocked) points += parseInt(achievement.reward.value);
               break;
-            case 'perfect_match':
+            case 'perfect_match': {
               const maxScore = Math.max(...insights.compatibilityAreas.map(area => area.score));
               achievement.unlocked = maxScore >= 90;
               if (achievement.unlocked) points += achievement.reward.type === 'points' ? parseInt(achievement.reward.value) : 0;
               break;
+            }
             case 'insight_master':
               achievement.progress = insights.compatibilityAreas.length;
               achievement.unlocked = (achievement.progress || 0) >= (achievement.maxProgress || 0);

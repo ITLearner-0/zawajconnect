@@ -15,6 +15,23 @@ const Chat = () => {
   const [searchParams] = useSearchParams();
   const [selectedChatId, setSelectedChatId] = useState<string | null>(null);
 
+  // Get matchId from URL params or search params (must be before any conditional returns)
+  const matchIdFromUrl = useMemo(() => {
+    return paramMatchId || searchParams.get('matchId') || null;
+  }, [paramMatchId, searchParams]);
+
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+
+    // Set initial selected chat from URL
+    if (matchIdFromUrl) {
+      setSelectedChatId(matchIdFromUrl);
+    }
+  }, [user, matchIdFromUrl, navigate]);
+
   // Bloquer si pas premium
   if (!subscription.subscribed) {
     return (
@@ -40,23 +57,6 @@ const Chat = () => {
       </div>
     );
   }
-  
-  // Get matchId from URL params or search params
-  const matchIdFromUrl = useMemo(() => {
-    return paramMatchId || searchParams.get('matchId') || null;
-  }, [paramMatchId, searchParams]);
-
-  useEffect(() => {
-    if (!user) {
-      navigate('/auth');
-      return;
-    }
-
-    // Set initial selected chat from URL
-    if (matchIdFromUrl) {
-      setSelectedChatId(matchIdFromUrl);
-    }
-  }, [user, matchIdFromUrl, navigate]);
 
   const handleChatSelect = (matchId: string) => {
     setSelectedChatId(matchId);

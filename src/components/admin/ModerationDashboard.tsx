@@ -56,20 +56,23 @@ const ModerationDashboard = () => {
     const endDate = now;
 
     switch (range) {
-      case 'today':
+      case 'today': {
         const startOfDay = new Date(now);
         startOfDay.setHours(0, 0, 0, 0);
         return { startDate: startOfDay, endDate };
+      }
 
-      case 'week':
+      case 'week': {
         const weekAgo = new Date(now);
         weekAgo.setDate(weekAgo.getDate() - 7);
         return { startDate: weekAgo, endDate };
+      }
 
-      case 'month':
+      case 'month': {
         const monthAgo = new Date(now);
         monthAgo.setMonth(monthAgo.getMonth() - 1);
         return { startDate: monthAgo, endDate };
+      }
 
       case 'all':
       default:

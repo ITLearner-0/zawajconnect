@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
+import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
 
@@ -17,12 +17,12 @@ interface AuthContextType {
   loading: boolean;
   subscription: SubscriptionStatus;
   checkSubscription: () => Promise<void>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signUp: (email: string, password: string, fullName: string, metadata?: {
     user_type?: 'wali' | 'candidate';
     invitation_token?: string;
     supervised_user_id?: string;
-  }) => Promise<{ error: any }>;
+  }) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<void>;
 }
 

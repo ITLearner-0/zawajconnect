@@ -29,6 +29,43 @@ interface MatchFilters {
   minCompatibility?: number;
 }
 
+interface Profile {
+  user_id: string;
+  full_name?: string;
+  age?: number;
+  gender?: string;
+  location?: string;
+  education?: string;
+  profession?: string;
+  bio?: string;
+  interests?: string[];
+  avatar_url?: string;
+}
+
+interface IslamicPreferences {
+  user_id: string;
+  prayer_frequency?: string;
+  sect?: string;
+  hijab_preference?: string;
+  religious_level?: string;
+  [key: string]: unknown;
+}
+
+interface VerificationData {
+  user_id: string;
+  verification_score: number;
+}
+
+interface ScoredMatch extends Profile {
+  compatibility_score: number;
+  islamic_score: number;
+  cultural_score: number;
+  personality_score: number;
+  shared_interests: string[];
+  compatibility_reasons: string[];
+  verification_score: number;
+}
+
 class MatchingOptimizationService {
   private cache: Map<string, CachedMatch[]> = new Map();
   private readonly CACHE_DURATION_MS = 30 * 60 * 1000; // 30 minutes
@@ -41,7 +78,7 @@ class MatchingOptimizationService {
     userId: string,
     limit: number = 10,
     filters?: MatchFilters
-  ): Promise<any[]> {
+  ): Promise<ScoredMatch[]> {
     try {
       // Check cache first
       const cacheKey = this.getCacheKey(userId, filters);
@@ -71,7 +108,7 @@ class MatchingOptimizationService {
   private async fetchOptimizedMatches(
     userId: string,
     filters?: MatchFilters
-  ): Promise<any[]> {
+  ): Promise<ScoredMatch[]> {
     // Step 1: Get user's profile and preferences in parallel
     const [myProfile, myIslamicPrefs] = await Promise.all([
       supabase
@@ -168,7 +205,7 @@ class MatchingOptimizationService {
   /**
    * Batch fetch Islamic preferences
    */
-  private async batchFetchIslamicPrefs(userIds: string[]): Promise<Map<string, any>> {
+  private async batchFetchIslamicPrefs(userIds: string[]): Promise<Map<string, IslamicPreferences>> {
     const prefsMap = new Map();
 
     // Process in batches to avoid query limits
@@ -191,7 +228,7 @@ class MatchingOptimizationService {
   /**
    * Batch fetch verification data
    */
-  private async batchFetchVerifications(userIds: string[]): Promise<Map<string, any>> {
+  private async batchFetchVerifications(userIds: string[]): Promise<Map<string, VerificationData>> {
     const verificationsMap = new Map();
 
     for (let i = 0; i < userIds.length; i += this.BATCH_SIZE) {
@@ -214,12 +251,12 @@ class MatchingOptimizationService {
    * Batch calculate compatibility scores
    */
   private async batchCalculateCompatibility(
-    profiles: any[],
-    islamicPrefsMap: Map<string, any>,
-    verificationsMap: Map<string, any>,
-    myProfile: any,
-    myIslamicPrefs: any
-  ): Promise<any[]> {
+    profiles: Profile[],
+    islamicPrefsMap: Map<string, IslamicPreferences>,
+    verificationsMap: Map<string, VerificationData>,
+    myProfile: Profile,
+    myIslamicPrefs: IslamicPreferences | null
+  ): Promise<ScoredMatch[]> {
     return profiles.map(profile => {
       const islamicPrefs = islamicPrefsMap.get(profile.user_id);
       const verification = verificationsMap.get(profile.user_id);
@@ -289,7 +326,7 @@ class MatchingOptimizationService {
   /**
    * Get matches from cache if not expired
    */
-  private getFromCache(cacheKey: string): any[] | null {
+  private getFromCache(cacheKey: string): ScoredMatch[] | null {
     const cached = this.cache.get(cacheKey);
     if (!cached) return null;
 

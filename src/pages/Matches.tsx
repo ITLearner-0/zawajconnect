@@ -65,7 +65,7 @@ const Matches = () => {
 
       if (matchesData) {
         const processedMatches = await Promise.all(
-          matchesData.map(async (match: any) => {
+          matchesData.map(async (match) => {
             const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
             
             const { data: otherUserProfile } = await supabase

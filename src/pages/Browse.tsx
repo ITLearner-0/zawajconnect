@@ -32,6 +32,23 @@ interface MatchingProfile {
   verification_score: number;
 }
 
+interface MatchData {
+  user1_id: string;
+  user2_id: string;
+}
+
+interface BlockedPairData {
+  user1_id: string;
+  user2_id: string;
+}
+
+interface SearchFilters {
+  ageRange?: [number, number];
+  education?: string;
+  location?: string;
+  interests?: string[];
+}
+
 const Browse = () => {
   const { user, subscription } = useAuth();
   const { calculateDetailedCompatibility } = useUnifiedCompatibility();
@@ -114,24 +131,24 @@ const Browse = () => {
 
       // Get users in active conversations to exclude them
       const { data: activeConversations } = await supabase
-        .from('matches' as any)
+        .from('matches')
         .select('user1_id, user2_id')
         .eq('conversation_status', 'active');
 
       const usersInConversation = new Set<string>();
-      activeConversations?.forEach((match: any) => {
+      activeConversations?.forEach((match: MatchData) => {
         usersInConversation.add(match.user1_id);
         usersInConversation.add(match.user2_id);
       });
 
       // Get blocked pairs to prevent showing previous matches
       const { data: blockedPairs } = await supabase
-        .from('blocked_match_pairs' as any)
+        .from('blocked_match_pairs')
         .select('user1_id, user2_id')
         .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
 
       const blockedUsers = new Set<string>();
-      blockedPairs?.forEach((pair: any) => {
+      blockedPairs?.forEach((pair: BlockedPairData) => {
         if (pair.user1_id === user.id) blockedUsers.add(pair.user2_id);
         if (pair.user2_id === user.id) blockedUsers.add(pair.user1_id);
       });
@@ -152,11 +169,11 @@ const Browse = () => {
       if (error) throw error;
 
       const profilesWithVerification = data
-        ?.filter((profile: any) => 
-          !usersInConversation.has(profile.user_id) && 
+        ?.filter((profile) =>
+          !usersInConversation.has(profile.user_id) &&
           !blockedUsers.has(profile.user_id)
         )
-        .map((profile: any) => ({
+        .map((profile): MatchingProfile => ({
           user_id: profile.user_id,
           age: profile.age,
           gender: profile.gender,
@@ -166,8 +183,7 @@ const Browse = () => {
           interests: profile.interests || [],
           looking_for: profile.looking_for,
           avatar_url: profile.avatar_url,
-          verification_score: profile.user_verifications?.verification_score || 0,
-          is_in_conversation: false
+          verification_score: profile.user_verifications?.verification_score || 0
         })) || [];
 
       setProfiles(profilesWithVerification.slice(0, 20)); // Limit to 20 after filtering
@@ -184,7 +200,7 @@ const Browse = () => {
     }
   };
 
-  const handleSearch = (filters: any) => {
+  const handleSearch = (filters: SearchFilters) => {
     let filtered = [...profiles];
 
     // Apply age filter
