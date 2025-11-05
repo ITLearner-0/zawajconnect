@@ -32,6 +32,11 @@ export const useCompatibility = () => {
   }, [user]);
 
   const fetchCompatibilityData = async () => {
+    if (!user?.id) {
+      setLoading(false);
+      return;
+    }
+
     try {
       // Get total number of active questions
       const { count: totalQuestions } = await supabase
@@ -43,7 +48,7 @@ export const useCompatibility = () => {
       const { data: userResponses, error } = await supabase
         .from('user_compatibility_responses')
         .select('question_key, response_value, updated_at')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
@@ -73,12 +78,16 @@ export const useCompatibility = () => {
   };
 
   const calculateCompatibilityScore = async (otherUserId: string): Promise<number> => {
+    if (!user?.id) {
+      return 0;
+    }
+
     try {
       // Get both users' responses
       const { data: myResponses } = await supabase
         .from('user_compatibility_responses')
         .select('question_key, response_value')
-        .eq('user_id', user?.id);
+        .eq('user_id', user.id);
 
       const { data: theirResponses } = await supabase
         .from('user_compatibility_responses')
@@ -102,11 +111,12 @@ export const useCompatibility = () => {
         const theirResponse = theirResponses.find(r => r.question_key === question.question_key);
 
         if (myResponse && theirResponse) {
-          totalWeight += question.weight;
+          const weight = question.weight ?? 1; // Default weight to 1 if null
+          totalWeight += weight;
           
           // Simple matching - exact match scores full weight
           if (myResponse.response_value === theirResponse.response_value) {
-            matchedWeight += question.weight;
+            matchedWeight += weight;
           }
           // Partial matching for some questions could be implemented here
           // For now, we use binary matching (match or no match)
