@@ -6,7 +6,7 @@ import { MatchApprovalData, ApprovalDecision, FamilyMemberData } from '@/types/m
 export const useMatchApproval = () => {
   const [matches, setMatches] = useState<MatchApprovalData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [processingId, setProcessingId] = useState<string | null>(null);
+  const [processingId, setProcessingId] = useState<string | undefined>(undefined);
   const { toast } = useToast();
 
   const loadMatchesForApproval = async () => {
@@ -198,7 +198,7 @@ export const useMatchApproval = () => {
       });
       return false;
     } finally {
-      setProcessingId(null);
+      setProcessingId(undefined);
     }
   };
 

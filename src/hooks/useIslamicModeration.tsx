@@ -24,7 +24,7 @@ export interface ModerationSuggestion {
 export const useIslamicModeration = () => {
   const { toast } = useToast();
   const [isChecking, setIsChecking] = useState(false);
-  const [lastResult, setLastResult] = useState<ModerationResult | null>(null);
+  const [lastResult, setLastResult] = useState<ModerationResult | undefined>(undefined);
 
   const moderateContent = async (
     content: string,
