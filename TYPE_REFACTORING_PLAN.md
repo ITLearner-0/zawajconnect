@@ -37,9 +37,9 @@ Impact: Critique sur toute l'application
 7. 📝 **useMatchApproval.tsx** - match_score et family_notes normalisés
 8. 📝 **useMatchingHistory.tsx** - avg_compatibility_score normalisé
 9. ✅ **useFormAutosave.ts** - Refactorisé (cast any pour table dynamique)
-10. 📝 **useInsightsAnalytics.tsx** - Nécessite normalisation analytics
+10. ✅ **useInsightsAnalytics.tsx** - Refactorisé (lastViewed: string | undefined, analytics normalisés)
 11. ✅ **useNavigationAnalytics.tsx** - Refactorisé (previousRoute undefined, Record<string, unknown>)
-12. 📝 **useProfileSave.tsx** - Nécessite normalisation profile
+12. ✅ **useProfileSave.tsx** - Refactorisé (age: number | undefined, tous types normalisés avec ??)
 13. 📝 **useSecurityEvents.tsx** - Nécessite normalisation security events
 14. 📝 **useSecurityMonitor.tsx** - Nécessite normalisation monitoring
 15. 📝 **useSmartRecommendations.tsx** - Nécessite normalisation recommendations
@@ -202,11 +202,12 @@ Pour chaque fichier à refactoriser:
 - 🔵 Priorité 5 (Tests): 2 fichiers
 
 **Avancement actuel**:
-- ✅ Terminé: 5 fichiers (useAuth.tsx partiellement, useChatMatch.tsx, useChatMessages.tsx, useFamilyApproval.tsx, useFormAutosave.ts, useNavigationAnalytics.tsx)
+- ✅ Terminé: 7 fichiers (useAuth.tsx partiellement, useChatMatch.tsx, useChatMessages.tsx, useFamilyApproval.tsx, useFormAutosave.ts, useNavigationAnalytics.tsx, useInsightsAnalytics.tsx, useProfileSave.tsx)
 - 📝 Normalisé partiellement: 4 fichiers (useFamilySupervision, useIslamicModeration, useMatchApproval, useMatchingHistory)
-- ⚠️ Avec @ts-nocheck: 26 fichiers restants
-- ⏱️ Estimation restante: 8-11 jours de travail
-- 📊 Progression: 16% (5/31 fichiers)
+- ✨ Fichiers liés normalisés: 3 fichiers (useOnboardingValidation.tsx, useFormPersistence.tsx, ProfilePreview.tsx) - types ProfileData.age normalisés
+- ⚠️ Avec @ts-nocheck: 24 fichiers restants
+- ⏱️ Estimation restante: 7-10 jours de travail
+- 📊 Progression: 23% (7/31 fichiers)
 
 ## Notes importantes
 
