@@ -216,6 +216,10 @@ const WaliDashboard: React.FC = () => {
               const supervisedUserId = userIds.find(id => id === match.user1_id || id === match.user2_id);
               const candidateId = supervisedUserId === match.user1_id ? match.user2_id : match.user1_id;
               
+              if (!supervisedUserId) {
+                return null;
+              }
+              
               // Récupérer le profil du candidat
               const { data: candidateProfile } = await supabase
                 .from('profiles')
@@ -224,9 +228,6 @@ const WaliDashboard: React.FC = () => {
                 .maybeSingle();
 
               // Récupérer le profil de l'utilisateur supervisé
-              const supervisedUserId = familyMembers?.find(fm => fm.user_id)?.user_id;
-              if (!supervisedUserId) continue;
-
               const { data: supervisedProfile } = await supabase
                 .from('profiles')
                 .select('full_name')
