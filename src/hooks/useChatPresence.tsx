@@ -57,7 +57,9 @@ export const useChatPresence = (matchId: string | null) => {
   }, [handleTyping]);
 
   const setupPresenceTracking = useCallback(() => {
-    if (!user || !matchId) return;
+    if (!user || !matchId) {
+      return () => {}; // Return empty cleanup function
+    }
 
     // Cleanup existing channel
     if (presenceChannelRef.current) {
@@ -89,14 +91,14 @@ export const useChatPresence = (matchId: string | null) => {
         console.log('User left:', key, leftPresences);
         setOnlineUsers(prev => prev.filter(u => u.user_id !== key));
       })
-      .on('broadcast', { event: 'typing' }, (payload) => {
-        if (payload.user_id !== user.id) {
+      .on('broadcast', { event: 'typing' }, (payload: any) => {
+        if (payload.payload?.user_id && payload.payload.user_id !== user.id) {
           setTypingUsers(prev => {
-            const filtered = prev.filter(u => u.user_id !== payload.user_id);
-            if (payload.typing) {
+            const filtered = prev.filter(u => u.user_id !== payload.payload.user_id);
+            if (!!payload.payload.typing) {
               return [...filtered, {
-                user_id: payload.user_id,
-                user_name: payload.user_name,
+                user_id: payload.payload.user_id,
+                user_name: payload.payload.user_name || 'Utilisateur',
                 timestamp: new Date().toISOString()
               }];
             }
@@ -132,8 +134,9 @@ export const useChatPresence = (matchId: string | null) => {
     };
   }, [user, matchId]);
 
-  const isUserOnline = useCallback((userId: string) => {
-    return onlineUsers.some(u => u.user_id === userId && u.status === 'online');
+  const isUserOnline = useCallback((userId: string): boolean => {
+    if (!userId) return false;
+    return !!onlineUsers.some(u => u.user_id === userId && u.status === 'online');
   }, [onlineUsers]);
 
   useEffect(() => {
@@ -141,6 +144,7 @@ export const useChatPresence = (matchId: string | null) => {
       const cleanup = setupPresenceTracking();
       return cleanup;
     }
+    return () => {}; // Return empty cleanup if matchId is null
   }, [setupPresenceTracking, matchId]);
 
   useEffect(() => {
