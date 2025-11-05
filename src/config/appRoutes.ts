@@ -1,47 +1,64 @@
-import { ComponentType } from 'react';
-import Index from '@/pages/Index';
-import Auth from '@/pages/Auth';
-import Dashboard from '@/pages/Dashboard';
-import Browse from '@/pages/Browse';
-import Matches from '@/pages/Matches';
-import Chat from '@/pages/Chat';
-import Profile from '@/pages/Profile';
-import Privacy from '@/pages/Privacy';
-import PrivacyPolicy from '@/pages/PrivacyPolicy';
-import Family from '@/pages/Family';
-import Guidance from '@/pages/Guidance';
-import ModerationTest from '@/pages/ModerationTest';
-import WaliDashboard from '@/pages/WaliDashboard';
-import WaliAccess from '@/pages/WaliAccess';
-import MatchApproval from '@/pages/MatchApproval';
-import FamilyAnalyticsPage from '@/pages/FamilyAnalytics';
-import ModerationTests from '@/pages/ModerationTests';
-import Admin from '@/pages/Admin';
-import AdminUserProfile from '@/pages/AdminUserProfile';
-import FAQ from '@/pages/FAQ';
-import Settings from '@/pages/Settings';
-import IslamicTools from '@/pages/IslamicTools';
-import FamilySupervision from '@/pages/FamilySupervision';
-import FamilyNotifications from '@/pages/FamilyNotifications';
-import InvitationAuth from '@/pages/InvitationAuth';
-import InvitationAccept from '@/pages/InvitationAccept';
-import FamilyAccess from '@/pages/FamilyAccess';
-import FamilyAccessPortal from '@/components/FamilyAccessPortal';
-import FamilySupervisionPanel from '@/components/FamilySupervisionPanel';
-import CompatibilityTest from '@/pages/CompatibilityTest';
-import CompatibilityInsightsPage from '@/pages/CompatibilityInsights';
-import EnhancedProfile from '@/pages/EnhancedProfile';
-import AdvancedMatching from '@/pages/AdvancedMatching';
-import Onboarding from '@/pages/Onboarding';
-import WaliOnboarding from '@/pages/WaliOnboarding';
-import SubscriptionSuccess from '@/pages/SubscriptionSuccess';
-import NotFound from '@/pages/NotFound';
-import TermsOfService from '@/pages/TermsOfService';
-import RefundPolicy from '@/pages/RefundPolicy';
-import CommunityGuidelines from '@/pages/CommunityGuidelines';
-import CookiePolicy from '@/pages/CookiePolicy';
-import SubscriptionCanceled from '@/pages/SubscriptionCanceled';
-import ResetPassword from '@/pages/ResetPassword';
+import { ComponentType, lazy } from 'react';
+
+// Lazy load all pages to reduce initial bundle size
+// Public pages (loaded on demand)
+const Index = lazy(() => import('@/pages/Index'));
+const Auth = lazy(() => import('@/pages/Auth'));
+const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
+const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('@/pages/TermsOfService'));
+const RefundPolicy = lazy(() => import('@/pages/RefundPolicy'));
+const CommunityGuidelines = lazy(() => import('@/pages/CommunityGuidelines'));
+const CookiePolicy = lazy(() => import('@/pages/CookiePolicy'));
+const FAQ = lazy(() => import('@/pages/FAQ'));
+const InvitationAuth = lazy(() => import('@/pages/InvitationAuth'));
+const InvitationAccept = lazy(() => import('@/pages/InvitationAccept'));
+
+// Special routes (onboarding flows)
+const Onboarding = lazy(() => import('@/pages/Onboarding'));
+const WaliOnboarding = lazy(() => import('@/pages/WaliOnboarding'));
+const SubscriptionSuccess = lazy(() => import('@/pages/SubscriptionSuccess'));
+const SubscriptionCanceled = lazy(() => import('@/pages/SubscriptionCanceled'));
+
+// Protected pages (user features)
+const Dashboard = lazy(() => import('@/pages/Dashboard'));
+const Browse = lazy(() => import('@/pages/Browse'));
+const Matches = lazy(() => import('@/pages/Matches'));
+const Chat = lazy(() => import('@/pages/Chat'));
+const Profile = lazy(() => import('@/pages/Profile'));
+const EnhancedProfile = lazy(() => import('@/pages/EnhancedProfile'));
+const Privacy = lazy(() => import('@/pages/Privacy'));
+const Settings = lazy(() => import('@/pages/Settings'));
+
+// Matching & Compatibility
+const AdvancedMatching = lazy(() => import('@/pages/AdvancedMatching'));
+const CompatibilityTest = lazy(() => import('@/pages/CompatibilityTest'));
+const CompatibilityInsightsPage = lazy(() => import('@/pages/CompatibilityInsights'));
+
+// Family features
+const Family = lazy(() => import('@/pages/Family'));
+const WaliDashboard = lazy(() => import('@/pages/WaliDashboard'));
+const WaliAccess = lazy(() => import('@/pages/WaliAccess'));
+const MatchApproval = lazy(() => import('@/pages/MatchApproval'));
+const FamilyAnalyticsPage = lazy(() => import('@/pages/FamilyAnalytics'));
+const FamilySupervision = lazy(() => import('@/pages/FamilySupervision'));
+const FamilyNotifications = lazy(() => import('@/pages/FamilyNotifications'));
+const FamilyAccess = lazy(() => import('@/pages/FamilyAccess'));
+const FamilyAccessPortal = lazy(() => import('@/components/FamilyAccessPortal'));
+const FamilySupervisionPanel = lazy(() => import('@/components/FamilySupervisionPanel'));
+
+// Islamic tools
+const IslamicTools = lazy(() => import('@/pages/IslamicTools'));
+const Guidance = lazy(() => import('@/pages/Guidance'));
+
+// Admin & Moderation
+const Admin = lazy(() => import('@/pages/Admin'));
+const AdminUserProfile = lazy(() => import('@/pages/AdminUserProfile'));
+const ModerationTest = lazy(() => import('@/pages/ModerationTest'));
+const ModerationTests = lazy(() => import('@/pages/ModerationTests'));
+
+// 404 page
+const NotFound = lazy(() => import('@/pages/NotFound'));
 
 export interface AppRouteConfig {
   path: string;

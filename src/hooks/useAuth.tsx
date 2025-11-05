@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/logger';
 
 interface SubscriptionStatus {
   subscribed: boolean;
@@ -92,16 +93,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const { data: { subscription: authSubscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         if (!mounted) return;
-        
+
         // CRITICAL: Only synchronous state updates here to prevent deadlocks
-        console.log('🔐 Auth state changed:', event, session?.user?.email);
-        
+        logger.auth.log('Auth state changed:', event, session?.user?.email);
+
         // Handle session expiry events
         if (event === 'SIGNED_OUT' && session === null) {
           window.dispatchEvent(new CustomEvent('auth:session-expired'));
-          setSubscription({ 
-            subscribed: false, 
-            product_id: null, 
+          setSubscription({
+            subscribed: false,
+            product_id: null,
             subscription_end: null,
             plan_duration: null,
             months_remaining: null
@@ -123,18 +124,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     // THEN check for existing session
     const initializeAuth = async () => {
       try {
-        console.log('🔐 Initializing auth...');
+        logger.auth.log('Initializing auth...');
         const { data: { session }, error } = await supabase.auth.getSession();
-        
+
         if (error) {
-          console.error('🔐 Error getting session:', error);
+          logger.auth.error('Error getting session:', error);
           setLoading(false);
           return;
         }
-        
+
         if (!mounted) return;
-        
-        console.log('🔐 Initial session check:', session?.user?.email);
+
+        logger.auth.log('Initial session check:', session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
@@ -144,7 +145,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setTimeout(() => checkSubscription(), 0);
         }
       } catch (error) {
-        console.error('🔐 Exception during auth initialization:', error);
+        logger.auth.error('Exception during auth initialization:', error);
         if (mounted) setLoading(false);
       }
     };
@@ -157,13 +158,41 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   }, []); // VIDE - ne s'exécute qu'au montage !
 
-  // Auto-refresh subscription every 5 minutes (réduit de 1 min à 5 min)
+  // Subscribe to real-time subscription changes instead of polling
   useEffect(() => {
     if (!user) return;
 
-    const interval = setInterval(checkSubscription, 300000); // 5 min
-    return () => clearInterval(interval);
-  }, [user?.id]); // Dépend uniquement de user.id
+    // Initial check
+    checkSubscription();
+
+    // Set up real-time subscription to subscriptions table
+    const channel = supabase
+      .channel(`subscription-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          schema: 'public',
+          table: 'subscriptions',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          logger.api.log('Subscription changed via Realtime:', payload.eventType);
+          // Update subscription state immediately
+          checkSubscription();
+        }
+      )
+      .subscribe((status) => {
+        if (status === 'SUBSCRIBED') {
+          logger.realtime.log('Subscribed to subscription changes');
+        }
+      });
+
+    return () => {
+      logger.realtime.log('Unsubscribing from subscription changes');
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, checkSubscription]); // Depend on user.id and checkSubscription
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
@@ -11,6 +11,16 @@ import { Toaster } from "@/components/ui/toaster";
 import ProtectedRouteWrapper from "@/components/routing/ProtectedRouteWrapper";
 import { FreemiumBanner } from "@/components/FreemiumBanner";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+
+// Loading fallback component for lazy-loaded routes
+const RouteLoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center gap-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+      <p className="text-sm text-gray-600">Chargement...</p>
+    </div>
+  </div>
+);
 
 // Create QueryClient outside component to avoid hook issues
 const queryClient = new QueryClient({
@@ -39,54 +49,64 @@ function App() {
               <NavigationGuard>
               <FreemiumBanner />
               <RouteTransition>
-                <Routes>
-                  {/* Public routes */}
-                  {publicRoutes.map((route) => {
-                    const Component = route.component;
-                    return (
-                      <Route
-                        key={route.path}
-                        path={route.path}
-                        element={<Component />}
-                      />
-                    );
-                  })}
-                  
-                  {/* Special routes (protected with different requirements) */}
-                  {specialRoutes.map((route) => {
-                    const Component = route.component;
-                    return (
-                      <Route
-                        key={route.path}
-                        path={route.path}
-                        element={
-                          <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
-                            <Component />
-                          </ProtectedRouteWrapper>
-                        }
-                      />
-                    );
-                  })}
-                  
-                  {/* Protected routes */} 
-                  {protectedRoutes.map((route) => {
-                    const Component = route.component;
-                    return (
-                      <Route
-                        key={route.path}
-                        path={route.path}
-                        element={
-                          <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
-                            <Component />
-                          </ProtectedRouteWrapper>
-                        }
-                      />
-                    );
-                  })}
-                  
-                  {/* Catch all route */}
-                  <Route path={notFoundRoute.path} element={<NotFoundComponent />} />
-                </Routes>
+                <Suspense fallback={<RouteLoadingFallback />}>
+                  <Routes>
+                    {/* Public routes */}
+                    {publicRoutes.map((route) => {
+                      const Component = route.component;
+                      return (
+                        <Route
+                          key={route.path}
+                          path={route.path}
+                          element={
+                            <Suspense fallback={<RouteLoadingFallback />}>
+                              <Component />
+                            </Suspense>
+                          }
+                        />
+                      );
+                    })}
+
+                    {/* Special routes (protected with different requirements) */}
+                    {specialRoutes.map((route) => {
+                      const Component = route.component;
+                      return (
+                        <Route
+                          key={route.path}
+                          path={route.path}
+                          element={
+                            <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
+                              <Suspense fallback={<RouteLoadingFallback />}>
+                                <Component />
+                              </Suspense>
+                            </ProtectedRouteWrapper>
+                          }
+                        />
+                      );
+                    })}
+
+                    {/* Protected routes */}
+                    {protectedRoutes.map((route) => {
+                      const Component = route.component;
+                      return (
+                        <Route
+                          key={route.path}
+                          path={route.path}
+                          element={
+                            <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
+                              <Suspense fallback={<RouteLoadingFallback />}>
+                                <Component />
+                              </Suspense>
+                            </ProtectedRouteWrapper>
+                          }
+                        />
+                      );
+                    })}
+
+                    {/* Catch all route */}
+                    <Route path={notFoundRoute.path} element={<NotFoundComponent />} />
+                  </Routes>
+                </Suspense>
               </RouteTransition>
               </NavigationGuard>
             </NavigationProvider>

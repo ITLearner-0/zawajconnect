@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import { logger } from '@/utils/logger';
 
 interface UserDataContextType {
   isAdmin: boolean;
@@ -67,7 +68,8 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
       
       setProfileComplete(isComplete);
     } catch (error) {
-      // Silencieux en cas d'erreur pour éviter de polluer les logs
+      // Log error for debugging but don't block the UI
+      logger.error('Failed to fetch user data', error, { userId: user.id });
       setIsAdmin(false);
       setIsWali(false);
       setProfileComplete(false);
