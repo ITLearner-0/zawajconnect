@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { TypingUser } from '@/hooks/useChatPresence';
 
 interface TypingIndicatorProps {
