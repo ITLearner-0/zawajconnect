@@ -40,8 +40,8 @@ Impact: Critique sur toute l'application
 10. ✅ **useInsightsAnalytics.tsx** - Refactorisé (lastViewed: string | undefined, analytics normalisés)
 11. ✅ **useNavigationAnalytics.tsx** - Refactorisé (previousRoute undefined, Record<string, unknown>)
 12. ✅ **useProfileSave.tsx** - Refactorisé (age: number | undefined, tous types normalisés avec ??)
-13. 📝 **useSecurityEvents.tsx** - Nécessite normalisation security events
-14. 📝 **useSecurityMonitor.tsx** - Nécessite normalisation monitoring
+13. ✅ **useSecurityEvents.tsx** - Refactorisé (Record<string, unknown>, tous types normalisés avec ??)
+14. ✅ **useSecurityMonitor.tsx** - Refactorisé (SecurityStatus/Events avec undefined, booléens normalisés)
 15. ✅ **useSmartRecommendations.tsx** - Refactorisé (tous types normalisés avec ?? undefined, Record<string, unknown> | undefined | null)
 16. ✅ **useUnifiedCompatibility.tsx** - Refactorisé (tous types normalisés, Record<string, unknown> | undefined)
 
@@ -202,12 +202,12 @@ Pour chaque fichier à refactoriser:
 - 🔵 Priorité 5 (Tests): 2 fichiers
 
 **Avancement actuel**:
-- ✅ Terminé: 9 fichiers (useAuth.tsx partiellement, useChatMatch.tsx, useChatMessages.tsx, useFamilyApproval.tsx, useFormAutosave.ts, useNavigationAnalytics.tsx, useInsightsAnalytics.tsx, useProfileSave.tsx, useUnifiedCompatibility.tsx, useSmartRecommendations.tsx)
+- ✅ Terminé: 11 fichiers (useAuth.tsx partiellement, useChatMatch.tsx, useChatMessages.tsx, useFamilyApproval.tsx, useFormAutosave.ts, useNavigationAnalytics.tsx, useInsightsAnalytics.tsx, useProfileSave.tsx, useUnifiedCompatibility.tsx, useSmartRecommendations.tsx, useSecurityEvents.tsx, useSecurityMonitor.tsx)
 - 📝 Normalisé partiellement: 4 fichiers (useFamilySupervision, useIslamicModeration, useMatchApproval, useMatchingHistory)
 - ✨ Fichiers liés normalisés: 4 fichiers (useOnboardingValidation.tsx, useFormPersistence.tsx, ProfilePreview.tsx, RecommendationCard.tsx) - types ProfileData.age et SmartRecommendation normalisés
-- ⚠️ Avec @ts-nocheck: 22 fichiers restants
-- ⏱️ Estimation restante: 6-9 jours de travail
-- 📊 Progression: 29% (9/31 fichiers)
+- ⚠️ Avec @ts-nocheck: 20 fichiers restants
+- ⏱️ Estimation restante: 5-8 jours de travail
+- 📊 Progression: 35% (11/31 fichiers)
 
 ## Notes importantes
 
