@@ -111,11 +111,12 @@ const PhotoUploadStep = ({
         title: "Photo uploadée",
         description: "Votre photo a été enregistrée avec succès",
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erreur upload:', error);
+      const errorMessage = error instanceof Error ? error.message : "Erreur lors de l'upload. Veuillez réessayer.";
       toast({
         title: "Erreur d'upload",
-        description: error.message || "Erreur lors de l'upload. Veuillez réessayer.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

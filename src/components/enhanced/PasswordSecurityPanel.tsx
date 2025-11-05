@@ -132,10 +132,11 @@ export const PasswordSecurityPanel = () => {
       setNewPassword('');
       setConfirmPassword('');
       setStrength(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to update password. Please try again.";
       toast({
         title: "Update Failed",
-        description: error.message || "Failed to update password. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

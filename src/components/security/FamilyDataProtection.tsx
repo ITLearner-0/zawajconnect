@@ -117,10 +117,11 @@ export default function FamilyDataProtection() {
       });
 
       loadFamilyData();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Une erreur est survenue";
       toast({
         title: "Erreur",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive"
       });
     }
