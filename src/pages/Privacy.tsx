@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,7 +22,7 @@ interface PrivacySettings {
 const Privacy = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [settings, setSettings] = useState<PrivacySettings | null>(null);
+  const [settings, setSettings] = useState<PrivacySettings | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -45,7 +44,15 @@ const Privacy = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      setSettings(data);
+      setSettings(data ? {
+        profile_visibility: data.profile_visibility ?? 'public',
+        photo_visibility: data.photo_visibility ?? 'matches_only',
+        contact_visibility: data.contact_visibility ?? 'matches_only',
+        last_seen_visibility: data.last_seen_visibility ?? 'everyone',
+        allow_messages_from: data.allow_messages_from ?? 'matches_only',
+        allow_profile_views: !!data.allow_profile_views,
+        allow_family_involvement: !!data.allow_family_involvement
+      } : undefined);
     } catch (error) {
       console.error('Error fetching privacy settings:', error);
     } finally {
@@ -73,7 +80,7 @@ const Privacy = () => {
   };
 
   const updateSetting = (key: keyof PrivacySettings, value: string | boolean) => {
-    setSettings(prev => prev ? { ...prev, [key]: value } : null);
+    setSettings(prev => prev ? { ...prev, [key]: value } : undefined);
   };
 
   if (loading) {

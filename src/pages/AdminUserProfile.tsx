@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -90,11 +89,11 @@ const AdminUserProfile = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [islamicPrefs, setIslamicPrefs] = useState<IslamicPreferences | null>(null);
-  const [privacySettings, setPrivacySettings] = useState<PrivacySettings | null>(null);
-  const [verification, setVerification] = useState<UserVerification | null>(null);
-  const [matchingPrefs, setMatchingPrefs] = useState<MatchingPreferences | null>(null);
+  const [profile, setProfile] = useState<ProfileData | undefined>(undefined);
+  const [islamicPrefs, setIslamicPrefs] = useState<IslamicPreferences | undefined>(undefined);
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettings | undefined>(undefined);
+  const [verification, setVerification] = useState<UserVerification | undefined>(undefined);
+  const [matchingPrefs, setMatchingPrefs] = useState<MatchingPreferences | undefined>(undefined);
   const [stats, setStats] = useState({
     totalMatches: 0,
     activeConversations: 0,
@@ -123,30 +122,78 @@ const AdminUserProfile = () => {
         matchesResult,
         messagesResult
       ] = await Promise.all([
-        supabase.from('profiles').select('*').eq('user_id', userId).single(),
-        supabase.from('islamic_preferences').select('*').eq('user_id', userId).maybeSingle(),
-        supabase.from('privacy_settings').select('*').eq('user_id', userId).maybeSingle(),
-        supabase.from('user_verifications').select('*').eq('user_id', userId).maybeSingle(),
-        supabase.from('matching_preferences').select('*').eq('user_id', userId).maybeSingle(),
+        supabase.from('profiles').select('*').eq('user_id', userId ?? '').single(),
+        supabase.from('islamic_preferences').select('*').eq('user_id', userId ?? '').maybeSingle(),
+        supabase.from('privacy_settings').select('*').eq('user_id', userId ?? '').maybeSingle(),
+        supabase.from('user_verifications').select('*').eq('user_id', userId ?? '').maybeSingle(),
+        supabase.from('matching_preferences').select('*').eq('user_id', userId ?? '').maybeSingle(),
         supabase.from('matches').select('*', { count: 'exact', head: true })
-          .or(`user1_id.eq.${userId},user2_id.eq.${userId}`),
+          .or(`user1_id.eq.${userId ?? ''},user2_id.eq.${userId ?? ''}`),
         supabase.from('messages').select('*', { count: 'exact', head: true })
-          .eq('sender_id', userId)
+          .eq('sender_id', userId ?? '')
       ]);
 
       if (profileResult.error) throw profileResult.error;
 
-      setProfile(profileResult.data);
-      setIslamicPrefs(islamicResult.data);
-      setPrivacySettings(privacyResult.data);
-      setVerification(verificationResult.data);
-      setMatchingPrefs(matchingResult.data);
+      setProfile(profileResult.data ? {
+        ...profileResult.data,
+        full_name: profileResult.data.full_name ?? '',
+        age: profileResult.data.age ?? 0,
+        gender: profileResult.data.gender ?? '',
+        location: profileResult.data.location ?? '',
+        bio: profileResult.data.bio ?? '',
+        avatar_url: profileResult.data.avatar_url ?? '',
+        education: profileResult.data.education ?? '',
+        profession: profileResult.data.profession ?? '',
+        interests: (profileResult.data.interests ?? []).filter((i): i is string => i !== null)
+      } : undefined);
+      
+      setIslamicPrefs(islamicResult.data ? {
+        prayer_frequency: islamicResult.data.prayer_frequency ?? '',
+        quran_reading: islamicResult.data.quran_reading ?? '',
+        madhab: islamicResult.data.madhab ?? '',
+        halal_diet: !!islamicResult.data.halal_diet,
+        hijab_preference: islamicResult.data.hijab_preference ?? '',
+        beard_preference: islamicResult.data.beard_preference ?? undefined,
+        desired_partner_sect: islamicResult.data.desired_partner_sect ?? undefined,
+        importance_of_religion: islamicResult.data.importance_of_religion ?? undefined
+      } : undefined);
+      
+      setPrivacySettings(privacyResult.data ? {
+        profile_visibility: privacyResult.data.profile_visibility ?? '',
+        allow_family_involvement: !!privacyResult.data.allow_family_involvement,
+        allow_messages_from: privacyResult.data.allow_messages_from ?? undefined,
+        allow_profile_views: !!privacyResult.data.allow_profile_views,
+        contact_visibility: privacyResult.data.contact_visibility ?? undefined,
+        last_seen_visibility: privacyResult.data.last_seen_visibility ?? undefined,
+        photo_visibility: privacyResult.data.photo_visibility ?? undefined
+      } : undefined);
+      
+      setVerification(verificationResult.data ? {
+        email_verified: !!verificationResult.data.email_verified,
+        phone_verified: !!verificationResult.data.phone_verified,
+        id_verified: !!verificationResult.data.id_verified,
+        verification_score: verificationResult.data.verification_score ?? 0
+      } : undefined);
+      
+      setMatchingPrefs(matchingResult.data ? {
+        min_age: (matchingResult.data as any).min_age ?? undefined,
+        max_age: (matchingResult.data as any).max_age ?? undefined,
+        preferred_locations: ((matchingResult.data as any).preferred_locations ?? []).filter((l: string | null): l is string => l !== null),
+        education_preference: (matchingResult.data as any).education_preference ?? undefined,
+        family_approval_required: !!matchingResult.data.family_approval_required,
+        min_compatibility: matchingResult.data.min_compatibility ?? undefined,
+        use_ai_scoring: !!matchingResult.data.use_ai_scoring,
+        weight_cultural: matchingResult.data.weight_cultural ?? undefined,
+        weight_islamic: matchingResult.data.weight_islamic ?? undefined,
+        weight_personality: matchingResult.data.weight_personality ?? undefined
+      } : undefined);
       
       // Count active conversations
       const { count: activeConversations } = await supabase
         .from('matches')
         .select('*', { count: 'exact', head: true })
-        .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
+        .or(`user1_id.eq.${userId ?? ''},user2_id.eq.${userId ?? ''}`)
         .eq('conversation_status', 'active');
 
       setStats({

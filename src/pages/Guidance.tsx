@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,7 +42,14 @@ const Guidance = () => {
         .order('featured', { ascending: false })
         .order('created_at', { ascending: false });
 
-      setArticles(data || []);
+      setArticles((data ?? []).map(article => ({
+        ...article,
+        title: article.title ?? '',
+        content: article.content ?? '',
+        category: article.category ?? '',
+        author: article.author ?? '',
+        featured: !!article.featured
+      })));
     } catch (error) {
       console.error('Error fetching articles:', error);
     } finally {
