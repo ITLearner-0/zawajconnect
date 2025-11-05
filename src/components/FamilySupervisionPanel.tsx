@@ -231,7 +231,7 @@ const FamilySupervisionPanel = () => {
     }
   };
 
-  const updateFamilyMember = async (memberId: string, field: string, value: any) => {
+  const updateFamilyMember = async (memberId: string, field: string, value: unknown) => {
     try {
       const { error } = await supabase
         .from('family_members')
@@ -348,7 +348,7 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
         description: "Choisissez votre solution email pour envoyer l'invitation.",
       });
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error generating invitation:', error);
       toast({
         title: "Erreur",

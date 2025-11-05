@@ -190,11 +190,12 @@ const FamilyInvitationManager = () => {
         fetchFamilyMembers();
       }, 500);
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('❌ [INVITATION] Error sending invitation:', error);
+      const errorMessage = error instanceof Error ? error.message : "Impossible d'envoyer l'invitation";
       toast({
         title: "❌ Erreur d'envoi",
-        description: error.message || "Impossible d'envoyer l'invitation",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

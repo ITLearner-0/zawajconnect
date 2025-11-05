@@ -54,12 +54,13 @@ const WaliInvitationTest: React.FC = () => {
         description: `Email d'invitation Wali envoyé à ${email}`,
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Test invitation error:', error);
       setTestResult('error');
+      const errorMessage = error instanceof Error ? error.message : "Impossible d'envoyer l'invitation de test";
       toast({
         title: "❌ Erreur de test",
-        description: error.message || "Impossible d'envoyer l'invitation de test",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

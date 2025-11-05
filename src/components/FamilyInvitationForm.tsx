@@ -88,11 +88,12 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
       setIsWali(false);
       
       onInvitationSent?.();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error sending invitation:', error);
+      const errorMessage = error instanceof Error ? error.message : "Impossible d'envoyer l'invitation";
       toast({
         title: "Erreur",
-        description: error.message || "Impossible d'envoyer l'invitation",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

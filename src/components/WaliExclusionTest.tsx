@@ -98,11 +98,12 @@ const WaliExclusionTest: React.FC = () => {
         });
       }
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Test Wali exclusion error:', error);
+      const errorMessage = error instanceof Error ? error.message : "Impossible d'exécuter le test";
       toast({
         title: "❌ Erreur de test",
-        description: error.message || "Impossible d'exécuter le test",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
