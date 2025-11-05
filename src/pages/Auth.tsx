@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserData } from '@/contexts/UserDataContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Heart, ArrowLeft, Eye, EyeOff, Mail, Shield, Smartphone, CheckCircle, AlertCircle } from 'lucide-react';
@@ -32,22 +33,36 @@ const Auth = () => {
   const [enablePhoneVerification, setEnablePhoneVerification] = useState(false);
   
   const { signIn, signUp, user } = useAuth();
+  const { isWali, profileComplete, loading: userDataLoading } = useUserData();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const isWaliMode = searchParams.get('mode') === 'wali';
 
   useEffect(() => {
-    if (user) {
-      // Rediriger selon le mode (wali ou utilisateur normal)
-      if (isWaliMode) {
-        // Pour les walis, on va d'abord sur le family access portal ou family supervision
-        navigate('/family-supervision');
+    // Only redirect when user is authenticated and user data is loaded
+    if (user && !userDataLoading) {
+      // Wali users
+      if (isWali) {
+        // If profile is incomplete, go to wali onboarding first
+        if (!profileComplete) {
+          navigate('/wali-onboarding?mode=wali');
+        } else {
+          // Profile complete, go to family supervision
+          navigate('/family-supervision');
+        }
       } else {
-        navigate('/enhanced-profile');
+        // Regular users
+        if (!profileComplete) {
+          // Profile incomplete, go to regular onboarding
+          navigate('/onboarding');
+        } else {
+          // Profile complete, go to profile page
+          navigate('/enhanced-profile');
+        }
       }
     }
-  }, [user, navigate, isWaliMode]);
+  }, [user, userDataLoading, isWali, profileComplete, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

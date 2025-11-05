@@ -26,6 +26,8 @@ import {
 import { format } from 'date-fns';
 import { logger } from '@/utils/logger';
 import { announce } from '@/utils/accessibility';
+import { generateInvoicePDF } from '@/utils/invoiceGenerator';
+import { useToast } from '@/hooks/use-toast';
 
 interface Payment {
   id: string;
@@ -54,6 +56,7 @@ interface Subscription {
 export default function PaymentHistory() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [payments, setPayments] = useState<Payment[]>([]);
   const [currentSubscription, setCurrentSubscription] = useState<Subscription | null>(null);
   const [loading, setLoading] = useState(true);
@@ -145,10 +148,53 @@ export default function PaymentHistory() {
     }).format(amount);
   };
 
-  const handleDownloadInvoice = (paymentId: string) => {
-    // TODO: Implement invoice generation/download
-    logger.log('Download invoice', paymentId);
-    announce('Invoice download started');
+  const handleDownloadInvoice = async (paymentId: string) => {
+    try {
+      // Find the payment
+      const payment = payments.find(p => p.id === paymentId);
+      if (!payment) {
+        toast({
+          title: 'Erreur',
+          description: 'Paiement introuvable',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      // Get user profile for invoice details
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('user_id', user?.id)
+        .maybeSingle();
+
+      // Generate invoice PDF
+      await generateInvoicePDF({
+        paymentId: payment.id,
+        amount: payment.amount,
+        currency: payment.currency,
+        status: payment.status,
+        createdAt: payment.created_at,
+        plan: payment.plan_type,
+        userEmail: user?.email || undefined,
+        userName: profile?.full_name || undefined,
+      });
+
+      logger.log('Invoice downloaded successfully', paymentId);
+      announce('Facture téléchargée avec succès');
+
+      toast({
+        title: 'Facture téléchargée',
+        description: 'La fenêtre d\'impression s\'est ouverte. Vous pouvez enregistrer en PDF.',
+      });
+    } catch (error) {
+      logger.error('Failed to download invoice', error);
+      toast({
+        title: 'Erreur',
+        description: error instanceof Error ? error.message : 'Impossible de télécharger la facture',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (loading) {
