@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useIslamicModeration } from '@/hooks/useIslamicModeration';
+import { useFormAutosave } from '@/hooks/useFormAutosave';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,11 +13,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  User, 
-  Heart, 
-  MapPin, 
-  GraduationCap, 
+import {
+  User,
+  Heart,
+  MapPin,
+  GraduationCap,
   Briefcase,
   Camera,
   Shield,
@@ -30,7 +31,9 @@ import {
   Settings,
   Globe,
   Lock,
-  Eye
+  Eye,
+  Save,
+  Clock
 } from 'lucide-react';
 
 interface ProfileData {
@@ -102,7 +105,7 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
   const { user } = useAuth();
   const { toast } = useToast();
   const { moderateContent } = useIslamicModeration();
-  
+
   const [currentStep, setCurrentStep] = useState(1);
   const [profileData, setProfileData] = useState<Partial<ProfileData>>(existingProfile || {});
   const [loading, setLoading] = useState(false);
@@ -112,12 +115,72 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
   const totalSteps = 7;
   const progress = (currentStep / totalSteps) * 100;
 
+  // Auto-save functionality
+  const { loadSaved, clearSaved, hasSavedData, getLastSaveTime } = useFormAutosave(
+    profileData,
+    {
+      storageKey: `profile-wizard-${user?.id}`,
+      debounceMs: 2000,
+      announceChanges: true,
+      onSuccess: () => {
+        // Silent success - user sees the auto-save indicator
+      },
+      onError: (error) => {
+        console.error('Auto-save error:', error);
+      }
+    }
+  );
+
+  const lastSaveTime = getLastSaveTime();
+
   useEffect(() => {
     // Load existing profile data if available
     if (user && !existingProfile) {
       loadExistingProfile();
     }
   }, [user]);
+
+  useEffect(() => {
+    // Check for auto-saved data and offer to restore it
+    if (hasSavedData() && user) {
+      const savedData = loadSaved();
+      if (savedData && Object.keys(savedData).length > 0) {
+        toast({
+          title: "Données sauvegardées trouvées",
+          description: "Voulez-vous restaurer votre brouillon précédent ?",
+          action: (
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                onClick={() => {
+                  setProfileData(savedData as Partial<ProfileData>);
+                  toast({
+                    title: "Brouillon restauré",
+                    description: "Vos données ont été restaurées avec succès"
+                  });
+                }}
+              >
+                Restaurer
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  clearSaved();
+                  toast({
+                    title: "Brouillon supprimé",
+                    description: "Le brouillon a été supprimé"
+                  });
+                }}
+              >
+                Ignorer
+              </Button>
+            </div>
+          ) as any
+        });
+      }
+    }
+  }, [user, hasSavedData]);
 
   const loadExistingProfile = async () => {
     if (!user) return;
@@ -314,6 +377,9 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
         });
 
       if (privacyError) throw privacyError;
+
+      // Clear auto-saved data after successful save
+      clearSaved();
 
       toast({
         title: "Profil sauvegardé",
@@ -1102,6 +1168,17 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
     </div>
   );
 
+  // Format last save time
+  const formatLastSaveTime = () => {
+    if (!lastSaveTime) return null;
+    const now = new Date();
+    const diff = Math.floor((now.getTime() - lastSaveTime.getTime()) / 1000); // seconds
+
+    if (diff < 60) return `il y a ${diff}s`;
+    if (diff < 3600) return `il y a ${Math.floor(diff / 60)}min`;
+    return `il y a ${Math.floor(diff / 3600)}h`;
+  };
+
   return (
     <Card className="max-w-4xl mx-auto">
       <CardHeader>
@@ -1110,9 +1187,19 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
             <Settings className="h-5 w-5" />
             Assistant de Création de Profil Islamique
           </CardTitle>
-          <Badge variant="secondary">{currentStep}/{totalSteps}</Badge>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary">{currentStep}/{totalSteps}</Badge>
+          </div>
         </div>
-        <Progress value={progress} className="mt-2" />
+        <div className="flex items-center justify-between mt-2">
+          <Progress value={progress} className="flex-1 mr-4" />
+          {lastSaveTime && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Save className="h-3 w-3" />
+              <span>{formatLastSaveTime()}</span>
+            </div>
+          )}
+        </div>
       </CardHeader>
 
       <CardContent className="space-y-6">

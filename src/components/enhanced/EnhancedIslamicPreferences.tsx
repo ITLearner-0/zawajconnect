@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useFormAutosave } from '@/hooks/useFormAutosave';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,18 +11,19 @@ import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Moon, 
-  Book, 
-  Heart, 
-  Users, 
-  Utensils, 
-  Shirt, 
-  MapPin, 
+import {
+  Moon,
+  Book,
+  Heart,
+  Users,
+  Utensils,
+  Shirt,
+  MapPin,
   Clock,
   Star,
   Shield,
-  Home
+  Home,
+  Save
 } from 'lucide-react';
 
 interface IslamicPreferences {
@@ -57,16 +59,45 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
     desired_partner_sect: '',
     smoking: ''
   });
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [currentSection, setCurrentSection] = useState('basic');
+
+  // Auto-save functionality
+  const { loadSaved, clearSaved, hasSavedData, getLastSaveTime } = useFormAutosave(
+    preferences,
+    {
+      storageKey: `islamic-preferences-${user?.id}`,
+      debounceMs: 2000,
+      announceChanges: false, // Silent for this form
+      onError: (error) => {
+        console.error('Auto-save error:', error);
+      }
+    }
+  );
+
+  const lastSaveTime = getLastSaveTime();
 
   useEffect(() => {
     if (user) {
       loadPreferences();
     }
   }, [user]);
+
+  useEffect(() => {
+    // Check for auto-saved data and load it if available
+    if (hasSavedData() && user && !loading) {
+      const savedData = loadSaved();
+      if (savedData && Object.keys(savedData).length > 0) {
+        toast({
+          title: "Brouillon trouvé",
+          description: "Vos modifications précédentes ont été restaurées",
+        });
+        setPreferences(prev => ({ ...prev, ...savedData }));
+      }
+    }
+  }, [user, loading]);
 
   const loadPreferences = async () => {
     if (!user) return;
@@ -111,6 +142,9 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
         });
 
       if (error) throw error;
+
+      // Clear auto-saved data after successful save
+      clearSaved();
 
       toast({
         title: "Préférences sauvegardées",
@@ -203,10 +237,18 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Progression</span>
-                <span>{Math.round(getCompletionPercentage())}% complété</span>
+                <div className="flex items-center gap-4">
+                  {lastSaveTime && (
+                    <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Save className="h-3 w-3" />
+                      <span>Sauvegardé il y a {Math.floor((Date.now() - lastSaveTime.getTime()) / 1000)}s</span>
+                    </div>
+                  )}
+                  <span>{Math.round(getCompletionPercentage())}% complété</span>
+                </div>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <div 
+                <div
                   className="bg-gradient-to-r from-emerald to-gold h-2 rounded-full transition-all duration-300"
                   style={{ width: `${getCompletionPercentage()}%` }}
                 />

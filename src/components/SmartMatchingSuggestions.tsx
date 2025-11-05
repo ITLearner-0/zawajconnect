@@ -5,7 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import { Brain, Heart, MapPin, GraduationCap, Briefcase, Star } from 'lucide-react';
+import { Brain, Heart, MapPin, GraduationCap, Briefcase, Star, Sparkles } from 'lucide-react';
+import {
+  calculateIslamicCompatibility,
+  calculateCulturalCompatibility,
+  calculateOverallCompatibility,
+  generateCompatibilityExplanation
+} from '@/utils/matchingAlgorithm';
+import { logger } from '@/utils/logger';
 
 interface MatchSuggestion {
   profile: {
@@ -92,83 +99,75 @@ const SmartMatchingSuggestions = () => {
         user_verifications: verifications?.find(v => v.user_id === match.user_id) || null
       }));
 
-      // Calculate compatibility for each potential match
+      // Calculate compatibility for each potential match using enhanced fuzzy matching
       const scoredMatches = enrichedMatches.map(match => {
-        const sharedInterests = (myProfile.interests || []).filter(interest => 
+        const sharedInterests = (myProfile.interests || []).filter(interest =>
           (match.interests || []).includes(interest)
         );
 
-        let compatibilityScore = 0;
-        const reasons: string[] = [];
+        // Get Islamic preferences for this match
+        const matchIslamicPrefs = match.islamic_preferences && Array.isArray(match.islamic_preferences)
+          ? match.islamic_preferences[0]
+          : null;
 
-        // Age compatibility (closer ages = higher score)
-        const ageDiff = Math.abs(myProfile.age - match.age);
-        if (ageDiff <= 3) {
-          compatibilityScore += 20;
-          reasons.push("Âges très compatibles");
-        } else if (ageDiff <= 6) {
-          compatibilityScore += 15;
-          reasons.push("Âges compatibles");
+        // Calculate Islamic compatibility using fuzzy matching
+        let islamicScore = 60; // Default neutral score
+        if (myPrefs && matchIslamicPrefs) {
+          islamicScore = calculateIslamicCompatibility(myPrefs, matchIslamicPrefs);
         }
 
-        // Location compatibility (same city/region)
-        if (myProfile.location && match.location) {
-          const myCity = myProfile.location.split(',')[0].trim();
-          const theirCity = match.location.split(',')[0].trim();
-          if (myCity.toLowerCase() === theirCity.toLowerCase()) {
-            compatibilityScore += 15;
-            reasons.push("Même ville");
-          }
-        }
+        // Calculate Cultural compatibility using fuzzy matching
+        const culturalPrefs = {
+          location: myProfile.location || '',
+          education_level: myProfile.education || '',
+          interests: myProfile.interests || [],
+        };
 
-        // Education level compatibility
-        if (myProfile.education && match.education) {
-          const educationLevels = ['Bac', 'Licence', 'Master', 'Doctorat'];
-          const myLevel = educationLevels.findIndex(level => 
-            myProfile.education.toLowerCase().includes(level.toLowerCase())
-          );
-          const theirLevel = educationLevels.findIndex(level => 
-            match.education.toLowerCase().includes(level.toLowerCase())
-          );
-          
-          if (myLevel !== -1 && theirLevel !== -1 && Math.abs(myLevel - theirLevel) <= 1) {
-            compatibilityScore += 10;
-            reasons.push("Niveaux d'éducation compatibles");
-          }
-        }
+        const matchCulturalPrefs = {
+          location: match.location || '',
+          education_level: match.education || '',
+          interests: match.interests || [],
+        };
 
-        // Shared interests
-        compatibilityScore += sharedInterests.length * 5;
-        if (sharedInterests.length > 0) {
-          reasons.push(`${sharedInterests.length} centres d'intérêt communs`);
-        }
+        const culturalScore = calculateCulturalCompatibility(culturalPrefs, matchCulturalPrefs);
 
-        // Islamic preferences compatibility
-        if (myPrefs && match.islamic_preferences && Array.isArray(match.islamic_preferences) && match.islamic_preferences.length > 0) {
-          const prefs = match.islamic_preferences[0];
-          
-          if (myPrefs.sect === prefs.sect) {
-            compatibilityScore += 15;
-            reasons.push("Même école islamique");
-          }
-          
-          if (myPrefs.prayer_frequency === prefs.prayer_frequency) {
-            compatibilityScore += 10;
-            reasons.push("Même fréquence de prière");
-          }
-          
-          if (myPrefs.importance_of_religion === prefs.importance_of_religion) {
-            compatibilityScore += 10;
-            reasons.push("Même importance accordée à la religion");
-          }
-        }
+        // Calculate personality score (based on questionnaire - default for now)
+        const personalityScore = 70; // Default - will be enhanced when questionnaire responses are available
 
-        // Verification score bonus
+        // Calculate overall compatibility with weighted scoring
+        const compatibilityScore = calculateOverallCompatibility(
+          islamicScore,
+          culturalScore,
+          personalityScore,
+          { islamic: 0.4, cultural: 0.3, personality: 0.3 }
+        );
+
+        // Generate explanation with strengths and concerns
+        const explanation = generateCompatibilityExplanation(
+          islamicScore,
+          culturalScore,
+          personalityScore
+        );
+
+        // Build reasons array from explanation
+        const reasons: string[] = [
+          ...explanation.strengths,
+          ...sharedInterests.map(interest => `Intérêt commun: ${interest}`)
+        ];
+
+        // Add verification bonus
         const verificationScore = match.user_verifications?.verification_score || 0;
         if (verificationScore >= 70) {
-          compatibilityScore += 5;
           reasons.push("Profil vérifié");
         }
+
+        logger.log('Match suggestion calculated', {
+          matchId: match.user_id,
+          islamicScore,
+          culturalScore,
+          personalityScore,
+          overallScore: compatibilityScore
+        });
 
         return {
           profile: {
@@ -182,7 +181,7 @@ const SmartMatchingSuggestions = () => {
             avatar_url: match.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.full_name)}&background=10b981&color=fff&size=200`,
             interests: match.interests || []
           },
-          compatibility_score: Math.min(100, compatibilityScore),
+          compatibility_score: compatibilityScore,
           shared_interests: sharedInterests,
           compatibility_reasons: reasons
         };
