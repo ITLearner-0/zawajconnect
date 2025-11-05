@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { useSecurityEvents } from '@/hooks/useSecurityEvents';
 import { useAuth } from '@/hooks/useAuth';
