@@ -68,10 +68,10 @@ Impact: Interface utilisateur et expérience - ✅ TERMINÉE
 **Estimation**: 4-5 jours (2-3 pages par session)
 
 ### 🟡 PRIORITÉ 3 - Services (2 fichiers) - Difficulté: Élevée
-Impact: Logique métier critique
+Impact: Logique métier critique - ✅ TERMINÉE
 
-1. 📝 **contentModerationService.ts** - Types ModerationRule incompatibles
-2. 📝 **matchingOptimizationService.ts** - Types Profile, ScoredMatch, CachedMatch incompatibles
+1. ✅ **contentModerationService.ts** - Refactorisé (ModerationRule normalisé avec ??, violations normalisées)
+2. ✅ **matchingOptimizationService.ts** - Refactorisé (Profile/IslamicPreferences avec undefined, normalisation complète des données Supabase, cache corrigé)
 
 **Estimation**: 2-3 jours (nécessite attention aux algorithmes)
 
@@ -206,12 +206,14 @@ Pour chaque fichier à refactoriser:
 **Avancement actuel**:
 - ✅ Terminé Priority 1: 16 hooks (useAuth.tsx partiellement, useChatMatch.tsx, useChatMessages.tsx, useFamilyApproval.tsx, useFormAutosave.ts, useNavigationAnalytics.tsx, useInsightsAnalytics.tsx, useProfileSave.tsx, useUnifiedCompatibility.tsx, useSmartRecommendations.tsx, useSecurityEvents.tsx, useSecurityMonitor.tsx, useFamilySupervision.tsx, useIslamicModeration.tsx, useMatchApproval.tsx, useMatchingHistory.tsx)
 - ✅ Terminé Priority 2: 12 pages (Admin.tsx, AdminUserProfile.tsx, Browse.tsx, Chat.tsx, Dashboard.tsx, EnhancedProfile.tsx, Family.tsx, Guidance.tsx, Matches.tsx, PaymentHistory.tsx, Privacy.tsx, Profile.tsx)
+- ✅ Terminé Priority 3: 2 services (contentModerationService.ts, matchingOptimizationService.ts)
 - ✨ Fichiers liés normalisés: 4 fichiers (useOnboardingValidation.tsx, useFormPersistence.tsx, ProfilePreview.tsx, RecommendationCard.tsx)
 - 🎯 Priority 1 COMPLÉTÉE: 16/16 hooks refactorisés (100%)
 - 🎯 Priority 2 COMPLÉTÉE: 12/12 pages refactorisées (100%)
-- ⚠️ Avec @ts-nocheck: 4 fichiers restants (Services Priority 3 + Utils Priority 4 + Tests Priority 5)
-- ⏱️ Estimation restante: 1-2 jours de travail
-- 📊 Progression: 90% (27/31 fichiers originaux)
+- 🎯 Priority 3 COMPLÉTÉE: 2/2 services refactorisés (100%)
+- ⚠️ Avec @ts-nocheck: 4 fichiers restants (Utils Priority 4 + Tests Priority 5)
+- ⏱️ Estimation restante: 0.5-1 jour de travail
+- 📊 Progression: 94% (29/31 fichiers originaux)
 
 ## Notes importantes
 

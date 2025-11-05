@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Content Moderation Service
  *
@@ -63,14 +62,22 @@ class ContentModerationService {
   async loadRules(): Promise<void> {
     try {
       const { data, error } = await supabase
-        .from('moderation_rules')
+        .from('moderation_rules' as any)
         .select('*')
         .eq('is_active', true)
         .order('severity', { ascending: false });
 
       if (error) throw error;
 
-      this.rules = data || [];
+      this.rules = (data ?? []).map((rule: any) => ({
+        id: rule.id ?? '',
+        rule_type: rule.rule_type ?? 'keyword',
+        pattern: rule.pattern ?? '',
+        severity: rule.severity ?? 'low',
+        action: rule.action ?? 'warn',
+        is_active: !!rule.is_active,
+        description: rule.description ?? ''
+      }));
       this.rulesLoaded = true;
 
       logger.log('Moderation rules loaded', {
@@ -195,20 +202,17 @@ class ContentModerationService {
         // Update highest severity
         if (this.severityLevel(rule.severity) > this.severityLevel(highestSeverity)) {
           highestSeverity = rule.severity;
-          // Map rule.action to actionToTake (verb → past tense)
-          const actionMap: Record<typeof rule.action, typeof actionToTake> = {
-            'warn': 'warned',
-            'block': 'blocked',
-            'escalate': 'escalated',
-            'auto_moderate': 'auto_moderated'
-          };
-          actionToTake = actionMap[rule.action];
+          // Map rule.action to actionToTake
+          if (rule.action === 'warn') actionToTake = 'warned';
+          else if (rule.action === 'block') actionToTake = 'blocked';
+          else if (rule.action === 'escalate') actionToTake = 'escalated';
+          else if (rule.action === 'auto_moderate') actionToTake = 'auto_moderated';
         }
       }
     }
 
     // Determine final action
-    const approved = violations.length === 0 || actionToTake === 'auto_moderated';
+    const approved = violations.length === 0 || actionToTake === 'auto_moderated' || actionToTake === 'approved';
 
     // Log violation if any
     if (violations.length > 0) {
@@ -287,7 +291,7 @@ class ContentModerationService {
   private async logViolation(violation: ModerationViolation): Promise<void> {
     try {
       const { error } = await supabase
-        .from('moderation_violations')
+        .from('moderation_violations' as any)
         .insert(violation);
 
       if (error) throw error;
@@ -331,7 +335,7 @@ class ContentModerationService {
   async getStats(startDate?: Date, endDate?: Date): Promise<ModerationStats> {
     try {
       let query = supabase
-        .from('moderation_violations')
+        .from('moderation_violations' as any)
         .select('*');
 
       if (startDate) {
@@ -345,7 +349,15 @@ class ContentModerationService {
 
       if (error) throw error;
 
-      const violations = data || [];
+      const violations = (data ?? []).map((v: any) => ({
+        user_id: v.user_id ?? '',
+        content: v.content ?? '',
+        content_type: v.content_type ?? 'message',
+        rules_violated: v.rules_violated ?? [],
+        severity: v.severity ?? 'low',
+        action_taken: v.action_taken ?? 'warned',
+        created_at: v.created_at ?? new Date().toISOString()
+      }));
 
       return {
         total_checks: violations.length,

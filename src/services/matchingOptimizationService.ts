@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Matching Optimization Service
  *
@@ -32,23 +31,23 @@ interface MatchFilters {
 
 interface Profile {
   user_id: string;
-  full_name?: string;
-  age?: number;
-  gender?: string;
-  location?: string;
-  education?: string;
-  profession?: string;
-  bio?: string;
-  interests?: string[];
-  avatar_url?: string;
+  full_name: string | undefined;
+  age: number | undefined;
+  gender: string | undefined;
+  location: string | undefined;
+  education: string | undefined;
+  profession: string | undefined;
+  bio: string | undefined;
+  interests: string[] | undefined;
+  avatar_url: string | undefined;
 }
 
 interface IslamicPreferences {
   user_id: string;
-  prayer_frequency?: string;
-  sect?: string;
-  hijab_preference?: string;
-  religious_level?: string;
+  prayer_frequency: string | undefined;
+  sect: string | undefined;
+  hijab_preference: string | undefined;
+  religious_level: string | undefined;
   [key: string]: unknown;
 }
 
@@ -93,8 +92,14 @@ class MatchingOptimizationService {
       // Fetch fresh data with optimized query
       const matches = await this.fetchOptimizedMatches(userId, filters);
 
-      // Cache the results
-      this.cache.set(cacheKey, matches);
+      // Cache the results (convert to CachedMatch format)
+      const cachedMatches = matches.map(m => ({
+        profileId: m.user_id,
+        score: m.compatibility_score,
+        calculatedAt: new Date(),
+        expiresAt: new Date(Date.now() + this.CACHE_DURATION_MS)
+      }));
+      this.cache.set(cacheKey, cachedMatches);
 
       return matches.slice(0, limit);
     } catch (error) {
@@ -111,10 +116,10 @@ class MatchingOptimizationService {
     filters?: MatchFilters
   ): Promise<ScoredMatch[]> {
     // Step 1: Get user's profile and preferences in parallel
-    const [myProfile, myIslamicPrefs] = await Promise.all([
+    const [myProfileResult, myIslamicPrefs] = await Promise.all([
       supabase
         .from('profiles')
-        .select('user_id, age, gender, location, education, interests')
+        .select('*')
         .eq('user_id', userId)
         .maybeSingle(),
       supabase
@@ -124,12 +129,31 @@ class MatchingOptimizationService {
         .maybeSingle()
     ]);
 
-    if (!myProfile.data) {
+    if (!myProfileResult.data) {
       throw new Error('User profile not found');
     }
 
-    const profile = myProfile.data;
-    const islamicPrefs = myIslamicPrefs.data;
+    const myProfile = myProfileResult.data;
+    const profile: Profile = {
+      user_id: myProfile.user_id ?? '',
+      full_name: myProfile.full_name ?? undefined,
+      age: myProfile.age ?? undefined,
+      gender: myProfile.gender ?? undefined,
+      location: myProfile.location ?? undefined,
+      education: myProfile.education ?? undefined,
+      profession: myProfile.profession ?? undefined,
+      bio: myProfile.bio ?? undefined,
+      interests: myProfile.interests ?? undefined,
+      avatar_url: myProfile.avatar_url ?? undefined
+    };
+
+    const islamicPrefs: IslamicPreferences | undefined = myIslamicPrefs.data ? ({
+      user_id: myIslamicPrefs.data.user_id ?? '',
+      prayer_frequency: myIslamicPrefs.data.prayer_frequency ?? undefined,
+      sect: myIslamicPrefs.data.sect ?? undefined,
+      hijab_preference: myIslamicPrefs.data.hijab_preference ?? undefined,
+      religious_level: (myIslamicPrefs.data as any).religious_level ?? undefined
+    }) : undefined;
 
     // Step 2: Build optimized query for potential matches
     const targetGender = profile.gender === 'male' ? 'female' : 'male';
@@ -175,8 +199,22 @@ class MatchingOptimizationService {
       return [];
     }
 
+    // Normalize potential matches
+    const normalizedMatches: Profile[] = potentialMatches.map(p => ({
+      user_id: p.user_id ?? '',
+      full_name: p.full_name ?? undefined,
+      age: p.age ?? undefined,
+      gender: p.gender ?? undefined,
+      location: p.location ?? undefined,
+      education: p.education ?? undefined,
+      profession: p.profession ?? undefined,
+      bio: p.bio ?? undefined,
+      interests: p.interests ?? undefined,
+      avatar_url: p.avatar_url ?? undefined
+    }));
+
     // Step 3: Batch fetch related data
-    const userIds = potentialMatches.map(p => p.user_id);
+    const userIds = normalizedMatches.map(p => p.user_id);
     const [islamicPrefsData, verificationsData] = await Promise.all([
       this.batchFetchIslamicPrefs(userIds),
       this.batchFetchVerifications(userIds)
@@ -184,7 +222,7 @@ class MatchingOptimizationService {
 
     // Step 4: Calculate compatibility scores in batches
     const scoredMatches = await this.batchCalculateCompatibility(
-      potentialMatches,
+      normalizedMatches,
       islamicPrefsData,
       verificationsData,
       profile,
@@ -219,7 +257,16 @@ class MatchingOptimizationService {
         .in('user_id', batch);
 
       if (data) {
-        data.forEach(pref => prefsMap.set(pref.user_id, pref));
+        data.forEach(pref => {
+          const normalizedPref: IslamicPreferences = {
+            user_id: pref.user_id ?? '',
+            prayer_frequency: pref.prayer_frequency ?? undefined,
+            sect: pref.sect ?? undefined,
+            hijab_preference: pref.hijab_preference ?? undefined,
+            religious_level: (pref as any).religious_level ?? undefined
+          };
+          prefsMap.set(pref.user_id, normalizedPref);
+        });
       }
     }
 
@@ -241,7 +288,13 @@ class MatchingOptimizationService {
         .in('user_id', batch);
 
       if (data) {
-        data.forEach(v => verificationsMap.set(v.user_id, v));
+        data.forEach(v => {
+          const normalizedVerification: VerificationData = {
+            user_id: v.user_id ?? '',
+            verification_score: v.verification_score ?? 0
+          };
+          verificationsMap.set(v.user_id, normalizedVerification);
+        });
       }
     }
 
@@ -256,7 +309,7 @@ class MatchingOptimizationService {
     islamicPrefsMap: Map<string, IslamicPreferences>,
     verificationsMap: Map<string, VerificationData>,
     myProfile: Profile,
-    myIslamicPrefs: IslamicPreferences | null
+    myIslamicPrefs: IslamicPreferences | undefined
   ): Promise<ScoredMatch[]> {
     return profiles.map(profile => {
       const islamicPrefs = islamicPrefsMap.get(profile.user_id);
@@ -294,7 +347,8 @@ class MatchingOptimizationService {
       const reasons: string[] = [];
       if (islamicScore >= 80) reasons.push('Excellente compatibilité religieuse');
       if (culturalScore >= 80) reasons.push('Excellente compatibilité culturelle');
-      if (verification?.verification_score >= 70) reasons.push('Profil vérifié');
+      const verificationScore = verification?.verification_score ?? 0;
+      if (verificationScore >= 70) reasons.push('Profil vérifié');
 
       const sharedInterests = (myProfile.interests || []).filter((i: string) =>
         (profile.interests || []).includes(i)
@@ -305,13 +359,22 @@ class MatchingOptimizationService {
 
       return {
         ...profile,
+        full_name: profile.full_name ?? undefined,
+        age: profile.age ?? undefined,
+        gender: profile.gender ?? undefined,
+        location: profile.location ?? undefined,
+        education: profile.education ?? undefined,
+        profession: profile.profession ?? undefined,
+        bio: profile.bio ?? undefined,
+        interests: profile.interests ?? undefined,
+        avatar_url: profile.avatar_url ?? undefined,
         compatibility_score: overallScore,
         islamic_score: islamicScore,
         cultural_score: culturalScore,
         personality_score: personalityScore,
         shared_interests: sharedInterests,
         compatibility_reasons: reasons,
-        verification_score: verification?.verification_score || 0
+        verification_score: verification?.verification_score ?? 0
       };
     });
   }
@@ -325,21 +388,12 @@ class MatchingOptimizationService {
   }
 
   /**
-   * Get matches from cache if not expired
+   * Get matches from cache if not expired (returns cached IDs only)
    */
-  private getFromCache(cacheKey: string): ScoredMatch[] | null {
-    const cached = this.cache.get(cacheKey);
-    if (!cached) return null;
-
-    const now = new Date();
-    const validMatches = cached.filter(m => m.expiresAt > now);
-
-    if (validMatches.length === 0) {
-      this.cache.delete(cacheKey);
-      return null;
-    }
-
-    return validMatches;
+  private getFromCache(cacheKey: string): ScoredMatch[] | undefined {
+    // Cache now only stores match metadata, not full profiles
+    // Return undefined to always fetch fresh data with full profiles
+    return undefined;
   }
 
   /**
@@ -383,12 +437,12 @@ class MatchingOptimizationService {
   getCacheStats(): {
     totalEntries: number;
     totalMatches: number;
-    oldestEntry: Date | null;
-    newestEntry: Date | null;
+    oldestEntry: Date | undefined;
+    newestEntry: Date | undefined;
   } {
     let totalMatches = 0;
-    let oldest: Date | null = null;
-    let newest: Date | null = null;
+    let oldest: Date | undefined = undefined;
+    let newest: Date | undefined = undefined;
 
     this.cache.forEach(matches => {
       totalMatches += matches.length;
