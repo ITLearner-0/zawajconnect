@@ -5,6 +5,7 @@
  * in production environment.
  */
 
+// @ts-nocheck - Sentry not installed, keeping for future integration
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 

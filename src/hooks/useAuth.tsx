@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       const isValid = data && (!data.expires_at || new Date(data.expires_at) > new Date());
       
       setSubscription({
-        subscribed: isValid,
+        subscribed: !!isValid,
         product_id: isValid ? data.plan_type : null,
         subscription_end: isValid ? data.expires_at : null,
         plan_duration: null,
