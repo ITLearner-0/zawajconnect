@@ -29,16 +29,16 @@ Tous les fichiers listés ci-dessous ont été temporairement annotés avec `// 
 Impact: Critique sur toute l'application
 
 1. ✅ **useAuth.tsx** - Partiellement refactorisé (booléens normalisés)
-2. ⚠️ **useChatMatch.tsx** - @ts-nocheck temporaire
-3. ⚠️ **useChatMessages.tsx** - @ts-nocheck temporaire
-4. 📝 **useFamilyApproval.tsx** - Types null normalisés (match_score)
+2. ✅ **useChatMatch.tsx** - Refactorisé (types normalisés, import corrigé)
+3. ✅ **useChatMessages.tsx** - Refactorisé (normalisation inline)
+4. ✅ **useFamilyApproval.tsx** - Refactorisé (tous types normalisés avec ??)
 5. 📝 **useFamilySupervision.tsx** - Types normalisés (invited_user_id, booleans, etc.)
 6. 📝 **useIslamicModeration.tsx** - islamic_guidance normalisé
 7. 📝 **useMatchApproval.tsx** - match_score et family_notes normalisés
 8. 📝 **useMatchingHistory.tsx** - avg_compatibility_score normalisé
-9. 📝 **useFormAutosave.ts** - Nécessite refactoring complet
+9. ✅ **useFormAutosave.ts** - Refactorisé (cast any pour table dynamique)
 10. 📝 **useInsightsAnalytics.tsx** - Nécessite normalisation analytics
-11. 📝 **useNavigationAnalytics.tsx** - Nécessite normalisation navigation
+11. ✅ **useNavigationAnalytics.tsx** - Refactorisé (previousRoute undefined, Record<string, unknown>)
 12. 📝 **useProfileSave.tsx** - Nécessite normalisation profile
 13. 📝 **useSecurityEvents.tsx** - Nécessite normalisation security events
 14. 📝 **useSecurityMonitor.tsx** - Nécessite normalisation monitoring
@@ -202,10 +202,11 @@ Pour chaque fichier à refactoriser:
 - 🔵 Priorité 5 (Tests): 2 fichiers
 
 **Avancement actuel**:
-- ✅ Terminé: 1 fichier (useAuth.tsx partiellement)
-- 📝 Normalisé partiellement: 5 fichiers (useFamilyApproval, useFamilySupervision, useIslamicModeration, useMatchApproval, useMatchingHistory)
-- ⚠️ Avec @ts-nocheck: 31 fichiers
-- ⏱️ Estimation totale: 10-14 jours de travail
+- ✅ Terminé: 5 fichiers (useAuth.tsx partiellement, useChatMatch.tsx, useChatMessages.tsx, useFamilyApproval.tsx, useFormAutosave.ts, useNavigationAnalytics.tsx)
+- 📝 Normalisé partiellement: 4 fichiers (useFamilySupervision, useIslamicModeration, useMatchApproval, useMatchingHistory)
+- ⚠️ Avec @ts-nocheck: 26 fichiers restants
+- ⏱️ Estimation restante: 8-11 jours de travail
+- 📊 Progression: 16% (5/31 fichiers)
 
 ## Notes importantes
 
