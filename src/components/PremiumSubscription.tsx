@@ -180,6 +180,7 @@ const PremiumSubscription = () => {
         console.log('Creating Braintree dropin instance...');
         
         // Créer nouvelle instance
+        // @ts-ignore - Braintree types are incomplete
         const instance = await window.braintree.dropin.create({
           authorization: clientToken,
           container: dropinContainer,
@@ -272,6 +273,7 @@ const PremiumSubscription = () => {
     setProcessingPayment(selectedPlan);
     try {
       console.log('Requesting payment method from Braintree...');
+      // @ts-ignore - Braintree types are incomplete
       const { nonce } = await braintreeInstance.requestPaymentMethod();
       console.log('Payment method nonce received');
 

@@ -109,11 +109,12 @@ const WaliDashboard: React.FC = () => {
         const user2Response = user2Responses.find(r => r.question_key === question.question_key);
 
         if (user1Response && user2Response) {
-          totalWeight += question.weight;
+          const weight = question.weight ?? 1;
+          totalWeight += weight;
           
           // Simple matching - exact match scores full weight
           if (user1Response.response_value === user2Response.response_value) {
-            matchedWeight += question.weight;
+            matchedWeight += weight;
           }
         }
       });
@@ -172,7 +173,7 @@ const WaliDashboard: React.FC = () => {
               full_name: profile?.full_name || 'Utilisateur',
               user_id: member.user_id, // L'ID de la personne supervisée (Sarah)
               relationship: member.relationship,
-              avatar_url: profile?.avatar_url
+              avatar_url: profile?.avatar_url ?? undefined
             };
           })
         );
@@ -188,7 +189,11 @@ const WaliDashboard: React.FC = () => {
         .limit(20);
 
       if (notificationData) {
-        setNotifications(notificationData);
+        setNotifications(notificationData.map(n => ({
+          ...n,
+          original_message: n.original_message ?? undefined,
+          read_at: n.read_at ?? undefined
+        })));
       }
 
       // Charger les matches en attente d'approbation
@@ -218,6 +223,9 @@ const WaliDashboard: React.FC = () => {
                 .maybeSingle();
 
               // Récupérer le profil de l'utilisateur supervisé
+              const supervisedUserId = familyMembers?.find(fm => fm.user_id)?.user_id;
+              if (!supervisedUserId) continue;
+
               const { data: supervisedProfile } = await supabase
                 .from('profiles')
                 .select('full_name')

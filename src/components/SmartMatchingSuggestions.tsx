@@ -113,14 +113,20 @@ const SmartMatchingSuggestions = () => {
         // Calculate Islamic compatibility using fuzzy matching
         let islamicScore = 60; // Default neutral score
         if (myPrefs && matchIslamicPrefs) {
-          islamicScore = calculateIslamicCompatibility(myPrefs, matchIslamicPrefs);
+          islamicScore = calculateIslamicCompatibility(
+            {
+              ...myPrefs,
+              smoking: typeof myPrefs.smoking === 'string' ? false : (myPrefs.smoking ?? null)
+            } as any,
+            matchIslamicPrefs
+          );
         }
 
         // Calculate Cultural compatibility using fuzzy matching
         const culturalPrefs = {
-          location: myProfile.location || '',
-          education_level: myProfile.education || '',
-          interests: myProfile.interests || [],
+          location: myProfile.location ?? '',
+          education_level: myProfile.education ?? '',
+          interests: myProfile.interests ?? [],
         };
 
         const matchCulturalPrefs = {
@@ -191,7 +197,19 @@ const SmartMatchingSuggestions = () => {
       const topSuggestions = scoredMatches
         .filter(match => match.compatibility_score > 20)
         .sort((a, b) => b.compatibility_score - a.compatibility_score)
-        .slice(0, 3);
+        .slice(0, 3)
+        .map(match => ({
+          ...match,
+          profile: {
+            ...match.profile,
+            full_name: match.profile.full_name ?? 'Utilisateur',
+            age: match.profile.age ?? 0,
+            location: match.profile.location ?? '',
+            profession: match.profile.profession ?? '',
+            education: match.profile.education ?? '',
+            bio: match.profile.bio ?? ''
+          }
+        }));
 
       setSuggestions(topSuggestions);
     } catch (error) {

@@ -64,28 +64,48 @@ const SecurityPrivacyPanel = () => {
         throw adminError;
       }
 
-      setSettings(adminSettings || []);
+      setSettings((adminSettings || []).map(s => ({
+        ...s,
+        description: s.description ?? '',
+        created_at: s.created_at ?? undefined,
+        updated_at: s.updated_at ?? undefined,
+        updated_by: s.updated_by ?? undefined
+      })));
+
+      if (!user?.id) return;
 
       // Load user privacy settings
       const { data: userPrivacy, error: privacyError } = await supabase
         .from('privacy_settings')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .maybeSingle();
 
       if (privacyError && privacyError.code !== 'PGRST116') {
         console.warn('Privacy settings not found, will create default');
       }
 
-      setPrivacySettings(userPrivacy || {
-        profile_visibility: 'matches_only',
-        photo_visibility: 'matches_only',
-        allow_messages_from: 'matches_only',
-        contact_visibility: 'matches_only',
-        last_seen_visibility: 'matches_only',
-        allow_family_involvement: false,
-        allow_profile_views: true
-      });
+      if (userPrivacy) {
+        setPrivacySettings({
+          profile_visibility: userPrivacy.profile_visibility ?? 'matches_only',
+          photo_visibility: userPrivacy.photo_visibility ?? 'matches_only',
+          allow_messages_from: userPrivacy.allow_messages_from ?? 'matches_only',
+          contact_visibility: userPrivacy.contact_visibility ?? 'matches_only',
+          last_seen_visibility: userPrivacy.last_seen_visibility ?? 'matches_only',
+          allow_family_involvement: userPrivacy.allow_family_involvement ?? false,
+          allow_profile_views: userPrivacy.allow_profile_views ?? true
+        });
+      } else {
+        setPrivacySettings({
+          profile_visibility: 'matches_only',
+          photo_visibility: 'matches_only',
+          allow_messages_from: 'matches_only',
+          contact_visibility: 'matches_only',
+          last_seen_visibility: 'matches_only',
+          allow_family_involvement: false,
+          allow_profile_views: true
+        });
+      }
 
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -144,10 +164,12 @@ const SecurityPrivacyPanel = () => {
       setSaving(true);
       const updatedSettings = { ...privacySettings, [field]: value };
 
+      if (!user?.id) return;
+
       const { error } = await supabase
         .from('privacy_settings')
         .upsert({
-          user_id: user?.id,
+          user_id: user.id,
           ...updatedSettings
         });
 
@@ -230,7 +252,7 @@ const SecurityPrivacyPanel = () => {
                   type="number"
                   min="6"
                   max="20"
-                  value={getSettingValue('security_password_min_length') || 8}
+                  value={(getSettingValue('security_password_min_length') as number) || 8}
                   onChange={(e) => updateAdminSetting('security_password_min_length', parseInt(e.target.value))}
                   disabled={saving}
                 />
@@ -243,39 +265,39 @@ const SecurityPrivacyPanel = () => {
                     Exiger une vérification avant de pouvoir envoyer des messages
                   </p>
                 </div>
-                <Switch
-                  checked={getSettingValue('verification_required_for_messaging') || false}
-                  onCheckedChange={(checked) => updateAdminSetting('verification_required_for_messaging', checked)}
-                  disabled={saving}
-                />
+              <Switch
+                checked={Boolean(getSettingValue('verification_required_for_messaging'))}
+                onCheckedChange={(checked) => updateAdminSetting('verification_required_for_messaging', checked)}
+                disabled={saving}
+              />
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
                 <Label htmlFor="max_daily_likes">Limite de likes par jour</Label>
-                <Input
-                  id="max_daily_likes"
-                  type="number"
-                  min="10"
-                  max="200"
-                  value={getSettingValue('max_daily_likes') || 50}
-                  onChange={(e) => updateAdminSetting('max_daily_likes', parseInt(e.target.value))}
-                  disabled={saving}
-                />
-              </div>
+              <Input
+                id="max_daily_likes"
+                type="number"
+                min="10"
+                max="200"
+                value={(getSettingValue('max_daily_likes') as number) || 50}
+                onChange={(e) => updateAdminSetting('max_daily_likes', parseInt(e.target.value))}
+                disabled={saving}
+              />
+            </div>
 
-              <div>
-                <Label htmlFor="max_photos">Photos maximum par profil</Label>
-                <Input
-                  id="max_photos"
-                  type="number"
-                  min="3"
-                  max="10"
-                  value={getSettingValue('max_photos_per_profile') || 6}
-                  onChange={(e) => updateAdminSetting('max_photos_per_profile', parseInt(e.target.value))}
-                  disabled={saving}
-                />
+            <div>
+              <Label htmlFor="max_photos">Photos maximum par profil</Label>
+              <Input
+                id="max_photos"
+                type="number"
+                min="3"
+                max="10"
+                value={(getSettingValue('max_photos_per_profile') as number) || 6}
+                onChange={(e) => updateAdminSetting('max_photos_per_profile', parseInt(e.target.value))}
+                disabled={saving}
+              />
               </div>
             </div>
           </div>

@@ -72,7 +72,21 @@ const VerificationCenter = () => {
       }
 
       if (data) {
-        setVerificationStatus(data);
+        setVerificationStatus({
+          email_verified: data.email_verified ?? false,
+          phone_verified: data.phone_verified ?? false,
+          id_verified: data.id_verified ?? false,
+          family_verified: data.family_verified ?? false,
+          verification_score: data.verification_score ?? 0,
+          verified_by: data.verified_by ?? undefined,
+          verified_at: data.verified_at ?? undefined,
+          verification_documents: data.verification_documents ?? undefined,
+          verification_notes: data.verification_notes ?? undefined,
+          user_id: data.user_id,
+          id: data.id,
+          created_at: data.created_at,
+          updated_at: data.updated_at
+        });
       } else {
         // Create initial verification record
         const { data: newRecord } = await supabase
@@ -85,7 +99,21 @@ const VerificationCenter = () => {
           .maybeSingle();
 
         if (newRecord) {
-          setVerificationStatus(newRecord);
+          setVerificationStatus({
+            email_verified: newRecord.email_verified ?? false,
+            phone_verified: newRecord.phone_verified ?? false,
+            id_verified: newRecord.id_verified ?? false,
+            family_verified: newRecord.family_verified ?? false,
+            verification_score: newRecord.verification_score ?? 0,
+            verified_by: newRecord.verified_by ?? undefined,
+            verified_at: newRecord.verified_at ?? undefined,
+            verification_documents: newRecord.verification_documents ?? undefined,
+            verification_notes: newRecord.verification_notes ?? undefined,
+            user_id: newRecord.user_id,
+            id: newRecord.id,
+            created_at: newRecord.created_at,
+            updated_at: newRecord.updated_at
+          });
         }
       }
     } catch (error) {
@@ -165,13 +193,15 @@ const VerificationCenter = () => {
 
     try {
       // Simulate verification (in real app, verify with service)
+      if (!user?.id) return;
+
       const { error } = await supabase
         .from('user_verifications')
         .update({ 
           phone_verified: true,
           verification_score: verificationStatus.verification_score + 25
         })
-        .eq('user_id', user?.id);
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
@@ -179,7 +209,7 @@ const VerificationCenter = () => {
       await supabase
         .from('profiles')
         .update({ phone: phoneNumber })
-        .eq('user_id', user?.id);
+        .eq('user_id', user.id);
 
       setVerificationStatus(prev => ({
         ...prev,

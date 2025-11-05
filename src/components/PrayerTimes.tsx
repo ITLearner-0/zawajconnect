@@ -164,7 +164,9 @@ const PrayerTimes = () => {
     setNextPrayer(nextPrayerName);
     
     // Calculate time remaining
-    const [hours, minutes] = nextPrayerTime.split(':').map(Number);
+    const timeParts = nextPrayerTime.split(':');
+    const hours = parseInt(timeParts[0] ?? '0');
+    const minutes = parseInt(timeParts[1] ?? '0');
     const nextPrayerDate = new Date(now);
     nextPrayerDate.setHours(hours, minutes, 0, 0);
     

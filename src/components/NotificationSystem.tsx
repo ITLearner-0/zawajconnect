@@ -51,7 +51,9 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
       if (data) {
         setNotifications(data.map(n => ({
           ...n,
-          is_read: n.is_read ?? false
+          is_read: n.is_read ?? false,
+          related_user_id: n.related_user_id ?? undefined,
+          related_match_id: n.related_match_id ?? undefined
         })));
         setUnreadCount(data.filter(n => !n.is_read).length);
       }

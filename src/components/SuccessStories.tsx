@@ -97,27 +97,28 @@ const SuccessStories = () => {
             {/* Main Story Card */}
             <div className="lg:col-span-2">
               <Card className="h-full animate-slide-up card-hover bg-gradient-to-br from-white/90 to-cream/40">
-                <CardContent className="p-8">
-                  {/* Story Header */}
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-4">
-                      <div className="h-16 w-16 bg-gradient-to-br from-emerald to-gold rounded-full flex items-center justify-center">
-                        <span className="text-xl font-bold text-white">
-                          {currentStoryData.avatar}
-                        </span>
-                      </div>
-                      <div>
-                        <h3 className="text-2xl font-bold text-foreground">{currentStoryData.names}</h3>
-                        <div className="flex items-center gap-4 text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <MapPin className="h-4 w-4" />
-                            {currentStoryData.location}
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Calendar className="h-4 w-4" />
-                            {currentStoryData.marriageDate}
-                          </div>
+                {currentStoryData && (
+                  <CardContent className="p-8">
+                    {/* Story Header */}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-4">
+                        <div className="h-16 w-16 bg-gradient-to-br from-emerald to-gold rounded-full flex items-center justify-center">
+                          <span className="text-xl font-bold text-white">
+                            {currentStoryData.avatar}
+                          </span>
                         </div>
+                        <div>
+                          <h3 className="text-2xl font-bold text-foreground">{currentStoryData.names}</h3>
+                          <div className="flex items-center gap-4 text-muted-foreground">
+                            <div className="flex items-center gap-1">
+                              <MapPin className="h-4 w-4" />
+                              {currentStoryData.location}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Calendar className="h-4 w-4" />
+                              {currentStoryData.marriageDate}
+                            </div>
+                          </div>
                       </div>
                     </div>
                     <Badge className="bg-emerald/10 text-emerald border-emerald/20 flex items-center gap-1">
@@ -186,8 +187,9 @@ const SuccessStories = () => {
                       <ChevronRight className="h-4 w-4" />
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  )}
+                </Card>
             </div>
 
             {/* Statistics Sidebar */}

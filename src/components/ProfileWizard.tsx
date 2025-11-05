@@ -215,6 +215,7 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
 
   const renderStepContent = () => {
     const currentStepData = steps[currentStep];
+    if (!currentStepData) return null;
 
     switch (currentStepData.id) {
       case 'basic':
@@ -506,8 +507,8 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
 
             {/* Current Step Content */}
             <div>
-              <h3 className="text-xl font-semibold mb-2">{steps[currentStep].title}</h3>
-              <p className="text-muted-foreground mb-4">{steps[currentStep].description}</p>
+              <h3 className="text-xl font-semibold mb-2">{steps[currentStep]?.title}</h3>
+              <p className="text-muted-foreground mb-4">{steps[currentStep]?.description}</p>
               {renderStepContent()}
             </div>
 
@@ -524,7 +525,7 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
               {currentStep < steps.length - 1 ? (
                 <Button
                   onClick={nextStep}
-                  disabled={!steps[currentStep].completed}
+                  disabled={!steps[currentStep]?.completed}
                   className="bg-emerald hover:bg-emerald-dark"
                 >
                   Suivant
@@ -532,7 +533,7 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
               ) : (
                 <Button
                   onClick={saveProfile}
-                  disabled={!steps.every(step => step.completed)}
+                  disabled={!steps.every(step => step?.completed)}
                   className="bg-emerald hover:bg-emerald-dark"
                 >
                   Terminer le profil

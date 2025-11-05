@@ -129,11 +129,22 @@ const ParentalApprovalWorkflow = () => {
           })
         );
 
-        setMatches(matchesWithProfiles.map(m => ({
-          ...m,
-          match_score: m.match_score ?? 0,
-          is_mutual: m.is_mutual ?? false
-        })));
+        setMatches(matchesWithProfiles.map(m => {
+          const profiles = m.profiles as any;
+          return {
+            ...m,
+            match_score: m.match_score ?? 0,
+            is_mutual: m.is_mutual ?? false,
+            profiles: {
+              full_name: profiles?.full_name ?? 'Utilisateur',
+              age: profiles?.age ?? 0,
+              location: profiles?.location ?? '',
+              profession: profiles?.profession ?? '',
+              avatar_url: profiles?.avatar_url ?? undefined,
+              bio: profiles?.bio ?? undefined
+            }
+          };
+        }) as Match[]);
       }
     } catch (error) {
       console.error('Error fetching matches:', error);
@@ -157,7 +168,11 @@ const ParentalApprovalWorkflow = () => {
         ...fm,
         is_wali: fm.is_wali ?? false,
         can_communicate: fm.can_communicate ?? false,
-        can_view_profile: fm.can_view_profile ?? false
+        can_view_profile: fm.can_view_profile ?? false,
+        invitation_status: fm.invitation_status ?? 'pending',
+        invitation_sent_at: fm.invitation_sent_at ?? undefined,
+        invitation_accepted_at: fm.invitation_accepted_at ?? undefined,
+        invitation_token: fm.invitation_token ?? undefined
       })));
     } catch (error) {
       console.error('Error fetching family members:', error);
@@ -167,11 +182,16 @@ const ParentalApprovalWorkflow = () => {
   const handleApproval = async (requestId: string, status: 'approved' | 'rejected', notes?: string) => {
     try {
       // Insert into family_reviews table
+      const familyMemberId = familyMembers.find(fm => fm.id === user?.id)?.id;
+      if (!familyMemberId) {
+        throw new Error('Family member not found');
+      }
+
       const { error } = await supabase
         .from('family_reviews')
         .insert({
           match_id: requestId,
-          family_member_id: familyMembers.find(fm => fm.id === user?.id)?.id,
+          family_member_id: familyMemberId,
           status,
           notes: notes || null
         });
@@ -210,13 +230,16 @@ const ParentalApprovalWorkflow = () => {
 
   const scheduleDiscussion = async (matchId: string) => {
     try {
-      await supabase.rpc('create_notification', {
-        target_user_id: matches.find(m => m.id === matchId)?.user1_id,
-        notification_type: 'family_meeting',
-        notification_title: 'Réunion familiale programmée',
-        notification_content: 'Une discussion familiale a été programmée pour examiner ce match.',
-        sender_user_id: user?.id
-      });
+      const targetMatch = matches.find(m => m.id === matchId);
+      if (targetMatch && user?.id) {
+        await supabase.rpc('create_notification', {
+          target_user_id: targetMatch.user1_id,
+          notification_type: 'family_meeting',
+          notification_title: 'Réunion familiale programmée',
+          notification_content: 'Une discussion familiale a été programmée pour examiner ce match.',
+          sender_user_id: user.id
+        });
+      }
 
       toast({
         title: "Discussion programmée",

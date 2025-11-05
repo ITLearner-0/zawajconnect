@@ -57,7 +57,15 @@ const PrivacySettingsForm = () => {
       }
 
       if (data) {
-        setSettings(data);
+        setSettings({
+          profile_visibility: data.profile_visibility ?? 'public',
+          photo_visibility: data.photo_visibility ?? 'matches_only',
+          contact_visibility: data.contact_visibility ?? 'matches_only',
+          last_seen_visibility: data.last_seen_visibility ?? 'matches_only',
+          allow_messages_from: data.allow_messages_from ?? 'matches_only',
+          allow_profile_views: data.allow_profile_views ?? true,
+          allow_family_involvement: data.allow_family_involvement ?? false
+        });
       }
     } catch (error) {
       console.error('Error loading privacy settings:', error);

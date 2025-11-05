@@ -118,11 +118,9 @@ const FamilySupervisionPanel = () => {
         can_communicate: m.can_communicate ?? false,
         can_view_profile: m.can_view_profile ?? false,
         is_wali: m.is_wali ?? false,
-        invitation_status: m.invitation_status ?? undefined,
+        invitation_status: m.invitation_status ?? 'pending',
         invitation_sent_at: m.invitation_sent_at ?? undefined,
         invitation_accepted_at: m.invitation_accepted_at ?? undefined,
-        email: m.email ?? undefined,
-        phone: m.phone ?? undefined,
         invitation_token: m.invitation_token ?? undefined
       })));
 
@@ -218,7 +216,19 @@ const FamilySupervisionPanel = () => {
         throw new Error('Failed to create family member');
       }
 
-      setFamilyMembers(prev => [...prev, data]);
+      setFamilyMembers(prev => [
+        ...prev,
+        {
+          ...data,
+          can_communicate: data.can_communicate ?? false,
+          can_view_profile: data.can_view_profile ?? false,
+          is_wali: data.is_wali ?? false,
+          invitation_status: data.invitation_status ?? 'pending',
+          invitation_sent_at: data.invitation_sent_at ?? undefined,
+          invitation_accepted_at: data.invitation_accepted_at ?? undefined,
+          invitation_token: data.invitation_token ?? undefined
+        }
+      ]);
       setNewMember({
         full_name: '',
         relationship: '',

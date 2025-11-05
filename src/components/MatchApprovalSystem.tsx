@@ -129,10 +129,14 @@ const MatchApprovalSystem = () => {
         ...match,
         match_score: match.match_score ?? 0,
         is_mutual: match.is_mutual ?? false,
+        family_approved: match.family_approved ?? false,
+        family1_approved: match.family1_approved ?? false,
+        family2_approved: match.family2_approved ?? false,
+        can_communicate: match.can_communicate ?? false,
         user1: { full_name: 'User 1', age: 25, location: 'Location', profession: 'Profession', education: 'Education', bio: 'Bio', avatar_url: '' },
         user2: { full_name: 'User 2', age: 25, location: 'Location', profession: 'Profession', education: 'Education', bio: 'Bio', avatar_url: '' },
         pending_reviews: reviewsData?.filter(r => r.match_id === match.id) || []
-      }));
+      })) as Match[];
 
       setMatches(matchesWithReviews || []);
     } catch (error) {
