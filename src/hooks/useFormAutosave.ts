@@ -101,9 +101,9 @@ export function useFormAutosave<T extends Record<string, any>>(
           .from(tableName)
           .upsert({
             user_id: userId,
-            data,
+            data: data as any,
             updated_at: new Date().toISOString(),
-          });
+          } as any);
 
         if (error) throw error;
 

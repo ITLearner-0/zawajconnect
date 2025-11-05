@@ -97,11 +97,14 @@ export const useEnhancedSessionMonitor = () => {
       }
 
       setActiveSessions((data || []).map(session => ({
-        ...session,
-        ip_address: session.ip_address as string || undefined,
-        device_fingerprint: session.device_fingerprint || undefined,
-        user_agent: session.user_agent || undefined,
-        expires_at: session.expires_at || undefined
+        id: session.id,
+        device_fingerprint: session.device_fingerprint ? String(session.device_fingerprint) : undefined,
+        ip_address: session.ip_address ? String(session.ip_address) : undefined,
+        user_agent: session.user_agent ? String(session.user_agent) : undefined,
+        is_active: !!session.is_active,
+        last_activity: session.last_activity ?? new Date().toISOString(),
+        expires_at: session.expires_at ? String(session.expires_at) : undefined,
+        created_at: session.created_at ?? new Date().toISOString()
       })));
 
       // Check for suspicious multiple sessions
