@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -6,10 +5,10 @@ import { useToast } from './use-toast';
 
 export interface SmartRecommendation {
   user_id: string;
-  full_name: string;
-  age: number;
-  location: string;
-  profession: string;
+  full_name: string | undefined;
+  age: number | undefined;
+  location: string | undefined;
+  profession: string | undefined;
   avatar_url?: string;
   recommendation_score: number;
   compatibility_score: number;
@@ -40,7 +39,7 @@ export const useSmartRecommendations = () => {
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
 
-  const calculateIslamicAlignment = (myPrefs: Record<string, unknown>, theirPrefs: Record<string, unknown>): number => {
+  const calculateIslamicAlignment = (myPrefs: Record<string, unknown> | undefined | null, theirPrefs: Record<string, unknown> | undefined | null): number => {
     if (!myPrefs || !theirPrefs) return 50;
     
     let score = 0;
@@ -48,15 +47,19 @@ export const useSmartRecommendations = () => {
     
     // Prayer frequency alignment
     const prayerWeights = { 'daily': 100, 'often': 80, 'sometimes': 60, 'rarely': 40, 'never': 20 };
-    const myPrayer = prayerWeights[myPrefs.prayer_frequency as keyof typeof prayerWeights] || 50;
-    const theirPrayer = prayerWeights[theirPrefs.prayer_frequency as keyof typeof prayerWeights] || 50;
+    const myPrayerFreq = (myPrefs.prayer_frequency as string | null) ?? '';
+    const theirPrayerFreq = (theirPrefs.prayer_frequency as string | null) ?? '';
+    const myPrayer = prayerWeights[myPrayerFreq as keyof typeof prayerWeights] ?? 50;
+    const theirPrayer = prayerWeights[theirPrayerFreq as keyof typeof prayerWeights] ?? 50;
     score += Math.max(20, 100 - Math.abs(myPrayer - theirPrayer));
     factors++;
     
     // Quran reading alignment
     const quranWeights = { 'daily': 100, 'weekly': 80, 'monthly': 60, 'rarely': 40, 'never': 20 };
-    const myQuran = quranWeights[myPrefs.quran_reading as keyof typeof quranWeights] || 50;
-    const theirQuran = quranWeights[theirPrefs.quran_reading as keyof typeof quranWeights] || 50;
+    const myQuranReading = (myPrefs.quran_reading as string | null) ?? '';
+    const theirQuranReading = (theirPrefs.quran_reading as string | null) ?? '';
+    const myQuran = quranWeights[myQuranReading as keyof typeof quranWeights] ?? 50;
+    const theirQuran = quranWeights[theirQuranReading as keyof typeof quranWeights] ?? 50;
     score += Math.max(20, 100 - Math.abs(myQuran - theirQuran));
     factors++;
     
@@ -69,8 +72,10 @@ export const useSmartRecommendations = () => {
     factors++;
     
     // Halal lifestyle
-    if (myPrefs.halal_diet === theirPrefs.halal_diet) {
-      score += myPrefs.halal_diet ? 95 : 80;
+    const myHalalDiet = !!myPrefs.halal_diet;
+    const theirHalalDiet = !!theirPrefs.halal_diet;
+    if (myHalalDiet === theirHalalDiet) {
+      score += myHalalDiet ? 95 : 80;
     } else {
       score += 40;
     }
@@ -79,22 +84,31 @@ export const useSmartRecommendations = () => {
     return Math.floor(score / factors);
   };
 
-  const calculatePersonalityMatch = (myProfile: Record<string, unknown>, theirProfile: Record<string, unknown>): number => {
+  const calculatePersonalityMatch = (myProfile: Record<string, unknown> | undefined | null, theirProfile: Record<string, unknown> | undefined | null): number => {
+    if (!myProfile || !theirProfile) return 60;
+    
     let score = 60; // Base score
     
     // Age compatibility
-    const ageDiff = Math.abs((myProfile?.age || 25) - (theirProfile?.age || 25));
+    const myAge = (myProfile?.age as number | null) ?? 25;
+    const theirAge = (theirProfile?.age as number | null) ?? 25;
+    const ageDiff = Math.abs(myAge - theirAge);
     if (ageDiff <= 3) score += 20;
     else if (ageDiff <= 6) score += 10;
     else if (ageDiff <= 10) score += 5;
     
     // Location proximity
-    if (myProfile?.location === theirProfile?.location) score += 15;
+    const myLocation = (myProfile?.location as string | null) ?? '';
+    const theirLocation = (theirProfile?.location as string | null) ?? '';
+    if (myLocation && theirLocation && myLocation === theirLocation) score += 15;
     
     // Professional compatibility
-    if (myProfile?.profession && theirProfile?.profession) {
+    const myProfession = (myProfile?.profession as string | null) ?? '';
+    const theirProfession = (theirProfile?.profession as string | null) ?? '';
+    
+    if (myProfession && theirProfession) {
       // Same profession or related fields
-      if (myProfile.profession === theirProfile.profession) {
+      if (myProfession === theirProfession) {
         score += 15;
       } else {
         score += 5; // Some bonus for having professions
@@ -104,35 +118,48 @@ export const useSmartRecommendations = () => {
     return Math.min(100, score);
   };
 
-  const calculateSharedInterests = (myInterests: string[], theirInterests: string[]): string[] => {
-    if (!myInterests || !theirInterests) return [];
-    return myInterests.filter(interest => theirInterests.includes(interest));
+  const calculateSharedInterests = (myInterests: string[] | null | undefined, theirInterests: string[] | null | undefined): string[] => {
+    const normalizedMyInterests = myInterests ?? [];
+    const normalizedTheirInterests = theirInterests ?? [];
+    return normalizedMyInterests.filter(interest => normalizedTheirInterests.includes(interest));
   };
 
   const generateRecommendationReasons = (
     islamicAlignment: number, 
     personalityMatch: number, 
     sharedInterests: string[],
-    myProfile: Record<string, unknown>,
-    theirProfile: Record<string, unknown>
+    myProfile: Record<string, unknown> | undefined | null,
+    theirProfile: Record<string, unknown> | undefined | null
   ): string[] => {
     const reasons = [];
     
     if (islamicAlignment >= 85) reasons.push("Excellente compatibilité religieuse");
     if (personalityMatch >= 80) reasons.push("Personnalités très complémentaires");
     if (sharedInterests.length >= 3) reasons.push(`${sharedInterests.length} centres d'intérêt partagés`);
-    if (myProfile?.location === theirProfile?.location) reasons.push("Proximité géographique");
     
-    const ageDiff = Math.abs((myProfile?.age || 25) - (theirProfile?.age || 25));
-    if (ageDiff <= 5) reasons.push("Âges compatibles");
+    if (myProfile && theirProfile) {
+      const myLocation = (myProfile?.location as string | null) ?? '';
+      const theirLocation = (theirProfile?.location as string | null) ?? '';
+      if (myLocation && theirLocation && myLocation === theirLocation) reasons.push("Proximité géographique");
     
-    // Add profile-based reasons
-    if (myProfile?.education && theirProfile?.education) {
-      reasons.push("Niveaux d'éducation compatibles");
-    }
-    if (myProfile?.profession && theirProfile?.profession) {
-      if (myProfile.profession === theirProfile.profession) {
-        reasons.push("Même domaine professionnel");
+      const myAge = (myProfile?.age as number | null) ?? 25;
+      const theirAge = (theirProfile?.age as number | null) ?? 25;
+      const ageDiff = Math.abs(myAge - theirAge);
+      if (ageDiff <= 5) reasons.push("Âges compatibles");
+    
+      // Add profile-based reasons
+      const myEducation = (myProfile?.education as string | null) ?? '';
+      const theirEducation = (theirProfile?.education as string | null) ?? '';
+      if (myEducation && theirEducation) {
+        reasons.push("Niveaux d'éducation compatibles");
+      }
+      
+      const myProfession = (myProfile?.profession as string | null) ?? '';
+      const theirProfession = (theirProfile?.profession as string | null) ?? '';
+      if (myProfession && theirProfession) {
+        if (myProfession === theirProfession) {
+          reasons.push("Même domaine professionnel");
+        }
       }
     }
     
@@ -213,7 +240,9 @@ export const useSmartRecommendations = () => {
         .eq('invitation_status', 'accepted')
         .not('invited_user_id', 'is', null);
 
-      const waliUserIds = waliUsers?.map(w => w.invited_user_id).filter(Boolean) || [];
+      const waliUserIds = (waliUsers ?? [])
+        .map(w => w.invited_user_id)
+        .filter((id): id is string => id !== null && id !== undefined);
 
       // Get potential matches (opposite gender only, excluding Walis)
       const { data: profiles } = await supabase
@@ -244,12 +273,12 @@ export const useSmartRecommendations = () => {
         // Combine the data
         const enrichedProfiles = profiles.map(profile => ({
           ...profile,
-          islamic_preferences: islamicPrefs?.filter(p => p.user_id === profile.user_id) || []
+          islamic_preferences: (islamicPrefs ?? []).filter(p => p.user_id === profile.user_id)
         }));
 
         // Apply AI-powered recommendation scoring
         const scoredRecommendations: SmartRecommendation[] = enrichedProfiles.map(profile => {
-          const islamicPrefs = profile.islamic_preferences?.[0];
+          const islamicPrefs = profile.islamic_preferences?.[0] ?? undefined;
           
           // Calculate various compatibility dimensions
           const islamic_alignment = calculateIslamicAlignment(myPrefs, islamicPrefs);
@@ -257,7 +286,9 @@ export const useSmartRecommendations = () => {
           const compatibility_score = Math.floor((islamic_alignment + personality_match) / 2);
           
           // Calculate shared interests
-          const shared_interests = calculateSharedInterests(myProfile?.interests || [], profile.interests || []);
+          const myInterests = (myProfile?.interests as string[] | null) ?? [];
+          const profileInterests = (profile.interests as string[] | null) ?? [];
+          const shared_interests = calculateSharedInterests(myInterests, profileInterests);
           
           // Generate AI-powered recommendation reasons
           const recommendation_reasons = generateRecommendationReasons(
@@ -293,11 +324,11 @@ export const useSmartRecommendations = () => {
 
           return {
             user_id: profile.user_id,
-            full_name: profile.full_name,
-            age: profile.age,
-            location: profile.location,
-            profession: profile.profession,
-            avatar_url: profile.avatar_url,
+            full_name: profile.full_name ?? undefined,
+            age: profile.age ?? undefined,
+            location: profile.location ?? undefined,
+            profession: profile.profession ?? undefined,
+            avatar_url: profile.avatar_url ?? undefined,
             recommendation_score,
             compatibility_score,
             islamic_alignment,

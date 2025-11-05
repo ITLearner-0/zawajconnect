@@ -8,10 +8,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface SmartRecommendation {
   user_id: string;
-  full_name: string;
-  age: number;
-  location: string;
-  profession: string;
+  full_name: string | undefined;
+  age: number | undefined;
+  location: string | undefined;
+  profession: string | undefined;
   avatar_url?: string;
   recommendation_score: number;
   compatibility_score: number;
@@ -54,12 +54,12 @@ export const RecommendationCard = ({ recommendation }: RecommendationCardProps) 
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-lg">{recommendation.full_name}</CardTitle>
+              <CardTitle className="text-lg">{recommendation.full_name ?? 'Profil Anonyme'}</CardTitle>
               <p className="text-sm text-muted-foreground">
-                {recommendation.age} ans • {recommendation.location}
+                {recommendation.age ?? '−'} ans • {recommendation.location ?? 'Non spécifié'}
               </p>
               <p className="text-xs text-muted-foreground">
-                {recommendation.profession}
+                {recommendation.profession ?? 'Non spécifié'}
               </p>
             </div>
           </div>

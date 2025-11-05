@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,12 +22,14 @@ export const useUnifiedCompatibility = () => {
   const [loading, setLoading] = useState(false);
 
   const calculateQuestionnaireCompatibility = async (otherUserId: string): Promise<number> => {
+    if (!user?.id) return 60;
+    
     try {
       // Get both users' responses
       const { data: myResponses } = await supabase
         .from('user_compatibility_responses')
         .select('question_key, response_value')
-        .eq('user_id', user?.id);
+        .eq('user_id', user.id);
 
       const { data: theirResponses } = await supabase
         .from('user_compatibility_responses')
@@ -40,23 +41,29 @@ export const useUnifiedCompatibility = () => {
         .select('question_key, weight')
         .eq('is_active', true);
 
-      if (!myResponses || !theirResponses || !questions) {
+      // Normalize responses with default values
+      const normalizedMyResponses = myResponses ?? [];
+      const normalizedTheirResponses = theirResponses ?? [];
+      const normalizedQuestions = questions ?? [];
+
+      if (normalizedMyResponses.length === 0 || normalizedTheirResponses.length === 0 || normalizedQuestions.length === 0) {
         return 60; // Default score when no data available
       }
 
       let totalWeight = 0;
       let matchedWeight = 0;
 
-      questions.forEach(question => {
-        const myResponse = myResponses.find(r => r.question_key === question.question_key);
-        const theirResponse = theirResponses.find(r => r.question_key === question.question_key);
+      normalizedQuestions.forEach(question => {
+        const myResponse = normalizedMyResponses.find(r => r.question_key === question.question_key);
+        const theirResponse = normalizedTheirResponses.find(r => r.question_key === question.question_key);
 
         if (myResponse && theirResponse) {
-          totalWeight += question.weight;
+          const weight = question.weight ?? 1;
+          totalWeight += weight;
           
           // Simple matching - exact match scores full weight
           if (myResponse.response_value === theirResponse.response_value) {
-            matchedWeight += question.weight;
+            matchedWeight += weight;
           }
         }
       });
@@ -104,11 +111,17 @@ export const useUnifiedCompatibility = () => {
         supabase.from('islamic_preferences').select('*').eq('user_id', otherUserId).maybeSingle()
       ]);
 
+      // Normalize data with default values
+      const normalizedMyIslamicPrefs = myIslamicPrefs?.data ?? undefined;
+      const normalizedTheirIslamicPrefs = theirIslamicPrefs?.data ?? undefined;
+      const normalizedMyProfile = myProfile?.data ?? undefined;
+      const normalizedTheirProfile = theirProfile?.data ?? undefined;
+
       // Calculate Islamic compatibility
-      const islamic_score = calculateIslamicCompatibility(myIslamicPrefs?.data, theirIslamicPrefs?.data);
+      const islamic_score = calculateIslamicCompatibility(normalizedMyIslamicPrefs, normalizedTheirIslamicPrefs);
       
       // Calculate cultural compatibility
-      const cultural_score = calculateCulturalCompatibility(myProfile?.data, theirProfile?.data);
+      const cultural_score = calculateCulturalCompatibility(normalizedMyProfile, normalizedTheirProfile);
       
       // Calculate personality compatibility (based on questionnaire)
       // Ensure personality score is between 0-100
@@ -141,8 +154,8 @@ export const useUnifiedCompatibility = () => {
         islamic_score,
         cultural_score,
         personality_score,
-        myProfile?.data,
-        theirProfile?.data
+        normalizedMyProfile,
+        normalizedTheirProfile
       );
 
       // Generate potential concerns
@@ -150,8 +163,8 @@ export const useUnifiedCompatibility = () => {
         islamic_score,
         cultural_score,
         personality_score,
-        myProfile?.data,
-        theirProfile?.data
+        normalizedMyProfile,
+        normalizedTheirProfile
       );
 
       return {
@@ -176,7 +189,7 @@ export const useUnifiedCompatibility = () => {
     }
   };
 
-  const calculateIslamicCompatibility = (myPrefs: Record<string, unknown>, theirPrefs: Record<string, unknown>): number => {
+  const calculateIslamicCompatibility = (myPrefs: Record<string, unknown> | undefined, theirPrefs: Record<string, unknown> | undefined): number => {
     // If both have no data, give a neutral score
     if (!myPrefs && !theirPrefs) return 75;
 
@@ -194,21 +207,21 @@ export const useUnifiedCompatibility = () => {
     }
   };
 
-  const calculateCulturalCompatibility = (myProfile: Record<string, unknown>, theirProfile: Record<string, unknown>): number => {
+  const calculateCulturalCompatibility = (myProfile: Record<string, unknown> | undefined, theirProfile: Record<string, unknown> | undefined): number => {
     if (!myProfile || !theirProfile) return 70; // More optimistic for missing data
 
     try {
       // Use enhanced fuzzy matching algorithm with location similarity
       const culturalPrefs = {
-        location: myProfile.location || '',
-        education: myProfile.education || '',
-        interests: myProfile.interests || [],
+        location: (myProfile.location as string | null) ?? '',
+        education: (myProfile.education as string | null) ?? '',
+        interests: (myProfile.interests as string[] | null) ?? [],
       };
 
       const theirCulturalPrefs = {
-        location: theirProfile.location || '',
-        education: theirProfile.education || '',
-        interests: theirProfile.interests || [],
+        location: (theirProfile.location as string | null) ?? '',
+        education: (theirProfile.education as string | null) ?? '',
+        interests: (theirProfile.interests as string[] | null) ?? [],
       };
 
       const score = calculateCulturalFuzzy(culturalPrefs, theirCulturalPrefs);
@@ -224,8 +237,8 @@ export const useUnifiedCompatibility = () => {
     islamic_score: number,
     cultural_score: number,
     personality_score: number,
-    myProfile: Record<string, unknown>,
-    theirProfile: Record<string, unknown>
+    myProfile: Record<string, unknown> | undefined,
+    theirProfile: Record<string, unknown> | undefined
   ): string[] => {
     const reasons: string[] = [];
 
@@ -234,18 +247,26 @@ export const useUnifiedCompatibility = () => {
     if (personality_score >= 85) reasons.push("Personnalités complémentaires");
     
     if (myProfile && theirProfile) {
-      if (myProfile.location === theirProfile.location) {
+      const myLocation = (myProfile.location as string | null) ?? '';
+      const theirLocation = (theirProfile.location as string | null) ?? '';
+      
+      if (myLocation && myLocation === theirLocation) {
         reasons.push("Proximité géographique");
       }
       
-      const ageDiff = Math.abs((myProfile.age || 25) - (theirProfile.age || 25));
+      const myAge = (myProfile.age as number | null) ?? 25;
+      const theirAge = (theirProfile.age as number | null) ?? 25;
+      const ageDiff = Math.abs(myAge - theirAge);
       if (ageDiff <= 5) {
         reasons.push("Âges compatibles");
       }
 
-      if (myProfile.interests && theirProfile.interests) {
-        const sharedCount = myProfile.interests.filter((interest: string) =>
-          theirProfile.interests.includes(interest)
+      const myInterests = (myProfile.interests as string[] | null) ?? [];
+      const theirInterests = (theirProfile.interests as string[] | null) ?? [];
+      
+      if (myInterests.length > 0 && theirInterests.length > 0) {
+        const sharedCount = myInterests.filter((interest: string) =>
+          theirInterests.includes(interest)
         ).length;
         if (sharedCount >= 2) {
           reasons.push(`${sharedCount} centres d'intérêt partagés`);
@@ -260,8 +281,8 @@ export const useUnifiedCompatibility = () => {
     islamic_score: number,
     cultural_score: number,
     personality_score: number,
-    myProfile: Record<string, unknown>,
-    theirProfile: Record<string, unknown>
+    myProfile: Record<string, unknown> | undefined,
+    theirProfile: Record<string, unknown> | undefined
   ): string[] => {
     const concerns: string[] = [];
 
@@ -270,12 +291,18 @@ export const useUnifiedCompatibility = () => {
     if (personality_score < 40) concerns.push("Personnalités potentiellement incompatibles");
 
     if (myProfile && theirProfile) {
-      const ageDiff = Math.abs((myProfile.age || 25) - (theirProfile.age || 25));
+      const myAge = (myProfile.age as number | null) ?? 25;
+      const theirAge = (theirProfile.age as number | null) ?? 25;
+      const ageDiff = Math.abs(myAge - theirAge);
+      
       if (ageDiff > 10) {
         concerns.push("Écart d'âge important");
       }
 
-      if (myProfile.location !== theirProfile.location) {
+      const myLocation = (myProfile.location as string | null) ?? '';
+      const theirLocation = (theirProfile.location as string | null) ?? '';
+      
+      if (myLocation && theirLocation && myLocation !== theirLocation) {
         concerns.push("Distance géographique");
       }
     }
