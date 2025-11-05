@@ -29,6 +29,7 @@ const Profile = lazy(() => import('@/pages/Profile'));
 const EnhancedProfile = lazy(() => import('@/pages/EnhancedProfile'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
 const Settings = lazy(() => import('@/pages/Settings'));
+const PaymentHistory = lazy(() => import('@/pages/PaymentHistory'));
 
 // Matching & Compatibility
 const AdvancedMatching = lazy(() => import('@/pages/AdvancedMatching'));
@@ -130,6 +131,7 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/moderation-tests', component: ModerationTests },
   { path: '/faq', component: FAQ },
   { path: '/settings', component: Settings },
+  { path: '/payment-history', component: PaymentHistory },
   { path: '/islamic-tools', component: IslamicTools },
   { path: '/family-supervision', component: FamilySupervision },
   { path: '/family-notifications', component: FamilyNotifications },

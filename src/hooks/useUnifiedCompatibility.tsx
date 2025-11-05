@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  calculateIslamicCompatibility as calculateIslamicFuzzy,
+  calculateCulturalCompatibility as calculateCulturalFuzzy,
+  calculateOverallCompatibility
+} from '@/utils/matchingAlgorithm';
+import { logger } from '@/utils/logger';
 
 interface UnifiedCompatibilityResult {
   compatibility_score: number;
@@ -57,7 +63,7 @@ export const useUnifiedCompatibility = () => {
       return totalWeight > 0 ? (matchedWeight / totalWeight) * 100 : 60;
 
     } catch (error) {
-      console.error('Error calculating questionnaire compatibility:', error);
+      logger.error('Error calculating questionnaire compatibility', error);
       return 60;
     }
   };
@@ -157,7 +163,7 @@ export const useUnifiedCompatibility = () => {
       };
 
     } catch (error) {
-      console.error('Error calculating unified compatibility:', error);
+      logger.error('Error calculating unified compatibility', error);
       return {
         compatibility_score: 0,
         islamic_score: 0,
@@ -172,84 +178,45 @@ export const useUnifiedCompatibility = () => {
   const calculateIslamicCompatibility = (myPrefs: any, theirPrefs: any): number => {
     // If both have no data, give a neutral score
     if (!myPrefs && !theirPrefs) return 75;
-    
+
     // If only one has data, give a slightly lower but still reasonable score
     if (!myPrefs || !theirPrefs) return 65;
 
-    let score = 60; // Higher base score for users with Islamic preferences
-
-    // Prayer frequency alignment
-    if (myPrefs.prayer_frequency === theirPrefs.prayer_frequency) {
-      score += 20;
-    } else if (
-      (myPrefs.prayer_frequency === '5_times_daily' && theirPrefs.prayer_frequency === 'sometimes') ||
-      (myPrefs.prayer_frequency === 'sometimes' && theirPrefs.prayer_frequency === '5_times_daily')
-    ) {
-      score += 10;
+    try {
+      // Use enhanced fuzzy matching algorithm
+      const score = calculateIslamicFuzzy(myPrefs, theirPrefs);
+      logger.log('Islamic compatibility calculated (fuzzy)', { score, myPrefs, theirPrefs });
+      return Math.min(100, Math.max(0, Math.round(score * 100)));
+    } catch (error) {
+      logger.error('Error in Islamic compatibility calculation', error);
+      return 65; // Fallback to neutral score
     }
-
-    // Sect compatibility
-    if (myPrefs.sect === theirPrefs.sect) {
-      score += 15;
-    }
-
-    // Halal diet compatibility
-    if (myPrefs.halal_diet === theirPrefs.halal_diet) {
-      score += 10;
-    }
-
-    // Importance of religion alignment
-    if (myPrefs.importance_of_religion === theirPrefs.importance_of_religion) {
-      score += 15;
-    }
-
-    // Smoking compatibility
-    if (myPrefs.smoking === theirPrefs.smoking) {
-      score += 10;
-    } else if (myPrefs.smoking === 'never' && theirPrefs.smoking !== 'never') {
-      score -= 10;
-    }
-
-    return Math.min(100, Math.max(0, score));
   };
 
   const calculateCulturalCompatibility = (myProfile: any, theirProfile: any): number => {
     if (!myProfile || !theirProfile) return 70; // More optimistic for missing data
 
-    let score = 60; // Higher base score
+    try {
+      // Use enhanced fuzzy matching algorithm with location similarity
+      const culturalPrefs = {
+        location: myProfile.location || '',
+        education: myProfile.education || '',
+        interests: myProfile.interests || [],
+      };
 
-    // Location proximity
-    if (myProfile.location === theirProfile.location) {
-      score += 20;
-    } else if (myProfile.location && theirProfile.location) {
-      // Same region/country logic could be added here
-      score += 5;
+      const theirCulturalPrefs = {
+        location: theirProfile.location || '',
+        education: theirProfile.education || '',
+        interests: theirProfile.interests || [],
+      };
+
+      const score = calculateCulturalFuzzy(culturalPrefs, theirCulturalPrefs);
+      logger.log('Cultural compatibility calculated (fuzzy)', { score, culturalPrefs, theirCulturalPrefs });
+      return Math.min(100, Math.max(0, Math.round(score * 100)));
+    } catch (error) {
+      logger.error('Error in cultural compatibility calculation', error);
+      return 70; // Fallback to optimistic score
     }
-
-    // Education level compatibility
-    if (myProfile.education && theirProfile.education) {
-      score += 10;
-    }
-
-    // Age compatibility
-    const ageDiff = Math.abs((myProfile.age || 25) - (theirProfile.age || 25));
-    if (ageDiff <= 3) {
-      score += 15;
-    } else if (ageDiff <= 7) {
-      score += 10;
-    } else if (ageDiff > 10) {
-      score -= 10;
-    }
-
-    // Shared interests
-    if (myProfile.interests && theirProfile.interests) {
-      const sharedInterests = myProfile.interests.filter((interest: string) =>
-        theirProfile.interests.includes(interest)
-      );
-      score += Math.min(20, sharedInterests.length * 5);
-    }
-
-    return Math.min(100, Math.max(0, score));
   };
 
   const generateMatchingReasons = (
