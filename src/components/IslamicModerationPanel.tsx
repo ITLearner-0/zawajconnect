@@ -17,7 +17,7 @@ interface ModerationRule {
   id: string;
   rule_name: string;
   rule_description: string;
-  keywords: any; // Use any for JSON type from Supabase
+  keywords: string[]; // JSON array from Supabase
   severity: 'low' | 'medium' | 'high';
   action: 'warn' | 'block' | 'escalate';
   islamic_value: 'respect' | 'modesty' | 'truthfulness' | 'no_vulgarity' | 'kindness';
@@ -31,7 +31,7 @@ interface ModerationLog {
   content_analyzed: string;
   action_taken: string;
   confidence_score: number;
-  rules_triggered: any; // Use any for JSON type from Supabase
+  rules_triggered: string[]; // JSON array from Supabase
   created_at: string;
   human_reviewed: boolean;
 }
@@ -317,9 +317,9 @@ const IslamicModerationPanel: React.FC = () => {
               
               <div>
                 <label className="text-sm font-medium">Valeur islamique</label>
-                <Select 
-                  value={newRule.islamic_value} 
-                  onValueChange={(value: any) => setNewRule(prev => ({ ...prev, islamic_value: value }))}
+                <Select
+                  value={newRule.islamic_value}
+                  onValueChange={(value: 'respect' | 'modesty' | 'truthfulness' | 'no_vulgarity' | 'kindness') => setNewRule(prev => ({ ...prev, islamic_value: value }))}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -336,9 +336,9 @@ const IslamicModerationPanel: React.FC = () => {
               
               <div>
                 <label className="text-sm font-medium">Sévérité</label>
-                <Select 
-                  value={newRule.severity} 
-                  onValueChange={(value: any) => setNewRule(prev => ({ ...prev, severity: value }))}
+                <Select
+                  value={newRule.severity}
+                  onValueChange={(value: 'low' | 'medium' | 'high') => setNewRule(prev => ({ ...prev, severity: value }))}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -353,9 +353,9 @@ const IslamicModerationPanel: React.FC = () => {
               
               <div className="col-span-2">
                 <label className="text-sm font-medium">Action</label>
-                <Select 
-                  value={newRule.action} 
-                  onValueChange={(value: any) => setNewRule(prev => ({ ...prev, action: value }))}
+                <Select
+                  value={newRule.action}
+                  onValueChange={(value: 'warn' | 'block' | 'escalate') => setNewRule(prev => ({ ...prev, action: value }))}
                 >
                   <SelectTrigger>
                     <SelectValue />

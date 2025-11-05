@@ -5,12 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { 
-  Crown, 
-  Check, 
-  Star, 
-  Infinity, 
-  MessageCircle, 
+import {
+  Crown,
+  Check,
+  Star,
+  Infinity as InfinityIcon,
+  MessageCircle,
   Heart,
   Shield,
   Users,
@@ -37,16 +37,35 @@ const PLAN_IDS = {
   premium_12: 'premium_12_months',
 };
 
+// Braintree types
+interface BraintreeHostedFieldsInstance {
+  tokenize: (options?: { vault?: boolean }) => Promise<{ nonce: string }>;
+  teardown: () => Promise<void>;
+}
+
+interface BraintreeClient {
+  create: (config: { authorization: string }) => Promise<unknown>;
+}
+
+interface BraintreeHostedFields {
+  create: (config: { client: unknown; fields: Record<string, unknown> }) => Promise<BraintreeHostedFieldsInstance>;
+}
+
+interface BraintreeAPI {
+  client: BraintreeClient;
+  hostedFields: BraintreeHostedFields;
+}
+
 declare global {
   interface Window {
-    braintree: any;
+    braintree: BraintreeAPI;
   }
 }
 
 const PremiumSubscription = () => {
   const { user, subscription, checkSubscription } = useAuth();
   const [processingPayment, setProcessingPayment] = useState<string | null>(null);
-  const [braintreeInstance, setBraintreeInstance] = useState<any>(null);
+  const [braintreeInstance, setBraintreeInstance] = useState<BraintreeHostedFieldsInstance | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [clientToken, setClientToken] = useState<string | null>(null);
@@ -227,9 +246,10 @@ const PremiumSubscription = () => {
       toast.dismiss();
       setProcessingPayment(null); // Réinitialiser pour permettre l'interaction avec le modal
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error processing payment:', error);
-      toast.error(error.message || 'Une erreur est survenue');
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
+      toast.error(errorMessage);
       setProcessingPayment(null);
     }
   };
@@ -292,16 +312,16 @@ const PremiumSubscription = () => {
       setBraintreeInstance(null); // Réinitialiser l'instance
       await checkSubscription();
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error in completePurchase:', error);
       toast.dismiss();
-      
+
       // Fermer le modal et réinitialiser pour forcer une nouvelle instance
       setShowPaymentModal(false);
       setBraintreeInstance(null);
-      
+
       // Message d'erreur plus clair
-      const errorMessage = error.message || 'Erreur lors du paiement';
+      const errorMessage = error instanceof Error ? error.message : 'Erreur lors du paiement';
       if (errorMessage.includes('nonce')) {
         toast.error('Erreur de paiement. Veuillez réessayer avec un nouveau moyen de paiement.');
       } else {
@@ -526,7 +546,7 @@ const PremiumSubscription = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="text-center space-y-3">
               <div className="h-12 w-12 bg-emerald/10 rounded-full flex items-center justify-center mx-auto">
-                <Infinity className="h-6 w-6 text-emerald" />
+                <InfinityIcon className="h-6 w-6 text-emerald" />
               </div>
               <h3 className="font-semibold">Accès Illimité</h3>
               <p className="text-sm text-muted-foreground">

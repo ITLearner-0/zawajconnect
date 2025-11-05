@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Compass, 
-  Navigation, 
-  MapPin, 
+import {
+  Compass,
+  Navigation,
+  MapPin,
   RefreshCw,
   Target,
   Smartphone,
@@ -18,6 +18,16 @@ interface LocationData {
   longitude: number;
   city?: string;
   accuracy?: number;
+}
+
+// iOS DeviceOrientationEvent extension
+interface IOSDeviceOrientationEvent extends DeviceOrientationEvent {
+  webkitCompassHeading?: number;
+}
+
+// iOS DeviceOrientationEvent constructor with requestPermission
+interface IOSDeviceOrientationEventConstructor {
+  requestPermission?: () => Promise<'granted' | 'denied'>;
 }
 
 const QiblaDirection = () => {
@@ -41,12 +51,13 @@ const QiblaDirection = () => {
   const checkDeviceOrientation = () => {
     if ('DeviceOrientationEvent' in window) {
       setCompassSupported(true);
-      
+
       // Request permission for iOS devices
-      if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
-        (DeviceOrientationEvent as any).requestPermission()
-          .then((permission: string) => {
-            setPermissionStatus(permission as any);
+      const DeviceOrientationEventIOS = DeviceOrientationEvent as unknown as IOSDeviceOrientationEventConstructor;
+      if (typeof DeviceOrientationEventIOS.requestPermission === 'function') {
+        DeviceOrientationEventIOS.requestPermission()
+          .then((permission) => {
+            setPermissionStatus(permission);
             if (permission === 'granted') {
               startCompass();
             }
@@ -67,7 +78,8 @@ const QiblaDirection = () => {
   const handleOrientation = (event: DeviceOrientationEvent) => {
     if (event.alpha !== null) {
       // iOS uses webkitCompassHeading, Android uses alpha
-      const heading = (event as any).webkitCompassHeading || (360 - event.alpha);
+      const iosEvent = event as IOSDeviceOrientationEvent;
+      const heading = iosEvent.webkitCompassHeading || (360 - event.alpha);
       setDeviceHeading(heading);
     }
   };
@@ -185,9 +197,10 @@ const QiblaDirection = () => {
   };
 
   const requestCompassPermission = async () => {
-    if (typeof (DeviceOrientationEvent as any).requestPermission === 'function') {
+    const DeviceOrientationEventIOS = DeviceOrientationEvent as unknown as IOSDeviceOrientationEventConstructor;
+    if (typeof DeviceOrientationEventIOS.requestPermission === 'function') {
       try {
-        const permission = await (DeviceOrientationEvent as any).requestPermission();
+        const permission = await DeviceOrientationEventIOS.requestPermission();
         setPermissionStatus(permission);
         if (permission === 'granted') {
           startCompass();
