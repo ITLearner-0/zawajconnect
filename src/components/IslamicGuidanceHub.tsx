@@ -65,7 +65,12 @@ const IslamicGuidanceHub = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setArticles(data || []);
+      setArticles((data || []).map(article => ({
+        ...article,
+        author: article.author || 'Auteur Inconnu',
+        featured: article.featured ?? false,
+        published: article.published ?? true
+      })));
     } catch (error) {
       console.error('Error fetching guidance articles:', error);
       setArticles([]);

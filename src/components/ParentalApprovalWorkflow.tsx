@@ -129,7 +129,11 @@ const ParentalApprovalWorkflow = () => {
           })
         );
 
-        setMatches(matchesWithProfiles);
+        setMatches(matchesWithProfiles.map(m => ({
+          ...m,
+          match_score: m.match_score ?? 0,
+          is_mutual: m.is_mutual ?? false
+        })));
       }
     } catch (error) {
       console.error('Error fetching matches:', error);
@@ -149,7 +153,12 @@ const ParentalApprovalWorkflow = () => {
         .eq('invitation_status', 'accepted');
 
       if (error) throw error;
-      setFamilyMembers(data || []);
+      setFamilyMembers((data || []).map(fm => ({
+        ...fm,
+        is_wali: fm.is_wali ?? false,
+        can_communicate: fm.can_communicate ?? false,
+        can_view_profile: fm.can_view_profile ?? false
+      })));
     } catch (error) {
       console.error('Error fetching family members:', error);
     }

@@ -98,8 +98,8 @@ const IslamicCalendarWidget = () => {
     // Simple prayer time calculation (in a real app, you'd use a proper Islamic calendar API)
     const times = prayerNames.map(prayer => {
       // Add some variation based on date and location
-      const baseHour = parseInt(prayer.baseTime.split(':')[0]);
-      const baseMinute = parseInt(prayer.baseTime.split(':')[1]);
+      const baseHour = parseInt(prayer.baseTime.split(':')[0] || '0');
+      const baseMinute = parseInt(prayer.baseTime.split(':')[1] || '0');
       
       // Simulate seasonal changes
       const dayOfYear = Math.floor((currentDate.getTime() - new Date(currentDate.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
@@ -140,7 +140,7 @@ const IslamicCalendarWidget = () => {
     ];
     
     const currentMonth = currentDate.getMonth();
-    const hijriMonth = islamicMonths[currentMonth];
+    const hijriMonth = islamicMonths[currentMonth] || '';
     const hijriDay = currentDate.getDate();
     
     // Check for events on this date
@@ -156,7 +156,7 @@ const IslamicCalendarWidget = () => {
     
     setIslamicDate({
       hijriDay,
-      hijriMonth,
+      hijriMonth: hijriMonth || '',
       hijriYear,
       gregorianDate: format(currentDate, 'dd MMMM yyyy', { locale: fr }),
       islamicEvents: todayEvents
@@ -194,7 +194,7 @@ const IslamicCalendarWidget = () => {
     }
     
     // If no prayer left today, return Fajr of tomorrow
-    return { ...prayerTimes[0], time: `Demain ${prayerTimes[0].time}` };
+    return prayerTimes[0] ? { ...prayerTimes[0], time: `Demain ${prayerTimes[0].time}` } : undefined;
   };
 
   const nextPrayer = getNextPrayer();

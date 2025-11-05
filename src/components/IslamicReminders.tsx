@@ -111,6 +111,8 @@ const IslamicReminders = () => {
   };
 
   const current = reminders[currentReminder];
+  if (!current) return null;
+  
   const category = categoryConfig[current.category];
 
   return (

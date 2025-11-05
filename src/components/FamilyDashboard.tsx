@@ -125,7 +125,12 @@ const FamilyDashboard = () => {
           profiles: {
             ...profile,
             age: profile.age ?? 0,
-            full_name: profile.full_name || 'Utilisateur'
+            full_name: profile.full_name || 'Utilisateur',
+            location: profile.location || '',
+            profession: profile.profession || '',
+            education: profile.education || '',
+            bio: profile.bio || '',
+            avatar_url: profile.avatar_url ?? undefined
           }
         })) || [];
 
@@ -196,7 +201,16 @@ const FamilyDashboard = () => {
 
           return {
             ...match,
-            profiles: profileData || {
+            profiles: profileData ? {
+              ...profileData,
+              age: profileData.age ?? 0,
+              full_name: profileData.full_name || 'Utilisateur',
+              location: profileData.location || '',
+              profession: profileData.profession || '',
+              education: profileData.education || '',
+              bio: profileData.bio || '',
+              avatar_url: profileData.avatar_url ?? undefined
+            } : {
               id: '',
               full_name: 'Utilisateur',
               age: 0,

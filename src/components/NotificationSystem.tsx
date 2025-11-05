@@ -49,7 +49,10 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
         .limit(20);
 
       if (data) {
-        setNotifications(data);
+        setNotifications(data.map(n => ({
+          ...n,
+          is_read: n.is_read ?? false
+        })));
         setUnreadCount(data.filter(n => !n.is_read).length);
       }
     } catch (error) {

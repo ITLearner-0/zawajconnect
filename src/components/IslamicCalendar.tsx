@@ -78,10 +78,10 @@ const IslamicCalendar = () => {
     
     return {
       day: gregorianDay,
-      month: islamicMonth,
+      month: islamicMonth || '',
       monthNumber: monthIndex + 1,
       year: islamicYear,
-      weekDay,
+      weekDay: weekDay || '',
       gregorianDate
     };
   };

@@ -198,6 +198,8 @@ const ModerationTestSuite: React.FC = () => {
 
     for (let i = 0; i < testCases.length; i++) {
       const testCase = testCases[i];
+      if (!testCase) continue;
+      
       setCurrentTest(testCase.name);
       setProgress((i / testCases.length) * 100);
 

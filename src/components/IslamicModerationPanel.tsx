@@ -86,14 +86,17 @@ const IslamicModerationPanel: React.FC = () => {
 
       setRules(rulesData?.map(rule => ({
         ...rule,
-        keywords: Array.isArray(rule.keywords) ? rule.keywords : [],
+        keywords: (Array.isArray(rule.keywords) ? rule.keywords : []).map(k => String(k)),
+        created_by: rule.created_by || undefined,
         severity: rule.severity as 'low' | 'medium' | 'high',
         action: rule.action as 'warn' | 'block' | 'escalate',
         islamic_value: rule.islamic_value as 'respect' | 'modesty' | 'truthfulness' | 'no_vulgarity' | 'kindness'
       })) || []);
       setLogs(logsData?.map(log => ({
         ...log,
-        rules_triggered: Array.isArray(log.rules_triggered) ? log.rules_triggered : []
+        rules_triggered: (Array.isArray(log.rules_triggered) ? log.rules_triggered : []).map(r => String(r)),
+        human_decision: log.human_decision || undefined,
+        human_reviewer_id: log.human_reviewer_id || undefined
       })) || []);
     } catch (error) {
       console.error('Error loading moderation data:', error);

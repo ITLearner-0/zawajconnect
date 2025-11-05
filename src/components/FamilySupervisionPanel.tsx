@@ -113,7 +113,18 @@ const FamilySupervisionPanel = () => {
 
       if (membersError) throw membersError;
 
-      setFamilyMembers(membersData || []);
+      setFamilyMembers((membersData || []).map(m => ({
+        ...m,
+        can_communicate: m.can_communicate ?? false,
+        can_view_profile: m.can_view_profile ?? false,
+        is_wali: m.is_wali ?? false,
+        invitation_status: m.invitation_status ?? undefined,
+        invitation_sent_at: m.invitation_sent_at ?? undefined,
+        invitation_accepted_at: m.invitation_accepted_at ?? undefined,
+        email: m.email ?? undefined,
+        phone: m.phone ?? undefined,
+        invitation_token: m.invitation_token ?? undefined
+      })));
 
       // Load supervision stats
       await loadSupervisionStats();
@@ -203,6 +214,10 @@ const FamilySupervisionPanel = () => {
 
       if (error) throw error;
 
+      if (!data) {
+        throw new Error('Failed to create family member');
+      }
+
       setFamilyMembers(prev => [...prev, data]);
       setNewMember({
         full_name: '',
@@ -217,7 +232,7 @@ const FamilySupervisionPanel = () => {
 
       toast({
         title: "Membre ajouté",
-        description: `${data.full_name} a été ajouté à votre famille`,
+        description: `${data?.full_name || 'Le membre'} a été ajouté à votre famille`,
       });
     } catch (error) {
       console.error('Error adding family member:', error);
@@ -295,7 +310,7 @@ const FamilySupervisionPanel = () => {
         .rpc('create_family_invitation', {
           p_user_id: user.id,
           p_full_name: member.full_name,
-          p_email: member.email,
+          p_email: member.email || '',
           p_relationship: member.relationship,
           p_is_wali: member.is_wali
         });

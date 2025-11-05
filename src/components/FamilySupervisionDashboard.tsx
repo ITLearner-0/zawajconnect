@@ -167,14 +167,14 @@ const FamilySupervisionDashboard = () => {
         participant_id: familyRole!.id,
         participant_type: 'family_member',
         family_member_id: familyRole!.id,
-        user_id: user?.id, // Use the current authenticated user's ID (the wali)
+        user_id: user?.id || '', // Use the current authenticated user's ID (the wali)
         can_send_messages: familyRole!.can_communicate,
         can_read_messages: familyRole!.can_view_profile
       };
       
       const { error } = await supabase
         .from('conversation_participants')
-        .upsert(participantData, {
+        .upsert([participantData], {
           onConflict: 'match_id,participant_id',
           ignoreDuplicates: false
         });

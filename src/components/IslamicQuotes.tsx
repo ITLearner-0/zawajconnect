@@ -49,7 +49,7 @@ const IslamicQuotes = () => {
     // Simulate loading delay
     setTimeout(() => {
       const randomIndex = Math.floor(Math.random() * quotes.length);
-      setCurrentQuote(quotes[randomIndex]);
+      setCurrentQuote(quotes[randomIndex] || null);
       setLoading(false);
     }, 500);
   };

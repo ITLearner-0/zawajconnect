@@ -79,7 +79,8 @@ const FamilyInvitationManager = () => {
         can_communicate: m.can_communicate ?? false,
         can_view_profile: m.can_view_profile ?? false,
         invitation_status: m.invitation_status ?? 'pending',
-        invitation_sent_at: m.invitation_sent_at ?? ''
+        invitation_sent_at: m.invitation_sent_at ?? '',
+        invitation_accepted_at: m.invitation_accepted_at ?? undefined
       }));
       setFamilyMembers(normalizedMembers);
     } catch (error) {

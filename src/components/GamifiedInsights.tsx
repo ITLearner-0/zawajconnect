@@ -178,8 +178,10 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
       // Determine level
       const currentLevel = levels.find(level => 
         points >= level.minPoints && points < level.maxPoints
-      ) || levels[0];
-      setUserLevel(currentLevel.level);
+      );
+      if (currentLevel) {
+        setUserLevel(currentLevel.level);
+      }
     };
 
     initializeGamification();
@@ -195,9 +197,9 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
     }
   };
 
-  const currentLevelInfo = levels.find(level => level.level === userLevel) || levels[0];
+  const currentLevelInfo = levels.find(level => level.level === userLevel);
   const nextLevelInfo = levels.find(level => level.level === userLevel + 1);
-  const levelProgress = nextLevelInfo 
+  const levelProgress = nextLevelInfo && currentLevelInfo
     ? ((totalPoints - currentLevelInfo.minPoints) / (nextLevelInfo.minPoints - currentLevelInfo.minPoints)) * 100
     : 100;
 
@@ -225,8 +227,8 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
-              {currentLevelInfo.icon}
-              <span>Niveau {userLevel}: {currentLevelInfo.title}</span>
+              {currentLevelInfo?.icon}
+              <span>Niveau {userLevel}: {currentLevelInfo?.title}</span>
             </CardTitle>
             <Badge variant="secondary" className="animate-pulse-gentle">
               <AnimatedCounter target={totalPoints} suffix=" points" />
@@ -362,7 +364,7 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
               Niveau supérieur ! 🎉
             </h2>
             <p className="text-emerald-light mb-4">
-              Vous avez atteint le niveau {userLevel}: {currentLevelInfo.title}
+              Vous avez atteint le niveau {userLevel}: {currentLevelInfo?.title}
             </p>
             <Button 
               variant="secondary"

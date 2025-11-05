@@ -127,6 +127,8 @@ const MatchApprovalSystem = () => {
       // Combine matches with their reviews
       const matchesWithReviews = matchesData?.map(match => ({
         ...match,
+        match_score: match.match_score ?? 0,
+        is_mutual: match.is_mutual ?? false,
         user1: { full_name: 'User 1', age: 25, location: 'Location', profession: 'Profession', education: 'Education', bio: 'Bio', avatar_url: '' },
         user2: { full_name: 'User 2', age: 25, location: 'Location', profession: 'Profession', education: 'Education', bio: 'Bio', avatar_url: '' },
         pending_reviews: reviewsData?.filter(r => r.match_id === match.id) || []
