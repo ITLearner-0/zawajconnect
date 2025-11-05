@@ -54,7 +54,7 @@ interface FamilyMeeting {
   // Additional fields from joins
   supervised_user_name?: string;
   candidate_name?: string;
-  match_details?: any;
+  match_details?: unknown;
 }
 
 interface FamilyMeetingSchedulerProps {

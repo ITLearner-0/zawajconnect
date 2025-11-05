@@ -499,7 +499,7 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
               <div className="space-y-4">
                 <h4 className="font-semibold">Ajouter une note familiale</h4>
                 <div className="flex gap-2">
-                  <Select value={noteType} onValueChange={(value: any) => setNoteType(value)}>
+                  <Select value={noteType} onValueChange={(value: unknown) => setNoteType(value)}>
                     <SelectTrigger className="w-40">
                       <SelectValue />
                     </SelectTrigger>

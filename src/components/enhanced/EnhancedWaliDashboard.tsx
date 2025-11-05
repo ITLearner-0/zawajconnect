@@ -123,7 +123,7 @@ const EnhancedWaliDashboard: React.FC = () => {
   }, []);
 
   const setupRealtimeSubscriptions = () => {
-    const channels: any[] = [];
+    const channels: unknown[] = [];
     
     // Subscribe to family notifications
     const notificationChannel = supabase
@@ -332,7 +332,7 @@ const EnhancedWaliDashboard: React.FC = () => {
     }
   };
 
-  const loadNotifications = async (familyMembers: any[]) => {
+  const loadNotifications = async (familyMembers: unknown[]) => {
     const { data: notificationData } = await supabase
       .from('family_notifications')
       .select('*')

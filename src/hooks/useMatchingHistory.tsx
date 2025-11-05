@@ -21,8 +21,8 @@ export interface MatchProfile {
 
 interface MatchingHistoryRecord {
   id: string;
-  matched_profiles: any; // JSON type from Supabase
-  preferences_used: any; // JSON type from Supabase
+  matched_profiles: unknown; // JSON type from Supabase
+  preferences_used: unknown; // JSON type from Supabase
   total_matches: number;
   avg_compatibility_score: number;
   search_timestamp: string;
@@ -33,7 +33,7 @@ interface MatchingHistoryRecord {
 export interface MatchingHistoryEntry {
   id: string;
   matched_profiles: MatchProfile[];
-  preferences_used: any;
+  preferences_used: unknown;
   total_matches: number;
   avg_compatibility_score: number;
   search_timestamp: string;
@@ -93,7 +93,7 @@ export const useMatchingHistory = () => {
   // Save new search to history
   const saveSearchToHistory = async (
     matches: MatchProfile[],
-    preferences: any
+    preferences: Record<string, unknown>
   ) => {
     if (!user || matches.length === 0) return;
 

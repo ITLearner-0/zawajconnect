@@ -101,7 +101,7 @@ export const UpgradeToPremiumModal = ({ open, onClose, reason = 'daily_limit' }:
   );
 };
 
-const PricingCard = ({ duration, pricePerMonth, badge, popular, discount }: any) => (
+const PricingCard = ({ duration, pricePerMonth, badge, popular, discount }: Record<string, unknown>) => (
   <Card className={`p-4 ${popular ? 'border-2 border-emerald shadow-lg' : ''}`}>
     <div className="text-center space-y-2">
       <div className="text-xs font-medium text-emerald">{badge}</div>

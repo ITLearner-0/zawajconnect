@@ -175,7 +175,7 @@ export const useUnifiedCompatibility = () => {
     }
   };
 
-  const calculateIslamicCompatibility = (myPrefs: any, theirPrefs: any): number => {
+  const calculateIslamicCompatibility = (myPrefs: Record<string, unknown>, theirPrefs: Record<string, unknown>): number => {
     // If both have no data, give a neutral score
     if (!myPrefs && !theirPrefs) return 75;
 
@@ -193,7 +193,7 @@ export const useUnifiedCompatibility = () => {
     }
   };
 
-  const calculateCulturalCompatibility = (myProfile: any, theirProfile: any): number => {
+  const calculateCulturalCompatibility = (myProfile: Record<string, unknown>, theirProfile: Record<string, unknown>): number => {
     if (!myProfile || !theirProfile) return 70; // More optimistic for missing data
 
     try {
@@ -223,8 +223,8 @@ export const useUnifiedCompatibility = () => {
     islamic_score: number,
     cultural_score: number,
     personality_score: number,
-    myProfile: any,
-    theirProfile: any
+    myProfile: Record<string, unknown>,
+    theirProfile: Record<string, unknown>
   ): string[] => {
     const reasons: string[] = [];
 
@@ -259,8 +259,8 @@ export const useUnifiedCompatibility = () => {
     islamic_score: number,
     cultural_score: number,
     personality_score: number,
-    myProfile: any,
-    theirProfile: any
+    myProfile: Record<string, unknown>,
+    theirProfile: Record<string, unknown>
   ): string[] => {
     const concerns: string[] = [];
 

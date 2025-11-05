@@ -36,7 +36,7 @@ const NavigationSuggestions = () => {
     ].map(path => getRouteByPath(path)).filter(Boolean);
 
     // Get contextual suggestions based on current route
-    let contextualRoutes: any[] = [];
+    let contextualRoutes: unknown[] = [];
     
     if (currentRoute?.category === 'main') {
       contextualRoutes = allRoutes.filter(route => 

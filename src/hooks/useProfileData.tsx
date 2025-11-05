@@ -4,11 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 export interface ProfileData {
-  profile: any;
-  islamicPreferences: any;
-  privacySettings: any;
-  userVerifications: any;
-  matchingPreferences: any;
+  profile: unknown;
+  islamicPreferences: unknown;
+  privacySettings: unknown;
+  userVerifications: unknown;
+  matchingPreferences: unknown;
 }
 
 interface UseProfileDataReturn {

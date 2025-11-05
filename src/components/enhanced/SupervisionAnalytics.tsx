@@ -174,7 +174,7 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
     }
   };
 
-  const processMessageActivity = (messages: any[], moderationLogs: any[]) => {
+  const processMessageActivity = (messages: unknown[], moderationLogs: unknown[]) => {
     const activityMap = new Map<string, { count: number; flagged: number }>();
     
     // Process messages
@@ -219,7 +219,7 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
     }));
   };
 
-  const calculateSupervisionMetrics = (messages: any[], moderationLogs: any[], matches: any[]) => {
+  const calculateSupervisionMetrics = (messages: unknown[], moderationLogs: unknown[], matches: unknown[]) => {
     const totalMessages = messages.length;
     const flaggedMessages = moderationLogs.filter(log => log.action_taken !== 'approved').length;
     
@@ -252,7 +252,7 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
     };
   };
 
-  const processUserActivity = async (users: SupervisedUser[], messages: any[]) => {
+  const processUserActivity = async (users: SupervisedUser[], messages: unknown[]) => {
     const userActivityPromises = users.map(async (user) => {
       // Count messages for this user
       const userMessages = messages.filter(m => 
@@ -272,9 +272,9 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
   };
 
   const processWeeklyTrends = (
-    messages: any[], 
+    messages: unknown[], 
     notifications: FamilyNotification[], 
-    matches: any[], 
+    matches: unknown[], 
     startDate: Date
   ) => {
     const weeks = [];

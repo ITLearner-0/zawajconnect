@@ -39,7 +39,7 @@ export const useSmartRecommendations = () => {
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
 
-  const calculateIslamicAlignment = (myPrefs: any, theirPrefs: any): number => {
+  const calculateIslamicAlignment = (myPrefs: Record<string, unknown>, theirPrefs: Record<string, unknown>): number => {
     if (!myPrefs || !theirPrefs) return 50;
     
     let score = 0;
@@ -78,7 +78,7 @@ export const useSmartRecommendations = () => {
     return Math.floor(score / factors);
   };
 
-  const calculatePersonalityMatch = (myProfile: any, theirProfile: any): number => {
+  const calculatePersonalityMatch = (myProfile: Record<string, unknown>, theirProfile: Record<string, unknown>): number => {
     let score = 60; // Base score
     
     // Age compatibility
@@ -112,8 +112,8 @@ export const useSmartRecommendations = () => {
     islamicAlignment: number, 
     personalityMatch: number, 
     sharedInterests: string[],
-    myProfile: any,
-    theirProfile: any
+    myProfile: Record<string, unknown>,
+    theirProfile: Record<string, unknown>
   ): string[] => {
     const reasons = [];
     

@@ -208,7 +208,7 @@ export default function FamilyDataProtection() {
               </div>
               <Select
                 value={contactSettings.contact_visibility}
-                onValueChange={(value: any) => updateContactVisibility(value)}
+                onValueChange={(value: unknown) => updateContactVisibility(value)}
               >
                 <SelectTrigger>
                   <SelectValue />

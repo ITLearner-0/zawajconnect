@@ -65,7 +65,7 @@ export const useCompatibilityInsights = (userId?: string) => {
     }
   };
 
-  const analyzeResponses = (responses: any[]): CompatibilityInsights => {
+  const analyzeResponses = (responses: unknown[]): CompatibilityInsights => {
     // Convert responses to a map for easier access
     const responseMap = responses.reduce((map, response) => {
       map[response.question_key] = response.response_value;

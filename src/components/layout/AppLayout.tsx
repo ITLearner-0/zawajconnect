@@ -50,7 +50,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   // const { isSessionNearExpiry } = useEnhancedSessionMonitor();
   // const { events } = useSecurityEvents();
   const isSessionNearExpiry = false;
-  const events: any[] = [];
+  const events: unknown[] = [];
 
   // Enable keyboard shortcuts and analytics
   useKeyboardShortcuts();

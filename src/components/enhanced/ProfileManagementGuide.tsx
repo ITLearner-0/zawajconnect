@@ -22,7 +22,7 @@ interface GuideStep {
   id: string;
   title: string;
   description: string;
-  icon: any;
+  icon: unknown;
   route: string;
   completed: boolean;
   importance: 'high' | 'medium' | 'low';

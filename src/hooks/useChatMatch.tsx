@@ -87,7 +87,7 @@ export const useChatMatch = (matchId: string | null) => {
     }
   }, [user, matchId, toast]);
 
-  const checkCommunicationPermissions = useCallback(async (matchData: any) => {
+  const checkCommunicationPermissions = useCallback(async (matchData: Record<string, unknown>) => {
     if (!user) return;
     
     try {

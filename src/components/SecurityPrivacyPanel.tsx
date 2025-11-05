@@ -25,7 +25,7 @@ import {
 interface SecuritySettings {
   id: string;
   setting_key: string;
-  setting_value: any;
+  setting_value: unknown;
   description: string;
   category: string;
 }
