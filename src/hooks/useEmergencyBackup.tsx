@@ -4,24 +4,24 @@ import { useAuth } from '@/hooks/useAuth';
 interface BackupData {
   timestamp: number;
   sessionId: string;
-  data: any;
+  data: unknown;
 }
 
 export const useEmergencyBackup = () => {
   const { user } = useAuth();
-  
+
   // Generate a unique session ID for this onboarding session
   const getSessionId = useCallback(() => {
     const existing = localStorage.getItem('onboarding_session_id');
     if (existing) return existing;
-    
+
     const newSessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     localStorage.setItem('onboarding_session_id', newSessionId);
     return newSessionId;
   }, []);
 
   // Save emergency backup that survives auth issues
-  const saveEmergencyBackup = useCallback((key: string, data: any) => {
+  const saveEmergencyBackup = useCallback((key: string, data: unknown) => {
     try {
       const sessionId = getSessionId();
       const backupData: BackupData = {
@@ -47,7 +47,7 @@ export const useEmergencyBackup = () => {
   }, [user, getSessionId]);
 
   // Restore emergency backup - OPTIMISÉ pour ne restaurer qu'une seule fois
-  const restoreEmergencyBackup = useCallback((key: string): any => {
+  const restoreEmergencyBackup = useCallback((key: string): unknown => {
     try {
       // Vérifier si déjà restauré dans cette session pour éviter les boucles
       const restoredKey = `restored_${key}`;

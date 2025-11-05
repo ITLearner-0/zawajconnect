@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 interface UseFormAutoSaveProps {
-  data: any;
+  data: unknown;
   key: string;
   interval?: number;
 }

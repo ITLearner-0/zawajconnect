@@ -102,7 +102,7 @@ export const useProfileSave = () => {
       }
 
     // Validate Islamic preferences before saving - matches database constraints exactly
-    const validateIslamicPrefs = (prefs: any) => {
+    const validateIslamicPrefs = (prefs: Partial<IslamicPreferences>): Partial<IslamicPreferences> => {
       // These values MUST match the CHECK constraints in the database
       const validSects = ['sunni', 'shia', 'other', 'prefer_not_to_say'];
       const validPrayerFreqs = ['5_times_daily', 'often', 'sometimes', 'fridays_only', 'occasionally', 'rarely', 'never'];
@@ -186,15 +186,18 @@ export const useProfileSave = () => {
 
       return { success: true };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Save profile error:', error);
-      
+
       let errorMessage = 'Une erreur est survenue lors de la sauvegarde de votre profil.';
-      
-      if (error.code === '23505') {
-        errorMessage = 'Ce profil existe déjà. Mise à jour en cours...';
-      } else if (error.message?.includes('network')) {
-        errorMessage = 'Erreur de connexion. Vérifiez votre connexion internet.';
+
+      if (typeof error === 'object' && error !== null) {
+        const err = error as { code?: string; message?: string };
+        if (err.code === '23505') {
+          errorMessage = 'Ce profil existe déjà. Mise à jour en cours...';
+        } else if (err.message?.includes('network')) {
+          errorMessage = 'Erreur de connexion. Vérifiez votre connexion internet.';
+        }
       }
 
       toast({
@@ -238,9 +241,10 @@ export const useProfileSave = () => {
 
       return { success: true, url: data.publicUrl };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Avatar upload error:', error);
-      return { success: false, error: error.message };
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed';
+      return { success: false, error: errorMessage };
     }
   };
 
