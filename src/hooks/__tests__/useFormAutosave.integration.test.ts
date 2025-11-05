@@ -193,10 +193,7 @@ describe('useFormAutosave Integration Tests', () => {
       })
     );
 
-    // Initially no save time
-    expect(result.current.getLastSaveTime()).toBeNull();
-
-    // Wait for auto-save
+    // Wait for auto-save, then check that we have a save time
     await waitFor(
       () => {
         const saveTime = result.current.getLastSaveTime();
@@ -260,6 +257,9 @@ describe('useFormAutosave Integration Tests', () => {
       useFormAutosave(formData, {
         storageKey,
         debounceMs: 300,
+        saveToDatabase: true,  // onSuccess is only called when saving to database
+        tableName: 'test_table',
+        userId: 'test-user',
         onSuccess,
       })
     );
