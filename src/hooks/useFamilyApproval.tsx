@@ -91,23 +91,27 @@ export const useFamilyApproval = () => {
       if (error) throw error;
 
       setNotifications((data || []).map(item => ({
-        id: item.id,
-        match_id: item.match_id,
-        notification_type: item.notification_type,
-        content: item.content,
-        severity: item.severity,
-        action_required: item.action_required,
-        is_read: item.is_read,
-        created_at: item.created_at,
-        family_member_id: item.family_member_id,
+        id: item.id ?? '',
+        match_id: item.match_id ?? '',
+        notification_type: item.notification_type ?? '',
+        content: item.content ?? '',
+        severity: item.severity ?? 'medium',
+        action_required: item.action_required ?? false,
+        is_read: item.is_read ?? false,
+        created_at: item.created_at ?? new Date().toISOString(),
+        family_member_id: item.family_member_id ?? '',
         match: item.match ? {
-          id: item.match.id,
-          user1_id: item.match.user1_id,
-          user2_id: item.match.user2_id,
+          id: item.match.id ?? '',
+          user1_id: item.match.user1_id ?? '',
+          user2_id: item.match.user2_id ?? '',
           match_score: item.match.match_score ?? 0,
-          user1_profile: Array.isArray(item.match.user1_profile) ? item.match.user1_profile[0] : item.match.user1_profile,
-          user2_profile: Array.isArray(item.match.user2_profile) ? item.match.user2_profile[0] : item.match.user2_profile
-        } : null
+          user1_profile: Array.isArray(item.match.user1_profile) 
+            ? item.match.user1_profile[0] ?? undefined
+            : item.match.user1_profile ?? undefined,
+          user2_profile: Array.isArray(item.match.user2_profile) 
+            ? item.match.user2_profile[0] ?? undefined
+            : item.match.user2_profile ?? undefined
+        } : undefined
       })));
     } catch (error) {
       console.error('Error loading notifications:', error);

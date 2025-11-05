@@ -1,9 +1,7 @@
-// @ts-nocheck
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from './use-toast';
-import { normalizeMatch } from '@/types/supabase';
 
 export interface ChatMatch {
   id: string;
@@ -16,7 +14,7 @@ export interface ChatMatch {
   other_user: {
     id: string;
     full_name: string;
-    avatar_url: string | null;
+    avatar_url: string | undefined;
   };
 }
 
@@ -63,11 +61,17 @@ export const useChatMatch = (matchId: string | null) => {
       if (profileError) throw profileError;
 
       const chatMatch: ChatMatch = {
-        ...normalizeMatch(matchData),
+        id: matchData.id,
+        user1_id: matchData.user1_id,
+        user2_id: matchData.user2_id,
+        match_score: matchData.match_score ?? 0,
+        is_mutual: matchData.is_mutual ?? false,
+        can_communicate: matchData.can_communicate ?? false,
+        family_supervision_required: matchData.family_supervision_required ?? false,
         other_user: {
           id: otherUserId,
-          full_name: otherProfile?.full_name || 'Utilisateur inconnu',
-          avatar_url: otherProfile?.avatar_url || undefined
+          full_name: otherProfile?.full_name ?? 'Utilisateur inconnu',
+          avatar_url: otherProfile?.avatar_url ?? undefined
         }
       };
 
