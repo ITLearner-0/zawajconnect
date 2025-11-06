@@ -43,7 +43,7 @@ const CompatibilityScoreChart: React.FC<CompatibilityScoreChartProps> = ({
     return 'bg-red-500';
   };
 
-  const getTrendIcon = (score: number) => {
+  const getTrendIcon = (score: number): React.ReactNode => {
     if (score >= 70) return <TrendingUp className="h-3 w-3" />;
     if (score >= 55) return <Minus className="h-3 w-3" />;
     return <TrendingDown className="h-3 w-3" />;
