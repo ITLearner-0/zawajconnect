@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/toaster";
 import ProtectedRouteWrapper from "@/components/routing/ProtectedRouteWrapper";
 import { FreemiumBanner } from "@/components/FreemiumBanner";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { AchievementNotificationProvider } from "@/components/AchievementNotificationProvider";
 
 // Loading fallback component for lazy-loaded routes
 const RouteLoadingFallback = () => (
@@ -39,7 +40,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <UserDataProvider>
-          <BrowserRouter
+          <AchievementNotificationProvider>
+            <BrowserRouter
             future={{
               v7_startTransition: true,
               v7_relativeSplatPath: true
@@ -113,9 +115,10 @@ function App() {
             <CookieConsentBanner />
             <Toaster />
           </BrowserRouter>
-        </UserDataProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+        </AchievementNotificationProvider>
+      </UserDataProvider>
+    </AuthProvider>
+  </QueryClientProvider>
   );
 }
 

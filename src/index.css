@@ -342,4 +342,17 @@ All colors MUST be HSL.
     0%, 100% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
   }
+
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite;
+  }
 }

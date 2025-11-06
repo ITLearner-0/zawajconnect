@@ -26,6 +26,7 @@ import SecurityAlertPanel from '@/components/security/SecurityAlertPanel';
 import FamilyRateLimitIndicator from '@/components/security/FamilyRateLimitIndicator';
 import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
 import { TestUserSelector } from '@/components/TestUserSelector';
+import { AchievementTestButton } from '@/components/AchievementTestButton';
 import { Code } from 'lucide-react';
 
 const Settings = () => {
@@ -227,6 +228,7 @@ const Settings = () => {
             {isDevMode && (
               <TabsContent value="dev-tools" className="space-y-6">
                 <TestUserSelector />
+                <AchievementTestButton />
               </TabsContent>
             )}
           </div>
