@@ -6,7 +6,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight, Lock, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import VerificationBadge from '@/components/VerificationBadge';
 import AdvancedSearch from '@/components/AdvancedSearch';
@@ -17,6 +19,7 @@ import CompatibilityScore from '@/components/CompatibilityScore';
 import { DailyLimitIndicator } from '@/components/DailyLimitIndicator';
 import { UpgradeToPremiumModal } from '@/components/UpgradeToPremiumModal';
 import { ActiveConversationBanner } from '@/components/ActiveConversationBanner';
+import ProfileComparator from '@/components/ProfileComparator';
 
 interface MatchingProfile {
   id?: string;
@@ -69,6 +72,9 @@ const Browse = () => {
   const [dailyLimitReached, setDailyLimitReached] = useState(false);
   const [isInActiveConversation, setIsInActiveConversation] = useState(false);
   const [activeMatchId, setActiveMatchId] = useState<string | undefined>(undefined);
+  const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
+  const [showComparator, setShowComparator] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -459,6 +465,34 @@ const Browse = () => {
     nextProfile();
   };
 
+  const toggleProfileSelection = (profileId: string) => {
+    setSelectedProfiles(prev => {
+      if (prev.includes(profileId)) {
+        return prev.filter(id => id !== profileId);
+      } else if (prev.length < 3) {
+        return [...prev, profileId];
+      } else {
+        toast({
+          title: "Limite atteinte",
+          description: "Vous ne pouvez comparer que 3 profils maximum",
+          variant: "destructive"
+        });
+        return prev;
+      }
+    });
+  };
+
+  const handleCompare = () => {
+    if (selectedProfiles.length >= 2) {
+      setShowComparator(true);
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedProfiles([]);
+    setSelectionMode(false);
+  };
+
   const currentProfile = filteredProfiles[currentIndex];
 
   if (loading) {
@@ -519,6 +553,35 @@ const Browse = () => {
       <div className="container mx-auto max-w-6xl">
         <DailyLimitIndicator />
         {isInActiveConversation && <ActiveConversationBanner matchId={activeMatchId} />}
+        
+        {/* Selection Mode Toggle */}
+        <div className="mb-4 flex items-center justify-between">
+          <Button
+            variant={selectionMode ? "default" : "outline"}
+            onClick={() => setSelectionMode(!selectionMode)}
+            className={selectionMode ? "bg-emerald text-white" : "border-emerald text-emerald hover:bg-emerald hover:text-white"}
+          >
+            <Users className="h-4 w-4 mr-2" />
+            {selectionMode ? "Mode sélection activé" : "Comparer des profils"}
+          </Button>
+          
+          {selectionMode && selectedProfiles.length > 0 && (
+            <div className="flex items-center gap-2">
+              <Badge variant="secondary" className="text-sm">
+                {selectedProfiles.length} profil{selectedProfiles.length > 1 ? 's' : ''} sélectionné{selectedProfiles.length > 1 ? 's' : ''}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleClearSelection}
+                className="text-muted-foreground"
+              >
+                Annuler
+              </Button>
+            </div>
+          )}
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Advanced Search - Toggle on mobile */}
           <div className="lg:hidden">
@@ -540,6 +603,18 @@ const Browse = () => {
           <div className="lg:col-span-2">
             <Card className="overflow-hidden shadow-lg animate-scale-in card-hover">
               <div className="relative">
+                {/* Selection Checkbox */}
+                {selectionMode && (
+                  <div className="absolute top-4 right-20 z-10">
+                    <div className="bg-white rounded-lg p-2 shadow-lg border-2 border-emerald/30">
+                      <Checkbox
+                        checked={selectedProfiles.includes(currentProfile.user_id)}
+                        onCheckedChange={() => toggleProfileSelection(currentProfile.user_id)}
+                        className="h-6 w-6"
+                      />
+                    </div>
+                  </div>
+                )}
                 {/* Profile Image */}
                 <div className="h-80 md:h-96 bg-gradient-to-br from-emerald/10 to-gold/10 flex items-center justify-center overflow-hidden">
                   {currentProfile.avatar_url ? (
@@ -737,9 +812,31 @@ const Browse = () => {
           onClose={() => setShowUpgradeModal(false)}
           reason="daily_limit"
         />
+
+        {/* Comparator Dialog */}
+        <Dialog open={showComparator} onOpenChange={setShowComparator}>
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Comparaison des profils sélectionnés</DialogTitle>
+            </DialogHeader>
+            <ProfileComparator profileIds={selectedProfiles} />
+          </DialogContent>
+        </Dialog>
       </div>
 
-      {/* Report Modal - Remove if not needed */}
+      {/* Floating Compare Button */}
+      {selectionMode && selectedProfiles.length >= 2 && (
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
+          <Button
+            size="lg"
+            onClick={handleCompare}
+            className="bg-gradient-to-r from-emerald to-gold text-white shadow-2xl hover:shadow-emerald/50 animate-pulse-gentle px-8 py-6 text-lg"
+          >
+            <Users className="h-5 w-5 mr-2" />
+            Comparer les {selectedProfiles.length} profils sélectionnés
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
