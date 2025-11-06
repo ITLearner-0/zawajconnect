@@ -21,9 +21,11 @@ import PhotoUploadStep from '@/components/onboarding/PhotoUploadStep';
 import IslamicPreferencesStep from '@/components/onboarding/IslamicPreferencesStep';
 import MobileStepNavigation from '@/components/onboarding/MobileStepNavigation';
 import { SessionResumptionModal } from '@/components/onboarding/SessionResumptionModal';
+import { KeyboardShortcutsPanel } from '@/components/onboarding/KeyboardShortcutsPanel';
 import { useOnboardingValidation } from '@/hooks/useOnboardingValidation';
 import { useOnboardingPersistence } from '@/hooks/useOnboardingPersistence';
 import { useOnboardingAnalytics } from '@/hooks/useOnboardingAnalytics';
+import { useOnboardingKeyboardNavigation } from '@/hooks/useOnboardingKeyboardNavigation';
 import { useProfileSave } from '@/hooks/useProfileSave';
 import { SaveStatusIndicator } from '@/components/SaveStatusIndicator';
 import { 
@@ -37,7 +39,8 @@ import {
   Sparkles,
   Star,
   Target,
-  Settings
+  Settings,
+  Keyboard
 } from 'lucide-react';
 
 interface ProfileData {
@@ -482,6 +485,16 @@ const Onboarding = () => {
 
   const isStepValid = () => validation.isStepValid(currentStep);
 
+  // Keyboard navigation - after all handler functions are defined
+  const keyboardNav = useOnboardingKeyboardNavigation({
+    onNextStep: nextStep,
+    onPrevStep: prevStep,
+    canGoNext: isStepValid(),
+    canGoPrev: currentStep > 1,
+    currentStep,
+    totalSteps,
+  });
+
   const handleStepClick = (step: number) => {
     // Allow navigation to previous steps or current step
     if (step <= currentStep) {
@@ -728,6 +741,14 @@ const Onboarding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 islamic-pattern pb-24 md:pb-8">
+      {/* Keyboard Shortcuts Panel */}
+      <KeyboardShortcutsPanel
+        show={keyboardNav.showHelp}
+        onClose={keyboardNav.closeHelp}
+        currentStep={currentStep}
+        totalSteps={totalSteps}
+      />
+
       {/* Session Resumption Modal */}
       {savedSessionData && (
         <SessionResumptionModal
@@ -751,6 +772,15 @@ const Onboarding = () => {
             <p className="text-muted-foreground">
               Quelques informations pour trouver votre âme sœur
             </p>
+            
+            {/* Keyboard shortcut hint */}
+            <button
+              onClick={keyboardNav.toggleHelp}
+              className="inline-flex items-center gap-2 mt-3 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors"
+            >
+              <Keyboard className="h-3 w-3" />
+              <span>Appuyez sur <kbd className="px-1.5 py-0.5 bg-background border border-border rounded text-xs font-mono">?</kbd> pour les raccourcis</span>
+            </button>
           </div>
 
           {/* Step Indicator */}
