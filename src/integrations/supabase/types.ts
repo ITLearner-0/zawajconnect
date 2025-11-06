@@ -1246,6 +1246,42 @@ export type Database = {
           },
         ]
       }
+      onboarding_analytics: {
+        Row: {
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          step_name: string | null
+          step_number: number | null
+          time_spent_seconds: number | null
+          user_id: string
+          validation_errors: Json | null
+        }
+        Insert: {
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          step_name?: string | null
+          step_number?: number | null
+          time_spent_seconds?: number | null
+          user_id: string
+          validation_errors?: Json | null
+        }
+        Update: {
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          step_name?: string | null
+          step_number?: number | null
+          time_spent_seconds?: number | null
+          user_id?: string
+          validation_errors?: Json | null
+        }
+        Relationships: []
+      }
       privacy_settings: {
         Row: {
           allow_family_involvement: boolean | null
@@ -2135,7 +2171,20 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      onboarding_analytics_summary: {
+        Row: {
+          abandonment_count: number | null
+          abandonment_rate: number | null
+          avg_time_spent: number | null
+          last_event_at: string | null
+          step_name: string | null
+          step_number: number | null
+          total_visits: number | null
+          unique_users: number | null
+          validation_error_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_family_invitation: {
@@ -2241,6 +2290,17 @@ export type Database = {
           relationship: string
         }[]
       }
+      get_onboarding_funnel: {
+        Args: { days_back?: number }
+        Returns: {
+          avg_time_seconds: number
+          completion_rate: number
+          step_name: string
+          step_number: number
+          users_completed: number
+          users_started: number
+        }[]
+      }
       get_user_role: {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
@@ -2263,6 +2323,14 @@ export type Database = {
           email_verified: boolean
           id_verified: boolean
           verification_score: number
+        }[]
+      }
+      get_validation_error_stats: {
+        Args: { days_back?: number }
+        Returns: {
+          error_count: number
+          error_percentage: number
+          field_name: string
         }[]
       }
       has_family_relationship_security_definer: {

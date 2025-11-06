@@ -23,6 +23,7 @@ import MobileStepNavigation from '@/components/onboarding/MobileStepNavigation';
 import { SessionResumptionModal } from '@/components/onboarding/SessionResumptionModal';
 import { useOnboardingValidation } from '@/hooks/useOnboardingValidation';
 import { useOnboardingPersistence } from '@/hooks/useOnboardingPersistence';
+import { useOnboardingAnalytics } from '@/hooks/useOnboardingAnalytics';
 import { useProfileSave } from '@/hooks/useProfileSave';
 import { SaveStatusIndicator } from '@/components/SaveStatusIndicator';
 import { 
@@ -123,6 +124,9 @@ const Onboarding = () => {
     islamicPrefs,
     currentStep
   });
+
+  // Analytics tracking
+  const analytics = useOnboardingAnalytics();
 
   // Profile save hook
   const { saveProfile: saveToDatabase, uploadAvatar, saving } = useProfileSave();
@@ -231,6 +235,8 @@ const Onboarding = () => {
 
   const startOnboarding = () => {
     setShowWelcome(false);
+    // Track onboarding start
+    analytics.trackStepStart(1);
   };
 
   const handleContinueSession = () => {
@@ -273,13 +279,24 @@ const Onboarding = () => {
 
   const nextStep = () => {
     if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
+      // Track step completion
+      analytics.trackStepComplete(currentStep);
+      
+      // Move to next step and track start
+      const nextStepNumber = currentStep + 1;
+      setCurrentStep(nextStepNumber);
+      analytics.trackStepStart(nextStepNumber);
     }
   };
 
   const prevStep = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      // Track step abandon when going back
+      analytics.trackStepAbandon(currentStep, 'navigated_back');
+      
+      const prevStepNumber = currentStep - 1;
+      setCurrentStep(prevStepNumber);
+      analytics.trackStepStart(prevStepNumber);
     }
   };
 
@@ -424,6 +441,9 @@ const Onboarding = () => {
       const result = await saveToDatabase(profileData, islamicPrefs);
       
       if (result.success) {
+        // Track onboarding completion
+        analytics.trackOnboardingComplete();
+        
         // Clear all saved data on successful completion
         persistence.clearAll();
         navigate('/enhanced-profile');
