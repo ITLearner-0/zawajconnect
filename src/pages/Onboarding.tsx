@@ -20,6 +20,7 @@ import StepValidation from '@/components/onboarding/StepValidation';
 import PhotoUploadStep from '@/components/onboarding/PhotoUploadStep';
 import IslamicPreferencesStep from '@/components/onboarding/IslamicPreferencesStep';
 import MobileStepNavigation from '@/components/onboarding/MobileStepNavigation';
+import { SessionResumptionModal } from '@/components/onboarding/SessionResumptionModal';
 import { useOnboardingValidation } from '@/hooks/useOnboardingValidation';
 import { useOnboardingPersistence } from '@/hooks/useOnboardingPersistence';
 import { useProfileSave } from '@/hooks/useProfileSave';
@@ -70,8 +71,14 @@ const Onboarding = () => {
   const { toast } = useToast();
   
   const [showWelcome, setShowWelcome] = useState(true);
+  const [showResumptionModal, setShowResumptionModal] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setSaving] = useState(false);
+  const [savedSessionData, setSavedSessionData] = useState<{
+    step: number;
+    progress: number;
+    lastSaveTime?: Date;
+  } | null>(null);
 
   // Profile data states
   const [profileData, setProfileData] = useState<ProfileData>({
@@ -181,25 +188,33 @@ const Onboarding = () => {
       // Use intelligent restore from unified persistence hook
       const restoredData = await persistence.restore();
 
-      if (restoredData) {
-        // Restore profile data
+      if (restoredData && (restoredData.profileData || restoredData.islamicPrefs)) {
+        // First restore the data to state
         if (restoredData.profileData) {
-          console.log('✅ Profil restauré depuis le système intelligent');
           setProfileData(restoredData.profileData);
-          setShowWelcome(false);
         }
-
-        // Restore Islamic preferences
         if (restoredData.islamicPrefs) {
-          console.log('✅ Préférences islamiques restaurées');
           setIslamicPrefs(restoredData.islamicPrefs);
         }
-
-        // Restore step progress
-        if (restoredData.currentStep && restoredData.currentStep > 0) {
-          console.log('✅ Étape restaurée:', restoredData.currentStep);
+        if (restoredData.currentStep) {
           setCurrentStep(restoredData.currentStep);
         }
+
+        // Wait for state to update, then calculate progress and show modal
+        setTimeout(() => {
+          const savedStep = restoredData.currentStep || 1;
+          const savedProgress = validation.getOverallProgress();
+
+          setSavedSessionData({
+            step: savedStep,
+            progress: savedProgress,
+            lastSaveTime: restoredData.timestamp ? new Date(restoredData.timestamp) : undefined,
+          });
+          setShowResumptionModal(true);
+          setShowWelcome(false);
+        }, 100);
+        
+        console.log('✅ Données restaurées - modal affichée');
       } else {
         console.log('ℹ️ Aucune donnée sauvegardée trouvée');
       }
@@ -216,6 +231,44 @@ const Onboarding = () => {
 
   const startOnboarding = () => {
     setShowWelcome(false);
+  };
+
+  const handleContinueSession = () => {
+    setShowResumptionModal(false);
+    // Data is already loaded, just continue
+  };
+
+  const handleRestartSession = () => {
+    // Clear all saved data and restart
+    persistence.clearAll();
+    setProfileData({
+      full_name: '',
+      age: undefined,
+      gender: '',
+      location: '',
+      education: '',
+      profession: '',
+      bio: '',
+      looking_for: '',
+      interests: [],
+      avatar_url: ''
+    });
+    setIslamicPrefs({
+      prayer_frequency: '',
+      quran_reading: '',
+      hijab_preference: '',
+      beard_preference: '',
+      sect: '',
+      madhab: '',
+      halal_diet: true,
+      smoking: '',
+      desired_partner_sect: '',
+      importance_of_religion: ''
+    });
+    setCurrentStep(1);
+    setSavedSessionData(null);
+    setShowResumptionModal(false);
+    setShowWelcome(true);
   };
 
   const nextStep = () => {
@@ -615,6 +668,19 @@ const Onboarding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 islamic-pattern pb-24 md:pb-8">
+      {/* Session Resumption Modal */}
+      {savedSessionData && (
+        <SessionResumptionModal
+          open={showResumptionModal}
+          onContinue={handleContinueSession}
+          onRestart={handleRestartSession}
+          savedStep={savedSessionData.step}
+          totalSteps={totalSteps}
+          completionPercentage={savedSessionData.progress}
+          lastSaveTime={savedSessionData.lastSaveTime}
+        />
+      )}
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
