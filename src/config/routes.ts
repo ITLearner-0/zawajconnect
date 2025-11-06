@@ -67,6 +67,14 @@ export const routes: RouteConfig[] = [
     category: 'main'
   },
   {
+    path: '/favorites',
+    component: 'Favorites',
+    label: 'Mes Favoris',
+    requiresAuth: true,
+    icon: 'Heart',
+    category: 'main'
+  },
+  {
     path: '/matches',
     component: 'Matches',
     label: 'Mes Matches',

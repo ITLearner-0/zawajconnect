@@ -1255,6 +1255,27 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_favorites: {
+        Row: {
+          created_at: string | null
+          id: string
+          profile_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          profile_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          profile_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile_matching_data: {
         Row: {
           age: number | null

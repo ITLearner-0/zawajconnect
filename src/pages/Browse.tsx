@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight, Lock, Users, Grid3x3, LayoutGrid, StickyNote } from 'lucide-react';
+import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight, Lock, Users, Grid3x3, LayoutGrid, StickyNote, Star } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -23,6 +23,7 @@ import { UpgradeToPremiumModal } from '@/components/UpgradeToPremiumModal';
 import { ActiveConversationBanner } from '@/components/ActiveConversationBanner';
 import ProfileComparator from '@/components/ProfileComparator';
 import ProfileNoteCard from '@/components/ProfileNoteCard';
+import { useFavorites } from '@/hooks/useFavorites';
 
 interface MatchingProfile {
   id?: string;
@@ -64,6 +65,7 @@ const Browse = () => {
   const { checkIfInConversation } = useConversationStatus();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { toggleFavorite, isFavorite } = useFavorites();
   const [profiles, setProfiles] = useState<MatchingProfile[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<MatchingProfile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -863,10 +865,34 @@ const Browse = () => {
                   </Button>
                 </div>
 
-                {/* Profiles Grid */}
+                 {/* Profiles Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   {gridProfiles.map((profile) => (
                     <Card key={profile.user_id} className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 card-hover relative">
+                      {/* Favorite Button - Top Left */}
+                      <button
+                        onClick={() => toggleFavorite(profile.user_id)}
+                        className="absolute top-3 left-3 z-20 bg-white rounded-full p-2 shadow-lg hover:scale-110 transition-transform"
+                      >
+                        <Heart
+                          className={`h-5 w-5 transition-colors ${
+                            isFavorite(profile.user_id)
+                              ? 'fill-yellow-500 text-yellow-500'
+                              : 'text-muted-foreground hover:text-yellow-500'
+                          }`}
+                        />
+                      </button>
+
+                      {/* Favoris Badge */}
+                      {isFavorite(profile.user_id) && (
+                        <div className="absolute top-14 left-3 z-20">
+                          <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white shadow-lg border-0">
+                            <Star className="h-3 w-3 mr-1 fill-white" />
+                            Favoris
+                          </Badge>
+                        </div>
+                      )}
+
                       {/* Selection Checkbox - Always Visible in Grid Mode */}
                       <div className="absolute top-3 right-3 z-20">
                         <div className="bg-white rounded-lg p-2 shadow-lg border-2 border-emerald/30">

@@ -32,6 +32,7 @@ const EnhancedProfile = lazy(() => import('@/pages/EnhancedProfile'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const PaymentHistory = lazy(() => import('@/pages/PaymentHistory'));
+const Favorites = lazy(() => import('@/pages/Favorites'));
 
 // Matching & Compatibility
 const AdvancedMatching = lazy(() => import('@/pages/AdvancedMatching'));
@@ -118,6 +119,7 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/profile', component: EnhancedProfile },
   { path: '/advanced-matching', component: AdvancedMatching },
   { path: '/browse', component: Browse },
+  { path: '/favorites', component: Favorites },
   { path: '/matches', component: Matches },
   { path: '/chat', component: Chat },
   { path: '/chat/:matchId', component: Chat },
