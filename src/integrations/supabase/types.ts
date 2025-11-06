@@ -575,6 +575,42 @@ export type Database = {
         }
         Relationships: []
       }
+      favorite_tags: {
+        Row: {
+          created_at: string | null
+          favorite_id: string
+          id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          favorite_id: string
+          id?: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string | null
+          favorite_id?: string
+          id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorite_tags_favorite_id_fkey"
+            columns: ["favorite_id"]
+            isOneToOne: false
+            referencedRelation: "profile_favorites"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorite_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "profile_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insight_actions: {
         Row: {
           action_type: string
@@ -1130,6 +1166,42 @@ export type Database = {
         }
         Relationships: []
       }
+      note_tags: {
+        Row: {
+          created_at: string | null
+          id: string
+          note_id: string
+          tag_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          note_id: string
+          tag_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          note_id?: string
+          tag_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "note_tags_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "profile_notes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "note_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "profile_tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           content: string
@@ -1355,6 +1427,30 @@ export type Database = {
           note?: string
           profile_id?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profile_tags: {
+        Row: {
+          color: string
+          created_at: string | null
+          id: string
+          tag_name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string | null
+          id?: string
+          tag_name: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string | null
+          id?: string
+          tag_name?: string
           user_id?: string
         }
         Relationships: []
