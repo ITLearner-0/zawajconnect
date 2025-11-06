@@ -323,6 +323,18 @@ export interface ModerationResult {
 }
 
 /**
+ * Suggestion de modération pour améliorer un message
+ */
+export interface ModerationSuggestion {
+  id: string;
+  original_message: string;
+  suggested_message: string;
+  improvement_reason: string;
+  islamic_guidance: string;
+  created_at: string;
+}
+
+/**
  * Statistiques de modération par catégorie
  */
 export interface ModerationStatsBySeverity {

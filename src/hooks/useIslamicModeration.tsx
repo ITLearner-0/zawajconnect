@@ -1,7 +1,16 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { ModerationSuggestion as ModerationSuggestionType } from '@/types/supabase';
+import type { PostgrestError } from '@supabase/supabase-js';
 
+// Export pour compatibilité avec composants existants
+export type { ModerationSuggestionType as ModerationSuggestion };
+
+/**
+ * Résultat de modération retourné par l'edge function
+ * Compatible avec le service mais adapté pour l'UI
+ */
 export interface ModerationResult {
   approved: boolean;
   action: 'approved' | 'blocked' | 'escalated' | 'warned';
@@ -10,15 +19,6 @@ export interface ModerationResult {
   suggestion?: string;
   islamicGuidance?: string;
   reason: string;
-}
-
-export interface ModerationSuggestion {
-  id: string;
-  original_message: string;
-  suggested_message: string;
-  improvement_reason: string;
-  islamic_guidance: string;
-  created_at: string;
 }
 
 export const useIslamicModeration = () => {
@@ -47,8 +47,12 @@ export const useIslamicModeration = () => {
       });
 
       if (error) {
-        console.error('Moderation error:', error);
+        console.error('[useIslamicModeration] Edge function error:', error.message);
         throw error;
+      }
+
+      if (!data) {
+        throw new Error('No data returned from moderation service');
       }
 
       const result = data as ModerationResult;
@@ -76,7 +80,7 @@ export const useIslamicModeration = () => {
                 }
               });
             } catch (emailError) {
-              console.error('Failed to send moderation email:', emailError);
+              console.error('[useIslamicModeration] Failed to send moderation email:', emailError);
             }
             break;
           case 'warned':
@@ -99,7 +103,7 @@ export const useIslamicModeration = () => {
                   }
                 });
               } catch (emailError) {
-                console.error('Failed to send warning email:', emailError);
+                console.error('[useIslamicModeration] Failed to send warning email:', emailError);
               }
             }
             break;
@@ -115,7 +119,7 @@ export const useIslamicModeration = () => {
 
       return result;
     } catch (error) {
-      console.error('Error moderating content:', error);
+      console.error('[useIslamicModeration] Error moderating content:', error);
       
       // Return safe fallback
       const fallbackResult: ModerationResult = {
@@ -133,7 +137,7 @@ export const useIslamicModeration = () => {
     }
   };
 
-  const getSuggestions = async (userId: string): Promise<ModerationSuggestion[]> => {
+  const getSuggestions = async (userId: string): Promise<ModerationSuggestionType[]> => {
     try {
       const { data, error } = await supabase
         .from('message_suggestions')
@@ -143,8 +147,13 @@ export const useIslamicModeration = () => {
         .order('created_at', { ascending: false })
         .limit(5);
 
-      if (error) throw error;
-      return (data || []).map(item => ({
+      if (error) {
+        const pgError = error as PostgrestError;
+        console.error('[useIslamicModeration] Error fetching suggestions:', pgError.message);
+        throw pgError;
+      }
+
+      return (data ?? []).map(item => ({
         id: item.id,
         original_message: item.original_message,
         suggested_message: item.suggested_message,
@@ -153,30 +162,36 @@ export const useIslamicModeration = () => {
         created_at: item.created_at
       }));
     } catch (error) {
-      console.error('Error fetching suggestions:', error);
+      const pgError = error as PostgrestError;
+      console.error('[useIslamicModeration] Error in getSuggestions:', pgError.message);
       return [];
     }
   };
 
-  const applySuggestion = async (suggestionId: string) => {
+  const applySuggestion = async (suggestionId: string): Promise<void> => {
     try {
       const { error } = await supabase
         .from('message_suggestions')
         .update({ used: true })
         .eq('id', suggestionId);
 
-      if (error) throw error;
+      if (error) {
+        const pgError = error as PostgrestError;
+        console.error('[useIslamicModeration] Error updating suggestion:', pgError.message);
+        throw pgError;
+      }
 
       toast({
         title: "Suggestion utilisée",
         description: "Merci d'avoir amélioré votre message !",
       });
     } catch (error) {
-      console.error('Error marking suggestion as used:', error);
+      const pgError = error as PostgrestError;
+      console.error('[useIslamicModeration] Error in applySuggestion:', pgError.message);
     }
   };
 
-  const getModerationLogs = async (userId: string, limit = 10) => {
+  const getModerationLogs = async (userId: string, limit = 10): Promise<unknown[]> => {
     try {
       const { data, error } = await supabase
         .from('moderation_logs')
@@ -185,10 +200,16 @@ export const useIslamicModeration = () => {
         .order('created_at', { ascending: false })
         .limit(limit);
 
-      if (error) throw error;
-      return data || [];
+      if (error) {
+        const pgError = error as PostgrestError;
+        console.error('[useIslamicModeration] Error fetching logs:', pgError.message);
+        throw pgError;
+      }
+
+      return data ?? [];
     } catch (error) {
-      console.error('Error fetching moderation logs:', error);
+      const pgError = error as PostgrestError;
+      console.error('[useIslamicModeration] Error in getModerationLogs:', pgError.message);
       return [];
     }
   };
