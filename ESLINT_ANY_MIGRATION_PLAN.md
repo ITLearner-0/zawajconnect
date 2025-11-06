@@ -444,10 +444,10 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 
 **Récapitulatif Phase 3:**
 - ✅ 5/5 hooks migrés (100%)
-- ✅ 3/3 composants matching migrés (100%)
-- ✅ 22 any éliminés (14 hooks + 8 composants)
+- ✅ 4/4 composants matching migrés (100%)
+- ✅ 24 any éliminés (14 hooks + 10 composants)
 - ✅ 4 types centralisés ajoutés
-- ✅ 175 → 153 warnings (-22 warnings, ~12.6%)
+- ✅ 175 → 151 warnings (-24 warnings, ~13.7%)
 
 **Hooks complétés:**
 1. `useSmartRecommendations.tsx` - 8 any éliminés
@@ -459,7 +459,8 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 **Composants complétés:**
 1. `MatchCard.tsx` - 4 any éliminés
 2. `RecommendationCard.tsx` - 4 any éliminés
-3. `MatchResultsGrid.tsx` - 0 any (types centralisés)
+3. `SmartRecommendationEngine.tsx` - 2 any éliminés
+4. `MatchResultsGrid.tsx` - 0 any (types centralisés)
 
 **Types centralisés ajoutés:**
 1. `MatchProfile` (extends `ScoredMatch`) - Pour affichage UI des matches
@@ -468,10 +469,10 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 4. `ModerationSuggestion` - Pour suggestions de modération
 
 **Harmonisation UI/Services:**
-- ✅ `matchingOptimizationService.ts` ↔ `useSmartRecommendations.tsx`
+- ✅ `matchingOptimizationService.ts` ↔ `useSmartRecommendations.tsx` ↔ `SmartRecommendationEngine.tsx`
 - ✅ `contentModerationService.ts` ↔ `useIslamicModeration.tsx`
-- ✅ Types partagés entre services backend et hooks UI
-- ✅ Flux de données cohérent de bout en bout
+- ✅ Types partagés entre services backend, hooks UI et composants UI
+- ✅ Flux de données cohérent de bout en bout (Service → Hook → Component)
 
 **Patterns établis:**
 - ✅ Extensions de `ScoredMatch` pour types UI (MatchProfile, SmartRecommendation)
@@ -480,11 +481,20 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 - ✅ Suppression des casts `as any` dans les opérations DB
 - ✅ Logging cohérent avec préfixes `[hookName]`
 - ✅ Gestion d'erreurs avec `PostgrestError` partout
+- ✅ Type de retour `JSX.Element` pour composants React
+- ✅ Documentation JSDoc pour composants complexes
+
+**Impact cumulatif (Phases 1-3):**
+- Phase 1: 29 any éliminés (Services & Utils)
+- Phase 2: 0 any (Consolidation types)
+- Phase 3: 24 any éliminés (Hooks & Composants)
+- **Total: 53 any éliminés, 12 fichiers migrés**
+- **Progression: 204 → 151 warnings (-26%)**
 
 **Prochaine phase:**
 - Phase 4: Enhanced Components & Admin Components
 - Cibles: EnhancedWaliDashboard, CompatibilityAssessment, ModerationDashboard
-- Estimation: ~43 any à éliminer
+- Estimation: ~40 any à éliminer
 
 ---
 
@@ -824,8 +834,8 @@ Pour chaque fichier migré:
 
 ### Phase 3 (Semaines 6-8) ✅ TERMINÉE
 - **Objectif**: Hooks & Composants Matching
-- **Warnings**: 175 → 153 (-22 warnings) ✅
-- **Résultat**: 22 any éliminés (5 hooks + 3 composants)
+- **Warnings**: 175 → 151 (-24 warnings) ✅
+- **Résultat**: 24 any éliminés (5 hooks + 4 composants = 9 fichiers)
 - **Détail**:
   - **Hooks** : 14 any éliminés
     - useSmartRecommendations: 8 any
@@ -833,16 +843,22 @@ Pour chaque fichier migré:
     - useMatchingHistory: 2 any
     - useMatchingPreferences: 0 any (logging amélioré)
     - useCompatibility: 0 any (logging amélioré)
-  - **Composants** : 8 any éliminés
+  - **Composants** : 10 any éliminés
     - MatchCard: 4 any
     - RecommendationCard: 4 any
+    - SmartRecommendationEngine: 2 any
     - MatchResultsGrid: 0 any (types centralisés)
 - **Types ajoutés**: `MatchProfile`, `SmartRecommendation`, `MatchingHistoryPreferences`, `ModerationSuggestion`
-- **Validation**: ✅ Couche Hooks & Composants matching strictement typée et harmonisée
+- **Validation**: ✅ Couche Hooks & Composants matching strictement typée, harmonisation Service → Hook → Component complète
+
+**Impact cumulatif (Phases 1-3):**
+- Total: 53 any éliminés sur 204 (26% de réduction)
+- 12 fichiers migrés (3 services + 5 hooks + 4 composants)
+- Progression: 204 → 151 warnings restants
 
 ### Phase 4 (Semaines 9-12)
 - **Objectif**: Enhanced Components & Admin
-- **Warnings**: ~153 → ~110 (-43 warnings estimés)
+- **Warnings**: ~151 → ~110 (-41 warnings estimés)
 - **Validation**: Composants enhanced et admin typés
 
 ### Phase 5 (Semaines 13-14)
