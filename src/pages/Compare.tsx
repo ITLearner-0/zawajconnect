@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Star, Trash2, Edit, Eye, Clock, Filter, StarOff, Download } from 'lucide-react';
+import { Calendar, Star, Trash2, Edit, Eye, Clock, Filter, StarOff, Download, Tag, X, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ProfileComparator from '@/components/ProfileComparator';
 import { format } from 'date-fns';
@@ -23,6 +23,7 @@ interface ComparisonHistory {
   comparison_name: string | null;
   notes: string | null;
   is_favorite: boolean;
+  tags: string[];
   created_at: string;
   updated_at: string;
 }
@@ -43,6 +44,12 @@ const Compare = () => {
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [exportingPdf, setExportingPdf] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [showTagsDialog, setShowTagsDialog] = useState(false);
+  const [editingTags, setEditingTags] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState('');
+  const [tagEditingComparison, setTagEditingComparison] = useState<ComparisonHistory | null>(null);
   const radarChartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -55,7 +62,18 @@ const Compare = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [history, dateFilter, favoritesOnly]);
+  }, [history, dateFilter, favoritesOnly, selectedTags]);
+
+  useEffect(() => {
+    // Extract all unique tags from history
+    const tags = new Set<string>();
+    history.forEach(item => {
+      if (item.tags && Array.isArray(item.tags)) {
+        item.tags.forEach(tag => tags.add(tag));
+      }
+    });
+    setAvailableTags(Array.from(tags).sort());
+  }, [history]);
 
   const fetchHistory = async () => {
     if (!user) return;
@@ -104,6 +122,13 @@ const Compare = () => {
     // Filter by favorites
     if (favoritesOnly) {
       filtered = filtered.filter(item => item.is_favorite);
+    }
+
+    // Filter by tags (OR logic - show if ANY selected tag matches)
+    if (selectedTags.length > 0) {
+      filtered = filtered.filter(item => 
+        item.tags && item.tags.some(tag => selectedTags.includes(tag))
+      );
     }
 
     setFilteredHistory(filtered);
@@ -181,6 +206,63 @@ const Compare = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handleOpenTagsDialog = (comparison: ComparisonHistory) => {
+    setTagEditingComparison(comparison);
+    setEditingTags(comparison.tags || []);
+    setNewTag('');
+    setShowTagsDialog(true);
+  };
+
+  const handleAddTag = () => {
+    if (newTag.trim() && !editingTags.includes(newTag.trim())) {
+      setEditingTags([...editingTags, newTag.trim()]);
+      setNewTag('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setEditingTags(editingTags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleSaveTags = async () => {
+    if (!tagEditingComparison) return;
+
+    try {
+      const { error } = await supabase
+        .from('profile_comparison_history')
+        .update({
+          tags: editingTags,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', tagEditingComparison.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Succès",
+        description: "Tags mis à jour"
+      });
+
+      setShowTagsDialog(false);
+      fetchHistory();
+    } catch (error) {
+      console.error('Error updating tags:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour les tags",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const toggleTagFilter = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
   };
 
   const handleDelete = async (id: string) => {
@@ -287,38 +369,72 @@ const Compare = () => {
         {/* Filters */}
         <Card className="mb-6">
           <CardContent className="p-4">
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <div className="flex items-center gap-2 flex-1">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <Select value={dateFilter} onValueChange={(value: any) => setDateFilter(value)}>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Période" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Toutes les dates</SelectItem>
-                    <SelectItem value="today">Aujourd'hui</SelectItem>
-                    <SelectItem value="week">Cette semaine</SelectItem>
-                    <SelectItem value="month">Ce mois</SelectItem>
-                  </SelectContent>
-                </Select>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                <div className="flex items-center gap-2 flex-1">
+                  <Filter className="h-4 w-4 text-muted-foreground" />
+                  <Select value={dateFilter} onValueChange={(value: any) => setDateFilter(value)}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Période" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Toutes les dates</SelectItem>
+                      <SelectItem value="today">Aujourd'hui</SelectItem>
+                      <SelectItem value="week">Cette semaine</SelectItem>
+                      <SelectItem value="month">Ce mois</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Button
+                  variant={favoritesOnly ? "default" : "outline"}
+                  onClick={() => setFavoritesOnly(!favoritesOnly)}
+                  className={favoritesOnly ? "bg-gold text-white" : "border-gold text-gold hover:bg-gold hover:text-white"}
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  {favoritesOnly ? "Afficher tout" : "Favoris uniquement"}
+                </Button>
+
+                <Button
+                  variant="outline"
+                  onClick={() => navigate('/browse')}
+                  className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+                >
+                  Nouvelle comparaison
+                </Button>
               </div>
 
-              <Button
-                variant={favoritesOnly ? "default" : "outline"}
-                onClick={() => setFavoritesOnly(!favoritesOnly)}
-                className={favoritesOnly ? "bg-gold text-white" : "border-gold text-gold hover:bg-gold hover:text-white"}
-              >
-                <Star className="h-4 w-4 mr-2" />
-                {favoritesOnly ? "Afficher tout" : "Favoris uniquement"}
-              </Button>
-
-              <Button
-                variant="outline"
-                onClick={() => navigate('/browse')}
-                className="border-emerald text-emerald hover:bg-emerald hover:text-white"
-              >
-                Nouvelle comparaison
-              </Button>
+              {/* Tags Filter */}
+              {availableTags.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <Tag className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Filtrer par tags:</span>
+                  {availableTags.map(tag => (
+                    <Badge
+                      key={tag}
+                      variant={selectedTags.includes(tag) ? "default" : "outline"}
+                      className={`cursor-pointer transition-colors ${
+                        selectedTags.includes(tag)
+                          ? 'bg-emerald text-white hover:bg-emerald/90'
+                          : 'hover:bg-emerald/10'
+                      }`}
+                      onClick={() => toggleTagFilter(tag)}
+                    >
+                      {tag}
+                    </Badge>
+                  ))}
+                  {selectedTags.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedTags([])}
+                      className="h-6 text-xs"
+                    >
+                      Réinitialiser
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -374,6 +490,16 @@ const Compare = () => {
                           {comparison.notes}
                         </p>
                       )}
+
+                      {comparison.tags && comparison.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {comparison.tags.map(tag => (
+                            <Badge key={tag} variant="secondary" className="text-xs">
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex gap-2 ml-4">
@@ -382,6 +508,7 @@ const Compare = () => {
                         variant="ghost"
                         onClick={() => handleToggleFavorite(comparison)}
                         className="hover:bg-gold/10"
+                        title="Favori"
                       >
                         {comparison.is_favorite ? (
                           <StarOff className="h-4 w-4 text-gold" />
@@ -392,8 +519,18 @@ const Compare = () => {
                       <Button
                         size="sm"
                         variant="ghost"
+                        onClick={() => handleOpenTagsDialog(comparison)}
+                        className="hover:bg-purple-100"
+                        title="Gérer les tags"
+                      >
+                        <Tag className="h-4 w-4 text-purple-600" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
                         onClick={() => handleView(comparison)}
                         className="hover:bg-emerald/10"
+                        title="Voir"
                       >
                         <Eye className="h-4 w-4 text-emerald" />
                       </Button>
@@ -402,6 +539,7 @@ const Compare = () => {
                         variant="ghost"
                         onClick={() => handleEdit(comparison)}
                         className="hover:bg-blue-100"
+                        title="Modifier"
                       >
                         <Edit className="h-4 w-4 text-blue-600" />
                       </Button>
@@ -410,6 +548,7 @@ const Compare = () => {
                         variant="ghost"
                         onClick={() => handleDelete(comparison.id)}
                         className="hover:bg-red-100"
+                        title="Supprimer"
                       >
                         <Trash2 className="h-4 w-4 text-red-600" />
                       </Button>
@@ -493,6 +632,81 @@ const Compare = () => {
                 Annuler
               </Button>
               <Button onClick={handleSaveEdit} className="bg-emerald text-white hover:bg-emerald-dark">
+                Enregistrer
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Tags Management Dialog */}
+        <Dialog open={showTagsDialog} onOpenChange={setShowTagsDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Gérer les tags</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium mb-2 block">Tags actuels</label>
+                <div className="flex flex-wrap gap-2 min-h-[40px] p-2 border rounded-md">
+                  {editingTags.length === 0 ? (
+                    <span className="text-sm text-muted-foreground">Aucun tag</span>
+                  ) : (
+                    editingTags.map(tag => (
+                      <Badge key={tag} variant="secondary" className="flex items-center gap-1">
+                        {tag}
+                        <X 
+                          className="h-3 w-3 cursor-pointer hover:text-destructive" 
+                          onClick={() => handleRemoveTag(tag)}
+                        />
+                      </Badge>
+                    ))
+                  )}
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium mb-2 block">Ajouter un tag</label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newTag}
+                    onChange={(e) => setNewTag(e.target.value)}
+                    placeholder="Ex: Candidats prioritaires, À revoir..."
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
+                  />
+                  <Button 
+                    onClick={handleAddTag}
+                    variant="outline"
+                    size="sm"
+                    disabled={!newTag.trim()}
+                  >
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+              {availableTags.length > 0 && (
+                <div>
+                  <label className="text-sm font-medium mb-2 block">Tags existants (cliquez pour ajouter)</label>
+                  <div className="flex flex-wrap gap-2">
+                    {availableTags
+                      .filter(tag => !editingTags.includes(tag))
+                      .map(tag => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="cursor-pointer hover:bg-emerald/10"
+                          onClick={() => setEditingTags([...editingTags, tag])}
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowTagsDialog(false)}>
+                Annuler
+              </Button>
+              <Button onClick={handleSaveTags} className="bg-emerald text-white hover:bg-emerald-dark">
                 Enregistrer
               </Button>
             </DialogFooter>
