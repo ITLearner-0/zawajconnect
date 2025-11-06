@@ -210,3 +210,149 @@ export type Optional<T> = T | undefined;
 export type DeepPartial<T> = {
   [P in keyof T]?: DeepPartial<T[P]>;
 };
+
+// ============================================================================
+// TYPES DE MODÉRATION DE CONTENU
+// ============================================================================
+
+/**
+ * Types de règles de modération
+ */
+export type ModerationRuleType = 'keyword' | 'pattern' | 'length' | 'format' | 'content_type';
+
+/**
+ * Niveaux de sévérité de modération
+ */
+export type ModerationSeverity = 'low' | 'medium' | 'high' | 'critical';
+
+/**
+ * Actions de modération possibles
+ */
+export type ModerationAction = 'warn' | 'block' | 'escalate' | 'auto_moderate';
+
+/**
+ * Actions prises après modération
+ */
+export type ModerationActionTaken = 'approved' | 'warned' | 'blocked' | 'escalated' | 'auto_moderated';
+
+/**
+ * Types de contenu modéré
+ */
+export type ModerationContentType = 'message' | 'profile' | 'bio' | 'photo' | 'comment';
+
+/**
+ * Règle de modération typée strictement
+ */
+export interface ModerationRule {
+  id: string;
+  rule_type: ModerationRuleType;
+  pattern: string;
+  severity: ModerationSeverity;
+  action: ModerationAction;
+  is_active: boolean;
+  description: string;
+}
+
+/**
+ * Row de règle de modération depuis la DB
+ */
+export interface ModerationRuleRow {
+  id: string;
+  rule_type: string;
+  pattern: string;
+  severity: string;
+  action: string;
+  is_active: boolean;
+  description: string;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+/**
+ * Violation de modération typée strictement
+ */
+export interface ModerationViolation {
+  user_id: string;
+  content: string;
+  content_type: ModerationContentType;
+  rules_violated: string[];
+  severity: ModerationSeverity;
+  action_taken: Exclude<ModerationActionTaken, 'approved'>;
+  auto_moderated_content?: string;
+  created_at: string;
+}
+
+/**
+ * Row de violation de modération depuis la DB
+ */
+export interface ModerationViolationRow {
+  id: string;
+  user_id: string;
+  content: string;
+  content_type: string;
+  rules_violated: string[];
+  severity: string;
+  action_taken: string;
+  auto_moderated_content?: string | null;
+  created_at: string;
+}
+
+/**
+ * Insert pour violation de modération
+ */
+export interface ModerationViolationInsert {
+  user_id: string;
+  content: string;
+  content_type: string;
+  rules_violated: string[];
+  severity: string;
+  action_taken: string;
+  auto_moderated_content?: string;
+}
+
+/**
+ * Résultat d'analyse de modération
+ */
+export interface ModerationResult {
+  approved: boolean;
+  action: ModerationActionTaken;
+  moderatedContent?: string;
+  violations: string[];
+  severity: ModerationSeverity | null;
+  reason: string;
+}
+
+/**
+ * Statistiques de modération par catégorie
+ */
+export interface ModerationStatsBySeverity {
+  low: number;
+  medium: number;
+  high: number;
+  critical: number;
+}
+
+/**
+ * Statistiques de modération par type de contenu
+ */
+export interface ModerationStatsByContentType {
+  message: number;
+  profile: number;
+  bio: number;
+  photo: number;
+  comment: number;
+}
+
+/**
+ * Statistiques globales de modération
+ */
+export interface ModerationStats {
+  total_checks: number;
+  violations_found: number;
+  content_blocked: number;
+  users_warned: number;
+  escalations: number;
+  auto_moderated: number;
+  by_severity: ModerationStatsBySeverity;
+  by_content_type: ModerationStatsByContentType;
+}

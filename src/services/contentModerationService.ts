@@ -8,49 +8,31 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { logger } from '@/utils/logger';
+import type { PostgrestError } from '@supabase/supabase-js';
+import type {
+  ModerationRule,
+  ModerationRuleRow,
+  ModerationViolation,
+  ModerationViolationRow,
+  ModerationViolationInsert,
+  ModerationResult,
+  ModerationStats,
+  ModerationRuleType,
+  ModerationSeverity,
+  ModerationAction,
+  ModerationActionTaken,
+  ModerationContentType
+} from '@/types/supabase';
 
-export interface ModerationRule {
-  id: string;
-  rule_type: 'keyword' | 'pattern' | 'length' | 'format' | 'content_type';
-  pattern: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  action: 'warn' | 'block' | 'escalate' | 'auto_moderate';
-  is_active: boolean;
-  description: string;
-}
-
-export interface ModerationViolation {
-  user_id: string;
-  content: string;
-  content_type: 'message' | 'profile' | 'bio' | 'photo' | 'comment';
-  rules_violated: string[];
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  action_taken: 'warned' | 'blocked' | 'escalated' | 'auto_moderated';
-  auto_moderated_content?: string;
-  created_at: string;
-}
-
-export interface ModerationStats {
-  total_checks: number;
-  violations_found: number;
-  content_blocked: number;
-  users_warned: number;
-  escalations: number;
-  auto_moderated: number;
-  by_severity: {
-    low: number;
-    medium: number;
-    high: number;
-    critical: number;
-  };
-  by_content_type: {
-    message: number;
-    profile: number;
-    bio: number;
-    photo: number;
-    comment: number;
-  };
-}
+/**
+ * Re-export types for backwards compatibility
+ */
+export type {
+  ModerationRule,
+  ModerationViolation,
+  ModerationResult,
+  ModerationStats
+};
 
 class ContentModerationService {
   private rules: ModerationRule[] = [];
@@ -61,21 +43,24 @@ class ContentModerationService {
    */
   async loadRules(): Promise<void> {
     try {
-      const { data, error } = await supabase
-        .from('moderation_rules' as any)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { data, error } = await (supabase as any)
+        .from('moderation_rules')
         .select('*')
         .eq('is_active', true)
         .order('severity', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        throw error as PostgrestError;
+      }
 
-      this.rules = (data ?? []).map((rule: any) => ({
+      this.rules = (data ?? []).map((rule: ModerationRuleRow): ModerationRule => ({
         id: rule.id ?? '',
-        rule_type: rule.rule_type ?? 'keyword',
+        rule_type: (rule.rule_type ?? 'keyword') as ModerationRuleType,
         pattern: rule.pattern ?? '',
-        severity: rule.severity ?? 'low',
-        action: rule.action ?? 'warn',
-        is_active: !!rule.is_active,
+        severity: (rule.severity ?? 'low') as ModerationSeverity,
+        action: (rule.action ?? 'warn') as ModerationAction,
+        is_active: rule.is_active ?? true,
         description: rule.description ?? ''
       }));
       this.rulesLoaded = true;
@@ -85,7 +70,7 @@ class ContentModerationService {
         bySeverity: this.groupBy(this.rules, 'severity')
       });
     } catch (error) {
-      logger.error('Failed to load moderation rules', error);
+      logger.error('Failed to load moderation rules', error as PostgrestError);
       this.rules = this.getFallbackRules();
       this.rulesLoaded = true;
     }
@@ -141,24 +126,17 @@ class ContentModerationService {
   async moderateContent(
     content: string,
     userId: string,
-    contentType: 'message' | 'profile' | 'bio' | 'photo' | 'comment' = 'message',
+    contentType: ModerationContentType = 'message',
     matchId?: string
-  ): Promise<{
-    approved: boolean;
-    action: 'approved' | 'warned' | 'blocked' | 'escalated' | 'auto_moderated';
-    moderatedContent?: string;
-    violations: string[];
-    severity: 'low' | 'medium' | 'high' | 'critical' | null;
-    reason: string;
-  }> {
+  ): Promise<ModerationResult> {
     // Ensure rules are loaded
     if (!this.rulesLoaded) {
       await this.loadRules();
     }
 
     const violations: string[] = [];
-    let highestSeverity: 'low' | 'medium' | 'high' | 'critical' | null = null;
-    let actionToTake: 'approved' | 'warned' | 'blocked' | 'escalated' | 'auto_moderated' = 'approved';
+    let highestSeverity: ModerationSeverity | null = null;
+    let actionToTake: ModerationActionTaken = 'approved';
     let moderatedContent: string | undefined;
 
     // Check content against all active rules
@@ -221,8 +199,8 @@ class ContentModerationService {
         content,
         content_type: contentType,
         rules_violated: violations,
-        severity: highestSeverity || 'low',
-        action_taken: actionToTake as 'warned' | 'blocked' | 'escalated' | 'auto_moderated',
+        severity: highestSeverity ?? 'low',
+        action_taken: actionToTake as Exclude<ModerationActionTaken, 'approved'>,
         auto_moderated_content: moderatedContent,
         created_at: new Date().toISOString()
       });
@@ -290,13 +268,26 @@ class ContentModerationService {
    */
   private async logViolation(violation: ModerationViolation): Promise<void> {
     try {
-      const { error } = await supabase
-        .from('moderation_violations' as any)
-        .insert(violation);
+      const violationInsert: ModerationViolationInsert = {
+        user_id: violation.user_id,
+        content: violation.content,
+        content_type: violation.content_type,
+        rules_violated: violation.rules_violated,
+        severity: violation.severity,
+        action_taken: violation.action_taken,
+        auto_moderated_content: violation.auto_moderated_content
+      };
 
-      if (error) throw error;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any)
+        .from('moderation_violations')
+        .insert(violationInsert);
+
+      if (error) {
+        throw error as PostgrestError;
+      }
     } catch (error) {
-      logger.error('Failed to log moderation violation', error);
+      logger.error('Failed to log moderation violation', error as PostgrestError);
     }
   }
 
@@ -334,8 +325,9 @@ class ContentModerationService {
    */
   async getStats(startDate?: Date, endDate?: Date): Promise<ModerationStats> {
     try {
-      let query = supabase
-        .from('moderation_violations' as any)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let query = (supabase as any)
+        .from('moderation_violations')
         .select('*');
 
       if (startDate) {
@@ -347,41 +339,44 @@ class ContentModerationService {
 
       const { data, error } = await query;
 
-      if (error) throw error;
+      if (error) {
+        throw error as PostgrestError;
+      }
 
-      const violations = (data ?? []).map((v: any) => ({
+      const violations = (data ?? []).map((v: ModerationViolationRow): ModerationViolation => ({
         user_id: v.user_id ?? '',
         content: v.content ?? '',
-        content_type: v.content_type ?? 'message',
-        rules_violated: v.rules_violated ?? [],
-        severity: v.severity ?? 'low',
-        action_taken: v.action_taken ?? 'warned',
+        content_type: (v.content_type ?? 'message') as ModerationContentType,
+        rules_violated: Array.isArray(v.rules_violated) ? v.rules_violated : [],
+        severity: (v.severity ?? 'low') as ModerationSeverity,
+        action_taken: (v.action_taken ?? 'warned') as Exclude<ModerationActionTaken, 'approved'>,
+        auto_moderated_content: v.auto_moderated_content ?? undefined,
         created_at: v.created_at ?? new Date().toISOString()
       }));
 
       return {
         total_checks: violations.length,
         violations_found: violations.length,
-        content_blocked: violations.filter(v => v.action_taken === 'blocked').length,
-        users_warned: violations.filter(v => v.action_taken === 'warned').length,
-        escalations: violations.filter(v => v.action_taken === 'escalated').length,
-        auto_moderated: violations.filter(v => v.action_taken === 'auto_moderated').length,
+        content_blocked: violations.filter((v: ModerationViolation) => v.action_taken === 'blocked').length,
+        users_warned: violations.filter((v: ModerationViolation) => v.action_taken === 'warned').length,
+        escalations: violations.filter((v: ModerationViolation) => v.action_taken === 'escalated').length,
+        auto_moderated: violations.filter((v: ModerationViolation) => v.action_taken === 'auto_moderated').length,
         by_severity: {
-          low: violations.filter(v => v.severity === 'low').length,
-          medium: violations.filter(v => v.severity === 'medium').length,
-          high: violations.filter(v => v.severity === 'high').length,
-          critical: violations.filter(v => v.severity === 'critical').length
+          low: violations.filter((v: ModerationViolation) => v.severity === 'low').length,
+          medium: violations.filter((v: ModerationViolation) => v.severity === 'medium').length,
+          high: violations.filter((v: ModerationViolation) => v.severity === 'high').length,
+          critical: violations.filter((v: ModerationViolation) => v.severity === 'critical').length
         },
         by_content_type: {
-          message: violations.filter(v => v.content_type === 'message').length,
-          profile: violations.filter(v => v.content_type === 'profile').length,
-          bio: violations.filter(v => v.content_type === 'bio').length,
-          photo: violations.filter(v => v.content_type === 'photo').length,
-          comment: violations.filter(v => v.content_type === 'comment').length
+          message: violations.filter((v: ModerationViolation) => v.content_type === 'message').length,
+          profile: violations.filter((v: ModerationViolation) => v.content_type === 'profile').length,
+          bio: violations.filter((v: ModerationViolation) => v.content_type === 'bio').length,
+          photo: violations.filter((v: ModerationViolation) => v.content_type === 'photo').length,
+          comment: violations.filter((v: ModerationViolation) => v.content_type === 'comment').length
         }
       };
     } catch (error) {
-      logger.error('Failed to get moderation stats', error);
+      logger.error('Failed to get moderation stats', error as PostgrestError);
       throw error;
     }
   }
