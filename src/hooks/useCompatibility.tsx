@@ -1,17 +1,38 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
+import type { Database } from '@/integrations/supabase/types';
+import type { PostgrestError } from '@supabase/supabase-js';
 
-interface CompatibilityResponse {
+// Types stricts extraits de la base de données Supabase
+type CompatibilityQuestionRow = Database['public']['Tables']['compatibility_questions']['Row'];
+type UserCompatibilityResponseRow = Database['public']['Tables']['user_compatibility_responses']['Row'];
+
+/**
+ * Réponse utilisateur pour une question de compatibilité
+ */
+export interface CompatibilityResponse {
   question_key: string;
   response_value: string;
+  updated_at?: string;
 }
 
-interface CompatibilityStats {
+/**
+ * Statistiques de complétion du questionnaire
+ */
+export interface CompatibilityStats {
   totalQuestions: number;
   answeredQuestions: number;
   completionPercentage: number;
   lastUpdated: string | null;
+}
+
+/**
+ * Question de compatibilité avec son poids
+ */
+interface WeightedQuestion {
+  question_key: string;
+  weight: number;
 }
 
 export const useCompatibility = () => {
@@ -31,73 +52,103 @@ export const useCompatibility = () => {
     }
   }, [user]);
 
-  const fetchCompatibilityData = async () => {
+  /**
+   * Charge les données de compatibilité pour l'utilisateur connecté
+   */
+  const fetchCompatibilityData = async (): Promise<void> => {
     if (!user?.id) {
       setLoading(false);
       return;
     }
 
     try {
-      // Get total number of active questions
-      const { count: totalQuestions } = await supabase
+      // Get total number of active questions with strict typing
+      const { count: totalQuestions, error: countError } = await supabase
         .from('compatibility_questions')
         .select('*', { count: 'exact' })
         .eq('is_active', true);
 
-      // Get user responses
-      const { data: userResponses, error } = await supabase
+      if (countError) throw countError;
+
+      // Get user responses with strict typing
+      const { data: userResponses, error: responsesError } = await supabase
         .from('user_compatibility_responses')
         .select('question_key, response_value, updated_at')
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
-      if (error) throw error;
+      if (responsesError) throw responsesError;
 
-      const answeredQuestions = userResponses?.length || 0;
+      const answeredQuestions = userResponses?.length ?? 0;
       const completionPercentage = totalQuestions ? (answeredQuestions / totalQuestions) * 100 : 0;
-      const lastUpdated = userResponses?.[0]?.updated_at || null;
+      const lastUpdated = userResponses?.[0]?.updated_at ?? null;
 
-      setResponses(userResponses || []);
+      // Normalize responses to match CompatibilityResponse interface
+      const normalizedResponses: CompatibilityResponse[] = (userResponses ?? []).map(response => ({
+        question_key: response.question_key,
+        response_value: response.response_value,
+        updated_at: response.updated_at
+      }));
+
+      setResponses(normalizedResponses);
       setStats({
-        totalQuestions: totalQuestions || 0,
+        totalQuestions: totalQuestions ?? 0,
         answeredQuestions,
         completionPercentage,
         lastUpdated
       });
 
-    } catch (error) {
+    } catch (err) {
+      const error = err as PostgrestError;
       console.error('Error fetching compatibility data:', error);
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Récupère la réponse de l'utilisateur pour une question donnée
+   * @param questionKey - Clé de la question
+   * @returns La valeur de la réponse ou null si non trouvée
+   */
   const getResponseValue = (questionKey: string): string | null => {
     const response = responses.find(r => r.question_key === questionKey);
-    return response?.response_value || null;
+    return response?.response_value ?? null;
   };
 
+  /**
+   * Calcule le score de compatibilité avec un autre utilisateur
+   * Compare les réponses des deux utilisateurs en tenant compte des poids des questions
+   * @param otherUserId - ID de l'autre utilisateur
+   * @returns Score de compatibilité entre 0 et 100
+   */
   const calculateCompatibilityScore = async (otherUserId: string): Promise<number> => {
     if (!user?.id) {
       return 0;
     }
 
     try {
-      // Get both users' responses
-      const { data: myResponses } = await supabase
+      // Get both users' responses with strict typing
+      const { data: myResponses, error: myError } = await supabase
         .from('user_compatibility_responses')
         .select('question_key, response_value')
         .eq('user_id', user.id);
 
-      const { data: theirResponses } = await supabase
+      if (myError) throw myError;
+
+      const { data: theirResponses, error: theirError } = await supabase
         .from('user_compatibility_responses')
         .select('question_key, response_value')
         .eq('user_id', otherUserId);
 
-      const { data: questions } = await supabase
+      if (theirError) throw theirError;
+
+      const { data: questions, error: questionsError } = await supabase
         .from('compatibility_questions')
         .select('question_key, weight')
         .eq('is_active', true);
+
+      if (questionsError) throw questionsError;
 
       if (!myResponses || !theirResponses || !questions) {
         return 0;
@@ -106,32 +157,41 @@ export const useCompatibility = () => {
       let totalWeight = 0;
       let matchedWeight = 0;
 
-      questions.forEach(question => {
+      // Normalize questions to WeightedQuestion type
+      const weightedQuestions: WeightedQuestion[] = questions.map(q => ({
+        question_key: q.question_key,
+        weight: q.weight ?? 1 // Default weight to 1 if null
+      }));
+
+      weightedQuestions.forEach(question => {
         const myResponse = myResponses.find(r => r.question_key === question.question_key);
         const theirResponse = theirResponses.find(r => r.question_key === question.question_key);
 
         if (myResponse && theirResponse) {
-          const weight = question.weight ?? 1; // Default weight to 1 if null
-          totalWeight += weight;
+          totalWeight += question.weight;
           
           // Simple matching - exact match scores full weight
           if (myResponse.response_value === theirResponse.response_value) {
-            matchedWeight += weight;
+            matchedWeight += question.weight;
           }
           // Partial matching for some questions could be implemented here
           // For now, we use binary matching (match or no match)
         }
       });
 
-      return totalWeight > 0 ? (matchedWeight / totalWeight) * 100 : 0;
+      return totalWeight > 0 ? Math.round((matchedWeight / totalWeight) * 100) : 0;
 
-    } catch (error) {
+    } catch (err) {
+      const error = err as PostgrestError;
       console.error('Error calculating compatibility score:', error);
       return 0;
     }
   };
 
-  const refreshData = () => {
+  /**
+   * Rafraîchit les données de compatibilité
+   */
+  const refreshData = (): void => {
     if (user) {
       fetchCompatibilityData();
     }

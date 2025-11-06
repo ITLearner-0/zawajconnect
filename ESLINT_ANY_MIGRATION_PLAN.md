@@ -8,12 +8,12 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 
 | Métrique | Valeur |
 |----------|--------|
-| **Warnings ESLint** | 204 → **191** ✅ |
+| **Warnings ESLint** | 204 → **187** ✅ |
 | **Type de warning** | `@typescript-eslint/no-explicit-any` |
 | **Statut actuel** | `warn` (permet la compilation) |
 | **Objectif final** | 0 warnings (règle à `error`) |
-| **Dernière migration** | `useFamilyApproval.tsx` (-3 any + 1 documenté) |
-| **Progrès total** | 14 types stricts ajoutés (9 any + 5 unknown), 1 any documenté |
+| **Dernière migration** | `useCompatibility.tsx` (-4 any) |
+| **Progrès total** | 18 types stricts ajoutés (13 any + 5 unknown), 1 any documenté |
 
 ---
 
@@ -234,6 +234,54 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 
 ---
 
+### ✅ Hook Compatibility - `useCompatibility.tsx` (Janvier 2025)
+
+**Warnings éliminés**: 4 types `any` implicites
+
+**Changements effectués**:
+1. **Import des types Supabase stricts:**
+   ```typescript
+   type CompatibilityQuestionRow = Database['public']['Tables']['compatibility_questions']['Row'];
+   type UserCompatibilityResponseRow = Database['public']['Tables']['user_compatibility_responses']['Row'];
+   ```
+
+2. **Interfaces exportées pour réutilisation:**
+   - `CompatibilityResponse` avec `updated_at` optionnel
+   - `CompatibilityStats` pour les statistiques de complétion
+   - `WeightedQuestion` pour le calcul des scores
+
+3. **Typage strict de toutes les opérations Supabase:**
+   - Vérification d'erreur explicite : `countError`, `responsesError`, `myError`, `theirError`, `questionsError`
+   - Type guards avec `PostgrestError` pour toutes les erreurs
+   - Normalisation des données avec types stricts
+
+4. **Signatures de fonction strictes:**
+   - `fetchCompatibilityData(): Promise<void>`
+   - `getResponseValue(questionKey: string): string | null`
+   - `calculateCompatibilityScore(otherUserId: string): Promise<number>`
+   - `refreshData(): void`
+
+5. **Amélioration de la logique de calcul:**
+   - Normalisation des questions avec `WeightedQuestion[]`
+   - Score arrondi avec `Math.round()`
+   - Utilisation de `??` au lieu de `||` pour les valeurs par défaut
+   - Documentation JSDoc pour toutes les fonctions
+
+**Validation**:
+- ✅ Tous les types Supabase correctement importés
+- ✅ Gestion stricte des erreurs avec `PostgrestError`
+- ✅ Pas d'`any` implicite dans les réponses Supabase
+- ✅ Calcul de compatibilité entièrement typé
+
+**Leçons apprises**:
+- Typer explicitement toutes les erreurs Supabase même pour les queries simples
+- Créer des types intermédiaires (`WeightedQuestion`) pour améliorer la clarté
+- Documenter les fonctions complexes avec JSDoc
+- Utiliser `Math.round()` pour les scores de pourcentage
+- Préférer `??` à `||` pour gérer correctement les valeurs nullish
+
+---
+
 ## 🎯 Stratégie de Migration
 
 ### Principes Directeurs
@@ -259,17 +307,17 @@ Fichiers estimés avec any:
 ✅ src/hooks/useAuth.tsx (COMPLÉTÉ - déjà conforme, 0 any)
 ✅ src/hooks/useMatchingPreferences.tsx (COMPLÉTÉ - 2 any éliminés)
 ✅ src/hooks/useFamilyApproval.tsx (COMPLÉTÉ - 3 any éliminés, 1 any documenté)
-- src/hooks/useCompatibility.tsx (calcul compatibilité)
+✅ src/hooks/useCompatibility.tsx (COMPLÉTÉ - 4 any éliminés)
 - src/hooks/useSecurityValidationEnhanced.tsx (sécurité)
 
 Estimation: ~30-40 warnings
-Complété: 13 warnings (8 any + 5 unknown), 1 any documenté
-Restant: ~17-27 warnings
+Complété: 17 warnings (12 any + 5 unknown), 1 any documenté
+Restant: ~13-23 warnings
 Durée estimée: 2-3 semaines
 ```
 
 **Objectif Phase 1**: Réduire de 204 à ~160-170 warnings
-**Progrès actuel**: 204 → 191 warnings (~6.4% complété, 6/8 hooks - 75%)
+**Progrès actuel**: 204 → 187 warnings (~8.3% complété, 7/8 hooks - 87.5%)
 
 ---
 
@@ -550,7 +598,7 @@ Pour chaque fichier migré:
 ### Phase 1 (Semaines 1-3)
 - **Objectif**: Hooks Core
 - **Warnings**: 204 → ~165 (-39 warnings)
-- **Progrès actuel**: 204 → 191 (-13 warnings, 75% des hooks complétés)
+- **Progrès actuel**: 204 → 187 (-17 warnings, 87.5% des hooks complétés)
 - **Validation**: Tous les hooks core sont strictement typés
 
 ### Phase 2 (Semaines 4-5)
