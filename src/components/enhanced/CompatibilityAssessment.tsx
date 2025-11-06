@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useCompatibility } from '@/hooks/useCompatibility';
+import { useCompatibility, type UseCompatibilityReturn } from '@/hooks/useCompatibility';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -45,7 +45,7 @@ interface CompatibilityAssessmentProps {
 const CompatibilityAssessment = ({ onComplete, embedded = false }: CompatibilityAssessmentProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { stats, responses, loading, refreshData } = useCompatibility();
+  const { stats, responses, loading, refreshData }: UseCompatibilityReturn = useCompatibility();
   const [compatibilityInsights, setCompatibilityInsights] = useState<CompatibilityInsight[]>([]);
   const [potentialMatches, setPotentialMatches] = useState<CompatibilityMatch[]>([]);
   const [activeTab, setActiveTab] = useState('questionnaire');
@@ -57,7 +57,7 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
     }
   }, [stats]);
 
-  const generateCompatibilityInsights = async () => {
+  const generateCompatibilityInsights = async (): Promise<void> => {
     if (!responses.length) return;
 
     setAnalyzing(true);
@@ -94,7 +94,7 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
       ];
 
       setCompatibilityInsights(insights);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating insights:', error);
     } finally {
       setAnalyzing(false);
@@ -108,7 +108,7 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
     return { level: 'Faible', color: 'text-red-500', bgColor: 'bg-red-100' };
   };
 
-  const handleQuestionnaireComplete = () => {
+  const handleQuestionnaireComplete = (): void => {
     refreshData();
     generateCompatibilityInsights();
     toast({
