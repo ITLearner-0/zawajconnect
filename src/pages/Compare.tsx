@@ -15,6 +15,7 @@ import ProfileComparator from '@/components/ProfileComparator';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { generateComparisonPDF } from '@/services/comparisonPdfExportService';
+import { useUnifiedCompatibility } from '@/hooks/useUnifiedCompatibility';
 
 interface ComparisonHistory {
   id: string;
@@ -32,6 +33,7 @@ const Compare = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { batchCalculateCompatibility } = useUnifiedCompatibility();
   const [history, setHistory] = useState<ComparisonHistory[]>([]);
   const [filteredHistory, setFilteredHistory] = useState<ComparisonHistory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -293,33 +295,52 @@ const Compare = () => {
   };
 
   const handleExportPdf = async () => {
-    if (!selectedComparison) return;
+    if (!selectedComparison || !user) return;
     
     setExportingPdf(true);
     try {
-      // Fetch profiles data
+      // Fetch profiles data with user_id
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, full_name, age, location, occupation')
+        .select('id, user_id, full_name, age, location, occupation')
         .in('id', selectedComparison.compared_profile_ids);
 
       if (profilesError) throw profilesError;
+      if (!profiles || profiles.length === 0) {
+        throw new Error('No profiles found');
+      }
 
-      // Calculate scores (simplified - in real app, fetch from compatibility calculations)
-      const scores = profiles?.map(profile => ({
-        profileId: profile.id,
-        overall: Math.floor(Math.random() * 30) + 70, // Mock data
-        islamic: Math.floor(Math.random() * 30) + 70,
-        cultural: Math.floor(Math.random() * 30) + 70,
-        personality: Math.floor(Math.random() * 30) + 70,
-      })) || [];
+      // Get user IDs from profiles
+      const userIds = profiles.map(p => p.user_id).filter(Boolean);
+
+      // Calculate real compatibility scores using the unified compatibility hook
+      const compatibilityResults = await batchCalculateCompatibility(userIds);
+
+      // Map compatibility results to scores by profile ID
+      const scores = profiles.map(profile => {
+        const result = compatibilityResults[profile.user_id];
+        return {
+          profileId: profile.id,
+          overall: result?.compatibility_score ?? 60,
+          islamic: result?.islamic_score ?? 60,
+          cultural: result?.cultural_score ?? 60,
+          personality: result?.personality_score ?? 60,
+        };
+      });
 
       await generateComparisonPDF({
         comparisonName: selectedComparison.comparison_name || 'Comparaison sans titre',
         comparisonDate: format(new Date(selectedComparison.created_at), 'PPP', { locale: fr }),
         data: {
-          profiles: profiles || [],
+          profiles: profiles.map(p => ({
+            id: p.id,
+            full_name: p.full_name,
+            age: p.age,
+            location: p.location,
+            occupation: p.occupation,
+          })),
           scores,
+          insights: compatibilityResults,
         },
         notes: selectedComparison.notes || undefined,
         radarChartElement: radarChartRef.current || undefined,
@@ -327,7 +348,7 @@ const Compare = () => {
 
       toast({
         title: "Export réussi",
-        description: "Le PDF a été téléchargé avec succès"
+        description: "Le PDF a été téléchargé avec les scores réels de compatibilité"
       });
     } catch (error) {
       console.error('Error exporting PDF:', error);
