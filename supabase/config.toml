@@ -74,3 +74,6 @@ verify_jwt = true
 
 [functions.cancel-braintree-subscription]
 verify_jwt = true
+
+[functions.generate-onboarding-suggestions]
+verify_jwt = true

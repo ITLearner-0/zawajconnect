@@ -22,10 +22,12 @@ import IslamicPreferencesStep from '@/components/onboarding/IslamicPreferencesSt
 import MobileStepNavigation from '@/components/onboarding/MobileStepNavigation';
 import { SessionResumptionModal } from '@/components/onboarding/SessionResumptionModal';
 import { KeyboardShortcutsPanel } from '@/components/onboarding/KeyboardShortcutsPanel';
+import { SmartSuggestionPanel } from '@/components/onboarding/SmartSuggestionPanel';
 import { useOnboardingValidation } from '@/hooks/useOnboardingValidation';
 import { useOnboardingPersistence } from '@/hooks/useOnboardingPersistence';
 import { useOnboardingAnalytics } from '@/hooks/useOnboardingAnalytics';
 import { useOnboardingKeyboardNavigation } from '@/hooks/useOnboardingKeyboardNavigation';
+import { useOnboardingSuggestions } from '@/hooks/useOnboardingSuggestions';
 import { useProfileSave } from '@/hooks/useProfileSave';
 import { SaveStatusIndicator } from '@/components/SaveStatusIndicator';
 import { 
@@ -136,6 +138,12 @@ const Onboarding = () => {
 
   // Profile save hook
   const { saveProfile: saveToDatabase, uploadAvatar, saving } = useProfileSave();
+
+  // Smart suggestions hook
+  const suggestions = useOnboardingSuggestions();
+  const [bioSuggestions, setBioSuggestions] = useState<string[]>([]);
+  const [islamicSuggestions, setIslamicSuggestions] = useState<any>(null);
+  const [interestsSuggestions, setInterestsSuggestions] = useState<string[]>([]);
 
   const calculateCompletionPercentage = validation.getOverallProgress;
 
@@ -292,6 +300,49 @@ const Onboarding = () => {
     // Track skipped section
     console.log(`Section skipped: ${sectionName}`);
     nextStep();
+  };
+
+  // Suggestion generators
+  const handleGenerateBioSuggestions = async () => {
+    const result = await suggestions.generateBioSuggestions({
+      interests: profileData.interests,
+      profession: profileData.profession,
+      education: profileData.education,
+      lookingFor: profileData.looking_for
+    });
+    
+    if (result && Array.isArray(result)) {
+      setBioSuggestions(result);
+    }
+  };
+
+  const handleGenerateIslamicSuggestions = async () => {
+    const result = await suggestions.generateIslamicPreferencesSuggestions({
+      sect: islamicPrefs.sect,
+      madhab: islamicPrefs.madhab,
+      prayerFrequency: islamicPrefs.prayer_frequency,
+      quranReading: islamicPrefs.quran_reading,
+      importanceOfReligion: islamicPrefs.importance_of_religion,
+      halalDiet: islamicPrefs.halal_diet,
+      hijabPreference: islamicPrefs.hijab_preference,
+      beardPreference: islamicPrefs.beard_preference
+    });
+    
+    if (result) {
+      setIslamicSuggestions(result);
+    }
+  };
+
+  const handleGenerateInterestsSuggestions = async () => {
+    const result = await suggestions.generateInterestsSuggestions({
+      currentInterests: profileData.interests,
+      profession: profileData.profession,
+      education: profileData.education
+    });
+    
+    if (result && Array.isArray(result)) {
+      setInterestsSuggestions(result);
+    }
   };
 
   const nextStep = () => {
@@ -618,8 +669,20 @@ const Onboarding = () => {
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="bio">À propos de moi *</Label>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="bio">À propos de moi *</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleGenerateBioSuggestions}
+                  disabled={suggestions.loading || !profileData.profession}
+                  className="h-8 gap-1"
+                >
+                  <Sparkles className="h-3 w-3" />
+                  <span className="text-xs">Suggestions IA</span>
+                </Button>
+              </div>
               <Textarea
                 id="bio"
                 value={profileData.bio}
@@ -628,9 +691,53 @@ const Onboarding = () => {
                 rows={4}
                 required
               />
+              
+              {/* Bio Suggestions */}
+              {bioSuggestions.length > 0 && (
+                <SmartSuggestionPanel
+                  title="Suggestions de bio"
+                  description="Cliquez sur une suggestion pour l'utiliser"
+                  suggestions={bioSuggestions}
+                  loading={suggestions.loading}
+                  onSelect={(suggestion) => setProfileData({...profileData, bio: suggestion})}
+                  onRefresh={handleGenerateBioSuggestions}
+                />
+              )}
             </div>
 
             <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Centres d'intérêt</Label>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleGenerateInterestsSuggestions}
+                  disabled={suggestions.loading}
+                  className="h-8 gap-1"
+                >
+                  <Sparkles className="h-3 w-3" />
+                  <span className="text-xs">Suggestions</span>
+                </Button>
+              </div>
+              
+              {/* Interests Suggestions */}
+              {interestsSuggestions.length > 0 && (
+                <SmartSuggestionPanel
+                  title="Suggestions d'intérêts"
+                  suggestions={interestsSuggestions}
+                  loading={suggestions.loading}
+                  onSelect={(suggestion) => {
+                    if (!profileData.interests.includes(suggestion)) {
+                      setProfileData({
+                        ...profileData,
+                        interests: [...profileData.interests, suggestion]
+                      });
+                    }
+                  }}
+                  compact
+                />
+              )}
+              
               <InterestsSelector 
                 interests={profileData.interests}
                 onInterestsChange={(interests) => setProfileData({...profileData, interests})}
@@ -671,11 +778,36 @@ const Onboarding = () => {
 
       case 3:
         return (
-          <IslamicPreferencesStep
-            preferences={islamicPrefs}
-            onPreferencesChange={setIslamicPrefs}
-            gender={profileData.gender}
-          />
+          <div className="space-y-6">
+            {/* Islamic Suggestions */}
+            {islamicSuggestions && (
+              <SmartSuggestionPanel
+                title="Suggestions et avertissements"
+                description="L'IA a analysé vos préférences islamiques"
+                suggestions={islamicSuggestions}
+                loading={suggestions.loading}
+              />
+            )}
+            
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleGenerateIslamicSuggestions}
+                disabled={suggestions.loading || !islamicPrefs.sect}
+                className="gap-2"
+              >
+                <Sparkles className="h-4 w-4" />
+                Analyser mes préférences
+              </Button>
+            </div>
+            
+            <IslamicPreferencesStep
+              preferences={islamicPrefs}
+              onPreferencesChange={setIslamicPrefs}
+              gender={profileData.gender}
+            />
+          </div>
         );
 
       case 4:
