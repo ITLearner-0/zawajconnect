@@ -28,6 +28,7 @@ export type FamilyReviewRow = Database['public']['Tables']['family_reviews']['Ro
 export type CompatibilityQuestionRow = Database['public']['Tables']['compatibility_questions']['Row'];
 export type UserCompatibilityResponseRow = Database['public']['Tables']['user_compatibility_responses']['Row'];
 export type ProfileViewRow = Database['public']['Tables']['profile_views']['Row'];
+export type SupervisionLogRow = Database['public']['Tables']['supervision_logs']['Row'];
 
 /**
  * Types Insert pour les opérations d'insertion/upsert
