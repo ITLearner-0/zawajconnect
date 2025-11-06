@@ -15,7 +15,7 @@ import {
   Users,
   Brain
 } from 'lucide-react';
-import { useCompatibilityInsights } from '@/hooks/useCompatibilityInsights';
+import { useCompatibilityInsights, type UseCompatibilityInsightsReturn } from '@/hooks/useCompatibilityInsights';
 import CompatibilityScoreChart from '@/components/CompatibilityScoreChart';
 import InsightsActionPanel from '@/components/InsightsActionPanel';
 import InsightsSummaryCard from '@/components/InsightsSummaryCard';
@@ -34,7 +34,7 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
   userId, 
   showActions = true 
 }) => {
-  const { insights, loading } = useCompatibilityInsights(userId);
+  const { insights, loading }: UseCompatibilityInsightsReturn = useCompatibilityInsights(userId);
   const navigate = useNavigate();
 
   if (loading) {
