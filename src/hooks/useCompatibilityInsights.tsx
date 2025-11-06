@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { useCompatibility } from '@/hooks/useCompatibility';
+import { useCompatibility, type UseCompatibilityReturn } from '@/hooks/useCompatibility';
 import { getGuidanceByCategory, getRandomGuidance } from '@/data/islamicGuidance';
 
 interface CompatibilityArea {
@@ -39,9 +39,14 @@ interface CompatibilityInsights {
   islamicGuidance: IslamicGuidance[];
 }
 
-export const useCompatibilityInsights = (userId?: string) => {
+export interface UseCompatibilityInsightsReturn {
+  insights: CompatibilityInsights | null;
+  loading: boolean;
+}
+
+export const useCompatibilityInsights = (userId?: string): UseCompatibilityInsightsReturn => {
   const { user } = useAuth();
-  const { responses, stats, loading } = useCompatibility();
+  const { responses, stats, loading }: UseCompatibilityReturn = useCompatibility();
   const [insights, setInsights] = useState<CompatibilityInsights | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
 
@@ -51,14 +56,14 @@ export const useCompatibilityInsights = (userId?: string) => {
     }
   }, [responses, loading]);
 
-  const generateInsights = async () => {
+  const generateInsights = async (): Promise<void> => {
     setAnalyzing(true);
     
     try {
       // Analyze responses to generate insights
       const analysisResult = analyzeResponses(responses);
       setInsights(analysisResult);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error generating insights:', error);
     } finally {
       setAnalyzing(false);
@@ -67,7 +72,7 @@ export const useCompatibilityInsights = (userId?: string) => {
 
   const analyzeResponses = (responses: Array<{ question_key: string; response_value: string }>): CompatibilityInsights => {
     // Convert responses to a map for easier access
-    const responseMap = responses.reduce((map, response) => {
+    const responseMap = responses.reduce((map: Record<string, string>, response) => {
       map[response.question_key] = response.response_value;
       return map;
     }, {} as Record<string, string>);
@@ -109,7 +114,7 @@ export const useCompatibilityInsights = (userId?: string) => {
   };
 
   const generatePersonalitySummary = (responses: Record<string, string>): string => {
-    const traits = [];
+    const traits: string[] = [];
     
     // Economic autonomy
     if (responses['economic_autonomy'] === 'complete_independence') {
@@ -155,7 +160,7 @@ export const useCompatibilityInsights = (userId?: string) => {
   };
 
   const identifyPriorities = (responses: Record<string, string>): string[] => {
-    const priorities = [];
+    const priorities: string[] = [];
     
     if (responses['economic_autonomy']?.includes('independence')) {
       priorities.push('Indépendance financière');
@@ -177,8 +182,6 @@ export const useCompatibilityInsights = (userId?: string) => {
   };
 
   const determineRelationshipStyle = (responses: Record<string, string>): string => {
-    const styles = [];
-    
     if (responses['family_decisions'] === 'consensus_decisions') {
       return 'Partnership collaboratif avec prise de décision partagée';
     } else if (responses['family_decisions'] === 'husband_leads') {
@@ -269,7 +272,7 @@ export const useCompatibilityInsights = (userId?: string) => {
   };
 
   const generateIdealPartnerProfile = (responses: Record<string, string>): string[] => {
-    const traits = [];
+    const traits: string[] = [];
     
     if (responses['economic_autonomy'] === 'shared_responsibilities') {
       traits.push('Partagent les responsabilités financières équitablement');
@@ -305,7 +308,7 @@ export const useCompatibilityInsights = (userId?: string) => {
   };
 
   const generateSuggestions = (responses: Record<string, string>): Suggestion[] => {
-    const suggestions = [];
+    const suggestions: Suggestion[] = [];
     
     // Economic flexibility
     if (responses['economic_autonomy'] === 'husband_provides') {
@@ -347,7 +350,7 @@ export const useCompatibilityInsights = (userId?: string) => {
   };
 
   const identifyRedFlags = (responses: Record<string, string>): RedFlag[] => {
-    const flags = [];
+    const flags: RedFlag[] = [];
     
     // Extreme positions that might limit compatibility
     if (responses['economic_autonomy'] === 'complete_independence' && 
@@ -382,7 +385,7 @@ export const useCompatibilityInsights = (userId?: string) => {
   };
 
   const getIslamicGuidance = (responses: Record<string, string>): IslamicGuidance[] => {
-    const categories = [];
+    const categories: string[] = [];
     
     // Determine relevant categories based on responses
     if (responses['economic_autonomy'] === 'shared_responsibilities') {
