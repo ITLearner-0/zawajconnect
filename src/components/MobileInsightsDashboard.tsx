@@ -13,7 +13,7 @@ import {
   TrendingUp,
   Star
 } from 'lucide-react';
-import { useCompatibilityInsights } from '@/hooks/useCompatibilityInsights';
+import { useCompatibilityInsights, type UseCompatibilityInsightsReturn } from '@/hooks/useCompatibilityInsights';
 import MobileCompatibilityCard from '@/components/MobileCompatibilityCard';
 import InteractiveInsightCard from '@/components/InteractiveInsightCard';
 
@@ -22,7 +22,7 @@ interface MobileInsightsDashboardProps {
 }
 
 const MobileInsightsDashboard: React.FC<MobileInsightsDashboardProps> = ({ userId }) => {
-  const { insights, loading } = useCompatibilityInsights(userId);
+  const { insights, loading }: UseCompatibilityInsightsReturn = useCompatibilityInsights(userId);
   const [activeTab, setActiveTab] = useState('overview');
 
   if (loading) {
