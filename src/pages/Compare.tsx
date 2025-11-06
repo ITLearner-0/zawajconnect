@@ -9,9 +9,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Star, Trash2, Edit, Eye, Clock, Filter, StarOff, Download, Tag, X, Plus } from 'lucide-react';
+import { Calendar, Star, Trash2, Edit, Eye, Clock, Filter, StarOff, Download, Tag, X, Plus, ArrowUpDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ProfileComparator from '@/components/ProfileComparator';
+import StarRating from '@/components/StarRating';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { generateComparisonPDF } from '@/services/comparisonPdfExportService';
@@ -25,6 +26,7 @@ interface ComparisonHistory {
   notes: string | null;
   is_favorite: boolean;
   tags: string[];
+  rating: number | null;
   created_at: string;
   updated_at: string;
 }
@@ -52,6 +54,8 @@ const Compare = () => {
   const [editingTags, setEditingTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   const [tagEditingComparison, setTagEditingComparison] = useState<ComparisonHistory | null>(null);
+  const [sortBy, setSortBy] = useState<'date' | 'rating'>('date');
+  const [ratingFilter, setRatingFilter] = useState<number | null>(null);
   const radarChartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,7 +68,7 @@ const Compare = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [history, dateFilter, favoritesOnly, selectedTags]);
+  }, [history, dateFilter, favoritesOnly, selectedTags, sortBy, ratingFilter]);
 
   useEffect(() => {
     // Extract all unique tags from history
@@ -131,6 +135,25 @@ const Compare = () => {
       filtered = filtered.filter(item => 
         item.tags && item.tags.some(tag => selectedTags.includes(tag))
       );
+    }
+
+    // Filter by rating
+    if (ratingFilter !== null) {
+      filtered = filtered.filter(item => item.rating === ratingFilter);
+    }
+
+    // Sort
+    if (sortBy === 'rating') {
+      filtered.sort((a, b) => {
+        // Sort by rating descending, nulls last
+        if (a.rating === null && b.rating === null) return 0;
+        if (a.rating === null) return 1;
+        if (b.rating === null) return -1;
+        return b.rating - a.rating;
+      });
+    } else {
+      // Sort by date descending (default)
+      filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     }
 
     setFilteredHistory(filtered);
@@ -267,6 +290,34 @@ const Compare = () => {
     );
   };
 
+  const handleRatingChange = async (comparisonId: string, newRating: number) => {
+    try {
+      const { error } = await supabase
+        .from('profile_comparison_history')
+        .update({
+          rating: newRating === 0 ? null : newRating,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', comparisonId);
+
+      if (error) throw error;
+
+      toast({
+        title: newRating === 0 ? "Note retirée" : "Note enregistrée",
+        description: newRating === 0 ? "La note a été supprimée" : `Note: ${newRating}/5 étoiles`
+      });
+
+      fetchHistory();
+    } catch (error) {
+      console.error('Error updating rating:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour la note",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleDelete = async (id: string) => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette comparaison ?')) return;
 
@@ -391,8 +442,8 @@ const Compare = () => {
         <Card className="mb-6">
           <CardContent className="p-4">
             <div className="flex flex-col gap-4">
-              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                <div className="flex items-center gap-2 flex-1">
+              <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center flex-wrap">
+                <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4 text-muted-foreground" />
                   <Select value={dateFilter} onValueChange={(value: any) => setDateFilter(value)}>
                     <SelectTrigger className="w-[180px]">
@@ -403,6 +454,39 @@ const Compare = () => {
                       <SelectItem value="today">Aujourd'hui</SelectItem>
                       <SelectItem value="week">Cette semaine</SelectItem>
                       <SelectItem value="month">Ce mois</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Star className="h-4 w-4 text-muted-foreground" />
+                  <Select 
+                    value={ratingFilter?.toString() || 'all'} 
+                    onValueChange={(value) => setRatingFilter(value === 'all' ? null : parseInt(value))}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Toutes les notes" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Toutes les notes</SelectItem>
+                      <SelectItem value="5">5 étoiles</SelectItem>
+                      <SelectItem value="4">4 étoiles</SelectItem>
+                      <SelectItem value="3">3 étoiles</SelectItem>
+                      <SelectItem value="2">2 étoiles</SelectItem>
+                      <SelectItem value="1">1 étoile</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+                  <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Trier par" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="date">Date (récent)</SelectItem>
+                      <SelectItem value="rating">Note (meilleur)</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -494,6 +578,14 @@ const Compare = () => {
                         {comparison.is_favorite && (
                           <Star className="h-5 w-5 text-gold fill-gold" />
                         )}
+                      </div>
+
+                      <div className="flex items-center gap-2 mb-3">
+                        <StarRating
+                          rating={comparison.rating}
+                          onRatingChange={(rating) => handleRatingChange(comparison.id, rating)}
+                          size="sm"
+                        />
                       </div>
 
                       <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground mb-3">
