@@ -13,7 +13,7 @@ import {
   Download,
   RefreshCw
 } from 'lucide-react';
-import { useCompatibilityInsights } from '@/hooks/useCompatibilityInsights';
+import { useCompatibilityInsights, type UseCompatibilityInsightsReturn } from '@/hooks/useCompatibilityInsights';
 
 interface InsightsSummaryCardProps {
   userId?: string;
@@ -24,7 +24,7 @@ const InsightsSummaryCard: React.FC<InsightsSummaryCardProps> = ({
   userId, 
   compact = false 
 }) => {
-  const { insights, loading } = useCompatibilityInsights(userId);
+  const { insights, loading }: UseCompatibilityInsightsReturn = useCompatibilityInsights(userId);
 
   if (loading) {
     return (
