@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight, Lock, Users } from 'lucide-react';
+import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight, Lock, Users, Grid3x3, LayoutGrid } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -77,6 +77,8 @@ const Browse = () => {
   const [selectedProfiles, setSelectedProfiles] = useState<string[]>([]);
   const [showComparator, setShowComparator] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
+  const [viewMode, setViewMode] = useState<'carousel' | 'grid'>('carousel');
+  const [gridStartIndex, setGridStartIndex] = useState(0);
 
   useEffect(() => {
     if (!user) {
@@ -507,6 +509,28 @@ const Browse = () => {
   };
 
   const currentProfile = filteredProfiles[currentIndex];
+  const gridProfilesPerPage = 9;
+  const gridProfiles = filteredProfiles.slice(gridStartIndex, gridStartIndex + gridProfilesPerPage);
+
+  const nextGridPage = async () => {
+    const canView = await checkDailyLimit();
+    if (!canView) return;
+    
+    if (gridStartIndex + gridProfilesPerPage < filteredProfiles.length) {
+      setGridStartIndex(gridStartIndex + gridProfilesPerPage);
+      // Log views for the new page
+      const newProfiles = filteredProfiles.slice(gridStartIndex + gridProfilesPerPage, gridStartIndex + gridProfilesPerPage * 2);
+      for (const profile of newProfiles) {
+        await logProfileView(profile.user_id);
+      }
+    }
+  };
+
+  const previousGridPage = () => {
+    if (gridStartIndex > 0) {
+      setGridStartIndex(Math.max(0, gridStartIndex - gridProfilesPerPage));
+    }
+  };
 
   if (loading) {
     return (
@@ -567,16 +591,32 @@ const Browse = () => {
         <DailyLimitIndicator />
         {isInActiveConversation && <ActiveConversationBanner matchId={activeMatchId} />}
         
-        {/* Selection Mode Toggle */}
-        <div className="mb-4 flex items-center justify-between">
-          <Button
-            variant={selectionMode ? "default" : "outline"}
-            onClick={() => setSelectionMode(!selectionMode)}
-            className={selectionMode ? "bg-emerald text-white" : "border-emerald text-emerald hover:bg-emerald hover:text-white"}
-          >
-            <Users className="h-4 w-4 mr-2" />
-            {selectionMode ? "Mode sélection activé" : "Comparer des profils"}
-          </Button>
+        {/* Selection Mode and View Toggle */}
+        <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <Button
+              variant={selectionMode ? "default" : "outline"}
+              onClick={() => setSelectionMode(!selectionMode)}
+              className={selectionMode ? "bg-emerald text-white" : "border-emerald text-emerald hover:bg-emerald hover:text-white"}
+            >
+              <Users className="h-4 w-4 mr-2" />
+              {selectionMode ? "Mode sélection activé" : "Comparer des profils"}
+            </Button>
+            
+            <Button
+              variant={viewMode === 'grid' ? "default" : "outline"}
+              onClick={() => {
+                setViewMode(viewMode === 'carousel' ? 'grid' : 'carousel');
+                if (viewMode === 'carousel') {
+                  setSelectionMode(true); // Auto-enable selection mode in grid view
+                }
+              }}
+              className={viewMode === 'grid' ? "bg-gold text-white" : "border-gold text-gold hover:bg-gold hover:text-white"}
+            >
+              {viewMode === 'grid' ? <LayoutGrid className="h-4 w-4 mr-2" /> : <Grid3x3 className="h-4 w-4 mr-2" />}
+              {viewMode === 'grid' ? 'Mode grille' : 'Mode grille'}
+            </Button>
+          </div>
           
           {selectionMode && selectedProfiles.length > 0 && (
             <div className="flex items-center gap-2">
@@ -612,9 +652,11 @@ const Browse = () => {
             )}
           </div>
 
-          {/* Main Profile Card */}
+          {/* Main Content Area */}
           <div className="lg:col-span-2">
-            <Card className="overflow-hidden shadow-lg animate-scale-in card-hover">
+            {viewMode === 'carousel' ? (
+              /* Carousel Mode - Original Single Profile View */
+              <Card className="overflow-hidden shadow-lg animate-scale-in card-hover">
               <div className="relative">
                 {/* Selection Checkbox */}
                 {selectionMode && (
@@ -789,7 +831,149 @@ const Browse = () => {
           </ReportModal>
         </div>
               </CardContent>
-            </Card>
+              </Card>
+            ) : (
+              /* Grid Mode - Multiple Profiles View */
+              <div className="space-y-6">
+                {/* Grid Navigation */}
+                <div className="flex items-center justify-between">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={previousGridPage}
+                    disabled={gridStartIndex === 0}
+                    className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-2" />
+                    Précédent
+                  </Button>
+                  <div className="text-sm text-muted-foreground">
+                    Profils {gridStartIndex + 1}-{Math.min(gridStartIndex + gridProfilesPerPage, filteredProfiles.length)} sur {filteredProfiles.length}
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={nextGridPage}
+                    disabled={gridStartIndex + gridProfilesPerPage >= filteredProfiles.length}
+                    className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+                  >
+                    Suivant
+                    <ChevronRight className="h-4 w-4 ml-2" />
+                  </Button>
+                </div>
+
+                {/* Profiles Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  {gridProfiles.map((profile) => (
+                    <Card key={profile.user_id} className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 card-hover relative">
+                      {/* Selection Checkbox - Always Visible in Grid Mode */}
+                      <div className="absolute top-3 right-3 z-20">
+                        <div className="bg-white rounded-lg p-2 shadow-lg border-2 border-emerald/30">
+                          <Checkbox
+                            checked={selectedProfiles.includes(profile.user_id)}
+                            onCheckedChange={() => toggleProfileSelection(profile.user_id)}
+                            className="h-5 w-5"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Profile Image */}
+                      <div className="relative h-48 bg-gradient-to-br from-emerald/10 to-gold/10 flex items-center justify-center overflow-hidden">
+                        {profile.avatar_url ? (
+                          <img 
+                            src={profile.avatar_url} 
+                            alt="Photo de profil" 
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <User className="h-16 w-16 text-muted-foreground" />
+                        )}
+                        
+                        {/* Verification Badge */}
+                        <div className="absolute top-2 left-2">
+                          <VerificationBadge verificationScore={profile.verification_score} />
+                        </div>
+                      </div>
+
+                      <CardContent className="p-4">
+                        {/* Basic Info */}
+                        <div className="mb-3">
+                          <h3 className="text-lg font-semibold mb-1">Profil Anonyme</h3>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            {profile.age && <span>{profile.age} ans</span>}
+                            {profile.city_only && (
+                              <>
+                                <span>•</span>
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="h-3 w-3" />
+                                  <span className="truncate">{profile.city_only}</span>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Details */}
+                        <div className="space-y-2 mb-3 text-sm">
+                          {profile.education_level && (
+                            <div className="flex items-center gap-2">
+                              <GraduationCap className="h-3 w-3 text-muted-foreground" />
+                              <span className="truncate">{profile.education_level}</span>
+                            </div>
+                          )}
+                          {profile.profession_category && (
+                            <div className="flex items-center gap-2">
+                              <Briefcase className="h-3 w-3 text-muted-foreground" />
+                              <span className="truncate">{profile.profession_category}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Interests */}
+                        {profile.interests && profile.interests.length > 0 && (
+                          <div className="mb-3">
+                            <div className="flex flex-wrap gap-1">
+                              {profile.interests.slice(0, 3).map((interest: string) => (
+                                <Badge key={interest} variant="secondary" className="text-xs">
+                                  {interest}
+                                </Badge>
+                              ))}
+                              {profile.interests.length > 3 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  +{profile.interests.length - 3}
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Action Buttons */}
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => navigate(`/profile/${profile.user_id}`)}
+                            className="flex-1 text-xs border-emerald text-emerald hover:bg-emerald hover:text-white"
+                          >
+                            Voir profil
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleLike(profile.user_id)}
+                            disabled={!subscription.subscribed || dailyLimitReached || isInActiveConversation}
+                            className="flex-1 text-xs"
+                          >
+                            <Heart className="h-3 w-3 mr-1" />
+                            {!subscription.subscribed ? 'Premium' : 'Liker'}
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Sidebar - Desktop only */}
