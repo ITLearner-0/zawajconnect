@@ -9,10 +9,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Star, Trash2, Edit, Eye, Clock, Filter, StarOff, Download, Tag, X, Plus, ArrowUpDown } from 'lucide-react';
+import { Calendar, Star, Trash2, Edit, Eye, Clock, Filter, StarOff, Download, Tag, X, Plus, ArrowUpDown, BarChart3 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ProfileComparator from '@/components/ProfileComparator';
 import StarRating from '@/components/StarRating';
+import ComparisonStatistics from '@/components/ComparisonStatistics';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { generateComparisonPDF } from '@/services/comparisonPdfExportService';
@@ -25,7 +26,7 @@ interface ComparisonHistory {
   comparison_name: string | null;
   notes: string | null;
   is_favorite: boolean;
-  tags: string[];
+  tags: string[] | null;
   rating: number | null;
   created_at: string;
   updated_at: string;
@@ -56,6 +57,7 @@ const Compare = () => {
   const [tagEditingComparison, setTagEditingComparison] = useState<ComparisonHistory | null>(null);
   const [sortBy, setSortBy] = useState<'date' | 'rating'>('date');
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
+  const [showStatistics, setShowStatistics] = useState(false);
   const radarChartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -353,7 +355,7 @@ const Compare = () => {
       // Fetch profiles data with user_id
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, user_id, full_name, age, location, occupation')
+        .select('id, user_id, full_name, age, location, profession')
         .in('id', selectedComparison.compared_profile_ids);
 
       if (profilesError) throw profilesError;
@@ -385,10 +387,10 @@ const Compare = () => {
         data: {
           profiles: profiles.map(p => ({
             id: p.id,
-            full_name: p.full_name,
-            age: p.age,
-            location: p.location,
-            occupation: p.occupation,
+            full_name: p.full_name || 'Non renseigné',
+            age: p.age || 0,
+            location: p.location || 'Non renseigné',
+            occupation: p.profession || 'Non renseigné',
           })),
           scores,
           insights: compatibilityResults,
@@ -431,12 +433,29 @@ const Compare = () => {
     <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
       <div className="container mx-auto max-w-6xl">
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Historique des Comparaisons</h1>
-          <p className="text-muted-foreground">
-            Retrouvez toutes vos comparaisons de profils précédentes
-          </p>
+        <div className="mb-6 flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Historique des Comparaisons</h1>
+            <p className="text-muted-foreground">
+              Retrouvez toutes vos comparaisons de profils précédentes
+            </p>
+          </div>
+          <Button
+            variant={showStatistics ? "default" : "outline"}
+            onClick={() => setShowStatistics(!showStatistics)}
+            className={showStatistics ? "bg-emerald text-white" : "border-emerald text-emerald hover:bg-emerald hover:text-white"}
+          >
+            <BarChart3 className="h-4 w-4 mr-2" />
+            {showStatistics ? "Masquer statistiques" : "Voir statistiques"}
+          </Button>
         </div>
+
+        {/* Statistics Section */}
+        {showStatistics && history.length > 0 && (
+          <div className="mb-6 animate-fade-in">
+            <ComparisonStatistics history={history} />
+          </div>
+        )}
 
         {/* Filters */}
         <Card className="mb-6">
