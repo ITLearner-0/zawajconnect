@@ -2,27 +2,22 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import type { 
+  MatchProfile, 
+  MatchingHistoryPreferences 
+} from '@/types/supabase';
+import type { PostgrestError } from '@supabase/supabase-js';
+import type { Database } from '@/integrations/supabase/types';
 
-export interface MatchProfile {
-  user_id: string;
-  full_name: string;
-  age: number;
-  location: string;
-  profession: string;
-  avatar_url?: string;
-  bio?: string;
-  compatibility_score: number;
-  islamic_score: number;
-  cultural_score: number;
-  personality_score: number;
-  matching_reasons: string[];
-  potential_concerns: string[];
-}
+type Json = Database['public']['Tables']['matching_history']['Insert']['matched_profiles'];
 
+/**
+ * Matching History Record - Raw DB type
+ */
 interface MatchingHistoryRecord {
   id: string;
-  matched_profiles: unknown; // JSON type from Supabase
-  preferences_used: unknown; // JSON type from Supabase
+  matched_profiles: unknown;
+  preferences_used: unknown;
   total_matches: number;
   avg_compatibility_score: number;
   search_timestamp: string;
@@ -30,10 +25,13 @@ interface MatchingHistoryRecord {
   created_at: string;
 }
 
+/**
+ * Matching History Entry - Typed for UI
+ */
 export interface MatchingHistoryEntry {
   id: string;
   matched_profiles: MatchProfile[];
-  preferences_used: unknown;
+  preferences_used: MatchingHistoryPreferences;
   total_matches: number;
   avg_compatibility_score: number;
   search_timestamp: string;
@@ -49,8 +47,8 @@ export const useMatchingHistory = () => {
   const transformHistoryData = (records: MatchingHistoryRecord[]): MatchingHistoryEntry[] => {
     return records.map(record => ({
       id: record.id,
-      matched_profiles: Array.isArray(record.matched_profiles) ? record.matched_profiles : [],
-      preferences_used: record.preferences_used,
+      matched_profiles: Array.isArray(record.matched_profiles) ? record.matched_profiles as MatchProfile[] : [],
+      preferences_used: (record.preferences_used as MatchingHistoryPreferences) || {},
       total_matches: record.total_matches,
       avg_compatibility_score: record.avg_compatibility_score ?? 0,
       search_timestamp: record.search_timestamp
@@ -85,7 +83,8 @@ export const useMatchingHistory = () => {
         })));
         setHistory(transformedData);
       } catch (error) {
-        console.error('Error loading history:', error);
+        const pgError = error as PostgrestError;
+        console.error('[useMatchingHistory] Load error:', pgError);
         toast({
           title: "Erreur",
           description: "Impossible de charger l'historique",
@@ -102,8 +101,8 @@ export const useMatchingHistory = () => {
   // Save new search to history
   const saveSearchToHistory = async (
     matches: MatchProfile[],
-    preferences: Record<string, unknown>
-  ) => {
+    preferences: MatchingHistoryPreferences
+  ): Promise<void> => {
     if (!user || matches.length === 0) return;
 
     try {
@@ -111,14 +110,18 @@ export const useMatchingHistory = () => {
       
       const { error } = await supabase
         .from('matching_history')
-        .insert({
-          matched_profiles: matches as any, // Cast to any for JSON storage
-          preferences_used: preferences,
+        .insert([{
+          matched_profiles: matches as unknown as Json,
+          preferences_used: preferences as unknown as Json,
           total_matches: matches.length,
-          avg_compatibility_score: avgScore
-        } as any);
+          avg_compatibility_score: avgScore,
+          user_id: user.id
+        }]);
 
-      if (error) throw error;
+      if (error) {
+        console.error('[useMatchingHistory] Insert error:', error);
+        throw error;
+      }
 
       // Refresh history
       const { data } = await supabase
@@ -143,7 +146,8 @@ export const useMatchingHistory = () => {
       }
 
     } catch (error) {
-      console.error('Error saving to history:', error);
+      const pgError = error as PostgrestError;
+      console.error('[useMatchingHistory] Save error:', pgError);
     }
   };
 

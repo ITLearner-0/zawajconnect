@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Sparkles, Brain } from 'lucide-react';
-import { MatchProfile } from '@/hooks/useMatchingHistory';
+import type { MatchProfile } from '@/types/supabase';
 import MatchCard from './MatchCard';
 
 interface MatchResultsGridProps {

@@ -5,24 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Heart, Sparkles, TrendingUp, Clock, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-interface SmartRecommendation {
-  user_id: string;
-  full_name: string | undefined;
-  age: number | undefined;
-  location: string | undefined;
-  profession: string | undefined;
-  avatar_url?: string;
-  recommendation_score: number;
-  compatibility_score: number;
-  islamic_alignment: number;
-  personality_match: number;
-  shared_interests: string[];
-  recommendation_reasons: string[];
-  growth_potential: number;
-  relationship_timeline: string;
-  success_probability: number;
-}
+import type { SmartRecommendation } from '@/types/supabase';
 
 interface RecommendationCardProps {
   recommendation: SmartRecommendation;
@@ -101,7 +84,7 @@ export const RecommendationCard = ({ recommendation }: RecommendationCardProps) 
           <div>
             <p className="text-sm font-medium text-success mb-2">Points forts:</p>
             <div className="flex flex-wrap gap-1">
-              {recommendation.recommendation_reasons.slice(0, 3).map((reason, index) => (
+              {recommendation.recommendation_reasons.slice(0, 3).map((reason: string, index: number) => (
                 <Badge key={index} variant="secondary" className="text-xs bg-success/10 text-success border-success/20">
                   {reason}
                 </Badge>
@@ -117,7 +100,7 @@ export const RecommendationCard = ({ recommendation }: RecommendationCardProps) 
               Intérêts partagés ({recommendation.shared_interests.length}):
             </p>
             <div className="flex flex-wrap gap-1">
-              {recommendation.shared_interests.slice(0, 4).map((interest, index) => (
+              {recommendation.shared_interests.slice(0, 4).map((interest: string, index: number) => (
                 <Badge key={index} variant="outline" className="text-xs">
                   {interest}
                 </Badge>

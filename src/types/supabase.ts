@@ -334,6 +334,64 @@ export interface ModerationSuggestion {
   created_at: string;
 }
 
+// ============================================================================
+// MATCHING UI TYPES
+// ============================================================================
+
+/**
+ * Match Profile - Extended from ScoredMatch for UI display
+ * Used by: MatchCard, MatchResultsGrid, useMatchingHistory
+ * Includes aliases for backward compatibility
+ */
+export interface MatchProfile extends ScoredMatch {
+  full_name: string;
+  age: number;
+  location: string;
+  profession: string;
+  avatar_url?: string;
+  bio?: string;
+  // Aliases for compatibility
+  matching_reasons: string[];
+  potential_concerns: string[];
+}
+
+/**
+ * Smart Recommendation - Extended match with ML insights
+ * Used by: RecommendationCard, useSmartRecommendations
+ */
+export interface SmartRecommendation extends Omit<ScoredMatch, 'compatibility_reasons'> {
+  user_id: string;
+  full_name: string;
+  age: number;
+  location: string;
+  profession: string;
+  avatar_url?: string;
+  recommendation_score: number;
+  islamic_alignment: number;
+  personality_match: number;
+  shared_interests: string[];
+  recommendation_reasons: string[];
+  growth_potential: number;
+  relationship_timeline: string;
+  success_probability: number;
+}
+
+/**
+ * Matching History Preferences
+ * Structured preferences used for matching
+ */
+export interface MatchingHistoryPreferences {
+  age_min?: number;
+  age_max?: number;
+  location?: string;
+  education_level?: string;
+  profession?: string;
+  sect?: string;
+  prayer_frequency?: string;
+  hijab_preference?: string;
+  [key: string]: unknown;
+}
+
 /**
  * Statistiques de modération par catégorie
  */

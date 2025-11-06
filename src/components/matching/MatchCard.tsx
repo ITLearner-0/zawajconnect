@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { MatchProfile } from '@/hooks/useMatchingHistory';
+import type { MatchProfile } from '@/types/supabase';
 import { ConversationStatusBadge } from '@/components/ui/ConversationStatusBadge';
 
 interface MatchCardProps {
@@ -186,7 +186,7 @@ const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: 
               <div>
                 <p className="text-sm font-medium text-emerald-700 mb-2">Points forts:</p>
                 <div className="flex flex-wrap gap-2">
-                  {match.matching_reasons.map((reason, index) => (
+                  {match.matching_reasons.map((reason: string, index: number) => (
                     <Badge key={index} variant="secondary" className="text-xs bg-success/10 text-success border-success/20">
                       {reason}
                     </Badge>
@@ -200,7 +200,7 @@ const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: 
               <div>
                 <p className="text-sm font-medium text-warning mb-2">À considérer:</p>
                 <div className="flex flex-wrap gap-2">
-                  {match.potential_concerns.map((concern, index) => (
+                  {match.potential_concerns.map((concern: string, index: number) => (
                     <Badge key={index} variant="outline" className="text-xs text-warning border-warning/30">
                       {concern}
                     </Badge>
