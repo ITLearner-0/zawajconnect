@@ -8,12 +8,12 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 
 | Métrique | Valeur |
 |----------|--------|
-| **Warnings ESLint** | 204 → **194** ✅ |
+| **Warnings ESLint** | 204 → **191** ✅ |
 | **Type de warning** | `@typescript-eslint/no-explicit-any` |
 | **Statut actuel** | `warn` (permet la compilation) |
 | **Objectif final** | 0 warnings (règle à `error`) |
-| **Dernière migration** | `useMatchingPreferences.tsx` (-2 any) |
-| **Progrès total** | 11 types stricts ajoutés (6 any + 5 unknown) |
+| **Dernière migration** | `useFamilyApproval.tsx` (-3 any + 1 documenté) |
+| **Progrès total** | 14 types stricts ajoutés (9 any + 5 unknown), 1 any documenté |
 
 ---
 
@@ -179,6 +179,61 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 
 ---
 
+### ✅ Hook Approval - `useFamilyApproval.tsx` (Janvier 2025)
+
+**Warnings éliminés**: 3 types `any` implicites (1 `any` nécessaire documenté)
+
+**Changements effectués**:
+1. **Remplacement de l'interface locale par les types Supabase:**
+   ```typescript
+   // Avant: Interface personnalisée FamilyNotification
+   interface FamilyNotification { ... }
+   
+   // Après: Types stricts exportés
+   export interface EnrichedFamilyNotification { ... }
+   export interface EnrichedMatch { ... }
+   export interface MatchProfileData { ... }
+   ```
+
+2. **Typage strict de toutes les opérations Supabase:**
+   - Imports: `FamilyNotificationRow`, `FamilyMemberRow`, `FamilyReviewInsert`
+   - Vérification des erreurs avec `PostgrestError`
+   - Type guards pour `memberError`, `reviewError`, `notifError`, `matchError`
+
+3. **Gestion des relations complexes Supabase:**
+   ```typescript
+   // Limitation connue: les joins complexes ne sont pas bien typés par Supabase
+   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   const rawMatch = (item as any).match;
+   ```
+   - Documentation du `as any` nécessaire (limitation Supabase)
+   - Normalisation stricte des données avec fallbacks
+
+4. **Signatures de fonction strictes:**
+   - `loadNotifications(userId?: string): Promise<void>`
+   - `handleApprovalDecision(...): Promise<void>`
+   - Types explicites pour toutes les opérations CRUD
+
+5. **Normalisation des données:**
+   - Valeurs par défaut pour tous les champs requis
+   - Gestion stricte des null/undefined
+   - `match_score: number` avec fallback 0
+
+**Validation**:
+- ✅ Types exportés utilisables dans les composants
+- ✅ Toutes les opérations base de données typées
+- ✅ 1 `any` documenté avec eslint-disable (limitation Supabase connue)
+- ✅ Normalisation stricte des données avec type safety
+
+**Leçons apprises**:
+- Supabase ne type pas bien les relations SQL complexes avec joins
+- `as any` est acceptable si bien documenté avec eslint-disable et commentaire
+- Exporter les interfaces pour réutilisation dans les composants
+- Fournir des valeurs par défaut pour améliorer la robustesse
+- Les types `Insert` de Supabase sont parfaits pour les opérations upsert
+
+---
+
 ## 🎯 Stratégie de Migration
 
 ### Principes Directeurs
@@ -203,18 +258,18 @@ Fichiers estimés avec any:
 ✅ src/hooks/useChatMessages.tsx (COMPLÉTÉ - 1 any éliminé)
 ✅ src/hooks/useAuth.tsx (COMPLÉTÉ - déjà conforme, 0 any)
 ✅ src/hooks/useMatchingPreferences.tsx (COMPLÉTÉ - 2 any éliminés)
-- src/hooks/useFamilyApproval.tsx (workflow famille)
+✅ src/hooks/useFamilyApproval.tsx (COMPLÉTÉ - 3 any éliminés, 1 any documenté)
 - src/hooks/useCompatibility.tsx (calcul compatibilité)
 - src/hooks/useSecurityValidationEnhanced.tsx (sécurité)
 
 Estimation: ~30-40 warnings
-Complété: 10 warnings (5 any + 5 unknown)
-Restant: ~20-30 warnings
+Complété: 13 warnings (8 any + 5 unknown), 1 any documenté
+Restant: ~17-27 warnings
 Durée estimée: 2-3 semaines
 ```
 
 **Objectif Phase 1**: Réduire de 204 à ~160-170 warnings
-**Progrès actuel**: 204 → 194 warnings (~4.9% complété, 5/8 hooks - 62.5%)
+**Progrès actuel**: 204 → 191 warnings (~6.4% complété, 6/8 hooks - 75%)
 
 ---
 
@@ -495,7 +550,7 @@ Pour chaque fichier migré:
 ### Phase 1 (Semaines 1-3)
 - **Objectif**: Hooks Core
 - **Warnings**: 204 → ~165 (-39 warnings)
-- **Progrès actuel**: 204 → 194 (-10 warnings, 62.5% des hooks complétés)
+- **Progrès actuel**: 204 → 191 (-13 warnings, 75% des hooks complétés)
 - **Validation**: Tous les hooks core sont strictement typés
 
 ### Phase 2 (Semaines 4-5)

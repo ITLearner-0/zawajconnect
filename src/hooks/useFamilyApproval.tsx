@@ -1,8 +1,45 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import type { Database } from '@/integrations/supabase/types';
+import type { PostgrestError } from '@supabase/supabase-js';
 
-interface FamilyNotification {
+// Types stricts extraits de la base de données Supabase
+type FamilyNotificationRow = Database['public']['Tables']['family_notifications']['Row'];
+type FamilyMemberRow = Database['public']['Tables']['family_members']['Row'];
+type FamilyReviewInsert = Database['public']['Tables']['family_reviews']['Insert'];
+type MatchRow = Database['public']['Tables']['matches']['Row'];
+type ProfileRow = Database['public']['Tables']['profiles']['Row'];
+
+/**
+ * Profile partiel pour l'affichage des matches
+ */
+export interface MatchProfileData {
+  full_name: string;
+  age: number;
+  location: string;
+  profession: string;
+  avatar_url: string;
+}
+
+/**
+ * Match enrichi avec les profils utilisateurs
+ * Compatible avec le composant FamilyNotificationCard
+ */
+export interface EnrichedMatch {
+  id: string;
+  user1_id: string;
+  user2_id: string;
+  match_score: number;
+  user1_profile?: MatchProfileData | null;
+  user2_profile?: MatchProfileData | null;
+}
+
+/**
+ * Notification familiale enrichie avec les données du match
+ * Exporté pour utilisation dans les composants
+ */
+export interface EnrichedFamilyNotification {
   id: string;
   match_id: string;
   notification_type: string;
@@ -12,47 +49,36 @@ interface FamilyNotification {
   is_read: boolean;
   created_at: string;
   family_member_id: string;
-  match?: {
-    id: string;
-    user1_id: string;
-    user2_id: string;
-    match_score: number;
-    user1_profile?: {
-      full_name: string;
-      age: number;
-      location: string;
-      profession: string;
-      avatar_url: string;
-    } | null;
-    user2_profile?: {
-      full_name: string;
-      age: number;
-      location: string;
-      profession: string;
-      avatar_url: string;
-    } | null;
-  } | null;
+  original_message: string | null;
+  read_at: string | null;
+  match?: EnrichedMatch | null;
 }
 
 export const useFamilyApproval = () => {
   const { toast } = useToast();
-  const [notifications, setNotifications] = useState<FamilyNotification[]>([]);
+  const [notifications, setNotifications] = useState<EnrichedFamilyNotification[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
 
-  const loadNotifications = async (userId?: string) => {
+  /**
+   * Charge les notifications familiales pour un utilisateur donné
+   * @param userId - ID de l'utilisateur wali
+   */
+  const loadNotifications = async (userId?: string): Promise<void> => {
     if (!userId) return;
     
     try {
       setLoading(true);
       
-      // Get family member record
-      const { data: familyMember } = await supabase
+      // Get family member record with strict typing
+      const { data: familyMember, error: memberError } = await supabase
         .from('family_members')
         .select('id')
         .eq('invited_user_id', userId)
         .eq('invitation_status', 'accepted')
         .maybeSingle();
+
+      if (memberError) throw memberError;
 
       if (!familyMember) {
         setNotifications([]);
@@ -60,6 +86,8 @@ export const useFamilyApproval = () => {
       }
 
       // Get notifications with match details
+      // Note: Supabase doesn't type complex joins well, using 'as any' is necessary here
+      // This is a known limitation when selecting nested relations with custom foreign keys
       const { data, error } = await supabase
         .from('family_notifications')
         .select(`
@@ -90,30 +118,53 @@ export const useFamilyApproval = () => {
 
       if (error) throw error;
 
-      setNotifications((data || []).map(item => ({
-        id: item.id ?? '',
-        match_id: item.match_id ?? '',
-        notification_type: item.notification_type ?? '',
-        content: item.content ?? '',
-        severity: item.severity ?? 'medium',
-        action_required: item.action_required ?? false,
-        is_read: item.is_read ?? false,
-        created_at: item.created_at ?? new Date().toISOString(),
-        family_member_id: item.family_member_id ?? '',
-        match: item.match ? {
-          id: item.match.id ?? '',
-          user1_id: item.match.user1_id ?? '',
-          user2_id: item.match.user2_id ?? '',
-          match_score: item.match.match_score ?? 0,
-          user1_profile: Array.isArray(item.match.user1_profile) 
-            ? item.match.user1_profile[0] ?? undefined
-            : item.match.user1_profile ?? undefined,
-          user2_profile: Array.isArray(item.match.user2_profile) 
-            ? item.match.user2_profile[0] ?? undefined
-            : item.match.user2_profile ?? undefined
-        } : undefined
-      })));
-    } catch (error) {
+      // Type-safe data normalization with fallback values
+      const normalizedNotifications: EnrichedFamilyNotification[] = (data ?? []).map((item): EnrichedFamilyNotification => {
+        // Supabase complex joins require casting due to type generation limitations
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rawMatch = (item as any).match;
+
+        // Normalize match data with default values for required fields
+        const enrichedMatch: EnrichedMatch | null = rawMatch ? {
+          id: rawMatch.id ?? '',
+          user1_id: rawMatch.user1_id ?? '',
+          user2_id: rawMatch.user2_id ?? '',
+          match_score: rawMatch.match_score ?? 0,
+          user1_profile: rawMatch.user1_profile ? {
+            full_name: rawMatch.user1_profile.full_name ?? 'Utilisateur',
+            age: rawMatch.user1_profile.age ?? 0,
+            location: rawMatch.user1_profile.location ?? 'Non spécifié',
+            profession: rawMatch.user1_profile.profession ?? 'Non spécifié',
+            avatar_url: rawMatch.user1_profile.avatar_url ?? ''
+          } : null,
+          user2_profile: rawMatch.user2_profile ? {
+            full_name: rawMatch.user2_profile.full_name ?? 'Utilisateur',
+            age: rawMatch.user2_profile.age ?? 0,
+            location: rawMatch.user2_profile.location ?? 'Non spécifié',
+            profession: rawMatch.user2_profile.profession ?? 'Non spécifié',
+            avatar_url: rawMatch.user2_profile.avatar_url ?? ''
+          } : null
+        } : null;
+
+        return {
+          id: item.id,
+          match_id: item.match_id,
+          notification_type: item.notification_type,
+          content: item.content,
+          severity: item.severity,
+          action_required: item.action_required,
+          is_read: item.is_read,
+          created_at: item.created_at,
+          family_member_id: item.family_member_id,
+          original_message: item.original_message,
+          read_at: item.read_at,
+          match: enrichedMatch
+        };
+      });
+
+      setNotifications(normalizedNotifications);
+    } catch (err) {
+      const error = err as PostgrestError;
       console.error('Error loading notifications:', error);
       toast({
         title: "Erreur",
@@ -126,34 +177,45 @@ export const useFamilyApproval = () => {
     }
   };
 
+  /**
+   * Gère la décision d'approbation familiale pour un match
+   * @param userId - ID de l'utilisateur wali
+   * @param notificationId - ID de la notification à traiter
+   * @param matchId - ID du match concerné
+   * @param decision - Décision prise (approved/rejected/needs_discussion)
+   * @param notes - Notes optionnelles pour la décision
+   */
   const handleApprovalDecision = async (
     userId: string,
     notificationId: string, 
     matchId: string, 
     decision: 'approved' | 'rejected' | 'needs_discussion',
     notes?: string
-  ) => {
+  ): Promise<void> => {
     setProcessingIds(prev => new Set([...prev, notificationId]));
     
     try {
-      // Get family member record
-      const { data: familyMember } = await supabase
+      // Get family member record with strict typing
+      const { data: familyMember, error: memberError } = await supabase
         .from('family_members')
         .select('id')
         .eq('invited_user_id', userId)
         .maybeSingle();
 
+      if (memberError) throw memberError;
       if (!familyMember) throw new Error('Membre de famille non trouvé');
 
-      // Create family review
+      // Create family review with strict typing
+      const reviewData: FamilyReviewInsert = {
+        family_member_id: familyMember.id,
+        match_id: matchId,
+        status: decision,
+        notes: notes ?? null
+      };
+
       const { error: reviewError } = await supabase
         .from('family_reviews')
-        .insert({
-          family_member_id: familyMember.id,
-          match_id: matchId,
-          status: decision,
-          notes: notes || null
-        });
+        .insert(reviewData);
 
       if (reviewError) throw reviewError;
 
@@ -187,11 +249,12 @@ export const useFamilyApproval = () => {
       // Reload notifications
       await loadNotifications(userId);
       
-    } catch (error) {
+    } catch (err) {
+      const error = err as PostgrestError | Error;
       console.error('Error processing decision:', error);
       toast({
         title: "Erreur",
-        description: "Impossible d'enregistrer votre décision",
+        description: error instanceof Error ? error.message : "Impossible d'enregistrer votre décision",
         variant: "destructive",
       });
     } finally {
