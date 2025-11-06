@@ -23,7 +23,15 @@ interface InsightsActionPanelProps {
   insightsAvailable: boolean;
 }
 
-const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({ 
+interface NextStep {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  action: () => void;
+  available: boolean;
+}
+
+const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
   completionPercentage, 
   insightsAvailable 
 }) => {
@@ -32,7 +40,7 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  const handleShare = async () => {
+  const handleShare = async (): Promise<void> => {
     setIsSharing(true);
     try {
       if (navigator.share) {
@@ -48,7 +56,7 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
           description: "Le lien vers vos insights a été copié dans le presse-papiers",
         });
       }
-    } catch (error) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur de partage",
         description: "Impossible de partager vos insights pour le moment",
@@ -59,7 +67,7 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
     }
   };
 
-  const handleExport = async () => {
+  const handleExport = async (): Promise<void> => {
     setIsExporting(true);
     try {
       // Simulate PDF generation
@@ -68,7 +76,7 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
         title: "Export réussi",
         description: "Vos insights ont été exportés en PDF",
       });
-    } catch (error) {
+    } catch (error: unknown) {
       toast({
         title: "Erreur d'export",
         description: "Impossible d'exporter vos insights pour le moment",
@@ -79,7 +87,7 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
     }
   };
 
-  const nextSteps = [
+  const nextSteps: NextStep[] = [
     {
       icon: Heart,
       title: "Améliorer votre profil",
