@@ -16,7 +16,7 @@ import {
   Sparkles,
   Heart
 } from 'lucide-react';
-import { useCompatibilityInsights } from '@/hooks/useCompatibilityInsights';
+import { useCompatibilityInsights, type UseCompatibilityInsightsReturn } from '@/hooks/useCompatibilityInsights';
 import AnimatedCounter from '@/components/AnimatedCounter';
 import ProgressiveReveal from '@/components/ProgressiveReveal';
 
@@ -49,7 +49,7 @@ interface GamifiedInsightsProps {
 }
 
 const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
-  const { insights, loading } = useCompatibilityInsights(userId);
+  const { insights, loading }: UseCompatibilityInsightsReturn = useCompatibilityInsights(userId);
   const [userLevel, setUserLevel] = useState(1);
   const [totalPoints, setTotalPoints] = useState(0);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
@@ -146,7 +146,7 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
 
   useEffect(() => {
     // Initialize achievements and check progress
-    const initializeGamification = () => {
+    const initializeGamification = (): void => {
       const currentAchievements = [...allAchievements];
       let points = 0;
       
@@ -187,7 +187,7 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
     initializeGamification();
   }, [insights]);
 
-  const getRarityColor = (rarity: Achievement['rarity']) => {
+  const getRarityColor = (rarity: Achievement['rarity']): string => {
     switch (rarity) {
       case 'common': return 'text-muted-foreground border-muted';
       case 'rare': return 'text-blue-600 border-blue-200 bg-blue-50';
