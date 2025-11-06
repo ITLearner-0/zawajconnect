@@ -2,17 +2,16 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import type { Database } from '@/integrations/supabase/types';
+import type { PostgrestError } from '@supabase/supabase-js';
 
-export interface MatchingPreferences {
-  use_ai_scoring: boolean;
-  weight_islamic: number;
-  weight_cultural: number;
-  weight_personality: number;
-  min_compatibility: number;
-  family_approval_required: boolean;
-}
+// Type strict extrait de la table Supabase
+export type MatchingPreferences = Database['public']['Tables']['matching_preferences']['Row'];
 
-const defaultPreferences: MatchingPreferences = {
+// Type pour l'insertion/mise à jour (sans id, created_at, updated_at, user_id)
+export type MatchingPreferencesUpdate = Omit<MatchingPreferences, 'id' | 'created_at' | 'updated_at' | 'user_id'>;
+
+const defaultPreferences: MatchingPreferencesUpdate = {
   use_ai_scoring: true,
   weight_islamic: 40,
   weight_cultural: 30,
@@ -24,7 +23,7 @@ const defaultPreferences: MatchingPreferences = {
 export const useMatchingPreferences = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const [preferences, setPreferences] = useState<MatchingPreferences>(defaultPreferences);
+  const [preferences, setPreferences] = useState<MatchingPreferencesUpdate>(defaultPreferences);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -47,6 +46,7 @@ export const useMatchingPreferences = () => {
         }
 
         if (data) {
+          // Type strict: data est de type MatchingPreferences (Row)
           setPreferences({
             use_ai_scoring: data.use_ai_scoring,
             weight_islamic: data.weight_islamic,
@@ -56,7 +56,8 @@ export const useMatchingPreferences = () => {
             family_approval_required: data.family_approval_required
           });
         }
-      } catch (error) {
+      } catch (err) {
+        const error = err as PostgrestError;
         console.error('Error loading preferences:', error);
         toast({
           title: "Erreur",
@@ -72,7 +73,7 @@ export const useMatchingPreferences = () => {
   }, [user, toast]);
 
   // Save preferences to database
-  const savePreferences = async (newPreferences: MatchingPreferences) => {
+  const savePreferences = async (newPreferences: MatchingPreferencesUpdate): Promise<boolean> => {
     if (!user) return false;
 
     setSaving(true);
@@ -94,7 +95,8 @@ export const useMatchingPreferences = () => {
         description: "Vos préférences de matching ont été mises à jour",
       });
       return true;
-    } catch (error) {
+    } catch (err) {
+      const error = err as PostgrestError;
       console.error('Error saving preferences:', error);
       toast({
         title: "Erreur",
@@ -107,8 +109,8 @@ export const useMatchingPreferences = () => {
     }
   };
 
-  const updatePreferences = (updates: Partial<MatchingPreferences>) => {
-    const newPreferences = { ...preferences, ...updates };
+  const updatePreferences = (updates: Partial<MatchingPreferencesUpdate>) => {
+    const newPreferences: MatchingPreferencesUpdate = { ...preferences, ...updates };
     setPreferences(newPreferences);
     
     // Clear existing timeout

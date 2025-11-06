@@ -8,12 +8,12 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 
 | Métrique | Valeur |
 |----------|--------|
-| **Warnings ESLint** | 204 → **196** ✅ |
+| **Warnings ESLint** | 204 → **194** ✅ |
 | **Type de warning** | `@typescript-eslint/no-explicit-any` |
 | **Statut actuel** | `warn` (permet la compilation) |
 | **Objectif final** | 0 warnings (règle à `error`) |
-| **Dernière migration** | `useChatMessages.tsx` (-1 any) |
-| **Progrès total** | 8 types stricts ajoutés (3 any + 5 unknown) |
+| **Dernière migration** | `useMatchingPreferences.tsx` (-2 any) |
+| **Progrès total** | 11 types stricts ajoutés (6 any + 5 unknown) |
 
 ---
 
@@ -112,6 +112,73 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 
 ---
 
+### ✅ Hook Auth - `useAuth.tsx` (Janvier 2025)
+
+**Warnings éliminés**: 0 (déjà conforme)
+
+**Status**: Déjà utilisant des types stricts Supabase Auth
+
+**Validation**:
+- ✅ Utilise `User`, `Session`, `AuthError` de `@supabase/supabase-js`
+- ✅ Pas d'`any` explicite ou implicite
+- ✅ Exemple de bonnes pratiques pour les autres hooks
+
+**Leçons apprises**:
+- Certains hooks sont déjà conformes et ne nécessitent pas de migration
+- Vérifier les issues réelles avant de commencer un travail de migration
+- Documenter les fichiers conformes pour tracer les bonnes pratiques
+
+---
+
+### ✅ Hook Preferences - `useMatchingPreferences.tsx` (Janvier 2025)
+
+**Warnings éliminés**: 2 types `any` implicites
+
+**Changements effectués**:
+1. **Remplacement de l'interface locale par les types Supabase:**
+   ```typescript
+   // Avant: Interface locale personnalisée
+   export interface MatchingPreferences {
+     use_ai_scoring: boolean;
+     weight_islamic: number;
+     // ...
+   }
+   
+   // Après: Type strict extrait de la base de données
+   export type MatchingPreferences = Database['public']['Tables']['matching_preferences']['Row'];
+   export type MatchingPreferencesUpdate = Omit<MatchingPreferences, 'id' | 'created_at' | 'updated_at' | 'user_id'>;
+   ```
+
+2. **Typage strict des réponses Supabase:**
+   - `.maybeSingle()` retourne maintenant `MatchingPreferences | null` typé
+   - Gestion d'erreur utilise le type `PostgrestError`
+
+3. **Signatures de fonction strictes:**
+   - `savePreferences(newPreferences: MatchingPreferencesUpdate): Promise<boolean>`
+   - `updatePreferences(updates: Partial<MatchingPreferencesUpdate>): void`
+
+4. **Type guards pour erreurs:**
+   ```typescript
+   catch (err) {
+     const error = err as PostgrestError;
+     console.error('Error saving preferences:', error);
+   }
+   ```
+
+**Validation**:
+- ✅ Types correspondent exactement au schéma Supabase
+- ✅ Toutes les opérations base de données correctement typées
+- ✅ Pas d'`any` implicite dans l'état ou les fonctions
+- ✅ Logique auto-save maintient la type safety
+
+**Leçons apprises**:
+- Utiliser `Database['public']['Tables']['table_name']['Row']` garantit la cohérence du schéma
+- Créer des types Update séparés (`Omit<Row, ...>`) pour les opérations upsert
+- Importer `PostgrestError` de `@supabase/supabase-js` pour le typage des erreurs
+- Préférer les types Supabase stricts aux interfaces personnalisées pour éviter la dérive
+
+---
+
 ## 🎯 Stratégie de Migration
 
 ### Principes Directeurs
@@ -134,19 +201,20 @@ Fichiers estimés avec any:
 ✅ src/hooks/useChatPresence.tsx (COMPLÉTÉ - 2 any éliminés)
 ✅ src/hooks/useProfileData.tsx (COMPLÉTÉ - 5 unknown → types stricts)
 ✅ src/hooks/useChatMessages.tsx (COMPLÉTÉ - 1 any éliminé)
-- src/hooks/useAuth.tsx (authentification - critique)
-- src/hooks/useMatchingPreferences.tsx (algorithme matching)
+✅ src/hooks/useAuth.tsx (COMPLÉTÉ - déjà conforme, 0 any)
+✅ src/hooks/useMatchingPreferences.tsx (COMPLÉTÉ - 2 any éliminés)
 - src/hooks/useFamilyApproval.tsx (workflow famille)
+- src/hooks/useCompatibility.tsx (calcul compatibilité)
 - src/hooks/useSecurityValidationEnhanced.tsx (sécurité)
 
 Estimation: ~30-40 warnings
-Complété: 8 warnings (3 any + 5 unknown)
-Restant: ~22-32 warnings
+Complété: 10 warnings (5 any + 5 unknown)
+Restant: ~20-30 warnings
 Durée estimée: 2-3 semaines
 ```
 
 **Objectif Phase 1**: Réduire de 204 à ~160-170 warnings
-**Progrès actuel**: 204 → 196 warnings (~3.9% complété, 3/8 hooks)
+**Progrès actuel**: 204 → 194 warnings (~4.9% complété, 5/8 hooks - 62.5%)
 
 ---
 
@@ -427,6 +495,7 @@ Pour chaque fichier migré:
 ### Phase 1 (Semaines 1-3)
 - **Objectif**: Hooks Core
 - **Warnings**: 204 → ~165 (-39 warnings)
+- **Progrès actuel**: 204 → 194 (-10 warnings, 62.5% des hooks complétés)
 - **Validation**: Tous les hooks core sont strictement typés
 
 ### Phase 2 (Semaines 4-5)
