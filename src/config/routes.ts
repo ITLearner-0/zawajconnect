@@ -75,6 +75,14 @@ export const routes: RouteConfig[] = [
     category: 'main'
   },
   {
+    path: '/notes',
+    component: 'NotesManager',
+    label: 'Mes Notes',
+    requiresAuth: true,
+    icon: 'StickyNote',
+    category: 'main'
+  },
+  {
     path: '/matches',
     component: 'Matches',
     label: 'Mes Matches',

@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ArrowLeft, Heart, Filter, X, FileDown, Download } from 'lucide-react';
+import { ArrowLeft, Heart, Filter, X, FileDown, Download, StickyNote } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useProfileTags, ProfileTag } from '@/hooks/useProfileTags';
@@ -180,8 +180,17 @@ export default function Favorites() {
         <div className="mb-8">
           <Button
             variant="outline"
-            onClick={() => navigate('/browse')}
+            onClick={() => navigate('/notes')}
             className="mb-4"
+          >
+            <StickyNote className="h-4 w-4 mr-2" />
+            Gérer mes notes
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={() => navigate('/browse')}
+            className="mb-4 ml-2"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour à la recherche
