@@ -46,6 +46,7 @@ interface SavedData {
   profileData: ProfileData;
   islamicPrefs: IslamicPreferences;
   currentStep: number;
+  skippedSections?: string[];
   timestamp: string;
   sessionId: string;
 }
@@ -54,6 +55,7 @@ interface UseOnboardingPersistenceProps {
   profileData: ProfileData;
   islamicPrefs: IslamicPreferences;
   currentStep: number;
+  skippedSections?: string[];
 }
 
 export type SaveStatus = 'idle' | 'saving' | 'saved' | 'error';
@@ -62,6 +64,7 @@ export const useOnboardingPersistence = ({
   profileData,
   islamicPrefs,
   currentStep,
+  skippedSections = [],
 }: UseOnboardingPersistenceProps) => {
   const { user } = useAuth();
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
@@ -73,6 +76,7 @@ export const useOnboardingPersistence = ({
   const debouncedProfileData = useDebounce(profileData, 1500);
   const debouncedIslamicPrefs = useDebounce(islamicPrefs, 1500);
   const debouncedStep = useDebounce(currentStep, 1500);
+  const debouncedSkippedSections = useDebounce(skippedSections, 1500);
 
   // Generate or retrieve session ID
   const getSessionId = useCallback(() => {
@@ -105,6 +109,8 @@ export const useOnboardingPersistence = ({
         localStorage.setItem(standardKey, JSON.stringify(data));
         localStorage.setItem(emergencyKey, JSON.stringify(data));
         localStorage.setItem(emailKey, JSON.stringify(data));
+        // Also save to the key that OnboardingCompletionGuide checks
+        localStorage.setItem('onboarding_progress', JSON.stringify(data));
 
         logger.log('Saved to localStorage', standardKey);
         return true;
@@ -168,11 +174,12 @@ export const useOnboardingPersistence = ({
       if (!user) return;
 
       const dataToSave = skipDebounce
-        ? { profileData, islamicPrefs, currentStep }
+        ? { profileData, islamicPrefs, currentStep, skippedSections }
         : {
             profileData: debouncedProfileData,
             islamicPrefs: debouncedIslamicPrefs,
             currentStep: debouncedStep,
+            skippedSections: debouncedSkippedSections,
           };
 
       // Check if data actually changed
@@ -220,9 +227,11 @@ export const useOnboardingPersistence = ({
       profileData,
       islamicPrefs,
       currentStep,
+      skippedSections,
       debouncedProfileData,
       debouncedIslamicPrefs,
       debouncedStep,
+      debouncedSkippedSections,
       getSessionId,
       saveToLocalStorage,
       saveToDatabase,
@@ -245,7 +254,7 @@ export const useOnboardingPersistence = ({
 
       // Priority 1: Try database first
       const [profileResult, prefsResult] = await Promise.all([
-        supabase.from('profiles').select('*').eq('id', user.id).single(),
+        supabase.from('profiles').select('*').eq('user_id', user.id).single(),
         supabase
           .from('islamic_preferences')
           .select('*')
@@ -261,6 +270,7 @@ export const useOnboardingPersistence = ({
           profileData: profileResult.data as any,
           islamicPrefs: prefsResult.data as any,
           currentStep: 0, // Will be overridden by localStorage step if available
+          skippedSections: [],
         };
       }
 
@@ -374,7 +384,7 @@ export const useOnboardingPersistence = ({
     if (user) {
       save();
     }
-  }, [debouncedProfileData, debouncedIslamicPrefs, debouncedStep]);
+  }, [debouncedProfileData, debouncedIslamicPrefs, debouncedStep, debouncedSkippedSections]);
 
   // Clean old backups on mount
   useEffect(() => {

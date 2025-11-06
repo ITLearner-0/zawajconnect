@@ -95,6 +95,8 @@ const Onboarding = () => {
     avatar_url: ''
   });
 
+  const [skippedSections, setSkippedSections] = useState<string[]>([]);
+
   const [islamicPrefs, setIslamicPrefs] = useState<IslamicPreferences>({
     prayer_frequency: '',
     quran_reading: '',
@@ -122,7 +124,8 @@ const Onboarding = () => {
   const persistence = useOnboardingPersistence({
     profileData,
     islamicPrefs,
-    currentStep
+    currentStep,
+    skippedSections
   });
 
   // Analytics tracking
@@ -203,6 +206,9 @@ const Onboarding = () => {
         if (restoredData.currentStep) {
           setCurrentStep(restoredData.currentStep);
         }
+        if (restoredData.skippedSections) {
+          setSkippedSections(restoredData.skippedSections);
+        }
 
         // Wait for state to update, then calculate progress and show modal
         setTimeout(() => {
@@ -272,9 +278,17 @@ const Onboarding = () => {
       importance_of_religion: ''
     });
     setCurrentStep(1);
+    setSkippedSections([]);
     setSavedSessionData(null);
     setShowResumptionModal(false);
     setShowWelcome(true);
+  };
+
+  const handleSkipSection = (sectionName: string) => {
+    setSkippedSections(prev => [...prev, sectionName]);
+    // Track skipped section
+    console.log(`Section skipped: ${sectionName}`);
+    nextStep();
   };
 
   const nextStep = () => {
@@ -603,16 +617,42 @@ const Onboarding = () => {
               />
             </div>
 
-            <InterestsSelector 
-              interests={profileData.interests}
-              onInterestsChange={(interests) => setProfileData({...profileData, interests})}
-            />
+            <div className="space-y-4">
+              <InterestsSelector 
+                interests={profileData.interests}
+                onInterestsChange={(interests) => setProfileData({...profileData, interests})}
+              />
+              {(!profileData.interests || profileData.interests.length === 0) && (
+                <div className="flex justify-center">
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSkipSection('interests')}
+                    className="text-muted-foreground"
+                  >
+                    Je compléterai plus tard
+                  </Button>
+                </div>
+              )}
+            </div>
 
-            <PhotoUploadStep 
-              avatarUrl={profileData.avatar_url}
-              onPhotoChange={(url) => setProfileData({...profileData, avatar_url: url})}
-              userName={profileData.full_name}
-            />
+            <div className="space-y-4">
+              <PhotoUploadStep 
+                avatarUrl={profileData.avatar_url}
+                onPhotoChange={(url) => setProfileData({...profileData, avatar_url: url})}
+                userName={profileData.full_name}
+              />
+              {!profileData.avatar_url && (
+                <div className="flex justify-center">
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleSkipSection('photo')}
+                    className="text-muted-foreground"
+                  >
+                    Je compléterai plus tard
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         );
 

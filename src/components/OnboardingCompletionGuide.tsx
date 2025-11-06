@@ -6,12 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, Circle, User, Heart, Camera, Shield, MessageSquare } from 'lucide-react';
+import { CheckCircle2, Circle, User, Heart, Camera, Shield, MessageSquare, AlertTriangle } from 'lucide-react';
 
 interface CompletionStatus {
   profileComplete: boolean;
   islamicPrefsSet: boolean;
   photoUploaded: boolean;
+  interestsAdded: boolean;
   compatibilityTestTaken: boolean;
   firstMessageSent: boolean;
 }
@@ -23,14 +24,26 @@ const OnboardingCompletionGuide = () => {
     profileComplete: false,
     islamicPrefsSet: false,
     photoUploaded: false,
+    interestsAdded: false,
     compatibilityTestTaken: false,
     firstMessageSent: false
   });
+  const [skippedDuringOnboarding, setSkippedDuringOnboarding] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
       checkCompletionStatus();
+      // Check for skipped sections from onboarding
+      const savedData = localStorage.getItem('onboarding_progress');
+      if (savedData) {
+        try {
+          const parsed = JSON.parse(savedData);
+          setSkippedDuringOnboarding(parsed.skippedSections || []);
+        } catch (e) {
+          console.error('Error parsing saved onboarding data:', e);
+        }
+      }
     }
   }, [user]);
 
@@ -47,6 +60,15 @@ const OnboardingCompletionGuide = () => {
 
       const profileComplete = !!(profile && profile.full_name && profile.age && profile.bio && profile.looking_for);
       const photoUploaded = !!(profile && profile.avatar_url);
+
+      // Check interests
+      const { data: profileWithInterests } = await supabase
+        .from('profiles')
+        .select('interests')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      const interestsAdded = !!(profileWithInterests && profileWithInterests.interests && profileWithInterests.interests.length > 0);
 
       // Check Islamic preferences
       const { data: islamicPrefs } = await supabase
@@ -77,6 +99,7 @@ const OnboardingCompletionGuide = () => {
         profileComplete,
         islamicPrefsSet,
         photoUploaded,
+        interestsAdded,
         compatibilityTestTaken,
         firstMessageSent
       });
@@ -111,7 +134,17 @@ const OnboardingCompletionGuide = () => {
       description: 'Une photo augmente vos chances de match de 300%',
       icon: Camera,
       action: () => navigate('/enhanced-profile?tab=profile'),
-      actionText: 'Ajouter une photo'
+      actionText: 'Ajouter une photo',
+      skipped: skippedDuringOnboarding.includes('photo')
+    },
+    {
+      key: 'interestsAdded' as keyof CompletionStatus,
+      title: 'Ajoutez vos centres d\'intérêt',
+      description: 'Partagez vos passions pour de meilleurs matches',
+      icon: Heart,
+      action: () => navigate('/enhanced-profile?tab=profile'),
+      actionText: 'Ajouter des intérêts',
+      skipped: skippedDuringOnboarding.includes('interests')
     },
     {
       key: 'compatibilityTestTaken' as keyof CompletionStatus,
@@ -173,35 +206,82 @@ const OnboardingCompletionGuide = () => {
         <div className="space-y-4">
           {steps.map((step) => {
             const isCompleted = status[step.key];
+            const isSkipped = 'skipped' in step && step.skipped;
             const Icon = step.icon;
             
-            return (
-              <div
-                key={step.key}
-                className={`flex items-start gap-3 p-3 rounded-lg transition-colors ${
-                  isCompleted ? 'bg-emerald/5 border border-emerald/20' : 'bg-muted/30'
-                }`}
-              >
-                <div className="mt-1">
-                  {isCompleted ? (
-                    <CheckCircle2 className="h-5 w-5 text-emerald" />
-                  ) : (
-                    <Circle className="h-5 w-5 text-muted-foreground" />
-                  )}
-                </div>
-                
-                <div className="flex-1">
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h4 className={`font-medium ${isCompleted ? 'text-emerald' : 'text-foreground'}`}>
-                        {step.title}
-                      </h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {step.description}
-                      </p>
+            // Prioritize skipped items at the top
+            return null;
+          })}
+          
+          {/* Show skipped items first */}
+          {steps
+            .filter(step => 'skipped' in step && step.skipped && !status[step.key])
+            .map((step) => {
+              const Icon = step.icon;
+              return (
+                <div
+                  key={step.key}
+                  className="flex items-start gap-3 p-3 rounded-lg transition-colors bg-gold/10 border border-gold/30"
+                >
+                  <div className="mt-1">
+                    <AlertTriangle className="h-5 w-5 text-gold" />
+                  </div>
+                  
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-medium text-gold">
+                            {step.title}
+                          </h4>
+                          <Badge variant="outline" className="bg-gold/20 text-gold border-gold/40">
+                            Sauté
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {step.description}
+                        </p>
+                      </div>
+                      
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={step.action}
+                        className="ml-4 shrink-0 bg-gold hover:bg-gold/90"
+                      >
+                        {step.actionText}
+                      </Button>
                     </div>
-                    
-                    {!isCompleted && (
+                  </div>
+                </div>
+              );
+            })}
+
+          {/* Show other incomplete items */}
+          {steps
+            .filter(step => !status[step.key] && !('skipped' in step && step.skipped))
+            .map((step) => {
+              const Icon = step.icon;
+              return (
+                <div
+                  key={step.key}
+                  className="flex items-start gap-3 p-3 rounded-lg transition-colors bg-muted/30"
+                >
+                  <div className="mt-1">
+                    <Circle className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-medium text-foreground">
+                          {step.title}
+                        </h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {step.description}
+                        </p>
+                      </div>
+                      
                       <Button
                         size="sm"
                         variant="outline"
@@ -210,12 +290,41 @@ const OnboardingCompletionGuide = () => {
                       >
                         {step.actionText}
                       </Button>
-                    )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+
+          {/* Show completed items */}
+          {steps
+            .filter(step => status[step.key])
+            .map((step) => {
+              const Icon = step.icon;
+              return (
+                <div
+                  key={step.key}
+                  className="flex items-start gap-3 p-3 rounded-lg transition-colors bg-emerald/5 border border-emerald/20"
+                >
+                  <div className="mt-1">
+                    <CheckCircle2 className="h-5 w-5 text-emerald" />
+                  </div>
+                  
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="font-medium text-emerald">
+                          {step.title}
+                        </h4>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {step.description}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
         </div>
 
         {completionPercentage > 0 && completionPercentage < 100 && (
