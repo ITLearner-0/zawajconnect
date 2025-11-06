@@ -1,4 +1,18 @@
 import { supabase } from '@/integrations/supabase/client';
+import type { PostgrestError } from '@supabase/supabase-js';
+import type {
+  ProfileRow,
+  UserMatchingRole,
+  FetchMatchingProfilesOptions
+} from '@/types/supabase';
+
+/**
+ * Re-export types for backwards compatibility
+ */
+export type {
+  UserMatchingRole,
+  FetchMatchingProfilesOptions
+};
 
 /**
  * Utility function to get Wali user IDs that should be excluded from matching
@@ -6,18 +20,22 @@ import { supabase } from '@/integrations/supabase/client';
  */
 export const getWaliUserIds = async (): Promise<string[]> => {
   try {
-    const { data: waliUsers } = await supabase
+    const { data: waliUsers, error } = await supabase
       .from('family_members')
       .select('invited_user_id')
       .eq('is_wali', true)
       .eq('invitation_status', 'accepted')
       .not('invited_user_id', 'is', null);
 
+    if (error) {
+      throw error as PostgrestError;
+    }
+
     return (waliUsers ?? [])
-      .map(w => w.invited_user_id)
+      .map((w: { invited_user_id: string | null }) => w.invited_user_id)
       .filter((id): id is string => id !== null && id !== undefined);
   } catch (error) {
-    console.error('Error fetching Wali user IDs:', error);
+    console.error('Error fetching Wali user IDs:', error as PostgrestError);
     return [];
   }
 };
@@ -27,18 +45,22 @@ export const getWaliUserIds = async (): Promise<string[]> => {
  */
 export const getOppositeGender = async (userId: string): Promise<string | undefined> => {
   try {
-    const { data: currentUserProfile } = await supabase
+    const { data: currentUserProfile, error } = await supabase
       .from('profiles')
       .select('gender')
       .eq('user_id', userId)
       .maybeSingle();
+
+    if (error) {
+      throw error as PostgrestError;
+    }
 
     const gender = currentUserProfile?.gender ?? undefined;
     if (!gender) return undefined;
     
     return gender === 'male' ? 'female' : 'male';
   } catch (error) {
-    console.error('Error fetching user gender:', error);
+    console.error('Error fetching user gender:', error as PostgrestError);
     return undefined;
   }
 };
@@ -51,12 +73,8 @@ export const getOppositeGender = async (userId: string): Promise<string | undefi
  */
 export const fetchMatchingProfiles = async (
   userId: string, 
-  options: {
-    limit?: number;
-    select?: string;
-    orderBy?: { column: string; ascending?: boolean };
-  } = {}
-) => {
+  options: FetchMatchingProfilesOptions = {}
+): Promise<ProfileRow[]> => {
   const { 
     limit = 50, 
     select = '*',
@@ -91,11 +109,15 @@ export const fetchMatchingProfiles = async (
 
     const { data, error } = await query;
 
-    if (error) throw error;
-    return data ?? [];
+    if (error) {
+      throw error as PostgrestError;
+    }
+    
+    // Cast data as unknown first to safely convert to ProfileRow[]
+    return (data ?? []) as unknown as ProfileRow[];
 
   } catch (error) {
-    console.error('Error fetching matching profiles:', error);
+    console.error('Error fetching matching profiles:', error as PostgrestError);
     throw error;
   }
 };
@@ -105,7 +127,7 @@ export const fetchMatchingProfiles = async (
  */
 export const isUserWali = async (userId: string): Promise<boolean> => {
   try {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('family_members')
       .select('id')
       .eq('invited_user_id', userId)
@@ -113,9 +135,13 @@ export const isUserWali = async (userId: string): Promise<boolean> => {
       .eq('invitation_status', 'accepted')
       .limit(1);
 
+    if (error) {
+      throw error as PostgrestError;
+    }
+
     return (data?.length ?? 0) > 0;
   } catch (error) {
-    console.error('Error checking Wali status:', error);
+    console.error('Error checking Wali status:', error as PostgrestError);
     return false;
   }
 };
@@ -123,12 +149,16 @@ export const isUserWali = async (userId: string): Promise<boolean> => {
 /**
  * Get user's role information for matching purposes
  */
-export const getUserMatchingRole = async (userId: string) => {
+export const getUserMatchingRole = async (userId: string): Promise<UserMatchingRole> => {
   try {
     const [isWali, profile] = await Promise.all([
       isUserWali(userId),
       supabase.from('profiles').select('gender, age, bio').eq('user_id', userId).maybeSingle()
     ]);
+
+    if (profile.error) {
+      throw profile.error as PostgrestError;
+    }
 
     const profileData = profile.data ? {
       gender: profile.data.gender ?? undefined,
@@ -150,7 +180,7 @@ export const getUserMatchingRole = async (userId: string) => {
       profile: profileData
     };
   } catch (error) {
-    console.error('Error getting user matching role:', error);
+    console.error('Error getting user matching role:', error as PostgrestError);
     return {
       isWali: false,
       hasCompleteProfile: false,

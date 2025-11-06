@@ -470,3 +470,29 @@ export interface CompatibilityExplanation {
   concerns: string[];
   summary: string;
 }
+
+/**
+ * Profil de rôle utilisateur pour le matching
+ */
+export interface UserMatchingRole {
+  isWali: boolean;
+  hasCompleteProfile: boolean;
+  canBeMatched: boolean;
+  profile?: {
+    gender?: string;
+    age?: number;
+    bio?: string;
+  };
+}
+
+/**
+ * Options pour la récupération de profils
+ */
+export interface FetchMatchingProfilesOptions {
+  limit?: number;
+  select?: string;
+  orderBy?: {
+    column: string;
+    ascending?: boolean;
+  };
+}
