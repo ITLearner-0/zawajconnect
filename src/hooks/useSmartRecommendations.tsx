@@ -18,7 +18,7 @@ import type { PostgrestError } from '@supabase/supabase-js';
  */
 export interface SmartRecommendation extends Omit<
   ScoredMatch, 
-  'compatibility_reasons' | 'full_name' | 'age' | 'location' | 'profession'
+  'full_name' | 'age' | 'location' | 'profession'
 > {
   full_name: string;
   age: number;

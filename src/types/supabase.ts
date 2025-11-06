@@ -359,7 +359,7 @@ export interface MatchProfile extends ScoredMatch {
  * Smart Recommendation - Extended match with ML insights
  * Used by: RecommendationCard, useSmartRecommendations
  */
-export interface SmartRecommendation extends Omit<ScoredMatch, 'compatibility_reasons'> {
+export interface SmartRecommendation extends ScoredMatch {
   user_id: string;
   full_name: string;
   age: number;
@@ -371,6 +371,7 @@ export interface SmartRecommendation extends Omit<ScoredMatch, 'compatibility_re
   personality_match: number;
   shared_interests: string[];
   recommendation_reasons: string[];
+  compatibility_reasons: string[];
   growth_potential: number;
   relationship_timeline: string;
   success_probability: number;
