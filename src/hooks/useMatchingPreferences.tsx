@@ -55,7 +55,7 @@ export const useMatchingPreferences = () => {
         }
       } catch (err) {
         const error = err as PostgrestError;
-        console.error('Error loading preferences:', error);
+        console.error('[useMatchingPreferences] Error loading preferences:', error.message);
         toast({
           title: "Erreur",
           description: "Impossible de charger vos préférences",
@@ -94,7 +94,7 @@ export const useMatchingPreferences = () => {
       return true;
     } catch (err) {
       const error = err as PostgrestError;
-      console.error('Error saving preferences:', error);
+      console.error('[useMatchingPreferences] Error saving preferences:', error.message);
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder vos préférences",

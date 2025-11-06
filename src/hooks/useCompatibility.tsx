@@ -43,7 +43,11 @@ export const useCompatibility = () => {
         .select('*', { count: 'exact' })
         .eq('is_active', true);
 
-      if (countError) throw countError;
+      if (countError) {
+        const pgError = countError as PostgrestError;
+        console.error('[useCompatibility] Error counting questions:', pgError.message);
+        throw pgError;
+      }
 
       // Get user responses with strict typing
       const { data: userResponses, error: responsesError } = await supabase
@@ -52,7 +56,11 @@ export const useCompatibility = () => {
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
-      if (responsesError) throw responsesError;
+      if (responsesError) {
+        const pgError = responsesError as PostgrestError;
+        console.error('[useCompatibility] Error fetching responses:', pgError.message);
+        throw pgError;
+      }
 
       const answeredQuestions = userResponses?.length ?? 0;
       const completionPercentage = totalQuestions ? (answeredQuestions / totalQuestions) * 100 : 0;
@@ -75,7 +83,7 @@ export const useCompatibility = () => {
 
     } catch (err) {
       const error = err as PostgrestError;
-      console.error('Error fetching compatibility data:', error);
+      console.error('[useCompatibility] Error fetching compatibility data:', error.message);
     } finally {
       setLoading(false);
     }
@@ -109,21 +117,33 @@ export const useCompatibility = () => {
         .select('question_key, response_value')
         .eq('user_id', user.id);
 
-      if (myError) throw myError;
+      if (myError) {
+        const pgError = myError as PostgrestError;
+        console.error('[useCompatibility] Error fetching user responses:', pgError.message);
+        throw pgError;
+      }
 
       const { data: theirResponses, error: theirError } = await supabase
         .from('user_compatibility_responses')
         .select('question_key, response_value')
         .eq('user_id', otherUserId);
 
-      if (theirError) throw theirError;
+      if (theirError) {
+        const pgError = theirError as PostgrestError;
+        console.error('[useCompatibility] Error fetching other user responses:', pgError.message);
+        throw pgError;
+      }
 
       const { data: questions, error: questionsError } = await supabase
         .from('compatibility_questions')
         .select('question_key, weight')
         .eq('is_active', true);
 
-      if (questionsError) throw questionsError;
+      if (questionsError) {
+        const pgError = questionsError as PostgrestError;
+        console.error('[useCompatibility] Error fetching questions:', pgError.message);
+        throw pgError;
+      }
 
       if (!myResponses || !theirResponses || !questions) {
         return 0;
@@ -158,7 +178,7 @@ export const useCompatibility = () => {
 
     } catch (err) {
       const error = err as PostgrestError;
-      console.error('Error calculating compatibility score:', error);
+      console.error('[useCompatibility] Error calculating compatibility score:', error.message);
       return 0;
     }
   };

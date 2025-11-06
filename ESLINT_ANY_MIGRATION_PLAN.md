@@ -507,19 +507,21 @@ Warnings restants: ~162 (204 initial)
 Fichiers en cours:
 ✅ src/hooks/useSmartRecommendations.tsx (COMPLÉTÉ - 8 any éliminés)
 ✅ src/hooks/useIslamicModeration.tsx (COMPLÉTÉ - 4 any éliminés)
-- src/hooks/useMatchingPreferences.tsx (préférences)
-- src/hooks/useCompatibility.tsx (compatibilité)
+✅ src/hooks/useMatchingPreferences.tsx (COMPLÉTÉ - déjà typé, logs améliorés)
+✅ src/hooks/useCompatibility.tsx (COMPLÉTÉ - déjà typé, logs améliorés)
 - src/components/matching/*.tsx (composants matching)
 - src/components/enhanced/*.tsx (composants avancés)
 
 Estimation: ~40-50 warnings
-Complété: 12 warnings
+Complété: 12 warnings (hooks) + 0 warnings (2 hooks déjà typés)
 Warnings restants: ~150 (204 initial)
 Durée estimée: 2-3 semaines
 ```
 
 **Objectif Phase 3**: Réduire de ~162 à ~120 warnings
-**Progrès Phase 3**: 162 → ~150 warnings (-12 warnings, 80% du premier objectif) 🟡 **EN COURS**
+**Progrès Phase 3**: 162 → ~150 warnings (-12 warnings, 4 hooks complétés) 🟡 **EN COURS**
+
+**Note:** Les hooks `useMatchingPreferences` et `useCompatibility` étaient déjà excellemment typés avec tous les types centralisés. Les améliorations apportées concernent uniquement le logging préfixé pour le debugging.
 
 ---
 
