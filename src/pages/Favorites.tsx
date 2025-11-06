@@ -6,12 +6,15 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { ArrowLeft, Heart, Filter, X } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { ArrowLeft, Heart, Filter, X, FileDown, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useFavorites } from '@/hooks/useFavorites';
 import { useProfileTags, ProfileTag } from '@/hooks/useProfileTags';
 import TagManager from '@/components/TagManager';
 import FavoriteTagSelector from '@/components/FavoriteTagSelector';
+import { FavoritesPdfExportService } from '@/services/favoritesPdfExportService';
+import { toast } from 'sonner';
 
 interface Profile {
   id: string;
@@ -35,6 +38,9 @@ export default function Favorites() {
   const [loading, setLoading] = useState(true);
   const [selectedTagFilter, setSelectedTagFilter] = useState<string | null>(null);
   const [profileTags, setProfileTags] = useState<Map<string, ProfileTag[]>>(new Map());
+  const [selectedProfiles, setSelectedProfiles] = useState<Set<string>>(new Set());
+  const [isExporting, setIsExporting] = useState(false);
+  const [selectionMode, setSelectionMode] = useState(false);
 
   useEffect(() => {
     if (user && favorites.size > 0) {
@@ -83,6 +89,77 @@ export default function Favorites() {
       )
     : profiles;
 
+  const handleExportSingle = async (profileId: string) => {
+    if (!user) return;
+    
+    setIsExporting(true);
+    try {
+      const exportService = new FavoritesPdfExportService();
+      await exportService.exportSingleProfile(user.id, profileId);
+      toast.success('PDF exporté avec succès');
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast.error('Erreur lors de l\'export PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportMultiple = async () => {
+    if (!user || selectedProfiles.size === 0) return;
+
+    setIsExporting(true);
+    try {
+      const exportService = new FavoritesPdfExportService();
+      await exportService.exportMultipleProfiles(user.id, Array.from(selectedProfiles));
+      toast.success(`${selectedProfiles.size} profil(s) exporté(s) avec succès`);
+      setSelectedProfiles(new Set());
+      setSelectionMode(false);
+    } catch (error) {
+      console.error('Error exporting PDFs:', error);
+      toast.error('Erreur lors de l\'export PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportAll = async () => {
+    if (!user || filteredProfiles.length === 0) return;
+
+    setIsExporting(true);
+    try {
+      const exportService = new FavoritesPdfExportService();
+      const profileIds = filteredProfiles.map(p => p.user_id);
+      await exportService.exportMultipleProfiles(user.id, profileIds);
+      toast.success(`${filteredProfiles.length} profil(s) exporté(s) avec succès`);
+    } catch (error) {
+      console.error('Error exporting all PDFs:', error);
+      toast.error('Erreur lors de l\'export PDF');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const toggleProfileSelection = (profileId: string) => {
+    setSelectedProfiles(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(profileId)) {
+        newSet.delete(profileId);
+      } else {
+        newSet.add(profileId);
+      }
+      return newSet;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedProfiles.size === filteredProfiles.length) {
+      setSelectedProfiles(new Set());
+    } else {
+      setSelectedProfiles(new Set(filteredProfiles.map(p => p.user_id)));
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -122,8 +199,68 @@ export default function Favorites() {
               </p>
             </div>
             
-            <TagManager />
+            <div className="flex gap-2 flex-wrap">
+              <TagManager />
+              
+              {filteredProfiles.length > 0 && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setSelectionMode(!selectionMode);
+                      setSelectedProfiles(new Set());
+                    }}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    {selectionMode ? 'Annuler' : 'Sélectionner'}
+                  </Button>
+                  
+                  {!selectionMode && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={handleExportAll}
+                      disabled={isExporting}
+                      className="gap-2 bg-emerald text-white hover:bg-emerald/90"
+                    >
+                      <FileDown className="h-4 w-4" />
+                      {isExporting ? 'Export...' : `Tout exporter (${filteredProfiles.length})`}
+                    </Button>
+                  )}
+                  
+                  {selectionMode && selectedProfiles.size > 0 && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={handleExportMultiple}
+                      disabled={isExporting}
+                      className="gap-2 bg-gold text-white hover:bg-gold/90"
+                    >
+                      <FileDown className="h-4 w-4" />
+                      {isExporting ? 'Export...' : `Exporter (${selectedProfiles.size})`}
+                    </Button>
+                  )}
+                </>
+              )}
+            </div>
           </div>
+
+          {selectionMode && filteredProfiles.length > 0 && (
+            <Card className="p-3 mb-4 bg-emerald/5 border-emerald/20">
+              <div className="flex items-center gap-3">
+                <Checkbox
+                  checked={selectedProfiles.size === filteredProfiles.length}
+                  onCheckedChange={toggleSelectAll}
+                  id="select-all"
+                />
+                <label htmlFor="select-all" className="text-sm font-medium cursor-pointer">
+                  Tout sélectionner ({selectedProfiles.size}/{filteredProfiles.length})
+                </label>
+              </div>
+            </Card>
+          )}
 
           {/* Tag Filters */}
           {tags.length > 0 && (
@@ -188,7 +325,17 @@ export default function Favorites() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredProfiles.map((profile) => (
-              <Card key={profile.user_id} className="overflow-hidden">
+              <Card key={profile.user_id} className="overflow-hidden relative">
+                {selectionMode && (
+                  <div className="absolute top-2 left-2 z-10">
+                    <Checkbox
+                      checked={selectedProfiles.has(profile.user_id)}
+                      onCheckedChange={() => toggleProfileSelection(profile.user_id)}
+                      className="bg-white border-2 shadow-lg"
+                    />
+                  </div>
+                )}
+                
                 <div className="relative">
                   <ProfileCard
                     profile={{
@@ -205,8 +352,22 @@ export default function Favorites() {
                     compact={true}
                   />
                 </div>
-                <div className="p-4 border-t">
+                
+                <div className="p-4 border-t space-y-3">
                   <FavoriteTagSelector profileId={profile.user_id} />
+                  
+                  {!selectionMode && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleExportSingle(profile.user_id)}
+                      disabled={isExporting}
+                      className="w-full gap-2"
+                    >
+                      <FileDown className="h-3 w-3" />
+                      Exporter en PDF
+                    </Button>
+                  )}
                 </div>
               </Card>
             ))}
