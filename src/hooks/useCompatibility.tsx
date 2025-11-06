@@ -10,7 +10,25 @@ import type {
   WeightedQuestion
 } from '@/types/supabase';
 
-export const useCompatibility = () => {
+/**
+ * Type de retour du hook useCompatibility
+ */
+export interface UseCompatibilityReturn {
+  /** Réponses de l'utilisateur aux questions de compatibilité */
+  responses: CompatibilityResponse[];
+  /** Statistiques de complétion du questionnaire */
+  stats: CompatibilityStats;
+  /** État de chargement des données */
+  loading: boolean;
+  /** Récupère la valeur d'une réponse par clé de question */
+  getResponseValue: (questionKey: string) => string | null;
+  /** Calcule le score de compatibilité avec un autre utilisateur */
+  calculateCompatibilityScore: (otherUserId: string) => Promise<number>;
+  /** Rafraîchit les données de compatibilité */
+  refreshData: () => void;
+}
+
+export const useCompatibility = (): UseCompatibilityReturn => {
   const { user } = useAuth();
   const [responses, setResponses] = useState<CompatibilityResponse[]>([]);
   const [stats, setStats] = useState<CompatibilityStats>({
