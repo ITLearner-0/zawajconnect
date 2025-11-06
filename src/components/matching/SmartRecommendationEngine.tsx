@@ -7,10 +7,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Brain, Sparkles, Target, TrendingUp } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useSmartRecommendations } from '@/hooks/useSmartRecommendations';
+import type { SmartRecommendation } from '@/types/supabase';
 import { RecommendationCard } from './RecommendationCard';
 import { InsightCard } from './InsightCard';
 
-const SmartRecommendationEngine = () => {
+/**
+ * Smart Recommendation Engine Component
+ * Displays AI-powered match recommendations with Islamic compatibility scoring
+ */
+const SmartRecommendationEngine = (): JSX.Element => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { 
@@ -88,7 +93,7 @@ const SmartRecommendationEngine = () => {
 
           <TabsContent value="recommendations" className="space-y-4">
             <div className="grid gap-6 md:grid-cols-2">
-              {recommendations.map((recommendation) => (
+              {recommendations.map((recommendation: SmartRecommendation) => (
                 <RecommendationCard
                   key={recommendation.user_id}
                   recommendation={recommendation}
@@ -99,7 +104,7 @@ const SmartRecommendationEngine = () => {
 
           <TabsContent value="insights" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
-              {insights.map((insight, index) => (
+              {insights.map((insight, index: number) => (
                 <InsightCard
                   key={index}
                   insight={insight}
