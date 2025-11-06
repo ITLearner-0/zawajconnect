@@ -1,58 +1,16 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { Database } from '@/integrations/supabase/types';
 import type { PostgrestError } from '@supabase/supabase-js';
-
-// Types stricts extraits de la base de données Supabase
-type FamilyNotificationRow = Database['public']['Tables']['family_notifications']['Row'];
-type FamilyMemberRow = Database['public']['Tables']['family_members']['Row'];
-type FamilyReviewInsert = Database['public']['Tables']['family_reviews']['Insert'];
-type MatchRow = Database['public']['Tables']['matches']['Row'];
-type ProfileRow = Database['public']['Tables']['profiles']['Row'];
-
-/**
- * Profile partiel pour l'affichage des matches
- */
-export interface MatchProfileData {
-  full_name: string;
-  age: number;
-  location: string;
-  profession: string;
-  avatar_url: string;
-}
-
-/**
- * Match enrichi avec les profils utilisateurs
- * Compatible avec le composant FamilyNotificationCard
- */
-export interface EnrichedMatch {
-  id: string;
-  user1_id: string;
-  user2_id: string;
-  match_score: number;
-  user1_profile?: MatchProfileData | null;
-  user2_profile?: MatchProfileData | null;
-}
-
-/**
- * Notification familiale enrichie avec les données du match
- * Exporté pour utilisation dans les composants
- */
-export interface EnrichedFamilyNotification {
-  id: string;
-  match_id: string;
-  notification_type: string;
-  content: string;
-  severity: string;
-  action_required: boolean;
-  is_read: boolean;
-  created_at: string;
-  family_member_id: string;
-  original_message: string | null;
-  read_at: string | null;
-  match?: EnrichedMatch | null;
-}
+import type {
+  FamilyNotificationRow,
+  FamilyMemberRow,
+  FamilyReviewInsert,
+  MatchRow,
+  EnrichedFamilyNotification,
+  EnrichedMatch,
+  MatchProfileData
+} from '@/types/supabase';
 
 export const useFamilyApproval = () => {
   const { toast } = useToast();

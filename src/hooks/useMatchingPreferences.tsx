@@ -2,14 +2,11 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import type { Database } from '@/integrations/supabase/types';
 import type { PostgrestError } from '@supabase/supabase-js';
+import type { MatchingPreferencesRow, MatchingPreferencesUpdate } from '@/types/supabase';
 
-// Type strict extrait de la table Supabase
-export type MatchingPreferences = Database['public']['Tables']['matching_preferences']['Row'];
-
-// Type pour l'insertion/mise à jour (sans id, created_at, updated_at, user_id)
-export type MatchingPreferencesUpdate = Omit<MatchingPreferences, 'id' | 'created_at' | 'updated_at' | 'user_id'>;
+// Export le type principal pour compatibilité avec le code existant
+export type MatchingPreferences = MatchingPreferencesRow;
 
 const defaultPreferences: MatchingPreferencesUpdate = {
   use_ai_scoring: true,

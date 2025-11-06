@@ -1,39 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import type { Database } from '@/integrations/supabase/types';
 import type { PostgrestError } from '@supabase/supabase-js';
-
-// Types stricts extraits de la base de données Supabase
-type CompatibilityQuestionRow = Database['public']['Tables']['compatibility_questions']['Row'];
-type UserCompatibilityResponseRow = Database['public']['Tables']['user_compatibility_responses']['Row'];
-
-/**
- * Réponse utilisateur pour une question de compatibilité
- */
-export interface CompatibilityResponse {
-  question_key: string;
-  response_value: string;
-  updated_at?: string;
-}
-
-/**
- * Statistiques de complétion du questionnaire
- */
-export interface CompatibilityStats {
-  totalQuestions: number;
-  answeredQuestions: number;
-  completionPercentage: number;
-  lastUpdated: string | null;
-}
-
-/**
- * Question de compatibilité avec son poids
- */
-interface WeightedQuestion {
-  question_key: string;
-  weight: number;
-}
+import type {
+  CompatibilityQuestionRow,
+  UserCompatibilityResponseRow,
+  CompatibilityResponse,
+  CompatibilityStats,
+  WeightedQuestion
+} from '@/types/supabase';
 
 export const useCompatibility = () => {
   const { user } = useAuth();

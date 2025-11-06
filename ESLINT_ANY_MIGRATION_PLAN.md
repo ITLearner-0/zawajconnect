@@ -12,9 +12,9 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 | **Type de warning** | `@typescript-eslint/no-explicit-any` |
 | **Statut actuel** | `warn` (permet la compilation) |
 | **Objectif final** | 0 warnings (règle à `error`) |
-| **Dernière migration** | `useSecurityValidationEnhanced.tsx` (-3 any) |
+| **Dernière action** | Centralisation des types dans `src/types/supabase.ts` |
 | **Progrès Phase 1** | 21 types stricts ajoutés (16 any + 5 unknown), 1 any documenté |
-| **Status** | ✅ **Phase 1 TERMINÉE (100%)** |
+| **Status** | ✅ **Phase 1 TERMINÉE (100%)** + Types centralisés |
 
 ---
 
@@ -372,6 +372,71 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 - ✅ Documentation JSDoc pour fonctions complexes
 - ✅ Préférence pour `??` sur `||`
 - ✅ Types `Insert`/`Update` pour opérations CRUD
+- ✅ **Types centralisés dans `src/types/supabase.ts`**
+
+---
+
+### 📦 Centralisation des Types - `src/types/supabase.ts` (Janvier 2025)
+
+**Fichier créé**: `src/types/supabase.ts`
+
+**Objectif**: Centraliser tous les types réutilisables pour éviter la duplication et faciliter Phase 2
+
+**Types centralisés:**
+
+1. **Types de base Supabase (Row):**
+   - `ProfileRow`, `IslamicPreferencesRow`, `PrivacySettingsRow`
+   - `UserVerificationRow`, `MatchingPreferencesRow`, `MatchRow`
+   - `MessageRow`, `FamilyMemberRow`, `FamilyNotificationRow`
+   - `FamilyReviewRow`, `CompatibilityQuestionRow`, `UserCompatibilityResponseRow`
+   - `ProfileViewRow`
+
+2. **Types Insert/Update:**
+   - `FamilyReviewInsert`
+   - `MatchingPreferencesUpdate`
+
+3. **Types de compatibilité:**
+   - `CompatibilityResponse`
+   - `CompatibilityStats`
+   - `WeightedQuestion`
+
+4. **Types d'approbation familiale:**
+   - `MatchProfileData`
+   - `EnrichedMatch`
+   - `EnrichedFamilyNotification`
+
+5. **Types de validation de sécurité:**
+   - `UserVerificationStatus`
+   - `ValidationAdditionalInfo`
+   - `ValidationResult`
+   - `SecurityValidationHook`
+
+6. **Types de profil utilisateur:**
+   - `ProfileData`
+
+7. **Types utilitaires:**
+   - `Nullable<T>`
+   - `Optional<T>`
+   - `DeepPartial<T>`
+
+**Hooks mis à jour:**
+- ✅ `useCompatibility.tsx` - Import depuis types centralisés
+- ✅ `useFamilyApproval.tsx` - Import depuis types centralisés
+- ✅ `useMatchingPreferences.tsx` - Import depuis types centralisés
+- ✅ `useSecurityValidationEnhanced.tsx` - Import depuis types centralisés
+
+**Bénéfices:**
+- ✅ Source unique de vérité pour tous les types
+- ✅ Facilite la maintenance et les mises à jour
+- ✅ Évite la duplication de code
+- ✅ Améliore la cohérence entre hooks et composants
+- ✅ Prêt pour Phase 2 (Services & Utils)
+
+**Leçons apprises:**
+- Centraliser les types dès le début facilite grandement les phases suivantes
+- Organiser les types par domaine (tables, compatibilité, sécurité, etc.)
+- Documenter chaque type avec JSDoc pour la clarté
+- Exporter à la fois les types de base (`Row`) et les types dérivés (`Update`, `Insert`)
 
 ---
 

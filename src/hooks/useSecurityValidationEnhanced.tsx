@@ -3,58 +3,16 @@ import { useAuth } from '@/hooks/useAuth';
 import { useSecurityEvents } from '@/hooks/useSecurityEvents';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import type { Database } from '@/integrations/supabase/types';
 import type { PostgrestError } from '@supabase/supabase-js';
-
-// Types stricts extraits de la base de données Supabase
-type MatchRow = Database['public']['Tables']['matches']['Row'];
-type FamilyMemberRow = Database['public']['Tables']['family_members']['Row'];
-type ProfileViewRow = Database['public']['Tables']['profile_views']['Row'];
-
-/**
- * Structure de vérification utilisateur retournée par RPC
- */
-interface UserVerificationStatus {
-  email_verified: boolean;
-  id_verified: boolean;
-  verification_score: number;
-}
-
-/**
- * Informations additionnelles pour les résultats de validation
- */
-interface ValidationAdditionalInfo {
-  daily_limit?: number;
-  current_count?: number;
-  hourly_limit?: number;
-  operation_type?: string;
-  verification_score?: number;
-  required_score?: number;
-}
-
-/**
- * Résultat d'une validation de sécurité
- */
-export interface ValidationResult {
-  isValid: boolean;
-  reason?: string;
-  requiredScore?: number;
-  currentScore?: number;
-  additionalInfo?: ValidationAdditionalInfo;
-}
-
-/**
- * Interface du hook de validation de sécurité
- */
-export interface SecurityValidationHook {
-  validateFamilyOperationEnhanced: (operationType: string, requiredScore?: number) => Promise<ValidationResult>;
-  validateMessagePermissionsEnhanced: (matchId: string, requiredScore?: number) => Promise<ValidationResult>;
-  validateProfileAccessEnhanced: (targetUserId: string, requiredScore?: number) => Promise<ValidationResult>;
-  validateContactInfoAccess: (familyMemberId: string) => Promise<ValidationResult>;
-  validateWithFeedback: (validationFn: () => Promise<ValidationResult>) => Promise<boolean>;
-  showValidationError: (result: ValidationResult) => void;
-  validating: boolean;
-}
+import type {
+  MatchRow,
+  FamilyMemberRow,
+  ProfileViewRow,
+  UserVerificationStatus,
+  ValidationAdditionalInfo,
+  ValidationResult,
+  SecurityValidationHook
+} from '@/types/supabase';
 
 export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
   const { user } = useAuth();
