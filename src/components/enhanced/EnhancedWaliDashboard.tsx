@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,6 +28,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { RealtimeChannel } from '@supabase/supabase-js';
+import type { 
+  FamilyMemberRow, 
+  FamilyNotificationRow, 
+  MatchRow, 
+  MessageRow, 
+  SupervisionLogRow 
+} from '@/types/supabase';
 
 // Import enhanced notification components
 import RealTimeNotifications from './RealTimeNotifications';
@@ -90,6 +97,8 @@ interface RealtimeActivity {
   severity?: 'low' | 'medium' | 'high' | 'critical';
 }
 
+type ModerationSeverity = 'low' | 'medium' | 'high' | 'critical';
+
 const EnhancedWaliDashboard: React.FC = () => {
   const [supervisedUsers, setSupervisedUsers] = useState<SupervisedUser[]>([]);
   const [notifications, setNotifications] = useState<FamilyNotification[]>([]);
@@ -123,8 +132,8 @@ const EnhancedWaliDashboard: React.FC = () => {
     };
   }, []);
 
-  const setupRealtimeSubscriptions = () => {
-    const channels: unknown[] = [];
+  const setupRealtimeSubscriptions = (): RealtimeChannel[] => {
+    const channels: RealtimeChannel[] = [];
     
     // Subscribe to family notifications
     const notificationChannel = supabase
@@ -142,14 +151,14 @@ const EnhancedWaliDashboard: React.FC = () => {
         schema: 'public',
         table: 'messages'
       }, (payload) => {
-        handleNewMessage(payload.new);
+        handleNewMessage(payload.new as MessageRow);
       })
       .on('postgres_changes', {
         event: 'INSERT',
         schema: 'public',
         table: 'matches'
       }, (payload) => {
-        handleNewMatch(payload.new);
+        handleNewMatch(payload.new as MatchRow);
       })
       .subscribe();
 
@@ -163,7 +172,7 @@ const EnhancedWaliDashboard: React.FC = () => {
         schema: 'public',
         table: 'supervision_logs'
       }, (payload) => {
-        handleSupervisionActivity(payload.new);
+        handleSupervisionActivity(payload.new as SupervisionLogRow);
       })
       .subscribe();
 
@@ -182,7 +191,7 @@ const EnhancedWaliDashboard: React.FC = () => {
       user_name: 'Système',
       content: notification.content,
       timestamp: notification.created_at,
-      severity: notification.severity as any
+      severity: notification.severity as ModerationSeverity
     };
     
     setRealtimeActivities(prev => [activity, ...prev.slice(0, 19)]);
@@ -204,7 +213,7 @@ const EnhancedWaliDashboard: React.FC = () => {
     }));
   };
 
-  const handleNewMessage = (message: any) => {
+  const handleNewMessage = (message: MessageRow) => {
     // Add message to real-time activity feed
     const activity: RealtimeActivity = {
       id: message.id,
@@ -224,7 +233,7 @@ const EnhancedWaliDashboard: React.FC = () => {
     })));
   };
 
-  const handleNewMatch = (match: any) => {
+  const handleNewMatch = (match: MatchRow) => {
     // Add match to real-time activity feed
     const activity: RealtimeActivity = {
       id: match.id,
@@ -240,13 +249,13 @@ const EnhancedWaliDashboard: React.FC = () => {
     loadMatchesForApproval();
   };
 
-  const handleSupervisionActivity = (log: any) => {
+  const handleSupervisionActivity = (log: SupervisionLogRow) => {
     // Update activity based on supervision log
     const activity: RealtimeActivity = {
       id: log.id,
       type: 'alert',
       user_name: 'Supervision',
-      content: `Activité: ${log.action_type}`,
+      content: `Activité: ${log.action_type || 'Activité de supervision'}`,
       timestamp: log.created_at
     };
     
@@ -299,7 +308,7 @@ const EnhancedWaliDashboard: React.FC = () => {
               full_name: profile?.full_name || 'Utilisateur',
               user_id: member.user_id,
               relationship: member.relationship,
-              avatar_url: profile?.avatar_url,
+              avatar_url: profile?.avatar_url || undefined,
               active_conversations: matches?.length || 0,
               unread_messages: unreadCount || 0,
               recent_activity: 'En ligne'
@@ -333,16 +342,22 @@ const EnhancedWaliDashboard: React.FC = () => {
     }
   };
 
-  const loadNotifications = async (familyMembers: unknown[]) => {
+  const loadNotifications = async (familyMembers: Array<{ id: string }> | null) => {
+    if (!familyMembers || familyMembers.length === 0) return;
+
     const { data: notificationData } = await supabase
       .from('family_notifications')
       .select('*')
-      .in('family_member_id', familyMembers?.map(fm => fm.id) || [])
+      .in('family_member_id', familyMembers.map(fm => fm.id))
       .order('created_at', { ascending: false })
       .limit(50);
 
     if (notificationData) {
-      setNotifications(notificationData);
+      const mappedNotifications: FamilyNotification[] = notificationData.map(n => ({
+        ...n,
+        original_message: n.original_message || undefined
+      }));
+      setNotifications(mappedNotifications);
       const criticalCount = notificationData.filter(n => n.severity === 'critical' && !n.is_read).length;
       setStats(prev => ({ ...prev, criticalAlerts: criticalCount }));
     }
@@ -371,18 +386,23 @@ const EnhancedWaliDashboard: React.FC = () => {
           .or(`and(user1_id.in.(${userIds.join(',')}),family1_approved.is.null),and(user2_id.in.(${userIds.join(',')}),family2_approved.is.null)`);
 
         if (matches) {
-          const enrichedMatches = await Promise.all(
+          const enrichedMatches: MatchForApproval[] = await Promise.all(
             matches.map(async (match) => {
               const supervisedUserId = userIds.find(id => id === match.user1_id || id === match.user2_id);
               const candidateId = supervisedUserId === match.user1_id ? match.user2_id : match.user1_id;
               
               const [candidateProfile, supervisedProfile] = await Promise.all([
                 supabase.from('profiles').select('full_name').eq('user_id', candidateId).maybeSingle(),
-                supabase.from('profiles').select('full_name').eq('user_id', supervisedUserId).maybeSingle()
+                supabase.from('profiles').select('full_name').eq('user_id', supervisedUserId || '').maybeSingle()
               ]);
 
               return {
-                ...match,
+                id: match.id,
+                user1_id: match.user1_id,
+                user2_id: match.user2_id,
+                match_score: match.match_score || 0,
+                created_at: match.created_at,
+                can_communicate: match.can_communicate,
                 candidate_name: candidateProfile.data?.full_name || 'Candidat inconnu',
                 candidate_id: candidateId,
                 supervised_user_name: supervisedProfile.data?.full_name || 'Utilisateur supervisé',
