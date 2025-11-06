@@ -21,10 +21,8 @@ import PhotoUploadStep from '@/components/onboarding/PhotoUploadStep';
 import IslamicPreferencesStep from '@/components/onboarding/IslamicPreferencesStep';
 import MobileStepNavigation from '@/components/onboarding/MobileStepNavigation';
 import { useOnboardingValidation } from '@/hooks/useOnboardingValidation';
-import { useFormPersistence } from '@/hooks/useFormPersistence';
+import { useOnboardingPersistence } from '@/hooks/useOnboardingPersistence';
 import { useProfileSave } from '@/hooks/useProfileSave';
-import { useFormAutoSave } from '@/hooks/useFormAutoSave';
-import { useEmergencyBackup } from '@/hooks/useEmergencyBackup';
 import { SaveStatusIndicator } from '@/components/SaveStatusIndicator';
 import { 
   ArrowLeft, 
@@ -112,8 +110,8 @@ const Onboarding = () => {
     currentStep
   });
 
-  // Form persistence
-  const formPersistence = useFormPersistence({
+  // Unified persistence hook - replaces useFormAutoSave, useEmergencyBackup, and useFormPersistence
+  const persistence = useOnboardingPersistence({
     profileData,
     islamicPrefs,
     currentStep
@@ -121,27 +119,6 @@ const Onboarding = () => {
 
   // Profile save hook
   const { saveProfile: saveToDatabase, uploadAvatar, saving } = useProfileSave();
-
-  // Auto-save hooks for immediate data persistence
-  useFormAutoSave({ data: profileData, key: 'profile_auto', interval: 2000 });
-  useFormAutoSave({ data: islamicPrefs, key: 'islamic_auto', interval: 2000 });
-  useFormAutoSave({ data: { currentStep }, key: 'step_auto', interval: 1000 });
-
-  // Emergency backup system
-  const { saveEmergencyBackup, restoreEmergencyBackup } = useEmergencyBackup();
-
-  // Save emergency backups on every change
-  useEffect(() => {
-    saveEmergencyBackup('profile', profileData);
-  }, [profileData, saveEmergencyBackup]);
-
-  useEffect(() => {
-    saveEmergencyBackup('islamic', islamicPrefs);
-  }, [islamicPrefs, saveEmergencyBackup]);
-
-  useEffect(() => {
-    saveEmergencyBackup('step', currentStep);
-  }, [currentStep, saveEmergencyBackup]);
 
   const calculateCompletionPercentage = validation.getOverallProgress;
 
@@ -199,105 +176,41 @@ const Onboarding = () => {
     if (!user) return;
 
     try {
-      console.log('📂 Chargement des données depuis la base de données...');
+      console.log('📂 Chargement des données avec le système unifié...');
       
-      // Charger le profil et les préférences en une seule fois
-      const [{ data: profile }, { data: islamicData }] = await Promise.all([
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle(),
-        supabase
-          .from('islamic_preferences')
-          .select('*')
-          .eq('user_id', user.id)
-          .maybeSingle()
-      ]);
+      // Use intelligent restore from unified persistence hook
+      const restoredData = await persistence.restore();
 
-      // PRIORITÉ 1: Données de la base de données
-      if (profile) {
-        console.log('✅ Profil chargé depuis la base de données');
-        const loadedProfile = {
-          full_name: profile.full_name || '',
-          age: profile.age ?? undefined,
-          gender: profile.gender || '',
-          location: profile.location || '',
-          education: profile.education || '',
-          profession: profile.profession || '',
-          bio: profile.bio || '',
-          looking_for: profile.looking_for || '',
-          interests: profile.interests || [],
-          avatar_url: profile.avatar_url || ''
-        };
-        setProfileData(loadedProfile);
-        
-        // Si des données existent, masquer l'écran de bienvenue
-        setShowWelcome(false);
-        console.log('✅ Données existantes chargées - écran de bienvenue masqué');
-        
-        // Sauvegarder dans le localStorage pour la prochaine fois
-        saveEmergencyBackup('profile', loadedProfile);
-      } else {
-        // PRIORITÉ 2: Si pas de données en base, essayer le localStorage
-        console.log('⚠️ Pas de profil en base, tentative de restauration depuis localStorage');
-        const emergencyProfile = restoreEmergencyBackup('profile');
-        if (emergencyProfile && Object.keys(emergencyProfile).length > 1) {
-          setProfileData(prev => ({ ...prev, ...emergencyProfile }));
-          console.log('🚨 Profil restauré depuis localStorage');
+      if (restoredData) {
+        // Restore profile data
+        if (restoredData.profileData) {
+          console.log('✅ Profil restauré depuis le système intelligent');
+          setProfileData(restoredData.profileData);
+          setShowWelcome(false);
         }
-      }
 
-      if (islamicData) {
-        console.log('✅ Préférences islamiques chargées depuis la base de données');
-        const loadedPrefs = {
-          prayer_frequency: islamicData.prayer_frequency || '',
-          quran_reading: islamicData.quran_reading || '',
-          hijab_preference: islamicData.hijab_preference || '',
-          beard_preference: islamicData.beard_preference || '',
-          sect: islamicData.sect || '',
-          madhab: islamicData.madhab || '',
-          halal_diet: islamicData.halal_diet ?? true,
-          smoking: islamicData.smoking || '',
-          desired_partner_sect: islamicData.desired_partner_sect || '',
-          importance_of_religion: islamicData.importance_of_religion || ''
-        };
-        setIslamicPrefs(loadedPrefs);
-        
-        // Sauvegarder dans le localStorage pour la prochaine fois
-        saveEmergencyBackup('islamic', loadedPrefs);
-      } else {
-        // PRIORITÉ 2: Si pas de données en base, essayer le localStorage
-        console.log('⚠️ Pas de préférences en base, tentative de restauration depuis localStorage');
-        const emergencyIslamic = restoreEmergencyBackup('islamic');
-        if (emergencyIslamic && Object.keys(emergencyIslamic).length > 1) {
-          setIslamicPrefs(prev => ({ ...prev, ...emergencyIslamic }));
-          console.log('🚨 Préférences restaurées depuis localStorage');
+        // Restore Islamic preferences
+        if (restoredData.islamicPrefs) {
+          console.log('✅ Préférences islamiques restaurées');
+          setIslamicPrefs(restoredData.islamicPrefs);
         }
-      }
-      
-      // Restaurer l'étape sauvegardée
-      const emergencyStep = restoreEmergencyBackup('step');
-      if (emergencyStep && typeof emergencyStep === 'number') {
-        setCurrentStep(emergencyStep);
-        console.log('🚨 Étape restaurée:', emergencyStep);
+
+        // Restore step progress
+        if (restoredData.currentStep && restoredData.currentStep > 0) {
+          console.log('✅ Étape restaurée:', restoredData.currentStep);
+          setCurrentStep(restoredData.currentStep);
+        }
+      } else {
+        console.log('ℹ️ Aucune donnée sauvegardée trouvée');
       }
       
     } catch (error) {
       console.error('❌ Erreur chargement données:', error);
-      // En cas d'erreur, essayer de restaurer depuis localStorage
-      const emergencyProfile = restoreEmergencyBackup('profile');
-      const emergencyIslamic = restoreEmergencyBackup('islamic');
-      
-      if (emergencyProfile && Object.keys(emergencyProfile).length > 1) {
-        setProfileData(prev => ({ ...prev, ...emergencyProfile }));
-        console.log('🚨 Profil restauré depuis localStorage (après erreur)');
-      }
-      
-      if (emergencyIslamic && Object.keys(emergencyIslamic).length > 1) {
-        setIslamicPrefs(prev => ({ ...prev, ...emergencyIslamic }));
-        console.log('🚨 Préférences restaurées depuis localStorage (après erreur)');
-      }
+      toast({
+        title: "Erreur de chargement",
+        description: "Impossible de charger vos données sauvegardées.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -458,8 +371,8 @@ const Onboarding = () => {
       const result = await saveToDatabase(profileData, islamicPrefs);
       
       if (result.success) {
-        // Clear form drafts on successful completion
-        formPersistence.clearDrafts();
+        // Clear all saved data on successful completion
+        persistence.clearAll();
         navigate('/enhanced-profile');
       } else {
         toast({
@@ -739,7 +652,10 @@ const Onboarding = () => {
                       <div className="text-sm text-muted-foreground mb-2">
                         Temps estimé: {steps[currentStep - 1]?.estimatedTime}
                       </div>
-                      <SaveStatusIndicator />
+                      <SaveStatusIndicator 
+                        status={persistence.saveStatus}
+                        lastSaveTime={persistence.lastSaveTime}
+                      />
                       <Progress value={progress} className="h-2 w-32 animate-slide-in-right mt-2" />
                     </div>
                   </div>
