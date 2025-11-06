@@ -10,7 +10,15 @@ interface InsightsAnalytics {
   actionsTaken: string[];
 }
 
-export const useInsightsAnalytics = () => {
+export interface UseInsightsAnalyticsReturn {
+  analytics: InsightsAnalytics;
+  trackAction: (action: string) => Promise<void>;
+  getInsightEngagement: () => 'low' | 'medium' | 'high';
+  getRecommendations: () => string[];
+  refresh: () => Promise<void>;
+}
+
+export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
   const { user } = useAuth();
   const [analytics, setAnalytics] = useState<InsightsAnalytics>({
     viewCount: 0,
@@ -27,22 +35,22 @@ export const useInsightsAnalytics = () => {
     }
   }, [user]);
 
-  const trackInsightView = async () => {
+  const trackInsightView = async (): Promise<void> => {
     try {
       const { error } = await supabase
         .from('user_settings')
         .upsert({
-          user_id: user?.id,
+          user_id: user!.id,
           updated_at: new Date().toISOString()
-        } as any);
+        });
 
       if (error) throw error;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error tracking insight view:', error);
     }
   };
 
-  const trackAction = async (action: string) => {
+  const trackAction = async (action: string): Promise<void> => {
     try {
       // For now, we'll store in local state
       // In production, this would go to a proper analytics table
@@ -50,12 +58,12 @@ export const useInsightsAnalytics = () => {
         ...prev,
         actionsTaken: [...prev.actionsTaken, action]
       }));
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error tracking action:', error);
     }
   };
 
-  const loadAnalytics = async () => {
+  const loadAnalytics = async (): Promise<void> => {
     try {
       // Load user analytics data
       // For now, using mock data as we'd need to create proper analytics tables
@@ -66,7 +74,7 @@ export const useInsightsAnalytics = () => {
         exportCount: Math.floor(Math.random() * 2),
         actionsTaken: ['view_insights', 'complete_test']
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error loading analytics:', error);
     }
   };
@@ -80,7 +88,7 @@ export const useInsightsAnalytics = () => {
 
   const getRecommendations = (): string[] => {
     const engagement = getInsightEngagement();
-    const recommendations = [];
+    const recommendations: string[] = [];
 
     if (analytics.shareCount === 0) {
       recommendations.push('Partagez vos insights avec votre famille pour obtenir leurs avis');
