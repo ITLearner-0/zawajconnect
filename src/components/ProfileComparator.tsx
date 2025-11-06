@@ -15,11 +15,11 @@ interface ProfileComparatorProps {
 
 interface ProfileData {
   id: string;
-  full_name: string;
-  age: number;
-  location: string;
-  profession: string;
-  avatar_url?: string;
+  full_name: string | null;
+  age: number | null;
+  location: string | null;
+  profession: string | null;
+  avatar_url?: string | null;
 }
 
 interface CompatibilityData {
@@ -90,7 +90,7 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
       const dataPoint: any = { category: cat.category };
       profiles.forEach(profile => {
         const compat = compatibilityData[profile.id];
-        if (compat) {
+        if (compat && profile.full_name) {
           dataPoint[profile.full_name] = compat[cat.key as keyof CompatibilityData];
         }
       });
@@ -114,7 +114,7 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
 
       if (compat.overall >= 80) {
         recommendations.push({
-          profile: profile.full_name,
+          profile: profile.full_name || 'Profil anonyme',
           message: 'Excellente compatibilité globale - Candidat prioritaire à considérer',
           type: 'success',
         });
@@ -122,7 +122,7 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
 
       if (compat.islamic >= 85) {
         recommendations.push({
-          profile: profile.full_name,
+          profile: profile.full_name || 'Profil anonyme',
           message: 'Très forte compatibilité sur les valeurs islamiques',
           type: 'success',
         });
@@ -130,7 +130,7 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
 
       if (compat.concerns.length > 3) {
         recommendations.push({
-          profile: profile.full_name,
+          profile: profile.full_name || 'Profil anonyme',
           message: `${compat.concerns.length} préoccupations identifiées - À discuter en détail`,
           type: 'warning',
         });
@@ -138,7 +138,7 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
 
       if (compat.cultural < 50) {
         recommendations.push({
-          profile: profile.full_name,
+          profile: profile.full_name || 'Profil anonyme',
           message: 'Différences culturelles importantes - Communication essentielle',
           type: 'info',
         });
@@ -203,8 +203,8 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
               {profiles.map((profile, index) => (
                 <Radar
                   key={profile.id}
-                  name={profile.full_name}
-                  dataKey={profile.full_name}
+                  name={profile.full_name || 'Profil anonyme'}
+                  dataKey={profile.full_name || 'Profil anonyme'}
                   stroke={colors[index]}
                   fill={colors[index]}
                   fillOpacity={0.3}

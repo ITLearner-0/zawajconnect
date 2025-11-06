@@ -9,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Star, Trash2, Edit, Eye, Clock, Filter, StarOff, Download, Tag, X, Plus, ArrowUpDown, BarChart3 } from 'lucide-react';
+import { Calendar, Star, Trash2, Edit, Eye, Clock, Filter, StarOff, Download, Tag, X, Plus, ArrowUpDown, BarChart3, FileText, CheckSquare } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ProfileComparator from '@/components/ProfileComparator';
 import StarRating from '@/components/StarRating';
@@ -17,7 +17,9 @@ import ComparisonStatistics from '@/components/ComparisonStatistics';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { generateComparisonPDF } from '@/services/comparisonPdfExportService';
+import { generateMultipleComparisonPDF } from '@/services/multipleComparisonPdfService';
 import { useUnifiedCompatibility } from '@/hooks/useUnifiedCompatibility';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface ComparisonHistory {
   id: string;
@@ -58,6 +60,8 @@ const Compare = () => {
   const [sortBy, setSortBy] = useState<'date' | 'rating'>('date');
   const [ratingFilter, setRatingFilter] = useState<number | null>(null);
   const [showStatistics, setShowStatistics] = useState(false);
+  const [selectedForExport, setSelectedForExport] = useState<string[]>([]);
+  const [exportingMultiple, setExportingMultiple] = useState(false);
   const radarChartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -415,6 +419,107 @@ const Compare = () => {
     }
   };
 
+  const toggleSelectForExport = (comparisonId: string) => {
+    setSelectedForExport(prev =>
+      prev.includes(comparisonId)
+        ? prev.filter(id => id !== comparisonId)
+        : [...prev, comparisonId]
+    );
+  };
+
+  const selectAllForExport = () => {
+    if (selectedForExport.length === filteredHistory.length) {
+      setSelectedForExport([]);
+    } else {
+      setSelectedForExport(filteredHistory.map(c => c.id));
+    }
+  };
+
+  const handleExportMultiple = async () => {
+    if (!user || selectedForExport.length === 0) return;
+
+    setExportingMultiple(true);
+    try {
+      // Fetch data for all selected comparisons
+      const comparisonsData = await Promise.all(
+        selectedForExport.map(async (compId) => {
+          const comparison = history.find(h => h.id === compId);
+          if (!comparison) return null;
+
+          // Fetch profiles
+          const { data: profiles, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, user_id, full_name, age, location, profession')
+            .in('id', comparison.compared_profile_ids);
+
+          if (profilesError || !profiles || profiles.length === 0) return null;
+
+          // Calculate compatibility
+          const userIds = profiles.map(p => p.user_id).filter(Boolean);
+          const compatibilityResults = await batchCalculateCompatibility(userIds);
+
+          const scores = profiles.map(profile => {
+            const result = compatibilityResults[profile.user_id];
+            return {
+              profileId: profile.id,
+              overall: result?.compatibility_score ?? 60,
+              islamic: result?.islamic_score ?? 60,
+              cultural: result?.cultural_score ?? 60,
+              personality: result?.personality_score ?? 60,
+            };
+          });
+
+          return {
+            id: comparison.id,
+            name: comparison.comparison_name || `Comparaison du ${format(new Date(comparison.created_at), 'PPP', { locale: fr })}`,
+            date: format(new Date(comparison.created_at), 'PPP', { locale: fr }),
+            data: {
+              profiles: profiles.map(p => ({
+                id: p.id,
+                full_name: p.full_name || 'Non renseigné',
+                age: p.age || 0,
+                location: p.location || 'Non renseigné',
+                occupation: p.profession || 'Non renseigné',
+              })),
+              scores,
+              insights: compatibilityResults,
+            },
+            notes: comparison.notes || undefined,
+            rating: comparison.rating,
+          };
+        })
+      );
+
+      const validComparisons = comparisonsData.filter(c => c !== null);
+
+      if (validComparisons.length === 0) {
+        throw new Error('No valid comparisons to export');
+      }
+
+      await generateMultipleComparisonPDF({
+        comparisons: validComparisons,
+        exportDate: format(new Date(), 'PPP à HH:mm', { locale: fr }),
+        userName: user.email || undefined,
+      });
+
+      toast({
+        title: "Export réussi",
+        description: `${validComparisons.length} comparaison(s) exportée(s) en PDF consolidé`
+      });
+
+      setSelectedForExport([]);
+    } catch (error) {
+      console.error('Error exporting multiple PDFs:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'exporter les comparaisons",
+        variant: "destructive"
+      });
+    } finally {
+      setExportingMultiple(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
@@ -526,6 +631,17 @@ const Compare = () => {
                 >
                   Nouvelle comparaison
                 </Button>
+
+                {filteredHistory.length > 0 && (
+                  <Button
+                    variant={selectedForExport.length > 0 ? "default" : "outline"}
+                    onClick={selectAllForExport}
+                    className={selectedForExport.length > 0 ? "bg-gold text-white" : "border-gold text-gold hover:bg-gold hover:text-white"}
+                  >
+                    <CheckSquare className="h-4 w-4 mr-2" />
+                    {selectedForExport.length === filteredHistory.length ? "Tout désélectionner" : "Tout sélectionner"}
+                  </Button>
+                )}
               </div>
 
               {/* Tags Filter */}
@@ -588,7 +704,16 @@ const Compare = () => {
             {filteredHistory.map((comparison) => (
               <Card key={comparison.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-4">
+                    {/* Checkbox for multiple export */}
+                    <div className="pt-1">
+                      <Checkbox
+                        checked={selectedForExport.includes(comparison.id)}
+                        onCheckedChange={() => toggleSelectForExport(comparison.id)}
+                        className="h-5 w-5"
+                      />
+                    </div>
+
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-lg font-semibold">
@@ -845,6 +970,24 @@ const Compare = () => {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Floating Export Multiple Button */}
+      {selectedForExport.length > 0 && (
+        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
+          <Button
+            size="lg"
+            onClick={handleExportMultiple}
+            disabled={exportingMultiple}
+            className="bg-gradient-to-r from-gold to-emerald text-white shadow-2xl hover:shadow-gold/50 px-8 py-6 text-lg"
+          >
+            <FileText className="h-5 w-5 mr-2" />
+            {exportingMultiple 
+              ? 'Export en cours...' 
+              : `Exporter ${selectedForExport.length} comparaison(s) en PDF consolidé`
+            }
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
