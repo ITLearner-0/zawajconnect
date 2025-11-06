@@ -17,8 +17,10 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useInsightsAnalytics, type UseInsightsAnalyticsReturn } from '@/hooks/useInsightsAnalytics';
+import { useCompatibilityInsights } from '@/hooks/useCompatibilityInsights';
+import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
-import jsPDF from 'jspdf';
+import { generateEnhancedPDF } from '@/services/enhancedPdfExportService';
 
 interface InsightsActionPanelProps {
   completionPercentage: number;
@@ -40,6 +42,8 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
   const [isSharing, setIsSharing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { insights } = useCompatibilityInsights(user?.id);
   const { trackShare, trackExport, trackAction, getRecommendations }: UseInsightsAnalyticsReturn = useInsightsAnalytics();
 
   const handleShare = async (): Promise<void> => {
@@ -75,109 +79,22 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
   const handleExport = async (): Promise<void> => {
     setIsExporting(true);
     try {
-      // Créer le PDF avec jsPDF
-      const doc = new jsPDF();
-      
-      // Configuration
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const margin = 20;
-      let yPosition = margin;
-      
-      // Titre principal
-      doc.setFontSize(20);
-      doc.setTextColor(16, 185, 129); // Emerald color
-      doc.text('Mes Insights de Compatibilité', margin, yPosition);
-      yPosition += 15;
-      
-      // Date
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')}`, margin, yPosition);
-      yPosition += 15;
-      
-      // Ligne de séparation
-      doc.setDrawColor(200, 200, 200);
-      doc.line(margin, yPosition, pageWidth - margin, yPosition);
-      yPosition += 10;
-      
-      // Score global (si disponible)
-      doc.setFontSize(14);
-      doc.setTextColor(0, 0, 0);
-      doc.text(`Progression: ${completionPercentage}%`, margin, yPosition);
-      yPosition += 10;
-      
-      // Barre de progression visuelle
-      const progressBarWidth = pageWidth - (2 * margin);
-      const progressBarHeight = 8;
-      doc.setFillColor(229, 231, 235); // Gray background
-      doc.rect(margin, yPosition, progressBarWidth, progressBarHeight, 'F');
-      doc.setFillColor(16, 185, 129); // Emerald progress
-      doc.rect(margin, yPosition, (progressBarWidth * completionPercentage) / 100, progressBarHeight, 'F');
-      yPosition += 20;
-      
-      // Section: Prochaines étapes
-      doc.setFontSize(16);
-      doc.setTextColor(16, 185, 129);
-      doc.text('Prochaines Étapes Recommandées', margin, yPosition);
-      yPosition += 10;
-      
-      // Recommandations dynamiques
-      const recommendations = getRecommendations();
-      doc.setFontSize(11);
-      doc.setTextColor(60, 60, 60);
-      
-      recommendations.forEach((rec, index) => {
-        const lines = doc.splitTextToSize(`${index + 1}. ${rec}`, pageWidth - (2 * margin));
-        lines.forEach((line: string) => {
-          if (yPosition > 270) {
-            doc.addPage();
-            yPosition = margin;
-          }
-          doc.text(line, margin, yPosition);
-          yPosition += 6;
-        });
-        yPosition += 3;
+      if (!insights) {
+        toast.error('Aucun insight disponible pour l\'export');
+        return;
+      }
+
+      // Utiliser le service d'export amélioré
+      await generateEnhancedPDF({
+        insights,
+        userName: user?.email?.split('@')[0] || 'Utilisateur',
+        completionPercentage
       });
-      
-      yPosition += 10;
-      
-      // Section: Actions disponibles
-      doc.setFontSize(16);
-      doc.setTextColor(16, 185, 129);
-      doc.text('Actions Disponibles', margin, yPosition);
-      yPosition += 10;
-      
-      doc.setFontSize(11);
-      doc.setTextColor(60, 60, 60);
-      
-      const nextStepsText = [
-        '• Améliorer votre profil avec les suggestions',
-        '• Découvrir des profils compatibles',
-        '• Consulter les guidances islamiques',
-        '• Partager vos insights avec votre famille'
-      ];
-      
-      nextStepsText.forEach(text => {
-        doc.text(text, margin, yPosition);
-        yPosition += 7;
-      });
-      
-      yPosition += 15;
-      
-      // Footer
-      doc.setFontSize(8);
-      doc.setTextColor(150, 150, 150);
-      const footerText = 'Muslima - Plateforme de mariage musulman | muslima.app';
-      const footerWidth = doc.getTextWidth(footerText);
-      doc.text(footerText, (pageWidth - footerWidth) / 2, 280);
-      
-      // Télécharger le PDF
-      doc.save('mes-insights-compatibilite.pdf');
       
       // Tracker l'export
       await trackExport();
       
-      toast.success('PDF téléchargé avec succès !');
+      toast.success('PDF professionnel téléchargé avec succès !');
     } catch (error: unknown) {
       console.error('Erreur lors de l\'export PDF:', error);
       toast.error('Erreur lors de la génération du PDF');
