@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievement_unlocks: {
+        Row: {
+          achievement_id: string
+          achievement_title: string
+          id: string
+          points_awarded: number
+          rarity: string
+          unlocked_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_id: string
+          achievement_title: string
+          id?: string
+          points_awarded?: number
+          rarity: string
+          unlocked_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_id?: string
+          achievement_title?: string
+          id?: string
+          points_awarded?: number
+          rarity?: string
+          unlocked_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       admin_settings: {
         Row: {
           category: string
@@ -545,6 +575,63 @@ export type Database = {
         }
         Relationships: []
       }
+      insight_actions: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          user_id: string
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id: string
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      insights_analytics: {
+        Row: {
+          created_at: string | null
+          export_count: number | null
+          id: string
+          last_viewed_at: string | null
+          share_count: number | null
+          updated_at: string | null
+          user_id: string
+          view_count: number | null
+        }
+        Insert: {
+          created_at?: string | null
+          export_count?: number | null
+          id?: string
+          last_viewed_at?: string | null
+          share_count?: number | null
+          updated_at?: string | null
+          user_id: string
+          view_count?: number | null
+        }
+        Update: {
+          created_at?: string | null
+          export_count?: number | null
+          id?: string
+          last_viewed_at?: string | null
+          share_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+          view_count?: number | null
+        }
+        Relationships: []
+      }
       islamic_guidance: {
         Row: {
           author: string | null
@@ -970,6 +1057,78 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      moderation_rules: {
+        Row: {
+          action: string
+          created_at: string | null
+          description: string
+          id: string
+          is_active: boolean
+          pattern: string
+          rule_type: string
+          severity: string
+          updated_at: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          description: string
+          id?: string
+          is_active?: boolean
+          pattern: string
+          rule_type: string
+          severity: string
+          updated_at?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          is_active?: boolean
+          pattern?: string
+          rule_type?: string
+          severity?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      moderation_violations: {
+        Row: {
+          action_taken: string
+          auto_moderated_content: string | null
+          content: string
+          content_type: string
+          created_at: string | null
+          id: string
+          rules_violated: string[]
+          severity: string
+          user_id: string
+        }
+        Insert: {
+          action_taken: string
+          auto_moderated_content?: string | null
+          content: string
+          content_type: string
+          created_at?: string | null
+          id?: string
+          rules_violated: string[]
+          severity: string
+          user_id: string
+        }
+        Update: {
+          action_taken?: string
+          auto_moderated_content?: string | null
+          content?: string
+          content_type?: string
+          created_at?: string | null
+          id?: string
+          rules_violated?: string[]
+          severity?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       notifications: {
         Row: {
@@ -1490,6 +1649,42 @@ export type Database = {
         }
         Relationships: []
       }
+      user_progression: {
+        Row: {
+          achievements_count: number
+          created_at: string | null
+          current_level: number
+          id: string
+          insights_viewed_count: number
+          last_level_up_at: string | null
+          total_points: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievements_count?: number
+          created_at?: string | null
+          current_level?: number
+          id?: string
+          insights_viewed_count?: number
+          last_level_up_at?: string | null
+          total_points?: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievements_count?: number
+          created_at?: string | null
+          current_level?: number
+          id?: string
+          insights_viewed_count?: number
+          last_level_up_at?: string | null
+          total_points?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           assigned_at: string | null
@@ -1905,6 +2100,10 @@ export type Database = {
       }
       increment_family_operation_count: {
         Args: { p_operation_type: string; p_user_id: string }
+        Returns: undefined
+      }
+      increment_insight_views: {
+        Args: { p_user_id: string }
         Returns: undefined
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }

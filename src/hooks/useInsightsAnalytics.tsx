@@ -1,21 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-
-interface InsightsAnalytics {
-  viewCount: number;
-  lastViewed: string | undefined;
-  shareCount: number;
-  exportCount: number;
-  actionsTaken: string[];
-}
+import { toast } from 'sonner';
+import type { InsightsAnalytics, EngagementLevel } from '@/types/compatibility';
 
 export interface UseInsightsAnalyticsReturn {
   analytics: InsightsAnalytics;
-  trackAction: (action: string) => Promise<void>;
-  getInsightEngagement: () => 'low' | 'medium' | 'high';
+  trackAction: (action: string, metadata?: Record<string, unknown>) => Promise<void>;
+  trackView: () => Promise<void>;
+  trackShare: () => Promise<void>;
+  trackExport: () => Promise<void>;
+  getInsightEngagement: () => EngagementLevel;
   getRecommendations: () => string[];
   refresh: () => Promise<void>;
+  loading: boolean;
 }
 
 export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
@@ -27,65 +25,227 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
     exportCount: 0,
     actionsTaken: []
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (user) {
-      trackInsightView();
       loadAnalytics();
     }
   }, [user]);
 
-  const trackInsightView = async (): Promise<void> => {
+  /**
+   * Charge les analytics depuis Supabase
+   */
+  const loadAnalytics = async (): Promise<void> => {
+    if (!user) return;
+    
+    setLoading(true);
     try {
-      const { error } = await supabase
-        .from('user_settings')
-        .upsert({
-          user_id: user!.id,
-          updated_at: new Date().toISOString()
-        });
+      // Charger les analytics de base
+      const { data: analyticsData, error: analyticsError } = await supabase
+        .from('insights_analytics')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
 
-      if (error) throw error;
+      if (analyticsError && analyticsError.code !== 'PGRST116') {
+        throw analyticsError;
+      }
+
+      // Charger les actions récentes (derniers 30 jours)
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+      const { data: actionsData, error: actionsError } = await supabase
+        .from('insight_actions')
+        .select('action_type')
+        .eq('user_id', user.id)
+        .gte('created_at', thirtyDaysAgo.toISOString())
+        .order('created_at', { ascending: false });
+
+      if (actionsError) {
+        throw actionsError;
+      }
+
+      // Si pas d'analytics, créer une entrée
+      if (!analyticsData) {
+        const { error: insertError } = await supabase
+          .from('insights_analytics')
+          .insert({
+            user_id: user.id,
+            view_count: 0,
+            share_count: 0,
+            export_count: 0
+          });
+
+        if (insertError) {
+          throw insertError;
+        }
+
+        setAnalytics({
+          viewCount: 0,
+          lastViewed: undefined,
+          shareCount: 0,
+          exportCount: 0,
+          actionsTaken: []
+        });
+      } else {
+        setAnalytics({
+          viewCount: analyticsData.view_count || 0,
+          lastViewed: analyticsData.last_viewed_at || undefined,
+          shareCount: analyticsData.share_count || 0,
+          exportCount: analyticsData.export_count || 0,
+          actionsTaken: actionsData?.map(a => a.action_type) || []
+        });
+      }
     } catch (error: unknown) {
-      console.error('Error tracking insight view:', error);
+      console.error('Error loading analytics:', error);
+      toast.error('Erreur lors du chargement des analytics');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const trackAction = async (action: string): Promise<void> => {
+  /**
+   * Track une action générique
+   */
+  const trackAction = async (
+    action: string, 
+    metadata: Record<string, unknown> = {}
+  ): Promise<void> => {
+    if (!user) return;
+
     try {
-      // For now, we'll store in local state
-      // In production, this would go to a proper analytics table
+      const { error } = await supabase
+        .from('insight_actions')
+        .insert({
+          user_id: user.id,
+          action_type: action,
+          metadata: metadata as never
+        });
+
+      if (error) throw error;
+
+      // Mettre à jour l'état local
       setAnalytics(prev => ({
         ...prev,
-        actionsTaken: [...prev.actionsTaken, action]
+        actionsTaken: [action, ...prev.actionsTaken]
       }));
     } catch (error: unknown) {
       console.error('Error tracking action:', error);
     }
   };
 
-  const loadAnalytics = async (): Promise<void> => {
+  /**
+   * Track une vue d'insights
+   */
+  const trackView = async (): Promise<void> => {
+    if (!user) return;
+
     try {
-      // Load user analytics data
-      // For now, using mock data as we'd need to create proper analytics tables
-      setAnalytics({
-        viewCount: Math.floor(Math.random() * 10) + 1,
-        lastViewed: new Date().toISOString(),
-        shareCount: Math.floor(Math.random() * 3),
-        exportCount: Math.floor(Math.random() * 2),
-        actionsTaken: ['view_insights', 'complete_test']
+      // Incrémenter le compteur de vues
+      const { error } = await supabase.rpc('increment_insight_views', {
+        p_user_id: user.id
       });
+
+      if (error) {
+        // Si la fonction n'existe pas, faire un update manuel
+        const { error: updateError } = await supabase
+          .from('insights_analytics')
+          .update({
+            view_count: analytics.viewCount + 1,
+            last_viewed_at: new Date().toISOString()
+          })
+          .eq('user_id', user.id);
+
+        if (updateError) throw updateError;
+      }
+
+      // Logger l'action
+      await trackAction('view_insights');
+
+      // Mettre à jour l'état local
+      setAnalytics(prev => ({
+        ...prev,
+        viewCount: prev.viewCount + 1,
+        lastViewed: new Date().toISOString()
+      }));
     } catch (error: unknown) {
-      console.error('Error loading analytics:', error);
+      console.error('Error tracking view:', error);
     }
   };
 
-  const getInsightEngagement = (): 'low' | 'medium' | 'high' => {
+  /**
+   * Track un partage d'insights
+   */
+  const trackShare = async (): Promise<void> => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('insights_analytics')
+        .update({
+          share_count: analytics.shareCount + 1
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      await trackAction('share_insights');
+
+      setAnalytics(prev => ({
+        ...prev,
+        shareCount: prev.shareCount + 1
+      }));
+
+      toast.success('Partage enregistré !');
+    } catch (error: unknown) {
+      console.error('Error tracking share:', error);
+    }
+  };
+
+  /**
+   * Track un export PDF
+   */
+  const trackExport = async (): Promise<void> => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('insights_analytics')
+        .update({
+          export_count: analytics.exportCount + 1
+        })
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      await trackAction('export_pdf');
+
+      setAnalytics(prev => ({
+        ...prev,
+        exportCount: prev.exportCount + 1
+      }));
+
+      toast.success('Export enregistré !');
+    } catch (error: unknown) {
+      console.error('Error tracking export:', error);
+    }
+  };
+
+  /**
+   * Calcule le niveau d'engagement
+   */
+  const getInsightEngagement = (): EngagementLevel => {
     const totalActions = analytics.shareCount + analytics.exportCount + analytics.actionsTaken.length;
     if (totalActions >= 10) return 'high';
     if (totalActions >= 5) return 'medium';
     return 'low';
   };
 
+  /**
+   * Génère des recommandations personnalisées
+   */
   const getRecommendations = (): string[] => {
     const engagement = getInsightEngagement();
     const recommendations: string[] = [];
@@ -106,14 +266,22 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
       recommendations.push('Découvrez des profils compatibles basés sur vos insights');
     }
 
+    if (analytics.viewCount < 3) {
+      recommendations.push('Revisitez vos insights régulièrement pour suivre votre progression');
+    }
+
     return recommendations;
   };
 
   return {
     analytics,
     trackAction,
+    trackView,
+    trackShare,
+    trackExport,
     getInsightEngagement,
     getRecommendations,
-    refresh: loadAnalytics
+    refresh: loadAnalytics,
+    loading
   };
 };

@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { useToast } from '@/hooks/use-toast';
 import { 
   Share2, 
   Download, 
@@ -17,6 +16,9 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useInsightsAnalytics, type UseInsightsAnalyticsReturn } from '@/hooks/useInsightsAnalytics';
+import { toast } from 'sonner';
+import jsPDF from 'jspdf';
 
 interface InsightsActionPanelProps {
   completionPercentage: number;
@@ -37,31 +39,34 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
 }) => {
   const [isSharing, setIsSharing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const { toast } = useToast();
   const navigate = useNavigate();
+  const { trackShare, trackExport, trackAction, getRecommendations }: UseInsightsAnalyticsReturn = useInsightsAnalytics();
 
   const handleShare = async (): Promise<void> => {
     setIsSharing(true);
     try {
       if (navigator.share) {
         await navigator.share({
-           title: 'Mes Insights de Compatibilité - ZawajConnect',
-           text: 'Découvrez mes insights de compatibilité personnalisés sur ZawajConnect',
-          url: window.location.origin + '/compatibility-insights'
+           title: 'Mes Insights de Compatibilité',
+           text: 'Découvrez mon profil de compatibilité sur Muslima',
+          url: window.location.href
         });
+        
+        // Tracker le partage
+        await trackShare();
+        
+        toast.success('Insights partagés avec succès !');
       } else {
-        await navigator.clipboard.writeText(window.location.origin + '/compatibility-insights');
-        toast({
-          title: "Lien copié",
-          description: "Le lien vers vos insights a été copié dans le presse-papiers",
-        });
+        await navigator.clipboard.writeText(window.location.href);
+        
+        // Tracker même si c'est juste le lien copié
+        await trackShare();
+        
+        toast.success('Lien copié dans le presse-papier !');
       }
     } catch (error: unknown) {
-      toast({
-        title: "Erreur de partage",
-        description: "Impossible de partager vos insights pour le moment",
-        variant: "destructive"
-      });
+      console.error('Erreur lors du partage:', error);
+      toast.error('Impossible de partager pour le moment');
     } finally {
       setIsSharing(false);
     }
@@ -70,18 +75,112 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
   const handleExport = async (): Promise<void> => {
     setIsExporting(true);
     try {
-      // Simulate PDF generation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      toast({
-        title: "Export réussi",
-        description: "Vos insights ont été exportés en PDF",
+      // Créer le PDF avec jsPDF
+      const doc = new jsPDF();
+      
+      // Configuration
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      let yPosition = margin;
+      
+      // Titre principal
+      doc.setFontSize(20);
+      doc.setTextColor(16, 185, 129); // Emerald color
+      doc.text('Mes Insights de Compatibilité', margin, yPosition);
+      yPosition += 15;
+      
+      // Date
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Généré le ${new Date().toLocaleDateString('fr-FR')}`, margin, yPosition);
+      yPosition += 15;
+      
+      // Ligne de séparation
+      doc.setDrawColor(200, 200, 200);
+      doc.line(margin, yPosition, pageWidth - margin, yPosition);
+      yPosition += 10;
+      
+      // Score global (si disponible)
+      doc.setFontSize(14);
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Progression: ${completionPercentage}%`, margin, yPosition);
+      yPosition += 10;
+      
+      // Barre de progression visuelle
+      const progressBarWidth = pageWidth - (2 * margin);
+      const progressBarHeight = 8;
+      doc.setFillColor(229, 231, 235); // Gray background
+      doc.rect(margin, yPosition, progressBarWidth, progressBarHeight, 'F');
+      doc.setFillColor(16, 185, 129); // Emerald progress
+      doc.rect(margin, yPosition, (progressBarWidth * completionPercentage) / 100, progressBarHeight, 'F');
+      yPosition += 20;
+      
+      // Section: Prochaines étapes
+      doc.setFontSize(16);
+      doc.setTextColor(16, 185, 129);
+      doc.text('Prochaines Étapes Recommandées', margin, yPosition);
+      yPosition += 10;
+      
+      // Recommandations dynamiques
+      const recommendations = getRecommendations();
+      doc.setFontSize(11);
+      doc.setTextColor(60, 60, 60);
+      
+      recommendations.forEach((rec, index) => {
+        const lines = doc.splitTextToSize(`${index + 1}. ${rec}`, pageWidth - (2 * margin));
+        lines.forEach((line: string) => {
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = margin;
+          }
+          doc.text(line, margin, yPosition);
+          yPosition += 6;
+        });
+        yPosition += 3;
       });
+      
+      yPosition += 10;
+      
+      // Section: Actions disponibles
+      doc.setFontSize(16);
+      doc.setTextColor(16, 185, 129);
+      doc.text('Actions Disponibles', margin, yPosition);
+      yPosition += 10;
+      
+      doc.setFontSize(11);
+      doc.setTextColor(60, 60, 60);
+      
+      const nextStepsText = [
+        '• Améliorer votre profil avec les suggestions',
+        '• Découvrir des profils compatibles',
+        '• Consulter les guidances islamiques',
+        '• Partager vos insights avec votre famille'
+      ];
+      
+      nextStepsText.forEach(text => {
+        doc.text(text, margin, yPosition);
+        yPosition += 7;
+      });
+      
+      yPosition += 15;
+      
+      // Footer
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      const footerText = 'Muslima - Plateforme de mariage musulman | muslima.app';
+      const footerWidth = doc.getTextWidth(footerText);
+      doc.text(footerText, (pageWidth - footerWidth) / 2, 280);
+      
+      // Télécharger le PDF
+      doc.save('mes-insights-compatibilite.pdf');
+      
+      // Tracker l'export
+      await trackExport();
+      
+      toast.success('PDF téléchargé avec succès !');
     } catch (error: unknown) {
-      toast({
-        title: "Erreur d'export",
-        description: "Impossible d'exporter vos insights pour le moment",
-        variant: "destructive"
-      });
+      console.error('Erreur lors de l\'export PDF:', error);
+      toast.error('Erreur lors de la génération du PDF');
     } finally {
       setIsExporting(false);
     }
@@ -89,32 +188,44 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
 
   const nextSteps: NextStep[] = [
     {
-      icon: Heart,
-      title: "Améliorer votre profil",
-      description: "Suivez les suggestions pour optimiser votre compatibilité",
-      action: () => navigate('/enhanced-profile'),
-      available: insightsAvailable
+      icon: TrendingUp,
+      title: "Améliorer mon profil",
+      description: "Optimisez votre profil selon vos insights",
+      action: () => {
+        trackAction('improve_profile');
+        navigate('/profile');
+      },
+      available: completionPercentage < 100
     },
     {
       icon: Users,
       title: "Découvrir des profils",
-      description: "Explorez des partenaires compatibles selon vos insights",
-      action: () => navigate('/browse'),
+      description: "Trouvez des personnes compatibles",
+      action: () => {
+        trackAction('browse_profiles');
+        navigate('/browse');
+      },
       available: insightsAvailable
     },
     {
       icon: BookOpen,
       title: "Guidance islamique",
-      description: "Approfondissez vos connaissances sur le mariage en Islam",
-      action: () => navigate('/guidance'),
+      description: "Consultez nos conseils islamiques",
+      action: () => {
+        trackAction('read_guidance');
+        navigate('/guidance');
+      },
       available: true
     },
     {
-      icon: Calendar,
+      icon: RefreshCw,
       title: "Refaire le test",
-      description: "Mettez à jour vos réponses pour des insights plus précis",
-      action: () => navigate('/compatibility-test'),
-      available: true
+      description: "Mettez à jour vos réponses",
+      action: () => {
+        trackAction('retake_test');
+        navigate('/compatibility-test');
+      },
+      available: insightsAvailable
     }
   ];
 

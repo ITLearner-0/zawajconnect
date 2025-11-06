@@ -3,41 +3,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCompatibility, type UseCompatibilityReturn } from '@/hooks/useCompatibility';
 import { getGuidanceByCategory, getRandomGuidance } from '@/data/islamicGuidance';
 
-interface CompatibilityArea {
-  category: string;
-  score: number;
-  description: string;
-}
-
-interface Suggestion {
-  title: string;
-  description: string;
-  priority: 'low' | 'medium' | 'high';
-}
-
-interface RedFlag {
-  title: string;
-  description: string;
-  severity: 'warning' | 'important' | 'critical';
-}
-
-interface IslamicGuidance {
-  title: string;
-  verse: string;
-  source: string;
-  application: string;
-}
-
-interface CompatibilityInsights {
-  summary: string;
-  priorities: string[];
-  relationshipStyle: string;
-  compatibilityAreas: CompatibilityArea[];
-  idealPartner: string[];
-  suggestions: Suggestion[];
-  redFlags: RedFlag[];
-  islamicGuidance: IslamicGuidance[];
-}
+import type {
+  CompatibilityArea,
+  Suggestion,
+  RedFlag,
+  IslamicGuidance,
+  CompatibilityInsights
+} from '@/types/compatibility';
 
 export interface UseCompatibilityInsightsReturn {
   insights: CompatibilityInsights | null;

@@ -17,32 +17,13 @@ import {
   Heart
 } from 'lucide-react';
 import { useCompatibilityInsights, type UseCompatibilityInsightsReturn } from '@/hooks/useCompatibilityInsights';
+import { useInsightsAnalytics, type UseInsightsAnalyticsReturn } from '@/hooks/useInsightsAnalytics';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 import AnimatedCounter from '@/components/AnimatedCounter';
 import ProgressiveReveal from '@/components/ProgressiveReveal';
-
-interface Achievement {
-  id: string;
-  title: string;
-  description: string;
-  icon: React.ReactNode;
-  unlocked: boolean;
-  progress?: number;
-  maxProgress?: number;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
-  reward: {
-    type: 'points' | 'badge' | 'unlock';
-    value: string;
-  };
-}
-
-interface GamificationLevel {
-  level: number;
-  title: string;
-  minPoints: number;
-  maxPoints: number;
-  benefits: string[];
-  icon: React.ReactNode;
-}
+import type { Achievement, GamificationLevel } from '@/types/compatibility';
 
 interface GamifiedInsightsProps {
   userId?: string;
@@ -50,10 +31,17 @@ interface GamifiedInsightsProps {
 
 const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
   const { insights, loading }: UseCompatibilityInsightsReturn = useCompatibilityInsights(userId);
+  const { trackView, trackAction, analytics }: UseInsightsAnalyticsReturn = useInsightsAnalytics();
+  const { user } = useAuth();
   const [userLevel, setUserLevel] = useState(1);
   const [totalPoints, setTotalPoints] = useState(0);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [showLevelUp, setShowLevelUp] = useState(false);
+
+  // Track view when component mounts
+  useEffect(() => {
+    trackView();
+  }, []);
 
   const levels: GamificationLevel[] = [
     {
@@ -146,46 +134,142 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
 
   useEffect(() => {
     // Initialize achievements and check progress
-    const initializeGamification = (): void => {
+    const initializeGamification = async (): Promise<void> => {
+      if (!user) return;
+      
       const currentAchievements = [...allAchievements];
       let points = 0;
+      
+      // Charger la progression depuis Supabase
+      const { data: progression } = await supabase
+        .from('user_progression')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (progression) {
+        setTotalPoints(progression.total_points);
+        setUserLevel(progression.current_level);
+        points = progression.total_points;
+      }
+      
+      // Charger les achievements depuis Supabase
+      const { data: unlockedAchievements } = await supabase
+        .from('achievement_unlocks')
+        .select('achievement_id, points_awarded')
+        .eq('user_id', user.id);
+
+      const unlockedIds = new Set(unlockedAchievements?.map(ua => ua.achievement_id) || []);
       
       if (insights) {
         // Check achievements based on insights data
         currentAchievements.forEach(achievement => {
+          const isUnlocked = unlockedIds.has(achievement.id);
+          
           switch (achievement.id) {
             case 'first_test':
-              achievement.unlocked = true;
-              if (achievement.unlocked) points += parseInt(achievement.reward.value);
+              achievement.unlocked = isUnlocked || true;
+              if (achievement.unlocked && !isUnlocked) {
+                unlockAchievement(achievement);
+              }
               break;
             case 'perfect_match': {
               const maxScore = Math.max(...insights.compatibilityAreas.map(area => area.score));
               achievement.unlocked = maxScore >= 90;
-              if (achievement.unlocked) points += achievement.reward.type === 'points' ? parseInt(achievement.reward.value) : 0;
+              if (achievement.unlocked && !isUnlocked) {
+                unlockAchievement(achievement);
+              }
               break;
             }
             case 'insight_master':
               achievement.progress = insights.compatibilityAreas.length;
               achievement.unlocked = (achievement.progress || 0) >= (achievement.maxProgress || 0);
+              if (achievement.unlocked && !isUnlocked) {
+                unlockAchievement(achievement);
+              }
               break;
+            case 'insights_explorer':
+              achievement.progress = analytics.viewCount;
+              achievement.unlocked = (achievement.progress || 0) >= (achievement.maxProgress || 0);
+              if (achievement.unlocked && !isUnlocked) {
+                unlockAchievement(achievement);
+              }
+              break;
+            default:
+              achievement.unlocked = isUnlocked;
           }
         });
       }
 
       setAchievements(currentAchievements);
-      setTotalPoints(points);
       
-      // Determine level
-      const currentLevel = levels.find(level => 
-        points >= level.minPoints && points < level.maxPoints
-      );
-      if (currentLevel) {
-        setUserLevel(currentLevel.level);
+      // Determine level if not loaded from DB
+      if (!progression) {
+        const currentLevel = levels.find(level => 
+          points >= level.minPoints && points < level.maxPoints
+        );
+        if (currentLevel) {
+          setUserLevel(currentLevel.level);
+        }
       }
     };
 
     initializeGamification();
-  }, [insights]);
+  }, [insights, user, analytics.viewCount]);
+
+  const unlockAchievement = async (achievement: Achievement): Promise<void> => {
+    if (!user) return;
+    
+    try {
+      const pointsToAward = achievement.reward.type === 'points' 
+        ? parseInt(achievement.reward.value) 
+        : 0;
+
+      // Enregistrer l'achievement débloqué
+      const { error: achievementError } = await supabase
+        .from('achievement_unlocks')
+        .insert({
+          user_id: user.id,
+          achievement_id: achievement.id,
+          achievement_title: achievement.title,
+          rarity: achievement.rarity,
+          points_awarded: pointsToAward
+        });
+
+      if (achievementError && achievementError.code !== '23505') throw achievementError;
+
+      // Mettre à jour la progression
+      const newTotalPoints = totalPoints + pointsToAward;
+      const { error: progressionError } = await supabase
+        .from('user_progression')
+        .upsert({
+          user_id: user.id,
+          total_points: newTotalPoints,
+          achievements_count: achievements.filter(a => a.unlocked).length + 1,
+          insights_viewed_count: analytics.viewCount
+        });
+
+      if (progressionError) throw progressionError;
+
+      // Tracker l'action
+      await trackAction('achievement_unlocked', {
+        achievement_id: achievement.id,
+        achievement_title: achievement.title,
+        rarity: achievement.rarity,
+        points_awarded: pointsToAward
+      });
+
+      setTotalPoints(newTotalPoints);
+
+      // Afficher notification
+      toast.success(`Achievement débloqué: ${achievement.title}!`, {
+        description: `+${pointsToAward} points`
+      });
+
+    } catch (error: unknown) {
+      console.error('Error unlocking achievement:', error);
+    }
+  };
 
   const getRarityColor = (rarity: Achievement['rarity']): string => {
     switch (rarity) {
