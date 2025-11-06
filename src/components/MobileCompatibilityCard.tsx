@@ -27,13 +27,13 @@ const MobileCompatibilityCard: React.FC<MobileCompatibilityCardProps> = ({
   highlights = [],
   className = ""
 }) => {
-  const getScoreColor = (score: number) => {
+  const getScoreColor = (score: number): string => {
     if (score >= 80) return "text-emerald";
     if (score >= 60) return "text-gold";
     return "text-muted-foreground";
   };
 
-  const getProgressColor = (score: number) => {
+  const getProgressColor = (score: number): string => {
     if (score >= 80) return "bg-emerald";
     if (score >= 60) return "bg-gold";
     return "bg-muted";
