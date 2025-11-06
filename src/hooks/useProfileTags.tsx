@@ -214,6 +214,71 @@ export const useProfileTags = () => {
     }
   };
 
+  const addTagToNote = async (noteId: string, tagId: string) => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('note_tags')
+        .insert({
+          note_id: noteId,
+          tag_id: tagId
+        });
+
+      if (error) throw error;
+
+      toast.success('Tag ajouté à la note');
+      return true;
+    } catch (error: any) {
+      console.error('Error adding tag to note:', error);
+      if (error.code === '23505') {
+        toast.error('Ce tag est déjà associé à cette note');
+      } else {
+        toast.error('Erreur lors de l\'ajout du tag');
+      }
+      return false;
+    }
+  };
+
+  const removeTagFromNote = async (noteId: string, tagId: string) => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('note_tags')
+        .delete()
+        .eq('note_id', noteId)
+        .eq('tag_id', tagId);
+
+      if (error) throw error;
+
+      toast.success('Tag retiré de la note');
+      return true;
+    } catch (error) {
+      console.error('Error removing tag from note:', error);
+      toast.error('Erreur lors du retrait du tag');
+      return false;
+    }
+  };
+
+  const getNoteTags = async (noteId: string): Promise<ProfileTag[]> => {
+    if (!user) return [];
+
+    try {
+      const { data, error } = await supabase
+        .from('note_tags')
+        .select('tag_id, profile_tags(*)')
+        .eq('note_id', noteId);
+
+      if (error) throw error;
+
+      return data?.map(item => (item as any).profile_tags).filter(Boolean) || [];
+    } catch (error) {
+      console.error('Error fetching note tags:', error);
+      return [];
+    }
+  };
+
   return {
     tags,
     loading,
@@ -223,6 +288,9 @@ export const useProfileTags = () => {
     addTagToFavorite,
     removeTagFromFavorite,
     getFavoriteTags,
+    addTagToNote,
+    removeTagFromNote,
+    getNoteTags,
     refetch: fetchTags
   };
 };

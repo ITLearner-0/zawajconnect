@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { StickyNote, Save, X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import NoteTagSelector from './NoteTagSelector';
 
 interface ProfileNoteCardProps {
   userId: string;
@@ -33,6 +34,7 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
   const [isVisible, setIsVisible] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasNote, setHasNote] = useState(false);
+  const [noteId, setNoteId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchNote();
@@ -42,7 +44,7 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
     try {
       const { data, error } = await supabase
         .from('profile_notes')
-        .select('note')
+        .select('id, note')
         .eq('user_id', userId)
         .eq('profile_id', profileId)
         .maybeSingle();
@@ -50,6 +52,7 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
       if (error) throw error;
       if (data) {
         setNote(data.note);
+        setNoteId(data.id);
         setHasNote(true);
       }
     } catch (error) {
@@ -65,7 +68,7 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
 
     setIsSaving(true);
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('profile_notes')
         .upsert({
           user_id: userId,
@@ -74,11 +77,16 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'user_id,profile_id'
-        });
+        })
+        .select('id')
+        .single();
 
       if (error) throw error;
 
       setHasNote(true);
+      if (data) {
+        setNoteId(data.id);
+      }
       setIsVisible(false);
       toast({
         title: "Note sauvegardée",
@@ -133,7 +141,7 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
 
       {/* Note Editor Popover */}
       {isVisible && (
-        <Card className="absolute top-full right-0 mt-2 p-3 w-64 shadow-xl z-30 border-2 border-emerald/20 animate-fade-in">
+        <Card className="absolute top-full right-0 mt-2 p-3 w-80 shadow-xl z-30 border-2 border-emerald/20 animate-fade-in">
           <div className="space-y-2">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">Note privée</span>
@@ -164,6 +172,13 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
             <div className="text-xs text-muted-foreground text-right">
               {note.length}/500
             </div>
+            
+            {noteId && (
+              <div className="pt-2 border-t">
+                <NoteTagSelector noteId={noteId} />
+              </div>
+            )}
+            
             <div className="flex gap-2">
               <Button
                 size="sm"
