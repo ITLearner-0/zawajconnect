@@ -9,9 +9,25 @@ import { useToast } from '@/hooks/use-toast';
 interface ProfileNoteCardProps {
   userId: string;
   profileId: string;
+  searchKeyword?: string;
 }
 
-const ProfileNoteCard = ({ userId, profileId }: ProfileNoteCardProps) => {
+const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardProps) => {
+  // Helper function to highlight text
+  const highlightText = (text: string, keyword?: string) => {
+    if (!keyword || !text) return text;
+    
+    const parts = text.split(new RegExp(`(${keyword})`, 'gi'));
+    return parts.map((part, index) => 
+      part.toLowerCase() === keyword.toLowerCase() ? (
+        <mark key={index} className="bg-yellow-300 text-black font-semibold px-1 rounded">
+          {part}
+        </mark>
+      ) : (
+        part
+      )
+    );
+  };
   const { toast } = useToast();
   const [note, setNote] = useState('');
   const [isVisible, setIsVisible] = useState(false);
@@ -130,6 +146,14 @@ const ProfileNoteCard = ({ userId, profileId }: ProfileNoteCardProps) => {
                 <X className="h-3 w-3" />
               </Button>
             </div>
+            {searchKeyword && note && (
+              <div className="text-xs p-2 border rounded-md bg-yellow-50 border-yellow-200 mb-2">
+                <div className="font-medium text-yellow-800 mb-1">📌 Mot-clé trouvé :</div>
+                <div className="text-yellow-900">
+                  {highlightText(note, searchKeyword)}
+                </div>
+              </div>
+            )}
             <Textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}

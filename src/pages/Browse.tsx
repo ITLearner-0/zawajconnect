@@ -24,6 +24,7 @@ import { ActiveConversationBanner } from '@/components/ActiveConversationBanner'
 import ProfileComparator from '@/components/ProfileComparator';
 import ProfileNoteCard from '@/components/ProfileNoteCard';
 import { useFavorites } from '@/hooks/useFavorites';
+import NotesSearchFilter from '@/components/NotesSearchFilter';
 
 interface MatchingProfile {
   id?: string;
@@ -82,6 +83,8 @@ const Browse = () => {
   const [selectionMode, setSelectionMode] = useState(false);
   const [viewMode, setViewMode] = useState<'carousel' | 'grid'>('carousel');
   const [gridStartIndex, setGridStartIndex] = useState(0);
+  const [notesSearchKeyword, setNotesSearchKeyword] = useState('');
+  const [profilesWithNotes, setProfilesWithNotes] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!user) {
@@ -289,6 +292,57 @@ const Browse = () => {
     setCurrentIndex(0);
     toast({
       title: "Filtres réinitialisés",
+      description: "Tous les profils sont maintenant affichés",
+    });
+  };
+
+  const handleNotesSearch = async (keyword: string) => {
+    if (!user) return;
+
+    try {
+      // Fetch all notes that contain the keyword
+      const { data: notes, error } = await supabase
+        .from('profile_notes')
+        .select('profile_id, note')
+        .eq('user_id', user.id)
+        .ilike('note', `%${keyword}%`);
+
+      if (error) throw error;
+
+      // Create a set of profile IDs that have matching notes
+      const matchingProfileIds = new Set(notes?.map(n => n.profile_id) ?? []);
+      setProfilesWithNotes(matchingProfileIds);
+      
+      // Filter profiles to only show those with matching notes
+      const filtered = profiles.filter(profile => 
+        matchingProfileIds.has(profile.user_id)
+      );
+
+      setFilteredProfiles(filtered);
+      setNotesSearchKeyword(keyword);
+      setGridStartIndex(0);
+
+      toast({
+        title: "Recherche effectuée",
+        description: `${filtered.length} profil${filtered.length > 1 ? 's' : ''} trouvé${filtered.length > 1 ? 's' : ''} avec des notes correspondantes`,
+      });
+    } catch (error) {
+      console.error('Error searching notes:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de rechercher dans les notes",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleClearNotesSearch = () => {
+    setNotesSearchKeyword('');
+    setProfilesWithNotes(new Set());
+    setFilteredProfiles(profiles);
+    setGridStartIndex(0);
+    toast({
+      title: "Recherche réinitialisée",
       description: "Tous les profils sont maintenant affichés",
     });
   };
@@ -838,6 +892,14 @@ const Browse = () => {
             ) : (
               /* Grid Mode - Multiple Profiles View */
               <div className="space-y-6">
+                {/* Notes Search Filter */}
+                <NotesSearchFilter
+                  onSearch={handleNotesSearch}
+                  onClear={handleClearNotesSearch}
+                  isActive={!!notesSearchKeyword}
+                  resultsCount={notesSearchKeyword ? filteredProfiles.length : undefined}
+                />
+
                 {/* Grid Navigation */}
                 <div className="flex items-center justify-between">
                   <Button
@@ -889,6 +951,16 @@ const Browse = () => {
                           <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white shadow-lg border-0">
                             <Star className="h-3 w-3 mr-1 fill-white" />
                             Favoris
+                          </Badge>
+                        </div>
+                      )}
+
+                      {/* Notes Found Badge */}
+                      {notesSearchKeyword && profilesWithNotes.has(profile.user_id) && (
+                        <div className={`absolute ${isFavorite(profile.user_id) ? 'top-24' : 'top-14'} left-3 z-20`}>
+                          <Badge className="bg-gradient-to-r from-gold to-amber-600 text-white shadow-lg border-0 animate-pulse-gentle">
+                            <StickyNote className="h-3 w-3 mr-1 fill-white" />
+                            Note trouvée
                           </Badge>
                         </div>
                       )}
@@ -995,7 +1067,11 @@ const Browse = () => {
                             {!subscription.subscribed ? 'Premium' : 'Liker'}
                           </Button>
                           {user && (
-                            <ProfileNoteCard userId={user.id} profileId={profile.user_id} />
+                            <ProfileNoteCard 
+                              userId={user.id} 
+                              profileId={profile.user_id}
+                              searchKeyword={notesSearchKeyword}
+                            />
                           )}
                         </div>
                       </CardContent>
