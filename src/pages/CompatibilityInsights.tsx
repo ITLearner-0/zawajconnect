@@ -8,7 +8,7 @@ import CompatibilityAchievements from '@/components/CompatibilityAchievements';
 import GamifiedInsights from '@/components/GamifiedInsights';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const CompatibilityInsightsPage = () => {
+const CompatibilityInsightsPage: React.FC = () => {
   const { user, loading } = useAuth();
 
   if (loading) {
