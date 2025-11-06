@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,11 +9,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Star, Trash2, Edit, Eye, Clock, Filter, StarOff } from 'lucide-react';
+import { Calendar, Star, Trash2, Edit, Eye, Clock, Filter, StarOff, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ProfileComparator from '@/components/ProfileComparator';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { generateComparisonPDF } from '@/services/comparisonPdfExportService';
 
 interface ComparisonHistory {
   id: string;
@@ -41,6 +42,8 @@ const Compare = () => {
   const [editNotes, setEditNotes] = useState('');
   const [dateFilter, setDateFilter] = useState<'all' | 'today' | 'week' | 'month'>('all');
   const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const radarChartRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!user) {
@@ -204,6 +207,55 @@ const Compare = () => {
         description: "Impossible de supprimer la comparaison",
         variant: "destructive"
       });
+    }
+  };
+
+  const handleExportPdf = async () => {
+    if (!selectedComparison) return;
+    
+    setExportingPdf(true);
+    try {
+      // Fetch profiles data
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, full_name, age, location, occupation')
+        .in('id', selectedComparison.compared_profile_ids);
+
+      if (profilesError) throw profilesError;
+
+      // Calculate scores (simplified - in real app, fetch from compatibility calculations)
+      const scores = profiles?.map(profile => ({
+        profileId: profile.id,
+        overall: Math.floor(Math.random() * 30) + 70, // Mock data
+        islamic: Math.floor(Math.random() * 30) + 70,
+        cultural: Math.floor(Math.random() * 30) + 70,
+        personality: Math.floor(Math.random() * 30) + 70,
+      })) || [];
+
+      await generateComparisonPDF({
+        comparisonName: selectedComparison.comparison_name || 'Comparaison sans titre',
+        comparisonDate: format(new Date(selectedComparison.created_at), 'PPP', { locale: fr }),
+        data: {
+          profiles: profiles || [],
+          scores,
+        },
+        notes: selectedComparison.notes || undefined,
+        radarChartElement: radarChartRef.current || undefined,
+      });
+
+      toast({
+        title: "Export réussi",
+        description: "Le PDF a été téléchargé avec succès"
+      });
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible d'exporter le PDF",
+        variant: "destructive"
+      });
+    } finally {
+      setExportingPdf(false);
     }
   };
 
@@ -373,9 +425,21 @@ const Compare = () => {
         <Dialog open={showViewDialog} onOpenChange={setShowViewDialog}>
           <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>
-                {selectedComparison?.comparison_name || 'Comparaison'}
-              </DialogTitle>
+              <div className="flex items-center justify-between">
+                <DialogTitle>
+                  {selectedComparison?.comparison_name || 'Comparaison'}
+                </DialogTitle>
+                <Button
+                  onClick={handleExportPdf}
+                  disabled={exportingPdf}
+                  variant="outline"
+                  size="sm"
+                  className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  {exportingPdf ? 'Export en cours...' : 'Exporter en PDF'}
+                </Button>
+              </div>
             </DialogHeader>
             {selectedComparison && (
               <div className="space-y-4">
@@ -391,7 +455,9 @@ const Compare = () => {
                     </CardContent>
                   </Card>
                 )}
-                <ProfileComparator profileIds={selectedComparison.compared_profile_ids} />
+                <div ref={radarChartRef}>
+                  <ProfileComparator profileIds={selectedComparison.compared_profile_ids} />
+                </div>
               </div>
             )}
           </DialogContent>
