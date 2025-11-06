@@ -13,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import SecurityPrivacyPanel from '@/components/SecurityPrivacyPanel';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
+import { InsightsAnalyticsDashboard } from '@/components/admin/InsightsAnalyticsDashboard';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { 
   Users, 
@@ -469,13 +470,14 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
 
       {/* Admin Tabs */}
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-8">
           <TabsTrigger value="users">Utilisateurs</TabsTrigger>
           <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
           <TabsTrigger value="roles">Rôles</TabsTrigger>
           <TabsTrigger value="reports">Rapports</TabsTrigger>
           <TabsTrigger value="security">Sécurité</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="insights">Insights</TabsTrigger>
           <TabsTrigger value="settings">Paramètres</TabsTrigger>
         </TabsList>
 
@@ -776,10 +778,15 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
           <SecurityPrivacyPanel />
         </TabsContent>
 
-        {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-4">
-          <AnalyticsDashboard />
-        </TabsContent>
+      {/* Analytics Tab */}
+      <TabsContent value="analytics" className="space-y-4">
+        <AnalyticsDashboard />
+      </TabsContent>
+
+      {/* Insights Analytics Tab */}
+      <TabsContent value="insights" className="space-y-4">
+        <InsightsAnalyticsDashboard />
+      </TabsContent>
 
         {/* Moderation Tab */}
         <TabsContent value="moderation" className="space-y-4">
