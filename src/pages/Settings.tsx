@@ -25,11 +25,16 @@ import PasswordSecurityPanel from '@/components/enhanced/PasswordSecurityPanel';
 import SecurityAlertPanel from '@/components/security/SecurityAlertPanel';
 import FamilyRateLimitIndicator from '@/components/security/FamilyRateLimitIndicator';
 import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
+import { TestUserSelector } from '@/components/TestUserSelector';
+import { Code } from 'lucide-react';
 
 const Settings = () => {
   const { user, subscription, signOut } = useAuth();
   const navigate = useNavigate();
   const { securityStatus } = useSecurityMonitor();
+  
+  // Check for dev mode
+  const isDevMode = import.meta.env.VITE_DEV_MODE === 'true';
   
   // Check for premium tab in URL params
   const urlParams = new URLSearchParams(window.location.search);
@@ -85,7 +90,7 @@ const Settings = () => {
         {/* Main Content avec meilleure organisation */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="bg-card/50 backdrop-blur-sm rounded-xl p-2 border shadow-sm">
-            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6 gap-2 bg-transparent">
+            <TabsList className={`grid w-full ${isDevMode ? 'grid-cols-3 lg:grid-cols-7' : 'grid-cols-3 lg:grid-cols-6'} gap-2 bg-transparent`}>
               <TabsTrigger 
                 value="privacy" 
                 className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -133,6 +138,15 @@ const Settings = () => {
                 <Bell className="h-4 w-4" />
                 <span className="hidden sm:inline">Notifications</span>
               </TabsTrigger>
+              {isDevMode && (
+                <TabsTrigger 
+                  value="dev-tools" 
+                  className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  <Code className="h-4 w-4" />
+                  <span className="hidden sm:inline">Dev Tools</span>
+                </TabsTrigger>
+              )}
             </TabsList>
           </div>
 
@@ -209,6 +223,12 @@ const Settings = () => {
                 <NotificationSystem />
               </Card>
             </TabsContent>
+
+            {isDevMode && (
+              <TabsContent value="dev-tools" className="space-y-6">
+                <TestUserSelector />
+              </TabsContent>
+            )}
           </div>
         </Tabs>
       </div>
