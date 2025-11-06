@@ -37,6 +37,7 @@ const PaymentHistory = lazy(() => import('@/pages/PaymentHistory'));
 const AdvancedMatching = lazy(() => import('@/pages/AdvancedMatching'));
 const CompatibilityTest = lazy(() => import('@/pages/CompatibilityTest'));
 const CompatibilityInsightsPage = lazy(() => import('@/pages/CompatibilityInsights'));
+const Compare = lazy(() => import('@/pages/Compare'));
 
 // Family features
 const Family = lazy(() => import('@/pages/Family'));
@@ -142,6 +143,7 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/family-supervision-panel', component: FamilySupervisionPanel },
   { path: '/compatibility-test', component: CompatibilityTest },
   { path: '/compatibility-insights', component: CompatibilityInsightsPage },
+  { path: '/compare', component: Compare },
 ];
 
 // Catch all route

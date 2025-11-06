@@ -9,6 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight, Lock, Users } from 'lucide-react';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
 import VerificationBadge from '@/components/VerificationBadge';
 import AdvancedSearch from '@/components/AdvancedSearch';
@@ -482,8 +484,19 @@ const Browse = () => {
     });
   };
 
-  const handleCompare = () => {
+  const handleCompare = async () => {
     if (selectedProfiles.length >= 2) {
+      // Save comparison to history before opening
+      try {
+        await supabase.from('profile_comparison_history').insert({
+          user_id: user!.id,
+          compared_profile_ids: selectedProfiles,
+          comparison_name: `Comparaison du ${format(new Date(), 'PPP', { locale: fr })}`
+        });
+      } catch (error) {
+        console.error('Error saving comparison:', error);
+      }
+      
       setShowComparator(true);
     }
   };

@@ -1216,6 +1216,39 @@ export type Database = {
         }
         Relationships: []
       }
+      profile_comparison_history: {
+        Row: {
+          compared_profile_ids: string[]
+          comparison_name: string | null
+          created_at: string
+          id: string
+          is_favorite: boolean
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          compared_profile_ids: string[]
+          comparison_name?: string | null
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          compared_profile_ids?: string[]
+          comparison_name?: string | null
+          created_at?: string
+          id?: string
+          is_favorite?: boolean
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile_matching_data: {
         Row: {
           age: number | null
