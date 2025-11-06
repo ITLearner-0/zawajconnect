@@ -356,3 +356,88 @@ export interface ModerationStats {
   by_severity: ModerationStatsBySeverity;
   by_content_type: ModerationStatsByContentType;
 }
+
+// ============================================================================
+// TYPES DE MATCHING ET COMPATIBILITÉ (Service)
+// ============================================================================
+
+/**
+ * Filtres de recherche de matches
+ */
+export interface MatchFilters {
+  minAge?: number;
+  maxAge?: number;
+  location?: string;
+  education?: string;
+  sect?: string;
+  minCompatibility?: number;
+}
+
+/**
+ * Profil normalisé pour le matching
+ */
+export interface MatchingProfile {
+  user_id: string;
+  full_name?: string;
+  age?: number;
+  gender?: string;
+  location?: string;
+  education?: string;
+  profession?: string;
+  bio?: string;
+  interests?: string[];
+  avatar_url?: string;
+}
+
+/**
+ * Préférences islamiques normalisées pour le matching
+ */
+export interface MatchingIslamicPreferences {
+  user_id: string;
+  prayer_frequency?: string;
+  sect?: string;
+  hijab_preference?: string;
+  religious_level?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Données de vérification utilisateur
+ */
+export interface UserVerificationData {
+  user_id: string;
+  verification_score: number;
+}
+
+/**
+ * Match avec score de compatibilité calculé
+ */
+export interface ScoredMatch extends MatchingProfile {
+  compatibility_score: number;
+  islamic_score: number;
+  cultural_score: number;
+  personality_score: number;
+  shared_interests: string[];
+  compatibility_reasons: string[];
+  verification_score: number;
+}
+
+/**
+ * Match en cache avec métadonnées
+ */
+export interface CachedMatch {
+  profileId: string;
+  score: number;
+  calculatedAt: Date;
+  expiresAt: Date;
+}
+
+/**
+ * Statistiques du cache de matching
+ */
+export interface MatchingCacheStats {
+  totalEntries: number;
+  totalMatches: number;
+  oldestEntry?: Date;
+  newestEntry?: Date;
+}
