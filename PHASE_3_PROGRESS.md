@@ -2,12 +2,12 @@
 
 ## 📊 Vue d'ensemble
 
-**Phase 3 : Migration de la couche Hooks (UI Logic Layer)**
+**Phase 3 : Migration de la couche Hooks & Composants Matching**
 
-- **Hooks migrés** : 4/4 ✅
-- **Any éliminés** : 12
-- **Hooks déjà typés améliorés** : 2
-- **Types centralisés ajoutés** : 1 (ModerationSuggestion)
+- **Hooks migrés** : 5/5 ✅
+- **Composants migrés** : 3/3 ✅
+- **Any éliminés** : 22
+- **Types centralisés ajoutés** : 3 (MatchProfile, SmartRecommendation, MatchingHistoryPreferences)
 - **Statut** : Phase 3 complétée, prête pour Phase 4
 
 ## 🎯 Hooks migrés avec succès
@@ -65,6 +65,48 @@
   - Logging amélioré avec préfixes `[useCompatibility]`
   - Gestion d'erreurs explicite
 
+### 5. useMatchingHistory.tsx ✅
+- **Any éliminés** : 2
+- **Types réutilisés** :
+  - `MatchProfile` (extends `ScoredMatch`)
+  - `MatchingHistoryPreferences`
+  - `PostgrestError`
+- **Types ajoutés** :
+  - `MatchProfile` centralisé dans `src/types/supabase.ts`
+  - `MatchingHistoryPreferences` centralisé dans `src/types/supabase.ts`
+- **Améliorations** :
+  - Typage strict de `saveSearchToHistory`
+  - Suppression des casts `as any`
+  - Import de `Json` type depuis Supabase types
+  - Logging amélioré avec préfixes `[useMatchingHistory]`
+
+## 🎨 Composants UI migrés avec succès
+
+### 1. MatchCard.tsx ✅
+- **Any éliminés** : 4
+- **Types réutilisés** :
+  - `MatchProfile` (de types centralisés)
+- **Améliorations** :
+  - Typage explicite des callbacks map `(reason: string, index: number)`
+  - Utilisation des types centralisés au lieu de définitions locales
+  - Props strictement typées
+
+### 2. MatchResultsGrid.tsx ✅
+- **Any éliminés** : 0 (déjà typé)
+- **Types réutilisés** :
+  - `MatchProfile` (de types centralisés)
+- **Améliorations** :
+  - Utilisation des types centralisés au lieu d'imports de hooks
+
+### 3. RecommendationCard.tsx ✅
+- **Any éliminés** : 4
+- **Types réutilisés** :
+  - `SmartRecommendation` (de types centralisés)
+- **Améliorations** :
+  - Suppression de la définition locale de `SmartRecommendation`
+  - Typage explicite des callbacks map `(reason/interest: string, index: number)`
+  - Utilisation des types centralisés
+
 ## 🔧 Harmonisation UI/Services
 
 ### Modération
@@ -87,10 +129,29 @@
 |-------|-------------|--------------|-----------------|
 | Phase 1 | Services & Utils | 29 | 3 services |
 | Phase 2 | Types centralisés | 0 | Consolidation |
-| **Phase 3** | **Hooks UI Logic** | **12** | **4 hooks** |
-| **TOTAL** | | **41** | **7 fichiers** |
+| **Phase 3** | **Hooks & Composants** | **22** | **8 fichiers** |
+| **TOTAL** | | **51** | **11 fichiers** |
 
-**Progression** : 204 → 163 any warnings restants (20% de réduction)
+**Progression** : 204 → 153 any warnings restants (25% de réduction)
+
+### Détail Phase 3
+- **Hooks** : 14 any éliminés (5 hooks migrés)
+  - useSmartRecommendations: 8 any
+  - useIslamicModeration: 4 any
+  - useMatchingHistory: 2 any
+  - useMatchingPreferences: 0 any (amélioration logging)
+  - useCompatibility: 0 any (amélioration logging)
+
+- **Composants** : 8 any éliminés (3 composants migrés)
+  - MatchCard: 4 any
+  - RecommendationCard: 4 any
+  - MatchResultsGrid: 0 any (types centralisés)
+
+- **Types centralisés ajoutés** : 4
+  - `MatchProfile` (extends `ScoredMatch`)
+  - `SmartRecommendation` (extends `ScoredMatch`)
+  - `MatchingHistoryPreferences`
+  - `ModerationSuggestion` (déjà ajouté en Phase 3 précédente)
 
 ## 🎯 Prochaines étapes - Phase 4 : Composants UI
 
