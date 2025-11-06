@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight, Lock, Users, Grid3x3, LayoutGrid } from 'lucide-react';
+import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight, Lock, Users, Grid3x3, LayoutGrid, StickyNote } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -22,6 +22,7 @@ import { DailyLimitIndicator } from '@/components/DailyLimitIndicator';
 import { UpgradeToPremiumModal } from '@/components/UpgradeToPremiumModal';
 import { ActiveConversationBanner } from '@/components/ActiveConversationBanner';
 import ProfileComparator from '@/components/ProfileComparator';
+import ProfileNoteCard from '@/components/ProfileNoteCard';
 
 interface MatchingProfile {
   id?: string;
@@ -967,6 +968,9 @@ const Browse = () => {
                             <Heart className="h-3 w-3 mr-1" />
                             {!subscription.subscribed ? 'Premium' : 'Liker'}
                           </Button>
+                          {user && (
+                            <ProfileNoteCard userId={user.id} profileId={profile.user_id} />
+                          )}
                         </div>
                       </CardContent>
                     </Card>
