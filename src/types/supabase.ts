@@ -393,7 +393,7 @@ export interface MatchingProfile {
  * Préférences islamiques normalisées pour le matching
  */
 export interface MatchingIslamicPreferences {
-  user_id: string;
+  user_id?: string;
   prayer_frequency?: string;
   sect?: string;
   hijab_preference?: string;
@@ -440,4 +440,33 @@ export interface MatchingCacheStats {
   totalMatches: number;
   oldestEntry?: Date;
   newestEntry?: Date;
+}
+
+/**
+ * Préférences culturelles pour le matching
+ */
+export interface CulturalPreferences {
+  location?: string | null;
+  education_level?: string | null;
+  profession?: string | null;
+  interests?: string[] | null;
+  languages?: string[] | null;
+}
+
+/**
+ * Poids des dimensions de compatibilité
+ */
+export interface CompatibilityWeights {
+  islamic: number;
+  cultural: number;
+  personality: number;
+}
+
+/**
+ * Explication de compatibilité pour les utilisateurs
+ */
+export interface CompatibilityExplanation {
+  strengths: string[];
+  concerns: string[];
+  summary: string;
 }

@@ -6,6 +6,20 @@
  */
 
 import { logger } from './logger';
+import type {
+  MatchingIslamicPreferences,
+  CulturalPreferences,
+  CompatibilityWeights,
+  CompatibilityExplanation
+} from '@/types/supabase';
+
+/**
+ * Re-export types for backwards compatibility
+ */
+export type {
+  CompatibilityWeights,
+  CompatibilityExplanation
+};
 
 /**
  * Islamic preference compatibility levels
@@ -99,21 +113,9 @@ export const calculateNumericCompatibility = (
 /**
  * Calculate Islamic preference compatibility with fuzzy logic
  */
-interface IslamicPreferences {
-  prayer_frequency?: string | null;
-  quran_reading?: string | null;
-  sect?: string | null;
-  madhab?: string | null;
-  hijab_wearing?: string | null;
-  beard_preference?: string | null;
-  halal_diet?: boolean | null;
-  smoking?: boolean | null;
-  importance_of_religion?: number | null;
-}
-
 export const calculateIslamicCompatibility = (
-  user1Prefs: IslamicPreferences,
-  user2Prefs: IslamicPreferences
+  user1Prefs: MatchingIslamicPreferences,
+  user2Prefs: MatchingIslamicPreferences
 ): number => {
   const scores: number[] = [];
 
@@ -134,56 +136,63 @@ export const calculateIslamicCompatibility = (
     scores.push(sectScore * 1.5); // 1.5x weight for sect
   }
 
-  // Madhab compatibility
-  if (user1Prefs.madhab && user2Prefs.madhab) {
-    const madhabScore = user1Prefs.madhab === user2Prefs.madhab
+  // Madhab compatibility (using index signature)
+  const madhab1 = user1Prefs['madhab'] as string | undefined;
+  const madhab2 = user2Prefs['madhab'] as string | undefined;
+  if (madhab1 && madhab2) {
+    const madhabScore = madhab1 === madhab2
       ? CompatibilityLevel.EXACT_MATCH
       : CompatibilityLevel.MEDIUM; // Same sect but different madhab is okay
     scores.push(madhabScore);
   }
 
-  // Quran reading habits
-  if (user1Prefs.quran_reading && user2Prefs.quran_reading) {
-    scores.push(
-      calculateStringSimilarity(user1Prefs.quran_reading, user2Prefs.quran_reading)
-    );
+  // Quran reading habits (using index signature)
+  const quran1 = user1Prefs['quran_reading'] as string | undefined;
+  const quran2 = user2Prefs['quran_reading'] as string | undefined;
+  if (quran1 && quran2) {
+    scores.push(calculateStringSimilarity(quran1, quran2));
   }
 
-  // Halal diet (boolean exact match)
-  if (user1Prefs.halal_diet !== null && user2Prefs.halal_diet !== null) {
-    const halalScore = user1Prefs.halal_diet === user2Prefs.halal_diet
+  // Halal diet (using index signature)
+  const halal1 = user1Prefs['halal_diet'] as boolean | undefined;
+  const halal2 = user2Prefs['halal_diet'] as boolean | undefined;
+  if (halal1 !== undefined && halal2 !== undefined) {
+    const halalScore = halal1 === halal2
       ? CompatibilityLevel.EXACT_MATCH
       : CompatibilityLevel.LOW;
     scores.push(halalScore);
   }
 
-  // Smoking preference (important for health)
-  if (user1Prefs.smoking !== null && user2Prefs.smoking !== null) {
-    const smokingScore = user1Prefs.smoking === user2Prefs.smoking
+  // Smoking preference (using index signature)
+  const smoking1 = user1Prefs['smoking'] as string | undefined;
+  const smoking2 = user2Prefs['smoking'] as string | undefined;
+  if (smoking1 !== undefined && smoking2 !== undefined) {
+    const smokingScore = smoking1 === smoking2
       ? CompatibilityLevel.EXACT_MATCH
       : CompatibilityLevel.MEDIUM; // Some flexibility
     scores.push(smokingScore);
   }
 
-  // Importance of religion (numeric range)
-  if (user1Prefs.importance_of_religion && user2Prefs.importance_of_religion) {
+  // Importance of religion (using index signature)
+  const importance1 = user1Prefs['importance_of_religion'] as number | undefined;
+  const importance2 = user2Prefs['importance_of_religion'] as number | undefined;
+  if (importance1 !== undefined && importance2 !== undefined) {
     scores.push(
       calculateNumericCompatibility(
-        user1Prefs.importance_of_religion,
-        user2Prefs.importance_of_religion,
+        importance1,
+        importance2,
         0.15 // 15% tolerance
       )
     );
   }
 
-  // Hijab/Beard preferences (appearance)
-  if (user1Prefs.hijab_wearing && user2Prefs.beard_preference) {
+  // Hijab/Beard preferences (appearance - using index signature)
+  const hijab1 = user1Prefs['hijab_wearing'] as string | undefined;
+  const beard2 = user2Prefs['beard_preference'] as string | undefined;
+  if (hijab1 && beard2) {
     // Cross-gender appearance compatibility
     scores.push(
-      calculateAppearanceCompatibility(
-        user1Prefs.hijab_wearing,
-        user2Prefs.beard_preference
-      )
+      calculateAppearanceCompatibility(hijab1, beard2)
     );
   }
 
@@ -196,15 +205,15 @@ export const calculateIslamicCompatibility = (
   let totalWeight = 0;
   if (user1Prefs.prayer_frequency && user2Prefs.prayer_frequency) totalWeight += 2;
   if (user1Prefs.sect && user2Prefs.sect) totalWeight += 1.5;
-  if (user1Prefs.madhab && user2Prefs.madhab) totalWeight += 1;
-  if (user1Prefs.quran_reading && user2Prefs.quran_reading) totalWeight += 1;
-  if (user1Prefs.halal_diet !== null && user2Prefs.halal_diet !== null) totalWeight += 1;
-  if (user1Prefs.smoking !== null && user2Prefs.smoking !== null) totalWeight += 1;
-  if (user1Prefs.importance_of_religion && user2Prefs.importance_of_religion) totalWeight += 1;
-  if (user1Prefs.hijab_wearing && user2Prefs.beard_preference) totalWeight += 1;
+  if (madhab1 && madhab2) totalWeight += 1;
+  if (quran1 && quran2) totalWeight += 1;
+  if (halal1 !== undefined && halal2 !== undefined) totalWeight += 1;
+  if (smoking1 !== undefined && smoking2 !== undefined) totalWeight += 1;
+  if (importance1 !== undefined && importance2 !== undefined) totalWeight += 1;
+  if (hijab1 && beard2) totalWeight += 1;
 
   // Weighted average normalized to 0-1, then scale to 0-100
-  const totalScore = scores.reduce((sum, score) => sum + score, 0);
+  const totalScore = scores.reduce((sum: number, score: number) => sum + score, 0);
   const normalizedScore = totalWeight > 0 ? totalScore / totalWeight : 0;
 
   return Math.round(normalizedScore * 100);
@@ -214,7 +223,7 @@ export const calculateIslamicCompatibility = (
  * Calculate prayer frequency compatibility with granularity
  */
 const calculatePrayerCompatibility = (freq1: string, freq2: string): number => {
-  const prayerLevels: { [key: string]: number } = {
+  const prayerLevels: Record<string, number> = {
     'five_times_daily': 5,
     'regularly': 4,
     'sometimes': 3,
@@ -222,8 +231,8 @@ const calculatePrayerCompatibility = (freq1: string, freq2: string): number => {
     'never': 1,
   };
 
-  const level1 = prayerLevels[freq1.toLowerCase()] || 0;
-  const level2 = prayerLevels[freq2.toLowerCase()] || 0;
+  const level1 = prayerLevels[freq1.toLowerCase()] ?? 0;
+  const level2 = prayerLevels[freq2.toLowerCase()] ?? 0;
 
   const diff = Math.abs(level1 - level2);
 
@@ -273,14 +282,6 @@ const calculateAppearanceCompatibility = (
 /**
  * Calculate cultural compatibility with partial matching
  */
-interface CulturalPreferences {
-  location?: string | null;
-  education_level?: string | null;
-  profession?: string | null;
-  interests?: string[] | null;
-  languages?: string[] | null;
-}
-
 export const calculateCulturalCompatibility = (
   user1Prefs: CulturalPreferences,
   user2Prefs: CulturalPreferences
@@ -320,7 +321,7 @@ export const calculateCulturalCompatibility = (
   if (scores.length === 0) return 60;
 
   // Calculate average score (already in 0-1 range from CompatibilityLevel enum)
-  const averageScore = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+  const averageScore = scores.reduce((sum: number, score: number) => sum + score, 0) / scores.length;
 
   // Scale to 0-100
   return Math.round(averageScore * 100);
@@ -330,7 +331,7 @@ export const calculateCulturalCompatibility = (
  * Calculate education level compatibility
  */
 const calculateEducationCompatibility = (edu1: string, edu2: string): number => {
-  const educationLevels: { [key: string]: number } = {
+  const educationLevels: Record<string, number> = {
     'doctorate': 6,
     'masters': 5,
     'bachelors': 4,
@@ -339,8 +340,8 @@ const calculateEducationCompatibility = (edu1: string, edu2: string): number => 
     'some_high_school': 1,
   };
 
-  const level1 = educationLevels[edu1.toLowerCase().replace(/\s/g, '_')] || 0;
-  const level2 = educationLevels[edu2.toLowerCase().replace(/\s/g, '_')] || 0;
+  const level1 = educationLevels[edu1.toLowerCase().replace(/\s/g, '_')] ?? 0;
+  const level2 = educationLevels[edu2.toLowerCase().replace(/\s/g, '_')] ?? 0;
 
   const diff = Math.abs(level1 - level2);
 
@@ -356,10 +357,10 @@ const calculateEducationCompatibility = (edu1: string, edu2: string): number => 
 const calculateArrayOverlap = (arr1: string[], arr2: string[]): number => {
   if (arr1.length === 0 || arr2.length === 0) return 0;
 
-  const set1 = new Set(arr1.map(item => item.toLowerCase().trim()));
-  const set2 = new Set(arr2.map(item => item.toLowerCase().trim()));
+  const set1 = new Set(arr1.map((item: string) => item.toLowerCase().trim()));
+  const set2 = new Set(arr2.map((item: string) => item.toLowerCase().trim()));
 
-  const intersection = new Set([...set1].filter(x => set2.has(x)));
+  const intersection = new Set([...set1].filter((x: string) => set2.has(x)));
   const union = new Set([...set1, ...set2]);
 
   const jaccardIndex = intersection.size / union.size;
@@ -374,12 +375,6 @@ const calculateArrayOverlap = (arr1: string[], arr2: string[]): number => {
 /**
  * Calculate overall compatibility score with weighted dimensions
  */
-interface CompatibilityWeights {
-  islamic: number;
-  cultural: number;
-  personality: number;
-}
-
 export const calculateOverallCompatibility = (
   islamicScore: number,
   culturalScore: number,
@@ -388,7 +383,7 @@ export const calculateOverallCompatibility = (
 ): number => {
   // Normalize weights to sum to 1
   const totalWeight = weights.islamic + weights.cultural + weights.personality;
-  const normalizedWeights = {
+  const normalizedWeights: CompatibilityWeights = {
     islamic: weights.islamic / totalWeight,
     cultural: weights.cultural / totalWeight,
     personality: weights.personality / totalWeight,
@@ -405,12 +400,6 @@ export const calculateOverallCompatibility = (
 /**
  * Generate compatibility explanation for users
  */
-export interface CompatibilityExplanation {
-  strengths: string[];
-  concerns: string[];
-  summary: string;
-}
-
 export const generateCompatibilityExplanation = (
   islamicScore: number,
   culturalScore: number,
