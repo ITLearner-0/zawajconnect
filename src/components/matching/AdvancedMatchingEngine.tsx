@@ -5,7 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Brain, Sparkles } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Brain, Sparkles, History, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useMatchingPreferences } from '@/hooks/useMatchingPreferences';
 import { fetchMatchingProfiles } from '@/utils/matchingUtils';
@@ -14,16 +15,19 @@ import { useUnifiedCompatibility } from '@/hooks/useUnifiedCompatibility';
 import MatchingPreferencesPanel from './MatchingPreferencesPanel';
 import MatchResultsGrid from './MatchResultsGrid';
 import MatchingHistoryPanel from './MatchingHistoryPanel';
+import { useMobile } from '@/hooks/use-mobile';
 
 const AdvancedMatchingEngine = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const isMobile = useMobile();
   const { preferences } = useMatchingPreferences();
   const { saveSearchToHistory } = useMatchingHistory();
   const { batchCalculateCompatibility } = useUnifiedCompatibility();
   const [matches, setMatches] = useState<MatchProfile[]>([]);
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [historySidebarOpen, setHistorySidebarOpen] = useState(true);
 
   const runAdvancedMatching = async () => {
     if (!user) return;
@@ -124,8 +128,11 @@ const AdvancedMatchingEngine = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="flex gap-6 relative">
+        {/* Main Content Area - Flexible Width */}
+        <div className={`flex-1 space-y-6 transition-all duration-300 ${
+          !isMobile && historySidebarOpen ? 'lg:mr-80' : ''
+        }`}>
           {/* AI Matching Controls */}
           <MatchingPreferencesPanel 
             onRunMatching={runAdvancedMatching}
@@ -162,7 +169,7 @@ const AdvancedMatchingEngine = () => {
                 <Brain className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Moteur IA Prêt</h3>
                 <p className="text-muted-foreground mb-4">
-                  Lancez l'analyse IA pour découvrir vos matches les plus compatibles selon les valeurs islamiques
+                  Lancez l'analyse IA pour découvrir vos matches les plus compatibles
                 </p>
                 <Button onClick={runAdvancedMatching} disabled={loading}>
                   <Sparkles className="h-4 w-4 mr-2" />
@@ -173,10 +180,61 @@ const AdvancedMatchingEngine = () => {
           )}
         </div>
 
-        {/* History Panel */}
-        <div className="lg:col-span-1">
-          <MatchingHistoryPanel />
-        </div>
+        {/* History Panel - Mobile: Sheet, Desktop: Collapsible Sidebar */}
+        {isMobile ? (
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="outline"
+                size="icon"
+                className="fixed bottom-20 right-4 h-12 w-12 rounded-full shadow-lg z-50 bg-background border-2"
+              >
+                <History className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-full sm:w-96 overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Historique des Recherches</SheetTitle>
+              </SheetHeader>
+              <div className="mt-6">
+                <MatchingHistoryPanel />
+              </div>
+            </SheetContent>
+          </Sheet>
+        ) : (
+          <>
+            {/* Toggle Button - Desktop */}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setHistorySidebarOpen(!historySidebarOpen)}
+              className={`fixed top-32 z-50 h-10 w-10 rounded-l-lg rounded-r-none shadow-md transition-all duration-300 ${
+                historySidebarOpen ? 'right-80' : 'right-0'
+              }`}
+            >
+              {historySidebarOpen ? (
+                <ChevronRight className="h-4 w-4" />
+              ) : (
+                <ChevronLeft className="h-4 w-4" />
+              )}
+            </Button>
+
+            {/* Sidebar Panel - Desktop */}
+            <div
+              className={`fixed top-32 right-0 h-[calc(100vh-8rem)] w-80 bg-background border-l transition-transform duration-300 overflow-hidden z-40 ${
+                historySidebarOpen ? 'translate-x-0' : 'translate-x-full'
+              }`}
+            >
+              <div className="h-full overflow-y-auto p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">Historique</h3>
+                  <History className="h-5 w-5 text-muted-foreground" />
+                </div>
+                <MatchingHistoryPanel />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
