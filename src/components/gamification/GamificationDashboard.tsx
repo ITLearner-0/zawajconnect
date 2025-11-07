@@ -1,6 +1,7 @@
 import React from 'react';
 import UserLevelBadge from './UserLevelBadge';
 import StreakCounter from './StreakCounter';
+import DailyQuests from './DailyQuests';
 import WeeklyChallenges from './WeeklyChallenges';
 import Leaderboard from './Leaderboard';
 
@@ -18,6 +19,7 @@ const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
           <UserLevelBadge />
           <StreakCounter />
         </div>
+        <DailyQuests />
         <WeeklyChallenges />
         <Leaderboard />
       </div>
@@ -29,6 +31,7 @@ const GamificationDashboard: React.FC<GamificationDashboardProps> = ({
       <div className="space-y-6">
         <UserLevelBadge />
         <StreakCounter />
+        <DailyQuests />
         <WeeklyChallenges />
       </div>
       <div>

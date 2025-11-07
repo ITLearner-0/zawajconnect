@@ -211,6 +211,45 @@ export type Database = {
           },
         ]
       }
+      daily_quests: {
+        Row: {
+          created_at: string
+          description: string
+          icon: string
+          id: string
+          is_active: boolean
+          quest_type: string
+          target_value: number
+          title: string
+          updated_at: string
+          xp_reward: number
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          quest_type: string
+          target_value?: number
+          title: string
+          updated_at?: string
+          xp_reward?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          icon?: string
+          id?: string
+          is_active?: boolean
+          quest_type?: string
+          target_value?: number
+          title?: string
+          updated_at?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
       family_access_audit: {
         Row: {
           access_granted: boolean
@@ -1939,6 +1978,50 @@ export type Database = {
         }
         Relationships: []
       }
+      user_daily_quest_progress: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          current_progress: number
+          id: string
+          quest_date: string
+          quest_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_progress?: number
+          id?: string
+          quest_date?: string
+          quest_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_progress?: number
+          id?: string
+          quest_date?: string
+          quest_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_daily_quest_progress_quest_id_fkey"
+            columns: ["quest_id"]
+            isOneToOne: false
+            referencedRelation: "daily_quests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_levels: {
         Row: {
           created_at: string
@@ -2347,6 +2430,18 @@ export type Database = {
       add_user_xp: {
         Args: { p_user_id: string; p_xp_amount: number }
         Returns: undefined
+      }
+      assign_daily_quests_to_user: {
+        Args: { p_user_id: string }
+        Returns: {
+          description: string
+          icon: string
+          quest_id: string
+          quest_type: string
+          target_value: number
+          title: string
+          xp_reward: number
+        }[]
       }
       can_access_family_contact_info: {
         Args: {
