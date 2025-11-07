@@ -29,7 +29,11 @@ import { useOnboardingAnalytics } from '@/hooks/useOnboardingAnalytics';
 import { useOnboardingKeyboardNavigation } from '@/hooks/useOnboardingKeyboardNavigation';
 import { useOnboardingSuggestions } from '@/hooks/useOnboardingSuggestions';
 import { useOnboardingAchievements } from '@/hooks/useOnboardingAchievements';
+import { useOnboardingTutorial } from '@/hooks/useOnboardingTutorial';
 import { useProfileSave } from '@/hooks/useProfileSave';
+import OnboardingTooltip from '@/components/onboarding/OnboardingTooltip';
+import ProfileExamplesModal from '@/components/onboarding/ProfileExamplesModal';
+import ProgressCelebration from '@/components/onboarding/ProgressCelebration';
 import { SaveStatusIndicator } from '@/components/SaveStatusIndicator';
 import { 
   ArrowLeft, 
@@ -149,6 +153,10 @@ const Onboarding = () => {
   // Achievements hook
   const { checkProfileComplete, checkSpeedMaster, checkDetailOriented } = useOnboardingAchievements();
   const [onboardingStartTime] = useState(Date.now());
+
+  // Tutorial hook
+  const tutorial = useOnboardingTutorial(currentStep);
+  const [showExamplesModal, setShowExamplesModal] = useState(false);
 
   const calculateCompletionPercentage = validation.getOverallProgress;
 
@@ -588,18 +596,51 @@ const Onboarding = () => {
               </div>
               <h2 className="text-2xl font-bold">Informations personnelles</h2>
               <p className="text-muted-foreground">Parlez-nous un peu de vous</p>
+              {tutorial.tutorialEnabled && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowExamplesModal(true)}
+                  className="mt-2"
+                >
+                  <Star className="h-4 w-4 mr-2" />
+                  Voir des exemples de profils
+                </Button>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className="relative">
                 <Label htmlFor="fullName">Nom complet *</Label>
                 <Input
                   id="fullName"
                   value={profileData.full_name}
-                  onChange={(e) => setProfileData({...profileData, full_name: e.target.value})}
+                  onChange={(e) => {
+                    setProfileData({...profileData, full_name: e.target.value});
+                    if (e.target.value && tutorial.tutorialEnabled) {
+                      tutorial.markFieldComplete('full_name');
+                    }
+                  }}
+                  onFocus={() => tutorial.showTooltip('full_name')}
+                  onBlur={() => tutorial.hideTooltip()}
                   placeholder="Votre nom complet"
                   required
                 />
+                {tutorial.currentTooltip === 'full_name' && tutorial.tutorialEnabled && (
+                  <OnboardingTooltip
+                    title="Votre nom complet"
+                    description="Utilisez votre vrai nom pour établir la confiance"
+                    tips={[
+                      'Soyez authentique - utilisez votre vrai nom',
+                      'Évitez les pseudonymes ou surnoms',
+                      'La transparence est clé dans les rencontres halal'
+                    ]}
+                    example="Ahmed Ben Ali"
+                    isVisible={true}
+                    onClose={() => tutorial.hideTooltip()}
+                    onMarkComplete={() => tutorial.markFieldComplete('full_name')}
+                  />
+                )}
               </div>
               <div>
                 <Label htmlFor="age">Âge *</Label>
@@ -695,14 +736,40 @@ const Onboarding = () => {
                   <span className="text-xs">Suggestions IA</span>
                 </Button>
               </div>
-              <Textarea
-                id="bio"
-                value={profileData.bio}
-                onChange={(e) => setProfileData({...profileData, bio: e.target.value})}
-                placeholder="Décrivez-vous en quelques phrases..."
-                rows={4}
-                required
-              />
+              <div className="relative">
+                <Textarea
+                  id="bio"
+                  value={profileData.bio}
+                  onChange={(e) => {
+                    setProfileData({...profileData, bio: e.target.value});
+                    if (e.target.value.length > 50 && tutorial.tutorialEnabled) {
+                      tutorial.markFieldComplete('bio');
+                    }
+                  }}
+                  onFocus={() => tutorial.showTooltip('bio')}
+                  onBlur={() => tutorial.hideTooltip()}
+                  placeholder="Décrivez-vous en quelques phrases..."
+                  rows={4}
+                  required
+                />
+                {tutorial.currentTooltip === 'bio' && tutorial.tutorialEnabled && (
+                  <OnboardingTooltip
+                    title="Votre biographie"
+                    description="Présentez-vous de manière authentique et engageante"
+                    tips={[
+                      'Visez 150-250 caractères pour l\'optimal',
+                      'Parlez de vos valeurs, passions et objectifs',
+                      'Soyez positif et authentique',
+                      'Mentionnez ce qui vous rend unique'
+                    ]}
+                    example="Ingénieur passionné par la technologie et l'innovation. J'aime voyager, découvrir de nouvelles cultures et pratiquer le sport. Je recherche une personne partageant mes valeurs pour construire une famille solide basée sur la foi et le respect mutuel."
+                    isVisible={true}
+                    onClose={() => tutorial.hideTooltip()}
+                    onMarkComplete={() => tutorial.markFieldComplete('bio')}
+                    position="bottom"
+                  />
+                )}
+              </div>
               
               {/* Bio Suggestions */}
               {bioSuggestions.length > 0 && (
@@ -885,6 +952,18 @@ const Onboarding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 islamic-pattern pb-24 md:pb-8">
+      {/* Celebration Animation */}
+      <ProgressCelebration
+        message={tutorial.celebrationMessage}
+        isVisible={tutorial.showCelebration}
+      />
+
+      {/* Profile Examples Modal */}
+      <ProfileExamplesModal
+        isOpen={showExamplesModal}
+        onClose={() => setShowExamplesModal(false)}
+      />
+
       {/* Keyboard Shortcuts Panel */}
       <KeyboardShortcutsPanel
         show={keyboardNav.showHelp}
@@ -892,6 +971,26 @@ const Onboarding = () => {
         currentStep={currentStep}
         totalSteps={totalSteps}
       />
+
+      {/* Tutorial Dismissal Banner */}
+      {tutorial.tutorialEnabled && (
+        <div className="fixed top-4 right-4 z-40 animate-fade-in">
+          <Card className="p-3 shadow-lg border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-accent/5">
+            <div className="flex items-center gap-3">
+              <Sparkles className="h-4 w-4 text-primary flex-shrink-0" />
+              <p className="text-sm font-medium">Mode tutoriel activé</p>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={tutorial.dismissTutorial}
+                className="ml-2 h-6 px-2 text-xs"
+              >
+                Désactiver
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
 
       {/* Session Resumption Modal */}
       {savedSessionData && (
