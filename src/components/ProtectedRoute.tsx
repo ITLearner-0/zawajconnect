@@ -35,6 +35,12 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
     return <>{children}</>;
   }
 
+  // Also skip onboarding check for enhanced-profile and dashboard 
+  // These pages will handle their own onboarding status checks
+  if (location.pathname === '/enhanced-profile' || location.pathname === '/dashboard' || location.pathname === '/profile') {
+    return <>{children}</>;
+  }
+
   // Redirect to onboarding if profile is incomplete and onboarding is required
   if (requireOnboarding && !profileComplete) {
     // Redirect Walis to wali-onboarding, regular users to onboarding
