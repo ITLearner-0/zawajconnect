@@ -26,34 +26,34 @@ export const RecommendationCard = ({ recommendation }: RecommendationCardProps) 
   };
 
   return (
-    <Card className="hover:shadow-lg transition-shadow">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <Avatar className="h-12 w-12">
+    <Card className="hover:shadow-xl transition-all hover:scale-[1.01] border-primary/10">
+      <CardHeader className="pb-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-14 w-14 ring-2 ring-primary/10">
               <AvatarImage src={recommendation.avatar_url} />
               <AvatarFallback className="bg-gradient-to-br from-primary to-accent">
-                <User className="h-5 w-5 text-primary-foreground" />
+                <User className="h-6 w-6 text-primary-foreground" />
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-lg">{recommendation.full_name ?? 'Profil Anonyme'}</CardTitle>
+              <CardTitle className="text-lg mb-1">{recommendation.full_name ?? 'Profil Anonyme'}</CardTitle>
               <p className="text-sm text-muted-foreground">
                 {recommendation.age ?? '−'} ans • {recommendation.location ?? 'Non spécifié'}
               </p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 {recommendation.profession ?? 'Non spécifié'}
               </p>
             </div>
           </div>
-          <Badge className={`${getScoreColor(recommendation.recommendation_score)} font-semibold`}>
+          <Badge className={`${getScoreColor(recommendation.recommendation_score)} font-semibold shrink-0`}>
             <Sparkles className="h-3 w-3 mr-1" />
             {recommendation.recommendation_score}%
           </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         {/* Compatibility Scores */}
         <div className="grid grid-cols-3 gap-4 text-sm">
           <div>

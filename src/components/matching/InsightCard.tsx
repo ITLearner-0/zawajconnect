@@ -33,39 +33,39 @@ export const InsightCard = ({ insight }: InsightCardProps) => {
   };
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <div className="flex items-center justify-between">
+    <Card className="h-full hover:shadow-lg transition-shadow border-primary/10">
+      <CardHeader className="pb-4">
+        <div className="flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             {insight.icon}
-            <CardTitle className="text-base">{insight.title}</CardTitle>
+            <CardTitle className="text-base leading-tight">{insight.title}</CardTitle>
           </div>
-          <Badge className={getCategoryColor(insight.category)}>
+          <Badge className={`${getCategoryColor(insight.category)} shrink-0`}>
             {insight.category}
           </Badge>
         </div>
       </CardHeader>
       
       <CardContent className="space-y-4">
-        <p className="text-sm text-muted-foreground">
+        <p className="text-sm text-muted-foreground leading-relaxed">
           {insight.description}
         </p>
         
-        <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
-          <p className="text-sm font-medium text-primary mb-1">Conseil actionnable:</p>
-          <p className="text-sm text-foreground">
+        <div className="p-4 bg-primary/5 rounded-lg border border-primary/10 space-y-1">
+          <p className="text-sm font-semibold text-primary">Conseil actionnable:</p>
+          <p className="text-sm text-foreground leading-relaxed">
             {insight.actionable_tip}
           </p>
         </div>
         
-        <div className="p-3 bg-success/5 rounded-lg border border-success/10">
-          <p className="text-sm font-medium text-success mb-1">Guidance islamique:</p>
-          <p className="text-sm text-foreground italic">
+        <div className="p-4 bg-success/5 rounded-lg border border-success/10 space-y-1">
+          <p className="text-sm font-semibold text-success">Guidance islamique:</p>
+          <p className="text-sm text-foreground italic leading-relaxed">
             {insight.islamic_guidance}
           </p>
         </div>
         
-        <Button variant="outline" size="sm" className="w-full">
+        <Button variant="outline" size="sm" className="w-full mt-2">
           <ExternalLink className="h-3 w-3 mr-2" />
           En savoir plus
         </Button>

@@ -38,13 +38,13 @@ const MatchingPreferencesPanel = ({ onRunMatching, analyzing, loading }: Matchin
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
+    <Card className="border-primary/20 shadow-lg">
+      <CardHeader className="pb-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <CardTitle className="flex items-center gap-2 text-xl">
             <Brain className="h-5 w-5 text-primary" />
-            Moteur IA de Compatibilité Islamique
-          </div>
+            Configuration du Matching IA
+          </CardTitle>
           <div className="flex items-center gap-2">
             {saving && (
               <Badge variant="secondary" className="animate-pulse">
@@ -62,109 +62,123 @@ const MatchingPreferencesPanel = ({ onRunMatching, analyzing, loading }: Matchin
               Sauvegarder
             </Button>
           </div>
-        </CardTitle>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              Poids Islamique ({preferences.weight_islamic}%)
-            </label>
-            <input
-              type="range"
-              min="20"
-              max="60"
-              value={preferences.weight_islamic}
-              onChange={(e) => handleSliderChange('weight_islamic', parseInt(e.target.value))}
-              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground mt-1">
-              <span>20%</span>
-              <span>60%</span>
+      <CardContent className="space-y-8">
+        {/* Sliders Section */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+            Pondération des critères
+          </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="space-y-3">
+              <label className="text-sm font-medium flex items-center justify-between">
+                <span>Poids Islamique</span>
+                <Badge variant="secondary" className="font-mono">{preferences.weight_islamic}%</Badge>
+              </label>
+              <input
+                type="range"
+                min="20"
+                max="60"
+                value={preferences.weight_islamic}
+                onChange={(e) => handleSliderChange('weight_islamic', parseInt(e.target.value))}
+                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>20%</span>
+                <span>60%</span>
+              </div>
             </div>
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              Poids Culturel ({preferences.weight_cultural}%)
-            </label>
-            <input
-              type="range"
-              min="10"
-              max="50"
-              value={preferences.weight_cultural}
-              onChange={(e) => handleSliderChange('weight_cultural', parseInt(e.target.value))}
-              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground mt-1">
-              <span>10%</span>
-              <span>50%</span>
+            
+            <div className="space-y-3">
+              <label className="text-sm font-medium flex items-center justify-between">
+                <span>Poids Culturel</span>
+                <Badge variant="secondary" className="font-mono">{preferences.weight_cultural}%</Badge>
+              </label>
+              <input
+                type="range"
+                min="10"
+                max="50"
+                value={preferences.weight_cultural}
+                onChange={(e) => handleSliderChange('weight_cultural', parseInt(e.target.value))}
+                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>10%</span>
+                <span>50%</span>
+              </div>
             </div>
-          </div>
-          
-          <div>
-            <label className="text-sm font-medium mb-2 block">
-              Poids Personnalité ({preferences.weight_personality}%)
-            </label>
-            <input
-              type="range"
-              min="10"
-              max="50"
-              value={preferences.weight_personality}
-              onChange={(e) => handleSliderChange('weight_personality', parseInt(e.target.value))}
-              className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground mt-1">
-              <span>10%</span>
-              <span>50%</span>
+            
+            <div className="space-y-3">
+              <label className="text-sm font-medium flex items-center justify-between">
+                <span>Poids Personnalité</span>
+                <Badge variant="secondary" className="font-mono">{preferences.weight_personality}%</Badge>
+              </label>
+              <input
+                type="range"
+                min="10"
+                max="50"
+                value={preferences.weight_personality}
+                onChange={(e) => handleSliderChange('weight_personality', parseInt(e.target.value))}
+                className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>10%</span>
+                <span>50%</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <label className="text-sm font-medium">
-              Compatibilité minimum: {preferences.min_compatibility}%
-            </label>
-            <input
-              type="range"
-              min="50"
-              max="90"
-              value={preferences.min_compatibility}
-              onChange={(e) => handleSliderChange('min_compatibility', parseInt(e.target.value))}
-              className="w-32 h-2 bg-muted rounded-lg appearance-none cursor-pointer"
-            />
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 text-sm">
+        {/* Controls Section */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t">
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-3">
+              <label className="text-sm font-medium whitespace-nowrap">
+                Compatibilité min:
+              </label>
+              <Badge variant="outline" className="font-mono">
+                {preferences.min_compatibility}%
+              </Badge>
+              <input
+                type="range"
+                min="50"
+                max="90"
+                value={preferences.min_compatibility}
+                onChange={(e) => handleSliderChange('min_compatibility', parseInt(e.target.value))}
+                className="w-24 h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
+              />
+            </div>
+            
+            <label className="flex items-center gap-2 text-sm cursor-pointer">
               <input
                 type="checkbox"
                 checked={preferences.family_approval_required}
                 onChange={(e) => handleCheckboxChange('family_approval_required', e.target.checked)}
-                className="rounded"
+                className="rounded accent-primary"
               />
-              Approbation famille requise
+              <span className="whitespace-nowrap">Approbation famille</span>
             </label>
-
-            <Button 
-              onClick={onRunMatching} 
-              disabled={loading}
-              className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90"
-            >
-              {analyzing ? (
-                <>
-                  <Brain className="h-4 w-4 mr-2 animate-spin" />
-                  Analyse IA en cours...
-                </>
-              ) : (
-                <>
-                  <Brain className="h-4 w-4 mr-2" />
-                  Lancer l'IA Matching
-                </>
-              )}
-            </Button>
           </div>
+
+          <Button 
+            onClick={onRunMatching} 
+            disabled={loading}
+            size="lg"
+            className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity shadow-md w-full sm:w-auto"
+          >
+            {analyzing ? (
+              <>
+                <Brain className="h-4 w-4 mr-2 animate-spin" />
+                Analyse en cours...
+              </>
+            ) : (
+              <>
+                <Brain className="h-4 w-4 mr-2" />
+                Lancer le Matching
+              </>
+            )}
+          </Button>
         </div>
       </CardContent>
     </Card>
