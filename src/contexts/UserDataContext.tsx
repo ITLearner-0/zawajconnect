@@ -23,14 +23,13 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
   const lastUserIdRef = useRef<string | null>(null);
 
   const refreshUserData = async () => {
-    // Protection contre boucle infinie
-    if (!user || fetchingRef.current || lastUserIdRef.current === user.id) {
+    // Protection contre boucle infinie - mais permet le refresh si on demande explicitement
+    if (!user || fetchingRef.current) {
       setLoading(false);
       return;
     }
 
     fetchingRef.current = true;
-    lastUserIdRef.current = user.id;
 
     try {
       // Une seule requête parallèle pour toutes les données
@@ -50,7 +49,7 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
           .maybeSingle(),
         supabase
           .from('profiles')
-          .select('full_name, bio, looking_for')
+          .select('full_name, onboarding_completed')
           .eq('user_id', user.id)
           .maybeSingle()
       ]);
@@ -62,11 +61,13 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
       setIsAdmin(!!adminData);
       setIsWali(!!waliData);
       
+      // Use onboarding_completed field for profile completion status
       const isComplete = waliData 
         ? !!(profile?.full_name && profile.full_name.trim().length > 0)
-        : !!(profile?.bio && profile?.looking_for);
+        : !!(profile?.onboarding_completed);
       
       setProfileComplete(isComplete);
+      lastUserIdRef.current = user.id;
     } catch (error) {
       // Log error for debugging but don't block the UI
       logger.error('Failed to fetch user data', error, { userId: user.id });
@@ -80,9 +81,11 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
   };
 
   useEffect(() => {
-    if (user && lastUserIdRef.current !== user.id) {
+    if (user) {
+      // Always refresh when user changes or user is logged in
       refreshUserData();
-    } else if (!user) {
+    } else {
+      // Reset state when user logs out
       setIsAdmin(false);
       setIsWali(false);
       setProfileComplete(false);

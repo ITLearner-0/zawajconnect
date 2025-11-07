@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserData } from '@/contexts/UserDataContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,6 +79,7 @@ interface IslamicPreferences {
 
 const Onboarding = () => {
   const { user } = useAuth();
+  const { refreshUserData } = useUserData();
   const navigate = useNavigate();
   const { toast } = useToast();
   
@@ -534,6 +536,10 @@ const Onboarding = () => {
         
         // Clear all saved data on successful completion
         persistence.clearAll();
+        
+        // Refresh user data to update profileComplete status
+        await refreshUserData();
+        
         navigate('/enhanced-profile');
       } else {
         toast({

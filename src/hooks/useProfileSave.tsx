@@ -64,6 +64,7 @@ export const useProfileSave = () => {
         looking_for: profileData.looking_for ?? '',
         interests: profileData.interests ?? [],
         avatar_url: profileData.avatar_url ?? '',
+        onboarding_completed: true, // Mark onboarding as complete
         updated_at: new Date().toISOString()
       };
       
@@ -176,6 +177,7 @@ export const useProfileSave = () => {
       }
 
       console.log('✅ Profile and Islamic preferences saved successfully');
+      console.log('⚡ Onboarding marked as completed');
       console.log('⚡ All other settings handled automatically by database triggers');
 
       toast({

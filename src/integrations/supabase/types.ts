@@ -1618,6 +1618,7 @@ export type Database = {
           interests: string[] | null
           location: string | null
           looking_for: string | null
+          onboarding_completed: boolean | null
           phone: string | null
           profession: string | null
           terms_accepted_at: string | null
@@ -1637,6 +1638,7 @@ export type Database = {
           interests?: string[] | null
           location?: string | null
           looking_for?: string | null
+          onboarding_completed?: boolean | null
           phone?: string | null
           profession?: string | null
           terms_accepted_at?: string | null
@@ -1656,6 +1658,7 @@ export type Database = {
           interests?: string[] | null
           location?: string | null
           looking_for?: string | null
+          onboarding_completed?: boolean | null
           phone?: string | null
           profession?: string | null
           terms_accepted_at?: string | null
