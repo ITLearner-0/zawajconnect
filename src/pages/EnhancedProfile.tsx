@@ -34,6 +34,7 @@ import CompatibilityAssessment from '@/components/enhanced/CompatibilityAssessme
 // Existing Components
 import VerificationBadge from '@/components/VerificationBadge';
 import PhotoUpload from '@/components/PhotoUpload';
+import ProfileQualityPanel from '@/components/ProfileQualityPanel';
 
 interface ProfileCompletionStats {
   overall: number;
@@ -597,6 +598,25 @@ const EnhancedProfile = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Profile Quality Panel */}
+            <ProfileQualityPanel
+              profileData={profile}
+              islamicPrefs={islamicPrefs}
+              onNavigateToSection={(sectionId) => {
+                const tabMap: Record<string, string> = {
+                  'basic_info': 'wizard',
+                  'bio': 'wizard',
+                  'interests': 'wizard',
+                  'islamic': 'islamic',
+                  'photo': 'photos'
+                };
+                const targetTab = tabMap[sectionId];
+                if (targetTab) {
+                  setActiveTab(targetTab);
+                }
+              }}
+            />
 
             {/* Recommendations */}
             <Card>

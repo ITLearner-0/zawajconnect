@@ -83,6 +83,38 @@ Les intérêts doivent être halal, variés (spirituels, loisirs, culturels) et 
 Retourne uniquement un tableau JSON avec 5 strings, sans texte supplémentaire.`;
         break;
 
+      case "profile_improvement":
+        systemPrompt = `Tu es un expert en optimisation de profils pour une application de rencontre musulmane.
+Tu analyses les profils de manière holistique et fournis des recommandations personnalisées et actionnables.`;
+        
+        userPrompt = `Analyse ce profil et fournis 3-5 recommandations concrètes pour améliorer les chances de match:
+
+PROFIL:
+- Nom: ${data.profileData?.full_name || "Non défini"}
+- Âge: ${data.profileData?.age || "Non défini"}
+- Localisation: ${data.profileData?.location || "Non défini"}
+- Profession: ${data.profileData?.profession || "Non défini"}
+- Éducation: ${data.profileData?.education || "Non défini"}
+- Bio: ${data.profileData?.bio ? `"${data.profileData.bio}"` : "Vide"}
+- Intérêts: ${data.profileData?.interests?.join(", ") || "Aucun"}
+- Photo: ${data.profileData?.avatar_url ? "Oui" : "Non"}
+
+PRÉFÉRENCES ISLAMIQUES:
+- Fréquence de prière: ${data.islamicPrefs?.prayer_frequency || "Non défini"}
+- Lecture du Coran: ${data.islamicPrefs?.quran_reading || "Non défini"}
+- Secte: ${data.islamicPrefs?.sect || "Non défini"}
+- Madhab: ${data.islamicPrefs?.madhab || "Non défini"}
+- Importance religion: ${data.islamicPrefs?.importance_of_religion || "Non défini"}
+
+STATISTIQUES:
+- Score actuel: ${data.currentScore || 0}/100
+- Sections manquantes: ${data.missingSections?.join(", ") || "Aucune"}
+
+Fournis des recommandations spécifiques, actionnables et personnalisées pour ce profil.
+Concentre-toi sur les points faibles et les opportunités d'amélioration.
+Retourne uniquement un tableau JSON avec 3-5 strings de recommandations, sans texte supplémentaire.`;
+        break;
+
       default:
         throw new Error(`Unknown suggestion type: ${type}`);
     }
