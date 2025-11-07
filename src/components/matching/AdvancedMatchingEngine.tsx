@@ -15,12 +15,12 @@ import { useUnifiedCompatibility } from '@/hooks/useUnifiedCompatibility';
 import MatchingPreferencesPanel from './MatchingPreferencesPanel';
 import MatchResultsGrid from './MatchResultsGrid';
 import MatchingHistoryPanel from './MatchingHistoryPanel';
-import { useMobile } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const AdvancedMatchingEngine = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const { preferences } = useMatchingPreferences();
   const { saveSearchToHistory } = useMatchingHistory();
   const { batchCalculateCompatibility } = useUnifiedCompatibility();
