@@ -218,6 +218,23 @@ const Onboarding = () => {
     try {
       console.log('📂 Chargement des données avec le système unifié...');
       
+      // Check if onboarding is already completed in database
+      const { data: profileCheck } = await supabase
+        .from('profiles')
+        .select('onboarding_completed')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (profileCheck?.onboarding_completed) {
+        console.log('✅ Profil déjà complet - redirection vers /enhanced-profile');
+        toast({
+          title: "Profil déjà complet",
+          description: "Vous avez déjà terminé votre onboarding. Redirection vers votre profil...",
+        });
+        navigate('/enhanced-profile');
+        return;
+      }
+      
       // Use intelligent restore from unified persistence hook
       const restoredData = await persistence.restore();
 
