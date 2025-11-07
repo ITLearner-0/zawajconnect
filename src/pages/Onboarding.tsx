@@ -28,6 +28,7 @@ import { useOnboardingPersistence } from '@/hooks/useOnboardingPersistence';
 import { useOnboardingAnalytics } from '@/hooks/useOnboardingAnalytics';
 import { useOnboardingKeyboardNavigation } from '@/hooks/useOnboardingKeyboardNavigation';
 import { useOnboardingSuggestions } from '@/hooks/useOnboardingSuggestions';
+import { useOnboardingAchievements } from '@/hooks/useOnboardingAchievements';
 import { useProfileSave } from '@/hooks/useProfileSave';
 import { SaveStatusIndicator } from '@/components/SaveStatusIndicator';
 import { 
@@ -144,6 +145,10 @@ const Onboarding = () => {
   const [bioSuggestions, setBioSuggestions] = useState<string[]>([]);
   const [islamicSuggestions, setIslamicSuggestions] = useState<any>(null);
   const [interestsSuggestions, setInterestsSuggestions] = useState<string[]>([]);
+
+  // Achievements hook
+  const { checkProfileComplete, checkSpeedMaster, checkDetailOriented } = useOnboardingAchievements();
+  const [onboardingStartTime] = useState(Date.now());
 
   const calculateCompletionPercentage = validation.getOverallProgress;
 
@@ -511,6 +516,13 @@ const Onboarding = () => {
       if (result.success) {
         // Track onboarding completion
         analytics.trackOnboardingComplete();
+        
+        // Check and unlock achievements
+        await checkProfileComplete(calculateCompletionPercentage());
+        await checkSpeedMaster(onboardingStartTime);
+        if (profileData.bio) {
+          await checkDetailOriented(profileData.bio.length);
+        }
         
         // Clear all saved data on successful completion
         persistence.clearAll();

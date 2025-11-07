@@ -11,6 +11,7 @@ import { ArrowLeft, MapPin, GraduationCap, Briefcase, Heart, User, MessageCircle
 import VerificationBadge from '@/components/VerificationBadge';
 import CompatibilityScore from '@/components/CompatibilityScore';
 import ReportModal from '@/components/ReportModal';
+import OnboardingBadges from '@/components/OnboardingBadges';
 
 interface ProfileData {
   id: string;
@@ -505,6 +506,11 @@ const Profile = () => {
                     </div>
                   </CardContent>
                 </Card>
+              )}
+
+              {/* Onboarding Achievements - Only visible to owner */}
+              {user && userId === user.id && (
+                <OnboardingBadges />
               )}
             </div>
 
