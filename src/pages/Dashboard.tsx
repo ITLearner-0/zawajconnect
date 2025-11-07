@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { User, Heart, Settings, Eye, Save, Camera, MapPin, Briefcase, GraduationCap, Brain, Target, Sparkles } from 'lucide-react';
+import { User, Heart, Settings, Eye, Save, Camera, MapPin, Briefcase, GraduationCap, Brain, Target, Sparkles, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import PhotoUpload from '@/components/PhotoUpload';
@@ -23,6 +23,7 @@ import GamifiedInsights from '@/components/GamifiedInsights';
 import SmartMatchingSuggestions from '@/components/SmartMatchingSuggestions';
 import QuickActionsPanel from '@/components/QuickActionsPanel';
 import OnboardingCompletionGuide from '@/components/OnboardingCompletionGuide';
+import GamificationDashboard from '@/components/gamification/GamificationDashboard';
 
 interface Profile {
   id: string;
@@ -371,10 +372,14 @@ const Dashboard = () => {
           {/* Main Content */}
           <div className="xl:col-span-3 order-2 xl:order-1">
             <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="profile">Profil Personnel</TabsTrigger>
                 <TabsTrigger value="islamic">Préférences Islamiques</TabsTrigger>
                 <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
+                <TabsTrigger value="gamification">
+                  <Trophy className="h-4 w-4 mr-2" />
+                  Gamification
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="profile" className="space-y-6">
@@ -670,6 +675,10 @@ const Dashboard = () => {
                     </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="gamification" className="space-y-6">
+                <GamificationDashboard layout="stack" />
               </TabsContent>
             </Tabs>
           </div>

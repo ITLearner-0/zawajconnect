@@ -797,6 +797,36 @@ export type Database = {
         }
         Relationships: []
       }
+      login_streaks: {
+        Row: {
+          created_at: string
+          current_streak: number
+          id: string
+          last_login_date: string
+          longest_streak: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_login_date?: string
+          longest_streak?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_streak?: number
+          id?: string
+          last_login_date?: string
+          longest_streak?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           can_communicate: boolean
@@ -1841,6 +1871,47 @@ export type Database = {
         }
         Relationships: []
       }
+      user_challenge_progress: {
+        Row: {
+          challenge_id: string
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          current_progress: number
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_progress?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_progress?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenge_progress_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "weekly_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_compatibility_responses: {
         Row: {
           created_at: string
@@ -1863,6 +1934,36 @@ export type Database = {
           id?: string
           question_key?: string
           response_value?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_levels: {
+        Row: {
+          created_at: string
+          current_level: string
+          id: string
+          level_progress: number
+          total_xp: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_level?: string
+          id?: string
+          level_progress?: number
+          total_xp?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_level?: string
+          id?: string
+          level_progress?: number
+          total_xp?: number
           updated_at?: string
           user_id?: string
         }
@@ -2169,8 +2270,60 @@ export type Database = {
           },
         ]
       }
+      weekly_challenges: {
+        Row: {
+          challenge_type: string
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          target_value: number
+          title: string
+          week_end: string
+          week_start: string
+          xp_reward: number
+        }
+        Insert: {
+          challenge_type: string
+          created_at?: string
+          description: string
+          id?: string
+          is_active?: boolean
+          target_value: number
+          title: string
+          week_end: string
+          week_start: string
+          xp_reward?: number
+        }
+        Update: {
+          challenge_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          target_value?: number
+          title?: string
+          week_end?: string
+          week_start?: string
+          xp_reward?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
+      leaderboard: {
+        Row: {
+          avatar_url: string | null
+          current_level: string | null
+          current_streak: number | null
+          full_name: string | null
+          longest_streak: number | null
+          rank: number | null
+          total_xp: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       onboarding_analytics_summary: {
         Row: {
           abandonment_count: number | null
@@ -2190,6 +2343,10 @@ export type Database = {
       accept_family_invitation: {
         Args: { p_invitation_token: string; p_invited_user_id: string }
         Returns: boolean
+      }
+      add_user_xp: {
+        Args: { p_user_id: string; p_xp_amount: number }
+        Returns: undefined
       }
       can_access_family_contact_info: {
         Args: {
@@ -2393,6 +2550,7 @@ export type Database = {
       send_match_suggestions_batch: { Args: never; Returns: undefined }
       send_monthly_newsletter: { Args: never; Returns: undefined }
       send_weekly_tips_batch: { Args: never; Returns: undefined }
+      update_login_streak: { Args: { p_user_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "super_admin" | "admin" | "moderator" | "user"
