@@ -3,6 +3,7 @@ import { Heart, User, Menu, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Link, useNavigate } from "react-router-dom";
 import NotificationSystem from "./NotificationSystem";
+import { OnboardingProgressIndicator } from "./OnboardingProgressIndicator";
 
 const Header = () => {
   const { user, signOut, loading } = useAuth();
@@ -44,7 +45,8 @@ const Header = () => {
             {loading ? (
               <div className="h-9 w-20 bg-muted animate-pulse rounded-md" />
             ) : user ? (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
+                <OnboardingProgressIndicator />
                 <NotificationSystem />
                 <span className="text-sm text-muted-foreground">
                   Bonjour, {user.user_metadata?.full_name || user.email?.split('@')[0]}
