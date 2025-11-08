@@ -242,133 +242,109 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="py-8 px-4">
-      <div className="container mx-auto p-4 space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="bg-card rounded-lg border p-6">
+        <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Mon Profil</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Tableau de Bord</h1>
             <p className="text-muted-foreground">
-              Gérez votre profil et vos préférences
+              Vue d'ensemble de votre profil et activité
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <VerificationBadge verificationScore={verification?.verification_score || 0} />
-            {profile && (
-              <Badge 
-                variant={profile.bio && profile.looking_for ? "default" : "secondary"}
-                className="text-xs"
-              >
-                {profile.bio && profile.looking_for ? 'Profil complet' : 'Profil incomplet'}
-              </Badge>
-            )}
-          </div>
+          <VerificationBadge verificationScore={verification?.verification_score || 0} />
         </div>
+      </div>
 
-        {/* Onboarding Guide for new users */}
-        <OnboardingCompletionGuide />
+      {/* Onboarding Guide */}
+      <OnboardingCompletionGuide />
+      <CompatibilityPrompt />
 
-        {/* Compatibility Prompt for incomplete questionnaires */}
-        <CompatibilityPrompt />
-
-        {/* Quick Stats */}
+      {/* Statistics Section */}
+      <div className="bg-card rounded-lg border p-6">
+        <h2 className="text-xl font-semibold mb-4">Statistiques</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <User className="h-5 w-5 text-emerald" />
-                <div>
-                  <p className="text-sm font-medium">Profil</p>
-                  <p className="text-xs text-muted-foreground">
-                    {profile?.bio ? 'Complet' : 'À compléter'}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Heart className="h-5 w-5 text-gold" />
-                <div>
-                  <p className="text-sm font-medium">Préférences</p>
-                  <p className="text-xs text-muted-foreground">
-                    {islamicPrefs?.sect ? 'Configurées' : 'À configurer'}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate('/advanced-matching')}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Brain className="h-5 w-5 text-primary" />
-                <div>
-                  <p className="text-sm font-medium">Matching IA</p>
-                  <p className="text-xs text-muted-foreground">
-                    Système avancé
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <CompatibilityCard compact />
-        </div>
-
-        {/* Advanced Matching Features */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="h-5 w-5 text-primary" />
-              Système de Matching Avancé
-            </CardTitle>
+          <div className="p-4 bg-muted/30 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <User className="h-5 w-5 text-emerald" />
+              <span className="font-medium">Profil</span>
+            </div>
             <p className="text-sm text-muted-foreground">
-              Découvrez vos compatibilités avec notre IA spécialisée dans les valeurs islamiques
+              {profile?.bio ? 'Complet' : 'À compléter'}
             </p>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="border-2 border-primary/20 hover:border-primary/40 transition-colors cursor-pointer" onClick={() => navigate('/advanced-matching?tab=ai-engine')}>
-                <CardContent className="p-4 text-center">
-                  <Brain className="h-8 w-8 text-primary mx-auto mb-2" />
-                  <h3 className="font-semibold">Moteur IA</h3>
-                  <p className="text-xs text-muted-foreground">Analyse de compatibilité intelligente</p>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-2 border-emerald/20 hover:border-emerald/40 transition-colors cursor-pointer" onClick={() => navigate('/advanced-matching?tab=islamic-filters')}>
-                <CardContent className="p-4 text-center">
-                  <Target className="h-8 w-8 text-emerald mx-auto mb-2" />
-                  <h3 className="font-semibold">Filtres Islamiques</h3>
-                  <p className="text-xs text-muted-foreground">Critères religieux avancés</p>
-                </CardContent>
-              </Card>
-              
-              <Card className="border-2 border-gold/20 hover:border-gold/40 transition-colors cursor-pointer" onClick={() => navigate('/advanced-matching?tab=smart-recommendations')}>
-                <CardContent className="p-4 text-center">
-                  <Sparkles className="h-8 w-8 text-gold mx-auto mb-2" />
-                  <h3 className="font-semibold">Recommandations IA</h3>
-                  <p className="text-xs text-muted-foreground">Suggestions personnalisées</p>
-                </CardContent>
-              </Card>
+          </div>
+          
+          <div className="p-4 bg-muted/30 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Heart className="h-5 w-5 text-gold" />
+              <span className="font-medium">Préférences</span>
             </div>
-            
-            <div className="flex justify-center pt-2">
-              <Button 
-                onClick={() => navigate('/advanced-matching')}
-                className="bg-gradient-to-r from-primary via-primary-glow to-emerald-600 hover:from-primary-dark hover:via-primary hover:to-emerald-700 text-white"
-              >
-                <Brain className="h-4 w-4 mr-2" />
-                Accéder au Matching Avancé
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            <p className="text-sm text-muted-foreground">
+              {islamicPrefs?.sect ? 'Configurées' : 'À configurer'}
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+          <div className="p-4 bg-muted/30 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/advanced-matching')}>
+            <div className="flex items-center gap-2 mb-2">
+              <Brain className="h-5 w-5 text-primary" />
+              <span className="font-medium">Matching IA</span>
+            </div>
+            <p className="text-sm text-muted-foreground">Système avancé</p>
+          </div>
+
+          <div className="p-4 bg-muted/30 rounded-lg">
+            <CompatibilityCard compact />
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-card rounded-lg border p-6">
+        <h2 className="text-xl font-semibold mb-4">Actions rapides</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Button 
+            variant="outline" 
+            className="justify-start h-auto py-4"
+            onClick={() => navigate('/advanced-matching')}
+          >
+            <Brain className="h-5 w-5 mr-3" />
+            <div className="text-left">
+              <div className="font-medium">Matching Avancé</div>
+              <div className="text-xs text-muted-foreground">Analyse IA de compatibilité</div>
+            </div>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="justify-start h-auto py-4"
+            onClick={() => navigate('/browse')}
+          >
+            <Target className="h-5 w-5 mr-3" />
+            <div className="text-left">
+              <div className="font-medium">Découvrir</div>
+              <div className="text-xs text-muted-foreground">Parcourir les profils</div>
+            </div>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="justify-start h-auto py-4"
+            onClick={() => navigate('/compatibility-insights')}
+          >
+            <Sparkles className="h-5 w-5 mr-3" />
+            <div className="text-left">
+              <div className="font-medium">Mes Insights</div>
+              <div className="text-xs text-muted-foreground">Analyses personnalisées</div>
+            </div>
+          </Button>
+        </div>
+      </div>
+
+      {/* Profile Management Section */}
+      <div className="bg-card rounded-lg border p-6">
+        <h2 className="text-xl font-semibold mb-6">Gestion du Profil</h2>
+        
+        <div className="space-y-8">
           {/* Main Content */}
           <div className="xl:col-span-3 order-2 xl:order-1">
             <Tabs defaultValue="profile" className="space-y-6">

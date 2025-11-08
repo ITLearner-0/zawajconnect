@@ -24,55 +24,39 @@ const CompatibilityInsightsPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
-      <Header />
-      <main className="pt-20 pb-12">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              Vos Insights de Compatibilité
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Découvrez des analyses personnalisées basées sur vos réponses au test de compatibilité 
-              et recevez des conseils pour améliorer votre recherche de partenaire.
-            </p>
-          </div>
-          
-          <div className="space-y-6 xl:space-y-0 xl:grid xl:grid-cols-12 xl:gap-6">
-            <div className="xl:col-span-7">
-              <Tabs defaultValue="insights" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="insights" className="text-xs sm:text-sm px-2 sm:px-4">
-                    Insights Détaillés
-                  </TabsTrigger>
-                  <TabsTrigger value="gamification" className="text-xs sm:text-sm px-2 sm:px-4">
-                    Progression & Récompenses
-                  </TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="insights" className="mt-6">
-                  <CompatibilityInsights />
-                </TabsContent>
-                
-                <TabsContent value="gamification" className="mt-6">
-                  <GamifiedInsights />
-                </TabsContent>
-              </Tabs>
-            </div>
-            <div className="xl:col-span-5">
-              <div className="xl:sticky xl:top-24 xl:pl-2">
-                <CompatibilityAchievements 
-                  completionPercentage={100}
-                  insightsViewed={3}
-                  profilesVisited={7}
-                  guidanceRead={2}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </main>
-      <Footer />
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="bg-card rounded-lg border p-6">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
+          Mes Insights de Compatibilité
+        </h1>
+        <p className="text-muted-foreground">
+          Analyses personnalisées basées sur votre test de compatibilité
+        </p>
+      </div>
+
+      {/* Achievements Overview */}
+      <div className="bg-card rounded-lg border p-6">
+        <h2 className="text-xl font-semibold mb-4">Progression & Récompenses</h2>
+        <CompatibilityAchievements 
+          completionPercentage={100}
+          insightsViewed={3}
+          profilesVisited={7}
+          guidanceRead={2}
+        />
+      </div>
+
+      {/* Main Insights Section */}
+      <div className="bg-card rounded-lg border p-6">
+        <h2 className="text-xl font-semibold mb-4">Analyses Détaillées</h2>
+        <CompatibilityInsights />
+      </div>
+
+      {/* Gamified Section */}
+      <div className="bg-card rounded-lg border p-6">
+        <h2 className="text-xl font-semibold mb-4">Système de Progression</h2>
+        <GamifiedInsights />
+      </div>
     </div>
   );
 };

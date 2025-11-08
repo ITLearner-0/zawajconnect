@@ -643,49 +643,45 @@ const Browse = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
-      <div className="container mx-auto max-w-6xl">
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 py-6 space-y-6">
+        {/* Header */}
+        <div className="bg-card rounded-lg border p-6">
+          <h1 className="text-3xl font-bold text-foreground mb-2">Découvrir les Profils</h1>
+          <p className="text-muted-foreground">
+            Parcourez et connectez-vous avec des profils compatibles
+          </p>
+        </div>
+
         <DailyLimitIndicator />
         {isInActiveConversation && <ActiveConversationBanner matchId={activeMatchId} />}
         
-        {/* Selection Mode and View Toggle */}
-        <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        {/* Controls */}
+        <div className="flex flex-wrap items-center justify-between gap-4 bg-card rounded-lg border p-4">
           <div className="flex items-center gap-2">
             <Button
               variant={selectionMode ? "default" : "outline"}
               onClick={() => setSelectionMode(!selectionMode)}
-              className={selectionMode ? "bg-emerald text-white" : "border-emerald text-emerald hover:bg-emerald hover:text-white"}
             >
               <Users className="h-4 w-4 mr-2" />
-              {selectionMode ? "Mode sélection activé" : "Comparer des profils"}
+              {selectionMode ? "Mode sélection" : "Comparer"}
             </Button>
             
             <Button
               variant={viewMode === 'grid' ? "default" : "outline"}
-              onClick={() => {
-                setViewMode(viewMode === 'carousel' ? 'grid' : 'carousel');
-                if (viewMode === 'carousel') {
-                  setSelectionMode(true); // Auto-enable selection mode in grid view
-                }
-              }}
-              className={viewMode === 'grid' ? "bg-gold text-white" : "border-gold text-gold hover:bg-gold hover:text-white"}
+              onClick={() => setViewMode(viewMode === 'carousel' ? 'grid' : 'carousel')}
             >
               {viewMode === 'grid' ? <LayoutGrid className="h-4 w-4 mr-2" /> : <Grid3x3 className="h-4 w-4 mr-2" />}
-              {viewMode === 'grid' ? 'Mode grille' : 'Mode grille'}
+              {viewMode === 'grid' ? 'Grille' : 'Carousel'}
             </Button>
           </div>
           
           {selectionMode && selectedProfiles.length > 0 && (
             <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-sm">
-                {selectedProfiles.length} profil{selectedProfiles.length > 1 ? 's' : ''} sélectionné{selectedProfiles.length > 1 ? 's' : ''}
+              <Badge variant="secondary">
+                {selectedProfiles.length} sélectionné{selectedProfiles.length > 1 ? 's' : ''}
               </Badge>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearSelection}
-                className="text-muted-foreground"
-              >
+              <Button variant="ghost" size="sm" onClick={handleClearSelection}>
                 Annuler
               </Button>
             </div>
