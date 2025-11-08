@@ -56,15 +56,15 @@ const islamicValues: Value[] = [
 
 const IslamicValues = () => {
   return (
-    <section id="valeurs" className="py-12 bg-gradient-to-br from-background via-sage/5 to-cream/10">
+    <section id="valeurs" className="py-12 bg-background border-y border-border">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-200 mb-6">
-            <Building2 className="w-5 h-5 text-emerald-600" />
-            <span className="text-emerald-700 font-medium">Fondation Islamique</span>
+          <div className="inline-flex items-center gap-2 bg-muted px-4 py-2 rounded border border-border mb-6">
+            <Building2 className="w-5 h-5 text-primary" />
+            <span className="text-foreground font-medium">Fondation Islamique</span>
           </div>
           
-          <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-sage-700 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold mb-6 text-foreground">
             Fondé sur les Valeurs Islamiques
           </h2>
           
@@ -76,15 +76,14 @@ const IslamicValues = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {islamicValues.map((value, index) => (
+          {islamicValues.map((value) => (
             <Card 
               key={value.id} 
-              className="relative overflow-hidden border-0 shadow-lg card-hover animate-fade-in group bg-card/80 backdrop-blur-sm"
-              style={{ animationDelay: `${index * 0.1}s` }}
+              className="border border-border bg-card"
             >
               <CardContent className="p-8">
                 <div className="flex flex-col items-center text-center">
-                  <div className="mb-6 p-4 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md group-hover:shadow-lg transition-smooth group-hover:animate-float">
+                  <div className="mb-6 p-4 rounded-full bg-muted">
                     {value.icon}
                   </div>
                   
@@ -97,27 +96,24 @@ const IslamicValues = () => {
                   </p>
                   
                   {value.verse && (
-                    <blockquote className="text-sm text-emerald-600 font-medium italic text-center border-t border-emerald-100 pt-4 leading-relaxed animate-fade-in" style={{ animationDelay: `${index * 0.1 + 0.3}s` }}>
+                    <blockquote className="text-sm text-primary font-medium italic text-center border-t border-border pt-4 leading-relaxed">
                       "{value.verse}"
                     </blockquote>
                   )}
                 </div>
               </CardContent>
-              
-              {/* Decorative gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-emerald-50/20 opacity-0 group-hover:opacity-100 transition-smooth pointer-events-none" />
             </Card>
           ))}
         </div>
 
         <div className="text-center mt-12">
           <div className="max-w-4xl mx-auto">
-            <div className="bg-gradient-to-r from-emerald-50 to-sage-50 rounded-2xl p-8 border border-emerald-200">
-              <Building2 className="w-12 h-12 text-emerald-600 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-emerald-700 mb-4">
+            <div className="bg-muted rounded border border-border p-8">
+              <Building2 className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-foreground mb-4">
                 "Et Allah a créé pour vous, à partir de vous-mêmes, des conjoints"
               </h3>
-              <p className="text-emerald-600 font-medium">
+              <p className="text-muted-foreground font-medium">
                 Coran 16:72 • Rejoignez-nous en suivant les conseils d'Allah pour le mariage
               </p>
             </div>
