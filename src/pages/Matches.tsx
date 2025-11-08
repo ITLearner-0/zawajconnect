@@ -256,8 +256,8 @@ const Matches = () => {
   }
 
   return (
-    <div className="py-8 px-4">
-      <div className="container mx-auto">
+    <div className="py-8 px-4 overflow-x-hidden max-w-full w-full">
+      <div className="container mx-auto max-w-full w-full">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
             <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">

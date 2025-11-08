@@ -19,7 +19,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
     return (
       <>
         <Header />
-        <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5">
+        <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 overflow-x-hidden max-w-full">
           {children}
         </div>
       </>
@@ -27,12 +27,12 @@ const AppLayout = ({ children }: AppLayoutProps) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream via-sage/20 to-emerald/5 overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-cream via-sage/20 to-emerald/5 overflow-x-hidden max-w-full w-full">
       <Header />
       
       {/* Main content area with traditional centered layout */}
-      <main className="flex-1 overflow-x-hidden">
-        <div className="container mx-auto px-4 py-8 max-w-7xl max-w-full">
+      <main className="flex-1 overflow-x-hidden w-full max-w-full">
+        <div className="container mx-auto px-4 py-8 max-w-7xl w-full">
           {children}
         </div>
       </main>

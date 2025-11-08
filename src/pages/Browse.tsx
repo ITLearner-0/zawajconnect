@@ -648,10 +648,10 @@ const Browse = () => {
   }
 
   return (
-    <div className="min-h-screen">
-      <div className="container mx-auto px-4 py-6 space-y-6">
+    <div className="min-h-screen overflow-x-hidden max-w-full w-full">
+      <div className="container mx-auto px-4 py-6 space-y-6 max-w-full w-full">
         {/* Header */}
-        <div className="bg-card rounded-lg border p-6">
+        <div className="bg-card rounded-lg border p-6 max-w-full overflow-x-hidden w-full">
           <h1 className="text-3xl font-bold text-foreground mb-2">Découvrir les Profils</h1>
           <p className="text-muted-foreground">
             Parcourez et connectez-vous avec des profils compatibles
@@ -693,9 +693,9 @@ const Browse = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-full w-full">
           {/* Advanced Search - Toggle on mobile */}
-          <div className="lg:hidden">
+          <div className="lg:hidden max-w-full w-full">
             <Button
               onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
               variant="outline"
@@ -711,7 +711,7 @@ const Browse = () => {
           </div>
 
           {/* Main Content Area */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 max-w-full overflow-x-hidden w-full">
             {viewMode === 'carousel' ? (
               /* Carousel Mode - Swipeable on Mobile, Traditional on Desktop */
               isMobile ? (
