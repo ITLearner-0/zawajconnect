@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import { ConversationStatusBadge } from '@/components/ui/ConversationStatusBadge';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { MatchCard } from '@/components/MatchCard';
 
 interface Match {
   id: string;
@@ -35,6 +37,7 @@ interface Match {
 const Matches = () => {
   const { user, subscription, checkSubscription, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [matches, setMatches] = useState<Match[]>([]);
   const [mutualMatches, setMutualMatches] = useState<Match[]>([]);
   const [pendingMatches, setPendingMatches] = useState<Match[]>([]);
@@ -281,8 +284,23 @@ const Matches = () => {
             <TabsContent value="mutual" className="space-y-4">
               {mutualMatches.length > 0 ? (
                 <>
-                <div className="border rounded-lg overflow-x-auto max-w-full">
-                  <Table className="min-w-full">
+                {/* Mobile View - Cards */}
+                {isMobile ? (
+                  <div className="space-y-3">
+                    {sortMatches(mutualMatches).slice((mutualPage - 1) * matchesPerPage, mutualPage * matchesPerPage).map((match) => (
+                      <MatchCard
+                        key={match.id}
+                        match={match}
+                        statusBadge={getStatusBadge(match)}
+                        onViewProfile={viewProfile}
+                        onStartChat={startChat}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  /* Desktop View - Table */
+                  <div className="border rounded-lg overflow-x-auto max-w-full">
+                    <Table className="min-w-full">
                     <TableHeader>
                       <TableRow className="bg-muted/50">
                         <TableHead className="w-16">Photo</TableHead>
@@ -378,6 +396,7 @@ const Matches = () => {
                     </TableBody>
                   </Table>
                 </div>
+                )}
 
                 {/* Pagination for Mutual Matches */}
                 {mutualMatches.length > matchesPerPage && (
@@ -446,8 +465,23 @@ const Matches = () => {
             <TabsContent value="pending" className="space-y-4">
               {pendingMatches.length > 0 ? (
                 <>
-                <div className="border rounded-lg overflow-x-auto max-w-full">
-                  <Table className="min-w-full">
+                {/* Mobile View - Cards */}
+                {isMobile ? (
+                  <div className="space-y-3">
+                    {sortMatches(pendingMatches).slice((pendingPage - 1) * matchesPerPage, pendingPage * matchesPerPage).map((match) => (
+                      <MatchCard
+                        key={match.id}
+                        match={match}
+                        statusBadge={getStatusBadge(match)}
+                        onViewProfile={viewProfile}
+                        onStartChat={startChat}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  /* Desktop View - Table */
+                  <div className="border rounded-lg overflow-x-auto max-w-full">
+                    <Table className="min-w-full">
                     <TableHeader>
                       <TableRow className="bg-muted/50">
                         <TableHead className="w-16">Photo</TableHead>
@@ -543,6 +577,7 @@ const Matches = () => {
                     </TableBody>
                   </Table>
                 </div>
+                )}
 
                 {/* Pagination for Pending Matches */}
                 {pendingMatches.length > matchesPerPage && (

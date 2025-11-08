@@ -26,6 +26,8 @@ import ProfileComparator from '@/components/ProfileComparator';
 import ProfileNoteCard from '@/components/ProfileNoteCard';
 import { useFavorites } from '@/hooks/useFavorites';
 import NotesSearchFilter from '@/components/NotesSearchFilter';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { BrowseProfileCard } from '@/components/BrowseProfileCard';
 
 interface MatchingProfile {
   id?: string;
@@ -68,6 +70,7 @@ const Browse = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { toggleFavorite, isFavorite } = useFavorites();
+  const isMobile = useIsMobile();
   const [profiles, setProfiles] = useState<MatchingProfile[]>([]);
   const [filteredProfiles, setFilteredProfiles] = useState<MatchingProfile[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -903,9 +906,28 @@ const Browse = () => {
                   </div>
                 </div>
 
-                 {/* Profiles Table */}
-                <div className="border rounded overflow-x-auto max-w-full">
-                  <table className="w-full min-w-full">
+                 {/* Profiles Table/Cards */}
+                {isMobile ? (
+                  /* Mobile View - Cards */
+                  <div className="space-y-3">
+                    {gridProfiles.map((profile) => (
+                      <BrowseProfileCard
+                        key={profile.user_id}
+                        profile={profile}
+                        selectionMode={selectionMode}
+                        isSelected={selectedProfiles.includes(profile.user_id)}
+                        isFavorite={isFavorite(profile.user_id)}
+                        onToggleSelection={toggleProfileSelection}
+                        onToggleFavorite={toggleFavorite}
+                        onViewDetails={(userId) => navigate(`/profile/${userId}`)}
+                        onLike={handleLike}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  /* Desktop View - Table */
+                  <div className="border rounded overflow-x-auto max-w-full">
+                    <table className="w-full min-w-full">
                     <thead className="bg-muted/30 border-b">
                       <tr>
                         <th className="text-left p-3 text-sm font-semibold">Photo</th>
@@ -1038,6 +1060,7 @@ const Browse = () => {
                     </div>
                   )}
                 </div>
+                )}
 
                 {/* Traditional Pagination */}
                 <Pagination>
