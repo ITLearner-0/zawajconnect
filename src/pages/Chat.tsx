@@ -63,39 +63,35 @@ const Chat = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/30 to-primary/5 p-4">
-      <div className="container mx-auto max-w-6xl">
+    <div className="min-h-screen bg-background p-4">
+      <div className="container mx-auto max-w-7xl">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-4 pb-4 border-b">
           <Button
             variant="ghost"
             onClick={() => navigate('/matches')}
-            className="hover:bg-accent"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Retour aux matches
+            Retour
           </Button>
-          <div className="flex items-center gap-2">
-            <MessageCircle className="h-6 w-6 text-primary" />
-            <h1 className="text-2xl font-bold text-foreground">Messages</h1>
-          </div>
+          <h1 className="text-xl font-semibold text-foreground">Messages</h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-12rem)]">
-          {/* Chat List */}
-          <div className="lg:col-span-1">
+        <div className="flex gap-4 h-[calc(100vh-10rem)]">
+          {/* Chat List - 30% */}
+          <div className="w-[30%] border-r pr-4">
             <ChatList 
               onChatSelect={handleChatSelect}
               selectedChatId={selectedChatId}
             />
           </div>
 
-          {/* Chat Window */}
-          <div className="lg:col-span-2">
+          {/* Chat Window - 70% */}
+          <div className="flex-1">
             {selectedChatId ? (
               <ChatWindow matchId={selectedChatId} />
             ) : (
-              <Card className="h-full flex items-center justify-center">
+              <div className="h-full flex items-center justify-center border rounded-lg bg-muted/20">
                 <div className="text-center p-6">
                   <MessageCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
                   <h3 className="text-lg font-semibold mb-2">
@@ -105,7 +101,7 @@ const Chat = () => {
                     Choisissez une conversation dans la liste pour commencer à discuter
                   </p>
                 </div>
-              </Card>
+              </div>
             )}
           </div>
         </div>

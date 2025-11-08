@@ -31,16 +31,16 @@ export const MessageBubble = ({ message, isMyMessage }: MessageBubbleProps) => {
   };
 
   return (
-    <div className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex mb-3 ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+        className={`max-w-[70%] px-3 py-2 rounded-lg ${
           isMyMessage
             ? 'bg-primary text-primary-foreground'
             : 'bg-muted text-foreground'
         }`}
       >
-        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
-        <div className={`flex items-center justify-between text-xs mt-1 ${
+        <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
+        <div className={`flex items-center gap-2 text-xs mt-1 ${
           isMyMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
         }`}>
           <span>{formatMessageTime(message.created_at)}</span>

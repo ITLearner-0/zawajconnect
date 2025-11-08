@@ -149,128 +149,113 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
 
   if (loading) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-2">
         {[...Array(5)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-4">
-                <div className="h-12 w-12 bg-muted rounded-full"></div>
-                <div className="flex-1 space-y-2">
-                  <div className="h-4 bg-muted rounded w-3/4"></div>
-                  <div className="h-3 bg-muted rounded w-1/2"></div>
-                </div>
+          <div key={i} className="border-b p-3 animate-pulse">
+            <div className="flex items-center space-x-3">
+              <div className="h-10 w-10 bg-muted rounded-full"></div>
+              <div className="flex-1 space-y-2">
+                <div className="h-3 bg-muted rounded w-3/4"></div>
+                <div className="h-2 bg-muted rounded w-1/2"></div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
-            Mes Conversations
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Rechercher une conversation..."
-              className="pl-10"
-            />
-          </div>
-        </CardContent>
-      </Card>
+    <div className="h-full flex flex-col">
+      {/* Search */}
+      <div className="mb-4">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Rechercher..."
+            className="pl-10"
+          />
+        </div>
+      </div>
 
-      {filteredChats.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-center">
-            <MessageCircle className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Aucune conversation</h3>
-            <p className="text-muted-foreground mb-4">
-              Vous n'avez pas encore de conversations actives. 
-              Commencez par découvrir des profils et créer des matches mutuels.
+      {/* Conversations List */}
+      <div className="flex-1 overflow-y-auto">
+        {filteredChats.length === 0 ? (
+          <div className="text-center py-8">
+            <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+            <p className="text-sm font-medium mb-1">Aucune conversation</p>
+            <p className="text-xs text-muted-foreground">
+              Créez des matches pour démarrer
             </p>
-            <Button className="bg-primary hover:bg-primary/90">
-              Découvrir des profils
-            </Button>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="space-y-2">
-          {filteredChats.map((chat) => (
-            <Card
-              key={chat.match_id}
-              className={`cursor-pointer transition-colors hover:bg-accent/50 ${
-                selectedChatId === chat.match_id ? 'ring-2 ring-primary' : ''
-              }`}
-              onClick={() => onChatSelect(chat.match_id)}
-            >
-              <CardContent className="p-4">
-                <div className="flex items-center space-x-4">
+          </div>
+        ) : (
+          <div>
+            {filteredChats.map((chat) => (
+              <div
+                key={chat.match_id}
+                className={`border-b p-3 cursor-pointer hover:bg-muted/50 transition-colors ${
+                  selectedChatId === chat.match_id ? 'bg-muted' : ''
+                }`}
+                onClick={() => onChatSelect(chat.match_id)}
+              >
+                <div className="flex items-center space-x-3">
                   <div className="relative">
                     {chat.other_user.avatar_url ? (
                       <img 
                         src={chat.other_user.avatar_url}
                         alt={chat.other_user.full_name}
-                        className="h-12 w-12 rounded-full object-cover"
+                        className="h-10 w-10 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="h-12 w-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center">
-                        <User className="h-6 w-6 text-primary-foreground" />
+                      <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center">
+                        <User className="h-5 w-5 text-primary-foreground" />
                       </div>
                     )}
                     {chat.unread_count > 0 && (
-                      <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 flex items-center justify-center bg-destructive text-destructive-foreground text-xs">
+                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-xs flex items-center justify-center font-semibold">
                         {chat.unread_count > 9 ? '9+' : chat.unread_count}
-                      </Badge>
+                      </span>
                     )}
                   </div>
                   
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
-                      <h4 className="font-semibold text-foreground truncate">
+                      <h4 className="text-sm font-semibold text-foreground truncate">
                         {chat.other_user.full_name}
                       </h4>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="text-xs bg-primary/10 text-primary border-primary/20">
-                          {chat.match_score}%
-                        </Badge>
-                        {chat.last_message && (
-                          <span className="text-xs text-muted-foreground">
-                            {formatDistanceToNow(new Date(chat.last_message.created_at), { 
-                              addSuffix: true,
-                              locale: fr 
-                            })}
-                          </span>
-                        )}
-                      </div>
+                      {chat.last_message && (
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(chat.last_message.created_at), { 
+                            addSuffix: true,
+                            locale: fr 
+                          })}
+                        </span>
+                      )}
                     </div>
                     
                     {chat.last_message ? (
-                      <p className="text-sm text-muted-foreground truncate">
+                      <p className="text-xs text-muted-foreground truncate">
                         {chat.last_message.sender_id === user?.id ? 'Vous: ' : ''}
                         {chat.last_message.content}
                       </p>
                     ) : (
-                      <p className="text-sm text-muted-foreground italic">
-                        Commencez la conversation...
+                      <p className="text-xs text-muted-foreground italic">
+                        Nouvelle conversation
                       </p>
                     )}
                   </div>
+                  
+                  <span className="text-xs bg-muted px-2 py-1 rounded">
+                    {chat.match_score}%
+                  </span>
                 </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

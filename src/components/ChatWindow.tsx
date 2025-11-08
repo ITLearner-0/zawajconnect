@@ -115,7 +115,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   }
 
   return (
-    <div className="flex flex-col h-full max-h-[600px] bg-background rounded-lg border shadow-lg">
+    <div className="flex flex-col h-full bg-background rounded-lg border">
       {!canCommunicate ? (
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="text-center max-w-md">
@@ -131,7 +131,8 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
         </div>
       ) : (
         <>
-          <div className="flex items-center justify-between border-b p-4">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b p-3 bg-muted/30">
             <ChatHeader
               match={match}
               isOnline={isUserOnline(match.other_user.id)}
@@ -142,23 +143,22 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
               variant="ghost"
               size="sm"
               onClick={() => setShowEndDialog(true)}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10"
+              className="text-destructive hover:bg-destructive/10"
             >
-              <X className="h-4 w-4 mr-2" />
-              Mettre fin à l'échange
+              Mettre fin
             </Button>
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          <div className="flex-1 overflow-y-auto p-4 bg-background">
             {messages.length === 0 ? (
-              <div className="text-center py-8">
-                <Heart className="h-12 w-12 mx-auto text-primary/50 mb-4" />
-                <p className="text-muted-foreground">
-                  C'est le début de votre conversation ! 
+              <div className="text-center py-12">
+                <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                <p className="text-sm text-muted-foreground">
+                  Début de conversation
                 </p>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Présentez-vous et commencez à faire connaissance de manière respectueuse.
+                <p className="text-xs text-muted-foreground mt-1">
+                  Présentez-vous de manière respectueuse
                 </p>
               </div>
             ) : (
@@ -177,27 +177,27 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
           </div>
 
           {/* Islamic Reminder */}
-          <div className="px-4 py-2 bg-gradient-to-r from-secondary/10 to-primary/10 border-t border-border/50">
+          <div className="px-4 py-2 bg-muted/50 border-t">
             <p className="text-xs text-center text-muted-foreground">
               💝 Rappel : Communiquez avec respect et selon les valeurs islamiques
             </p>
           </div>
 
           {/* Message Input */}
-          <div className="border-t p-4">
+          <div className="border-t p-3 bg-background">
             <div className="flex items-center gap-2">
               <Input
                 value={newMessage}
                 onChange={handleInputChange}
                 onKeyPress={handleKeyPress}
-                placeholder={canCommunicate ? "Écrivez votre message..." : "Configuration familiale requise"}
+                placeholder="Écrivez votre message..."
                 disabled={sending || !canCommunicate}
                 className="flex-1"
               />
               <Button 
                 onClick={handleSendMessage}
                 disabled={!newMessage.trim() || sending || !canCommunicate}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                size="icon"
               >
                 {sending ? (
                   <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent"></div>
