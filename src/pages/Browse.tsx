@@ -28,6 +28,7 @@ import { useFavorites } from '@/hooks/useFavorites';
 import NotesSearchFilter from '@/components/NotesSearchFilter';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { BrowseProfileCard } from '@/components/BrowseProfileCard';
+import { SwipeableProfileCard } from '@/components/SwipeableProfileCard';
 
 interface MatchingProfile {
   id?: string;
@@ -712,8 +713,32 @@ const Browse = () => {
           {/* Main Content Area */}
           <div className="lg:col-span-2">
             {viewMode === 'carousel' ? (
-              /* Carousel Mode - Original Single Profile View */
-              <div className="border rounded overflow-hidden">
+              /* Carousel Mode - Swipeable on Mobile, Traditional on Desktop */
+              isMobile ? (
+                /* Mobile: Swipeable Card */
+                <div className="h-[calc(100vh-12rem)] relative">
+                  {filteredProfiles.length > 0 && currentProfile ? (
+                    <SwipeableProfileCard
+                      profile={currentProfile}
+                      onSwipeLeft={handlePass}
+                      onSwipeRight={() => handleLike(currentProfile.user_id)}
+                      onDoubleTap={() => navigate(`/profile/${currentProfile.user_id}`)}
+                    />
+                  ) : (
+                    <Card className="h-full flex items-center justify-center">
+                      <CardContent className="text-center">
+                        <User className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                        <h3 className="text-lg font-semibold mb-2">Plus de profils</h3>
+                        <p className="text-sm text-muted-foreground">
+                          Revenez plus tard pour découvrir de nouveaux profils
+                        </p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              ) : (
+                /* Desktop: Traditional Carousel */
+                <div className="border rounded overflow-hidden">
               <div className="relative">
                 {/* Selection Checkbox */}
                 {selectionMode && (
@@ -888,6 +913,7 @@ const Browse = () => {
         </div>
               </div>
               </div>
+              )
             ) : (
               /* Grid Mode - Multiple Profiles View */
               <div className="space-y-6">
