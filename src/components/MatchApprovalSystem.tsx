@@ -408,7 +408,7 @@ const MatchApprovalSystem = () => {
                         </DialogHeader>
                         
                         <Tabs defaultValue="profiles" className="space-y-6">
-                          <ResponsiveTabsList tabCount={3>
+                          <ResponsiveTabsList tabCount={3}>
                             <TabsTrigger value="profiles">Profils</TabsTrigger>
                             <TabsTrigger value="compatibility">Compatibilité</TabsTrigger>
                             <TabsTrigger value="review">Évaluation</TabsTrigger>

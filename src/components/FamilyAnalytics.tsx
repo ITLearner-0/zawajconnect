@@ -303,7 +303,7 @@ const FamilyAnalytics: React.FC = () => {
 
       {/* Charts */}
       <Tabs defaultValue="moderation" className="space-y-6">
-        <ResponsiveTabsList tabCount={4>
+        <ResponsiveTabsList tabCount={4}>
           <TabsTrigger value="moderation">Modération</TabsTrigger>
           <TabsTrigger value="approvals">Approbations</TabsTrigger>
           <TabsTrigger value="activity">Activité</TabsTrigger>
