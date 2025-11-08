@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Heart, X, MapPin, GraduationCap, Briefcase, User, Info } from 'lucide-react';
 import VerificationBadge from '@/components/VerificationBadge';
+import { hapticLight, hapticMedium, hapticSuccess, hapticImpact } from '@/utils/haptics';
 
 interface SwipeableProfileCardProps {
   profile: {
@@ -41,6 +42,7 @@ export const SwipeableProfileCard = ({
   const handleStart = (clientX: number, clientY: number) => {
     setIsDragging(true);
     setStartPosition({ x: clientX, y: clientY });
+    hapticLight(); // Light vibration on touch start
   };
 
   const handleMove = (clientX: number, clientY: number) => {
@@ -58,6 +60,13 @@ export const SwipeableProfileCard = ({
 
     // Check if swipe threshold is met
     if (Math.abs(position.x) > SWIPE_THRESHOLD) {
+      // Haptic feedback for successful swipe
+      if (position.x > 0) {
+        hapticSuccess(); // Success pattern for like
+      } else {
+        hapticMedium(); // Medium vibration for pass
+      }
+      
       // Animate out
       setIsAnimatingOut(true);
       const direction = position.x > 0 ? 1 : -1;
@@ -74,6 +83,10 @@ export const SwipeableProfileCard = ({
         setPosition({ x: 0, y: 0 });
       }, 200);
     } else {
+      // Light haptic for return to center
+      if (Math.abs(position.x) > 20) {
+        hapticLight();
+      }
       // Return to center
       setPosition({ x: 0, y: 0 });
     }
@@ -85,9 +98,10 @@ export const SwipeableProfileCard = ({
     if (!touch) return;
     handleStart(touch.clientX, touch.clientY);
     
-    // Double tap detection
+    // Double tap detection with haptic
     const now = Date.now();
     if (now - lastTap < 300 && onDoubleTap) {
+      hapticMedium(); // Haptic for double tap
       onDoubleTap();
     }
     setLastTap(now);
@@ -120,6 +134,7 @@ export const SwipeableProfileCard = ({
   // Button handlers
   const handleLikeButton = () => {
     if (isAnimatingOut) return;
+    hapticSuccess(); // Success haptic for like button
     setIsAnimatingOut(true);
     setPosition({ x: window.innerWidth, y: 0 });
     setTimeout(() => {
@@ -131,6 +146,7 @@ export const SwipeableProfileCard = ({
 
   const handlePassButton = () => {
     if (isAnimatingOut) return;
+    hapticMedium(); // Medium haptic for pass button
     setIsAnimatingOut(true);
     setPosition({ x: -window.innerWidth, y: 0 });
     setTimeout(() => {
@@ -138,6 +154,13 @@ export const SwipeableProfileCard = ({
       setIsAnimatingOut(false);
       setPosition({ x: 0, y: 0 });
     }, 200);
+  };
+
+  const handleInfoButton = () => {
+    hapticLight(); // Light haptic for info button
+    if (onDoubleTap) {
+      onDoubleTap();
+    }
   };
 
   const rotation = position.x * ROTATION_MULTIPLIER;
@@ -280,7 +303,7 @@ export const SwipeableProfileCard = ({
         {/* Info Button */}
         {onDoubleTap && (
           <Button
-            onClick={onDoubleTap}
+            onClick={handleInfoButton}
             disabled={isAnimatingOut}
             size="lg"
             variant="outline"
