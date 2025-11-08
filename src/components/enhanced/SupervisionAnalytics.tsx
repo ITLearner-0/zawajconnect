@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   TrendingUp, 
@@ -454,12 +455,12 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
 
       {/* Detailed Analytics */}
       <Tabs defaultValue="activity" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <ResponsiveTabsList tabCount={4}>
           <TabsTrigger value="activity">Activité</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="users">Utilisateurs</TabsTrigger>
           <TabsTrigger value="trends">Tendances</TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         {/* Message Activity */}
         <TabsContent value="activity" className="space-y-6">

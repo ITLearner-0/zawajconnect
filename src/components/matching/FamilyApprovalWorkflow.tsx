@@ -8,7 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Shield, Heart, Users, Clock, CheckCircle, XCircle, MessageSquare, Star, MapPin, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -289,7 +290,7 @@ const FamilyApprovalWorkflow = () => {
 
       {/* Approval Workflow Tabs */}
       <Tabs defaultValue="pending" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <ResponsiveTabsList tabCount={3}>
           <TabsTrigger value="pending" className="flex items-center gap-2">
             <Clock className="h-4 w-4" />
             En Attente ({pendingMatches.length})
@@ -302,7 +303,7 @@ const FamilyApprovalWorkflow = () => {
             <MessageSquare className="h-4 w-4" />
             Avis Famille ({familyReviews.length})
           </TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         <TabsContent value="pending" className="space-y-4">
           {pendingMatches.length === 0 ? (

@@ -3,7 +3,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Brain, Sparkles, Target, TrendingUp } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { useSmartRecommendations } from '@/hooks/useSmartRecommendations';
@@ -80,7 +81,7 @@ const SmartRecommendationEngine = (): JSX.Element => {
       {/* Results */}
       {recommendations.length > 0 && (
         <Tabs defaultValue="recommendations" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <ResponsiveTabsList tabCount={2}>
             <TabsTrigger value="recommendations" className="flex items-center gap-2">
               <Target className="h-4 w-4" />
               Recommandations ({recommendations.length})
@@ -89,7 +90,7 @@ const SmartRecommendationEngine = (): JSX.Element => {
               <TrendingUp className="h-4 w-4" />
               Insights ({insights.length})
             </TabsTrigger>
-          </TabsList>
+          </ResponsiveTabsList>
 
           <TabsContent value="recommendations" className="space-y-4">
             <div className="grid gap-6 md:grid-cols-2">

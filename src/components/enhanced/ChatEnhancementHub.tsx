@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useFamilySupervision } from '@/hooks/useFamilySupervision';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
@@ -180,7 +181,7 @@ const ChatEnhancementHub: React.FC<ChatEnhancementHubProps> = ({ matchId, onClos
       {/* Main Content */}
       <div className="flex-1 overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-          <TabsList className="grid w-full grid-cols-4 bg-muted/50">
+          <ResponsiveTabsList tabCount={4} className="bg-muted/50">
             <TabsTrigger value="chat" className="flex items-center gap-2">
               <MessageCircle className="h-4 w-4" />
               <span className="hidden sm:inline">Chat</span>
@@ -199,7 +200,7 @@ const ChatEnhancementHub: React.FC<ChatEnhancementHubProps> = ({ matchId, onClos
               <Star className="h-4 w-4" />
               <span className="hidden sm:inline">Outils</span>
             </TabsTrigger>
-          </TabsList>
+          </ResponsiveTabsList>
 
           <div className="flex-1 overflow-hidden">
             <TabsContent value="chat" className="h-full m-0">

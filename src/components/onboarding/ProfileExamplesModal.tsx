@@ -9,7 +9,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { User, Heart, Star, CheckCircle, Trophy } from 'lucide-react';
 
 interface ProfileExample {
@@ -112,7 +113,7 @@ const ProfileExamplesModal: React.FC<ProfileExamplesModalProps> = ({
         </DialogHeader>
 
         <Tabs value={selectedExample} onValueChange={setSelectedExample} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <ResponsiveTabsList tabCount={3}>
             <TabsTrigger value="excellent" className="flex items-center gap-1">
               <Trophy className="h-3 w-3" />
               <span className="hidden sm:inline">Excellent</span>
@@ -125,7 +126,7 @@ const ProfileExamplesModal: React.FC<ProfileExamplesModalProps> = ({
               <User className="h-3 w-3" />
               <span className="hidden sm:inline">À améliorer</span>
             </TabsTrigger>
-          </TabsList>
+          </ResponsiveTabsList>
 
           <TabsContent value={selectedExample} className="mt-4 space-y-4">
             {/* Score Badge */}

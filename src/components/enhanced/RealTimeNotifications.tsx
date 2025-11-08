@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
   Bell, 
@@ -316,7 +317,7 @@ const RealTimeNotifications: React.FC<RealTimeNotificationsProps> = ({
 
           {/* Filter Tabs */}
           <Tabs value={activeFilter} onValueChange={(value) => setActiveFilter(value as any)} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <ResponsiveTabsList tabCount={3}>
               <TabsTrigger value="all">
                 Toutes ({notifications.length})
               </TabsTrigger>
@@ -328,7 +329,7 @@ const RealTimeNotifications: React.FC<RealTimeNotificationsProps> = ({
                 Critiques ({criticalCount})
                 {criticalCount > 0 && <div className="ml-2 h-2 w-2 bg-red-500 rounded-full animate-pulse"></div>}
               </TabsTrigger>
-            </TabsList>
+            </ResponsiveTabsList>
 
             <TabsContent value={activeFilter} className="space-y-3 mt-4">
               {filteredNotifications.length === 0 ? (

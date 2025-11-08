@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import CompatibilityQuestionnaire from '@/components/CompatibilityQuestionnaire';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -177,7 +178,7 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <ResponsiveTabsList tabCount={4}>
             <TabsTrigger value="questionnaire" className="flex items-center gap-2">
               <Heart className="h-4 w-4" />
               Questionnaire
@@ -194,7 +195,7 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
               <Target className="h-4 w-4" />
               Recommandations
             </TabsTrigger>
-          </TabsList>
+          </ResponsiveTabsList>
 
           <TabsContent value="questionnaire" className="space-y-0">
             <CompatibilityQuestionnaire 
