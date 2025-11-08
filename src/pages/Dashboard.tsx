@@ -240,7 +240,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-6 p-4 max-w-full overflow-hidden">
       {/* Header Section */}
       <div className="border rounded p-4">
         <div className="flex items-start justify-between">
@@ -259,9 +259,9 @@ const Dashboard = () => {
       <CompatibilityPrompt />
 
       {/* Statistics Section */}
-      <div className="border rounded p-4">
+      <div className="border rounded p-4 max-w-full overflow-hidden">
         <h2 className="text-lg font-semibold mb-4 pb-2 border-b">Statistiques</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 overflow-x-auto">
           <div className="p-3 border rounded">
             <div className="flex items-center gap-2 mb-2">
               <User className="h-4 w-4 text-primary" />
@@ -297,9 +297,9 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="border rounded p-4">
+      <div className="border rounded p-4 max-w-full overflow-hidden">
         <h2 className="text-lg font-semibold mb-4 pb-2 border-b">Actions rapides</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 overflow-x-auto">
           <Button 
             variant="outline" 
             className="justify-start py-3"
@@ -339,7 +339,7 @@ const Dashboard = () => {
       </div>
 
       {/* Profile Management Section */}
-      <div className="border rounded p-4">
+      <div className="border rounded p-4 max-w-full overflow-hidden">
         <h2 className="text-lg font-semibold mb-4 pb-2 border-b">Gestion du Profil</h2>
         
         <div className="space-y-6">

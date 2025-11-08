@@ -281,8 +281,8 @@ const Matches = () => {
             <TabsContent value="mutual" className="space-y-4">
               {mutualMatches.length > 0 ? (
                 <>
-                <div className="border rounded-lg overflow-hidden">
-                  <Table>
+                <div className="border rounded-lg overflow-x-auto max-w-full">
+                  <Table className="min-w-full">
                     <TableHeader>
                       <TableRow className="bg-muted/50">
                         <TableHead className="w-16">Photo</TableHead>
@@ -328,9 +328,9 @@ const Matches = () => {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div>
-                              <div className="font-medium text-foreground">{match.other_user?.full_name}</div>
-                              <div className="text-sm text-muted-foreground">
+                            <div className="max-w-[200px]">
+                              <div className="font-medium text-foreground truncate">{match.other_user?.full_name}</div>
+                              <div className="text-sm text-muted-foreground truncate">
                                 {match.other_user?.age} ans • {match.other_user?.location}
                               </div>
                             </div>
@@ -446,8 +446,8 @@ const Matches = () => {
             <TabsContent value="pending" className="space-y-4">
               {pendingMatches.length > 0 ? (
                 <>
-                <div className="border rounded-lg overflow-hidden">
-                  <Table>
+                <div className="border rounded-lg overflow-x-auto max-w-full">
+                  <Table className="min-w-full">
                     <TableHeader>
                       <TableRow className="bg-muted/50">
                         <TableHead className="w-16">Photo</TableHead>
@@ -493,9 +493,9 @@ const Matches = () => {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div>
-                              <div className="font-medium text-foreground">{match.other_user?.full_name}</div>
-                              <div className="text-sm text-muted-foreground">
+                            <div className="max-w-[200px]">
+                              <div className="font-medium text-foreground truncate">{match.other_user?.full_name}</div>
+                              <div className="text-sm text-muted-foreground truncate">
                                 {match.other_user?.age} ans • {match.other_user?.location}
                               </div>
                             </div>

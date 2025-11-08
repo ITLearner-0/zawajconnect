@@ -904,8 +904,8 @@ const Browse = () => {
                 </div>
 
                  {/* Profiles Table */}
-                <div className="border rounded overflow-hidden">
-                  <table className="w-full">
+                <div className="border rounded overflow-x-auto max-w-full">
+                  <table className="w-full min-w-full">
                     <thead className="bg-muted/30 border-b">
                       <tr>
                         <th className="text-left p-3 text-sm font-semibold">Photo</th>
@@ -954,11 +954,11 @@ const Browse = () => {
                           </td>
 
                           {/* Nom */}
-                          <td className="p-3">
-                            <div className="font-medium text-sm">Profil Anonyme</div>
+                          <td className="p-3 max-w-[150px]">
+                            <div className="font-medium text-sm truncate">Profil Anonyme</div>
                             {profile.profession_category && (
-                              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
-                                <Briefcase className="h-3 w-3" />
+                              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1 truncate">
+                                <Briefcase className="h-3 w-3 flex-shrink-0" />
                                 {profile.profession_category}
                               </div>
                             )}
@@ -970,17 +970,17 @@ const Browse = () => {
                           </td>
 
                           {/* Localisation */}
-                          <td className="p-3">
-                            <div className="text-sm flex items-center gap-1">
-                              <MapPin className="h-3 w-3 text-muted-foreground" />
+                          <td className="p-3 max-w-[120px]">
+                            <div className="text-sm flex items-center gap-1 truncate">
+                              <MapPin className="h-3 w-3 text-muted-foreground flex-shrink-0" />
                               {profile.city_only || '-'}
                             </div>
                           </td>
 
                           {/* Éducation */}
-                          <td className="p-3">
-                            <div className="text-xs text-muted-foreground flex items-center gap-1">
-                              <GraduationCap className="h-3 w-3" />
+                          <td className="p-3 max-w-[120px]">
+                            <div className="text-xs text-muted-foreground flex items-center gap-1 truncate">
+                              <GraduationCap className="h-3 w-3 flex-shrink-0" />
                               {profile.education_level || '-'}
                             </div>
                           </td>
