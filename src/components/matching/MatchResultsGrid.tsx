@@ -28,23 +28,19 @@ const MatchResultsGrid = ({ matches, familyApprovalRequired, analyzing }: MatchR
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between pb-4 border-b">
-        <div>
-          <h3 className="text-xl font-semibold">
-            Résultats du Matching
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            {matches.length} profils compatibles trouvés
-          </p>
-        </div>
-        <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
-          <Sparkles className="h-3 w-3 mr-1" />
-          IA Activée
-        </Badge>
+    <div className="space-y-4">
+      {/* Header */}
+      <div className="border-b pb-3">
+        <h3 className="text-lg font-semibold">
+          Résultats du Matching
+        </h3>
+        <p className="text-sm text-muted-foreground mt-1">
+          {matches.length} profils compatibles trouvés
+        </p>
       </div>
 
-      <div className="grid gap-5">
+      {/* List of Matches */}
+      <div className="space-y-3">
         {matches.map((match) => (
           <MatchCard 
             key={match.user_id} 
