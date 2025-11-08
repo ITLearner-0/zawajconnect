@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Heart, MessageCircle, Eye, Users, Clock, Crown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ConversationStatusBadge } from '@/components/ui/ConversationStatusBadge';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 
 interface Match {
   id: string;
@@ -37,6 +38,9 @@ const Matches = () => {
   const [mutualMatches, setMutualMatches] = useState<Match[]>([]);
   const [pendingMatches, setPendingMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mutualPage, setMutualPage] = useState(1);
+  const [pendingPage, setPendingPage] = useState(1);
+  const matchesPerPage = 10;
 
   // Debug: afficher le statut d'abonnement
   console.log('📊 Statut abonnement Matches:', subscription);
@@ -214,8 +218,9 @@ const Matches = () => {
 
             <TabsContent value="mutual" className="space-y-4">
               {mutualMatches.length > 0 ? (
+                <>
                 <div className="grid gap-4">
-                  {mutualMatches.map((match) => (
+                  {mutualMatches.slice((mutualPage - 1) * matchesPerPage, mutualPage * matchesPerPage).map((match) => (
                     <Card key={match.id} className="hover:shadow-lg transition-all duration-300 animate-fade-in">
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between">
@@ -271,6 +276,57 @@ const Matches = () => {
                     </Card>
                   ))}
                 </div>
+
+                {/* Pagination for Mutual Matches */}
+                {mutualMatches.length > matchesPerPage && (
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => setMutualPage(p => Math.max(1, p - 1))}
+                          className={mutualPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                        />
+                      </PaginationItem>
+                      
+                      {Array.from({ length: Math.ceil(mutualMatches.length / matchesPerPage) }, (_, i) => {
+                        const pageNumber = i + 1;
+                        const totalPages = Math.ceil(mutualMatches.length / matchesPerPage);
+                        
+                        if (
+                          pageNumber === 1 ||
+                          pageNumber === totalPages ||
+                          (pageNumber >= mutualPage - 1 && pageNumber <= mutualPage + 1)
+                        ) {
+                          return (
+                            <PaginationItem key={i}>
+                              <PaginationLink
+                                onClick={() => setMutualPage(pageNumber)}
+                                isActive={mutualPage === pageNumber}
+                                className="cursor-pointer"
+                              >
+                                {pageNumber}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        } else if (
+                          pageNumber === mutualPage - 2 ||
+                          pageNumber === mutualPage + 2
+                        ) {
+                          return <PaginationEllipsis key={i} />;
+                        }
+                        return null;
+                      })}
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => setMutualPage(p => Math.min(Math.ceil(mutualMatches.length / matchesPerPage), p + 1))}
+                          className={mutualPage >= Math.ceil(mutualMatches.length / matchesPerPage) ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                )}
+                </>
               ) : (
                 <div className="text-center py-12">
                   <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
@@ -287,8 +343,9 @@ const Matches = () => {
 
             <TabsContent value="pending" className="space-y-4">
               {pendingMatches.length > 0 ? (
+                <>
                 <div className="grid gap-4">
-                  {pendingMatches.map((match) => {
+                  {pendingMatches.slice((pendingPage - 1) * matchesPerPage, pendingPage * matchesPerPage).map((match) => {
                     const iLiked = (match.user1_id === user?.id && match.user1_liked) || 
                                    (match.user2_id === user?.id && match.user2_liked);
                     const theyLiked = (match.user1_id === user?.id && match.user2_liked) || 
@@ -346,6 +403,57 @@ const Matches = () => {
                     );
                   })}
                 </div>
+
+                {/* Pagination for Pending Matches */}
+                {pendingMatches.length > matchesPerPage && (
+                  <Pagination>
+                    <PaginationContent>
+                      <PaginationItem>
+                        <PaginationPrevious 
+                          onClick={() => setPendingPage(p => Math.max(1, p - 1))}
+                          className={pendingPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                        />
+                      </PaginationItem>
+                      
+                      {Array.from({ length: Math.ceil(pendingMatches.length / matchesPerPage) }, (_, i) => {
+                        const pageNumber = i + 1;
+                        const totalPages = Math.ceil(pendingMatches.length / matchesPerPage);
+                        
+                        if (
+                          pageNumber === 1 ||
+                          pageNumber === totalPages ||
+                          (pageNumber >= pendingPage - 1 && pageNumber <= pendingPage + 1)
+                        ) {
+                          return (
+                            <PaginationItem key={i}>
+                              <PaginationLink
+                                onClick={() => setPendingPage(pageNumber)}
+                                isActive={pendingPage === pageNumber}
+                                className="cursor-pointer"
+                              >
+                                {pageNumber}
+                              </PaginationLink>
+                            </PaginationItem>
+                          );
+                        } else if (
+                          pageNumber === pendingPage - 2 ||
+                          pageNumber === pendingPage + 2
+                        ) {
+                          return <PaginationEllipsis key={i} />;
+                        }
+                        return null;
+                      })}
+                      
+                      <PaginationItem>
+                        <PaginationNext 
+                          onClick={() => setPendingPage(p => Math.min(Math.ceil(pendingMatches.length / matchesPerPage), p + 1))}
+                          className={pendingPage >= Math.ceil(pendingMatches.length / matchesPerPage) ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                        />
+                      </PaginationItem>
+                    </PaginationContent>
+                  </Pagination>
+                )}
+                </>
               ) : (
                 <div className="text-center py-12">
                   <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">

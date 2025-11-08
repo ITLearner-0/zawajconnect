@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Heart, X, MapPin, GraduationCap, Briefcase, Search, User, ChevronLeft, ChevronRight, Lock, Users, Grid3x3, LayoutGrid, StickyNote, Star } from 'lucide-react';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -896,31 +897,11 @@ const Browse = () => {
                   resultsCount={notesSearchKeyword ? filteredProfiles.length : undefined}
                 />
 
-                {/* Grid Navigation */}
-                <div className="flex items-center justify-between">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={previousGridPage}
-                    disabled={gridStartIndex === 0}
-                    className="border-emerald text-emerald hover:bg-emerald hover:text-white"
-                  >
-                    <ChevronLeft className="h-4 w-4 mr-2" />
-                    Précédent
-                  </Button>
+                {/* Grid Pagination - Traditional Style */}
+                <div className="flex flex-col items-center gap-4">
                   <div className="text-sm text-muted-foreground">
-                    Profils {gridStartIndex + 1}-{Math.min(gridStartIndex + gridProfilesPerPage, filteredProfiles.length)} sur {filteredProfiles.length}
+                    Page {Math.floor(gridStartIndex / gridProfilesPerPage) + 1} sur {Math.ceil(filteredProfiles.length / gridProfilesPerPage)} • {filteredProfiles.length} profils au total
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={nextGridPage}
-                    disabled={gridStartIndex + gridProfilesPerPage >= filteredProfiles.length}
-                    className="border-emerald text-emerald hover:bg-emerald hover:text-white"
-                  >
-                    Suivant
-                    <ChevronRight className="h-4 w-4 ml-2" />
-                  </Button>
                 </div>
 
                  {/* Profiles Grid */}
@@ -936,44 +917,25 @@ const Browse = () => {
                           className={`h-5 w-5 transition-colors ${
                             isFavorite(profile.user_id)
                               ? 'fill-yellow-500 text-yellow-500'
-                              : 'text-muted-foreground hover:text-yellow-500'
+                              : 'text-gray-400'
                           }`}
                         />
                       </button>
 
-                      {/* Favoris Badge */}
-                      {isFavorite(profile.user_id) && (
-                        <div className="absolute top-14 left-3 z-20">
-                          <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white shadow-lg border-0">
-                            <Star className="h-3 w-3 mr-1 fill-white" />
-                            Favoris
-                          </Badge>
+                      {/* Selection Checkbox - Top Right */}
+                      {selectionMode && (
+                        <div className="absolute top-3 right-3 z-20">
+                          <div className="bg-white rounded-lg p-2 shadow-lg border-2 border-emerald/30">
+                            <Checkbox
+                              checked={selectedProfiles.includes(profile.user_id)}
+                              onCheckedChange={() => toggleProfileSelection(profile.user_id)}
+                              className="h-5 w-5"
+                            />
+                          </div>
                         </div>
                       )}
 
-                      {/* Notes Found Badge */}
-                      {notesSearchKeyword && profilesWithNotes.has(profile.user_id) && (
-                        <div className={`absolute ${isFavorite(profile.user_id) ? 'top-24' : 'top-14'} left-3 z-20`}>
-                          <Badge className="bg-gradient-to-r from-gold to-amber-600 text-white shadow-lg border-0 animate-pulse-gentle">
-                            <StickyNote className="h-3 w-3 mr-1 fill-white" />
-                            Note trouvée
-                          </Badge>
-                        </div>
-                      )}
-
-                      {/* Selection Checkbox - Always Visible in Grid Mode */}
-                      <div className="absolute top-3 right-3 z-20">
-                        <div className="bg-white rounded-lg p-2 shadow-lg border-2 border-emerald/30">
-                          <Checkbox
-                            checked={selectedProfiles.includes(profile.user_id)}
-                            onCheckedChange={() => toggleProfileSelection(profile.user_id)}
-                            className="h-5 w-5"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Profile Image */}
-                      <div className="relative h-48 bg-gradient-to-br from-emerald/10 to-gold/10 flex items-center justify-center overflow-hidden">
+                      <div className="h-48 bg-gradient-to-br from-emerald/10 to-gold/10 flex items-center justify-center overflow-hidden">
                         {profile.avatar_url ? (
                           <img 
                             src={profile.avatar_url} 
@@ -983,78 +945,52 @@ const Browse = () => {
                         ) : (
                           <User className="h-16 w-16 text-muted-foreground" />
                         )}
-                        
-                        {/* Verification Badge */}
-                        <div className="absolute top-2 left-2">
-                          <VerificationBadge verificationScore={profile.verification_score} />
-                        </div>
                       </div>
 
-                      <CardContent className="p-4">
-                        {/* Basic Info */}
-                        <div className="mb-3">
-                          <h3 className="text-lg font-semibold mb-1">Profil Anonyme</h3>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            {profile.age && <span>{profile.age} ans</span>}
-                            {profile.city_only && (
-                              <>
-                                <span>•</span>
-                                <div className="flex items-center gap-1">
-                                  <MapPin className="h-3 w-3" />
-                                  <span className="truncate">{profile.city_only}</span>
-                                </div>
-                              </>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Details */}
-                        <div className="space-y-2 mb-3 text-sm">
-                          {profile.education_level && (
-                            <div className="flex items-center gap-2">
-                              <GraduationCap className="h-3 w-3 text-muted-foreground" />
-                              <span className="truncate">{profile.education_level}</span>
-                            </div>
-                          )}
-                          {profile.profession_category && (
-                            <div className="flex items-center gap-2">
-                              <Briefcase className="h-3 w-3 text-muted-foreground" />
-                              <span className="truncate">{profile.profession_category}</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Interests */}
-                        {profile.interests && profile.interests.length > 0 && (
-                          <div className="mb-3">
-                            <div className="flex flex-wrap gap-1">
-                              {profile.interests.slice(0, 3).map((interest: string) => (
-                                <Badge key={interest} variant="secondary" className="text-xs">
-                                  {interest}
-                                </Badge>
-                              ))}
-                              {profile.interests.length > 3 && (
-                                <Badge variant="secondary" className="text-xs">
-                                  +{profile.interests.length - 3}
-                                </Badge>
+                      <CardContent className="p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <h3 className="font-semibold text-foreground">Profil Anonyme</h3>
+                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                              {profile.age && <span>{profile.age} ans</span>}
+                              {profile.city_only && (
+                                <>
+                                  <span>•</span>
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="h-3 w-3" />
+                                    {profile.city_only}
+                                  </span>
+                                </>
                               )}
                             </div>
                           </div>
+                          <VerificationBadge verificationScore={profile.verification_score} />
+                        </div>
+
+                        {profile.education_level && (
+                          <div className="flex items-center gap-2 text-xs">
+                            <GraduationCap className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-muted-foreground">{profile.education_level}</span>
+                          </div>
                         )}
 
-                        {/* Action Buttons */}
-                        <div className="flex gap-2">
+                        {profile.profession_category && (
+                          <div className="flex items-center gap-2 text-xs">
+                            <Briefcase className="h-3 w-3 text-muted-foreground" />
+                            <span className="text-muted-foreground">{profile.profession_category}</span>
+                          </div>
+                        )}
+
+                        <div className="flex gap-2 pt-2">
                           <Button
-                            size="sm"
                             variant="outline"
+                            size="sm"
                             onClick={() => navigate(`/profile/${profile.user_id}`)}
-                            className="flex-1 text-xs border-emerald text-emerald hover:bg-emerald hover:text-white"
+                            className="flex-1 text-xs"
                           >
                             Voir profil
                           </Button>
                           <Button
-                            size="sm"
-                            variant="outline"
                             onClick={() => handleLike(profile.user_id)}
                             disabled={!subscription.subscribed || dailyLimitReached || isInActiveConversation}
                             className="flex-1 text-xs"
@@ -1074,6 +1010,60 @@ const Browse = () => {
                     </Card>
                   ))}
                 </div>
+
+                {/* Traditional Pagination */}
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious 
+                        onClick={previousGridPage}
+                        className={gridStartIndex === 0 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                    
+                    {Array.from({ length: Math.ceil(filteredProfiles.length / gridProfilesPerPage) }, (_, i) => {
+                      const currentPage = Math.floor(gridStartIndex / gridProfilesPerPage) + 1;
+                      const totalPages = Math.ceil(filteredProfiles.length / gridProfilesPerPage);
+                      const pageNumber = i + 1;
+                      
+                      // Show first page, last page, current page, and pages around current
+                      if (
+                        pageNumber === 1 ||
+                        pageNumber === totalPages ||
+                        (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                      ) {
+                        return (
+                          <PaginationItem key={i}>
+                            <PaginationLink
+                              onClick={async () => {
+                                const canView = await checkDailyLimit();
+                                if (!canView) return;
+                                setGridStartIndex(i * gridProfilesPerPage);
+                              }}
+                              isActive={currentPage === pageNumber}
+                              className="cursor-pointer"
+                            >
+                              {pageNumber}
+                            </PaginationLink>
+                          </PaginationItem>
+                        );
+                      } else if (
+                        pageNumber === currentPage - 2 ||
+                        pageNumber === currentPage + 2
+                      ) {
+                        return <PaginationEllipsis key={i} />;
+                      }
+                      return null;
+                    })}
+                    
+                    <PaginationItem>
+                      <PaginationNext 
+                        onClick={nextGridPage}
+                        className={gridStartIndex + gridProfilesPerPage >= filteredProfiles.length ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
               </div>
             )}
           </div>
