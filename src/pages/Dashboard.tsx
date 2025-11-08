@@ -223,15 +223,13 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4">
+      <div className="min-h-screen bg-background p-4">
         <div className="container mx-auto max-w-2xl">
-          <Card className="shadow-lg">
-            <CardContent className="p-8">
-              <div className="flex items-center justify-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald"></div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="border rounded p-8">
+            <div className="flex items-center justify-center">
+              <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full" style={{ animation: 'spin 1s linear infinite' }}></div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -242,13 +240,13 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 p-4">
       {/* Header Section */}
-      <div className="bg-card rounded-lg border p-6">
+      <div className="border rounded p-4">
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Tableau de Bord</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl font-bold mb-1">Tableau de Bord</h1>
+            <p className="text-sm text-muted-foreground">
               Vue d'ensemble de votre profil et activité
             </p>
           </div>
@@ -261,79 +259,79 @@ const Dashboard = () => {
       <CompatibilityPrompt />
 
       {/* Statistics Section */}
-      <div className="bg-card rounded-lg border p-6">
-        <h2 className="text-xl font-semibold mb-4">Statistiques</h2>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="p-4 bg-muted/30 rounded-lg">
+      <div className="border rounded p-4">
+        <h2 className="text-lg font-semibold mb-4 pb-2 border-b">Statistiques</h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="p-3 border rounded">
             <div className="flex items-center gap-2 mb-2">
-              <User className="h-5 w-5 text-emerald" />
-              <span className="font-medium">Profil</span>
+              <User className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">Profil</span>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {profile?.bio ? 'Complet' : 'À compléter'}
             </p>
           </div>
           
-          <div className="p-4 bg-muted/30 rounded-lg">
+          <div className="p-3 border rounded">
             <div className="flex items-center gap-2 mb-2">
-              <Heart className="h-5 w-5 text-gold" />
-              <span className="font-medium">Préférences</span>
+              <Heart className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">Préférences</span>
             </div>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground">
               {islamicPrefs?.sect ? 'Configurées' : 'À configurer'}
             </p>
           </div>
 
-          <div className="p-4 bg-muted/30 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors" onClick={() => navigate('/advanced-matching')}>
+          <div className="p-3 border rounded cursor-pointer" onClick={() => navigate('/advanced-matching')}>
             <div className="flex items-center gap-2 mb-2">
-              <Brain className="h-5 w-5 text-primary" />
-              <span className="font-medium">Matching IA</span>
+              <Brain className="h-4 w-4 text-primary" />
+              <span className="text-sm font-medium">Matching IA</span>
             </div>
-            <p className="text-sm text-muted-foreground">Système avancé</p>
+            <p className="text-xs text-muted-foreground">Système avancé</p>
           </div>
 
-          <div className="p-4 bg-muted/30 rounded-lg">
+          <div className="p-3 border rounded">
             <CompatibilityCard compact />
           </div>
         </div>
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-card rounded-lg border p-6">
-        <h2 className="text-xl font-semibold mb-4">Actions rapides</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="border rounded p-4">
+        <h2 className="text-lg font-semibold mb-4 pb-2 border-b">Actions rapides</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <Button 
             variant="outline" 
-            className="justify-start h-auto py-4"
+            className="justify-start py-3"
             onClick={() => navigate('/advanced-matching')}
           >
-            <Brain className="h-5 w-5 mr-3" />
+            <Brain className="h-4 w-4 mr-2" />
             <div className="text-left">
-              <div className="font-medium">Matching Avancé</div>
+              <div className="text-sm font-medium">Matching Avancé</div>
               <div className="text-xs text-muted-foreground">Analyse IA de compatibilité</div>
             </div>
           </Button>
           
           <Button 
             variant="outline" 
-            className="justify-start h-auto py-4"
+            className="justify-start py-3"
             onClick={() => navigate('/browse')}
           >
-            <Target className="h-5 w-5 mr-3" />
+            <Target className="h-4 w-4 mr-2" />
             <div className="text-left">
-              <div className="font-medium">Découvrir</div>
+              <div className="text-sm font-medium">Découvrir</div>
               <div className="text-xs text-muted-foreground">Parcourir les profils</div>
             </div>
           </Button>
           
           <Button 
             variant="outline" 
-            className="justify-start h-auto py-4"
+            className="justify-start py-3"
             onClick={() => navigate('/compatibility-insights')}
           >
-            <Sparkles className="h-5 w-5 mr-3" />
+            <Sparkles className="h-4 w-4 mr-2" />
             <div className="text-left">
-              <div className="font-medium">Mes Insights</div>
+              <div className="text-sm font-medium">Mes Insights</div>
               <div className="text-xs text-muted-foreground">Analyses personnalisées</div>
             </div>
           </Button>
@@ -341,14 +339,14 @@ const Dashboard = () => {
       </div>
 
       {/* Profile Management Section */}
-      <div className="bg-card rounded-lg border p-6">
-        <h2 className="text-xl font-semibold mb-6">Gestion du Profil</h2>
+      <div className="border rounded p-4">
+        <h2 className="text-lg font-semibold mb-4 pb-2 border-b">Gestion du Profil</h2>
         
-        <div className="space-y-8">
+        <div className="space-y-6">
           {/* Main Content */}
-          <div className="xl:col-span-3 order-2 xl:order-1">
-            <Tabs defaultValue="profile" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
+          <div>
+            <Tabs defaultValue="profile" className="space-y-4">
+              <TabsList className="grid w-full grid-cols-4 border">
                 <TabsTrigger value="profile">Profil Personnel</TabsTrigger>
                 <TabsTrigger value="islamic">Préférences Islamiques</TabsTrigger>
                 <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
@@ -358,15 +356,13 @@ const Dashboard = () => {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="profile" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <User className="h-5 w-5" />
-                      Informations Personnelles
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+              <TabsContent value="profile" className="space-y-4">
+                <div className="border rounded p-4">
+                  <h3 className="text-base font-semibold mb-4 pb-2 border-b flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Informations Personnelles
+                  </h3>
+                  <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="fullName">Nom complet</Label>
@@ -468,7 +464,7 @@ const Dashboard = () => {
                           <Badge 
                             key={interest} 
                             variant="secondary" 
-                            className="cursor-pointer hover:bg-destructive hover:text-destructive-foreground" 
+                            className="cursor-pointer" 
                             onClick={() => removeInterest(interest)}
                           >
                             {interest} ×
@@ -496,28 +492,26 @@ const Dashboard = () => {
                     <Button 
                       onClick={saveProfile} 
                       disabled={saving}
-                      className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                      className="w-full"
                     >
                       {saving ? (
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                        <span className="mr-2">⏳</span>
                       ) : (
                         <Save className="h-4 w-4 mr-2" />
                       )}
                       {saving ? 'Sauvegarde...' : 'Sauvegarder les modifications'}
                     </Button>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </TabsContent>
 
-              <TabsContent value="islamic" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Heart className="h-5 w-5" />
-                      Préférences Islamiques
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
+              <TabsContent value="islamic" className="space-y-4">
+                <div className="border rounded p-4">
+                  <h3 className="text-base font-semibold mb-4 pb-2 border-b flex items-center gap-2">
+                    <Heart className="h-4 w-4" />
+                    Préférences Islamiques
+                  </h3>
+                  <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label>Fréquence de prière</Label>
@@ -598,32 +592,30 @@ const Dashboard = () => {
                     <Button 
                       onClick={saveIslamicPreferences} 
                       disabled={saving}
-                      className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                      className="w-full"
                     >
                       {saving ? (
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                        <span className="mr-2">⏳</span>
                       ) : (
                         <Save className="h-4 w-4 mr-2" />
                       )}
                       {saving ? 'Sauvegarde...' : 'Sauvegarder les préférences'}
                     </Button>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </TabsContent>
 
-              <TabsContent value="privacy" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Settings className="h-5 w-5" />
-                      Paramètres de confidentialité
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+              <TabsContent value="privacy" className="space-y-4">
+                <div className="border rounded p-4">
+                  <h3 className="text-base font-semibold mb-4 pb-2 border-b flex items-center gap-2">
+                    <Settings className="h-4 w-4" />
+                    Paramètres de confidentialité
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 border rounded">
                       <div>
-                        <h3 className="font-medium">Visibilité du profil</h3>
-                        <p className="text-sm text-muted-foreground">Qui peut voir votre profil complet</p>
+                        <h4 className="text-sm font-medium">Visibilité du profil</h4>
+                        <p className="text-xs text-muted-foreground">Qui peut voir votre profil complet</p>
                       </div>
                       <Button 
                         variant="outline" 
@@ -635,10 +627,10 @@ const Dashboard = () => {
                       </Button>
                     </div>
                     
-                    <div className="flex items-center justify-between p-4 border border-border rounded-lg">
+                    <div className="flex items-center justify-between p-3 border rounded">
                       <div>
-                        <h3 className="font-medium">Photos</h3>
-                        <p className="text-sm text-muted-foreground">Gérer la visibilité de vos photos</p>
+                        <h4 className="text-sm font-medium">Photos</h4>
+                        <p className="text-xs text-muted-foreground">Gérer la visibilité de vos photos</p>
                       </div>
                       <Button 
                         variant="outline" 
@@ -649,24 +641,22 @@ const Dashboard = () => {
                         Configurer
                       </Button>
                     </div>
-                  </CardContent>
-                </Card>
+                  </div>
+                </div>
               </TabsContent>
 
-              <TabsContent value="gamification" className="space-y-6">
+              <TabsContent value="gamification" className="space-y-4">
                 <GamificationDashboard layout="stack" />
               </TabsContent>
             </Tabs>
           </div>
 
-          {/* Compatibility Card */}
-          <div className="xl:col-span-1 order-1 xl:order-2">
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-1">
-              <QuickActionsPanel />
-              <SmartMatchingSuggestions />
-              <CompatibilityCard />
-              <InsightsPreviewCard />
-            </div>
+          {/* Additional Cards */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <QuickActionsPanel />
+            <SmartMatchingSuggestions />
+            <CompatibilityCard />
+            <InsightsPreviewCard />
           </div>
         </div>
       </div>
