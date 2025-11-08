@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Heart, MessageCircle, Eye, Users, Clock, Crown } from 'lucide-react';
+import { Heart, MessageCircle, Eye, Users, Clock, Crown, ArrowUpDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ConversationStatusBadge } from '@/components/ui/ConversationStatusBadge';
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface Match {
   id: string;
@@ -41,6 +42,8 @@ const Matches = () => {
   const [mutualPage, setMutualPage] = useState(1);
   const [pendingPage, setPendingPage] = useState(1);
   const matchesPerPage = 10;
+  const [sortColumn, setSortColumn] = useState<'name' | 'score' | 'date'>('date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   // Debug: afficher le statut d'abonnement
   console.log('📊 Statut abonnement Matches:', subscription);
@@ -123,6 +126,65 @@ const Matches = () => {
 
   const viewProfile = (userId: string) => {
     navigate(`/profile/${userId}`);
+  };
+
+  const handleSort = (column: 'name' | 'score' | 'date') => {
+    if (sortColumn === column) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('desc');
+    }
+  };
+
+  const sortMatches = (matchesToSort: Match[]) => {
+    return [...matchesToSort].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortColumn) {
+        case 'name':
+          comparison = (a.other_user?.full_name || '').localeCompare(b.other_user?.full_name || '');
+          break;
+        case 'score':
+          comparison = a.match_score - b.match_score;
+          break;
+        case 'date':
+          comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+          break;
+      }
+      
+      return sortDirection === 'asc' ? comparison : -comparison;
+    });
+  };
+
+
+  const getStatusBadge = (match: Match) => {
+    if (match.conversation_status === 'ended') {
+      return <Badge variant="outline" className="border-destructive/50 text-destructive">Terminée</Badge>;
+    }
+    if (match.conversation_status === 'active') {
+      return <Badge variant="outline" className="border-emerald/50 text-emerald">Active</Badge>;
+    }
+    if (match.is_mutual) {
+      return <Badge variant="outline" className="border-gold/50 text-gold-dark">Mutuel</Badge>;
+    }
+    
+    const iLiked = (match.user1_id === user?.id && match.user1_liked) || 
+                   (match.user2_id === user?.id && match.user2_liked);
+    const theyLiked = (match.user1_id === user?.id && match.user2_liked) || 
+                      (match.user2_id === user?.id && match.user1_liked);
+    
+    if (iLiked && theyLiked) {
+      return <Badge variant="outline" className="border-gold/50 text-gold-dark">Mutuel</Badge>;
+    }
+    if (iLiked) {
+      return <Badge variant="outline" className="border-emerald/50 text-emerald">Vous avez liké</Badge>;
+    }
+    if (theyLiked) {
+      return <Badge variant="outline" className="border-gold/50 text-gold-dark">Vous a liké</Badge>;
+    }
+    
+    return <Badge variant="outline">En attente</Badge>;
   };
 
   // Tous les returns conditionnels APRÈS les hooks et fonctions
@@ -219,62 +281,102 @@ const Matches = () => {
             <TabsContent value="mutual" className="space-y-4">
               {mutualMatches.length > 0 ? (
                 <>
-                <div className="grid gap-4">
-                  {mutualMatches.slice((mutualPage - 1) * matchesPerPage, mutualPage * matchesPerPage).map((match) => (
-                    <Card key={match.id} className="hover:shadow-lg transition-all duration-300 animate-fade-in">
-                      <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className="h-16 w-16 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-                              <span className="text-xl text-primary-foreground font-bold">
+                <div className="border rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="w-16">Photo</TableHead>
+                        <TableHead>
+                          <button 
+                            onClick={() => handleSort('name')}
+                            className="flex items-center gap-1 hover:text-foreground"
+                          >
+                            Nom
+                            <ArrowUpDown className="h-4 w-4" />
+                          </button>
+                        </TableHead>
+                        <TableHead>
+                          <button 
+                            onClick={() => handleSort('score')}
+                            className="flex items-center gap-1 hover:text-foreground"
+                          >
+                            Score
+                            <ArrowUpDown className="h-4 w-4" />
+                          </button>
+                        </TableHead>
+                        <TableHead>
+                          <button 
+                            onClick={() => handleSort('date')}
+                            className="flex items-center gap-1 hover:text-foreground"
+                          >
+                            Date du match
+                            <ArrowUpDown className="h-4 w-4" />
+                          </button>
+                        </TableHead>
+                        <TableHead>Statut</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {sortMatches(mutualMatches).slice((mutualPage - 1) * matchesPerPage, mutualPage * matchesPerPage).map((match) => (
+                        <TableRow key={match.id} className="hover:bg-muted/30">
+                          <TableCell>
+                            <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
+                              <span className="text-sm text-primary-foreground font-bold">
                                 {match.other_user?.full_name?.charAt(0) || '?'}
                               </span>
                             </div>
-                            <div className="flex-1">
-                               <div className="flex items-center gap-3 mb-2">
-                                <h3 className="text-xl font-bold text-foreground">
-                                  {match.other_user?.full_name}
-                                </h3>
-                                {match.conversation_status === 'active' && <ConversationStatusBadge />}
-                                <Badge className="bg-emerald/10 text-emerald border-emerald/20">
-                                  {match.match_score}% compatible
-                                </Badge>
-                                <Badge variant="secondary" className="bg-gold/10 text-gold-dark border-gold/20">
-                                  Match mutuel 💕
-                                </Badge>
-                              </div>
-                              <p className="text-muted-foreground mb-1">
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium text-foreground">{match.other_user?.full_name}</div>
+                              <div className="text-sm text-muted-foreground">
                                 {match.other_user?.age} ans • {match.other_user?.location}
-                              </p>
-                              <p className="text-sm text-muted-foreground">
-                                {match.other_user?.profession}
-                              </p>
-                              <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                                {match.other_user?.bio}
-                              </p>
+                              </div>
                             </div>
-                          </div>
-                          <div className="flex flex-col gap-2">
-                            <Button
-                              onClick={() => startChat(match.id)}
-                              className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
-                              disabled={match.conversation_status === 'ended'}
-                            >
-                              <MessageCircle className="h-4 w-4 mr-2" />
-                              {match.conversation_status === 'ended' ? 'Conversation terminée' : 'Discuter'}
-                            </Button>
-                            <Button
-                              variant="outline"
-                              onClick={() => viewProfile(match.other_user.user_id)}
-                            >
-                              <Eye className="h-4 w-4 mr-2" />
-                              Voir profil
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="border-emerald/50 text-emerald">
+                              {match.match_score}%
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(match.created_at).toLocaleDateString('fr-FR', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              })}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(match)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center justify-end gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => viewProfile(match.other_user.user_id)}
+                                variant="outline"
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                Profil
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => startChat(match.id)}
+                                disabled={match.conversation_status === 'ended'}
+                                className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                              >
+                                <MessageCircle className="h-3 w-3 mr-1" />
+                                Message
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
 
                 {/* Pagination for Mutual Matches */}
@@ -344,64 +446,102 @@ const Matches = () => {
             <TabsContent value="pending" className="space-y-4">
               {pendingMatches.length > 0 ? (
                 <>
-                <div className="grid gap-4">
-                  {pendingMatches.slice((pendingPage - 1) * matchesPerPage, pendingPage * matchesPerPage).map((match) => {
-                    const iLiked = (match.user1_id === user?.id && match.user1_liked) || 
-                                   (match.user2_id === user?.id && match.user2_liked);
-                    const theyLiked = (match.user1_id === user?.id && match.user2_liked) || 
-                                      (match.user2_id === user?.id && match.user1_liked);
-
-                    return (
-                      <Card key={match.id} className="hover:shadow-lg transition-all duration-300 animate-fade-in">
-                        <CardContent className="p-6">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                              <div className="h-16 w-16 bg-gradient-to-br from-sage to-sage-dark rounded-full flex items-center justify-center">
-                                <span className="text-xl text-primary-foreground font-bold">
-                                  {match.other_user?.full_name?.charAt(0) || '?'}
-                                </span>
-                              </div>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-3 mb-2">
-                                  <h3 className="text-xl font-bold text-foreground">
-                                    {match.other_user?.full_name}
-                                  </h3>
-                                  <Badge variant="outline">
-                                    {match.match_score}% compatible
-                                  </Badge>
-                                  {iLiked && (
-                                    <Badge className="bg-emerald/10 text-emerald border-emerald/20">
-                                      Vous avez liké
-                                    </Badge>
-                                  )}
-                                  {theyLiked && (
-                                    <Badge className="bg-gold/10 text-gold-dark border-gold/20">
-                                      Vous a liké
-                                    </Badge>
-                                  )}
-                                </div>
-                                <p className="text-muted-foreground mb-1">
-                                  {match.other_user?.age} ans • {match.other_user?.location}
-                                </p>
-                                <p className="text-sm text-muted-foreground">
-                                  {match.other_user?.profession}
-                                </p>
+                <div className="border rounded-lg overflow-hidden">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="w-16">Photo</TableHead>
+                        <TableHead>
+                          <button 
+                            onClick={() => handleSort('name')}
+                            className="flex items-center gap-1 hover:text-foreground"
+                          >
+                            Nom
+                            <ArrowUpDown className="h-4 w-4" />
+                          </button>
+                        </TableHead>
+                        <TableHead>
+                          <button 
+                            onClick={() => handleSort('score')}
+                            className="flex items-center gap-1 hover:text-foreground"
+                          >
+                            Score
+                            <ArrowUpDown className="h-4 w-4" />
+                          </button>
+                        </TableHead>
+                        <TableHead>
+                          <button 
+                            onClick={() => handleSort('date')}
+                            className="flex items-center gap-1 hover:text-foreground"
+                          >
+                            Date du match
+                            <ArrowUpDown className="h-4 w-4" />
+                          </button>
+                        </TableHead>
+                        <TableHead>Statut</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {sortMatches(pendingMatches).slice((pendingPage - 1) * matchesPerPage, pendingPage * matchesPerPage).map((match) => (
+                        <TableRow key={match.id} className="hover:bg-muted/30">
+                          <TableCell>
+                            <div className="h-12 w-12 bg-gradient-to-br from-sage to-sage-dark rounded-full flex items-center justify-center">
+                              <span className="text-sm text-primary-foreground font-bold">
+                                {match.other_user?.full_name?.charAt(0) || '?'}
+                              </span>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div>
+                              <div className="font-medium text-foreground">{match.other_user?.full_name}</div>
+                              <div className="text-sm text-muted-foreground">
+                                {match.other_user?.age} ans • {match.other_user?.location}
                               </div>
                             </div>
-                            <div className="flex flex-col gap-2">
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline">
+                              {match.match_score}%
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(match.created_at).toLocaleDateString('fr-FR', {
+                                day: 'numeric',
+                                month: 'short',
+                                year: 'numeric'
+                              })}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            {getStatusBadge(match)}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center justify-end gap-2">
                               <Button
-                                variant="outline"
+                                size="sm"
                                 onClick={() => viewProfile(match.other_user.user_id)}
+                                variant="outline"
                               >
-                                <Eye className="h-4 w-4 mr-2" />
-                                Voir profil
+                                <Eye className="h-3 w-3 mr-1" />
+                                Profil
+                              </Button>
+                              <Button
+                                size="sm"
+                                onClick={() => startChat(match.id)}
+                                disabled={!match.is_mutual}
+                                className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                              >
+                                <MessageCircle className="h-3 w-3 mr-1" />
+                                Message
                               </Button>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
                 </div>
 
                 {/* Pagination for Pending Matches */}
