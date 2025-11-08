@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -342,7 +343,7 @@ const ParentalApprovalWorkflow = () => {
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <ResponsiveTabsList tabCount={3}>
           <TabsTrigger value="pending">
             À examiner ({pendingMatches.length})
           </TabsTrigger>
@@ -352,7 +353,7 @@ const ParentalApprovalWorkflow = () => {
           <TabsTrigger value="guidance">
             Guidance islamique
           </TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         <TabsContent value="pending" className="space-y-4">
           {pendingMatches.length > 0 ? (

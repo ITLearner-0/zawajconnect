@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -410,7 +411,7 @@ const FamilyDashboard = () => {
 
       {/* Main Content */}
       <Tabs defaultValue="matches" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <ResponsiveTabsList tabCount={3}>
           <TabsTrigger value="matches">
             Matches récents ({matches.length})
           </TabsTrigger>
@@ -420,7 +421,7 @@ const FamilyDashboard = () => {
           <TabsTrigger value="guidance">
             Conseils familiaux
           </TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         <TabsContent value="matches" className="space-y-4">
           {matches.length > 0 ? (

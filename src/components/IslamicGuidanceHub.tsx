@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { 
   BookOpen, 
   Heart, 
@@ -204,7 +205,7 @@ const IslamicGuidanceHub = () => {
 
       {/* Articles */}
       <Tabs defaultValue="all" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <ResponsiveTabsList tabCount={3}>
           <TabsTrigger value="all">Tous ({filteredArticles.length})</TabsTrigger>
           <TabsTrigger value="featured">
             <Star className="h-4 w-4 mr-1" />
@@ -214,7 +215,7 @@ const IslamicGuidanceHub = () => {
             <Bookmark className="h-4 w-4 mr-1" />
             Favoris ({bookmarkedArticles.length})
           </TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         <TabsContent value="all" className="space-y-4">
           {filteredArticles.length === 0 ? (

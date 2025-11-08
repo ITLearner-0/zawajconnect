@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
@@ -312,7 +313,7 @@ const InsightsAnalytics: React.FC = () => {
 
       {/* Onglets détaillés */}
       <Tabs defaultValue="demographics" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <ResponsiveTabsList tabCount={4}>
           <TabsTrigger value="demographics">
             <PieChart className="h-4 w-4 mr-2" />
             Démographie
@@ -329,7 +330,7 @@ const InsightsAnalytics: React.FC = () => {
             <Award className="h-4 w-4 mr-2" />
             Performance
           </TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         <TabsContent value="demographics" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-3">

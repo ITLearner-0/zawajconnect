@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import SupervisionMetrics from '@/components/SupervisionMetrics';
@@ -470,7 +471,7 @@ const WaliDashboard: React.FC = () => {
 
       {/* Main Content */}
       <Tabs defaultValue="notifications" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <ResponsiveTabsList tabCount={4}>
           <TabsTrigger value="notifications">
             Notifications
             {stats.criticalAlerts > 0 && (
@@ -489,7 +490,7 @@ const WaliDashboard: React.FC = () => {
           </TabsTrigger>
           <TabsTrigger value="supervised">Supervisés</TabsTrigger>
           <TabsTrigger value="reports">Rapports</TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         {/* Notifications Tab */}
         <TabsContent value="notifications" className="space-y-4">

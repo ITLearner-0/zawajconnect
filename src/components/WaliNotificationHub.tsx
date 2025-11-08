@@ -23,7 +23,8 @@ import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 
 interface Notification {
   id: string;
@@ -400,7 +401,7 @@ const WaliNotificationHub = () => {
       <Card>
         <CardContent className="p-4">
           <Tabs value={filter} onValueChange={(value) => setFilter(value as any)}>
-            <TabsList className="grid w-full grid-cols-3">
+            <ResponsiveTabsList tabCount={3}>
               <TabsTrigger value="all">
                 Toutes ({notifications.length})
               </TabsTrigger>
@@ -410,7 +411,7 @@ const WaliNotificationHub = () => {
               <TabsTrigger value="urgent">
                 Urgentes ({notifications.filter(n => n.severity === 'high' || n.action_required).length})
               </TabsTrigger>
-            </TabsList>
+            </ResponsiveTabsList>
           </Tabs>
         </CardContent>
       </Card>

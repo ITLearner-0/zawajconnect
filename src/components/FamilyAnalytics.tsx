@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { 
   BarChart, 
   Bar, 
@@ -302,12 +303,12 @@ const FamilyAnalytics: React.FC = () => {
 
       {/* Charts */}
       <Tabs defaultValue="moderation" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <ResponsiveTabsList tabCount={4>
           <TabsTrigger value="moderation">Modération</TabsTrigger>
           <TabsTrigger value="approvals">Approbations</TabsTrigger>
           <TabsTrigger value="activity">Activité</TabsTrigger>
           <TabsTrigger value="performance">Performance</TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         {/* Moderation Tab */}
         <TabsContent value="moderation" className="space-y-6">

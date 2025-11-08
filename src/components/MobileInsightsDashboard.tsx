@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
@@ -62,12 +63,12 @@ const MobileInsightsDashboard: React.FC<MobileInsightsDashboardProps> = ({ userI
   return (
     <div className="w-full max-w-sm mx-auto">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 mb-4">
+        <ResponsiveTabsList tabCount={4} className="mb-4">
           <TabsTrigger value="overview" className="text-xs">Vue</TabsTrigger>
           <TabsTrigger value="scores" className="text-xs">Scores</TabsTrigger>
           <TabsTrigger value="tips" className="text-xs">Conseils</TabsTrigger>
           <TabsTrigger value="guidance" className="text-xs">Guide</TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-3">
