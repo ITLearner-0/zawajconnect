@@ -5,7 +5,8 @@ import IslamicModerationPanel from './IslamicModerationPanel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -471,7 +472,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
 
       {/* Admin Tabs */}
       <Tabs defaultValue="users" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-9">
+        <ResponsiveTabsList tabCount={9}>
           <TabsTrigger value="users">Utilisateurs</TabsTrigger>
           <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
           <TabsTrigger value="roles">Rôles</TabsTrigger>
@@ -481,7 +482,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
           <TabsTrigger value="onboarding">Onboarding</TabsTrigger>
           <TabsTrigger value="insights">Insights</TabsTrigger>
           <TabsTrigger value="settings">Paramètres</TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         {/* Users Tab */}
         <TabsContent value="users" className="space-y-4">

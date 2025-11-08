@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { 
   Play, 
   Pause, 
@@ -443,7 +444,7 @@ const ModerationTestSuite: React.FC = () => {
 
       {/* Test Results */}
       <Tabs defaultValue="all" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <ResponsiveTabsList tabCount={6}>
           <TabsTrigger value="all">
             Tous
             <Badge variant="outline" className="ml-2">
@@ -466,7 +467,7 @@ const ModerationTestSuite: React.FC = () => {
               </TabsTrigger>
             );
           })}
-        </TabsList>
+        </ResponsiveTabsList>
 
         <TabsContent value="all">
           <div className="space-y-4">

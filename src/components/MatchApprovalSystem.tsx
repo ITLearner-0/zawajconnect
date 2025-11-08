@@ -24,7 +24,8 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 
 interface Match {
   id: string;
@@ -407,11 +408,11 @@ const MatchApprovalSystem = () => {
                         </DialogHeader>
                         
                         <Tabs defaultValue="profiles" className="space-y-6">
-                          <TabsList className="grid w-full grid-cols-3">
+                          <ResponsiveTabsList tabCount={3>
                             <TabsTrigger value="profiles">Profils</TabsTrigger>
                             <TabsTrigger value="compatibility">Compatibilité</TabsTrigger>
                             <TabsTrigger value="review">Évaluation</TabsTrigger>
-                          </TabsList>
+                          </ResponsiveTabsList>
 
                           <TabsContent value="profiles" className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

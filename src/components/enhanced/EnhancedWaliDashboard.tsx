@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -667,7 +668,7 @@ const EnhancedWaliDashboard: React.FC = () => {
 
       {/* Enhanced Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <ResponsiveTabsList tabCount={6}>
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="notifications">
             Notifications
@@ -688,7 +689,7 @@ const EnhancedWaliDashboard: React.FC = () => {
           <TabsTrigger value="supervised">Supervisés</TabsTrigger>
           <TabsTrigger value="meetings">Réunions</TabsTrigger>
           <TabsTrigger value="analytics">Analyses</TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         {/* Overview Tab */}
         <TabsContent value="overview" className="space-y-6">
