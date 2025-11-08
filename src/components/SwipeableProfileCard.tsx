@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, X, MapPin, GraduationCap, Briefcase, User } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Heart, X, MapPin, GraduationCap, Briefcase, User, Info } from 'lucide-react';
 import VerificationBadge from '@/components/VerificationBadge';
 
 interface SwipeableProfileCardProps {
@@ -114,6 +115,29 @@ export const SwipeableProfileCard = ({
 
   const handleMouseUp = () => {
     handleEnd();
+  };
+
+  // Button handlers
+  const handleLikeButton = () => {
+    if (isAnimatingOut) return;
+    setIsAnimatingOut(true);
+    setPosition({ x: window.innerWidth, y: 0 });
+    setTimeout(() => {
+      onSwipeRight();
+      setIsAnimatingOut(false);
+      setPosition({ x: 0, y: 0 });
+    }, 200);
+  };
+
+  const handlePassButton = () => {
+    if (isAnimatingOut) return;
+    setIsAnimatingOut(true);
+    setPosition({ x: -window.innerWidth, y: 0 });
+    setTimeout(() => {
+      onSwipeLeft();
+      setIsAnimatingOut(false);
+      setPosition({ x: 0, y: 0 });
+    }, 200);
   };
 
   const rotation = position.x * ROTATION_MULTIPLIER;
@@ -240,11 +264,49 @@ export const SwipeableProfileCard = ({
         </CardContent>
       </Card>
 
+      {/* Action Buttons */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4">
+        {/* Pass Button */}
+        <Button
+          onClick={handlePassButton}
+          disabled={isAnimatingOut}
+          size="lg"
+          variant="outline"
+          className="h-16 w-16 rounded-full border-2 border-red-500 hover:bg-red-500 hover:text-white transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg disabled:opacity-50"
+        >
+          <X className="h-7 w-7" />
+        </Button>
+
+        {/* Info Button */}
+        {onDoubleTap && (
+          <Button
+            onClick={onDoubleTap}
+            disabled={isAnimatingOut}
+            size="lg"
+            variant="outline"
+            className="h-12 w-12 rounded-full border-2 border-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg disabled:opacity-50"
+          >
+            <Info className="h-5 w-5" />
+          </Button>
+        )}
+
+        {/* Like Button */}
+        <Button
+          onClick={handleLikeButton}
+          disabled={isAnimatingOut}
+          size="lg"
+          variant="outline"
+          className="h-16 w-16 rounded-full border-2 border-green-500 hover:bg-green-500 hover:text-white transition-all duration-200 hover:scale-110 active:scale-95 shadow-lg disabled:opacity-50"
+        >
+          <Heart className="h-7 w-7" />
+        </Button>
+      </div>
+
       {/* Swipe Instructions (shown initially) */}
       {!isDragging && position.x === 0 && !isAnimatingOut && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none animate-fade-in">
-          <div className="bg-background/90 backdrop-blur-sm px-4 py-2 rounded-full text-xs text-muted-foreground border shadow-sm">
-            👆 Glissez pour liker ou passer · Double tap pour détails
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none animate-fade-in">
+          <div className="bg-background/90 backdrop-blur-sm px-3 py-1.5 rounded-full text-xs text-muted-foreground border shadow-sm">
+            👆 Glissez ou utilisez les boutons
           </div>
         </div>
       )}
