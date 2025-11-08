@@ -710,12 +710,12 @@ const Browse = () => {
           <div className="lg:col-span-2">
             {viewMode === 'carousel' ? (
               /* Carousel Mode - Original Single Profile View */
-              <Card className="overflow-hidden shadow-lg animate-scale-in card-hover">
+              <div className="border rounded overflow-hidden">
               <div className="relative">
                 {/* Selection Checkbox */}
                 {selectionMode && (
                   <div className="absolute top-4 right-20 z-10">
-                    <div className="bg-white rounded-lg p-2 shadow-lg border-2 border-emerald/30">
+                    <div className="bg-white rounded p-2 shadow border">
                       <Checkbox
                         checked={selectedProfiles.includes(currentProfile.user_id)}
                         onCheckedChange={() => toggleProfileSelection(currentProfile.user_id)}
@@ -725,15 +725,15 @@ const Browse = () => {
                   </div>
                 )}
                 {/* Profile Image */}
-                <div className="h-80 md:h-96 bg-gradient-to-br from-emerald/10 to-gold/10 flex items-center justify-center overflow-hidden">
+                <div className="h-80 md:h-96 bg-muted/30 flex items-center justify-center overflow-hidden">
                   {currentProfile.avatar_url ? (
                     <img 
                       src={currentProfile.avatar_url} 
                       alt="Photo de profil anonyme" 
-                      className="w-full h-full object-cover transition-smooth hover:scale-110"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
-                    <User className="h-24 w-24 text-muted-foreground animate-pulse-gentle" />
+                    <User className="h-24 w-24 text-muted-foreground" />
                   )}
                 </div>
 
@@ -741,7 +741,7 @@ const Browse = () => {
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="absolute left-2 top-1/2 transform -translate-y-1/2 rounded-full p-2 shadow-lg hover-scale"
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 rounded-full p-2 shadow"
                   onClick={previousProfile}
                   disabled={currentIndex === 0}
                 >
@@ -750,7 +750,7 @@ const Browse = () => {
                 <Button
                   variant="secondary"
                   size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full p-2 shadow-lg hover-scale"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full p-2 shadow"
                   onClick={nextProfile}
                   disabled={currentIndex === filteredProfiles.length - 1}
                 >
@@ -758,7 +758,7 @@ const Browse = () => {
                 </Button>
 
                 {/* Profile Counter */}
-                <div className="absolute top-4 right-4 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-1 rounded text-sm">
                   {currentIndex + 1} / {filteredProfiles.length}
                 </div>
 
@@ -768,10 +768,10 @@ const Browse = () => {
                 </div>
               </div>
 
-              <CardContent className="p-6">
+              <div className="p-6 border-t">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                   <div>
-                    <h2 className="text-2xl font-bold text-foreground mb-1">
+                    <h2 className="text-2xl font-bold mb-1">
                       Profil Anonyme
                     </h2>
                     <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
@@ -828,12 +828,12 @@ const Browse = () => {
                 )}
 
         {/* Enhanced Mobile Navigation */}
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t animate-fade-in">
+        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
           <Button
             onClick={handlePass}
             variant="outline"
             disabled={isInActiveConversation}
-            className="flex-1 border-muted-foreground text-muted-foreground hover:bg-muted order-1 sm:order-none transition-smooth"
+            className="flex-1"
           >
             <X className="h-4 w-4 mr-2" />
             Passer
@@ -841,8 +841,7 @@ const Browse = () => {
           <Button
             onClick={() => handleLike(currentProfile.user_id)}
             disabled={!subscription.subscribed || dailyLimitReached || isInActiveConversation}
-            variant="gradient"
-            className="flex-1 order-0 sm:order-none animate-pulse-gentle"
+            className="flex-1"
           >
             {isInActiveConversation ? (
               <>
@@ -864,7 +863,7 @@ const Browse = () => {
           <Button
             variant="outline"
             onClick={() => navigate(`/profile/${currentProfile.user_id}`)}
-            className="flex-1 border-emerald text-emerald hover:bg-emerald hover:text-white order-2 sm:order-none hover-scale"
+            className="flex-1"
           >
             Voir le profil complet
           </Button>
@@ -878,14 +877,14 @@ const Browse = () => {
             <Button
               variant="outline"
               size="sm"
-              className="text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+              className="text-destructive border-destructive"
             >
               Signaler ce profil
             </Button>
           </ReportModal>
         </div>
-              </CardContent>
-              </Card>
+              </div>
+              </div>
             ) : (
               /* Grid Mode - Multiple Profiles View */
               <div className="space-y-6">
@@ -904,111 +903,140 @@ const Browse = () => {
                   </div>
                 </div>
 
-                 {/* Profiles Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {gridProfiles.map((profile) => (
-                    <Card key={profile.user_id} className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 card-hover relative">
-                      {/* Favorite Button - Top Left */}
-                      <button
-                        onClick={() => toggleFavorite(profile.user_id)}
-                        className="absolute top-3 left-3 z-20 bg-white rounded-full p-2 shadow-lg hover:scale-110 transition-transform"
-                      >
-                        <Heart
-                          className={`h-5 w-5 transition-colors ${
-                            isFavorite(profile.user_id)
-                              ? 'fill-yellow-500 text-yellow-500'
-                              : 'text-gray-400'
-                          }`}
-                        />
-                      </button>
+                 {/* Profiles Table */}
+                <div className="border rounded overflow-hidden">
+                  <table className="w-full">
+                    <thead className="bg-muted/30 border-b">
+                      <tr>
+                        <th className="text-left p-3 text-sm font-semibold">Photo</th>
+                        <th className="text-left p-3 text-sm font-semibold">Nom</th>
+                        <th className="text-left p-3 text-sm font-semibold">Âge</th>
+                        <th className="text-left p-3 text-sm font-semibold">Localisation</th>
+                        <th className="text-left p-3 text-sm font-semibold">Éducation</th>
+                        <th className="text-left p-3 text-sm font-semibold">Vérification</th>
+                        <th className="text-center p-3 text-sm font-semibold">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {gridProfiles.map((profile, index) => (
+                        <tr 
+                          key={profile.user_id} 
+                          className={`border-b ${index % 2 === 0 ? 'bg-background' : 'bg-muted/20'}`}
+                        >
+                          {/* Photo */}
+                          <td className="p-3">
+                            <div className="relative">
+                              {profile.avatar_url ? (
+                                <img 
+                                  src={profile.avatar_url} 
+                                  alt="Photo de profil" 
+                                  className="h-16 w-16 rounded object-cover border"
+                                />
+                              ) : (
+                                <div className="h-16 w-16 rounded border bg-muted flex items-center justify-center">
+                                  <User className="h-8 w-8 text-muted-foreground" />
+                                </div>
+                              )}
+                              {/* Favorite Star */}
+                              <button
+                                onClick={() => toggleFavorite(profile.user_id)}
+                                className="absolute -top-1 -right-1 bg-white rounded-full p-1 shadow border"
+                              >
+                                <Star
+                                  className={`h-3 w-3 ${
+                                    isFavorite(profile.user_id)
+                                      ? 'fill-yellow-500 text-yellow-500'
+                                      : 'text-gray-400'
+                                  }`}
+                                />
+                              </button>
+                            </div>
+                          </td>
 
-                      {/* Selection Checkbox - Top Right */}
-                      {selectionMode && (
-                        <div className="absolute top-3 right-3 z-20">
-                          <div className="bg-white rounded-lg p-2 shadow-lg border-2 border-emerald/30">
-                            <Checkbox
-                              checked={selectedProfiles.includes(profile.user_id)}
-                              onCheckedChange={() => toggleProfileSelection(profile.user_id)}
-                              className="h-5 w-5"
-                            />
-                          </div>
-                        </div>
-                      )}
+                          {/* Nom */}
+                          <td className="p-3">
+                            <div className="font-medium text-sm">Profil Anonyme</div>
+                            {profile.profession_category && (
+                              <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                                <Briefcase className="h-3 w-3" />
+                                {profile.profession_category}
+                              </div>
+                            )}
+                          </td>
 
-                      <div className="h-48 bg-gradient-to-br from-emerald/10 to-gold/10 flex items-center justify-center overflow-hidden">
-                        {profile.avatar_url ? (
-                          <img 
-                            src={profile.avatar_url} 
-                            alt="Photo de profil" 
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <User className="h-16 w-16 text-muted-foreground" />
-                        )}
-                      </div>
+                          {/* Âge */}
+                          <td className="p-3">
+                            <span className="text-sm">{profile.age || '-'} ans</span>
+                          </td>
 
-                      <CardContent className="p-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h3 className="font-semibold text-foreground">Profil Anonyme</h3>
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                              {profile.age && <span>{profile.age} ans</span>}
-                              {profile.city_only && (
-                                <>
-                                  <span>•</span>
-                                  <span className="flex items-center gap-1">
-                                    <MapPin className="h-3 w-3" />
-                                    {profile.city_only}
-                                  </span>
-                                </>
+                          {/* Localisation */}
+                          <td className="p-3">
+                            <div className="text-sm flex items-center gap-1">
+                              <MapPin className="h-3 w-3 text-muted-foreground" />
+                              {profile.city_only || '-'}
+                            </div>
+                          </td>
+
+                          {/* Éducation */}
+                          <td className="p-3">
+                            <div className="text-xs text-muted-foreground flex items-center gap-1">
+                              <GraduationCap className="h-3 w-3" />
+                              {profile.education_level || '-'}
+                            </div>
+                          </td>
+
+                          {/* Vérification */}
+                          <td className="p-3">
+                            <VerificationBadge verificationScore={profile.verification_score} />
+                          </td>
+
+                          {/* Actions */}
+                          <td className="p-3">
+                            <div className="flex items-center justify-center gap-2">
+                              {selectionMode && (
+                                <Checkbox
+                                  checked={selectedProfiles.includes(profile.user_id)}
+                                  onCheckedChange={() => toggleProfileSelection(profile.user_id)}
+                                  className="h-4 w-4"
+                                />
+                              )}
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => navigate(`/profile/${profile.user_id}`)}
+                                className="text-xs"
+                              >
+                                Voir
+                              </Button>
+                              <Button
+                                onClick={() => handleLike(profile.user_id)}
+                                disabled={!subscription.subscribed || dailyLimitReached || isInActiveConversation}
+                                size="sm"
+                                className="text-xs"
+                              >
+                                <Heart className="h-3 w-3" />
+                              </Button>
+                              {user && (
+                                <ProfileNoteCard 
+                                  userId={user.id} 
+                                  profileId={profile.user_id}
+                                  searchKeyword={notesSearchKeyword}
+                                />
                               )}
                             </div>
-                          </div>
-                          <VerificationBadge verificationScore={profile.verification_score} />
-                        </div>
-
-                        {profile.education_level && (
-                          <div className="flex items-center gap-2 text-xs">
-                            <GraduationCap className="h-3 w-3 text-muted-foreground" />
-                            <span className="text-muted-foreground">{profile.education_level}</span>
-                          </div>
-                        )}
-
-                        {profile.profession_category && (
-                          <div className="flex items-center gap-2 text-xs">
-                            <Briefcase className="h-3 w-3 text-muted-foreground" />
-                            <span className="text-muted-foreground">{profile.profession_category}</span>
-                          </div>
-                        )}
-
-                        <div className="flex gap-2 pt-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => navigate(`/profile/${profile.user_id}`)}
-                            className="flex-1 text-xs"
-                          >
-                            Voir profil
-                          </Button>
-                          <Button
-                            onClick={() => handleLike(profile.user_id)}
-                            disabled={!subscription.subscribed || dailyLimitReached || isInActiveConversation}
-                            className="flex-1 text-xs"
-                          >
-                            <Heart className="h-3 w-3 mr-1" />
-                            {!subscription.subscribed ? 'Premium' : 'Liker'}
-                          </Button>
-                          {user && (
-                            <ProfileNoteCard 
-                              userId={user.id} 
-                              profileId={profile.user_id}
-                              searchKeyword={notesSearchKeyword}
-                            />
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  
+                  {/* Empty State */}
+                  {gridProfiles.length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground">
+                      <User className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                      <p>Aucun profil à afficher</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Traditional Pagination */}
