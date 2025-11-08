@@ -4,6 +4,7 @@ import { useChatMessages } from '@/hooks/useChatMessages';
 import { useChatMatch } from '@/hooks/useChatMatch';
 import { useChatPresence } from '@/hooks/useChatPresence';
 import { useConversationStatus } from '@/hooks/useConversationStatus';
+import { useWebRTCCall } from '@/hooks/useWebRTCCall';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -11,6 +12,8 @@ import { ChatHeader } from '@/components/chat/ChatHeader';
 import { MessageBubble } from '@/components/chat/MessageBubble';
 import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { EndConversationDialog } from '@/components/chat/EndConversationDialog';
+import { IncomingCallNotification } from '@/components/IncomingCallNotification';
+import { ActiveCallWindow } from '@/components/ActiveCallWindow';
 import { Send, Shield, Heart, X } from 'lucide-react';
 
 interface ChatWindowProps {
@@ -21,16 +24,36 @@ interface ChatWindowProps {
 const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   const { messages, loading: messagesLoading, sending, sendMessage } = useChatMessages(matchId);
   const { match, loading: matchLoading, canCommunicate } = useChatMatch(matchId);
   const { typingUsers, isUserOnline, startTyping, stopTyping } = useChatPresence(matchId);
   const { endConversation, loading: endingConversation } = useConversationStatus();
-  
+
+  // WebRTC Call Management
+  const {
+    callState,
+    localStream,
+    remoteStream,
+    incomingCall,
+    callDuration,
+    isAudioEnabled,
+    isVideoEnabled,
+    initiateCall,
+    acceptCall,
+    rejectCall,
+    endCall,
+    toggleAudio,
+    toggleVideo,
+    isCallActive,
+    isIncomingCall
+  } = useWebRTCCall({ matchId });
+
   const [newMessage, setNewMessage] = useState('');
   const [showEndDialog, setShowEndDialog] = useState(false);
+  const [currentCallType, setCurrentCallType] = useState<'audio' | 'video'>('audio');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   const loading = messagesLoading || matchLoading;
 
   useEffect(() => {
@@ -59,7 +82,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
     startTyping();
   };
 
-  const handleCall = (isVideo: boolean) => {
+  const handleCall = async (isVideo: boolean) => {
     if (!canCommunicate) {
       toast({
         title: "Communication non autorisée",
@@ -68,11 +91,28 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
       });
       return;
     }
-    
-    toast({
-      title: isVideo ? "Appel vidéo" : "Appel audio",
-      description: `Démarrage de l'${isVideo ? 'appel vidéo' : 'appel audio'} avec ${match?.other_user.full_name}...`,
-    });
+
+    if (!match || !user) {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'initier l'appel",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setCurrentCallType(isVideo ? 'video' : 'audio');
+      await initiateCall(isVideo ? 'video' : 'audio', user.user_metadata?.full_name || 'Utilisateur');
+      console.log(`✅ ${isVideo ? 'Video' : 'Audio'} call initiated`);
+    } catch (error) {
+      console.error('❌ Failed to initiate call:', error);
+      toast({
+        title: "Erreur d'appel",
+        description: "Impossible de démarrer l'appel. Vérifiez vos permissions micro/caméra.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -215,6 +255,34 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
             loading={endingConversation}
           />
         </>
+      )}
+
+      {/* Incoming Call Notification */}
+      {isIncomingCall && incomingCall && (
+        <IncomingCallNotification
+          incomingCall={incomingCall}
+          onAccept={acceptCall}
+          onReject={rejectCall}
+          callerAvatar={match?.other_user.avatar_url}
+        />
+      )}
+
+      {/* Active Call Window */}
+      {isCallActive && (callState === 'calling' || callState === 'connecting' || callState === 'connected') && match && (
+        <ActiveCallWindow
+          localStream={localStream}
+          remoteStream={remoteStream}
+          callState={callState}
+          isAudioEnabled={isAudioEnabled}
+          isVideoEnabled={isVideoEnabled}
+          callDuration={callDuration}
+          partnerName={match.other_user.full_name}
+          partnerAvatar={match.other_user.avatar_url}
+          isVideoCall={currentCallType === 'video'}
+          onToggleAudio={toggleAudio}
+          onToggleVideo={toggleVideo}
+          onEndCall={endCall}
+        />
       )}
     </div>
   );
