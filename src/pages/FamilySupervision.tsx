@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Shield, Users, Heart, Bell } from 'lucide-react';
 import FamilyInvitationManager from '@/components/FamilyInvitationManager';
 import MatchApprovalSystem from '@/components/MatchApprovalSystem';
@@ -25,7 +26,7 @@ const FamilySupervision = () => {
 
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <ResponsiveTabsList tabCount={4}>
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
               Vue d'ensemble
@@ -42,7 +43,7 @@ const FamilySupervision = () => {
               <Bell className="h-4 w-4" />
               Notifications
             </TabsTrigger>
-          </TabsList>
+          </ResponsiveTabsList>
 
           <TabsContent value="overview" className="space-y-0">
             <FamilySupervisionDashboard />

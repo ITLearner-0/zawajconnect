@@ -5,7 +5,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -335,13 +336,13 @@ const AdminUserProfile = () => {
 
       {/* Detailed Information Tabs */}
       <Tabs defaultValue="profile" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-5">
+        <ResponsiveTabsList tabCount={5}>
           <TabsTrigger value="profile">Profil</TabsTrigger>
           <TabsTrigger value="islamic">Préférences Islamiques</TabsTrigger>
           <TabsTrigger value="matching">Critères de recherche</TabsTrigger>
           <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
           <TabsTrigger value="verification">Vérification</TabsTrigger>
-        </TabsList>
+        </ResponsiveTabsList>
 
         {/* Profile Tab */}
         <TabsContent value="profile">

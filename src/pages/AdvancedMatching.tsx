@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Navigate } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AdvancedMatchingEngine from '@/components/matching/AdvancedMatchingEngine';
@@ -68,7 +69,7 @@ const AdvancedMatching = () => {
           {/* Main Categories */}
           <div>
             <h2 className="text-lg font-semibold mb-3">Catégories</h2>
-            <TabsList className="grid w-full grid-cols-3">
+            <ResponsiveTabsList tabCount={3}>
               <TabsTrigger value="ai" className="flex items-center gap-2">
                 <Brain className="h-4 w-4" />
                 Analyse IA
@@ -81,7 +82,7 @@ const AdvancedMatching = () => {
                 <Shield className="h-4 w-4" />
                 Famille
               </TabsTrigger>
-            </TabsList>
+            </ResponsiveTabsList>
           </div>
 
           {/* Sub Navigation */}

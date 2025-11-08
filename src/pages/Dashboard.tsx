@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { User, Heart, Settings, Eye, Save, Camera, MapPin, Briefcase, GraduationCap, Brain, Target, Sparkles, Trophy } from 'lucide-react';
@@ -346,7 +347,7 @@ const Dashboard = () => {
           {/* Main Content */}
           <div>
             <Tabs defaultValue="profile" className="space-y-4">
-              <TabsList className="grid w-full grid-cols-4 border">
+              <ResponsiveTabsList tabCount={4} className="border">
                 <TabsTrigger value="profile">Profil Personnel</TabsTrigger>
                 <TabsTrigger value="islamic">Préférences Islamiques</TabsTrigger>
                 <TabsTrigger value="privacy">Confidentialité</TabsTrigger>
@@ -354,7 +355,7 @@ const Dashboard = () => {
                   <Trophy className="h-4 w-4 mr-2" />
                   Gamification
                 </TabsTrigger>
-              </TabsList>
+              </ResponsiveTabsList>
 
               <TabsContent value="profile" className="space-y-4">
                 <div className="border rounded p-4">

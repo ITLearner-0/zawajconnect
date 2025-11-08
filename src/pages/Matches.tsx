@@ -4,7 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
+import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Heart, MessageCircle, Eye, Users, Clock, Crown, ArrowUpDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ConversationStatusBadge } from '@/components/ui/ConversationStatusBadge';
@@ -270,7 +271,7 @@ const Matches = () => {
           </div>
 
           <Tabs defaultValue="mutual" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2">
+            <ResponsiveTabsList tabCount={2}>
               <TabsTrigger value="mutual" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
                 Matches Mutuels ({mutualMatches.length})
@@ -279,7 +280,7 @@ const Matches = () => {
                 <Clock className="h-4 w-4" />
                 En Attente ({pendingMatches.length})
               </TabsTrigger>
-            </TabsList>
+            </ResponsiveTabsList>
 
             <TabsContent value="mutual" className="space-y-4">
               {mutualMatches.length > 0 ? (
