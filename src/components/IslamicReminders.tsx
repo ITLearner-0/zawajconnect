@@ -116,11 +116,11 @@ const IslamicReminders = () => {
   const category = categoryConfig[current.category];
 
   return (
-    <section className="py-16 px-4 bg-background border-y border-border">
+    <section className="py-16 px-4 bg-gradient-to-br from-emerald/5 via-cream/20 to-sage/10">
       <div className="container mx-auto max-w-4xl">
-        <div className="text-center mb-12">
-          <div className="h-16 w-16 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
-            <BookOpen className="h-8 w-8 text-primary-foreground" />
+        <div className="text-center mb-12 animate-fade-in">
+          <div className="h-16 w-16 bg-gradient-to-br from-gold to-emerald rounded-full flex items-center justify-center mx-auto mb-6">
+            <BookOpen className="h-8 w-8 text-white" />
           </div>
           <h2 className="text-4xl font-bold text-foreground mb-4">
             Rappels Islamiques
@@ -133,7 +133,7 @@ const IslamicReminders = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Reminder Card */}
           <div className="lg:col-span-2">
-            <Card className="h-full border border-border bg-card">
+            <Card className="h-full animate-slide-up card-hover bg-gradient-to-br from-white/90 to-cream/40">
               <CardContent className="p-8">
                 {/* Header with Category and Timer */}
                 <div className="flex items-center justify-between mb-6">
@@ -154,7 +154,7 @@ const IslamicReminders = () => {
 
                 {/* Arabic Text */}
                 {current.arabic && (
-                  <div className="text-center mb-6 p-4 bg-muted rounded border border-border">
+                  <div className="text-center mb-6 p-4 bg-gradient-to-r from-gold/10 to-emerald/10 rounded-lg">
                     <p className="text-2xl font-arabic text-foreground leading-relaxed">
                       {current.arabic}
                     </p>
@@ -163,10 +163,10 @@ const IslamicReminders = () => {
 
                 {/* Translation */}
                 <div className="mb-6">
-                  <blockquote className="text-lg text-muted-foreground italic leading-relaxed border-l-4 border-primary pl-4">
+                  <blockquote className="text-lg text-muted-foreground italic leading-relaxed border-l-4 border-emerald pl-4">
                     "{current.translation}"
                   </blockquote>
-                  <p className="text-sm text-primary font-medium mt-2">
+                  <p className="text-sm text-gold-dark font-medium mt-2">
                     - {current.source}
                   </p>
                 </div>
@@ -177,7 +177,7 @@ const IslamicReminders = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {current.benefits.map((benefit, index) => (
                       <div key={index} className="flex items-center gap-2">
-                        <div className="h-2 w-2 bg-primary rounded-full"></div>
+                        <div className="h-2 w-2 bg-emerald rounded-full"></div>
                         <span className="text-sm text-muted-foreground">{benefit}</span>
                       </div>
                     ))}
@@ -189,6 +189,7 @@ const IslamicReminders = () => {
                   <Button
                     variant="outline"
                     onClick={prevReminder}
+                    className="flex items-center gap-2"
                   >
                     ← Précédent
                   </Button>
@@ -201,8 +202,8 @@ const IslamicReminders = () => {
                           setCurrentReminder(index);
                           setTimeLeft(300);
                         }}
-                        className={`h-2 w-8 rounded-full ${
-                          index === currentReminder ? 'bg-primary' : 'bg-muted-foreground/30'
+                        className={`h-2 w-8 rounded-full transition-all ${
+                          index === currentReminder ? 'bg-emerald' : 'bg-muted-foreground/30'
                         }`}
                       />
                     ))}
@@ -211,6 +212,7 @@ const IslamicReminders = () => {
                   <Button
                     variant="outline"
                     onClick={nextReminder}
+                    className="flex items-center gap-2"
                   >
                     Suivant →
                   </Button>
@@ -222,10 +224,10 @@ const IslamicReminders = () => {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Actions */}
-            <Card className="border border-border bg-card">
+            <Card className="animate-slide-up card-hover" style={{ animationDelay: '0.2s' }}>
               <CardContent className="p-6">
                 <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
-                  <RefreshCw className="h-5 w-5 text-primary" />
+                  <RefreshCw className="h-5 w-5 text-emerald" />
                   Actions Rapides
                 </h4>
                 <div className="space-y-3">
@@ -250,7 +252,7 @@ const IslamicReminders = () => {
             </Card>
 
             {/* Categories Overview */}
-            <Card className="border border-border bg-card">
+            <Card className="animate-slide-up card-hover" style={{ animationDelay: '0.4s' }}>
               <CardContent className="p-6">
                 <h4 className="font-semibold text-foreground mb-4">Catégories</h4>
                 <div className="space-y-2">
@@ -273,7 +275,7 @@ const IslamicReminders = () => {
             </Card>
 
             {/* Daily Reminder */}
-            <Card className="border border-border bg-muted">
+            <Card className="animate-slide-up card-hover bg-gradient-to-br from-gold/10 to-emerald/10 border-gold/20" style={{ animationDelay: '0.6s' }}>
               <CardContent className="p-6 text-center">
                 <h4 className="font-semibold text-foreground mb-3">Rappel du Jour</h4>
                 <p className="text-sm text-muted-foreground mb-3">
@@ -282,7 +284,7 @@ const IslamicReminders = () => {
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  className="w-full"
+                  className="w-full border-gold/30 text-gold-dark hover:bg-gold/10"
                 >
                   <Star className="h-4 w-4 mr-2" />
                   Faire Salat al-Istikhara

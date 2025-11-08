@@ -16,10 +16,10 @@ const Index = () => {
       <IslamicValues />
       <ProcessSection />
       <CompatibilitySection />
-      <section className="py-12 px-4 bg-background border-y border-border">
+      <section className="py-12 px-4 bg-gradient-to-br from-emerald/5 via-cream/20 to-sage/10">
         <div className="container mx-auto">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-10">
+            <div className="text-center mb-10 animate-fade-in">
               <h2 className="text-3xl font-bold text-foreground mb-4">
                 Outils Islamiques du Quotidien
               </h2>
@@ -27,14 +27,14 @@ const Index = () => {
                 Restez connecté à votre foi pendant votre recherche du partenaire idéal
               </p>
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-slide-up">
+              <div className="animate-fade-in">
                 <PrayerTimes />
               </div>
-              <div>
+              <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
                 <QiblaDirection />
               </div>
-              <div>
+              <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
                 <IslamicCalendar />
               </div>
             </div>

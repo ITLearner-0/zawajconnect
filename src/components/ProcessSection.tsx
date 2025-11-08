@@ -87,10 +87,10 @@ const processSteps: ProcessStep[] = [
 
 const ProcessSection = () => {
   return (
-    <section id="processus" className="py-12 bg-background border-y border-border">
+    <section id="processus" className="py-12 bg-gradient-to-br from-cream/10 via-background to-sage/5">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-6 text-foreground">
+          <h2 className="text-4xl font-bold mb-6 bg-gradient-to-r from-emerald-600 to-sage-700 bg-clip-text text-transparent">
             Votre Parcours vers le Mariage
           </h2>
           <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -100,16 +100,16 @@ const ProcessSection = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {processSteps.map((step) => (
-            <Card key={step.id} className="border border-border bg-card">
+          {processSteps.map((step, index) => (
+            <Card key={step.id} className="relative overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
               <CardContent className="p-8">
                 {/* Step Number */}
-                <div className="absolute top-4 right-4 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-bold">
+                <div className="absolute top-4 right-4 w-8 h-8 bg-gradient-to-r from-emerald-500 to-sage-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
                   {step.id}
                 </div>
 
                 {/* Icon */}
-                <div className="mb-6 p-4 rounded-full bg-muted w-fit">
+                <div className="mb-6 p-4 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md group-hover:shadow-lg transition-shadow duration-300 w-fit">
                   {step.icon}
                 </div>
 
@@ -127,28 +127,39 @@ const ProcessSection = () => {
                 <ul className="space-y-2 mb-6">
                   {step.details.map((detail, detailIndex) => (
                     <li key={detailIndex} className="flex items-start gap-3 text-sm">
-                      <CheckCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
                       <span className="text-muted-foreground">{detail}</span>
                     </li>
                   ))}
                 </ul>
+
+                {/* Connection Line (for larger screens) */}
+                {index < processSteps.length - 1 && (
+                  <div className="hidden xl:block absolute -right-4 top-1/2 transform -translate-y-1/2 z-10">
+                    <div className="w-8 h-px bg-gradient-to-r from-emerald-300 to-sage-400"></div>
+                    <div className="absolute -right-1 -top-1 w-2 h-2 bg-emerald-400 rounded-full"></div>
+                  </div>
+                )}
               </CardContent>
+
+              {/* Hover gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-emerald-50/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
             </Card>
           ))}
         </div>
 
         {/* Call to Action */}
         <div className="text-center mt-12">
-          <div className="bg-muted rounded border border-border p-8 max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-foreground mb-4">
+          <div className="bg-gradient-to-r from-emerald-50 to-sage-50 rounded-2xl p-8 border border-emerald-200 max-w-4xl mx-auto">
+            <h3 className="text-2xl font-bold text-emerald-700 mb-4">
               Prêt à Commencer Votre Parcours ?
             </h3>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-emerald-600 mb-6">
               Rejoignez des milliers de musulmans qui ont trouvé leurs partenaires de vie grâce à notre plateforme.
             </p>
             <Button 
               size="lg" 
-              className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3"
+              className="bg-gradient-to-r from-emerald-600 to-sage-600 hover:from-emerald-700 hover:to-sage-700 text-white px-8 py-3"
             >
               Créez Votre Profil Aujourd'hui
             </Button>
