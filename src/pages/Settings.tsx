@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -13,8 +12,10 @@ import {
   User,
   LogOut,
   ArrowLeft,
-  Crown
+  Crown,
+  Code
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import PrivacySettingsForm from '@/components/PrivacySettingsForm';
 import FamilySupervisionPanel from '@/components/FamilySupervisionPanel';
 import VerificationCenter from '@/components/VerificationCenter';
@@ -27,7 +28,6 @@ import FamilyRateLimitIndicator from '@/components/security/FamilyRateLimitIndic
 import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
 import { TestUserSelector } from '@/components/TestUserSelector';
 import { AchievementTestButton } from '@/components/AchievementTestButton';
-import { Code } from 'lucide-react';
 
 const Settings = () => {
   const { user, subscription, signOut } = useAuth();
@@ -37,10 +37,20 @@ const Settings = () => {
   // Check for dev mode
   const isDevMode = import.meta.env.VITE_DEV_MODE === 'true';
   
-  // Check for premium tab in URL params
+  // Check for active section in URL params
   const urlParams = new URLSearchParams(window.location.search);
-  const tabFromUrl = urlParams.get('tab');
-  const [activeTab, setActiveTab] = useState(tabFromUrl || 'privacy');
+  const sectionFromUrl = urlParams.get('section');
+  const [activeSection, setActiveSection] = useState(sectionFromUrl || 'privacy');
+
+  const menuItems = [
+    { id: 'privacy', label: 'Confidentialité', icon: Shield },
+    { id: 'family', label: 'Famille', icon: Users },
+    { id: 'verification', label: 'Vérification', icon: User },
+    { id: 'security', label: 'Sécurité', icon: Shield },
+    { id: 'premium', label: 'Premium', icon: Crown, badge: subscription.subscribed },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    ...(isDevMode ? [{ id: 'dev-tools', label: 'Dev Tools', icon: Code }] : []),
+  ];
 
   const handleSignOut = async () => {
     await signOut();
@@ -48,133 +58,99 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5">
+    <div className="min-h-screen bg-background">
       <div className="container mx-auto max-w-7xl px-4 py-6">
-        {/* Header avec meilleure disposition */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => navigate('/enhanced-profile')}
-                className="hover:bg-accent"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Retour
-              </Button>
-            </div>
+        {/* Header */}
+        <div className="mb-6 flex items-center justify-between border-b pb-4">
+          <div className="flex items-center gap-3">
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={handleSignOut}
-              className="text-destructive border-destructive hover:bg-destructive hover:text-destructive-foreground"
+              onClick={() => navigate('/enhanced-profile')}
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              Se déconnecter
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
             </Button>
-          </div>
-          
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-3 rounded-xl bg-primary/10">
-              <SettingsIcon className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-foreground">Paramètres</h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                Gérez vos préférences et votre compte
-              </p>
+            <div className="flex items-center gap-2 ml-4">
+              <SettingsIcon className="h-5 w-5 text-foreground" />
+              <h1 className="text-2xl font-bold text-foreground">Paramètres</h1>
             </div>
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSignOut}
+          >
+            <LogOut className="h-4 w-4 mr-2" />
+            Se déconnecter
+          </Button>
         </div>
 
-        {/* Main Content avec meilleure organisation */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <div className="bg-card/50 backdrop-blur-sm rounded-xl p-2 border shadow-sm">
-            <TabsList className={`grid w-full ${isDevMode ? 'grid-cols-3 lg:grid-cols-7' : 'grid-cols-3 lg:grid-cols-6'} gap-2 bg-transparent`}>
-              <TabsTrigger 
-                value="privacy" 
-                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline">Confidentialité</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="family" 
-                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Users className="h-4 w-4" />
-                <span className="hidden sm:inline">Famille</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="verification" 
-                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">Vérification</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="security" 
-                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Shield className="h-4 w-4" />
-                <span className="hidden sm:inline">Sécurité</span>
-              </TabsTrigger>
-              <TabsTrigger 
-                value="premium" 
-                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground relative"
-              >
-                <Crown className="h-4 w-4" />
-                <span className="hidden sm:inline">Premium</span>
-                {subscription.subscribed && (
-                  <Badge className="absolute -top-1 -right-1 bg-emerald text-white text-xs px-1.5 py-0 h-4">
-                    ✓
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger 
-                value="notifications" 
-                className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-              >
-                <Bell className="h-4 w-4" />
-                <span className="hidden sm:inline">Notifications</span>
-              </TabsTrigger>
-              {isDevMode && (
-                <TabsTrigger 
-                  value="dev-tools" 
-                  className="flex items-center justify-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-                >
-                  <Code className="h-4 w-4" />
-                  <span className="hidden sm:inline">Dev Tools</span>
-                </TabsTrigger>
-              )}
-            </TabsList>
-          </div>
+        {/* Layout: Menu vertical à gauche et contenu à droite */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Menu vertical à gauche */}
+          <aside className="lg:col-span-1">
+            <Card className="p-4">
+              <nav className="space-y-1">
+                {menuItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeSection === item.id;
+                  
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => setActiveSection(item.id)}
+                      className={cn(
+                        "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                        isActive
+                          ? "bg-primary text-primary-foreground"
+                          : "text-foreground hover:bg-accent"
+                      )}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{item.label}</span>
+                      {item.badge && (
+                        <Badge className="ml-auto bg-emerald text-white text-xs px-2 py-0 h-5">
+                          ✓
+                        </Badge>
+                      )}
+                    </button>
+                  );
+                })}
+              </nav>
+            </Card>
+          </aside>
 
-          {/* Contenu des onglets */}
-          <div className="mt-6">
-            <TabsContent value="privacy" className="space-y-6">
-              <Card className="p-6 shadow-sm">
+          {/* Contenu à droite */}
+          <main className="lg:col-span-3">
+            {activeSection === 'privacy' && (
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Confidentialité</h2>
                 <PrivacySettingsForm />
               </Card>
-            </TabsContent>
+            )}
 
-            <TabsContent value="family" className="space-y-6">
-              <Card className="p-6 shadow-sm">
+            {activeSection === 'family' && (
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Famille</h2>
                 <FamilySupervisionPanel />
               </Card>
-            </TabsContent>
+            )}
 
-            <TabsContent value="verification" className="space-y-6">
-              <IDVerificationSystem />
-            </TabsContent>
+            {activeSection === 'verification' && (
+              <div>
+                <h2 className="text-xl font-semibold mb-4">Vérification</h2>
+                <IDVerificationSystem />
+              </div>
+            )}
 
-            <TabsContent value="security" className="space-y-6">
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <SecurityAlertPanel />
-                <div className="space-y-6">
+            {activeSection === 'security' && (
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold mb-4">Sécurité</h2>
+                <div className="grid grid-cols-1 gap-6">
+                  <SecurityAlertPanel />
                   <FamilyRateLimitIndicator />
-                  <Card className="p-6 shadow-sm">
+                  <Card className="p-6">
                     <h4 className="text-sm font-semibold mb-4 flex items-center gap-2">
                       <Shield className="h-5 w-5 text-primary" />
                       Sécurité du Mot de Passe
@@ -193,46 +169,49 @@ const Settings = () => {
                   </Card>
                 </div>
               </div>
-            </TabsContent>
-            
-            <TabsContent value="premium" className="space-y-6">
-              {subscription.subscribed && (
-                <Card className="p-6 shadow-sm border-primary/20 bg-gradient-to-r from-primary/5 to-accent/10">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-xl bg-primary/10">
-                        <Crown className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-lg">Statut de l'abonnement</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Vous avez accès aux fonctionnalités premium
-                        </p>
-                      </div>
-                    </div>
-                    <Badge className="bg-emerald text-white px-4 py-1.5">
-                      Actif
-                    </Badge>
-                  </div>
-                </Card>
-              )}
-              <PremiumSubscription />
-            </TabsContent>
+            )}
 
-            <TabsContent value="notifications" className="space-y-6">
-              <Card className="p-6 shadow-sm">
+            {activeSection === 'premium' && (
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold mb-4">Premium</h2>
+                {subscription.subscribed && (
+                  <Card className="p-6 border-primary/20 bg-primary/5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <Crown className="h-6 w-6 text-primary" />
+                        <div>
+                          <h3 className="font-semibold text-lg">Statut de l'abonnement</h3>
+                          <p className="text-sm text-muted-foreground mt-1">
+                            Vous avez accès aux fonctionnalités premium
+                          </p>
+                        </div>
+                      </div>
+                      <Badge className="bg-emerald text-white px-4 py-1.5">
+                        Actif
+                      </Badge>
+                    </div>
+                  </Card>
+                )}
+                <PremiumSubscription />
+              </div>
+            )}
+
+            {activeSection === 'notifications' && (
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-4">Notifications</h2>
                 <NotificationSystem />
               </Card>
-            </TabsContent>
+            )}
 
-            {isDevMode && (
-              <TabsContent value="dev-tools" className="space-y-6">
+            {activeSection === 'dev-tools' && isDevMode && (
+              <div className="space-y-6">
+                <h2 className="text-xl font-semibold mb-4">Dev Tools</h2>
                 <TestUserSelector />
                 <AchievementTestButton />
-              </TabsContent>
+              </div>
             )}
-          </div>
-        </Tabs>
+          </main>
+        </div>
       </div>
     </div>
   );
