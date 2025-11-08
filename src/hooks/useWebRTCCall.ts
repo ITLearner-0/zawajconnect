@@ -9,6 +9,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { WebRTCSignalingService, CallType, CallState, CallOffer } from '@/services/webrtc-signaling';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface UseWebRTCCallOptions {
   matchId: string;
@@ -58,6 +59,7 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
   // Refs
   const signalingService = useRef<WebRTCSignalingService | null>(null);
   const callTimerInterval = useRef<NodeJS.Timeout | null>(null);
+  const currentCallId = useRef<string | null>(null);
 
   /**
    * Initialize signaling service
@@ -71,15 +73,34 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
         const service = new WebRTCSignalingService(matchId, user.id);
 
         // Set up callbacks
-        service.onCallStateChange = (state) => {
+        service.onCallStateChange = async (state) => {
           console.log('📞 Call state changed:', state);
           setCallState(state);
 
-          // Start/stop call timer
-          if (state === 'connected') {
-            startCallTimer();
-          } else if (state === 'ended' || state === 'rejected' || state === 'failed') {
-            stopCallTimer();
+          // Update call record in database
+          if (currentCallId.current) {
+            const updates: any = { status: state };
+
+            if (state === 'connected') {
+              updates.connected_at = new Date().toISOString();
+              startCallTimer();
+            } else if (state === 'ended' || state === 'rejected' || state === 'failed') {
+              updates.ended_at = new Date().toISOString();
+              if (state !== 'rejected' && state !== 'failed') {
+                updates.duration_seconds = callDuration;
+              }
+              updates.end_reason = state;
+              stopCallTimer();
+            }
+
+            const { error } = await supabase
+              .from('webrtc_calls')
+              .update(updates)
+              .eq('id', currentCallId.current);
+
+            if (error) {
+              console.error('Failed to update call record:', error);
+            }
           }
         };
 
@@ -173,19 +194,51 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
    * Initiate an outgoing call
    */
   const initiateCall = useCallback(async (callType: CallType, callerName: string) => {
-    if (!signalingService.current) {
+    if (!signalingService.current || !user?.id) {
       throw new Error('Signaling service not initialized');
     }
 
     try {
       setCurrentCallType(callType);
+      
+      // Déterminer le callee_id depuis le match
+      const { data: matchData } = await supabase
+        .from('matches')
+        .select('user1_id, user2_id')
+        .eq('id', matchId)
+        .single();
+
+      if (!matchData) throw new Error('Match not found');
+
+      const calleeId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
+
+      // Créer l'enregistrement de l'appel
+      const { data: callRecord, error: callError } = await supabase
+        .from('webrtc_calls')
+        .insert({
+          match_id: matchId,
+          caller_id: user.id,
+          callee_id: calleeId,
+          call_type: callType,
+          status: 'initiated'
+        })
+        .select()
+        .single();
+
+      if (callError) {
+        console.error('Failed to create call record:', callError);
+      } else {
+        currentCallId.current = callRecord.id;
+        console.log('📝 Call record created:', callRecord.id);
+      }
+
       await signalingService.current.initiateCall(callType, callerName);
       console.log(`✅ ${callType} call initiated`);
     } catch (error) {
       console.error('❌ Failed to initiate call:', error);
       throw error;
     }
-  }, []);
+  }, [matchId, user?.id]);
 
   /**
    * Accept an incoming call
@@ -270,6 +323,7 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
    * Handle call cleanup
    */
   const handleCallCleanup = useCallback(() => {
+    currentCallId.current = null;
     setLocalStream(null);
     setRemoteStream(null);
     setIncomingCall(null);

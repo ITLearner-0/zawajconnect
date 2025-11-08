@@ -2356,6 +2356,68 @@ export type Database = {
           },
         ]
       }
+      webrtc_calls: {
+        Row: {
+          call_type: string
+          callee_id: string
+          caller_id: string
+          connected_at: string | null
+          created_at: string
+          duration_seconds: number | null
+          end_reason: string | null
+          ended_at: string | null
+          family_notified: boolean | null
+          id: string
+          match_id: string
+          quality_metrics: Json | null
+          started_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          call_type: string
+          callee_id: string
+          caller_id: string
+          connected_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          end_reason?: string | null
+          ended_at?: string | null
+          family_notified?: boolean | null
+          id?: string
+          match_id: string
+          quality_metrics?: Json | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          call_type?: string
+          callee_id?: string
+          caller_id?: string
+          connected_at?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          end_reason?: string | null
+          ended_at?: string | null
+          family_notified?: boolean | null
+          id?: string
+          match_id?: string
+          quality_metrics?: Json | null
+          started_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "webrtc_calls_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weekly_challenges: {
         Row: {
           challenge_type: string

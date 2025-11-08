@@ -14,6 +14,8 @@ import { TypingIndicator } from '@/components/chat/TypingIndicator';
 import { EndConversationDialog } from '@/components/chat/EndConversationDialog';
 import { IncomingCallNotification } from '@/components/IncomingCallNotification';
 import { ActiveCallWindow } from '@/components/ActiveCallWindow';
+import { CallHistory } from '@/components/chat/CallHistory';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Send, Shield, Heart, X } from 'lucide-react';
 
 interface ChatWindowProps {
@@ -190,31 +192,42 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
           </div>
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-4 bg-background">
-            {messages.length === 0 ? (
-              <div className="text-center py-12">
-                <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                <p className="text-sm text-muted-foreground">
-                  Début de conversation
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Présentez-vous de manière respectueuse
-                </p>
-              </div>
-            ) : (
-              <>
-                {messages.map((message) => (
-                  <MessageBubble
-                    key={message.id}
-                    message={message}
-                    isMyMessage={message.sender_id === user?.id}
-                  />
-                ))}
-                <TypingIndicator typingUsers={typingUsers} />
-              </>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
+          <Tabs defaultValue="messages" className="flex-1 flex flex-col overflow-hidden">
+            <TabsList className="w-full justify-start px-4 border-b rounded-none bg-background h-12 shrink-0">
+              <TabsTrigger value="messages">Messages</TabsTrigger>
+              <TabsTrigger value="calls">Historique des appels</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="messages" className="flex-1 overflow-y-auto p-4 bg-background mt-0 data-[state=inactive]:hidden">
+              {messages.length === 0 ? (
+                <div className="text-center py-12">
+                  <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                  <p className="text-sm text-muted-foreground">
+                    Début de conversation
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Présentez-vous de manière respectueuse
+                  </p>
+                </div>
+              ) : (
+                <>
+                  {messages.map((message) => (
+                    <MessageBubble
+                      key={message.id}
+                      message={message}
+                      isMyMessage={message.sender_id === user?.id}
+                    />
+                  ))}
+                  <TypingIndicator typingUsers={typingUsers} />
+                </>
+              )}
+              <div ref={messagesEndRef} />
+            </TabsContent>
+
+            <TabsContent value="calls" className="flex-1 overflow-y-auto p-4 bg-background mt-0 data-[state=inactive]:hidden">
+              <CallHistory matchId={matchId} />
+            </TabsContent>
+          </Tabs>
 
           {/* Islamic Reminder */}
           <div className="px-4 py-2 bg-muted/50 border-t">
