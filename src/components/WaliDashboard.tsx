@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +9,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import SupervisionMetrics from '@/components/SupervisionMetrics';
 import NotificationCenter from '@/components/NotificationCenter';
+import { SupervisedCallsHistory } from '@/components/wali/SupervisedCallsHistory';
+import { CallSupervisionSettings } from '@/components/wali/CallSupervisionSettings';
 import { 
   Shield, 
   Users, 
@@ -21,7 +22,8 @@ import {
   Eye,
   Heart,
   Calendar,
-  TrendingUp
+  TrendingUp,
+  Phone
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -247,7 +249,7 @@ const WaliDashboard: React.FC = () => {
               };
             })
           );
-          setMatchesForApproval(enrichedMatches);
+          setMatchesForApproval(enrichedMatches.filter(m => m !== null) as MatchForApproval[]);
         }
       }
 
@@ -471,7 +473,7 @@ const WaliDashboard: React.FC = () => {
 
       {/* Main Content */}
       <Tabs defaultValue="notifications" className="space-y-6">
-        <ResponsiveTabsList tabCount={4}>
+        <ResponsiveTabsList tabCount={5}>
           <TabsTrigger value="notifications">
             Notifications
             {stats.criticalAlerts > 0 && (
@@ -488,6 +490,7 @@ const WaliDashboard: React.FC = () => {
               </Badge>
             )}
           </TabsTrigger>
+          <TabsTrigger value="calls">Appels</TabsTrigger>
           <TabsTrigger value="supervised">Supervisés</TabsTrigger>
           <TabsTrigger value="reports">Rapports</TabsTrigger>
         </ResponsiveTabsList>
@@ -573,6 +576,11 @@ const WaliDashboard: React.FC = () => {
           </Card>
         </TabsContent>
 
+        {/* Calls Tab */}
+        <TabsContent value="calls" className="space-y-4">
+          <SupervisedCallsHistory />
+        </TabsContent>
+
         {/* Supervised Users Tab */}
         <TabsContent value="supervised" className="space-y-4">
           <Card>
@@ -591,41 +599,47 @@ const WaliDashboard: React.FC = () => {
                   </div>
                 ) : (
                   supervisedUsers.map((user) => (
-                    <Card key={user.id} className="border">
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div className="p-2 bg-emerald/10 rounded-full">
-                              <Users className="h-6 w-6 text-emerald" />
+                    <div key={user.id} className="space-y-4">
+                      <Card className="border">
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div className="p-2 bg-emerald/10 rounded-full">
+                                <Users className="h-6 w-6 text-emerald" />
+                              </div>
+                              <div>
+                                <p className="font-medium">{user.full_name}</p>
+                                <p className="text-sm text-muted-foreground">
+                                  Relation: {user.relationship}
+                                </p>
+                              </div>
                             </div>
-                            <div>
-                              <p className="font-medium">{user.full_name}</p>
-                              <p className="text-sm text-muted-foreground">
-                                Relation: {user.relationship}
-                              </p>
+                            <div className="flex gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => handleViewProfile(user.user_id)}
+                              >
+                                <Eye className="h-4 w-4 mr-1" />
+                                Voir Profil
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleViewConversations(user.user_id)}
+                              >
+                                <MessageSquare className="h-4 w-4 mr-1" />
+                                Conversations
+                              </Button>
                             </div>
                           </div>
-                          <div className="flex gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => handleViewProfile(user.user_id)}
-                            >
-                              <Eye className="h-4 w-4 mr-1" />
-                              Voir Profil
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleViewConversations(user.user_id)}
-                            >
-                              <MessageSquare className="h-4 w-4 mr-1" />
-                              Conversations
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                        </CardContent>
+                      </Card>
+                      <CallSupervisionSettings 
+                        familyMemberId={user.id}
+                        supervisedUserName={user.full_name}
+                      />
+                    </div>
                   ))
                 )}
               </div>

@@ -400,6 +400,7 @@ export type Database = {
       }
       family_members: {
         Row: {
+          allow_video_calls: boolean | null
           can_communicate: boolean | null
           can_view_profile: boolean | null
           created_at: string
@@ -411,10 +412,14 @@ export type Database = {
           invitation_token: string | null
           invited_user_id: string | null
           is_wali: boolean | null
+          max_call_duration_minutes: number | null
+          notify_on_calls: boolean | null
           relationship: string
+          require_call_approval: boolean | null
           user_id: string
         }
         Insert: {
+          allow_video_calls?: boolean | null
           can_communicate?: boolean | null
           can_view_profile?: boolean | null
           created_at?: string
@@ -426,10 +431,14 @@ export type Database = {
           invitation_token?: string | null
           invited_user_id?: string | null
           is_wali?: boolean | null
+          max_call_duration_minutes?: number | null
+          notify_on_calls?: boolean | null
           relationship: string
+          require_call_approval?: boolean | null
           user_id: string
         }
         Update: {
+          allow_video_calls?: boolean | null
           can_communicate?: boolean | null
           can_view_profile?: boolean | null
           created_at?: string
@@ -441,7 +450,10 @@ export type Database = {
           invitation_token?: string | null
           invited_user_id?: string | null
           is_wali?: boolean | null
+          max_call_duration_minutes?: number | null
+          notify_on_calls?: boolean | null
           relationship?: string
+          require_call_approval?: boolean | null
           user_id?: string
         }
         Relationships: []

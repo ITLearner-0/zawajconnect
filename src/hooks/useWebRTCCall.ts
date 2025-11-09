@@ -214,8 +214,6 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
     }
 
     try {
-      setCurrentCallType(callType);
-      
       // Déterminer le callee_id depuis le match
       const { data: matchData } = await supabase
         .from('matches')
@@ -226,6 +224,38 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
       if (!matchData) throw new Error('Match not found');
 
       const calleeId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
+
+      // Check family supervision settings before initiating call
+      const { data: familyMembers } = await supabase
+        .from('family_members')
+        .select('allow_video_calls, require_call_approval, max_call_duration_minutes')
+        .or(`user_id.eq.${user.id},user_id.eq.${calleeId}`)
+        .eq('invitation_status', 'accepted')
+        .eq('is_wali', true);
+
+      if (familyMembers && familyMembers.length > 0) {
+        // Check if video calls are allowed
+        if (callType === 'video' && familyMembers.some(fm => fm.allow_video_calls === false)) {
+          toast({
+            title: "Appel vidéo non autorisé",
+            description: "Les appels vidéo nécessitent l'autorisation de votre Wali. Utilisez un appel audio à la place.",
+            variant: "destructive"
+          });
+          throw new Error('Video calls not allowed');
+        }
+
+        // Check if call approval is required
+        if (familyMembers.some(fm => fm.require_call_approval)) {
+          toast({
+            title: "Approbation requise",
+            description: "Vous devez obtenir l'approbation de votre Wali avant de passer cet appel.",
+            variant: "destructive"
+          });
+          throw new Error('Call approval required');
+        }
+      }
+
+      setCurrentCallType(callType);
 
       // Créer l'enregistrement de l'appel
       const { data: callRecord, error: callError } = await supabase
@@ -245,6 +275,22 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
       } else {
         currentCallId.current = callRecord.id;
         console.log('📝 Call record created:', callRecord.id);
+        
+        // Notify walis that call has started
+        try {
+          await supabase.functions.invoke('send-call-notification', {
+            body: {
+              callId: callRecord.id,
+              matchId: matchId,
+              callerId: user.id,
+              calleeId: calleeId,
+              callType: callType,
+              eventType: 'started'
+            }
+          });
+        } catch (notifError) {
+          console.error('Failed to send call notification:', notifError);
+        }
       }
 
       await signalingService.current.initiateCall(callType, callerName);
@@ -253,7 +299,7 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
       console.error('❌ Failed to initiate call:', error);
       throw error;
     }
-  }, [matchId, user?.id]);
+  }, [matchId, user?.id, toast]);
 
   /**
    * Accept an incoming call
@@ -295,12 +341,71 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
   /**
    * End an ongoing call
    */
+  /**
+   * Handle call cleanup
+   */
+  const handleCallCleanup = useCallback(() => {
+    currentCallId.current = null;
+    setLocalStream(null);
+    setRemoteStream(null);
+    setIncomingCall(null);
+    setCallState('idle');
+    setIsAudioEnabled(true);
+    setIsVideoEnabled(true);
+    stopCallTimer();
+  }, [stopCallTimer]);
+
+  /**
+   * End an ongoing call
+   */
   const endCall = useCallback(async () => {
     if (!signalingService.current) {
       throw new Error('Signaling service not initialized');
     }
 
     try {
+      // Update call record before ending
+      if (currentCallId.current && user?.id) {
+        const endTime = new Date();
+        const durationSeconds = callDuration;
+
+        await supabase
+          .from('webrtc_calls')
+          .update({
+            status: 'ended',
+            ended_at: endTime.toISOString(),
+            duration_seconds: durationSeconds
+          })
+          .eq('id', currentCallId.current);
+
+        // Notify walis that call has ended
+        const { data: matchData } = await supabase
+          .from('matches')
+          .select('user1_id, user2_id')
+          .eq('id', matchId)
+          .single();
+
+        if (matchData) {
+          const calleeId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
+
+          try {
+            await supabase.functions.invoke('send-call-notification', {
+              body: {
+                callId: currentCallId.current,
+                matchId: matchId,
+                callerId: user.id,
+                calleeId: calleeId,
+                callType: currentCallType,
+                eventType: 'ended',
+                duration: durationSeconds
+              }
+            });
+          } catch (notifError) {
+            console.error('Failed to send call end notification:', notifError);
+          }
+        }
+      }
+
       await signalingService.current.endCall();
       handleCallCleanup();
       console.log('✅ Call ended');
@@ -308,7 +413,7 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
       console.error('❌ Failed to end call:', error);
       throw error;
     }
-  }, []);
+  }, [matchId, user?.id, currentCallType, callDuration, handleCallCleanup, stopCallTimer]);
 
   /**
    * Toggle audio on/off
@@ -333,20 +438,6 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
     setIsVideoEnabled(newState);
     console.log(`📹 Video ${newState ? 'enabled' : 'disabled'}`);
   }, [isVideoEnabled, currentCallType]);
-
-  /**
-   * Handle call cleanup
-   */
-  const handleCallCleanup = useCallback(() => {
-    currentCallId.current = null;
-    setLocalStream(null);
-    setRemoteStream(null);
-    setIncomingCall(null);
-    setCallState('idle');
-    setIsAudioEnabled(true);
-    setIsVideoEnabled(true);
-    stopCallTimer();
-  }, [stopCallTimer]);
 
   /**
    * Computed values
