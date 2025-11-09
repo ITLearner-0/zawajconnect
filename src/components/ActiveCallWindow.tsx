@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import { CallState, QualityMetrics } from '@/services/webrtc-signaling';
 import { ConnectionQualityIndicator } from '@/components/ConnectionQualityIndicator';
+import { MobileCallInterface } from '@/components/mobile/MobileCallInterface';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { motion } from 'framer-motion';
 
 interface ActiveCallWindowProps {
@@ -55,9 +57,31 @@ export function ActiveCallWindow({
   onToggleVideo,
   onEndCall
 }: ActiveCallWindowProps) {
+  const isMobile = useIsMobile();
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const [isMinimized, setIsMinimized] = useState(false);
+
+  // Use mobile interface on mobile devices
+  if (isMobile) {
+    return (
+      <MobileCallInterface
+        localStream={localStream}
+        remoteStream={remoteStream}
+        callState={callState}
+        isAudioEnabled={isAudioEnabled}
+        isVideoEnabled={isVideoEnabled}
+        callDuration={callDuration}
+        partnerName={partnerName}
+        partnerAvatar={partnerAvatar}
+        isVideoCall={isVideoCall}
+        qualityMetrics={qualityMetrics}
+        onToggleAudio={onToggleAudio}
+        onToggleVideo={onToggleVideo}
+        onEndCall={onEndCall}
+      />
+    );
+  }
 
   /**
    * Attach local stream to video element
