@@ -20,7 +20,8 @@ import {
   Minimize2,
   Maximize2
 } from 'lucide-react';
-import { CallState } from '@/services/webrtc-signaling';
+import { CallState, QualityMetrics } from '@/services/webrtc-signaling';
+import { ConnectionQualityIndicator } from '@/components/ConnectionQualityIndicator';
 import { motion } from 'framer-motion';
 
 interface ActiveCallWindowProps {
@@ -33,6 +34,7 @@ interface ActiveCallWindowProps {
   partnerName: string;
   partnerAvatar?: string;
   isVideoCall: boolean;
+  qualityMetrics: QualityMetrics | null;
   onToggleAudio: () => void;
   onToggleVideo: () => void;
   onEndCall: () => void;
@@ -48,6 +50,7 @@ export function ActiveCallWindow({
   partnerName,
   partnerAvatar,
   isVideoCall,
+  qualityMetrics,
   onToggleAudio,
   onToggleVideo,
   onEndCall
@@ -267,16 +270,9 @@ export function ActiveCallWindow({
         </div>
 
         {/* Connection Quality Indicator */}
-        {callState === 'connected' && (
+        {callState === 'connected' && qualityMetrics && (
           <div className="absolute top-20 left-6">
-            <div className="flex items-center gap-2 bg-black/50 rounded-full px-3 py-1">
-              <div className="flex gap-1">
-                <div className="w-1 h-3 bg-green-500 rounded-full"></div>
-                <div className="w-1 h-4 bg-green-500 rounded-full"></div>
-                <div className="w-1 h-5 bg-green-500 rounded-full"></div>
-              </div>
-              <span className="text-xs text-white">Excellente</span>
-            </div>
+            <ConnectionQualityIndicator metrics={qualityMetrics} compact />
           </div>
         )}
       </div>

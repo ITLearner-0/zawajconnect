@@ -10,6 +10,21 @@ import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export type CallType = 'audio' | 'video';
 export type CallState = 'idle' | 'calling' | 'ringing' | 'connecting' | 'connected' | 'ended' | 'rejected' | 'failed';
+export type ConnectionQuality = 'excellent' | 'good' | 'fair' | 'poor';
+
+export interface QualityMetrics {
+  packetsLost: number;
+  jitter: number;
+  rtt: number;
+  bitrate: number;
+  quality: ConnectionQuality;
+}
+
+export interface VideoConstraints {
+  width: number;
+  height: number;
+  frameRate: number;
+}
 
 export interface CallOffer {
   sdp: RTCSessionDescriptionInit;
@@ -45,6 +60,16 @@ export class WebRTCSignalingService {
   private userId: string;
   private iceCandidateQueue: RTCIceCandidateInit[] = [];
   private isRemoteDescriptionSet = false;
+  
+  // Quality monitoring
+  private qualityMonitorInterval: NodeJS.Timeout | null = null;
+  private currentQualityMetrics: QualityMetrics | null = null;
+  private currentVideoConstraints: VideoConstraints = { width: 1280, height: 720, frameRate: 30 };
+  
+  // Retry mechanism
+  private reconnectAttempts = 0;
+  private readonly MAX_RECONNECT_ATTEMPTS = 3;
+  private reconnectTimeout: NodeJS.Timeout | null = null;
 
   // Callbacks
   public onCallStateChange?: (state: CallState) => void;
@@ -53,16 +78,34 @@ export class WebRTCSignalingService {
   public onIncomingCall?: (offer: CallOffer) => void;
   public onCallEnd?: () => void;
   public onError?: (error: Error) => void;
+  public onQualityChange?: (metrics: QualityMetrics) => void;
 
-  // WebRTC Configuration
+  // WebRTC Configuration with TURN servers for restrictive networks
   private rtcConfig: RTCConfiguration = {
     iceServers: [
+      // STUN servers (free)
       { urls: 'stun:stun.l.google.com:19302' },
       { urls: 'stun:stun1.l.google.com:19302' },
       { urls: 'stun:stun2.l.google.com:19302' },
-      { urls: 'stun:stun3.l.google.com:19302' },
-      { urls: 'stun:stun4.l.google.com:19302' }
-    ]
+      // TURN servers (metered.ca - free tier)
+      {
+        urls: 'turn:a.relay.metered.ca:80',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      },
+      {
+        urls: 'turn:a.relay.metered.ca:443',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      },
+      {
+        urls: 'turn:a.relay.metered.ca:443?transport=tcp',
+        username: 'openrelayproject',
+        credential: 'openrelayproject'
+      }
+    ],
+    iceTransportPolicy: 'all', // Try all connection methods
+    iceCandidatePoolSize: 10
   };
 
   constructor(matchId: string, userId: string) {
@@ -136,11 +179,22 @@ export class WebRTCSignalingService {
       console.log(`📞 Initiating ${callType} call...`);
       this.onCallStateChange?.('calling');
 
-      // Get local media stream
-      this.localStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: callType === 'video'
-      });
+      // Get local media stream with quality constraints
+      const constraints: MediaStreamConstraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 48000
+        },
+        video: callType === 'video' ? {
+          width: { ideal: this.currentVideoConstraints.width },
+          height: { ideal: this.currentVideoConstraints.height },
+          frameRate: { ideal: this.currentVideoConstraints.frameRate }
+        } : false
+      };
+      
+      this.localStream = await this.getUserMediaWithRetry(constraints);
 
       this.onLocalStream?.(this.localStream);
 
@@ -186,11 +240,22 @@ export class WebRTCSignalingService {
       console.log(`📞 Accepting ${callType} call...`);
       this.onCallStateChange?.('connecting');
 
-      // Get local media stream
-      this.localStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: callType === 'video'
-      });
+      // Get local media stream with quality constraints
+      const constraints: MediaStreamConstraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 48000
+        },
+        video: callType === 'video' ? {
+          width: { ideal: this.currentVideoConstraints.width },
+          height: { ideal: this.currentVideoConstraints.height },
+          frameRate: { ideal: this.currentVideoConstraints.frameRate }
+        } : false
+      };
+      
+      this.localStream = await this.getUserMediaWithRetry(constraints);
 
       this.onLocalStream?.(this.localStream);
 
@@ -309,11 +374,21 @@ export class WebRTCSignalingService {
       switch (state) {
         case 'connected':
           this.onCallStateChange?.('connected');
+          this.reconnectAttempts = 0; // Reset on successful connection
+          this.startQualityMonitoring();
           break;
         case 'disconnected':
+          console.warn('⚠️ Connection disconnected, attempting reconnect...');
+          this.attemptReconnect();
+          break;
         case 'failed':
-          this.onCallStateChange?.('failed');
-          this.cleanup();
+          console.error('❌ Connection failed');
+          if (this.reconnectAttempts < this.MAX_RECONNECT_ATTEMPTS) {
+            this.attemptReconnect();
+          } else {
+            this.onCallStateChange?.('failed');
+            this.cleanup();
+          }
           break;
         case 'closed':
           this.onCallStateChange?.('ended');
@@ -437,10 +512,222 @@ export class WebRTCSignalingService {
   }
 
   /**
+   * Get user media with exponential backoff retry
+   */
+  private async getUserMediaWithRetry(
+    constraints: MediaStreamConstraints,
+    attempt = 1
+  ): Promise<MediaStream> {
+    const MAX_ATTEMPTS = 3;
+    const RETRY_DELAY = 1000;
+
+    try {
+      return await navigator.mediaDevices.getUserMedia(constraints);
+    } catch (error) {
+      console.error(`❌ getUserMedia attempt ${attempt} failed:`, error);
+      
+      if (attempt < MAX_ATTEMPTS) {
+        const delay = RETRY_DELAY * Math.pow(2, attempt - 1);
+        console.log(`⏳ Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return this.getUserMediaWithRetry(constraints, attempt + 1);
+      }
+      
+      throw error;
+    }
+  }
+
+  /**
+   * Attempt to reconnect after connection failure
+   */
+  private attemptReconnect(): void {
+    if (this.reconnectAttempts >= this.MAX_RECONNECT_ATTEMPTS) {
+      console.error('❌ Max reconnection attempts reached');
+      return;
+    }
+
+    this.reconnectAttempts++;
+    const delay = 1000 * Math.pow(2, this.reconnectAttempts - 1);
+    
+    console.log(`🔄 Reconnection attempt ${this.reconnectAttempts}/${this.MAX_RECONNECT_ATTEMPTS} in ${delay}ms...`);
+    
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+    }
+    
+    this.reconnectTimeout = setTimeout(async () => {
+      try {
+        // Attempt to restart ICE
+        if (this.peerConnection) {
+          this.peerConnection.restartIce();
+          console.log('🔄 ICE restart initiated');
+        }
+      } catch (error) {
+        console.error('❌ Reconnection failed:', error);
+      }
+    }, delay);
+  }
+
+  /**
+   * Start monitoring connection quality
+   */
+  private startQualityMonitoring(): void {
+    if (this.qualityMonitorInterval) {
+      clearInterval(this.qualityMonitorInterval);
+    }
+
+    this.qualityMonitorInterval = setInterval(async () => {
+      await this.checkConnectionQuality();
+    }, 2000); // Check every 2 seconds
+
+    console.log('📊 Quality monitoring started');
+  }
+
+  /**
+   * Stop monitoring connection quality
+   */
+  private stopQualityMonitoring(): void {
+    if (this.qualityMonitorInterval) {
+      clearInterval(this.qualityMonitorInterval);
+      this.qualityMonitorInterval = null;
+    }
+    console.log('📊 Quality monitoring stopped');
+  }
+
+  /**
+   * Check connection quality using getStats()
+   */
+  private async checkConnectionQuality(): Promise<void> {
+    if (!this.peerConnection) return;
+
+    try {
+      const stats = await this.peerConnection.getStats();
+      let packetsLost = 0;
+      let packetsReceived = 0;
+      let jitter = 0;
+      let rtt = 0;
+      let bitrate = 0;
+      let bytesReceived = 0;
+
+      stats.forEach((report) => {
+        if (report.type === 'inbound-rtp') {
+          packetsLost += report.packetsLost || 0;
+          packetsReceived += report.packetsReceived || 0;
+          jitter += report.jitter || 0;
+          bytesReceived += report.bytesReceived || 0;
+        }
+        
+        if (report.type === 'candidate-pair' && report.state === 'succeeded') {
+          rtt = report.currentRoundTripTime * 1000 || 0; // Convert to ms
+        }
+      });
+
+      // Calculate bitrate (simple approximation)
+      if (this.currentQualityMetrics) {
+        const timeDiff = 2; // 2 seconds between checks
+        const bytesDiff = bytesReceived - (this.currentQualityMetrics.bitrate / 8 * timeDiff);
+        bitrate = (bytesDiff * 8) / timeDiff; // bits per second
+      }
+
+      // Calculate packet loss percentage
+      const packetLossPercentage = packetsReceived > 0 
+        ? (packetsLost / (packetsLost + packetsReceived)) * 100 
+        : 0;
+
+      // Determine quality level
+      let quality: ConnectionQuality = 'excellent';
+      if (packetLossPercentage > 5 || rtt > 300 || jitter > 0.05) {
+        quality = 'poor';
+      } else if (packetLossPercentage > 2 || rtt > 150 || jitter > 0.03) {
+        quality = 'fair';
+      } else if (packetLossPercentage > 0.5 || rtt > 100 || jitter > 0.02) {
+        quality = 'good';
+      }
+
+      this.currentQualityMetrics = {
+        packetsLost,
+        jitter: jitter * 1000, // Convert to ms
+        rtt,
+        bitrate,
+        quality
+      };
+
+      console.log('📊 Quality metrics:', this.currentQualityMetrics);
+      this.onQualityChange?.(this.currentQualityMetrics);
+
+      // Adjust quality if needed
+      await this.adjustQualityBasedOnMetrics(quality);
+    } catch (error) {
+      console.error('❌ Failed to get connection stats:', error);
+    }
+  }
+
+  /**
+   * Adjust video quality based on connection metrics
+   */
+  private async adjustQualityBasedOnMetrics(quality: ConnectionQuality): Promise<void> {
+    if (!this.localStream) return;
+
+    const videoTrack = this.localStream.getVideoTracks()[0];
+    if (!videoTrack) return;
+
+    let newConstraints: VideoConstraints;
+
+    switch (quality) {
+      case 'poor':
+        newConstraints = { width: 640, height: 360, frameRate: 15 };
+        break;
+      case 'fair':
+        newConstraints = { width: 854, height: 480, frameRate: 24 };
+        break;
+      case 'good':
+        newConstraints = { width: 1280, height: 720, frameRate: 30 };
+        break;
+      case 'excellent':
+        newConstraints = { width: 1280, height: 720, frameRate: 30 };
+        break;
+    }
+
+    // Only adjust if constraints changed
+    if (JSON.stringify(newConstraints) === JSON.stringify(this.currentVideoConstraints)) {
+      return;
+    }
+
+    try {
+      await videoTrack.applyConstraints({
+        width: { ideal: newConstraints.width },
+        height: { ideal: newConstraints.height },
+        frameRate: { ideal: newConstraints.frameRate }
+      });
+
+      this.currentVideoConstraints = newConstraints;
+      console.log(`🎥 Video quality adjusted to ${quality}:`, newConstraints);
+    } catch (error) {
+      console.error('❌ Failed to adjust video quality:', error);
+    }
+  }
+
+  /**
+   * Get current quality metrics
+   */
+  getCurrentQuality(): QualityMetrics | null {
+    return this.currentQualityMetrics;
+  }
+
+  /**
    * Cleanup resources
    */
   cleanup(): void {
     console.log('🧹 Cleaning up WebRTC resources...');
+
+    // Stop quality monitoring
+    this.stopQualityMonitoring();
+    
+    // Clear reconnect timeout
+    if (this.reconnectTimeout) {
+      clearTimeout(this.reconnectTimeout);
+      this.reconnectTimeout = null;
+    }
 
     // Stop local stream
     if (this.localStream) {
@@ -464,6 +751,8 @@ export class WebRTCSignalingService {
     this.remoteStream = null;
     this.iceCandidateQueue = [];
     this.isRemoteDescriptionSet = false;
+    this.reconnectAttempts = 0;
+    this.currentQualityMetrics = null;
 
     console.log('✅ Cleanup complete');
   }

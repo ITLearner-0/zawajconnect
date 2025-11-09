@@ -7,7 +7,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { WebRTCSignalingService, CallType, CallState, CallOffer } from '@/services/webrtc-signaling';
+import { WebRTCSignalingService, CallType, CallState, CallOffer, QualityMetrics } from '@/services/webrtc-signaling';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -25,6 +25,7 @@ export interface UseWebRTCCallReturn {
   callDuration: number;
   isAudioEnabled: boolean;
   isVideoEnabled: boolean;
+  qualityMetrics: QualityMetrics | null;
 
   // Actions
   initiateCall: (callType: CallType, callerName: string) => Promise<void>;
@@ -55,6 +56,7 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [currentCallType, setCurrentCallType] = useState<CallType>('audio');
+  const [qualityMetrics, setQualityMetrics] = useState<QualityMetrics | null>(null);
 
   // Refs
   const signalingService = useRef<WebRTCSignalingService | null>(null);
@@ -140,6 +142,19 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
             description: error.message || "Une erreur s'est produite pendant l'appel",
             variant: "destructive"
           });
+        };
+
+        service.onQualityChange = (metrics) => {
+          setQualityMetrics(metrics);
+          
+          // Notify user if quality drops to poor
+          if (metrics.quality === 'poor') {
+            toast({
+              title: "Qualité de connexion faible",
+              description: "La qualité vidéo a été réduite pour maintenir l'appel",
+              variant: "default"
+            });
+          }
         };
 
         // Initialize the service
@@ -348,6 +363,7 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
     callDuration,
     isAudioEnabled,
     isVideoEnabled,
+    qualityMetrics,
 
     // Actions
     initiateCall,

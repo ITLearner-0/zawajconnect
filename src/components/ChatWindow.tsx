@@ -41,6 +41,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
     callDuration,
     isAudioEnabled,
     isVideoEnabled,
+    qualityMetrics,
     initiateCall,
     acceptCall,
     rejectCall,
@@ -292,6 +293,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
           partnerName={match.other_user.full_name}
           partnerAvatar={match.other_user.avatar_url}
           isVideoCall={currentCallType === 'video'}
+          qualityMetrics={qualityMetrics}
           onToggleAudio={toggleAudio}
           onToggleVideo={toggleVideo}
           onEndCall={endCall}
