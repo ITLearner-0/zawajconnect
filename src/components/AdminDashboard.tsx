@@ -16,6 +16,8 @@ import SecurityPrivacyPanel from '@/components/SecurityPrivacyPanel';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
 import { InsightsAnalyticsDashboard } from '@/components/admin/InsightsAnalyticsDashboard';
 import { OnboardingAnalyticsDashboard } from '@/components/admin/OnboardingAnalyticsDashboard';
+import CallAnalyticsDashboard from '@/components/admin/CallAnalyticsDashboard';
+import CallFeedbackDashboard from '@/components/admin/CallFeedbackDashboard';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { 
   Users, 
@@ -783,7 +785,25 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
 
       {/* Analytics Tab */}
       <TabsContent value="analytics" className="space-y-4">
-        <AnalyticsDashboard />
+        <Tabs defaultValue="general" className="space-y-4">
+          <ResponsiveTabsList tabCount={3}>
+            <TabsTrigger value="general">Général</TabsTrigger>
+            <TabsTrigger value="calls">Appels</TabsTrigger>
+            <TabsTrigger value="feedback">Feedbacks</TabsTrigger>
+          </ResponsiveTabsList>
+          
+          <TabsContent value="general">
+            <AnalyticsDashboard />
+          </TabsContent>
+          
+          <TabsContent value="calls">
+            <CallAnalyticsDashboard />
+          </TabsContent>
+          
+          <TabsContent value="feedback">
+            <CallFeedbackDashboard />
+          </TabsContent>
+        </Tabs>
       </TabsContent>
 
       {/* Onboarding Analytics Tab */}
