@@ -15,6 +15,8 @@ import { EndConversationDialog } from '@/components/chat/EndConversationDialog';
 import { IncomingCallNotification } from '@/components/IncomingCallNotification';
 import { ActiveCallWindow } from '@/components/ActiveCallWindow';
 import { CallHistory } from '@/components/chat/CallHistory';
+import CallFeedbackDialog from '@/components/CallFeedbackDialog';
+import { CallFeedbackData } from '@/hooks/useWebRTCCall';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Send, Shield, Heart, X } from 'lucide-react';
 
@@ -50,11 +52,19 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
     toggleVideo,
     isCallActive,
     isIncomingCall
-  } = useWebRTCCall({ matchId });
+  } = useWebRTCCall({ 
+    matchId,
+    onRequestFeedback: (data: CallFeedbackData) => {
+      setFeedbackData(data);
+      setShowFeedbackDialog(true);
+    }
+  });
 
   const [newMessage, setNewMessage] = useState('');
   const [showEndDialog, setShowEndDialog] = useState(false);
   const [currentCallType, setCurrentCallType] = useState<'audio' | 'video'>('audio');
+  const [feedbackData, setFeedbackData] = useState<CallFeedbackData | null>(null);
+  const [showFeedbackDialog, setShowFeedbackDialog] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const loading = messagesLoading || matchLoading;
@@ -297,6 +307,17 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
           onToggleAudio={toggleAudio}
           onToggleVideo={toggleVideo}
           onEndCall={endCall}
+        />
+      )}
+
+      {/* Call Feedback Dialog */}
+      {feedbackData && (
+        <CallFeedbackDialog
+          open={showFeedbackDialog}
+          onOpenChange={setShowFeedbackDialog}
+          callId={feedbackData.callId}
+          callType={feedbackData.callType}
+          callDuration={feedbackData.callDuration}
         />
       )}
     </div>

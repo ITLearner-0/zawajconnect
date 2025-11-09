@@ -11,9 +11,16 @@ import { WebRTCSignalingService, CallType, CallState, CallOffer, QualityMetrics 
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
+export interface CallFeedbackData {
+  callId: string;
+  callType: 'audio' | 'video';
+  callDuration: number; // in seconds
+}
+
 export interface UseWebRTCCallOptions {
   matchId: string;
   onCallEnd?: () => void;
+  onRequestFeedback?: (feedbackData: CallFeedbackData) => void;
 }
 
 export interface UseWebRTCCallReturn {
@@ -43,7 +50,7 @@ export interface UseWebRTCCallReturn {
 /**
  * Custom hook for managing WebRTC calls
  */
-export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): UseWebRTCCallReturn {
+export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebRTCCallOptions): UseWebRTCCallReturn {
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -407,13 +414,27 @@ export function useWebRTCCall({ matchId, onCallEnd }: UseWebRTCCallOptions): Use
       }
 
       await signalingService.current.endCall();
+      
+      // Trigger feedback request for calls longer than 10 seconds
+      if (currentCallId.current && callDuration > 10 && onRequestFeedback) {
+        onRequestFeedback({
+          callId: currentCallId.current,
+          callType: currentCallType,
+          callDuration: callDuration
+        });
+      }
+      
       handleCallCleanup();
       console.log('✅ Call ended');
+      
+      if (onCallEnd) {
+        onCallEnd();
+      }
     } catch (error) {
       console.error('❌ Failed to end call:', error);
       throw error;
     }
-  }, [matchId, user?.id, currentCallType, callDuration, handleCallCleanup, stopCallTimer]);
+  }, [matchId, user?.id, currentCallType, callDuration, handleCallCleanup, stopCallTimer, onCallEnd, onRequestFeedback]);
 
   /**
    * Toggle audio on/off

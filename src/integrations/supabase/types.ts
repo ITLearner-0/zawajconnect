@@ -115,6 +115,45 @@ export type Database = {
           },
         ]
       }
+      call_feedback: {
+        Row: {
+          audio_quality: string | null
+          call_id: string
+          comments: string | null
+          connection_stability: string | null
+          created_at: string
+          id: string
+          rating: number
+          technical_issues: string[] | null
+          user_id: string
+          video_quality: string | null
+        }
+        Insert: {
+          audio_quality?: string | null
+          call_id: string
+          comments?: string | null
+          connection_stability?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          technical_issues?: string[] | null
+          user_id: string
+          video_quality?: string | null
+        }
+        Update: {
+          audio_quality?: string | null
+          call_id?: string
+          comments?: string | null
+          connection_stability?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          technical_issues?: string[] | null
+          user_id?: string
+          video_quality?: string | null
+        }
+        Relationships: []
+      }
       compatibility_questions: {
         Row: {
           category: string
