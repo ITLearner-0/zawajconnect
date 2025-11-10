@@ -7,9 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { AlertCircle, Crown, Gift, Plus, Search, Users } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AlertCircle, Crown, Gift, Plus, Search, Users, History } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import SubscriptionHistoryViewer from '@/components/admin/SubscriptionHistoryViewer';
 
 interface UserSubscription {
   id: string;
@@ -216,11 +218,25 @@ const SubscriptionManagement = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-3xl font-bold">Gestion des Abonnements</h2>
-          <p className="text-muted-foreground">Accordez et gérez les abonnements premium des utilisateurs</p>
-        </div>
+      <div>
+        <h2 className="text-3xl font-bold">Gestion des Abonnements</h2>
+        <p className="text-muted-foreground">Accordez et gérez les abonnements premium des utilisateurs</p>
+      </div>
+
+      <Tabs defaultValue="subscriptions" className="space-y-6">
+        <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsTrigger value="subscriptions" className="gap-2">
+            <Crown className="h-4 w-4" />
+            Abonnements
+          </TabsTrigger>
+          <TabsTrigger value="history" className="gap-2">
+            <History className="h-4 w-4" />
+            Historique
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="subscriptions" className="space-y-6">
+          <div className="flex justify-end">
         
         <Dialog open={grantDialogOpen} onOpenChange={setGrantDialogOpen}>
           <DialogTrigger asChild>
@@ -454,6 +470,12 @@ const SubscriptionManagement = () => {
           )}
         </CardContent>
       </Card>
+        </TabsContent>
+
+        <TabsContent value="history">
+          <SubscriptionHistoryViewer />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
