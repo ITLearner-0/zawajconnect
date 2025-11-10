@@ -15,6 +15,7 @@ const CookiePolicy = lazy(() => import('@/pages/CookiePolicy'));
 const FAQ = lazy(() => import('@/pages/FAQ'));
 const InvitationAuth = lazy(() => import('@/pages/InvitationAuth'));
 const InvitationAccept = lazy(() => import('@/pages/InvitationAccept'));
+const Status = lazy(() => import('@/pages/Status'));
 
 // Special routes (onboarding flows)
 const Onboarding = lazy(() => import('@/pages/Onboarding'));
@@ -92,6 +93,7 @@ export const publicRoutes: AppRouteConfig[] = [
   { path: '/invitation', component: InvitationAccept },
   { path: '/invitation/accept', component: InvitationAccept },
   { path: '/invitation-accept', component: InvitationAccept },
+  { path: '/status', component: Status },
 ];
 
 // Special routes - protected but may have different requirements
