@@ -9,6 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   User, 
   Heart, 
@@ -338,9 +339,32 @@ const EnhancedProfile = () => {
     return AlertCircle;
   };
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0
+    }
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4"
+      >
         <div className="container mx-auto max-w-6xl">
           <Card className="shadow-lg">
             <CardContent className="p-8">
@@ -351,14 +375,22 @@ const EnhancedProfile = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="space-y-8">
+    <motion.div 
+      className="space-y-8"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       {/* Header Section */}
-      <div className="bg-card rounded-lg border p-6">
+      <motion.div 
+        variants={itemVariants}
+        className="bg-card rounded-lg border p-6"
+      >
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Mon Profil</h1>
@@ -367,16 +399,31 @@ const EnhancedProfile = () => {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <VerificationBadge verificationScore={verification?.verification_score || 0} />
-            <Badge variant="outline">
-              {completionStats.overall}% Complété
-            </Badge>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+            >
+              <VerificationBadge verificationScore={verification?.verification_score || 0} />
+            </motion.div>
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
+            >
+              <Badge variant="outline">
+                {completionStats.overall}% Complété
+              </Badge>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Profile Sections */}
-      <div className="bg-card rounded-lg border p-6">
+      <motion.div 
+        variants={itemVariants}
+        className="bg-card rounded-lg border p-6"
+      >
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
             <TabsTrigger value="overview" className="flex items-center gap-2">
@@ -406,75 +453,104 @@ const EnhancedProfile = () => {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
-            {/* Quick Actions and Profile Summary */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="overview"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* Quick Actions and Profile Summary */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5 text-emerald" />
-                    Actions Rapides
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <Button 
-                    onClick={() => setActiveTab('wizard')}
-                    className="w-full justify-start bg-gradient-to-r from-emerald to-emerald-light text-primary-foreground"
-                    disabled={completionStats.basicInfo >= 80}
-                  >
-                    <User className="h-4 w-4 mr-2" />
-                    {completionStats.basicInfo >= 80 ? 'Profil de base complété' : 'Compléter le profil de base'}
-                  </Button>
-                  
-                  <Button 
-                    onClick={() => setActiveTab('photos')}
-                    variant="outline"
-                    className="w-full justify-start"
-                    disabled={completionStats.photos >= 100}
-                  >
-                    <Camera className="h-4 w-4 mr-2" />
-                    {completionStats.photos >= 100 ? 'Photos vérifiées' : 'Vérifier les photos'}
-                  </Button>
-                  
-                  <Button 
-                    onClick={() => setActiveTab('compatibility')}
-                    variant="outline"
-                    className="w-full justify-start"
-                    disabled={completionStats.compatibility >= 80}
-                  >
-                    <Brain className="h-4 w-4 mr-2" />
-                    {completionStats.compatibility >= 80 ? 'Test complété' : 'Faire le test de compatibilité'}
-                  </Button>
-                  
-                  <Button 
-                    onClick={() => setActiveTab('islamic')}
-                    variant="outline"
-                    className="w-full justify-start"
-                  >
-                    <Heart className="h-4 w-4 mr-2" />
-                    Configurer les préférences islamiques
-                  </Button>
-                  
-                  <Button 
-                    onClick={() => setActiveTab('privacy')}
-                    variant="outline"
-                    className="w-full justify-start"
-                  >
-                    <Shield className="h-4 w-4 mr-2" />
-                    Paramètres de confidentialité
-                  </Button>
-                </CardContent>
-              </Card>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.1, duration: 0.4 }}
+              >
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="h-5 w-5 text-emerald" />
+                      Actions Rapides
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button 
+                        onClick={() => setActiveTab('wizard')}
+                        className="w-full justify-start bg-gradient-to-r from-emerald to-emerald-light text-primary-foreground"
+                        disabled={completionStats.basicInfo >= 80}
+                      >
+                        <User className="h-4 w-4 mr-2" />
+                        {completionStats.basicInfo >= 80 ? 'Profil de base complété' : 'Compléter le profil de base'}
+                      </Button>
+                    </motion.div>
+                    
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button 
+                        onClick={() => setActiveTab('photos')}
+                        variant="outline"
+                        className="w-full justify-start"
+                        disabled={completionStats.photos >= 100}
+                      >
+                        <Camera className="h-4 w-4 mr-2" />
+                        {completionStats.photos >= 100 ? 'Photos vérifiées' : 'Vérifier les photos'}
+                      </Button>
+                    </motion.div>
+                    
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button 
+                        onClick={() => setActiveTab('compatibility')}
+                        variant="outline"
+                        className="w-full justify-start"
+                        disabled={completionStats.compatibility >= 80}
+                      >
+                        <Brain className="h-4 w-4 mr-2" />
+                        {completionStats.compatibility >= 80 ? 'Test complété' : 'Faire le test de compatibilité'}
+                      </Button>
+                    </motion.div>
+                    
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button 
+                        onClick={() => setActiveTab('islamic')}
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
+                        <Heart className="h-4 w-4 mr-2" />
+                        Configurer les préférences islamiques
+                      </Button>
+                    </motion.div>
+                    
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button 
+                        onClick={() => setActiveTab('privacy')}
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
+                        <Shield className="h-4 w-4 mr-2" />
+                        Paramètres de confidentialité
+                      </Button>
+                    </motion.div>
+                  </CardContent>
+                </Card>
+              </motion.div>
 
               {/* Profile Summary */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <User className="h-5 w-5 text-gold" />
-                    Résumé du Profil
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2, duration: 0.4 }}
+              >
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <User className="h-5 w-5 text-gold" />
+                      Résumé du Profil
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
                   <div className="flex items-center gap-4">
                     <div className="h-16 w-16 rounded-full overflow-hidden bg-gradient-to-br from-emerald/20 to-gold/20 flex items-center justify-center">
                       {profile?.avatar_url ? (
@@ -520,182 +596,317 @@ const EnhancedProfile = () => {
                     </div>
                   </div>
 
-                  <Button 
-                    onClick={() => navigate('/matches')}
-                    className="w-full bg-gradient-to-r from-gold to-gold-light text-primary-foreground"
-                    disabled={completionStats.overall < 60}
-                  >
-                    <Users className="h-4 w-4 mr-2" />
-                    {completionStats.overall >= 60 ? 'Voir mes Matches' : 'Complétez votre profil pour les matches'}
-                  </Button>
-                </CardContent>
-              </Card>
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button 
+                        onClick={() => navigate('/matches')}
+                        className="w-full bg-gradient-to-r from-gold to-gold-light text-primary-foreground"
+                        disabled={completionStats.overall < 60}
+                      >
+                        <Users className="h-4 w-4 mr-2" />
+                        {completionStats.overall >= 60 ? 'Voir mes Matches' : 'Complétez votre profil pour les matches'}
+                      </Button>
+                    </motion.div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
 
             {/* Completion Progress */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl font-semibold">Progression du Profil</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-4">
-                  {[
-                    { key: 'basicInfo', label: 'Informations de Base', icon: User },
-                    { key: 'islamicPrefs', label: 'Préférences Islamiques', icon: Heart },
-                    { key: 'photos', label: 'Photos', icon: Camera },
-                    { key: 'compatibility', label: 'Test de Compatibilité', icon: Brain },
-                    { key: 'privacy', label: 'Paramètres de Confidentialité', icon: Lock },
-                    { key: 'verification', label: 'Vérification', icon: Shield }
-                  ].map(({ key, label, icon: Icon }) => {
-                    const percentage = completionStats[key as keyof ProfileCompletionStats];
-                    return (
-                      <div key={key} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                        <div className="flex items-center gap-3">
-                          <Icon className="h-5 w-5 text-muted-foreground" />
-                          <span className="font-medium">{label}</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Progress value={percentage} className="w-32 h-2" />
-                          <span className="text-sm font-medium w-12 text-right">{percentage}%</span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                
-                <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/10">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium">Score Global</span>
-                    <Badge variant="outline">{completionStats.overall}/100</Badge>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl font-semibold">Progression du Profil</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-4">
+                    {[
+                      { key: 'basicInfo', label: 'Informations de Base', icon: User },
+                      { key: 'islamicPrefs', label: 'Préférences Islamiques', icon: Heart },
+                      { key: 'photos', label: 'Photos', icon: Camera },
+                      { key: 'compatibility', label: 'Test de Compatibilité', icon: Brain },
+                      { key: 'privacy', label: 'Paramètres de Confidentialité', icon: Lock },
+                      { key: 'verification', label: 'Vérification', icon: Shield }
+                    ].map(({ key, label, icon: Icon }, index) => {
+                      const percentage = completionStats[key as keyof ProfileCompletionStats];
+                      return (
+                        <motion.div
+                          key={key}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.4 + index * 0.1, duration: 0.4 }}
+                          whileHover={{ scale: 1.02, x: 5 }}
+                          className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Icon className="h-5 w-5 text-muted-foreground" />
+                            <span className="font-medium">{label}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${percentage}%` }}
+                                transition={{ delay: 0.5 + index * 0.1, duration: 1, ease: "easeOut" }}
+                                className="h-full bg-primary"
+                              />
+                            </div>
+                            <motion.span
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.7 + index * 0.1 }}
+                              className="text-sm font-medium w-12 text-right"
+                            >
+                              {percentage}%
+                            </motion.span>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
                   </div>
-                  <Progress value={completionStats.overall} className="h-3" />
-                </div>
-              </CardContent>
-            </Card>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 1, duration: 0.5 }}
+                    className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/10"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="font-medium">Score Global</span>
+                      <Badge variant="outline">{completionStats.overall}/100</Badge>
+                    </div>
+                    <div className="h-3 bg-muted rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${completionStats.overall}%` }}
+                        transition={{ delay: 1.2, duration: 1.5, ease: "easeOut" }}
+                        className="h-full bg-gradient-to-r from-primary to-primary/80"
+                      />
+                    </div>
+                  </motion.div>
+                </CardContent>
+              </Card>
+            </motion.div>
 
             {/* Profile Quality Panel */}
-            <ProfileQualityPanel
-              profileData={profile}
-              islamicPrefs={islamicPrefs}
-              onNavigateToSection={(sectionId) => {
-                const tabMap: Record<string, string> = {
-                  'basic_info': 'wizard',
-                  'bio': 'wizard',
-                  'interests': 'wizard',
-                  'islamic': 'islamic',
-                  'photo': 'photos'
-                };
-                const targetTab = tabMap[sectionId];
-                if (targetTab) {
-                  setActiveTab(targetTab);
-                }
-              }}
-            />
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.5 }}
+            >
+              <ProfileQualityPanel
+                profileData={profile}
+                islamicPrefs={islamicPrefs}
+                onNavigateToSection={(sectionId) => {
+                  const tabMap: Record<string, string> = {
+                    'basic_info': 'wizard',
+                    'bio': 'wizard',
+                    'interests': 'wizard',
+                    'islamic': 'islamic',
+                    'photo': 'photos'
+                  };
+                  const targetTab = tabMap[sectionId];
+                  if (targetTab) {
+                    setActiveTab(targetTab);
+                  }
+                }}
+              />
+            </motion.div>
 
             {/* Recommendations */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Brain className="h-5 w-5 text-emerald" />
-                  Recommandations Personnalisées
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {completionStats.basicInfo < 80 && (
-                    <div className="p-4 bg-accent/20 rounded-lg border border-accent/30">
-                      <h4 className="font-medium text-primary mb-2">Complétez vos informations</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Ajoutez plus de détails à votre profil pour de meilleurs matches.
-                      </p>
-                    </div>
-                  )}
-                  
-                  {completionStats.photos < 100 && (
-                    <div className="p-4 bg-secondary/50 rounded-lg border border-secondary">
-                      <h4 className="font-medium text-secondary-foreground mb-2">Vérifiez vos photos</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Les photos vérifiées augmentent la confiance de 300%.
-                      </p>
-                    </div>
-                  )}
-                  
-                  {completionStats.compatibility < 70 && (
-                    <div className="p-4 bg-emerald/5 rounded-lg border border-emerald/20">
-                      <h4 className="font-medium text-emerald mb-2">Test de compatibilité</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Améliorez vos matches avec notre IA avancée.
-                      </p>
-                    </div>
-                  )}
-                  
-                  {completionStats.islamicPrefs < 70 && (
-                    <div className="p-4 bg-gold/5 rounded-lg border border-gold/20">
-                      <h4 className="font-medium text-gold mb-2">Préférences islamiques</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Configurez vos préférences religieuses pour de meilleurs matches.
-                      </p>
-                    </div>
-                  )}
-                  
-                  {completionStats.privacy < 70 && (
-                    <div className="p-4 bg-sage/20 rounded-lg border border-sage/30">
-                      <h4 className="font-medium text-sage-dark mb-2">Paramètres de confidentialité</h4>
-                      <p className="text-sm text-muted-foreground">
-                        Personnalisez qui peut voir vos informations.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+            >
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Brain className="h-5 w-5 text-emerald" />
+                    Recommandations Personnalisées
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {completionStats.basicInfo < 80 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.7, duration: 0.4 }}
+                        whileHover={{ scale: 1.05, y: -5 }}
+                        className="p-4 bg-accent/20 rounded-lg border border-accent/30 cursor-pointer"
+                      >
+                        <h4 className="font-medium text-primary mb-2">Complétez vos informations</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Ajoutez plus de détails à votre profil pour de meilleurs matches.
+                        </p>
+                      </motion.div>
+                    )}
+                    
+                    {completionStats.photos < 100 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.8, duration: 0.4 }}
+                        whileHover={{ scale: 1.05, y: -5 }}
+                        className="p-4 bg-secondary/50 rounded-lg border border-secondary cursor-pointer"
+                      >
+                        <h4 className="font-medium text-secondary-foreground mb-2">Vérifiez vos photos</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Les photos vérifiées augmentent la confiance de 300%.
+                        </p>
+                      </motion.div>
+                    )}
+                    
+                    {completionStats.compatibility < 70 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.9, duration: 0.4 }}
+                        whileHover={{ scale: 1.05, y: -5 }}
+                        className="p-4 bg-emerald/5 rounded-lg border border-emerald/20 cursor-pointer"
+                      >
+                        <h4 className="font-medium text-emerald mb-2">Test de compatibilité</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Améliorez vos matches avec notre IA avancée.
+                        </p>
+                      </motion.div>
+                    )}
+                    
+                    {completionStats.islamicPrefs < 70 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 1.0, duration: 0.4 }}
+                        whileHover={{ scale: 1.05, y: -5 }}
+                        className="p-4 bg-gold/5 rounded-lg border border-gold/20 cursor-pointer"
+                      >
+                        <h4 className="font-medium text-gold mb-2">Préférences islamiques</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Configurez vos préférences religieuses pour de meilleurs matches.
+                        </p>
+                      </motion.div>
+                    )}
+                    
+                    {completionStats.privacy < 70 && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 1.1, duration: 0.4 }}
+                        whileHover={{ scale: 1.05, y: -5 }}
+                        className="p-4 bg-sage/20 rounded-lg border border-sage/30 cursor-pointer"
+                      >
+                        <h4 className="font-medium text-sage-dark mb-2">Paramètres de confidentialité</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Personnalisez qui peut voir vos informations.
+                        </p>
+                      </motion.div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+              </motion.div>
+            </AnimatePresence>
           </TabsContent>
 
           <TabsContent value="wizard">
-            <ProfileWizard onComplete={fetchProfileData} />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="wizard"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ProfileWizard onComplete={fetchProfileData} />
+              </motion.div>
+            </AnimatePresence>
           </TabsContent>
 
           <TabsContent value="photos">
-            <div className="space-y-6">
-              <PhotoUpload 
-                currentPhotoUrl={profile?.avatar_url}
-                onPhotoUpdate={fetchProfileData}
-              />
-              <PhotoVerificationSystem 
-                onComplete={() => {
-                  fetchProfileData();
-                  toast({ 
-                    title: "Photos vérifiées", 
-                    description: "Vos photos ont été traitées avec succès" 
-                  });
-                }} 
-              />
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="photos"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+              >
+                <PhotoUpload 
+                  currentPhotoUrl={profile?.avatar_url}
+                  onPhotoUpdate={fetchProfileData}
+                />
+                <PhotoVerificationSystem 
+                  onComplete={() => {
+                    fetchProfileData();
+                    toast({ 
+                      title: "Photos vérifiées", 
+                      description: "Vos photos ont été traitées avec succès" 
+                    });
+                  }} 
+                />
+              </motion.div>
+            </AnimatePresence>
           </TabsContent>
 
           <TabsContent value="islamic">
-            <EnhancedIslamicPreferences 
-              embedded 
-              onComplete={() => {
-                fetchProfileData();
-                toast({ 
-                  title: "Préférences sauvegardées", 
-                  description: "Vos préférences islamiques ont été enregistrées avec succès" 
-                });
-              }}
-            />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="islamic"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <EnhancedIslamicPreferences 
+                  embedded 
+                  onComplete={() => {
+                    fetchProfileData();
+                    toast({ 
+                      title: "Préférences sauvegardées", 
+                      description: "Vos préférences islamiques ont été enregistrées avec succès" 
+                    });
+                  }}
+                />
+              </motion.div>
+            </AnimatePresence>
           </TabsContent>
 
           <TabsContent value="compatibility">
-            <CompatibilityAssessment embedded />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="compatibility"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <CompatibilityAssessment embedded />
+              </motion.div>
+            </AnimatePresence>
           </TabsContent>
 
           <TabsContent value="privacy">
-            <EnhancedPrivacyControls embedded />
+            <AnimatePresence mode="wait">
+              <motion.div
+                key="privacy"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <EnhancedPrivacyControls embedded />
+              </motion.div>
+            </AnimatePresence>
           </TabsContent>
         </Tabs>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
