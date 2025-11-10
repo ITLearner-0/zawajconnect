@@ -41,6 +41,8 @@ import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AdminWaliAlert, useAdminWaliAlerts } from '@/hooks/useAdminWaliAlerts';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AdminAlertsTableProps {
   alerts: AdminWaliAlert[];
@@ -57,6 +59,7 @@ const severityConfig = {
 
 export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTableProps) => {
   const { user } = useAuth();
+  const { toast } = useToast();
   const { acknowledgeAlert, suspendWali } = useAdminWaliAlerts();
   const [filterRisk, setFilterRisk] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -79,21 +82,70 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
   };
 
   const handleSuspend = async () => {
-    if (!user?.id || !selectedWali) return;
-    
-    const success = await suspendWali(
-      selectedWali.wali_user_id,
-      user.id,
-      suspendReason,
-      parseInt(suspendDays)
-    );
-    
-    if (success) {
-      setSuspendDialogOpen(false);
-      setSelectedWali(null);
-      setSuspendReason('');
-      setSuspendDays('30');
-      onRefresh();
+    if (!user?.id || !selectedWali || !suspendReason.trim()) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez fournir une raison de suspension",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const success = await suspendWali(
+        selectedWali.wali_user_id,
+        user.id,
+        suspendReason,
+        parseInt(suspendDays)
+      );
+      
+      if (success) {
+        // Récupérer le nom de l'admin
+        const { data: adminProfile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+
+        const adminName = adminProfile?.full_name || 'L\'équipe Zawaj Connect';
+
+        // Envoyer l'email de notification de suspension
+        const { error: emailError } = await supabase.functions.invoke('send-wali-email', {
+          body: {
+            wali_user_id: selectedWali.wali_user_id,
+            email_type: 'suspension',
+            suspension_reason: suspendReason,
+            suspension_duration_days: parseInt(suspendDays),
+            admin_name: adminName
+          }
+        });
+
+        if (emailError) {
+          console.error('Erreur envoi email:', emailError);
+          toast({
+            title: "Suspension effectuée",
+            description: "Le Wali a été suspendu mais l'email de notification n'a pas pu être envoyé",
+            variant: "default",
+          });
+        } else {
+          toast({
+            title: "Wali suspendu",
+            description: `Le Wali a été suspendu pour ${suspendDays} jours et notifié par email`,
+          });
+        }
+
+        setSuspendDialogOpen(false);
+        setSelectedWali(null);
+        setSuspendReason('');
+        setSuspendDays('30');
+        onRefresh();
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
     }
   };
 
@@ -228,7 +280,47 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
                               <Ban className="h-4 w-4 mr-2" />
                               Suspendre Wali
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                if (!user?.id) return;
+                                
+                                const message = prompt("Message à envoyer au Wali :");
+                                if (!message?.trim()) return;
+
+                                try {
+                                  const { data: adminProfile } = await supabase
+                                    .from('profiles')
+                                    .select('full_name')
+                                    .eq('id', user.id)
+                                    .single();
+
+                                  const adminName = adminProfile?.full_name || 'L\'équipe Zawaj Connect';
+
+                                  const { error } = await supabase.functions.invoke('send-wali-email', {
+                                    body: {
+                                      wali_user_id: alert.wali_user_id,
+                                      email_type: 'contact',
+                                      subject: `Message de l'administration - Zawaj Connect`,
+                                      message: message,
+                                      admin_name: adminName
+                                    }
+                                  });
+
+                                  if (error) throw error;
+
+                                  toast({
+                                    title: "Email envoyé",
+                                    description: "Le Wali a été contacté par email",
+                                  });
+                                } catch (error: any) {
+                                  toast({
+                                    title: "Erreur",
+                                    description: error.message,
+                                    variant: "destructive",
+                                  });
+                                }
+                              }}
+                            >
                               <Mail className="h-4 w-4 mr-2" />
                               Contacter Wali
                             </DropdownMenuItem>
