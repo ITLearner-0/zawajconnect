@@ -28,21 +28,29 @@ export const useIslamicModeration = () => {
 
   const moderateContent = async (
     content: string,
-    userId: string,
     context?: string,
     matchId?: string
   ): Promise<ModerationResult> => {
     setIsChecking(true);
     
     try {
-      console.log('Moderating content:', content);
+      console.log('🔒 Moderating content with JWT authentication...');
+      
+      // Get the current session to extract JWT token
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session?.access_token) {
+        throw new Error('No authentication token available. Please sign in.');
+      }
       
       const { data, error } = await supabase.functions.invoke('moderate-content', {
         body: {
           content,
-          userId,
           matchId,
           context
+        },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`
         }
       });
 
@@ -68,11 +76,10 @@ export const useIslamicModeration = () => {
               variant: "destructive"
             });
             
-            // Send email notification for blocked content
+            // Send email notification for blocked content (server will use JWT user ID)
             try {
               await supabase.functions.invoke('send-moderation-notification-email', {
                 body: {
-                  user_id: userId,
                   action_taken: 'blocked',
                   reason: result.reason,
                   severity: result.confidence > 0.8 ? 'critical' : 'high',
@@ -95,7 +102,6 @@ export const useIslamicModeration = () => {
               try {
                 await supabase.functions.invoke('send-moderation-notification-email', {
                   body: {
-                    user_id: userId,
                     action_taken: 'warned',
                     reason: result.reason,
                     severity: 'medium',

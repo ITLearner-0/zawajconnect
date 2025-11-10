@@ -372,7 +372,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
     setSending(true);
     
     try {
-      const moderationResult = await moderateContent(newMessage.trim(), user.id, 'chat', matchId);
+      const moderationResult = await moderateContent(newMessage.trim(), 'chat', matchId);
       
       if (!moderationResult.approved) {
         if (moderationResult.action === 'blocked') {

@@ -208,7 +208,6 @@ const ModerationTestSuite: React.FC = () => {
         const startTime = Date.now();
         const result = await moderateContent(
           testCase.message,
-          'test-user-id',
           'automated-test',
           'test-match-id'
         );
@@ -267,7 +266,6 @@ const ModerationTestSuite: React.FC = () => {
       const startTime = Date.now();
       const result = await moderateContent(
         testCase.message,
-        'test-user-id',
         'single-test',
         'test-match-id'
       );

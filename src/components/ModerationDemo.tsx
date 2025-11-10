@@ -35,7 +35,7 @@ const ModerationDemo: React.FC = () => {
     }
 
     try {
-      const result = await moderateContent(message, user.id, 'test');
+      const result = await moderateContent(message, 'test');
       setResults(prev => [{ message, result, timestamp: Date.now() }, ...prev.slice(0, 9)]);
     } catch (error) {
       console.error('Error testing moderation:', error);

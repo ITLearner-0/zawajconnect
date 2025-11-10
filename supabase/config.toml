@@ -7,7 +7,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.moderate-content]
-verify_jwt = true
+verify_jwt = true  # CRITICAL: Must verify JWT to prevent identity spoofing
 
 [functions.family-approval-request]
 verify_jwt = true

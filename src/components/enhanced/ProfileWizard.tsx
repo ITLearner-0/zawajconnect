@@ -270,7 +270,7 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
     if (validateStep(currentStep)) {
       // Moderate content for text fields in certain steps
       if (currentStep === 6 && profileData.bio) {
-        const moderationResult = await moderateContent(profileData.bio, user?.id || '', 'profile');
+        const moderationResult = await moderateContent(profileData.bio, 'profile');
         if (!moderationResult.approved) {
           toast({
             title: "Contenu non conforme",

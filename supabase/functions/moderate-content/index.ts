@@ -24,24 +24,52 @@ serve(async (req) => {
   }
 
   try {
-    // Initialize Supabase client
-    const supabase = createClient(
+    console.log('🔒 Moderating content with JWT verification...');
+
+    // Initialize Supabase client with service role for admin operations
+    const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { content, userId, matchId } = await req.json();
-
-    if (!content || !userId) {
+    // Extract and verify JWT token
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.error('❌ No Authorization header provided');
       return new Response(
-        JSON.stringify({ error: 'Content and userId are required' }),
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+
+    if (authError || !user) {
+      console.error('❌ Authentication failed:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid authentication token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Extract userId from verified JWT - this is the ONLY trusted source
+    const userId = user.id;
+    console.log(`✅ Authenticated user: ${userId}`);
+
+    const { content, matchId } = await req.json();
+
+    if (!content) {
+      return new Response(
+        JSON.stringify({ error: 'Content is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Rate limiting: Check recent moderation calls (max 10 per minute per user)
+    // Now using the verified userId from JWT - cannot be bypassed
     const oneMinuteAgo = new Date(Date.now() - 60000).toISOString();
-    const { data: recentCalls, error: rateLimitError } = await supabase
+    const { data: recentCalls, error: rateLimitError } = await supabaseAdmin
       .from('moderation_logs')
       .select('id')
       .eq('user_id', userId)
@@ -50,7 +78,24 @@ serve(async (req) => {
     if (rateLimitError) {
       console.error('Rate limit check error:', rateLimitError);
     } else if (recentCalls && recentCalls.length >= 10) {
-      console.warn(`Rate limit exceeded for user ${userId}`);
+      console.warn(`⚠️ Rate limit exceeded for authenticated user ${userId}`);
+      
+      // Log security event for rate limit abuse
+      await supabaseAdmin
+        .from('security_events')
+        .insert({
+          user_id: userId,
+          event_type: 'rate_limit_exceeded',
+          severity: 'medium',
+          description: 'User exceeded moderation rate limit',
+          metadata: {
+            endpoint: 'moderate-content',
+            call_count: recentCalls.length,
+            timeframe: '1 minute'
+          }
+        })
+        .catch(err => console.error('Failed to log security event:', err));
+
       return new Response(
         JSON.stringify({
           approved: false,
@@ -191,11 +236,12 @@ Sois strict sur la pudeur (haya) et la supervision familiale selon la Sharia.`;
     }
 
     // Save message suggestion if content was improved
+    // Using verified userId from JWT
     if (moderationResult.suggestion && moderationResult.approved === false) {
-      const { error: suggestionError } = await supabase
+      const { error: suggestionError } = await supabaseAdmin
         .from('message_suggestions')
         .insert({
-          user_id: userId,
+          user_id: userId, // Verified from JWT
           original_message: content,
           suggested_message: moderationResult.suggestion,
           improvement_reason: moderationResult.reason,
@@ -209,13 +255,14 @@ Sois strict sur la pudeur (haya) et la supervision familiale selon la Sharia.`;
 
     console.log('Moderation result:', moderationResult);
 
-    // Sauvegarder le log de modération pour déclencher les notifications familiales si nécessaire
+    // Sauvegarder le log de modération avec userId vérifié du JWT
+    // Ceci garantit que les logs d'audit sont précis et non falsifiables
     try {
-      const { error: logError } = await supabase
+      const { error: logError } = await supabaseAdmin
         .from('moderation_logs')
         .insert({
-          user_id: userId,
-          match_id: matchId, // Nécessaire pour les notifications familiales
+          user_id: userId, // Verified from JWT - cannot be spoofed
+          match_id: matchId,
           content_analyzed: content,
           ai_analysis: moderationResult,
           rules_triggered: moderationResult.rulesTriggered,
@@ -225,12 +272,12 @@ Sois strict sur la pudeur (haya) et la supervision familiale selon la Sharia.`;
         });
 
       if (logError) {
-        console.error('Error logging moderation decision:', logError);
+        console.error('❌ Error logging moderation decision:', logError);
       } else {
-        console.log('Moderation log saved successfully');
+        console.log('✅ Moderation log saved successfully for authenticated user');
       }
     } catch (error) {
-      console.error('Error logging moderation decision:', error);
+      console.error('❌ Error logging moderation decision:', error);
     }
 
     return new Response(JSON.stringify(moderationResult), {
