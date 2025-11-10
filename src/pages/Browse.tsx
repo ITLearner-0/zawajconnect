@@ -619,29 +619,57 @@ const Browse = () => {
     );
   }
 
-  if (!currentProfile) {
+  // Show empty state if no profiles available (works for both carousel and grid modes)
+  if (filteredProfiles.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <AdvancedSearch onSearch={handleSearch} onReset={handleResetSearch} />
-            </div>
-            <div>
-              <Card>
-                <CardContent className="p-8 text-center">
-                  <User className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Aucun profil trouvé</h3>
-                  <p className="text-muted-foreground">
-                    {filteredProfiles.length === 0 && profiles.length > 0 
-                      ? "Aucun profil ne correspond à vos critères de recherche."
-                      : "Il n'y a pas de nouveaux profils à découvrir pour le moment."
+              <Card className="bg-card">
+                <CardContent className="p-12 text-center">
+                  <User className="h-20 w-20 mx-auto text-muted-foreground mb-6" />
+                  <h2 className="text-2xl font-bold mb-3">Aucun profil disponible</h2>
+                  <p className="text-muted-foreground mb-6">
+                    {profiles.length === 0 
+                      ? "Il n'y a pas de nouveaux profils à découvrir pour le moment. Revenez plus tard !"
+                      : "Aucun profil ne correspond à vos critères de recherche. Essayez de modifier vos filtres."
                     }
                   </p>
+                  {profiles.length > 0 && (
+                    <Button onClick={handleResetSearch} variant="outline">
+                      Réinitialiser les filtres
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             </div>
+            <div>
+              <AdvancedSearch onSearch={handleSearch} onReset={handleResetSearch} />
+            </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Additional safety check for carousel mode
+  if (!currentProfile) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
+        <div className="container mx-auto max-w-6xl">
+          <Card className="bg-card">
+            <CardContent className="p-12 text-center">
+              <User className="h-20 w-20 mx-auto text-muted-foreground mb-6" />
+              <h2 className="text-2xl font-bold mb-3">Erreur de chargement</h2>
+              <p className="text-muted-foreground mb-6">
+                Une erreur s'est produite lors du chargement des profils.
+              </p>
+              <Button onClick={fetchProfiles} variant="outline">
+                Réessayer
+              </Button>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );
