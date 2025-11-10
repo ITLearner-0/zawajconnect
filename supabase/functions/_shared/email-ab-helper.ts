@@ -1,4 +1,5 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { generateSignedTrackingUrl } from './tracking-security.ts';
 
 interface ABTestVariant {
   ab_test_id: string;
@@ -70,18 +71,22 @@ export async function trackEmailSent(
   }
 }
 
-export function generateEmailHTML(
+export async function generateEmailHTML(
   variant: ABTestVariant,
   emailData: EmailData,
   trackingId: string
-): string {
+): Promise<string> {
   const { userName, expirationDate, planType, daysUntilExpiry } = emailData;
   const { offer_percentage, promo_code, email_tone, cta_text } = variant;
 
-  // Pixel de tracking pour les ouvertures d'email
-  const trackingPixel = `<img src="https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/track-email-event?result_id=${trackingId}&event_type=opened" width="1" height="1" style="display:none;" />`;
+  // Generate signed tracking URLs with HMAC
+  const baseUrl = 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/track-email-event';
+  const trackingPixelUrl = await generateSignedTrackingUrl(baseUrl, trackingId, emailData.userId, 'opened');
+  
+  // Pixel de tracking pour les ouvertures d'email avec signature HMAC
+  const trackingPixel = `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;" alt="" />`;
 
-  // URL avec tracking des clics
+  // URL avec tracking des clics (le tracking ID sera validé côté serveur lors du POST)
   const ctaUrl = `https://mariage-halal.com/settings?renew=true&code=${promo_code}&urgent=${daysUntilExpiry === 7 ? '7days' : daysUntilExpiry === 3 ? '3days' : 'lastday'}&track=${trackingId}`;
 
   const urgencyColors = {

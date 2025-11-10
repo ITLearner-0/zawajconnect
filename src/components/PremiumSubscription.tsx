@@ -310,7 +310,7 @@ const PremiumSubscription = () => {
       toast.dismiss();
       toast.success('Abonnement activé avec succès !');
       
-      // Track renewal if tracking ID is present in URL
+      // Track renewal if tracking ID is present in URL (with JWT authentication)
       const urlParams = new URLSearchParams(window.location.search);
       const trackingId = urlParams.get('track');
       const promoCode = urlParams.get('code');
@@ -320,22 +320,30 @@ const PremiumSubscription = () => {
         const renewalAmount = selectedPlanDetails ? selectedPlanDetails.price * selectedPlanDetails.duration : 0;
         
         try {
-          console.log('Tracking renewal event...', { trackingId, renewalAmount, promoCode });
+          console.log('🔒 Tracking renewal event with JWT...', { trackingId, renewalAmount, promoCode });
           
-          const { error: trackError } = await supabase.functions.invoke('track-email-event', {
-            body: {
-              result_id: trackingId,
-              event_type: 'renewed',
-              user_id: user.id,
-              renewal_amount: renewalAmount,
-              promo_code_used: promoCode || undefined
-            }
-          });
-
-          if (trackError) {
-            console.error('Error tracking renewal:', trackError);
+          const { data: { session } } = await supabase.auth.getSession();
+          
+          if (!session?.access_token) {
+            console.error('No authentication token available for tracking');
           } else {
-            console.log('Renewal tracked successfully');
+            const { error: trackError } = await supabase.functions.invoke('track-email-event', {
+              body: {
+                result_id: trackingId,
+                event_type: 'renewed',
+                renewal_amount: renewalAmount,
+                promo_code_used: promoCode || undefined
+              },
+              headers: {
+                Authorization: `Bearer ${session.access_token}`
+              }
+            });
+
+            if (trackError) {
+              console.error('Error tracking renewal:', trackError);
+            } else {
+              console.log('✅ Renewal tracked successfully with JWT');
+            }
           }
         } catch (trackingError) {
           console.error('Error tracking renewal:', trackingError);

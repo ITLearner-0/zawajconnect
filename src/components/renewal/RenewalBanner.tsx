@@ -66,21 +66,29 @@ const RenewalBanner = ({ onDismiss }: RenewalBannerProps) => {
   };
 
   const handleRenew = async () => {
-    // Track click event if tracking ID is present
+    // Track click event if tracking ID is present (with JWT authentication)
     if (trackingId && user) {
       try {
-        const { error } = await supabase.functions.invoke('track-email-event', {
-          body: {
-            result_id: trackingId,
-            event_type: 'clicked',
-            user_id: user.id
-          }
-        });
-
-        if (error) {
-          console.error('Error tracking click:', error);
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session?.access_token) {
+          console.error('No authentication token available');
         } else {
-          console.log('Click tracked successfully');
+          const { error } = await supabase.functions.invoke('track-email-event', {
+            body: {
+              result_id: trackingId,
+              event_type: 'clicked'
+            },
+            headers: {
+              Authorization: `Bearer ${session.access_token}`
+            }
+          });
+
+          if (error) {
+            console.error('Error tracking click:', error);
+          } else {
+            console.log('✅ Click tracked successfully with JWT');
+          }
         }
       } catch (error) {
         console.error('Error tracking click:', error);
