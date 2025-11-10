@@ -7,7 +7,7 @@
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF)](https://vitejs.dev/)
 [![Supabase](https://img.shields.io/badge/Supabase-2.57-3ECF8E)](https://supabase.com/)
 [![Tests](https://img.shields.io/badge/Tests-98%20passing-success)](https://vitest.dev/)
-[![codecov](https://codecov.io/gh/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/branch/main/graph/badge.svg)](https://codecov.io/gh/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME)
+[![codecov](https://codecov.io/gh/ITLearner-0/zawajconnect/branch/main/graph/badge.svg)](https://codecov.io/gh/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME)
 
 ## 📋 Table of Contents
 
@@ -23,6 +23,7 @@
 ## ✨ Features
 
 ### Core Features
+
 - 🔐 **Secure Authentication** - Email/password with Supabase Auth
 - 👤 **Profile Management** - Comprehensive user profiles with photos
 - 🤝 **Smart Matching** - Advanced compatibility algorithm
@@ -31,6 +32,7 @@
 - ✅ **Match Approval** - Family-involved decision making
 
 ### Islamic Features
+
 - 🕌 **Islamic Preferences** - Prayer frequency, Quranic reading, madhab
 - 📿 **Prayer Times** - Accurate salah times
 - 🧭 **Qibla Direction** - Find direction to Mecca
@@ -38,6 +40,7 @@
 - 📖 **Islamic Guidance** - Marriage guidance content
 
 ### Technical Features
+
 - ⚡ **Lazy Loading** - Route-based code splitting
 - 🔄 **Real-time Updates** - Supabase Realtime subscriptions
 - 📊 **Analytics** - User insights and compatibility metrics
@@ -47,6 +50,7 @@
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **Framework:** React 18.3 + TypeScript 5.8
 - **Build Tool:** Vite 5.4
 - **Routing:** React Router 6.30
@@ -54,11 +58,13 @@
 - **Forms:** React Hook Form 7.62 + Zod 4.1
 
 ### UI
+
 - **Components:** shadcn/ui (Radix UI)
 - **Styling:** Tailwind CSS 3.4
 - **Icons:** Lucide React
 
 ### Backend
+
 - **BaaS:** Supabase 2.57
 - **Database:** PostgreSQL
 - **Auth:** Supabase Auth
@@ -66,6 +72,7 @@
 - **Payments:** Braintree 3.33
 
 ### Testing
+
 - **Framework:** Vitest 4.0
 - **Library:** @testing-library/react 16.3
 - **Status:** 37 tests passing ✅
@@ -145,12 +152,14 @@ npm run lint             # Run ESLint
 ### Development Guidelines
 
 #### 1. TypeScript Strict Mode ✅
+
 ```typescript
 // Enabled: noImplicitAny, strictNullChecks
 // Always type your code properly
 ```
 
 #### 2. Logging System 🔊
+
 ```typescript
 import { logger } from '@/utils/logger';
 
@@ -166,6 +175,7 @@ logger.error('Failed', error, { userId });
 ```
 
 #### 3. Testing 🧪
+
 ```typescript
 import { render, screen } from '@/test/utils';
 
@@ -176,6 +186,7 @@ it('renders correctly', () => {
 ```
 
 #### 4. Code Splitting ⚡
+
 ```typescript
 // Routes are lazy-loaded automatically
 const MyPage = lazy(() => import('@/pages/MyPage'));
@@ -285,18 +296,21 @@ const channel = supabase
 ## 🗺️ Roadmap
 
 ### ✅ Phase 1 (Current)
+
 - Core matching features
 - Family supervision
 - Real-time chat
 - Test infrastructure (37 tests)
 
 ### ⏳ Phase 2 (Next)
+
 - Increase test coverage (80%)
 - Video calls
 - Advanced analytics
 - Mobile app
 
 ### ⏳ Phase 3 (Future)
+
 - AI recommendations
 - Multi-language
 - Event management
