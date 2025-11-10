@@ -127,6 +127,14 @@ const SubscriptionManagement = () => {
     }
 
     try {
+      // Get current admin user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error('Session expirée, veuillez vous reconnecter');
+        return;
+      }
+
       const expiresAt = expirationDays ? 
         new Date(Date.now() + parseInt(expirationDays) * 24 * 60 * 60 * 1000).toISOString() : 
         null;
@@ -138,7 +146,8 @@ const SubscriptionManagement = () => {
           plan_type: planType,
           status: 'active',
           expires_at: expiresAt,
-          notes: notes || null
+          notes: notes || null,
+          granted_by: user.id
         }, {
           onConflict: 'user_id'
         });
