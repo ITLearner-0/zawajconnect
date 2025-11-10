@@ -2719,6 +2719,30 @@ export type Database = {
         }
         Relationships: []
       }
+      public_invitation_info: {
+        Row: {
+          full_name: string | null
+          invitation_sent_at: string | null
+          invitation_token: string | null
+          is_valid: boolean | null
+          relationship: string | null
+        }
+        Insert: {
+          full_name?: string | null
+          invitation_sent_at?: string | null
+          invitation_token?: string | null
+          is_valid?: never
+          relationship?: string | null
+        }
+        Update: {
+          full_name?: string | null
+          invitation_sent_at?: string | null
+          invitation_token?: string | null
+          is_valid?: never
+          relationship?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_family_invitation: {
