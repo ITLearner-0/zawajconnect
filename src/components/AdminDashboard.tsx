@@ -40,6 +40,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useUnacknowledgedAlertsCount } from '@/hooks/useUnacknowledgedAlertsCount';
 
 interface AdminDashboardProps {
   userRole?: string | null;
@@ -88,6 +89,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { count: unacknowledgedCount, loading: alertsLoading } = useUnacknowledgedAlertsCount();
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
     activeMatches: 0,
@@ -475,18 +477,37 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
 
       {/* Admin Tabs */}
       <Tabs defaultValue="users" className="space-y-4">
-        <ResponsiveTabsList tabCount={10}>
-          <TabsTrigger value="users">Utilisateurs</TabsTrigger>
-          <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
-          <TabsTrigger value="roles">Rôles</TabsTrigger>
-          <TabsTrigger value="reports">Rapports</TabsTrigger>
-          <TabsTrigger value="security">Sécurité</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="abtesting">Tests A/B</TabsTrigger>
-          <TabsTrigger value="onboarding">Onboarding</TabsTrigger>
-          <TabsTrigger value="insights">Insights</TabsTrigger>
-          <TabsTrigger value="settings">Paramètres</TabsTrigger>
-        </ResponsiveTabsList>
+        <div className="flex items-center justify-between mb-4">
+          <ResponsiveTabsList tabCount={10}>
+            <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+            <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
+            <TabsTrigger value="roles">Rôles</TabsTrigger>
+            <TabsTrigger value="reports">Rapports</TabsTrigger>
+            <TabsTrigger value="security">Sécurité</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="abtesting">Tests A/B</TabsTrigger>
+            <TabsTrigger value="onboarding">Onboarding</TabsTrigger>
+            <TabsTrigger value="insights">Insights</TabsTrigger>
+            <TabsTrigger value="settings">Paramètres</TabsTrigger>
+          </ResponsiveTabsList>
+          
+          <Button
+            onClick={() => navigate('/admin/wali-alerts')}
+            variant="destructive"
+            className="ml-4 relative"
+          >
+            <AlertTriangle className="h-4 w-4 mr-2" />
+            Alertes Wali
+            {unacknowledgedCount > 0 && (
+              <Badge 
+                variant="secondary" 
+                className="ml-2 bg-white text-destructive hover:bg-white animate-pulse"
+              >
+                {unacknowledgedCount}
+              </Badge>
+            )}
+          </Button>
+        </div>
 
         {/* Users Tab */}
         <TabsContent value="users" className="space-y-4">
