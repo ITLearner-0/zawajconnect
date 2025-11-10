@@ -1,0 +1,78 @@
+name: 🚀 Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Permet le déclenchement manuel
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🔨 Build project
+        run: npm run build
+        env:
+          NODE_ENV: production
+          
+      - name: 📊 Build summary
+        run: |
+          echo "### 📦 Build completed successfully! ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Build size:**" >> $GITHUB_STEP_SUMMARY
+          du -sh dist >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Files:**" >> $GITHUB_STEP_SUMMARY
+          find dist -type f | wc -l | xargs -I {} echo "{} files" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 🚀 Deploy to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          local-dir: ./dist/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/*.map
+            
+      - name: ✅ Deployment success notification
+        if: success()
+        run: |
+          echo "### 🎉 Deployment successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Site URL:** https://zawajconnect.me" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed at:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          
+      - name: ❌ Deployment failure notification
+        if: failure()
+        run: |
+          echo "### ❌ Deployment failed!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check the logs above for error details." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Common issues:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Incorrect FTP credentials in GitHub Secrets" >> $GITHUB_STEP_SUMMARY
+          echo "- FTP server unreachable" >> $GITHUB_STEP_SUMMARY
+          echo "- Insufficient permissions on remote directory" >> $GITHUB_STEP_SUMMARY
