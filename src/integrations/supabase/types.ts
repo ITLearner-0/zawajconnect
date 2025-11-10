@@ -289,6 +289,123 @@ export type Database = {
         }
         Relationships: []
       }
+      email_ab_test_results: {
+        Row: {
+          ab_test_id: string
+          clicked_at: string | null
+          created_at: string
+          days_until_expiry: number
+          id: string
+          ip_address: unknown
+          opened_at: string | null
+          promo_code_used: string | null
+          renewal_amount: number | null
+          renewed_at: string | null
+          sent_at: string
+          subscription_id: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          ab_test_id: string
+          clicked_at?: string | null
+          created_at?: string
+          days_until_expiry: number
+          id?: string
+          ip_address?: unknown
+          opened_at?: string | null
+          promo_code_used?: string | null
+          renewal_amount?: number | null
+          renewed_at?: string | null
+          sent_at?: string
+          subscription_id: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          ab_test_id?: string
+          clicked_at?: string | null
+          created_at?: string
+          days_until_expiry?: number
+          id?: string
+          ip_address?: unknown
+          opened_at?: string | null
+          promo_code_used?: string | null
+          renewal_amount?: number | null
+          renewed_at?: string | null
+          sent_at?: string
+          subscription_id?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_ab_test_results_ab_test_id_fkey"
+            columns: ["ab_test_id"]
+            isOneToOne: false
+            referencedRelation: "email_ab_test_analytics"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "email_ab_test_results_ab_test_id_fkey"
+            columns: ["ab_test_id"]
+            isOneToOne: false
+            referencedRelation: "email_ab_tests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_ab_tests: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          cta_text: string
+          email_tone: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          offer_percentage: number
+          promo_code: string
+          reminder_type: string
+          subject_line: string
+          test_name: string
+          traffic_allocation: number
+          variant_name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          cta_text: string
+          email_tone: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          offer_percentage: number
+          promo_code: string
+          reminder_type: string
+          subject_line: string
+          test_name: string
+          traffic_allocation?: number
+          variant_name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          cta_text?: string
+          email_tone?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          offer_percentage?: number
+          promo_code?: string
+          reminder_type?: string
+          subject_line?: string
+          test_name?: string
+          traffic_allocation?: number
+          variant_name?: string
+        }
+        Relationships: []
+      }
       family_access_audit: {
         Row: {
           access_granted: boolean
@@ -2551,6 +2668,30 @@ export type Database = {
       }
     }
     Views: {
+      email_ab_test_analytics: {
+        Row: {
+          click_rate: number | null
+          conversion_rate: number | null
+          created_at: string | null
+          email_tone: string | null
+          id: string | null
+          is_active: boolean | null
+          offer_percentage: number | null
+          open_rate: number | null
+          reminder_type: string | null
+          revenue_per_email: number | null
+          subject_line: string | null
+          test_name: string | null
+          total_clicked: number | null
+          total_opened: number | null
+          total_renewed: number | null
+          total_revenue: number | null
+          total_sent: number | null
+          traffic_allocation: number | null
+          variant_name: string | null
+        }
+        Relationships: []
+      }
       leaderboard: {
         Row: {
           avatar_url: string | null
@@ -2799,6 +2940,18 @@ export type Database = {
         Returns: string
       }
       migrate_family_contact_data_secure: { Args: never; Returns: undefined }
+      select_ab_test_variant: {
+        Args: { p_reminder_type: string }
+        Returns: {
+          ab_test_id: string
+          cta_text: string
+          email_tone: string
+          offer_percentage: number
+          promo_code: string
+          subject_line: string
+          variant_name: string
+        }[]
+      }
       send_match_suggestions_batch: { Args: never; Returns: undefined }
       send_monthly_newsletter: { Args: never; Returns: undefined }
       send_weekly_tips_batch: { Args: never; Returns: undefined }

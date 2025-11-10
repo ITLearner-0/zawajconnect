@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 import { Resend } from 'npm:resend@2.0.0';
+import { selectABVariant, trackEmailSent, generateEmailHTML } from '../_shared/email-ab-helper.ts';
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 
@@ -106,256 +107,44 @@ Deno.serve(async (req) => {
         const userEmail = authUser.user.email;
         const userName = subscription.profiles?.full_name || 'Membre';
         const expirationDate = new Date(subscription.expires_at);
+
+        // Select A/B test variant
+        const variant = await selectABVariant(supabaseAdmin, '3days');
         
-        // Determine discount code
-        let discountPercent = 0;
-        let discountCode = '';
-        if (subscription.plan_type.includes('12')) {
-          discountPercent = 15;
-          discountCode = 'RENOUVELLEMENT15';
-        } else if (subscription.plan_type.includes('6')) {
-          discountPercent = 10;
-          discountCode = 'RENOUVELLEMENT10';
-        } else {
-          discountPercent = 5;
-          discountCode = 'RENOUVELLEMENT5';
+        if (!variant) {
+          console.warn('No A/B variant found, skipping email for', subscription.id);
+          results.errors.push(`No A/B variant configured for 3days reminder`);
+          continue;
         }
+
+        console.log(`Using A/B variant: ${variant.variant_name} for user ${subscription.user_id}`);
+
+        // Track email
+        const trackingId = await trackEmailSent(supabaseAdmin, variant.ab_test_id, {
+          userName,
+          expirationDate,
+          planType: subscription.plan_type,
+          daysUntilExpiry: 3,
+          subscriptionId: subscription.id,
+          userId: subscription.user_id,
+        });
+
+        // Generate email HTML
+        const emailHTML = generateEmailHTML(variant, {
+          userName,
+          expirationDate,
+          planType: subscription.plan_type,
+          daysUntilExpiry: 3,
+          subscriptionId: subscription.id,
+          userId: subscription.user_id,
+        }, trackingId || 'no-track');
 
         try {
           const emailResponse = await resend.emails.send({
             from: 'Mariage Halal <onboarding@resend.dev>',
             to: [userEmail],
-            subject: '⚠️ Plus que 3 jours - Votre abonnement expire bientôt',
-            html: `
-              <!DOCTYPE html>
-              <html>
-                <head>
-                  <meta charset="utf-8">
-                  <style>
-                    body {
-                      font-family: Arial, sans-serif;
-                      line-height: 1.6;
-                      color: #333;
-                      max-width: 600px;
-                      margin: 0 auto;
-                      padding: 20px;
-                    }
-                    .header {
-                      background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-                      color: white;
-                      padding: 30px;
-                      border-radius: 10px 10px 0 0;
-                      text-align: center;
-                      position: relative;
-                      overflow: hidden;
-                    }
-                    .header::before {
-                      content: "⚠️";
-                      position: absolute;
-                      font-size: 120px;
-                      opacity: 0.1;
-                      top: -20px;
-                      right: -20px;
-                    }
-                    .content {
-                      background: #f9fafb;
-                      padding: 30px;
-                      border-radius: 0 0 10px 10px;
-                    }
-                    .urgency-banner {
-                      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-                      color: white;
-                      padding: 20px;
-                      margin: 25px 0;
-                      border-radius: 8px;
-                      text-align: center;
-                      font-size: 18px;
-                      font-weight: bold;
-                      box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
-                      animation: pulse 2s infinite;
-                    }
-                    @keyframes pulse {
-                      0%, 100% { transform: scale(1); }
-                      50% { transform: scale(1.02); }
-                    }
-                    .countdown {
-                      display: flex;
-                      justify-content: center;
-                      gap: 20px;
-                      margin: 30px 0;
-                    }
-                    .countdown-item {
-                      background: white;
-                      padding: 20px;
-                      border-radius: 12px;
-                      text-align: center;
-                      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-                      border: 3px solid #f97316;
-                    }
-                    .countdown-number {
-                      font-size: 48px;
-                      font-weight: bold;
-                      color: #f97316;
-                      line-height: 1;
-                    }
-                    .countdown-label {
-                      font-size: 14px;
-                      color: #6b7280;
-                      margin-top: 5px;
-                      text-transform: uppercase;
-                    }
-                    .offer-box {
-                      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                      color: white;
-                      padding: 25px;
-                      margin: 25px 0;
-                      border-radius: 8px;
-                      text-align: center;
-                    }
-                    .promo-code {
-                      background: white;
-                      color: #10b981;
-                      padding: 15px 30px;
-                      border-radius: 8px;
-                      font-family: monospace;
-                      font-size: 24px;
-                      font-weight: bold;
-                      margin: 15px 0;
-                      border: 3px dashed #10b981;
-                      display: inline-block;
-                    }
-                    .button {
-                      display: inline-block;
-                      background: #f97316;
-                      color: white;
-                      padding: 18px 45px;
-                      text-decoration: none;
-                      border-radius: 8px;
-                      margin: 20px 0;
-                      font-weight: bold;
-                      font-size: 18px;
-                      box-shadow: 0 6px 12px rgba(249, 115, 22, 0.4);
-                      transition: all 0.3s;
-                    }
-                    .warning-list {
-                      background: #fef3c7;
-                      border-left: 5px solid #f59e0b;
-                      padding: 20px;
-                      margin: 20px 0;
-                      border-radius: 4px;
-                    }
-                    .warning-list li {
-                      margin: 8px 0;
-                      color: #78350f;
-                    }
-                    .footer {
-                      text-align: center;
-                      margin-top: 30px;
-                      padding-top: 20px;
-                      border-top: 1px solid #e5e7eb;
-                      color: #6b7280;
-                      font-size: 14px;
-                    }
-                  </style>
-                </head>
-                <body>
-                  <div class="header">
-                    <h1 style="margin: 0; font-size: 28px;">⚠️ Rappel Urgent</h1>
-                    <p style="margin: 10px 0; font-size: 16px; opacity: 0.9;">
-                      Votre abonnement expire très bientôt
-                    </p>
-                  </div>
-                  <div class="content">
-                    <p>Bonjour ${userName},</p>
-                    
-                    <div class="urgency-banner">
-                      ⏰ ATTENTION : PLUS QUE 3 JOURS ! ⏰
-                    </div>
-                    
-                    <div class="countdown">
-                      <div class="countdown-item">
-                        <div class="countdown-number">3</div>
-                        <div class="countdown-label">Jours</div>
-                      </div>
-                      <div class="countdown-item">
-                        <div class="countdown-number">72</div>
-                        <div class="countdown-label">Heures</div>
-                      </div>
-                    </div>
-                    
-                    <p style="text-align: center; font-size: 17px; font-weight: 500;">
-                      Votre abonnement <strong>${subscription.plan_type}</strong> expire le 
-                      <strong style="color: #f97316;">${expirationDate.toLocaleDateString('fr-FR', { 
-                        weekday: 'long',
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}</strong>
-                    </p>
-                    
-                    <div class="warning-list">
-                      <strong style="font-size: 16px;">⚠️ Dans 3 jours, vous perdrez :</strong>
-                      <ul style="margin: 15px 0 10px 0;">
-                        <li><strong>❌ Matches illimités</strong> → Retour à 5 matches/jour maximum</li>
-                        <li><strong>❌ Visibilité premium</strong> → Votre profil sera moins visible</li>
-                        <li><strong>❌ Conversations prioritaires</strong> → Délais de réponse plus longs</li>
-                        <li><strong>❌ Algorithme avancé</strong> → Moins de compatibilité</li>
-                        <li><strong>❌ Support prioritaire</strong> → Assistance standard uniquement</li>
-                      </ul>
-                    </div>
-                    
-                    <div class="offer-box">
-                      <h2 style="margin-top: 0; font-size: 24px;">🎁 Votre Offre Exclusive est Toujours Valable</h2>
-                      <p style="font-size: 18px; margin: 15px 0;">
-                        Renouvelez maintenant et profitez de
-                      </p>
-                      <div style="font-size: 36px; font-weight: bold; margin: 15px 0;">
-                        -${discountPercent}% DE RÉDUCTION
-                      </div>
-                      <p style="margin: 20px 0;">
-                        Code promo à utiliser :
-                      </p>
-                      <div class="promo-code">
-                        ${discountCode}
-                      </div>
-                      <p style="font-size: 14px; opacity: 0.9; margin-top: 15px;">
-                        ⏰ Offre valable jusqu'au ${expirationDate.toLocaleDateString('fr-FR')} - Plus que 3 jours !
-                      </p>
-                    </div>
-                    
-                    <center>
-                      <a href="https://mariage-halal.com/settings?renew=true&code=${discountCode}&urgent=3days" class="button">
-                        🚀 Renouveler Maintenant (-${discountPercent}%)
-                      </a>
-                    </center>
-                    
-                    <div style="background: white; padding: 20px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #10b981;">
-                      <p style="margin: 0; font-size: 15px;">
-                        <strong>💡 Témoignage récent :</strong><br>
-                        <em>"Grâce à l'abonnement premium, j'ai trouvé mon épouse en seulement 2 mois. L'algorithme de matching est vraiment efficace !"</em><br>
-                        <span style="color: #6b7280; font-size: 13px;">- Ahmed, membre premium depuis 6 mois</span>
-                      </p>
-                    </div>
-                    
-                    <p style="background: #fee2e2; padding: 15px; border-radius: 6px; border-left: 4px solid #ef4444;">
-                      <strong style="color: #991b1b;">⚠️ Rappel Important :</strong><br>
-                      <span style="color: #7f1d1d;">Sans renouvellement, votre accès premium prendra fin automatiquement dans 3 jours. N'attendez pas le dernier moment !</span>
-                    </p>
-                    
-                    <p>Des questions ? Notre équipe est disponible pour vous accompagner.</p>
-                    
-                    <p>Qu'Allah facilite votre recherche,<br>
-                    <strong>L'équipe Mariage Halal</strong></p>
-                  </div>
-                  <div class="footer">
-                    <p><strong>Besoin d'aide ?</strong> Contactez-nous à support@mariage-halal.com</p>
-                    <p style="margin-top: 10px; font-size: 12px;">
-                      Vous recevez cet email car votre abonnement expire dans 3 jours.
-                    </p>
-                  </div>
-                </body>
-              </html>
-            `,
+            subject: variant.subject_line,
+            html: emailHTML,
           });
 
           console.log(`3-day reminder email sent to ${userEmail}:`, emailResponse);
