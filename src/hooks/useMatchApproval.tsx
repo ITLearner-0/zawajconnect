@@ -2,12 +2,16 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { MatchApprovalData, ApprovalDecision, FamilyMemberData } from '@/types/match-approval';
+import { useWaliRateLimit } from '@/hooks/useWaliRateLimit';
+import { useWaliAudit } from '@/hooks/useWaliAudit';
 
 export const useMatchApproval = () => {
   const [matches, setMatches] = useState<MatchApprovalData[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingId, setProcessingId] = useState<string | undefined>(undefined);
   const { toast } = useToast();
+  const { checkAndWarn, incrementRateLimit } = useWaliRateLimit();
+  const { logAction } = useWaliAudit();
 
   const loadMatchesForApproval = async () => {
     try {
@@ -139,6 +143,18 @@ export const useMatchApproval = () => {
 
     try {
       setProcessingId(match.id);
+      
+      // Récupérer l'utilisateur actuel
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // SÉCURITÉ: Vérifier le rate limit avant de procéder
+      const allowed = await checkAndWarn(user.id, 'match_approval');
+      if (!allowed) {
+        return false;
+      }
 
       // Créer une révision familiale avec le bon family_member_id
       const { error: reviewError } = await supabase
@@ -180,6 +196,26 @@ export const useMatchApproval = () => {
       // Supprimer de la liste locale
       setMatches(prev => prev.filter(m => m.id !== match.id));
 
+      // AUDIT: Logger l'action avec succès
+      await logAction({
+        waliUserId: user.id,
+        actionType: decision.approved ? 'match_approved' : 'match_rejected',
+        supervisedUserId: match.supervised_user_id,
+        actionDetails: {
+          match_score: match.match_score,
+          user2_name: match.user2_profile.full_name,
+          notes: decision.notes,
+          conditions: decision.conditions,
+          meeting_required: decision.meetingRequired
+        },
+        matchId: match.id,
+        familyMemberId: match.family_member_id,
+        success: true
+      });
+
+      // RATE LIMIT: Incrémenter le compteur
+      await incrementRateLimit(user.id, 'match_approval');
+
       toast({
         title: decision.approved ? "Match approuvé" : "Match refusé",
         description: decision.approved 
@@ -191,6 +227,21 @@ export const useMatchApproval = () => {
       return true;
     } catch (error) {
       console.error('Error processing approval decision:', error);
+      
+      // AUDIT: Logger l'échec
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await logAction({
+          waliUserId: user.id,
+          actionType: decision.approved ? 'match_approved' : 'match_rejected',
+          supervisedUserId: match.supervised_user_id,
+          matchId: match.id,
+          familyMemberId: match.family_member_id,
+          success: false,
+          errorMessage: error instanceof Error ? error.message : 'Unknown error'
+        });
+      }
+      
       toast({
         title: "Erreur",
         description: "Impossible de traiter la décision d'approbation",

@@ -6,6 +6,12 @@ interface UserRole {
   isWaliOnly: boolean;
   isRegularUser: boolean;
   isWali: boolean;
+  isVerifiedWali: boolean; // Wali avec score de vérification ≥85
+  canApproveMatches: boolean; // Peut approuver/rejeter des matches
+  canViewProfiles: boolean; // Peut voir les profils supervisés
+  verificationScore: number;
+  emailVerified: boolean;
+  idVerified: boolean;
   loading: boolean;
 }
 
@@ -62,7 +68,18 @@ class RoleCache {
       return role;
     } catch (error) {
       console.error('❌ Error fetching role for user:', userId, error);
-      return { isWaliOnly: false, isRegularUser: true, isWali: false, loading: false };
+      return { 
+        isWaliOnly: false, 
+        isRegularUser: true, 
+        isWali: false,
+        isVerifiedWali: false,
+        canApproveMatches: false,
+        canViewProfiles: false,
+        verificationScore: 0,
+        emailVerified: false,
+        idVerified: false,
+        loading: false 
+      };
     } finally {
       // Nettoyer les références
       this.activeRequests.delete(userId);
@@ -85,6 +102,12 @@ export const useUserRole = (): UserRole => {
     isWaliOnly: false,
     isRegularUser: false,
     isWali: false,
+    isVerifiedWali: false,
+    canApproveMatches: false,
+    canViewProfiles: false,
+    verificationScore: 0,
+    emailVerified: false,
+    idVerified: false,
     loading: true
   });
   
@@ -97,7 +120,7 @@ export const useUserRole = (): UserRole => {
 
   const fetchUserRole = useCallback(async (targetUserId: string): Promise<UserRole> => {
     return globalRoleCache.getRole(targetUserId, async () => {
-      const [profileResult, familyResult] = await Promise.all([
+      const [profileResult, familyResult, verificationResult] = await Promise.all([
         supabase
           .from('profiles')
           .select('full_name, age, gender, bio')
@@ -106,19 +129,39 @@ export const useUserRole = (): UserRole => {
         supabase
           .from('family_members')
           .select('invited_user_id, is_wali, relationship, invitation_status')
-          .eq('invited_user_id', targetUserId)
+          .eq('invited_user_id', targetUserId),
+        supabase
+          .from('user_verifications')
+          .select('email_verified, id_verified, verification_score')
+          .eq('user_id', targetUserId)
+          .maybeSingle()
       ]);
 
       const profile = profileResult.data;
       const invitedAs = familyResult.data;
+      const verification = verificationResult.data;
 
       const acceptedInvitations = invitedAs?.filter(invite => invite.invitation_status === 'accepted') || [];
       const isInvitedWali = acceptedInvitations.some(invite => invite.is_wali === true);
       const hasCompleteProfile = profile && profile.age && profile.gender && Boolean(profile.bio);
 
+      // Vérification du statut Wali
+      const emailVerified = verification?.email_verified ?? false;
+      const idVerified = verification?.id_verified ?? false;
+      const verificationScore = verification?.verification_score ?? 0;
+      
+      // Un Wali vérifié doit avoir:
+      // - Email vérifié + ID vérifié + Score ≥85 + Invitation acceptée
+      const isVerifiedWali = emailVerified && idVerified && verificationScore >= 85 && isInvitedWali;
+      
+      // Permissions basées sur le score de vérification
+      const canApproveMatches = isVerifiedWali; // Score ≥85 requis
+      const canViewProfiles = isInvitedWali && verificationScore >= 70; // Score ≥70 suffit pour voir
+      
       // Logic: 
       // - isWaliOnly: true si c'est SEULEMENT un Wali (pas de profil complet)
       // - isWali: true si a des droits de Wali (accepté invitation avec is_wali=true)
+      // - isVerifiedWali: true si Wali avec vérifications complètes (≥85)
       // - isRegularUser: true si a un profil complet OU est un Wali accepté
       
       const isOnlyWali = isInvitedWali && !hasCompleteProfile;
@@ -126,6 +169,12 @@ export const useUserRole = (): UserRole => {
       return {
         isWaliOnly: isOnlyWali,
         isWali: isInvitedWali,
+        isVerifiedWali,
+        canApproveMatches,
+        canViewProfiles,
+        verificationScore,
+        emailVerified,
+        idVerified,
         isRegularUser: hasCompleteProfile || isInvitedWali,
         loading: false
       };
@@ -134,7 +183,18 @@ export const useUserRole = (): UserRole => {
 
   useEffect(() => {
     if (!user) {
-      setRole({ isWaliOnly: false, isRegularUser: false, isWali: false, loading: false });
+      setRole({ 
+        isWaliOnly: false, 
+        isRegularUser: false, 
+        isWali: false,
+        isVerifiedWali: false,
+        canApproveMatches: false,
+        canViewProfiles: false,
+        verificationScore: 0,
+        emailVerified: false,
+        idVerified: false,
+        loading: false 
+      });
       isInitialized.current = false;
       lastUserId.current = null;
       return;
