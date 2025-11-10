@@ -5,28 +5,34 @@ import { Badge } from '@/components/ui/badge';
 import { X, Clock, Sparkles, Zap, Gift } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface RenewalBannerProps {
   onDismiss?: () => void;
 }
 
 const RenewalBanner = ({ onDismiss }: RenewalBannerProps) => {
-  const { subscription } = useAuth();
+  const { subscription, user } = useAuth();
+  const { toast } = useToast();
   const [promoCode, setPromoCode] = useState<string>('');
   const [urgency, setUrgency] = useState<'3days' | 'lastday' | null>(null);
   const [showBanner, setShowBanner] = useState(false);
   const [timeLeft, setTimeLeft] = useState({ hours: 0, minutes: 0, seconds: 0 });
+  const [trackingId, setTrackingId] = useState<string | null>(null);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const renew = urlParams.get('renew');
     const code = urlParams.get('code');
     const urgent = urlParams.get('urgent') as '3days' | 'lastday' | null;
+    const track = urlParams.get('track');
 
     if (renew === 'true') {
       setShowBanner(true);
       if (code) setPromoCode(code);
       if (urgent) setUrgency(urgent);
+      if (track) setTrackingId(track);
     }
   }, []);
 
@@ -59,7 +65,28 @@ const RenewalBanner = ({ onDismiss }: RenewalBannerProps) => {
     onDismiss?.();
   };
 
-  const handleRenew = () => {
+  const handleRenew = async () => {
+    // Track click event if tracking ID is present
+    if (trackingId && user) {
+      try {
+        const { error } = await supabase.functions.invoke('track-email-event', {
+          body: {
+            result_id: trackingId,
+            event_type: 'clicked',
+            user_id: user.id
+          }
+        });
+
+        if (error) {
+          console.error('Error tracking click:', error);
+        } else {
+          console.log('Click tracked successfully');
+        }
+      } catch (error) {
+        console.error('Error tracking click:', error);
+      }
+    }
+
     // Scroll to premium section
     const premiumSection = document.querySelector('[data-section="premium"]');
     if (premiumSection) {
