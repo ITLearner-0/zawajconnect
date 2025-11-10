@@ -270,7 +270,7 @@ const Auth = () => {
                   </div>
                 </div>
                 <CardTitle className="text-2xl font-bold text-foreground">
-                  {isWaliMode ? 'Supervision Familiale' : 'Bienvenue sur ZawajConnect'}
+                  {isWaliMode ? 'Supervision Familiale' : 'Bienvenue sur ZawajConnect (v1.0)'}
                 </CardTitle>
                 <CardDescription className="text-muted-foreground">
                   {isWaliMode 
