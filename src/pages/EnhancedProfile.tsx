@@ -40,6 +40,7 @@ import PhotoUpload from '@/components/PhotoUpload';
 import ProfileQualityPanel from '@/components/ProfileQualityPanel';
 import AISuggestions from '@/components/profile/AISuggestions';
 import ProfileChatbot from '@/components/profile/ProfileChatbot';
+import InteractiveTutorial from '@/components/profile/InteractiveTutorial';
 
 interface ProfileCompletionStats {
   overall: number;
@@ -909,6 +910,20 @@ const EnhancedProfile = () => {
                 profile={profile}
                 islamicPrefs={islamicPrefs}
                 completionStats={completionStats}
+              />
+            </motion.div>
+
+            {/* Interactive Tutorial */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55, duration: 0.5 }}
+            >
+              <InteractiveTutorial
+                profile={profile}
+                islamicPrefs={islamicPrefs}
+                completionStats={completionStats}
+                onNavigateToTab={setActiveTab}
               />
             </motion.div>
 
