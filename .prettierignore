@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+build
+.next
+*.config.js
+*.config.ts
+package-lock.json
+bun.lockb
+*.min.js
+*.min.css
+public
+.github

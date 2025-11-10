@@ -1,0 +1,388 @@
+name: Code Quality Analysis
+
+on:
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  lint-and-format:
+    name: ESLint & Prettier Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        id: eslint
+        run: |
+          npm run lint -- --format json --output-file eslint-report.json || true
+          npm run lint || echo "eslint_failed=true" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Run Prettier Check
+        id: prettier
+        run: |
+          npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css}" > prettier-report.txt 2>&1 || echo "prettier_failed=true" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Parse ESLint Results
+        id: eslint-results
+        run: |
+          if [ -f eslint-report.json ]; then
+            ERRORS=$(jq '[.[] | .errorCount] | add // 0' eslint-report.json)
+            WARNINGS=$(jq '[.[] | .warningCount] | add // 0' eslint-report.json)
+            
+            echo "errors=$ERRORS" >> $GITHUB_OUTPUT
+            echo "warnings=$WARNINGS" >> $GITHUB_OUTPUT
+            
+            # Extract top issues
+            jq -r '[.[] | select(.errorCount > 0 or .warningCount > 0) | .messages[] | select(.severity == 2) | "- **\(.ruleId)**: \(.message) (line \(.line))"] | .[0:5] | join("\n")' eslint-report.json > eslint-issues.txt || echo "Aucune erreur détaillée" > eslint-issues.txt
+          else
+            echo "errors=0" >> $GITHUB_OUTPUT
+            echo "warnings=0" >> $GITHUB_OUTPUT
+            echo "Aucune erreur" > eslint-issues.txt
+          fi
+
+      - name: Parse Prettier Results
+        id: prettier-results
+        run: |
+          if [ "${{ steps.prettier.outputs.prettier_failed }}" == "true" ]; then
+            grep "Code style issues found" prettier-report.txt > prettier-issues.txt || echo "Fichiers non formatés trouvés" > prettier-issues.txt
+          else
+            echo "✅ Tous les fichiers sont correctement formatés" > prettier-issues.txt
+          fi
+
+      - name: Create Quality Report Comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            
+            const eslintErrors = '${{ steps.eslint-results.outputs.errors }}';
+            const eslintWarnings = '${{ steps.eslint-results.outputs.warnings }}';
+            const eslintIssues = fs.readFileSync('eslint-issues.txt', 'utf8');
+            const prettierIssues = fs.readFileSync('prettier-issues.txt', 'utf8');
+            
+            const eslintStatus = eslintErrors === '0' ? '✅' : '❌';
+            const prettierStatus = '${{ steps.prettier.outputs.prettier_failed }}' === 'true' ? '❌' : '✅';
+            
+            const comment = `## 🔍 Code Quality Analysis Report
+            
+            ### ESLint Results ${eslintStatus}
+            
+            | Metric | Count |
+            |--------|-------|
+            | Errors | **${eslintErrors}** |
+            | Warnings | **${eslintWarnings}** |
+            
+            ${eslintErrors !== '0' ? '**Top Issues:**\n' + eslintIssues : '✅ Aucune erreur ESLint détectée'}
+            
+            ---
+            
+            ### Prettier Results ${prettierStatus}
+            
+            ${prettierIssues}
+            
+            ${prettierStatus === '❌' ? '\n⚠️ **Action requise**: Exécutez `npm run format` pour corriger le formatage.' : ''}
+            
+            ---
+            
+            ### Commands
+            
+            Pour corriger localement:
+            \`\`\`bash
+            # Fix ESLint issues
+            npm run lint:fix
+            
+            # Fix Prettier formatting
+            npm run format
+            \`\`\`
+            
+            ---
+            
+            <sub>🤖 Rapport généré automatiquement par le workflow Code Quality</sub>
+            `;
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Code Quality Analysis Report')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+      - name: Upload ESLint Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eslint-report
+          path: eslint-report.json
+          retention-days: 14
+
+      - name: Fail if ESLint errors found
+        if: steps.eslint-results.outputs.errors != '0'
+        run: |
+          echo "❌ ESLint found ${{ steps.eslint-results.outputs.errors }} error(s)"
+          exit 1
+
+  sonarcloud:
+    name: SonarCloud Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+        continue-on-error: true
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Get SonarCloud Results
+        id: sonar-results
+        run: |
+          # Wait for analysis to complete
+          sleep 10
+          
+          # Get project key from sonar-project.properties
+          PROJECT_KEY=$(grep "sonar.projectKey" sonar-project.properties | cut -d'=' -f2)
+          
+          # Fetch quality gate status
+          QUALITY_GATE=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=$PROJECT_KEY" | \
+            jq -r '.projectStatus.status')
+          
+          echo "quality_gate=$QUALITY_GATE" >> $GITHUB_OUTPUT
+          
+          # Fetch metrics
+          METRICS=$(curl -s -u "${{ secrets.SONAR_TOKEN }}:" \
+            "https://sonarcloud.io/api/measures/component?component=$PROJECT_KEY&metricKeys=bugs,vulnerabilities,code_smells,coverage,duplicated_lines_density,security_rating,reliability_rating,sqale_rating")
+          
+          echo "$METRICS" > sonar-metrics.json
+
+      - name: Parse SonarCloud Metrics
+        id: parse-metrics
+        run: |
+          BUGS=$(jq -r '.component.measures[] | select(.metric=="bugs") | .value // "0"' sonar-metrics.json)
+          VULNERABILITIES=$(jq -r '.component.measures[] | select(.metric=="vulnerabilities") | .value // "0"' sonar-metrics.json)
+          CODE_SMELLS=$(jq -r '.component.measures[] | select(.metric=="code_smells") | .value // "0"' sonar-metrics.json)
+          COVERAGE=$(jq -r '.component.measures[] | select(.metric=="coverage") | .value // "0"' sonar-metrics.json)
+          DUPLICATIONS=$(jq -r '.component.measures[] | select(.metric=="duplicated_lines_density") | .value // "0"' sonar-metrics.json)
+          
+          echo "bugs=$BUGS" >> $GITHUB_OUTPUT
+          echo "vulnerabilities=$VULNERABILITIES" >> $GITHUB_OUTPUT
+          echo "code_smells=$CODE_SMELLS" >> $GITHUB_OUTPUT
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          echo "duplications=$DUPLICATIONS" >> $GITHUB_OUTPUT
+
+      - name: Create SonarCloud Report Comment
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const qualityGate = '${{ steps.sonar-results.outputs.quality_gate }}';
+            const bugs = '${{ steps.parse-metrics.outputs.bugs }}';
+            const vulnerabilities = '${{ steps.parse-metrics.outputs.vulnerabilities }}';
+            const codeSmells = '${{ steps.parse-metrics.outputs.code_smells }}';
+            const coverage = '${{ steps.parse-metrics.outputs.coverage }}';
+            const duplications = '${{ steps.parse-metrics.outputs.duplications }}';
+            
+            const qualityGateEmoji = qualityGate === 'OK' ? '✅' : '❌';
+            const bugsEmoji = bugs === '0' ? '✅' : '⚠️';
+            const vulnEmoji = vulnerabilities === '0' ? '✅' : '🔴';
+            
+            const comment = `## 🔬 SonarCloud Analysis Report
+            
+            ### Quality Gate ${qualityGateEmoji}
+            
+            Status: **${qualityGate === 'OK' ? 'PASSED' : 'FAILED'}**
+            
+            ### Metrics Overview
+            
+            | Metric | Value | Status |
+            |--------|-------|--------|
+            | 🐛 Bugs | ${bugs} | ${bugsEmoji} |
+            | 🔒 Vulnerabilities | ${vulnerabilities} | ${vulnEmoji} |
+            | 💡 Code Smells | ${codeSmells} | ${codeSmells === '0' ? '✅' : '⚠️'} |
+            | 📊 Coverage | ${coverage}% | ${parseFloat(coverage) >= 80 ? '✅' : '⚠️'} |
+            | 📋 Duplications | ${duplications}% | ${parseFloat(duplications) <= 3 ? '✅' : '⚠️'} |
+            
+            ### Recommendations
+            
+            ${vulnerabilities !== '0' ? '- 🔴 **Critical**: Fix security vulnerabilities immediately\n' : ''}
+            ${bugs !== '0' ? '- ⚠️ Address bugs to improve reliability\n' : ''}
+            ${parseFloat(coverage) < 80 ? '- 📊 Increase test coverage to reach 80% threshold\n' : ''}
+            ${parseFloat(duplications) > 3 ? '- 📋 Reduce code duplication\n' : ''}
+            ${qualityGate === 'OK' && bugs === '0' && vulnerabilities === '0' ? '✨ **Excellent!** Code quality is on point!\n' : ''}
+            
+            ---
+            
+            [📊 View detailed report on SonarCloud](https://sonarcloud.io/dashboard?id=${process.env.PROJECT_KEY || 'your-project'})
+            
+            <sub>🤖 Rapport généré automatiquement par SonarCloud</sub>
+            `;
+            
+            // Find existing comment
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('SonarCloud Analysis Report')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: comment
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: comment
+              });
+            }
+
+      - name: Fail if Quality Gate failed
+        if: steps.sonar-results.outputs.quality_gate != 'OK'
+        run: |
+          echo "❌ SonarCloud Quality Gate failed"
+          exit 1
+
+  notify:
+    name: Send Notifications
+    needs: [lint-and-format, sonarcloud]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine overall status
+        id: status
+        run: |
+          if [ "${{ needs.lint-and-format.result }}" == "success" ] && [ "${{ needs.sonarcloud.result }}" == "success" ]; then
+            echo "status=success" >> $GITHUB_OUTPUT
+            echo "emoji=✅" >> $GITHUB_OUTPUT
+            echo "color=good" >> $GITHUB_OUTPUT
+          else
+            echo "status=failure" >> $GITHUB_OUTPUT
+            echo "emoji=❌" >> $GITHUB_OUTPUT
+            echo "color=danger" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Send Slack notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST $SLACK_WEBHOOK_URL \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "attachments": [{
+              "color": "${{ steps.status.outputs.color }}",
+              "title": "${{ steps.status.outputs.emoji }} Code Quality Check - PR #${{ github.event.pull_request.number }}",
+              "text": "*Status:* ${{ steps.status.outputs.status }}\n*PR:* ${{ github.event.pull_request.title }}\n*Author:* ${{ github.event.pull_request.user.login }}\n*Linting:* ${{ needs.lint-and-format.result }}\n*SonarCloud:* ${{ needs.sonarcloud.result }}",
+              "footer": "GitHub Actions",
+              "footer_icon": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+              "ts": '"$(date +%s)"'
+            }]
+          }'
+
+      - name: Send Discord notification
+        if: env.DISCORD_WEBHOOK_URL != ''
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          curl -X POST $DISCORD_WEBHOOK_URL \
+          -H 'Content-Type: application/json' \
+          -d '{
+            "embeds": [{
+              "title": "${{ steps.status.outputs.emoji }} Code Quality Check",
+              "description": "**PR #${{ github.event.pull_request.number }}**: ${{ github.event.pull_request.title }}",
+              "color": '"$( [ "${{ steps.status.outputs.status }}" == "success" ] && echo "3066993" || echo "15158332" )"',
+              "fields": [
+                {
+                  "name": "Author",
+                  "value": "${{ github.event.pull_request.user.login }}",
+                  "inline": true
+                },
+                {
+                  "name": "Status",
+                  "value": "${{ steps.status.outputs.status }}",
+                  "inline": true
+                },
+                {
+                  "name": "Linting",
+                  "value": "${{ needs.lint-and-format.result }}",
+                  "inline": true
+                },
+                {
+                  "name": "SonarCloud",
+                  "value": "${{ needs.sonarcloud.result }}",
+                  "inline": true
+                }
+              ],
+              "footer": {
+                "text": "GitHub Actions"
+              },
+              "timestamp": "'"$(date -u +%Y-%m-%dT%H:%M:%S.000Z)"'"
+            }]
+          }'
