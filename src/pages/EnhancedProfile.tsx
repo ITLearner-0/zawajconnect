@@ -22,7 +22,9 @@ import {
   Star,
   TrendingUp,
   Lock,
-  Users
+  Users,
+  Eye,
+  Edit
 } from 'lucide-react';
 
 // Enhanced Components
@@ -100,6 +102,7 @@ const EnhancedProfile = () => {
   
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [profile, setProfile] = useState<ProfileData | undefined>(undefined);
   const [verification, setVerification] = useState<VerificationData | undefined>(undefined);
   const [islamicPrefs, setIslamicPrefs] = useState<IslamicPreferencesData | undefined>(undefined);
@@ -393,12 +396,36 @@ const EnhancedProfile = () => {
       >
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Mon Profil</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-2">
+              {isPreviewMode ? 'Prévisualisation du Profil' : 'Mon Profil'}
+            </h1>
             <p className="text-muted-foreground">
-              Gérez vos informations et préférences
+              {isPreviewMode 
+                ? 'Votre profil tel que les autres utilisateurs le voient' 
+                : 'Gérez vos informations et préférences'}
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button
+                variant={isPreviewMode ? "default" : "outline"}
+                size="sm"
+                onClick={() => setIsPreviewMode(!isPreviewMode)}
+                className="gap-2"
+              >
+                {isPreviewMode ? (
+                  <>
+                    <Edit className="h-4 w-4" />
+                    <span className="hidden sm:inline">Mode Édition</span>
+                  </>
+                ) : (
+                  <>
+                    <Eye className="h-4 w-4" />
+                    <span className="hidden sm:inline">Prévisualiser</span>
+                  </>
+                )}
+              </Button>
+            </motion.div>
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
@@ -419,12 +446,191 @@ const EnhancedProfile = () => {
         </div>
       </motion.div>
 
-      {/* Profile Sections */}
-      <motion.div 
-        variants={itemVariants}
-        className="bg-card rounded-lg border p-6"
-      >
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      {/* Profile Sections with Flip Animation */}
+      <AnimatePresence mode="wait">
+        {isPreviewMode ? (
+          <motion.div
+            key="preview"
+            initial={{ rotateY: 90, opacity: 0 }}
+            animate={{ rotateY: 0, opacity: 1 }}
+            exit={{ rotateY: -90, opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            style={{ transformStyle: "preserve-3d" }}
+            className="bg-card rounded-lg border p-6"
+          >
+            <div className="max-w-4xl mx-auto space-y-6">
+              {/* Profile Preview Card */}
+              <Card className="overflow-hidden">
+                <div className="relative h-32 bg-gradient-to-r from-emerald to-emerald-light">
+                  <div className="absolute -bottom-16 left-6">
+                    <div className="h-32 w-32 rounded-full border-4 border-card overflow-hidden bg-gradient-to-br from-emerald/20 to-gold/20 flex items-center justify-center">
+                      {profile?.avatar_url ? (
+                        <img 
+                          src={profile.avatar_url} 
+                          alt="Photo de profil" 
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <User className="h-16 w-16 text-muted-foreground" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <CardContent className="pt-20 pb-6">
+                  <div className="flex items-start justify-between mb-6">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h2 className="text-2xl font-bold">{profile?.full_name || 'Non défini'}</h2>
+                        <VerificationBadge verificationScore={verification?.verification_score || 0} />
+                      </div>
+                      <div className="flex items-center gap-4 text-muted-foreground">
+                        <span>{profile?.age ? `${profile.age} ans` : 'Âge non défini'}</span>
+                        <span>•</span>
+                        <span>{profile?.location || 'Localisation non définie'}</span>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="text-emerald">
+                      {completionStats.overall}% Complété
+                    </Badge>
+                  </div>
+
+                  {profile?.bio && (
+                    <div className="mb-6">
+                      <h3 className="font-semibold mb-2">À propos</h3>
+                      <p className="text-muted-foreground">{profile.bio}</p>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    {profile?.profession && (
+                      <div>
+                        <h4 className="font-medium mb-1 text-sm text-muted-foreground">Profession</h4>
+                        <p>{profile.profession}</p>
+                      </div>
+                    )}
+                    {profile?.education && (
+                      <div>
+                        <h4 className="font-medium mb-1 text-sm text-muted-foreground">Éducation</h4>
+                        <p>{profile.education}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {profile?.interests && profile.interests.length > 0 && (
+                    <div className="mb-6">
+                      <h3 className="font-semibold mb-2">Centres d'intérêt</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {profile.interests.map((interest, index) => (
+                          <Badge key={index} variant="secondary">
+                            {interest}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {islamicPrefs && (
+                    <div>
+                      <h3 className="font-semibold mb-3 flex items-center gap-2">
+                        <Heart className="h-5 w-5 text-emerald" />
+                        Préférences Islamiques
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {islamicPrefs.prayer_frequency && (
+                          <div className="flex justify-between p-3 bg-muted/30 rounded-lg">
+                            <span className="text-sm text-muted-foreground">Prière</span>
+                            <span className="text-sm font-medium">{islamicPrefs.prayer_frequency}</span>
+                          </div>
+                        )}
+                        {islamicPrefs.quran_reading && (
+                          <div className="flex justify-between p-3 bg-muted/30 rounded-lg">
+                            <span className="text-sm text-muted-foreground">Lecture du Coran</span>
+                            <span className="text-sm font-medium">{islamicPrefs.quran_reading}</span>
+                          </div>
+                        )}
+                        {islamicPrefs.sect && (
+                          <div className="flex justify-between p-3 bg-muted/30 rounded-lg">
+                            <span className="text-sm text-muted-foreground">Courant</span>
+                            <span className="text-sm font-medium">{islamicPrefs.sect}</span>
+                          </div>
+                        )}
+                        {islamicPrefs.madhab && (
+                          <div className="flex justify-between p-3 bg-muted/30 rounded-lg">
+                            <span className="text-sm text-muted-foreground">Madhab</span>
+                            <span className="text-sm font-medium">{islamicPrefs.madhab}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Stats Preview */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-emerald mb-1">
+                        {completionStats.overall}%
+                      </div>
+                      <p className="text-sm text-muted-foreground">Profil Complété</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-gold mb-1">
+                        {verification?.verification_score || 0}%
+                      </div>
+                      <p className="text-sm text-muted-foreground">Vérifié</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-primary mb-1">
+                        {compatibilityStats.answeredQuestions}/{compatibilityStats.totalQuestions}
+                      </div>
+                      <p className="text-sm text-muted-foreground">Compatibilité</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Tips Banner */}
+              <Card className="bg-gradient-to-r from-emerald/10 to-gold/10 border-emerald/20">
+                <CardContent className="pt-6">
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-full bg-emerald/20 flex items-center justify-center flex-shrink-0">
+                      <Eye className="h-5 w-5 text-emerald" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-1">Mode Prévisualisation</h4>
+                      <p className="text-sm text-muted-foreground">
+                        C'est ainsi que votre profil apparaît aux autres utilisateurs. 
+                        {completionStats.overall < 80 && " Complétez votre profil pour augmenter vos chances de match !"}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="edit"
+            initial={{ rotateY: 90, opacity: 0 }}
+            animate={{ rotateY: 0, opacity: 1 }}
+            exit={{ rotateY: -90, opacity: 0 }}
+            transition={{ duration: 0.6, ease: "easeInOut" }}
+            style={{ transformStyle: "preserve-3d" }}
+            variants={itemVariants}
+            className="bg-card rounded-lg border p-6"
+          >
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
@@ -904,8 +1110,10 @@ const EnhancedProfile = () => {
               </motion.div>
             </AnimatePresence>
           </TabsContent>
-        </Tabs>
-      </motion.div>
+            </Tabs>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 };
