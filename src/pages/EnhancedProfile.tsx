@@ -375,43 +375,6 @@ const EnhancedProfile = () => {
         </div>
       </div>
 
-      {/* Completion Progress */}
-      <div className="bg-card rounded-lg border p-6">
-        <h2 className="text-xl font-semibold mb-4">Progression du Profil</h2>
-        <div className="space-y-4">
-          {[
-            { key: 'basicInfo', label: 'Informations de Base', icon: User },
-            { key: 'islamicPrefs', label: 'Préférences Islamiques', icon: Heart },
-            { key: 'photos', label: 'Photos', icon: Camera },
-            { key: 'compatibility', label: 'Test de Compatibilité', icon: Brain },
-            { key: 'privacy', label: 'Paramètres de Confidentialité', icon: Lock },
-            { key: 'verification', label: 'Vérification', icon: Shield }
-          ].map(({ key, label, icon: Icon }) => {
-            const percentage = completionStats[key as keyof ProfileCompletionStats];
-            return (
-              <div key={key} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-                <div className="flex items-center gap-3">
-                  <Icon className="h-5 w-5 text-muted-foreground" />
-                  <span className="font-medium">{label}</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Progress value={percentage} className="w-32 h-2" />
-                  <span className="text-sm font-medium w-12 text-right">{percentage}%</span>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        
-        <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/10">
-          <div className="flex items-center justify-between mb-2">
-            <span className="font-medium">Score Global</span>
-            <Badge variant="outline">{completionStats.overall}/100</Badge>
-          </div>
-          <Progress value={completionStats.overall} className="h-3" />
-        </div>
-      </div>
-
       {/* Profile Sections */}
       <div className="bg-card rounded-lg border p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
@@ -443,6 +406,7 @@ const EnhancedProfile = () => {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
+            {/* Quick Actions and Profile Summary */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Quick Actions */}
               <Card>
@@ -567,6 +531,47 @@ const EnhancedProfile = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Completion Progress */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold">Progression du Profil</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-4">
+                  {[
+                    { key: 'basicInfo', label: 'Informations de Base', icon: User },
+                    { key: 'islamicPrefs', label: 'Préférences Islamiques', icon: Heart },
+                    { key: 'photos', label: 'Photos', icon: Camera },
+                    { key: 'compatibility', label: 'Test de Compatibilité', icon: Brain },
+                    { key: 'privacy', label: 'Paramètres de Confidentialité', icon: Lock },
+                    { key: 'verification', label: 'Vérification', icon: Shield }
+                  ].map(({ key, label, icon: Icon }) => {
+                    const percentage = completionStats[key as keyof ProfileCompletionStats];
+                    return (
+                      <div key={key} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                        <div className="flex items-center gap-3">
+                          <Icon className="h-5 w-5 text-muted-foreground" />
+                          <span className="font-medium">{label}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Progress value={percentage} className="w-32 h-2" />
+                          <span className="text-sm font-medium w-12 text-right">{percentage}%</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                <div className="mt-6 p-4 bg-primary/5 rounded-lg border border-primary/10">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-medium">Score Global</span>
+                    <Badge variant="outline">{completionStats.overall}/100</Badge>
+                  </div>
+                  <Progress value={completionStats.overall} className="h-3" />
+                </div>
+              </CardContent>
+            </Card>
 
             {/* Profile Quality Panel */}
             <ProfileQualityPanel
