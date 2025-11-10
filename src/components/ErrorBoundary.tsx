@@ -1,6 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { Button } from '@/components/ui/button';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { ErrorFallback } from './ErrorFallback';
 
 interface Props {
   children: ReactNode;
@@ -8,56 +7,44 @@ interface Props {
 
 interface State {
   hasError: boolean;
-  error?: Error;
+  error: Error | null;
 }
 
 export class ErrorBoundary extends Component<Props, State> {
   public state: State = {
-    hasError: false
+    hasError: false,
+    error: null,
   };
 
   public static getDerivedStateFromError(error: Error): State {
+    // Update state so the next render will show the fallback UI
     return { hasError: true, error };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+    // Log to external service if configured
+    if (import.meta.env.VITE_SENTRY_DSN) {
+      // Sentry or other error tracking would go here
+      console.log('Error would be sent to Sentry:', {
+        error: error.message,
+        componentStack: errorInfo.componentStack,
+      });
+    }
   }
 
-  private handleReset = () => {
-    this.setState({ hasError: false, error: undefined });
+  private resetErrorBoundary = () => {
+    this.setState({ hasError: false, error: null });
   };
 
   public render() {
-    if (this.state.hasError) {
+    if (this.state.hasError && this.state.error) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center p-4">
-          <div className="max-w-md w-full bg-card rounded-lg border p-6 text-center">
-            <AlertTriangle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-foreground mb-2">
-              Une erreur s'est produite
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              L'application a rencontré un problème. Veuillez réessayer ou actualiser la page.
-            </p>
-            <div className="space-y-3">
-              <Button 
-                onClick={this.handleReset}
-                className="w-full"
-              >
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Réessayer
-              </Button>
-              <Button 
-                variant="outline"
-                onClick={() => window.location.reload()}
-                className="w-full"
-              >
-                Actualiser la page
-              </Button>
-            </div>
-          </div>
-        </div>
+        <ErrorFallback
+          error={this.state.error}
+          resetErrorBoundary={this.resetErrorBoundary}
+        />
       );
     }
 
