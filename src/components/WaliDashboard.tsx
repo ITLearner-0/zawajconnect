@@ -451,16 +451,26 @@ const WaliDashboard: React.FC = () => {
   return (
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="p-3 bg-primary/10 rounded-full">
-          <Shield className="h-8 w-8 text-primary" />
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-4">
+          <div className="p-3 bg-primary/10 rounded-full">
+            <Shield className="h-8 w-8 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">Tableau de Bord Wali</h1>
+            <p className="text-muted-foreground">
+              Supervision familiale selon les principes islamiques
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-3xl font-bold">Tableau de Bord Wali</h1>
-          <p className="text-muted-foreground">
-            Supervision familiale selon les principes islamiques
-          </p>
-        </div>
+        <Button 
+          onClick={() => navigate('/wali-monitoring')}
+          variant="outline"
+          className="gap-2"
+        >
+          <TrendingUp className="h-4 w-4" />
+          Dashboard de Monitoring
+        </Button>
       </div>
 
       {/* Métriques de supervision avec le nouveau composant */}
