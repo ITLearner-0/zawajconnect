@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, Crown, Gift, Plus, Search, Users, History } from 'lucide-react';
+import { AlertCircle, Crown, Gift, Plus, Search, Users, History, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import SubscriptionHistoryViewer from '@/components/admin/SubscriptionHistoryViewer';
@@ -41,6 +42,9 @@ const SubscriptionManagement = () => {
   const [planType, setPlanType] = useState('premium_3_months');
   const [expirationDays, setExpirationDays] = useState('90');
   const [notes, setNotes] = useState('');
+  const [existingSubscription, setExistingSubscription] = useState<UserSubscription | null>(null);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [replacementReason, setReplacementReason] = useState('');
 
   const planTypes = [
     { value: 'premium_3_months', label: 'Premium 3 mois (9.99€/mois)', color: 'bg-emerald-600', days: 90 },
@@ -122,12 +126,41 @@ const SubscriptionManagement = () => {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const grantSubscription = async () => {
+  const checkExistingSubscription = async () => {
     if (!selectedUserId || !planType) {
       toast.error('Veuillez sélectionner un utilisateur et un plan');
       return;
     }
 
+    try {
+      // Check for existing active subscription
+      const { data: existing, error } = await supabase
+        .from('subscriptions')
+        .select(`
+          *,
+          profiles(full_name)
+        `)
+        .eq('user_id', selectedUserId)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (existing) {
+        // Show confirmation dialog if active subscription exists
+        setExistingSubscription(existing as any);
+        setConfirmDialogOpen(true);
+      } else {
+        // Proceed directly if no active subscription
+        await proceedWithGrant();
+      }
+    } catch (error) {
+      console.error('Erreur lors de la vérification:', error);
+      toast.error('Impossible de vérifier l\'abonnement existant');
+    }
+  };
+
+  const proceedWithGrant = async (isReplacement: boolean = false) => {
     try {
       // Get current admin user
       const { data: { user } } = await supabase.auth.getUser();
@@ -137,9 +170,19 @@ const SubscriptionManagement = () => {
         return;
       }
 
+      // Validate replacement reason if replacing
+      if (isReplacement && !replacementReason.trim()) {
+        toast.error('Veuillez fournir une raison pour le remplacement');
+        return;
+      }
+
       const expiresAt = expirationDays ? 
         new Date(Date.now() + parseInt(expirationDays) * 24 * 60 * 60 * 1000).toISOString() : 
         null;
+
+      const finalNotes = isReplacement 
+        ? `[REMPLACEMENT] ${replacementReason}${notes ? ' | Notes: ' + notes : ''}`
+        : notes || null;
 
       const { error } = await supabase
         .from('subscriptions')
@@ -148,7 +191,7 @@ const SubscriptionManagement = () => {
           plan_type: planType,
           status: 'active',
           expires_at: expiresAt,
-          notes: notes || null,
+          notes: finalNotes,
           granted_by: user.id
         }, {
           onConflict: 'user_id'
@@ -156,13 +199,18 @@ const SubscriptionManagement = () => {
 
       if (error) throw error;
 
-      toast.success(`Abonnement ${planType} accordé avec succès`);
+      toast.success(`Abonnement ${planType} ${isReplacement ? 'remplacé' : 'accordé'} avec succès`);
+      
+      // Reset all states
       setGrantDialogOpen(false);
+      setConfirmDialogOpen(false);
       setSelectedUserId('');
       setSelectedUserName('');
       setSearchQuery('');
       setSearchResults([]);
       setNotes('');
+      setReplacementReason('');
+      setExistingSubscription(null);
       loadSubscriptions();
     } catch (error) {
       console.error('Erreur lors de l\'attribution de l\'abonnement:', error);
@@ -356,7 +404,7 @@ const SubscriptionManagement = () => {
                 />
               </div>
               
-              <Button onClick={grantSubscription} className="w-full">
+              <Button onClick={checkExistingSubscription} className="w-full">
                 <Gift className="h-4 w-4 mr-2" />
                 Accorder l'Abonnement
               </Button>
@@ -364,6 +412,120 @@ const SubscriptionManagement = () => {
           </DialogContent>
         </Dialog>
       </div>
+
+      {/* Confirmation Dialog for Replacement */}
+      <AlertDialog open={confirmDialogOpen} onOpenChange={setConfirmDialogOpen}>
+        <AlertDialogContent className="max-w-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-xl">
+              <AlertTriangle className="h-5 w-5 text-orange-500" />
+              Confirmer le Remplacement d'Abonnement
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Cet utilisateur possède déjà un abonnement actif. Le remplacer annulera l'ancien abonnement.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {existingSubscription && (
+            <div className="space-y-4">
+              <div className="p-4 bg-orange-50 dark:bg-orange-950 border border-orange-200 dark:border-orange-800 rounded-lg">
+                <h4 className="font-semibold text-orange-900 dark:text-orange-100 mb-3">
+                  Abonnement Actuel
+                </h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <div className="text-orange-700 dark:text-orange-300 font-medium">Type</div>
+                    <div className="text-orange-900 dark:text-orange-100">{existingSubscription.plan_type}</div>
+                  </div>
+                  <div>
+                    <div className="text-orange-700 dark:text-orange-300 font-medium">Statut</div>
+                    <Badge className="bg-green-500 text-white">{existingSubscription.status}</Badge>
+                  </div>
+                  <div>
+                    <div className="text-orange-700 dark:text-orange-300 font-medium">Accordé le</div>
+                    <div className="text-orange-900 dark:text-orange-100">
+                      {new Date(existingSubscription.granted_at).toLocaleDateString('fr-FR')}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-orange-700 dark:text-orange-300 font-medium">Expire le</div>
+                    <div className="text-orange-900 dark:text-orange-100">
+                      {existingSubscription.expires_at 
+                        ? new Date(existingSubscription.expires_at).toLocaleDateString('fr-FR')
+                        : 'Jamais'}
+                    </div>
+                  </div>
+                </div>
+                {existingSubscription.notes && (
+                  <div className="mt-3 pt-3 border-t border-orange-200 dark:border-orange-800">
+                    <div className="text-orange-700 dark:text-orange-300 font-medium mb-1">Notes</div>
+                    <div className="text-orange-900 dark:text-orange-100 text-sm italic">
+                      {existingSubscription.notes}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="p-4 bg-emerald-50 dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+                <h4 className="font-semibold text-emerald-900 dark:text-emerald-100 mb-3">
+                  Nouvel Abonnement
+                </h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <div className="text-emerald-700 dark:text-emerald-300 font-medium">Type</div>
+                    <div className="text-emerald-900 dark:text-emerald-100">{planType}</div>
+                  </div>
+                  <div>
+                    <div className="text-emerald-700 dark:text-emerald-300 font-medium">Durée</div>
+                    <div className="text-emerald-900 dark:text-emerald-100">{expirationDays} jours</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="replacementReason" className="text-base font-semibold">
+                  Raison du Remplacement <span className="text-destructive">*</span>
+                </Label>
+                <Textarea
+                  id="replacementReason"
+                  placeholder="Expliquez pourquoi cet abonnement doit être remplacé (obligatoire)..."
+                  value={replacementReason}
+                  onChange={(e) => setReplacementReason(e.target.value)}
+                  className="min-h-[100px]"
+                  required
+                />
+                {replacementReason.trim() && replacementReason.length < 10 && (
+                  <p className="text-sm text-orange-600 dark:text-orange-400">
+                    Veuillez fournir une raison détaillée (minimum 10 caractères)
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setConfirmDialogOpen(false);
+              setReplacementReason('');
+              setExistingSubscription(null);
+            }}>
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (replacementReason.trim().length < 10) {
+                  toast.error('Veuillez fournir une raison détaillée (minimum 10 caractères)');
+                  return;
+                }
+                proceedWithGrant(true);
+              }}
+              className="bg-orange-600 hover:bg-orange-700"
+            >
+              Confirmer le Remplacement
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3">
