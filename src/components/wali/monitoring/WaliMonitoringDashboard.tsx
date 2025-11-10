@@ -10,6 +10,7 @@ import { WaliStatsCards } from './WaliStatsCards';
 import { WaliActivityChart } from './WaliActivityChart';
 import { WaliRateLimitIndicators } from './WaliRateLimitIndicators';
 import { WaliActivityList } from './WaliActivityList';
+import { WaliAlertPanel } from './WaliAlertPanel';
 
 export const WaliMonitoringDashboard = () => {
   const { user } = useAuth();
@@ -122,6 +123,9 @@ export const WaliMonitoringDashboard = () => {
 
       {/* Statistics Cards */}
       <WaliStatsCards statistics={statistics} loading={loading} />
+
+      {/* Alertes de sécurité */}
+      <WaliAlertPanel />
 
       {/* Charts & Rate Limits */}
       <div className="grid gap-6 md:grid-cols-2">
