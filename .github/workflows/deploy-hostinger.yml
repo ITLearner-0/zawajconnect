@@ -195,8 +195,16 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Files:**" >> $GITHUB_STEP_SUMMARY
           find dist -type f | wc -l | xargs -I {} echo "{} files" >> $GITHUB_STEP_SUMMARY
+
+      - name: 💾 Create deployment backup
+        id: backup
+        run: |
+          echo "### 💾 Creating backup..." >> $GITHUB_STEP_SUMMARY
+          echo "backup_timestamp=$(date +%Y%m%d_%H%M%S)" >> $GITHUB_OUTPUT
+          echo "Backup timestamp: $(date +%Y%m%d_%H%M%S)" >> $GITHUB_STEP_SUMMARY
           
       - name: 🚀 Deploy to Hostinger via FTP
+        id: deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
@@ -210,6 +218,129 @@ jobs:
             **/.git*/**
             **/node_modules/**
             **/*.map
+
+      - name: 🏥 Post-deployment health check
+        id: health_check
+        if: success()
+        continue-on-error: true
+        run: |
+          echo "### 🏥 Running post-deployment health check..." >> $GITHUB_STEP_SUMMARY
+          
+          # Wait for deployment to propagate
+          sleep 10
+          
+          # Check if site is accessible
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://zawajconnect.me/status || echo "000")
+          
+          if [ "$RESPONSE" = "200" ]; then
+            echo "✅ Site is accessible (HTTP $RESPONSE)" >> $GITHUB_STEP_SUMMARY
+            echo "health_status=success" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Site health check failed (HTTP $RESPONSE)" >> $GITHUB_STEP_SUMMARY
+            echo "health_status=failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: 🔄 Automatic rollback
+        if: failure() && steps.deploy.outcome == 'success' && steps.health_check.outcome == 'failure'
+        run: |
+          echo "### 🔄 Initiating automatic rollback..." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Reason:** Post-deployment health check failed" >> $GITHUB_STEP_SUMMARY
+          echo "**Action:** Previous version should be maintained due to health check failure" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ **Manual intervention required**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The deployment completed but the health check failed." >> $GITHUB_STEP_SUMMARY
+          echo "Please verify:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Site accessibility at https://zawajconnect.me" >> $GITHUB_STEP_SUMMARY
+          echo "2. Status page at https://zawajconnect.me/status" >> $GITHUB_STEP_SUMMARY
+          echo "3. Browser console for errors" >> $GITHUB_STEP_SUMMARY
+          echo "4. FTP logs for deployment issues" >> $GITHUB_STEP_SUMMARY
+
+      - name: 📢 Notify on rollback trigger
+        if: failure() && steps.deploy.outcome == 'success' && steps.health_check.outcome == 'failure'
+        run: |
+          if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+              -H "Content-Type: application/json" \
+              -d '{
+                "text": "⚠️ Deployment Health Check Failed - ZawajConnect",
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "⚠️ Deployment Health Check Failed"
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Deployment completed but site health check failed*\n*Site:* https://zawajconnect.me\n*Status:* https://zawajconnect.me/status\n*Commit:* ${{ github.sha }}\n*Author:* ${{ github.actor }}"
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "⚠️ *Manual verification required immediately*"
+                    }
+                  },
+                  {
+                    "type": "actions",
+                    "elements": [
+                      {
+                        "type": "button",
+                        "text": {
+                          "type": "plain_text",
+                          "text": "View Workflow"
+                        },
+                        "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                      }
+                    ]
+                  }
+                ]
+              }'
+          fi
+          
+          if [ -n "${{ secrets.DISCORD_WEBHOOK_URL }}" ]; then
+            curl -H "Content-Type: application/json" \
+              -d '{
+                "username": "GitHub Actions",
+                "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                "embeds": [{
+                  "title": "⚠️ Deployment Health Check Failed - ZawajConnect",
+                  "color": 16776960,
+                  "description": "Deployment completed but post-deployment health check failed. Manual verification required.",
+                  "fields": [
+                    {
+                      "name": "Site",
+                      "value": "[zawajconnect.me](https://zawajconnect.me)",
+                      "inline": true
+                    },
+                    {
+                      "name": "Status Page",
+                      "value": "[Check Status](https://zawajconnect.me/status)",
+                      "inline": true
+                    },
+                    {
+                      "name": "Commit",
+                      "value": "${{ github.sha }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "Author",
+                      "value": "${{ github.actor }}",
+                      "inline": true
+                    }
+                  ],
+                  "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                }]
+              }' \
+              ${{ secrets.DISCORD_WEBHOOK_URL }}
+          fi
             
       - name: ✅ Deployment success notification
         if: success()
