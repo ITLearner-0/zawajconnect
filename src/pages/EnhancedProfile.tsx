@@ -39,6 +39,7 @@ import VerificationBadge from '@/components/VerificationBadge';
 import PhotoUpload from '@/components/PhotoUpload';
 import ProfileQualityPanel from '@/components/ProfileQualityPanel';
 import AISuggestions from '@/components/profile/AISuggestions';
+import ProfileChatbot from '@/components/profile/ProfileChatbot';
 
 interface ProfileCompletionStats {
   overall: number;
@@ -1128,6 +1129,12 @@ const EnhancedProfile = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Profile Chatbot - Always visible */}
+      <ProfileChatbot 
+        profile={profile}
+        completionStats={completionStats}
+      />
     </motion.div>
   );
 };
