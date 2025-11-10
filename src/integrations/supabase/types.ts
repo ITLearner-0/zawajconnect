@@ -2749,6 +2749,10 @@ export type Database = {
         Args: { p_invitation_token: string; p_invited_user_id: string }
         Returns: boolean
       }
+      acknowledge_wali_alert: {
+        Args: { p_admin_id: string; p_alert_id: string }
+        Returns: boolean
+      }
       add_user_xp: {
         Args: { p_user_id: string; p_xp_amount: number }
         Returns: undefined
@@ -2907,6 +2911,31 @@ export type Database = {
           field_name: string
         }[]
       }
+      get_wali_alerts_statistics: {
+        Args: never
+        Returns: {
+          alerts_this_month: number
+          alerts_this_week: number
+          alerts_today: number
+          critical_alerts: number
+          high_alerts: number
+          low_alerts: number
+          medium_alerts: number
+          total_alerts: number
+          unacknowledged_alerts: number
+        }[]
+      }
+      get_wali_alerts_trend: {
+        Args: { p_days?: number }
+        Returns: {
+          critical_count: number
+          date: string
+          high_count: number
+          low_count: number
+          medium_count: number
+          total_count: number
+        }[]
+      }
       has_family_relationship_security_definer: {
         Args: { target_user_id: string }
         Returns: boolean
@@ -2945,6 +2974,7 @@ export type Database = {
         Args: { check_user_id: string }
         Returns: boolean
       }
+      is_wali_suspended: { Args: { p_user_id: string }; Returns: boolean }
       log_profile_access: {
         Args: {
           p_risk_level?: string
@@ -2979,6 +3009,15 @@ export type Database = {
       send_match_suggestions_batch: { Args: never; Returns: undefined }
       send_monthly_newsletter: { Args: never; Returns: undefined }
       send_weekly_tips_batch: { Args: never; Returns: undefined }
+      suspend_wali_user: {
+        Args: {
+          p_admin_id: string
+          p_duration_days?: number
+          p_reason: string
+          p_wali_user_id: string
+        }
+        Returns: boolean
+      }
       update_login_streak: { Args: { p_user_id: string }; Returns: undefined }
     }
     Enums: {
