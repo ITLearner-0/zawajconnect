@@ -216,6 +216,15 @@ export const routes: RouteConfig[] = [
     roles: ['admin']
   },
   {
+    path: '/ab-testing',
+    component: 'ABTestingDashboard',
+    label: 'Tests A/B Emails',
+    requiresAuth: true,
+    icon: 'BarChart3',
+    category: 'admin',
+    roles: ['admin']
+  },
+  {
     path: '/faq',
     component: 'FAQ',
     label: 'FAQ',

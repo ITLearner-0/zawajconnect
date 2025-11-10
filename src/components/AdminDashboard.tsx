@@ -19,6 +19,7 @@ import { OnboardingAnalyticsDashboard } from '@/components/admin/OnboardingAnaly
 import CallAnalyticsDashboard from '@/components/admin/CallAnalyticsDashboard';
 import CallFeedbackDashboard from '@/components/admin/CallFeedbackDashboard';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
+import ABTestingDashboard from '@/pages/ABTestingDashboard';
 import { 
   Users, 
   Heart, 
@@ -474,13 +475,14 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
 
       {/* Admin Tabs */}
       <Tabs defaultValue="users" className="space-y-4">
-        <ResponsiveTabsList tabCount={9}>
+        <ResponsiveTabsList tabCount={10}>
           <TabsTrigger value="users">Utilisateurs</TabsTrigger>
           <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
           <TabsTrigger value="roles">Rôles</TabsTrigger>
           <TabsTrigger value="reports">Rapports</TabsTrigger>
           <TabsTrigger value="security">Sécurité</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="abtesting">Tests A/B</TabsTrigger>
           <TabsTrigger value="onboarding">Onboarding</TabsTrigger>
           <TabsTrigger value="insights">Insights</TabsTrigger>
           <TabsTrigger value="settings">Paramètres</TabsTrigger>
@@ -804,6 +806,11 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
             <CallFeedbackDashboard />
           </TabsContent>
         </Tabs>
+      </TabsContent>
+
+      {/* A/B Testing Tab */}
+      <TabsContent value="abtesting" className="space-y-4">
+        <ABTestingDashboard />
       </TabsContent>
 
       {/* Onboarding Analytics Tab */}
