@@ -43,6 +43,7 @@ import { AdminWaliAlert, useAdminWaliAlerts } from '@/hooks/useAdminWaliAlerts';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { WaliEmailHistoryDialog } from './WaliEmailHistoryDialog';
 
 interface AdminAlertsTableProps {
   alerts: AdminWaliAlert[];
@@ -67,6 +68,8 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
   const [selectedWali, setSelectedWali] = useState<AdminWaliAlert | null>(null);
   const [suspendReason, setSuspendReason] = useState('');
   const [suspendDays, setSuspendDays] = useState('30');
+  const [emailHistoryOpen, setEmailHistoryOpen] = useState(false);
+  const [selectedWaliForHistory, setSelectedWaliForHistory] = useState<AdminWaliAlert | null>(null);
 
   const filteredAlerts = alerts.filter(alert => {
     if (filterRisk !== 'all' && alert.risk_level !== filterRisk) return false;
@@ -324,6 +327,15 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
                               <Mail className="h-4 w-4 mr-2" />
                               Contacter Wali
                             </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedWaliForHistory(alert);
+                                setEmailHistoryOpen(true);
+                              }}
+                            >
+                              <Mail className="h-4 w-4 mr-2" />
+                              Voir historique emails
+                            </DropdownMenuItem>
                             <DropdownMenuItem>
                               <FileText className="h-4 w-4 mr-2" />
                               Générer rapport
@@ -386,6 +398,13 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <WaliEmailHistoryDialog
+        open={emailHistoryOpen}
+        onOpenChange={setEmailHistoryOpen}
+        waliUserId={selectedWaliForHistory?.wali_user_id || ''}
+        waliName={`${selectedWaliForHistory?.wali_profile?.first_name} ${selectedWaliForHistory?.wali_profile?.last_name}`}
+      />
     </>
   );
 };

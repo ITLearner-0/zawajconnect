@@ -2565,6 +2565,60 @@ export type Database = {
           },
         ]
       }
+      wali_email_history: {
+        Row: {
+          clicked_at: string | null
+          created_at: string | null
+          delivered_at: string | null
+          delivery_status: string
+          email_type: string
+          error_message: string | null
+          id: string
+          message_content: string
+          metadata: Json | null
+          opened_at: string | null
+          resend_email_id: string | null
+          sent_at: string
+          sent_by: string
+          subject: string
+          wali_user_id: string
+        }
+        Insert: {
+          clicked_at?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_status?: string
+          email_type: string
+          error_message?: string | null
+          id?: string
+          message_content: string
+          metadata?: Json | null
+          opened_at?: string | null
+          resend_email_id?: string | null
+          sent_at?: string
+          sent_by: string
+          subject: string
+          wali_user_id: string
+        }
+        Update: {
+          clicked_at?: string | null
+          created_at?: string | null
+          delivered_at?: string | null
+          delivery_status?: string
+          email_type?: string
+          error_message?: string | null
+          id?: string
+          message_content?: string
+          metadata?: Json | null
+          opened_at?: string | null
+          resend_email_id?: string | null
+          sent_at?: string
+          sent_by?: string
+          subject?: string
+          wali_user_id?: string
+        }
+        Relationships: []
+      }
       webrtc_calls: {
         Row: {
           call_type: string
@@ -2934,6 +2988,37 @@ export type Database = {
           low_count: number
           medium_count: number
           total_count: number
+        }[]
+      }
+      get_wali_email_history: {
+        Args: { p_limit?: number; p_wali_user_id: string }
+        Returns: {
+          clicked_at: string
+          delivered_at: string
+          delivery_status: string
+          email_type: string
+          error_message: string
+          id: string
+          message_content: string
+          metadata: Json
+          opened_at: string
+          sender_name: string
+          sent_at: string
+          sent_by: string
+          subject: string
+          wali_user_id: string
+        }[]
+      }
+      get_wali_email_stats: {
+        Args: { p_wali_user_id: string }
+        Returns: {
+          clicked_count: number
+          delivered_count: number
+          failed_count: number
+          last_email_sent_at: string
+          opened_count: number
+          sent_count: number
+          total_emails: number
         }[]
       }
       has_family_relationship_security_definer: {

@@ -309,7 +309,33 @@ serve(async (req) => {
 
     console.log(`✅ Email envoyé avec succès:`, emailResponse);
 
-    // Logger l'envoi d'email
+    // Logger l'email dans wali_email_history
+    const emailHistoryData = {
+      wali_user_id,
+      sent_by: userData.user.id,
+      email_type,
+      subject: emailSubject,
+      message_content: email_type === 'suspension' 
+        ? suspension_reason || ''
+        : message || '',
+      delivery_status: 'sent',
+      resend_email_id: emailResponse.id,
+      metadata: {
+        suspension_duration_days: suspension_duration_days || null,
+        admin_name: adminDisplayName,
+        wali_email: waliProfile.email
+      }
+    };
+
+    const { error: historyError } = await supabaseClient
+      .from('wali_email_history')
+      .insert(emailHistoryData);
+
+    if (historyError) {
+      console.error('Erreur lors de l\'enregistrement dans l\'historique:', historyError);
+    }
+
+    // Logger l'envoi d'email dans l'audit
     await supabaseClient
       .from('wali_action_audit')
       .insert({
