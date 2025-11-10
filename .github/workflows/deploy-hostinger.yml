@@ -24,26 +24,32 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci
         
-      - name: 🧪 Run tests
-        run: npm test
+      - name: 🧪 Run tests with coverage
+        run: npm run test:coverage
         env:
           CI: true
         
       - name: 📊 Test results
         if: success()
         run: |
-          echo "### ✅ All tests passed! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ All tests passed with sufficient coverage! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Coverage requirement:** 80% minimum" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Proceeding with build and deployment..." >> $GITHUB_STEP_SUMMARY
           
-      - name: ❌ Tests failed
+      - name: ❌ Tests or coverage failed
         if: failure()
         run: |
-          echo "### ❌ Tests failed!" >> $GITHUB_STEP_SUMMARY
+          echo "### ❌ Tests failed or coverage below threshold!" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Deployment cancelled to prevent broken code from going live.**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Please fix the failing tests before deploying." >> $GITHUB_STEP_SUMMARY
+          echo "**Requirements:**" >> $GITHUB_STEP_SUMMARY
+          echo "- All tests must pass" >> $GITHUB_STEP_SUMMARY
+          echo "- Minimum 80% coverage on lines, functions, branches, and statements" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please fix the failing tests or improve test coverage before deploying." >> $GITHUB_STEP_SUMMARY
           exit 1
         
       - name: 🔨 Build project
