@@ -38,6 +38,7 @@ import CompatibilityAssessment from '@/components/enhanced/CompatibilityAssessme
 import VerificationBadge from '@/components/VerificationBadge';
 import PhotoUpload from '@/components/PhotoUpload';
 import ProfileQualityPanel from '@/components/ProfileQualityPanel';
+import AISuggestions from '@/components/profile/AISuggestions';
 
 interface ProfileCompletionStats {
   overall: number;
@@ -897,11 +898,24 @@ const EnhancedProfile = () => {
               </Card>
             </motion.div>
 
-            {/* Profile Quality Panel */}
+            {/* AI Suggestions */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.5 }}
+            >
+              <AISuggestions
+                profile={profile}
+                islamicPrefs={islamicPrefs}
+                completionStats={completionStats}
+              />
+            </motion.div>
+
+            {/* Profile Quality Panel */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
             >
               <ProfileQualityPanel
                 profileData={profile}
@@ -926,7 +940,7 @@ const EnhancedProfile = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6, duration: 0.5 }}
+              transition={{ delay: 0.7, duration: 0.5 }}
             >
               <Card>
                 <CardHeader>
