@@ -145,3 +145,107 @@ jobs:
         run: |
           echo "Tests failed or coverage is below threshold"
           exit 1
+          
+      - name: 📢 Notify Slack on PR test failure
+        if: failure() && secrets.SLACK_WEBHOOK_URL != ''
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "⚠️ PR Tests Failed - ZawajConnect",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "⚠️ PR Tests Failed"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*PR:*\n<${{ github.event.pull_request.html_url }}|#${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author:*\n${{ github.event.pull_request.user.login }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Coverage:*\nLines: ${{ steps.coverage.outputs.lines }}% | Branches: ${{ steps.coverage.outputs.branches }}%"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Threshold:*\n80% required"
+                    }
+                  ]
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View PR"
+                      },
+                      "url": "${{ github.event.pull_request.html_url }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Workflow"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          
+      - name: 📢 Notify Discord on PR test failure
+        if: failure() && secrets.DISCORD_WEBHOOK_URL != ''
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "username": "GitHub Actions",
+              "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+              "embeds": [{
+                "title": "⚠️ PR Tests Failed - ZawajConnect",
+                "color": 16776960,
+                "fields": [
+                  {
+                    "name": "Pull Request",
+                    "value": "[#${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}](${{ github.event.pull_request.html_url }})",
+                    "inline": false
+                  },
+                  {
+                    "name": "Author",
+                    "value": "${{ github.event.pull_request.user.login }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Threshold",
+                    "value": "80% required",
+                    "inline": true
+                  },
+                  {
+                    "name": "Coverage",
+                    "value": "Lines: ${{ steps.coverage.outputs.lines }}% | Branches: ${{ steps.coverage.outputs.branches }}%",
+                    "inline": false
+                  }
+                ],
+                "timestamp": "${{ github.event.pull_request.updated_at }}",
+                "footer": {
+                  "text": "View workflow"
+                },
+                "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              }]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}

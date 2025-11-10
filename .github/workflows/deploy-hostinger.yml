@@ -60,6 +60,119 @@ jobs:
           echo "Please fix the failing tests or improve test coverage before deploying." >> $GITHUB_STEP_SUMMARY
           exit 1
           
+      - name: 📢 Notify Slack on failure
+        if: failure() && secrets.SLACK_WEBHOOK_URL != ''
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "❌ Deployment Failed - ZawajConnect",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "❌ Deployment Failed"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repository:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit:*\n<${{ github.event.head_commit.url }}|${{ github.sha }}>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author:*\n${{ github.actor }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Reason:* Tests failed or coverage below 80% threshold\n*Message:* ${{ github.event.head_commit.message }}"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Workflow"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          
+      - name: 📢 Notify Discord on failure
+        if: failure() && secrets.DISCORD_WEBHOOK_URL != ''
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "username": "GitHub Actions",
+              "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+              "embeds": [{
+                "title": "❌ Deployment Failed - ZawajConnect",
+                "color": 15158332,
+                "fields": [
+                  {
+                    "name": "Repository",
+                    "value": "${{ github.repository }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Branch",
+                    "value": "${{ github.ref_name }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Author",
+                    "value": "${{ github.actor }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Commit",
+                    "value": "[${{ github.sha }}](${{ github.event.head_commit.url }})",
+                    "inline": false
+                  },
+                  {
+                    "name": "Reason",
+                    "value": "Tests failed or coverage below 80% threshold",
+                    "inline": false
+                  },
+                  {
+                    "name": "Message",
+                    "value": "${{ github.event.head_commit.message }}",
+                    "inline": false
+                  }
+                ],
+                "timestamp": "${{ github.event.head_commit.timestamp }}",
+                "footer": {
+                  "text": "View workflow"
+                },
+                "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              }]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
+          
       - name: 📈 Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
@@ -108,6 +221,92 @@ jobs:
           echo "**Deployed at:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 📢 Notify Slack on success
+        if: success() && secrets.SLACK_WEBHOOK_URL != ''
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "✅ Deployment Successful - ZawajConnect",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "✅ Deployment Successful"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Site:*\n<https://zawajconnect.me|zawajconnect.me>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author:*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Deployed:*\n<!date^${{ github.event.head_commit.timestamp }}^{date_short_pretty} at {time}|$(date)>"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Message:* ${{ github.event.head_commit.message }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          
+      - name: 📢 Notify Discord on success
+        if: success() && secrets.DISCORD_WEBHOOK_URL != ''
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "username": "GitHub Actions",
+              "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+              "embeds": [{
+                "title": "✅ Deployment Successful - ZawajConnect",
+                "color": 3066993,
+                "fields": [
+                  {
+                    "name": "Site",
+                    "value": "[zawajconnect.me](https://zawajconnect.me)",
+                    "inline": true
+                  },
+                  {
+                    "name": "Branch",
+                    "value": "${{ github.ref_name }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Author",
+                    "value": "${{ github.actor }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Message",
+                    "value": "${{ github.event.head_commit.message }}",
+                    "inline": false
+                  }
+                ],
+                "timestamp": "${{ github.event.head_commit.timestamp }}"
+              }]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
           
       - name: ❌ Deployment failure notification
         if: failure()
