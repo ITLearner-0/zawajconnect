@@ -28,6 +28,7 @@ import FamilyRateLimitIndicator from '@/components/security/FamilyRateLimitIndic
 import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
 import { TestUserSelector } from '@/components/TestUserSelector';
 import { AchievementTestButton } from '@/components/AchievementTestButton';
+import RenewalBanner from '@/components/renewal/RenewalBanner';
 
 const Settings = () => {
   const { user, subscription, signOut } = useAuth();
@@ -85,6 +86,9 @@ const Settings = () => {
             Se déconnecter
           </Button>
         </div>
+
+        {/* Renewal Banner */}
+        <RenewalBanner />
 
         {/* Layout: Menu vertical à gauche et contenu à droite */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -172,7 +176,7 @@ const Settings = () => {
             )}
 
             {activeSection === 'premium' && (
-              <div className="space-y-6">
+              <div className="space-y-6" data-section="premium">
                 <h2 className="text-xl font-semibold mb-4">Premium</h2>
                 {subscription.subscribed && (
                   <Card className="p-6 border-primary/20 bg-primary/5">
