@@ -32,8 +32,11 @@ import {
   Users,
   Calendar,
   BarChart3,
-  Globe
+  Globe,
+  Download,
+  FileSpreadsheet
 } from 'lucide-react';
+import { exportToExcel, exportToPDF } from '@/utils/callAnalyticsExport';
 
 interface CallStats {
   totalCalls: number;
@@ -77,6 +80,7 @@ const CallAnalyticsDashboard = () => {
   const [stats, setStats] = useState<CallStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     fetchCallStats();
@@ -234,6 +238,52 @@ const CallAnalyticsDashboard = () => {
     return labels[status] || status;
   };
 
+  const handleExportExcel = () => {
+    if (!stats) return;
+    
+    try {
+      setExporting(true);
+      const timeRangeLabel = timeRange === '7d' ? '7 jours' : timeRange === '30d' ? '30 jours' : '90 jours';
+      exportToExcel(stats, timeRangeLabel);
+      toast({
+        title: "Export réussi",
+        description: "Le fichier Excel a été téléchargé avec succès",
+      });
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+      toast({
+        title: "Erreur d'export",
+        description: "Impossible d'exporter les données en Excel",
+        variant: "destructive"
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleExportPDF = async () => {
+    if (!stats) return;
+    
+    try {
+      setExporting(true);
+      const timeRangeLabel = timeRange === '7d' ? '7 jours' : timeRange === '30d' ? '30 jours' : '90 jours';
+      await exportToPDF(stats, timeRangeLabel, 'charts-container');
+      toast({
+        title: "Export réussi",
+        description: "Le fichier PDF a été téléchargé avec succès",
+      });
+    } catch (error) {
+      console.error('Error exporting to PDF:', error);
+      toast({
+        title: "Erreur d'export",
+        description: "Impossible d'exporter les données en PDF",
+        variant: "destructive"
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center p-12">
@@ -256,35 +306,57 @@ const CallAnalyticsDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-3xl font-bold">Analytics des Appels</h2>
           <p className="text-muted-foreground mt-1">
             Statistiques globales et métriques de performance
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant={timeRange === '7d' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setTimeRange('7d')}
-          >
-            7 jours
-          </Button>
-          <Button
-            variant={timeRange === '30d' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setTimeRange('30d')}
-          >
-            30 jours
-          </Button>
-          <Button
-            variant={timeRange === '90d' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setTimeRange('90d')}
-          >
-            90 jours
-          </Button>
+        <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2">
+            <Button
+              variant={timeRange === '7d' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTimeRange('7d')}
+            >
+              7 jours
+            </Button>
+            <Button
+              variant={timeRange === '30d' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTimeRange('30d')}
+            >
+              30 jours
+            </Button>
+            <Button
+              variant={timeRange === '90d' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setTimeRange('90d')}
+            >
+              90 jours
+            </Button>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportExcel}
+              disabled={exporting || !stats}
+            >
+              <FileSpreadsheet className="h-4 w-4 mr-2" />
+              Excel
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportPDF}
+              disabled={exporting || !stats}
+            >
+              <Download className="h-4 w-4 mr-2" />
+              PDF
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -344,23 +416,24 @@ const CallAnalyticsDashboard = () => {
       </div>
 
       {/* Charts */}
-      <Tabs defaultValue="trends" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="trends">Tendances</TabsTrigger>
-          <TabsTrigger value="distribution">Distribution</TabsTrigger>
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="quality">Qualité</TabsTrigger>
-        </TabsList>
+      <div id="charts-container">
+        <Tabs defaultValue="trends" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="trends">Tendances</TabsTrigger>
+            <TabsTrigger value="distribution">Distribution</TabsTrigger>
+            <TabsTrigger value="performance">Performance</TabsTrigger>
+            <TabsTrigger value="quality">Qualité</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="trends" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Appels par jour</CardTitle>
-              <CardDescription>Volume quotidien sur les 14 derniers jours</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={stats.callsByDay}>
+          <TabsContent value="trends" className="space-y-4">
+            <Card className="chart-capture">
+              <CardHeader>
+                <CardTitle data-chart-title>Appels par jour</CardTitle>
+                <CardDescription>Volume quotidien sur les 14 derniers jours</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <AreaChart data={stats.callsByDay}>
                   <defs>
                     <linearGradient id="colorCalls" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.8}/>
@@ -383,9 +456,9 @@ const CallAnalyticsDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="chart-capture">
             <CardHeader>
-              <CardTitle>Appels par heure de la journée</CardTitle>
+              <CardTitle data-chart-title>Appels par heure de la journée</CardTitle>
               <CardDescription>Distribution des appels sur 24h</CardDescription>
             </CardHeader>
             <CardContent>
@@ -413,9 +486,9 @@ const CallAnalyticsDashboard = () => {
 
         <TabsContent value="distribution" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <Card>
+            <Card className="chart-capture">
               <CardHeader>
-                <CardTitle>Types d'appels</CardTitle>
+                <CardTitle data-chart-title>Types d'appels</CardTitle>
                 <CardDescription>Audio vs Vidéo</CardDescription>
               </CardHeader>
               <CardContent>
@@ -443,9 +516,9 @@ const CallAnalyticsDashboard = () => {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="chart-capture">
               <CardHeader>
-                <CardTitle>Statut des appels</CardTitle>
+                <CardTitle data-chart-title>Statut des appels</CardTitle>
                 <CardDescription>Répartition par état final</CardDescription>
               </CardHeader>
               <CardContent>
@@ -476,9 +549,9 @@ const CallAnalyticsDashboard = () => {
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-4">
-          <Card>
+          <Card className="chart-capture">
             <CardHeader>
-              <CardTitle>Durée moyenne par type</CardTitle>
+              <CardTitle data-chart-title>Durée moyenne par type</CardTitle>
               <CardDescription>Comparaison Audio vs Vidéo</CardDescription>
             </CardHeader>
             <CardContent>
@@ -605,6 +678,7 @@ const CallAnalyticsDashboard = () => {
           </div>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 };
