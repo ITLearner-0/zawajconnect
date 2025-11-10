@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { createHmac } from "https://deno.land/std@0.190.0/node/crypto.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -32,27 +31,45 @@ interface ResendWebhookEvent {
   };
 }
 
-const verifyWebhookSignature = (
+const verifyWebhookSignature = async (
   payload: string,
   signature: string,
   timestamp: string,
   secret: string
-): boolean => {
+): Promise<boolean> => {
   try {
     // Resend utilise Svix pour les webhooks
     // Le format de vérification est: timestamp.payload
     const signedContent = `${timestamp}.${payload}`;
     
-    // Créer le HMAC avec SHA256
-    const hmac = createHmac("sha256", secret);
-    hmac.update(signedContent);
-    const expectedSignature = hmac.digest("base64");
+    // Encoder le secret et le contenu
+    const encoder = new TextEncoder();
+    const keyData = encoder.encode(secret);
+    const messageData = encoder.encode(signedContent);
+    
+    // Importer la clé pour HMAC
+    const key = await crypto.subtle.importKey(
+      'raw',
+      keyData,
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign']
+    );
+    
+    // Créer la signature
+    const signatureBuffer = await crypto.subtle.sign('HMAC', key, messageData);
+    
+    // Convertir en base64
+    const signatureArray = Array.from(new Uint8Array(signatureBuffer));
+    const expectedSignature = btoa(String.fromCharCode(...signatureArray));
     
     // Comparer les signatures (Svix utilise plusieurs signatures séparées par des espaces)
     const signatures = signature.split(' ');
     return signatures.some(sig => {
-      const version = sig.split(',')[0]; // v1
-      const signatureValue = sig.split(',')[1];
+      // Format: v1,signature_base64
+      const parts = sig.split(',');
+      if (parts.length !== 2) return false;
+      const signatureValue = parts[1];
       return signatureValue === expectedSignature;
     });
   } catch (error) {
@@ -90,7 +107,7 @@ serve(async (req) => {
     const body = await req.text();
     
     // Vérifier la signature
-    const isValid = verifyWebhookSignature(
+    const isValid = await verifyWebhookSignature(
       body,
       svixSignature,
       svixTimestamp,
