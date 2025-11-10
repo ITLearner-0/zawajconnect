@@ -24,6 +24,28 @@ jobs:
       - name: 📦 Install dependencies
         run: npm ci
         
+      - name: 🧪 Run tests
+        run: npm test
+        env:
+          CI: true
+        
+      - name: 📊 Test results
+        if: success()
+        run: |
+          echo "### ✅ All tests passed! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Proceeding with build and deployment..." >> $GITHUB_STEP_SUMMARY
+          
+      - name: ❌ Tests failed
+        if: failure()
+        run: |
+          echo "### ❌ Tests failed!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment cancelled to prevent broken code from going live.**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please fix the failing tests before deploying." >> $GITHUB_STEP_SUMMARY
+          exit 1
+        
       - name: 🔨 Build project
         run: npm run build
         env:
