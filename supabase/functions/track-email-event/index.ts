@@ -8,6 +8,7 @@ const corsHeaders = {
 interface TrackEventRequest {
   result_id: string;
   event_type: 'opened' | 'clicked' | 'renewed';
+  user_id?: string;
   renewal_amount?: number;
   promo_code_used?: string;
 }
@@ -31,7 +32,7 @@ Deno.serve(async (req) => {
       }
     );
 
-    const { result_id, event_type, renewal_amount, promo_code_used }: TrackEventRequest = await req.json();
+    const { result_id, event_type, user_id, renewal_amount, promo_code_used }: TrackEventRequest = await req.json();
 
     if (!result_id || !event_type) {
       return new Response(
@@ -43,7 +44,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log(`Tracking ${event_type} event for result ${result_id}`);
+    console.log(`Tracking ${event_type} event for result ${result_id}`, { user_id, renewal_amount, promo_code_used });
 
     // Update the appropriate field based on event type
     const updateData: any = {};

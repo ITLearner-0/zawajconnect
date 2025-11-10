@@ -310,6 +310,38 @@ const PremiumSubscription = () => {
       toast.dismiss();
       toast.success('Abonnement activé avec succès !');
       
+      // Track renewal if tracking ID is present in URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const trackingId = urlParams.get('track');
+      const promoCode = urlParams.get('code');
+      
+      if (trackingId && user) {
+        const selectedPlanDetails = subscriptionPlans.find(p => p.id === selectedPlan);
+        const renewalAmount = selectedPlanDetails ? selectedPlanDetails.price * selectedPlanDetails.duration : 0;
+        
+        try {
+          console.log('Tracking renewal event...', { trackingId, renewalAmount, promoCode });
+          
+          const { error: trackError } = await supabase.functions.invoke('track-email-event', {
+            body: {
+              result_id: trackingId,
+              event_type: 'renewed',
+              user_id: user.id,
+              renewal_amount: renewalAmount,
+              promo_code_used: promoCode || undefined
+            }
+          });
+
+          if (trackError) {
+            console.error('Error tracking renewal:', trackError);
+          } else {
+            console.log('Renewal tracked successfully');
+          }
+        } catch (trackingError) {
+          console.error('Error tracking renewal:', trackingError);
+        }
+      }
+      
       setShowPaymentModal(false);
       setBraintreeInstance(null); // Réinitialiser l'instance
       await checkSubscription();
