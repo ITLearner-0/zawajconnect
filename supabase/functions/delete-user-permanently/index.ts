@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { handleError, successResponse, ErrorCode } from '../_shared/errorHandler.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -32,7 +33,7 @@ serve(async (req) => {
     // Verify the user is authenticated and is an admin
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
     if (authError || !user) {
-      throw new Error('Non autorisé')
+      return handleError(authError || new Error('No user'), ErrorCode.UNAUTHORIZED, 'DELETE_USER')
     }
 
     // Check if user is admin
@@ -43,13 +44,13 @@ serve(async (req) => {
       .single()
 
     if (!userRole || !['admin', 'super_admin'].includes(userRole.role)) {
-      throw new Error('Privilèges administrateur requis')
+      return handleError(new Error('Not admin'), ErrorCode.FORBIDDEN, 'DELETE_USER')
     }
 
     const { userId } = await req.json()
 
     if (!userId) {
-      throw new Error('ID utilisateur requis')
+      return handleError(new Error('Missing userId'), ErrorCode.VALIDATION_ERROR, 'DELETE_USER')
     }
 
     // Get user info before deletion for logging
@@ -63,34 +64,26 @@ serve(async (req) => {
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId)
 
     if (deleteError) {
-      console.error('Error deleting user from auth:', deleteError)
-      throw new Error(`Erreur lors de la suppression: ${deleteError.message}`)
+      console.error('[DELETE_USER] Failed to delete user:', {
+        userId,
+        error: deleteError.message,
+        adminUser: user.email,
+      })
+      return handleError(deleteError, ErrorCode.OPERATION_FAILED, 'DELETE_USER')
     }
 
-    console.log(`User ${userProfile?.full_name || userId} permanently deleted by admin ${user.email}`)
+    console.log('[DELETE_USER] Success:', {
+      userName: userProfile?.full_name || 'unknown',
+      userId,
+      deletedBy: user.email,
+    })
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: `Utilisateur ${userProfile?.full_name || 'inconnu'} supprimé définitivement` 
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    )
+    return successResponse({ 
+      success: true, 
+      message: `Utilisateur ${userProfile?.full_name || 'inconnu'} supprimé définitivement` 
+    })
 
   } catch (error) {
-    console.error('Delete user error:', error)
-    return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message || 'Erreur lors de la suppression de l\'utilisateur' 
-      }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      }
-    )
+    return handleError(error, ErrorCode.INTERNAL_ERROR, 'DELETE_USER')
   }
 })

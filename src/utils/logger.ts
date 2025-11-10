@@ -22,7 +22,7 @@ const sendToMonitoring = (level: LogLevel, message: string, context?: LogContext
 
   // For now, only log errors to console in production
   if (level === 'error') {
-    console.error(message, context);
+    console.error('[PRODUCTION]', message, context);
   }
 };
 
@@ -54,6 +54,7 @@ export const logger = {
     if (isDev) {
       console.error(`❌ ${message}`, error, context);
     } else {
+      // In production: Log generic message, suppress details
       sendToMonitoring('error', message, {
         ...context,
         error: error instanceof Error ? error.message : String(error),
@@ -76,7 +77,11 @@ export const logger = {
       }
     },
     error: (message: string, error?: Error | unknown) => {
-      logger.error(`[Auth] ${message}`, error);
+      if (isDev) {
+        console.error(`🔐 [Auth] ${message}`, error);
+      } else {
+        logger.error(`[Auth] ${message}`, error);
+      }
     },
   },
 
@@ -87,7 +92,11 @@ export const logger = {
       }
     },
     error: (message: string, error?: Error | unknown) => {
-      logger.error(`[API] ${message}`, error);
+      if (isDev) {
+        console.error(`📡 [API] ${message}`, error);
+      } else {
+        logger.error(`[API] ${message}`, error);
+      }
     },
   },
 
@@ -98,7 +107,11 @@ export const logger = {
       }
     },
     error: (message: string, error?: Error | unknown) => {
-      logger.error(`[Realtime] ${message}`, error);
+      if (isDev) {
+        console.error(`🔄 [Realtime] ${message}`, error);
+      } else {
+        logger.error(`[Realtime] ${message}`, error);
+      }
     },
   },
 };

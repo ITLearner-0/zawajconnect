@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { handleError, successResponse, ErrorCode } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,14 +20,20 @@ serve(async (req) => {
     );
 
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header");
+    if (!authHeader) {
+      return handleError(new Error('No auth header'), ErrorCode.UNAUTHORIZED, 'LOG_PROFILE_VIEW');
+    }
 
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError || !userData.user) throw new Error("Authentication failed");
+    if (userError || !userData.user) {
+      return handleError(userError || new Error('No user'), ErrorCode.UNAUTHORIZED, 'LOG_PROFILE_VIEW');
+    }
 
     const { viewed_user_id } = await req.json();
-    if (!viewed_user_id) throw new Error("viewed_user_id is required");
+    if (!viewed_user_id) {
+      return handleError(new Error('Missing viewed_user_id'), ErrorCode.VALIDATION_ERROR, 'LOG_PROFILE_VIEW');
+    }
 
     // Logger la vue
     const { error: insertError } = await supabaseClient
@@ -36,16 +43,17 @@ serve(async (req) => {
         viewed_user_id: viewed_user_id
       });
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      console.error('[LOG_PROFILE_VIEW] Failed to log view:', {
+        viewer: userData.user.id,
+        viewed: viewed_user_id,
+        error: insertError.message,
+      });
+      return handleError(insertError, ErrorCode.OPERATION_FAILED, 'LOG_PROFILE_VIEW');
+    }
 
-    return new Response(
-      JSON.stringify({ success: true }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
-    );
+    return successResponse({ success: true });
   } catch (error) {
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-    );
+    return handleError(error, ErrorCode.INTERNAL_ERROR, 'LOG_PROFILE_VIEW');
   }
 });

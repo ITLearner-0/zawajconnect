@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { handleError, handleAIError, successResponse, ErrorCode } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -56,7 +57,8 @@ serve(async (req) => {
     
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error('[GENERATE_TUTORIAL] LOVABLE_API_KEY not configured');
+      return handleError(new Error('API key missing'), ErrorCode.INTERNAL_ERROR, 'GENERATE_TUTORIAL');
     }
 
     // Construire le contexte pour l'IA
@@ -182,36 +184,16 @@ Règles importantes :
     });
 
     if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Limite de requêtes dépassée." }), 
-          {
-            status: 429,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Crédits AI épuisés." }), 
-          {
-            status: 402,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      }
-      
       const errorText = await response.text();
-      console.error("AI Gateway error:", response.status, errorText);
-      throw new Error(`AI Gateway error: ${response.status}`);
+      return handleAIError(response.status, errorText, 'GENERATE_TUTORIAL');
     }
 
     const data = await response.json();
-    console.log("AI Response:", JSON.stringify(data, null, 2));
 
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
     if (!toolCall) {
-      throw new Error("No tool call in AI response");
+      console.error('[GENERATE_TUTORIAL] No tool call in AI response:', data);
+      return handleError(new Error('Invalid AI response'), ErrorCode.AI_GATEWAY_ERROR, 'GENERATE_TUTORIAL');
     }
 
     const tutorial = JSON.parse(toolCall.function.arguments);
@@ -222,23 +204,9 @@ Règles importantes :
       completed: false
     }));
 
-    return new Response(
-      JSON.stringify({ steps: stepsWithCompletion }), 
-      {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    return successResponse({ steps: stepsWithCompletion });
 
   } catch (error) {
-    console.error("Error in generate-tutorial function:", error);
-    return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : "Une erreur est survenue"
-      }), 
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+    return handleError(error, ErrorCode.INTERNAL_ERROR, 'GENERATE_TUTORIAL');
   }
 });
