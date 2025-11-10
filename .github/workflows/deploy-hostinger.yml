@@ -28,6 +28,14 @@ jobs:
         run: npm run test:coverage
         env:
           CI: true
+          
+      - name: 📤 Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
         
       - name: 📊 Test results
         if: success()

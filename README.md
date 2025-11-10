@@ -7,6 +7,7 @@
 [![Vite](https://img.shields.io/badge/Vite-5.4-646CFF)](https://vitejs.dev/)
 [![Supabase](https://img.shields.io/badge/Supabase-2.57-3ECF8E)](https://supabase.com/)
 [![Tests](https://img.shields.io/badge/Tests-98%20passing-success)](https://vitest.dev/)
+[![codecov](https://codecov.io/gh/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME/branch/main/graph/badge.svg)](https://codecov.io/gh/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME)
 
 ## 📋 Table of Contents
 
