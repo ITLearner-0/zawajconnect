@@ -166,6 +166,7 @@ jobs:
   sonarcloud:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
+    if: false  # Temporarily disabled - TODO: Configure SonarCloud properly
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -311,14 +312,14 @@ jobs:
 
   notify:
     name: Send Notifications
-    needs: [lint-and-format, sonarcloud]
+    needs: [lint-and-format]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Determine overall status
         id: status
         run: |
-          if [ "${{ needs.lint-and-format.result }}" == "success" ] && [ "${{ needs.sonarcloud.result }}" == "success" ]; then
+          if [ "${{ needs.lint-and-format.result }}" == "success" ]; then
             echo "status=success" >> $GITHUB_OUTPUT
             echo "emoji=✅" >> $GITHUB_OUTPUT
             echo "color=good" >> $GITHUB_OUTPUT
@@ -339,7 +340,7 @@ jobs:
             "attachments": [{
               "color": "${{ steps.status.outputs.color }}",
               "title": "${{ steps.status.outputs.emoji }} Code Quality Check - PR #${{ github.event.pull_request.number }}",
-              "text": "*Status:* ${{ steps.status.outputs.status }}\n*PR:* ${{ github.event.pull_request.title }}\n*Author:* ${{ github.event.pull_request.user.login }}\n*Linting:* ${{ needs.lint-and-format.result }}\n*SonarCloud:* ${{ needs.sonarcloud.result }}",
+              "text": "*Status:* ${{ steps.status.outputs.status }}\n*PR:* ${{ github.event.pull_request.title }}\n*Author:* ${{ github.event.pull_request.user.login }}\n*Linting:* ${{ needs.lint-and-format.result }}",
               "footer": "GitHub Actions",
               "footer_icon": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
               "ts": '"$(date +%s)"'
@@ -372,11 +373,6 @@ jobs:
                 {
                   "name": "Linting",
                   "value": "${{ needs.lint-and-format.result }}",
-                  "inline": true
-                },
-                {
-                  "name": "SonarCloud",
-                  "value": "${{ needs.sonarcloud.result }}",
                   "inline": true
                 }
               ],
