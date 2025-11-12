@@ -88,12 +88,6 @@ const IslamicCalendarWidget = () => {
     }
   ];
 
-  useEffect(() => {
-    generatePrayerTimes();
-    calculateIslamicDate();
-    loadUpcomingEvents();
-  }, [currentDate]);
-
   const generatePrayerTimes = () => {
     // Simple prayer time calculation (in a real app, you'd use a proper Islamic calendar API)
     const times = prayerNames.map(prayer => {
@@ -177,6 +171,12 @@ const IslamicCalendarWidget = () => {
     
     setUpcomingEvents(upcoming);
   };
+
+  useEffect(() => {
+    generatePrayerTimes();
+    calculateIslamicDate();
+    loadUpcomingEvents();
+  }, [currentDate]);
 
   const getNextPrayer = () => {
     // Return null if prayer times are not loaded yet

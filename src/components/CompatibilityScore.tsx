@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
@@ -70,7 +70,7 @@ const CompatibilityScore = ({ otherUserId, showDetails = false, compact = false 
     );
   }
 
-  const ScoreIcon = getScoreIcon(score);
+  const ScoreIcon = useMemo(() => getScoreIcon(score), [score]);
 
   if (compact) {
     return (
@@ -95,7 +95,7 @@ const CompatibilityScore = ({ otherUserId, showDetails = false, compact = false 
                 {Math.round(score)}%
               </Badge>
             </div>
-            
+
             <div>
               <Progress value={score} className="h-2 mb-1" />
               <p className="text-sm text-muted-foreground">

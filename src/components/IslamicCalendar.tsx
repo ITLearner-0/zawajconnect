@@ -45,20 +45,6 @@ const IslamicCalendar = () => {
     { day: 10, month: 12, event: 'Eid al-Adha', type: 'holy' }
   ];
 
-  useEffect(() => {
-    const today = new Date();
-    const islamicDate = convertToIslamic(today);
-    setCurrentIslamicDate(islamicDate);
-    setSelectedMonth(islamicDate.monthNumber);
-    setSelectedYear(islamicDate.year);
-    
-    // Filter important dates for current month
-    const currentMonthEvents = importantIslamicDates.filter(
-      date => date.month === islamicDate.monthNumber
-    );
-    setImportantDates(currentMonthEvents);
-  }, []);
-
   // Simplified Islamic date conversion (approximation)
   const convertToIslamic = (gregorianDate: Date): IslamicDate => {
     // This is a simplified approximation. In a real app, use a proper Islamic calendar library
@@ -85,6 +71,20 @@ const IslamicCalendar = () => {
       gregorianDate
     };
   };
+
+  useEffect(() => {
+    const today = new Date();
+    const islamicDate = convertToIslamic(today);
+    setCurrentIslamicDate(islamicDate);
+    setSelectedMonth(islamicDate.monthNumber);
+    setSelectedYear(islamicDate.year);
+
+    // Filter important dates for current month
+    const currentMonthEvents = importantIslamicDates.filter(
+      date => date.month === islamicDate.monthNumber
+    );
+    setImportantDates(currentMonthEvents);
+  }, []);
 
   const changeMonth = (direction: 'prev' | 'next') => {
     if (direction === 'next') {

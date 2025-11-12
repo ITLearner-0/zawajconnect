@@ -62,6 +62,24 @@ export function ActiveCallWindow({
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const [isMinimized, setIsMinimized] = useState(false);
 
+  /**
+   * Attach local stream to video element
+   */
+  useEffect(() => {
+    if (localVideoRef.current && localStream) {
+      localVideoRef.current.srcObject = localStream;
+    }
+  }, [localStream]);
+
+  /**
+   * Attach remote stream to video element
+   */
+  useEffect(() => {
+    if (remoteVideoRef.current && remoteStream) {
+      remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteStream]);
+
   // Use mobile interface on mobile devices
   if (isMobile) {
     return (
@@ -82,24 +100,6 @@ export function ActiveCallWindow({
       />
     );
   }
-
-  /**
-   * Attach local stream to video element
-   */
-  useEffect(() => {
-    if (localVideoRef.current && localStream) {
-      localVideoRef.current.srcObject = localStream;
-    }
-  }, [localStream]);
-
-  /**
-   * Attach remote stream to video element
-   */
-  useEffect(() => {
-    if (remoteVideoRef.current && remoteStream) {
-      remoteVideoRef.current.srcObject = remoteStream;
-    }
-  }, [remoteStream]);
 
   /**
    * Format call duration as MM:SS

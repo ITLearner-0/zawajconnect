@@ -15,14 +15,14 @@ const FavoriteTagSelector = ({ profileId }: FavoriteTagSelectorProps) => {
   const [selectedTags, setSelectedTags] = useState<ProfileTag[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    loadFavoriteTags();
-  }, [profileId]);
-
   const loadFavoriteTags = async () => {
     const favTags = await getFavoriteTags(profileId);
     setSelectedTags(favTags);
   };
+
+  useEffect(() => {
+    loadFavoriteTags();
+  }, [profileId]);
 
   const handleTagToggle = async (tag: ProfileTag) => {
     const isSelected = selectedTags.some(t => t.id === tag.id);

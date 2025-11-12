@@ -69,16 +69,16 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
 
   const loading = messagesLoading || matchLoading;
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
   const scrollToBottom = () => {
     // Use requestAnimationFrame to avoid forced reflow
     requestAnimationFrame(() => {
       messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     });
   };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSendMessage = async () => {
     if (!canCommunicate || !newMessage.trim()) return;
