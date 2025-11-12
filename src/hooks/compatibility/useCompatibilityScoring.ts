@@ -20,8 +20,8 @@ export function calculateCompatibilityScore(
 ): MatchScoreResult {
   let totalCompatibility = 0;
   let totalWeight = 0;
-  let categoryScores: CategoryScores = {};
-  let dealbreakers: string[] = [];
+  const categoryScores: CategoryScores = {};
+  const dealbreakers: string[] = [];
   let hasDealbreaker = false;
 
   // Process each answer with enhanced algorithm

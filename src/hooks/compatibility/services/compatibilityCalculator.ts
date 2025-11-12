@@ -38,10 +38,10 @@ export class CompatibilityCalculator {
     try {
       let totalScore = 0;
       let totalWeight = 0;
-      let categoryScores: Record<string, { score: number; weight: number }> = {};
-      let strengths: string[] = [];
-      let differences: string[] = [];
-      let dealbreakers: string[] = [];
+      const categoryScores: Record<string, { score: number; weight: number }> = {};
+      const strengths: string[] = [];
+      const differences: string[] = [];
+      const dealbreakers: string[] = [];
 
       // Check polygamy compatibility first as it's critical
       const polygamyCompatibility = polygamyCompatibilityService.checkCompatibility(myResults, otherUser);

@@ -161,7 +161,7 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
 
       // Flush final
       if (textBuffer.trim()) {
-        for (let raw of textBuffer.split('\n')) {
+        for (const raw of textBuffer.split('\n')) {
           if (!raw || raw.startsWith(':') || raw.trim() === '') continue;
           if (!raw.startsWith('data: ')) continue;
           const jsonStr = raw.slice(6).trim();

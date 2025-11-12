@@ -68,7 +68,7 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
     setLoading(true);
     let totalWeightedScore = 0;
     let totalWeight = 0;
-    let dealbreakers = [];
+    const dealbreakers = [];
 
     for (const [index, answer] of Object.entries(answers)) {
       const question = questions[Number(index)];

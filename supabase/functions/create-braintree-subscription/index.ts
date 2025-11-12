@@ -103,7 +103,7 @@ serve(async (req) => {
     const subscription = result.subscription;
 
     // Calculer la date d'expiration
-    let expiresAt = new Date();
+    const expiresAt = new Date();
     if (planId.includes('3_months')) {
       expiresAt.setMonth(expiresAt.getMonth() + 3);
     } else if (planId.includes('6_months')) {
