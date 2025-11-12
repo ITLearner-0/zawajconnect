@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent } from '@/components/ui/card';
@@ -46,10 +46,10 @@ const CompatibilityScore = ({ otherUserId, showDetails = false, compact = false 
     return 'Compatibilité faible';
   };
 
-  const getScoreIcon = (score: number) => {
-    if (score >= 70) return Heart;
-    if (score >= 50) return TrendingUp;
-    return Users;
+  const renderScoreIcon = (score: number, className: string) => {
+    if (score >= 70) return <Heart className={className} />;
+    if (score >= 50) return <TrendingUp className={className} />;
+    return <Users className={className} />;
   };
 
   if (loading) {
@@ -70,12 +70,10 @@ const CompatibilityScore = ({ otherUserId, showDetails = false, compact = false 
     );
   }
 
-  const ScoreIcon = useMemo(() => getScoreIcon(score), [score]);
-
   if (compact) {
     return (
       <Badge className={`${getScoreColor(score)} text-xs font-medium`}>
-        <ScoreIcon className="h-3 w-3 mr-1" />
+        {renderScoreIcon(score, "h-3 w-3 mr-1")}
         {Math.round(score)}%
       </Badge>
     );
@@ -88,7 +86,7 @@ const CompatibilityScore = ({ otherUserId, showDetails = false, compact = false 
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ScoreIcon className={`h-5 w-5 ${score >= 60 ? 'text-emerald' : 'text-gold'}`} />
+                {renderScoreIcon(score, `h-5 w-5 ${score >= 60 ? 'text-emerald' : 'text-gold'}`)}
                 <span className="font-medium">Score de Compatibilité</span>
               </div>
               <Badge className={`${getScoreColor(score)} font-semibold`}>
@@ -122,7 +120,7 @@ const CompatibilityScore = ({ otherUserId, showDetails = false, compact = false 
 
   return (
     <div className="flex items-center gap-2">
-      <ScoreIcon className={`h-4 w-4 ${score >= 60 ? 'text-emerald' : 'text-gold'}`} />
+      {renderScoreIcon(score, `h-4 w-4 ${score >= 60 ? 'text-emerald' : 'text-gold'}`)}
       <span className="text-sm font-medium">{getScoreText(score)}</span>
       <Badge className={`${getScoreColor(score)} text-xs`}>
         {Math.round(score)}%
