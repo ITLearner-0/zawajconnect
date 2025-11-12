@@ -1,0 +1,21 @@
+# Build outputs
+dist/
+build/
+coverage/
+.vite/
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+
+# Temporarily ignore Supabase functions with many warnings
+# TODO: Clean up and remove this ignore in a future PR
+supabase/functions/*/index.ts

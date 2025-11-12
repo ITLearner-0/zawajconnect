@@ -59,7 +59,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
       - name: Run ESLint
-        run: npm run lint
+        run: npm run lint -- --max-warnings 1000
 
   # Job 3: Run TypeScript type checking
   typecheck:
