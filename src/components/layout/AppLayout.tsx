@@ -32,7 +32,7 @@ const AppLayout = ({ children }: AppLayoutProps) => {
       
       {/* Main content area with traditional centered layout */}
       <main className="flex-1 overflow-x-hidden w-full max-w-full">
-        <div className="container mx-auto px-4 pt-2 pb-8 max-w-7xl w-full">
+        <div className="container mx-auto px-4 pb-8 max-w-7xl w-full">
           {children}
         </div>
       </main>
