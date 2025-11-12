@@ -62,8 +62,6 @@ jobs:
           
       - name: 📢 Notify Slack on failure
         if: failure() && env.SLACK_WEBHOOK_URL != ''
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         uses: slackapi/slack-github-action@v1.26.0
         with:
           payload: |
@@ -359,8 +357,6 @@ jobs:
           
       - name: 📢 Notify Slack on success
         if: success() && env.SLACK_WEBHOOK_URL != ''
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         uses: slackapi/slack-github-action@v1.26.0
         with:
           payload: |
