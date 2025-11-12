@@ -23,7 +23,7 @@ import {
   Activity,
   BarChart3,
   Calendar,
-  Download
+  Download,
 } from 'lucide-react';
 import { contentModerationService } from '@/services/contentModerationService';
 import type { ModerationStats } from '@/services/contentModerationService';
@@ -91,7 +91,7 @@ const ModerationDashboard = () => {
       low: 'bg-yellow-100 text-yellow-800',
       medium: 'bg-orange-100 text-orange-800',
       high: 'bg-red-100 text-red-800',
-      critical: 'bg-purple-100 text-purple-800'
+      critical: 'bg-purple-100 text-purple-800',
     };
     return colors[severity] || 'bg-gray-100 text-gray-800';
   };
@@ -101,7 +101,7 @@ const ModerationDashboard = () => {
       warned: 'text-yellow-600',
       blocked: 'text-red-600',
       escalated: 'text-orange-600',
-      auto_moderated: 'text-blue-600'
+      auto_moderated: 'text-blue-600',
     };
     return colors[action] || 'text-gray-600';
   };
@@ -201,9 +201,7 @@ const ModerationDashboard = () => {
             <div className="text-2xl font-bold text-orange-600">
               {stats.violations_found.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Sur {stats.total_checks} vérifications
-            </p>
+            <p className="text-xs text-muted-foreground">Sur {stats.total_checks} vérifications</p>
           </CardContent>
         </Card>
 
@@ -231,9 +229,7 @@ const ModerationDashboard = () => {
             <div className="text-2xl font-bold text-blue-600">
               {stats.auto_moderated.toLocaleString()}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Modération automatique réussie
-            </p>
+            <p className="text-xs text-muted-foreground">Modération automatique réussie</p>
           </CardContent>
         </Card>
       </div>
@@ -251,17 +247,13 @@ const ModerationDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Violations par Niveau de Sévérité</CardTitle>
-              <CardDescription>
-                Distribution des violations selon leur gravité
-              </CardDescription>
+              <CardDescription>Distribution des violations selon leur gravité</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {Object.entries(stats.by_severity).map(([severity, count]) => (
                 <div key={severity} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Badge className={getSeverityColor(severity)}>
-                      {severity.toUpperCase()}
-                    </Badge>
+                    <Badge className={getSeverityColor(severity)}>{severity.toUpperCase()}</Badge>
                     <span className="text-sm font-medium capitalize">{severity}</span>
                   </div>
                   <div className="flex items-center gap-4">
@@ -269,13 +261,11 @@ const ModerationDashboard = () => {
                       <div
                         className={`h-2 rounded-full ${getSeverityColor(severity)}`}
                         style={{
-                          width: `${((count / stats.violations_found) * 100).toFixed(1)}%`
+                          width: `${((count / stats.violations_found) * 100).toFixed(1)}%`,
                         }}
                       />
                     </div>
-                    <span className="text-sm font-bold w-12 text-right">
-                      {count}
-                    </span>
+                    <span className="text-sm font-bold w-12 text-right">{count}</span>
                     <span className="text-xs text-muted-foreground w-12 text-right">
                       {((count / stats.violations_found) * 100).toFixed(1)}%
                     </span>
@@ -311,13 +301,11 @@ const ModerationDashboard = () => {
                       <div
                         className="h-2 rounded-full bg-primary"
                         style={{
-                          width: `${((count / stats.violations_found) * 100).toFixed(1)}%`
+                          width: `${((count / stats.violations_found) * 100).toFixed(1)}%`,
                         }}
                       />
                     </div>
-                    <span className="text-sm font-bold w-12 text-right">
-                      {count}
-                    </span>
+                    <span className="text-sm font-bold w-12 text-right">{count}</span>
                     <span className="text-xs text-muted-foreground w-12 text-right">
                       {((count / stats.violations_found) * 100).toFixed(1)}%
                     </span>
@@ -346,9 +334,7 @@ const ModerationDashboard = () => {
                   <div className={`text-3xl font-bold ${getActionColor('warned')}`}>
                     {stats.users_warned}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Avertissements envoyés
-                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Avertissements envoyés</p>
                 </CardContent>
               </Card>
 

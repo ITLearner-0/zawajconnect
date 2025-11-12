@@ -14,7 +14,7 @@ const defaultPreferences: MatchingPreferencesUpdate = {
   weight_cultural: 30,
   weight_personality: 30,
   min_compatibility: 70,
-  family_approval_required: false
+  family_approval_required: false,
 };
 
 export const useMatchingPreferences = () => {
@@ -28,7 +28,7 @@ export const useMatchingPreferences = () => {
   // Load preferences from database
   useEffect(() => {
     if (!user) return;
-    
+
     const loadPreferences = async () => {
       setLoading(true);
       try {
@@ -50,16 +50,16 @@ export const useMatchingPreferences = () => {
             weight_cultural: data.weight_cultural,
             weight_personality: data.weight_personality,
             min_compatibility: data.min_compatibility,
-            family_approval_required: data.family_approval_required
+            family_approval_required: data.family_approval_required,
           });
         }
       } catch (err) {
         const error = err as PostgrestError;
         console.error('[useMatchingPreferences] Error loading preferences:', error.message);
         toast({
-          title: "Erreur",
-          description: "Impossible de charger vos préférences",
-          variant: "destructive",
+          title: 'Erreur',
+          description: 'Impossible de charger vos préférences',
+          variant: 'destructive',
         });
       } finally {
         setLoading(false);
@@ -75,30 +75,31 @@ export const useMatchingPreferences = () => {
 
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('matching_preferences')
-        .upsert({
+      const { error } = await supabase.from('matching_preferences').upsert(
+        {
           user_id: user.id,
-          ...newPreferences
-        }, {
-          onConflict: 'user_id'
-        });
+          ...newPreferences,
+        },
+        {
+          onConflict: 'user_id',
+        }
+      );
 
       if (error) throw error;
 
       setPreferences(newPreferences);
       toast({
-        title: "Préférences sauvegardées",
-        description: "Vos préférences de matching ont été mises à jour",
+        title: 'Préférences sauvegardées',
+        description: 'Vos préférences de matching ont été mises à jour',
       });
       return true;
     } catch (err) {
       const error = err as PostgrestError;
       console.error('[useMatchingPreferences] Error saving preferences:', error.message);
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder vos préférences",
-        variant: "destructive",
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder vos préférences',
+        variant: 'destructive',
       });
       return false;
     } finally {
@@ -109,12 +110,12 @@ export const useMatchingPreferences = () => {
   const updatePreferences = (updates: Partial<MatchingPreferencesUpdate>) => {
     const newPreferences: MatchingPreferencesUpdate = { ...preferences, ...updates };
     setPreferences(newPreferences);
-    
+
     // Clear existing timeout
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
-    
+
     // Auto-save after 1 second delay
     saveTimeoutRef.current = setTimeout(() => {
       savePreferences(newPreferences);
@@ -135,6 +136,6 @@ export const useMatchingPreferences = () => {
     loading,
     saving,
     updatePreferences,
-    savePreferences: () => savePreferences(preferences)
+    savePreferences: () => savePreferences(preferences),
   };
 };

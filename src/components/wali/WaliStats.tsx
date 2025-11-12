@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { WaliDashboardStats } from '@/types/wali';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -45,7 +44,7 @@ const WaliStats: React.FC<WaliStatsProps> = ({ statistics, className }) => {
             <span className="font-medium">{statistics.flaggedMessages}</span>
           </div>
         </div>
-        
+
         <div className="h-[120px] mt-6">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData}>

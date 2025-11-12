@@ -1,10 +1,10 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { sendEmail } from "../_shared/smtp.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { sendEmail } from '../_shared/smtp.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface VerificationApprovedRequest {
@@ -14,59 +14,61 @@ interface VerificationApprovedRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { user_id, verification_type, verification_score }: VerificationApprovedRequest = await req.json();
+    const { user_id, verification_type, verification_score }: VerificationApprovedRequest =
+      await req.json();
 
     // Get user email and profile
     const { data: userData, error: userError } = await supabase.auth.admin.getUserById(user_id);
     if (userError || !userData.user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
 
     const userEmail = userData.user.email;
     if (!userEmail) {
-      throw new Error("User email not found");
+      throw new Error('User email not found');
     }
 
     const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("user_id", user_id)
+      .from('profiles')
+      .select('full_name')
+      .eq('user_id', user_id)
       .maybeSingle();
 
-    const userName = profile?.full_name || "Cher(e) membre";
+    const userName = profile?.full_name || 'Cher(e) membre';
 
     // Verification type labels
     const verificationLabels: Record<string, string> = {
-      email: "Email",
-      phone: "Téléphone",
-      id: "Document d'identité"
+      email: 'Email',
+      phone: 'Téléphone',
+      id: "Document d'identité",
     };
 
     const verificationLabel = verificationLabels[verification_type] || verification_type;
 
     // Benefits based on verification type
-    const benefits = verification_type === 'id' 
-      ? [
-          "✅ Accès à toutes les fonctionnalités premium",
-          "✅ Profil marqué comme vérifié avec badge",
-          "✅ Priorité dans les suggestions de profils",
-          "✅ Accès illimité aux conversations",
-          "✅ Possibilité d'inviter des membres de famille"
-        ]
-      : [
-          "✅ Accès amélioré aux profils",
-          "✅ Meilleure visibilité dans les recherches",
-          "✅ Confiance accrue des autres membres"
-        ];
+    const benefits =
+      verification_type === 'id'
+        ? [
+            '✅ Accès à toutes les fonctionnalités premium',
+            '✅ Profil marqué comme vérifié avec badge',
+            '✅ Priorité dans les suggestions de profils',
+            '✅ Accès illimité aux conversations',
+            "✅ Possibilité d'inviter des membres de famille",
+          ]
+        : [
+            '✅ Accès amélioré aux profils',
+            '✅ Meilleure visibilité dans les recherches',
+            '✅ Confiance accrue des autres membres',
+          ];
 
     const emailHtml = `<!DOCTYPE html>
 <html>
@@ -116,12 +118,14 @@ const handler = async (req: Request): Promise<Response> => {
 <td style="background: #fef3c7; padding: 20px; border-radius: 8px;">
 <h3 style="margin: 0 0 15px 0; color: #92400e; font-size: 18px;">🎁 Avantages débloqués :</h3>
 <ul style="margin: 0; padding-left: 20px;">
-${benefits.map(benefit => `<li style="padding: 8px 0; font-size: 16px; line-height: 1.8; color: #1f2937;">${benefit}</li>`).join('')}
+${benefits.map((benefit) => `<li style="padding: 8px 0; font-size: 16px; line-height: 1.8; color: #1f2937;">${benefit}</li>`).join('')}
 </ul>
 </td>
 </tr>
 </table>
-${verification_type !== 'id' ? `
+${
+  verification_type !== 'id'
+    ? `
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
 <tr>
 <td style="background: #dbeafe; border: 1px solid #3b82f6; padding: 15px; border-radius: 8px;">
@@ -129,17 +133,19 @@ ${verification_type !== 'id' ? `
 </td>
 </tr>
 </table>
-` : ''}
+`
+    : ''
+}
 <!-- CTA Button -->
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
 <tr>
 <td style="text-align: center; padding: 30px 0;">
-<a href="${Deno.env.get("SUPABASE_URL") || 'https://dgfctwtivkqcfhwqgkya.supabase.co'}" style="display: inline-block; background: #059669; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px;">Accéder à mon profil</a>
+<a href="${Deno.env.get('SUPABASE_URL') || 'https://dgfctwtivkqcfhwqgkya.supabase.co'}" style="display: inline-block; background: #059669; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px;">Accéder à mon profil</a>
 </td>
 </tr>
 </table>
 <div style="height: 1px; background: #e5e7eb; margin: 30px 0;"></div>
-<p style="font-size: 14px; color: #6b7280;"><strong>Prochaines étapes :</strong><br>1. Complétez votre profil à 100%<br>2. ${verification_type === 'id' ? 'Commencez à parcourir les profils compatibles' : 'Vérifiez votre identité pour plus d\'avantages'}<br>3. Invitez un Wali pour une supervision familiale (optionnel)</p>
+<p style="font-size: 14px; color: #6b7280;"><strong>Prochaines étapes :</strong><br>1. Complétez votre profil à 100%<br>2. ${verification_type === 'id' ? 'Commencez à parcourir les profils compatibles' : "Vérifiez votre identité pour plus d'avantages"}<br>3. Invitez un Wali pour une supervision familiale (optionnel)</p>
 </td>
 </tr>
 <!-- Footer -->
@@ -162,7 +168,7 @@ ${verification_type !== 'id' ? `
       html: emailHtml,
     });
 
-    console.log("Verification approved email sent successfully to:", userEmail);
+    console.log('Verification approved email sent successfully to:', userEmail);
 
     return new Response(
       JSON.stringify({
@@ -171,13 +177,13 @@ ${verification_type !== 'id' ? `
       {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           ...corsHeaders,
         },
       }
     );
   } catch (error: any) {
-    console.error("Error sending verification approved email:", error);
+    console.error('Error sending verification approved email:', error);
     return new Response(
       JSON.stringify({
         error: error.message,
@@ -186,7 +192,7 @@ ${verification_type !== 'id' ? `
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           ...corsHeaders,
         },
       }

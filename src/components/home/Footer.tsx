@@ -1,4 +1,3 @@
-
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-r from-rose-400 via-pink-400 to-rose-300 dark:from-rose-800 dark:via-pink-800 dark:to-rose-700 text-white py-16 px-4 relative overflow-hidden">

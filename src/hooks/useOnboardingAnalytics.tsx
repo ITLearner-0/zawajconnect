@@ -1,6 +1,6 @@
 /**
  * Onboarding Analytics Hook
- * 
+ *
  * Tracks user behavior during the onboarding process:
  * - Step navigation (start, complete, abandon)
  * - Time spent on each step
@@ -20,7 +20,12 @@ interface ValidationError {
 }
 
 interface AnalyticsEvent {
-  event_type: 'step_started' | 'step_completed' | 'step_abandoned' | 'validation_error' | 'onboarding_completed';
+  event_type:
+    | 'step_started'
+    | 'step_completed'
+    | 'step_abandoned'
+    | 'validation_error'
+    | 'onboarding_completed';
   step_number?: number;
   step_name?: string;
   validation_errors?: ValidationError[];

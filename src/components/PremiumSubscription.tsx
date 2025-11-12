@@ -15,7 +15,7 @@ import {
   Shield,
   Users,
   Zap,
-  X
+  X,
 } from 'lucide-react';
 
 interface SubscriptionPlan {
@@ -48,7 +48,10 @@ interface BraintreeClient {
 }
 
 interface BraintreeHostedFields {
-  create: (config: { client: unknown; fields: Record<string, unknown> }) => Promise<BraintreeHostedFieldsInstance>;
+  create: (config: {
+    client: unknown;
+    fields: Record<string, unknown>;
+  }) => Promise<BraintreeHostedFieldsInstance>;
 }
 
 interface BraintreeAPI {
@@ -65,7 +68,9 @@ declare global {
 const PremiumSubscription = () => {
   const { user, subscription, checkSubscription } = useAuth();
   const [processingPayment, setProcessingPayment] = useState<string | null>(null);
-  const [braintreeInstance, setBraintreeInstance] = useState<BraintreeHostedFieldsInstance | null>(null);
+  const [braintreeInstance, setBraintreeInstance] = useState<BraintreeHostedFieldsInstance | null>(
+    null
+  );
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [clientToken, setClientToken] = useState<string | null>(null);
@@ -86,8 +91,8 @@ const PremiumSubscription = () => {
         'Recherche avancée',
         'Supervision familiale incluse',
         'Matching avancé',
-        'Support prioritaire'
-      ]
+        'Support prioritaire',
+      ],
     },
     {
       id: 'premium_6',
@@ -107,8 +112,8 @@ const PremiumSubscription = () => {
         'Supervision familiale incluse',
         'Matching avancé',
         'Support prioritaire',
-        'Boost de visibilité'
-      ]
+        'Boost de visibilité',
+      ],
     },
     {
       id: 'premium_12',
@@ -128,9 +133,9 @@ const PremiumSubscription = () => {
         'Matching avancé',
         'Support prioritaire',
         'Boost de visibilité',
-        'Consultations matrimoniales'
-      ]
-    }
+        'Consultations matrimoniales',
+      ],
+    },
   ];
 
   useEffect(() => {
@@ -162,7 +167,7 @@ const PremiumSubscription = () => {
         }
 
         console.log('Container found, checking for window.braintree...');
-        
+
         // Attendre que le script Braintree soit chargé
         if (!window.braintree) {
           console.log('Braintree not loaded yet, retrying...');
@@ -171,14 +176,14 @@ const PremiumSubscription = () => {
         }
 
         console.log('Braintree loaded, cleaning old instance...');
-        
+
         // Nettoyer l'ancien instance si existant
         if (braintreeInstance) {
           await braintreeInstance.teardown();
         }
 
         console.log('Creating Braintree dropin instance...');
-        
+
         // Créer nouvelle instance
         // @ts-ignore - Braintree types are incomplete
         const instance = await window.braintree.dropin.create({
@@ -191,7 +196,7 @@ const PremiumSubscription = () => {
         setBraintreeInstance(instance);
       } catch (error) {
         console.error('Erreur initialisation Braintree:', error);
-        toast.error('Erreur lors de l\'initialisation du paiement');
+        toast.error("Erreur lors de l'initialisation du paiement");
       }
     };
 
@@ -209,7 +214,7 @@ const PremiumSubscription = () => {
 
     try {
       const braintreePlanId = PLAN_IDS[planId as keyof typeof PLAN_IDS];
-      
+
       if (!braintreePlanId) {
         throw new Error('Invalid plan ID');
       }
@@ -217,7 +222,9 @@ const PremiumSubscription = () => {
       toast.loading('Initialisation du paiement...');
 
       // Vérifier la session actuelle
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Session expirée. Veuillez vous reconnecter.');
       }
@@ -227,14 +234,14 @@ const PremiumSubscription = () => {
         'create-braintree-token',
         {
           headers: {
-            Authorization: `Bearer ${session.access_token}`
-          }
+            Authorization: `Bearer ${session.access_token}`,
+          },
         }
       );
 
       if (tokenError) {
         console.error('Braintree token error:', tokenError);
-        throw new Error(tokenError.message || 'Impossible d\'initialiser le paiement');
+        throw new Error(tokenError.message || "Impossible d'initialiser le paiement");
       }
 
       if (!tokenData?.clientToken) {
@@ -246,7 +253,6 @@ const PremiumSubscription = () => {
       setShowPaymentModal(true);
       toast.dismiss();
       setProcessingPayment(null); // Réinitialiser pour permettre l'interaction avec le modal
-
     } catch (error: unknown) {
       console.error('Error processing payment:', error);
       const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
@@ -256,8 +262,11 @@ const PremiumSubscription = () => {
   };
 
   const completePurchase = async () => {
-    console.log('completePurchase called', { hasBraintreeInstance: !!braintreeInstance, selectedPlan });
-    
+    console.log('completePurchase called', {
+      hasBraintreeInstance: !!braintreeInstance,
+      selectedPlan,
+    });
+
     if (!braintreeInstance || !selectedPlan) {
       console.error('Missing braintreeInstance or selectedPlan');
       toast.error('Veuillez attendre que le formulaire de paiement se charge');
@@ -283,25 +292,24 @@ const PremiumSubscription = () => {
       toast.loading('Traitement du paiement...');
 
       console.log('Calling create-braintree-subscription edge function...');
-      
+
       // Obtenir le token de session
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Session expirée');
       }
 
-      const { data, error } = await supabase.functions.invoke(
-        'create-braintree-subscription',
-        {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`
-          },
-          body: {
-            paymentMethodNonce: nonce,
-            planId: braintreePlanId,
-          },
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('create-braintree-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: {
+          paymentMethodNonce: nonce,
+          planId: braintreePlanId,
+        },
+      });
 
       console.log('Edge function response:', { data, error });
 
@@ -309,21 +317,29 @@ const PremiumSubscription = () => {
 
       toast.dismiss();
       toast.success('Abonnement activé avec succès !');
-      
+
       // Track renewal if tracking ID is present in URL (with JWT authentication)
       const urlParams = new URLSearchParams(window.location.search);
       const trackingId = urlParams.get('track');
       const promoCode = urlParams.get('code');
-      
+
       if (trackingId && user) {
-        const selectedPlanDetails = subscriptionPlans.find(p => p.id === selectedPlan);
-        const renewalAmount = selectedPlanDetails ? selectedPlanDetails.price * selectedPlanDetails.duration : 0;
-        
+        const selectedPlanDetails = subscriptionPlans.find((p) => p.id === selectedPlan);
+        const renewalAmount = selectedPlanDetails
+          ? selectedPlanDetails.price * selectedPlanDetails.duration
+          : 0;
+
         try {
-          console.log('🔒 Tracking renewal event with JWT...', { trackingId, renewalAmount, promoCode });
-          
-          const { data: { session } } = await supabase.auth.getSession();
-          
+          console.log('🔒 Tracking renewal event with JWT...', {
+            trackingId,
+            renewalAmount,
+            promoCode,
+          });
+
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+
           if (!session?.access_token) {
             console.error('No authentication token available for tracking');
           } else {
@@ -332,11 +348,11 @@ const PremiumSubscription = () => {
                 result_id: trackingId,
                 event_type: 'renewed',
                 renewal_amount: renewalAmount,
-                promo_code_used: promoCode || undefined
+                promo_code_used: promoCode || undefined,
               },
               headers: {
-                Authorization: `Bearer ${session.access_token}`
-              }
+                Authorization: `Bearer ${session.access_token}`,
+              },
             });
 
             if (trackError) {
@@ -349,11 +365,10 @@ const PremiumSubscription = () => {
           console.error('Error tracking renewal:', trackingError);
         }
       }
-      
+
       setShowPaymentModal(false);
       setBraintreeInstance(null); // Réinitialiser l'instance
       await checkSubscription();
-      
     } catch (error: unknown) {
       console.error('Error in completePurchase:', error);
       toast.dismiss();
@@ -394,7 +409,7 @@ const PremiumSubscription = () => {
     } catch (error) {
       console.error('Error canceling subscription:', error);
       toast.dismiss();
-      toast.error('Impossible d\'annuler l\'abonnement');
+      toast.error("Impossible d'annuler l'abonnement");
     }
   };
 
@@ -412,7 +427,8 @@ const PremiumSubscription = () => {
             Trouvez Votre Partenaire Idéal Plus Rapidement
           </CardTitle>
           <p className="text-muted-foreground text-lg">
-            Débloquez des fonctionnalités premium pour maximiser vos chances de trouver l'amour selon les valeurs islamiques
+            Débloquez des fonctionnalités premium pour maximiser vos chances de trouver l'amour
+            selon les valeurs islamiques
           </p>
         </CardHeader>
       </Card>
@@ -432,20 +448,18 @@ const PremiumSubscription = () => {
                       <> - {subscription.months_remaining} mois restants</>
                     )}
                     {subscription.subscription_end && (
-                      <> - Expire le {new Date(subscription.subscription_end).toLocaleDateString('fr-FR')}</>
+                      <>
+                        {' '}
+                        - Expire le{' '}
+                        {new Date(subscription.subscription_end).toLocaleDateString('fr-FR')}
+                      </>
                     )}
                   </p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge className="bg-emerald text-primary-foreground">
-                  Actif
-                </Badge>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleManageSubscription}
-                >
+                <Badge className="bg-emerald text-primary-foreground">Actif</Badge>
+                <Button variant="outline" size="sm" onClick={handleManageSubscription}>
                   Gérer
                 </Button>
               </div>
@@ -457,17 +471,15 @@ const PremiumSubscription = () => {
       {/* Subscription Plans */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {subscriptionPlans.map((plan) => (
-          <Card 
-            key={plan.id} 
+          <Card
+            key={plan.id}
             className={`relative transition-all duration-300 hover:shadow-xl ${
               plan.popular ? 'ring-2 ring-emerald transform scale-105 border-emerald' : ''
             }`}
           >
             {plan.popular && (
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-emerald text-primary-foreground px-3 py-1">
-                  {plan.badge}
-                </Badge>
+                <Badge className="bg-emerald text-primary-foreground px-3 py-1">{plan.badge}</Badge>
               </div>
             )}
 
@@ -485,9 +497,7 @@ const PremiumSubscription = () => {
                 <div className="text-xs text-muted-foreground mt-1">
                   Abonnement mensuel récurrent
                 </div>
-                <div className="text-xs text-emerald/80 mt-1">
-                  TVA calculée automatiquement
-                </div>
+                <div className="text-xs text-emerald/80 mt-1">TVA calculée automatiquement</div>
                 {plan.discount && (
                   <div className="text-sm text-emerald font-medium mt-2">{plan.discount}</div>
                 )}
@@ -595,27 +605,23 @@ const PremiumSubscription = () => {
                 Consultez autant de profils que vous le souhaitez
               </p>
             </div>
-            
+
             <div className="text-center space-y-3">
               <div className="h-12 w-12 bg-emerald/10 rounded-full flex items-center justify-center mx-auto">
                 <Heart className="h-6 w-6 text-emerald" />
               </div>
               <h3 className="font-semibold">Likes Illimités</h3>
-              <p className="text-sm text-muted-foreground">
-                Exprimez votre intérêt sans limite
-              </p>
+              <p className="text-sm text-muted-foreground">Exprimez votre intérêt sans limite</p>
             </div>
-            
+
             <div className="text-center space-y-3">
-             <div className="h-12 w-12 bg-emerald/10 rounded-full flex items-center justify-center mx-auto">
-               <MessageCircle className="h-6 w-6 text-emerald" />
-             </div>
+              <div className="h-12 w-12 bg-emerald/10 rounded-full flex items-center justify-center mx-auto">
+                <MessageCircle className="h-6 w-6 text-emerald" />
+              </div>
               <h3 className="font-semibold">Messagerie Complète</h3>
-              <p className="text-sm text-muted-foreground">
-                Discutez avec tous vos matches
-              </p>
+              <p className="text-sm text-muted-foreground">Discutez avec tous vos matches</p>
             </div>
-            
+
             <div className="text-center space-y-3">
               <div className="h-12 w-12 bg-emerald/10 rounded-full flex items-center justify-center mx-auto">
                 <Users className="h-6 w-6 text-emerald" />
@@ -640,8 +646,8 @@ const PremiumSubscription = () => {
             </div>
           </div>
           <blockquote className="text-lg italic text-foreground mb-4">
-            "Grâce au plan Premium, j'ai pu trouver mon époux en seulement 2 mois. 
-            Les fonctionnalités illimitées et la supervision familiale ont vraiment fait la différence."
+            "Grâce au plan Premium, j'ai pu trouver mon époux en seulement 2 mois. Les
+            fonctionnalités illimitées et la supervision familiale ont vraiment fait la différence."
           </blockquote>
           <cite className="text-muted-foreground">- Fatima, utilisatrice Premium</cite>
         </CardContent>
@@ -656,22 +662,25 @@ const PremiumSubscription = () => {
           <div>
             <h4 className="font-semibold mb-2">Comment fonctionnent les paiements mensuels ?</h4>
             <p className="text-sm text-muted-foreground">
-              Vous choisissez un engagement de 3, 6 ou 12 mois et payez mensuellement. L'abonnement se renouvelle automatiquement chaque mois jusqu'à la fin de votre engagement, puis s'arrête.
+              Vous choisissez un engagement de 3, 6 ou 12 mois et payez mensuellement. L'abonnement
+              se renouvelle automatiquement chaque mois jusqu'à la fin de votre engagement, puis
+              s'arrête.
             </p>
           </div>
-          
+
           <div>
             <h4 className="font-semibold mb-2">Puis-je annuler mon abonnement ?</h4>
             <p className="text-sm text-muted-foreground">
-              Oui, vous pouvez annuler à tout moment via le portail de gestion. L'abonnement restera actif jusqu'à la fin de votre mois en cours.
+              Oui, vous pouvez annuler à tout moment via le portail de gestion. L'abonnement restera
+              actif jusqu'à la fin de votre mois en cours.
             </p>
           </div>
-          
+
           <div>
             <h4 className="font-semibold mb-2">Les paiements sont-ils sécurisés ?</h4>
             <p className="text-sm text-muted-foreground">
-              Absolument. Tous les paiements sont traités de manière sécurisée via Braintree (PayPal), 
-              leader mondial du paiement en ligne.
+              Absolument. Tous les paiements sont traités de manière sécurisée via Braintree
+              (PayPal), leader mondial du paiement en ligne.
             </p>
           </div>
         </CardContent>

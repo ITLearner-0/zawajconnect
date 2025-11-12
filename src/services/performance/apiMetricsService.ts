@@ -1,4 +1,3 @@
-
 import { logger } from '@/services/logging/LoggingService';
 
 export interface APIMetrics {
@@ -20,7 +19,7 @@ export class APIMetricsService {
       status,
       timestamp: Date.now(),
     };
-    
+
     this.apiMetrics = [...this.apiMetrics.slice(-99), apiMetric]; // Keep last 100 API calls
     logger.logApiCall(endpoint, method, duration, status);
   }

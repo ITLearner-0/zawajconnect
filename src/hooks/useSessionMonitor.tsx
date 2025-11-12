@@ -17,34 +17,34 @@ export const useSessionMonitor = () => {
       const expiresAt = new Date(session.expires_at! * 1000);
       const now = new Date();
       const timeUntilExpiry = expiresAt.getTime() - now.getTime();
-      
+
       // Show warning 5 minutes before expiry
       const warningTime = 5 * 60 * 1000; // 5 minutes in milliseconds
-      
+
       if (timeUntilExpiry <= warningTime && !sessionWarningShown) {
         setSessionWarningShown(true);
-        
+
         // Log security event
         try {
           await logSecurityEvent(
             'session_expiry_warning',
             'low',
-            'Session proche de l\'expiration',
+            "Session proche de l'expiration",
             { expires_in_minutes: Math.ceil(timeUntilExpiry / 60000) }
           );
         } catch (error) {
           console.error('Failed to log security event:', error);
         }
-        
+
         toast({
           title: "Session proche d'expirer",
           description: `Votre session expire dans ${Math.ceil(timeUntilExpiry / 60000)} minutes. Sauvegardez vos données !`,
-          variant: "destructive",
-          duration: 10000
+          variant: 'destructive',
+          duration: 10000,
         });
-        
+
         // Try to refresh token proactively
-        supabase.auth.refreshSession().catch(error => {
+        supabase.auth.refreshSession().catch((error) => {
           console.error('Failed to refresh session:', error);
         });
       }
@@ -62,7 +62,8 @@ export const useSessionMonitor = () => {
   }, [session?.expires_at]);
 
   return {
-    isSessionNearExpiry: session?.expires_at ? 
-      (new Date(session.expires_at * 1000).getTime() - Date.now()) < 5 * 60 * 1000 : false
+    isSessionNearExpiry: session?.expires_at
+      ? new Date(session.expires_at * 1000).getTime() - Date.now() < 5 * 60 * 1000
+      : false,
   };
 };

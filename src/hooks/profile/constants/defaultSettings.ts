@@ -1,4 +1,3 @@
-
 import { PrivacySettings } from '@/types/profile';
 
 export const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
@@ -6,5 +5,5 @@ export const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
   showAge: true,
   showLocation: true,
   showOccupation: true,
-  allowNonMatchMessages: true
+  allowNonMatchMessages: true,
 };

@@ -1,10 +1,15 @@
-
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ProfileFormData } from "@/types/profile";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { ProfileFormData } from '@/types/profile';
 
 interface BasicInfoSectionProps {
   formData: ProfileFormData;
@@ -12,7 +17,11 @@ interface BasicInfoSectionProps {
   handleSelectChange: (field: keyof ProfileFormData, value: string) => void;
 }
 
-const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleChange, handleSelectChange }) => {
+const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
+  formData,
+  handleChange,
+  handleSelectChange,
+}) => {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">Informations de Base</h3>
@@ -22,7 +31,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
           <Input
             id="fullName"
             name="fullName"
-            value={formData.fullName || ""}
+            value={formData.fullName || ''}
             onChange={handleChange}
             placeholder="Votre nom complet"
             className="w-full"
@@ -35,7 +44,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
             id="age"
             name="age"
             type="number"
-            value={formData.age || ""}
+            value={formData.age || ''}
             onChange={handleChange}
             placeholder="Votre âge"
             className="w-full"
@@ -44,7 +53,10 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
 
         <div className="space-y-2">
           <Label htmlFor="gender">Genre</Label>
-          <Select value={formData.gender || ""} onValueChange={(value) => handleSelectChange("gender", value)}>
+          <Select
+            value={formData.gender || ''}
+            onValueChange={(value) => handleSelectChange('gender', value)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Sélectionnez votre genre" />
             </SelectTrigger>
@@ -60,7 +72,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
           <Input
             id="location"
             name="location"
-            value={formData.location || ""}
+            value={formData.location || ''}
             onChange={handleChange}
             placeholder="Votre ville/région"
             className="w-full"
@@ -73,7 +85,7 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({ formData, handleCha
         <Textarea
           id="familyBackground"
           name="familyBackground"
-          value={formData.familyBackground || ""}
+          value={formData.familyBackground || ''}
           onChange={handleChange}
           placeholder="Décrivez votre contexte familial"
           rows={6}

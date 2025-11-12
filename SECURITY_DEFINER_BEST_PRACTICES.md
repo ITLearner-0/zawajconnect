@@ -60,7 +60,7 @@ BEGIN
   IF param1 != auth.uid() AND NOT is_admin(auth.uid()) THEN
     RAISE EXCEPTION 'Unauthorized: Can only access your own data';
   END IF;
-  
+
   -- 2. L'utilisateur a une relation appropriée (famille, match, etc.)
   -- IF NOT EXISTS (
   --   SELECT 1 FROM appropriate_relationship_table
@@ -98,7 +98,7 @@ BEGIN
   -- ============================================================================
   -- Ne retourner QUE les données nécessaires et autorisées
   RETURN v_result;
-  
+
 EXCEPTION
   -- Gérer les erreurs de manière sécurisée
   WHEN OTHERS THEN
@@ -110,7 +110,7 @@ $function$;
 -- ============================================================================
 -- DOCUMENTATION OBLIGATOIRE
 -- ============================================================================
-COMMENT ON FUNCTION public.secure_function_template(uuid, text) IS 
+COMMENT ON FUNCTION public.secure_function_template(uuid, text) IS
 'SECURITY DEFINER: [Description courte]
 Restrictions: [Qui peut appeler cette fonction]
 Security: [Quelles vérifications sont faites]
@@ -124,12 +124,14 @@ Logging: [Ce qui est logué]';
 Avant de créer ou modifier une fonction SECURITY DEFINER:
 
 ### Avant l'Implémentation
+
 - [ ] La fonction a-t-elle **vraiment** besoin de SECURITY DEFINER?
 - [ ] Peut-on faire la même chose avec une politique RLS?
 - [ ] Les risques sont-ils documentés?
 - [ ] L'équipe de sécurité a-t-elle approuvé?
 
 ### Pendant l'Implémentation
+
 - [ ] `SET search_path TO 'public'` est configuré
 - [ ] Vérification de `auth.uid()` en début de fonction
 - [ ] Validation des autorisations appropriées
@@ -139,6 +141,7 @@ Avant de créer ou modifier une fonction SECURITY DEFINER:
 - [ ] Limitation des données retournées au strict nécessaire
 
 ### Après l'Implémentation
+
 - [ ] Tests avec différents utilisateurs (authenticated, unauthorized, admin)
 - [ ] Tests de sécurité automatisés créés
 - [ ] Documentation complète avec exemples
@@ -162,12 +165,12 @@ BEGIN
   -- Test 1: Unauthorized access should fail
   BEGIN
     -- Simulate unauthorized user
-    PERFORM set_config('request.jwt.claims', 
+    PERFORM set_config('request.jwt.claims',
       jsonb_build_object('sub', other_user_id)::text, true);
-    
+
     -- Try to access data of test_user_id
     SELECT function_name(test_user_id) INTO test_result;
-    
+
     -- Should not reach here
     RAISE EXCEPTION 'SECURITY TEST FAILED: Unauthorized access allowed';
   EXCEPTION
@@ -178,25 +181,25 @@ BEGIN
         RAISE EXCEPTION 'SECURITY TEST FAILED: Wrong error: %', SQLERRM;
       END IF;
   END;
-  
+
   -- Test 2: Authorized access should succeed
   BEGIN
     -- Simulate authorized user
-    PERFORM set_config('request.jwt.claims', 
+    PERFORM set_config('request.jwt.claims',
       jsonb_build_object('sub', test_user_id)::text, true);
-    
+
     -- Try to access own data
     SELECT function_name(test_user_id) INTO test_result;
-    
+
     RAISE NOTICE 'PASS: Authorized access allowed';
   EXCEPTION
     WHEN OTHERS THEN
       RAISE EXCEPTION 'SECURITY TEST FAILED: Authorized access blocked: %', SQLERRM;
   END;
-  
+
   -- Test 3: Admin access should succeed
   -- ... (similar pattern)
-  
+
   RAISE NOTICE 'All security tests passed!';
 END $$;
 ```
@@ -208,10 +211,11 @@ END $$;
 ### Métriques à Surveiller
 
 1. **Appels de Fonctions SECURITY DEFINER**
+
    ```sql
    -- Créer une vue pour surveiller les appels
    CREATE VIEW security_definer_usage AS
-   SELECT 
+   SELECT
      schemaname,
      funcname,
      calls,
@@ -219,13 +223,14 @@ END $$;
      self_time
    FROM pg_stat_user_functions
    WHERE proname IN (
-     SELECT proname 
-     FROM pg_proc 
+     SELECT proname
+     FROM pg_proc
      WHERE prosecdef = true
    );
    ```
 
 2. **Tentatives d'Accès Non Autorisées**
+
    ```sql
    -- Surveiller les exceptions dans les logs
    SELECT *
@@ -297,12 +302,12 @@ BEGIN
   IF auth.uid() IS NULL THEN
     RAISE EXCEPTION 'Authentication required';
   END IF;
-  
+
   -- ✅ Vérifie l'autorisation
   IF target_id != auth.uid() AND NOT is_admin(auth.uid()) THEN
     RAISE EXCEPTION 'Unauthorized';
   END IF;
-  
+
   -- ✅ Utilise des requêtes paramétrées
   RETURN (SELECT * FROM sensitive_table WHERE id = target_id);
 END;
@@ -315,13 +320,13 @@ $$;
 
 Maintenir un registre à jour de toutes les fonctions:
 
-| Fonction | Raison | Restrictions | Dernière Revue | Risque |
-|----------|--------|--------------|----------------|--------|
-| is_user_in_active_conversation | Helper RLS | Self/Admin | 2025-11-10 | ✅ Faible |
-| has_previous_conversation | Helper RLS | Participants | 2025-11-10 | ✅ Faible |
-| get_user_verification_status_secure | Données sensibles | Self/Family/Match | 2025-11-10 | ✅ Faible |
-| is_premium_active | Business logic | Self/Admin | 2025-11-10 | ✅ Faible |
-| get_family_contact_secure | Données ultra-sensibles | Wali verified | 2025-11-10 | ✅ Faible |
+| Fonction                            | Raison                  | Restrictions      | Dernière Revue | Risque    |
+| ----------------------------------- | ----------------------- | ----------------- | -------------- | --------- |
+| is_user_in_active_conversation      | Helper RLS              | Self/Admin        | 2025-11-10     | ✅ Faible |
+| has_previous_conversation           | Helper RLS              | Participants      | 2025-11-10     | ✅ Faible |
+| get_user_verification_status_secure | Données sensibles       | Self/Family/Match | 2025-11-10     | ✅ Faible |
+| is_premium_active                   | Business logic          | Self/Admin        | 2025-11-10     | ✅ Faible |
+| get_family_contact_secure           | Données ultra-sensibles | Wali verified     | 2025-11-10     | ✅ Faible |
 
 ---
 
@@ -340,13 +345,13 @@ Maintenir un registre à jour de toutes les fonctions:
 ### SQL pour Identifier Toutes les Fonctions
 
 ```sql
-SELECT 
+SELECT
   n.nspname AS schema,
   p.proname AS function_name,
   pg_get_functiondef(p.oid) AS definition,
   CASE WHEN prosecdef THEN '⚠️ SECURITY DEFINER' ELSE '✅ INVOKER' END AS security_type,
-  CASE 
-    WHEN prosecdef AND pg_get_functiondef(p.oid) NOT LIKE '%auth.uid()%' 
+  CASE
+    WHEN prosecdef AND pg_get_functiondef(p.oid) NOT LIKE '%auth.uid()%'
     THEN '🔴 MISSING AUTH CHECK'
     ELSE '✅ OK'
   END AS auth_check

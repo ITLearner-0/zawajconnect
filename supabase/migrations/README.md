@@ -5,9 +5,11 @@ This directory contains SQL migration files for the ZawajConnect Supabase databa
 ## Migration Files
 
 ### 20250105_performance_indexes.sql
+
 **Purpose:** Add database indexes to improve query performance
 
 **Indexes Created:**
+
 - Profile filtering (gender, location, age)
 - Islamic preferences matching (sect, madhab, prayer frequency)
 - Match queries (user lookups, status filtering)
@@ -16,18 +18,22 @@ This directory contains SQL migration files for the ZawajConnect Supabase databa
 - User verifications scoring
 
 **Impact:**
+
 - Reduces query time by 60-80% for common operations
 - Improves matching algorithm performance
 - Speeds up message loading and profile browsing
 
 ### 20250105_moderation_tables.sql
+
 **Purpose:** Create tables for content moderation system
 
 **Tables Created:**
+
 - `moderation_rules` - Rules for automated content filtering
 - `moderation_violations` - Log of moderation violations
 
 **Features:**
+
 - Row Level Security (RLS) policies
 - Admin-only access to rules
 - Automated logging system
@@ -38,16 +44,19 @@ This directory contains SQL migration files for the ZawajConnect Supabase databa
 ### Using Supabase CLI
 
 1. **Install Supabase CLI:**
+
    ```bash
    npm install -g supabase
    ```
 
 2. **Login to Supabase:**
+
    ```bash
    supabase login
    ```
 
 3. **Link your project:**
+
    ```bash
    supabase link --project-ref your-project-ref
    ```
@@ -68,6 +77,7 @@ This directory contains SQL migration files for the ZawajConnect Supabase databa
 ### Order of Execution
 
 Apply migrations in chronological order (by filename date):
+
 1. `20250105_performance_indexes.sql`
 2. `20250105_moderation_tables.sql`
 
@@ -138,15 +148,18 @@ DROP TABLE IF EXISTS moderation_rules;
 ## Troubleshooting
 
 ### "relation already exists"
+
 - Migration was partially applied
 - Check existing objects with: `\d+ table_name`
 - Either complete or rollback the migration
 
 ### "permission denied"
+
 - Ensure you're using the correct database role
 - Check RLS policies aren't blocking operations
 
 ### Performance issues after indexes
+
 - Run `ANALYZE` to update query planner statistics:
   ```sql
   ANALYZE profiles;
@@ -156,6 +169,7 @@ DROP TABLE IF EXISTS moderation_rules;
 ## Support
 
 For issues with migrations:
+
 1. Check Supabase logs in dashboard
 2. Review SQL syntax errors
 3. Consult [Supabase Documentation](https://supabase.com/docs/guides/database/migrations)

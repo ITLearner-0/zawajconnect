@@ -51,13 +51,13 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
     toggleAudio,
     toggleVideo,
     isCallActive,
-    isIncomingCall
-  } = useWebRTCCall({ 
+    isIncomingCall,
+  } = useWebRTCCall({
     matchId,
     onRequestFeedback: (data: CallFeedbackData) => {
       setFeedbackData(data);
       setShowFeedbackDialog(true);
-    }
+    },
   });
 
   const [newMessage, setNewMessage] = useState('');
@@ -98,32 +98,35 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
   const handleCall = async (isVideo: boolean) => {
     if (!canCommunicate) {
       toast({
-        title: "Communication non autorisée",
-        description: "Vous devez configurer votre supervision familiale pour passer des appels",
-        variant: "destructive"
+        title: 'Communication non autorisée',
+        description: 'Vous devez configurer votre supervision familiale pour passer des appels',
+        variant: 'destructive',
       });
       return;
     }
 
     if (!match || !user) {
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'initier l'appel",
-        variant: "destructive"
+        variant: 'destructive',
       });
       return;
     }
 
     try {
       setCurrentCallType(isVideo ? 'video' : 'audio');
-      await initiateCall(isVideo ? 'video' : 'audio', user.user_metadata?.full_name || 'Utilisateur');
+      await initiateCall(
+        isVideo ? 'video' : 'audio',
+        user.user_metadata?.full_name || 'Utilisateur'
+      );
       console.log(`✅ ${isVideo ? 'Video' : 'Audio'} call initiated`);
     } catch (error) {
       console.error('❌ Failed to initiate call:', error);
       toast({
         title: "Erreur d'appel",
         description: "Impossible de démarrer l'appel. Vérifiez vos permissions micro/caméra.",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -177,7 +180,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
             <p className="text-muted-foreground mb-4">
               Selon les principes islamiques, vous devez configurer un Wali pour communiquer.
             </p>
-            <Button onClick={() => window.location.href = '/family'}>
+            <Button onClick={() => (window.location.href = '/family')}>
               Configurer ma Famille
             </Button>
           </div>
@@ -209,13 +212,14 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
               <TabsTrigger value="calls">Historique des appels</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="messages" className="flex-1 overflow-y-auto p-4 bg-background mt-0 data-[state=inactive]:hidden">
+            <TabsContent
+              value="messages"
+              className="flex-1 overflow-y-auto p-4 bg-background mt-0 data-[state=inactive]:hidden"
+            >
               {messages.length === 0 ? (
                 <div className="text-center py-12">
                   <Heart className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
-                  <p className="text-sm text-muted-foreground">
-                    Début de conversation
-                  </p>
+                  <p className="text-sm text-muted-foreground">Début de conversation</p>
                   <p className="text-xs text-muted-foreground mt-1">
                     Présentez-vous de manière respectueuse
                   </p>
@@ -235,7 +239,10 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
               <div ref={messagesEndRef} />
             </TabsContent>
 
-            <TabsContent value="calls" className="flex-1 overflow-y-auto p-4 bg-background mt-0 data-[state=inactive]:hidden">
+            <TabsContent
+              value="calls"
+              className="flex-1 overflow-y-auto p-4 bg-background mt-0 data-[state=inactive]:hidden"
+            >
               <CallHistory matchId={matchId} />
             </TabsContent>
           </Tabs>
@@ -258,7 +265,7 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
                 disabled={sending || !canCommunicate}
                 className="flex-1"
               />
-              <Button 
+              <Button
                 onClick={handleSendMessage}
                 disabled={!newMessage.trim() || sending || !canCommunicate}
                 size="icon"
@@ -292,23 +299,25 @@ const ChatWindow = ({ matchId, onClose }: ChatWindowProps) => {
       )}
 
       {/* Active Call Window */}
-      {isCallActive && (callState === 'calling' || callState === 'connecting' || callState === 'connected') && match && (
-        <ActiveCallWindow
-          localStream={localStream}
-          remoteStream={remoteStream}
-          callState={callState}
-          isAudioEnabled={isAudioEnabled}
-          isVideoEnabled={isVideoEnabled}
-          callDuration={callDuration}
-          partnerName={match.other_user.full_name}
-          partnerAvatar={match.other_user.avatar_url}
-          isVideoCall={currentCallType === 'video'}
-          qualityMetrics={qualityMetrics}
-          onToggleAudio={toggleAudio}
-          onToggleVideo={toggleVideo}
-          onEndCall={endCall}
-        />
-      )}
+      {isCallActive &&
+        (callState === 'calling' || callState === 'connecting' || callState === 'connected') &&
+        match && (
+          <ActiveCallWindow
+            localStream={localStream}
+            remoteStream={remoteStream}
+            callState={callState}
+            isAudioEnabled={isAudioEnabled}
+            isVideoEnabled={isVideoEnabled}
+            callDuration={callDuration}
+            partnerName={match.other_user.full_name}
+            partnerAvatar={match.other_user.avatar_url}
+            isVideoCall={currentCallType === 'video'}
+            qualityMetrics={qualityMetrics}
+            onToggleAudio={toggleAudio}
+            onToggleVideo={toggleVideo}
+            onEndCall={endCall}
+          />
+        )}
 
       {/* Call Feedback Dialog */}
       {feedbackData && (

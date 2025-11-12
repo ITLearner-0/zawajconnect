@@ -1,11 +1,22 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Calendar, Clock, Video, Phone, Users } from 'lucide-react';
 
@@ -25,10 +36,10 @@ interface CallSchedulerProps {
   isWaliRequired?: boolean;
 }
 
-const CallScheduler: React.FC<CallSchedulerProps> = ({ 
-  onScheduleCall, 
+const CallScheduler: React.FC<CallSchedulerProps> = ({
+  onScheduleCall,
   otherUserName,
-  isWaliRequired = false 
+  isWaliRequired = false,
 }) => {
   const [scheduleData, setScheduleData] = useState<CallScheduleData>({
     type: 'video',
@@ -37,7 +48,7 @@ const CallScheduler: React.FC<CallSchedulerProps> = ({
     duration: 30,
     includeWali: isWaliRequired,
     notes: '',
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
 
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +65,7 @@ const CallScheduler: React.FC<CallSchedulerProps> = ({
         duration: 30,
         includeWali: isWaliRequired,
         notes: '',
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
     }
   };
@@ -68,7 +79,7 @@ const CallScheduler: React.FC<CallSchedulerProps> = ({
     const now = new Date();
     const selectedDate = new Date(scheduleData.date);
     const isToday = selectedDate.toDateString() === now.toDateString();
-    
+
     if (isToday) {
       // Add 1 hour buffer for scheduling
       const minTime = new Date(now.getTime() + 60 * 60 * 1000);
@@ -85,7 +96,7 @@ const CallScheduler: React.FC<CallSchedulerProps> = ({
           Planifier
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -93,15 +104,15 @@ const CallScheduler: React.FC<CallSchedulerProps> = ({
             Planifier un Appel avec {otherUserName}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           {/* Call Type */}
           <div className="space-y-2">
             <Label>Type d'appel</Label>
             <Select
               value={scheduleData.type}
-              onValueChange={(value: 'audio' | 'video') => 
-                setScheduleData(prev => ({ ...prev, type: value }))
+              onValueChange={(value: 'audio' | 'video') =>
+                setScheduleData((prev) => ({ ...prev, type: value }))
               }
             >
               <SelectTrigger>
@@ -131,9 +142,7 @@ const CallScheduler: React.FC<CallSchedulerProps> = ({
               type="date"
               min={getMinDate()}
               value={scheduleData.date}
-              onChange={(e) => 
-                setScheduleData(prev => ({ ...prev, date: e.target.value }))
-              }
+              onChange={(e) => setScheduleData((prev) => ({ ...prev, date: e.target.value }))}
             />
           </div>
 
@@ -144,9 +153,7 @@ const CallScheduler: React.FC<CallSchedulerProps> = ({
               type="time"
               min={scheduleData.date ? getMinTime() : undefined}
               value={scheduleData.time}
-              onChange={(e) => 
-                setScheduleData(prev => ({ ...prev, time: e.target.value }))
-              }
+              onChange={(e) => setScheduleData((prev) => ({ ...prev, time: e.target.value }))}
             />
           </div>
 
@@ -155,8 +162,8 @@ const CallScheduler: React.FC<CallSchedulerProps> = ({
             <Label>Durée (minutes)</Label>
             <Select
               value={scheduleData.duration.toString()}
-              onValueChange={(value) => 
-                setScheduleData(prev => ({ ...prev, duration: parseInt(value) }))
+              onValueChange={(value) =>
+                setScheduleData((prev) => ({ ...prev, duration: parseInt(value) }))
               }
             >
               <SelectTrigger>
@@ -181,8 +188,8 @@ const CallScheduler: React.FC<CallSchedulerProps> = ({
             </div>
             <Switch
               checked={scheduleData.includeWali}
-              onCheckedChange={(checked) => 
-                setScheduleData(prev => ({ ...prev, includeWali: checked }))
+              onCheckedChange={(checked) =>
+                setScheduleData((prev) => ({ ...prev, includeWali: checked }))
               }
               disabled={isWaliRequired}
             />
@@ -194,9 +201,7 @@ const CallScheduler: React.FC<CallSchedulerProps> = ({
             <Textarea
               placeholder="Ajouter des notes sur l'appel..."
               value={scheduleData.notes}
-              onChange={(e) => 
-                setScheduleData(prev => ({ ...prev, notes: e.target.value }))
-              }
+              onChange={(e) => setScheduleData((prev) => ({ ...prev, notes: e.target.value }))}
               rows={3}
             />
           </div>
@@ -208,7 +213,7 @@ const CallScheduler: React.FC<CallSchedulerProps> = ({
           </div>
 
           {/* Schedule Button */}
-          <Button 
+          <Button
             onClick={handleSchedule}
             disabled={!scheduleData.date || !scheduleData.time}
             className="w-full"

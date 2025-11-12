@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect } from 'react';
 import { useApplicationMonitoring } from '@/hooks/useApplicationMonitoring';
 import { logger } from '@/services/logging/LoggingService';
@@ -27,19 +26,14 @@ interface MonitoringProviderProps {
   autoStart?: boolean;
 }
 
-export const MonitoringProvider: React.FC<MonitoringProviderProps> = ({ 
-  children, 
-  autoStart = true 
+export const MonitoringProvider: React.FC<MonitoringProviderProps> = ({
+  children,
+  autoStart = true,
 }) => {
   const { user } = useAuth();
   const location = useLocation();
-  const {
-    isMonitoring,
-    startMonitoring,
-    trackPageView,
-    trackUserAction,
-    trackError,
-  } = useApplicationMonitoring();
+  const { isMonitoring, startMonitoring, trackPageView, trackUserAction, trackError } =
+    useApplicationMonitoring();
 
   // Set user ID when user changes
   useEffect(() => {
@@ -69,9 +63,5 @@ export const MonitoringProvider: React.FC<MonitoringProviderProps> = ({
     isMonitoring,
   };
 
-  return (
-    <MonitoringContext.Provider value={contextValue}>
-      {children}
-    </MonitoringContext.Provider>
-  );
+  return <MonitoringContext.Provider value={contextValue}>{children}</MonitoringContext.Provider>;
 };

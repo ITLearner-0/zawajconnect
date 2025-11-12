@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -27,13 +26,16 @@ const ProgressiveImage = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [isHighQualityLoaded, setIsHighQualityLoaded] = useState(false);
 
-  const handleImageLoad = useCallback((event: React.SyntheticEvent<HTMLImageElement>) => {
-    setIsLoaded(true);
-    if (currentSrc === src) {
-      setIsHighQualityLoaded(true);
-    }
-    onLoad?.(event);
-  }, [currentSrc, src, onLoad]);
+  const handleImageLoad = useCallback(
+    (event: React.SyntheticEvent<HTMLImageElement>) => {
+      setIsLoaded(true);
+      if (currentSrc === src) {
+        setIsHighQualityLoaded(true);
+      }
+      onLoad?.(event);
+    },
+    [currentSrc, src, onLoad]
+  );
 
   const handleImageError = useCallback(() => {
     onError?.();
@@ -71,10 +73,10 @@ const ProgressiveImage = ({
       onLoad={handleImageLoad}
       onError={handleImageError}
       className={cn(
-        "transition-all duration-300",
-        isLowQuality && enableBlur && "filter blur-sm scale-105",
-        isLoaded ? "opacity-100" : "opacity-0",
-        !reducedMotion && "transition-all duration-300",
+        'transition-all duration-300',
+        isLowQuality && enableBlur && 'filter blur-sm scale-105',
+        isLoaded ? 'opacity-100' : 'opacity-0',
+        !reducedMotion && 'transition-all duration-300',
         className
       )}
       loading="lazy"

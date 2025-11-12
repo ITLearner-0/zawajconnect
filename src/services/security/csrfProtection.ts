@@ -1,4 +1,3 @@
-
 // CSRF Protection service
 export class CSRFProtection {
   private static readonly TOKEN_KEY = 'csrf_token';
@@ -35,19 +34,19 @@ export class CSRFProtection {
   static createProtectedFetch() {
     return async (url: string, options: RequestInit = {}) => {
       const token = this.getToken();
-      
+
       if (!token) {
         throw new Error('CSRF token not found');
       }
 
       const headers = {
         ...options.headers,
-        [this.HEADER_NAME]: token
+        [this.HEADER_NAME]: token,
       };
 
       return fetch(url, {
         ...options,
-        headers
+        headers,
       });
     };
   }
@@ -60,9 +59,12 @@ export class CSRFProtection {
     }
 
     // Refresh token periodically
-    setInterval(() => {
-      this.generateToken();
-    }, 30 * 60 * 1000); // Refresh every 30 minutes
+    setInterval(
+      () => {
+        this.generateToken();
+      },
+      30 * 60 * 1000
+    ); // Refresh every 30 minutes
   }
 
   // Generate random string

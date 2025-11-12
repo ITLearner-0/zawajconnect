@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -81,9 +80,7 @@ const SecurityDashboard: React.FC = () => {
             <div className="text-2xl font-bold">
               <Badge variant="default">High</Badge>
             </div>
-            <p className="text-xs text-muted-foreground">
-              All protections active
-            </p>
+            <p className="text-xs text-muted-foreground">All protections active</p>
           </CardContent>
         </Card>
 
@@ -94,9 +91,7 @@ const SecurityDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{auditStats?.total || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Security events recorded
-            </p>
+            <p className="text-xs text-muted-foreground">Security events recorded</p>
           </CardContent>
         </Card>
 
@@ -109,9 +104,7 @@ const SecurityDashboard: React.FC = () => {
             <div className="text-2xl font-bold">
               <Badge variant="default">Active</Badge>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Secure session
-            </p>
+            <p className="text-xs text-muted-foreground">Secure session</p>
           </CardContent>
         </Card>
 
@@ -124,9 +117,7 @@ const SecurityDashboard: React.FC = () => {
             <div className="text-2xl font-bold">
               <Badge variant="default">Low</Badge>
             </div>
-            <p className="text-xs text-muted-foreground">
-              No threats detected
-            </p>
+            <p className="text-xs text-muted-foreground">No threats detected</p>
           </CardContent>
         </Card>
       </div>
@@ -138,15 +129,16 @@ const SecurityDashboard: React.FC = () => {
             <Eye className="h-5 w-5" />
             Recent Security Events
           </CardTitle>
-          <CardDescription>
-            Your recent account activity and security events
-          </CardDescription>
+          <CardDescription>Your recent account activity and security events</CardDescription>
         </CardHeader>
         <CardContent>
           {auditStats?.byType ? (
             <div className="space-y-2">
               {Object.entries(auditStats.byType).map(([eventType, count]) => (
-                <div key={eventType} className="flex items-center justify-between p-2 border rounded">
+                <div
+                  key={eventType}
+                  className="flex items-center justify-between p-2 border rounded"
+                >
                   <span className="font-medium">{eventType.replace(/_/g, ' ').toUpperCase()}</span>
                   <Badge variant="outline">{String(count)}</Badge>
                 </div>

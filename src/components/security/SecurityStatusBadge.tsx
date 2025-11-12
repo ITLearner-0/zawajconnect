@@ -9,9 +9,9 @@ interface SecurityStatusBadgeProps {
   className?: string;
 }
 
-const SecurityStatusBadge: React.FC<SecurityStatusBadgeProps> = ({ 
-  variant = 'compact', 
-  className = '' 
+const SecurityStatusBadge: React.FC<SecurityStatusBadgeProps> = ({
+  variant = 'compact',
+  className = '',
 }) => {
   const { securityStatus, loading } = useSecurityMonitor();
   const { isSessionNearExpiry } = useEnhancedSessionMonitor();
@@ -31,28 +31,28 @@ const SecurityStatusBadge: React.FC<SecurityStatusBadgeProps> = ({
     const idVerified = securityStatus?.id_verified || false;
 
     if (score >= 85 && emailVerified && idVerified) {
-      return { 
-        level: 'high', 
-        label: 'Sécurité Élevée', 
-        color: 'bg-emerald-500', 
+      return {
+        level: 'high',
+        label: 'Sécurité Élevée',
+        color: 'bg-emerald-500',
         icon: CheckCircle,
-        variant: 'default' as const
+        variant: 'default' as const,
       };
     } else if (score >= 30 || emailVerified) {
-      return { 
-        level: 'medium', 
-        label: 'Profil Standard', 
-        color: 'bg-blue-500', 
+      return {
+        level: 'medium',
+        label: 'Profil Standard',
+        color: 'bg-blue-500',
         icon: Shield,
-        variant: 'outline' as const
+        variant: 'outline' as const,
       };
     } else {
-      return { 
-        level: 'low', 
-        label: 'À Compléter', 
-        color: 'bg-amber-500', 
+      return {
+        level: 'low',
+        label: 'À Compléter',
+        color: 'bg-amber-500',
         icon: AlertTriangle,
-        variant: 'secondary' as const
+        variant: 'secondary' as const,
       };
     }
   };
@@ -72,9 +72,7 @@ const SecurityStatusBadge: React.FC<SecurityStatusBadgeProps> = ({
       <Badge variant={badgeVariant} className={`flex items-center gap-1 ${className}`}>
         <Icon className="h-3 w-3" />
         {level === 'high' ? 'Vérifié' : level === 'medium' ? 'Standard' : 'Nouveau'}
-        {isSessionNearExpiry && (
-          <XCircle className="h-3 w-3 text-destructive" />
-        )}
+        {isSessionNearExpiry && <XCircle className="h-3 w-3 text-destructive" />}
       </Badge>
     );
   }

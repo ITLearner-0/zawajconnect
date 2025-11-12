@@ -98,19 +98,20 @@ const EnhancedChatContainer = ({
   onSendMessage,
   onStartVideoCall,
   isWaliSupervised = false,
-  isSupervisor = false
+  isSupervisor = false,
 }: EnhancedChatContainerProps) => {
-  const [messageInput, setMessageInput] = useState("");
-  const [temporaryMessageSettings, setTemporaryMessageSettings] = useState<TemporaryMessageSettings>({
-    enabled: false,
-    defaultDuration: 24,
-    allowCustomDuration: true,
-    warnBeforeExpiry: true,
-    warningTime: 30
-  });
-  
+  const [messageInput, setMessageInput] = useState('');
+  const [temporaryMessageSettings, setTemporaryMessageSettings] =
+    useState<TemporaryMessageSettings>({
+      enabled: false,
+      defaultDuration: 24,
+      allowCustomDuration: true,
+      warnBeforeExpiry: true,
+      warningTime: 30,
+    });
+
   // Use our custom hooks
-  const { 
+  const {
     showRetentionSettings,
     showSecuritySettings,
     showMonitoring,
@@ -120,28 +121,29 @@ const EnhancedChatContainer = ({
     toggleRetentionSettings,
     toggleSecuritySettings,
     toggleMonitoringPanel,
-    toggleEmergencyPanel
+    toggleEmergencyPanel,
   } = useChatControls();
-  
-  const { 
+
+  const {
     latestReport,
     monitoringEnabled,
     toggleMonitoring,
     loading: monitoringLoading,
-    error: monitoringError
+    error: monitoringError,
   } = useAIMonitoring(conversationId);
-  
-  const { 
-    moderateMessageContent, 
-    processContentFlags 
-  } = useMessageModeration(conversationId, messages, userId);
+
+  const { moderateMessageContent, processContentFlags } = useMessageModeration(
+    conversationId,
+    messages,
+    userId
+  );
 
   // Initialize message handler using the hook
   const { handleSendMessage } = useChatMessageHandler({
     conversationId,
     onSendMessage,
     moderateMessageContent,
-    processContentFlags
+    processContentFlags,
   });
 
   // Enhanced message handlers
@@ -153,16 +155,16 @@ const EnhancedChatContainer = ({
         reader.onloadend = () => resolve(reader.result as string);
         reader.readAsDataURL(audioBlob);
       });
-      
+
       // Send voice message with metadata
       const voiceMessage = {
         type: 'voice',
         content: `[Message vocal - ${Math.floor(duration)}s]`,
         audioData,
         duration,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       console.log('Sending voice message:', voiceMessage);
       handleSendMessage(`[Voice Message: ${duration}s]`);
     } catch (error) {
@@ -182,13 +184,13 @@ const EnhancedChatContainer = ({
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-islamic-darkCard">
-      <ChatHeader 
+      <ChatHeader
         conversation={{
           id: conversationId,
           profile: { first_name: otherUserName, last_name: '' },
           participants: [userId, otherUserId],
           created_at: new Date().toISOString(),
-          wali_supervised: isWaliSupervised
+          wali_supervised: isWaliSupervised,
         }}
         currentUserId={userId}
         backToList={() => {}}
@@ -198,8 +200,8 @@ const EnhancedChatContainer = ({
         setShowSecuritySettings={toggleSecuritySettings}
         openReportDialog={() => setShowReportDialog(true)}
       />
-      
-      <ChatBody 
+
+      <ChatBody
         messages={messages}
         currentUserId={userId}
         conversationId={conversationId}
@@ -217,14 +219,14 @@ const EnhancedChatContainer = ({
         monitoringError={monitoringError}
         onCloseMonitoring={() => toggleMonitoringPanel()}
       />
-      
-      <EnhancedMessageInput 
+
+      <EnhancedMessageInput
         messageInput={messageInput}
         setMessageInput={setMessageInput}
         sendMessage={() => {
           if (messageInput.trim()) {
             handleSendMessage(messageInput);
-            setMessageInput("");
+            setMessageInput('');
           }
         }}
         sendingMessage={false}
@@ -237,8 +239,8 @@ const EnhancedChatContainer = ({
         temporaryMessageSettings={temporaryMessageSettings}
         onTemporarySettingsChange={setTemporaryMessageSettings}
       />
-      
-      <ReportDialog 
+
+      <ReportDialog
         isOpen={showReportDialog}
         onClose={() => setShowReportDialog(false)}
         userId={otherUserId}

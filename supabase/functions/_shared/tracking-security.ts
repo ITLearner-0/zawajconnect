@@ -2,7 +2,8 @@
  * Security utilities for email tracking with HMAC signatures
  */
 
-const TRACKING_SECRET = Deno.env.get('TRACKING_SECRET') || 'default-tracking-secret-change-in-production';
+const TRACKING_SECRET =
+  Deno.env.get('TRACKING_SECRET') || 'default-tracking-secret-change-in-production';
 
 /**
  * Generate HMAC signature for tracking token
@@ -14,7 +15,7 @@ export async function generateTrackingSignature(
 ): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(`${resultId}:${userId}:${timestamp}`);
-  
+
   const key = await crypto.subtle.importKey(
     'raw',
     encoder.encode(TRACKING_SECRET),
@@ -22,10 +23,10 @@ export async function generateTrackingSignature(
     false,
     ['sign']
   );
-  
+
   const signature = await crypto.subtle.sign('HMAC', key, data);
   return Array.from(new Uint8Array(signature))
-    .map(b => b.toString(16).padStart(2, '0'))
+    .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 }
 
@@ -53,7 +54,7 @@ export async function generateSignedTrackingUrl(
 ): Promise<string> {
   const timestamp = Date.now();
   const signature = await generateTrackingSignature(resultId, userId, timestamp);
-  
+
   return `${baseUrl}?result_id=${resultId}&event_type=${eventType}&timestamp=${timestamp}&signature=${signature}`;
 }
 
@@ -72,16 +73,16 @@ export function parseTrackingParams(url: URL): TrackingParams | null {
   const event_type = url.searchParams.get('event_type') as 'opened' | 'clicked' | null;
   const timestamp = url.searchParams.get('timestamp');
   const signature = url.searchParams.get('signature');
-  
+
   if (!result_id || !event_type || !timestamp || !signature) {
     return null;
   }
-  
+
   return {
     result_id,
     event_type,
     timestamp: parseInt(timestamp, 10),
-    signature
+    signature,
   };
 }
 
@@ -103,12 +104,13 @@ export async function validateTrackingRequest(
   if (now - params.timestamp > maxAge) {
     return { valid: false, error: 'Tracking link expired (older than 7 days)' };
   }
-  
+
   // Prevent future timestamps (clock skew attack)
-  if (params.timestamp > now + 60000) { // 1 minute tolerance
+  if (params.timestamp > now + 60000) {
+    // 1 minute tolerance
     return { valid: false, error: 'Invalid timestamp (future)' };
   }
-  
+
   // Verify HMAC signature
   const signatureValid = await verifyTrackingSignature(
     params.result_id,
@@ -116,10 +118,10 @@ export async function validateTrackingRequest(
     params.timestamp,
     params.signature
   );
-  
+
   if (!signatureValid) {
     return { valid: false, error: 'Invalid signature - tracking link may have been tampered with' };
   }
-  
+
   return { valid: true };
 }

@@ -5,27 +5,27 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  BarChart, 
-  Bar, 
+import {
+  BarChart,
+  Bar,
   LineChart,
   Line,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
   PieChart,
   Pie,
   Cell,
   Area,
-  AreaChart
+  AreaChart,
 } from 'recharts';
-import { 
-  Phone, 
-  Video, 
-  TrendingUp, 
+import {
+  Phone,
+  Video,
+  TrendingUp,
   Clock,
   CheckCircle2,
   XCircle,
@@ -34,7 +34,7 @@ import {
   BarChart3,
   Globe,
   Download,
-  FileSpreadsheet
+  FileSpreadsheet,
 } from 'lucide-react';
 import { exportToExcel, exportToPDF } from '@/utils/callAnalyticsExport';
 
@@ -64,7 +64,7 @@ const COLORS = {
   warning: '#f59e0b',
   danger: '#ef4444',
   secondary: '#6366f1',
-  accent: '#8b5cf6'
+  accent: '#8b5cf6',
 };
 
 const STATUS_COLORS: { [key: string]: string } = {
@@ -72,7 +72,7 @@ const STATUS_COLORS: { [key: string]: string } = {
   ended: COLORS.primary,
   rejected: COLORS.warning,
   failed: COLORS.danger,
-  missed: COLORS.secondary
+  missed: COLORS.secondary,
 };
 
 const CallAnalyticsDashboard = () => {
@@ -117,19 +117,23 @@ const CallAnalyticsDashboard = () => {
 
       // Calculate statistics
       const totalCalls = calls.length;
-      const successfulCalls = calls.filter(c => c.status === 'ended' && c.duration_seconds && c.duration_seconds > 0);
+      const successfulCalls = calls.filter(
+        (c) => c.status === 'ended' && c.duration_seconds && c.duration_seconds > 0
+      );
       const successRate = totalCalls > 0 ? (successfulCalls.length / totalCalls) * 100 : 0;
 
-      const avgDuration = successfulCalls.length > 0
-        ? successfulCalls.reduce((sum, c) => sum + (c.duration_seconds || 0), 0) / successfulCalls.length
-        : 0;
+      const avgDuration =
+        successfulCalls.length > 0
+          ? successfulCalls.reduce((sum, c) => sum + (c.duration_seconds || 0), 0) /
+            successfulCalls.length
+          : 0;
 
-      const audioCallsCount = calls.filter(c => c.call_type === 'audio').length;
-      const videoCallsCount = calls.filter(c => c.call_type === 'video').length;
+      const audioCallsCount = calls.filter((c) => c.call_type === 'audio').length;
+      const videoCallsCount = calls.filter((c) => c.call_type === 'video').length;
 
       // Calls by day
       const callsByDayMap = new Map<string, number>();
-      calls.forEach(call => {
+      calls.forEach((call) => {
         const date = new Date(call.created_at).toLocaleDateString('fr-FR');
         callsByDayMap.set(date, (callsByDayMap.get(date) || 0) + 1);
       });
@@ -139,30 +143,44 @@ const CallAnalyticsDashboard = () => {
 
       // Calls by status
       const callsByStatusMap = new Map<string, number>();
-      calls.forEach(call => {
+      calls.forEach((call) => {
         const status = call.status || 'unknown';
         callsByStatusMap.set(status, (callsByStatusMap.get(status) || 0) + 1);
       });
-      const callsByStatus = Array.from(callsByStatusMap.entries())
-        .map(([status, count]) => ({ status, count }));
+      const callsByStatus = Array.from(callsByStatusMap.entries()).map(([status, count]) => ({
+        status,
+        count,
+      }));
 
       // Average duration by type
-      const audioSuccessful = calls.filter(c => c.call_type === 'audio' && c.duration_seconds && c.duration_seconds > 0);
-      const videoSuccessful = calls.filter(c => c.call_type === 'video' && c.duration_seconds && c.duration_seconds > 0);
-      
+      const audioSuccessful = calls.filter(
+        (c) => c.call_type === 'audio' && c.duration_seconds && c.duration_seconds > 0
+      );
+      const videoSuccessful = calls.filter(
+        (c) => c.call_type === 'video' && c.duration_seconds && c.duration_seconds > 0
+      );
+
       const avgDurationByType = [
         {
           type: 'Audio',
-          duration: audioSuccessful.length > 0
-            ? Math.round(audioSuccessful.reduce((sum, c) => sum + (c.duration_seconds || 0), 0) / audioSuccessful.length)
-            : 0
+          duration:
+            audioSuccessful.length > 0
+              ? Math.round(
+                  audioSuccessful.reduce((sum, c) => sum + (c.duration_seconds || 0), 0) /
+                    audioSuccessful.length
+                )
+              : 0,
         },
         {
           type: 'Vidéo',
-          duration: videoSuccessful.length > 0
-            ? Math.round(videoSuccessful.reduce((sum, c) => sum + (c.duration_seconds || 0), 0) / videoSuccessful.length)
-            : 0
-        }
+          duration:
+            videoSuccessful.length > 0
+              ? Math.round(
+                  videoSuccessful.reduce((sum, c) => sum + (c.duration_seconds || 0), 0) /
+                    videoSuccessful.length
+                )
+              : 0,
+        },
       ];
 
       // Calls by hour of day
@@ -170,23 +188,24 @@ const CallAnalyticsDashboard = () => {
       for (let i = 0; i < 24; i++) {
         callsByHourMap.set(i, 0);
       }
-      calls.forEach(call => {
+      calls.forEach((call) => {
         const hour = new Date(call.created_at).getHours();
         callsByHourMap.set(hour, (callsByHourMap.get(hour) || 0) + 1);
       });
-      const callsByHour = Array.from(callsByHourMap.entries())
-        .map(([hour, count]) => ({ hour, count }));
+      const callsByHour = Array.from(callsByHourMap.entries()).map(([hour, count]) => ({
+        hour,
+        count,
+      }));
 
       // Quality metrics from feedbacks
       const totalFeedbacks = feedbacks?.length || 0;
-      const avgRating = totalFeedbacks > 0
-        ? feedbacks.reduce((sum, f) => sum + f.rating, 0) / totalFeedbacks
-        : 0;
+      const avgRating =
+        totalFeedbacks > 0 ? feedbacks.reduce((sum, f) => sum + f.rating, 0) / totalFeedbacks : 0;
 
-      const excellentCount = feedbacks?.filter(f => f.rating === 5).length || 0;
-      const goodCount = feedbacks?.filter(f => f.rating === 4).length || 0;
-      const fairCount = feedbacks?.filter(f => f.rating === 3).length || 0;
-      const poorCount = feedbacks?.filter(f => f.rating <= 2).length || 0;
+      const excellentCount = feedbacks?.filter((f) => f.rating === 5).length || 0;
+      const goodCount = feedbacks?.filter((f) => f.rating === 4).length || 0;
+      const fairCount = feedbacks?.filter((f) => f.rating === 3).length || 0;
+      const poorCount = feedbacks?.filter((f) => f.rating <= 2).length || 0;
 
       setStats({
         totalCalls,
@@ -204,15 +223,15 @@ const CallAnalyticsDashboard = () => {
           excellentCount,
           goodCount,
           fairCount,
-          poorCount
-        }
+          poorCount,
+        },
       });
     } catch (error) {
       console.error('Error fetching call stats:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible de charger les statistiques d'appels",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -233,28 +252,29 @@ const CallAnalyticsDashboard = () => {
       ended: 'Terminé',
       rejected: 'Rejeté',
       failed: 'Échoué',
-      missed: 'Manqué'
+      missed: 'Manqué',
     };
     return labels[status] || status;
   };
 
   const handleExportExcel = () => {
     if (!stats) return;
-    
+
     try {
       setExporting(true);
-      const timeRangeLabel = timeRange === '7d' ? '7 jours' : timeRange === '30d' ? '30 jours' : '90 jours';
+      const timeRangeLabel =
+        timeRange === '7d' ? '7 jours' : timeRange === '30d' ? '30 jours' : '90 jours';
       exportToExcel(stats, timeRangeLabel);
       toast({
-        title: "Export réussi",
-        description: "Le fichier Excel a été téléchargé avec succès",
+        title: 'Export réussi',
+        description: 'Le fichier Excel a été téléchargé avec succès',
       });
     } catch (error) {
       console.error('Error exporting to Excel:', error);
       toast({
         title: "Erreur d'export",
         description: "Impossible d'exporter les données en Excel",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setExporting(false);
@@ -263,21 +283,22 @@ const CallAnalyticsDashboard = () => {
 
   const handleExportPDF = async () => {
     if (!stats) return;
-    
+
     try {
       setExporting(true);
-      const timeRangeLabel = timeRange === '7d' ? '7 jours' : timeRange === '30d' ? '30 jours' : '90 jours';
+      const timeRangeLabel =
+        timeRange === '7d' ? '7 jours' : timeRange === '30d' ? '30 jours' : '90 jours';
       await exportToPDF(stats, timeRangeLabel, 'charts-container');
       toast({
-        title: "Export réussi",
-        description: "Le fichier PDF a été téléchargé avec succès",
+        title: 'Export réussi',
+        description: 'Le fichier PDF a été téléchargé avec succès',
       });
     } catch (error) {
       console.error('Error exporting to PDF:', error);
       toast({
         title: "Erreur d'export",
         description: "Impossible d'exporter les données en PDF",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setExporting(false);
@@ -382,9 +403,7 @@ const CallAnalyticsDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatDuration(stats.avgDuration)}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Par appel réussi
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">Par appel réussi</p>
           </CardContent>
         </Card>
 
@@ -395,9 +414,7 @@ const CallAnalyticsDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.successRate}%</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Appels terminés normalement
-            </p>
+            <p className="text-xs text-muted-foreground mt-1">Appels terminés normalement</p>
           </CardContent>
         </Card>
 
@@ -434,250 +451,283 @@ const CallAnalyticsDashboard = () => {
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <AreaChart data={stats.callsByDay}>
-                  <defs>
-                    <linearGradient id="colorCalls" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Area 
-                    type="monotone" 
-                    dataKey="count" 
-                    stroke={COLORS.primary} 
-                    fillOpacity={1} 
-                    fill="url(#colorCalls)" 
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="chart-capture">
-            <CardHeader>
-              <CardTitle data-chart-title>Appels par heure de la journée</CardTitle>
-              <CardDescription>Distribution des appels sur 24h</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={stats.callsByHour}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="hour" 
-                    label={{ value: 'Heure', position: 'insideBottom', offset: -5 }} 
-                  />
-                  <YAxis label={{ value: 'Nombre', angle: -90, position: 'insideLeft' }} />
-                  <Tooltip />
-                  <Line 
-                    type="monotone" 
-                    dataKey="count" 
-                    stroke={COLORS.secondary} 
-                    strokeWidth={2}
-                    dot={{ fill: COLORS.secondary, r: 4 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="distribution" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card className="chart-capture">
-              <CardHeader>
-                <CardTitle data-chart-title>Types d'appels</CardTitle>
-                <CardDescription>Audio vs Vidéo</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={[
-                        { name: 'Audio', value: stats.audioCallsCount },
-                        { name: 'Vidéo', value: stats.videoCallsCount }
-                      ]}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={100}
-                      fill="#8884d8"
-                      dataKey="value"
-                    >
-                      <Cell fill={COLORS.primary} />
-                      <Cell fill={COLORS.success} />
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card className="chart-capture">
-              <CardHeader>
-                <CardTitle data-chart-title>Statut des appels</CardTitle>
-                <CardDescription>Répartition par état final</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={stats.callsByStatus}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ status, percent }) => 
-                        `${getStatusLabel(status)}: ${(percent * 100).toFixed(0)}%`
-                      }
-                      outerRadius={100}
-                      fill="#8884d8"
-                      dataKey="count"
-                    >
-                      {stats.callsByStatus.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={STATUS_COLORS[entry.status] || COLORS.secondary} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="performance" className="space-y-4">
-          <Card className="chart-capture">
-            <CardHeader>
-              <CardTitle data-chart-title>Durée moyenne par type</CardTitle>
-              <CardDescription>Comparaison Audio vs Vidéo</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={stats.avgDurationByType}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="type" />
-                  <YAxis label={{ value: 'Secondes', angle: -90, position: 'insideLeft' }} />
-                  <Tooltip formatter={(value) => formatDuration(Number(value))} />
-                  <Bar dataKey="duration" fill={COLORS.accent} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            {stats.callsByStatus.map(({ status, count }) => (
-              <Card key={status}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {getStatusLabel(status)}
-                  </CardTitle>
-                  {status === 'ended' ? (
-                    <CheckCircle2 className="h-4 w-4" style={{ color: STATUS_COLORS[status] }} />
-                  ) : status === 'failed' || status === 'rejected' ? (
-                    <XCircle className="h-4 w-4" style={{ color: STATUS_COLORS[status] }} />
-                  ) : (
-                    <Phone className="h-4 w-4" style={{ color: STATUS_COLORS[status] }} />
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{count}</div>
-                  <Badge 
-                    variant="secondary" 
-                    className="mt-2"
-                    style={{ backgroundColor: STATUS_COLORS[status] + '20', color: STATUS_COLORS[status] }}
-                  >
-                    {((count / stats.totalCalls) * 100).toFixed(1)}%
-                  </Badge>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="quality" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Distribution des notes</CardTitle>
-                <CardDescription>Feedback utilisateurs</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart
-                    data={[
-                      { rating: '⭐⭐⭐⭐⭐', count: stats.qualityMetrics.excellentCount },
-                      { rating: '⭐⭐⭐⭐', count: stats.qualityMetrics.goodCount },
-                      { rating: '⭐⭐⭐', count: stats.qualityMetrics.fairCount },
-                      { rating: '⭐⭐ & ⭐', count: stats.qualityMetrics.poorCount }
-                    ]}
-                  >
+                    <defs>
+                      <linearGradient id="colorCalls" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.8} />
+                        <stop offset="95%" stopColor={COLORS.primary} stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="rating" />
+                    <XAxis dataKey="date" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="count">
-                      <Cell fill={COLORS.success} />
-                      <Cell fill={COLORS.primary} />
-                      <Cell fill={COLORS.warning} />
-                      <Cell fill={COLORS.danger} />
-                    </Bar>
+                    <Area
+                      type="monotone"
+                      dataKey="count"
+                      stroke={COLORS.primary}
+                      fillOpacity={1}
+                      fill="url(#colorCalls)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <Card className="chart-capture">
+              <CardHeader>
+                <CardTitle data-chart-title>Appels par heure de la journée</CardTitle>
+                <CardDescription>Distribution des appels sur 24h</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={stats.callsByHour}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                      dataKey="hour"
+                      label={{ value: 'Heure', position: 'insideBottom', offset: -5 }}
+                    />
+                    <YAxis label={{ value: 'Nombre', angle: -90, position: 'insideLeft' }} />
+                    <Tooltip />
+                    <Line
+                      type="monotone"
+                      dataKey="count"
+                      stroke={COLORS.secondary}
+                      strokeWidth={2}
+                      dot={{ fill: COLORS.secondary, r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="distribution" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card className="chart-capture">
+                <CardHeader>
+                  <CardTitle data-chart-title>Types d'appels</CardTitle>
+                  <CardDescription>Audio vs Vidéo</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: 'Audio', value: stats.audioCallsCount },
+                          { name: 'Vidéo', value: stats.videoCallsCount },
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        <Cell fill={COLORS.primary} />
+                        <Cell fill={COLORS.success} />
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card className="chart-capture">
+                <CardHeader>
+                  <CardTitle data-chart-title>Statut des appels</CardTitle>
+                  <CardDescription>Répartition par état final</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <PieChart>
+                      <Pie
+                        data={stats.callsByStatus}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ status, percent }) =>
+                          `${getStatusLabel(status)}: ${(percent * 100).toFixed(0)}%`
+                        }
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="count"
+                      >
+                        {stats.callsByStatus.map((entry, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={STATUS_COLORS[entry.status] || COLORS.secondary}
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="performance" className="space-y-4">
+            <Card className="chart-capture">
+              <CardHeader>
+                <CardTitle data-chart-title>Durée moyenne par type</CardTitle>
+                <CardDescription>Comparaison Audio vs Vidéo</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={stats.avgDurationByType}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="type" />
+                    <YAxis label={{ value: 'Secondes', angle: -90, position: 'insideLeft' }} />
+                    <Tooltip formatter={(value) => formatDuration(Number(value))} />
+                    <Bar dataKey="duration" fill={COLORS.accent} />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Métriques de qualité</CardTitle>
-                <CardDescription>Résumé des feedbacks</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Excellent (5⭐)</span>
-                    <Badge style={{ backgroundColor: COLORS.success + '20', color: COLORS.success }}>
-                      {stats.qualityMetrics.excellentCount} ({((stats.qualityMetrics.excellentCount / stats.qualityMetrics.totalFeedbacks) * 100).toFixed(1)}%)
+            <div className="grid gap-4 md:grid-cols-3">
+              {stats.callsByStatus.map(({ status, count }) => (
+                <Card key={status}>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">{getStatusLabel(status)}</CardTitle>
+                    {status === 'ended' ? (
+                      <CheckCircle2 className="h-4 w-4" style={{ color: STATUS_COLORS[status] }} />
+                    ) : status === 'failed' || status === 'rejected' ? (
+                      <XCircle className="h-4 w-4" style={{ color: STATUS_COLORS[status] }} />
+                    ) : (
+                      <Phone className="h-4 w-4" style={{ color: STATUS_COLORS[status] }} />
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{count}</div>
+                    <Badge
+                      variant="secondary"
+                      className="mt-2"
+                      style={{
+                        backgroundColor: STATUS_COLORS[status] + '20',
+                        color: STATUS_COLORS[status],
+                      }}
+                    >
+                      {((count / stats.totalCalls) * 100).toFixed(1)}%
                     </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Bon (4⭐)</span>
-                    <Badge style={{ backgroundColor: COLORS.primary + '20', color: COLORS.primary }}>
-                      {stats.qualityMetrics.goodCount} ({((stats.qualityMetrics.goodCount / stats.qualityMetrics.totalFeedbacks) * 100).toFixed(1)}%)
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Moyen (3⭐)</span>
-                    <Badge style={{ backgroundColor: COLORS.warning + '20', color: COLORS.warning }}>
-                      {stats.qualityMetrics.fairCount} ({((stats.qualityMetrics.fairCount / stats.qualityMetrics.totalFeedbacks) * 100).toFixed(1)}%)
-                    </Badge>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm">Mauvais (≤2⭐)</span>
-                    <Badge style={{ backgroundColor: COLORS.danger + '20', color: COLORS.danger }}>
-                      {stats.qualityMetrics.poorCount} ({((stats.qualityMetrics.poorCount / stats.qualityMetrics.totalFeedbacks) * 100).toFixed(1)}%)
-                    </Badge>
-                  </div>
-                </div>
-                
-                <div className="pt-4 border-t">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold">Note moyenne globale</span>
-                    <div className="text-2xl font-bold">
-                      {stats.qualityMetrics.avgRating.toFixed(2)}/5
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="quality" className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Distribution des notes</CardTitle>
+                  <CardDescription>Feedback utilisateurs</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart
+                      data={[
+                        { rating: '⭐⭐⭐⭐⭐', count: stats.qualityMetrics.excellentCount },
+                        { rating: '⭐⭐⭐⭐', count: stats.qualityMetrics.goodCount },
+                        { rating: '⭐⭐⭐', count: stats.qualityMetrics.fairCount },
+                        { rating: '⭐⭐ & ⭐', count: stats.qualityMetrics.poorCount },
+                      ]}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="rating" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="count">
+                        <Cell fill={COLORS.success} />
+                        <Cell fill={COLORS.primary} />
+                        <Cell fill={COLORS.warning} />
+                        <Cell fill={COLORS.danger} />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Métriques de qualité</CardTitle>
+                  <CardDescription>Résumé des feedbacks</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Excellent (5⭐)</span>
+                      <Badge
+                        style={{ backgroundColor: COLORS.success + '20', color: COLORS.success }}
+                      >
+                        {stats.qualityMetrics.excellentCount} (
+                        {(
+                          (stats.qualityMetrics.excellentCount /
+                            stats.qualityMetrics.totalFeedbacks) *
+                          100
+                        ).toFixed(1)}
+                        %)
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Bon (4⭐)</span>
+                      <Badge
+                        style={{ backgroundColor: COLORS.primary + '20', color: COLORS.primary }}
+                      >
+                        {stats.qualityMetrics.goodCount} (
+                        {(
+                          (stats.qualityMetrics.goodCount / stats.qualityMetrics.totalFeedbacks) *
+                          100
+                        ).toFixed(1)}
+                        %)
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Moyen (3⭐)</span>
+                      <Badge
+                        style={{ backgroundColor: COLORS.warning + '20', color: COLORS.warning }}
+                      >
+                        {stats.qualityMetrics.fairCount} (
+                        {(
+                          (stats.qualityMetrics.fairCount / stats.qualityMetrics.totalFeedbacks) *
+                          100
+                        ).toFixed(1)}
+                        %)
+                      </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Mauvais (≤2⭐)</span>
+                      <Badge
+                        style={{ backgroundColor: COLORS.danger + '20', color: COLORS.danger }}
+                      >
+                        {stats.qualityMetrics.poorCount} (
+                        {(
+                          (stats.qualityMetrics.poorCount / stats.qualityMetrics.totalFeedbacks) *
+                          100
+                        ).toFixed(1)}
+                        %)
+                      </Badge>
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Basé sur {stats.qualityMetrics.totalFeedbacks} évaluations
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+
+                  <div className="pt-4 border-t">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold">Note moyenne globale</span>
+                      <div className="text-2xl font-bold">
+                        {stats.qualityMetrics.avgRating.toFixed(2)}/5
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Basé sur {stats.qualityMetrics.totalFeedbacks} évaluations
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

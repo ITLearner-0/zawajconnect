@@ -1,7 +1,6 @@
-
 import LazyMatchCard from './LazyMatchCard';
-import { CompatibilityMatch } from "@/types/compatibility";
-import { EnhancedCompatibilityMatch } from "@/hooks/compatibility/utils/enhancedCompatibilityScoring";
+import { CompatibilityMatch } from '@/types/compatibility';
+import { EnhancedCompatibilityMatch } from '@/hooks/compatibility/utils/enhancedCompatibilityScoring';
 
 interface MatchCardProps {
   match: CompatibilityMatch | EnhancedCompatibilityMatch;

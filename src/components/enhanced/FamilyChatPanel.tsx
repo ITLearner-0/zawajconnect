@@ -9,18 +9,30 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Users, 
-  MessageCircle, 
-  Shield, 
-  Send, 
-  Eye, 
-  EyeOff, 
-  Clock, 
-  User, 
+import {
+  Users,
+  MessageCircle,
+  Shield,
+  Send,
+  Eye,
+  EyeOff,
+  Clock,
+  User,
   CheckCircle,
   XCircle,
   AlertTriangle,
@@ -28,7 +40,7 @@ import {
   Settings,
   FileText,
   Heart,
-  Star
+  Star,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -77,12 +89,16 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { familyMembers, supervisionStatus } = useFamilySupervision();
-  
-  const [supervisedConversations, setSupervisedConversations] = useState<SupervisedConversation[]>([]);
+
+  const [supervisedConversations, setSupervisedConversations] = useState<SupervisedConversation[]>(
+    []
+  );
   const [selectedConversation, setSelectedConversation] = useState<string | null>(matchId || null);
   const [conversationNotes, setConversationNotes] = useState<ConversationNote[]>([]);
   const [newNote, setNewNote] = useState('');
-  const [noteType, setNoteType] = useState<'observation' | 'concern' | 'approval' | 'guidance'>('observation');
+  const [noteType, setNoteType] = useState<'observation' | 'concern' | 'approval' | 'guidance'>(
+    'observation'
+  );
   const [isPrivateNote, setIsPrivateNote] = useState(false);
   const [familyMessage, setFamilyMessage] = useState('');
   const [showGuidanceDialog, setShowGuidanceDialog] = useState(false);
@@ -90,7 +106,7 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
 
   useEffect(() => {
     if (!user) return;
-    
+
     fetchSupervisedConversations();
     if (selectedConversation) {
       fetchConversationNotes();
@@ -104,15 +120,20 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
       // Get matches where user is a family supervisor
       const { data: matches, error } = await supabase
         .from('matches')
-        .select(`
+        .select(
+          `
           id,
           user1_id,
           user2_id,
           family_approved,
           user1_profile:profiles!matches_user1_id_fkey(full_name),
           user2_profile:profiles!matches_user2_id_fkey(full_name)
-        `)
-        .in('user1_id', familyMembers.map(fm => fm.user_id || fm.id))
+        `
+        )
+        .in(
+          'user1_id',
+          familyMembers.map((fm) => fm.user_id || fm.id)
+        )
         .eq('family_supervision_required', true);
 
       if (error) throw error;
@@ -151,11 +172,11 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
             last_message: lastMessage || {
               content: 'Aucun message',
               created_at: (match as any).created_at || new Date().toISOString(),
-              sender_id: ''
+              sender_id: '',
             },
             message_count: messageCount || 0,
             requires_attention: (moderationFlags?.length || 0) > 0,
-            family_approved: match.family_approved || false
+            family_approved: match.family_approved || false,
           };
         })
       );
@@ -164,9 +185,9 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
     } catch (error) {
       console.error('Error fetching supervised conversations:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les conversations supervisées",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les conversations supervisées',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -179,24 +200,30 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
     try {
       const { data, error } = await supabase
         .from('family_reviews')
-        .select(`
+        .select(
+          `
           *,
           family_member:family_members(full_name, relationship)
-        `)
+        `
+        )
         .eq('match_id', selectedConversation)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const notes: ConversationNote[] = (data || []).map(review => ({
+      const notes: ConversationNote[] = (data || []).map((review) => ({
         id: review.id,
         match_id: review.match_id,
         family_member_id: review.family_member_id,
-        note_type: review.status === 'approved' ? 'approval' : 
-                   review.status === 'rejected' ? 'concern' : 'observation',
+        note_type:
+          review.status === 'approved'
+            ? 'approval'
+            : review.status === 'rejected'
+              ? 'concern'
+              : 'observation',
         content: review.notes || '',
         created_at: review.created_at,
-        is_private: false // For now, all notes are visible to family
+        is_private: false, // For now, all notes are visible to family
       }));
 
       setConversationNotes(notes);
@@ -210,12 +237,14 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
 
     try {
       // Find current user's family member record
-      const currentFamilyMember = familyMembers.find(fm => fm.invited_user_id === user.id || fm.user_id === user.id);
+      const currentFamilyMember = familyMembers.find(
+        (fm) => fm.invited_user_id === user.id || fm.user_id === user.id
+      );
       if (!currentFamilyMember) {
         toast({
-          title: "Erreur",
+          title: 'Erreur',
           description: "Vous n'êtes pas autorisé à ajouter des notes",
-          variant: "destructive"
+          variant: 'destructive',
         });
         return;
       }
@@ -223,30 +252,28 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
       const reviewData = {
         match_id: selectedConversation,
         family_member_id: currentFamilyMember.id,
-        status: noteType === 'approval' ? 'approved' : 
-                noteType === 'concern' ? 'rejected' : 'reviewed',
-        notes: newNote.trim()
+        status:
+          noteType === 'approval' ? 'approved' : noteType === 'concern' ? 'rejected' : 'reviewed',
+        notes: newNote.trim(),
       };
 
-      const { error } = await supabase
-        .from('family_reviews')
-        .insert(reviewData);
+      const { error } = await supabase.from('family_reviews').insert(reviewData);
 
       if (error) throw error;
 
       setNewNote('');
       fetchConversationNotes();
-      
+
       toast({
-        title: "Note ajoutée",
-        description: "Votre note a été ajoutée avec succès"
+        title: 'Note ajoutée',
+        description: 'Votre note a été ajoutée avec succès',
       });
     } catch (error) {
       console.error('Error adding note:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'ajouter la note",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -259,27 +286,25 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
         match_id: selectedConversation,
         sender_id: user.id,
         content: `[Message de la famille] ${familyMessage.trim()}`,
-        is_family_supervised: true
+        is_family_supervised: true,
       };
 
-      const { error } = await supabase
-        .from('messages')
-        .insert(messageData);
+      const { error } = await supabase.from('messages').insert(messageData);
 
       if (error) throw error;
 
       setFamilyMessage('');
-      
+
       toast({
-        title: "Message envoyé",
-        description: "Votre message de supervision a été envoyé"
+        title: 'Message envoyé',
+        description: 'Votre message de supervision a été envoyé',
       });
     } catch (error) {
       console.error('Error sending family message:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'envoyer le message",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -295,31 +320,36 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
 
       if (error) throw error;
 
-      setSupervisedConversations(prev => prev.map(conv => 
-        conv.id === selectedConversation 
-          ? { ...conv, family_approved: approved }
-          : conv
-      ));
+      setSupervisedConversations((prev) =>
+        prev.map((conv) =>
+          conv.id === selectedConversation ? { ...conv, family_approved: approved } : conv
+        )
+      );
 
       toast({
-        title: approved ? "Conversation approuvée" : "Approbation retirée",
-        description: approved 
-          ? "La conversation a été approuvée par la famille"
-          : "L'approbation familiale a été retirée"
+        title: approved ? 'Conversation approuvée' : 'Approbation retirée',
+        description: approved
+          ? 'La conversation a été approuvée par la famille'
+          : "L'approbation familiale a été retirée",
       });
     } catch (error) {
       console.error('Error updating approval:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible de mettre à jour l'approbation",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
 
   const getConversationStatus = (conversation: SupervisedConversation) => {
     if (conversation.requires_attention) {
-      return { icon: AlertTriangle, color: 'text-red-500', bg: 'bg-red-50', text: 'Attention requise' };
+      return {
+        icon: AlertTriangle,
+        color: 'text-red-500',
+        bg: 'bg-red-50',
+        text: 'Attention requise',
+      };
     }
     if (conversation.family_approved) {
       return { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-50', text: 'Approuvée' };
@@ -327,7 +357,7 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
     return { icon: Clock, color: 'text-yellow-500', bg: 'bg-yellow-50', text: 'En attente' };
   };
 
-  const selectedConv = supervisedConversations.find(c => c.id === selectedConversation);
+  const selectedConv = supervisedConversations.find((c) => c.id === selectedConversation);
 
   if (loading) {
     return (
@@ -359,7 +389,7 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
             {supervisedConversations.map((conversation) => {
               const status = getConversationStatus(conversation);
               const StatusIcon = status.icon;
-              
+
               return (
                 <div
                   key={conversation.id}
@@ -381,7 +411,7 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
                       <StatusIcon className={`h-3 w-3 ${status.color}`} />
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary" className="text-xs">
@@ -414,10 +444,12 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
                 </CardTitle>
                 <div className="flex items-center gap-2">
                   <Button
-                    variant={selectedConv.family_approved ? "default" : "outline"}
+                    variant={selectedConv.family_approved ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => updateConversationApproval(!selectedConv.family_approved)}
-                    className={selectedConv.family_approved ? "bg-green-600 hover:bg-green-700" : ""}
+                    className={
+                      selectedConv.family_approved ? 'bg-green-600 hover:bg-green-700' : ''
+                    }
                   >
                     {selectedConv.family_approved ? (
                       <>
@@ -431,7 +463,7 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
                       </>
                     )}
                   </Button>
-                  
+
                   <Dialog open={showGuidanceDialog} onOpenChange={setShowGuidanceDialog}>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm">
@@ -469,7 +501,7 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
                 </div>
               </div>
             </CardHeader>
-            
+
             <CardContent className="space-y-6">
               {/* Conversation Stats */}
               <div className="grid grid-cols-3 gap-4">
@@ -533,9 +565,14 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
                   {conversationNotes.map((note) => (
                     <div key={note.id} className="p-3 border rounded-lg bg-secondary/10">
                       <div className="flex items-start justify-between mb-2">
-                        <Badge 
-                          variant={note.note_type === 'approval' ? 'default' : 
-                                 note.note_type === 'concern' ? 'destructive' : 'secondary'}
+                        <Badge
+                          variant={
+                            note.note_type === 'approval'
+                              ? 'default'
+                              : note.note_type === 'concern'
+                                ? 'destructive'
+                                : 'secondary'
+                          }
                           className="text-xs"
                         >
                           {note.note_type === 'observation' && 'Observation'}
@@ -550,7 +587,7 @@ const FamilyChatPanel: React.FC<FamilyChatPanelProps> = ({ matchId }) => {
                       <p className="text-sm">{note.content}</p>
                     </div>
                   ))}
-                  
+
                   {conversationNotes.length === 0 && (
                     <div className="text-center py-8 text-muted-foreground">
                       <FileText className="h-12 w-12 mx-auto mb-2 opacity-50" />

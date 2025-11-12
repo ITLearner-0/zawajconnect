@@ -1,12 +1,12 @@
-import { supabase } from "@/integrations/supabase/client";
-import { ProfileViewEvent, ProgressiveRevealSettings } from "@/types/enhancedPrivacy";
+import { supabase } from '@/integrations/supabase/client';
+import { ProfileViewEvent, ProgressiveRevealSettings } from '@/types/enhancedPrivacy';
 
 export class ProgressiveRevealService {
   private viewHistory = new Map<string, ProfileViewEvent[]>();
 
   async getRevealLevel(
-    viewerId: string, 
-    targetUserId: string, 
+    viewerId: string,
+    targetUserId: string,
     compatibilityScore?: number
   ): Promise<keyof ProgressiveRevealSettings['revealStages']> {
     try {
@@ -38,7 +38,7 @@ export class ProgressiveRevealService {
       if (conversationDays >= 3) return 'personal';
       if (conversationDays >= 1) return 'religious';
       if (compatibilityScore && compatibilityScore >= 50) return 'education';
-      
+
       return 'basic'; // Minimum reveal level
     } catch (error) {
       console.error('Error determining reveal level:', error);
@@ -81,7 +81,7 @@ export class ProgressiveRevealService {
           birth_date: filtered.birth_date,
           location: this.obfuscateLocation(filtered.location),
           profile_picture: this.blurImage(filtered.profile_picture),
-          gallery: filtered.gallery?.map((img: string) => this.blurImage(img)) || []
+          gallery: filtered.gallery?.map((img: string) => this.blurImage(img)) || [],
         };
 
       case 'education':
@@ -89,7 +89,7 @@ export class ProgressiveRevealService {
         return {
           ...this.filterProfileData(profile, 'basic'),
           education_level: filtered.education_level,
-          occupation: filtered.occupation
+          occupation: filtered.occupation,
         };
 
       case 'religious':
@@ -98,7 +98,7 @@ export class ProgressiveRevealService {
           ...this.filterProfileData(profile, 'education'),
           religious_practice_level: filtered.religious_practice_level,
           prayer_frequency: filtered.prayer_frequency,
-          madhab: filtered.madhab
+          madhab: filtered.madhab,
         };
 
       case 'personal':
@@ -107,7 +107,7 @@ export class ProgressiveRevealService {
           ...this.filterProfileData(profile, 'religious'),
           about_me: filtered.about_me,
           profile_picture: filtered.profile_picture, // Unblur photos
-          gallery: filtered.gallery || []
+          gallery: filtered.gallery || [],
         };
 
       case 'contact':
@@ -121,7 +121,7 @@ export class ProgressiveRevealService {
 
   private obfuscateLocation(location: string): string {
     if (!location) return '';
-    
+
     // Remove specific addresses, keep only city/region
     const parts = location.split(',');
     if (parts.length > 1) {
@@ -132,7 +132,7 @@ export class ProgressiveRevealService {
 
   private blurImage(imageUrl: string): string {
     if (!imageUrl) return '';
-    
+
     // Add blur filter parameter (this would be handled by your image service)
     return `${imageUrl}?blur=15&brightness=80`;
   }
@@ -150,7 +150,7 @@ export class ProgressiveRevealService {
         viewedUserId,
         timestamp: new Date(),
         revealLevel,
-        compatibilityScore
+        compatibilityScore,
       };
 
       // Store in memory (in production, you'd store in database)
@@ -158,7 +158,9 @@ export class ProgressiveRevealService {
       userViews.push(viewEvent);
       this.viewHistory.set(viewerId, userViews);
 
-      console.log(`Profile view logged: ${viewerId} viewed ${viewedUserId} at level ${revealLevel}`);
+      console.log(
+        `Profile view logged: ${viewerId} viewed ${viewedUserId} at level ${revealLevel}`
+      );
     } catch (error) {
       console.error('Error logging profile view:', error);
     }

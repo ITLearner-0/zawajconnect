@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types/profile';
@@ -23,7 +22,7 @@ const parseContentFlags = (flags: any): any[] => {
 const convertDbMessageToMessage = (dbMessage: any): Message => {
   return {
     ...dbMessage,
-    content_flags: parseContentFlags(dbMessage.content_flags)
+    content_flags: parseContentFlags(dbMessage.content_flags),
   };
 };
 
@@ -32,20 +31,20 @@ export const useMessageExchange = (conversationId: string | undefined) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
-  
+
   // Get current user directly from supabase session
   const [userId, setUserId] = useState<string | null>(null);
-  
+
   // Get moderation functions
-  const { 
-    violations, 
-    latestReport, 
-    monitoringEnabled, 
-    toggleMonitoring, 
-    loading: monitoringLoading, 
+  const {
+    violations,
+    latestReport,
+    monitoringEnabled,
+    toggleMonitoring,
+    loading: monitoringLoading,
     error: monitoringError,
     moderateMessageContent,
-    processContentFlags 
+    processContentFlags,
   } = useMessageModeration(conversationId, messages, userId);
 
   // Get current user ID
@@ -54,14 +53,16 @@ export const useMessageExchange = (conversationId: string | undefined) => {
       const { data } = await supabase.auth.getSession();
       setUserId(data.session?.user?.id || null);
     };
-    
+
     fetchUser();
-    
+
     // Also set up listener for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setUserId(session?.user?.id || null);
     });
-    
+
     return () => {
       subscription.unsubscribe();
     };
@@ -82,9 +83,9 @@ export const useMessageExchange = (conversationId: string | undefined) => {
         if (fetchError) {
           setError(fetchError.message);
           toast({
-            title: "Error fetching messages",
+            title: 'Error fetching messages',
             description: fetchError.message,
-            variant: "destructive"
+            variant: 'destructive',
           });
         } else {
           // Convert database messages to our Message type
@@ -95,9 +96,9 @@ export const useMessageExchange = (conversationId: string | undefined) => {
       } catch (err: any) {
         setError(err.message);
         toast({
-          title: "Error fetching messages",
+          title: 'Error fetching messages',
           description: err.message,
-          variant: "destructive"
+          variant: 'destructive',
         });
       } finally {
         setLoading(false);
@@ -109,19 +110,30 @@ export const useMessageExchange = (conversationId: string | undefined) => {
     // Subscribe to real-time updates
     const messageSubscription = supabase
       .channel(`messages-${conversationId}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, payload => {
-        if (payload.eventType === 'INSERT') {
-          const newMessage = convertDbMessageToMessage(payload.new);
-          setMessages(prevMessages => [...prevMessages, newMessage]);
-        } else if (payload.eventType === 'UPDATE') {
-          const updatedMessage = convertDbMessageToMessage(payload.new);
-          setMessages(prevMessages =>
-            prevMessages.map(msg => (msg.id === updatedMessage.id ? updatedMessage : msg))
-          );
-        } else if (payload.eventType === 'DELETE') {
-          setMessages(prevMessages => prevMessages.filter(msg => msg.id !== (payload.old as any).id));
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        (payload) => {
+          if (payload.eventType === 'INSERT') {
+            const newMessage = convertDbMessageToMessage(payload.new);
+            setMessages((prevMessages) => [...prevMessages, newMessage]);
+          } else if (payload.eventType === 'UPDATE') {
+            const updatedMessage = convertDbMessageToMessage(payload.new);
+            setMessages((prevMessages) =>
+              prevMessages.map((msg) => (msg.id === updatedMessage.id ? updatedMessage : msg))
+            );
+          } else if (payload.eventType === 'DELETE') {
+            setMessages((prevMessages) =>
+              prevMessages.filter((msg) => msg.id !== (payload.old as any).id)
+            );
+          }
         }
-      })
+      )
       .subscribe();
 
     return () => {
@@ -131,23 +143,27 @@ export const useMessageExchange = (conversationId: string | undefined) => {
 
   const sendMessage = async (content: string, attachments: string[] = []) => {
     if (!conversationId || !userId || !content.trim()) {
-      console.error("Cannot send message: Missing conversation ID, user ID, or content");
+      console.error('Cannot send message: Missing conversation ID, user ID, or content');
       return null;
     }
 
     try {
       // Check for violations before sending
       const { flags, isFiltered, filteredContent } = moderateMessageContent(content);
-      
+
       // Process any flags that were detected
       if (flags.length > 0) {
         const messageId = Math.random().toString(36).substring(2, 15); // Temp ID for pre-insert flagging
-        flags.forEach(flag => {
+        flags.forEach((flag) => {
           if (flag.flag_type && flag.severity) {
             processContentFlags(
-              messageId, 
-              'message', 
-              flag.flag_type as 'inappropriate' | 'harassment' | 'religious_violation' | 'suspicious',
+              messageId,
+              'message',
+              flag.flag_type as
+                | 'inappropriate'
+                | 'harassment'
+                | 'religious_violation'
+                | 'suspicious',
               flag.severity as 'low' | 'medium' | 'high'
             );
           }
@@ -166,8 +182,8 @@ export const useMessageExchange = (conversationId: string | undefined) => {
             is_read: false,
             is_wali_visible: true, // Default value
             content_flags: flags,
-            is_filtered: isFiltered
-          }
+            is_filtered: isFiltered,
+          },
         ])
         .select('*')
         .single();
@@ -175,9 +191,9 @@ export const useMessageExchange = (conversationId: string | undefined) => {
       if (sendError) {
         setError(sendError.message);
         toast({
-          title: "Error sending message",
+          title: 'Error sending message',
           description: sendError.message,
-          variant: "destructive"
+          variant: 'destructive',
         });
         return null;
       }
@@ -186,9 +202,9 @@ export const useMessageExchange = (conversationId: string | undefined) => {
     } catch (error: any) {
       setError(error.message);
       toast({
-        title: "Error sending message",
+        title: 'Error sending message',
         description: error.message,
-        variant: "destructive"
+        variant: 'destructive',
       });
       return null;
     }
@@ -204,6 +220,6 @@ export const useMessageExchange = (conversationId: string | undefined) => {
     monitoringEnabled,
     toggleMonitoring,
     monitoringLoading,
-    monitoringError: monitoringError || error
+    monitoringError: monitoringError || error,
   };
 };

@@ -1,4 +1,3 @@
-
 import { logger } from '@/services/logging/LoggingService';
 
 export class MemoryService {
@@ -7,7 +6,7 @@ export class MemoryService {
 
     const memory = (performance as any).memory;
     const memoryUsage = memory.usedJSHeapSize;
-    
+
     logger.logPerformance('memory-usage', memoryUsage / 1024 / 1024, 'MB');
     return memoryUsage;
   }

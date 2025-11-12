@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { DailyLimits } from '@/types/filters';
 
@@ -8,7 +7,7 @@ export class DailyLimitsService {
 
   static async getDailyLimits(userId: string): Promise<DailyLimits> {
     const today = new Date().toISOString().split('T')[0];
-    
+
     // First check localStorage for quick access
     const stored = localStorage.getItem(`${this.STORAGE_KEY}_${userId}`);
     if (stored) {
@@ -22,7 +21,7 @@ export class DailyLimitsService {
     const newLimits: DailyLimits = {
       suggestionsPerDay: this.SUGGESTIONS_LIMIT,
       currentDayCount: 0,
-      lastResetDate: today
+      lastResetDate: today,
     };
 
     localStorage.setItem(`${this.STORAGE_KEY}_${userId}`, JSON.stringify(newLimits));
@@ -31,14 +30,14 @@ export class DailyLimitsService {
 
   static async incrementSuggestionCount(userId: string): Promise<boolean> {
     const limits = await this.getDailyLimits(userId);
-    
+
     if (limits.currentDayCount >= limits.suggestionsPerDay) {
       return false; // Limit reached
     }
 
     limits.currentDayCount += 1;
     localStorage.setItem(`${this.STORAGE_KEY}_${userId}`, JSON.stringify(limits));
-    
+
     return true;
   }
 

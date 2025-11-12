@@ -1,14 +1,13 @@
-
-import { ProfileFormData, VerificationStatus, PrivacySettings } from "@/types/profile";
-import { useProfileFormState } from "./profile/useProfileFormState";
-import { useProfileVerification } from "./profile/useProfileVerification";
-import { usePrivacyManagement } from "./profile/usePrivacyManagement";
-import { useAccountVisibility } from "./profile/useAccountVisibility";
-import { useBlockedUsers } from "./profile/useBlockedUsers";
-import { useProfileSubmission } from "./profile/useProfileSubmission";
-import { useAuthSignOut } from "./profile/useAuthSignOut";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect } from "react";
+import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
+import { useProfileFormState } from './profile/useProfileFormState';
+import { useProfileVerification } from './profile/useProfileVerification';
+import { usePrivacyManagement } from './profile/usePrivacyManagement';
+import { useAccountVisibility } from './profile/useAccountVisibility';
+import { useBlockedUsers } from './profile/useBlockedUsers';
+import { useProfileSubmission } from './profile/useProfileSubmission';
+import { useAuthSignOut } from './profile/useAuthSignOut';
+import { supabase } from '@/integrations/supabase/client';
+import { useEffect } from 'react';
 
 interface UseProfileFormProps {
   initialFormData: ProfileFormData | null;
@@ -25,16 +24,16 @@ const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
   showAge: true,
   showLocation: true,
   showOccupation: true,
-  allowNonMatchMessages: true
+  allowNonMatchMessages: true,
 };
 
-export const useProfileForm = ({ 
-  initialFormData, 
+export const useProfileForm = ({
+  initialFormData,
   initialVerificationStatus,
   initialPrivacySettings,
   initialBlockedUsers,
   initialIsVisible,
-  userId
+  userId,
 }: UseProfileFormProps) => {
   // Form state management
   const { formData, handleChange, setFormData } = useProfileFormState({
@@ -52,29 +51,29 @@ export const useProfileForm = ({
       waliName: '',
       waliRelationship: '',
       waliContact: '',
-      gallery: []
-    }
+      gallery: [],
+    },
   });
 
   // Verification status
   const { verificationStatus, handleVerificationChange } = useProfileVerification({
-    initialVerificationStatus
+    initialVerificationStatus,
   });
-  
+
   // Privacy settings - initialize with default values if null
   const { privacySettings, handlePrivacySettingsChange } = usePrivacyManagement({
     userId: userId || undefined,
-    initialPrivacySettings: initialPrivacySettings || DEFAULT_PRIVACY_SETTINGS
+    initialPrivacySettings: initialPrivacySettings || DEFAULT_PRIVACY_SETTINGS,
   });
 
   // Account visibility
   const { isAccountVisible, toggleAccountVisibility } = useAccountVisibility({
-    initialIsVisible
+    initialIsVisible,
   });
 
   // Blocked users
   const blockedUsersData = useBlockedUsers(userId);
-  
+
   useEffect(() => {
     if (userId) {
       blockedUsersData.fetchBlockedUsers();
@@ -83,30 +82,30 @@ export const useProfileForm = ({
 
   // Profile submission
   const { submitProfile } = useProfileSubmission();
-  
+
   const handleSubmit = async () => {
     if (!userId) {
-      console.error("No user ID available");
+      console.error('No user ID available');
       return false;
     }
-    
-    console.log("handleSubmit called with:", {
+
+    console.log('handleSubmit called with:', {
       userId,
       formData,
-      privacySettings: privacySettings || DEFAULT_PRIVACY_SETTINGS
+      privacySettings: privacySettings || DEFAULT_PRIVACY_SETTINGS,
     });
-    
+
     const success = await submitProfile(
-      userId, 
-      formData, 
+      userId,
+      formData,
       privacySettings || DEFAULT_PRIVACY_SETTINGS,
       (savedData) => {
         // Update form data with the saved data to retain the information
         setFormData(savedData);
       }
     );
-    
-    console.log("submitProfile returned:", success);
+
+    console.log('submitProfile returned:', success);
     return success;
   };
 

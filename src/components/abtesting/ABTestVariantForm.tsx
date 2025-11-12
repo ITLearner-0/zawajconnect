@@ -1,14 +1,20 @@
-import { useState } from "react";
-import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Slider } from "@/components/ui/slider";
-import { toast } from "sonner";
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { Slider } from '@/components/ui/slider';
+import { toast } from 'sonner';
 
 interface ABTestVariantFormProps {
   reminderType: '7days' | '3days' | '1day';
@@ -30,35 +36,39 @@ interface FormData {
 export function ABTestVariantForm({ reminderType, onSuccess }: ABTestVariantFormProps) {
   const queryClient = useQueryClient();
   const [trafficAllocation, setTrafficAllocation] = useState(50);
-  
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormData>({
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<FormData>({
     defaultValues: {
       traffic_allocation: 50,
       email_tone: 'friendly',
-    }
+    },
   });
 
   const createVariant = useMutation({
     mutationFn: async (data: FormData) => {
-      const { error } = await supabase
-        .from('email_ab_tests')
-        .insert({
-          test_name: data.test_name,
-          reminder_type: reminderType,
-          variant_name: data.variant_name,
-          subject_line: data.subject_line,
-          offer_percentage: data.offer_percentage,
-          promo_code: data.promo_code,
-          email_tone: data.email_tone,
-          cta_text: data.cta_text,
-          traffic_allocation: data.traffic_allocation,
-          notes: data.notes,
-        });
-      
+      const { error } = await supabase.from('email_ab_tests').insert({
+        test_name: data.test_name,
+        reminder_type: reminderType,
+        variant_name: data.variant_name,
+        subject_line: data.subject_line,
+        offer_percentage: data.offer_percentage,
+        promo_code: data.promo_code,
+        email_tone: data.email_tone,
+        cta_text: data.cta_text,
+        traffic_allocation: data.traffic_allocation,
+        notes: data.notes,
+      });
+
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Variante créée avec succès!");
+      toast.success('Variante créée avec succès!');
       queryClient.invalidateQueries({ queryKey: ['ab-tests'] });
       onSuccess?.();
     },
@@ -148,9 +158,7 @@ export function ABTestVariantForm({ reminderType, onSuccess }: ABTestVariantForm
         </div>
 
         <div className="space-y-2 md:col-span-2">
-          <Label htmlFor="traffic_allocation">
-            Allocation du Trafic: {trafficAllocation}%
-          </Label>
+          <Label htmlFor="traffic_allocation">Allocation du Trafic: {trafficAllocation}%</Label>
           <Slider
             id="traffic_allocation"
             min={0}

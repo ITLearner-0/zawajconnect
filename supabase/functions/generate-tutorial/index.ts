@@ -1,9 +1,9 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
 import { handleError, handleAIError, successResponse, ErrorCode } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface TutorialRequest {
@@ -48,17 +48,21 @@ interface TutorialStep {
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { profile, islamicPrefs, completionStats }: TutorialRequest = await req.json();
-    
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       console.error('[GENERATE_TUTORIAL] LOVABLE_API_KEY not configured');
-      return handleError(new Error('API key missing'), ErrorCode.INTERNAL_ERROR, 'GENERATE_TUTORIAL');
+      return handleError(
+        new Error('API key missing'),
+        ErrorCode.INTERNAL_ERROR,
+        'GENERATE_TUTORIAL'
+      );
     }
 
     // Construire le contexte pour l'IA
@@ -106,80 +110,89 @@ Règles importantes :
 - Adapte le ton : encourageant, bienveillant et professionnel
 - Respecte les valeurs islamiques dans tes recommandations`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: 'google/gemini-2.5-flash',
         messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: contextPrompt }
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: contextPrompt },
         ],
         tools: [
           {
-            type: "function",
+            type: 'function',
             function: {
-              name: "generate_tutorial",
+              name: 'generate_tutorial',
               description: "Génère un tutoriel personnalisé d'amélioration de profil",
               parameters: {
-                type: "object",
+                type: 'object',
                 properties: {
                   steps: {
-                    type: "array",
+                    type: 'array',
                     items: {
-                      type: "object",
+                      type: 'object',
                       properties: {
                         id: {
-                          type: "string",
-                          description: "Identifiant unique de l'étape (ex: 'step-1')"
+                          type: 'string',
+                          description: "Identifiant unique de l'étape (ex: 'step-1')",
                         },
                         title: {
-                          type: "string",
-                          description: "Titre court et accrocheur de l'étape"
+                          type: 'string',
+                          description: "Titre court et accrocheur de l'étape",
                         },
                         description: {
-                          type: "string",
-                          description: "Description détaillée de ce qu'il faut faire"
+                          type: 'string',
+                          description: "Description détaillée de ce qu'il faut faire",
                         },
                         targetTab: {
-                          type: "string",
-                          enum: ["wizard", "photos", "islamic", "compatibility", "privacy"],
-                          description: "L'onglet où cette action doit être effectuée"
+                          type: 'string',
+                          enum: ['wizard', 'photos', 'islamic', 'compatibility', 'privacy'],
+                          description: "L'onglet où cette action doit être effectuée",
                         },
                         objective: {
-                          type: "string",
-                          description: "L'objectif spécifique à atteindre"
+                          type: 'string',
+                          description: "L'objectif spécifique à atteindre",
                         },
                         tips: {
-                          type: "array",
-                          items: { type: "string" },
-                          description: "2-4 conseils pratiques pour réussir cette étape"
+                          type: 'array',
+                          items: { type: 'string' },
+                          description: '2-4 conseils pratiques pour réussir cette étape',
                         },
                         estimatedTime: {
-                          type: "string",
-                          description: "Temps estimé (ex: '5 min', '10 min')"
+                          type: 'string',
+                          description: "Temps estimé (ex: '5 min', '10 min')",
                         },
                         priority: {
-                          type: "string",
-                          enum: ["high", "medium", "low"],
-                          description: "Niveau de priorité de cette étape"
-                        }
+                          type: 'string',
+                          enum: ['high', 'medium', 'low'],
+                          description: 'Niveau de priorité de cette étape',
+                        },
                       },
-                      required: ["id", "title", "description", "targetTab", "objective", "tips", "estimatedTime", "priority"],
-                      additionalProperties: false
-                    }
-                  }
+                      required: [
+                        'id',
+                        'title',
+                        'description',
+                        'targetTab',
+                        'objective',
+                        'tips',
+                        'estimatedTime',
+                        'priority',
+                      ],
+                      additionalProperties: false,
+                    },
+                  },
                 },
-                required: ["steps"],
-                additionalProperties: false
-              }
-            }
-          }
+                required: ['steps'],
+                additionalProperties: false,
+              },
+            },
+          },
         ],
-        tool_choice: { type: "function", function: { name: "generate_tutorial" } }
+        tool_choice: { type: 'function', function: { name: 'generate_tutorial' } },
       }),
     });
 
@@ -193,7 +206,11 @@ Règles importantes :
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
     if (!toolCall) {
       console.error('[GENERATE_TUTORIAL] No tool call in AI response:', data);
-      return handleError(new Error('Invalid AI response'), ErrorCode.AI_GATEWAY_ERROR, 'GENERATE_TUTORIAL');
+      return handleError(
+        new Error('Invalid AI response'),
+        ErrorCode.AI_GATEWAY_ERROR,
+        'GENERATE_TUTORIAL'
+      );
     }
 
     const tutorial = JSON.parse(toolCall.function.arguments);
@@ -201,11 +218,10 @@ Règles importantes :
     // Ajouter completed: false à chaque étape
     const stepsWithCompletion = tutorial.steps.map((step: TutorialStep) => ({
       ...step,
-      completed: false
+      completed: false,
     }));
 
     return successResponse({ steps: stepsWithCompletion });
-
   } catch (error) {
     return handleError(error, ErrorCode.INTERNAL_ERROR, 'GENERATE_TUTORIAL');
   }

@@ -42,24 +42,28 @@ Deno.serve(async (req) => {
     const now = new Date();
     const threeDaysFromNow = new Date(now);
     threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
-    
+
     const startOfDay = new Date(threeDaysFromNow);
     startOfDay.setHours(0, 0, 0, 0);
-    
+
     const endOfDay = new Date(threeDaysFromNow);
     endOfDay.setHours(23, 59, 59, 999);
 
-    console.log(`Searching for subscriptions expiring in 3 days: ${startOfDay.toISOString()} to ${endOfDay.toISOString()}`);
+    console.log(
+      `Searching for subscriptions expiring in 3 days: ${startOfDay.toISOString()} to ${endOfDay.toISOString()}`
+    );
 
     const { data: expiringSubscriptions, error: fetchError } = await supabaseAdmin
       .from('subscriptions')
-      .select(`
+      .select(
+        `
         id,
         user_id,
         plan_type,
         expires_at,
         profiles!inner(full_name)
-      `)
+      `
+      )
       .eq('status', 'active')
       .gte('expires_at', startOfDay.toISOString())
       .lte('expires_at', endOfDay.toISOString());
@@ -73,9 +77,9 @@ Deno.serve(async (req) => {
 
     if (!expiringSubscriptions || expiringSubscriptions.length === 0) {
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           message: 'No subscriptions expiring in 3 days',
-          count: 0 
+          count: 0,
         }),
         {
           status: 200,
@@ -110,7 +114,7 @@ Deno.serve(async (req) => {
 
         // Select A/B test variant
         const variant = await selectABVariant(supabaseAdmin, '3days');
-        
+
         if (!variant) {
           console.warn('No A/B variant found, skipping email for', subscription.id);
           results.errors.push(`No A/B variant configured for 3days reminder`);
@@ -130,14 +134,18 @@ Deno.serve(async (req) => {
         });
 
         // Generate email HTML
-        const emailHTML = generateEmailHTML(variant, {
-          userName,
-          expirationDate,
-          planType: subscription.plan_type,
-          daysUntilExpiry: 3,
-          subscriptionId: subscription.id,
-          userId: subscription.user_id,
-        }, trackingId || 'no-track');
+        const emailHTML = generateEmailHTML(
+          variant,
+          {
+            userName,
+            expirationDate,
+            planType: subscription.plan_type,
+            daysUntilExpiry: 3,
+            subscriptionId: subscription.id,
+            userId: subscription.user_id,
+          },
+          trackingId || 'no-track'
+        );
 
         try {
           const emailResponse = await resend.emails.send({
@@ -155,7 +163,9 @@ Deno.serve(async (req) => {
         }
       } catch (subscriptionError: any) {
         console.error(`Error processing subscription ${subscription.id}:`, subscriptionError);
-        results.errors.push(`Processing failed for ${subscription.id}: ${subscriptionError.message}`);
+        results.errors.push(
+          `Processing failed for ${subscription.id}: ${subscriptionError.message}`
+        );
       }
     }
 

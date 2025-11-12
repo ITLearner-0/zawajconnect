@@ -6,10 +6,5 @@
   "remoteRoot": "/public_html",
   "siteUrl": "https://zawajconnect.me",
   "deleteRemote": true,
-  "exclude": [
-    "**/*.map",
-    ".git/**",
-    ".DS_Store",
-    "node_modules/**"
-  ]
+  "exclude": ["**/*.map", ".git/**", ".DS_Store", "node_modules/**"]
 }

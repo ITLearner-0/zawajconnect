@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Violation } from '@/services/monitoring/types';
 import { Badge } from '@/components/ui/badge';
@@ -24,19 +23,27 @@ const ViolationItem: React.FC<ViolationItemProps> = ({ violation }) => {
 
   const getSeverityColor = () => {
     switch (violation.severity) {
-      case 'high': return 'bg-red-100/95 text-red-800 border-red-400 dark:bg-red-900/60 dark:text-red-200 dark:border-red-600/80';
-      case 'medium': return 'bg-amber-100/95 text-amber-800 border-amber-400 dark:bg-amber-900/60 dark:text-amber-200 dark:border-amber-600/80';
-      case 'low': return 'bg-blue-100/95 text-blue-800 border-blue-400 dark:bg-blue-900/60 dark:text-blue-200 dark:border-blue-600/80';
-      default: return 'bg-gray-100/95 text-gray-800 border-gray-400 dark:bg-gray-800/80 dark:text-gray-200 dark:border-gray-600/80';
+      case 'high':
+        return 'bg-red-100/95 text-red-800 border-red-400 dark:bg-red-900/60 dark:text-red-200 dark:border-red-600/80';
+      case 'medium':
+        return 'bg-amber-100/95 text-amber-800 border-amber-400 dark:bg-amber-900/60 dark:text-amber-200 dark:border-amber-600/80';
+      case 'low':
+        return 'bg-blue-100/95 text-blue-800 border-blue-400 dark:bg-blue-900/60 dark:text-blue-200 dark:border-blue-600/80';
+      default:
+        return 'bg-gray-100/95 text-gray-800 border-gray-400 dark:bg-gray-800/80 dark:text-gray-200 dark:border-gray-600/80';
     }
   };
-  
+
   const getBadgeColor = () => {
     switch (violation.severity) {
-      case 'high': return 'text-white bg-red-600 border-red-400 dark:text-white dark:border-red-400 dark:bg-red-700';
-      case 'medium': return 'text-black bg-amber-400 border-amber-500 dark:text-black dark:border-amber-400 dark:bg-amber-400';
-      case 'low': return 'text-white bg-blue-600 border-blue-400 dark:text-white dark:border-blue-400 dark:bg-blue-600';
-      default: return 'text-gray-600 border-gray-300 dark:text-gray-300 dark:border-gray-600/60 bg-gray-50 dark:bg-gray-800';
+      case 'high':
+        return 'text-white bg-red-600 border-red-400 dark:text-white dark:border-red-400 dark:bg-red-700';
+      case 'medium':
+        return 'text-black bg-amber-400 border-amber-500 dark:text-black dark:border-amber-400 dark:bg-amber-400';
+      case 'low':
+        return 'text-white bg-blue-600 border-blue-400 dark:text-white dark:border-blue-400 dark:bg-blue-600';
+      default:
+        return 'text-gray-600 border-gray-300 dark:text-gray-300 dark:border-gray-600/60 bg-gray-50 dark:bg-gray-800';
     }
   };
 

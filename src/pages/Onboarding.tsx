@@ -9,7 +9,13 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import PhotoUpload from '@/components/PhotoUpload';
@@ -36,19 +42,19 @@ import OnboardingTooltip from '@/components/onboarding/OnboardingTooltip';
 import ProfileExamplesModal from '@/components/onboarding/ProfileExamplesModal';
 import ProgressCelebration from '@/components/onboarding/ProgressCelebration';
 import { SaveStatusIndicator } from '@/components/SaveStatusIndicator';
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  User, 
-  Heart, 
-  Camera, 
-  MapPin, 
+import {
+  ArrowLeft,
+  ArrowRight,
+  User,
+  Heart,
+  Camera,
+  MapPin,
   CheckCircle,
   Sparkles,
   Star,
   Target,
   Settings,
-  Keyboard
+  Keyboard,
 } from 'lucide-react';
 
 interface ProfileData {
@@ -82,7 +88,7 @@ const Onboarding = () => {
   const { refreshUserData } = useUserData();
   const navigate = useNavigate();
   const { toast } = useToast();
-  
+
   const [showWelcome, setShowWelcome] = useState(true);
   const [showResumptionModal, setShowResumptionModal] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
@@ -104,7 +110,7 @@ const Onboarding = () => {
     bio: '',
     looking_for: '',
     interests: [],
-    avatar_url: ''
+    avatar_url: '',
   });
 
   const [skippedSections, setSkippedSections] = useState<string[]>([]);
@@ -119,7 +125,7 @@ const Onboarding = () => {
     halal_diet: true,
     smoking: '',
     desired_partner_sect: '',
-    importance_of_religion: ''
+    importance_of_religion: '',
   });
 
   const totalSteps = 4;
@@ -129,7 +135,7 @@ const Onboarding = () => {
   const validation = useOnboardingValidation({
     profileData,
     islamicPrefs,
-    currentStep
+    currentStep,
   });
 
   // Unified persistence hook - replaces useFormAutoSave, useEmergencyBackup, and useFormPersistence
@@ -137,7 +143,7 @@ const Onboarding = () => {
     profileData,
     islamicPrefs,
     currentStep,
-    skippedSections
+    skippedSections,
   });
 
   // Analytics tracking
@@ -153,7 +159,8 @@ const Onboarding = () => {
   const [interestsSuggestions, setInterestsSuggestions] = useState<string[]>([]);
 
   // Achievements hook
-  const { checkProfileComplete, checkSpeedMaster, checkDetailOriented } = useOnboardingAchievements();
+  const { checkProfileComplete, checkSpeedMaster, checkDetailOriented } =
+    useOnboardingAchievements();
   const [onboardingStartTime] = useState(Date.now());
 
   // Tutorial hook
@@ -165,32 +172,32 @@ const Onboarding = () => {
   const steps = [
     {
       id: 1,
-      title: "Informations personnelles",
-      description: "Nom, âge, localisation",
+      title: 'Informations personnelles',
+      description: 'Nom, âge, localisation',
       icon: <User className="w-5 h-5" />,
-      estimatedTime: "30s"
+      estimatedTime: '30s',
     },
     {
       id: 2,
-      title: "Profil détaillé",
-      description: "Éducation, profession, bio",
+      title: 'Profil détaillé',
+      description: 'Éducation, profession, bio',
       icon: <Settings className="w-5 h-5" />,
-      estimatedTime: "1min"
+      estimatedTime: '1min',
     },
     {
       id: 3,
-      title: "Préférences islamiques",
-      description: "Pratiques religieuses",
+      title: 'Préférences islamiques',
+      description: 'Pratiques religieuses',
       icon: <Heart className="w-5 h-5" />,
-      estimatedTime: "1min"
+      estimatedTime: '1min',
     },
     {
       id: 4,
-      title: "Objectifs",
-      description: "Ce que vous recherchez",
+      title: 'Objectifs',
+      description: 'Ce que vous recherchez',
       icon: <Target className="w-5 h-5" />,
-      estimatedTime: "30s"
-    }
+      estimatedTime: '30s',
+    },
   ];
 
   useEffect(() => {
@@ -198,16 +205,16 @@ const Onboarding = () => {
       navigate('/auth');
       return;
     }
-    
+
     // Check if this is a Wali user and redirect to Wali onboarding
     const userType = user.user_metadata?.user_type;
-    
+
     if (userType === 'wali') {
       const token = user.user_metadata?.invitation_token;
       navigate(`/wali-onboarding${token ? `?token=${token}` : ''}`);
       return;
     }
-    
+
     // PRIORITÉ: Charger d'abord les données de la base de données
     loadExistingData();
   }, [user, navigate]);
@@ -217,7 +224,7 @@ const Onboarding = () => {
 
     try {
       console.log('📂 Chargement des données avec le système unifié...');
-      
+
       // Check if onboarding is already completed in database
       const { data: profileCheck } = await supabase
         .from('profiles')
@@ -228,13 +235,13 @@ const Onboarding = () => {
       if (profileCheck?.onboarding_completed) {
         console.log('✅ Profil déjà complet - redirection vers /enhanced-profile');
         toast({
-          title: "Profil déjà complet",
-          description: "Vous avez déjà terminé votre onboarding. Redirection vers votre profil...",
+          title: 'Profil déjà complet',
+          description: 'Vous avez déjà terminé votre onboarding. Redirection vers votre profil...',
         });
         navigate('/enhanced-profile');
         return;
       }
-      
+
       // Use intelligent restore from unified persistence hook
       const restoredData = await persistence.restore();
 
@@ -266,18 +273,17 @@ const Onboarding = () => {
           setShowResumptionModal(true);
           setShowWelcome(false);
         }, 100);
-        
+
         console.log('✅ Données restaurées - modal affichée');
       } else {
         console.log('ℹ️ Aucune donnée sauvegardée trouvée');
       }
-      
     } catch (error) {
       console.error('❌ Erreur chargement données:', error);
       toast({
-        title: "Erreur de chargement",
-        description: "Impossible de charger vos données sauvegardées.",
-        variant: "destructive"
+        title: 'Erreur de chargement',
+        description: 'Impossible de charger vos données sauvegardées.',
+        variant: 'destructive',
       });
     }
   };
@@ -306,7 +312,7 @@ const Onboarding = () => {
       bio: '',
       looking_for: '',
       interests: [],
-      avatar_url: ''
+      avatar_url: '',
     });
     setIslamicPrefs({
       prayer_frequency: '',
@@ -318,7 +324,7 @@ const Onboarding = () => {
       halal_diet: true,
       smoking: '',
       desired_partner_sect: '',
-      importance_of_religion: ''
+      importance_of_religion: '',
     });
     setCurrentStep(1);
     setSkippedSections([]);
@@ -328,7 +334,7 @@ const Onboarding = () => {
   };
 
   const handleSkipSection = (sectionName: string) => {
-    setSkippedSections(prev => [...prev, sectionName]);
+    setSkippedSections((prev) => [...prev, sectionName]);
     // Track skipped section
     console.log(`Section skipped: ${sectionName}`);
     nextStep();
@@ -340,9 +346,9 @@ const Onboarding = () => {
       interests: profileData.interests,
       profession: profileData.profession,
       education: profileData.education,
-      lookingFor: profileData.looking_for
+      lookingFor: profileData.looking_for,
     });
-    
+
     if (result && Array.isArray(result)) {
       setBioSuggestions(result);
     }
@@ -357,9 +363,9 @@ const Onboarding = () => {
       importanceOfReligion: islamicPrefs.importance_of_religion,
       halalDiet: islamicPrefs.halal_diet,
       hijabPreference: islamicPrefs.hijab_preference,
-      beardPreference: islamicPrefs.beard_preference
+      beardPreference: islamicPrefs.beard_preference,
     });
-    
+
     if (result) {
       setIslamicSuggestions(result);
     }
@@ -369,9 +375,9 @@ const Onboarding = () => {
     const result = await suggestions.generateInterestsSuggestions({
       currentInterests: profileData.interests,
       profession: profileData.profession,
-      education: profileData.education
+      education: profileData.education,
     });
-    
+
     if (result && Array.isArray(result)) {
       setInterestsSuggestions(result);
     }
@@ -381,7 +387,7 @@ const Onboarding = () => {
     if (currentStep < totalSteps) {
       // Track step completion
       analytics.trackStepComplete(currentStep);
-      
+
       // Move to next step and track start
       const nextStepNumber = currentStep + 1;
       setCurrentStep(nextStepNumber);
@@ -393,7 +399,7 @@ const Onboarding = () => {
     if (currentStep > 1) {
       // Track step abandon when going back
       analytics.trackStepAbandon(currentStep, 'navigated_back');
-      
+
       const prevStepNumber = currentStep - 1;
       setCurrentStep(prevStepNumber);
       analytics.trackStepStart(prevStepNumber);
@@ -402,7 +408,7 @@ const Onboarding = () => {
 
   const saveProfile = async () => {
     if (!user) return false;
-    
+
     try {
       // Check if profile exists first
       const { data: existingProfile } = await supabase
@@ -417,23 +423,24 @@ const Onboarding = () => {
           .from('profiles')
           .update(profileData)
           .eq('user_id', user.id);
-        
+
         if (error) throw error;
       } else {
         // Insert or update profile using upsert to avoid conflicts
-        const { error } = await supabase
-          .from('profiles')
-          .upsert({
+        const { error } = await supabase.from('profiles').upsert(
+          {
             user_id: user.id,
-            ...profileData
-          }, {
+            ...profileData,
+          },
+          {
             onConflict: 'user_id',
-            ignoreDuplicates: false
-          });
-        
+            ignoreDuplicates: false,
+          }
+        );
+
         if (error) throw error;
       }
-      
+
       return true;
     } catch (error) {
       console.error('Error saving profile:', error);
@@ -443,16 +450,13 @@ const Onboarding = () => {
 
   const saveIslamicPreferences = async () => {
     if (!user) return false;
-    
+
     try {
       // Filter out empty strings and replace with null, remove undefined values
       const cleanPrefs = Object.fromEntries(
         Object.entries(islamicPrefs)
           .filter(([_, value]) => value !== undefined)
-          .map(([key, value]) => [
-            key,
-            value === '' || value === null ? null : value
-          ])
+          .map(([key, value]) => [key, value === '' || value === null ? null : value])
       );
 
       // Check if preferences exist first
@@ -468,17 +472,15 @@ const Onboarding = () => {
           .from('islamic_preferences')
           .update(cleanPrefs)
           .eq('user_id', user.id);
-        
+
         if (error) throw error;
       } else {
         // Insert new preferences
-        const { error } = await supabase
-          .from('islamic_preferences')
-          .insert({
-            user_id: user.id,
-            ...cleanPrefs
-          });
-        
+        const { error } = await supabase.from('islamic_preferences').insert({
+          user_id: user.id,
+          ...cleanPrefs,
+        });
+
         if (error) throw error;
       }
 
@@ -493,8 +495,8 @@ const Onboarding = () => {
     if (!user) {
       toast({
         title: "Erreur d'authentification",
-        description: "Vous devez être connecté pour finaliser votre profil.",
-        variant: "destructive"
+        description: 'Vous devez être connecté pour finaliser votre profil.',
+        variant: 'destructive',
       });
       return;
     }
@@ -508,9 +510,9 @@ const Onboarding = () => {
     // Validate required fields before saving
     if (!profileData.full_name || !profileData.age || !profileData.gender) {
       toast({
-        title: "Informations manquantes",
-        description: "Veuillez remplir tous les champs obligatoires.",
-        variant: "destructive"
+        title: 'Informations manquantes',
+        description: 'Veuillez remplir tous les champs obligatoires.',
+        variant: 'destructive',
       });
       return;
     }
@@ -520,57 +522,61 @@ const Onboarding = () => {
     if (!validGenders.includes(profileData.gender)) {
       console.error('Invalid gender value:', profileData.gender);
       toast({
-        title: "Erreur de validation",
-        description: "Veuillez sélectionner un genre valide.",
-        variant: "destructive"
+        title: 'Erreur de validation',
+        description: 'Veuillez sélectionner un genre valide.',
+        variant: 'destructive',
       });
       return;
     }
 
     console.log('Profile data before save:', JSON.stringify(profileData, null, 2));
     console.log('Islamic preferences before save:', JSON.stringify(islamicPrefs, null, 2));
-    
+
     // Double check gender value before calling hook
     console.log('ONBOARDING DEBUG - Gender value before save:', JSON.stringify(profileData.gender));
     console.log('ONBOARDING DEBUG - Gender type:', typeof profileData.gender);
-    console.log('ONBOARDING DEBUG - Is valid gender?', ['male', 'female'].includes(profileData.gender));
-    
+    console.log(
+      'ONBOARDING DEBUG - Is valid gender?',
+      ['male', 'female'].includes(profileData.gender)
+    );
+
     setSaving(true);
-    
+
     try {
       const result = await saveToDatabase(profileData, islamicPrefs);
-      
+
       if (result.success) {
         // Track onboarding completion
         analytics.trackOnboardingComplete();
-        
+
         // Check and unlock achievements
         await checkProfileComplete(calculateCompletionPercentage());
         await checkSpeedMaster(onboardingStartTime);
         if (profileData.bio) {
           await checkDetailOriented(profileData.bio.length);
         }
-        
+
         // Clear all saved data on successful completion
         persistence.clearAll();
-        
+
         // Refresh user data to update profileComplete status
         await refreshUserData();
-        
+
         navigate('/enhanced-profile');
       } else {
         toast({
-          title: "Erreur de sauvegarde",
-          description: result.error || "Une erreur est survenue lors de la sauvegarde de votre profil.",
-          variant: "destructive"
+          title: 'Erreur de sauvegarde',
+          description:
+            result.error || 'Une erreur est survenue lors de la sauvegarde de votre profil.',
+          variant: 'destructive',
         });
       }
     } catch (error) {
       console.error('Onboarding completion error:', error);
       toast({
-        title: "Erreur",
-        description: "Une erreur est survenue. Veuillez réessayer.",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Une erreur est survenue. Veuillez réessayer.',
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
@@ -599,10 +605,7 @@ const Onboarding = () => {
   // Show welcome screen first
   if (showWelcome) {
     return (
-      <OnboardingWelcome 
-        onStart={startOnboarding}
-        userName={user?.user_metadata?.full_name}
-      />
+      <OnboardingWelcome onStart={startOnboarding} userName={user?.user_metadata?.full_name} />
     );
   }
 
@@ -639,7 +642,7 @@ const Onboarding = () => {
                   id="fullName"
                   value={profileData.full_name}
                   onChange={(e) => {
-                    setProfileData({...profileData, full_name: e.target.value});
+                    setProfileData({ ...profileData, full_name: e.target.value });
                     if (e.target.value && tutorial.tutorialEnabled) {
                       tutorial.markFieldComplete('full_name');
                     }
@@ -656,7 +659,7 @@ const Onboarding = () => {
                     tips={[
                       'Soyez authentique - utilisez votre vrai nom',
                       'Évitez les pseudonymes ou surnoms',
-                      'La transparence est clé dans les rencontres halal'
+                      'La transparence est clé dans les rencontres halal',
                     ]}
                     example="Ahmed Ben Ali"
                     isVisible={true}
@@ -671,7 +674,9 @@ const Onboarding = () => {
                   id="age"
                   type="number"
                   value={profileData.age || ''}
-                  onChange={(e) => setProfileData({...profileData, age: parseInt(e.target.value) || undefined})}
+                  onChange={(e) =>
+                    setProfileData({ ...profileData, age: parseInt(e.target.value) || undefined })
+                  }
                   placeholder="Votre âge"
                   required
                 />
@@ -681,7 +686,10 @@ const Onboarding = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label>Genre *</Label>
-                <Select value={profileData.gender} onValueChange={(value) => setProfileData({...profileData, gender: value})}>
+                <Select
+                  value={profileData.gender}
+                  onValueChange={(value) => setProfileData({ ...profileData, gender: value })}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionnez votre genre" />
                   </SelectTrigger>
@@ -698,7 +706,7 @@ const Onboarding = () => {
                   <Input
                     id="location"
                     value={profileData.location}
-                    onChange={(e) => setProfileData({...profileData, location: e.target.value})}
+                    onChange={(e) => setProfileData({ ...profileData, location: e.target.value })}
                     placeholder="Ville, Pays"
                     className="pl-10"
                     required
@@ -728,7 +736,7 @@ const Onboarding = () => {
                 <Input
                   id="education"
                   value={profileData.education}
-                  onChange={(e) => setProfileData({...profileData, education: e.target.value})}
+                  onChange={(e) => setProfileData({ ...profileData, education: e.target.value })}
                   placeholder="Votre niveau d'éducation"
                   required
                 />
@@ -738,7 +746,7 @@ const Onboarding = () => {
                 <Input
                   id="profession"
                   value={profileData.profession}
-                  onChange={(e) => setProfileData({...profileData, profession: e.target.value})}
+                  onChange={(e) => setProfileData({ ...profileData, profession: e.target.value })}
                   placeholder="Votre profession"
                   required
                 />
@@ -764,7 +772,7 @@ const Onboarding = () => {
                   id="bio"
                   value={profileData.bio}
                   onChange={(e) => {
-                    setProfileData({...profileData, bio: e.target.value});
+                    setProfileData({ ...profileData, bio: e.target.value });
                     if (e.target.value.length > 50 && tutorial.tutorialEnabled) {
                       tutorial.markFieldComplete('bio');
                     }
@@ -780,10 +788,10 @@ const Onboarding = () => {
                     title="Votre biographie"
                     description="Présentez-vous de manière authentique et engageante"
                     tips={[
-                      'Visez 150-250 caractères pour l\'optimal',
+                      "Visez 150-250 caractères pour l'optimal",
                       'Parlez de vos valeurs, passions et objectifs',
                       'Soyez positif et authentique',
-                      'Mentionnez ce qui vous rend unique'
+                      'Mentionnez ce qui vous rend unique',
                     ]}
                     example="Ingénieur passionné par la technologie et l'innovation. J'aime voyager, découvrir de nouvelles cultures et pratiquer le sport. Je recherche une personne partageant mes valeurs pour construire une famille solide basée sur la foi et le respect mutuel."
                     isVisible={true}
@@ -793,7 +801,7 @@ const Onboarding = () => {
                   />
                 )}
               </div>
-              
+
               {/* Bio Suggestions */}
               {bioSuggestions.length > 0 && (
                 <SmartSuggestionPanel
@@ -801,7 +809,7 @@ const Onboarding = () => {
                   description="Cliquez sur une suggestion pour l'utiliser"
                   suggestions={bioSuggestions}
                   loading={suggestions.loading}
-                  onSelect={(suggestion) => setProfileData({...profileData, bio: suggestion})}
+                  onSelect={(suggestion) => setProfileData({ ...profileData, bio: suggestion })}
                   onRefresh={handleGenerateBioSuggestions}
                 />
               )}
@@ -821,7 +829,7 @@ const Onboarding = () => {
                   <span className="text-xs">Suggestions</span>
                 </Button>
               </div>
-              
+
               {/* Interests Suggestions */}
               {interestsSuggestions.length > 0 && (
                 <SmartSuggestionPanel
@@ -832,17 +840,17 @@ const Onboarding = () => {
                     if (!profileData.interests.includes(suggestion)) {
                       setProfileData({
                         ...profileData,
-                        interests: [...profileData.interests, suggestion]
+                        interests: [...profileData.interests, suggestion],
                       });
                     }
                   }}
                   compact
                 />
               )}
-              
-              <InterestsSelector 
+
+              <InterestsSelector
                 interests={profileData.interests}
-                onInterestsChange={(interests) => setProfileData({...profileData, interests})}
+                onInterestsChange={(interests) => setProfileData({ ...profileData, interests })}
               />
               {(!profileData.interests || profileData.interests.length === 0) && (
                 <div className="flex justify-center">
@@ -858,9 +866,9 @@ const Onboarding = () => {
             </div>
 
             <div className="space-y-4">
-              <PhotoUploadStep 
+              <PhotoUploadStep
                 avatarUrl={profileData.avatar_url}
-                onPhotoChange={(url) => setProfileData({...profileData, avatar_url: url})}
+                onPhotoChange={(url) => setProfileData({ ...profileData, avatar_url: url })}
                 userName={profileData.full_name}
               />
               {!profileData.avatar_url && (
@@ -890,7 +898,7 @@ const Onboarding = () => {
                 loading={suggestions.loading}
               />
             )}
-            
+
             <div className="flex justify-end">
               <Button
                 variant="outline"
@@ -903,7 +911,7 @@ const Onboarding = () => {
                 Analyser mes préférences
               </Button>
             </div>
-            
+
             <IslamicPreferencesStep
               preferences={islamicPrefs}
               onPreferencesChange={setIslamicPrefs}
@@ -930,7 +938,7 @@ const Onboarding = () => {
               <Textarea
                 id="lookingFor"
                 value={profileData.looking_for}
-                onChange={(e) => setProfileData({...profileData, looking_for: e.target.value})}
+                onChange={(e) => setProfileData({ ...profileData, looking_for: e.target.value })}
                 placeholder="Décrivez le type de partenaire que vous recherchez, vos valeurs communes, vos objectifs de mariage..."
                 rows={6}
                 required
@@ -939,16 +947,21 @@ const Onboarding = () => {
 
             <div>
               <Label>Secte du partenaire souhaité</Label>
-              <Select value={islamicPrefs.desired_partner_sect} onValueChange={(value) => setIslamicPrefs({...islamicPrefs, desired_partner_sect: value})}>
+              <Select
+                value={islamicPrefs.desired_partner_sect}
+                onValueChange={(value) =>
+                  setIslamicPrefs({ ...islamicPrefs, desired_partner_sect: value })
+                }
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionnez" />
                 </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="same_sect">Même secte que moi</SelectItem>
-                <SelectItem value="sunni">Sunnite</SelectItem>
-                <SelectItem value="shia">Chiite</SelectItem>
-                <SelectItem value="any">Peu importe</SelectItem>
-              </SelectContent>
+                <SelectContent>
+                  <SelectItem value="same_sect">Même secte que moi</SelectItem>
+                  <SelectItem value="sunni">Sunnite</SelectItem>
+                  <SelectItem value="shia">Chiite</SelectItem>
+                  <SelectItem value="any">Peu importe</SelectItem>
+                </SelectContent>
               </Select>
             </div>
 
@@ -959,7 +972,8 @@ const Onboarding = () => {
                   <div>
                     <h4 className="font-medium text-emerald">Profil presque terminé !</h4>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Une fois votre profil validé, vous pourrez découvrir des personnes compatibles selon vos valeurs islamiques.
+                      Une fois votre profil validé, vous pourrez découvrir des personnes compatibles
+                      selon vos valeurs islamiques.
                     </p>
                   </div>
                 </div>
@@ -1038,24 +1052,26 @@ const Onboarding = () => {
             <p className="text-muted-foreground">
               Quelques informations pour trouver votre âme sœur
             </p>
-            
+
             {/* Keyboard shortcut hint */}
             <button
               onClick={keyboardNav.toggleHelp}
               className="inline-flex items-center gap-2 mt-3 px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground bg-muted/50 hover:bg-muted rounded-full transition-colors"
             >
               <Keyboard className="h-3 w-3" />
-              <span>Appuyez sur <kbd className="px-1.5 py-0.5 bg-background border border-border rounded text-xs font-mono">?</kbd> pour les raccourcis</span>
+              <span>
+                Appuyez sur{' '}
+                <kbd className="px-1.5 py-0.5 bg-background border border-border rounded text-xs font-mono">
+                  ?
+                </kbd>{' '}
+                pour les raccourcis
+              </span>
             </button>
           </div>
 
           {/* Step Indicator */}
           <div className="mb-8">
-            <StepIndicator
-              steps={steps}
-              currentStep={currentStep}
-              onStepClick={handleStepClick}
-            />
+            <StepIndicator steps={steps} currentStep={currentStep} onStepClick={handleStepClick} />
           </div>
 
           <div className="grid lg:grid-cols-3 gap-8">
@@ -1074,7 +1090,7 @@ const Onboarding = () => {
                       <div className="text-sm text-muted-foreground mb-2">
                         Temps estimé: {steps[currentStep - 1]?.estimatedTime}
                       </div>
-                      <SaveStatusIndicator 
+                      <SaveStatusIndicator
                         status={persistence.saveStatus}
                         lastSaveTime={persistence.lastSaveTime}
                       />
@@ -1085,9 +1101,9 @@ const Onboarding = () => {
 
                 <CardContent className="space-y-6">
                   {renderStep()}
-                  
+
                   {/* Step Validation */}
-                  <StepValidation 
+                  <StepValidation
                     rules={validation.getCurrentStepRules()}
                     stepNumber={currentStep}
                   />

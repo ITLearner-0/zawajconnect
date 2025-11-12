@@ -14,16 +14,16 @@ const MatchApprovalWorkflow: React.FC = () => {
     approved: false,
     notes: '',
     conditions: [],
-    meetingRequired: false
+    meetingRequired: false,
   });
 
   const openApprovalDialog = (match: MatchApprovalData, approved: boolean) => {
     setSelectedMatch(match);
-    setDecision({ 
-      approved, 
-      notes: '', 
-      conditions: [], 
-      meetingRequired: false 
+    setDecision({
+      approved,
+      notes: '',
+      conditions: [],
+      meetingRequired: false,
     });
     setShowApprovalDialog(true);
   };

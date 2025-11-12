@@ -20,7 +20,7 @@ export const useOnboardingKeyboardNavigation = ({
   const [showHelp, setShowHelp] = useState(false);
 
   const toggleHelp = useCallback(() => {
-    setShowHelp(prev => !prev);
+    setShowHelp((prev) => !prev);
   }, []);
 
   const closeHelp = useCallback(() => {
@@ -31,10 +31,8 @@ export const useOnboardingKeyboardNavigation = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       // Ignore if user is typing in an input/textarea
       const target = event.target as HTMLElement;
-      const isInputField = 
-        target.tagName === 'INPUT' || 
-        target.tagName === 'TEXTAREA' || 
-        target.isContentEditable;
+      const isInputField =
+        target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
 
       // Show help panel with '?' or Shift+/ (which produces '?')
       if (event.key === '?' && !isInputField) {

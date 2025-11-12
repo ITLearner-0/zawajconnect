@@ -5,6 +5,7 @@
 Ce guide complet explique comment configurer tous les Cron Jobs nécessaires pour les emails automatiques de Zawaj-Connect.
 
 **Prérequis :**
+
 - Extensions `pg_cron` et `pg_net` activées dans Supabase
 - Service Role Key configurée
 - Edge functions déployées
@@ -56,10 +57,10 @@ DECLARE
   sender_profile RECORD;
 BEGIN
   -- Parcourir tous les matchs avec des messages non lus depuis plus de 24h
-  FOR user_record IN 
+  FOR user_record IN
     SELECT DISTINCT
       m.id as match_id,
-      CASE 
+      CASE
         WHEN m.user1_id = msg.sender_id THEN m.user2_id
         ELSE m.user1_id
       END as recipient_id,
@@ -71,7 +72,7 @@ BEGIN
     WHERE msg.is_read = false
     AND msg.created_at < (now() - INTERVAL '24 hours')
     AND m.conversation_status = 'active'
-    GROUP BY m.id, 
+    GROUP BY m.id,
       CASE WHEN m.user1_id = msg.sender_id THEN m.user2_id ELSE m.user1_id END,
       msg.sender_id
     HAVING COUNT(*) >= 1
@@ -80,7 +81,7 @@ BEGIN
     SELECT full_name INTO sender_profile
     FROM profiles
     WHERE user_id = user_record.sender_id;
-    
+
     -- Appeler la fonction d'envoi d'email via HTTP
     PERFORM net.http_post(
       url := 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/send-unread-messages-reminder',
@@ -137,8 +138,8 @@ DECLARE
   days_remaining INTEGER;
 BEGIN
   -- Parcourir les abonnements qui expirent dans 7, 3 ou 1 jour(s)
-  FOR sub_record IN 
-    SELECT 
+  FOR sub_record IN
+    SELECT
       s.user_id,
       s.plan_type,
       s.expires_at,
@@ -159,7 +160,7 @@ BEGIN
     )
   LOOP
     days_remaining := CEIL(sub_record.days_until_expiry);
-    
+
     -- Appeler la fonction d'envoi d'email
     PERFORM net.http_post(
       url := 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/send-subscription-expiring-email',
@@ -211,8 +212,8 @@ DECLARE
   missing_fields TEXT[];
   completion_pct INTEGER;
 BEGIN
-  FOR profile_record IN 
-    SELECT 
+  FOR profile_record IN
+    SELECT
       p.user_id,
       p.full_name,
       p.bio,
@@ -240,46 +241,46 @@ BEGIN
   LOOP
     -- Calculate missing fields
     missing_fields := ARRAY[]::TEXT[];
-    
+
     IF profile_record.bio IS NULL OR profile_record.bio = '' THEN
       missing_fields := array_append(missing_fields, 'bio');
     END IF;
-    
+
     IF profile_record.avatar_url IS NULL THEN
       missing_fields := array_append(missing_fields, 'avatar_url');
     END IF;
-    
+
     IF profile_record.education IS NULL THEN
       missing_fields := array_append(missing_fields, 'education');
     END IF;
-    
+
     IF profile_record.profession IS NULL THEN
       missing_fields := array_append(missing_fields, 'profession');
     END IF;
-    
+
     IF profile_record.interests IS NULL OR array_length(profile_record.interests, 1) = 0 THEN
       missing_fields := array_append(missing_fields, 'interests');
     END IF;
-    
+
     IF profile_record.location IS NULL THEN
       missing_fields := array_append(missing_fields, 'location');
     END IF;
-    
+
     IF profile_record.prayer_frequency IS NULL THEN
       missing_fields := array_append(missing_fields, 'prayer_frequency');
     END IF;
-    
+
     IF profile_record.quran_reading IS NULL THEN
       missing_fields := array_append(missing_fields, 'quran_reading');
     END IF;
-    
+
     IF profile_record.madhab IS NULL THEN
       missing_fields := array_append(missing_fields, 'madhab');
     END IF;
-    
+
     -- Calculate completion percentage
     completion_pct := 100 - (array_length(missing_fields, 1) * 11);
-    
+
     -- Send reminder email
     PERFORM net.http_post(
       url := 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/send-profile-reminder',
@@ -328,7 +329,7 @@ DECLARE
   user_record RECORD;
   suggestions JSONB;
 BEGIN
-  FOR user_record IN 
+  FOR user_record IN
     SELECT DISTINCT p.user_id
     FROM profiles p
     JOIN subscriptions s ON s.user_id = p.user_id
@@ -356,7 +357,7 @@ BEGIN
          OR (m.user2_id = user_record.user_id AND m.user1_id = pmd.user_id)
     )
     LIMIT 5;
-    
+
     IF suggestions IS NOT NULL AND jsonb_array_length(suggestions) > 0 THEN
       PERFORM net.http_post(
         url := 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/send-match-suggestions',
@@ -407,10 +408,10 @@ DECLARE
   featured_content JSONB;
 BEGIN
   -- Calculate edition number (months since Jan 2025)
-  edition_num := EXTRACT(YEAR FROM now())::INTEGER * 12 + 
-                 EXTRACT(MONTH FROM now())::INTEGER - 
+  edition_num := EXTRACT(YEAR FROM now())::INTEGER * 12 +
+                 EXTRACT(MONTH FROM now())::INTEGER -
                  (2025 * 12 + 1);
-  
+
   -- Prepare featured articles
   featured_content := jsonb_build_array(
     jsonb_build_object(
@@ -429,8 +430,8 @@ BEGIN
       'link', 'https://mariage-halal.com/guidance'
     )
   );
-  
-  FOR user_record IN 
+
+  FOR user_record IN
     SELECT p.user_id
     FROM profiles p
     WHERE p.created_at < (now() - INTERVAL '7 days')
@@ -485,7 +486,7 @@ DECLARE
 BEGIN
   -- Calculate week number
   week_num := EXTRACT(WEEK FROM now())::INTEGER;
-  
+
   -- Rotate tips based on week number
   tips_content := jsonb_build_array(
     jsonb_build_object(
@@ -504,8 +505,8 @@ BEGIN
       'icon', '⏳'
     )
   );
-  
-  FOR user_record IN 
+
+  FOR user_record IN
     SELECT p.user_id
     FROM profiles p
     WHERE p.created_at < (now() - INTERVAL '7 days')
@@ -546,7 +547,7 @@ SELECT cron.schedule(
 ### Lister tous les Cron Jobs actifs
 
 ```sql
-SELECT 
+SELECT
   jobid,
   schedule,
   command,
@@ -562,7 +563,7 @@ ORDER BY jobid;
 ### Voir l'historique d'exécution
 
 ```sql
-SELECT 
+SELECT
   jobid,
   runid,
   job_pid,
@@ -573,22 +574,22 @@ SELECT
   return_message,
   start_time,
   end_time
-FROM cron.job_run_details 
-ORDER BY start_time DESC 
+FROM cron.job_run_details
+ORDER BY start_time DESC
 LIMIT 20;
 ```
 
 ### Vérifier les erreurs récentes
 
 ```sql
-SELECT 
+SELECT
   jobid,
   status,
   return_message,
   start_time
-FROM cron.job_run_details 
+FROM cron.job_run_details
 WHERE status = 'failed'
-ORDER BY start_time DESC 
+ORDER BY start_time DESC
 LIMIT 10;
 ```
 
@@ -702,14 +703,14 @@ SELECT test_email_for_user('USER_ID_ICI');
 
 ## 📝 Résumé complet des Cron Jobs
 
-| Nom | Fréquence | Fonction | Description |
-|-----|-----------|----------|-------------|
-| send-unread-messages-reminders | Quotidien 10h | `check_unread_messages_and_notify()` | Rappel messages non lus (>24h) |
-| check-subscription-expiry | Quotidien 9h | `check_subscription_expiry_and_notify()` | Alerte expiration (7/3/1 jours avant) |
-| send-profile-completion-reminders | Dimanche 10h | `check_incomplete_profiles_and_notify()` | Rappel profil incomplet |
-| send-match-suggestions | Mar/Ven 14h | `send_match_suggestions_batch()` | Suggestions profils compatibles |
-| send-monthly-newsletter | 1er lundi 10h | `send_monthly_newsletter()` | Newsletter mensuelle |
-| send-weekly-tips | Mercredi 9h | `send_weekly_tips_batch()` | Conseils hebdomadaires |
+| Nom                               | Fréquence     | Fonction                                 | Description                           |
+| --------------------------------- | ------------- | ---------------------------------------- | ------------------------------------- |
+| send-unread-messages-reminders    | Quotidien 10h | `check_unread_messages_and_notify()`     | Rappel messages non lus (>24h)        |
+| check-subscription-expiry         | Quotidien 9h  | `check_subscription_expiry_and_notify()` | Alerte expiration (7/3/1 jours avant) |
+| send-profile-completion-reminders | Dimanche 10h  | `check_incomplete_profiles_and_notify()` | Rappel profil incomplet               |
+| send-match-suggestions            | Mar/Ven 14h   | `send_match_suggestions_batch()`         | Suggestions profils compatibles       |
+| send-monthly-newsletter           | 1er lundi 10h | `send_monthly_newsletter()`              | Newsletter mensuelle                  |
+| send-weekly-tips                  | Mercredi 9h   | `send_weekly_tips_batch()`               | Conseils hebdomadaires                |
 
 ## 🔧 Script d'installation complet
 

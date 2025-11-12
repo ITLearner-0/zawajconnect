@@ -1,5 +1,11 @@
 // @ts-nocheck
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Check, Crown, Sparkles } from 'lucide-react';
@@ -11,16 +17,20 @@ interface UpgradeToPremiumModalProps {
   reason?: 'daily_limit' | 'feature_locked';
 }
 
-export const UpgradeToPremiumModal = ({ open, onClose, reason = 'daily_limit' }: UpgradeToPremiumModalProps) => {
+export const UpgradeToPremiumModal = ({
+  open,
+  onClose,
+  reason = 'daily_limit',
+}: UpgradeToPremiumModalProps) => {
   const navigate = useNavigate();
 
   const premiumFeatures = [
-    "Profils détaillés illimités",
-    "Likes et mises en relation illimités",
-    "Messagerie complète",
-    "Supervision familiale incluse",
-    "Matching avancé avec score de compatibilité",
-    "Accès prioritaire aux nouveaux profils"
+    'Profils détaillés illimités',
+    'Likes et mises en relation illimités',
+    'Messagerie complète',
+    'Supervision familiale incluse',
+    'Matching avancé avec score de compatibilité',
+    'Accès prioritaire aux nouveaux profils',
   ];
 
   return (
@@ -32,9 +42,9 @@ export const UpgradeToPremiumModal = ({ open, onClose, reason = 'daily_limit' }:
             <DialogTitle className="text-2xl">Passez à Premium</DialogTitle>
           </div>
           <DialogDescription>
-            {reason === 'daily_limit' 
-              ? "Vous avez atteint votre limite quotidienne de 5 profils. Débloquez un accès illimité avec Premium !"
-              : "Cette fonctionnalité est réservée aux membres Premium."}
+            {reason === 'daily_limit'
+              ? 'Vous avez atteint votre limite quotidienne de 5 profils. Débloquez un accès illimité avec Premium !'
+              : 'Cette fonctionnalité est réservée aux membres Premium.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -102,7 +112,13 @@ export const UpgradeToPremiumModal = ({ open, onClose, reason = 'daily_limit' }:
   );
 };
 
-const PricingCard = ({ duration, pricePerMonth, badge, popular, discount }: Record<string, unknown>) => (
+const PricingCard = ({
+  duration,
+  pricePerMonth,
+  badge,
+  popular,
+  discount,
+}: Record<string, unknown>) => (
   <Card className={`p-4 ${popular ? 'border-2 border-emerald shadow-lg' : ''}`}>
     <div className="text-center space-y-2">
       <div className="text-xs font-medium text-emerald">{badge}</div>

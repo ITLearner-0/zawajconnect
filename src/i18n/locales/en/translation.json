@@ -1,4 +1,3 @@
-
 {
   "app": {
     "name": "Nikah Connect",
@@ -23,7 +22,7 @@
     "videoFeatures": "Video Features",
     "messagingTips": [
       "Click on a profile to start a conversation",
-      "Send messages with the chat input at the bottom", 
+      "Send messages with the chat input at the bottom",
       "Test message encryption and retention policies"
     ],
     "videoTips": [
@@ -58,7 +57,7 @@
       "subtitle": "Explore all our features with interactive demo profiles. Test messaging, video calls and discover how we respect Islamic values.",
       "features": {
         "secureMessaging": {
-          "title": "Secure Messaging", 
+          "title": "Secure Messaging",
           "description": "Real-time chat with end-to-end encryption"
         },
         "videoCalls": {
@@ -79,7 +78,7 @@
       "featuresToTest": "Features to Test",
       "stats": {
         "dailyTests": "Daily Tests",
-        "satisfaction": "Demo Satisfaction", 
+        "satisfaction": "Demo Satisfaction",
         "availability": "Availability",
         "secure": "Secure"
       },
@@ -94,7 +93,7 @@
         "description": "Designed according to Islamic principles"
       },
       "waliSupervision": {
-        "title": "Wali Supervision", 
+        "title": "Wali Supervision",
         "description": "Conversations supervised by guardian"
       },
       "respectfulCommunity": {
@@ -135,7 +134,7 @@
     "welcomeBack": "Welcome Back",
     "signUpToFind": "Sign up to find your compatible match",
     "signInToContinue": "Sign in to continue your journey",
-    "signIn": "Sign In", 
+    "signIn": "Sign In",
     "alreadyHaveAccount": "Already have an account? Sign in",
     "dontHaveAccount": "Don't have an account? Sign up",
     "firstName": "First Name",

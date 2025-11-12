@@ -4,7 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
@@ -30,7 +36,7 @@ const PrivacySettingsForm = () => {
     last_seen_visibility: 'matches_only',
     allow_messages_from: 'matches_only',
     allow_profile_views: true,
-    allow_family_involvement: false
+    allow_family_involvement: false,
   });
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -64,15 +70,15 @@ const PrivacySettingsForm = () => {
           last_seen_visibility: data.last_seen_visibility ?? 'matches_only',
           allow_messages_from: data.allow_messages_from ?? 'matches_only',
           allow_profile_views: data.allow_profile_views ?? true,
-          allow_family_involvement: data.allow_family_involvement ?? false
+          allow_family_involvement: data.allow_family_involvement ?? false,
         });
       }
     } catch (error) {
       console.error('Error loading privacy settings:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger vos paramètres de confidentialité",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger vos paramètres de confidentialité',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -84,51 +90,62 @@ const PrivacySettingsForm = () => {
 
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('privacy_settings')
-        .upsert({
-          user_id: user.id,
-          ...settings,
-          updated_at: new Date().toISOString()
-        });
+      const { error } = await supabase.from('privacy_settings').upsert({
+        user_id: user.id,
+        ...settings,
+        updated_at: new Date().toISOString(),
+      });
 
       if (error) throw error;
 
       toast({
-        title: "Paramètres sauvegardés",
-        description: "Vos paramètres de confidentialité ont été mis à jour",
+        title: 'Paramètres sauvegardés',
+        description: 'Vos paramètres de confidentialité ont été mis à jour',
       });
     } catch (error) {
       console.error('Error saving privacy settings:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder vos paramètres",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder vos paramètres',
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
     }
   };
 
-  const updateSetting = <K extends keyof PrivacySettings>(
-    key: K, 
-    value: PrivacySettings[K]
-  ) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+  const updateSetting = <K extends keyof PrivacySettings>(key: K, value: PrivacySettings[K]) => {
+    setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const visibilityOptions = [
     { value: 'public', label: 'Public', description: 'Visible par tous les utilisateurs' },
-    { value: 'matches_only', label: 'Matches uniquement', description: 'Visible seulement par vos matches' },
-    { value: 'family_approved', label: 'Approuvé par la famille', description: 'Nécessite approbation familiale' },
-    { value: 'private', label: 'Privé', description: 'Visible uniquement par vous' }
+    {
+      value: 'matches_only',
+      label: 'Matches uniquement',
+      description: 'Visible seulement par vos matches',
+    },
+    {
+      value: 'family_approved',
+      label: 'Approuvé par la famille',
+      description: 'Nécessite approbation familiale',
+    },
+    { value: 'private', label: 'Privé', description: 'Visible uniquement par vous' },
   ];
 
   const messageOptions = [
     { value: 'everyone', label: 'Tout le monde', description: 'Recevoir des messages de tous' },
-    { value: 'matches_only', label: 'Matches uniquement', description: 'Seulement de vos matches mutuels' },
-    { value: 'family_supervised', label: 'Supervisé par la famille', description: 'Messages approuvés par la famille' },
-    { value: 'none', label: 'Personne', description: 'Ne pas recevoir de messages' }
+    {
+      value: 'matches_only',
+      label: 'Matches uniquement',
+      description: 'Seulement de vos matches mutuels',
+    },
+    {
+      value: 'family_supervised',
+      label: 'Supervisé par la famille',
+      description: 'Messages approuvés par la famille',
+    },
+    { value: 'none', label: 'Personne', description: 'Ne pas recevoir de messages' },
   ];
 
   if (loading) {
@@ -153,7 +170,8 @@ const PrivacySettingsForm = () => {
             Confidentialité selon les Valeurs Islamiques
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Configurez vos paramètres de confidentialité en respectant les principes islamiques de modestie et de respect.
+            Configurez vos paramètres de confidentialité en respectant les principes islamiques de
+            modestie et de respect.
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -163,15 +181,15 @@ const PrivacySettingsForm = () => {
               <Eye className="h-4 w-4 text-emerald" />
               <Label className="text-base font-medium">Visibilité du Profil</Label>
             </div>
-            <Select 
-              value={settings.profile_visibility} 
+            <Select
+              value={settings.profile_visibility}
               onValueChange={(value) => updateSetting('profile_visibility', value)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {visibilityOptions.map(option => (
+                {visibilityOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     <div>
                       <div className="font-medium">{option.label}</div>
@@ -194,15 +212,15 @@ const PrivacySettingsForm = () => {
             <p className="text-sm text-muted-foreground">
               Contrôlez qui peut voir vos photos selon les principes islamiques de modestie.
             </p>
-            <Select 
-              value={settings.photo_visibility} 
+            <Select
+              value={settings.photo_visibility}
               onValueChange={(value) => updateSetting('photo_visibility', value)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {visibilityOptions.map(option => (
+                {visibilityOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     <div>
                       <div className="font-medium">{option.label}</div>
@@ -222,15 +240,15 @@ const PrivacySettingsForm = () => {
               <MessageCircle className="h-4 w-4 text-emerald" />
               <Label className="text-base font-medium">Informations de Contact</Label>
             </div>
-            <Select 
-              value={settings.contact_visibility} 
+            <Select
+              value={settings.contact_visibility}
               onValueChange={(value) => updateSetting('contact_visibility', value)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {visibilityOptions.map(option => (
+                {visibilityOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     <div>
                       <div className="font-medium">{option.label}</div>
@@ -250,15 +268,15 @@ const PrivacySettingsForm = () => {
               <Clock className="h-4 w-4 text-sage" />
               <Label className="text-base font-medium">Dernière Connexion</Label>
             </div>
-            <Select 
-              value={settings.last_seen_visibility} 
+            <Select
+              value={settings.last_seen_visibility}
               onValueChange={(value) => updateSetting('last_seen_visibility', value)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {visibilityOptions.map(option => (
+                {visibilityOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     <div>
                       <div className="font-medium">{option.label}</div>
@@ -278,15 +296,15 @@ const PrivacySettingsForm = () => {
               <MessageCircle className="h-4 w-4 text-emerald" />
               <Label className="text-base font-medium">Recevoir des Messages de</Label>
             </div>
-            <Select 
-              value={settings.allow_messages_from} 
+            <Select
+              value={settings.allow_messages_from}
               onValueChange={(value) => updateSetting('allow_messages_from', value)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {messageOptions.map(option => (
+                {messageOptions.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     <div>
                       <div className="font-medium">{option.label}</div>
@@ -350,19 +368,22 @@ const PrivacySettingsForm = () => {
             <div className="flex items-start gap-3">
               <div className="h-2 w-2 bg-gold rounded-full mt-2"></div>
               <p className="text-muted-foreground">
-                <strong>Modestie :</strong> Limitez la visibilité de vos photos aux matches sérieux pour respecter les principes islamiques de modestie.
+                <strong>Modestie :</strong> Limitez la visibilité de vos photos aux matches sérieux
+                pour respecter les principes islamiques de modestie.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <div className="h-2 w-2 bg-emerald rounded-full mt-2"></div>
               <p className="text-muted-foreground">
-                <strong>Supervision familiale :</strong> L'implication de la famille est encouragée dans l'Islam pour garantir des relations appropriées.
+                <strong>Supervision familiale :</strong> L'implication de la famille est encouragée
+                dans l'Islam pour garantir des relations appropriées.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <div className="h-2 w-2 bg-sage rounded-full mt-2"></div>
               <p className="text-muted-foreground">
-                <strong>Communication respectueuse :</strong> Limitez les messages pour maintenir des interactions appropriées et respectueuses.
+                <strong>Communication respectueuse :</strong> Limitez les messages pour maintenir
+                des interactions appropriées et respectueuses.
               </p>
             </div>
           </div>
@@ -371,7 +392,7 @@ const PrivacySettingsForm = () => {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button 
+        <Button
           onClick={savePrivacySettings}
           disabled={saving}
           className="bg-emerald hover:bg-emerald-dark text-primary-foreground"

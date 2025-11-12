@@ -1,26 +1,31 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Filter, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Save, 
+import {
+  Filter,
+  Plus,
+  Edit,
+  Trash2,
+  Save,
   Shield,
   Clock,
   MessageSquare,
   Users,
   CheckCircle,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
 import { AdvancedFiltersService, WaliFilter, FilterConfig } from '@/services/wali/advancedFilters';
 import { useToast } from '@/hooks/use-toast';
@@ -38,7 +43,7 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
   const [formData, setFormData] = useState({
     filter_name: '',
     filter_type: '',
-    filter_config: {} as FilterConfig
+    filter_config: {} as FilterConfig,
   });
 
   useEffect(() => {
@@ -53,9 +58,9 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
     } catch (error) {
       console.error('Error loading filters:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les filtres",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les filtres',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -64,12 +69,12 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
 
   const handleCreateFilter = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.filter_name || !formData.filter_type) {
       toast({
-        title: "Champs requis",
-        description: "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive"
+        title: 'Champs requis',
+        description: 'Veuillez remplir tous les champs obligatoires',
+        variant: 'destructive',
       });
       return;
     }
@@ -80,29 +85,29 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
         filter_name: formData.filter_name,
         filter_type: formData.filter_type as any,
         filter_config: formData.filter_config,
-        is_active: true
+        is_active: true,
       });
 
       if (result.success) {
         toast({
-          title: "Filtre créé",
-          description: "Le nouveau filtre a été créé avec succès",
+          title: 'Filtre créé',
+          description: 'Le nouveau filtre a été créé avec succès',
         });
         setShowCreateForm(false);
         resetForm();
         loadFilters();
       } else {
         toast({
-          title: "Erreur",
-          description: result.error || "Erreur lors de la création",
-          variant: "destructive"
+          title: 'Erreur',
+          description: result.error || 'Erreur lors de la création',
+          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Une erreur inattendue s'est produite",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -112,16 +117,16 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
       const result = await AdvancedFiltersService.updateFilter(filterId, { is_active: isActive });
       if (result.success) {
         toast({
-          title: isActive ? "Filtre activé" : "Filtre désactivé",
-          description: "Le statut du filtre a été mis à jour",
+          title: isActive ? 'Filtre activé' : 'Filtre désactivé',
+          description: 'Le statut du filtre a été mis à jour',
         });
         loadFilters();
       }
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Impossible de modifier le filtre",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de modifier le filtre',
+        variant: 'destructive',
       });
     }
   };
@@ -130,7 +135,7 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
     setFormData({
       filter_name: '',
       filter_type: '',
-      filter_config: {}
+      filter_config: {},
     });
     setEditingFilter(null);
   };
@@ -139,37 +144,47 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
     setFormData({
       filter_name: template.filter_name || '',
       filter_type: template.filter_type || '',
-      filter_config: template.filter_config || {}
+      filter_config: template.filter_config || {},
     });
   };
 
   const updateFilterConfig = (key: string, value: any) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       filter_config: {
         ...prev.filter_config,
-        [key]: value
-      }
+        [key]: value,
+      },
     }));
   };
 
   const getFilterIcon = (type: string) => {
     switch (type) {
-      case 'content': return <MessageSquare className="h-4 w-4" />;
-      case 'behavior': return <Users className="h-4 w-4" />;
-      case 'time': return <Clock className="h-4 w-4" />;
-      case 'contact': return <Shield className="h-4 w-4" />;
-      default: return <Filter className="h-4 w-4" />;
+      case 'content':
+        return <MessageSquare className="h-4 w-4" />;
+      case 'behavior':
+        return <Users className="h-4 w-4" />;
+      case 'time':
+        return <Clock className="h-4 w-4" />;
+      case 'contact':
+        return <Shield className="h-4 w-4" />;
+      default:
+        return <Filter className="h-4 w-4" />;
     }
   };
 
   const getFilterTypeLabel = (type: string) => {
     switch (type) {
-      case 'content': return 'Contenu';
-      case 'behavior': return 'Comportement';
-      case 'time': return 'Temporel';
-      case 'contact': return 'Contact';
-      default: return type;
+      case 'content':
+        return 'Contenu';
+      case 'behavior':
+        return 'Comportement';
+      case 'time':
+        return 'Temporel';
+      case 'contact':
+        return 'Contact';
+      default:
+        return type;
     }
   };
 
@@ -182,7 +197,15 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
               <Label>Mots Interdits (séparés par des virgules)</Label>
               <Textarea
                 value={formData.filter_config.blocked_words?.join(', ') || ''}
-                onChange={(e) => updateFilterConfig('blocked_words', e.target.value.split(',').map(w => w.trim()).filter(Boolean))}
+                onChange={(e) =>
+                  updateFilterConfig(
+                    'blocked_words',
+                    e.target.value
+                      .split(',')
+                      .map((w) => w.trim())
+                      .filter(Boolean)
+                  )
+                }
                 placeholder="mot1, mot2, mot3..."
               />
             </div>
@@ -190,7 +213,15 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
               <Label>Phrases Interdites (séparées par des virgules)</Label>
               <Textarea
                 value={formData.filter_config.blocked_phrases?.join(', ') || ''}
-                onChange={(e) => updateFilterConfig('blocked_phrases', e.target.value.split(',').map(p => p.trim()).filter(Boolean))}
+                onChange={(e) =>
+                  updateFilterConfig(
+                    'blocked_phrases',
+                    e.target.value
+                      .split(',')
+                      .map((p) => p.trim())
+                      .filter(Boolean)
+                  )
+                }
                 placeholder="phrase1, phrase2..."
               />
             </div>
@@ -205,7 +236,9 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
               <Input
                 type="number"
                 value={formData.filter_config.max_messages_per_hour || ''}
-                onChange={(e) => updateFilterConfig('max_messages_per_hour', parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  updateFilterConfig('max_messages_per_hour', parseInt(e.target.value) || 0)
+                }
                 placeholder="10"
               />
             </div>
@@ -214,7 +247,9 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
               <Input
                 type="number"
                 value={formData.filter_config.max_consecutive_messages || ''}
-                onChange={(e) => updateFilterConfig('max_consecutive_messages', parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  updateFilterConfig('max_consecutive_messages', parseInt(e.target.value) || 0)
+                }
                 placeholder="3"
               />
             </div>
@@ -258,7 +293,9 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
             <div className="flex items-center space-x-2">
               <Switch
                 checked={formData.filter_config.auto_approve_known_contacts || false}
-                onCheckedChange={(checked) => updateFilterConfig('auto_approve_known_contacts', checked)}
+                onCheckedChange={(checked) =>
+                  updateFilterConfig('auto_approve_known_contacts', checked)
+                }
               />
               <Label>Approuver automatiquement les contacts connus</Label>
             </div>
@@ -290,7 +327,9 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
             <Filter className="h-6 w-6" />
             Filtres Avancés
           </h2>
-          <p className="text-muted-foreground">Configurez des filtres automatiques pour la modération</p>
+          <p className="text-muted-foreground">
+            Configurez des filtres automatiques pour la modération
+          </p>
         </div>
         <Button onClick={() => setShowCreateForm(true)}>
           <Plus className="mr-2 h-4 w-4" />
@@ -343,7 +382,9 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
                   <Label>Nom du Filtre *</Label>
                   <Input
                     value={formData.filter_name}
-                    onChange={(e) => setFormData(prev => ({ ...prev, filter_name: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, filter_name: e.target.value }))
+                    }
                     placeholder="Nom descriptif du filtre"
                   />
                 </div>
@@ -351,7 +392,9 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
                   <Label>Type de Filtre *</Label>
                   <Select
                     value={formData.filter_type}
-                    onValueChange={(value) => setFormData(prev => ({ ...prev, filter_type: value, filter_config: {} }))}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, filter_type: value, filter_config: {} }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionnez le type" />
@@ -373,10 +416,14 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
                   <Save className="mr-2 h-4 w-4" />
                   {editingFilter ? 'Modifier' : 'Créer'}
                 </Button>
-                <Button type="button" variant="outline" onClick={() => {
-                  setShowCreateForm(false);
-                  resetForm();
-                }}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowCreateForm(false);
+                    resetForm();
+                  }}
+                >
                   Annuler
                 </Button>
               </div>
@@ -395,9 +442,7 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
         </CardHeader>
         <CardContent>
           {filters.length === 0 ? (
-            <p className="text-center text-muted-foreground py-4">
-              Aucun filtre configuré
-            </p>
+            <p className="text-center text-muted-foreground py-4">Aucun filtre configuré</p>
           ) : (
             <div className="space-y-4">
               {filters.map((filter) => (
@@ -422,10 +467,10 @@ const AdvancedFiltersConfig: React.FC<AdvancedFiltersConfigProps> = ({ wali_id }
                       </Button>
                     </div>
                   </div>
-                  
+
                   <div className="text-sm">
-                    <Badge variant={filter.is_active ? "default" : "secondary"}>
-                      {filter.is_active ? "Actif" : "Inactif"}
+                    <Badge variant={filter.is_active ? 'default' : 'secondary'}>
+                      {filter.is_active ? 'Actif' : 'Inactif'}
                     </Badge>
                   </div>
                 </div>

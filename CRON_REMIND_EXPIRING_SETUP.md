@@ -9,6 +9,7 @@ Cette edge function envoie des **emails de rappel automatiques** aux utilisateur
 ✅ **Détection automatique** des abonnements expirant dans 7 jours  
 ✅ **Emails personnalisés** avec le nom de l'utilisateur et détails de l'abonnement  
 ✅ **Offres de réduction exclusives** selon le type d'abonnement :
+
 - Premium 12 mois : **-15%** avec code `RENOUVELLEMENT15`
 - Premium 6 mois : **-10%** avec code `RENOUVELLEMENT10`
 - Premium 3 mois : **-5%** avec code `RENOUVELLEMENT5`
@@ -54,7 +55,7 @@ Exemples :
 
 ```sql
 -- View the scheduled job
-SELECT 
+SELECT
   jobid,
   jobname,
   schedule,
@@ -82,7 +83,7 @@ SELECT
 
 ```sql
 -- View cron job execution history
-SELECT 
+SELECT
   runid,
   jobid,
   job_name,
@@ -114,6 +115,7 @@ SELECT cron.unschedule('remind-expiring-subscriptions-daily');
 Les utilisateurs reçoivent un email professionnel contenant :
 
 ### 🎨 Design & Contenu
+
 - ⏰ **Compte à rebours visuel** : "7 JOURS" en grand et en couleur
 - 📅 **Date d'expiration précise** : Formatée en français
 - ⚠️ **Avertissement clair** : Liste des limitations du compte gratuit
@@ -123,19 +125,23 @@ Les utilisateurs reçoivent un email professionnel contenant :
 - 🎯 **CTA attractif** : Bouton jaune avec réduction visible
 
 ### 💰 Codes Promo par Type d'Abonnement
-| Type d'Abonnement | Réduction | Code Promo |
-|------------------|-----------|------------|
-| Premium 12 mois  | -15%      | `RENOUVELLEMENT15` |
-| Premium 6 mois   | -10%      | `RENOUVELLEMENT10` |
-| Premium 3 mois   | -5%       | `RENOUVELLEMENT5` |
+
+| Type d'Abonnement | Réduction | Code Promo         |
+| ----------------- | --------- | ------------------ |
+| Premium 12 mois   | -15%      | `RENOUVELLEMENT15` |
+| Premium 6 mois    | -10%      | `RENOUVELLEMENT10` |
+| Premium 3 mois    | -5%       | `RENOUVELLEMENT5`  |
 
 ### 🔗 CTA avec Paramètres
+
 Le bouton CTA redirige vers :
+
 ```
 https://mariage-halal.com/settings?renew=true&code={CODE_PROMO}
 ```
 
 Vous pouvez détecter ces paramètres dans votre page Settings pour :
+
 - Afficher un message personnalisé de renouvellement
 - Pré-remplir le code promo
 - Mettre en avant les options de renouvellement
@@ -143,6 +149,7 @@ Vous pouvez détecter ces paramètres dans votre page Settings pour :
 ## 🎯 Logique de Détection
 
 La fonction cherche les abonnements qui :
+
 1. ✅ Ont le statut `'active'`
 2. ✅ Ont une date `expires_at` entre :
    - Début : Aujourd'hui + 7 jours à 00:00:00
@@ -153,14 +160,16 @@ Exemple : Si exécuté le 10 janvier 2025, cherche les abonnements expirant le 1
 ## 📈 Métriques & Logs
 
 Chaque exécution génère un rapport avec :
+
 ```json
 {
   "success": true,
   "message": "Subscription reminder process completed",
   "results": {
-    "total": 15,           // Nombre total d'abonnements concernés
-    "emailsSent": 14,      // Nombre d'emails envoyés avec succès
-    "errors": [            // Liste des erreurs éventuelles
+    "total": 15, // Nombre total d'abonnements concernés
+    "emailsSent": 14, // Nombre d'emails envoyés avec succès
+    "errors": [
+      // Liste des erreurs éventuelles
       "No email found for user abc-123"
     ]
   }
@@ -170,13 +179,17 @@ Chaque exécution génère un rapport avec :
 ## 🔔 Notifications & Monitoring
 
 ### Logs Supabase
+
 Consultez les logs dans le dashboard Supabase pour :
+
 - Nombre d'abonnements détectés
 - Emails envoyés avec succès
 - Erreurs d'envoi (email invalide, Resend API down, etc.)
 
 ### Alertes Recommandées
+
 Configurez des alertes si :
+
 - ❌ Aucun email n'est envoyé pendant 7 jours consécutifs
 - ❌ Taux d'erreur > 20%
 - ❌ Échec de l'exécution du cron job
@@ -185,12 +198,12 @@ Configurez des alertes si :
 
 Cette fonction fait partie d'une stratégie en plusieurs étapes :
 
-| Timing | Action | Fonction |
-|--------|--------|----------|
+| Timing | Action                         | Fonction                                         |
+| ------ | ------------------------------ | ------------------------------------------------ |
 | J-7    | 🎁 Rappel avec offre exclusive | `remind-expiring-subscriptions` (CETTE FONCTION) |
-| J-3    | ⚠️ Deuxième rappel plus urgent | À créer |
-| J-1    | 🚨 Dernière chance | À créer |
-| J      | ❌ Expiration & downgrade | `expire-subscriptions` (existante) |
+| J-3    | ⚠️ Deuxième rappel plus urgent | À créer                                          |
+| J-1    | 🚨 Dernière chance             | À créer                                          |
+| J      | ❌ Expiration & downgrade      | `expire-subscriptions` (existante)               |
 
 ## 💡 Prochaines Améliorations
 
@@ -203,6 +216,7 @@ Cette fonction fait partie d'une stratégie en plusieurs étapes :
 ## ⚙️ Configuration Resend
 
 Assurez-vous que :
+
 - ✅ Le domaine d'envoi est vérifié sur Resend
 - ✅ La clé API `RESEND_API_KEY` est configurée
 - ✅ L'adresse `onboarding@resend.dev` est remplacée par votre domaine

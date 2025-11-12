@@ -1,4 +1,3 @@
-
 export type UserStatusType = 'online' | 'offline' | 'away';
 
 export type UserStatus = {

@@ -1,4 +1,3 @@
-
 // Re-export all analytics functions from their respective modules
 export { getAnalyticsData } from './core';
 export { getEmergencyStats } from './emergency';
@@ -17,5 +16,5 @@ export type {
   DemographicStat,
   FlagByType,
   EmergencyReport,
-  SupervisionTrend
+  SupervisionTrend,
 } from '@/types/analytics';

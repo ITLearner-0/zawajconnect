@@ -30,7 +30,9 @@ const WaliNotificationCenter: React.FC = () => {
 
   const loadNotifications = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data: familyMembers } = await supabase
@@ -45,13 +47,16 @@ const WaliNotificationCenter: React.FC = () => {
       const { data: notifications } = await supabase
         .from('family_notifications')
         .select('*')
-        .in('family_member_id', familyMembers.map(fm => fm.id))
+        .in(
+          'family_member_id',
+          familyMembers.map((fm) => fm.id)
+        )
         .order('created_at', { ascending: false })
         .limit(20);
 
       if (notifications) {
         setNotifications(notifications);
-        setUnreadCount(notifications.filter(n => !n.is_read).length);
+        setUnreadCount(notifications.filter((n) => !n.is_read).length);
       }
     } catch (error) {
       console.error('Error loading notifications:', error);
@@ -61,32 +66,36 @@ const WaliNotificationCenter: React.FC = () => {
   const setupRealtimeSubscription = () => {
     const channel = supabase
       .channel('wali-realtime-notifications')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'family_notifications'
-      }, (payload) => {
-        const newNotification = payload.new as WaliNotification;
-        setNotifications(prev => [newNotification, ...prev]);
-        setUnreadCount(prev => prev + 1);
-        
-        // Notification push immédiate pour les alertes critiques
-        if (newNotification.severity === 'critical') {
-          // Notification push browser si supporté
-          if ('Notification' in window && Notification.permission === 'granted') {
-            new Notification('🚨 Alerte Critique Wali', {
-              body: newNotification.content,
-              icon: '/favicon.ico'
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'family_notifications',
+        },
+        (payload) => {
+          const newNotification = payload.new as WaliNotification;
+          setNotifications((prev) => [newNotification, ...prev]);
+          setUnreadCount((prev) => prev + 1);
+
+          // Notification push immédiate pour les alertes critiques
+          if (newNotification.severity === 'critical') {
+            // Notification push browser si supporté
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('🚨 Alerte Critique Wali', {
+                body: newNotification.content,
+                icon: '/favicon.ico',
+              });
+            }
+
+            toast({
+              title: '🚨 Alerte Critique',
+              description: newNotification.content,
+              variant: 'destructive',
             });
           }
-          
-          toast({
-            title: "🚨 Alerte Critique",
-            description: newNotification.content,
-            variant: "destructive"
-          });
         }
-      })
+      )
       .subscribe();
 
     return () => supabase.removeChannel(channel);
@@ -99,12 +108,10 @@ const WaliNotificationCenter: React.FC = () => {
         .update({ is_read: true, read_at: new Date().toISOString() })
         .eq('id', id);
 
-      setNotifications(prev => 
-        prev.map(notif => 
-          notif.id === id ? { ...notif, is_read: true } : notif
-        )
+      setNotifications((prev) =>
+        prev.map((notif) => (notif.id === id ? { ...notif, is_read: true } : notif))
       );
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Error marking notification as read:', error);
     }
@@ -112,18 +119,25 @@ const WaliNotificationCenter: React.FC = () => {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'destructive';
-      case 'high': return 'destructive';
-      case 'medium': return 'secondary';
-      default: return 'outline';
+      case 'critical':
+        return 'destructive';
+      case 'high':
+        return 'destructive';
+      case 'medium':
+        return 'secondary';
+      default:
+        return 'outline';
     }
   };
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
-      case 'critical': return <AlertTriangle className="h-4 w-4 text-red-600" />;
-      case 'high': return <AlertTriangle className="h-4 w-4 text-orange-600" />;
-      default: return <MessageSquare className="h-4 w-4 text-blue-600" />;
+      case 'critical':
+        return <AlertTriangle className="h-4 w-4 text-red-600" />;
+      case 'high':
+        return <AlertTriangle className="h-4 w-4 text-orange-600" />;
+      default:
+        return <MessageSquare className="h-4 w-4 text-blue-600" />;
     }
   };
 
@@ -133,8 +147,8 @@ const WaliNotificationCenter: React.FC = () => {
       const permission = await Notification.requestPermission();
       if (permission === 'granted') {
         toast({
-          title: "Notifications activées",
-          description: "Vous recevrez des alertes en temps réel"
+          title: 'Notifications activées',
+          description: 'Vous recevrez des alertes en temps réel',
         });
       }
     }
@@ -150,8 +164,8 @@ const WaliNotificationCenter: React.FC = () => {
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
-            <Badge 
-              variant="destructive" 
+            <Badge
+              variant="destructive"
               className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
             >
               {unreadCount > 99 ? '99+' : unreadCount}
@@ -187,7 +201,10 @@ const WaliNotificationCenter: React.FC = () => {
                       {getSeverityIcon(notification.severity)}
                       <div className="flex-1 text-sm">
                         <div className="flex items-center gap-2 mb-1">
-                          <Badge variant={getSeverityColor(notification.severity)} className="text-xs">
+                          <Badge
+                            variant={getSeverityColor(notification.severity)}
+                            className="text-xs"
+                          >
                             {notification.severity.toUpperCase()}
                           </Badge>
                           <span className="text-xs text-muted-foreground">

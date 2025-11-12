@@ -17,17 +17,13 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        {children}
-      </BrowserRouter>
+      <BrowserRouter>{children}</BrowserRouter>
     </QueryClientProvider>
   );
 };
 
-const customRender = (
-  ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>,
-) => render(ui, { wrapper: AllTheProviders, ...options });
+const customRender = (ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) =>
+  render(ui, { wrapper: AllTheProviders, ...options });
 
 // Re-export everything
 export * from '@testing-library/react';
@@ -62,5 +58,4 @@ export const mockSession = {
 /**
  * Wait for async operations with timeout
  */
-export const waitForAsync = (ms = 100) =>
-  new Promise(resolve => setTimeout(resolve, ms));
+export const waitForAsync = (ms = 100) => new Promise((resolve) => setTimeout(resolve, ms));

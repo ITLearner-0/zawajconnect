@@ -1,4 +1,3 @@
-
 // Data encryption at rest service
 import CryptoJS from 'crypto-js';
 
@@ -33,23 +32,23 @@ export class DataEncryptionService {
   static encryptProfileData(profile: any) {
     const sensitiveFields = ['phone', 'address', 'wali_contact', 'birth_date'];
     const encrypted = { ...profile };
-    
-    sensitiveFields.forEach(field => {
+
+    sensitiveFields.forEach((field) => {
       if (encrypted[field]) {
         encrypted[`${field}_encrypted`] = this.encryptData(encrypted[field]);
         delete encrypted[field];
       }
     });
-    
+
     return encrypted;
   }
 
   // Decrypt profile data
   static decryptProfileData(encryptedProfile: any) {
     const decrypted = { ...encryptedProfile };
-    const encryptedFields = Object.keys(decrypted).filter(key => key.endsWith('_encrypted'));
-    
-    encryptedFields.forEach(field => {
+    const encryptedFields = Object.keys(decrypted).filter((key) => key.endsWith('_encrypted'));
+
+    encryptedFields.forEach((field) => {
       const originalField = field.replace('_encrypted', '');
       try {
         decrypted[originalField] = this.decryptData(decrypted[field]);
@@ -58,7 +57,7 @@ export class DataEncryptionService {
         console.warn(`Failed to decrypt ${originalField}:`, error);
       }
     });
-    
+
     return decrypted;
   }
 

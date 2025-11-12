@@ -4,7 +4,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Heart, Filter, RotateCcw } from 'lucide-react';
 
 interface CompatibilityFilterProps {
@@ -25,25 +31,25 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
     religiousImportance: [],
     economicAutonomy: [],
     careerFamily: [],
-    familyOriented: null
+    familyOriented: null,
   });
 
   const religiousOptions = [
     { value: 'very_important', label: 'Très important' },
     { value: 'important', label: 'Important' },
-    { value: 'somewhat_important', label: 'Assez important' }
+    { value: 'somewhat_important', label: 'Assez important' },
   ];
 
   const economicAutonomyOptions = [
     { value: 'financial_independence', label: 'Indépendance financière' },
     { value: 'shared_finances', label: 'Finances partagées' },
-    { value: 'traditional_roles', label: 'Rôles traditionnels' }
+    { value: 'traditional_roles', label: 'Rôles traditionnels' },
   ];
 
   const careerFamilyOptions = [
     { value: 'career_focused', label: 'Axé sur la carrière' },
     { value: 'family_focused', label: 'Axé sur la famille' },
-    { value: 'balanced_approach', label: 'Approche équilibrée' }
+    { value: 'balanced_approach', label: 'Approche équilibrée' },
   ];
 
   useEffect(() => {
@@ -51,29 +57,29 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
   }, [filters, onFilterChange]);
 
   const handleReligiousChange = (value: string, checked: boolean) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      religiousImportance: checked 
+      religiousImportance: checked
         ? [...prev.religiousImportance, value]
-        : prev.religiousImportance.filter(item => item !== value)
+        : prev.religiousImportance.filter((item) => item !== value),
     }));
   };
 
   const handleEconomicAutonomyChange = (value: string, checked: boolean) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      economicAutonomy: checked 
+      economicAutonomy: checked
         ? [...prev.economicAutonomy, value]
-        : prev.economicAutonomy.filter(item => item !== value)
+        : prev.economicAutonomy.filter((item) => item !== value),
     }));
   };
 
   const handleCareerFamilyChange = (value: string, checked: boolean) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      careerFamily: checked 
+      careerFamily: checked
         ? [...prev.careerFamily, value]
-        : prev.careerFamily.filter(item => item !== value)
+        : prev.careerFamily.filter((item) => item !== value),
     }));
   };
 
@@ -83,7 +89,7 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
       religiousImportance: [],
       economicAutonomy: [],
       careerFamily: [],
-      familyOriented: null
+      familyOriented: null,
     });
   };
 
@@ -101,13 +107,13 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
           Filtres de Compatibilité
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent className="space-y-6">
         {/* Compatibility Score Filter */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <Label>Score de compatibilité minimum</Label>
-            <Badge 
+            <Badge
               className={`${getCompatibilityColor(filters.minCompatibilityScore)} bg-transparent border`}
             >
               {filters.minCompatibilityScore}%+
@@ -115,7 +121,9 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
           </div>
           <Slider
             value={[filters.minCompatibilityScore ?? 70]}
-            onValueChange={([value]) => setFilters(prev => ({ ...prev, minCompatibilityScore: value ?? 70 }))}
+            onValueChange={([value]) =>
+              setFilters((prev) => ({ ...prev, minCompatibilityScore: value ?? 70 }))
+            }
             min={0}
             max={100}
             step={5}
@@ -132,7 +140,7 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
         <div className="space-y-3">
           <Label>Importance de la religion</Label>
           <div className="space-y-2">
-            {religiousOptions.map(option => (
+            {religiousOptions.map((option) => (
               <div key={option.value} className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -141,10 +149,7 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
                   onChange={(e) => handleReligiousChange(option.value, e.target.checked)}
                   className="rounded border-gray-300"
                 />
-                <label 
-                  htmlFor={`religious-${option.value}`}
-                  className="text-sm cursor-pointer"
-                >
+                <label htmlFor={`religious-${option.value}`} className="text-sm cursor-pointer">
                   {option.label}
                 </label>
               </div>
@@ -156,7 +161,7 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
         <div className="space-y-3">
           <Label>Autonomie économique</Label>
           <div className="space-y-2">
-            {economicAutonomyOptions.map(option => (
+            {economicAutonomyOptions.map((option) => (
               <div key={option.value} className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -165,10 +170,7 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
                   onChange={(e) => handleEconomicAutonomyChange(option.value, e.target.checked)}
                   className="rounded border-gray-300"
                 />
-                <label 
-                  htmlFor={`economic-${option.value}`}
-                  className="text-sm cursor-pointer"
-                >
+                <label htmlFor={`economic-${option.value}`} className="text-sm cursor-pointer">
                   {option.label}
                 </label>
               </div>
@@ -180,7 +182,7 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
         <div className="space-y-3">
           <Label>Carrière vs Famille</Label>
           <div className="space-y-2">
-            {careerFamilyOptions.map(option => (
+            {careerFamilyOptions.map((option) => (
               <div key={option.value} className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -189,10 +191,7 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
                   onChange={(e) => handleCareerFamilyChange(option.value, e.target.checked)}
                   className="rounded border-gray-300"
                 />
-                <label 
-                  htmlFor={`career-${option.value}`}
-                  className="text-sm cursor-pointer"
-                >
+                <label htmlFor={`career-${option.value}`} className="text-sm cursor-pointer">
                   {option.label}
                 </label>
               </div>
@@ -203,11 +202,11 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
         {/* Family Oriented */}
         <div className="space-y-3">
           <Label>Orienté famille</Label>
-          <Select 
+          <Select
             value={filters.familyOriented === null ? 'any' : filters.familyOriented.toString()}
             onValueChange={(value) => {
               const boolValue = value === 'any' ? null : value === 'true';
-              setFilters(prev => ({ ...prev, familyOriented: boolValue }));
+              setFilters((prev) => ({ ...prev, familyOriented: boolValue }));
             }}
           >
             <SelectTrigger>
@@ -222,8 +221,8 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
         </div>
 
         {/* Active Filters Summary */}
-        {(filters.religiousImportance.length > 0 || 
-          filters.economicAutonomy.length > 0 || 
+        {(filters.religiousImportance.length > 0 ||
+          filters.economicAutonomy.length > 0 ||
           filters.careerFamily.length > 0 ||
           filters.minCompatibilityScore > 50 ||
           filters.familyOriented !== null) && (
@@ -235,19 +234,19 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
                   Score ≥{filters.minCompatibilityScore}%
                 </Badge>
               )}
-              {filters.religiousImportance.map(item => (
+              {filters.religiousImportance.map((item) => (
                 <Badge key={item} variant="secondary" className="text-xs">
-                  {religiousOptions.find(opt => opt.value === item)?.label}
+                  {religiousOptions.find((opt) => opt.value === item)?.label}
                 </Badge>
               ))}
-              {filters.economicAutonomy.map(item => (
+              {filters.economicAutonomy.map((item) => (
                 <Badge key={item} variant="secondary" className="text-xs">
-                  {economicAutonomyOptions.find(opt => opt.value === item)?.label}
+                  {economicAutonomyOptions.find((opt) => opt.value === item)?.label}
                 </Badge>
               ))}
-              {filters.careerFamily.map(item => (
+              {filters.careerFamily.map((item) => (
                 <Badge key={item} variant="secondary" className="text-xs">
-                  {careerFamilyOptions.find(opt => opt.value === item)?.label}
+                  {careerFamilyOptions.find((opt) => opt.value === item)?.label}
                 </Badge>
               ))}
               {filters.familyOriented !== null && (
@@ -260,12 +259,7 @@ const CompatibilityFilter = ({ onFilterChange }: CompatibilityFilterProps) => {
         )}
 
         {/* Reset Button */}
-        <Button
-          variant="outline"
-          onClick={resetFilters}
-          className="w-full"
-          size="sm"
-        >
+        <Button variant="outline" onClick={resetFilters} className="w-full" size="sm">
           <RotateCcw className="h-4 w-4 mr-2" />
           Réinitialiser les filtres
         </Button>

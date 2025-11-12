@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 import { useRateLimiting } from '@/hooks/useRateLimiting';
@@ -20,13 +19,13 @@ interface SecurityProviderProps {
 export const SecurityProvider: React.FC<SecurityProviderProps> = ({ children }) => {
   const enhancedAuth = useEnhancedAuth();
   const rateLimiting = useRateLimiting();
-  
+
   // Apply security headers
   useSecurityHeaders();
 
   const value: SecurityContextType = {
     enhancedAuth,
-    rateLimiting
+    rateLimiting,
   };
 
   return (

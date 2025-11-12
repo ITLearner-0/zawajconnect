@@ -1,13 +1,12 @@
-
-import { MatchingFilters, UserResultWithProfile } from "../types/matchingTypes";
-import { logInfo } from "./loggingService";
+import { MatchingFilters, UserResultWithProfile } from '../types/matchingTypes';
+import { logInfo } from './loggingService';
 
 export class MatchingFiltersService {
   applyFilters(user: UserResultWithProfile, filters?: MatchingFilters): boolean {
     if (!filters) return true;
 
     const profile = user.profiles;
-    
+
     // Age filter
     if (filters.ageRange && profile.birth_date) {
       const age = this.calculateAge(profile.birth_date);
@@ -27,14 +26,15 @@ export class MatchingFiltersService {
     }
 
     // Religious level filter
-    if (filters.religiousLevel?.length && 
-        !filters.religiousLevel.includes(profile.religious_practice_level)) {
+    if (
+      filters.religiousLevel?.length &&
+      !filters.religiousLevel.includes(profile.religious_practice_level)
+    ) {
       return false;
     }
 
     // Verification filter
-    if (filters.verifiedOnly && 
-        !(profile.email_verified && profile.phone_verified)) {
+    if (filters.verifiedOnly && !(profile.email_verified && profile.phone_verified)) {
       return false;
     }
 
@@ -44,10 +44,10 @@ export class MatchingFiltersService {
   filterUsers(users: UserResultWithProfile[], filters?: MatchingFilters): UserResultWithProfile[] {
     if (!filters) return users;
 
-    const filteredUsers = users.filter(user => this.applyFilters(user, filters));
-    
+    const filteredUsers = users.filter((user) => this.applyFilters(user, filters));
+
     logInfo('filterUsers', `${filteredUsers.length} users passed filters out of ${users.length}`);
-    
+
     return filteredUsers;
   }
 
@@ -56,11 +56,11 @@ export class MatchingFiltersService {
     const today = new Date();
     let age = today.getFullYear() - birth.getFullYear();
     const monthDiff = today.getMonth() - birth.getMonth();
-    
+
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
       age--;
     }
-    
+
     return age;
   }
 }

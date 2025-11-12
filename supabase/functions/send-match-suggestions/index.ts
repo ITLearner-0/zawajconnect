@@ -1,9 +1,9 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { sendEmail } from "../_shared/smtp.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { sendEmail } from '../_shared/smtp.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface MatchSuggestionsRequest {
@@ -18,49 +18,49 @@ interface MatchSuggestionsRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { user_id, suggestions }: MatchSuggestionsRequest = await req.json();
 
-    console.log("Sending match suggestions to user:", user_id);
+    console.log('Sending match suggestions to user:', user_id);
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
     const profileResponse = await fetch(
       `${supabaseUrl}/rest/v1/profiles?user_id=eq.${user_id}&select=full_name`,
       {
         headers: {
-          "apikey": supabaseKey!,
-          "Authorization": `Bearer ${supabaseKey}`,
+          apikey: supabaseKey!,
+          Authorization: `Bearer ${supabaseKey}`,
         },
       }
     );
 
     const profiles = await profileResponse.json();
-    const userName = profiles[0]?.full_name || "Cher membre";
+    const userName = profiles[0]?.full_name || 'Cher membre';
 
-    const userResponse = await fetch(
-      `${supabaseUrl}/auth/v1/admin/users/${user_id}`,
-      {
-        headers: {
-          "apikey": supabaseKey!,
-          "Authorization": `Bearer ${supabaseKey}`,
-        },
-      }
-    );
+    const userResponse = await fetch(`${supabaseUrl}/auth/v1/admin/users/${user_id}`, {
+      headers: {
+        apikey: supabaseKey!,
+        Authorization: `Bearer ${supabaseKey}`,
+      },
+    });
 
     const userData = await userResponse.json();
     const userEmail = userData.email;
 
     if (!userEmail) {
-      throw new Error("User email not found");
+      throw new Error('User email not found');
     }
 
-    const suggestionsHtml = suggestions.slice(0, 3).map((suggestion, index) => `
+    const suggestionsHtml = suggestions
+      .slice(0, 3)
+      .map(
+        (suggestion, index) => `
       <div style="background: white; padding: 25px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #E2E8F0;">
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
           <div>
@@ -86,7 +86,9 @@ const handler = async (req: Request): Promise<Response> => {
           Voir le profil →
         </a>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     await sendEmail({
       to: userEmail,
@@ -131,7 +133,9 @@ const handler = async (req: Request): Promise<Response> => {
 
               ${suggestionsHtml}
 
-              ${suggestions.length > 3 ? `
+              ${
+                suggestions.length > 3
+                  ? `
               <div style="background: white; padding: 20px; margin: 20px 0; border-radius: 8px; text-align: center; border: 2px dashed #E2E8F0;">
                 <p style="color: #4A5568; font-size: 15px; margin: 0 0 10px 0;">
                   <strong style="color: #7C3AED;">+${suggestions.length - 3} autres profils</strong> vous attendent
@@ -140,7 +144,9 @@ const handler = async (req: Request): Promise<Response> => {
                   Voir tous les profils →
                 </a>
               </div>
-              ` : ''}
+              `
+                  : ''
+              }
 
               <div style="text-align: center; margin: 30px 0;">
                 <a href="https://dgfctwtivkqcfhwqgkya.supabase.co/matches" style="display: inline-block; background: linear-gradient(135deg, #7C3AED 0%, #DB2777 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px;">
@@ -173,24 +179,21 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Match suggestions sent successfully to:", userEmail);
+    console.log('Match suggestions sent successfully to:', userEmail);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         ...corsHeaders,
       },
     });
   } catch (error: any) {
-    console.error("Error in send-match-suggestions function:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    console.error('Error in send-match-suggestions function:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
   }
 };
 

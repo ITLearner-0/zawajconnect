@@ -2,7 +2,13 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, Star, Target, TrendingUp, User } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -73,10 +79,10 @@ export function TestUserSelector() {
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
-  const currentTestUser = TEST_USERS.find(u => u.email === user?.email);
+  const currentTestUser = TEST_USERS.find((u) => u.email === user?.email);
 
   const handleSwitchUser = async (userId: string) => {
-    const testUser = TEST_USERS.find(u => u.id === userId);
+    const testUser = TEST_USERS.find((u) => u.id === userId);
     if (!testUser) return;
 
     setLoading(true);
@@ -93,14 +99,14 @@ export function TestUserSelector() {
       if (error) throw error;
 
       toast.success(`Connecté en tant que ${testUser.name}`);
-      
+
       // Reload to update the entire app state
       setTimeout(() => {
         window.location.reload();
       }, 500);
     } catch (error) {
       console.error('Error switching user:', error);
-      toast.error('Erreur lors du changement d\'utilisateur');
+      toast.error("Erreur lors du changement d'utilisateur");
     } finally {
       setLoading(false);
     }
@@ -133,11 +139,15 @@ export function TestUserSelector() {
                 </div>
                 <div className="flex items-center gap-1">
                   <Trophy className="h-3 w-3 text-primary" />
-                  <span className="text-muted-foreground">{currentTestUser.achievements} achievements</span>
+                  <span className="text-muted-foreground">
+                    {currentTestUser.achievements} achievements
+                  </span>
                 </div>
                 <div className="flex items-center gap-1">
                   <TrendingUp className="h-3 w-3 text-primary" />
-                  <span className="text-muted-foreground">{currentTestUser.stats.viewCount} vues</span>
+                  <span className="text-muted-foreground">
+                    {currentTestUser.stats.viewCount} vues
+                  </span>
                 </div>
               </div>
             </div>
@@ -168,7 +178,7 @@ export function TestUserSelector() {
         {selectedUser && (
           <div className="space-y-3">
             {(() => {
-              const testUser = TEST_USERS.find(u => u.id === selectedUser);
+              const testUser = TEST_USERS.find((u) => u.id === selectedUser);
               if (!testUser) return null;
 
               return (
@@ -212,7 +222,9 @@ export function TestUserSelector() {
                     disabled={loading || currentTestUser?.id === selectedUser}
                     className="w-full"
                   >
-                    {loading ? 'Changement en cours...' : `Se connecter en tant que ${testUser.name}`}
+                    {loading
+                      ? 'Changement en cours...'
+                      : `Se connecter en tant que ${testUser.name}`}
                   </Button>
                 </>
               );
@@ -222,7 +234,8 @@ export function TestUserSelector() {
 
         <div className="pt-2 border-t border-border">
           <p className="text-xs text-muted-foreground">
-            💡 Mot de passe pour tous les utilisateurs test : <code className="text-foreground">TestUser123!</code>
+            💡 Mot de passe pour tous les utilisateurs test :{' '}
+            <code className="text-foreground">TestUser123!</code>
           </p>
         </div>
       </CardContent>

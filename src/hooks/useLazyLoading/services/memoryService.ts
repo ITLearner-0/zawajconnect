@@ -1,4 +1,3 @@
-
 // WeakRef polyfill for better browser compatibility
 interface WeakRefLike<T extends object> {
   deref(): T | undefined;
@@ -6,11 +5,11 @@ interface WeakRefLike<T extends object> {
 
 class WeakRefPolyfill<T extends object> implements WeakRefLike<T> {
   private ref: T | undefined;
-  
+
   constructor(target: T) {
     this.ref = target;
   }
-  
+
   deref(): T | undefined {
     return this.ref;
   }
@@ -138,12 +137,12 @@ export class MemoryManagementService {
     for (const [url, entry] of this.imageCache.entries()) {
       // Remove if element was garbage collected or hasn't been accessed recently
       const element = entry.element.deref();
-      if (!element || (now - entry.lastAccessed) > this.MAX_IDLE_TIME) {
+      if (!element || now - entry.lastAccessed > this.MAX_IDLE_TIME) {
         staleEntries.push(url);
       }
     }
 
-    staleEntries.forEach(url => this.imageCache.delete(url));
+    staleEntries.forEach((url) => this.imageCache.delete(url));
 
     if (process.env.NODE_ENV === 'development') {
       console.log(`Cleaned up ${staleEntries.length} stale image cache entries`);
@@ -159,8 +158,10 @@ export class MemoryManagementService {
 
   getMemoryStats(): MemoryStats {
     const totalCachedImages = this.imageCache.size;
-    const memoryUsage = Array.from(this.imageCache.values())
-      .reduce((total, entry) => total + entry.size, 0);
+    const memoryUsage = Array.from(this.imageCache.values()).reduce(
+      (total, entry) => total + entry.size,
+      0
+    );
 
     return {
       totalObservedElements: 0, // Will be updated by observer service

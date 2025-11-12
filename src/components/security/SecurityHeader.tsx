@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, AlertTriangle } from 'lucide-react';
@@ -27,8 +26,8 @@ const SecurityHeader = () => {
     <Alert className="border-yellow-200 bg-yellow-50 text-yellow-800 mb-4">
       <AlertTriangle className="h-4 w-4" />
       <AlertDescription>
-        {securityIssues.length} problème(s) de sécurité détecté(s). 
-        Veuillez vérifier vos paramètres de sécurité.
+        {securityIssues.length} problème(s) de sécurité détecté(s). Veuillez vérifier vos paramètres
+        de sécurité.
       </AlertDescription>
     </Alert>
   );

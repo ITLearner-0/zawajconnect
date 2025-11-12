@@ -1,25 +1,35 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  UserPlus, 
-  Users, 
-  Calendar, 
-  Shield, 
+import {
+  UserPlus,
+  Users,
+  Calendar,
+  Shield,
   Clock,
   CheckCircle,
   XCircle,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
-import { DelegationService, WaliDelegation, DelegateWali, DelegationPermission } from '@/services/wali/delegationService';
+import {
+  DelegationService,
+  WaliDelegation,
+  DelegateWali,
+  DelegationPermission,
+} from '@/services/wali/delegationService';
 import { useToast } from '@/hooks/use-toast';
 
 interface DelegationManagerProps {
@@ -27,10 +37,7 @@ interface DelegationManagerProps {
   managed_users: string[];
 }
 
-const DelegationManager: React.FC<DelegationManagerProps> = ({
-  wali_id,
-  managed_users
-}) => {
+const DelegationManager: React.FC<DelegationManagerProps> = ({ wali_id, managed_users }) => {
   const { toast } = useToast();
   const [delegations, setDelegations] = useState<WaliDelegation[]>([]);
   const [availableWalis, setAvailableWalis] = useState<DelegateWali[]>([]);
@@ -43,7 +50,7 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
     start_date: '',
     end_date: '',
     reason: '',
-    permissions: [] as DelegationPermission[]
+    permissions: [] as DelegationPermission[],
   });
 
   const defaultPermissions: DelegationPermission[] = [
@@ -51,7 +58,7 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
     { action: 'reject_requests', granted: false },
     { action: 'end_conversations', granted: false },
     { action: 'access_messages', granted: false },
-    { action: 'make_decisions', granted: false }
+    { action: 'make_decisions', granted: false },
   ];
 
   useEffect(() => {
@@ -63,18 +70,18 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
     try {
       const [delegationsList, walisList] = await Promise.all([
         DelegationService.getActiveDelegations(wali_id),
-        DelegationService.findAvailableWalis(wali_id)
+        DelegationService.findAvailableWalis(wali_id),
       ]);
-      
+
       setDelegations(delegationsList);
       setAvailableWalis(walisList);
-      setFormData(prev => ({ ...prev, permissions: defaultPermissions }));
+      setFormData((prev) => ({ ...prev, permissions: defaultPermissions }));
     } catch (error) {
       console.error('Error loading delegation data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données de délégation",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données de délégation',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -83,12 +90,12 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
 
   const handleCreateDelegation = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.delegate_wali_id || !formData.managed_user_id || !formData.delegation_type) {
       toast({
-        title: "Champs requis",
-        description: "Veuillez remplir tous les champs obligatoires",
-        variant: "destructive"
+        title: 'Champs requis',
+        description: 'Veuillez remplir tous les champs obligatoires',
+        variant: 'destructive',
       });
       return;
     }
@@ -102,28 +109,28 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
         permissions: formData.permissions,
         start_date: formData.start_date,
         end_date: formData.end_date,
-        reason: formData.reason
+        reason: formData.reason,
       });
 
       if (result.success) {
         toast({
-          title: "Délégation créée",
-          description: "La délégation a été créée avec succès",
+          title: 'Délégation créée',
+          description: 'La délégation a été créée avec succès',
         });
         setShowCreateForm(false);
         loadData();
       } else {
         toast({
-          title: "Erreur",
-          description: result.error || "Erreur lors de la création",
-          variant: "destructive"
+          title: 'Erreur',
+          description: result.error || 'Erreur lors de la création',
+          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Une erreur inattendue s'est produite",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -133,39 +140,57 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
       const result = await DelegationService.revokeDelegation(delegationId);
       if (result.success) {
         toast({
-          title: "Délégation révoquée",
-          description: "La délégation a été révoquée avec succès",
+          title: 'Délégation révoquée',
+          description: 'La délégation a été révoquée avec succès',
         });
         loadData();
       }
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Impossible de révoquer la délégation",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de révoquer la délégation',
+        variant: 'destructive',
       });
     }
   };
 
   const updatePermission = (action: string, granted: boolean) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      permissions: prev.permissions.map(p => 
-        p.action === action ? { ...p, granted } : p
-      )
+      permissions: prev.permissions.map((p) => (p.action === action ? { ...p, granted } : p)),
     }));
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge variant="default" className="bg-green-500"><CheckCircle className="h-3 w-3 mr-1" />Active</Badge>;
+        return (
+          <Badge variant="default" className="bg-green-500">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Active
+          </Badge>
+        );
       case 'pending':
-        return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />En attente</Badge>;
+        return (
+          <Badge variant="secondary">
+            <Clock className="h-3 w-3 mr-1" />
+            En attente
+          </Badge>
+        );
       case 'expired':
-        return <Badge variant="outline"><XCircle className="h-3 w-3 mr-1" />Expirée</Badge>;
+        return (
+          <Badge variant="outline">
+            <XCircle className="h-3 w-3 mr-1" />
+            Expirée
+          </Badge>
+        );
       case 'revoked':
-        return <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" />Révoquée</Badge>;
+        return (
+          <Badge variant="destructive">
+            <XCircle className="h-3 w-3 mr-1" />
+            Révoquée
+          </Badge>
+        );
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
@@ -173,12 +198,18 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
 
   const getPermissionLabel = (action: string) => {
     switch (action) {
-      case 'approve_conversations': return 'Approuver les conversations';
-      case 'reject_requests': return 'Rejeter les demandes';
-      case 'end_conversations': return 'Terminer les conversations';
-      case 'access_messages': return 'Accéder aux messages';
-      case 'make_decisions': return 'Prendre des décisions';
-      default: return action;
+      case 'approve_conversations':
+        return 'Approuver les conversations';
+      case 'reject_requests':
+        return 'Rejeter les demandes';
+      case 'end_conversations':
+        return 'Terminer les conversations';
+      case 'access_messages':
+        return 'Accéder aux messages';
+      case 'make_decisions':
+        return 'Prendre des décisions';
+      default:
+        return action;
     }
   };
 
@@ -202,11 +233,11 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
             <UserPlus className="h-6 w-6" />
             Gestion des Délégations
           </h2>
-          <p className="text-muted-foreground">Déléguer temporairement vos responsabilités à d'autres walis</p>
+          <p className="text-muted-foreground">
+            Déléguer temporairement vos responsabilités à d'autres walis
+          </p>
         </div>
-        <Button onClick={() => setShowCreateForm(true)}>
-          Nouvelle Délégation
-        </Button>
+        <Button onClick={() => setShowCreateForm(true)}>Nouvelle Délégation</Button>
       </div>
 
       {/* Create Form */}
@@ -220,14 +251,20 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  La délégation permet à un autre wali vérifié de superviser temporairement vos responsabilités.
+                  La délégation permet à un autre wali vérifié de superviser temporairement vos
+                  responsabilités.
                 </AlertDescription>
               </Alert>
 
               {/* Delegate Selection */}
               <div className="space-y-2">
                 <Label>Wali Délégué *</Label>
-                <Select value={formData.delegate_wali_id} onValueChange={(value) => setFormData(prev => ({ ...prev, delegate_wali_id: value }))}>
+                <Select
+                  value={formData.delegate_wali_id}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, delegate_wali_id: value }))
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionnez un wali" />
                   </SelectTrigger>
@@ -244,7 +281,12 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
               {/* Managed User Selection */}
               <div className="space-y-2">
                 <Label>Utilisateur Supervisé *</Label>
-                <Select value={formData.managed_user_id} onValueChange={(value) => setFormData(prev => ({ ...prev, managed_user_id: value }))}>
+                <Select
+                  value={formData.managed_user_id}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, managed_user_id: value }))
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionnez un utilisateur" />
                   </SelectTrigger>
@@ -261,7 +303,12 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
               {/* Delegation Type */}
               <div className="space-y-2">
                 <Label>Type de Délégation *</Label>
-                <Select value={formData.delegation_type} onValueChange={(value) => setFormData(prev => ({ ...prev, delegation_type: value }))}>
+                <Select
+                  value={formData.delegation_type}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, delegation_type: value }))
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionnez le type" />
                   </SelectTrigger>
@@ -280,7 +327,9 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
                   <Input
                     type="datetime-local"
                     value={formData.start_date}
-                    onChange={(e) => setFormData(prev => ({ ...prev, start_date: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, start_date: e.target.value }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -288,7 +337,7 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
                   <Input
                     type="datetime-local"
                     value={formData.end_date}
-                    onChange={(e) => setFormData(prev => ({ ...prev, end_date: e.target.value }))}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, end_date: e.target.value }))}
                   />
                 </div>
               </div>
@@ -301,7 +350,9 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
                     <Checkbox
                       id={permission.action}
                       checked={permission.granted}
-                      onCheckedChange={(checked) => updatePermission(permission.action, checked === true)}
+                      onCheckedChange={(checked) =>
+                        updatePermission(permission.action, checked === true)
+                      }
                     />
                     <Label htmlFor={permission.action} className="text-sm">
                       {getPermissionLabel(permission.action)}
@@ -315,7 +366,7 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
                 <Label>Raison de la Délégation</Label>
                 <Textarea
                   value={formData.reason}
-                  onChange={(e) => setFormData(prev => ({ ...prev, reason: e.target.value }))}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, reason: e.target.value }))}
                   placeholder="Expliquez la raison de cette délégation..."
                   rows={3}
                 />
@@ -326,9 +377,7 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
                 <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>
                   Annuler
                 </Button>
-                <Button type="submit">
-                  Créer la Délégation
-                </Button>
+                <Button type="submit">Créer la Délégation</Button>
               </div>
             </form>
           </CardContent>
@@ -345,9 +394,7 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
         </CardHeader>
         <CardContent>
           {delegations.length === 0 ? (
-            <p className="text-center text-muted-foreground py-4">
-              Aucune délégation active
-            </p>
+            <p className="text-center text-muted-foreground py-4">Aucune délégation active</p>
           ) : (
             <div className="space-y-4">
               {delegations.map((delegation) => (
@@ -358,15 +405,16 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
                       <div>
                         <h3 className="font-medium">Délégation {delegation.delegation_type}</h3>
                         <p className="text-sm text-muted-foreground">
-                          Du {new Date(delegation.start_date).toLocaleDateString()} au {new Date(delegation.end_date).toLocaleDateString()}
+                          Du {new Date(delegation.start_date).toLocaleDateString()} au{' '}
+                          {new Date(delegation.end_date).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {getStatusBadge(delegation.status)}
                       {delegation.status === 'active' && (
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant="outline"
                           onClick={() => handleRevokeDelegation(delegation.id)}
                         >
@@ -375,10 +423,15 @@ const DelegationManager: React.FC<DelegationManagerProps> = ({
                       )}
                     </div>
                   </div>
-                  
+
                   <div className="text-sm">
-                    <p><strong>Raison:</strong> {delegation.reason}</p>
-                    <p><strong>Permissions:</strong> {delegation.permissions.filter(p => p.granted).length} accordée(s)</p>
+                    <p>
+                      <strong>Raison:</strong> {delegation.reason}
+                    </p>
+                    <p>
+                      <strong>Permissions:</strong>{' '}
+                      {delegation.permissions.filter((p) => p.granted).length} accordée(s)
+                    </p>
                   </div>
                 </div>
               ))}

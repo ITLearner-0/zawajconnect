@@ -1,4 +1,3 @@
-
 import { sanitizeText, sanitizeHtml } from './enhancedValidation';
 import { ProfileFormData } from '@/types/profile';
 

@@ -2,16 +2,16 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Heart, 
-  Shield, 
-  Users, 
-  Sparkles, 
-  CheckCircle, 
+import {
+  Heart,
+  Shield,
+  Users,
+  Sparkles,
+  CheckCircle,
   Star,
   ArrowRight,
   Clock,
-  Target
+  Target,
 } from 'lucide-react';
 
 interface OnboardingWelcomeProps {
@@ -25,28 +25,28 @@ const OnboardingWelcome = ({ onStart, userName }: OnboardingWelcomeProps) => {
   const benefits = [
     {
       icon: <Heart className="h-5 w-5" />,
-      title: "Compatibilité IA",
-      description: "Algorithme intelligent basé sur vos valeurs islamiques",
-      color: "from-rose-500 to-pink-500"
+      title: 'Compatibilité IA',
+      description: 'Algorithme intelligent basé sur vos valeurs islamiques',
+      color: 'from-rose-500 to-pink-500',
     },
     {
       icon: <Shield className="h-5 w-5" />,
-      title: "Sécurisé & Halal", 
-      description: "Modération automatique et supervision familiale",
-      color: "from-emerald-500 to-teal-500"
+      title: 'Sécurisé & Halal',
+      description: 'Modération automatique et supervision familiale',
+      color: 'from-emerald-500 to-teal-500',
     },
     {
       icon: <Users className="h-5 w-5" />,
-      title: "Communauté Vérifiée",
+      title: 'Communauté Vérifiée',
       description: "Profils authentiques avec vérification d'identité",
-      color: "from-blue-500 to-indigo-500"
-    }
+      color: 'from-blue-500 to-indigo-500',
+    },
   ];
 
   const stats = [
-    { value: "2k+", label: "Mariages réussis", icon: <Heart className="h-4 w-4" /> },
-    { value: "98%", label: "Satisfaction", icon: <Star className="h-4 w-4" /> },
-    { value: "24/7", label: "Support", icon: <Shield className="h-4 w-4" /> }
+    { value: '2k+', label: 'Mariages réussis', icon: <Heart className="h-4 w-4" /> },
+    { value: '98%', label: 'Satisfaction', icon: <Star className="h-4 w-4" /> },
+    { value: '24/7', label: 'Support', icon: <Shield className="h-4 w-4" /> },
   ];
 
   useEffect(() => {
@@ -63,23 +63,27 @@ const OnboardingWelcome = ({ onStart, userName }: OnboardingWelcomeProps) => {
           <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald to-emerald-light rounded-full mb-6 animate-float">
             <Heart className="h-10 w-10 text-white fill-current" />
           </div>
-          
+
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
             Bienvenue {userName ? `${userName} ` : ''}sur{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald to-gold">
               ZawajConnect
             </span>
           </h1>
-          
+
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Trouvez votre âme sœur grâce à notre plateforme de rencontres islamiques 
-            intelligente et respectueuse des valeurs halal.
+            Trouvez votre âme sœur grâce à notre plateforme de rencontres islamiques intelligente et
+            respectueuse des valeurs halal.
           </p>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 max-w-md mx-auto mb-8">
             {stats.map((stat, index) => (
-              <Card key={index} className="bg-white/50 backdrop-blur border-emerald/20 animate-slide-up" style={{ animationDelay: `${index * 200}ms` }}>
+              <Card
+                key={index}
+                className="bg-white/50 backdrop-blur border-emerald/20 animate-slide-up"
+                style={{ animationDelay: `${index * 200}ms` }}
+              >
                 <CardContent className="p-4 text-center">
                   <div className="flex items-center justify-center mb-2 text-emerald">
                     {stat.icon}
@@ -96,7 +100,7 @@ const OnboardingWelcome = ({ onStart, userName }: OnboardingWelcomeProps) => {
         <div className="mb-12">
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             {benefits.map((benefit, index) => (
-              <Card 
+              <Card
                 key={index}
                 className={`transition-all duration-500 cursor-pointer transform hover:scale-105 animate-slide-up ${
                   index === currentStep ? 'ring-2 ring-emerald/50 shadow-lg' : 'hover:shadow-md'
@@ -104,7 +108,9 @@ const OnboardingWelcome = ({ onStart, userName }: OnboardingWelcomeProps) => {
                 style={{ animationDelay: `${index * 200}ms` }}
               >
                 <CardContent className="p-6 text-center">
-                  <div className={`w-12 h-12 bg-gradient-to-r ${benefit.color} rounded-full flex items-center justify-center mx-auto mb-4 text-white`}>
+                  <div
+                    className={`w-12 h-12 bg-gradient-to-r ${benefit.color} rounded-full flex items-center justify-center mx-auto mb-4 text-white`}
+                  >
                     {benefit.icon}
                   </div>
                   <h3 className="font-semibold text-lg mb-2">{benefit.title}</h3>
@@ -146,7 +152,9 @@ const OnboardingWelcome = ({ onStart, userName }: OnboardingWelcomeProps) => {
                 </div>
                 <div>
                   <h3 className="font-semibold">Configuration rapide</h3>
-                  <p className="text-sm text-muted-foreground">Seulement 3 minutes pour un profil complet</p>
+                  <p className="text-sm text-muted-foreground">
+                    Seulement 3 minutes pour un profil complet
+                  </p>
                 </div>
               </div>
               <Badge variant="secondary" className="flex items-center space-x-1">
@@ -157,10 +165,10 @@ const OnboardingWelcome = ({ onStart, userName }: OnboardingWelcomeProps) => {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { step: 1, title: "Infos de base", time: "30s" },
-                { step: 2, title: "Profil détaillé", time: "1min" },
-                { step: 3, title: "Préférences islamiques", time: "1min" },
-                { step: 4, title: "Objectifs", time: "30s" }
+                { step: 1, title: 'Infos de base', time: '30s' },
+                { step: 2, title: 'Profil détaillé', time: '1min' },
+                { step: 3, title: 'Préférences islamiques', time: '1min' },
+                { step: 4, title: 'Objectifs', time: '30s' },
               ].map((item) => (
                 <div key={item.step} className="text-center">
                   <div className="w-8 h-8 bg-emerald/20 text-emerald rounded-full flex items-center justify-center text-sm font-semibold mx-auto mb-2">
@@ -184,7 +192,7 @@ const OnboardingWelcome = ({ onStart, userName }: OnboardingWelcomeProps) => {
             Commencer mon profil
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
-          
+
           <div className="mt-4 flex items-center justify-center space-x-4 text-sm text-muted-foreground">
             <div className="flex items-center space-x-1">
               <Shield className="h-4 w-4 text-emerald" />

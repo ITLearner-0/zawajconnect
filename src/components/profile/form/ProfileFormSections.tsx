@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
 import { StrictFormValidation } from '@/types/strictTypes';
@@ -12,7 +11,9 @@ import PrivacySettingsComponent from '../PrivacySettings';
 
 interface ProfileFormSectionsProps {
   formData: ProfileFormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => void;
   handleSelectChange: (field: keyof ProfileFormData, value: string) => void;
   verificationStatus: VerificationStatus;
   userEmail: string | null;
@@ -43,41 +44,38 @@ const ProfileFormSections: React.FC<ProfileFormSectionsProps> = ({
 }) => {
   return (
     <div className="space-y-8">
-      <BasicInfoSection 
-        formData={formData} 
+      <BasicInfoSection
+        formData={formData}
         handleChange={handleChange}
         handleSelectChange={handleSelectChange}
       />
-      
-      <EducationSection 
-        formData={formData} 
+
+      <EducationSection
+        formData={formData}
         handleChange={handleChange}
         handleSelectChange={handleSelectChange}
       />
-      
-      <ReligiousSection 
-        formData={formData} 
+
+      <ReligiousSection
+        formData={formData}
         handleChange={handleChange}
         handleSelectChange={handleSelectChange}
       />
-      
-      <AboutSection 
-        formData={formData} 
-        handleChange={handleChange} 
-      />
-      
-      <WaliSection 
-        formData={formData} 
+
+      <AboutSection formData={formData} handleChange={handleChange} />
+
+      <WaliSection
+        formData={formData}
         handleChange={handleChange}
         handleSelectChange={handleSelectChange}
       />
-      
+
       <VerificationPanel
         verificationStatus={verificationStatus}
         userEmail={userEmail}
         onVerificationChange={handleVerificationChange}
       />
-      
+
       <PrivacySettingsComponent
         privacySettings={privacySettings}
         blockedUsers={blockedUsers}

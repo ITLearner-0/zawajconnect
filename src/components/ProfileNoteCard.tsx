@@ -17,9 +17,9 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
   // Helper function to highlight text
   const highlightText = (text: string, keyword?: string) => {
     if (!keyword || !text) return text;
-    
+
     const parts = text.split(new RegExp(`(${keyword})`, 'gi'));
-    return parts.map((part, index) => 
+    return parts.map((part, index) =>
       part.toLowerCase() === keyword.toLowerCase() ? (
         <mark key={index} className="bg-yellow-300 text-black font-semibold px-1 rounded">
           {part}
@@ -70,14 +70,17 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
     try {
       const { data, error } = await supabase
         .from('profile_notes')
-        .upsert({
-          user_id: userId,
-          profile_id: profileId,
-          note: note.trim(),
-          updated_at: new Date().toISOString()
-        }, {
-          onConflict: 'user_id,profile_id'
-        })
+        .upsert(
+          {
+            user_id: userId,
+            profile_id: profileId,
+            note: note.trim(),
+            updated_at: new Date().toISOString(),
+          },
+          {
+            onConflict: 'user_id,profile_id',
+          }
+        )
         .select('id')
         .single();
 
@@ -89,15 +92,15 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
       }
       setIsVisible(false);
       toast({
-        title: "Note sauvegardée",
-        description: "Votre note privée a été enregistrée"
+        title: 'Note sauvegardée',
+        description: 'Votre note privée a été enregistrée',
       });
     } catch (error) {
       console.error('Error saving note:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder la note",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder la note',
+        variant: 'destructive',
       });
     } finally {
       setIsSaving(false);
@@ -118,8 +121,8 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
       setHasNote(false);
       setIsVisible(false);
       toast({
-        title: "Note supprimée",
-        description: "La note a été supprimée"
+        title: 'Note supprimée',
+        description: 'La note a été supprimée',
       });
     } catch (error) {
       console.error('Error deleting note:', error);
@@ -134,7 +137,7 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
         variant="ghost"
         onClick={() => setIsVisible(!isVisible)}
         className={`${hasNote ? 'text-gold hover:text-gold/80' : 'text-muted-foreground hover:text-gold'}`}
-        title={hasNote ? "Modifier la note" : "Ajouter une note"}
+        title={hasNote ? 'Modifier la note' : 'Ajouter une note'}
       >
         <StickyNote className={`h-4 w-4 ${hasNote ? 'fill-gold' : ''}`} />
       </Button>
@@ -157,9 +160,7 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
             {searchKeyword && note && (
               <div className="text-xs p-2 border rounded-md bg-yellow-50 border-yellow-200 mb-2">
                 <div className="font-medium text-yellow-800 mb-1">📌 Mot-clé trouvé :</div>
-                <div className="text-yellow-900">
-                  {highlightText(note, searchKeyword)}
-                </div>
+                <div className="text-yellow-900">{highlightText(note, searchKeyword)}</div>
               </div>
             )}
             <Textarea
@@ -169,16 +170,14 @@ const ProfileNoteCard = ({ userId, profileId, searchKeyword }: ProfileNoteCardPr
               className="min-h-[100px] text-sm"
               maxLength={500}
             />
-            <div className="text-xs text-muted-foreground text-right">
-              {note.length}/500
-            </div>
-            
+            <div className="text-xs text-muted-foreground text-right">{note.length}/500</div>
+
             {noteId && (
               <div className="pt-2 border-t">
                 <NoteTagSelector noteId={noteId} />
               </div>
             )}
-            
+
             <div className="flex gap-2">
               <Button
                 size="sm"

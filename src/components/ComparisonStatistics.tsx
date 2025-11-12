@@ -1,7 +1,21 @@
 import { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { TrendingUp, Tag, Users, Calendar } from 'lucide-react';
 import { format, startOfMonth, eachMonthOfInterval, subMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -18,7 +32,14 @@ interface ComparisonStatisticsProps {
   history: ComparisonHistory[];
 }
 
-const COLORS = ['hsl(var(--emerald))', 'hsl(var(--gold))', 'hsl(var(--sage))', 'hsl(var(--cream))', 'hsl(var(--chart-1))', 'hsl(var(--chart-2))'];
+const COLORS = [
+  'hsl(var(--emerald))',
+  'hsl(var(--gold))',
+  'hsl(var(--sage))',
+  'hsl(var(--cream))',
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+];
 
 const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
   // Calculate statistics
@@ -28,14 +49,14 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
 
     // Tags frequency
     const tagFrequency: Record<string, number> = {};
-    history.forEach(item => {
+    history.forEach((item) => {
       if (item.tags && Array.isArray(item.tags)) {
-        item.tags.forEach(tag => {
+        item.tags.forEach((tag) => {
           tagFrequency[tag] = (tagFrequency[tag] || 0) + 1;
         });
       }
     });
-    
+
     const topTags = Object.entries(tagFrequency)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 6)
@@ -43,52 +64,55 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
 
     // Profile frequency
     const profileFrequency: Record<string, number> = {};
-    history.forEach(item => {
-      item.compared_profile_ids.forEach(profileId => {
+    history.forEach((item) => {
+      item.compared_profile_ids.forEach((profileId) => {
         profileFrequency[profileId] = (profileFrequency[profileId] || 0) + 1;
       });
     });
-    
+
     const topProfiles = Object.entries(profileFrequency)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 5)
-      .map(([id, count]) => ({ 
-        name: `Profil ${id.slice(0, 8)}...`, 
+      .map(([id, count]) => ({
+        name: `Profil ${id.slice(0, 8)}...`,
         value: count,
-        id 
+        id,
       }));
 
     // Monthly evolution (last 6 months)
     const sixMonthsAgo = subMonths(new Date(), 6);
     const monthlyData = eachMonthOfInterval({
       start: sixMonthsAgo,
-      end: new Date()
-    }).map(month => {
+      end: new Date(),
+    }).map((month) => {
       const monthStart = startOfMonth(month);
       const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
-      
-      const count = history.filter(item => {
+
+      const count = history.filter((item) => {
         const itemDate = new Date(item.created_at);
         return itemDate >= monthStart && itemDate <= monthEnd;
       }).length;
-      
+
       return {
         month: format(month, 'MMM yyyy', { locale: fr }),
-        comparisons: count
+        comparisons: count,
       };
     });
 
     // Rating distribution
-    const ratingDistribution = [1, 2, 3, 4, 5].map(rating => ({
+    const ratingDistribution = [1, 2, 3, 4, 5].map((rating) => ({
       rating: `${rating} ⭐`,
-      count: history.filter(item => item.rating === rating).length
+      count: history.filter((item) => item.rating === rating).length,
     }));
 
     // Average rating
-    const ratingsWithValues = history.filter(item => item.rating !== null).map(item => item.rating as number);
-    const averageRating = ratingsWithValues.length > 0 
-      ? (ratingsWithValues.reduce((sum, r) => sum + r, 0) / ratingsWithValues.length).toFixed(1)
-      : 'N/A';
+    const ratingsWithValues = history
+      .filter((item) => item.rating !== null)
+      .map((item) => item.rating as number);
+    const averageRating =
+      ratingsWithValues.length > 0
+        ? (ratingsWithValues.reduce((sum, r) => sum + r, 0) / ratingsWithValues.length).toFixed(1)
+        : 'N/A';
 
     return {
       totalComparisons,
@@ -98,7 +122,7 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
       ratingDistribution,
       averageRating,
       totalTags: Object.keys(tagFrequency).length,
-      totalProfiles: Object.keys(profileFrequency).length
+      totalProfiles: Object.keys(profileFrequency).length,
     };
   }, [history]);
 
@@ -114,7 +138,8 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
           <CardContent>
             <div className="text-2xl font-bold">{statistics.totalComparisons}</div>
             <p className="text-xs text-muted-foreground">
-              {statistics.monthlyData[statistics.monthlyData.length - 1]?.comparisons || 0} ce mois-ci
+              {statistics.monthlyData[statistics.monthlyData.length - 1]?.comparisons || 0} ce
+              mois-ci
             </p>
           </CardContent>
         </Card>
@@ -139,9 +164,7 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{statistics.totalProfiles}</div>
-            <p className="text-xs text-muted-foreground">
-              Profils uniques analysés
-            </p>
+            <p className="text-xs text-muted-foreground">Profils uniques analysés</p>
           </CardContent>
         </Card>
 
@@ -153,7 +176,7 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
           <CardContent>
             <div className="text-2xl font-bold">{statistics.averageRating} ⭐</div>
             <p className="text-xs text-muted-foreground">
-              Sur {history.filter(h => h.rating !== null).length} évaluations
+              Sur {history.filter((h) => h.rating !== null).length} évaluations
             </p>
           </CardContent>
         </Card>
@@ -170,24 +193,20 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={statistics.monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="month" 
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
-                />
+                <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <Tooltip 
-                  contentStyle={{ 
+                <Tooltip
+                  contentStyle={{
                     backgroundColor: 'hsl(var(--card))',
                     border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
                   }}
                 />
                 <Legend />
-                <Line 
-                  type="monotone" 
-                  dataKey="comparisons" 
-                  stroke="hsl(var(--emerald))" 
+                <Line
+                  type="monotone"
+                  dataKey="comparisons"
+                  stroke="hsl(var(--emerald))"
                   strokeWidth={2}
                   name="Comparaisons"
                   dot={{ fill: 'hsl(var(--emerald))' }}
@@ -206,8 +225,8 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={statistics.topTags}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis 
-                  dataKey="name" 
+                <XAxis
+                  dataKey="name"
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
                   angle={-45}
@@ -215,11 +234,11 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
                   height={80}
                 />
                 <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <Tooltip 
-                  contentStyle={{ 
+                <Tooltip
+                  contentStyle={{
                     backgroundColor: 'hsl(var(--card))',
                     border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
                   }}
                 />
                 <Bar dataKey="value" fill="hsl(var(--gold))" name="Utilisations" />
@@ -238,18 +257,18 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
               <BarChart data={statistics.topProfiles} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                <YAxis 
-                  type="category" 
-                  dataKey="name" 
+                <YAxis
+                  type="category"
+                  dataKey="name"
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={11}
                   width={120}
                 />
-                <Tooltip 
-                  contentStyle={{ 
+                <Tooltip
+                  contentStyle={{
                     backgroundColor: 'hsl(var(--card))',
                     border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
                   }}
                 />
                 <Bar dataKey="value" fill="hsl(var(--emerald))" name="Comparaisons" />
@@ -271,7 +290,7 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
                   cx="50%"
                   cy="50%"
                   labelLine={false}
-                  label={({ rating, count }) => count > 0 ? `${rating}: ${count}` : null}
+                  label={({ rating, count }) => (count > 0 ? `${rating}: ${count}` : null)}
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="count"
@@ -280,11 +299,11 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
                     <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{ 
+                <Tooltip
+                  contentStyle={{
                     backgroundColor: 'hsl(var(--card))',
                     border: '1px solid hsl(var(--border))',
-                    borderRadius: '8px'
+                    borderRadius: '8px',
                   }}
                 />
               </PieChart>
@@ -302,13 +321,13 @@ const ComparisonStatistics = ({ history }: ComparisonStatisticsProps) => {
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {statistics.topTags.map((tag, index) => (
-                <Badge 
-                  key={tag.name} 
+                <Badge
+                  key={tag.name}
                   variant="secondary"
                   className="text-sm"
                   style={{
                     fontSize: `${Math.max(0.75, Math.min(1.5, tag.value / 2))}rem`,
-                    opacity: 1 - (index * 0.1)
+                    opacity: 1 - index * 0.1,
                   }}
                 >
                   {tag.name} ({tag.value})

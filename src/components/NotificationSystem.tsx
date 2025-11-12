@@ -49,13 +49,15 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
         .limit(20);
 
       if (data) {
-        setNotifications(data.map(n => ({
-          ...n,
-          is_read: n.is_read ?? false,
-          related_user_id: n.related_user_id ?? undefined,
-          related_match_id: n.related_match_id ?? undefined
-        })));
-        setUnreadCount(data.filter(n => !n.is_read).length);
+        setNotifications(
+          data.map((n) => ({
+            ...n,
+            is_read: n.is_read ?? false,
+            related_user_id: n.related_user_id ?? undefined,
+            related_match_id: n.related_match_id ?? undefined,
+          }))
+        );
+        setUnreadCount(data.filter((n) => !n.is_read).length);
       }
     } catch (error) {
       console.error('Error fetching notifications:', error);
@@ -67,18 +69,19 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
 
     const subscription = supabase
       .channel(`notifications_${user.id}`)
-      .on('postgres_changes', 
-        { 
-          event: 'INSERT', 
-          schema: 'public', 
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
           table: 'notifications',
-          filter: `user_id=eq.${user.id}`
-        }, 
+          filter: `user_id=eq.${user.id}`,
+        },
         (payload) => {
           const newNotification = payload.new as Notification;
-          setNotifications(prev => [newNotification, ...prev]);
-          setUnreadCount(prev => prev + 1);
-          
+          setNotifications((prev) => [newNotification, ...prev]);
+          setUnreadCount((prev) => prev + 1);
+
           // Show toast notification
           toast({
             title: newNotification.title,
@@ -97,17 +100,12 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
     if (!user) return;
 
     try {
-      await supabase
-        .from('notifications')
-        .update({ is_read: true })
-        .eq('id', notificationId);
+      await supabase.from('notifications').update({ is_read: true }).eq('id', notificationId);
 
-      setNotifications(prev => 
-        prev.map(n => 
-          n.id === notificationId ? { ...n, is_read: true } : n
-        )
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n))
       );
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Error marking notification as read:', error);
     }
@@ -123,9 +121,7 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
         .eq('user_id', user.id)
         .eq('is_read', false);
 
-      setNotifications(prev => 
-        prev.map(n => ({ ...n, is_read: true }))
-      );
+      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
       setUnreadCount(0);
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
@@ -136,12 +132,9 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
     if (!user) return;
 
     try {
-      await supabase
-        .from('notifications')
-        .delete()
-        .eq('id', notificationId);
+      await supabase.from('notifications').delete().eq('id', notificationId);
 
-      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
     } catch (error) {
       console.error('Error deleting notification:', error);
     }
@@ -170,7 +163,7 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
     const diffInDays = Math.floor(diffInHours / 24);
 
     if (diffInHours < 1) {
-      return 'À l\'instant';
+      return "À l'instant";
     } else if (diffInHours < 24) {
       return `Il y a ${diffInHours}h`;
     } else if (diffInDays < 7) {
@@ -191,9 +184,7 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
       >
         <Bell className="h-5 w-5 text-emerald" />
         {unreadCount > 0 && (
-          <Badge 
-            className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500 hover:bg-red-500"
-          >
+          <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs bg-red-500 hover:bg-red-500">
             {unreadCount > 99 ? '99+' : unreadCount}
           </Badge>
         )}
@@ -240,9 +231,7 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="mt-0.5">
-                        {getNotificationIcon(notification.type)}
-                      </div>
+                      <div className="mt-0.5">{getNotificationIcon(notification.type)}</div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">

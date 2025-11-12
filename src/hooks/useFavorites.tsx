@@ -25,7 +25,7 @@ export const useFavorites = () => {
 
       if (error) throw error;
 
-      const favSet = new Set(data.map(fav => fav.profile_id));
+      const favSet = new Set(data.map((fav) => fav.profile_id));
       setFavorites(favSet);
     } catch (error) {
       console.error('Error fetching favorites:', error);
@@ -53,7 +53,7 @@ export const useFavorites = () => {
 
         if (error) throw error;
 
-        setFavorites(prev => {
+        setFavorites((prev) => {
           const newSet = new Set(prev);
           newSet.delete(profileId);
           return newSet;
@@ -61,16 +61,14 @@ export const useFavorites = () => {
         toast.success('Retiré des favoris');
       } else {
         // Add to favorites
-        const { error } = await supabase
-          .from('profile_favorites')
-          .insert({
-            user_id: user.id,
-            profile_id: profileId
-          });
+        const { error } = await supabase.from('profile_favorites').insert({
+          user_id: user.id,
+          profile_id: profileId,
+        });
 
         if (error) throw error;
 
-        setFavorites(prev => new Set(prev).add(profileId));
+        setFavorites((prev) => new Set(prev).add(profileId));
         toast.success('Ajouté aux favoris');
       }
     } catch (error) {
@@ -86,6 +84,6 @@ export const useFavorites = () => {
     loading,
     toggleFavorite,
     isFavorite,
-    refetch: fetchFavorites
+    refetch: fetchFavorites,
   };
 };

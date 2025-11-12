@@ -69,19 +69,21 @@ const RenewalBanner = ({ onDismiss }: RenewalBannerProps) => {
     // Track click event if tracking ID is present (with JWT authentication)
     if (trackingId && user) {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
         if (!session?.access_token) {
           console.error('No authentication token available');
         } else {
           const { error } = await supabase.functions.invoke('track-email-event', {
             body: {
               result_id: trackingId,
-              event_type: 'clicked'
+              event_type: 'clicked',
             },
             headers: {
-              Authorization: `Bearer ${session.access_token}`
-            }
+              Authorization: `Bearer ${session.access_token}`,
+            },
           });
 
           if (error) {
@@ -120,8 +122,10 @@ const RenewalBanner = ({ onDismiss }: RenewalBannerProps) => {
       <div
         className={cn(
           'absolute inset-0 opacity-10',
-          isLastDay && 'bg-gradient-to-r from-destructive/20 via-destructive/10 to-destructive/20 animate-[slide-in-right_3s_ease-in-out_infinite]',
-          is3Days && 'bg-gradient-to-r from-warning/20 via-warning/10 to-warning/20 animate-[slide-in-right_4s_ease-in-out_infinite]'
+          isLastDay &&
+            'bg-gradient-to-r from-destructive/20 via-destructive/10 to-destructive/20 animate-[slide-in-right_3s_ease-in-out_infinite]',
+          is3Days &&
+            'bg-gradient-to-r from-warning/20 via-warning/10 to-warning/20 animate-[slide-in-right_4s_ease-in-out_infinite]'
         )}
       />
 
@@ -181,9 +185,9 @@ const RenewalBanner = ({ onDismiss }: RenewalBannerProps) => {
 
             <p className="text-muted-foreground mb-4">
               {isLastDay &&
-                "Votre abonnement Premium expire demain ! Ne perdez pas vos avantages exclusifs. Renouvelez maintenant avec votre remise exclusive."}
+                'Votre abonnement Premium expire demain ! Ne perdez pas vos avantages exclusifs. Renouvelez maintenant avec votre remise exclusive.'}
               {is3Days &&
-                "Votre abonnement Premium expire dans 3 jours. Profitez de notre offre spéciale de renouvellement et continuez à bénéficier de tous vos avantages."}
+                'Votre abonnement Premium expire dans 3 jours. Profitez de notre offre spéciale de renouvellement et continuez à bénéficier de tous vos avantages.'}
               {!urgency &&
                 "Profitez d'une offre spéciale pour renouveler votre abonnement Premium et continuer à bénéficier de tous les avantages."}
             </p>
@@ -191,9 +195,7 @@ const RenewalBanner = ({ onDismiss }: RenewalBannerProps) => {
             {/* Countdown Timer */}
             {urgency && subscription.subscription_end && (
               <div className="flex items-center gap-4 mb-4">
-                <span className="text-sm font-medium text-muted-foreground">
-                  Temps restant :
-                </span>
+                <span className="text-sm font-medium text-muted-foreground">Temps restant :</span>
                 <div className="flex gap-2">
                   {[
                     { value: timeLeft.hours, label: 'H' },
@@ -233,9 +235,9 @@ const RenewalBanner = ({ onDismiss }: RenewalBannerProps) => {
                   <code className="text-lg font-bold text-primary">{promoCode}</code>
                 </div>
                 <Badge className="bg-primary text-primary-foreground">
-                  {isLastDay && 'Jusqu\'à 15% OFF'}
-                  {is3Days && 'Jusqu\'à 10% OFF'}
-                  {!urgency && 'Jusqu\'à 5% OFF'}
+                  {isLastDay && "Jusqu'à 15% OFF"}
+                  {is3Days && "Jusqu'à 10% OFF"}
+                  {!urgency && "Jusqu'à 5% OFF"}
                 </Badge>
               </div>
             )}
@@ -254,7 +256,7 @@ const RenewalBanner = ({ onDismiss }: RenewalBannerProps) => {
               >
                 {isLastDay && '🔥 Renouveler maintenant !'}
                 {is3Days && '⚡ Renouveler avec -10%'}
-                {!urgency && '✨ Découvrir l\'offre'}
+                {!urgency && "✨ Découvrir l'offre"}
               </Button>
               <Button variant="outline" onClick={handleDismiss}>
                 Plus tard

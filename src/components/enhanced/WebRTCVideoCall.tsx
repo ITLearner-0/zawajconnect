@@ -4,16 +4,16 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Video, 
-  VideoOff, 
-  Mic, 
-  MicOff, 
-  Phone, 
+import {
+  Video,
+  VideoOff,
+  Mic,
+  MicOff,
+  Phone,
   PhoneOff,
   Users,
   MessageSquare,
-  Settings
+  Settings,
 } from 'lucide-react';
 
 interface WebRTCVideoCallProps {
@@ -31,18 +31,20 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
   partnerName,
   onCallEnd,
   isVideoCall = true,
-  autoStart = false
+  autoStart = false,
 }) => {
   const { toast } = useToast();
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
-  
+
   const [isCallActive, setIsCallActive] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(isVideoCall);
   const [isAudioEnabled, setIsAudioEnabled] = useState(true);
   const [callDuration, setCallDuration] = useState(0);
-  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
+  const [connectionStatus, setConnectionStatus] = useState<
+    'connecting' | 'connected' | 'disconnected'
+  >('connecting');
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
 
   // Call timer
@@ -50,7 +52,7 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
     let interval: NodeJS.Timeout;
     if (isCallActive) {
       interval = setInterval(() => {
-        setCallDuration(prev => prev + 1);
+        setCallDuration((prev) => prev + 1);
       }, 1000);
     }
     return () => clearInterval(interval);
@@ -74,12 +76,12 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
     const configuration = {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
-      ]
+        { urls: 'stun:stun1.l.google.com:19302' },
+      ],
     };
 
     const pc = new RTCPeerConnection(configuration);
-    
+
     pc.oniceconnectionstatechange = () => {
       console.log('ICE connection state:', pc.iceConnectionState);
       switch (pc.iceConnectionState) {
@@ -108,13 +110,13 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
 
   const initializeMedia = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: isVideoCall, 
-        audio: true 
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: isVideoCall,
+        audio: true,
       });
-      
+
       setLocalStream(stream);
-      
+
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
@@ -125,7 +127,7 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
       toast({
         title: "Erreur d'accès aux médias",
         description: "Impossible d'accéder à votre caméra ou microphone",
-        variant: "destructive"
+        variant: 'destructive',
       });
       throw error;
     }
@@ -135,38 +137,37 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
     try {
       setIsCallActive(true);
       setConnectionStatus('connecting');
-      
+
       // Initialize peer connection
       const pc = initializePeerConnection();
       peerConnectionRef.current = pc;
-      
+
       // Get user media
       const stream = await initializeMedia();
-      
+
       // Add tracks to peer connection
-      stream.getTracks().forEach(track => {
+      stream.getTracks().forEach((track) => {
         pc.addTrack(track, stream);
       });
 
       // Create offer (in a real app, this would be sent via signaling server)
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      
+
       // Simulate connection established
       setTimeout(() => {
         setConnectionStatus('connected');
         toast({
-          title: "Appel connecté",
-          description: `Connecté avec ${partnerName}`
+          title: 'Appel connecté',
+          description: `Connecté avec ${partnerName}`,
         });
       }, 2000);
-      
     } catch (error) {
       console.error('Error starting call:', error);
       toast({
-        title: "Erreur de connexion",
+        title: 'Erreur de connexion',
         description: "Impossible d'établir la connexion",
-        variant: "destructive"
+        variant: 'destructive',
       });
       endCall();
     }
@@ -177,22 +178,22 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
     setIsCallActive(false);
     setCallDuration(0);
     setConnectionStatus('disconnected');
-    
+
     toast({
-      title: "Appel terminé",
-      description: `Appel avec ${partnerName} terminé`
+      title: 'Appel terminé',
+      description: `Appel avec ${partnerName} terminé`,
     });
-    
+
     onCallEnd();
   };
 
   const cleanupCall = () => {
     // Stop local stream
     if (localStream) {
-      localStream.getTracks().forEach(track => track.stop());
+      localStream.getTracks().forEach((track) => track.stop());
       setLocalStream(null);
     }
-    
+
     // Close peer connection
     if (peerConnectionRef.current) {
       peerConnectionRef.current.close();
@@ -228,10 +229,14 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
 
   const getConnectionStatusColor = () => {
     switch (connectionStatus) {
-      case 'connected': return 'bg-green-500';
-      case 'connecting': return 'bg-yellow-500';
-      case 'disconnected': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      case 'connected':
+        return 'bg-green-500';
+      case 'connecting':
+        return 'bg-yellow-500';
+      case 'disconnected':
+        return 'bg-red-500';
+      default:
+        return 'bg-gray-500';
     }
   };
 
@@ -268,15 +273,15 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
     <div className="relative w-full h-screen bg-black">
       {/* Connection Status & Call Info */}
       <div className="absolute top-4 left-4 z-10 flex items-center gap-4">
-        <Badge 
-          variant="secondary" 
-          className={`${getConnectionStatusColor()} text-white`}
-        >
+        <Badge variant="secondary" className={`${getConnectionStatusColor()} text-white`}>
           <div className="w-2 h-2 rounded-full bg-white mr-2" />
-          {connectionStatus === 'connected' ? 'Connecté' : 
-           connectionStatus === 'connecting' ? 'Connexion...' : 'Déconnecté'}
+          {connectionStatus === 'connected'
+            ? 'Connecté'
+            : connectionStatus === 'connecting'
+              ? 'Connexion...'
+              : 'Déconnecté'}
         </Badge>
-        
+
         {isCallActive && (
           <Badge variant="outline" className="bg-black/50 text-white border-white/30">
             {formatDuration(callDuration)}
@@ -295,12 +300,7 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
       {/* Remote Video/Audio Placeholder */}
       <div className="w-full h-full flex items-center justify-center bg-gray-900">
         {isVideoCall ? (
-          <video 
-            ref={remoteVideoRef}
-            className="w-full h-full object-cover"
-            autoPlay
-            playsInline
-          />
+          <video ref={remoteVideoRef} className="w-full h-full object-cover" autoPlay playsInline />
         ) : (
           <div className="text-center">
             <div className="w-32 h-32 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -315,14 +315,14 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
       {/* Local Video - Picture in Picture (only for video calls) */}
       {isVideoCall && (
         <div className="absolute top-20 right-4 w-48 h-36 bg-gray-900 rounded-lg overflow-hidden border-2 border-white/30">
-          <video 
+          <video
             ref={localVideoRef}
             className="w-full h-full object-cover"
             autoPlay
             playsInline
             muted
           />
-          
+
           {!isVideoEnabled && (
             <div className="absolute inset-0 bg-black flex items-center justify-center">
               <VideoOff className="h-8 w-8 text-white" />
@@ -336,7 +336,7 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
         <div className="flex items-center gap-2 bg-black/70 backdrop-blur-md rounded-full p-3">
           {/* Audio Toggle */}
           <Button
-            variant={isAudioEnabled ? "secondary" : "destructive"}
+            variant={isAudioEnabled ? 'secondary' : 'destructive'}
             size="lg"
             className="rounded-full w-14 h-14"
             onClick={toggleAudio}
@@ -347,7 +347,7 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
           {/* Video Toggle (only for video calls) */}
           {isVideoCall && (
             <Button
-              variant={isVideoEnabled ? "secondary" : "destructive"}
+              variant={isVideoEnabled ? 'secondary' : 'destructive'}
               size="lg"
               className="rounded-full w-14 h-14"
               onClick={toggleVideo}
@@ -371,7 +371,7 @@ const WebRTCVideoCall: React.FC<WebRTCVideoCallProps> = ({
             variant="secondary"
             size="lg"
             className="rounded-full w-14 h-14"
-            onClick={() => toast({ title: "Chat", description: "Retour au chat..." })}
+            onClick={() => toast({ title: 'Chat', description: 'Retour au chat...' })}
           >
             <MessageSquare className="h-6 w-6" />
           </Button>

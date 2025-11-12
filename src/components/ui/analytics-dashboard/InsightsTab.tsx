@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { AlertTriangle, CheckCircle } from 'lucide-react';
@@ -48,7 +47,7 @@ const InsightsTab = ({ metrics }: InsightsTabProps) => {
 
             {metrics.bottlenecks.length === 0 && metrics.recommendations.length === 0 && (
               <div className="text-center py-8 text-gray-500">
-                No specific insights available yet. 
+                No specific insights available yet.
                 <br />
                 Keep using lazy loading components to generate more data.
               </div>

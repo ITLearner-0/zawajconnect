@@ -7,20 +7,26 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Shield, 
-  Lock, 
-  Eye, 
-  EyeOff, 
-  UserCheck, 
+import {
+  Shield,
+  Lock,
+  Eye,
+  EyeOff,
+  UserCheck,
   AlertTriangle,
   Settings,
   Database,
   Clock,
-  Bell
+  Bell,
 } from 'lucide-react';
 
 interface SecuritySettings {
@@ -65,13 +71,15 @@ const SecurityPrivacyPanel = () => {
         throw adminError;
       }
 
-      setSettings((adminSettings || []).map(s => ({
-        ...s,
-        description: s.description ?? '',
-        created_at: s.created_at ?? undefined,
-        updated_at: s.updated_at ?? undefined,
-        updated_by: s.updated_by ?? undefined
-      })));
+      setSettings(
+        (adminSettings || []).map((s) => ({
+          ...s,
+          description: s.description ?? '',
+          created_at: s.created_at ?? undefined,
+          updated_at: s.updated_at ?? undefined,
+          updated_by: s.updated_by ?? undefined,
+        }))
+      );
 
       if (!user?.id) return;
 
@@ -94,7 +102,7 @@ const SecurityPrivacyPanel = () => {
           contact_visibility: userPrivacy.contact_visibility ?? 'matches_only',
           last_seen_visibility: userPrivacy.last_seen_visibility ?? 'matches_only',
           allow_family_involvement: userPrivacy.allow_family_involvement ?? false,
-          allow_profile_views: userPrivacy.allow_profile_views ?? true
+          allow_profile_views: userPrivacy.allow_profile_views ?? true,
         });
       } else {
         setPrivacySettings({
@@ -104,16 +112,15 @@ const SecurityPrivacyPanel = () => {
           contact_visibility: 'matches_only',
           last_seen_visibility: 'matches_only',
           allow_family_involvement: false,
-          allow_profile_views: true
+          allow_profile_views: true,
         });
       }
-
     } catch (error) {
       console.error('Error loading settings:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les paramètres",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les paramètres',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -125,33 +132,31 @@ const SecurityPrivacyPanel = () => {
       setSaving(true);
       const { error } = await supabase
         .from('admin_settings')
-        .update({ 
+        .update({
           setting_value: value,
-          updated_by: user?.id 
+          updated_by: user?.id,
         })
         .eq('setting_key', settingKey);
 
       if (error) throw error;
 
       // Update local state
-      setSettings(prev => 
-        prev.map(setting => 
-          setting.setting_key === settingKey 
-            ? { ...setting, setting_value: value }
-            : setting
+      setSettings((prev) =>
+        prev.map((setting) =>
+          setting.setting_key === settingKey ? { ...setting, setting_value: value } : setting
         )
       );
 
       toast({
-        title: "Succès",
-        description: "Paramètre mis à jour avec succès"
+        title: 'Succès',
+        description: 'Paramètre mis à jour avec succès',
       });
     } catch (error) {
       console.error('Error updating admin setting:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le paramètre",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour le paramètre',
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
@@ -167,27 +172,25 @@ const SecurityPrivacyPanel = () => {
 
       if (!user?.id) return;
 
-      const { error } = await supabase
-        .from('privacy_settings')
-        .upsert({
-          user_id: user.id,
-          ...updatedSettings
-        });
+      const { error } = await supabase.from('privacy_settings').upsert({
+        user_id: user.id,
+        ...updatedSettings,
+      });
 
       if (error) throw error;
 
       setPrivacySettings(updatedSettings);
 
       toast({
-        title: "Succès",
-        description: "Paramètre de confidentialité mis à jour"
+        title: 'Succès',
+        description: 'Paramètre de confidentialité mis à jour',
       });
     } catch (error) {
       console.error('Error updating privacy setting:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le paramètre",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour le paramètre',
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
@@ -195,7 +198,7 @@ const SecurityPrivacyPanel = () => {
   };
 
   const getSettingValue = (key: string) => {
-    const setting = settings.find(s => s.setting_key === key);
+    const setting = settings.find((s) => s.setting_key === key);
     return setting?.setting_value;
   };
 
@@ -204,7 +207,7 @@ const SecurityPrivacyPanel = () => {
       public: 'Public',
       matches_only: 'Matches uniquement',
       family_only: 'Famille uniquement',
-      private: 'Privé'
+      private: 'Privé',
     };
     return labels[value as keyof typeof labels] || value;
   };
@@ -228,7 +231,9 @@ const SecurityPrivacyPanel = () => {
         </div>
         <div>
           <h2 className="text-2xl font-bold">Sécurité & Confidentialité</h2>
-          <p className="text-muted-foreground">Gérez la sécurité et la confidentialité de votre plateforme</p>
+          <p className="text-muted-foreground">
+            Gérez la sécurité et la confidentialité de votre plateforme
+          </p>
         </div>
       </div>
 
@@ -239,9 +244,7 @@ const SecurityPrivacyPanel = () => {
             <Lock className="h-5 w-5" />
             Paramètres de Sécurité
           </CardTitle>
-          <CardDescription>
-            Configurez les paramètres de sécurité de la plateforme
-          </CardDescription>
+          <CardDescription>Configurez les paramètres de sécurité de la plateforme</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -254,11 +257,13 @@ const SecurityPrivacyPanel = () => {
                   min="6"
                   max="20"
                   value={(getSettingValue('security_password_min_length') as number) || 8}
-                  onChange={(e) => updateAdminSetting('security_password_min_length', parseInt(e.target.value))}
+                  onChange={(e) =>
+                    updateAdminSetting('security_password_min_length', parseInt(e.target.value))
+                  }
                   disabled={saving}
                 />
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <div>
                   <Label>Vérification requise pour les messages</Label>
@@ -266,39 +271,43 @@ const SecurityPrivacyPanel = () => {
                     Exiger une vérification avant de pouvoir envoyer des messages
                   </p>
                 </div>
-              <Switch
-                checked={Boolean(getSettingValue('verification_required_for_messaging'))}
-                onCheckedChange={(checked) => updateAdminSetting('verification_required_for_messaging', checked)}
-                disabled={saving}
-              />
+                <Switch
+                  checked={Boolean(getSettingValue('verification_required_for_messaging'))}
+                  onCheckedChange={(checked) =>
+                    updateAdminSetting('verification_required_for_messaging', checked)
+                  }
+                  disabled={saving}
+                />
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
                 <Label htmlFor="max_daily_likes">Limite de likes par jour</Label>
-              <Input
-                id="max_daily_likes"
-                type="number"
-                min="10"
-                max="200"
-                value={(getSettingValue('max_daily_likes') as number) || 50}
-                onChange={(e) => updateAdminSetting('max_daily_likes', parseInt(e.target.value))}
-                disabled={saving}
-              />
-            </div>
+                <Input
+                  id="max_daily_likes"
+                  type="number"
+                  min="10"
+                  max="200"
+                  value={(getSettingValue('max_daily_likes') as number) || 50}
+                  onChange={(e) => updateAdminSetting('max_daily_likes', parseInt(e.target.value))}
+                  disabled={saving}
+                />
+              </div>
 
-            <div>
-              <Label htmlFor="max_photos">Photos maximum par profil</Label>
-              <Input
-                id="max_photos"
-                type="number"
-                min="3"
-                max="10"
-                value={(getSettingValue('max_photos_per_profile') as number) || 6}
-                onChange={(e) => updateAdminSetting('max_photos_per_profile', parseInt(e.target.value))}
-                disabled={saving}
-              />
+              <div>
+                <Label htmlFor="max_photos">Photos maximum par profil</Label>
+                <Input
+                  id="max_photos"
+                  type="number"
+                  min="3"
+                  max="10"
+                  value={(getSettingValue('max_photos_per_profile') as number) || 6}
+                  onChange={(e) =>
+                    updateAdminSetting('max_photos_per_profile', parseInt(e.target.value))
+                  }
+                  disabled={saving}
+                />
               </div>
             </div>
           </div>
@@ -326,7 +335,9 @@ const SecurityPrivacyPanel = () => {
             </div>
             <Switch
               checked={getSettingValue('enable_family_supervision') || false}
-              onCheckedChange={(checked) => updateAdminSetting('enable_family_supervision', checked)}
+              onCheckedChange={(checked) =>
+                updateAdminSetting('enable_family_supervision', checked)
+              }
               disabled={saving}
             />
           </div>
@@ -355,9 +366,7 @@ const SecurityPrivacyPanel = () => {
               <Eye className="h-5 w-5" />
               Paramètres de Confidentialité Personnels
             </CardTitle>
-            <CardDescription>
-              Gérez vos propres paramètres de confidentialité
-            </CardDescription>
+            <CardDescription>Gérez vos propres paramètres de confidentialité</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -445,7 +454,9 @@ const SecurityPrivacyPanel = () => {
                 </div>
                 <Switch
                   checked={privacySettings.allow_family_involvement}
-                  onCheckedChange={(checked) => updatePrivacySetting('allow_family_involvement', checked)}
+                  onCheckedChange={(checked) =>
+                    updatePrivacySetting('allow_family_involvement', checked)
+                  }
                   disabled={saving}
                 />
               </div>
@@ -459,7 +470,9 @@ const SecurityPrivacyPanel = () => {
                 </div>
                 <Switch
                   checked={privacySettings.allow_profile_views}
-                  onCheckedChange={(checked) => updatePrivacySetting('allow_profile_views', checked)}
+                  onCheckedChange={(checked) =>
+                    updatePrivacySetting('allow_profile_views', checked)
+                  }
                   disabled={saving}
                 />
               </div>
@@ -475,9 +488,7 @@ const SecurityPrivacyPanel = () => {
             <AlertTriangle className="h-5 w-5" />
             État du Système
           </CardTitle>
-          <CardDescription>
-            Surveillez l'état de sécurité de votre plateforme
-          </CardDescription>
+          <CardDescription>Surveillez l'état de sécurité de votre plateforme</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -488,7 +499,7 @@ const SecurityPrivacyPanel = () => {
                 <p className="text-sm text-muted-foreground">RLS Activé</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3 p-4 border rounded-lg">
               <div className="h-3 w-3 bg-yellow-500 rounded-full"></div>
               <div>
@@ -496,7 +507,7 @@ const SecurityPrivacyPanel = () => {
                 <p className="text-sm text-muted-foreground">À configurer</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-3 p-4 border rounded-lg">
               <div className="h-3 w-3 bg-green-500 rounded-full"></div>
               <div>

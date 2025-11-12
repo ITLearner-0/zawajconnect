@@ -28,14 +28,16 @@ export const OnboardingProgressIndicator = () => {
         const [profileRes, islamicRes] = await Promise.all([
           supabase
             .from('profiles')
-            .select('onboarding_completed, full_name, age, gender, bio, looking_for, interests, avatar_url')
+            .select(
+              'onboarding_completed, full_name, age, gender, bio, looking_for, interests, avatar_url'
+            )
             .eq('user_id', user.id)
             .maybeSingle(),
           supabase
             .from('islamic_preferences')
             .select('prayer_frequency, quran_reading, sect, importance_of_religion')
             .eq('user_id', user.id)
-            .maybeSingle()
+            .maybeSingle(),
         ]);
 
         const profile = profileRes.data;
@@ -54,20 +56,29 @@ export const OnboardingProgressIndicator = () => {
 
         // Basic info (6 fields)
         const basicFields = ['full_name', 'age', 'gender', 'bio', 'looking_for', 'avatar_url'];
-        basicFields.forEach(field => {
+        basicFields.forEach((field) => {
           totalFields++;
           if (profile?.[field as keyof typeof profile]) completedFields++;
         });
 
         // Interests (1 field, but checking if at least 3 interests)
         totalFields++;
-        if (profile?.interests && Array.isArray(profile.interests) && profile.interests.length >= 3) {
+        if (
+          profile?.interests &&
+          Array.isArray(profile.interests) &&
+          profile.interests.length >= 3
+        ) {
           completedFields++;
         }
 
         // Islamic preferences (4 key fields)
-        const islamicFields = ['prayer_frequency', 'quran_reading', 'sect', 'importance_of_religion'];
-        islamicFields.forEach(field => {
+        const islamicFields = [
+          'prayer_frequency',
+          'quran_reading',
+          'sect',
+          'importance_of_religion',
+        ];
+        islamicFields.forEach((field) => {
           totalFields++;
           if (islamicPrefs?.[field as keyof typeof islamicPrefs]) completedFields++;
         });
@@ -76,7 +87,7 @@ export const OnboardingProgressIndicator = () => {
 
         setStatus({
           onboardingCompleted: false,
-          completionPercentage: percentage
+          completionPercentage: percentage,
         });
       } catch (error) {
         console.error('Error fetching onboarding status:', error);
@@ -96,7 +107,7 @@ export const OnboardingProgressIndicator = () => {
           event: '*',
           schema: 'public',
           table: 'profiles',
-          filter: `user_id=eq.${user.id}`
+          filter: `user_id=eq.${user.id}`,
         },
         () => {
           fetchOnboardingStatus();
@@ -115,8 +126,8 @@ export const OnboardingProgressIndicator = () => {
   }
 
   return (
-    <Link 
-      to="/onboarding" 
+    <Link
+      to="/onboarding"
       className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 hover:bg-muted transition-colors cursor-pointer"
     >
       <Target className="h-3.5 w-3.5 text-emerald" />
@@ -125,15 +136,15 @@ export const OnboardingProgressIndicator = () => {
           Profil: {status.completionPercentage}%
         </span>
         {status.completionPercentage >= 80 ? (
-          <Badge variant="default" className="h-5 px-1.5 text-[10px] bg-emerald/20 text-emerald hover:bg-emerald/30">
+          <Badge
+            variant="default"
+            className="h-5 px-1.5 text-[10px] bg-emerald/20 text-emerald hover:bg-emerald/30"
+          >
             <CheckCircle className="h-2.5 w-2.5 mr-0.5" />
             Presque fini
           </Badge>
         ) : (
-          <Progress 
-            value={status.completionPercentage} 
-            className="h-1.5 w-16"
-          />
+          <Progress value={status.completionPercentage} className="h-1.5 w-16" />
         )}
       </div>
     </Link>

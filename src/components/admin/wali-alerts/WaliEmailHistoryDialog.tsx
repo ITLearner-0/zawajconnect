@@ -10,20 +10,13 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Mail, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  Eye, 
-  MousePointer
-} from 'lucide-react';
+import { Mail, CheckCircle, XCircle, Clock, Eye, MousePointer } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { 
-  WaliEmailHistoryItem, 
-  WaliEmailStats, 
-  useWaliEmailHistory 
+import {
+  WaliEmailHistoryItem,
+  WaliEmailStats,
+  useWaliEmailHistory,
 } from '@/hooks/useWaliEmailHistory';
 
 interface WaliEmailHistoryDialogProps {
@@ -37,7 +30,7 @@ const emailTypeConfig = {
   contact: { label: 'Contact', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900' },
   suspension: { label: 'Suspension', color: 'bg-red-100 text-red-800 dark:bg-red-900' },
   warning: { label: 'Avertissement', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900' },
-  reactivation: { label: 'Réactivation', color: 'bg-green-100 text-green-800 dark:bg-green-900' }
+  reactivation: { label: 'Réactivation', color: 'bg-green-100 text-green-800 dark:bg-green-900' },
 };
 
 const deliveryStatusConfig = {
@@ -45,14 +38,14 @@ const deliveryStatusConfig = {
   sent: { label: 'Envoyé', icon: CheckCircle, color: 'bg-blue-100 text-blue-800' },
   delivered: { label: 'Délivré', icon: CheckCircle, color: 'bg-green-100 text-green-800' },
   failed: { label: 'Échec', icon: XCircle, color: 'bg-red-100 text-red-800' },
-  bounced: { label: 'Rejeté', icon: XCircle, color: 'bg-red-100 text-red-800' }
+  bounced: { label: 'Rejeté', icon: XCircle, color: 'bg-red-100 text-red-800' },
 };
 
 export const WaliEmailHistoryDialog = ({
   open,
   onOpenChange,
   waliUserId,
-  waliName
+  waliName,
 }: WaliEmailHistoryDialogProps) => {
   const { getEmailHistory, getEmailStats, loading } = useWaliEmailHistory();
   const [history, setHistory] = useState<WaliEmailHistoryItem[]>([]);
@@ -67,7 +60,7 @@ export const WaliEmailHistoryDialog = ({
   const loadData = async () => {
     const [historyData, statsData] = await Promise.all([
       getEmailHistory(waliUserId),
-      getEmailStats(waliUserId)
+      getEmailStats(waliUserId),
     ]);
     setHistory(historyData);
     setStats(statsData);
@@ -81,9 +74,7 @@ export const WaliEmailHistoryDialog = ({
             <Mail className="h-5 w-5" />
             Historique des emails - {waliName}
           </DialogTitle>
-          <DialogDescription>
-            Tous les emails envoyés à ce Wali
-          </DialogDescription>
+          <DialogDescription>Tous les emails envoyés à ce Wali</DialogDescription>
         </DialogHeader>
 
         {loading ? (
@@ -132,8 +123,12 @@ export const WaliEmailHistoryDialog = ({
               ) : (
                 <div className="space-y-4">
                   {history.map((email) => {
-                    const typeConfig = emailTypeConfig[email.email_type as keyof typeof emailTypeConfig];
-                    const statusConfig = deliveryStatusConfig[email.delivery_status as keyof typeof deliveryStatusConfig];
+                    const typeConfig =
+                      emailTypeConfig[email.email_type as keyof typeof emailTypeConfig];
+                    const statusConfig =
+                      deliveryStatusConfig[
+                        email.delivery_status as keyof typeof deliveryStatusConfig
+                      ];
                     const StatusIcon = statusConfig.icon;
 
                     return (
@@ -155,7 +150,7 @@ export const WaliEmailHistoryDialog = ({
                           </div>
 
                           <h4 className="font-semibold mb-2">{email.subject}</h4>
-                          
+
                           <p className="text-sm text-muted-foreground mb-3 line-clamp-3">
                             {email.message_content}
                           </p>
@@ -167,7 +162,7 @@ export const WaliEmailHistoryDialog = ({
                               <span className="text-muted-foreground">Envoyé par:</span>
                               <p className="font-medium">{email.sender_name}</p>
                             </div>
-                            
+
                             {email.delivered_at && (
                               <div>
                                 <span className="text-muted-foreground">Délivré:</span>
@@ -206,7 +201,8 @@ export const WaliEmailHistoryDialog = ({
 
                           {email.metadata?.suspension_duration_days && (
                             <div className="mt-3 p-2 bg-muted rounded text-xs">
-                              <strong>Durée de suspension:</strong> {email.metadata.suspension_duration_days} jours
+                              <strong>Durée de suspension:</strong>{' '}
+                              {email.metadata.suspension_duration_days} jours
                             </div>
                           )}
                         </CardContent>

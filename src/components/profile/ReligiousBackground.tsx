@@ -1,13 +1,14 @@
-
-import { Label } from "@/components/ui/label";
-import { ProfileFormData } from "@/types/profile";
-import { FieldTooltip, TooltipProvider } from "@/components/ui/tooltip";
-import { fieldTooltips } from "@/utils/profileTooltips";
-import MadhabField from "./MadhabField";
+import { Label } from '@/components/ui/label';
+import { ProfileFormData } from '@/types/profile';
+import { FieldTooltip, TooltipProvider } from '@/components/ui/tooltip';
+import { fieldTooltips } from '@/utils/profileTooltips';
+import MadhabField from './MadhabField';
 
 interface ReligiousBackgroundProps {
   formData: ProfileFormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => void;
 }
 
 const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProps) => {
@@ -15,15 +16,17 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
     const event = {
       target: {
         name: 'madhab',
-        value: value
-      }
+        value: value,
+      },
     } as React.ChangeEvent<HTMLSelectElement>;
     handleChange(event);
   };
 
   return (
     <div className="space-y-4">
-      <h2 id="religious-background-heading" className="text-xl font-semibold text-primary">Religious Background</h2>
+      <h2 id="religious-background-heading" className="text-xl font-semibold text-primary">
+        Religious Background
+      </h2>
       <div className="grid grid-cols-1 gap-4">
         <div className="space-y-2">
           <div className="flex items-center">
@@ -50,12 +53,9 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
             How you would describe your level of religious practice
           </p>
         </div>
-        
-        <MadhabField 
-          value={formData.madhab || ''} 
-          onChange={handleMadhabChange} 
-        />
-        
+
+        <MadhabField value={formData.madhab || ''} onChange={handleMadhabChange} />
+
         <div className="space-y-2">
           <div className="flex items-center">
             <Label htmlFor="prayerFrequency">Prayer Frequency</Label>

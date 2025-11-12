@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { CompatibilityMatch } from '@/types/compatibility';
 import { useEnhancedLazyLoading } from '@/hooks/useLazyLoading/useEnhancedLazyLoading';
@@ -26,11 +25,11 @@ export const useEnhancedDeferredCompatibility = ({
   // Sort matches with verified profiles prioritized
   const sortedMatches = useMemo(() => {
     if (!prioritizeVerified) return matches;
-    
+
     return [...matches].sort((a, b) => {
       const aVerified = a.profileData?.email_verified || a.profileData?.phone_verified || false;
       const bVerified = b.profileData?.email_verified || b.profileData?.phone_verified || false;
-      
+
       if (aVerified && !bVerified) return -1;
       if (!aVerified && bVerified) return 1;
       return b.score - a.score; // Fallback to score sorting
@@ -42,33 +41,37 @@ export const useEnhancedDeferredCompatibility = ({
     if (isProcessing || processedCount >= sortedMatches.length) return;
 
     setIsProcessing(true);
-    
-    const batchSize = enableAdaptiveBatching 
+
+    const batchSize = enableAdaptiveBatching
       ? Math.min(config.batchSize, sortedMatches.length - processedCount)
       : config.batchSize;
 
     // Simulate processing time based on device capabilities
-    await new Promise(resolve => setTimeout(resolve, config.delay));
-    
-    setProcessedCount(prev => Math.min(prev + batchSize, sortedMatches.length));
+    await new Promise((resolve) => setTimeout(resolve, config.delay));
+
+    setProcessedCount((prev) => Math.min(prev + batchSize, sortedMatches.length));
     setIsProcessing(false);
   }, [isProcessing, processedCount, sortedMatches.length, enableAdaptiveBatching, config]);
 
   // Process matches when component becomes visible
   useEffect(() => {
     if (!shouldLoad || processedCount >= sortedMatches.length) return;
-    
+
     processBatch();
   }, [shouldLoad, processedCount, sortedMatches.length, processBatch]);
 
   // Preload next batch when user is close to the end
   useEffect(() => {
-    const shouldPreload = processedCount > 0 && 
-      (processedCount / sortedMatches.length) > 0.7 && 
+    const shouldPreload =
+      processedCount > 0 &&
+      processedCount / sortedMatches.length > 0.7 &&
       processedCount < sortedMatches.length;
 
     if (shouldPreload && !isProcessing) {
-      const remainingMatches = sortedMatches.slice(processedCount, processedCount + config.preloadDistance);
+      const remainingMatches = sortedMatches.slice(
+        processedCount,
+        processedCount + config.preloadDistance
+      );
       setProcessingQueue(remainingMatches);
     }
   }, [processedCount, sortedMatches, isProcessing, config.preloadDistance]);

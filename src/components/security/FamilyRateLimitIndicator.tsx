@@ -58,12 +58,12 @@ const FamilyRateLimitIndicator = () => {
     const nextReset = new Date(resetTime.getTime() + 24 * 60 * 60 * 1000);
     const now = new Date();
     const diffMs = nextReset.getTime() - now.getTime();
-    
+
     if (diffMs <= 0) return 'Réinitialisé';
-    
+
     const hours = Math.floor(diffMs / (1000 * 60 * 60));
     const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     if (hours > 0) return `${hours}h ${minutes}m`;
     return `${minutes}m`;
   };
@@ -86,9 +86,7 @@ const FamilyRateLimitIndicator = () => {
           <Users className="h-4 w-4 text-emerald" />
           <h4 className="text-sm font-medium">Limites d'opérations</h4>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Aucune opération effectuée aujourd'hui
-        </p>
+        <p className="text-xs text-muted-foreground">Aucune opération effectuée aujourd'hui</p>
       </Card>
     );
   }
@@ -131,10 +129,7 @@ const FamilyRateLimitIndicator = () => {
                 </div>
               </div>
 
-              <Progress 
-                value={percentage} 
-                className="h-2"
-              />
+              <Progress value={percentage} className="h-2" />
 
               <div className="flex items-center justify-between text-xs text-muted-foreground">
                 <span>Réinitialisation dans:</span>

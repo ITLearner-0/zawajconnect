@@ -287,9 +287,13 @@ Protected Pages
 // Subscription example
 const channel = supabase
   .channel('my-channel')
-  .on('postgres_changes', {
-    table: 'subscriptions'
-  }, handleChange)
+  .on(
+    'postgres_changes',
+    {
+      table: 'subscriptions',
+    },
+    handleChange
+  )
   .subscribe();
 ```
 

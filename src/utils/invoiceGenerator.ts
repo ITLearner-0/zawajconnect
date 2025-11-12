@@ -326,11 +326,11 @@ function createInvoiceHTML(invoice: InvoiceData): string {
       </div>
       <div class="totals-row">
         <span>TVA (20%):</span>
-        <span>${formatCurrency(invoice.amount * 0.20, invoice.currency)}</span>
+        <span>${formatCurrency(invoice.amount * 0.2, invoice.currency)}</span>
       </div>
       <div class="totals-row total">
         <span>Total TTC:</span>
-        <span>${formatCurrency(invoice.amount * 1.20, invoice.currency)}</span>
+        <span>${formatCurrency(invoice.amount * 1.2, invoice.currency)}</span>
       </div>
     </div>
 
@@ -359,10 +359,10 @@ function createInvoiceHTML(invoice: InvoiceData): string {
  */
 function translateStatus(status: string): string {
   const translations: Record<string, string> = {
-    'completed': 'Payé',
-    'pending': 'En attente',
-    'failed': 'Échoué',
-    'refunded': 'Remboursé',
+    completed: 'Payé',
+    pending: 'En attente',
+    failed: 'Échoué',
+    refunded: 'Remboursé',
   };
   return translations[status.toLowerCase()] || status;
 }

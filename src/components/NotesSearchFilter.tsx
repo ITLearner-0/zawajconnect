@@ -11,7 +11,12 @@ interface NotesSearchFilterProps {
   resultsCount?: number;
 }
 
-const NotesSearchFilter = ({ onSearch, onClear, isActive, resultsCount }: NotesSearchFilterProps) => {
+const NotesSearchFilter = ({
+  onSearch,
+  onClear,
+  isActive,
+  resultsCount,
+}: NotesSearchFilterProps) => {
   const [keyword, setKeyword] = useState('');
 
   const handleSearch = () => {

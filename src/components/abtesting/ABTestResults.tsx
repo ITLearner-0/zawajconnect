@@ -1,8 +1,8 @@
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Skeleton } from "@/components/ui/skeleton";
-import { TrendingUp, Mail, Eye, MousePointerClick, DollarSign } from "lucide-react";
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TrendingUp, Mail, Eye, MousePointerClick, DollarSign } from 'lucide-react';
 
 interface ABTestAnalytics {
   id: string | null;
@@ -57,35 +57,33 @@ export function ABTestResults({ analytics, isLoading, reminderType }: ABTestResu
   }
 
   // Find winner (highest conversion rate)
-  const winner = analytics.reduce((prev, current) => 
-    ((current.conversion_rate || 0) > (prev.conversion_rate || 0)) ? current : prev
+  const winner = analytics.reduce((prev, current) =>
+    (current.conversion_rate || 0) > (prev.conversion_rate || 0) ? current : prev
   );
 
   return (
     <div className="space-y-4">
       {analytics.map((variant) => {
         const isWinner = variant.id === winner.id && (variant.total_sent || 0) > 0;
-        
+
         return (
           <Card key={variant.id} className={`p-6 ${isWinner ? 'border-green-500 border-2' : ''}`}>
             <div className="flex items-start justify-between mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="text-lg font-semibold">{variant.variant_name || 'N/A'}</h3>
-                  {isWinner && (
-                    <Badge className="bg-green-500">
-                      🏆 Meilleur Taux
-                    </Badge>
-                  )}
-                  {!variant.is_active && (
-                    <Badge variant="secondary">Inactif</Badge>
-                  )}
+                  {isWinner && <Badge className="bg-green-500">🏆 Meilleur Taux</Badge>}
+                  {!variant.is_active && <Badge variant="secondary">Inactif</Badge>}
                   <Badge variant="outline">{variant.email_tone || 'N/A'}</Badge>
                 </div>
                 <p className="text-sm text-muted-foreground">{variant.subject_line || 'N/A'}</p>
                 <div className="flex items-center gap-4 mt-2 text-sm">
-                  <span>Offre: <strong>-{variant.offer_percentage || 0}%</strong></span>
-                  <span>Traffic: <strong>{variant.traffic_allocation || 0}%</strong></span>
+                  <span>
+                    Offre: <strong>-{variant.offer_percentage || 0}%</strong>
+                  </span>
+                  <span>
+                    Traffic: <strong>{variant.traffic_allocation || 0}%</strong>
+                  </span>
                 </div>
               </div>
             </div>
@@ -123,7 +121,9 @@ export function ABTestResults({ analytics, isLoading, reminderType }: ABTestResu
                   <span>Conversion</span>
                 </div>
                 <p className="text-2xl font-bold">{variant.conversion_rate || 0}%</p>
-                <p className="text-xs text-muted-foreground">{variant.total_renewed || 0} renouv.</p>
+                <p className="text-xs text-muted-foreground">
+                  {variant.total_renewed || 0} renouv.
+                </p>
               </div>
 
               <div className="space-y-1">
@@ -132,7 +132,9 @@ export function ABTestResults({ analytics, isLoading, reminderType }: ABTestResu
                   <span>Revenus</span>
                 </div>
                 <p className="text-2xl font-bold">{variant.total_revenue?.toFixed(0) || 0}€</p>
-                <p className="text-xs text-muted-foreground">{variant.revenue_per_email?.toFixed(2) || 0}€/email</p>
+                <p className="text-xs text-muted-foreground">
+                  {variant.revenue_per_email?.toFixed(2) || 0}€/email
+                </p>
               </div>
             </div>
 
@@ -142,13 +144,13 @@ export function ABTestResults({ analytics, isLoading, reminderType }: ABTestResu
                 <span className="font-medium">{variant.open_rate || 0}%</span>
               </div>
               <Progress value={variant.open_rate || 0} className="h-2" />
-              
+
               <div className="flex items-center justify-between text-sm">
                 <span>Taux de clic</span>
                 <span className="font-medium">{variant.click_rate || 0}%</span>
               </div>
               <Progress value={variant.click_rate || 0} className="h-2" />
-              
+
               <div className="flex items-center justify-between text-sm">
                 <span>Taux de conversion</span>
                 <span className="font-medium">{variant.conversion_rate || 0}%</span>

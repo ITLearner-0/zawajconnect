@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,7 +13,7 @@ interface ProfileFormActionsProps {
 const ProfileFormActions: React.FC<ProfileFormActionsProps> = ({
   onSubmit,
   isSubmitting,
-  hasErrors = false
+  hasErrors = false,
 }) => {
   const handleSubmitClick = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,9 +31,9 @@ const ProfileFormActions: React.FC<ProfileFormActionsProps> = ({
             </AlertDescription>
           </Alert>
         )}
-        
+
         <div className="flex justify-end">
-          <Button 
+          <Button
             onClick={handleSubmitClick}
             disabled={isSubmitting || hasErrors}
             className="flex items-center gap-2"

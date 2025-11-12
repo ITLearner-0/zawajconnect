@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Send, Lock, Timer, Mic, BookOpen, Calendar, Shield } from 'lucide-react';
 import VoiceMessageRecorder from './VoiceMessageRecorder';
@@ -55,7 +61,7 @@ const TEMP_DURATION_OPTIONS = [
   { value: 1, label: '1h' },
   { value: 6, label: '6h' },
   { value: 24, label: '1j' },
-  { value: 168, label: '1s' }
+  { value: 168, label: '1s' },
 ];
 
 const EnhancedMessageInput: React.FC<EnhancedMessageInputProps> = ({
@@ -70,7 +76,7 @@ const EnhancedMessageInput: React.FC<EnhancedMessageInputProps> = ({
   onScheduleCall,
   isWaliRequired = false,
   temporaryMessageSettings,
-  onTemporarySettingsChange
+  onTemporarySettingsChange,
 }) => {
   const [isRecordingMode, setIsRecordingMode] = useState(false);
   const [selectedTempDuration, setSelectedTempDuration] = useState<number | null>(null);
@@ -102,18 +108,11 @@ const EnhancedMessageInput: React.FC<EnhancedMessageInputProps> = ({
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium">Mode Vocal</span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsRecordingMode(false)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setIsRecordingMode(false)}>
               Texte
             </Button>
           </div>
-          <VoiceMessageRecorder
-            onSendVoiceMessage={onSendVoiceMessage}
-            disabled={sendingMessage}
-          />
+          <VoiceMessageRecorder onSendVoiceMessage={onSendVoiceMessage} disabled={sendingMessage} />
         </div>
       ) : (
         <div className="space-y-3">
@@ -139,7 +138,7 @@ const EnhancedMessageInput: React.FC<EnhancedMessageInputProps> = ({
             {temporaryMessageSettings.enabled && (
               <Select
                 value={selectedTempDuration?.toString() || 'none'}
-                onValueChange={(value) => 
+                onValueChange={(value) =>
                   setSelectedTempDuration(value === 'none' ? null : parseInt(value))
                 }
               >
@@ -149,8 +148,7 @@ const EnhancedMessageInput: React.FC<EnhancedMessageInputProps> = ({
                 <SelectContent>
                   <SelectItem value="none">
                     <div className="flex items-center gap-1">
-                      <Shield className="h-3 w-3" />
-                      ∞
+                      <Shield className="h-3 w-3" />∞
                     </div>
                   </SelectItem>
                   {TEMP_DURATION_OPTIONS.map((option) => (
@@ -176,9 +174,9 @@ const EnhancedMessageInput: React.FC<EnhancedMessageInputProps> = ({
             />
 
             {/* Send Button */}
-            <Button 
-              onClick={handleSend} 
-              disabled={sendingMessage || !messageInput.trim()} 
+            <Button
+              onClick={handleSend}
+              disabled={sendingMessage || !messageInput.trim()}
               size="sm"
             >
               {sendingMessage ? (
@@ -192,11 +190,7 @@ const EnhancedMessageInput: React.FC<EnhancedMessageInputProps> = ({
           {/* Action Buttons Row */}
           <div className="flex items-center gap-2 flex-wrap">
             {/* Voice Mode Toggle */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setIsRecordingMode(true)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setIsRecordingMode(true)}>
               <Mic className="h-4 w-4 mr-1" />
               Vocal
             </Button>
@@ -227,11 +221,14 @@ const EnhancedMessageInput: React.FC<EnhancedMessageInputProps> = ({
                   <span>Chiffré</span>
                 </div>
               )}
-              
+
               {selectedTempDuration && (
                 <div className="flex items-center gap-1">
                   <Timer className="h-3 w-3 text-orange-600" />
-                  <span>Expire dans {TEMP_DURATION_OPTIONS.find(o => o.value === selectedTempDuration)?.label}</span>
+                  <span>
+                    Expire dans{' '}
+                    {TEMP_DURATION_OPTIONS.find((o) => o.value === selectedTempDuration)?.label}
+                  </span>
                 </div>
               )}
             </div>

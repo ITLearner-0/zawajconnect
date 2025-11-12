@@ -1,5 +1,4 @@
-
-import { ProfileFormData, PrivacySettings, VerificationStatus } from "@/types/profile";
+import { ProfileFormData, PrivacySettings, VerificationStatus } from '@/types/profile';
 
 export interface ProfileFetcherResult {
   profileData: ProfileFormData | null;

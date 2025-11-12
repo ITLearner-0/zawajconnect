@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 
 export const ContentSecurityPolicy = () => {
@@ -17,7 +16,7 @@ export const ContentSecurityPolicy = () => {
       "frame-src 'none'",
       "object-src 'none'",
       "base-uri 'self'",
-      "form-action 'self'"
+      "form-action 'self'",
     ].join('; ');
 
     // Only add if not already present

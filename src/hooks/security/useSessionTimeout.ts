@@ -1,4 +1,3 @@
-
 import { useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -11,14 +10,16 @@ interface UseSessionTimeoutProps {
 export const useSessionTimeout = ({
   currentUserId,
   sessionTimeout,
-  updateLastActivity
+  updateLastActivity,
 }: UseSessionTimeoutProps) => {
   const checkSessionValidity = useCallback(async () => {
     if (!currentUserId) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!session) {
         // Session is invalid, redirect to login
         window.location.href = '/auth';
@@ -52,13 +53,13 @@ export const useSessionTimeout = ({
     };
 
     const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-    events.forEach(event => {
+    events.forEach((event) => {
       document.addEventListener(event, handleUserActivity, { passive: true });
     });
 
     return () => {
       clearInterval(interval);
-      events.forEach(event => {
+      events.forEach((event) => {
         document.removeEventListener(event, handleUserActivity);
       });
     };

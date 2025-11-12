@@ -9,13 +9,13 @@ import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  ArrowLeft, 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
+import {
+  ArrowLeft,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
   Heart,
   Shield,
   Users,
@@ -26,7 +26,7 @@ import {
   BookOpen,
   Briefcase,
   GraduationCap,
-  Home
+  Home,
 } from 'lucide-react';
 
 interface ProfileData {
@@ -98,7 +98,7 @@ const AdminUserProfile = () => {
   const [stats, setStats] = useState({
     totalMatches: 0,
     activeConversations: 0,
-    totalMessages: 0
+    totalMessages: 0,
   });
 
   useEffect(() => {
@@ -121,75 +121,123 @@ const AdminUserProfile = () => {
         verificationResult,
         matchingResult,
         matchesResult,
-        messagesResult
+        messagesResult,
       ] = await Promise.all([
-        supabase.from('profiles').select('*').eq('user_id', userId ?? '').single(),
-        supabase.from('islamic_preferences').select('*').eq('user_id', userId ?? '').maybeSingle(),
-        supabase.from('privacy_settings').select('*').eq('user_id', userId ?? '').maybeSingle(),
-        supabase.from('user_verifications').select('*').eq('user_id', userId ?? '').maybeSingle(),
-        supabase.from('matching_preferences').select('*').eq('user_id', userId ?? '').maybeSingle(),
-        supabase.from('matches').select('*', { count: 'exact', head: true })
+        supabase
+          .from('profiles')
+          .select('*')
+          .eq('user_id', userId ?? '')
+          .single(),
+        supabase
+          .from('islamic_preferences')
+          .select('*')
+          .eq('user_id', userId ?? '')
+          .maybeSingle(),
+        supabase
+          .from('privacy_settings')
+          .select('*')
+          .eq('user_id', userId ?? '')
+          .maybeSingle(),
+        supabase
+          .from('user_verifications')
+          .select('*')
+          .eq('user_id', userId ?? '')
+          .maybeSingle(),
+        supabase
+          .from('matching_preferences')
+          .select('*')
+          .eq('user_id', userId ?? '')
+          .maybeSingle(),
+        supabase
+          .from('matches')
+          .select('*', { count: 'exact', head: true })
           .or(`user1_id.eq.${userId ?? ''},user2_id.eq.${userId ?? ''}`),
-        supabase.from('messages').select('*', { count: 'exact', head: true })
-          .eq('sender_id', userId ?? '')
+        supabase
+          .from('messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('sender_id', userId ?? ''),
       ]);
 
       if (profileResult.error) throw profileResult.error;
 
-      setProfile(profileResult.data ? {
-        ...profileResult.data,
-        full_name: profileResult.data.full_name ?? '',
-        age: profileResult.data.age ?? 0,
-        gender: profileResult.data.gender ?? '',
-        location: profileResult.data.location ?? '',
-        bio: profileResult.data.bio ?? '',
-        avatar_url: profileResult.data.avatar_url ?? '',
-        education: profileResult.data.education ?? '',
-        profession: profileResult.data.profession ?? '',
-        interests: (profileResult.data.interests ?? []).filter((i): i is string => i !== null)
-      } : undefined);
-      
-      setIslamicPrefs(islamicResult.data ? {
-        prayer_frequency: islamicResult.data.prayer_frequency ?? '',
-        quran_reading: islamicResult.data.quran_reading ?? '',
-        madhab: islamicResult.data.madhab ?? '',
-        halal_diet: !!islamicResult.data.halal_diet,
-        hijab_preference: islamicResult.data.hijab_preference ?? '',
-        beard_preference: islamicResult.data.beard_preference ?? undefined,
-        desired_partner_sect: islamicResult.data.desired_partner_sect ?? undefined,
-        importance_of_religion: islamicResult.data.importance_of_religion ?? undefined
-      } : undefined);
-      
-      setPrivacySettings(privacyResult.data ? {
-        profile_visibility: privacyResult.data.profile_visibility ?? '',
-        allow_family_involvement: !!privacyResult.data.allow_family_involvement,
-        allow_messages_from: privacyResult.data.allow_messages_from ?? undefined,
-        allow_profile_views: !!privacyResult.data.allow_profile_views,
-        contact_visibility: privacyResult.data.contact_visibility ?? undefined,
-        last_seen_visibility: privacyResult.data.last_seen_visibility ?? undefined,
-        photo_visibility: privacyResult.data.photo_visibility ?? undefined
-      } : undefined);
-      
-      setVerification(verificationResult.data ? {
-        email_verified: !!verificationResult.data.email_verified,
-        phone_verified: !!verificationResult.data.phone_verified,
-        id_verified: !!verificationResult.data.id_verified,
-        verification_score: verificationResult.data.verification_score ?? 0
-      } : undefined);
-      
-      setMatchingPrefs(matchingResult.data ? {
-        min_age: (matchingResult.data as any).min_age ?? undefined,
-        max_age: (matchingResult.data as any).max_age ?? undefined,
-        preferred_locations: ((matchingResult.data as any).preferred_locations ?? []).filter((l: string | null): l is string => l !== null),
-        education_preference: (matchingResult.data as any).education_preference ?? undefined,
-        family_approval_required: !!matchingResult.data.family_approval_required,
-        min_compatibility: matchingResult.data.min_compatibility ?? undefined,
-        use_ai_scoring: !!matchingResult.data.use_ai_scoring,
-        weight_cultural: matchingResult.data.weight_cultural ?? undefined,
-        weight_islamic: matchingResult.data.weight_islamic ?? undefined,
-        weight_personality: matchingResult.data.weight_personality ?? undefined
-      } : undefined);
-      
+      setProfile(
+        profileResult.data
+          ? {
+              ...profileResult.data,
+              full_name: profileResult.data.full_name ?? '',
+              age: profileResult.data.age ?? 0,
+              gender: profileResult.data.gender ?? '',
+              location: profileResult.data.location ?? '',
+              bio: profileResult.data.bio ?? '',
+              avatar_url: profileResult.data.avatar_url ?? '',
+              education: profileResult.data.education ?? '',
+              profession: profileResult.data.profession ?? '',
+              interests: (profileResult.data.interests ?? []).filter(
+                (i): i is string => i !== null
+              ),
+            }
+          : undefined
+      );
+
+      setIslamicPrefs(
+        islamicResult.data
+          ? {
+              prayer_frequency: islamicResult.data.prayer_frequency ?? '',
+              quran_reading: islamicResult.data.quran_reading ?? '',
+              madhab: islamicResult.data.madhab ?? '',
+              halal_diet: !!islamicResult.data.halal_diet,
+              hijab_preference: islamicResult.data.hijab_preference ?? '',
+              beard_preference: islamicResult.data.beard_preference ?? undefined,
+              desired_partner_sect: islamicResult.data.desired_partner_sect ?? undefined,
+              importance_of_religion: islamicResult.data.importance_of_religion ?? undefined,
+            }
+          : undefined
+      );
+
+      setPrivacySettings(
+        privacyResult.data
+          ? {
+              profile_visibility: privacyResult.data.profile_visibility ?? '',
+              allow_family_involvement: !!privacyResult.data.allow_family_involvement,
+              allow_messages_from: privacyResult.data.allow_messages_from ?? undefined,
+              allow_profile_views: !!privacyResult.data.allow_profile_views,
+              contact_visibility: privacyResult.data.contact_visibility ?? undefined,
+              last_seen_visibility: privacyResult.data.last_seen_visibility ?? undefined,
+              photo_visibility: privacyResult.data.photo_visibility ?? undefined,
+            }
+          : undefined
+      );
+
+      setVerification(
+        verificationResult.data
+          ? {
+              email_verified: !!verificationResult.data.email_verified,
+              phone_verified: !!verificationResult.data.phone_verified,
+              id_verified: !!verificationResult.data.id_verified,
+              verification_score: verificationResult.data.verification_score ?? 0,
+            }
+          : undefined
+      );
+
+      setMatchingPrefs(
+        matchingResult.data
+          ? {
+              min_age: (matchingResult.data as any).min_age ?? undefined,
+              max_age: (matchingResult.data as any).max_age ?? undefined,
+              preferred_locations: ((matchingResult.data as any).preferred_locations ?? []).filter(
+                (l: string | null): l is string => l !== null
+              ),
+              education_preference: (matchingResult.data as any).education_preference ?? undefined,
+              family_approval_required: !!matchingResult.data.family_approval_required,
+              min_compatibility: matchingResult.data.min_compatibility ?? undefined,
+              use_ai_scoring: !!matchingResult.data.use_ai_scoring,
+              weight_cultural: matchingResult.data.weight_cultural ?? undefined,
+              weight_islamic: matchingResult.data.weight_islamic ?? undefined,
+              weight_personality: matchingResult.data.weight_personality ?? undefined,
+            }
+          : undefined
+      );
+
       // Count active conversations
       const { count: activeConversations } = await supabase
         .from('matches')
@@ -200,15 +248,14 @@ const AdminUserProfile = () => {
       setStats({
         totalMatches: matchesResult.count || 0,
         activeConversations: activeConversations || 0,
-        totalMessages: messagesResult.count || 0
+        totalMessages: messagesResult.count || 0,
       });
-
     } catch (error) {
       console.error('Error loading user profile:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger le profil utilisateur",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger le profil utilisateur',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -359,7 +406,7 @@ const AdminUserProfile = () => {
                     <p className="text-muted-foreground">{profile.bio || 'Non renseignée'}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <GraduationCap className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div className="flex-1">
@@ -367,22 +414,26 @@ const AdminUserProfile = () => {
                     <p className="text-muted-foreground">{profile.education || 'Non renseignée'}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <Briefcase className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div className="flex-1">
                     <p className="font-medium">Profession</p>
-                    <p className="text-muted-foreground">{profile.profession || 'Non renseignée'}</p>
+                    <p className="text-muted-foreground">
+                      {profile.profession || 'Non renseignée'}
+                    </p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-start gap-3">
                   <Heart className="h-5 w-5 text-muted-foreground mt-0.5" />
                   <div className="flex-1">
                     <p className="font-medium">Centres d'intérêt</p>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {profile.interests?.map((interest, idx) => (
-                        <Badge key={idx} variant="outline">{interest}</Badge>
+                        <Badge key={idx} variant="outline">
+                          {interest}
+                        </Badge>
                       )) || <span className="text-muted-foreground">Aucun</span>}
                     </div>
                   </div>
@@ -403,11 +454,15 @@ const AdminUserProfile = () => {
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="font-medium">Fréquence de prière</span>
-                    <span className="text-muted-foreground capitalize">{islamicPrefs.prayer_frequency}</span>
+                    <span className="text-muted-foreground capitalize">
+                      {islamicPrefs.prayer_frequency}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-medium">Lecture du Coran</span>
-                    <span className="text-muted-foreground capitalize">{islamicPrefs.quran_reading}</span>
+                    <span className="text-muted-foreground capitalize">
+                      {islamicPrefs.quran_reading}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="font-medium">Madhab</span>
@@ -424,7 +479,9 @@ const AdminUserProfile = () => {
                   {islamicPrefs.hijab_preference && (
                     <div className="flex justify-between">
                       <span className="font-medium">Préférence Hijab</span>
-                      <span className="text-muted-foreground capitalize">{islamicPrefs.hijab_preference}</span>
+                      <span className="text-muted-foreground capitalize">
+                        {islamicPrefs.hijab_preference}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -452,23 +509,28 @@ const AdminUserProfile = () => {
                       </span>
                     </div>
                   )}
-                  {matchingPrefs.preferred_locations && matchingPrefs.preferred_locations.length > 0 && (
-                    <div className="flex items-start gap-3">
-                      <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
-                      <div className="flex-1">
-                        <p className="font-medium">Localisations préférées</p>
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {matchingPrefs.preferred_locations.map((loc, idx) => (
-                            <Badge key={idx} variant="outline">{loc}</Badge>
-                          ))}
+                  {matchingPrefs.preferred_locations &&
+                    matchingPrefs.preferred_locations.length > 0 && (
+                      <div className="flex items-start gap-3">
+                        <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
+                        <div className="flex-1">
+                          <p className="font-medium">Localisations préférées</p>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {matchingPrefs.preferred_locations.map((loc, idx) => (
+                              <Badge key={idx} variant="outline">
+                                {loc}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
                   {matchingPrefs.education_preference && (
                     <div className="flex justify-between">
                       <span className="font-medium">Niveau d'éducation</span>
-                      <span className="text-muted-foreground capitalize">{matchingPrefs.education_preference}</span>
+                      <span className="text-muted-foreground capitalize">
+                        {matchingPrefs.education_preference}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -496,7 +558,9 @@ const AdminUserProfile = () => {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Implication familiale</span>
-                    <Badge variant={privacySettings.allow_family_involvement ? 'default' : 'secondary'}>
+                    <Badge
+                      variant={privacySettings.allow_family_involvement ? 'default' : 'secondary'}
+                    >
                       {privacySettings.allow_family_involvement ? 'Autorisée' : 'Non autorisée'}
                     </Badge>
                   </div>
@@ -528,21 +592,33 @@ const AdminUserProfile = () => {
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Email vérifié</span>
                     <Badge variant={verification.email_verified ? 'default' : 'secondary'}>
-                      {verification.email_verified ? <CheckCircle className="h-3 w-3 mr-1" /> : <Clock className="h-3 w-3 mr-1" />}
+                      {verification.email_verified ? (
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                      ) : (
+                        <Clock className="h-3 w-3 mr-1" />
+                      )}
                       {verification.email_verified ? 'Vérifié' : 'Non vérifié'}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Téléphone vérifié</span>
                     <Badge variant={verification.phone_verified ? 'default' : 'secondary'}>
-                      {verification.phone_verified ? <CheckCircle className="h-3 w-3 mr-1" /> : <Clock className="h-3 w-3 mr-1" />}
+                      {verification.phone_verified ? (
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                      ) : (
+                        <Clock className="h-3 w-3 mr-1" />
+                      )}
                       {verification.phone_verified ? 'Vérifié' : 'Non vérifié'}
                     </Badge>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Identité vérifiée</span>
                     <Badge variant={verification.id_verified ? 'default' : 'secondary'}>
-                      {verification.id_verified ? <CheckCircle className="h-3 w-3 mr-1" /> : <Clock className="h-3 w-3 mr-1" />}
+                      {verification.id_verified ? (
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                      ) : (
+                        <Clock className="h-3 w-3 mr-1" />
+                      )}
                       {verification.id_verified ? 'Vérifié' : 'Non vérifié'}
                     </Badge>
                   </div>
@@ -551,12 +627,14 @@ const AdminUserProfile = () => {
                       <span className="font-medium">Score de vérification global</span>
                       <div className="flex items-center gap-2">
                         <div className="w-32 h-2 bg-secondary rounded-full overflow-hidden">
-                          <div 
+                          <div
                             className="h-full bg-gradient-to-r from-emerald to-gold transition-all"
                             style={{ width: `${verification.verification_score}%` }}
                           />
                         </div>
-                        <span className="font-bold text-lg">{verification.verification_score}%</span>
+                        <span className="font-bold text-lg">
+                          {verification.verification_score}%
+                        </span>
                       </div>
                     </div>
                   </div>

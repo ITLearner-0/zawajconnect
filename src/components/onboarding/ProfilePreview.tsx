@@ -2,15 +2,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
-import { 
-  MapPin, 
-  Briefcase, 
-  GraduationCap, 
-  Heart, 
+import {
+  MapPin,
+  Briefcase,
+  GraduationCap,
+  Heart,
   Star,
   Shield,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
 } from 'lucide-react';
 
 interface ProfileData {
@@ -45,11 +45,15 @@ interface ProfilePreviewProps {
   completionPercentage: number;
 }
 
-const ProfilePreview = ({ profileData, islamicPrefs, completionPercentage }: ProfilePreviewProps) => {
+const ProfilePreview = ({
+  profileData,
+  islamicPrefs,
+  completionPercentage,
+}: ProfilePreviewProps) => {
   const getInitials = (name: string) => {
     return name
       .split(' ')
-      .map(n => n[0])
+      .map((n) => n[0])
       .join('')
       .toUpperCase();
   };
@@ -71,34 +75,34 @@ const ProfilePreview = ({ profileData, islamicPrefs, completionPercentage }: Pro
     const labels: { [key: string]: { [value: string]: string } } = {
       prayer_frequency: {
         '5_times_daily': '5x/jour',
-        'often': 'Souvent',
-        'sometimes': 'Parfois',
-        'fridays_only': 'Vendredi',
-        'occasionally': 'Occasionnel',
-        'rarely': 'Rarement',
-        'never': 'Jamais'
+        often: 'Souvent',
+        sometimes: 'Parfois',
+        fridays_only: 'Vendredi',
+        occasionally: 'Occasionnel',
+        rarely: 'Rarement',
+        never: 'Jamais',
       },
       quran_reading: {
-        'daily': 'Quotidien',
-        'weekly': 'Hebdo',
-        'monthly': 'Mensuel',
-        'occasionally': 'Occasionnel',
-        'rarely': 'Rare',
-        'learning': 'Apprentissage'
+        daily: 'Quotidien',
+        weekly: 'Hebdo',
+        monthly: 'Mensuel',
+        occasionally: 'Occasionnel',
+        rarely: 'Rare',
+        learning: 'Apprentissage',
       },
       sect: {
-        'sunni': 'Sunnite',
-        'shia': 'Chiite',
-        'other': 'Autre',
-        'prefer_not_to_say': 'Non précisé'
+        sunni: 'Sunnite',
+        shia: 'Chiite',
+        other: 'Autre',
+        prefer_not_to_say: 'Non précisé',
       },
       importance_of_religion: {
-        'very_important': 'Très important',
-        'important': 'Important',
-        'somewhat_important': 'Assez important',
-        'not_important': 'Peu important',
-        'extremely_important': 'Extrêmement important'
-      }
+        very_important: 'Très important',
+        important: 'Important',
+        somewhat_important: 'Assez important',
+        not_important: 'Peu important',
+        extremely_important: 'Extrêmement important',
+      },
     };
     return labels[key]?.[value] || value;
   };
@@ -108,17 +112,14 @@ const ProfilePreview = ({ profileData, islamicPrefs, completionPercentage }: Pro
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Aperçu de votre profil</CardTitle>
-          <Badge 
-            variant={completionPercentage >= 80 ? 'default' : 'secondary'} 
+          <Badge
+            variant={completionPercentage >= 80 ? 'default' : 'secondary'}
             className={`${getCompletionColor(completionPercentage)} animate-pulse-gentle`}
           >
             {Math.round(completionPercentage)}% complété
           </Badge>
         </div>
-        <Progress 
-          value={completionPercentage} 
-          className="h-2 animate-slide-in-right" 
-        />
+        <Progress value={completionPercentage} className="h-2 animate-slide-in-right" />
         <p className={`text-sm ${getCompletionColor(completionPercentage)} font-medium`}>
           {getCompletionMessage(completionPercentage)}
         </p>
@@ -140,11 +141,9 @@ const ProfilePreview = ({ profileData, islamicPrefs, completionPercentage }: Pro
               </div>
             )}
           </div>
-          
+
           <div className="flex-1">
-            <h3 className="font-semibold text-lg">
-              {profileData.full_name || 'Votre nom'}
-            </h3>
+            <h3 className="font-semibold text-lg">{profileData.full_name || 'Votre nom'}</h3>
             <div className="flex items-center space-x-2 text-sm text-muted-foreground">
               {profileData.age && <span>{profileData.age} ans</span>}
               {profileData.location && (
@@ -168,7 +167,8 @@ const ProfilePreview = ({ profileData, islamicPrefs, completionPercentage }: Pro
               <span>À propos</span>
             </h4>
             <p className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
-              {profileData.bio.slice(0, 100)}{profileData.bio.length > 100 ? '...' : ''}
+              {profileData.bio.slice(0, 100)}
+              {profileData.bio.length > 100 ? '...' : ''}
             </p>
           </div>
         )}
@@ -223,7 +223,9 @@ const ProfilePreview = ({ profileData, islamicPrefs, completionPercentage }: Pro
             {islamicPrefs.prayer_frequency && (
               <div className="bg-emerald/10 p-2 rounded">
                 <div className="text-muted-foreground">Prière</div>
-                <div className="font-medium">{formatPreference('prayer_frequency', islamicPrefs.prayer_frequency)}</div>
+                <div className="font-medium">
+                  {formatPreference('prayer_frequency', islamicPrefs.prayer_frequency)}
+                </div>
               </div>
             )}
             {islamicPrefs.sect && (
@@ -235,13 +237,17 @@ const ProfilePreview = ({ profileData, islamicPrefs, completionPercentage }: Pro
             {islamicPrefs.quran_reading && (
               <div className="bg-emerald/10 p-2 rounded">
                 <div className="text-muted-foreground">Coran</div>
-                <div className="font-medium">{formatPreference('quran_reading', islamicPrefs.quran_reading)}</div>
+                <div className="font-medium">
+                  {formatPreference('quran_reading', islamicPrefs.quran_reading)}
+                </div>
               </div>
             )}
             {islamicPrefs.importance_of_religion && (
               <div className="bg-emerald/10 p-2 rounded">
                 <div className="text-muted-foreground">Importance</div>
-                <div className="font-medium">{formatPreference('importance_of_religion', islamicPrefs.importance_of_religion)}</div>
+                <div className="font-medium">
+                  {formatPreference('importance_of_religion', islamicPrefs.importance_of_religion)}
+                </div>
               </div>
             )}
           </div>
@@ -255,7 +261,8 @@ const ProfilePreview = ({ profileData, islamicPrefs, completionPercentage }: Pro
               <span>Recherche</span>
             </h4>
             <p className="text-sm text-muted-foreground bg-gold/10 p-3 rounded-lg">
-              {profileData.looking_for.slice(0, 80)}{profileData.looking_for.length > 80 ? '...' : ''}
+              {profileData.looking_for.slice(0, 80)}
+              {profileData.looking_for.length > 80 ? '...' : ''}
             </p>
           </div>
         )}
@@ -271,7 +278,9 @@ const ProfilePreview = ({ profileData, islamicPrefs, completionPercentage }: Pro
                   {!profileData.avatar_url && <li>• Ajoutez une photo de profil</li>}
                   {!profileData.bio && <li>• Rédigez une description personnelle</li>}
                   {profileData.interests.length < 3 && <li>• Ajoutez plus de centres d'intérêt</li>}
-                  {!islamicPrefs.prayer_frequency && <li>• Complétez vos préférences islamiques</li>}
+                  {!islamicPrefs.prayer_frequency && (
+                    <li>• Complétez vos préférences islamiques</li>
+                  )}
                 </ul>
               </div>
             </div>

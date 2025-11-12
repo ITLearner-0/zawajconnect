@@ -12,7 +12,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from '@/components/ui/select';
 
 interface FamilyMember {
   id: string;
@@ -39,7 +39,7 @@ export default function FamilyDataProtection() {
   const [verificationStatus, setVerificationStatus] = useState({
     email_verified: false,
     id_verified: false,
-    verification_score: 0
+    verification_score: 0,
   });
 
   useEffect(() => {
@@ -69,10 +69,13 @@ export default function FamilyDataProtection() {
 
         if (securityData) {
           setContactSettings({
-            contact_visibility: (securityData.contact_visibility || 'wali_only') as 'wali_only' | 'family' | 'private',
+            contact_visibility: (securityData.contact_visibility || 'wali_only') as
+              | 'wali_only'
+              | 'family'
+              | 'private',
             encrypted: true,
             access_count: securityData.access_count || 0,
-            last_accessed_at: securityData.last_accessed_at
+            last_accessed_at: securityData.last_accessed_at,
           });
         }
       }
@@ -96,7 +99,7 @@ export default function FamilyDataProtection() {
       setVerificationStatus({
         email_verified: data.email_verified || false,
         id_verified: data.id_verified || false,
-        verification_score: data.verification_score || 0
+        verification_score: data.verification_score || 0,
       });
     }
   };
@@ -113,17 +116,17 @@ export default function FamilyDataProtection() {
       if (error) throw error;
 
       toast({
-        title: "Paramètres mis à jour",
-        description: "Vos préférences de visibilité ont été enregistrées.",
+        title: 'Paramètres mis à jour',
+        description: 'Vos préférences de visibilité ont été enregistrées.',
       });
 
       loadFamilyData();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Une erreur est survenue";
+      const errorMessage = error instanceof Error ? error.message : 'Une erreur est survenue';
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: errorMessage,
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -132,12 +135,12 @@ export default function FamilyDataProtection() {
     const configs = {
       wali_only: { label: 'Wali uniquement', variant: 'default' as const, icon: Lock },
       family: { label: 'Famille', variant: 'secondary' as const, icon: Users },
-      private: { label: 'Privé', variant: 'outline' as const, icon: EyeOff }
+      private: { label: 'Privé', variant: 'outline' as const, icon: EyeOff },
     };
-    
+
     const config = configs[visibility as keyof typeof configs] || configs.private;
     const Icon = config.icon;
-    
+
     return (
       <Badge variant={config.variant} className="flex items-center gap-1">
         <Icon className="w-3 h-3" />
@@ -173,7 +176,7 @@ export default function FamilyDataProtection() {
               <Shield className="w-5 h-5 text-primary" />
               <CardTitle>Protection des données familiales</CardTitle>
             </div>
-            <Badge variant={securityScore >= 80 ? "default" : "destructive"}>
+            <Badge variant={securityScore >= 80 ? 'default' : 'destructive'}>
               Score: {securityScore}/100
             </Badge>
           </div>
@@ -254,9 +257,7 @@ export default function FamilyDataProtection() {
       <Card>
         <CardHeader>
           <CardTitle>Membres de la famille</CardTitle>
-          <CardDescription>
-            {familyMembers.length} membre(s) avec accès
-          </CardDescription>
+          <CardDescription>{familyMembers.length} membre(s) avec accès</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -275,9 +276,7 @@ export default function FamilyDataProtection() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  {member.is_wali && (
-                    <Badge variant="default">Wali</Badge>
-                  )}
+                  {member.is_wali && <Badge variant="default">Wali</Badge>}
                   {member.can_view_profile && (
                     <Badge variant="secondary">
                       <Eye className="w-3 h-3 mr-1" />
@@ -315,7 +314,7 @@ export default function FamilyDataProtection() {
                   <span>Complétez la vérification d'identité (+35 points)</span>
                 </li>
               )}
-              {familyMembers.filter(m => m.is_wali).length === 0 && (
+              {familyMembers.filter((m) => m.is_wali).length === 0 && (
                 <li className="flex items-start gap-2">
                   <AlertCircle className="w-4 h-4 text-destructive mt-0.5" />
                   <span>Configurez un Wali pour renforcer la sécurité (+20 points)</span>

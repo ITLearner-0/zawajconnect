@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -14,7 +13,7 @@ export const useSecurityMiddleware = () => {
     isSecure: false,
     emailVerified: false,
     phoneVerified: false,
-    loading: true
+    loading: true,
   });
 
   useEffect(() => {
@@ -23,14 +22,16 @@ export const useSecurityMiddleware = () => {
 
   const checkSecurityStatus = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!session?.user) {
         setSecurityStatus({
           isSecure: false,
           emailVerified: false,
           phoneVerified: false,
-          loading: false
+          loading: false,
         });
         return;
       }
@@ -52,9 +53,9 @@ export const useSecurityMiddleware = () => {
 
       setSecurityStatus({
         isSecure,
-        emailVerified: emailVerified || (profile?.email_verified || false),
-        phoneVerified: phoneVerified || (profile?.phone_verified || false),
-        loading: false
+        emailVerified: emailVerified || profile?.email_verified || false,
+        phoneVerified: phoneVerified || profile?.phone_verified || false,
+        loading: false,
       });
     } catch (error) {
       console.error('Error checking security status:', error);
@@ -62,15 +63,17 @@ export const useSecurityMiddleware = () => {
         isSecure: false,
         emailVerified: false,
         phoneVerified: false,
-        loading: false
+        loading: false,
       });
     }
   };
 
   const validateAction = async (action: string, data?: any): Promise<boolean> => {
     // Basic validation - check if user is authenticated
-    const { data: { session } } = await supabase.auth.getSession();
-    
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
     if (!session?.user) {
       console.warn('Action blocked: User not authenticated');
       return false;
@@ -102,6 +105,6 @@ export const useSecurityMiddleware = () => {
   return {
     securityStatus,
     validateAction,
-    checkSecurityStatus
+    checkSecurityStatus,
   };
 };

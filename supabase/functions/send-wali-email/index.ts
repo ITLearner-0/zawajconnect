@@ -1,12 +1,12 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { Resend } from "npm:resend@2.0.0";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.2';
+import { Resend } from 'npm:resend@2.0.0';
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface WaliEmailRequest {
@@ -84,9 +84,9 @@ const getContactEmailTemplate = (waliName: string, message: string, adminName: s
 `;
 
 const getSuspensionEmailTemplate = (
-  waliName: string, 
-  reason: string, 
-  durationDays: number, 
+  waliName: string,
+  reason: string,
+  durationDays: number,
   expiryDate: string,
   adminName: string
 ) => `
@@ -208,23 +208,23 @@ const getSuspensionEmailTemplate = (
 `;
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       { auth: { persistSession: false } }
     );
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("No authorization header");
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) throw new Error('No authorization header');
 
-    const token = authHeader.replace("Bearer ", "");
+    const token = authHeader.replace('Bearer ', '');
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError || !userData.user) throw new Error("Authentication failed");
+    if (userError || !userData.user) throw new Error('Authentication failed');
 
     // Vérifier que l'utilisateur est admin
     const { data: roleData } = await supabaseClient
@@ -244,7 +244,7 @@ serve(async (req) => {
       message,
       suspension_reason,
       suspension_duration_days,
-      admin_name
+      admin_name,
     }: WaliEmailRequest = await req.json();
 
     console.log(`📧 Envoi email ${email_type} pour Wali ${wali_user_id}`);
@@ -261,7 +261,7 @@ serve(async (req) => {
     }
 
     const waliName = `${waliProfile.first_name} ${waliProfile.last_name}`;
-    const adminDisplayName = admin_name || 'L\'équipe Zawaj Connect';
+    const adminDisplayName = admin_name || "L'équipe Zawaj Connect";
 
     let emailHtml: string;
     let emailSubject: string;
@@ -277,7 +277,7 @@ serve(async (req) => {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
       });
 
       emailSubject = '⚠️ Suspension temporaire de votre compte Wali - Zawaj Connect';
@@ -293,7 +293,7 @@ serve(async (req) => {
         throw new Error('Message is required for contact email');
       }
 
-      emailSubject = subject || 'Message de l\'équipe Zawaj Connect';
+      emailSubject = subject || "Message de l'équipe Zawaj Connect";
       emailHtml = getContactEmailTemplate(waliName, message, adminDisplayName);
     } else {
       throw new Error('Invalid email type');
@@ -301,7 +301,7 @@ serve(async (req) => {
 
     // Envoyer l'email via Resend
     const emailResponse = await resend.emails.send({
-      from: "Zawaj Connect <onboarding@resend.dev>", // Remplacer par votre domaine vérifié
+      from: 'Zawaj Connect <onboarding@resend.dev>', // Remplacer par votre domaine vérifié
       to: [waliProfile.email],
       subject: emailSubject,
       html: emailHtml,
@@ -315,16 +315,14 @@ serve(async (req) => {
       sent_by: userData.user.id,
       email_type,
       subject: emailSubject,
-      message_content: email_type === 'suspension' 
-        ? suspension_reason || ''
-        : message || '',
+      message_content: email_type === 'suspension' ? suspension_reason || '' : message || '',
       delivery_status: 'sent',
       resend_email_id: emailResponse.id,
       metadata: {
         suspension_duration_days: suspension_duration_days || null,
         admin_name: adminDisplayName,
-        wali_email: waliProfile.email
-      }
+        wali_email: waliProfile.email,
+      },
     };
 
     const { error: historyError } = await supabaseClient
@@ -332,38 +330,36 @@ serve(async (req) => {
       .insert(emailHistoryData);
 
     if (historyError) {
-      console.error('Erreur lors de l\'enregistrement dans l\'historique:', historyError);
+      console.error("Erreur lors de l'enregistrement dans l'historique:", historyError);
     }
 
     // Logger l'envoi d'email dans l'audit
-    await supabaseClient
-      .from('wali_action_audit')
-      .insert({
-        wali_user_id,
-        action_type: `email_sent_${email_type}`,
-        action_details: {
-          email_type,
-          subject: emailSubject,
-          sent_to: waliProfile.email,
-          sent_by: userData.user.id,
-          resend_id: emailResponse.id
-        },
-        success: true
-      });
+    await supabaseClient.from('wali_action_audit').insert({
+      wali_user_id,
+      action_type: `email_sent_${email_type}`,
+      action_details: {
+        email_type,
+        subject: emailSubject,
+        sent_to: waliProfile.email,
+        sent_by: userData.user.id,
+        resend_id: emailResponse.id,
+      },
+      success: true,
+    });
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         email_id: emailResponse.id,
-        message: 'Email envoyé avec succès'
+        message: 'Email envoyé avec succès',
       }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
   } catch (error) {
     console.error('❌ Erreur fonction send-wali-email:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 500,
+    });
   }
 });

@@ -32,7 +32,7 @@ export default function SecurityMonitoringPanel() {
     if (isAdmin && user) {
       loadSecurityMetrics();
       loadSecurityEvents();
-      
+
       // Set up real-time monitoring for critical events
       const subscription = supabase
         .channel('security_events_monitor')
@@ -42,14 +42,14 @@ export default function SecurityMonitoringPanel() {
             event: 'INSERT',
             schema: 'public',
             table: 'security_events',
-            filter: 'severity=in.(critical,high)'
+            filter: 'severity=in.(critical,high)',
           },
           (payload) => {
             toast({
-              title: "🚨 Alerte sécurité critique",
+              title: '🚨 Alerte sécurité critique',
               description: `Nouvel événement détecté: ${payload.new.description}`,
-              variant: "destructive",
-              duration: 10000
+              variant: 'destructive',
+              duration: 10000,
             });
             loadSecurityMetrics();
           }
@@ -64,7 +64,7 @@ export default function SecurityMonitoringPanel() {
 
   const loadSecurityMetrics = async () => {
     if (!isAdmin) return;
-    
+
     setLoading(true);
     try {
       // Load metrics from existing tables instead of non-existent RPC function
@@ -74,29 +74,29 @@ export default function SecurityMonitoringPanel() {
           .from('security_events')
           .select('*', { count: 'exact', head: true })
           .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
-        
+
         // Critical events
         supabase
           .from('security_events')
           .select('*', { count: 'exact', head: true })
           .in('severity', ['critical', 'high'])
           .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
-        
+
         // Family access violations
         supabase
           .from('family_access_audit')
           .select('*', { count: 'exact', head: true })
           .eq('access_granted', false)
-          .gte('access_timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString())
+          .gte('access_timestamp', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()),
       ]);
-      
+
       setMetrics({
         total_events: eventsResult.count || 0,
         critical_events: criticalResult.count || 0,
         high_risk_events: criticalResult.count || 0,
         recent_suspicious_activity: Math.floor((criticalResult.count || 0) / 2),
         family_access_violations: familyResult.count || 0,
-        message_blocks: 0 // Would need moderation_logs table access
+        message_blocks: 0, // Would need moderation_logs table access
       });
     } catch (error) {
       console.error('Failed to load security metrics:', error);
@@ -107,7 +107,7 @@ export default function SecurityMonitoringPanel() {
         high_risk_events: 0,
         recent_suspicious_activity: 0,
         family_access_violations: 0,
-        message_blocks: 0
+        message_blocks: 0,
       });
     } finally {
       setLoading(false);
@@ -116,18 +116,25 @@ export default function SecurityMonitoringPanel() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'destructive';
-      case 'high': return 'secondary';
-      case 'medium': return 'outline';
-      default: return 'secondary';
+      case 'critical':
+        return 'destructive';
+      case 'high':
+        return 'secondary';
+      case 'medium':
+        return 'outline';
+      default:
+        return 'secondary';
     }
   };
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
-      case 'critical': return <AlertTriangle className="h-4 w-4 text-destructive" />;
-      case 'high': return <Shield className="h-4 w-4 text-orange-500" />;
-      default: return <Eye className="h-4 w-4 text-muted-foreground" />;
+      case 'critical':
+        return <AlertTriangle className="h-4 w-4 text-destructive" />;
+      case 'high':
+        return <Shield className="h-4 w-4 text-orange-500" />;
+      default:
+        return <Eye className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -135,9 +142,7 @@ export default function SecurityMonitoringPanel() {
     return (
       <Alert>
         <Shield className="h-4 w-4" />
-        <AlertDescription>
-          Accès réservé aux administrateurs.
-        </AlertDescription>
+        <AlertDescription>Accès réservé aux administrateurs.</AlertDescription>
       </Alert>
     );
   }
@@ -165,9 +170,7 @@ export default function SecurityMonitoringPanel() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{metrics?.total_events || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Dernières 24h
-            </p>
+            <p className="text-xs text-muted-foreground">Dernières 24h</p>
           </CardContent>
         </Card>
 
@@ -177,10 +180,10 @@ export default function SecurityMonitoringPanel() {
             <AlertTriangle className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-destructive">{metrics?.critical_events || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Nécessitent une action
-            </p>
+            <div className="text-2xl font-bold text-destructive">
+              {metrics?.critical_events || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">Nécessitent une action</p>
           </CardContent>
         </Card>
 
@@ -190,10 +193,10 @@ export default function SecurityMonitoringPanel() {
             <Eye className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-500">{metrics?.recent_suspicious_activity || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Activités surveillées
-            </p>
+            <div className="text-2xl font-bold text-orange-500">
+              {metrics?.recent_suspicious_activity || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">Activités surveillées</p>
           </CardContent>
         </Card>
 
@@ -203,10 +206,10 @@ export default function SecurityMonitoringPanel() {
             <Users className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-orange-500">{metrics?.family_access_violations || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Accès non autorisés
-            </p>
+            <div className="text-2xl font-bold text-orange-500">
+              {metrics?.family_access_violations || 0}
+            </div>
+            <p className="text-xs text-muted-foreground">Accès non autorisés</p>
           </CardContent>
         </Card>
 
@@ -217,9 +220,7 @@ export default function SecurityMonitoringPanel() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-500">{metrics?.message_blocks || 0}</div>
-            <p className="text-xs text-muted-foreground">
-              Contenu inapproprié
-            </p>
+            <p className="text-xs text-muted-foreground">Contenu inapproprié</p>
           </CardContent>
         </Card>
       </div>
@@ -228,11 +229,7 @@ export default function SecurityMonitoringPanel() {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Événements de sécurité récents</CardTitle>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={loadSecurityEvents}
-          >
+          <Button variant="outline" size="sm" onClick={loadSecurityEvents}>
             <Clock className="h-4 w-4 mr-2" />
             Actualiser
           </Button>
@@ -240,9 +237,7 @@ export default function SecurityMonitoringPanel() {
         <CardContent>
           <div className="space-y-4">
             {events.length === 0 ? (
-              <p className="text-muted-foreground text-center py-4">
-                Aucun événement récent
-              </p>
+              <p className="text-muted-foreground text-center py-4">Aucun événement récent</p>
             ) : (
               events.slice(0, 10).map((event) => (
                 <div key={event.id} className="flex items-start space-x-3 p-3 border rounded-lg">
@@ -252,9 +247,7 @@ export default function SecurityMonitoringPanel() {
                       <p className="text-sm font-medium text-foreground truncate">
                         {event.description}
                       </p>
-                      <Badge variant={getSeverityColor(event.severity)}>
-                        {event.severity}
-                      </Badge>
+                      <Badge variant={getSeverityColor(event.severity)}>{event.severity}</Badge>
                     </div>
                     <p className="text-xs text-muted-foreground">
                       {event.event_type} • {new Date(event.created_at).toLocaleString('fr-FR')}

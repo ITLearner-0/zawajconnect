@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { dummyMessages } from '@/data/messages';
 
@@ -26,23 +25,26 @@ export const useDemoMessages = (conversationId: string | undefined) => {
 
     // Check if this is a demo conversation
     const isDemo = checkIsDemoConversation(conversationId);
-    
+
     if (isDemo && !initialLoadComplete.current) {
       initialLoadComplete.current = true;
       setIsDemoConversation(true);
-      
+
       // Map user-X to conv-X if needed
       let demoConvId = conversationId;
       if (conversationId.startsWith('user-')) {
         const userNumber = conversationId.split('-')[1];
         demoConvId = `conv-${userNumber}`;
       }
-      
+
       if (dummyMessages[demoConvId]) {
         console.log(`Loading demo messages for ${demoConvId}`);
         setDemoMessages(dummyMessages[demoConvId]);
       } else {
-        console.log(`No demo messages found for ${demoConvId}, available conversations:`, Object.keys(dummyMessages));
+        console.log(
+          `No demo messages found for ${demoConvId}, available conversations:`,
+          Object.keys(dummyMessages)
+        );
         // Default to empty array if no messages found
         setDemoMessages([]);
       }
@@ -56,6 +58,6 @@ export const useDemoMessages = (conversationId: string | undefined) => {
   return {
     isDemoConversation,
     demoMessages,
-    setDemoMessages
+    setDemoMessages,
   };
 };

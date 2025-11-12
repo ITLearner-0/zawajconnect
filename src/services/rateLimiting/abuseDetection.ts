@@ -1,21 +1,20 @@
-
 import { AbuseDetectionResult, UserPatterns, RateLimitStateEntry } from './types';
 
 export class AbuseDetectionService {
   detectAbuse(
-    userId: string, 
-    endpoint: string, 
+    userId: string,
+    endpoint: string,
     requestData: any,
     rateLimitState: Map<string, RateLimitStateEntry>
   ): AbuseDetectionResult {
     const patterns = this.analyzeUserPatterns(userId, rateLimitState);
-    
+
     // Check for various abuse patterns
     const checks = [
       this.checkRapidFireRequests(patterns),
       this.checkDistributedAttack(patterns),
       this.checkSuspiciousContent(requestData),
-      this.checkTimeBasedPatterns(patterns)
+      this.checkTimeBasedPatterns(patterns),
     ];
 
     // Find the highest severity issue
@@ -27,7 +26,10 @@ export class AbuseDetectionService {
     return highestSeverity;
   }
 
-  private analyzeUserPatterns(userId: string, rateLimitState: Map<string, RateLimitStateEntry>): UserPatterns {
+  private analyzeUserPatterns(
+    userId: string,
+    rateLimitState: Map<string, RateLimitStateEntry>
+  ): UserPatterns {
     const now = Date.now();
     const oneMinute = 60 * 1000;
     const oneHour = 60 * 60 * 1000;
@@ -59,7 +61,7 @@ export class AbuseDetectionService {
       requestsInLastMinute,
       requestsInLastHour,
       distinctEndpointsHit: distinctEndpoints.size,
-      failedAuthAttempts
+      failedAuthAttempts,
     };
   }
 
@@ -69,16 +71,16 @@ export class AbuseDetectionService {
         isAbusive: true,
         severity: 'high',
         reason: 'Rapid fire requests detected',
-        recommendedAction: 'block'
+        recommendedAction: 'block',
       };
     }
-    
+
     if (patterns.requestsInLastMinute > 50) {
       return {
         isAbusive: true,
         severity: 'medium',
         reason: 'High request rate detected',
-        recommendedAction: 'throttle'
+        recommendedAction: 'throttle',
       };
     }
 
@@ -86,7 +88,7 @@ export class AbuseDetectionService {
       isAbusive: false,
       severity: 'low',
       reason: 'Normal request pattern',
-      recommendedAction: 'warn'
+      recommendedAction: 'warn',
     };
   }
 
@@ -96,7 +98,7 @@ export class AbuseDetectionService {
         isAbusive: true,
         severity: 'high',
         reason: 'Distributed attack pattern detected',
-        recommendedAction: 'block'
+        recommendedAction: 'block',
       };
     }
 
@@ -104,7 +106,7 @@ export class AbuseDetectionService {
       isAbusive: false,
       severity: 'low',
       reason: 'Normal endpoint usage',
-      recommendedAction: 'warn'
+      recommendedAction: 'warn',
     };
   }
 
@@ -114,7 +116,7 @@ export class AbuseDetectionService {
         isAbusive: false,
         severity: 'low',
         reason: 'No request data to analyze',
-        recommendedAction: 'warn'
+        recommendedAction: 'warn',
       };
     }
 
@@ -124,18 +126,18 @@ export class AbuseDetectionService {
       /on\w+\s*=/i,
       /eval\s*\(/i,
       /union\s+select/i,
-      /drop\s+table/i
+      /drop\s+table/i,
     ];
 
     const content = JSON.stringify(requestData).toLowerCase();
-    const foundPattern = suspiciousPatterns.some(pattern => pattern.test(content));
+    const foundPattern = suspiciousPatterns.some((pattern) => pattern.test(content));
 
     if (foundPattern) {
       return {
         isAbusive: true,
         severity: 'high',
         reason: 'Suspicious content detected in request',
-        recommendedAction: 'block'
+        recommendedAction: 'block',
       };
     }
 
@@ -143,7 +145,7 @@ export class AbuseDetectionService {
       isAbusive: false,
       severity: 'low',
       reason: 'Content appears normal',
-      recommendedAction: 'warn'
+      recommendedAction: 'warn',
     };
   }
 
@@ -154,7 +156,7 @@ export class AbuseDetectionService {
         isAbusive: true,
         severity: 'high',
         reason: 'Multiple failed authentication attempts',
-        recommendedAction: 'block'
+        recommendedAction: 'block',
       };
     }
 
@@ -163,7 +165,7 @@ export class AbuseDetectionService {
         isAbusive: true,
         severity: 'medium',
         reason: 'Suspicious authentication pattern',
-        recommendedAction: 'throttle'
+        recommendedAction: 'throttle',
       };
     }
 
@@ -171,7 +173,7 @@ export class AbuseDetectionService {
       isAbusive: false,
       severity: 'low',
       reason: 'Normal authentication pattern',
-      recommendedAction: 'warn'
+      recommendedAction: 'warn',
     };
   }
 }

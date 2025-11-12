@@ -1,4 +1,3 @@
-
 // Service for handling voice message processing and storage
 
 export interface VoiceMessage {
@@ -14,7 +13,6 @@ export interface VoiceMessage {
 }
 
 export class VoiceMessageService {
-  
   // Convert audio blob to base64
   static async blobToBase64(blob: Blob): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -34,11 +32,11 @@ export class VoiceMessageService {
   static base64ToBlob(base64Data: string, mimeType: string): Blob {
     const byteCharacters = atob(base64Data);
     const byteNumbers = new Array(byteCharacters.length);
-    
+
     for (let i = 0; i < byteCharacters.length; i++) {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
-    
+
     const byteArray = new Uint8Array(byteNumbers);
     return new Blob([byteArray], { type: mimeType });
   }
@@ -91,7 +89,7 @@ export class VoiceMessageService {
       mimeType: audioBlob.type || 'audio/webm',
       createdAt: new Date().toISOString(),
       isRead: false,
-      isEncrypted: false
+      isEncrypted: false,
     };
   }
 
@@ -104,7 +102,7 @@ export class VoiceMessageService {
 
   // Cleanup audio URLs to prevent memory leaks
   static cleanup(audioUrls: string[]): void {
-    audioUrls.forEach(url => {
+    audioUrls.forEach((url) => {
       try {
         URL.revokeObjectURL(url);
       } catch (error) {

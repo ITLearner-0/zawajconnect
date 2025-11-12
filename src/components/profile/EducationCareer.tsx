@@ -1,9 +1,8 @@
-
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ProfileFormData } from "@/types/profile";
-import { FieldTooltip, TooltipProvider } from "@/components/ui/tooltip";
-import { fieldTooltips } from "@/utils/profileTooltips";
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ProfileFormData } from '@/types/profile';
+import { FieldTooltip, TooltipProvider } from '@/components/ui/tooltip';
+import { fieldTooltips } from '@/utils/profileTooltips';
 
 interface EducationCareerProps {
   formData: ProfileFormData;
@@ -12,11 +11,18 @@ interface EducationCareerProps {
 
 const EducationCareer = ({ formData, handleChange }: EducationCareerProps) => (
   <div className="space-y-4">
-    <h2 id="education-career-heading" className="text-xl font-semibold text-islamic-teal dark:text-islamic-cream">Education & Career</h2>
+    <h2
+      id="education-career-heading"
+      className="text-xl font-semibold text-islamic-teal dark:text-islamic-cream"
+    >
+      Education & Career
+    </h2>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="education" className="text-islamic-burgundy dark:text-islamic-cream/90">Education Level</Label>
+          <Label htmlFor="education" className="text-islamic-burgundy dark:text-islamic-cream/90">
+            Education Level
+          </Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.education} />
           </TooltipProvider>
@@ -31,12 +37,15 @@ const EducationCareer = ({ formData, handleChange }: EducationCareerProps) => (
           className="border-islamic-teal/30 dark:border-islamic-darkTeal/30 dark:bg-islamic-darkCard/80 dark:text-islamic-cream"
         />
         <p id="education-description" className="sr-only">
-          Your highest level of education completed, such as high school, bachelor's degree, master's degree, etc.
+          Your highest level of education completed, such as high school, bachelor's degree,
+          master's degree, etc.
         </p>
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="occupation" className="text-islamic-burgundy dark:text-islamic-cream/90">Occupation</Label>
+          <Label htmlFor="occupation" className="text-islamic-burgundy dark:text-islamic-cream/90">
+            Occupation
+          </Label>
           <TooltipProvider>
             <FieldTooltip text={fieldTooltips.occupation} />
           </TooltipProvider>

@@ -1,5 +1,5 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -15,7 +15,7 @@ serve(async (req) => {
     // Extraire le token du header Authorization
     const authHeader = req.headers.get('Authorization');
     console.log('🔑 Authorization header:', authHeader ? 'présent' : 'absent');
-    
+
     if (!authHeader) {
       console.log('❌ Pas de header Authorization');
       return new Response(
@@ -35,10 +35,13 @@ serve(async (req) => {
 
     // Extraire le JWT token du header
     const token = authHeader.replace('Bearer ', '');
-    
+
     // Récupérer l'utilisateur à partir du token
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: userError,
+    } = await supabaseClient.auth.getUser(token);
+
     console.log('🔍 Utilisateur authentifié:', user?.id, user?.email);
     console.log('🔍 Erreur auth:', userError);
 
@@ -55,8 +58,8 @@ serve(async (req) => {
 
     // Vérifier dans Supabase si l'utilisateur a un abonnement actif
     // On vérifie TOUS les abonnements actifs (manuels, Braintree, etc.)
-    console.log('🔍 Recherche d\'abonnement pour user_id:', user.id);
-    
+    console.log("🔍 Recherche d'abonnement pour user_id:", user.id);
+
     const { data: subscription, error } = await supabaseClient
       .from('subscriptions')
       .select('*')
@@ -93,7 +96,7 @@ serve(async (req) => {
     // Vérifier si l'abonnement n'est pas expiré
     const expiresAt = new Date(subscription.expires_at);
     const now = new Date();
-    
+
     if (expiresAt < now) {
       // Abonnement expiré, mettre à jour le statut
       await supabaseClient
@@ -115,24 +118,18 @@ serve(async (req) => {
       plan_id: subscription.plan_type,
       subscription_end: subscription.expires_at,
     };
-    
+
     console.log('✅ Abonnement trouvé:', response);
-    
-    return new Response(
-      JSON.stringify(response),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+
+    return new Response(JSON.stringify(response), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
   } catch (error) {
     console.error('Erreur:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 400,
+    });
   }
 });

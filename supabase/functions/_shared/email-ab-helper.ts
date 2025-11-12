@@ -26,7 +26,7 @@ export async function selectABVariant(
 ): Promise<ABTestVariant | null> {
   try {
     const { data, error } = await supabaseAdmin.rpc('select_ab_test_variant', {
-      p_reminder_type: reminderType
+      p_reminder_type: reminderType,
     });
 
     if (error) {
@@ -81,8 +81,13 @@ export async function generateEmailHTML(
 
   // Generate signed tracking URLs with HMAC
   const baseUrl = 'https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/track-email-event';
-  const trackingPixelUrl = await generateSignedTrackingUrl(baseUrl, trackingId, emailData.userId, 'opened');
-  
+  const trackingPixelUrl = await generateSignedTrackingUrl(
+    baseUrl,
+    trackingId,
+    emailData.userId,
+    'opened'
+  );
+
   // Pixel de tracking pour les ouvertures d'email avec signature HMAC
   const trackingPixel = `<img src="${trackingPixelUrl}" width="1" height="1" style="display:none;" alt="" />`;
 
@@ -93,24 +98,26 @@ export async function generateEmailHTML(
     friendly: { primary: '#f59e0b', secondary: '#d97706' },
     urgent: { primary: '#f97316', secondary: '#ea580c' },
     professional: { primary: '#3b82f6', secondary: '#2563eb' },
-    dramatic: { primary: '#dc2626', secondary: '#991b1b' }
+    dramatic: { primary: '#dc2626', secondary: '#991b1b' },
   };
 
   const colors = urgencyColors[email_tone as keyof typeof urgencyColors] || urgencyColors.friendly;
 
-  const countdownDisplay = daysUntilExpiry === 7 
-    ? '<div class="countdown-number">7</div><div class="countdown-label">Jours</div>'
-    : daysUntilExpiry === 3
-    ? '<div class="countdown-number">3</div><div class="countdown-label">Jours</div><div class="countdown-item"><div class="countdown-number">72</div><div class="countdown-label">Heures</div></div>'
-    : '<div class="countdown-number">1</div><div class="countdown-label">Jour</div><div class="countdown-item"><div class="countdown-number">24</div><div class="countdown-label">Heures</div></div>';
+  const countdownDisplay =
+    daysUntilExpiry === 7
+      ? '<div class="countdown-number">7</div><div class="countdown-label">Jours</div>'
+      : daysUntilExpiry === 3
+        ? '<div class="countdown-number">3</div><div class="countdown-label">Jours</div><div class="countdown-item"><div class="countdown-number">72</div><div class="countdown-label">Heures</div></div>'
+        : '<div class="countdown-number">1</div><div class="countdown-label">Jour</div><div class="countdown-item"><div class="countdown-number">24</div><div class="countdown-label">Heures</div></div>';
 
-  const urgencyMessage = email_tone === 'dramatic' 
-    ? '🔴 ALERTE MAXIMALE 🔴'
-    : email_tone === 'urgent'
-    ? '⚠️ ACTION REQUISE ⚠️'
-    : email_tone === 'professional'
-    ? '📋 Rappel Important'
-    : '⏰ Notification';
+  const urgencyMessage =
+    email_tone === 'dramatic'
+      ? '🔴 ALERTE MAXIMALE 🔴'
+      : email_tone === 'urgent'
+        ? '⚠️ ACTION REQUISE ⚠️'
+        : email_tone === 'professional'
+          ? '📋 Rappel Important'
+          : '⏰ Notification';
 
   return `
     <!DOCTYPE html>
@@ -235,9 +242,13 @@ export async function generateEmailHTML(
           <p>Bonjour ${userName},</p>
           
           <div class="urgency-banner">
-            ${daysUntilExpiry === 1 ? '🚨 DERNIÈRE CHANCE - EXPIRATION DEMAIN 🚨' : 
-              daysUntilExpiry === 3 ? '⏰ PLUS QUE 3 JOURS ⏰' : 
-              '⏰ VOTRE ABONNEMENT EXPIRE DANS 7 JOURS ⏰'}
+            ${
+              daysUntilExpiry === 1
+                ? '🚨 DERNIÈRE CHANCE - EXPIRATION DEMAIN 🚨'
+                : daysUntilExpiry === 3
+                  ? '⏰ PLUS QUE 3 JOURS ⏰'
+                  : '⏰ VOTRE ABONNEMENT EXPIRE DANS 7 JOURS ⏰'
+            }
           </div>
           
           <div class="countdown">
@@ -248,11 +259,11 @@ export async function generateEmailHTML(
           
           <p style="text-align: center; font-size: 17px;">
             Votre abonnement <strong>${planType}</strong> expire le 
-            <strong style="color: ${colors.primary};">${expirationDate.toLocaleDateString('fr-FR', { 
+            <strong style="color: ${colors.primary};">${expirationDate.toLocaleDateString('fr-FR', {
               weekday: 'long',
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
             })}</strong>
           </p>
           

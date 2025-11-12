@@ -6,27 +6,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import StarRating from '@/components/StarRating';
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell
+  Cell,
 } from 'recharts';
-import { 
-  Phone, 
-  Video, 
-  TrendingUp, 
-  AlertTriangle, 
-  CheckCircle2,
-  MessageSquare 
-} from 'lucide-react';
+import { Phone, Video, TrendingUp, AlertTriangle, CheckCircle2, MessageSquare } from 'lucide-react';
 
 interface CallFeedback {
   id: string;
@@ -89,9 +82,9 @@ const CallFeedbackDashboard = () => {
     } catch (error) {
       console.error('Error fetching feedbacks:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les feedbacks",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les feedbacks',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -114,7 +107,7 @@ const CallFeedbackDashboard = () => {
     const issuesMap: { [key: string]: number } = {};
     const ratingCounts: { [key: number]: number } = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
 
-    feedbacks.forEach(feedback => {
+    feedbacks.forEach((feedback) => {
       // Audio quality
       if (feedback.audio_quality) {
         audioQuality[feedback.audio_quality] = (audioQuality[feedback.audio_quality] || 0) + 1;
@@ -127,12 +120,13 @@ const CallFeedbackDashboard = () => {
 
       // Connection stability
       if (feedback.connection_stability) {
-        connectionStability[feedback.connection_stability] = (connectionStability[feedback.connection_stability] || 0) + 1;
+        connectionStability[feedback.connection_stability] =
+          (connectionStability[feedback.connection_stability] || 0) + 1;
       }
 
       // Technical issues
       if (feedback.technical_issues) {
-        feedback.technical_issues.forEach(issue => {
+        feedback.technical_issues.forEach((issue) => {
           issuesMap[issue] = (issuesMap[issue] || 0) + 1;
         });
       }
@@ -149,8 +143,10 @@ const CallFeedbackDashboard = () => {
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
-    const ratingDistribution = Object.entries(ratingCounts)
-      .map(([rating, count]) => ({ rating: parseInt(rating), count }));
+    const ratingDistribution = Object.entries(ratingCounts).map(([rating, count]) => ({
+      rating: parseInt(rating),
+      count,
+    }));
 
     setStats({
       totalFeedbacks: feedbacks.length,
@@ -159,7 +155,7 @@ const CallFeedbackDashboard = () => {
       videoQualityDistribution: videoQuality,
       connectionStabilityDistribution: connectionStability,
       commonIssues,
-      ratingDistribution
+      ratingDistribution,
     });
   };
 
@@ -169,7 +165,7 @@ const CallFeedbackDashboard = () => {
       good: 'Bonne',
       fair: 'Correcte',
       poor: 'Mauvaise',
-      not_applicable: 'N/A'
+      not_applicable: 'N/A',
     };
     return labels[quality] || quality;
   };
@@ -179,7 +175,7 @@ const CallFeedbackDashboard = () => {
       excellent: 'bg-green-500',
       good: 'bg-blue-500',
       fair: 'bg-yellow-500',
-      poor: 'bg-red-500'
+      poor: 'bg-red-500',
     };
     return colors[quality] || 'bg-gray-500';
   };
@@ -194,7 +190,7 @@ const CallFeedbackDashboard = () => {
       delay_lag: 'Délai/latence',
       no_audio: 'Pas de son',
       no_video: 'Pas de vidéo',
-      other: 'Autre'
+      other: 'Autre',
     };
     return labels[issueId] || issueId;
   };
@@ -302,7 +298,10 @@ const CallFeedbackDashboard = () => {
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={stats.ratingDistribution}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="rating" label={{ value: 'Note', position: 'insideBottom', offset: -5 }} />
+                    <XAxis
+                      dataKey="rating"
+                      label={{ value: 'Note', position: 'insideBottom', offset: -5 }}
+                    />
                     <YAxis label={{ value: 'Nombre', angle: -90, position: 'insideLeft' }} />
                     <Tooltip />
                     <Bar dataKey="count" fill="#3b82f6" />
@@ -367,15 +366,17 @@ const CallFeedbackDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    {Object.entries(stats.connectionStabilityDistribution).map(([quality, count]) => (
-                      <div key={quality} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-3 h-3 rounded-full ${getQualityColor(quality)}`} />
-                          <span className="text-sm">{getQualityLabel(quality)}</span>
+                    {Object.entries(stats.connectionStabilityDistribution).map(
+                      ([quality, count]) => (
+                        <div key={quality} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className={`w-3 h-3 rounded-full ${getQualityColor(quality)}`} />
+                            <span className="text-sm">{getQualityLabel(quality)}</span>
+                          </div>
+                          <Badge variant="secondary">{count}</Badge>
                         </div>
-                        <Badge variant="secondary">{count}</Badge>
-                      </div>
-                    ))}
+                      )
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -393,13 +394,18 @@ const CallFeedbackDashboard = () => {
                   <BarChart data={stats.commonIssues} layout="vertical">
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" />
-                    <YAxis 
-                      type="category" 
-                      dataKey="issue" 
+                    <YAxis
+                      type="category"
+                      dataKey="issue"
                       width={150}
                       tickFormatter={getIssueLabel}
                     />
-                    <Tooltip formatter={(value, name, props) => [value, getIssueLabel(props.payload.issue)]} />
+                    <Tooltip
+                      formatter={(value, name, props) => [
+                        value,
+                        getIssueLabel(props.payload.issue),
+                      ]}
+                    />
                     <Bar dataKey="count" fill="#ef4444" />
                   </BarChart>
                 </ResponsiveContainer>

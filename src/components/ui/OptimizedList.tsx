@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -24,9 +23,7 @@ export const OptimizedList = <T,>({
 }: OptimizedListProps<T>) => {
   const renderedItems = useMemo(() => {
     return items.map((item, index) => (
-      <React.Fragment key={keyExtractor(item, index)}>
-        {renderItem(item, index)}
-      </React.Fragment>
+      <React.Fragment key={keyExtractor(item, index)}>{renderItem(item, index)}</React.Fragment>
     ));
   }, [items, renderItem, keyExtractor]);
 
@@ -38,11 +35,7 @@ export const OptimizedList = <T,>({
     return <div className="text-center py-4 text-gray-500">{emptyMessage}</div>;
   }
 
-  return (
-    <div className={cn('space-y-2', className)}>
-      {renderedItems}
-    </div>
-  );
+  return <div className={cn('space-y-2', className)}>{renderedItems}</div>;
 };
 
 export default OptimizedList;

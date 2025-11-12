@@ -7,19 +7,19 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  BookOpen, 
-  Heart, 
-  Clock, 
-  Star, 
-  Moon, 
-  Sun, 
+import {
+  BookOpen,
+  Heart,
+  Clock,
+  Star,
+  Moon,
+  Sun,
   MessageCircle,
   RefreshCw,
   Quote,
   Lightbulb,
   Compass,
-  Calendar
+  Calendar,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -48,14 +48,14 @@ interface IslamicGuidanceChatProps {
   onApplyGuidance?: (guidance: IslamicContent) => void;
 }
 
-const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({ 
-  matchId, 
+const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
+  matchId,
   conversationContext,
-  onApplyGuidance 
+  onApplyGuidance,
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   const [guidanceContent, setGuidanceContent] = useState<IslamicContent[]>([]);
   const [prayerTimes, setPrayerTimes] = useState<any>(null);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -65,7 +65,7 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
   useEffect(() => {
     fetchIslamicGuidance();
     fetchPrayerTimes();
-    
+
     const timer = setInterval(() => {
       setCurrentTime(new Date());
     }, 60000); // Update every minute
@@ -86,18 +86,18 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
       if (error) throw error;
 
       // Transform to our interface
-      const guidance: IslamicContent[] = (guidanceData || []).map(item => ({
+      const guidance: IslamicContent[] = (guidanceData || []).map((item) => ({
         id: item.id,
         type: 'guidance' as const,
         content: item.content,
         reference: item.author,
         category: item.category,
-        timing: 'any' as const
+        timing: 'any' as const,
       }));
 
       // Add contextual verses and hadiths
       const contextualContent = getContextualIslamicContent();
-      
+
       setGuidanceContent([...guidance, ...contextualContent]);
     } catch (error) {
       console.error('Error fetching Islamic guidance:', error);
@@ -108,45 +108,54 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
 
   const getContextualIslamicContent = (): IslamicContent[] => {
     const currentHour = currentTime.getHours();
-    const timeOfDay = currentHour < 12 ? 'morning' : 
-                     currentHour < 17 ? 'afternoon' : 
-                     currentHour < 21 ? 'evening' : 'night';
+    const timeOfDay =
+      currentHour < 12
+        ? 'morning'
+        : currentHour < 17
+          ? 'afternoon'
+          : currentHour < 21
+            ? 'evening'
+            : 'night';
 
     const baseContent: IslamicContent[] = [
       // Quranic verses about marriage and relationships
       {
         id: 'verse-marriage-1',
         type: 'verse',
-        content: 'Et parmi Ses signes Il a créé de vous, pour vous, des épouses pour que vous viviez en tranquillité avec elles et Il a mis entre vous de l\'affection et de la bonté. Il y a en cela des preuves pour des gens qui réfléchissent.',
+        content:
+          "Et parmi Ses signes Il a créé de vous, pour vous, des épouses pour que vous viviez en tranquillité avec elles et Il a mis entre vous de l'affection et de la bonté. Il y a en cela des preuves pour des gens qui réfléchissent.",
         reference: 'Coran 30:21',
         category: 'mariage',
-        timing: 'any'
+        timing: 'any',
       },
       {
         id: 'verse-respect-1',
         type: 'verse',
-        content: 'Ô vous qui avez cru ! Il ne convient pas que vous héritiez des femmes contre leur gré. Ne les empêchez pas de se remarier dans le but de récupérer une partie de ce que vous leur aviez donné, à moins qu\'elles ne commettent un péché prouvé.',
+        content:
+          "Ô vous qui avez cru ! Il ne convient pas que vous héritiez des femmes contre leur gré. Ne les empêchez pas de se remarier dans le but de récupérer une partie de ce que vous leur aviez donné, à moins qu'elles ne commettent un péché prouvé.",
         reference: 'Coran 4:19',
         category: 'respect',
-        timing: 'any'
+        timing: 'any',
       },
       // Hadiths about good character
       {
         id: 'hadith-character-1',
         type: 'hadith',
-        content: 'Les croyants les plus parfaits en matière de foi sont ceux d\'entre eux qui ont le meilleur caractère.',
+        content:
+          "Les croyants les plus parfaits en matière de foi sont ceux d'entre eux qui ont le meilleur caractère.",
         reference: 'Abu Dawud',
         category: 'caractère',
-        timing: 'any'
+        timing: 'any',
       },
       {
         id: 'hadith-marriage-1',
         type: 'hadith',
-        content: 'Quand l\'homme regarde sa femme et qu\'elle le regarde, Allah les regarde avec miséricorde.',
+        content:
+          "Quand l'homme regarde sa femme et qu'elle le regarde, Allah les regarde avec miséricorde.",
         reference: 'Tirmidhi',
         category: 'mariage',
-        timing: 'any'
-      }
+        timing: 'any',
+      },
     ];
 
     // Add prayer reminders based on time
@@ -154,9 +163,10 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
       baseContent.push({
         id: 'prayer-fajr',
         type: 'prayer_reminder',
-        content: 'C\'est l\'heure de la prière de Fajr. Prendre un moment pour se connecter à Allah peut bénir vos interactions.',
+        content:
+          "C'est l'heure de la prière de Fajr. Prendre un moment pour se connecter à Allah peut bénir vos interactions.",
         category: 'prière',
-        timing: 'morning'
+        timing: 'morning',
       });
     }
 
@@ -166,16 +176,18 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
         {
           id: 'starter-introduction-1',
           type: 'conversation_starter',
-          content: 'Vous pourriez partager vos aspirations spirituelles et comment votre foi guide votre vie quotidienne.',
+          content:
+            'Vous pourriez partager vos aspirations spirituelles et comment votre foi guide votre vie quotidienne.',
           category: 'conversation',
-          timing: 'any'
+          timing: 'any',
         },
         {
           id: 'starter-introduction-2',
           type: 'conversation_starter',
-          content: 'Discuter de vos valeurs islamiques importantes pourrait créer une base solide pour votre relation.',
+          content:
+            'Discuter de vos valeurs islamiques importantes pourrait créer une base solide pour votre relation.',
           category: 'conversation',
-          timing: 'any'
+          timing: 'any',
         }
       );
     } else if (conversationContext?.stage === 'getting_to_know') {
@@ -183,16 +195,18 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
         {
           id: 'starter-getting-to-know-1',
           type: 'conversation_starter',
-          content: 'Explorez ensemble comment vous envisagez construire un foyer islamique harmonieux.',
+          content:
+            'Explorez ensemble comment vous envisagez construire un foyer islamique harmonieux.',
           category: 'conversation',
-          timing: 'any'
+          timing: 'any',
         },
         {
           id: 'starter-getting-to-know-2',
           type: 'conversation_starter',
-          content: 'Partagez vos expériences d\'apprentissage de l\'Islam et vos sources d\'inspiration spirituelle.',
+          content:
+            "Partagez vos expériences d'apprentissage de l'Islam et vos sources d'inspiration spirituelle.",
           category: 'conversation',
-          timing: 'any'
+          timing: 'any',
         }
       );
     }
@@ -202,17 +216,19 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
       baseContent.push({
         id: 'morning-guidance',
         type: 'guidance',
-        content: 'Le matin est un moment béni pour des conversations sincères et constructives. Commencez par invoquer Allah.',
+        content:
+          'Le matin est un moment béni pour des conversations sincères et constructives. Commencez par invoquer Allah.',
         category: 'moment',
-        timing: 'morning'
+        timing: 'morning',
       });
     } else if (timeOfDay === 'evening') {
       baseContent.push({
         id: 'evening-guidance',
         type: 'guidance',
-        content: 'Les conversations du soir peuvent être plus profondes. Réfléchissez ensemble sur les bénédictions de la journée.',
+        content:
+          'Les conversations du soir peuvent être plus profondes. Réfléchissez ensemble sur les bénédictions de la journée.',
         category: 'moment',
-        timing: 'evening'
+        timing: 'evening',
       });
     }
 
@@ -229,7 +245,7 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
         asr: '16:30',
         maghrib: '19:00',
         isha: '21:00',
-        date: today.toDateString()
+        date: today.toDateString(),
       });
     } catch (error) {
       console.error('Error fetching prayer times:', error);
@@ -238,22 +254,22 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
 
   const isNearPrayerTime = () => {
     if (!prayerTimes) return false;
-    
+
     const now = format(currentTime, 'HH:mm');
     const prayerTimesList = [
       prayerTimes.fajr,
       prayerTimes.dhuhr,
       prayerTimes.asr,
       prayerTimes.maghrib,
-      prayerTimes.isha
+      prayerTimes.isha,
     ];
 
-    return prayerTimesList.some(prayerTime => {
+    return prayerTimesList.some((prayerTime) => {
       const [pHour, pMinute] = prayerTime.split(':').map(Number);
       const [nHour, nMinute] = now.split(':').map(Number);
       const prayerMinutes = pHour * 60 + pMinute;
       const currentMinutes = nHour * 60 + nMinute;
-      
+
       // Within 15 minutes before prayer time
       return Math.abs(prayerMinutes - currentMinutes) <= 15 && prayerMinutes > currentMinutes;
     });
@@ -261,31 +277,44 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
 
   const getGuidanceIcon = (type: string) => {
     switch (type) {
-      case 'verse': return BookOpen;
-      case 'hadith': return Quote;
-      case 'guidance': return Lightbulb;
-      case 'prayer_reminder': return Moon;
-      case 'conversation_starter': return MessageCircle;
-      default: return Heart;
+      case 'verse':
+        return BookOpen;
+      case 'hadith':
+        return Quote;
+      case 'guidance':
+        return Lightbulb;
+      case 'prayer_reminder':
+        return Moon;
+      case 'conversation_starter':
+        return MessageCircle;
+      default:
+        return Heart;
     }
   };
 
   const getGuidanceColor = (type: string) => {
     switch (type) {
-      case 'verse': return 'text-emerald-600 bg-emerald-50';
-      case 'hadith': return 'text-blue-600 bg-blue-50';
-      case 'guidance': return 'text-amber-600 bg-amber-50';
-      case 'prayer_reminder': return 'text-purple-600 bg-purple-50';
-      case 'conversation_starter': return 'text-pink-600 bg-pink-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'verse':
+        return 'text-emerald-600 bg-emerald-50';
+      case 'hadith':
+        return 'text-blue-600 bg-blue-50';
+      case 'guidance':
+        return 'text-amber-600 bg-amber-50';
+      case 'prayer_reminder':
+        return 'text-purple-600 bg-purple-50';
+      case 'conversation_starter':
+        return 'text-pink-600 bg-pink-50';
+      default:
+        return 'text-gray-600 bg-gray-50';
     }
   };
 
-  const filteredContent = selectedCategory === 'all' 
-    ? guidanceContent 
-    : guidanceContent.filter(item => item.category === selectedCategory);
+  const filteredContent =
+    selectedCategory === 'all'
+      ? guidanceContent
+      : guidanceContent.filter((item) => item.category === selectedCategory);
 
-  const categories = [...new Set(guidanceContent.map(item => item.category))];
+  const categories = [...new Set(guidanceContent.map((item) => item.category))];
 
   if (loading) {
     return (
@@ -294,7 +323,9 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
           <div className="flex items-center justify-center h-32">
             <div className="text-center">
               <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent mx-auto mb-2"></div>
-              <p className="text-sm text-muted-foreground">Chargement des guidances islamiques...</p>
+              <p className="text-sm text-muted-foreground">
+                Chargement des guidances islamiques...
+              </p>
             </div>
           </div>
         </CardContent>
@@ -315,7 +346,7 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
             size="sm"
             onClick={() => {
               fetchIslamicGuidance();
-              toast({ title: "Guidance actualisée" });
+              toast({ title: 'Guidance actualisée' });
             }}
           >
             <RefreshCw className="h-4 w-4" />
@@ -330,9 +361,7 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
             <div className="flex items-center gap-2">
               <Moon className="h-4 w-4 text-purple-600" />
               <div>
-                <p className="text-sm font-medium text-purple-800">
-                  Temps de prière approche
-                </p>
+                <p className="text-sm font-medium text-purple-800">Temps de prière approche</p>
                 <p className="text-xs text-purple-600">
                   Considérez prendre une pause pour la prière
                 </p>
@@ -350,7 +379,7 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
           >
             Tout
           </Button>
-          {categories.map(category => (
+          {categories.map((category) => (
             <Button
               key={category}
               variant={selectedCategory === category ? 'default' : 'outline'}
@@ -369,9 +398,12 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
           {filteredContent.map((item) => {
             const Icon = getGuidanceIcon(item.type);
             const colorClasses = getGuidanceColor(item.type);
-            
+
             return (
-              <div key={item.id} className="p-4 border rounded-lg hover:shadow-sm transition-shadow">
+              <div
+                key={item.id}
+                className="p-4 border rounded-lg hover:shadow-sm transition-shadow"
+              >
                 <div className="flex items-start gap-3">
                   <div className={`p-2 rounded-full ${colorClasses}`}>
                     <Icon className="h-4 w-4" />
@@ -396,15 +428,11 @@ const IslamicGuidanceChat: React.FC<IslamicGuidanceChatProps> = ({
                         </Button>
                       )}
                     </div>
-                    
-                    <p className="text-sm mb-2 leading-relaxed">
-                      {item.content}
-                    </p>
-                    
+
+                    <p className="text-sm mb-2 leading-relaxed">{item.content}</p>
+
                     {item.reference && (
-                      <p className="text-xs text-muted-foreground italic">
-                        — {item.reference}
-                      </p>
+                      <p className="text-xs text-muted-foreground italic">— {item.reference}</p>
                     )}
                   </div>
                 </div>

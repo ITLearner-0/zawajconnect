@@ -43,13 +43,15 @@ Deno.serve(async (req) => {
     // Find all active subscriptions that have expired
     const { data: expiredSubscriptions, error: fetchError } = await supabaseAdmin
       .from('subscriptions')
-      .select(`
+      .select(
+        `
         id,
         user_id,
         plan_type,
         expires_at,
         profiles!inner(full_name)
-      `)
+      `
+      )
       .eq('status', 'active')
       .lt('expires_at', new Date().toISOString())
       .not('expires_at', 'is', null);
@@ -63,9 +65,9 @@ Deno.serve(async (req) => {
 
     if (!expiredSubscriptions || expiredSubscriptions.length === 0) {
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           message: 'No expired subscriptions found',
-          count: 0 
+          count: 0,
         }),
         {
           status: 200,
@@ -181,10 +183,12 @@ Deno.serve(async (req) => {
                   <div class="content">
                     <p>Bonjour ${userName},</p>
                     
-                    <p>Votre abonnement <strong>${subscription.plan_type}</strong> est arrivé à expiration le <strong>${new Date(subscription.expires_at).toLocaleDateString('fr-FR', { 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
+                    <p>Votre abonnement <strong>${subscription.plan_type}</strong> est arrivé à expiration le <strong>${new Date(
+                      subscription.expires_at
+                    ).toLocaleDateString('fr-FR', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
                     })}</strong>.</p>
                     
                     <div class="info-box">
@@ -225,7 +229,9 @@ Deno.serve(async (req) => {
         }
       } catch (subscriptionError: any) {
         console.error(`Error processing subscription ${subscription.id}:`, subscriptionError);
-        results.errors.push(`Processing failed for ${subscription.id}: ${subscriptionError.message}`);
+        results.errors.push(
+          `Processing failed for ${subscription.id}: ${subscriptionError.message}`
+        );
       }
     }
 

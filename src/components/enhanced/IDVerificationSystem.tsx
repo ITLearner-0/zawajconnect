@@ -53,13 +53,15 @@ export const IDVerificationSystem = () => {
         return;
       }
 
-      setStatus(data || {
-        email_verified: false,
-        id_verified: false,
-        verification_score: 0,
-        id_document_status: null,
-        submitted_at: null
-      });
+      setStatus(
+        data || {
+          email_verified: false,
+          id_verified: false,
+          verification_score: 0,
+          id_document_status: null,
+          submitted_at: null,
+        }
+      );
     } catch (error) {
       console.error('Error:', error);
     } finally {
@@ -84,12 +86,15 @@ export const IDVerificationSystem = () => {
       // Update verification status
       const { data: verificationData, error: updateError } = await supabase
         .from('user_verifications')
-        .upsert({
-          user_id: user.id,
-          id_document_status: 'pending_review',
-          submitted_at: new Date().toISOString(),
-          verification_score: Math.max((status?.verification_score || 0), 20)
-        }, { onConflict: 'user_id' })
+        .upsert(
+          {
+            user_id: user.id,
+            id_document_status: 'pending_review',
+            submitted_at: new Date().toISOString(),
+            verification_score: Math.max(status?.verification_score || 0, 20),
+          },
+          { onConflict: 'user_id' }
+        )
         .select()
         .single();
 
@@ -98,19 +103,20 @@ export const IDVerificationSystem = () => {
       // If verification was approved by an admin, send email notification
       // Note: This should typically be triggered by an admin action, not on upload
       // This is just a placeholder showing where to add the email trigger
-      
+
       toast({
-        title: "ID Document Uploaded",
-        description: "Your ID document has been submitted for review. This may take 1-2 business days.",
+        title: 'ID Document Uploaded',
+        description:
+          'Your ID document has been submitted for review. This may take 1-2 business days.',
       });
 
       loadVerificationStatus();
     } catch (error) {
       console.error('Upload error:', error);
       toast({
-        title: "Upload Failed",
-        description: "Failed to upload ID document. Please try again.",
-        variant: "destructive",
+        title: 'Upload Failed',
+        description: 'Failed to upload ID document. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setUploading(false);
@@ -178,9 +184,9 @@ export const IDVerificationSystem = () => {
           </div>
 
           <div className="w-full bg-muted rounded-full h-2">
-            <div 
+            <div
               className="bg-primary h-2 rounded-full transition-all duration-300"
-              style={{ width: `${Math.min((status?.verification_score || 0), 100)}%` }}
+              style={{ width: `${Math.min(status?.verification_score || 0, 100)}%` }}
             />
           </div>
           <p className="text-sm text-muted-foreground text-center">
@@ -213,14 +219,12 @@ export const IDVerificationSystem = () => {
                 Accepted formats: JPG, PNG, PDF (max 5MB)
               </p>
               <label htmlFor="id-upload">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   disabled={uploading || status?.id_document_status === 'pending_review'}
                   asChild
                 >
-                  <span>
-                    {uploading ? 'Uploading...' : 'Choose File'}
-                  </span>
+                  <span>{uploading ? 'Uploading...' : 'Choose File'}</span>
                 </Button>
               </label>
               <input
@@ -236,7 +240,8 @@ export const IDVerificationSystem = () => {
             <Alert>
               <Shield className="h-4 w-4" />
               <AlertDescription>
-                Your documents are encrypted and processed securely. We only use them for verification purposes.
+                Your documents are encrypted and processed securely. We only use them for
+                verification purposes.
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -250,19 +255,19 @@ export const IDVerificationSystem = () => {
         <CardContent>
           <div className="grid gap-3">
             <div className="flex items-center gap-2">
-              <Badge variant={status?.verification_score >= 30 ? "default" : "outline"}>
+              <Badge variant={status?.verification_score >= 30 ? 'default' : 'outline'}>
                 Score 30+
               </Badge>
               <span className="text-sm">Access compatibility questions</span>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant={status?.verification_score >= 60 ? "default" : "outline"}>
+              <Badge variant={status?.verification_score >= 60 ? 'default' : 'outline'}>
                 Score 60+
               </Badge>
               <span className="text-sm">Enhanced profile visibility</span>
             </div>
             <div className="flex items-center gap-2">
-              <Badge variant={status?.verification_score >= 80 ? "default" : "outline"}>
+              <Badge variant={status?.verification_score >= 80 ? 'default' : 'outline'}>
                 Score 80+
               </Badge>
               <span className="text-sm">Priority matching and family supervision access</span>

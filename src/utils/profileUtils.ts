@@ -1,5 +1,4 @@
-
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Updates a user's location coordinates via Supabase Edge Function
@@ -7,9 +6,9 @@ import { supabase } from "@/integrations/supabase/client";
 export async function updateUserCoordinates(userId: string, latitude: number, longitude: number) {
   try {
     const { data, error } = await supabase.functions.invoke('update-coordinates', {
-      body: { userId, latitude, longitude }
+      body: { userId, latitude, longitude },
     });
-    
+
     if (error) throw error;
     return true;
   } catch (error) {

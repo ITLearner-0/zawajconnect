@@ -8,14 +8,14 @@ const log = {
   success: (msg) => console.log(`\x1b[32m✓ ${msg}\x1b[0m`),
   error: (msg) => console.log(`\x1b[31m✖ ${msg}\x1b[0m`),
   warn: (msg) => console.log(`\x1b[33m⚠ ${msg}\x1b[0m`),
-  step: (msg) => console.log(`\x1b[35m▶ ${msg}\x1b[0m`)
+  step: (msg) => console.log(`\x1b[35m▶ ${msg}\x1b[0m`),
 };
 
 async function createBackup() {
   log.step('Creating backup of current deployment...');
 
   const configPath = path.join(__dirname, '..', '.ftp-deploy.json');
-  
+
   if (!fs.existsSync(configPath)) {
     log.error('Configuration file not found: .ftp-deploy.json');
     log.info('Please create .ftp-deploy.json with your FTP credentials');
@@ -37,7 +37,7 @@ async function createBackup() {
     exclude: config.exclude || [],
     deleteRemote: false,
     forcePasv: true,
-    sftp: false
+    sftp: false,
   };
 
   try {
@@ -48,12 +48,12 @@ async function createBackup() {
     }
 
     log.info('Downloading current version from Hostinger...');
-    
+
     // Note: FTP-Deploy doesn't support downloading, so we'll use a different approach
     // This is a placeholder - in practice, you'd need to implement FTP download functionality
     log.warn('Backup creation requires FTP download capability');
     log.info('Consider using Git tags/releases for version management instead');
-    
+
     log.success('Backup preparation completed');
   } catch (err) {
     log.error('Backup failed!');
@@ -66,7 +66,7 @@ async function rollback() {
   log.step('Rolling back to previous version...');
 
   const configPath = path.join(__dirname, '..', '.ftp-deploy.json');
-  
+
   if (!fs.existsSync(configPath)) {
     log.error('Configuration file not found: .ftp-deploy.json');
     process.exit(1);
@@ -94,7 +94,7 @@ async function rollback() {
     exclude: [],
     deleteRemote: false,
     forcePasv: true,
-    sftp: false
+    sftp: false,
   };
 
   ftpDeploy.on('uploading', (data) => {
@@ -108,7 +108,7 @@ async function rollback() {
   try {
     log.info('Connecting to FTP server...');
     await ftpDeploy.deploy(ftpConfig);
-    
+
     log.success('✨ Rollback completed successfully!');
     log.info(`Site restored at: ${config.siteUrl || 'your Hostinger site'}`);
   } catch (err) {

@@ -37,7 +37,7 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
     totalDuration: 0,
     averageDuration: 0,
     videoCalls: 0,
-    audioCalls: 0
+    audioCalls: 0,
   });
 
   useEffect(() => {
@@ -63,14 +63,14 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
         return;
       }
 
-      const supervisedUserIds = familyMembers.map(fm => fm.user_id);
+      const supervisedUserIds = familyMembers.map((fm) => fm.user_id);
       const maxDurationsMap = new Map(
-        familyMembers.map(fm => [fm.user_id, fm.max_call_duration_minutes])
+        familyMembers.map((fm) => [fm.user_id, fm.max_call_duration_minutes])
       );
 
       // Filter by specific supervised user if provided
-      const userIdsToQuery = supervisedUserId 
-        ? supervisedUserIds.filter(id => id === supervisedUserId)
+      const userIdsToQuery = supervisedUserId
+        ? supervisedUserIds.filter((id) => id === supervisedUserId)
         : supervisedUserIds;
 
       // Get all calls involving supervised users
@@ -85,26 +85,24 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
 
       // Enrich with profile names
       if (callsData) {
-        const userIds = [...new Set([
-          ...callsData.map(c => c.caller_id),
-          ...callsData.map(c => c.callee_id)
-        ])];
+        const userIds = [
+          ...new Set([...callsData.map((c) => c.caller_id), ...callsData.map((c) => c.callee_id)]),
+        ];
 
         const { data: profiles } = await supabase
           .from('profiles')
           .select('user_id, full_name')
           .in('user_id', userIds);
 
-        const profileMap = new Map(profiles?.map(p => [p.user_id, p.full_name]) || []);
+        const profileMap = new Map(profiles?.map((p) => [p.user_id, p.full_name]) || []);
 
-        const enrichedCalls: CallRecord[] = callsData.map(call => {
-          const supervisedId = supervisedUserIds.includes(call.caller_id) 
-            ? call.caller_id 
+        const enrichedCalls: CallRecord[] = callsData.map((call) => {
+          const supervisedId = supervisedUserIds.includes(call.caller_id)
+            ? call.caller_id
             : call.callee_id;
           const maxDuration = maxDurationsMap.get(supervisedId);
-          const durationExceeded = maxDuration && call.duration_seconds 
-            ? call.duration_seconds > (maxDuration * 60) 
-            : false;
+          const durationExceeded =
+            maxDuration && call.duration_seconds ? call.duration_seconds > maxDuration * 60 : false;
 
           return {
             id: call.id,
@@ -120,26 +118,26 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
             callee_name: profileMap.get(call.callee_id) || 'Inconnu',
             supervised_user_id: supervisedId,
             supervised_user_name: profileMap.get(supervisedId) || 'Inconnu',
-            max_duration_exceeded: durationExceeded
+            max_duration_exceeded: durationExceeded,
           };
         });
 
         setCalls(enrichedCalls);
 
         // Calculate stats
-        const totalDuration = enrichedCalls.reduce((sum, call) => 
-          sum + (call.duration_seconds || 0), 0
+        const totalDuration = enrichedCalls.reduce(
+          (sum, call) => sum + (call.duration_seconds || 0),
+          0
         );
-        const completedCalls = enrichedCalls.filter(c => c.duration_seconds);
+        const completedCalls = enrichedCalls.filter((c) => c.duration_seconds);
 
         setStats({
           totalCalls: enrichedCalls.length,
           totalDuration,
-          averageDuration: completedCalls.length > 0 
-            ? Math.round(totalDuration / completedCalls.length) 
-            : 0,
-          videoCalls: enrichedCalls.filter(c => c.call_type === 'video').length,
-          audioCalls: enrichedCalls.filter(c => c.call_type === 'audio').length
+          averageDuration:
+            completedCalls.length > 0 ? Math.round(totalDuration / completedCalls.length) : 0,
+          videoCalls: enrichedCalls.filter((c) => c.call_type === 'video').length,
+          audioCalls: enrichedCalls.filter((c) => c.call_type === 'audio').length,
         });
       }
     } catch (error) {
@@ -152,13 +150,17 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
   const subscribeToCallUpdates = () => {
     const channel = supabase
       .channel('wali-calls-updates')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'webrtc_calls'
-      }, () => {
-        loadCallsHistory();
-      })
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'webrtc_calls',
+        },
+        () => {
+          loadCallsHistory();
+        }
+      )
       .subscribe();
 
     return () => {
@@ -171,7 +173,7 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
     const hours = Math.floor(seconds / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    
+
     if (hours > 0) {
       return `${hours}h ${mins}m ${secs}s`;
     }
@@ -179,16 +181,22 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
   };
 
   const getCallIcon = (call: CallRecord) => {
-    return call.call_type === 'video' 
-      ? <Video className="h-5 w-5 text-primary" />
-      : <Phone className="h-5 w-5 text-primary" />;
+    return call.call_type === 'video' ? (
+      <Video className="h-5 w-5 text-primary" />
+    ) : (
+      <Phone className="h-5 w-5 text-primary" />
+    );
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'connected':
       case 'ended':
-        return <Badge variant="default" className="bg-green-500">Terminé</Badge>;
+        return (
+          <Badge variant="default" className="bg-green-500">
+            Terminé
+          </Badge>
+        );
       case 'rejected':
         return <Badge variant="destructive">Rejeté</Badge>;
       case 'missed':
@@ -220,7 +228,7 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
@@ -231,7 +239,7 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
@@ -242,7 +250,7 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="pt-6">
             <div className="text-center">
@@ -276,30 +284,35 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3 flex-1">
                       {getCallIcon(call)}
-                      
+
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium">
-                            {call.supervised_user_name}
-                          </span>
+                          <span className="font-medium">{call.supervised_user_name}</span>
                           <span className="text-muted-foreground">↔</span>
                           <span className="font-medium">
-                            {call.caller_id === call.supervised_user_id 
-                              ? call.callee_name 
+                            {call.caller_id === call.supervised_user_id
+                              ? call.callee_name
                               : call.caller_name}
                           </span>
                           {call.max_duration_exceeded && (
                             <AlertTriangle className="h-4 w-4 text-destructive" />
                           )}
                         </div>
-                        
+
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Calendar className="h-3 w-3" />
-                          <span>{format(new Date(call.started_at), 'dd MMM yyyy', { locale: fr })}</span>
+                          <span>
+                            {format(new Date(call.started_at), 'dd MMM yyyy', { locale: fr })}
+                          </span>
                           <Clock className="h-3 w-3 ml-2" />
                           <span>{format(new Date(call.started_at), 'HH:mm', { locale: fr })}</span>
                           <span>•</span>
-                          <span>{formatDistanceToNow(new Date(call.started_at), { addSuffix: true, locale: fr })}</span>
+                          <span>
+                            {formatDistanceToNow(new Date(call.started_at), {
+                              addSuffix: true,
+                              locale: fr,
+                            })}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -313,7 +326,7 @@ export function SupervisedCallsHistory({ supervisedUserId }: SupervisedCallsHist
                       {getStatusBadge(call.status)}
                     </div>
                   </div>
-                  
+
                   {call.max_duration_exceeded && (
                     <div className="mt-2 p-2 bg-destructive/10 rounded text-sm text-destructive flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4" />

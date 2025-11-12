@@ -1,11 +1,10 @@
-
-import React from "react";
-import { CompatibilityMatch } from "@/types/compatibility";
-import { Progress } from "@/components/ui/progress";
-import LazyMatchCard from "./LazyMatchCard";
-import { useDeferredCompatibility } from "@/hooks/compatibility/useDeferredCompatibility";
-import { Card, CardContent } from "@/components/ui/card";
-import { Loader2 } from "lucide-react";
+import React from 'react';
+import { CompatibilityMatch } from '@/types/compatibility';
+import { Progress } from '@/components/ui/progress';
+import LazyMatchCard from './LazyMatchCard';
+import { useDeferredCompatibility } from '@/hooks/compatibility/useDeferredCompatibility';
+import { Card, CardContent } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 
 interface LazyMatchListProps {
   matches: CompatibilityMatch[];
@@ -13,11 +12,7 @@ interface LazyMatchListProps {
   delay?: number;
 }
 
-const LazyMatchList = ({ 
-  matches, 
-  batchSize = 10, 
-  delay = 100 
-}: LazyMatchListProps) => {
+const LazyMatchList = ({ matches, batchSize = 10, delay = 100 }: LazyMatchListProps) => {
   const {
     elementRef,
     visibleMatches,
@@ -46,9 +41,7 @@ const LazyMatchList = ({
               <span className="text-sm font-medium text-blue-700">
                 Loading matches ({processedCount}/{totalMatches})
               </span>
-              {isProcessing && (
-                <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-              )}
+              {isProcessing && <Loader2 className="h-4 w-4 animate-spin text-blue-600" />}
             </div>
             <Progress value={progress} className="h-2" />
           </CardContent>

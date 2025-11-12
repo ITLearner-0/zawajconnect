@@ -1,9 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { MonitoringReport } from '@/services/monitoring';  // Updated import path
+import { MonitoringReport } from '@/services/monitoring'; // Updated import path
 import { X } from 'lucide-react';
 import MonitoringHeader from './monitoring/MonitoringHeader';
 import MonitoringFooter from './monitoring/MonitoringFooter';
@@ -25,26 +24,28 @@ const AIMonitoringDashboard: React.FC<AIMonitoringDashboardProps> = ({
   onToggleMonitoring,
   isLoading,
   error,
-  onClose
+  onClose,
 }) => {
   return (
     <Card className="w-full shadow-sm border border-islamic-teal/20 dark:border-islamic-darkTeal/30 bg-white dark:bg-islamic-darkCard">
-      <MonitoringHeader 
-        isEnabled={isEnabled} 
-        onToggleMonitoring={onToggleMonitoring} 
+      <MonitoringHeader
+        isEnabled={isEnabled}
+        onToggleMonitoring={onToggleMonitoring}
         isLoading={isLoading}
         onClose={onClose}
       />
-      
+
       <CardContent className="p-4">
         {!isEnabled ? (
           <div className="text-center p-6">
-            <h3 className="font-medium mb-2 text-islamic-burgundy dark:text-islamic-cream">AI Monitoring is disabled</h3>
+            <h3 className="font-medium mb-2 text-islamic-burgundy dark:text-islamic-cream">
+              AI Monitoring is disabled
+            </h3>
             <p className="text-sm text-muted-foreground dark:text-islamic-cream/70">
               Enable monitoring to get real-time insights into conversation compliance.
             </p>
-            <Button 
-              onClick={onToggleMonitoring} 
+            <Button
+              onClick={onToggleMonitoring}
               className="mt-4 bg-islamic-brightGold text-islamic-burgundy hover:bg-islamic-brightGold/90 dark:bg-islamic-darkBrightGold dark:text-islamic-cream dark:hover:bg-islamic-darkBrightGold/90"
               disabled={isLoading}
             >
@@ -52,9 +53,7 @@ const AIMonitoringDashboard: React.FC<AIMonitoringDashboardProps> = ({
             </Button>
           </div>
         ) : error ? (
-          <div className="text-center text-red-500 p-4">
-            {error}
-          </div>
+          <div className="text-center text-red-500 p-4">{error}</div>
         ) : !report ? (
           <div className="text-center p-6">
             <div className="animate-pulse">
@@ -72,7 +71,7 @@ const AIMonitoringDashboard: React.FC<AIMonitoringDashboardProps> = ({
           </>
         )}
       </CardContent>
-      
+
       <MonitoringFooter report={report} />
     </Card>
   );

@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 interface UseLazyLoadingOptions {
@@ -7,12 +6,10 @@ interface UseLazyLoadingOptions {
   triggerOnce?: boolean;
 }
 
-export const useLazyLoading = <T extends HTMLElement = HTMLDivElement>(options: UseLazyLoadingOptions = {}) => {
-  const {
-    threshold = 0.1,
-    rootMargin = '50px',
-    triggerOnce = true,
-  } = options;
+export const useLazyLoading = <T extends HTMLElement = HTMLDivElement>(
+  options: UseLazyLoadingOptions = {}
+) => {
+  const { threshold = 0.1, rootMargin = '50px', triggerOnce = true } = options;
 
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [hasTriggered, setHasTriggered] = useState(false);
@@ -26,7 +23,7 @@ export const useLazyLoading = <T extends HTMLElement = HTMLDivElement>(options: 
       ([entry]) => {
         const isVisible = entry.isIntersecting;
         setIsIntersecting(isVisible);
-        
+
         if (isVisible && triggerOnce && !hasTriggered) {
           setHasTriggered(true);
         }
@@ -44,7 +41,7 @@ export const useLazyLoading = <T extends HTMLElement = HTMLDivElement>(options: 
     };
   }, [threshold, rootMargin, triggerOnce, hasTriggered]);
 
-  const shouldLoad = triggerOnce ? (hasTriggered || isIntersecting) : isIntersecting;
+  const shouldLoad = triggerOnce ? hasTriggered || isIntersecting : isIntersecting;
 
   return { elementRef, isIntersecting, shouldLoad };
 };

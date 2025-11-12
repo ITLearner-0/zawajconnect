@@ -6,14 +6,11 @@ interface ConversationStatusBadgeProps {
   className?: string;
 }
 
-export const ConversationStatusBadge: React.FC<ConversationStatusBadgeProps> = ({ 
-  className = '' 
+export const ConversationStatusBadge: React.FC<ConversationStatusBadgeProps> = ({
+  className = '',
 }) => {
   return (
-    <Badge 
-      variant="secondary" 
-      className={`flex items-center gap-1 ${className}`}
-    >
+    <Badge variant="secondary" className={`flex items-center gap-1 ${className}`}>
       <Lock className="h-3 w-3" />
       En discussion
     </Badge>

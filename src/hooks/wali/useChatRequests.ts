@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ChatRequest } from '@/types/wali';
@@ -48,13 +47,13 @@ export const useChatRequests = (waliId: string) => {
                 requester_profile: {
                   first_name: 'Unknown',
                   last_name: 'User',
-                }
+                },
               };
             }
 
             return {
               ...request,
-              requester_profile: profileData
+              requester_profile: profileData,
             };
           } catch (err) {
             console.error('Error fetching profile for request:', err);
@@ -63,7 +62,7 @@ export const useChatRequests = (waliId: string) => {
               requester_profile: {
                 first_name: 'Unknown',
                 last_name: 'User',
-              }
+              },
             };
           }
         })
@@ -85,16 +84,20 @@ export const useChatRequests = (waliId: string) => {
     if (waliId) {
       const channel = supabase
         .channel(`chat_requests_${waliId}`)
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'chat_requests',
-          filter: `wali_id=eq.${waliId}`
-        }, () => {
-          fetchChatRequests();
-        })
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'chat_requests',
+            filter: `wali_id=eq.${waliId}`,
+          },
+          () => {
+            fetchChatRequests();
+          }
+        )
         .subscribe();
-        
+
       return () => {
         supabase.removeChannel(channel);
       };
@@ -108,9 +111,9 @@ export const useChatRequests = (waliId: string) => {
     try {
       const { error: updateError } = await supabase
         .from('chat_requests')
-        .update({ 
-          status, 
-          reviewed_at: new Date().toISOString() 
+        .update({
+          status,
+          reviewed_at: new Date().toISOString(),
         })
         .eq('id', requestId)
         .eq('wali_id', waliId);
@@ -120,32 +123,31 @@ export const useChatRequests = (waliId: string) => {
       }
 
       // Update local state
-      setChatRequests(prev => 
-        prev.map(req => 
-          req.id === requestId 
-            ? { ...req, status, reviewed_at: new Date().toISOString() } 
-            : req
+      setChatRequests((prev) =>
+        prev.map((req) =>
+          req.id === requestId ? { ...req, status, reviewed_at: new Date().toISOString() } : req
         )
       );
 
       toast({
-        title: status === 'approved' ? "Request Approved" : "Request Rejected",
-        description: status === 'approved' 
-          ? "The chat request has been approved" 
-          : "The chat request has been rejected",
-        variant: "default"
+        title: status === 'approved' ? 'Request Approved' : 'Request Rejected',
+        description:
+          status === 'approved'
+            ? 'The chat request has been approved'
+            : 'The chat request has been rejected',
+        variant: 'default',
       });
 
       return true;
     } catch (err: any) {
       console.error('Error handling chat request:', err);
-      
+
       toast({
-        title: "Action Failed",
-        description: err.message || "Could not process request",
-        variant: "destructive"
+        title: 'Action Failed',
+        description: err.message || 'Could not process request',
+        variant: 'destructive',
       });
-      
+
       return false;
     }
   };
@@ -166,30 +168,26 @@ export const useChatRequests = (waliId: string) => {
       }
 
       // Update local state
-      setChatRequests(prev => 
-        prev.map(req => 
-          req.id === requestId 
-            ? { ...req, wali_notes: note } 
-            : req
-        )
+      setChatRequests((prev) =>
+        prev.map((req) => (req.id === requestId ? { ...req, wali_notes: note } : req))
       );
 
       toast({
-        title: "Note Added",
-        description: "Your note has been saved",
-        variant: "default"
+        title: 'Note Added',
+        description: 'Your note has been saved',
+        variant: 'default',
       });
 
       return true;
     } catch (err: any) {
       console.error('Error adding note to chat request:', err);
-      
+
       toast({
-        title: "Note Update Failed",
-        description: err.message || "Could not save your note",
-        variant: "destructive"
+        title: 'Note Update Failed',
+        description: err.message || 'Could not save your note',
+        variant: 'destructive',
       });
-      
+
       return false;
     }
   };
@@ -200,6 +198,6 @@ export const useChatRequests = (waliId: string) => {
     error,
     handleChatRequest,
     addWaliNote,
-    refreshChatRequests: fetchChatRequests
+    refreshChatRequests: fetchChatRequests,
   };
 };

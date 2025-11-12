@@ -60,8 +60,8 @@ export const exportToExcel = (stats: CallStats, timeRange: string) => {
   // Calls by day sheet
   const callsByDayData = [
     ['APPELS PAR JOUR'],
-    ['Date', 'Nombre d\'appels'],
-    ...stats.callsByDay.map(item => [item.date, item.count])
+    ['Date', "Nombre d'appels"],
+    ...stats.callsByDay.map((item) => [item.date, item.count]),
   ];
   const wsCallsByDay = XLSX.utils.aoa_to_sheet(callsByDayData);
   XLSX.utils.book_append_sheet(wb, wsCallsByDay, 'Appels par Jour');
@@ -70,7 +70,7 @@ export const exportToExcel = (stats: CallStats, timeRange: string) => {
   const callsByStatusData = [
     ['APPELS PAR STATUT'],
     ['Statut', 'Nombre'],
-    ...stats.callsByStatus.map(item => [item.status, item.count])
+    ...stats.callsByStatus.map((item) => [item.status, item.count]),
   ];
   const wsCallsByStatus = XLSX.utils.aoa_to_sheet(callsByStatusData);
   XLSX.utils.book_append_sheet(wb, wsCallsByStatus, 'Statuts');
@@ -79,11 +79,11 @@ export const exportToExcel = (stats: CallStats, timeRange: string) => {
   const durationByTypeData = [
     ['DURÉE MOYENNE PAR TYPE'],
     ['Type', 'Durée (secondes)', 'Durée (formatée)'],
-    ...stats.avgDurationByType.map(item => [
+    ...stats.avgDurationByType.map((item) => [
       item.type,
       item.duration,
-      formatDuration(item.duration)
-    ])
+      formatDuration(item.duration),
+    ]),
   ];
   const wsDuration = XLSX.utils.aoa_to_sheet(durationByTypeData);
   XLSX.utils.book_append_sheet(wb, wsDuration, 'Durées par Type');
@@ -91,8 +91,8 @@ export const exportToExcel = (stats: CallStats, timeRange: string) => {
   // Calls by hour sheet
   const callsByHourData = [
     ['APPELS PAR HEURE'],
-    ['Heure', 'Nombre d\'appels'],
-    ...stats.callsByHour.map(item => [`${item.hour}:00`, item.count])
+    ['Heure', "Nombre d'appels"],
+    ...stats.callsByHour.map((item) => [`${item.hour}:00`, item.count]),
   ];
   const wsCallsByHour = XLSX.utils.aoa_to_sheet(callsByHourData);
   XLSX.utils.book_append_sheet(wb, wsCallsByHour, 'Appels par Heure');
@@ -102,7 +102,11 @@ export const exportToExcel = (stats: CallStats, timeRange: string) => {
   XLSX.writeFile(wb, fileName);
 };
 
-export const exportToPDF = async (stats: CallStats, timeRange: string, chartsContainerId: string) => {
+export const exportToPDF = async (
+  stats: CallStats,
+  timeRange: string,
+  chartsContainerId: string
+) => {
   const pdf = new jsPDF('p', 'mm', 'a4');
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -112,12 +116,17 @@ export const exportToPDF = async (stats: CallStats, timeRange: string, chartsCon
   pdf.setFontSize(20);
   pdf.setFont('helvetica', 'bold');
   pdf.text('Rapport Analytics des Appels', pageWidth / 2, yOffset, { align: 'center' });
-  
+
   yOffset += 10;
   pdf.setFontSize(10);
   pdf.setFont('helvetica', 'normal');
-  pdf.text(`Période: ${timeRange} | Généré le: ${new Date().toLocaleString('fr-FR')}`, pageWidth / 2, yOffset, { align: 'center' });
-  
+  pdf.text(
+    `Période: ${timeRange} | Généré le: ${new Date().toLocaleString('fr-FR')}`,
+    pageWidth / 2,
+    yOffset,
+    { align: 'center' }
+  );
+
   yOffset += 15;
 
   // Summary statistics
@@ -128,7 +137,7 @@ export const exportToPDF = async (stats: CallStats, timeRange: string, chartsCon
 
   pdf.setFontSize(10);
   pdf.setFont('helvetica', 'normal');
-  
+
   const summaryStats = [
     `Total Appels: ${stats.totalCalls} (${stats.audioCallsCount} audio, ${stats.videoCallsCount} vidéo)`,
     `Durée Moyenne: ${formatDuration(stats.avgDuration)}`,
@@ -136,7 +145,7 @@ export const exportToPDF = async (stats: CallStats, timeRange: string, chartsCon
     `Note Qualité: ${stats.qualityMetrics.avgRating.toFixed(2)}/5 (${stats.qualityMetrics.totalFeedbacks} feedbacks)`,
   ];
 
-  summaryStats.forEach(stat => {
+  summaryStats.forEach((stat) => {
     pdf.text(stat, 15, yOffset);
     yOffset += 6;
   });
@@ -151,7 +160,7 @@ export const exportToPDF = async (stats: CallStats, timeRange: string, chartsCon
 
   pdf.setFontSize(10);
   pdf.setFont('helvetica', 'normal');
-  
+
   const qualityStats = [
     `Excellent (5★): ${stats.qualityMetrics.excellentCount}`,
     `Bon (4★): ${stats.qualityMetrics.goodCount}`,
@@ -159,7 +168,7 @@ export const exportToPDF = async (stats: CallStats, timeRange: string, chartsCon
     `Faible (≤2★): ${stats.qualityMetrics.poorCount}`,
   ];
 
-  qualityStats.forEach(stat => {
+  qualityStats.forEach((stat) => {
     pdf.text(stat, 15, yOffset);
     yOffset += 6;
   });
@@ -168,10 +177,10 @@ export const exportToPDF = async (stats: CallStats, timeRange: string, chartsCon
   const chartsContainer = document.getElementById(chartsContainerId);
   if (chartsContainer) {
     const chartElements = chartsContainer.querySelectorAll('.chart-capture');
-    
+
     for (let i = 0; i < chartElements.length; i++) {
       const chartElement = chartElements[i] as HTMLElement;
-      
+
       // Add new page if needed
       if (yOffset > pageHeight - 80) {
         pdf.addPage();
@@ -182,13 +191,13 @@ export const exportToPDF = async (stats: CallStats, timeRange: string, chartsCon
         const canvas = await html2canvas(chartElement, {
           scale: 2,
           logging: false,
-          backgroundColor: '#ffffff'
+          backgroundColor: '#ffffff',
         });
-        
+
         const imgData = canvas.toDataURL('image/png');
         const imgWidth = pageWidth - 30;
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
+
         // Add chart title if available
         const titleElement = chartElement.querySelector('[data-chart-title]');
         if (titleElement) {
@@ -197,7 +206,7 @@ export const exportToPDF = async (stats: CallStats, timeRange: string, chartsCon
           pdf.text(titleElement.textContent || '', 15, yOffset);
           yOffset += 8;
         }
-        
+
         pdf.addImage(imgData, 'PNG', 15, yOffset, imgWidth, imgHeight);
         yOffset += imgHeight + 15;
       } catch (error) {
@@ -221,10 +230,10 @@ export const exportToPDF = async (stats: CallStats, timeRange: string, chartsCon
   pdf.setFontSize(11);
   pdf.text('Appels par Statut:', 15, yOffset);
   yOffset += 6;
-  
+
   pdf.setFontSize(9);
   pdf.setFont('helvetica', 'normal');
-  stats.callsByStatus.forEach(item => {
+  stats.callsByStatus.forEach((item) => {
     pdf.text(`• ${item.status}: ${item.count} appels`, 20, yOffset);
     yOffset += 5;
   });

@@ -16,27 +16,27 @@ const ModerationDemo: React.FC = () => {
   const [results, setResults] = useState<any[]>([]);
 
   const testMessages = [
-    "Assalamu alaikum, comment allez-vous ?",
-    "Tu es vraiment stupide !",
+    'Assalamu alaikum, comment allez-vous ?',
+    'Tu es vraiment stupide !',
     "J'aimerais vous connaître mieux respectueusement",
     "Salut ma belle, tu veux qu'on se voit ce soir ?",
-    "Je cherche une épouse pieuse pour fonder une famille islamique",
-    "Vous mentez constamment dans vos messages"
+    'Je cherche une épouse pieuse pour fonder une famille islamique',
+    'Vous mentez constamment dans vos messages',
   ];
 
   const handleTest = async (message: string) => {
     if (!user) {
       toast({
-        title: "Erreur",
-        description: "Vous devez être connecté pour tester la modération",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Vous devez être connecté pour tester la modération',
+        variant: 'destructive',
       });
       return;
     }
 
     try {
       const result = await moderateContent(message, 'test');
-      setResults(prev => [{ message, result, timestamp: Date.now() }, ...prev.slice(0, 9)]);
+      setResults((prev) => [{ message, result, timestamp: Date.now() }, ...prev.slice(0, 9)]);
     } catch (error) {
       console.error('Error testing moderation:', error);
     }
@@ -44,31 +44,46 @@ const ModerationDemo: React.FC = () => {
 
   const getResultColor = (action: string) => {
     switch (action) {
-      case 'approved': return 'bg-green-100 text-green-800 border-green-200';
-      case 'warned': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'blocked': return 'bg-red-100 text-red-800 border-red-200';
-      case 'escalated': return 'bg-orange-100 text-orange-800 border-orange-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'approved':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'warned':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'blocked':
+        return 'bg-red-100 text-red-800 border-red-200';
+      case 'escalated':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   const getResultIcon = (action: string) => {
     switch (action) {
-      case 'approved': return <CheckCircle className="h-4 w-4" />;
-      case 'warned': return <AlertTriangle className="h-4 w-4" />;
-      case 'blocked': return <Shield className="h-4 w-4" />;
-      case 'escalated': return <BookOpen className="h-4 w-4" />;
-      default: return <AlertTriangle className="h-4 w-4" />;
+      case 'approved':
+        return <CheckCircle className="h-4 w-4" />;
+      case 'warned':
+        return <AlertTriangle className="h-4 w-4" />;
+      case 'blocked':
+        return <Shield className="h-4 w-4" />;
+      case 'escalated':
+        return <BookOpen className="h-4 w-4" />;
+      default:
+        return <AlertTriangle className="h-4 w-4" />;
     }
   };
 
   const getActionText = (action: string) => {
     switch (action) {
-      case 'approved': return 'Approuvé ✅';
-      case 'warned': return 'Avertissement ⚠️';
-      case 'blocked': return 'Bloqué 🚫';
-      case 'escalated': return 'Escaladé 📋';
-      default: return action;
+      case 'approved':
+        return 'Approuvé ✅';
+      case 'warned':
+        return 'Avertissement ⚠️';
+      case 'blocked':
+        return 'Bloqué 🚫';
+      case 'escalated':
+        return 'Escaladé 📋';
+      default:
+        return action;
     }
   };
 
@@ -116,9 +131,7 @@ const ModerationDemo: React.FC = () => {
             <div className="grid gap-2">
               {testMessages.map((message, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <p className="flex-1 text-sm p-2 bg-muted rounded border">
-                    "{message}"
-                  </p>
+                  <p className="flex-1 text-sm p-2 bg-muted rounded border">"{message}"</p>
                   <Button
                     size="sm"
                     variant="outline"

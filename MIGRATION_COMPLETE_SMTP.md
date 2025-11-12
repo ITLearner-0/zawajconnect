@@ -7,6 +7,7 @@
 ### ✨ Fonctions migrées (13 au total)
 
 #### Emails transactionnels
+
 1. ✅ `send-welcome-email` - Email de bienvenue
 2. ✅ `send-match-notification` - Notification de nouveau match
 3. ✅ `send-conversation-ended-email` - Notification de fin de conversation
@@ -16,6 +17,7 @@
 7. ✅ `send-verification-approved-email` - Email de vérification approuvée
 
 #### Emails automatiques (Cron Jobs)
+
 8. ✅ `send-match-suggestions` - Suggestions de matchs hebdomadaires
 9. ✅ `send-newsletter` - Newsletter mensuelle
 10. ✅ `send-weekly-tips` - Conseils hebdomadaires
@@ -23,6 +25,7 @@
 12. ✅ `send-subscription-expiring-email` - Rappel d'expiration d'abonnement
 
 #### Module partagé
+
 13. ✅ `_shared/smtp.ts` - Module SMTP réutilisable
 
 ---
@@ -109,6 +112,7 @@ Les cron jobs sont configurés dans `COMPLETE_CRON_SETUP.sql` :
 ### Erreur : "SMTP configuration missing"
 
 Les secrets SMTP ne sont pas configurés. Configurez-les via :
+
 ```
 https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/settings/functions
 ```
@@ -126,6 +130,7 @@ https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/settings/functions
 ### Emails dans les spams
 
 Configurez les enregistrements DNS chez Hostinger :
+
 - **SPF** : `v=spf1 include:_spf.hostinger.com ~all`
 - **DKIM** : Activez via le panneau Hostinger
 - **DMARC** : `v=DMARC1; p=quarantine; rua=mailto:postmaster@zawajconnect.me`
@@ -156,7 +161,7 @@ Configurez les enregistrements DNS chez Hostinger :
 ✅ **Contrôle total** : Gestion directe via Hostinger  
 ✅ **Délivrabilité** : Utilisation de votre propre domaine  
 ✅ **Scalabilité** : Infrastructure SMTP professionnelle  
-✅ **Traçabilité** : Logs complets dans Supabase  
+✅ **Traçabilité** : Logs complets dans Supabase
 
 ---
 

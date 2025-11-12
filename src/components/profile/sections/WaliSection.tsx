@@ -1,9 +1,14 @@
-
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ProfileFormData } from "@/types/profile";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { ProfileFormData } from '@/types/profile';
 
 interface WaliSectionProps {
   formData: ProfileFormData;
@@ -11,9 +16,13 @@ interface WaliSectionProps {
   handleSelectChange: (field: keyof ProfileFormData, value: string) => void;
 }
 
-const WaliSection: React.FC<WaliSectionProps> = ({ formData, handleChange, handleSelectChange }) => {
+const WaliSection: React.FC<WaliSectionProps> = ({
+  formData,
+  handleChange,
+  handleSelectChange,
+}) => {
   // Only show Wali section for female users
-  if (formData.gender !== "female") {
+  if (formData.gender !== 'female') {
     return null;
   }
 
@@ -26,7 +35,7 @@ const WaliSection: React.FC<WaliSectionProps> = ({ formData, handleChange, handl
           <Input
             id="waliName"
             name="waliName"
-            value={formData.waliName || ""}
+            value={formData.waliName || ''}
             onChange={handleChange}
             placeholder="Entrez le nom de votre wali"
             className="w-full"
@@ -35,7 +44,10 @@ const WaliSection: React.FC<WaliSectionProps> = ({ formData, handleChange, handl
 
         <div className="space-y-2">
           <Label htmlFor="waliRelationship">Relation</Label>
-          <Select value={formData.waliRelationship || ""} onValueChange={(value) => handleSelectChange("waliRelationship", value)}>
+          <Select
+            value={formData.waliRelationship || ''}
+            onValueChange={(value) => handleSelectChange('waliRelationship', value)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Sélectionnez la relation" />
             </SelectTrigger>
@@ -54,7 +66,7 @@ const WaliSection: React.FC<WaliSectionProps> = ({ formData, handleChange, handl
           <Input
             id="waliContact"
             name="waliContact"
-            value={formData.waliContact || ""}
+            value={formData.waliContact || ''}
             onChange={handleChange}
             placeholder="Numéro de contact du wali"
             className="w-full"

@@ -5,12 +5,29 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Users, Plus, Mail, Phone, Shield, Heart, UserCheck, AlertCircle, Trash2, Send } from 'lucide-react';
+import {
+  Users,
+  Plus,
+  Mail,
+  Phone,
+  Shield,
+  Heart,
+  UserCheck,
+  AlertCircle,
+  Trash2,
+  Send,
+} from 'lucide-react';
 import { z } from 'zod';
 
 interface FamilyMember {
@@ -37,13 +54,13 @@ interface SupervisionStats {
 const FamilySupervisionPanel = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   const [familyMembers, setFamilyMembers] = useState<FamilyMember[]>([]);
   const [stats, setStats] = useState<SupervisionStats>({
     total_matches: 0,
     reviewed_matches: 0,
     pending_reviews: 0,
-    family_members: 0
+    family_members: 0,
   });
   const [showAddForm, setShowAddForm] = useState(false);
   const [newMember, setNewMember] = useState({
@@ -53,7 +70,7 @@ const FamilySupervisionPanel = () => {
     phone: '',
     can_communicate: false,
     can_view_profile: true,
-    is_wali: false
+    is_wali: false,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -61,36 +78,48 @@ const FamilySupervisionPanel = () => {
   const [emailTemplate, setEmailTemplate] = useState({
     subject: '',
     body: '',
-    to: ''
+    to: '',
   });
 
   // Validation schema for family member input
   const familyMemberSchema = z.object({
-    full_name: z.string()
+    full_name: z
+      .string()
       .trim()
       .min(2, 'Le nom doit contenir au moins 2 caractères')
       .max(100, 'Le nom ne peut pas dépasser 100 caractères')
       .regex(/^[a-zA-ZÀ-ÿ\s'-]+$/, 'Le nom contient des caractères invalides'),
-    relationship: z.string()
+    relationship: z
+      .string()
       .trim()
       .min(2, 'La relation doit être spécifiée')
       .max(50, 'La relation ne peut pas dépasser 50 caractères'),
-    email: z.string()
+    email: z
+      .string()
       .trim()
       .email('Format email invalide')
-      .max(255, 'L\'email ne peut pas dépasser 255 caractères')
+      .max(255, "L'email ne peut pas dépasser 255 caractères")
       .optional()
       .or(z.literal('')),
-    phone: z.string()
+    phone: z
+      .string()
       .trim()
       .regex(/^\+?[1-9]\d{7,14}$/, 'Format de téléphone invalide (exemple: +33612345678)')
       .optional()
-      .or(z.literal(''))
+      .or(z.literal('')),
   });
 
   const relationshipOptions = [
-    'Père', 'Mère', 'Frère', 'Sœur', 'Oncle', 'Tante', 
-    'Grand-père', 'Grand-mère', 'Tuteur/Wali', 'Autre'
+    'Père',
+    'Mère',
+    'Frère',
+    'Sœur',
+    'Oncle',
+    'Tante',
+    'Grand-père',
+    'Grand-mère',
+    'Tuteur/Wali',
+    'Autre',
   ];
 
   useEffect(() => {
@@ -113,25 +142,27 @@ const FamilySupervisionPanel = () => {
 
       if (membersError) throw membersError;
 
-      setFamilyMembers((membersData || []).map(m => ({
-        ...m,
-        can_communicate: m.can_communicate ?? false,
-        can_view_profile: m.can_view_profile ?? false,
-        is_wali: m.is_wali ?? false,
-        invitation_status: m.invitation_status ?? 'pending',
-        invitation_sent_at: m.invitation_sent_at ?? undefined,
-        invitation_accepted_at: m.invitation_accepted_at ?? undefined,
-        invitation_token: m.invitation_token ?? undefined
-      })));
+      setFamilyMembers(
+        (membersData || []).map((m) => ({
+          ...m,
+          can_communicate: m.can_communicate ?? false,
+          can_view_profile: m.can_view_profile ?? false,
+          is_wali: m.is_wali ?? false,
+          invitation_status: m.invitation_status ?? 'pending',
+          invitation_sent_at: m.invitation_sent_at ?? undefined,
+          invitation_accepted_at: m.invitation_accepted_at ?? undefined,
+          invitation_token: m.invitation_token ?? undefined,
+        }))
+      );
 
       // Load supervision stats
       await loadSupervisionStats();
     } catch (error) {
       console.error('Error loading family data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données familiales",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données familiales',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -152,19 +183,20 @@ const FamilySupervisionPanel = () => {
       const { count: reviewedMatches } = await supabase
         .from('family_reviews')
         .select('*', { count: 'exact', head: true })
-        .in('match_id', 
+        .in(
+          'match_id',
           await supabase
             .from('matches')
             .select('id')
             .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
-            .then(res => res.data?.map(m => m.id) || [])
+            .then((res) => res.data?.map((m) => m.id) || [])
         );
 
       setStats({
         total_matches: totalMatches || 0,
         reviewed_matches: reviewedMatches || 0,
         pending_reviews: (totalMatches || 0) - (reviewedMatches || 0),
-        family_members: familyMembers.length
+        family_members: familyMembers.length,
       });
     } catch (error) {
       console.error('Error loading supervision stats:', error);
@@ -181,15 +213,15 @@ const FamilySupervisionPanel = () => {
         full_name: newMember.full_name,
         relationship: newMember.relationship,
         email: newMember.email || '',
-        phone: newMember.phone || ''
+        phone: newMember.phone || '',
       });
 
       if (!validationResult.success) {
-        const errors = validationResult.error.issues.map(e => e.message).join(', ');
+        const errors = validationResult.error.issues.map((e) => e.message).join(', ');
         toast({
-          title: "Erreur de validation",
+          title: 'Erreur de validation',
           description: errors,
-          variant: "destructive"
+          variant: 'destructive',
         });
         setSaving(false);
         return;
@@ -205,7 +237,7 @@ const FamilySupervisionPanel = () => {
           relationship: validatedData.relationship,
           can_communicate: newMember.can_communicate,
           can_view_profile: newMember.can_view_profile,
-          is_wali: newMember.is_wali
+          is_wali: newMember.is_wali,
         })
         .select()
         .maybeSingle();
@@ -216,7 +248,7 @@ const FamilySupervisionPanel = () => {
         throw new Error('Failed to create family member');
       }
 
-      setFamilyMembers(prev => [
+      setFamilyMembers((prev) => [
         ...prev,
         {
           ...data,
@@ -226,8 +258,8 @@ const FamilySupervisionPanel = () => {
           invitation_status: data.invitation_status ?? 'pending',
           invitation_sent_at: data.invitation_sent_at ?? undefined,
           invitation_accepted_at: data.invitation_accepted_at ?? undefined,
-          invitation_token: data.invitation_token ?? undefined
-        }
+          invitation_token: data.invitation_token ?? undefined,
+        },
       ]);
       setNewMember({
         full_name: '',
@@ -236,20 +268,20 @@ const FamilySupervisionPanel = () => {
         phone: '',
         can_communicate: false,
         can_view_profile: true,
-        is_wali: false
+        is_wali: false,
       });
       setShowAddForm(false);
 
       toast({
-        title: "Membre ajouté",
+        title: 'Membre ajouté',
         description: `${data?.full_name || 'Le membre'} a été ajouté à votre famille`,
       });
     } catch (error) {
       console.error('Error adding family member:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'ajouter le membre de famille",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
@@ -265,47 +297,42 @@ const FamilySupervisionPanel = () => {
 
       if (error) throw error;
 
-      setFamilyMembers(prev =>
-        prev.map(member =>
-          member.id === memberId ? { ...member, [field]: value } : member
-        )
+      setFamilyMembers((prev) =>
+        prev.map((member) => (member.id === memberId ? { ...member, [field]: value } : member))
       );
 
       toast({
-        title: "Mis à jour",
-        description: "Les permissions ont été mises à jour",
+        title: 'Mis à jour',
+        description: 'Les permissions ont été mises à jour',
       });
     } catch (error) {
       console.error('Error updating family member:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour les permissions",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour les permissions',
+        variant: 'destructive',
       });
     }
   };
 
   const deleteFamilyMember = async (memberId: string, memberName: string) => {
     try {
-      const { error } = await supabase
-        .from('family_members')
-        .delete()
-        .eq('id', memberId);
+      const { error } = await supabase.from('family_members').delete().eq('id', memberId);
 
       if (error) throw error;
 
-      setFamilyMembers(prev => prev.filter(member => member.id !== memberId));
+      setFamilyMembers((prev) => prev.filter((member) => member.id !== memberId));
 
       toast({
-        title: "Membre supprimé",
+        title: 'Membre supprimé',
         description: `${memberName} a été retiré de votre famille`,
       });
     } catch (error) {
       console.error('Error deleting family member:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de supprimer le membre de famille",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de supprimer le membre de famille',
+        variant: 'destructive',
       });
     }
   };
@@ -316,14 +343,13 @@ const FamilySupervisionPanel = () => {
     setLoading(true);
     try {
       // Generate invitation token and create family member record
-      const { data: invitationToken, error } = await supabase
-        .rpc('create_family_invitation', {
-          p_user_id: user.id,
-          p_full_name: member.full_name,
-          p_email: member.email || '',
-          p_relationship: member.relationship,
-          p_is_wali: member.is_wali
-        });
+      const { data: invitationToken, error } = await supabase.rpc('create_family_invitation', {
+        p_user_id: user.id,
+        p_full_name: member.full_name,
+        p_email: member.email || '',
+        p_relationship: member.relationship,
+        p_is_wali: member.is_wali,
+      });
 
       if (error) throw error;
 
@@ -336,9 +362,9 @@ const FamilySupervisionPanel = () => {
 
       const inviterName = profile?.full_name || 'Un membre de famille';
       const invitationUrl = `${window.location.origin}/invitation?token=${invitationToken}`;
-      
+
       // Create email template
-      const emailSubject = "Invitation à superviser sur ZawajConnect";
+      const emailSubject = 'Invitation à superviser sur ZawajConnect';
       const emailBody = `Assalamu Alaikum ${member.full_name},
 
 ${inviterName} vous invite à devenir ${member.is_wali ? 'tuteur (Wali)' : 'membre de famille'} sur ZawajConnect pour superviser leurs interactions selon les principes islamiques.
@@ -364,7 +390,7 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
       setEmailTemplate({
         subject: emailSubject,
         body: emailBody,
-        to: member.email || ''
+        to: member.email || '',
       });
       setShowEmailDialog(true);
 
@@ -372,13 +398,12 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
         title: "Lien d'invitation généré",
         description: "Choisissez votre solution email pour envoyer l'invitation.",
       });
-      
     } catch (error: unknown) {
       console.error('Error generating invitation:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible de générer l'invitation. Veuillez réessayer.",
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -392,7 +417,7 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
     const encodedTo = encodeURIComponent(to);
 
     let url = '';
-    
+
     switch (client) {
       case 'gmail':
         url = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodedTo}&su=${encodedSubject}&body=${encodedBody}`;
@@ -412,9 +437,9 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
 
     window.open(url, '_blank');
     setShowEmailDialog(false);
-    
+
     toast({
-      title: "Email ouvert",
+      title: 'Email ouvert',
       description: "L'invitation a été préparée dans votre client email.",
     });
   };
@@ -443,7 +468,7 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
             <div className="text-sm text-muted-foreground">Total Matches</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4 text-center">
             <UserCheck className="h-8 w-8 text-gold mx-auto mb-2" />
@@ -451,7 +476,7 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
             <div className="text-sm text-muted-foreground">Évalués</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4 text-center">
             <AlertCircle className="h-8 w-8 text-orange-500 mx-auto mb-2" />
@@ -459,7 +484,7 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
             <div className="text-sm text-muted-foreground">En Attente</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-4 text-center">
             <Users className="h-8 w-8 text-sage mx-auto mb-2" />
@@ -486,7 +511,8 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
             </Button>
           </div>
           <p className="text-sm text-muted-foreground">
-            Gérez les membres de votre famille qui peuvent vous aider dans votre recherche de partenaire selon les traditions islamiques.
+            Gérez les membres de votre famille qui peuvent vous aider dans votre recherche de
+            partenaire selon les traditions islamiques.
           </p>
         </CardHeader>
         <CardContent>
@@ -502,22 +528,26 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
                     <Input
                       id="full_name"
                       value={newMember.full_name}
-                      onChange={(e) => setNewMember(prev => ({ ...prev, full_name: e.target.value }))}
+                      onChange={(e) =>
+                        setNewMember((prev) => ({ ...prev, full_name: e.target.value }))
+                      }
                       placeholder="Nom du membre de famille"
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="relationship">Relation *</Label>
-                    <Select 
+                    <Select
                       value={newMember.relationship}
-                      onValueChange={(value) => setNewMember(prev => ({ ...prev, relationship: value }))}
+                      onValueChange={(value) =>
+                        setNewMember((prev) => ({ ...prev, relationship: value }))
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner la relation" />
                       </SelectTrigger>
                       <SelectContent>
-                        {relationshipOptions.map(relation => (
+                        {relationshipOptions.map((relation) => (
                           <SelectItem key={relation} value={relation}>
                             {relation}
                           </SelectItem>
@@ -525,24 +555,24 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="email">Email (optionnel)</Label>
                     <Input
                       id="email"
                       type="email"
                       value={newMember.email}
-                      onChange={(e) => setNewMember(prev => ({ ...prev, email: e.target.value }))}
+                      onChange={(e) => setNewMember((prev) => ({ ...prev, email: e.target.value }))}
                       placeholder="email@example.com"
                     />
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="phone">Téléphone (optionnel)</Label>
                     <Input
                       id="phone"
                       value={newMember.phone}
-                      onChange={(e) => setNewMember(prev => ({ ...prev, phone: e.target.value }))}
+                      onChange={(e) => setNewMember((prev) => ({ ...prev, phone: e.target.value }))}
                       placeholder="+33 6 12 34 56 78"
                     />
                   </div>
@@ -558,10 +588,12 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
                     </div>
                     <Switch
                       checked={newMember.can_communicate}
-                      onCheckedChange={(checked) => setNewMember(prev => ({ ...prev, can_communicate: checked }))}
+                      onCheckedChange={(checked) =>
+                        setNewMember((prev) => ({ ...prev, can_communicate: checked }))
+                      }
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Peut voir le profil complet</Label>
@@ -571,10 +603,12 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
                     </div>
                     <Switch
                       checked={newMember.can_view_profile}
-                      onCheckedChange={(checked) => setNewMember(prev => ({ ...prev, can_view_profile: checked }))}
+                      onCheckedChange={(checked) =>
+                        setNewMember((prev) => ({ ...prev, can_view_profile: checked }))
+                      }
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
                       <Label>Wali (Tuteur)</Label>
@@ -584,7 +618,9 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
                     </div>
                     <Switch
                       checked={newMember.is_wali}
-                      onCheckedChange={(checked) => setNewMember(prev => ({ ...prev, is_wali: checked }))}
+                      onCheckedChange={(checked) =>
+                        setNewMember((prev) => ({ ...prev, is_wali: checked }))
+                      }
                     />
                   </div>
                 </div>
@@ -597,10 +633,7 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
                   >
                     {saving ? 'Ajout...' : 'Ajouter'}
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowAddForm(false)}
-                  >
+                  <Button variant="outline" onClick={() => setShowAddForm(false)}>
                     Annuler
                   </Button>
                 </div>
@@ -613,7 +646,8 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
               <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">Aucun membre de famille ajouté</h3>
               <p className="text-muted-foreground mb-4">
-                Ajoutez des membres de votre famille pour bénéficier de leur guidance selon les traditions islamiques.
+                Ajoutez des membres de votre famille pour bénéficier de leur guidance selon les
+                traditions islamiques.
               </p>
             </div>
           ) : (
@@ -633,14 +667,20 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
                             </Badge>
                           )}
                           {member.invitation_status && (
-                            <Badge 
+                            <Badge
                               variant={
-                                member.invitation_status === 'accepted' ? 'default' : 
-                                member.invitation_status === 'pending' ? 'secondary' : 'destructive'
+                                member.invitation_status === 'accepted'
+                                  ? 'default'
+                                  : member.invitation_status === 'pending'
+                                    ? 'secondary'
+                                    : 'destructive'
                               }
                             >
-                              {member.invitation_status === 'accepted' ? 'Acceptée' : 
-                               member.invitation_status === 'pending' ? 'En attente' : 'Expirée'}
+                              {member.invitation_status === 'accepted'
+                                ? 'Acceptée'
+                                : member.invitation_status === 'pending'
+                                  ? 'En attente'
+                                  : 'Expirée'}
                             </Badge>
                           )}
                         </div>
@@ -688,23 +728,29 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
                         <Label className="text-sm">Communication directe</Label>
                         <Switch
                           checked={member.can_communicate}
-                          onCheckedChange={(checked) => updateFamilyMember(member.id, 'can_communicate', checked)}
+                          onCheckedChange={(checked) =>
+                            updateFamilyMember(member.id, 'can_communicate', checked)
+                          }
                         />
                       </div>
-                      
+
                       <div className="flex items-center justify-between">
                         <Label className="text-sm">Voir profils complets</Label>
                         <Switch
                           checked={member.can_view_profile}
-                          onCheckedChange={(checked) => updateFamilyMember(member.id, 'can_view_profile', checked)}
+                          onCheckedChange={(checked) =>
+                            updateFamilyMember(member.id, 'can_view_profile', checked)
+                          }
                         />
                       </div>
-                      
+
                       <div className="flex items-center justify-between">
                         <Label className="text-sm">Autorité Wali</Label>
                         <Switch
                           checked={member.is_wali}
-                          onCheckedChange={(checked) => updateFamilyMember(member.id, 'is_wali', checked)}
+                          onCheckedChange={(checked) =>
+                            updateFamilyMember(member.id, 'is_wali', checked)
+                          }
                         />
                       </div>
                     </div>
@@ -729,19 +775,23 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
             <div className="flex items-start gap-3">
               <div className="h-2 w-2 bg-gold rounded-full mt-2"></div>
               <p className="text-muted-foreground">
-                <strong>Le rôle du Wali :</strong> Dans l'Islam, le wali (tuteur) a une responsabilité importante dans le processus de mariage, particulièrement pour les femmes.
+                <strong>Le rôle du Wali :</strong> Dans l'Islam, le wali (tuteur) a une
+                responsabilité importante dans le processus de mariage, particulièrement pour les
+                femmes.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <div className="h-2 w-2 bg-emerald rounded-full mt-2"></div>
               <p className="text-muted-foreground">
-                <strong>Consultation familiale :</strong> Impliquer la famille dans le choix du partenaire est une pratique recommandée pour assurer la compatibilité et l'harmonie.
+                <strong>Consultation familiale :</strong> Impliquer la famille dans le choix du
+                partenaire est une pratique recommandée pour assurer la compatibilité et l'harmonie.
               </p>
             </div>
             <div className="flex items-start gap-3">
               <div className="h-2 w-2 bg-sage rounded-full mt-2"></div>
               <p className="text-muted-foreground">
-                <strong>Supervision respectueuse :</strong> La supervision doit être équilibrée, respectant à la fois les traditions islamiques et l'autonomie personnelle.
+                <strong>Supervision respectueuse :</strong> La supervision doit être équilibrée,
+                respectant à la fois les traditions islamiques et l'autonomie personnelle.
               </p>
             </div>
           </div>
@@ -794,7 +844,8 @@ ZawajConnect - Plateforme de rencontres islamiques avec supervision familiale`;
             </div>
             <div className="mt-4 p-3 bg-muted rounded-lg">
               <p className="text-xs text-muted-foreground">
-                <strong>Destinataire :</strong> {emailTemplate.to}<br />
+                <strong>Destinataire :</strong> {emailTemplate.to}
+                <br />
                 <strong>Objet :</strong> {emailTemplate.subject}
               </p>
             </div>

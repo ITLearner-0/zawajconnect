@@ -3,7 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
@@ -40,22 +46,31 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
     hijabPreference: 'no_preference',
     interests: [],
     verifiedOnly: false,
-    withPhoto: false
+    withPhoto: false,
   });
 
   const [isExpanded, setIsExpanded] = useState(false);
 
   const interests = [
-    'Lecture du Coran', 'Voyages', 'Sport', 'Cuisine', 'Art', 'Musique',
-    'Technologie', 'Nature', 'Photographie', 'Écriture', 'Bénévolat'
+    'Lecture du Coran',
+    'Voyages',
+    'Sport',
+    'Cuisine',
+    'Art',
+    'Musique',
+    'Technologie',
+    'Nature',
+    'Photographie',
+    'Écriture',
+    'Bénévolat',
   ];
 
   const handleInterestChange = (interest: string, checked: boolean) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      interests: checked 
+      interests: checked
         ? [...prev.interests, interest]
-        : prev.interests.filter(i => i !== interest)
+        : prev.interests.filter((i) => i !== interest),
     }));
   };
 
@@ -75,7 +90,7 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
       hijabPreference: 'no_preference',
       interests: [],
       verifiedOnly: false,
-      withPhoto: false
+      withPhoto: false,
     });
     onReset();
   };
@@ -88,33 +103,29 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
             <Search className="h-5 w-5 text-emerald" />
             Recherche Avancée
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)}>
             <Filter className="h-4 w-4" />
             {isExpanded ? 'Réduire' : 'Étendre'}
           </Button>
         </CardTitle>
       </CardHeader>
-      
+
       <CardContent className="space-y-6">
         {/* Quick Filters */}
         <div className="flex flex-wrap gap-2">
           <Button
-            variant={filters.verifiedOnly ? "default" : "outline"}
+            variant={filters.verifiedOnly ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setFilters(prev => ({ ...prev, verifiedOnly: !prev.verifiedOnly }))}
-            className={filters.verifiedOnly ? "bg-emerald hover:bg-emerald-dark" : ""}
+            onClick={() => setFilters((prev) => ({ ...prev, verifiedOnly: !prev.verifiedOnly }))}
+            className={filters.verifiedOnly ? 'bg-emerald hover:bg-emerald-dark' : ''}
           >
             Profils Vérifiés
           </Button>
           <Button
-            variant={filters.withPhoto ? "default" : "outline"}
+            variant={filters.withPhoto ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setFilters(prev => ({ ...prev, withPhoto: !prev.withPhoto }))}
-            className={filters.withPhoto ? "bg-emerald hover:bg-emerald-dark" : ""}
+            onClick={() => setFilters((prev) => ({ ...prev, withPhoto: !prev.withPhoto }))}
+            className={filters.withPhoto ? 'bg-emerald hover:bg-emerald-dark' : ''}
           >
             Avec Photo
           </Button>
@@ -122,10 +133,14 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
 
         {/* Age Range */}
         <div className="space-y-2">
-          <Label>Âge: {filters.ageRange[0]} - {filters.ageRange[1]} ans</Label>
+          <Label>
+            Âge: {filters.ageRange[0]} - {filters.ageRange[1]} ans
+          </Label>
           <Slider
             value={filters.ageRange}
-            onValueChange={(value) => setFilters(prev => ({ ...prev, ageRange: value as [number, number] }))}
+            onValueChange={(value) =>
+              setFilters((prev) => ({ ...prev, ageRange: value as [number, number] }))
+            }
             min={18}
             max={65}
             step={1}
@@ -140,7 +155,7 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
             id="location"
             placeholder="Ville, région..."
             value={filters.location}
-            onChange={(e) => setFilters(prev => ({ ...prev, location: e.target.value }))}
+            onChange={(e) => setFilters((prev) => ({ ...prev, location: e.target.value }))}
           />
         </div>
 
@@ -150,9 +165,9 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Éducation</Label>
-                <Select 
-                  value={filters.education} 
-                  onValueChange={(value) => setFilters(prev => ({ ...prev, education: value }))}
+                <Select
+                  value={filters.education}
+                  onValueChange={(value) => setFilters((prev) => ({ ...prev, education: value }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Niveau d'éducation" />
@@ -172,7 +187,7 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
                 <Input
                   placeholder="Profession..."
                   value={filters.profession}
-                  onChange={(e) => setFilters(prev => ({ ...prev, profession: e.target.value }))}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, profession: e.target.value }))}
                 />
               </div>
             </div>
@@ -181,9 +196,9 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Secte</Label>
-                <Select 
-                  value={filters.sect} 
-                  onValueChange={(value) => setFilters(prev => ({ ...prev, sect: value }))}
+                <Select
+                  value={filters.sect}
+                  onValueChange={(value) => setFilters((prev) => ({ ...prev, sect: value }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Secte islamique" />
@@ -198,9 +213,9 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
 
               <div className="space-y-2">
                 <Label>Madhab</Label>
-                <Select 
-                  value={filters.madhab} 
-                  onValueChange={(value) => setFilters(prev => ({ ...prev, madhab: value }))}
+                <Select
+                  value={filters.madhab}
+                  onValueChange={(value) => setFilters((prev) => ({ ...prev, madhab: value }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="École juridique" />
@@ -220,9 +235,11 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Fréquence de Prière</Label>
-                <Select 
-                  value={filters.prayerFrequency} 
-                  onValueChange={(value) => setFilters(prev => ({ ...prev, prayerFrequency: value }))}
+                <Select
+                  value={filters.prayerFrequency}
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({ ...prev, prayerFrequency: value }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Fréquence" />
@@ -239,9 +256,11 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
 
               <div className="space-y-2">
                 <Label>Préférence Hijab</Label>
-                <Select 
-                  value={filters.hijabPreference} 
-                  onValueChange={(value) => setFilters(prev => ({ ...prev, hijabPreference: value }))}
+                <Select
+                  value={filters.hijabPreference}
+                  onValueChange={(value) =>
+                    setFilters((prev) => ({ ...prev, hijabPreference: value }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Préférence" />
@@ -260,17 +279,16 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
             <div className="space-y-3">
               <Label>Centres d'intérêt</Label>
               <div className="flex flex-wrap gap-2">
-                {interests.map(interest => (
+                {interests.map((interest) => (
                   <div key={interest} className="flex items-center space-x-1">
                     <Checkbox
                       id={interest}
                       checked={filters.interests.includes(interest)}
-                      onCheckedChange={(checked) => handleInterestChange(interest, checked as boolean)}
+                      onCheckedChange={(checked) =>
+                        handleInterestChange(interest, checked as boolean)
+                      }
                     />
-                    <Label 
-                      htmlFor={interest} 
-                      className="text-sm cursor-pointer"
-                    >
+                    <Label htmlFor={interest} className="text-sm cursor-pointer">
                       {interest}
                     </Label>
                   </div>
@@ -278,15 +296,11 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
               </div>
               {filters.interests.length > 0 && (
                 <div className="flex flex-wrap gap-1 mt-2">
-                  {filters.interests.map(interest => (
-                    <Badge 
-                      key={interest} 
-                      variant="secondary" 
-                      className="text-xs"
-                    >
+                  {filters.interests.map((interest) => (
+                    <Badge key={interest} variant="secondary" className="text-xs">
                       {interest}
-                      <X 
-                        className="h-3 w-3 ml-1 cursor-pointer" 
+                      <X
+                        className="h-3 w-3 ml-1 cursor-pointer"
                         onClick={() => handleInterestChange(interest, false)}
                       />
                     </Badge>
@@ -299,15 +313,15 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
 
         {/* Action Buttons */}
         <div className="flex gap-2 pt-4">
-          <Button 
+          <Button
             onClick={handleSearch}
             className="flex-1 bg-emerald hover:bg-emerald-dark text-primary-foreground"
           >
             <Search className="h-4 w-4 mr-2" />
             Rechercher
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={handleReset}
             className="border-emerald text-emerald hover:bg-emerald hover:text-white"
           >

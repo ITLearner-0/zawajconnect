@@ -6,22 +6,28 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  BarChart3, 
-  PieChart, 
-  Users, 
-  MessageSquare, 
-  Shield, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  PieChart,
+  Users,
+  MessageSquare,
+  Shield,
   Calendar,
   Clock,
   Activity,
   AlertTriangle,
   CheckCircle,
   Heart,
-  Download
+  Download,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { format, subDays, subWeeks, subMonths } from 'date-fns';
@@ -73,7 +79,7 @@ interface SupervisionAnalyticsProps {
 const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
   supervisedUsers,
   notifications,
-  stats
+  stats,
 }) => {
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData>({
     messageActivity: [],
@@ -83,10 +89,10 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
       flaggedMessages: 0,
       approvedMatches: 0,
       rejectedMatches: 0,
-      responseTime: 0
+      responseTime: 0,
     },
     userActivity: [],
-    weeklyTrends: []
+    weeklyTrends: [],
   });
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('30d');
   const [loading, setLoading] = useState(true);
@@ -98,10 +104,10 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
   const loadAnalyticsData = async () => {
     try {
       setLoading(true);
-      
+
       const endDate = new Date();
       let startDate: Date;
-      
+
       switch (timeRange) {
         case '7d':
           startDate = subDays(endDate, 7);
@@ -114,8 +120,8 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
           break;
       }
 
-      const supervisedUserIds = supervisedUsers.map(u => u.user_id);
-      
+      const supervisedUserIds = supervisedUsers.map((u) => u.user_id);
+
       // Load message activity
       const { data: messageData } = await supabase
         .from('messages')
@@ -139,10 +145,10 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
 
       // Process message activity by day
       const messageActivity = processMessageActivity(messageData || [], moderationData || []);
-      
+
       // Process notification trends
       const notificationTrends = processNotificationTrends(notifications);
-      
+
       // Calculate supervision metrics
       const supervisionMetrics = calculateSupervisionMetrics(
         messageData || [],
@@ -166,9 +172,8 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
         notificationTrends,
         supervisionMetrics,
         userActivity,
-        weeklyTrends
+        weeklyTrends,
       });
-
     } catch (error) {
       console.error('Error loading analytics data:', error);
     } finally {
@@ -178,16 +183,16 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
 
   const processMessageActivity = (messages: unknown[], moderationLogs: unknown[]) => {
     const activityMap = new Map<string, { count: number; flagged: number }>();
-    
+
     // Process messages
-    messages.forEach(message => {
+    messages.forEach((message) => {
       const date = format(new Date(message.created_at), 'yyyy-MM-dd');
       const existing = activityMap.get(date) || { count: 0, flagged: 0 };
       activityMap.set(date, { ...existing, count: existing.count + 1 });
     });
 
     // Process flagged content
-    moderationLogs.forEach(log => {
+    moderationLogs.forEach((log) => {
       const date = format(new Date(log.created_at), 'yyyy-MM-dd');
       const existing = activityMap.get(date) || { count: 0, flagged: 0 };
       if (log.action_taken !== 'approved') {
@@ -199,74 +204,80 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
       .map(([date, data]) => ({
         date,
         count: data.count,
-        flagged: data.flagged
+        flagged: data.flagged,
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
   };
 
   const processNotificationTrends = (notifications: FamilyNotification[]) => {
     const typeMap = new Map<string, number>();
-    
-    notifications.forEach(notification => {
+
+    notifications.forEach((notification) => {
       const type = notification.notification_type;
       typeMap.set(type, (typeMap.get(type) || 0) + 1);
     });
 
     const total = notifications.length;
-    
+
     return Array.from(typeMap.entries()).map(([type, count]) => ({
       type: type.replace('_', ' '),
       count,
-      percentage: total > 0 ? (count / total) * 100 : 0
+      percentage: total > 0 ? (count / total) * 100 : 0,
     }));
   };
 
-  const calculateSupervisionMetrics = (messages: unknown[], moderationLogs: unknown[], matches: unknown[]) => {
+  const calculateSupervisionMetrics = (
+    messages: unknown[],
+    moderationLogs: unknown[],
+    matches: unknown[]
+  ) => {
     const totalMessages = messages.length;
-    const flaggedMessages = moderationLogs.filter(log => log.action_taken !== 'approved').length;
-    
-    const approvedMatches = matches.filter(match => 
-      match.family1_approved === true || match.family2_approved === true
+    const flaggedMessages = moderationLogs.filter((log) => log.action_taken !== 'approved').length;
+
+    const approvedMatches = matches.filter(
+      (match) => match.family1_approved === true || match.family2_approved === true
     ).length;
-    
-    const rejectedMatches = matches.filter(match => 
-      match.family1_approved === false || match.family2_approved === false
+
+    const rejectedMatches = matches.filter(
+      (match) => match.family1_approved === false || match.family2_approved === false
     ).length;
 
     // Calculate average response time (simplified)
-    const reviewedMatches = matches.filter(match => match.family_reviewed_at);
+    const reviewedMatches = matches.filter((match) => match.family_reviewed_at);
     const totalResponseTime = reviewedMatches.reduce((sum, match) => {
       const created = new Date(match.created_at);
       const reviewed = new Date(match.family_reviewed_at);
       return sum + (reviewed.getTime() - created.getTime());
     }, 0);
-    
-    const responseTime = reviewedMatches.length > 0 
-      ? Math.round(totalResponseTime / (reviewedMatches.length * 1000 * 60 * 60)) // hours
-      : 0;
+
+    const responseTime =
+      reviewedMatches.length > 0
+        ? Math.round(totalResponseTime / (reviewedMatches.length * 1000 * 60 * 60)) // hours
+        : 0;
 
     return {
       totalMessages,
       flaggedMessages,
       approvedMatches,
       rejectedMatches,
-      responseTime
+      responseTime,
     };
   };
 
   const processUserActivity = async (users: SupervisedUser[], messages: unknown[]) => {
     const userActivityPromises = users.map(async (user) => {
       // Count messages for this user
-      const userMessages = messages.filter(m => 
-        // This would need to be enhanced with actual match data lookup
-        true // Simplified for now
+      const userMessages = messages.filter(
+        (m) =>
+          // This would need to be enhanced with actual match data lookup
+          true // Simplified for now
       ).length;
 
       return {
         userId: user.user_id,
         name: user.full_name,
         messages: userMessages,
-        lastSeen: format(new Date(), 'yyyy-MM-dd HH:mm')
+        lastSeen: format(new Date(), 'yyyy-MM-dd HH:mm'),
       };
     });
 
@@ -274,30 +285,30 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
   };
 
   const processWeeklyTrends = (
-    messages: unknown[], 
-    notifications: FamilyNotification[], 
-    matches: unknown[], 
+    messages: unknown[],
+    notifications: FamilyNotification[],
+    matches: unknown[],
     startDate: Date
   ) => {
     const weeks = [];
     const currentDate = new Date(startDate);
-    
+
     while (currentDate <= new Date()) {
       const weekStart = new Date(currentDate);
       const weekEnd = new Date(currentDate);
       weekEnd.setDate(weekEnd.getDate() + 6);
-      
-      const weekMessages = messages.filter(m => {
+
+      const weekMessages = messages.filter((m) => {
         const messageDate = new Date(m.created_at);
         return messageDate >= weekStart && messageDate <= weekEnd;
       }).length;
 
-      const weekAlerts = notifications.filter(n => {
+      const weekAlerts = notifications.filter((n) => {
         const notifDate = new Date(n.created_at);
         return notifDate >= weekStart && notifDate <= weekEnd && n.severity === 'critical';
       }).length;
 
-      const weekApprovals = matches.filter(m => {
+      const weekApprovals = matches.filter((m) => {
         const matchDate = new Date(m.family_reviewed_at || m.created_at);
         return matchDate >= weekStart && matchDate <= weekEnd;
       }).length;
@@ -306,7 +317,7 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
         week: format(weekStart, 'dd MMM', { locale: fr }),
         messages: weekMessages,
         alerts: weekAlerts,
-        approvals: weekApprovals
+        approvals: weekApprovals,
       });
 
       currentDate.setDate(currentDate.getDate() + 7);
@@ -321,16 +332,16 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
       timeRange,
       stats,
       analyticsData,
-      supervisedUsers: supervisedUsers.map(u => ({
+      supervisedUsers: supervisedUsers.map((u) => ({
         name: u.full_name,
-        relationship: u.relationship
-      }))
+        relationship: u.relationship,
+      })),
     };
 
     const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-      type: 'application/json'
+      type: 'application/json',
     });
-    
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -362,7 +373,7 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
             Insights détaillés sur l'activité de supervision familiale
           </p>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <Select value={timeRange} onValueChange={(value) => setTimeRange(value as any)}>
             <SelectTrigger className="w-32">
@@ -374,7 +385,7 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
               <SelectItem value="90d">90 jours</SelectItem>
             </SelectContent>
           </Select>
-          
+
           <Button variant="outline" onClick={exportAnalytics}>
             <Download className="h-4 w-4 mr-2" />
             Exporter
@@ -389,7 +400,9 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-blue-600">Messages Supervisés</p>
-                <p className="text-3xl font-bold text-blue-700">{analyticsData.supervisionMetrics.totalMessages}</p>
+                <p className="text-3xl font-bold text-blue-700">
+                  {analyticsData.supervisionMetrics.totalMessages}
+                </p>
               </div>
               <MessageSquare className="h-8 w-8 text-blue-500" />
             </div>
@@ -405,15 +418,21 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-red-600">Contenu Signalé</p>
-                <p className="text-3xl font-bold text-red-700">{analyticsData.supervisionMetrics.flaggedMessages}</p>
+                <p className="text-3xl font-bold text-red-700">
+                  {analyticsData.supervisionMetrics.flaggedMessages}
+                </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-red-500" />
             </div>
             <div className="mt-4">
-              <Progress 
-                value={analyticsData.supervisionMetrics.totalMessages > 0 
-                  ? (analyticsData.supervisionMetrics.flaggedMessages / analyticsData.supervisionMetrics.totalMessages) * 100 
-                  : 0} 
+              <Progress
+                value={
+                  analyticsData.supervisionMetrics.totalMessages > 0
+                    ? (analyticsData.supervisionMetrics.flaggedMessages /
+                        analyticsData.supervisionMetrics.totalMessages) *
+                      100
+                    : 0
+                }
                 className="h-2"
               />
             </div>
@@ -425,7 +444,9 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-green-600">Matches Approuvés</p>
-                <p className="text-3xl font-bold text-green-700">{analyticsData.supervisionMetrics.approvedMatches}</p>
+                <p className="text-3xl font-bold text-green-700">
+                  {analyticsData.supervisionMetrics.approvedMatches}
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
@@ -441,7 +462,9 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-amber-600">Temps de Réponse</p>
-                <p className="text-3xl font-bold text-amber-700">{analyticsData.supervisionMetrics.responseTime}h</p>
+                <p className="text-3xl font-bold text-amber-700">
+                  {analyticsData.supervisionMetrics.responseTime}h
+                </p>
               </div>
               <Clock className="h-8 w-8 text-amber-500" />
             </div>
@@ -485,7 +508,14 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
                           {format(new Date(day.date), 'dd MMM', { locale: fr })}
                         </div>
                         <div className="flex-1 flex items-center gap-2">
-                          <Progress value={(day.count / Math.max(...analyticsData.messageActivity.map(d => d.count))) * 100} className="flex-1" />
+                          <Progress
+                            value={
+                              (day.count /
+                                Math.max(...analyticsData.messageActivity.map((d) => d.count))) *
+                              100
+                            }
+                            className="flex-1"
+                          />
                           <div className="w-16 text-sm font-medium text-right">{day.count}</div>
                           {day.flagged > 0 && (
                             <Badge variant="destructive" className="text-xs">
@@ -516,9 +546,12 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
                 {analyticsData.notificationTrends.map((trend, index) => (
                   <div key={trend.type} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full`} style={{
-                        backgroundColor: `hsl(${index * 45}, 70%, 50%)`
-                      }}></div>
+                      <div
+                        className={`w-3 h-3 rounded-full`}
+                        style={{
+                          backgroundColor: `hsl(${index * 45}, 70%, 50%)`,
+                        }}
+                      ></div>
                       <span className="text-sm font-medium capitalize">{trend.type}</span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -539,27 +572,29 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-primary mb-2">
-                    {stats.approvalRate}%
-                  </div>
+                  <div className="text-3xl font-bold text-primary mb-2">{stats.approvalRate}%</div>
                   <p className="text-sm text-muted-foreground">Taux d'approbation global</p>
                 </div>
-                
+
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Messages approuvés</span>
                     <span className="font-medium">
-                      {analyticsData.supervisionMetrics.totalMessages - analyticsData.supervisionMetrics.flaggedMessages}
+                      {analyticsData.supervisionMetrics.totalMessages -
+                        analyticsData.supervisionMetrics.flaggedMessages}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Temps de réponse moyen</span>
-                    <span className="font-medium">{analyticsData.supervisionMetrics.responseTime}h</span>
+                    <span className="font-medium">
+                      {analyticsData.supervisionMetrics.responseTime}h
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Matches supervisés</span>
                     <span className="font-medium">
-                      {analyticsData.supervisionMetrics.approvedMatches + analyticsData.supervisionMetrics.rejectedMatches}
+                      {analyticsData.supervisionMetrics.approvedMatches +
+                        analyticsData.supervisionMetrics.rejectedMatches}
                     </span>
                   </div>
                 </div>
@@ -586,7 +621,10 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
                 ) : (
                   <div className="space-y-3">
                     {analyticsData.userActivity.map((user) => (
-                      <div key={user.userId} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div
+                        key={user.userId}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                             <span className="text-sm font-medium text-primary">
@@ -600,7 +638,7 @@ const SupervisionAnalytics: React.FC<SupervisionAnalyticsProps> = ({
                             </p>
                           </div>
                         </div>
-                        
+
                         <div className="text-right">
                           <div className="text-lg font-bold text-primary">{user.messages}</div>
                           <div className="text-xs text-muted-foreground">messages</div>

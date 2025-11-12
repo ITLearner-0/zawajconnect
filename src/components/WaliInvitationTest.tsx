@@ -16,9 +16,9 @@ const WaliInvitationTest: React.FC = () => {
   const testInvitationEmail = async () => {
     if (!email) {
       toast({
-        title: "Email requis",
+        title: 'Email requis',
         description: "Veuillez saisir un email pour tester l'invitation",
-        variant: "destructive"
+        variant: 'destructive',
       });
       return;
     }
@@ -27,7 +27,9 @@ const WaliInvitationTest: React.FC = () => {
     setTestResult(null);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Non authentifié');
       }
@@ -37,7 +39,7 @@ const WaliInvitationTest: React.FC = () => {
           fullName: 'Test Wali',
           email: email,
           relationship: 'father',
-          isWali: true
+          isWali: true,
         },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
@@ -50,18 +52,18 @@ const WaliInvitationTest: React.FC = () => {
 
       setTestResult('success');
       toast({
-        title: "✅ Test réussi !",
+        title: '✅ Test réussi !',
         description: `Email d'invitation Wali envoyé à ${email}`,
       });
-
     } catch (error: unknown) {
       console.error('Test invitation error:', error);
       setTestResult('error');
-      const errorMessage = error instanceof Error ? error.message : "Impossible d'envoyer l'invitation de test";
+      const errorMessage =
+        error instanceof Error ? error.message : "Impossible d'envoyer l'invitation de test";
       toast({
-        title: "❌ Erreur de test",
+        title: '❌ Erreur de test',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -84,7 +86,8 @@ const WaliInvitationTest: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-emerald-dark">Test d'invitation Wali</p>
                 <p className="text-sm text-emerald-dark/70">
-                  Ce test vérifie que les emails d'invitation sont correctement envoyés aux futurs Walis/tuteurs.
+                  Ce test vérifie que les emails d'invitation sont correctement envoyés aux futurs
+                  Walis/tuteurs.
                 </p>
               </div>
             </div>
@@ -102,7 +105,7 @@ const WaliInvitationTest: React.FC = () => {
             />
           </div>
 
-          <Button 
+          <Button
             onClick={testInvitationEmail}
             disabled={loading || !email}
             className="w-full bg-emerald hover:bg-emerald-dark"
@@ -121,11 +124,13 @@ const WaliInvitationTest: React.FC = () => {
           </Button>
 
           {testResult && (
-            <div className={`flex items-center gap-2 p-3 rounded-lg ${
-              testResult === 'success' 
-                ? 'bg-green-50 border border-green-200 text-green-700'
-                : 'bg-red-50 border border-red-200 text-red-700'
-            }`}>
+            <div
+              className={`flex items-center gap-2 p-3 rounded-lg ${
+                testResult === 'success'
+                  ? 'bg-green-50 border border-green-200 text-green-700'
+                  : 'bg-red-50 border border-red-200 text-red-700'
+              }`}
+            >
               {testResult === 'success' ? (
                 <>
                   <CheckCircle className="h-4 w-4" />
@@ -141,7 +146,9 @@ const WaliInvitationTest: React.FC = () => {
           )}
 
           <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
-            <p><strong>Vérifications :</strong></p>
+            <p>
+              <strong>Vérifications :</strong>
+            </p>
             <ul className="mt-1 space-y-1">
               <li>✅ Fonction create_family_invitation corrigée</li>
               <li>✅ Email avec URL d'invitation dynamique</li>

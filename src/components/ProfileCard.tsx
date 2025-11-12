@@ -30,15 +30,14 @@ interface ProfileCardProps {
   isInConversation?: boolean;
 }
 
-const ProfileCard = ({ 
-  profile, 
-  verification, 
-  showCompatibility = true, 
+const ProfileCard = ({
+  profile,
+  verification,
+  showCompatibility = true,
   showActions = true,
   compact = false,
-  isInConversation = false
+  isInConversation = false,
 }: ProfileCardProps) => {
-  
   return (
     <Card className={`hover:shadow-md transition-shadow ${compact ? 'p-0' : ''}`}>
       <CardHeader className={compact ? 'p-4 pb-2' : ''}>
@@ -49,20 +48,23 @@ const ProfileCard = ({
               <User className="h-6 w-6" />
             </AvatarFallback>
           </Avatar>
-          
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className={`font-semibold text-foreground truncate ${compact ? 'text-base' : 'text-lg'}`}>
+              <h3
+                className={`font-semibold text-foreground truncate ${compact ? 'text-base' : 'text-lg'}`}
+              >
                 {profile.full_name}
               </h3>
               {verification?.email_verified && (
-                <VerificationBadge verificationScore={verification.email_verified ? 80 : 0} className="h-4" />
+                <VerificationBadge
+                  verificationScore={verification.email_verified ? 80 : 0}
+                  className="h-4"
+                />
               )}
-              {isInConversation && (
-                <ConversationStatusBadge className="ml-2" />
-              )}
+              {isInConversation && <ConversationStatusBadge className="ml-2" />}
             </div>
-            
+
             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
               <span>{profile.age} ans</span>
               {profile.location && (
@@ -72,20 +74,15 @@ const ProfileCard = ({
                 </div>
               )}
             </div>
-            
+
             {profile.profession && (
-              <p className="text-sm text-muted-foreground mb-2">
-                {profile.profession}
-              </p>
+              <p className="text-sm text-muted-foreground mb-2">{profile.profession}</p>
             )}
 
             {/* Compatibility Score */}
             {showCompatibility && (
               <div className="mb-3">
-                <CompatibilityScore 
-                  otherUserId={profile.user_id} 
-                  compact 
-                />
+                <CompatibilityScore otherUserId={profile.user_id} compact />
               </div>
             )}
           </div>
@@ -95,9 +92,7 @@ const ProfileCard = ({
       <CardContent className={compact ? 'p-4 pt-0' : 'pt-0'}>
         {/* Bio */}
         {!compact && profile.bio && (
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-            {profile.bio}
-          </p>
+          <p className="text-sm text-muted-foreground mb-4 line-clamp-3">{profile.bio}</p>
         )}
 
         {/* Interests */}
@@ -127,10 +122,10 @@ const ProfileCard = ({
                 Voir profil
               </Button>
             </Link>
-            
+
             <Button size="sm" className="flex-1 bg-emerald hover:bg-emerald-dark">
               <Heart className="h-4 w-4 mr-2" />
-              {compact ? 'J\'aime' : 'Montrer intérêt'}
+              {compact ? "J'aime" : 'Montrer intérêt'}
             </Button>
           </div>
         )}

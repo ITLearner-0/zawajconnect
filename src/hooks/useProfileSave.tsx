@@ -39,12 +39,12 @@ export const useProfileSave = () => {
       console.error('❌ No authenticated user found');
       toast({
         title: "Erreur d'authentification",
-        description: "Vous devez être connecté pour sauvegarder votre profil.",
-        variant: "destructive"
+        description: 'Vous devez être connecté pour sauvegarder votre profil.',
+        variant: 'destructive',
       });
       return { success: false, error: 'User not authenticated' };
     }
-    
+
     console.log('✅ Authenticated user:', user.id);
     console.log('📊 Profile data to save:', { ...profileData, user_id: user.id });
 
@@ -65,98 +65,172 @@ export const useProfileSave = () => {
         interests: profileData.interests ?? [],
         avatar_url: profileData.avatar_url ?? '',
         onboarding_completed: true, // Mark onboarding as complete
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       };
-      
+
       // Debug gender value specifically
       console.log('Raw gender value:', JSON.stringify(profileUpdateData.gender));
       console.log('Gender type:', typeof profileUpdateData.gender);
       console.log('Gender length:', profileUpdateData.gender?.length);
-      console.log('Gender char codes:', profileUpdateData.gender?.split('').map(c => c.charCodeAt(0)));
-      
+      console.log(
+        'Gender char codes:',
+        profileUpdateData.gender?.split('').map((c) => c.charCodeAt(0))
+      );
+
       // Validate gender exists (database constraint will handle case/whitespace)
       if (!profileUpdateData.gender || profileUpdateData.gender.trim().length === 0) {
         throw new Error(`Gender value is required.`);
       }
-      
+
       console.log('Sending to database:', JSON.stringify(profileUpdateData, null, 2));
-      
+
       // Check if user is still authenticated before database operation
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Session expired. Please log in again.');
       }
-      
+
       console.log('✅ Session valid, proceeding with upsert...');
-      
+
       // 1. Save basic profile using UPSERT to avoid conflicts
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert(profileUpdateData, {
-          onConflict: 'user_id',
-          ignoreDuplicates: false
-        });
+      const { error: profileError } = await supabase.from('profiles').upsert(profileUpdateData, {
+        onConflict: 'user_id',
+        ignoreDuplicates: false,
+      });
 
       if (profileError) {
         console.error('Profile save error:', profileError);
         throw profileError;
       }
 
-    // Validate Islamic preferences before saving - matches database constraints exactly
-    const validateIslamicPrefs = (prefs: Partial<IslamicPreferences>): Partial<IslamicPreferences> => {
-      // These values MUST match the CHECK constraints in the database
-      const validSects = ['sunni', 'shia', 'other', 'prefer_not_to_say'];
-      const validPrayerFreqs = ['5_times_daily', 'often', 'sometimes', 'fridays_only', 'occasionally', 'rarely', 'never'];
-      const validImportance = ['very_important', 'important', 'somewhat_important', 'not_important', 'extremely_important'];
-      const validQuranReading = ['daily', 'weekly', 'monthly', 'occasionally', 'rarely', 'learning'];
-      const validHijab = ['always', 'most_times', 'sometimes', 'never', 'not_applicable', 'yes', 'no', 'prefer_not_to_say'];
-      const validBeard = ['full_beard', 'trimmed_beard', 'goatee', 'mustache_only', 'clean_shaven', 'not_applicable', 'yes', 'no', 'sometimes', 'prefer_not_to_say'];
-      const validMadhab = ['hanafi', 'maliki', 'shafii', 'hanbali', 'salafi', 'other', 'none', 'prefer_not_to_say'];
-      const validSmoking = ['never', 'occasionally', 'regularly', 'trying_to_quit'];
-      const validDesiredPartnerSect = ['same_sect', 'sunni', 'shia', 'any', 'other', 'open_discussion'];
-      
-      // Log validation for debugging
-      console.log('Validating Islamic preferences:', prefs);
-      
-      const validated = {
-        prayer_frequency: validPrayerFreqs.includes(prefs.prayer_frequency ?? '') ? prefs.prayer_frequency : undefined,
-        quran_reading: validQuranReading.includes(prefs.quran_reading ?? '') ? prefs.quran_reading : undefined,
-        hijab_preference: validHijab.includes(prefs.hijab_preference ?? '') ? prefs.hijab_preference : undefined,
-        beard_preference: validBeard.includes(prefs.beard_preference ?? '') ? prefs.beard_preference : undefined,
-        sect: validSects.includes(prefs.sect ?? '') ? prefs.sect : undefined,
-        madhab: validMadhab.includes(prefs.madhab ?? '') ? prefs.madhab : undefined,
-        halal_diet: prefs.halal_diet ?? true,
-        smoking: validSmoking.includes(prefs.smoking ?? '') ? prefs.smoking : undefined,
-        desired_partner_sect: validDesiredPartnerSect.includes(prefs.desired_partner_sect ?? '') ? prefs.desired_partner_sect : undefined,
-        importance_of_religion: validImportance.includes(prefs.importance_of_religion ?? '') ? prefs.importance_of_religion : undefined,
-      };
-      
-      console.log('Validated Islamic preferences:', validated);
-      return validated;
-    };
+      // Validate Islamic preferences before saving - matches database constraints exactly
+      const validateIslamicPrefs = (
+        prefs: Partial<IslamicPreferences>
+      ): Partial<IslamicPreferences> => {
+        // These values MUST match the CHECK constraints in the database
+        const validSects = ['sunni', 'shia', 'other', 'prefer_not_to_say'];
+        const validPrayerFreqs = [
+          '5_times_daily',
+          'often',
+          'sometimes',
+          'fridays_only',
+          'occasionally',
+          'rarely',
+          'never',
+        ];
+        const validImportance = [
+          'very_important',
+          'important',
+          'somewhat_important',
+          'not_important',
+          'extremely_important',
+        ];
+        const validQuranReading = [
+          'daily',
+          'weekly',
+          'monthly',
+          'occasionally',
+          'rarely',
+          'learning',
+        ];
+        const validHijab = [
+          'always',
+          'most_times',
+          'sometimes',
+          'never',
+          'not_applicable',
+          'yes',
+          'no',
+          'prefer_not_to_say',
+        ];
+        const validBeard = [
+          'full_beard',
+          'trimmed_beard',
+          'goatee',
+          'mustache_only',
+          'clean_shaven',
+          'not_applicable',
+          'yes',
+          'no',
+          'sometimes',
+          'prefer_not_to_say',
+        ];
+        const validMadhab = [
+          'hanafi',
+          'maliki',
+          'shafii',
+          'hanbali',
+          'salafi',
+          'other',
+          'none',
+          'prefer_not_to_say',
+        ];
+        const validSmoking = ['never', 'occasionally', 'regularly', 'trying_to_quit'];
+        const validDesiredPartnerSect = [
+          'same_sect',
+          'sunni',
+          'shia',
+          'any',
+          'other',
+          'open_discussion',
+        ];
 
-    const validatedPrefs = validateIslamicPrefs(islamicPrefs);
-    
-    // 2. Save Islamic preferences - Clean data before saving
-    const cleanIslamicPrefs = {
-      user_id: user.id,
-      prayer_frequency: validatedPrefs.prayer_frequency ?? undefined,
-      quran_reading: validatedPrefs.quran_reading ?? undefined,
-      hijab_preference: validatedPrefs.hijab_preference ?? undefined,
-      beard_preference: validatedPrefs.beard_preference ?? undefined,
-      sect: validatedPrefs.sect ?? undefined,
-      madhab: validatedPrefs.madhab ?? undefined,
-      halal_diet: validatedPrefs.halal_diet ?? true,
-      smoking: validatedPrefs.smoking ?? undefined,
-      desired_partner_sect: validatedPrefs.desired_partner_sect ?? undefined,
-      importance_of_religion: validatedPrefs.importance_of_religion ?? undefined,
-      updated_at: new Date().toISOString()
-    };
+        // Log validation for debugging
+        console.log('Validating Islamic preferences:', prefs);
+
+        const validated = {
+          prayer_frequency: validPrayerFreqs.includes(prefs.prayer_frequency ?? '')
+            ? prefs.prayer_frequency
+            : undefined,
+          quran_reading: validQuranReading.includes(prefs.quran_reading ?? '')
+            ? prefs.quran_reading
+            : undefined,
+          hijab_preference: validHijab.includes(prefs.hijab_preference ?? '')
+            ? prefs.hijab_preference
+            : undefined,
+          beard_preference: validBeard.includes(prefs.beard_preference ?? '')
+            ? prefs.beard_preference
+            : undefined,
+          sect: validSects.includes(prefs.sect ?? '') ? prefs.sect : undefined,
+          madhab: validMadhab.includes(prefs.madhab ?? '') ? prefs.madhab : undefined,
+          halal_diet: prefs.halal_diet ?? true,
+          smoking: validSmoking.includes(prefs.smoking ?? '') ? prefs.smoking : undefined,
+          desired_partner_sect: validDesiredPartnerSect.includes(prefs.desired_partner_sect ?? '')
+            ? prefs.desired_partner_sect
+            : undefined,
+          importance_of_religion: validImportance.includes(prefs.importance_of_religion ?? '')
+            ? prefs.importance_of_religion
+            : undefined,
+        };
+
+        console.log('Validated Islamic preferences:', validated);
+        return validated;
+      };
+
+      const validatedPrefs = validateIslamicPrefs(islamicPrefs);
+
+      // 2. Save Islamic preferences - Clean data before saving
+      const cleanIslamicPrefs = {
+        user_id: user.id,
+        prayer_frequency: validatedPrefs.prayer_frequency ?? undefined,
+        quran_reading: validatedPrefs.quran_reading ?? undefined,
+        hijab_preference: validatedPrefs.hijab_preference ?? undefined,
+        beard_preference: validatedPrefs.beard_preference ?? undefined,
+        sect: validatedPrefs.sect ?? undefined,
+        madhab: validatedPrefs.madhab ?? undefined,
+        halal_diet: validatedPrefs.halal_diet ?? true,
+        smoking: validatedPrefs.smoking ?? undefined,
+        desired_partner_sect: validatedPrefs.desired_partner_sect ?? undefined,
+        importance_of_religion: validatedPrefs.importance_of_religion ?? undefined,
+        updated_at: new Date().toISOString(),
+      };
 
       const { error: prefsError } = await supabase
         .from('islamic_preferences')
         .upsert(cleanIslamicPrefs, {
-          onConflict: 'user_id' // Spécifier la colonne de conflit
+          onConflict: 'user_id', // Spécifier la colonne de conflit
         });
 
       if (prefsError) {
@@ -165,14 +239,14 @@ export const useProfileSave = () => {
           message: prefsError.message,
           details: prefsError.details,
           hint: prefsError.hint,
-          code: prefsError.code
+          code: prefsError.code,
         });
-        
+
         // Show user-friendly error message
         const errorMessage = prefsError.message.includes('check constraint')
           ? 'Certaines préférences islamiques contiennent des valeurs invalides. Veuillez vérifier vos sélections.'
           : `Erreur lors de la sauvegarde des préférences islamiques: ${prefsError.message}`;
-        
+
         throw new Error(errorMessage);
       }
 
@@ -181,13 +255,12 @@ export const useProfileSave = () => {
       console.log('⚡ All other settings handled automatically by database triggers');
 
       toast({
-        title: "Profil sauvegardé !",
-        description: "Votre profil a été créé avec succès. Bienvenue sur notre plateforme !",
-        variant: "default"
+        title: 'Profil sauvegardé !',
+        description: 'Votre profil a été créé avec succès. Bienvenue sur notre plateforme !',
+        variant: 'default',
       });
 
       return { success: true };
-
     } catch (error: unknown) {
       console.error('Save profile error:', error);
 
@@ -203,9 +276,9 @@ export const useProfileSave = () => {
       }
 
       toast({
-        title: "Erreur de sauvegarde",
+        title: 'Erreur de sauvegarde',
         description: errorMessage,
-        variant: "destructive"
+        variant: 'destructive',
       });
 
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
@@ -214,7 +287,9 @@ export const useProfileSave = () => {
     }
   };
 
-  const uploadAvatar = async (file: File): Promise<{ success: boolean; url?: string; error?: string }> => {
+  const uploadAvatar = async (
+    file: File
+  ): Promise<{ success: boolean; url?: string; error?: string }> => {
     if (!user) {
       return { success: false, error: 'User not authenticated' };
     }
@@ -228,7 +303,7 @@ export const useProfileSave = () => {
         .from('profile-photos')
         .upload(fileName, file, {
           upsert: true, // Replace existing file
-          contentType: file.type
+          contentType: file.type,
         });
 
       if (uploadError) {
@@ -237,12 +312,9 @@ export const useProfileSave = () => {
       }
 
       // Get public URL
-      const { data } = supabase.storage
-        .from('profile-photos')
-        .getPublicUrl(fileName);
+      const { data } = supabase.storage.from('profile-photos').getPublicUrl(fileName);
 
       return { success: true, url: data.publicUrl };
-
     } catch (error: unknown) {
       console.error('Avatar upload error:', error);
       const errorMessage = error instanceof Error ? error.message : 'Upload failed';
@@ -253,6 +325,6 @@ export const useProfileSave = () => {
   return {
     saveProfile,
     uploadAvatar,
-    saving
+    saving,
   };
 };

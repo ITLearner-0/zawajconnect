@@ -1,10 +1,14 @@
-
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Search, BookOpen, Scale, Heart } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Search, BookOpen, Scale, Heart } from 'lucide-react';
 import { FaqItem } from '@/types/resources';
 
 interface FaqSectionProps {
@@ -19,13 +23,14 @@ const FaqSection: React.FC<FaqSectionProps> = ({ faqs }) => {
     { id: 'all', name: 'Toutes les questions', icon: BookOpen },
     { id: 'marriage-contract', name: 'Contrat de mariage', icon: Scale },
     { id: 'courtship', name: 'Fréquentation', icon: Heart },
-    { id: 'family', name: 'Vie familiale', icon: BookOpen }
+    { id: 'family', name: 'Vie familiale', icon: BookOpen },
   ];
 
-  const filteredFaqs = faqs.filter(faq => {
-    const matchesSearch = faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         faq.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredFaqs = faqs.filter((faq) => {
+    const matchesSearch =
+      faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      faq.answer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      faq.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === 'all' || faq.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -42,7 +47,8 @@ const FaqSection: React.FC<FaqSectionProps> = ({ faqs }) => {
           FAQ Fiqh Matrimonial
         </h2>
         <p className="text-rose-600 dark:text-rose-300 max-w-2xl mx-auto">
-          Questions fréquentes sur le mariage en Islam avec des réponses basées sur les sources authentiques
+          Questions fréquentes sur le mariage en Islam avec des réponses basées sur les sources
+          authentiques
         </p>
       </div>
 
@@ -59,7 +65,7 @@ const FaqSection: React.FC<FaqSectionProps> = ({ faqs }) => {
         </div>
 
         <div className="flex flex-wrap gap-2 justify-center">
-          {categories.map(category => (
+          {categories.map((category) => (
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.id)}
@@ -89,16 +95,22 @@ const FaqSection: React.FC<FaqSectionProps> = ({ faqs }) => {
         </CardHeader>
         <CardContent>
           <Accordion type="single" collapsible className="space-y-4">
-            {filteredFaqs.map(faq => (
-              <AccordionItem key={faq.id} value={faq.id} className="border border-rose-200 dark:border-rose-700 rounded-lg px-4">
+            {filteredFaqs.map((faq) => (
+              <AccordionItem
+                key={faq.id}
+                value={faq.id}
+                className="border border-rose-200 dark:border-rose-700 rounded-lg px-4"
+              >
                 <AccordionTrigger className="text-left hover:no-underline">
                   <div className="space-y-2">
-                    <h3 className="font-medium text-rose-800 dark:text-rose-200">
-                      {faq.question}
-                    </h3>
+                    <h3 className="font-medium text-rose-800 dark:text-rose-200">{faq.question}</h3>
                     <div className="flex flex-wrap gap-1">
-                      {faq.tags.slice(0, 3).map(tag => (
-                        <Badge key={tag} variant="outline" className="text-xs border-rose-300 text-rose-600">
+                      {faq.tags.slice(0, 3).map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="text-xs border-rose-300 text-rose-600"
+                        >
                           {tag}
                         </Badge>
                       ))}
@@ -110,10 +122,12 @@ const FaqSection: React.FC<FaqSectionProps> = ({ faqs }) => {
                     <div className="prose prose-rose max-w-none text-rose-700 dark:text-rose-300">
                       <p className="whitespace-pre-line">{faq.answer}</p>
                     </div>
-                    
+
                     {faq.references && faq.references.length > 0 && (
                       <div className="border-t border-rose-200 dark:border-rose-700 pt-4">
-                        <h4 className="font-medium text-rose-800 dark:text-rose-200 mb-2">Références :</h4>
+                        <h4 className="font-medium text-rose-800 dark:text-rose-200 mb-2">
+                          Références :
+                        </h4>
                         <ul className="text-sm text-rose-600 dark:text-rose-300 space-y-1">
                           {faq.references.map((ref, index) => (
                             <li key={index}>• {ref}</li>
@@ -121,17 +135,19 @@ const FaqSection: React.FC<FaqSectionProps> = ({ faqs }) => {
                         </ul>
                       </div>
                     )}
-                    
+
                     <div className="flex justify-between items-center text-xs text-rose-500 dark:text-rose-400 border-t border-rose-200 dark:border-rose-700 pt-2">
                       {faq.author && <span>Par {faq.author}</span>}
-                      <span>Mis à jour le {new Date(faq.lastUpdated).toLocaleDateString('fr-FR')}</span>
+                      <span>
+                        Mis à jour le {new Date(faq.lastUpdated).toLocaleDateString('fr-FR')}
+                      </span>
                     </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-          
+
           {filteredFaqs.length === 0 && (
             <div className="text-center py-8 text-rose-600 dark:text-rose-300">
               <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />

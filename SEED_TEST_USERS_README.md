@@ -52,6 +52,7 @@ supabase db remote exec < supabase/seeds/test_users_with_achievements.sql
 **UUID:** `11111111-1111-1111-1111-111111111111`
 
 **Profil:**
+
 - Nom: Ahmed Test Beginner
 - Genre: Male
 - Pays: France, Paris
@@ -59,6 +60,7 @@ supabase db remote exec < supabase/seeds/test_users_with_achievements.sql
 - Premium: Non
 
 **Progression:**
+
 - **Niveau:** 1
 - **Points:** 100
 - **Achievements:** 1 (Premier Test)
@@ -74,6 +76,7 @@ supabase db remote exec < supabase/seeds/test_users_with_achievements.sql
 **UUID:** `22222222-2222-2222-2222-222222222222`
 
 **Profil:**
+
 - Nom: Fatima Test Intermediate
 - Genre: Female
 - Pays: France, Lyon
@@ -81,6 +84,7 @@ supabase db remote exec < supabase/seeds/test_users_with_achievements.sql
 - Premium: Oui
 
 **Progression:**
+
 - **Niveau:** 2
 - **Points:** 350
 - **Achievements:** 3
@@ -101,6 +105,7 @@ supabase db remote exec < supabase/seeds/test_users_with_achievements.sql
 **UUID:** `33333333-3333-3333-3333-333333333333`
 
 **Profil:**
+
 - Nom: Youssef Test Advanced
 - Genre: Male
 - Pays: Maroc, Casablanca
@@ -108,6 +113,7 @@ supabase db remote exec < supabase/seeds/test_users_with_achievements.sql
 - Premium: Oui
 
 **Progression:**
+
 - **Niveau:** 3
 - **Points:** 950
 - **Achievements:** 6 (Tous les achievements disponibles)
@@ -167,7 +173,7 @@ Pour chaque utilisateur, le script insère:
 ### Requête 1: Vue d'ensemble des utilisateurs
 
 ```sql
-SELECT 
+SELECT
   p.email,
   p.full_name,
   up.total_points,
@@ -186,7 +192,7 @@ ORDER BY up.total_points DESC;
 ### Requête 2: Détail des achievements
 
 ```sql
-SELECT 
+SELECT
   p.email,
   au.achievement_title,
   au.points_awarded,
@@ -201,7 +207,7 @@ ORDER BY p.email, au.unlocked_at;
 ### Requête 3: Historique des actions
 
 ```sql
-SELECT 
+SELECT
   p.email,
   ia.action_type,
   ia.created_at,
@@ -216,7 +222,7 @@ LIMIT 20;
 ### Requête 4: Statistiques globales
 
 ```sql
-SELECT 
+SELECT
   COUNT(DISTINCT p.id) as total_users,
   SUM(up.total_points) as total_points,
   SUM(up.achievements_count) as total_achievements,
@@ -259,21 +265,25 @@ DELETE FROM profiles WHERE email LIKE 'test-phase5-%@zawajconnect.com';
 ## 🧪 Scénarios de test
 
 ### Scénario 1: Test du système d'achievements
+
 1. Utiliser l'UUID du beginner user
 2. Simuler des actions (vues, partages, exports)
 3. Vérifier les déblocages dans `achievement_unlocks`
 
 ### Scénario 2: Test de la progression
+
 1. Utiliser l'UUID de l'intermediate user
 2. Ajouter des actions supplémentaires
 3. Vérifier l'update de `user_progression`
 
 ### Scénario 3: Test des analytics
+
 1. Utiliser l'UUID de l'advanced user
 2. Requêter `insights_analytics`
 3. Vérifier les compteurs et timestamps
 
 ### Scénario 4: Test de l'UI complète
+
 1. Charger le composant `GamifiedInsights` avec un UUID de test
 2. Vérifier l'affichage des achievements déjà débloqués
 3. Tester l'export PDF avec des données réelles
@@ -288,7 +298,7 @@ DELETE FROM profiles WHERE email LIKE 'test-phase5-%@zawajconnect.com';
   ```sql
   -- Exemple: créer un compte auth pour le beginner user
   INSERT INTO auth.users (
-    id, email, encrypted_password, 
+    id, email, encrypted_password,
     email_confirmed_at, created_at, updated_at
   ) VALUES (
     '11111111-1111-1111-1111-111111111111',
@@ -305,11 +315,12 @@ DELETE FROM profiles WHERE email LIKE 'test-phase5-%@zawajconnect.com';
 ✅ **Données réalistes:** Profils complets avec historique d'actions  
 ✅ **Tous les niveaux:** 3 profils couvrant beginner, intermediate, advanced  
 ✅ **Facile à nettoyer:** Pattern email reconnaissable  
-✅ **Documentation intégrée:** Commentaires SQL explicites  
+✅ **Documentation intégrée:** Commentaires SQL explicites
 
 ## 🔄 Ré-exécution
 
 Le script peut être ré-exécuté à tout moment:
+
 - Nettoie automatiquement les données existantes
 - Recrée les profils avec les mêmes UUIDs
 - Réinitialise tous les compteurs
@@ -324,11 +335,13 @@ Le script peut être ré-exécuté à tout moment:
 Si vous rencontrez des problèmes:
 
 1. **Vérifier la connexion Supabase:**
+
    ```bash
    supabase status
    ```
 
 2. **Vérifier les tables:**
+
    ```bash
    supabase db remote exec "SELECT tablename FROM pg_tables WHERE schemaname = 'public' ORDER BY tablename;"
    ```

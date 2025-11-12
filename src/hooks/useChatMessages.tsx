@@ -18,7 +18,7 @@ export interface Message {
 export const useChatMessages = (matchId: string | null) => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -35,18 +35,20 @@ export const useChatMessages = (matchId: string | null) => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages((data || []).map(msg => ({
-        ...msg,
-        is_read: msg.is_read ?? false,
-        family_member_id: msg.family_member_id ?? undefined,
-        is_family_supervised: msg.is_family_supervised ?? false
-      })));
+      setMessages(
+        (data || []).map((msg) => ({
+          ...msg,
+          is_read: msg.is_read ?? false,
+          family_member_id: msg.family_member_id ?? undefined,
+          is_family_supervised: msg.is_family_supervised ?? false,
+        }))
+      );
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les messages",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les messages',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -73,8 +75,8 @@ export const useChatMessages = (matchId: string | null) => {
         },
         (payload) => {
           const newMessage = payload.new as Message;
-          setMessages(prev => [...prev, newMessage]);
-          
+          setMessages((prev) => [...prev, newMessage]);
+
           // Mark as read if not sent by current user
           if (newMessage.sender_id !== user.id) {
             markMessageAsRead(newMessage.id);
@@ -91,9 +93,9 @@ export const useChatMessages = (matchId: string | null) => {
         },
         (payload) => {
           const updatedMessage = payload.new as Message;
-          setMessages(prev => prev.map(msg => 
-            msg.id === updatedMessage.id ? updatedMessage : msg
-          ));
+          setMessages((prev) =>
+            prev.map((msg) => (msg.id === updatedMessage.id ? updatedMessage : msg))
+          );
         }
       )
       .subscribe();
@@ -103,10 +105,7 @@ export const useChatMessages = (matchId: string | null) => {
 
   const markMessageAsRead = useCallback(async (messageId: string) => {
     try {
-      await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .eq('id', messageId);
+      await supabase.from('messages').update({ is_read: true }).eq('id', messageId);
     } catch (error) {
       console.error('Error marking message as read:', error);
     }
@@ -127,34 +126,35 @@ export const useChatMessages = (matchId: string | null) => {
     }
   }, [user, matchId]);
 
-  const sendMessage = useCallback(async (content: string) => {
-    if (!user || !matchId || !content.trim()) return false;
+  const sendMessage = useCallback(
+    async (content: string) => {
+      if (!user || !matchId || !content.trim()) return false;
 
-    setSending(true);
-    
-    try {
-      const { error } = await supabase
-        .from('messages')
-        .insert({
+      setSending(true);
+
+      try {
+        const { error } = await supabase.from('messages').insert({
           match_id: matchId,
           sender_id: user.id,
-          content: content.trim()
+          content: content.trim(),
         });
 
-      if (error) throw error;
-      return true;
-    } catch (error) {
-      console.error('Error sending message:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible d'envoyer le message",
-        variant: "destructive"
-      });
-      return false;
-    } finally {
-      setSending(false);
-    }
-  }, [user, matchId, toast]);
+        if (error) throw error;
+        return true;
+      } catch (error) {
+        console.error('Error sending message:', error);
+        toast({
+          title: 'Erreur',
+          description: "Impossible d'envoyer le message",
+          variant: 'destructive',
+        });
+        return false;
+      } finally {
+        setSending(false);
+      }
+    },
+    [user, matchId, toast]
+  );
 
   useEffect(() => {
     if (matchId) {
@@ -176,6 +176,6 @@ export const useChatMessages = (matchId: string | null) => {
     sending,
     sendMessage,
     markMessageAsRead,
-    refetch: fetchMessages
+    refetch: fetchMessages,
   };
 };

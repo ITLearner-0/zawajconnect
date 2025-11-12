@@ -1,9 +1,8 @@
-
-import { supabase } from "@/integrations/supabase/client";
-import { RealtimeChannel } from "@supabase/supabase-js";
-import { RealtimeCallbacks } from "./types";
-import { NotificationMapper } from "./notificationMapper";
-import { logInfo } from "../loggingService";
+import { supabase } from '@/integrations/supabase/client';
+import { RealtimeChannel } from '@supabase/supabase-js';
+import { RealtimeCallbacks } from './types';
+import { NotificationMapper } from './notificationMapper';
+import { logInfo } from '../loggingService';
 
 export class ChannelManager {
   private channels: Map<string, RealtimeChannel> = new Map();
@@ -15,7 +14,7 @@ export class ChannelManager {
 
   subscribeToCompatibilityResults(userId: string, callbacks: RealtimeCallbacks): RealtimeChannel {
     const channelName = `compatibility-${userId}`;
-    
+
     if (this.channels.has(channelName)) {
       this.unsubscribe(channelName);
     }
@@ -30,7 +29,7 @@ export class ChannelManager {
           event: 'INSERT',
           schema: 'public',
           table: 'compatibility_results',
-          filter: `user_id=neq.${userId}`
+          filter: `user_id=neq.${userId}`,
         },
         (payload) => {
           logInfo('channelManager', 'New compatibility result detected', payload);
@@ -45,7 +44,7 @@ export class ChannelManager {
 
   subscribeToProfileUpdates(userId: string, callbacks: RealtimeCallbacks): RealtimeChannel {
     const channelName = `profiles-${userId}`;
-    
+
     if (this.channels.has(channelName)) {
       this.unsubscribe(channelName);
     }
@@ -59,7 +58,7 @@ export class ChannelManager {
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'profiles'
+          table: 'profiles',
         },
         (payload) => {
           logInfo('channelManager', 'Profile update detected', payload);
@@ -76,7 +75,7 @@ export class ChannelManager {
 
   subscribeToNotifications(userId: string, callbacks: RealtimeCallbacks): RealtimeChannel {
     const channelName = `notifications-${userId}`;
-    
+
     if (this.channels.has(channelName)) {
       this.unsubscribe(channelName);
     }
@@ -91,12 +90,12 @@ export class ChannelManager {
           event: 'INSERT',
           schema: 'public',
           table: 'match_notifications',
-          filter: `user_id=eq.${userId}`
+          filter: `user_id=eq.${userId}`,
         },
         (payload) => {
           logInfo('channelManager', 'New notification received', payload);
           const notification = NotificationMapper.mapToMatchNotification(payload.new);
-          
+
           if (this.callbacks.onNotification) {
             this.callbacks.onNotification(notification);
           }
@@ -112,10 +111,13 @@ export class ChannelManager {
     return channel;
   }
 
-  private async handleCompatibilityResultChange(payload: any, currentUserId: string): Promise<void> {
+  private async handleCompatibilityResultChange(
+    payload: any,
+    currentUserId: string
+  ): Promise<void> {
     try {
       const newResult = payload.new;
-      
+
       if (this.callbacks.onNewMatch) {
         logInfo('channelManager', 'Potential new match detected', { newResult, currentUserId });
       }

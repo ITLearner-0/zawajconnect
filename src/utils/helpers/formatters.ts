@@ -1,4 +1,3 @@
-
 // Utility functions for consistent formatting across the app
 export const formatters = {
   // Time and duration formatting

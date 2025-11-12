@@ -21,7 +21,7 @@ const ApprovalDecisionDialog: React.FC<ApprovalDecisionDialogProps> = ({
   decision,
   onDecisionChange,
   onConfirm,
-  isLoading = false
+  isLoading = false,
 }) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -36,16 +36,14 @@ const ApprovalDecisionDialog: React.FC<ApprovalDecisionDialogProps> = ({
             {decision.approved ? 'Approuver le Match' : 'Refuser le Match'}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <Alert>
             <Shield className="h-4 w-4" />
             <AlertDescription>
-              {decision.approved ? (
-                'Vous autorisez la communication entre ces deux personnes selon les principes islamiques.'
-              ) : (
-                'Vous refusez ce match. Veuillez expliquer les raisons à votre famille.'
-              )}
+              {decision.approved
+                ? 'Vous autorisez la communication entre ces deux personnes selon les principes islamiques.'
+                : 'Vous refusez ce match. Veuillez expliquer les raisons à votre famille.'}
             </AlertDescription>
           </Alert>
 
@@ -57,9 +55,9 @@ const ApprovalDecisionDialog: React.FC<ApprovalDecisionDialogProps> = ({
               value={decision.notes}
               onChange={(e) => onDecisionChange({ ...decision, notes: e.target.value })}
               placeholder={
-                decision.approved 
-                  ? "Conditions ou recommandations pour cette communication..."
-                  : "Expliquez les raisons de ce refus..."
+                decision.approved
+                  ? 'Conditions ou recommandations pour cette communication...'
+                  : 'Expliquez les raisons de ce refus...'
               }
               rows={4}
             />

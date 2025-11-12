@@ -60,6 +60,6 @@ export function useOrientation(): OrientationState {
     orientation,
     isPortrait: orientation === 'portrait',
     isLandscape: orientation === 'landscape',
-    angle
+    angle,
   };
 }

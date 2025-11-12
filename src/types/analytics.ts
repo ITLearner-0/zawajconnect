@@ -1,4 +1,3 @@
-
 // General analytics data
 export interface AnalyticsData {
   totalConversations: number;

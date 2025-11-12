@@ -13,7 +13,7 @@ const RouteRenderer: React.FC<RouteRendererProps> = ({ routes, isProtected = fal
     <>
       {routes.map((route) => {
         const Component = route.component;
-        
+
         if (isProtected || route.protected) {
           return (
             <Route
@@ -27,14 +27,8 @@ const RouteRenderer: React.FC<RouteRendererProps> = ({ routes, isProtected = fal
             />
           );
         }
-        
-        return (
-          <Route
-            key={route.path}
-            path={route.path}
-            element={<Component />}
-          />
-        );
+
+        return <Route key={route.path} path={route.path} element={<Component />} />;
       })}
     </>
   );

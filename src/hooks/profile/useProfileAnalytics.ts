@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -20,7 +19,7 @@ export const useProfileAnalytics = (userId?: string) => {
     responseRate: 0,
     profileCompleteness: 0,
     popularTimes: [],
-    topMatchingCategories: []
+    topMatchingCategories: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -46,7 +45,7 @@ export const useProfileAnalytics = (userId?: string) => {
           responseRate: Math.floor(Math.random() * 40) + 50,
           profileCompleteness: completeness,
           popularTimes: ['14h-16h', '19h-21h', '21h-23h'],
-          topMatchingCategories: ['Pratique religieuse', 'Valeurs familiales', 'Éducation']
+          topMatchingCategories: ['Pratique religieuse', 'Valeurs familiales', 'Éducation'],
         };
 
         setAnalytics(mockAnalytics);
@@ -76,13 +75,19 @@ export const useProfileAnalytics = (userId?: string) => {
       if (!profile) return 0;
 
       const requiredFields = [
-        'first_name', 'last_name', 'gender', 'birth_date', 
-        'location', 'education_level', 'occupation', 
-        'religious_practice_level', 'about_me'
+        'first_name',
+        'last_name',
+        'gender',
+        'birth_date',
+        'location',
+        'education_level',
+        'occupation',
+        'religious_practice_level',
+        'about_me',
       ];
 
-      const completedFields = requiredFields.filter(field => 
-        profile[field] && profile[field].toString().trim() !== ''
+      const completedFields = requiredFields.filter(
+        (field) => profile[field] && profile[field].toString().trim() !== ''
       );
 
       return Math.round((completedFields.length / requiredFields.length) * 100);

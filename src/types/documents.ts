@@ -1,4 +1,3 @@
-
 export interface PhotoBlurSettings {
   blur_profile_picture: boolean;
   blur_gallery_photos: boolean;

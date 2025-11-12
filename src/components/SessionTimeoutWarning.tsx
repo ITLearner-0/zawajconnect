@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   AlertDialog,
@@ -23,7 +22,7 @@ const SessionTimeoutWarning: React.FC<SessionTimeoutWarningProps> = ({
   show,
   remainingTime,
   onExtend,
-  onLogout
+  onLogout,
 }) => {
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -49,9 +48,7 @@ const SessionTimeoutWarning: React.FC<SessionTimeoutWarningProps> = ({
             <LogOut className="h-4 w-4" />
             Se déconnecter
           </Button>
-          <AlertDialogAction onClick={onExtend}>
-            Continuer la session
-          </AlertDialogAction>
+          <AlertDialogAction onClick={onExtend}>Continuer la session</AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

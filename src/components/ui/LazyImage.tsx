@@ -1,4 +1,3 @@
-
 import React from 'react';
 import LazyImageCore from './lazy-image/LazyImageCore';
 import LazyImageStatusIndicators from './lazy-image/LazyImageStatusIndicators';
@@ -60,18 +59,18 @@ const LazyImage = ({
   });
 
   // Use optimized image URL if network optimization is enabled
-  const optimizedSrc = enableNetworkOptimization 
-    ? networkOptimization.optimizeImageUrl(src)
-    : src;
+  const optimizedSrc = enableNetworkOptimization ? networkOptimization.optimizeImageUrl(src) : src;
 
   // Adjust progressive loading based on network conditions
-  const shouldUseProgressiveLoading = enableProgressiveLoading || 
+  const shouldUseProgressiveLoading =
+    enableProgressiveLoading ||
     (enableNetworkOptimization && networkOptimization.loadingStrategy.enableProgressiveLoading);
 
   // Adjust retry attempts based on network conditions
-  const optimizedMaxRetries = enableNetworkOptimization && networkOptimization.isSlowConnection
-    ? Math.min(maxRetries, 2)
-    : maxRetries;
+  const optimizedMaxRetries =
+    enableNetworkOptimization && networkOptimization.isSlowConnection
+      ? Math.min(maxRetries, 2)
+      : maxRetries;
 
   const coreProps = LazyImageCore({
     src: optimizedSrc,
@@ -106,14 +105,16 @@ const LazyImage = ({
 
   return (
     <LazyLoadingErrorBoundary showRetry={enableRetry}>
-      <div 
-        ref={elementRef} 
+      <div
+        ref={elementRef}
         className={cn('relative overflow-hidden', className)}
         role="img"
         aria-label={alt}
         data-debug-id={enableDebug ? debugId : undefined}
         data-network-optimized={enableNetworkOptimization}
-        data-connection-type={enableNetworkOptimization ? networkOptimization.effectiveType : undefined}
+        data-connection-type={
+          enableNetworkOptimization ? networkOptimization.effectiveType : undefined
+        }
       >
         <LazyImageStatusIndicators
           showNetworkStatus={showNetworkStatus}

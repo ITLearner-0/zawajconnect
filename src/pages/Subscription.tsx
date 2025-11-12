@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,22 +7,22 @@ import { Check, Crown, Star, Zap, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Subscription = () => {
-  const { 
-    subscribed, 
-    subscription_tier, 
+  const {
+    subscribed,
+    subscription_tier,
     subscription_end,
-    loading, 
-    createCheckoutSession, 
+    loading,
+    createCheckoutSession,
     openCustomerPortal,
     isPremium,
-    isVip
+    isVip,
   } = useSubscription();
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
     });
   };
 
@@ -71,7 +70,7 @@ const Subscription = () => {
                 )}
               </CardHeader>
               <CardContent>
-                <Button 
+                <Button
                   onClick={handleManageSubscription}
                   disabled={loading}
                   className="w-full bg-rose-600 hover:bg-rose-700 text-white"
@@ -98,9 +97,7 @@ const Subscription = () => {
               <CardTitle className="text-2xl font-bold text-gray-800 dark:text-gray-200">
                 Gratuit
               </CardTitle>
-              <CardDescription>
-                Commencez votre recherche
-              </CardDescription>
+              <CardDescription>Commencez votre recherche</CardDescription>
               <div className="text-3xl font-bold text-gray-800 dark:text-gray-200">
                 0€<span className="text-sm font-normal">/mois</span>
               </div>
@@ -125,15 +122,15 @@ const Subscription = () => {
                 </li>
               </ul>
               <Button asChild variant="outline" className="w-full">
-                <Link to="/auth">
-                  Commencer Gratuitement
-                </Link>
+                <Link to="/auth">Commencer Gratuitement</Link>
               </Button>
             </CardContent>
           </Card>
 
           {/* Plan Premium */}
-          <Card className={`relative border-2 ${isPremium ? 'border-rose-500 bg-rose-50 dark:bg-rose-950' : 'border-rose-300'}`}>
+          <Card
+            className={`relative border-2 ${isPremium ? 'border-rose-500 bg-rose-50 dark:bg-rose-950' : 'border-rose-300'}`}
+          >
             {isPremium && (
               <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-rose-500 text-white">
                 Plan Actuel
@@ -144,9 +141,7 @@ const Subscription = () => {
                 <Star className="h-6 w-6" />
                 Premium
               </CardTitle>
-              <CardDescription>
-                Recherche avancée et messages illimités
-              </CardDescription>
+              <CardDescription>Recherche avancée et messages illimités</CardDescription>
               <div className="text-3xl font-bold text-rose-800 dark:text-rose-200">
                 9,99€<span className="text-sm font-normal">/mois</span>
               </div>
@@ -174,7 +169,7 @@ const Subscription = () => {
                   <span>Voir qui a visité votre profil</span>
                 </li>
               </ul>
-              <Button 
+              <Button
                 onClick={handlePremiumClick}
                 disabled={loading || isPremium}
                 className="w-full bg-rose-600 hover:bg-rose-700 text-white"
@@ -194,7 +189,9 @@ const Subscription = () => {
           </Card>
 
           {/* Plan VIP */}
-          <Card className={`relative border-2 ${isVip ? 'border-purple-500 bg-purple-50 dark:bg-purple-950' : 'border-purple-300'}`}>
+          <Card
+            className={`relative border-2 ${isVip ? 'border-purple-500 bg-purple-50 dark:bg-purple-950' : 'border-purple-300'}`}
+          >
             {isVip && (
               <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-purple-500 text-white">
                 Plan Actuel
@@ -208,9 +205,7 @@ const Subscription = () => {
                 <Crown className="h-6 w-6" />
                 VIP
               </CardTitle>
-              <CardDescription>
-                Accès complet + conseiller matrimonial
-              </CardDescription>
+              <CardDescription>Accès complet + conseiller matrimonial</CardDescription>
               <div className="text-3xl font-bold text-purple-800 dark:text-purple-200">
                 19,99€<span className="text-sm font-normal">/mois</span>
               </div>
@@ -238,7 +233,7 @@ const Subscription = () => {
                   <span>Support prioritaire</span>
                 </li>
               </ul>
-              <Button 
+              <Button
                 onClick={handleVipClick}
                 disabled={loading || isVip}
                 className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
@@ -284,7 +279,9 @@ const Subscription = () => {
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
                   <tr>
-                    <td className="px-6 py-4 text-gray-800 dark:text-gray-200">Correspondances par jour</td>
+                    <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
+                      Correspondances par jour
+                    </td>
                     <td className="px-6 py-4 text-center">5</td>
                     <td className="px-6 py-4 text-center">Illimitées</td>
                     <td className="px-6 py-4 text-center">Illimitées</td>
@@ -308,7 +305,9 @@ const Subscription = () => {
                     <td className="px-6 py-4 text-center">✅</td>
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 text-gray-800 dark:text-gray-200">Conseiller matrimonial</td>
+                    <td className="px-6 py-4 text-gray-800 dark:text-gray-200">
+                      Conseiller matrimonial
+                    </td>
                     <td className="px-6 py-4 text-center">❌</td>
                     <td className="px-6 py-4 text-center">❌</td>
                     <td className="px-6 py-4 text-center">✅</td>

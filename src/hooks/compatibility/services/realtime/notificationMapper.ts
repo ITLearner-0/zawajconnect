@@ -1,5 +1,4 @@
-
-import { MatchNotification } from "./types";
+import { MatchNotification } from './types';
 
 export class NotificationMapper {
   static mapToMatchNotification(dbRow: any): MatchNotification {

@@ -45,28 +45,32 @@ Deno.serve(async (req) => {
     const now = new Date();
     const sevenDaysFromNow = new Date(now);
     sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-    
+
     // Set to start of day (00:00:00)
     const startOfDay = new Date(sevenDaysFromNow);
     startOfDay.setHours(0, 0, 0, 0);
-    
+
     // Set to end of day (23:59:59)
     const endOfDay = new Date(sevenDaysFromNow);
     endOfDay.setHours(23, 59, 59, 999);
 
-    console.log(`Searching for subscriptions expiring between ${startOfDay.toISOString()} and ${endOfDay.toISOString()}`);
+    console.log(
+      `Searching for subscriptions expiring between ${startOfDay.toISOString()} and ${endOfDay.toISOString()}`
+    );
 
     // Find all active subscriptions expiring in exactly 7 days
     const { data: expiringSubscriptions, error: fetchError } = await supabaseAdmin
       .from('subscriptions')
-      .select(`
+      .select(
+        `
         id,
         user_id,
         plan_type,
         expires_at,
         granted_at,
         profiles!inner(full_name)
-      `)
+      `
+      )
       .eq('status', 'active')
       .gte('expires_at', startOfDay.toISOString())
       .lte('expires_at', endOfDay.toISOString());
@@ -80,9 +84,9 @@ Deno.serve(async (req) => {
 
     if (!expiringSubscriptions || expiringSubscriptions.length === 0) {
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           message: 'No subscriptions expiring in 7 days',
-          count: 0 
+          count: 0,
         }),
         {
           status: 200,
@@ -100,7 +104,9 @@ Deno.serve(async (req) => {
     // Process each expiring subscription
     for (const subscription of expiringSubscriptions as ExpiringSubscription[]) {
       try {
-        console.log(`Processing reminder for subscription ${subscription.id} for user ${subscription.user_id}`);
+        console.log(
+          `Processing reminder for subscription ${subscription.id} for user ${subscription.user_id}`
+        );
 
         // Get user email from auth.users
         const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(
@@ -119,7 +125,7 @@ Deno.serve(async (req) => {
 
         // Select A/B test variant
         const variant = await selectABVariant(supabaseAdmin, '7days');
-        
+
         if (!variant) {
           console.warn('No A/B variant found, skipping email for', subscription.id);
           results.errors.push(`No A/B variant configured for 7days reminder`);
@@ -143,14 +149,18 @@ Deno.serve(async (req) => {
         }
 
         // Generate email HTML with A/B variant
-        const emailHTML = generateEmailHTML(variant, {
-          userName,
-          expirationDate,
-          planType: subscription.plan_type,
-          daysUntilExpiry: 7,
-          subscriptionId: subscription.id,
-          userId: subscription.user_id,
-        }, trackingId || 'no-track');
+        const emailHTML = generateEmailHTML(
+          variant,
+          {
+            userName,
+            expirationDate,
+            planType: subscription.plan_type,
+            daysUntilExpiry: 7,
+            subscriptionId: subscription.id,
+            userId: subscription.user_id,
+          },
+          trackingId || 'no-track'
+        );
 
         // Send email
         try {
@@ -169,7 +179,9 @@ Deno.serve(async (req) => {
         }
       } catch (subscriptionError: any) {
         console.error(`Error processing subscription ${subscription.id}:`, subscriptionError);
-        results.errors.push(`Processing failed for ${subscription.id}: ${subscriptionError.message}`);
+        results.errors.push(
+          `Processing failed for ${subscription.id}: ${subscriptionError.message}`
+        );
       }
     }
 

@@ -1,4 +1,3 @@
-
 import { PrivacySettings } from './profile';
 
 export interface ProgressiveRevealSettings {
@@ -44,7 +43,7 @@ export interface EnhancedPrivacySettings {
   showLocation: boolean;
   showOccupation: boolean;
   allowNonMatchMessages: boolean;
-  
+
   // Enhanced privacy features
   progressiveReveal: ProgressiveRevealSettings;
   incognito: IncognitoSettings;

@@ -5,16 +5,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/hooks/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  MessageCircle, 
-  Send, 
-  Loader2,
-  Bot,
-  User,
-  X,
-  Minimize2,
-  Maximize2
-} from 'lucide-react';
+import { MessageCircle, Send, Loader2, Bot, User, X, Minimize2, Maximize2 } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -46,8 +37,9 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: 'Bonjour ! 👋 Je suis votre assistant personnel pour optimiser votre profil. Comment puis-je vous aider aujourd\'hui ?'
-    }
+      content:
+        "Bonjour ! 👋 Je suis votre assistant personnel pour optimiser votre profil. Comment puis-je vous aider aujourd'hui ?",
+    },
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -62,14 +54,14 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
 
   const streamChat = async (userMessage: string) => {
     setIsLoading(true);
-    
+
     const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
     setMessages(newMessages);
     setInput('');
 
     try {
       const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/profile-chat`;
-      
+
       const response = await fetch(CHAT_URL, {
         method: 'POST',
         headers: {
@@ -77,28 +69,28 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
-          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+          messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
           profileContext: {
             profile,
-            completionStats
-          }
+            completionStats,
+          },
         }),
       });
 
       if (!response.ok) {
         if (response.status === 429) {
           toast({
-            title: "Limite atteinte",
-            description: "Trop de requêtes. Veuillez réessayer dans quelques instants.",
-            variant: "destructive"
+            title: 'Limite atteinte',
+            description: 'Trop de requêtes. Veuillez réessayer dans quelques instants.',
+            variant: 'destructive',
           });
           return;
         }
         if (response.status === 402) {
           toast({
-            title: "Crédits épuisés",
-            description: "Les crédits AI sont épuisés. Contactez le support.",
-            variant: "destructive"
+            title: 'Crédits épuisés',
+            description: 'Les crédits AI sont épuisés. Contactez le support.',
+            variant: 'destructive',
           });
           return;
         }
@@ -114,12 +106,12 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
       let assistantMessage = '';
 
       // Ajouter un message assistant vide qui sera rempli progressivement
-      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
 
       while (!streamDone) {
         const { done, value } = await reader.read();
         if (done) break;
-        
+
         textBuffer += decoder.decode(value, { stream: true });
 
         let newlineIndex: number;
@@ -143,11 +135,11 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
             if (content) {
               assistantMessage += content;
               // Mettre à jour le dernier message
-              setMessages(prev => {
+              setMessages((prev) => {
                 const newMessages = [...prev];
                 newMessages[newMessages.length - 1] = {
                   role: 'assistant',
-                  content: assistantMessage
+                  content: assistantMessage,
                 };
                 return newMessages;
               });
@@ -171,28 +163,29 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
             const content = parsed.choices?.[0]?.delta?.content as string | undefined;
             if (content) {
               assistantMessage += content;
-              setMessages(prev => {
+              setMessages((prev) => {
                 const newMessages = [...prev];
                 newMessages[newMessages.length - 1] = {
                   role: 'assistant',
-                  content: assistantMessage
+                  content: assistantMessage,
                 };
                 return newMessages;
               });
             }
-          } catch { /* ignore */ }
+          } catch {
+            /* ignore */
+          }
         }
       }
-
     } catch (error) {
       console.error('Error streaming chat:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de se connecter au chatbot. Réessayez plus tard.",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de se connecter au chatbot. Réessayez plus tard.',
+        variant: 'destructive',
       });
       // Retirer le message assistant vide en cas d'erreur
-      setMessages(prev => prev.slice(0, -1));
+      setMessages((prev) => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
     }
@@ -231,11 +224,11 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ 
-        opacity: 1, 
-        y: 0, 
+      animate={{
+        opacity: 1,
+        y: 0,
         scale: 1,
-        height: isMinimized ? 'auto' : '600px'
+        height: isMinimized ? 'auto' : '600px',
       }}
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
       className="fixed bottom-6 right-6 z-50 w-96"
@@ -254,7 +247,11 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
                 onClick={() => setIsMinimized(!isMinimized)}
                 className="h-7 w-7 p-0 text-primary-foreground hover:bg-primary-foreground/20"
               >
-                {isMinimized ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
+                {isMinimized ? (
+                  <Maximize2 className="h-4 w-4" />
+                ) : (
+                  <Minimize2 className="h-4 w-4" />
+                )}
               </Button>
               <Button
                 variant="ghost"
@@ -267,7 +264,7 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
             </div>
           </div>
         </CardHeader>
-        
+
         {!isMinimized && (
           <CardContent className="p-0">
             <ScrollArea className="h-[440px] p-4" ref={scrollAreaRef}>
@@ -282,28 +279,28 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
                       message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
                     }`}
                   >
-                    <div className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${
-                      message.role === 'user' 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-muted'
-                    }`}>
+                    <div
+                      className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center ${
+                        message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                      }`}
+                    >
                       {message.role === 'user' ? (
                         <User className="h-4 w-4" />
                       ) : (
                         <Bot className="h-4 w-4" />
                       )}
                     </div>
-                    <div className={`flex-1 p-3 rounded-lg ${
-                      message.role === 'user'
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted'
-                    }`}>
+                    <div
+                      className={`flex-1 p-3 rounded-lg ${
+                        message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                      }`}
+                    >
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                     </div>
                   </motion.div>
                 ))}
               </AnimatePresence>
-              
+
               {isLoading && (
                 <motion.div
                   initial={{ opacity: 0 }}
@@ -333,11 +330,7 @@ const ProfileChatbot = ({ profile, completionStats }: ProfileChatbotProps) => {
                   disabled={isLoading}
                   className="flex-1"
                 />
-                <Button
-                  onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
-                  size="icon"
-                >
+                <Button onClick={handleSend} disabled={!input.trim() || isLoading} size="icon">
                   {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (

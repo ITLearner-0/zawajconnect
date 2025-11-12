@@ -19,20 +19,20 @@ const EnhancedSecurityGuard: React.FC<SecurityGuardProps> = ({
   children,
   requiredVerificationScore = 60,
   requireEmailVerification = true,
-  requireIdVerification = false
+  requireIdVerification = false,
 }) => {
   const { user } = useAuth();
   const { logSecurityEvent } = useSecurityEvents();
   const { isSessionNearExpiry } = useSessionMonitor();
   const { toast } = useToast();
-  
+
   const [securityStatus, setSecurityStatus] = useState<{
     emailVerified: boolean;
     idVerified: boolean;
     verificationScore: number;
     isSecure: boolean;
   } | null>(null);
-  
+
   const [loading, setLoading] = useState(true);
   const [blocked, setBlocked] = useState(false);
 
@@ -66,7 +66,7 @@ const EnhancedSecurityGuard: React.FC<SecurityGuardProps> = ({
         emailVerified: verificationData?.email_verified || false,
         idVerified: verificationData?.id_verified || false,
         verificationScore: verificationData?.verification_score || 0,
-        isSecure: true
+        isSecure: true,
       };
 
       // Check security requirements
@@ -99,15 +99,14 @@ const EnhancedSecurityGuard: React.FC<SecurityGuardProps> = ({
 
       setSecurityStatus(status);
       setBlocked(!status.isSecure);
-
     } catch (error) {
       console.error('Security check failed:', error);
       setBlocked(true);
-      
+
       toast({
-        title: "Erreur de sécurité",
-        description: "Impossible de vérifier votre statut de sécurité",
-        variant: "destructive"
+        title: 'Erreur de sécurité',
+        description: 'Impossible de vérifier votre statut de sécurité',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -116,17 +115,15 @@ const EnhancedSecurityGuard: React.FC<SecurityGuardProps> = ({
 
   const createDefaultVerification = async () => {
     try {
-      const { error } = await supabase
-        .from('user_verifications')
-        .insert({
-          user_id: user!.id,
-          email_verified: false,
-          id_verified: false,
-          verification_score: 10
-        });
+      const { error } = await supabase.from('user_verifications').insert({
+        user_id: user!.id,
+        email_verified: false,
+        id_verified: false,
+        verification_score: 10,
+      });
 
       if (error) throw error;
-      
+
       // Retry check after creating verification record
       setTimeout(checkSecurityStatus, 1000);
     } catch (error) {
@@ -177,7 +174,10 @@ const EnhancedSecurityGuard: React.FC<SecurityGuardProps> = ({
                 <li>• Identité non vérifiée</li>
               )}
               {securityStatus && securityStatus.verificationScore < requiredVerificationScore && (
-                <li>• Score de vérification insuffisant ({securityStatus.verificationScore}/{requiredVerificationScore})</li>
+                <li>
+                  • Score de vérification insuffisant ({securityStatus.verificationScore}/
+                  {requiredVerificationScore})
+                </li>
               )}
             </ul>
           </AlertDescription>

@@ -1,4 +1,3 @@
-
 import { useUserSession } from './useUserSession';
 import { useDeviceFingerprinting } from './security/useDeviceFingerprinting';
 import { usePasswordValidation } from './security/usePasswordValidation';
@@ -18,25 +17,25 @@ export const useEnhancedAuth = () => {
     resetFailedAttempts,
     isAccountLocked,
     updateDeviceFingerprint,
-    updateLastActivity
+    updateLastActivity,
   } = useSecurityState();
 
   // Sync device fingerprint
-  useDeviceFingerprintSync({ 
-    deviceFingerprint, 
-    updateDeviceFingerprint 
+  useDeviceFingerprintSync({
+    deviceFingerprint,
+    updateDeviceFingerprint,
   });
 
   // Handle session timeout
   useSessionTimeout({
     currentUserId,
     sessionTimeout: securitySettings.sessionTimeout,
-    updateLastActivity
+    updateLastActivity,
   });
 
   // Security event logging
   const { logSecurityEvent } = useSecurityEventLogger(
-    currentUserId, 
+    currentUserId,
     securityState.deviceFingerprint
   );
 
@@ -48,6 +47,6 @@ export const useEnhancedAuth = () => {
     resetFailedAttempts,
     isAccountLocked,
     logSecurityEvent,
-    generateDeviceFingerprint
+    generateDeviceFingerprint,
   };
 };

@@ -1,10 +1,13 @@
-
-import { questions } from "@/data/compatibilityQuestions";
-import { CompatibilityMatch } from "@/types/compatibility";
-import { UserResultWithProfile } from "../types/matchingTypes";
-import { getIslamicWeight, calculateCategoryCompatibility, calculateIslamicBonus } from "./islamicScoring";
-import { matchQualityService, MatchQualityMetrics } from "../services/matchQualityService";
-import { ValidatedUserResults } from "../services/dataFetchingService";
+import { questions } from '@/data/compatibilityQuestions';
+import { CompatibilityMatch } from '@/types/compatibility';
+import { UserResultWithProfile } from '../types/matchingTypes';
+import {
+  getIslamicWeight,
+  calculateCategoryCompatibility,
+  calculateIslamicBonus,
+} from './islamicScoring';
+import { matchQualityService, MatchQualityMetrics } from '../services/matchQualityService';
+import { ValidatedUserResults } from '../services/dataFetchingService';
 
 export interface EnhancedCompatibilityMatch extends CompatibilityMatch {
   qualityMetrics?: MatchQualityMetrics;
@@ -29,25 +32,25 @@ export function calculateEnhancedCompatibilityScore(
   // Enhanced scoring algorithm with Islamic values emphasis
   Object.entries(myAnswers).forEach(([qId, myAnswer]) => {
     const otherAnswer = otherAnswers[qId];
-    const questionObj = questions.find(q => q.id.toString() === qId);
-    
+    const questionObj = questions.find((q) => q.id.toString() === qId);
+
     if (!questionObj || !myAnswer || !otherAnswer) return;
-    
+
     const category = questionObj.category;
     const effectiveWeight = getIslamicWeight(questionObj, myAnswer.weight);
-    
+
     // Calculate compatibility with Islamic emphasis
     const rawDifference = Math.abs(myAnswer.value - otherAnswer.value);
     const compatibility = calculateCategoryCompatibility(questionObj, rawDifference);
-    
+
     // Category tracking
     if (!categoryScores[category]) {
       categoryScores[category] = { score: 0, weight: 0 };
     }
     categoryScores[category].score += compatibility * effectiveWeight;
     categoryScores[category].weight += effectiveWeight;
-    
-    totalCompatibility += (compatibility * effectiveWeight);
+
+    totalCompatibility += compatibility * effectiveWeight;
     totalWeight += effectiveWeight;
 
     // Track strengths and differences
@@ -55,9 +58,11 @@ export function calculateEnhancedCompatibilityScore(
     else if (compatibility <= 50) differences.push(category);
 
     // Enhanced dealbreaker detection
-    if (myAnswer.isBreaker && 
-        myAnswer.breakerThreshold && 
-        otherAnswer.value < myAnswer.breakerThreshold) {
+    if (
+      myAnswer.isBreaker &&
+      myAnswer.breakerThreshold &&
+      otherAnswer.value < myAnswer.breakerThreshold
+    ) {
       dealbreakers.push(category);
       hasDealbreaker = true;
     }
@@ -65,11 +70,11 @@ export function calculateEnhancedCompatibilityScore(
 
   // Calculate final score with Islamic bonuses
   let finalScore = totalWeight > 0 ? (totalCompatibility / (totalWeight * 100)) * 100 : 0;
-  
+
   // Apply Islamic priority bonuses
   const islamicBonus = calculateIslamicBonus(categoryScores);
   finalScore = Math.min(100, finalScore + islamicBonus);
-  
+
   // Apply dealbreaker penalty
   if (hasDealbreaker) {
     finalScore = Math.max(0, finalScore - 25);
@@ -93,14 +98,14 @@ export function calculateEnhancedCompatibilityScore(
       education_level: profile.education_level,
       email_verified: profile.email_verified,
       phone_verified: profile.phone_verified,
-      id_verified: profile.id_verified
+      id_verified: profile.id_verified,
     },
     matchDetails: {
       strengths: [...new Set(strengths)],
       differences: [...new Set(differences)],
       dealbreakers: dealbreakers.length ? [...new Set(dealbreakers)] : undefined,
-      categoryScores
-    }
+      categoryScores,
+    },
   };
 
   // Calculate quality metrics
@@ -112,6 +117,6 @@ export function calculateEnhancedCompatibilityScore(
 
   return {
     ...compatibilityMatch,
-    qualityMetrics
+    qualityMetrics,
   };
 }

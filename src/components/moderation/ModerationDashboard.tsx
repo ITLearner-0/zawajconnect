@@ -4,16 +4,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Shield, 
-  AlertTriangle, 
-  Users, 
+import {
+  Shield,
+  AlertTriangle,
+  Users,
   MessageSquare,
   TrendingUp,
   Clock,
   CheckCircle,
   XCircle,
-  Scale
+  Scale,
 } from 'lucide-react';
 import BehaviorScoreDisplay from './BehaviorScoreDisplay';
 import AppealForm from './AppealForm';
@@ -31,7 +31,7 @@ interface ModerationDashboardProps {
 const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
   userId,
   userRole,
-  className = ''
+  className = '',
 }) => {
   const { toast } = useToast();
   const [behaviorScore, setBehaviorScore] = useState<BehaviorScore | null>(null);
@@ -45,7 +45,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
     totalFlags: 143,
     pendingReviews: 28,
     resolvedToday: 15,
-    falsePositives: 3
+    falsePositives: 3,
   };
 
   useEffect(() => {
@@ -66,9 +66,9 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
     } catch (error) {
       console.error('Error loading moderation data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données de modération",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données de modération',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -97,9 +97,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
           Tableau de Modération
         </h2>
         {userRole !== 'user' && (
-          <Badge variant="outline">
-            {userRole === 'admin' ? 'Administrateur' : 'Modérateur'}
-          </Badge>
+          <Badge variant="outline">{userRole === 'admin' ? 'Administrateur' : 'Modérateur'}</Badge>
         )}
       </div>
 
@@ -108,9 +106,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
           <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
           <TabsTrigger value="behavior">Comportement</TabsTrigger>
           <TabsTrigger value="appeals">Appels</TabsTrigger>
-          {userRole !== 'user' && (
-            <TabsTrigger value="moderation">Modération</TabsTrigger>
-          )}
+          {userRole !== 'user' && <TabsTrigger value="moderation">Modération</TabsTrigger>}
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -122,9 +118,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{moderationStats.totalFlags}</div>
-                <p className="text-xs text-muted-foreground">
-                  +12% par rapport au mois dernier
-                </p>
+                <p className="text-xs text-muted-foreground">+12% par rapport au mois dernier</p>
               </CardContent>
             </Card>
 
@@ -135,9 +129,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{moderationStats.pendingReviews}</div>
-                <p className="text-xs text-muted-foreground">
-                  Nécessitent une révision
-                </p>
+                <p className="text-xs text-muted-foreground">Nécessitent une révision</p>
               </CardContent>
             </Card>
 
@@ -148,9 +140,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{moderationStats.resolvedToday}</div>
-                <p className="text-xs text-muted-foreground">
-                  +8% d'efficacité
-                </p>
+                <p className="text-xs text-muted-foreground">+8% d'efficacité</p>
               </CardContent>
             </Card>
 
@@ -161,9 +151,7 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{moderationStats.falsePositives}</div>
-                <p className="text-xs text-muted-foreground">
-                  -2% ce mois-ci
-                </p>
+                <p className="text-xs text-muted-foreground">-2% ce mois-ci</p>
               </CardContent>
             </Card>
           </div>
@@ -171,18 +159,15 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
           <Alert>
             <Shield className="h-4 w-4" />
             <AlertDescription>
-              Le système de modération automatique analyse en permanence les comportements 
-              pour maintenir un environnement sûr et respectueux.
+              Le système de modération automatique analyse en permanence les comportements pour
+              maintenir un environnement sûr et respectueux.
             </AlertDescription>
           </Alert>
         </TabsContent>
 
         <TabsContent value="behavior" className="space-y-4">
           {behaviorScore ? (
-            <BehaviorScoreDisplay 
-              behaviorScore={behaviorScore} 
-              showDetails={true}
-            />
+            <BehaviorScoreDisplay behaviorScore={behaviorScore} showDetails={true} />
           ) : (
             <Card>
               <CardContent className="p-6 text-center">
@@ -200,11 +185,13 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
           {showAppealForm ? (
             <AppealForm
               moderationActionId={selectedAction?.id || ''}
-              originalAction={selectedAction || {
-                type: 'Test Action',
-                reason: 'Test Reason',
-                date: new Date().toLocaleDateString()
-              }}
+              originalAction={
+                selectedAction || {
+                  type: 'Test Action',
+                  reason: 'Test Reason',
+                  date: new Date().toLocaleDateString(),
+                }
+              }
               onAppealSubmitted={handleAppealSubmitted}
               onCancel={() => {
                 setShowAppealForm(false);
@@ -215,13 +202,13 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-lg font-medium">Mes Appels</h3>
-                <Button 
+                <Button
                   onClick={() => {
                     setSelectedAction({
                       id: 'demo-action',
                       type: 'Avertissement',
                       reason: 'Message inapproprié détecté',
-                      date: new Date().toLocaleDateString()
+                      date: new Date().toLocaleDateString(),
                     });
                     setShowAppealForm(true);
                   }}
@@ -250,19 +237,20 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
                         <div className="flex items-start justify-between">
                           <div className="space-y-1">
                             <h4 className="font-medium">{appeal.originalAction.type}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              {appeal.appealReason}
-                            </p>
+                            <p className="text-sm text-muted-foreground">{appeal.appealReason}</p>
                             <div className="text-xs text-muted-foreground">
                               Soumis le {new Date(appeal.submittedAt).toLocaleDateString()}
                             </div>
                           </div>
-                          <Badge 
+                          <Badge
                             variant={
-                              appeal.status === 'approved' ? 'default' :
-                              appeal.status === 'rejected' ? 'destructive' :
-                              appeal.status === 'under_review' ? 'secondary' :
-                              'outline'
+                              appeal.status === 'approved'
+                                ? 'default'
+                                : appeal.status === 'rejected'
+                                  ? 'destructive'
+                                  : appeal.status === 'under_review'
+                                    ? 'secondary'
+                                    : 'outline'
                             }
                           >
                             {appeal.status === 'pending' && 'En Attente'}
@@ -290,11 +278,11 @@ const ModerationDashboard: React.FC<ModerationDashboardProps> = ({
             <Alert>
               <Shield className="h-4 w-4" />
               <AlertDescription>
-                Interface de modération avancée pour les modérateurs et administrateurs.
-                Cette section permettrait de gérer les signalements et réviser les appels.
+                Interface de modération avancée pour les modérateurs et administrateurs. Cette
+                section permettrait de gérer les signalements et réviser les appels.
               </AlertDescription>
             </Alert>
-            
+
             {/* This would contain moderation tools for moderators/admins */}
             <Card>
               <CardHeader>

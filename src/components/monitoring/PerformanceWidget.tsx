@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -16,20 +15,12 @@ interface PerformanceWidgetProps {
   position?: 'bottom-right' | 'bottom-left' | 'top-right' | 'top-left';
 }
 
-const PerformanceWidget: React.FC<PerformanceWidgetProps> = ({ 
-  position = 'bottom-left' 
-}) => {
+const PerformanceWidget: React.FC<PerformanceWidgetProps> = ({ position = 'bottom-left' }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
-  
-  const {
-    metrics,
-    getPerformanceSummary,
-    clearMetrics,
-    isTracking,
-    startTracking,
-    stopTracking,
-  } = usePerformanceMetrics();
+
+  const { metrics, getPerformanceSummary, clearMetrics, isTracking, startTracking, stopTracking } =
+    usePerformanceMetrics();
 
   const summary = getPerformanceSummary();
 
@@ -70,9 +61,11 @@ const PerformanceWidget: React.FC<PerformanceWidgetProps> = ({
 
   return (
     <div className={`fixed ${positionClasses[position]} z-40`}>
-      <Card className={`shadow-lg transition-all duration-300 ${
-        isExpanded ? 'w-96 h-[500px]' : 'w-64 h-auto'
-      }`}>
+      <Card
+        className={`shadow-lg transition-all duration-300 ${
+          isExpanded ? 'w-96 h-[500px]' : 'w-64 h-auto'
+        }`}
+      >
         <CardHeader className="pb-2">
           <PerformanceWidgetHeader
             isTracking={isTracking}
@@ -80,7 +73,7 @@ const PerformanceWidget: React.FC<PerformanceWidgetProps> = ({
             onToggleExpand={() => setIsExpanded(!isExpanded)}
           />
         </CardHeader>
-        
+
         <CardContent className="p-3">
           {!isExpanded ? (
             <div className="space-y-2">
@@ -92,7 +85,7 @@ const PerformanceWidget: React.FC<PerformanceWidgetProps> = ({
                 formatMemory={formatMemory}
                 getScoreColor={getScoreColor}
               />
-              
+
               <PerformanceWidgetControls
                 isTracking={isTracking}
                 isExpanded={isExpanded}
@@ -102,10 +95,7 @@ const PerformanceWidget: React.FC<PerformanceWidgetProps> = ({
             </div>
           ) : (
             <div className="h-full flex flex-col">
-              <PerformanceWidgetTabs
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-              />
+              <PerformanceWidgetTabs activeTab={activeTab} onTabChange={setActiveTab} />
 
               <ScrollArea className="flex-1">
                 {activeTab === 'overview' && (

@@ -1,10 +1,9 @@
-
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import CustomButton from "@/components/CustomButton";
-import { ShieldCheck, Check } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import CustomButton from '@/components/CustomButton';
+import { ShieldCheck, Check } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface IdVerificationProps {
   isVerified: boolean;
@@ -18,39 +17,41 @@ const IdVerification = ({ isVerified, onVerificationChange }: IdVerificationProp
     try {
       // In a real app, redirect to a KYC provider
       // For this demo, we'll simulate verification
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) {
-        throw new Error("User not found");
+        throw new Error('User not found');
       }
-      
+
       // Update the profile with verification metadata
       const { error } = await supabase
-        .from("profiles")
-        .update({ 
+        .from('profiles')
+        .update({
           id_verified: true,
           is_verified: true,
-          verification_document_url: "id:verified",
-          document_verification_status: "approved"
+          verification_document_url: 'id:verified',
+          document_verification_status: 'approved',
         })
-        .eq("id", user.id);
-      
+        .eq('id', user.id);
+
       if (error) throw error;
-      
+
       toast({
         title: "Vérification d'identité",
-        description: "Votre identité a été vérifiée avec succès",
+        description: 'Votre identité a été vérifiée avec succès',
       });
-      
+
       // Notify parent component of the verification change
       if (onVerificationChange) {
         onVerificationChange(true);
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Could not complete verification. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Could not complete verification. Please try again.',
+        variant: 'destructive',
       });
     }
   };
@@ -61,7 +62,9 @@ const IdVerification = ({ isVerified, onVerificationChange }: IdVerificationProp
         <ShieldCheck className="h-5 w-5 text-islamic-teal dark:text-islamic-brightGold" />
         <div>
           <Label className="text-islamic-burgundy dark:text-islamic-cream">ID Verification</Label>
-          <p className="text-xs text-gray-500 dark:text-islamic-cream/70">Verify your identity for maximum trust</p>
+          <p className="text-xs text-gray-500 dark:text-islamic-cream/70">
+            Verify your identity for maximum trust
+          </p>
         </div>
       </div>
       <div>
@@ -74,11 +77,7 @@ const IdVerification = ({ isVerified, onVerificationChange }: IdVerificationProp
             Verified
           </Badge>
         ) : (
-          <CustomButton
-            size="sm"
-            variant="gold"
-            onClick={startIdVerification}
-          >
+          <CustomButton size="sm" variant="gold" onClick={startIdVerification}>
             Verify ID
           </CustomButton>
         )}

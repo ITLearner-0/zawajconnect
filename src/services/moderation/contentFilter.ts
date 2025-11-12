@@ -1,4 +1,3 @@
-
 import { ContentFlag } from '@/types/profile';
 
 interface FlaggedContent {
@@ -28,31 +27,31 @@ export const filterMessageContent = (content: string): FlaggedContent => {
     { term: 'phone number', flag: 'suspicious' as const, severity: 'low' as const },
     { term: 'address', flag: 'suspicious' as const, severity: 'low' as const },
   ];
-  
+
   let filteredContent = content;
   const flags: { flag_type: ContentFlag['flag_type']; severity: ContentFlag['severity'] }[] = [];
   let isFiltered = false;
-  
+
   // Check for inappropriate terms
-  inappropriateTerms.forEach(item => {
+  inappropriateTerms.forEach((item) => {
     const regex = new RegExp(item.term, 'gi');
     if (regex.test(content)) {
       filteredContent = filteredContent.replace(regex, '***');
       isFiltered = true;
-      
+
       // Add flag if not already added for this type
-      if (!flags.some(f => f.flag_type === item.flag)) {
+      if (!flags.some((f) => f.flag_type === item.flag)) {
         flags.push({
           flag_type: item.flag,
-          severity: item.severity
+          severity: item.severity,
         });
       }
     }
   });
-  
+
   return {
     flags,
     isFiltered,
-    filteredContent
+    filteredContent,
   };
 };

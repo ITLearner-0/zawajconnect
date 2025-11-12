@@ -1,9 +1,9 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { sendEmail } from "../_shared/smtp.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { sendEmail } from '../_shared/smtp.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface NewsletterRequest {
@@ -17,57 +17,58 @@ interface NewsletterRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { user_id, edition_number, featured_articles }: NewsletterRequest = await req.json();
 
-    console.log("Sending newsletter to user:", user_id);
+    console.log('Sending newsletter to user:', user_id);
 
     // Get user email from Supabase
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
     const profileResponse = await fetch(
       `${supabaseUrl}/rest/v1/profiles?user_id=eq.${user_id}&select=full_name`,
       {
         headers: {
-          "apikey": supabaseKey!,
-          "Authorization": `Bearer ${supabaseKey}`,
+          apikey: supabaseKey!,
+          Authorization: `Bearer ${supabaseKey}`,
         },
       }
     );
 
     const profiles = await profileResponse.json();
-    const userName = profiles[0]?.full_name || "Cher membre";
+    const userName = profiles[0]?.full_name || 'Cher membre';
 
-    const userResponse = await fetch(
-      `${supabaseUrl}/auth/v1/admin/users/${user_id}`,
-      {
-        headers: {
-          "apikey": supabaseKey!,
-          "Authorization": `Bearer ${supabaseKey}`,
-        },
-      }
-    );
+    const userResponse = await fetch(`${supabaseUrl}/auth/v1/admin/users/${user_id}`, {
+      headers: {
+        apikey: supabaseKey!,
+        Authorization: `Bearer ${supabaseKey}`,
+      },
+    });
 
     const userData = await userResponse.json();
     const userEmail = userData.email;
 
     if (!userEmail) {
-      throw new Error("User email not found");
+      throw new Error('User email not found');
     }
 
     // Build articles HTML
-    const articlesHtml = featured_articles.map(article => `
+    const articlesHtml = featured_articles
+      .map(
+        (article) => `
       <div style="background: #f8f9fa; padding: 20px; margin: 15px 0; border-radius: 8px; border-left: 4px solid #7C3AED;">
         <h3 style="color: #2D3748; margin: 0 0 10px 0; font-size: 18px;">${article.title}</h3>
         <p style="color: #4A5568; margin: 0 0 15px 0; line-height: 1.6;">${article.content}</p>
         <a href="${article.link}" style="color: #7C3AED; text-decoration: none; font-weight: 600;">Lire la suite →</a>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     await sendEmail({
       to: userEmail,
@@ -138,24 +139,21 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Newsletter sent successfully to:", userEmail);
+    console.log('Newsletter sent successfully to:', userEmail);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         ...corsHeaders,
       },
     });
   } catch (error: any) {
-    console.error("Error in send-newsletter function:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    console.error('Error in send-newsletter function:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
   }
 };
 

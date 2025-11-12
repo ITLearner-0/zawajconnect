@@ -7,9 +7,38 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar, Star, Trash2, Edit, Eye, Clock, Filter, StarOff, Download, Tag, X, Plus, ArrowUpDown, BarChart3, FileText, CheckSquare } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Calendar,
+  Star,
+  Trash2,
+  Edit,
+  Eye,
+  Clock,
+  Filter,
+  StarOff,
+  Download,
+  Tag,
+  X,
+  Plus,
+  ArrowUpDown,
+  BarChart3,
+  FileText,
+  CheckSquare,
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ProfileComparator from '@/components/ProfileComparator';
 import StarRating from '@/components/StarRating';
@@ -79,9 +108,9 @@ const Compare = () => {
   useEffect(() => {
     // Extract all unique tags from history
     const tags = new Set<string>();
-    history.forEach(item => {
+    history.forEach((item) => {
       if (item.tags && Array.isArray(item.tags)) {
-        item.tags.forEach(tag => tags.add(tag));
+        item.tags.forEach((tag) => tags.add(tag));
       }
     });
     setAvailableTags(Array.from(tags).sort());
@@ -103,9 +132,9 @@ const Compare = () => {
     } catch (error) {
       console.error('Error fetching comparison history:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible de charger l'historique des comparaisons",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -128,24 +157,24 @@ const Compare = () => {
         filterDate.setMonth(now.getMonth() - 1);
       }
 
-      filtered = filtered.filter(item => new Date(item.created_at) >= filterDate);
+      filtered = filtered.filter((item) => new Date(item.created_at) >= filterDate);
     }
 
     // Filter by favorites
     if (favoritesOnly) {
-      filtered = filtered.filter(item => item.is_favorite);
+      filtered = filtered.filter((item) => item.is_favorite);
     }
 
     // Filter by tags (OR logic - show if ANY selected tag matches)
     if (selectedTags.length > 0) {
-      filtered = filtered.filter(item => 
-        item.tags && item.tags.some(tag => selectedTags.includes(tag))
+      filtered = filtered.filter(
+        (item) => item.tags && item.tags.some((tag) => selectedTags.includes(tag))
       );
     }
 
     // Filter by rating
     if (ratingFilter !== null) {
-      filtered = filtered.filter(item => item.rating === ratingFilter);
+      filtered = filtered.filter((item) => item.rating === ratingFilter);
     }
 
     // Sort
@@ -186,15 +215,15 @@ const Compare = () => {
         .update({
           comparison_name: editName || null,
           notes: editNotes || null,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', editingComparison.id);
 
       if (error) throw error;
 
       toast({
-        title: "Succès",
-        description: "Comparaison mise à jour"
+        title: 'Succès',
+        description: 'Comparaison mise à jour',
       });
 
       setShowEditDialog(false);
@@ -202,9 +231,9 @@ const Compare = () => {
     } catch (error) {
       console.error('Error updating comparison:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour la comparaison",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour la comparaison',
+        variant: 'destructive',
       });
     }
   };
@@ -215,26 +244,26 @@ const Compare = () => {
         .from('profile_comparison_history')
         .update({
           is_favorite: !comparison.is_favorite,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', comparison.id);
 
       if (error) throw error;
 
       toast({
-        title: comparison.is_favorite ? "Retiré des favoris" : "Ajouté aux favoris",
-        description: comparison.is_favorite 
+        title: comparison.is_favorite ? 'Retiré des favoris' : 'Ajouté aux favoris',
+        description: comparison.is_favorite
           ? "Cette comparaison n'est plus dans vos favoris"
-          : "Cette comparaison est maintenant dans vos favoris"
+          : 'Cette comparaison est maintenant dans vos favoris',
       });
 
       fetchHistory();
     } catch (error) {
       console.error('Error toggling favorite:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de modifier le favori",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de modifier le favori',
+        variant: 'destructive',
       });
     }
   };
@@ -254,7 +283,7 @@ const Compare = () => {
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setEditingTags(editingTags.filter(tag => tag !== tagToRemove));
+    setEditingTags(editingTags.filter((tag) => tag !== tagToRemove));
   };
 
   const handleSaveTags = async () => {
@@ -265,15 +294,15 @@ const Compare = () => {
         .from('profile_comparison_history')
         .update({
           tags: editingTags,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', tagEditingComparison.id);
 
       if (error) throw error;
 
       toast({
-        title: "Succès",
-        description: "Tags mis à jour"
+        title: 'Succès',
+        description: 'Tags mis à jour',
       });
 
       setShowTagsDialog(false);
@@ -281,18 +310,16 @@ const Compare = () => {
     } catch (error) {
       console.error('Error updating tags:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour les tags",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour les tags',
+        variant: 'destructive',
       });
     }
   };
 
   const toggleTagFilter = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
     );
   };
 
@@ -302,24 +329,24 @@ const Compare = () => {
         .from('profile_comparison_history')
         .update({
           rating: newRating === 0 ? null : newRating,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', comparisonId);
 
       if (error) throw error;
 
       toast({
-        title: newRating === 0 ? "Note retirée" : "Note enregistrée",
-        description: newRating === 0 ? "La note a été supprimée" : `Note: ${newRating}/5 étoiles`
+        title: newRating === 0 ? 'Note retirée' : 'Note enregistrée',
+        description: newRating === 0 ? 'La note a été supprimée' : `Note: ${newRating}/5 étoiles`,
       });
 
       fetchHistory();
     } catch (error) {
       console.error('Error updating rating:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour la note",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour la note',
+        variant: 'destructive',
       });
     }
   };
@@ -328,32 +355,29 @@ const Compare = () => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette comparaison ?')) return;
 
     try {
-      const { error } = await supabase
-        .from('profile_comparison_history')
-        .delete()
-        .eq('id', id);
+      const { error } = await supabase.from('profile_comparison_history').delete().eq('id', id);
 
       if (error) throw error;
 
       toast({
-        title: "Supprimé",
-        description: "Comparaison supprimée avec succès"
+        title: 'Supprimé',
+        description: 'Comparaison supprimée avec succès',
       });
 
       fetchHistory();
     } catch (error) {
       console.error('Error deleting comparison:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la comparaison",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de supprimer la comparaison',
+        variant: 'destructive',
       });
     }
   };
 
   const handleExportPdf = async () => {
     if (!selectedComparison || !user) return;
-    
+
     setExportingPdf(true);
     try {
       // Fetch profiles data with user_id
@@ -368,13 +392,13 @@ const Compare = () => {
       }
 
       // Get user IDs from profiles
-      const userIds = profiles.map(p => p.user_id).filter(Boolean);
+      const userIds = profiles.map((p) => p.user_id).filter(Boolean);
 
       // Calculate real compatibility scores using the unified compatibility hook
       const compatibilityResults = await batchCalculateCompatibility(userIds);
 
       // Map compatibility results to scores by profile ID
-      const scores = profiles.map(profile => {
+      const scores = profiles.map((profile) => {
         const result = compatibilityResults[profile.user_id];
         return {
           profileId: profile.id,
@@ -389,7 +413,7 @@ const Compare = () => {
         comparisonName: selectedComparison.comparison_name || 'Comparaison sans titre',
         comparisonDate: format(new Date(selectedComparison.created_at), 'PPP', { locale: fr }),
         data: {
-          profiles: profiles.map(p => ({
+          profiles: profiles.map((p) => ({
             id: p.id,
             full_name: p.full_name || 'Non renseigné',
             age: p.age || 0,
@@ -404,15 +428,15 @@ const Compare = () => {
       });
 
       toast({
-        title: "Export réussi",
-        description: "Le PDF a été téléchargé avec les scores réels de compatibilité"
+        title: 'Export réussi',
+        description: 'Le PDF a été téléchargé avec les scores réels de compatibilité',
       });
     } catch (error) {
       console.error('Error exporting PDF:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'exporter le PDF",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setExportingPdf(false);
@@ -420,9 +444,9 @@ const Compare = () => {
   };
 
   const toggleSelectForExport = (comparisonId: string) => {
-    setSelectedForExport(prev =>
+    setSelectedForExport((prev) =>
       prev.includes(comparisonId)
-        ? prev.filter(id => id !== comparisonId)
+        ? prev.filter((id) => id !== comparisonId)
         : [...prev, comparisonId]
     );
   };
@@ -431,7 +455,7 @@ const Compare = () => {
     if (selectedForExport.length === filteredHistory.length) {
       setSelectedForExport([]);
     } else {
-      setSelectedForExport(filteredHistory.map(c => c.id));
+      setSelectedForExport(filteredHistory.map((c) => c.id));
     }
   };
 
@@ -443,7 +467,7 @@ const Compare = () => {
       // Fetch data for all selected comparisons
       const comparisonsData = await Promise.all(
         selectedForExport.map(async (compId) => {
-          const comparison = history.find(h => h.id === compId);
+          const comparison = history.find((h) => h.id === compId);
           if (!comparison) return null;
 
           // Fetch profiles
@@ -455,10 +479,10 @@ const Compare = () => {
           if (profilesError || !profiles || profiles.length === 0) return null;
 
           // Calculate compatibility
-          const userIds = profiles.map(p => p.user_id).filter(Boolean);
+          const userIds = profiles.map((p) => p.user_id).filter(Boolean);
           const compatibilityResults = await batchCalculateCompatibility(userIds);
 
-          const scores = profiles.map(profile => {
+          const scores = profiles.map((profile) => {
             const result = compatibilityResults[profile.user_id];
             return {
               profileId: profile.id,
@@ -471,10 +495,12 @@ const Compare = () => {
 
           return {
             id: comparison.id,
-            name: comparison.comparison_name || `Comparaison du ${format(new Date(comparison.created_at), 'PPP', { locale: fr })}`,
+            name:
+              comparison.comparison_name ||
+              `Comparaison du ${format(new Date(comparison.created_at), 'PPP', { locale: fr })}`,
             date: format(new Date(comparison.created_at), 'PPP', { locale: fr }),
             data: {
-              profiles: profiles.map(p => ({
+              profiles: profiles.map((p) => ({
                 id: p.id,
                 full_name: p.full_name || 'Non renseigné',
                 age: p.age || 0,
@@ -490,7 +516,7 @@ const Compare = () => {
         })
       );
 
-      const validComparisons = comparisonsData.filter(c => c !== null);
+      const validComparisons = comparisonsData.filter((c) => c !== null);
 
       if (validComparisons.length === 0) {
         throw new Error('No valid comparisons to export');
@@ -503,17 +529,17 @@ const Compare = () => {
       });
 
       toast({
-        title: "Export réussi",
-        description: `${validComparisons.length} comparaison(s) exportée(s) en PDF consolidé`
+        title: 'Export réussi',
+        description: `${validComparisons.length} comparaison(s) exportée(s) en PDF consolidé`,
       });
 
       setSelectedForExport([]);
     } catch (error) {
       console.error('Error exporting multiple PDFs:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'exporter les comparaisons",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setExportingMultiple(false);
@@ -546,12 +572,16 @@ const Compare = () => {
             </p>
           </div>
           <Button
-            variant={showStatistics ? "default" : "outline"}
+            variant={showStatistics ? 'default' : 'outline'}
             onClick={() => setShowStatistics(!showStatistics)}
-            className={showStatistics ? "bg-emerald text-white" : "border-emerald text-emerald hover:bg-emerald hover:text-white"}
+            className={
+              showStatistics
+                ? 'bg-emerald text-white'
+                : 'border-emerald text-emerald hover:bg-emerald hover:text-white'
+            }
           >
             <BarChart3 className="h-4 w-4 mr-2" />
-            {showStatistics ? "Masquer statistiques" : "Voir statistiques"}
+            {showStatistics ? 'Masquer statistiques' : 'Voir statistiques'}
           </Button>
         </div>
 
@@ -584,9 +614,11 @@ const Compare = () => {
 
                 <div className="flex items-center gap-2">
                   <Star className="h-4 w-4 text-muted-foreground" />
-                  <Select 
-                    value={ratingFilter?.toString() || 'all'} 
-                    onValueChange={(value) => setRatingFilter(value === 'all' ? null : parseInt(value))}
+                  <Select
+                    value={ratingFilter?.toString() || 'all'}
+                    onValueChange={(value) =>
+                      setRatingFilter(value === 'all' ? null : parseInt(value))
+                    }
                   >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Toutes les notes" />
@@ -616,12 +648,16 @@ const Compare = () => {
                 </div>
 
                 <Button
-                  variant={favoritesOnly ? "default" : "outline"}
+                  variant={favoritesOnly ? 'default' : 'outline'}
                   onClick={() => setFavoritesOnly(!favoritesOnly)}
-                  className={favoritesOnly ? "bg-gold text-white" : "border-gold text-gold hover:bg-gold hover:text-white"}
+                  className={
+                    favoritesOnly
+                      ? 'bg-gold text-white'
+                      : 'border-gold text-gold hover:bg-gold hover:text-white'
+                  }
                 >
                   <Star className="h-4 w-4 mr-2" />
-                  {favoritesOnly ? "Afficher tout" : "Favoris uniquement"}
+                  {favoritesOnly ? 'Afficher tout' : 'Favoris uniquement'}
                 </Button>
 
                 <Button
@@ -634,12 +670,18 @@ const Compare = () => {
 
                 {filteredHistory.length > 0 && (
                   <Button
-                    variant={selectedForExport.length > 0 ? "default" : "outline"}
+                    variant={selectedForExport.length > 0 ? 'default' : 'outline'}
                     onClick={selectAllForExport}
-                    className={selectedForExport.length > 0 ? "bg-gold text-white" : "border-gold text-gold hover:bg-gold hover:text-white"}
+                    className={
+                      selectedForExport.length > 0
+                        ? 'bg-gold text-white'
+                        : 'border-gold text-gold hover:bg-gold hover:text-white'
+                    }
                   >
                     <CheckSquare className="h-4 w-4 mr-2" />
-                    {selectedForExport.length === filteredHistory.length ? "Tout désélectionner" : "Tout sélectionner"}
+                    {selectedForExport.length === filteredHistory.length
+                      ? 'Tout désélectionner'
+                      : 'Tout sélectionner'}
                   </Button>
                 )}
               </div>
@@ -649,10 +691,10 @@ const Compare = () => {
                 <div className="flex flex-wrap items-center gap-2">
                   <Tag className="h-4 w-4 text-muted-foreground" />
                   <span className="text-sm text-muted-foreground">Filtrer par tags:</span>
-                  {availableTags.map(tag => (
+                  {availableTags.map((tag) => (
                     <Badge
                       key={tag}
-                      variant={selectedTags.includes(tag) ? "default" : "outline"}
+                      variant={selectedTags.includes(tag) ? 'default' : 'outline'}
                       className={`cursor-pointer transition-colors ${
                         selectedTags.includes(tag)
                           ? 'bg-emerald text-white hover:bg-emerald/90'
@@ -685,16 +727,18 @@ const Compare = () => {
             <CardContent className="p-12 text-center">
               <Calendar className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">
-                {history.length === 0 
-                  ? "Aucune comparaison" 
-                  : "Aucune comparaison trouvée"}
+                {history.length === 0 ? 'Aucune comparaison' : 'Aucune comparaison trouvée'}
               </h3>
               <p className="text-muted-foreground mb-4">
                 {history.length === 0
-                  ? "Commencez à comparer des profils depuis la page Découvrir"
-                  : "Aucune comparaison ne correspond aux filtres sélectionnés"}
+                  ? 'Commencez à comparer des profils depuis la page Découvrir'
+                  : 'Aucune comparaison ne correspond aux filtres sélectionnés'}
               </p>
-              <Button onClick={() => navigate('/browse')} variant="outline" className="border-emerald text-emerald hover:bg-emerald hover:text-white">
+              <Button
+                onClick={() => navigate('/browse')}
+                variant="outline"
+                className="border-emerald text-emerald hover:bg-emerald hover:text-white"
+              >
                 Découvrir des profils
               </Button>
             </CardContent>
@@ -717,11 +761,10 @@ const Compare = () => {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-lg font-semibold">
-                          {comparison.comparison_name || `Comparaison du ${format(new Date(comparison.created_at), 'PPP', { locale: fr })}`}
+                          {comparison.comparison_name ||
+                            `Comparaison du ${format(new Date(comparison.created_at), 'PPP', { locale: fr })}`}
                         </h3>
-                        {comparison.is_favorite && (
-                          <Star className="h-5 w-5 text-gold fill-gold" />
-                        )}
+                        {comparison.is_favorite && <Star className="h-5 w-5 text-gold fill-gold" />}
                       </div>
 
                       <div className="flex items-center gap-2 mb-3">
@@ -750,7 +793,7 @@ const Compare = () => {
 
                       {comparison.tags && comparison.tags.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
-                          {comparison.tags.map(tag => (
+                          {comparison.tags.map((tag) => (
                             <Badge key={tag} variant="secondary" className="text-xs">
                               {tag}
                             </Badge>
@@ -822,9 +865,7 @@ const Compare = () => {
           <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <div className="flex items-center justify-between">
-                <DialogTitle>
-                  {selectedComparison?.comparison_name || 'Comparaison'}
-                </DialogTitle>
+                <DialogTitle>{selectedComparison?.comparison_name || 'Comparaison'}</DialogTitle>
                 <Button
                   onClick={handleExportPdf}
                   disabled={exportingPdf}
@@ -888,7 +929,10 @@ const Compare = () => {
               <Button variant="outline" onClick={() => setShowEditDialog(false)}>
                 Annuler
               </Button>
-              <Button onClick={handleSaveEdit} className="bg-emerald text-white hover:bg-emerald-dark">
+              <Button
+                onClick={handleSaveEdit}
+                className="bg-emerald text-white hover:bg-emerald-dark"
+              >
                 Enregistrer
               </Button>
             </DialogFooter>
@@ -908,11 +952,11 @@ const Compare = () => {
                   {editingTags.length === 0 ? (
                     <span className="text-sm text-muted-foreground">Aucun tag</span>
                   ) : (
-                    editingTags.map(tag => (
+                    editingTags.map((tag) => (
                       <Badge key={tag} variant="secondary" className="flex items-center gap-1">
                         {tag}
-                        <X 
-                          className="h-3 w-3 cursor-pointer hover:text-destructive" 
+                        <X
+                          className="h-3 w-3 cursor-pointer hover:text-destructive"
                           onClick={() => handleRemoveTag(tag)}
                         />
                       </Badge>
@@ -929,7 +973,7 @@ const Compare = () => {
                     placeholder="Ex: Candidats prioritaires, À revoir..."
                     onKeyPress={(e) => e.key === 'Enter' && handleAddTag()}
                   />
-                  <Button 
+                  <Button
                     onClick={handleAddTag}
                     variant="outline"
                     size="sm"
@@ -941,11 +985,13 @@ const Compare = () => {
               </div>
               {availableTags.length > 0 && (
                 <div>
-                  <label className="text-sm font-medium mb-2 block">Tags existants (cliquez pour ajouter)</label>
+                  <label className="text-sm font-medium mb-2 block">
+                    Tags existants (cliquez pour ajouter)
+                  </label>
                   <div className="flex flex-wrap gap-2">
                     {availableTags
-                      .filter(tag => !editingTags.includes(tag))
-                      .map(tag => (
+                      .filter((tag) => !editingTags.includes(tag))
+                      .map((tag) => (
                         <Badge
                           key={tag}
                           variant="outline"
@@ -963,7 +1009,10 @@ const Compare = () => {
               <Button variant="outline" onClick={() => setShowTagsDialog(false)}>
                 Annuler
               </Button>
-              <Button onClick={handleSaveTags} className="bg-emerald text-white hover:bg-emerald-dark">
+              <Button
+                onClick={handleSaveTags}
+                className="bg-emerald text-white hover:bg-emerald-dark"
+              >
                 Enregistrer
               </Button>
             </DialogFooter>
@@ -981,10 +1030,9 @@ const Compare = () => {
             className="bg-gradient-to-r from-gold to-emerald text-white shadow-2xl hover:shadow-gold/50 px-8 py-6 text-lg"
           >
             <FileText className="h-5 w-5 mr-2" />
-            {exportingMultiple 
-              ? 'Export en cours...' 
-              : `Exporter ${selectedForExport.length} comparaison(s) en PDF consolidé`
-            }
+            {exportingMultiple
+              ? 'Export en cours...'
+              : `Exporter ${selectedForExport.length} comparaison(s) en PDF consolidé`}
           </Button>
         </div>
       )}

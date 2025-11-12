@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useRateLimiting } from '@/hooks/useRateLimiting';
 import { useToast } from '@/components/ui/use-toast';
@@ -10,11 +9,11 @@ export const useRateLimitedMessaging = () => {
 
   const sendMessage = async (content: string, conversationId: string) => {
     setLoading(true);
-    
+
     try {
       // Check rate limit before sending message
       const allowed = checkRateLimit('message');
-      
+
       if (!allowed) {
         setLoading(false);
         return null;
@@ -24,7 +23,7 @@ export const useRateLimitedMessaging = () => {
       const response = await fetch('/api/messages', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content, conversationId })
+        body: JSON.stringify({ content, conversationId }),
       });
 
       if (!response.ok) {
@@ -32,19 +31,19 @@ export const useRateLimitedMessaging = () => {
       }
 
       const result = await response.json();
-      
+
       toast({
-        title: "Success",
-        description: "Message sent successfully",
+        title: 'Success',
+        description: 'Message sent successfully',
       });
 
       return result;
     } catch (error) {
       console.error('Failed to send message:', error);
       toast({
-        title: "Error",
-        description: "Failed to send message",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to send message',
+        variant: 'destructive',
       });
       return null;
     } finally {
@@ -54,15 +53,15 @@ export const useRateLimitedMessaging = () => {
 
   const uploadFile = async (file: File) => {
     setLoading(true);
-    
+
     try {
       // Check rate limit with custom config for file uploads
-      const allowed = checkRateLimit('fileUpload', { 
-        maxRequests: 10, 
+      const allowed = checkRateLimit('fileUpload', {
+        maxRequests: 10,
         windowMs: 60000, // 1 minute
-        blockDuration: 300000 // 5 minutes
+        blockDuration: 300000, // 5 minutes
       });
-      
+
       if (!allowed) {
         setLoading(false);
         return null;
@@ -74,7 +73,7 @@ export const useRateLimitedMessaging = () => {
 
       const response = await fetch('/api/upload', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       if (!response.ok) {
@@ -82,19 +81,19 @@ export const useRateLimitedMessaging = () => {
       }
 
       const result = await response.json();
-      
+
       toast({
-        title: "Success",
-        description: "File uploaded successfully",
+        title: 'Success',
+        description: 'File uploaded successfully',
       });
 
       return result;
     } catch (error) {
       console.error('Failed to upload file:', error);
       toast({
-        title: "Error",
-        description: "Failed to upload file",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to upload file',
+        variant: 'destructive',
       });
       return null;
     } finally {
@@ -105,6 +104,6 @@ export const useRateLimitedMessaging = () => {
   return {
     sendMessage,
     uploadFile,
-    loading
+    loading,
   };
 };

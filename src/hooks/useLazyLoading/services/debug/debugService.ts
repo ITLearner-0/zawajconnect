@@ -1,4 +1,3 @@
-
 import { DebugConfig, PerformanceMetrics, LazyLoadingEvent } from './types';
 import { DebugLogger } from './logger';
 import { PerformanceTracker } from './performanceTracker';
@@ -13,7 +12,7 @@ class LazyLoadingDebugService {
     logLevel: 'info',
     trackingPrefix: '[LazyLoading]',
   };
-  
+
   private logger: DebugLogger;
   private performanceTracker: PerformanceTracker;
   private eventTracker: EventTracker;
@@ -21,7 +20,10 @@ class LazyLoadingDebugService {
 
   private constructor() {
     this.logger = new DebugLogger(this.config);
-    this.performanceTracker = new PerformanceTracker(this.logger, this.config.enablePerformanceTracking);
+    this.performanceTracker = new PerformanceTracker(
+      this.logger,
+      this.config.enablePerformanceTracking
+    );
     this.eventTracker = new EventTracker(this.logger, this.config.enableLogging);
     this.reportGenerator = new ReportGenerator(this.config);
   }
@@ -36,7 +38,10 @@ class LazyLoadingDebugService {
   configure(config: Partial<DebugConfig>): void {
     this.config = { ...this.config, ...config };
     this.logger = new DebugLogger(this.config);
-    this.performanceTracker = new PerformanceTracker(this.logger, this.config.enablePerformanceTracking);
+    this.performanceTracker = new PerformanceTracker(
+      this.logger,
+      this.config.enablePerformanceTracking
+    );
     this.eventTracker = new EventTracker(this.logger, this.config.enableLogging);
     this.reportGenerator = new ReportGenerator(this.config);
   }

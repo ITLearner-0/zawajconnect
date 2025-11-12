@@ -43,7 +43,8 @@ const Chat = () => {
           <div>
             <h2 className="text-2xl font-bold mb-2">Messagerie Premium</h2>
             <p className="text-muted-foreground">
-              La messagerie est réservée aux membres Premium. Passez Premium pour discuter avec vos matches.
+              La messagerie est réservée aux membres Premium. Passez Premium pour discuter avec vos
+              matches.
             </p>
           </div>
           <Button
@@ -67,10 +68,7 @@ const Chat = () => {
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
         <div className="flex items-center gap-4 mb-4 pb-4 border-b">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/matches')}
-          >
+          <Button variant="ghost" onClick={() => navigate('/matches')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour
           </Button>
@@ -80,10 +78,7 @@ const Chat = () => {
         <div className="flex gap-4 h-[calc(100vh-10rem)]">
           {/* Chat List - 30% */}
           <div className="w-[30%] border-r pr-4">
-            <ChatList 
-              onChatSelect={handleChatSelect}
-              selectedChatId={selectedChatId}
-            />
+            <ChatList onChatSelect={handleChatSelect} selectedChatId={selectedChatId} />
           </div>
 
           {/* Chat Window - 70% */}
@@ -94,9 +89,7 @@ const Chat = () => {
               <div className="h-full flex items-center justify-center border rounded-lg bg-muted/20">
                 <div className="text-center p-6">
                   <MessageCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">
-                    Sélectionnez une conversation
-                  </h3>
+                  <h3 className="text-lg font-semibold mb-2">Sélectionnez une conversation</h3>
                   <p className="text-muted-foreground">
                     Choisissez une conversation dans la liste pour commencer à discuter
                   </p>

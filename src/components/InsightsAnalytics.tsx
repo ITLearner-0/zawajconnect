@@ -6,8 +6,8 @@ import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  TrendingUp, 
+import {
+  TrendingUp,
   TrendingDown,
   BarChart3,
   PieChart,
@@ -21,7 +21,7 @@ import {
   AlertTriangle,
   CheckCircle,
   Calendar,
-  Activity
+  Activity,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -75,60 +75,59 @@ const InsightsAnalytics: React.FC = () => {
       startDate.setDate(startDate.getDate() - daysBack);
 
       // Charger les données en parallèle
-      const [
-        profilesData,
-        matchesData,
-        familyData,
-        moderationData,
-        messagesData
-      ] = await Promise.all([
-        // Profils utilisateurs
-        supabase
-          .from('profiles')
-          .select('id, age, location, created_at')
-          .gte('created_at', startDate.toISOString()),
-        
-        // Matches
-        supabase
-          .from('matches')
-          .select('id, is_mutual, created_at, family_supervision_required')
-          .gte('created_at', startDate.toISOString()),
-        
-        // Supervision familiale
-        supabase
-          .from('family_members')
-          .select('id, is_wali, invitation_status, created_at')
-          .eq('invitation_status', 'accepted'),
-        
-        // Logs de modération
-        supabase
-          .from('moderation_logs')
-          .select('id, action_taken, confidence_score, created_at')
-          .gte('created_at', startDate.toISOString()),
-        
-        // Messages
-        supabase
-          .from('messages')
-          .select('id, created_at')
-          .gte('created_at', startDate.toISOString())
-      ]);
+      const [profilesData, matchesData, familyData, moderationData, messagesData] =
+        await Promise.all([
+          // Profils utilisateurs
+          supabase
+            .from('profiles')
+            .select('id, age, location, created_at')
+            .gte('created_at', startDate.toISOString()),
+
+          // Matches
+          supabase
+            .from('matches')
+            .select('id, is_mutual, created_at, family_supervision_required')
+            .gte('created_at', startDate.toISOString()),
+
+          // Supervision familiale
+          supabase
+            .from('family_members')
+            .select('id, is_wali, invitation_status, created_at')
+            .eq('invitation_status', 'accepted'),
+
+          // Logs de modération
+          supabase
+            .from('moderation_logs')
+            .select('id, action_taken, confidence_score, created_at')
+            .gte('created_at', startDate.toISOString()),
+
+          // Messages
+          supabase
+            .from('messages')
+            .select('id, created_at')
+            .gte('created_at', startDate.toISOString()),
+        ]);
 
       // Traitement des données
       const totalUsers = profilesData.data?.length || 0;
-      const activeMatches = matchesData.data?.filter(m => m.is_mutual)?.length || 0;
-      const familySupervision = familyData.data?.filter(f => f.is_wali)?.length || 0;
-      const moderationAlerts = moderationData.data?.filter(m => m.action_taken === 'blocked')?.length || 0;
+      const activeMatches = matchesData.data?.filter((m) => m.is_mutual)?.length || 0;
+      const familySupervision = familyData.data?.filter((f) => f.is_wali)?.length || 0;
+      const moderationAlerts =
+        moderationData.data?.filter((m) => m.action_taken === 'blocked')?.length || 0;
 
       // Calcul des tendances (simulation pour la démo)
       const prevPeriodUsers = Math.floor(totalUsers * 0.85);
-      const userGrowth = prevPeriodUsers > 0 ? Math.round(((totalUsers - prevPeriodUsers) / prevPeriodUsers) * 100) : 0;
+      const userGrowth =
+        prevPeriodUsers > 0
+          ? Math.round(((totalUsers - prevPeriodUsers) / prevPeriodUsers) * 100)
+          : 0;
 
       // Données démographiques
       const ageGroups = [
         { range: '18-25', count: Math.floor(totalUsers * 0.35), percentage: 35 },
         { range: '26-35', count: Math.floor(totalUsers * 0.45), percentage: 45 },
         { range: '36-45', count: Math.floor(totalUsers * 0.15), percentage: 15 },
-        { range: '45+', count: Math.floor(totalUsers * 0.05), percentage: 5 }
+        { range: '45+', count: Math.floor(totalUsers * 0.05), percentage: 5 },
       ];
 
       const locations = [
@@ -136,14 +135,14 @@ const InsightsAnalytics: React.FC = () => {
         { city: 'Lyon', count: Math.floor(totalUsers * 0.15), percentage: 15 },
         { city: 'Marseille', count: Math.floor(totalUsers * 0.12), percentage: 12 },
         { city: 'Toulouse', count: Math.floor(totalUsers * 0.08), percentage: 8 },
-        { city: 'Autres', count: Math.floor(totalUsers * 0.40), percentage: 40 }
+        { city: 'Autres', count: Math.floor(totalUsers * 0.4), percentage: 40 },
       ];
 
       const religiousLevel = [
-        { level: 'Très pratiquant', count: Math.floor(totalUsers * 0.30), percentage: 30 },
+        { level: 'Très pratiquant', count: Math.floor(totalUsers * 0.3), percentage: 30 },
         { level: 'Pratiquant', count: Math.floor(totalUsers * 0.45), percentage: 45 },
-        { level: 'Modéré', count: Math.floor(totalUsers * 0.20), percentage: 20 },
-        { level: 'Débutant', count: Math.floor(totalUsers * 0.05), percentage: 5 }
+        { level: 'Modéré', count: Math.floor(totalUsers * 0.2), percentage: 20 },
+        { level: 'Débutant', count: Math.floor(totalUsers * 0.05), percentage: 5 },
       ];
 
       const analyticsData: AnalyticsData = {
@@ -152,37 +151,39 @@ const InsightsAnalytics: React.FC = () => {
           activeMatches,
           familySupervision,
           moderationAlerts,
-          successRate: activeMatches > 0 ? Math.round((activeMatches / (matchesData.data?.length || 1)) * 100) : 0,
-          avgResponseTime: 2.4 // heures
+          successRate:
+            activeMatches > 0
+              ? Math.round((activeMatches / (matchesData.data?.length || 1)) * 100)
+              : 0,
+          avgResponseTime: 2.4, // heures
         },
         trends: {
           userGrowth,
           matchIncrease: 12,
           moderationEfficiency: 95,
-          familyAdoption: 68
+          familyAdoption: 68,
         },
         demographics: {
           ageGroups,
           locations,
-          religiousLevel
+          religiousLevel,
         },
         moderation: {
           totalReviews: moderationData.data?.length || 0,
           averageScore: 92,
           flaggedContent: moderationAlerts,
           falsePositives: Math.floor(moderationAlerts * 0.03),
-          responseTime: 1.2
-        }
+          responseTime: 1.2,
+        },
       };
 
       setData(analyticsData);
-
     } catch (error) {
       console.error('Error loading analytics:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données analytiques",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données analytiques',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -229,7 +230,7 @@ const InsightsAnalytics: React.FC = () => {
             Aperçu des performances et tendances de la plateforme
           </p>
         </div>
-        
+
         <div className="flex gap-2">
           {(['7d', '30d', '90d'] as const).map((period) => (
             <Button
@@ -252,9 +253,10 @@ const InsightsAnalytics: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Utilisateurs Actifs</p>
                 <p className="text-2xl font-bold">{data.overview.totalUsers}</p>
-                <div className={`flex items-center gap-1 text-sm ${getTrendColor(data.trends.userGrowth)}`}>
-                  {getTrendIcon(data.trends.userGrowth)}
-                  +{data.trends.userGrowth}%
+                <div
+                  className={`flex items-center gap-1 text-sm ${getTrendColor(data.trends.userGrowth)}`}
+                >
+                  {getTrendIcon(data.trends.userGrowth)}+{data.trends.userGrowth}%
                 </div>
               </div>
               <Users className="h-8 w-8 text-blue-500" />
@@ -268,9 +270,10 @@ const InsightsAnalytics: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Matches Actifs</p>
                 <p className="text-2xl font-bold">{data.overview.activeMatches}</p>
-                <div className={`flex items-center gap-1 text-sm ${getTrendColor(data.trends.matchIncrease)}`}>
-                  {getTrendIcon(data.trends.matchIncrease)}
-                  +{data.trends.matchIncrease}%
+                <div
+                  className={`flex items-center gap-1 text-sm ${getTrendColor(data.trends.matchIncrease)}`}
+                >
+                  {getTrendIcon(data.trends.matchIncrease)}+{data.trends.matchIncrease}%
                 </div>
               </div>
               <Heart className="h-8 w-8 text-red-500" />
@@ -284,9 +287,10 @@ const InsightsAnalytics: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Supervision Familiale</p>
                 <p className="text-2xl font-bold">{data.overview.familySupervision}</p>
-                <div className={`flex items-center gap-1 text-sm ${getTrendColor(data.trends.familyAdoption)}`}>
-                  {getTrendIcon(data.trends.familyAdoption)}
-                  +{data.trends.familyAdoption}%
+                <div
+                  className={`flex items-center gap-1 text-sm ${getTrendColor(data.trends.familyAdoption)}`}
+                >
+                  {getTrendIcon(data.trends.familyAdoption)}+{data.trends.familyAdoption}%
                 </div>
               </div>
               <Shield className="h-8 w-8 text-green-500" />
@@ -343,7 +347,9 @@ const InsightsAnalytics: React.FC = () => {
                   <div key={group.range} className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>{group.range} ans</span>
-                      <span className="font-medium">{group.count} ({group.percentage}%)</span>
+                      <span className="font-medium">
+                        {group.count} ({group.percentage}%)
+                      </span>
                     </div>
                     <Progress value={group.percentage} className="h-2" />
                   </div>
@@ -360,7 +366,9 @@ const InsightsAnalytics: React.FC = () => {
                   <div key={location.city} className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>{location.city}</span>
-                      <span className="font-medium">{location.count} ({location.percentage}%)</span>
+                      <span className="font-medium">
+                        {location.count} ({location.percentage}%)
+                      </span>
                     </div>
                     <Progress value={location.percentage} className="h-2" />
                   </div>
@@ -377,7 +385,9 @@ const InsightsAnalytics: React.FC = () => {
                   <div key={level.level} className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>{level.level}</span>
-                      <span className="font-medium">{level.count} ({level.percentage}%)</span>
+                      <span className="font-medium">
+                        {level.count} ({level.percentage}%)
+                      </span>
                     </div>
                     <Progress value={level.percentage} className="h-2" />
                   </div>
@@ -401,7 +411,7 @@ const InsightsAnalytics: React.FC = () => {
                   </div>
                   <Progress value={85} className="h-2" />
                 </div>
-                
+
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm">Taux de conversion matches</span>
@@ -409,7 +419,7 @@ const InsightsAnalytics: React.FC = () => {
                   </div>
                   <Progress value={data.overview.successRate} className="h-2" />
                 </div>
-                
+
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm">Adoption supervision familiale</span>
@@ -429,21 +439,24 @@ const InsightsAnalytics: React.FC = () => {
                   <Alert>
                     <TrendingUp className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Croissance positive :</strong> +{data.trends.userGrowth}% nouveaux utilisateurs cette période
+                      <strong>Croissance positive :</strong> +{data.trends.userGrowth}% nouveaux
+                      utilisateurs cette période
                     </AlertDescription>
                   </Alert>
-                  
+
                   <Alert>
                     <Heart className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Matches en hausse :</strong> +{data.trends.matchIncrease}% de matches réussis
+                      <strong>Matches en hausse :</strong> +{data.trends.matchIncrease}% de matches
+                      réussis
                     </AlertDescription>
                   </Alert>
-                  
+
                   <Alert>
                     <Shield className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Modération efficace :</strong> {data.trends.moderationEfficiency}% de précision
+                      <strong>Modération efficace :</strong> {data.trends.moderationEfficiency}% de
+                      précision
                     </AlertDescription>
                   </Alert>
                 </div>
@@ -461,19 +474,27 @@ const InsightsAnalytics: React.FC = () => {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="text-center p-4 bg-muted/30 rounded-lg">
-                    <p className="text-2xl font-bold text-green-600">{data.moderation.totalReviews}</p>
+                    <p className="text-2xl font-bold text-green-600">
+                      {data.moderation.totalReviews}
+                    </p>
                     <p className="text-sm text-muted-foreground">Reviews Total</p>
                   </div>
                   <div className="text-center p-4 bg-muted/30 rounded-lg">
-                    <p className="text-2xl font-bold text-blue-600">{data.moderation.averageScore}%</p>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {data.moderation.averageScore}%
+                    </p>
                     <p className="text-sm text-muted-foreground">Score Moyen</p>
                   </div>
                   <div className="text-center p-4 bg-muted/30 rounded-lg">
-                    <p className="text-2xl font-bold text-orange-600">{data.moderation.flaggedContent}</p>
+                    <p className="text-2xl font-bold text-orange-600">
+                      {data.moderation.flaggedContent}
+                    </p>
                     <p className="text-sm text-muted-foreground">Contenus Signalés</p>
                   </div>
                   <div className="text-center p-4 bg-muted/30 rounded-lg">
-                    <p className="text-2xl font-bold text-red-600">{data.moderation.falsePositives}</p>
+                    <p className="text-2xl font-bold text-red-600">
+                      {data.moderation.falsePositives}
+                    </p>
                     <p className="text-sm text-muted-foreground">Faux Positifs</p>
                   </div>
                 </div>
@@ -493,7 +514,7 @@ const InsightsAnalytics: React.FC = () => {
                     </div>
                     <Progress value={95} className="h-2" />
                   </div>
-                  
+
                   <div>
                     <div className="flex justify-between mb-1">
                       <span className="text-sm">Temps de réponse</span>
@@ -501,7 +522,7 @@ const InsightsAnalytics: React.FC = () => {
                     </div>
                     <Progress value={88} className="h-2" />
                   </div>
-                  
+
                   <div>
                     <div className="flex justify-between mb-1">
                       <span className="text-sm">Satisfaction utilisateur</span>
@@ -529,13 +550,13 @@ const InsightsAnalytics: React.FC = () => {
                       <p className="text-2xl font-bold">4.8/5</p>
                       <p className="text-sm text-muted-foreground">Note Moyenne App</p>
                     </div>
-                    
+
                     <div className="text-center p-6 border rounded-lg">
                       <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
                       <p className="text-2xl font-bold">89%</p>
                       <p className="text-sm text-muted-foreground">Taux de Rétention</p>
                     </div>
-                    
+
                     <div className="text-center p-6 border rounded-lg">
                       <MessageSquare className="h-8 w-8 text-blue-500 mx-auto mb-2" />
                       <p className="text-2xl font-bold">2.3k</p>
@@ -546,8 +567,9 @@ const InsightsAnalytics: React.FC = () => {
                   <Alert>
                     <TrendingUp className="h-4 w-4" />
                     <AlertDescription>
-                      <strong>Performance Excellente :</strong> Tous les indicateurs sont au-dessus des objectifs. 
-                      La supervision familiale contribue positivement à la qualité des interactions.
+                      <strong>Performance Excellente :</strong> Tous les indicateurs sont au-dessus
+                      des objectifs. La supervision familiale contribue positivement à la qualité
+                      des interactions.
                     </AlertDescription>
                   </Alert>
                 </div>

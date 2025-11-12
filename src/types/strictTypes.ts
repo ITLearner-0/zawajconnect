@@ -1,4 +1,3 @@
-
 // Strict type definitions to improve type safety
 
 import { DatabaseId, EmailAddress, PhoneNumber } from './typeUtils';

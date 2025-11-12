@@ -14,7 +14,7 @@ import {
   Clock,
   CreditCard,
   Calendar,
-  DollarSign
+  DollarSign,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { logger } from '@/utils/logger';
@@ -51,7 +51,9 @@ export default function PaymentHistory() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [payments, setPayments] = useState<Payment[]>([]);
-  const [currentSubscription, setCurrentSubscription] = useState<Subscription | undefined>(undefined);
+  const [currentSubscription, setCurrentSubscription] = useState<Subscription | undefined>(
+    undefined
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
 
@@ -95,27 +97,37 @@ export default function PaymentHistory() {
       }
 
       // Map payments from subscriptions table (if payments table doesn't exist)
-      setPayments((paymentsData ?? []).map(sub => ({
-        id: sub.id,
-        user_id: sub.user_id,
-        plan_type: sub.plan_type ?? '',
-        amount: 0, // Amount not available in subscriptions table
-        currency: 'EUR',
-        status: (sub.status === 'active' ? 'completed' : 'pending') as 'completed' | 'pending' | 'failed' | 'refunded',
-        payment_method: '',
-        transaction_id: null,
-        created_at: sub.created_at,
-        updated_at: sub.created_at
-      })));
-      
-      setCurrentSubscription(subscriptionData ? {
-        ...subscriptionData,
-        plan_type: subscriptionData.plan_type ?? '',
-        status: (subscriptionData.status ?? 'active') as 'active' | 'cancelled' | 'expired',
-        start_date: subscriptionData.created_at,
-        expires_at: subscriptionData.expires_at ?? null,
-        auto_renew: false
-      } : undefined);
+      setPayments(
+        (paymentsData ?? []).map((sub) => ({
+          id: sub.id,
+          user_id: sub.user_id,
+          plan_type: sub.plan_type ?? '',
+          amount: 0, // Amount not available in subscriptions table
+          currency: 'EUR',
+          status: (sub.status === 'active' ? 'completed' : 'pending') as
+            | 'completed'
+            | 'pending'
+            | 'failed'
+            | 'refunded',
+          payment_method: '',
+          transaction_id: null,
+          created_at: sub.created_at,
+          updated_at: sub.created_at,
+        }))
+      );
+
+      setCurrentSubscription(
+        subscriptionData
+          ? {
+              ...subscriptionData,
+              plan_type: subscriptionData.plan_type ?? '',
+              status: (subscriptionData.status ?? 'active') as 'active' | 'cancelled' | 'expired',
+              start_date: subscriptionData.created_at,
+              expires_at: subscriptionData.expires_at ?? null,
+              auto_renew: false,
+            }
+          : undefined
+      );
 
       announce('Payment history loaded');
     } catch (err) {
@@ -166,7 +178,7 @@ export default function PaymentHistory() {
   const handleDownloadInvoice = async (paymentId: string) => {
     try {
       // Find the payment
-      const payment = payments.find(p => p.id === paymentId);
+      const payment = payments.find((p) => p.id === paymentId);
       if (!payment) {
         toast({
           title: 'Erreur',
@@ -200,13 +212,14 @@ export default function PaymentHistory() {
 
       toast({
         title: 'Facture téléchargée',
-        description: 'La fenêtre d\'impression s\'est ouverte. Vous pouvez enregistrer en PDF.',
+        description: "La fenêtre d'impression s'est ouverte. Vous pouvez enregistrer en PDF.",
       });
     } catch (error) {
       logger.error('Failed to download invoice', error);
       toast({
         title: 'Erreur',
-        description: error instanceof Error ? error.message : 'Impossible de télécharger la facture',
+        description:
+          error instanceof Error ? error.message : 'Impossible de télécharger la facture',
         variant: 'destructive',
       });
     }
@@ -226,18 +239,16 @@ export default function PaymentHistory() {
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
-          Payment History
-        </h1>
-        <p className="text-gray-600">
-          View your subscription and payment details
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment History</h1>
+        <p className="text-gray-600">View your subscription and payment details</p>
       </div>
 
       {error && (
         <Card className="mb-6 border-red-200 bg-red-50">
           <CardContent className="pt-6">
-            <p className="text-red-800" role="alert">{error}</p>
+            <p className="text-red-800" role="alert">
+              {error}
+            </p>
           </CardContent>
         </Card>
       )}
@@ -320,9 +331,7 @@ export default function PaymentHistory() {
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-semibold text-gray-900">
-                          {payment.plan_type}
-                        </h3>
+                        <h3 className="font-semibold text-gray-900">{payment.plan_type}</h3>
                         <Badge
                           className={getStatusColor(payment.status)}
                           aria-label={`Payment status: ${payment.status}`}
@@ -377,10 +386,7 @@ export default function PaymentHistory() {
         <CardContent className="pt-6">
           <p className="text-sm text-blue-900">
             <strong>Need help with billing?</strong> Contact our support team at{' '}
-            <a
-              href="mailto:billing@zawajconnect.com"
-              className="underline hover:text-blue-700"
-            >
+            <a href="mailto:billing@zawajconnect.com" className="underline hover:text-blue-700">
               billing@zawajconnect.com
             </a>
           </p>

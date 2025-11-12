@@ -1,4 +1,3 @@
-
 // Performance utilities for optimization
 export const performance = {
   // Debounce function
@@ -36,11 +35,11 @@ export const performance = {
     const start = globalThis.performance.now();
     const result = await operation();
     const duration = globalThis.performance.now() - start;
-    
+
     if (label) {
       console.log(`[Performance] ${label}: ${duration.toFixed(2)}ms`);
     }
-    
+
     return { result, duration };
   },
 

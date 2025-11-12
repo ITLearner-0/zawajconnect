@@ -1,17 +1,16 @@
-
-import { z } from "zod";
+import { z } from 'zod';
 
 export const profileFormSchema = z.object({
-  fullName: z.string().min(1, "Full name is required"),
-  age: z.string().min(1, "Age is required"),
-  gender: z.string().min(1, "Gender is required"),
-  location: z.string().min(1, "Location is required"),
+  fullName: z.string().min(1, 'Full name is required'),
+  age: z.string().min(1, 'Age is required'),
+  gender: z.string().min(1, 'Gender is required'),
+  location: z.string().min(1, 'Location is required'),
   education: z.string().optional(),
   occupation: z.string().optional(),
-  religiousLevel: z.string().min(1, "Religious level is required"),
+  religiousLevel: z.string().min(1, 'Religious level is required'),
   prayerFrequency: z.string().optional(),
   familyBackground: z.string().optional(),
-  aboutMe: z.string().min(10, "Please write at least 10 characters about yourself"),
+  aboutMe: z.string().min(10, 'Please write at least 10 characters about yourself'),
   waliName: z.string().optional(),
   waliRelationship: z.string().optional(),
   waliContact: z.string().optional(),
@@ -25,12 +24,15 @@ export const validateProfileForm = (data: Partial<ProfileFormValues>) => {
     return { isValid: true, errors: {} };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return { 
-        isValid: false, 
-        errors: error.errors.reduce((acc, err) => {
-          acc[err.path[0]] = err.message;
-          return acc;
-        }, {} as Record<string, string>)
+      return {
+        isValid: false,
+        errors: error.errors.reduce(
+          (acc, err) => {
+            acc[err.path[0]] = err.message;
+            return acc;
+          },
+          {} as Record<string, string>
+        ),
       };
     }
     return { isValid: false, errors: {} };

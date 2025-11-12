@@ -25,22 +25,21 @@ export const useFormAutoSave = ({ data, key, interval = 5000 }: UseFormAutoSaveP
     intervalRef.current = setInterval(() => {
       try {
         const serializedData = JSON.stringify(data);
-        
+
         // Only save if data has changed
         if (serializedData !== lastSaveRef.current) {
           // Emit save start event
           window.dispatchEvent(new CustomEvent('onboarding:save:start'));
-          
+
           const saveKey = `${key}_${user.id}`;
           const backupKey = `${key}_backup_${user.email}`;
           const timestampedData = { ...data, timestamp: Date.now() };
-          
+
           localStorage.setItem(saveKey, JSON.stringify(timestampedData));
           localStorage.setItem(backupKey, JSON.stringify(timestampedData));
-          
+
           lastSaveRef.current = serializedData;
-          
-          
+
           // Emit save success event
           window.dispatchEvent(new CustomEvent('onboarding:save:success'));
         }
@@ -66,7 +65,7 @@ export const useFormAutoSave = ({ data, key, interval = 5000 }: UseFormAutoSaveP
           const saveKey = `${key}_${user.id}`;
           const backupKey = `${key}_backup_${user.email}`;
           const timestampedData = { ...data, timestamp: Date.now() };
-          
+
           localStorage.setItem(saveKey, JSON.stringify(timestampedData));
           localStorage.setItem(backupKey, JSON.stringify(timestampedData));
         } catch (error) {

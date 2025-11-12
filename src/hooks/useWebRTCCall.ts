@@ -7,7 +7,13 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/hooks/useAuth';
-import { WebRTCSignalingService, CallType, CallState, CallOffer, QualityMetrics } from '@/services/webrtc-signaling';
+import {
+  WebRTCSignalingService,
+  CallType,
+  CallState,
+  CallOffer,
+  QualityMetrics,
+} from '@/services/webrtc-signaling';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -50,7 +56,11 @@ export interface UseWebRTCCallReturn {
 /**
  * Custom hook for managing WebRTC calls
  */
-export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebRTCCallOptions): UseWebRTCCallReturn {
+export function useWebRTCCall({
+  matchId,
+  onCallEnd,
+  onRequestFeedback,
+}: UseWebRTCCallOptions): UseWebRTCCallReturn {
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -132,7 +142,7 @@ export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebR
           toast({
             title: `Appel ${offer.callType === 'video' ? 'vidéo' : 'audio'} entrant`,
             description: `${offer.callerName} vous appelle...`,
-            duration: 30000 // 30 seconds
+            duration: 30000, // 30 seconds
           });
         };
 
@@ -147,19 +157,19 @@ export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebR
           toast({
             title: "Erreur d'appel",
             description: error.message || "Une erreur s'est produite pendant l'appel",
-            variant: "destructive"
+            variant: 'destructive',
           });
         };
 
         service.onQualityChange = (metrics) => {
           setQualityMetrics(metrics);
-          
+
           // Notify user if quality drops to poor
           if (metrics.quality === 'poor') {
             toast({
-              title: "Qualité de connexion faible",
+              title: 'Qualité de connexion faible',
               description: "La qualité vidéo a été réduite pour maintenir l'appel",
-              variant: "default"
+              variant: 'default',
             });
           }
         };
@@ -174,7 +184,7 @@ export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebR
         toast({
           title: "Erreur d'initialisation",
           description: "Impossible d'initialiser le système d'appel",
-          variant: "destructive"
+          variant: 'destructive',
         });
       }
     };
@@ -197,7 +207,7 @@ export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebR
   const startCallTimer = useCallback(() => {
     setCallDuration(0);
     callTimerInterval.current = setInterval(() => {
-      setCallDuration(prev => prev + 1);
+      setCallDuration((prev) => prev + 1);
     }, 1000);
   }, []);
 
@@ -215,98 +225,103 @@ export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebR
   /**
    * Initiate an outgoing call
    */
-  const initiateCall = useCallback(async (callType: CallType, callerName: string) => {
-    if (!signalingService.current || !user?.id) {
-      throw new Error('Signaling service not initialized');
-    }
-
-    try {
-      // Déterminer le callee_id depuis le match
-      const { data: matchData } = await supabase
-        .from('matches')
-        .select('user1_id, user2_id')
-        .eq('id', matchId)
-        .single();
-
-      if (!matchData) throw new Error('Match not found');
-
-      const calleeId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
-
-      // Check family supervision settings before initiating call
-      const { data: familyMembers } = await supabase
-        .from('family_members')
-        .select('allow_video_calls, require_call_approval, max_call_duration_minutes')
-        .or(`user_id.eq.${user.id},user_id.eq.${calleeId}`)
-        .eq('invitation_status', 'accepted')
-        .eq('is_wali', true);
-
-      if (familyMembers && familyMembers.length > 0) {
-        // Check if video calls are allowed
-        if (callType === 'video' && familyMembers.some(fm => fm.allow_video_calls === false)) {
-          toast({
-            title: "Appel vidéo non autorisé",
-            description: "Les appels vidéo nécessitent l'autorisation de votre Wali. Utilisez un appel audio à la place.",
-            variant: "destructive"
-          });
-          throw new Error('Video calls not allowed');
-        }
-
-        // Check if call approval is required
-        if (familyMembers.some(fm => fm.require_call_approval)) {
-          toast({
-            title: "Approbation requise",
-            description: "Vous devez obtenir l'approbation de votre Wali avant de passer cet appel.",
-            variant: "destructive"
-          });
-          throw new Error('Call approval required');
-        }
+  const initiateCall = useCallback(
+    async (callType: CallType, callerName: string) => {
+      if (!signalingService.current || !user?.id) {
+        throw new Error('Signaling service not initialized');
       }
 
-      setCurrentCallType(callType);
+      try {
+        // Déterminer le callee_id depuis le match
+        const { data: matchData } = await supabase
+          .from('matches')
+          .select('user1_id, user2_id')
+          .eq('id', matchId)
+          .single();
 
-      // Créer l'enregistrement de l'appel
-      const { data: callRecord, error: callError } = await supabase
-        .from('webrtc_calls')
-        .insert({
-          match_id: matchId,
-          caller_id: user.id,
-          callee_id: calleeId,
-          call_type: callType,
-          status: 'initiated'
-        })
-        .select()
-        .single();
+        if (!matchData) throw new Error('Match not found');
 
-      if (callError) {
-        console.error('Failed to create call record:', callError);
-      } else {
-        currentCallId.current = callRecord.id;
-        console.log('📝 Call record created:', callRecord.id);
-        
-        // Notify walis that call has started
-        try {
-          await supabase.functions.invoke('send-call-notification', {
-            body: {
-              callId: callRecord.id,
-              matchId: matchId,
-              callerId: user.id,
-              calleeId: calleeId,
-              callType: callType,
-              eventType: 'started'
-            }
-          });
-        } catch (notifError) {
-          console.error('Failed to send call notification:', notifError);
+        const calleeId = matchData.user1_id === user.id ? matchData.user2_id : matchData.user1_id;
+
+        // Check family supervision settings before initiating call
+        const { data: familyMembers } = await supabase
+          .from('family_members')
+          .select('allow_video_calls, require_call_approval, max_call_duration_minutes')
+          .or(`user_id.eq.${user.id},user_id.eq.${calleeId}`)
+          .eq('invitation_status', 'accepted')
+          .eq('is_wali', true);
+
+        if (familyMembers && familyMembers.length > 0) {
+          // Check if video calls are allowed
+          if (callType === 'video' && familyMembers.some((fm) => fm.allow_video_calls === false)) {
+            toast({
+              title: 'Appel vidéo non autorisé',
+              description:
+                "Les appels vidéo nécessitent l'autorisation de votre Wali. Utilisez un appel audio à la place.",
+              variant: 'destructive',
+            });
+            throw new Error('Video calls not allowed');
+          }
+
+          // Check if call approval is required
+          if (familyMembers.some((fm) => fm.require_call_approval)) {
+            toast({
+              title: 'Approbation requise',
+              description:
+                "Vous devez obtenir l'approbation de votre Wali avant de passer cet appel.",
+              variant: 'destructive',
+            });
+            throw new Error('Call approval required');
+          }
         }
-      }
 
-      await signalingService.current.initiateCall(callType, callerName);
-      console.log(`✅ ${callType} call initiated`);
-    } catch (error) {
-      console.error('❌ Failed to initiate call:', error);
-      throw error;
-    }
-  }, [matchId, user?.id, toast]);
+        setCurrentCallType(callType);
+
+        // Créer l'enregistrement de l'appel
+        const { data: callRecord, error: callError } = await supabase
+          .from('webrtc_calls')
+          .insert({
+            match_id: matchId,
+            caller_id: user.id,
+            callee_id: calleeId,
+            call_type: callType,
+            status: 'initiated',
+          })
+          .select()
+          .single();
+
+        if (callError) {
+          console.error('Failed to create call record:', callError);
+        } else {
+          currentCallId.current = callRecord.id;
+          console.log('📝 Call record created:', callRecord.id);
+
+          // Notify walis that call has started
+          try {
+            await supabase.functions.invoke('send-call-notification', {
+              body: {
+                callId: callRecord.id,
+                matchId: matchId,
+                callerId: user.id,
+                calleeId: calleeId,
+                callType: callType,
+                eventType: 'started',
+              },
+            });
+          } catch (notifError) {
+            console.error('Failed to send call notification:', notifError);
+          }
+        }
+
+        await signalingService.current.initiateCall(callType, callerName);
+        console.log(`✅ ${callType} call initiated`);
+      } catch (error) {
+        console.error('❌ Failed to initiate call:', error);
+        throw error;
+      }
+    },
+    [matchId, user?.id, toast]
+  );
 
   /**
    * Accept an incoming call
@@ -381,7 +396,7 @@ export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebR
           .update({
             status: 'ended',
             ended_at: endTime.toISOString(),
-            duration_seconds: durationSeconds
+            duration_seconds: durationSeconds,
           })
           .eq('id', currentCallId.current);
 
@@ -404,8 +419,8 @@ export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebR
                 calleeId: calleeId,
                 callType: currentCallType,
                 eventType: 'ended',
-                duration: durationSeconds
-              }
+                duration: durationSeconds,
+              },
             });
           } catch (notifError) {
             console.error('Failed to send call end notification:', notifError);
@@ -414,19 +429,19 @@ export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebR
       }
 
       await signalingService.current.endCall();
-      
+
       // Trigger feedback request for calls longer than 10 seconds
       if (currentCallId.current && callDuration > 10 && onRequestFeedback) {
         onRequestFeedback({
           callId: currentCallId.current,
           callType: currentCallType,
-          callDuration: callDuration
+          callDuration: callDuration,
         });
       }
-      
+
       handleCallCleanup();
       console.log('✅ Call ended');
-      
+
       if (onCallEnd) {
         onCallEnd();
       }
@@ -434,7 +449,16 @@ export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebR
       console.error('❌ Failed to end call:', error);
       throw error;
     }
-  }, [matchId, user?.id, currentCallType, callDuration, handleCallCleanup, stopCallTimer, onCallEnd, onRequestFeedback]);
+  }, [
+    matchId,
+    user?.id,
+    currentCallType,
+    callDuration,
+    handleCallCleanup,
+    stopCallTimer,
+    onCallEnd,
+    onRequestFeedback,
+  ]);
 
   /**
    * Toggle audio on/off
@@ -487,6 +511,6 @@ export function useWebRTCCall({ matchId, onCallEnd, onRequestFeedback }: UseWebR
 
     // Connection info
     isCallActive,
-    isIncomingCall
+    isIncomingCall,
   };
 }

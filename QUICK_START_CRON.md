@@ -26,6 +26,7 @@
 Le script affichera automatiquement la liste des cron jobs créés.
 
 Vous devriez voir **6 cron jobs** configurés:
+
 - ✅ send-unread-messages-reminders
 - ✅ check-subscription-expiry
 - ✅ send-profile-completion-reminders
@@ -42,15 +43,15 @@ Tous vos emails automatiques sont maintenant configurés et s'exécuteront aux h
 Pour voir les exécutions des cron jobs:
 
 ```sql
-SELECT 
+SELECT
   jobid,
   runid,
   status,
   return_message,
   start_time,
   end_time
-FROM cron.job_run_details 
-ORDER BY start_time DESC 
+FROM cron.job_run_details
+ORDER BY start_time DESC
 LIMIT 20;
 ```
 

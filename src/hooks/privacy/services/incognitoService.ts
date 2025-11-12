@@ -1,6 +1,5 @@
-
-import { supabase } from "@/integrations/supabase/client";
-import { IncognitoSettings } from "@/types/enhancedPrivacy";
+import { supabase } from '@/integrations/supabase/client';
+import { IncognitoSettings } from '@/types/enhancedPrivacy';
 
 export class IncognitoService {
   private incognitoUsers = new Set<string>();
@@ -9,7 +8,7 @@ export class IncognitoService {
   async enableIncognito(userId: string): Promise<boolean> {
     try {
       this.incognitoUsers.add(userId);
-      
+
       // Update user's privacy settings
       const { error } = await supabase
         .from('profiles')
@@ -21,9 +20,9 @@ export class IncognitoService {
               hideLastActive: true,
               hideViewHistory: true,
               limitProfileViews: true,
-              maxProfileViewsPerDay: 5
-            }
-          }
+              maxProfileViewsPerDay: 5,
+            },
+          },
         })
         .eq('id', userId);
 
@@ -43,7 +42,7 @@ export class IncognitoService {
   async disableIncognito(userId: string): Promise<boolean> {
     try {
       this.incognitoUsers.delete(userId);
-      
+
       // Update user's privacy settings
       const { error } = await supabase
         .from('profiles')
@@ -55,9 +54,9 @@ export class IncognitoService {
               hideLastActive: false,
               hideViewHistory: false,
               limitProfileViews: false,
-              maxProfileViewsPerDay: 0
-            }
-          }
+              maxProfileViewsPerDay: 0,
+            },
+          },
         })
         .eq('id', userId);
 
@@ -98,7 +97,7 @@ export class IncognitoService {
         .single();
 
       const incognitoSettings = viewerProfile?.privacy_settings?.incognito;
-      
+
       if (!incognitoSettings?.limitProfileViews) {
         return true; // No limit set
       }
@@ -174,9 +173,9 @@ export class IncognitoService {
 
   async obfuscateLastActive(userId: string): Promise<string> {
     const isIncognito = await this.checkIncognitoStatus(userId);
-    
+
     if (isIncognito) {
-      return "Actif récemment"; // Generic message
+      return 'Actif récemment'; // Generic message
     }
 
     // Return actual last active time
@@ -194,16 +193,16 @@ export class IncognitoService {
         const now = new Date();
         const diffMinutes = Math.floor((now.getTime() - lastActive.getTime()) / (1000 * 60));
 
-        if (diffMinutes < 5) return "En ligne";
+        if (diffMinutes < 5) return 'En ligne';
         if (diffMinutes < 60) return `Actif il y a ${diffMinutes} minutes`;
         if (diffMinutes < 1440) return `Actif il y a ${Math.floor(diffMinutes / 60)} heures`;
         return `Actif il y a ${Math.floor(diffMinutes / 1440)} jours`;
       }
 
-      return "Actif récemment";
+      return 'Actif récemment';
     } catch (error) {
       console.error('Error getting last active time:', error);
-      return "Actif récemment";
+      return 'Actif récemment';
     }
   }
 }

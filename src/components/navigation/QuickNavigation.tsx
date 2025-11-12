@@ -24,21 +24,21 @@ const QuickNavigation = () => {
   const { isAdmin } = useIsAdmin();
 
   const allRoutes = getNavigationRoutes();
-  
+
   // Filter routes based on user role
-  const availableRoutes = allRoutes.filter(route => {
+  const availableRoutes = allRoutes.filter((route) => {
     if (!route.roles) return true;
-    
+
     if (route.roles.includes('admin') && !isAdmin) return false;
     if (route.roles.includes('wali') && !isWali && !isAdmin) return false;
-    
+
     return true;
   });
 
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
-      setOpen(open => !open);
+      setOpen((open) => !open);
     }
   };
 
@@ -54,25 +54,25 @@ const QuickNavigation = () => {
 
   // Icon mapping for the route system
   const iconMap: Record<string, IconName> = {
-    'Home': 'Home',
-    'User': 'User',
-    'Search': 'Search',
-    'Heart': 'Heart',
-    'MessageCircle': 'MessageCircle',
-    'BookOpen': 'BookOpen',
-    'Users': 'Users',
-    'Settings': 'Settings',
-    'Shield': 'Shield',
-    'CheckCircle': 'CheckCircle',
-    'TrendingUp': 'TrendingUp',
-    'Eye': 'Eye',
-    'Lock': 'Lock',
-    'Compass': 'Compass',
-    'Target': 'Target',
-    'BarChart3': 'BarChart3',
-    'Crown': 'Crown',
-    'HelpCircle': 'HelpCircle',
-    'Zap': 'Zap'
+    Home: 'Home',
+    User: 'User',
+    Search: 'Search',
+    Heart: 'Heart',
+    MessageCircle: 'MessageCircle',
+    BookOpen: 'BookOpen',
+    Users: 'Users',
+    Settings: 'Settings',
+    Shield: 'Shield',
+    CheckCircle: 'CheckCircle',
+    TrendingUp: 'TrendingUp',
+    Eye: 'Eye',
+    Lock: 'Lock',
+    Compass: 'Compass',
+    Target: 'Target',
+    BarChart3: 'BarChart3',
+    Crown: 'Crown',
+    HelpCircle: 'HelpCircle',
+    Zap: 'Zap',
   };
 
   if (!user) return null;
@@ -97,10 +97,10 @@ const QuickNavigation = () => {
         <CommandInput placeholder="Rechercher une page..." />
         <CommandList>
           <CommandEmpty>Aucune page trouvée.</CommandEmpty>
-          
+
           <CommandGroup heading="Navigation principale">
             {availableRoutes
-              .filter(route => route.category === 'main')
+              .filter((route) => route.category === 'main')
               .map((route) => {
                 const iconName = route.icon ? iconMap[route.icon] : null;
                 return (
@@ -118,7 +118,7 @@ const QuickNavigation = () => {
 
           <CommandGroup heading="Matching & Compatibilité">
             {availableRoutes
-              .filter(route => route.category === 'matching')
+              .filter((route) => route.category === 'matching')
               .map((route) => {
                 const iconName = route.icon ? iconMap[route.icon] : null;
                 return (
@@ -136,7 +136,7 @@ const QuickNavigation = () => {
 
           <CommandGroup heading="Outils Islamiques">
             {availableRoutes
-              .filter(route => route.category === 'tools')
+              .filter((route) => route.category === 'tools')
               .map((route) => {
                 const iconName = route.icon ? iconMap[route.icon] : null;
                 return (
@@ -155,7 +155,7 @@ const QuickNavigation = () => {
           {(isWali || isAdmin) && (
             <CommandGroup heading="Supervision Familiale">
               {availableRoutes
-                .filter(route => route.category === 'family')
+                .filter((route) => route.category === 'family')
                 .map((route) => {
                   const iconName = route.icon ? iconMap[route.icon] : null;
                   return (
@@ -175,7 +175,7 @@ const QuickNavigation = () => {
           {isAdmin && (
             <CommandGroup heading="Administration">
               {availableRoutes
-                .filter(route => route.category === 'admin')
+                .filter((route) => route.category === 'admin')
                 .map((route) => {
                   const iconName = route.icon ? iconMap[route.icon] : null;
                   return (

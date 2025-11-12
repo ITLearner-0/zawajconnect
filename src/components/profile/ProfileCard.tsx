@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { DatabaseProfile } from '@/types/profile';
 import { IslamicPattern } from '@/components/ui/islamic-pattern';
@@ -17,7 +16,7 @@ interface ProfileCardProps {
 
 const ProfileCard = ({ profile }: ProfileCardProps) => {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  
+
   // Get current user ID
   useEffect(() => {
     const getCurrentUser = async () => {
@@ -28,7 +27,7 @@ const ProfileCard = ({ profile }: ProfileCardProps) => {
     };
     getCurrentUser();
   }, []);
-  
+
   // Use the extracted profile interactions hook
   const {
     dialogOpen,
@@ -38,29 +37,25 @@ const ProfileCard = ({ profile }: ProfileCardProps) => {
     requestType,
     handleMessage,
     handleVideoCall,
-    handleContactWali
+    handleContactWali,
   } = useProfileInteractions(profile);
 
   return (
     <IslamicPattern variant="border" className="bg-white rounded-lg shadow-lg p-6">
       <ProfileCardHeader profile={profile} />
-      
-      <ProfileCardActions 
+
+      <ProfileCardActions
         profile={profile}
         onMessageRequest={handleMessage}
         onVideoCallRequest={handleVideoCall}
         onWaliContactRequest={handleContactWali}
       />
-      
+
       {/* Wali Contact Dialog */}
-      <WaliContactDialog 
-        profile={profile} 
-        open={dialogOpen} 
-        onOpenChange={setDialogOpen} 
-      />
-      
+      <WaliContactDialog profile={profile} open={dialogOpen} onOpenChange={setDialogOpen} />
+
       {/* Wali Request Dialog */}
-      <WaliRequestDialog 
+      <WaliRequestDialog
         profile={profile}
         open={waliRequestDialogOpen}
         onOpenChange={setWaliRequestDialogOpen}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,22 +14,22 @@ export const useSubscription = () => {
   const [subscriptionData, setSubscriptionData] = useState<SubscriptionData>({
     subscribed: false,
     subscription_tier: null,
-    subscription_end: null
+    subscription_end: null,
   });
   const [loading, setLoading] = useState(false);
 
   const checkSubscription = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
       console.log('Checking subscription for user:', user.email);
-      
+
       const { data, error } = await supabase.functions.invoke('check-subscription');
-      
+
       if (error) {
         console.error('Error checking subscription:', error);
-        toast.error('Erreur lors de la vérification de l\'abonnement');
+        toast.error("Erreur lors de la vérification de l'abonnement");
         return;
       }
 
@@ -38,7 +37,7 @@ export const useSubscription = () => {
       setSubscriptionData(data);
     } catch (error) {
       console.error('Error checking subscription:', error);
-      toast.error('Erreur lors de la vérification de l\'abonnement');
+      toast.error("Erreur lors de la vérification de l'abonnement");
     } finally {
       setLoading(false);
     }
@@ -52,10 +51,10 @@ export const useSubscription = () => {
 
     console.log('Creating checkout session for plan:', plan);
     setLoading(true);
-    
+
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { plan }
+        body: { plan },
       });
 
       console.log('Checkout response:', { data, error });
@@ -75,7 +74,7 @@ export const useSubscription = () => {
       console.log('Redirecting to checkout URL:', data.url);
       // Open Stripe checkout in new tab
       window.open(data.url, '_blank');
-      
+
       toast.success('Redirection vers le paiement...');
     } catch (error) {
       console.error('Error creating checkout session:', error);
@@ -93,7 +92,7 @@ export const useSubscription = () => {
 
     console.log('Opening customer portal for user:', user.email);
     setLoading(true);
-    
+
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
 
@@ -101,7 +100,7 @@ export const useSubscription = () => {
 
       if (error) {
         console.error('Error opening customer portal:', error);
-        toast.error('Erreur lors de l\'ouverture du portail client');
+        toast.error("Erreur lors de l'ouverture du portail client");
         return;
       }
 
@@ -114,11 +113,11 @@ export const useSubscription = () => {
       console.log('Redirecting to customer portal URL:', data.url);
       // Open customer portal in new tab
       window.open(data.url, '_blank');
-      
+
       toast.success('Ouverture du portail client...');
     } catch (error) {
       console.error('Error opening customer portal:', error);
-      toast.error('Erreur lors de l\'ouverture du portail client');
+      toast.error("Erreur lors de l'ouverture du portail client");
     } finally {
       setLoading(false);
     }
@@ -144,6 +143,6 @@ export const useSubscription = () => {
     createCheckoutSession,
     openCustomerPortal,
     isPremium: subscriptionData.subscribed && subscriptionData.subscription_tier === 'Premium',
-    isVip: subscriptionData.subscribed && subscriptionData.subscription_tier === 'VIP'
+    isVip: subscriptionData.subscribed && subscriptionData.subscription_tier === 'VIP',
   };
 };

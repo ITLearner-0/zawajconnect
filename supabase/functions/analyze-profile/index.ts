@@ -1,9 +1,9 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
 import { handleError, handleAIError, successResponse, ErrorCode } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface ProfileAnalysisRequest {
@@ -45,14 +45,14 @@ interface Suggestion {
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { profile, islamicPrefs, completionStats }: ProfileAnalysisRequest = await req.json();
-    
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       console.error('[ANALYZE_PROFILE] LOVABLE_API_KEY not configured');
       return handleError(new Error('API key missing'), ErrorCode.INTERNAL_ERROR, 'ANALYZE_PROFILE');
@@ -99,70 +99,70 @@ Règles importantes :
 
 Propose 3-5 suggestions d'amélioration personnalisées.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: 'google/gemini-2.5-flash',
         messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt }
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt },
         ],
         tools: [
           {
-            type: "function",
+            type: 'function',
             function: {
-              name: "provide_suggestions",
+              name: 'provide_suggestions',
               description: "Retourne des suggestions d'amélioration du profil",
               parameters: {
-                type: "object",
+                type: 'object',
                 properties: {
                   suggestions: {
-                    type: "array",
+                    type: 'array',
                     items: {
-                      type: "object",
+                      type: 'object',
                       properties: {
                         type: {
-                          type: "string",
-                          enum: ["urgent", "important", "optional"],
-                          description: "Niveau de priorité de la suggestion"
+                          type: 'string',
+                          enum: ['urgent', 'important', 'optional'],
+                          description: 'Niveau de priorité de la suggestion',
                         },
                         category: {
-                          type: "string",
-                          description: "Catégorie (photos, bio, préférences, etc.)"
+                          type: 'string',
+                          description: 'Catégorie (photos, bio, préférences, etc.)',
                         },
                         title: {
-                          type: "string",
-                          description: "Titre court et accrocheur"
+                          type: 'string',
+                          description: 'Titre court et accrocheur',
                         },
                         description: {
-                          type: "string",
-                          description: "Explication détaillée du pourquoi"
+                          type: 'string',
+                          description: 'Explication détaillée du pourquoi',
                         },
                         action: {
-                          type: "string",
-                          description: "Action concrète à effectuer"
+                          type: 'string',
+                          description: 'Action concrète à effectuer',
                         },
                         impact: {
-                          type: "string",
-                          description: "Impact attendu sur le profil"
-                        }
+                          type: 'string',
+                          description: 'Impact attendu sur le profil',
+                        },
                       },
-                      required: ["type", "category", "title", "description", "action", "impact"],
-                      additionalProperties: false
-                    }
-                  }
+                      required: ['type', 'category', 'title', 'description', 'action', 'impact'],
+                      additionalProperties: false,
+                    },
+                  },
                 },
-                required: ["suggestions"],
-                additionalProperties: false
-              }
-            }
-          }
+                required: ['suggestions'],
+                additionalProperties: false,
+              },
+            },
+          },
         ],
-        tool_choice: { type: "function", function: { name: "provide_suggestions" } }
+        tool_choice: { type: 'function', function: { name: 'provide_suggestions' } },
       }),
     });
 
@@ -177,13 +177,16 @@ Propose 3-5 suggestions d'amélioration personnalisées.`;
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
     if (!toolCall) {
       console.error('[ANALYZE_PROFILE] No tool call in AI response:', data);
-      return handleError(new Error('Invalid AI response'), ErrorCode.AI_GATEWAY_ERROR, 'ANALYZE_PROFILE');
+      return handleError(
+        new Error('Invalid AI response'),
+        ErrorCode.AI_GATEWAY_ERROR,
+        'ANALYZE_PROFILE'
+      );
     }
 
     const suggestions = JSON.parse(toolCall.function.arguments);
 
     return successResponse(suggestions);
-
   } catch (error) {
     return handleError(error, ErrorCode.INTERNAL_ERROR, 'ANALYZE_PROFILE');
   }

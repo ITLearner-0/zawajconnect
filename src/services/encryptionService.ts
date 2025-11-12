@@ -1,11 +1,12 @@
-
 // This service handles end-to-end encryption for message content
 
 // Generate a random initialization vector
 export const generateIV = (): string => {
   const arr = new Uint8Array(12);
   window.crypto.getRandomValues(arr);
-  return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+  return Array.from(arr)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 };
 
 // Generate a new encryption key
@@ -28,7 +29,7 @@ export const exportKey = async (key: CryptoKey): Promise<string> => {
 
 // Import key from base64 string
 export const importKey = async (keyString: string): Promise<CryptoKey> => {
-  const keyData = Uint8Array.from(atob(keyString), c => c.charCodeAt(0));
+  const keyData = Uint8Array.from(atob(keyString), (c) => c.charCodeAt(0));
   return window.crypto.subtle.importKey(
     'raw',
     keyData,
@@ -49,14 +50,14 @@ export const encryptMessage = async (
 ): Promise<string> => {
   try {
     // Convert IV from hex to Uint8Array
-    const ivArray = new Uint8Array(iv.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
-    
+    const ivArray = new Uint8Array(iv.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)));
+
     // Import the key
     const key = await importKey(keyString);
-    
+
     // Encode the message
     const encodedMessage = new TextEncoder().encode(message);
-    
+
     // Encrypt
     const encryptedBuffer = await window.crypto.subtle.encrypt(
       {
@@ -66,7 +67,7 @@ export const encryptMessage = async (
       key,
       encodedMessage
     );
-    
+
     // Convert to base64 for storage
     return btoa(String.fromCharCode(...new Uint8Array(encryptedBuffer)));
   } catch (error) {
@@ -83,14 +84,14 @@ export const decryptMessage = async (
 ): Promise<string> => {
   try {
     // Convert IV from hex to Uint8Array
-    const ivArray = new Uint8Array(iv.match(/.{1,2}/g)!.map(byte => parseInt(byte, 16)));
-    
+    const ivArray = new Uint8Array(iv.match(/.{1,2}/g)!.map((byte) => parseInt(byte, 16)));
+
     // Import the key
     const key = await importKey(keyString);
-    
+
     // Decode the base64 encrypted message
-    const encryptedData = Uint8Array.from(atob(encryptedMessage), c => c.charCodeAt(0));
-    
+    const encryptedData = Uint8Array.from(atob(encryptedMessage), (c) => c.charCodeAt(0));
+
     // Decrypt
     const decryptedBuffer = await window.crypto.subtle.decrypt(
       {
@@ -100,7 +101,7 @@ export const decryptMessage = async (
       key,
       encryptedData
     );
-    
+
     // Decode the decrypted data
     return new TextDecoder().decode(decryptedBuffer);
   } catch (error) {

@@ -31,7 +31,9 @@ const StreakCounter: React.FC<StreakCounterProps> = ({ compact = false }) => {
 
   if (compact) {
     return (
-      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border-2 ${getStreakColor(streak.current_streak)}`}>
+      <div
+        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border-2 ${getStreakColor(streak.current_streak)}`}
+      >
         <Flame className="h-4 w-4" />
         <span className="font-semibold text-sm">
           {streak.current_streak} {getStreakEmoji(streak.current_streak)}
@@ -71,9 +73,11 @@ const StreakCounter: React.FC<StreakCounterProps> = ({ compact = false }) => {
         {streak.current_streak >= 7 && (
           <div className="p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-200">
             <p className="text-sm text-center font-medium text-orange-900">
-              {streak.current_streak >= 30 ? '🌟 Légende! 30+ jours!' :
-               streak.current_streak >= 14 ? '🔥 Incroyable! 2 semaines!' :
-               '💪 Super! 1 semaine complète!'}
+              {streak.current_streak >= 30
+                ? '🌟 Légende! 30+ jours!'
+                : streak.current_streak >= 14
+                  ? '🔥 Incroyable! 2 semaines!'
+                  : '💪 Super! 1 semaine complète!'}
             </p>
           </div>
         )}

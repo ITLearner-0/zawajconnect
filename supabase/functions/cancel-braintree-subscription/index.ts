@@ -1,7 +1,7 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 // @deno-types="npm:@types/braintree@3.3.11"
-import braintree from "npm:braintree@3.23.0";
+import braintree from 'npm:braintree@3.23.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -55,25 +55,26 @@ serve(async (req) => {
     }
 
     console.log('Creating Braintree gateway...');
-    
+
     // Utiliser le SDK Braintree officiel
     const gateway = new braintree.BraintreeGateway({
-      environment: environment === 'production' 
-        ? braintree.Environment.Production 
-        : braintree.Environment.Sandbox,
+      environment:
+        environment === 'production'
+          ? braintree.Environment.Production
+          : braintree.Environment.Sandbox,
       merchantId: merchantId,
       publicKey: publicKey,
       privateKey: privateKey,
     });
 
     console.log('Canceling subscription:', subscription.provider_subscription_id);
-    
+
     // Annuler l'abonnement
     const result = await gateway.subscription.cancel(subscription.provider_subscription_id);
 
     if (!result.success) {
       console.error('Braintree error:', result.message);
-      throw new Error(result.message || 'Impossible d\'annuler l\'abonnement');
+      throw new Error(result.message || "Impossible d'annuler l'abonnement");
     }
 
     // Mettre à jour le statut dans Supabase
@@ -89,22 +90,16 @@ serve(async (req) => {
     }
 
     console.log('Subscription cancelled successfully');
-    
-    return new Response(
-      JSON.stringify({ success: true }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
   } catch (error) {
     console.error('Erreur:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 400,
+    });
   }
 });

@@ -4,16 +4,22 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  Star, 
-  Heart, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Star,
+  Heart,
   CheckCircle,
   XCircle,
   MessageSquare,
   Calendar,
   MapPin,
-  Briefcase
+  Briefcase,
 } from 'lucide-react';
 
 interface MatchProfile {
@@ -57,13 +63,13 @@ interface MatchReviewCardProps {
   showActions?: boolean;
 }
 
-const MatchReviewCard: React.FC<MatchReviewCardProps> = ({ 
-  match, 
+const MatchReviewCard: React.FC<MatchReviewCardProps> = ({
+  match,
   reviews = [],
-  onApprove, 
-  onReject, 
+  onApprove,
+  onReject,
   onScheduleDiscussion,
-  showActions = false 
+  showActions = false,
 }) => {
   const [notes, setNotes] = useState('');
   const [showNotesField, setShowNotesField] = useState(false);
@@ -72,10 +78,14 @@ const MatchReviewCard: React.FC<MatchReviewCardProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'approved': return 'text-success bg-success/10 border-success/20';
-      case 'rejected': return 'text-destructive bg-destructive/10 border-destructive/20';
-      case 'needs_discussion': return 'text-warning bg-warning/10 border-warning/20';
-      default: return 'text-muted-foreground bg-muted border-border';
+      case 'approved':
+        return 'text-success bg-success/10 border-success/20';
+      case 'rejected':
+        return 'text-destructive bg-destructive/10 border-destructive/20';
+      case 'needs_discussion':
+        return 'text-warning bg-warning/10 border-warning/20';
+      default:
+        return 'text-muted-foreground bg-muted border-border';
     }
   };
 
@@ -84,7 +94,7 @@ const MatchReviewCard: React.FC<MatchReviewCardProps> = ({
     if (score >= 60) return 'text-warning';
     return 'text-destructive';
   };
-  
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardContent className="p-6">
@@ -109,11 +119,9 @@ const MatchReviewCard: React.FC<MatchReviewCardProps> = ({
         <div className="flex items-start gap-4 mb-6">
           <Avatar className="h-16 w-16">
             <AvatarImage src={profile.avatar_url} />
-            <AvatarFallback>
-              {profile.full_name?.charAt(0) || 'U'}
-            </AvatarFallback>
+            <AvatarFallback>{profile.full_name?.charAt(0) || 'U'}</AvatarFallback>
           </Avatar>
-          
+
           <div className="flex-1">
             <h3 className="text-lg font-semibold mb-2">{profile.full_name}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-muted-foreground">
@@ -130,9 +138,7 @@ const MatchReviewCard: React.FC<MatchReviewCardProps> = ({
                 {profile.profession}
               </div>
             </div>
-            {profile.bio && (
-              <p className="text-sm text-muted-foreground mt-2">{profile.bio}</p>
-            )}
+            {profile.bio && <p className="text-sm text-muted-foreground mt-2">{profile.bio}</p>}
           </div>
 
           <div className="text-right">
@@ -154,15 +160,17 @@ const MatchReviewCard: React.FC<MatchReviewCardProps> = ({
                     <div className="flex items-center gap-2 mb-1">
                       <span className="font-medium text-sm">{review.family_member.full_name}</span>
                       <Badge variant="outline" className={getStatusColor(review.status)}>
-                        {review.status === 'approved' ? 'Approuvé' : 
-                         review.status === 'rejected' ? 'Refusé' : 
-                         'Discussion requise'}
+                        {review.status === 'approved'
+                          ? 'Approuvé'
+                          : review.status === 'rejected'
+                            ? 'Refusé'
+                            : 'Discussion requise'}
                       </Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-1">{review.family_member.relationship}</p>
-                    {review.notes && (
-                      <p className="text-sm">{review.notes}</p>
-                    )}
+                    <p className="text-xs text-muted-foreground mb-1">
+                      {review.family_member.relationship}
+                    </p>
+                    {review.notes && <p className="text-sm">{review.notes}</p>}
                   </div>
                   {review.reviewed_at && (
                     <span className="text-xs text-muted-foreground">
@@ -189,7 +197,7 @@ const MatchReviewCard: React.FC<MatchReviewCardProps> = ({
                 />
               </div>
             )}
-            
+
             <div className="flex gap-2 flex-wrap">
               <Button
                 onClick={() => {
@@ -206,7 +214,7 @@ const MatchReviewCard: React.FC<MatchReviewCardProps> = ({
                 <CheckCircle className="h-4 w-4 mr-2" />
                 {showNotesField ? 'Confirmer Approbation' : 'Approuver'}
               </Button>
-              
+
               <Button
                 variant="destructive"
                 onClick={() => {
@@ -222,7 +230,7 @@ const MatchReviewCard: React.FC<MatchReviewCardProps> = ({
                 <XCircle className="h-4 w-4 mr-2" />
                 {showNotesField ? 'Confirmer Refus' : 'Exprimer des Réserves'}
               </Button>
-              
+
               <Button
                 variant="outline"
                 onClick={() => {
@@ -232,7 +240,7 @@ const MatchReviewCard: React.FC<MatchReviewCardProps> = ({
                 <MessageSquare className="h-4 w-4 mr-2" />
                 Programmer Discussion
               </Button>
-              
+
               {showNotesField && (
                 <Button
                   variant="ghost"

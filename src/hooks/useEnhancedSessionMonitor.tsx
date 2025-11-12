@@ -32,18 +32,22 @@ export const useEnhancedSessionMonitor = () => {
       ctx.font = '14px Arial';
       ctx.fillText('Device fingerprint', 2, 2);
     }
-    
-    const fingerprint = btoa(JSON.stringify({
-      userAgent: navigator.userAgent,
-      language: navigator.language,
-      platform: navigator.platform,
-      screen: `${screen.width}x${screen.height}`,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      canvas: canvas.toDataURL(),
-      cookies: navigator.cookieEnabled,
-      plugins: Array.from(navigator.plugins).map(p => p.name).sort()
-    })).slice(0, 32);
-    
+
+    const fingerprint = btoa(
+      JSON.stringify({
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        platform: navigator.platform,
+        screen: `${screen.width}x${screen.height}`,
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        canvas: canvas.toDataURL(),
+        cookies: navigator.cookieEnabled,
+        plugins: Array.from(navigator.plugins)
+          .map((p) => p.name)
+          .sort(),
+      })
+    ).slice(0, 32);
+
     setDeviceFingerprint(fingerprint);
     return fingerprint;
   };
@@ -54,23 +58,21 @@ export const useEnhancedSessionMonitor = () => {
 
     try {
       const fingerprint = deviceFingerprint || generateDeviceFingerprint();
-      
+
       const sessionData = {
         user_id: user.id,
         session_token: session.access_token.slice(-10), // Only last 10 chars for privacy
         device_fingerprint: fingerprint,
         user_agent: navigator.userAgent,
         is_active: true,
-        expires_at: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : null
+        expires_at: session.expires_at ? new Date(session.expires_at * 1000).toISOString() : null,
       };
 
       // Insert or update session info
-      const { error } = await supabase
-        .from('user_sessions')
-        .upsert(sessionData, { 
-          onConflict: 'session_token',
-          ignoreDuplicates: false 
-        });
+      const { error } = await supabase.from('user_sessions').upsert(sessionData, {
+        onConflict: 'session_token',
+        ignoreDuplicates: false,
+      });
 
       if (error && !error.message.includes('permission denied')) {
         console.error('Failed to track session:', error);
@@ -96,16 +98,20 @@ export const useEnhancedSessionMonitor = () => {
         throw error;
       }
 
-      setActiveSessions((data || []).map(session => ({
-        id: session.id,
-        device_fingerprint: session.device_fingerprint ? String(session.device_fingerprint) : undefined,
-        ip_address: session.ip_address ? String(session.ip_address) : undefined,
-        user_agent: session.user_agent ? String(session.user_agent) : undefined,
-        is_active: !!session.is_active,
-        last_activity: session.last_activity ?? new Date().toISOString(),
-        expires_at: session.expires_at ? String(session.expires_at) : undefined,
-        created_at: session.created_at ?? new Date().toISOString()
-      })));
+      setActiveSessions(
+        (data || []).map((session) => ({
+          id: session.id,
+          device_fingerprint: session.device_fingerprint
+            ? String(session.device_fingerprint)
+            : undefined,
+          ip_address: session.ip_address ? String(session.ip_address) : undefined,
+          user_agent: session.user_agent ? String(session.user_agent) : undefined,
+          is_active: !!session.is_active,
+          last_activity: session.last_activity ?? new Date().toISOString(),
+          expires_at: session.expires_at ? String(session.expires_at) : undefined,
+          created_at: session.created_at ?? new Date().toISOString(),
+        }))
+      );
 
       // Check for suspicious multiple sessions
       if (data && data.length > 3) {
@@ -113,7 +119,7 @@ export const useEnhancedSessionMonitor = () => {
           'multiple_sessions',
           'medium',
           `${data.length} sessions actives détectées`,
-          { session_count: data.length, devices: data.map(s => s.device_fingerprint) }
+          { session_count: data.length, devices: data.map((s) => s.device_fingerprint) }
         );
       }
     } catch (error) {
@@ -126,25 +132,25 @@ export const useEnhancedSessionMonitor = () => {
     if (!user || activeSessions.length === 0) return;
 
     const currentFingerprint = deviceFingerprint || generateDeviceFingerprint();
-    const knownDevices = activeSessions.map(s => s.device_fingerprint).filter(Boolean);
-    
+    const knownDevices = activeSessions.map((s) => s.device_fingerprint).filter(Boolean);
+
     if (knownDevices.length > 0 && !knownDevices.includes(currentFingerprint)) {
       await logSecurityEvent(
         'new_device_detected',
         'medium',
         'Nouvel appareil détecté pour cette session',
-        { 
+        {
           new_device: currentFingerprint,
           known_devices: knownDevices.length,
-          user_agent: navigator.userAgent
+          user_agent: navigator.userAgent,
         }
       );
 
       toast({
-        title: "Nouvel appareil détecté",
-        description: "Connexion depuis un nouvel appareil. Vérifiez vos sessions actives.",
-        variant: "default",
-        duration: 8000
+        title: 'Nouvel appareil détecté',
+        description: 'Connexion depuis un nouvel appareil. Vérifiez vos sessions actives.',
+        variant: 'default',
+        duration: 8000,
       });
     }
   };
@@ -157,29 +163,26 @@ export const useEnhancedSessionMonitor = () => {
       const expiresAt = new Date(session.expires_at! * 1000);
       const now = new Date();
       const timeUntilExpiry = expiresAt.getTime() - now.getTime();
-      
+
       // Show warning 10 minutes before expiry
       const warningTime = 10 * 60 * 1000;
-      
+
       if (timeUntilExpiry <= warningTime && !sessionWarningShown) {
         setSessionWarningShown(true);
-        
-        await logSecurityEvent(
-          'session_expiry_warning',
-          'low',
-          'Session proche de l\'expiration',
-          { expires_in_minutes: Math.ceil(timeUntilExpiry / 60000) }
-        );
-        
+
+        await logSecurityEvent('session_expiry_warning', 'low', "Session proche de l'expiration", {
+          expires_in_minutes: Math.ceil(timeUntilExpiry / 60000),
+        });
+
         toast({
           title: "Session proche d'expirer",
           description: `Votre session expire dans ${Math.ceil(timeUntilExpiry / 60000)} minutes.`,
-          variant: "destructive",
-          duration: 15000
+          variant: 'destructive',
+          duration: 15000,
         });
-        
+
         // Try to refresh token proactively
-        supabase.auth.refreshSession().catch(error => {
+        supabase.auth.refreshSession().catch((error) => {
           console.error('Failed to refresh session:', error);
         });
       }
@@ -210,14 +213,14 @@ export const useEnhancedSessionMonitor = () => {
   // Track user activity
   useEffect(() => {
     const trackActivity = () => trackSessionActivity();
-    
+
     const events = ['mousedown', 'keydown', 'scroll', 'click'];
-    events.forEach(event => document.addEventListener(event, trackActivity));
-    
+    events.forEach((event) => document.addEventListener(event, trackActivity));
+
     const activityInterval = setInterval(trackActivity, 5 * 60 * 1000); // Every 5 minutes
 
     return () => {
-      events.forEach(event => document.removeEventListener(event, trackActivity));
+      events.forEach((event) => document.removeEventListener(event, trackActivity));
       clearInterval(activityInterval);
     };
   }, [user, session, deviceFingerprint]);
@@ -230,8 +233,9 @@ export const useEnhancedSessionMonitor = () => {
   return {
     activeSessions,
     deviceFingerprint,
-    isSessionNearExpiry: session?.expires_at ? 
-      (new Date(session.expires_at * 1000).getTime() - Date.now()) < 10 * 60 * 1000 : false,
-    loadActiveSessions
+    isSessionNearExpiry: session?.expires_at
+      ? new Date(session.expires_at * 1000).getTime() - Date.now() < 10 * 60 * 1000
+      : false,
+    loadActiveSessions,
   };
 };

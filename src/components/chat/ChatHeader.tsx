@@ -30,7 +30,10 @@ export const ChatHeader = ({ match, isOnline, onClose, onCall }: ChatHeaderProps
           <div>
             <h3 className="font-semibold text-foreground">{match.other_user.full_name}</h3>
             <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="text-xs bg-primary/10 text-primary border-primary/20">
+              <Badge
+                variant="secondary"
+                className="text-xs bg-primary/10 text-primary border-primary/20"
+              >
                 {match.match_score}% compatible
               </Badge>
               <span className="text-xs text-muted-foreground">
@@ -39,22 +42,22 @@ export const ChatHeader = ({ match, isOnline, onClose, onCall }: ChatHeaderProps
             </div>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
           {onCall && (
             <>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="text-primary hover:bg-primary/10"
                 onClick={() => onCall(false)}
                 title="Appel audio"
               >
                 <Phone className="h-4 w-4" />
               </Button>
-              <Button 
-                variant="ghost" 
-                size="sm" 
+              <Button
+                variant="ghost"
+                size="sm"
                 className="text-primary hover:bg-primary/10"
                 onClick={() => onCall(true)}
                 title="Appel vidéo"

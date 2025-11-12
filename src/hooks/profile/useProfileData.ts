@@ -1,10 +1,9 @@
-
 import { useProfileFetcher } from './useProfileFetcher';
 import { ProfileFormData } from '@/types/profile';
 
 export const useProfileData = (userId?: string | null) => {
-  console.log("useProfileData: Hook started with userId:", userId);
-  
+  console.log('useProfileData: Hook started with userId:', userId);
+
   // Use only the profile fetcher hook to get profile data
   const {
     profileData,
@@ -15,14 +14,14 @@ export const useProfileData = (userId?: string | null) => {
     verificationStatus,
     privacySettings,
     blockedUsers,
-    isAccountVisible
+    isAccountVisible,
   } = useProfileFetcher(userId);
 
-  console.log("useProfileData: useProfileFetcher returned:", {
+  console.log('useProfileData: useProfileFetcher returned:', {
     profileData: !!profileData,
     loading,
     error,
-    isNewUser
+    isNewUser,
   });
 
   const finalData = {
@@ -36,13 +35,13 @@ export const useProfileData = (userId?: string | null) => {
     userId,
     privacySettings,
     blockedUsers,
-    isAccountVisible
+    isAccountVisible,
   };
 
-  console.log("useProfileData: Returning final data:", {
+  console.log('useProfileData: Returning final data:', {
     profileData: !!finalData.profileData,
     loading: finalData.loading,
-    error: finalData.error
+    error: finalData.error,
   });
 
   return finalData;

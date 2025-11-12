@@ -38,13 +38,12 @@ const InsightsPreviewCard = () => {
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          {isComplete 
-            ? "Découvrez des analyses personnalisées basées sur vos réponses et recevez des conseils pour optimiser votre recherche de partenaire."
-            : "Complétez le test de compatibilité pour débloquer des insights personnalisés sur votre profil et vos préférences."
-          }
+          {isComplete
+            ? 'Découvrez des analyses personnalisées basées sur vos réponses et recevez des conseils pour optimiser votre recherche de partenaire.'
+            : 'Complétez le test de compatibilité pour débloquer des insights personnalisés sur votre profil et vos préférences.'}
         </p>
 
         {isComplete && (
@@ -69,11 +68,11 @@ const InsightsPreviewCard = () => {
         )}
 
         <div className="pt-2">
-          <Link to={isComplete ? "/compatibility-insights" : "/compatibility-test"}>
-            <Button 
+          <Link to={isComplete ? '/compatibility-insights' : '/compatibility-test'}>
+            <Button
               className={`w-full ${
-                isComplete 
-                  ? 'bg-gradient-to-r from-emerald to-emerald/80 hover:from-emerald-dark hover:to-emerald' 
+                isComplete
+                  ? 'bg-gradient-to-r from-emerald to-emerald/80 hover:from-emerald-dark hover:to-emerald'
                   : 'bg-gradient-to-r from-primary to-primary/80'
               }`}
             >
@@ -96,7 +95,10 @@ const InsightsPreviewCard = () => {
         {!isComplete && (
           <div className="text-center">
             <p className="text-xs text-muted-foreground">
-              <span className="font-medium">{stats.answeredQuestions}/{stats.totalQuestions}</span> questions complétées
+              <span className="font-medium">
+                {stats.answeredQuestions}/{stats.totalQuestions}
+              </span>{' '}
+              questions complétées
             </p>
           </div>
         )}

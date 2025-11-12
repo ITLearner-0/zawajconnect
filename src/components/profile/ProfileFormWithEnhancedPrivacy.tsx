@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
 import { PhotoBlurSettings as PhotoBlurSettingsType } from '@/types/documents';
@@ -17,7 +16,9 @@ import { useDocumentVerification } from '@/hooks/useDocumentVerification';
 
 interface ProfileFormWithEnhancedPrivacyProps {
   formData: ProfileFormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => void;
   handleSubmit: () => Promise<boolean>;
   verificationStatus: VerificationStatus;
   userEmail: string | null;
@@ -48,7 +49,7 @@ const ProfileFormWithEnhancedPrivacy = ({
   onUnblockUser,
   userId,
   photoBlurSettings,
-  onPhotoBlurSettingsChange
+  onPhotoBlurSettingsChange,
 }: ProfileFormWithEnhancedPrivacyProps) => {
   const { verifications, refetchVerifications } = useDocumentVerification(userId);
 
@@ -56,7 +57,7 @@ const ProfileFormWithEnhancedPrivacy = ({
     blur_profile_picture: false,
     blur_gallery_photos: false,
     blur_until_approved: false,
-    blur_for_non_matches: true
+    blur_for_non_matches: true,
   };
 
   return (
@@ -64,19 +65,19 @@ const ProfileFormWithEnhancedPrivacy = ({
       <form className="space-y-6">
         {/* Basic Information */}
         <BasicInformation formData={formData} handleChange={handleChange} />
-        
+
         {/* Education & Career */}
         <EducationCareer formData={formData} handleChange={handleChange} />
-        
+
         {/* Religious Background */}
         <ReligiousBackground formData={formData} handleChange={handleChange} />
-        
+
         {/* About Me */}
         <AboutMe formData={formData} handleChange={handleChange} />
-        
+
         {/* Wali Information */}
         <WaliInformation formData={formData} handleChange={handleChange} />
-        
+
         {/* Verification Panel */}
         <VerificationPanel
           verificationStatus={verificationStatus}
@@ -86,8 +87,8 @@ const ProfileFormWithEnhancedPrivacy = ({
 
         {/* Save Button */}
         <div className="flex justify-end pt-4">
-          <Button 
-            type="button" 
+          <Button
+            type="button"
             onClick={handleSubmit}
             className="bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white px-8 py-2"
           >

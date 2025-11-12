@@ -10,9 +10,9 @@ interface CompatibilityScoreChartProps {
   showTrends?: boolean;
 }
 
-const CompatibilityScoreChart: React.FC<CompatibilityScoreChartProps> = ({ 
-  areas, 
-  showTrends = false 
+const CompatibilityScoreChart: React.FC<CompatibilityScoreChartProps> = ({
+  areas,
+  showTrends = false,
 }) => {
   const getScoreColor = (score: number): string => {
     if (score >= 85) return 'text-emerald-600 bg-emerald-50 border-emerald-200';
@@ -59,20 +59,13 @@ const CompatibilityScoreChart: React.FC<CompatibilityScoreChartProps> = ({
           </Badge>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-6">
         {/* Overall Score Display */}
         <div className="text-center p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg border">
-          <div className="text-2xl font-bold text-primary mb-1">
-            {Math.round(averageScore)}%
-          </div>
-          <div className="text-sm text-muted-foreground mb-2">
-            Score de Compatibilité Global
-          </div>
-          <Progress 
-            value={averageScore} 
-            className="h-3"
-          />
+          <div className="text-2xl font-bold text-primary mb-1">{Math.round(averageScore)}%</div>
+          <div className="text-sm text-muted-foreground mb-2">Score de Compatibilité Global</div>
+          <Progress value={averageScore} className="h-3" />
         </div>
 
         {/* Individual Area Scores */}
@@ -80,7 +73,7 @@ const CompatibilityScoreChart: React.FC<CompatibilityScoreChartProps> = ({
           <h4 className="font-medium text-sm text-muted-foreground uppercase tracking-wide">
             Détail par Domaine
           </h4>
-          
+
           {areas.map((area, index) => (
             <div key={index} className="space-y-2">
               <div className="flex items-center justify-between">
@@ -89,29 +82,22 @@ const CompatibilityScoreChart: React.FC<CompatibilityScoreChartProps> = ({
                   {showTrends && getTrendIcon(area.score)}
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-muted-foreground">
-                    {area.score}%
-                  </span>
-                  <Badge 
-                    variant="outline" 
-                    className={`text-xs ${getScoreColor(area.score)}`}
-                  >
+                  <span className="text-sm text-muted-foreground">{area.score}%</span>
+                  <Badge variant="outline" className={`text-xs ${getScoreColor(area.score)}`}>
                     {getScoreLabel(area.score)}
                   </Badge>
                 </div>
               </div>
-              
+
               <div className="relative">
                 <Progress value={area.score} className="h-2" />
-                <div 
+                <div
                   className={`absolute top-0 left-0 h-2 rounded-full transition-all duration-500 ${getProgressColor(area.score)}`}
                   style={{ width: `${area.score}%` }}
                 />
               </div>
-              
-              <p className="text-xs text-muted-foreground">
-                {area.description}
-              </p>
+
+              <p className="text-xs text-muted-foreground">{area.description}</p>
             </div>
           ))}
         </div>

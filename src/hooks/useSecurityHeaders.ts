@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 
 export const useSecurityHeaders = () => {
@@ -17,7 +16,7 @@ export const useSecurityHeaders = () => {
       "frame-src 'none'",
       "object-src 'none'",
       "base-uri 'self'",
-      "form-action 'self'"
+      "form-action 'self'",
     ].join('; ');
 
     if (!document.querySelector('meta[http-equiv="Content-Security-Policy"]')) {
@@ -29,10 +28,10 @@ export const useSecurityHeaders = () => {
       { name: 'X-Content-Type-Options', content: 'nosniff' },
       { name: 'X-Frame-Options', content: 'DENY' },
       { name: 'X-XSS-Protection', content: '1; mode=block' },
-      { name: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' }
+      { name: 'Referrer-Policy', content: 'strict-origin-when-cross-origin' },
     ];
 
-    headers.forEach(header => {
+    headers.forEach((header) => {
       if (!document.querySelector(`meta[name="${header.name}"]`)) {
         const meta = document.createElement('meta');
         meta.name = header.name;

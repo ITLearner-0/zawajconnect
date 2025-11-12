@@ -13,6 +13,7 @@ Votre site https://zawajconnect.me/ affiche une page blanche car **les variables
 ### Erreur Technique
 
 L'application nécessite deux variables d'environnement pour fonctionner :
+
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_PUBLISHABLE_KEY`
 
@@ -25,6 +26,7 @@ Sans ces variables, l'application ne peut pas se connecter à votre base de donn
 ### Étape 1: Obtenir les Valeurs Supabase
 
 1. **Connectez-vous à Supabase**
+
    ```
    https://app.supabase.com
    ```
@@ -46,6 +48,7 @@ Hostinger gère les variables d'environnement différemment selon votre type d'h
 #### Option A: Si vous utilisez **Hostinger avec Node.js** (recommandé)
 
 1. **Connectez-vous à hPanel Hostinger**
+
    ```
    https://hpanel.hostinger.com
    ```
@@ -70,12 +73,14 @@ Pour l'hébergement web classique, vous devez :
 1. **Construire l'application en local avec les variables**
 
    Créez un fichier `.env` dans votre projet (en local sur votre ordinateur) :
+
    ```bash
    VITE_SUPABASE_URL=https://votre-projet.supabase.co
    VITE_SUPABASE_PUBLISHABLE_KEY=votre_clé_publique_ici
    ```
 
 2. **Construire le projet**
+
    ```bash
    npm install
    npm run build
@@ -93,6 +98,7 @@ Pour l'hébergement web classique, vous devez :
 4. **Configuration .htaccess** (important pour React Router)
 
    Vérifiez que le fichier `.htaccess` existe dans `public_html` avec ce contenu :
+
    ```apache
    <IfModule mod_rewrite.c>
      RewriteEngine On
@@ -113,6 +119,7 @@ Pour l'hébergement web classique, vous devez :
 1. **Videz le cache du navigateur** (Ctrl+Shift+R ou Cmd+Shift+R)
 
 2. **Accédez au site**
+
    ```
    https://zawajconnect.me/
    ```
@@ -132,11 +139,13 @@ Pour l'hébergement web classique, vous devez :
 ### 1. **Système de Gestion d'Erreur Amélioré** ✅
 
 Au lieu d'une page blanche, vous verrez maintenant une **page d'erreur détaillée** avec :
+
 - Le message d'erreur exact
 - Instructions de résolution
 - Informations de débogage
 
 **Fichiers créés/modifiés :**
+
 - `src/components/ErrorFallback.tsx` (nouveau) - Page d'erreur visible
 - `src/components/ErrorBoundary.tsx` (modifié) - Capture les erreurs React
 - `src/errorHandler.ts` (nouveau) - Gestionnaire d'erreur global
@@ -148,11 +157,13 @@ Au lieu d'une page blanche, vous verrez maintenant une **page d'erreur détaill�
 Pour que les appels audio/vidéo fonctionnent :
 
 **Avant :**
+
 ```toml
 Permissions-Policy = "geolocation=(), microphone=(), camera=()"
 ```
 
 **Après :**
+
 ```toml
 Permissions-Policy = "geolocation=(), microphone=(self), camera=(self)"
 ```
@@ -166,18 +177,21 @@ Le package manquant a été ajouté pour l'export des données.
 ## 📋 Checklist de Déploiement Hostinger
 
 ### Configuration Initiale
+
 - [ ] Variables d'environnement Supabase obtenues (URL + Key)
 - [ ] Variables configurées sur Hostinger (Node.js ou build local)
 - [ ] Fichier `.htaccess` présent dans `public_html`
 - [ ] Build réussi sans erreurs
 
 ### Premier Déploiement
+
 - [ ] Dossier `dist/` complet uploadé sur Hostinger
 - [ ] Tous les fichiers dans `public_html` (ou dossier web)
 - [ ] `.htaccess` configuré pour React Router
 - [ ] Cache navigateur vidé
 
 ### Vérification Finale
+
 - [ ] Site accessible (pas de page blanche)
 - [ ] Console navigateur sans erreurs critiques
 - [ ] Login/registration fonctionne
@@ -199,40 +213,41 @@ name: Deploy to Hostinger
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '18'
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Build
-      env:
-        VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-        VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
-      run: npm run build
+      - name: Build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+        run: npm run build
 
-    - name: Deploy to Hostinger via FTP
-      uses: SamKirkland/FTP-Deploy-Action@4.3.0
-      with:
-        server: ftp.zawajconnect.me
-        username: ${{ secrets.FTP_USERNAME }}
-        password: ${{ secrets.FTP_PASSWORD }}
-        local-dir: ./dist/
-        server-dir: /public_html/
+      - name: Deploy to Hostinger via FTP
+        uses: SamKirkland/FTP-Deploy-Action@4.3.0
+        with:
+          server: ftp.zawajconnect.me
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          server-dir: /public_html/
 ```
 
 **Configuration des secrets GitHub** :
+
 1. Allez dans Settings → Secrets and variables → Actions
 2. Ajoutez :
    - `VITE_SUPABASE_URL`
@@ -267,6 +282,7 @@ echo "✅ Déploiement terminé !"
 ```
 
 Rendez-le exécutable :
+
 ```bash
 chmod +x deploy-hostinger.sh
 ```
@@ -281,6 +297,7 @@ chmod +x deploy-hostinger.sh
    - F12 → Console → Vous devriez voir les erreurs exactes maintenant
 
 2. **Vérifiez que tous les fichiers sont uploadés**
+
    ```
    public_html/
    ├── index.html
@@ -317,6 +334,7 @@ Si vous avez besoin d'aide avec Hostinger :
 - **Tutoriels** : https://support.hostinger.com
 
 Questions fréquentes à poser :
+
 - "Comment configurer les variables d'environnement pour une application Node.js ?"
 - "Comment configurer le .htaccess pour une Single Page Application ?"
 - "Comment vider le cache CDN de mon site ?"
@@ -325,15 +343,15 @@ Questions fréquentes à poser :
 
 ## 📝 Résumé des Fichiers Modifiés
 
-| Fichier | Changement | Status |
-|---------|------------|--------|
-| `src/components/ErrorFallback.tsx` | ✅ Créé | Nouveau composant d'erreur |
-| `src/components/ErrorBoundary.tsx` | ✅ Modifié | Utilise ErrorFallback |
-| `src/errorHandler.ts` | ✅ Créé | Gestionnaire d'erreur global |
-| `src/main.tsx` | ✅ Modifié | Intégration ErrorBoundary |
-| `src/integrations/supabase/client.ts` | ✅ Modifié | Erreur non-bloquante |
-| `netlify.toml` | ✅ Modifié | Permissions WebRTC |
-| `package.json` | ✅ Modifié | Ajout de xlsx |
+| Fichier                               | Changement | Status                       |
+| ------------------------------------- | ---------- | ---------------------------- |
+| `src/components/ErrorFallback.tsx`    | ✅ Créé    | Nouveau composant d'erreur   |
+| `src/components/ErrorBoundary.tsx`    | ✅ Modifié | Utilise ErrorFallback        |
+| `src/errorHandler.ts`                 | ✅ Créé    | Gestionnaire d'erreur global |
+| `src/main.tsx`                        | ✅ Modifié | Intégration ErrorBoundary    |
+| `src/integrations/supabase/client.ts` | ✅ Modifié | Erreur non-bloquante         |
+| `netlify.toml`                        | ✅ Modifié | Permissions WebRTC           |
+| `package.json`                        | ✅ Modifié | Ajout de xlsx                |
 
 ---
 

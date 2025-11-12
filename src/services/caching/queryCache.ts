@@ -1,4 +1,3 @@
-
 /**
  * Query caching service for frequently accessed data
  */
@@ -13,7 +12,7 @@ class QueryCacheService {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),
-      ttl
+      ttl,
     });
   }
 
@@ -22,13 +21,13 @@ class QueryCacheService {
    */
   get(key: string): any | null {
     const entry = this.cache.get(key);
-    
+
     if (!entry) {
       return null;
     }
 
     const isExpired = Date.now() - entry.timestamp > entry.ttl;
-    
+
     if (isExpired) {
       this.cache.delete(key);
       return null;
@@ -42,7 +41,7 @@ class QueryCacheService {
    */
   cleanup() {
     const now = Date.now();
-    
+
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > entry.ttl) {
         this.cache.delete(key);
@@ -63,9 +62,9 @@ class QueryCacheService {
   generateKey(prefix: string, params: Record<string, any>): string {
     const sortedParams = Object.keys(params)
       .sort()
-      .map(key => `${key}:${params[key]}`)
+      .map((key) => `${key}:${params[key]}`)
       .join('|');
-    
+
     return `${prefix}:${sortedParams}`;
   }
 }
@@ -73,6 +72,9 @@ class QueryCacheService {
 export const queryCache = new QueryCacheService();
 
 // Cleanup expired entries every 10 minutes
-setInterval(() => {
-  queryCache.cleanup();
-}, 10 * 60 * 1000);
+setInterval(
+  () => {
+    queryCache.cleanup();
+  },
+  10 * 60 * 1000
+);

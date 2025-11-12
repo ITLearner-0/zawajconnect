@@ -21,6 +21,7 @@
 ## ✅ Prérequis
 
 ### Comptes Nécessaires
+
 - [ ] Compte Supabase (avec projet existant)
 - [ ] Compte Vercel/Netlify/AWS (pour hébergement)
 - [ ] Compte Sentry (optionnel, monitoring erreurs)
@@ -28,12 +29,14 @@
 - [ ] Domaine personnalisé (optionnel)
 
 ### Outils Installés
+
 - [ ] Node.js 18+ installé
 - [ ] Supabase CLI installé (`npm install -g supabase`)
 - [ ] Git configuré
 - [ ] Accès au repository GitHub
 
 ### Vérifications Préalables
+
 ```bash
 # Vérifier que le build fonctionne
 npm run build
@@ -46,6 +49,7 @@ cat .env.example
 ```
 
 **Résultats Attendus:**
+
 - ✅ Build réussi (~22s, 0 erreurs)
 - ✅ 98/98 tests passent
 - ✅ Toutes les variables documentées
@@ -66,6 +70,7 @@ supabase link --project-ref YOUR_PROJECT_REF
 ```
 
 **Où trouver PROJECT_REF:**
+
 - Dashboard Supabase → Settings → General → Reference ID
 - Format: `abcdefghijklmnop`
 
@@ -83,10 +88,12 @@ supabase db remote status
 ```
 
 **Migrations à Appliquer:**
+
 1. `20250105_performance_indexes.sql` - 20+ index pour performance
 2. `20250105_moderation_tables.sql` - Tables modération
 
 **Vérification:**
+
 ```sql
 -- Dans Supabase SQL Editor
 -- Vérifier que les index existent
@@ -104,6 +111,7 @@ AND table_name LIKE 'moderation%';
 ```
 
 **Résultats Attendus:**
+
 - ✅ 20+ index créés (idx_profiles_gender, idx_matches_user1_status, etc.)
 - ✅ 2 tables créées (moderation_rules, moderation_violations)
 
@@ -116,12 +124,14 @@ AND table_name LIKE 'moderation%';
 ```
 
 **OU via CLI:**
+
 ```bash
 # Si vous avez configuré les seeds
 supabase db seed
 ```
 
 **Vérification:**
+
 ```sql
 -- Dans Supabase SQL Editor
 SELECT COUNT(*) as total_rules,
@@ -130,12 +140,14 @@ FROM moderation_rules;
 ```
 
 **Résultats Attendus:**
+
 - ✅ 17 règles totales
 - ✅ 17 règles actives
 
 ### Étape 4: Configurer Row Level Security (RLS)
 
 **Vérifier que RLS est activé:**
+
 ```sql
 SELECT tablename, rowsecurity
 FROM pg_tables
@@ -144,6 +156,7 @@ AND tablename IN ('profiles', 'matches', 'messages', 'moderation_rules', 'modera
 ```
 
 **Si RLS n'est pas activé sur certaines tables:**
+
 ```sql
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE matches ENABLE ROW LEVEL SECURITY;
@@ -215,6 +228,7 @@ vercel --prod
 ```
 
 **Configuration Vercel (vercel.json):**
+
 ```json
 {
   "buildCommand": "npm run build",
@@ -222,9 +236,7 @@ vercel --prod
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "vite",
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
 ```
 
@@ -259,6 +271,7 @@ netlify deploy --prod
 ```
 
 **Configuration Netlify (netlify.toml):**
+
 ```toml
 [build]
   command = "npm run build"
@@ -273,6 +286,7 @@ netlify deploy --prod
 ### Option 3: Déploiement sur AWS (Avancé)
 
 **Ressources Nécessaires:**
+
 - S3 bucket pour hébergement statique
 - CloudFront pour CDN
 - Route 53 pour DNS (optionnel)
@@ -298,6 +312,7 @@ aws cloudfront create-invalidation --distribution-id YOUR_DIST_ID --paths "/*"
 ### Production Environment Variables
 
 **Créer un fichier `.env.production` (NE PAS commiter):**
+
 ```bash
 # Supabase Configuration (OBLIGATOIRE)
 VITE_SUPABASE_URL=https://your-project.supabase.co
@@ -343,14 +358,17 @@ netlify env:set VITE_SUPABASE_PUBLISHABLE_KEY "your_key"
 ### ⚠️ Sécurité des Variables
 
 **JAMAIS commiter:**
+
 - ❌ `.env`
 - ❌ `.env.production`
 - ❌ `.env.local`
 
 **Toujours commiter:**
+
 - ✅ `.env.example` (sans vraies valeurs)
 
 **Vérifier .gitignore:**
+
 ```bash
 # S'assurer que .gitignore contient:
 grep -E "\.env" .gitignore
@@ -370,12 +388,14 @@ grep -E "\.env" .gitignore
 ### 2. Checklist Manuelle
 
 #### A. Pages Publiques
+
 - [ ] Landing page (/) charge correctement
 - [ ] Page auth (/auth) accessible
 - [ ] Pages légales accessibles (privacy, terms, etc.)
 - [ ] Design responsive (mobile, tablet, desktop)
 
 #### B. Authentification
+
 - [ ] Signup fonctionne (créer compte test)
 - [ ] Email vérification reçu
 - [ ] Login fonctionne
@@ -383,6 +403,7 @@ grep -E "\.env" .gitignore
 - [ ] Logout fonctionne
 
 #### C. Onboarding
+
 - [ ] Wizard profil accessible
 - [ ] Auto-save fonctionne (rafraîchir page)
 - [ ] Validation étapes OK
@@ -390,6 +411,7 @@ grep -E "\.env" .gitignore
 - [ ] Complétion profil redirige vers dashboard
 
 #### D. Features Premium
+
 - [ ] Browse page affiche profils
 - [ ] Scores compatibilité calculés (fuzzy matching)
 - [ ] Système de likes fonctionne
@@ -398,6 +420,7 @@ grep -E "\.env" .gitignore
 - [ ] Modération messages active
 
 #### E. Paiements
+
 - [ ] Page settings → Premium accessible
 - [ ] Stripe checkout fonctionne (mode test)
 - [ ] Callback success/cancel OK
@@ -405,6 +428,7 @@ grep -E "\.env" .gitignore
 - [ ] Téléchargement factures PDF fonctionne
 
 #### F. Performance
+
 - [ ] Lighthouse score > 80
 - [ ] Temps chargement initial < 3s
 - [ ] Images optimisées
@@ -424,6 +448,7 @@ k6 run scripts/load-test.js
 ### 4. Monitoring Actif
 
 **Configurer Sentry:**
+
 ```bash
 # S'assurer que Sentry DSN est configuré
 # Tester en déclenchant une erreur volontaire
@@ -431,6 +456,7 @@ k6 run scripts/load-test.js
 ```
 
 **Configurer Supabase Alerts:**
+
 - Dashboard Supabase → Database → Logs
 - Activer alertes pour erreurs critiques
 - Configurer webhook notifications (optionnel)
@@ -442,17 +468,20 @@ k6 run scripts/load-test.js
 ### Métriques à Suivre
 
 #### Supabase Dashboard
+
 - **Database:** Connections actives, query performance
 - **Auth:** Taux signup, taux vérification email
 - **Storage:** Utilisation espace, uploads réussis
 - **Functions:** Invocations, erreurs
 
 #### Sentry Dashboard
+
 - **Errors:** Taux erreurs, types erreurs
 - **Performance:** Temps chargement pages
 - **Releases:** Tracking versions déployées
 
 #### Analytics (Google Analytics / Mixpanel)
+
 - **Acquisition:** Sources trafic, conversions
 - **Engagement:** Pages vues, temps session
 - **Retention:** Utilisateurs actifs quotidiens/hebdo
@@ -461,12 +490,14 @@ k6 run scripts/load-test.js
 ### Alertes Recommandées
 
 **Critiques (Notification immédiate):**
+
 - Taux erreur > 5%
 - Temps réponse API > 2s
 - Database connexions > 80% capacity
 - Paiement échoué pour raison technique
 
 **Importantes (Email quotidien):**
+
 - Nouvelles inscriptions < baseline
 - Taux conversion premium en baisse
 - Contenu modéré > 10 violations/jour
@@ -474,17 +505,20 @@ k6 run scripts/load-test.js
 ### Maintenance Régulière
 
 **Quotidien:**
+
 - [ ] Vérifier dashboard Sentry (erreurs nouvelles)
 - [ ] Vérifier logs Supabase (erreurs auth/db)
 - [ ] Vérifier queue modération (contenu flaggé)
 
 **Hebdomadaire:**
+
 - [ ] Analyser métriques engagement
 - [ ] Backup manuel base de données
 - [ ] Review incidents Sentry résolus
 - [ ] Vérifier mise à jour dépendances sécurité
 
 **Mensuel:**
+
 - [ ] Audit performance (Lighthouse)
 - [ ] Review logs accès (patterns inhabituels)
 - [ ] Optimiser requêtes lentes (Supabase slow queries)
@@ -559,6 +593,7 @@ supabase db push
 ## 🎯 Checklist Finale Pré-Déploiement
 
 ### Code & Build
+
 - [x] Build production réussi sans warnings
 - [x] 98/98 tests automatisés passent
 - [x] Pas d'erreurs TypeScript
@@ -566,6 +601,7 @@ supabase db push
 - [x] Documentation à jour
 
 ### Configuration
+
 - [ ] Variables environnement production configurées
 - [ ] Supabase project lié correctement
 - [ ] Migrations base de données appliquées
@@ -574,24 +610,28 @@ supabase db push
 - [ ] Storage buckets configurés
 
 ### Sécurité
+
 - [ ] Pas de secrets hardcodés
-- [ ] .env* dans .gitignore
+- [ ] .env\* dans .gitignore
 - [ ] HTTPS activé (certificat SSL)
 - [ ] CORS configuré correctement
 - [ ] Rate limiting activé (API Supabase)
 
 ### Monitoring
+
 - [ ] Sentry DSN configuré
 - [ ] Error tracking actif
 - [ ] Performance monitoring activé
 - [ ] Alertes configurées
 
 ### Backup
+
 - [ ] Backup automatique Supabase activé
 - [ ] Point de restauration créé avant déploiement
 - [ ] Plan de rollback documenté
 
 ### Communication
+
 - [ ] Équipe informée du déploiement
 - [ ] Status page mise à jour (si applicable)
 - [ ] Documentation utilisateur à jour
@@ -601,6 +641,7 @@ supabase db push
 ## 📞 Support & Ressources
 
 ### Documentation
+
 - **Supabase:** https://supabase.com/docs
 - **Vercel:** https://vercel.com/docs
 - **Netlify:** https://docs.netlify.com
@@ -609,21 +650,25 @@ supabase db push
 ### Aide Dépannage
 
 **Erreur: "Failed to fetch"**
+
 - Vérifier CORS dans Supabase
 - Vérifier URL Supabase correcte
 - Vérifier anon key valide
 
 **Erreur: "Row Level Security Policy Violation"**
+
 - Vérifier policies RLS configurées
 - Vérifier auth.uid() retourne valeur
 - Tester requêtes via SQL Editor
 
 **Build échoue sur Vercel/Netlify**
+
 - Vérifier Node version (18+)
 - Vérifier variables env configurées
 - Vérifier commandes build dans settings
 
 **Performance lente**
+
 - Vérifier index base de données appliqués
 - Analyser slow queries Supabase
 - Vérifier bundle size (npm run build)

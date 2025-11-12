@@ -12,26 +12,26 @@ interface WaliStatsCardsProps {
 }
 
 const actionTypeLabels: Record<string, { label: string; icon: any; color: string }> = {
-  match_approved: { 
-    label: 'Approbations', 
-    icon: CheckCircle, 
-    color: 'text-green-600 dark:text-green-400' 
+  match_approved: {
+    label: 'Approbations',
+    icon: CheckCircle,
+    color: 'text-green-600 dark:text-green-400',
   },
-  match_rejected: { 
-    label: 'Rejets', 
-    icon: XCircle, 
-    color: 'text-red-600 dark:text-red-400' 
+  match_rejected: {
+    label: 'Rejets',
+    icon: XCircle,
+    color: 'text-red-600 dark:text-red-400',
   },
-  profile_viewed: { 
-    label: 'Vues de profil', 
-    icon: Eye, 
-    color: 'text-blue-600 dark:text-blue-400' 
+  profile_viewed: {
+    label: 'Vues de profil',
+    icon: Eye,
+    color: 'text-blue-600 dark:text-blue-400',
   },
-  match_needs_discussion: { 
-    label: 'Discussions', 
-    icon: MessageSquare, 
-    color: 'text-orange-600 dark:text-orange-400' 
-  }
+  match_needs_discussion: {
+    label: 'Discussions',
+    icon: MessageSquare,
+    color: 'text-orange-600 dark:text-orange-400',
+  },
 };
 
 export const WaliStatsCards = ({ statistics, loading }: WaliStatsCardsProps) => {
@@ -54,10 +54,13 @@ export const WaliStatsCards = ({ statistics, loading }: WaliStatsCardsProps) => 
     );
   }
 
-  const statsMap = statistics.reduce((acc, stat) => {
-    acc[stat.action_type] = stat;
-    return acc;
-  }, {} as Record<string, typeof statistics[0]>);
+  const statsMap = statistics.reduce(
+    (acc, stat) => {
+      acc[stat.action_type] = stat;
+      return acc;
+    },
+    {} as Record<string, (typeof statistics)[0]>
+  );
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -70,16 +73,12 @@ export const WaliStatsCards = ({ statistics, loading }: WaliStatsCardsProps) => 
         return (
           <Card key={actionType}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {config.label}
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">{config.label}</CardTitle>
               <Icon className={`h-4 w-4 ${config.color}`} />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{count}</div>
-              <p className="text-xs text-muted-foreground">
-                {successRate}% de succès
-              </p>
+              <p className="text-xs text-muted-foreground">{successRate}% de succès</p>
             </CardContent>
           </Card>
         );

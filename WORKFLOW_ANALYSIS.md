@@ -23,6 +23,7 @@ L'application ZawajConnect est une plateforme matrimoniale islamique bien struct
 ## 🔍 Structure des Routes
 
 ### Routes Publiques (8 routes)
+
 - `/` - Landing page
 - `/auth` - Authentification (login/signup)
 - `/reset-password` - Récupération mot de passe
@@ -31,12 +32,15 @@ L'application ZawajConnect est une plateforme matrimoniale islamique bien struct
 - `/invitation-auth`, `/invitation`, `/invitation/accept`
 
 ### Routes Spéciales (3 routes)
+
 - `/onboarding` - Création profil utilisateur
 - `/wali-onboarding` - Configuration Wali
 - `/subscription-success` - Callback paiement
 
 ### Routes Protégées (30+ routes)
+
 **Principales :**
+
 - `/dashboard` - Tableau de bord
 - `/browse` - Navigation profils (Premium)
 - `/matches` - Matchs mutuels (Premium)
@@ -44,16 +48,19 @@ L'application ZawajConnect est une plateforme matrimoniale islamique bien struct
 - `/enhanced-profile` - Gestion profil
 
 **Famille/Wali :**
+
 - `/family-supervision` - Supervision familiale
 - `/wali-dashboard` - Tableau de bord Wali
 - `/match-approval` - Approbation matchs
 - `/family-analytics` - Analytique famille
 
 **Admin :**
+
 - `/admin` - Administration
 - `/moderation-test(s)` - Tests modération
 
 **Outils :**
+
 - `/settings` - Paramètres
 - `/payment-history` - Historique paiements
 - `/islamic-tools` - Outils islamiques
@@ -224,6 +231,7 @@ Badge Affiché:
 **Statut :** ✅ RÉSOLU
 
 **Problème :**
+
 - Les Walis étaient redirigés directement vers `/family-supervision` après signup
 - Ils sautaient l'étape `/wali-onboarding`
 - Configuration Wali incomplète
@@ -231,6 +239,7 @@ Badge Affiché:
 **Localisation :** `src/pages/Auth.tsx` lignes 40-50
 
 **Solution Appliquée :**
+
 ```typescript
 // AVANT
 if (isWaliMode) {
@@ -248,6 +257,7 @@ if (isWali) {
 ```
 
 **Fichiers Modifiés :**
+
 - `src/pages/Auth.tsx` - Ajout import `useUserData` + logique conditionnelle
 
 **Validation :** ✅ Build réussi, tests passent
@@ -260,6 +270,7 @@ if (isWali) {
 **Statut :** ✅ RÉSOLU
 
 **Problème :**
+
 - Bouton "Télécharger facture" présent mais TODO
 - Utilisateurs ne pouvaient pas obtenir leurs factures
 - Problème compliance/comptabilité
@@ -276,6 +287,7 @@ if (isWali) {
    - Fallback téléchargement HTML
 
 2. **Fonction complète :**
+
 ```typescript
 generateInvoicePDF({
   paymentId: payment.id,
@@ -290,6 +302,7 @@ generateInvoicePDF({
 ```
 
 **Features Facture :**
+
 - ✅ Informations complètes (ID transaction, date, montant)
 - ✅ Calcul TVA 20%
 - ✅ Branding professionnel
@@ -299,6 +312,7 @@ generateInvoicePDF({
 - ✅ Responsive & accessible
 
 **Fichiers Modifiés :**
+
 - `src/utils/invoiceGenerator.ts` - Nouveau (271 lignes)
 - `src/pages/PaymentHistory.tsx` - Implémentation handleDownloadInvoice
 
@@ -335,11 +349,13 @@ generateInvoicePDF({
 
 **Statut :** INTÉGRÉ COMPLET
 **Fichiers :**
+
 - `src/utils/matchingAlgorithm.ts` - Algorithmes Levenshtein, Jaccard
 - `src/hooks/useUnifiedCompatibility.tsx` - Calculs intégrés
 - `src/components/SmartMatchingSuggestions.tsx` - Affichage scores
 
 **Performance :**
+
 - Scores 0-100 (vs binaire avant)
 - Similarité ~80% = HIGH score
 - Tolérance numérique ±20%
@@ -349,16 +365,19 @@ generateInvoicePDF({
 
 **Statut :** INTÉGRÉ COMPLET
 **Fichiers :**
+
 - `src/hooks/useFormAutoSave.tsx` - Save localStorage simple
 - `src/hooks/useFormAutosave.ts` - Save localStorage + Supabase
 - `src/hooks/useDebounce.ts` - Debouncing optimisé
 
 **Intégrations :**
+
 - Onboarding.tsx - Sauvegarde complète profil
 - EnhancedProfile.tsx - Modifications profil
 - ProfileWizard.tsx - Wizard multi-étapes
 
 **Features :**
+
 - Debounce 1-5 secondes (configurable)
 - Backup automatique sur unload
 - Récupération session perdue
@@ -368,16 +387,19 @@ generateInvoicePDF({
 
 **Statut :** INTÉGRÉ COMPLET
 **Fichiers :**
+
 - `src/services/contentModerationService.ts` - Engine modération
 - `src/hooks/useIslamicModeration.tsx` - Hook wrapper
 - `supabase/migrations/20250105_moderation_tables.sql` - Tables BDD
 - `supabase/seeds/moderation_rules_seed.sql` - 17 règles par défaut
 
 **Intégrations :**
+
 - RealTimeChat - Modération messages
 - ModerationTestSuite - Tests interface
 
 **Rules :**
+
 - ❌ Mots-clés inappropriés (critical)
 - ❌ Activités haram (high)
 - ⚠️ Liens externes (medium)
@@ -389,10 +411,12 @@ generateInvoicePDF({
 
 **Statut :** INTÉGRÉ COMPLET
 **Fichiers :**
+
 - `src/pages/PaymentHistory.tsx` - Interface complète
 - `src/utils/invoiceGenerator.ts` - Génération PDF
 
 **Features :**
+
 - Abonnement actuel
 - Historique transactions
 - Téléchargement factures PDF ✅ NOUVEAU
@@ -404,6 +428,7 @@ generateInvoicePDF({
 ## 🏗️ Architecture Technique
 
 ### Data Flow
+
 ```
 UI Components
     ↓
@@ -417,6 +442,7 @@ Backend (Database, Realtime, Auth)
 ```
 
 ### Dépendances Critiques
+
 ```
 ProtectedRoute
 ├─ useAuth() → Session
@@ -431,6 +457,7 @@ Browse/Chat/Matches
 ```
 
 ### Gating Features Premium
+
 ```
 Browse:   subscription.subscribed ? allow : upgrade_modal
 Matches:  subscription.subscribed ? allow : upgrade_card
@@ -445,6 +472,7 @@ Advanced: premium_only
 ## 🔒 Sécurité
 
 ### ✅ Points Forts
+
 - Routes protégées nécessitent authentification
 - Contrôle accès basé rôles (RBAC)
 - Modération contenu bloque contenu inapproprié
@@ -452,6 +480,7 @@ Advanced: premium_only
 - Paramètres confidentialité limitent visibilité
 
 ### ⚠️ À Vérifier
+
 - Politiques RLS Supabase sur toutes tables
 - Validation user ID sur toutes requêtes
 - Rate limiting messagerie (anti-spam)
@@ -463,6 +492,7 @@ Advanced: premium_only
 ## 🧪 Tests
 
 ### Couverture Actuelle
+
 ```
 ✅ 98/98 tests passent (100%)
 
@@ -476,6 +506,7 @@ Test Files:
 ```
 
 ### Recommandations Extension
+
 - Workflows authentification
 - Logique routes protégées
 - Règles engine modération
@@ -487,6 +518,7 @@ Test Files:
 ## 📦 Build & Déploiement
 
 ### Build Stats (Production)
+
 ```
 ✓ Clean build - 22.27s
 ✓ 3,729 modules transformés
@@ -507,6 +539,7 @@ Total: ~1.1 MB gzippé
 ### Prérequis Déploiement
 
 **Base de Données :**
+
 1. Appliquer migrations :
    - `supabase/migrations/20250105_performance_indexes.sql`
    - `supabase/migrations/20250105_moderation_tables.sql`
@@ -514,6 +547,7 @@ Total: ~1.1 MB gzippé
    - `supabase/seeds/moderation_rules_seed.sql`
 
 **Variables Environnement :**
+
 ```bash
 VITE_SUPABASE_URL=https://xxx.supabase.co
 VITE_SUPABASE_PUBLISHABLE_KEY=xxx
@@ -523,6 +557,7 @@ VITE_APP_VERSION=1.0.0
 ```
 
 **Monitoring :**
+
 - Configurer Sentry DSN pour tracking erreurs
 - Activer analytics Supabase
 - Monitorer performance queries avec indexes
@@ -532,6 +567,7 @@ VITE_APP_VERSION=1.0.0
 ## 📊 Métriques Performance
 
 ### Optimisations Appliquées
+
 - ✅ 20+ index BDD (réduction 60-80% temps requête)
 - ✅ Code splitting (43 routes lazy loaded)
 - ✅ Cache algorithme matching (30 min TTL)
@@ -539,6 +575,7 @@ VITE_APP_VERSION=1.0.0
 - ✅ Real-time subscriptions (vs polling)
 
 ### Améliorations Recommandées
+
 - Lazy load images profils (IntersectionObserver)
 - Service Worker pour offline support
 - Compression images côté client avant upload
@@ -549,6 +586,7 @@ VITE_APP_VERSION=1.0.0
 ## ✅ Checklist Production
 
 ### Critique (Avant Déploiement)
+
 - [x] ✅ Tous tests passent (98/98)
 - [x] ✅ Build clean sans erreurs
 - [x] ✅ Routes vérifiées fonctionnelles
@@ -560,6 +598,7 @@ VITE_APP_VERSION=1.0.0
 - [ ] ⚠️ Sentry DSN configuré
 
 ### Important (Première Semaine)
+
 - [ ] Monitoring erreurs actif
 - [ ] Analytics configuré
 - [ ] Backup BDD automatique
@@ -568,6 +607,7 @@ VITE_APP_VERSION=1.0.0
 - [ ] Tests E2E sur staging
 
 ### Recommandé (Premier Mois)
+
 - [ ] Session timeout warnings
 - [ ] Error boundaries pages
 - [ ] Notifications real-time
@@ -581,6 +621,7 @@ VITE_APP_VERSION=1.0.0
 ### Statut Global : ✅ PRODUCTION-READY
 
 **Points Forts :**
+
 - Architecture solide et bien structurée
 - Tous workflows critiques fonctionnels
 - Nouvelles features bien intégrées
@@ -588,10 +629,12 @@ VITE_APP_VERSION=1.0.0
 - Build optimisé et performant
 
 **Correctifs Appliqués :**
+
 1. ✅ Navigation Wali post-auth corrigée
 2. ✅ Téléchargement factures implémenté
 
 **Prochaines Étapes :**
+
 1. Appliquer migrations BDD production
 2. Configurer Sentry monitoring
 3. Déployer sur environnement staging

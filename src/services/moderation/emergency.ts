@@ -1,4 +1,3 @@
-
 /**
  * Reports an emergency situation to moderators
  */
@@ -16,12 +15,12 @@ export const reportEmergency = async (
       Type: ${emergencyType}
       Priority: ${emergencyType === 'immediate_threat' ? 'high' : 'medium'}
     `);
-    
+
     // For immediate threats, also notify admins via a different channel
     if (emergencyType === 'immediate_threat') {
       await notifyAdminsImmediately(conversationId, reporterId);
     }
-    
+
     return true;
   } catch (err) {
     console.error('Error reporting emergency:', err);
@@ -37,7 +36,9 @@ const notifyAdminsImmediately = async (
   reporterId: string
 ): Promise<void> => {
   try {
-    console.log(`URGENT NOTIFICATION: User ${reporterId} has reported an immediate threat in conversation ${conversationId}`);
+    console.log(
+      `URGENT NOTIFICATION: User ${reporterId} has reported an immediate threat in conversation ${conversationId}`
+    );
     console.log(`Emergency notification sent for conversation ${conversationId}`);
   } catch (err) {
     console.error('Error notifying admins:', err);
@@ -59,7 +60,7 @@ export const resolveEmergencyReport = async (
       Resolution: ${resolution}
       Action taken: ${actionTaken}
     `);
-    
+
     return true;
   } catch (err) {
     console.error('Error resolving emergency report:', err);

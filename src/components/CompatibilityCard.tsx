@@ -12,7 +12,11 @@ interface CompatibilityCardProps {
   compact?: boolean;
 }
 
-const CompatibilityCard = ({ userId, showActions = true, compact = false }: CompatibilityCardProps) => {
+const CompatibilityCard = ({
+  userId,
+  showActions = true,
+  compact = false,
+}: CompatibilityCardProps) => {
   const { stats, loading } = useCompatibility();
 
   if (loading) {
@@ -31,7 +35,9 @@ const CompatibilityCard = ({ userId, showActions = true, compact = false }: Comp
   const isStarted = stats.answeredQuestions > 0;
 
   return (
-    <Card className={`border-l-4 ${isComplete ? 'border-l-emerald' : isStarted ? 'border-l-gold' : 'border-l-gray-300'}`}>
+    <Card
+      className={`border-l-4 ${isComplete ? 'border-l-emerald' : isStarted ? 'border-l-gold' : 'border-l-gray-300'}`}
+    >
       {!compact && (
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg">
@@ -40,24 +46,21 @@ const CompatibilityCard = ({ userId, showActions = true, compact = false }: Comp
           </CardTitle>
         </CardHeader>
       )}
-      
+
       <CardContent className={compact ? 'p-4' : ''}>
         <div className="space-y-4">
           {/* Progress */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">Progression</span>
-              <Badge 
-                variant={isComplete ? "default" : isStarted ? "secondary" : "outline"}
-                className={isComplete ? "bg-emerald text-white" : ""}
+              <Badge
+                variant={isComplete ? 'default' : isStarted ? 'secondary' : 'outline'}
+                className={isComplete ? 'bg-emerald text-white' : ''}
               >
                 {stats.answeredQuestions}/{stats.totalQuestions}
               </Badge>
             </div>
-            <Progress 
-              value={stats.completionPercentage} 
-              className="h-2"
-            />
+            <Progress value={stats.completionPercentage} className="h-2" />
             <p className="text-xs text-muted-foreground mt-1">
               {Math.round(stats.completionPercentage)}% complété
             </p>
@@ -73,7 +76,9 @@ const CompatibilityCard = ({ userId, showActions = true, compact = false }: Comp
             ) : isStarted ? (
               <div className="flex items-center gap-2 text-gold-dark">
                 <TrendingUp className="h-4 w-4" />
-                <span>En cours - {stats.totalQuestions - stats.answeredQuestions} questions restantes</span>
+                <span>
+                  En cours - {stats.totalQuestions - stats.answeredQuestions} questions restantes
+                </span>
               </div>
             ) : (
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -106,17 +111,13 @@ const CompatibilityCard = ({ userId, showActions = true, compact = false }: Comp
           {showActions && (
             <div className="flex gap-2">
               <Link to="/compatibility-test" className="flex-1">
-                <Button 
-                  className="w-full"
-                  variant={isComplete ? "outline" : "default"}
-                  size="sm"
-                >
+                <Button className="w-full" variant={isComplete ? 'outline' : 'default'} size="sm">
                   {isComplete ? 'Modifier réponses' : isStarted ? 'Continuer' : 'Commencer'}
                 </Button>
               </Link>
               {isComplete && (
                 <Link to="/compatibility-insights">
-                  <Button 
+                  <Button
                     variant="default"
                     size="sm"
                     className="bg-gradient-to-r from-emerald to-emerald/80"

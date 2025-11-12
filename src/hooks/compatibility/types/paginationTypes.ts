@@ -1,4 +1,3 @@
-
 export interface PaginationCursor {
   score: number;
   userId: string;

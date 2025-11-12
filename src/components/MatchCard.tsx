@@ -39,9 +39,7 @@ export const MatchCard = ({ match, statusBadge, onViewProfile, onStartChat }: Ma
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-base truncate">{match.other_user?.full_name}</h3>
-                <p className="text-sm text-muted-foreground">
-                  {match.other_user?.age} ans
-                </p>
+                <p className="text-sm text-muted-foreground">{match.other_user?.age} ans</p>
               </div>
               <Badge variant="outline" className="border-emerald/50 text-emerald flex-shrink-0">
                 {match.match_score}%
@@ -61,15 +59,13 @@ export const MatchCard = ({ match, statusBadge, onViewProfile, onStartChat }: Ma
                 {new Date(match.created_at).toLocaleDateString('fr-FR', {
                   day: 'numeric',
                   month: 'short',
-                  year: 'numeric'
+                  year: 'numeric',
                 })}
               </span>
             </div>
 
             {/* Status Badge */}
-            <div className="mb-3">
-              {statusBadge}
-            </div>
+            <div className="mb-3">{statusBadge}</div>
 
             {/* Actions */}
             <div className="flex gap-2">

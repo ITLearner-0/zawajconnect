@@ -1,24 +1,29 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Slider } from '@/components/ui/slider';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Eye, 
-  EyeOff, 
-  Shield, 
-  MapPin, 
-  Clock, 
+import {
+  Eye,
+  EyeOff,
+  Shield,
+  MapPin,
+  Clock,
   Settings,
   Users,
   Lock,
   Unlock,
-  Info
+  Info,
 } from 'lucide-react';
 
 interface VisibilitySettings {
@@ -39,7 +44,7 @@ interface ProfileVisibilityManagerProps {
 const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
   userId,
   settings,
-  onSettingsChange
+  onSettingsChange,
 }) => {
   const [localSettings, setLocalSettings] = useState<VisibilitySettings>(settings);
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -53,24 +58,24 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
   const getVisibilityDescription = (level: number) => {
     switch (level) {
       case 0:
-        return "Profil complètement privé - Invisible pour tous";
+        return 'Profil complètement privé - Invisible pour tous';
       case 25:
-        return "Très privé - Visible uniquement pour les matchs vérifiés";
+        return 'Très privé - Visible uniquement pour les matchs vérifiés';
       case 50:
-        return "Privé - Visible pour les matchs et utilisateurs compatibles";
+        return 'Privé - Visible pour les matchs et utilisateurs compatibles';
       case 75:
-        return "Modéré - Visible avec informations limitées";
+        return 'Modéré - Visible avec informations limitées';
       case 100:
-        return "Public - Toutes les informations visibles";
+        return 'Public - Toutes les informations visibles';
       default:
-        return "Niveau de visibilité personnalisé";
+        return 'Niveau de visibilité personnalisé';
     }
   };
 
   const setTemporaryHide = (hours: number) => {
     const hideUntil = new Date();
     hideUntil.setHours(hideUntil.getHours() + hours);
-    
+
     updateSetting('temporaryHide', true);
     updateSetting('temporaryHideUntil', hideUntil);
   };
@@ -101,10 +106,9 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                 Profil {localSettings.isVisible ? 'Visible' : 'Masqué'}
               </Label>
               <p className="text-sm text-muted-foreground">
-                {localSettings.isVisible 
+                {localSettings.isVisible
                   ? "Votre profil apparaît dans les recherches et peut être vu par d'autres utilisateurs"
-                  : "Votre profil est complètement masqué de tous les utilisateurs"
-                }
+                  : 'Votre profil est complètement masqué de tous les utilisateurs'}
               </p>
             </div>
             <Switch
@@ -118,8 +122,8 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
             <Alert>
               <EyeOff className="h-4 w-4" />
               <AlertDescription>
-                Votre profil est actuellement masqué. Vous n'apparaissez dans aucune recherche 
-                et ne recevrez aucune nouvelle connexion.
+                Votre profil est actuellement masqué. Vous n'apparaissez dans aucune recherche et ne
+                recevrez aucune nouvelle connexion.
               </AlertDescription>
             </Alert>
           )}
@@ -139,11 +143,9 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <Label>Niveau de confidentialité</Label>
-                <Badge variant="outline">
-                  {localSettings.visibilityLevel}%
-                </Badge>
+                <Badge variant="outline">{localSettings.visibilityLevel}%</Badge>
               </div>
-              
+
               <Slider
                 value={[localSettings.visibilityLevel]}
                 onValueChange={([value]) => updateSetting('visibilityLevel', value)}
@@ -152,7 +154,7 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                 step={25}
                 className="w-full"
               />
-              
+
               <div className="grid grid-cols-5 text-xs text-muted-foreground">
                 <span>Privé</span>
                 <span>Très privé</span>
@@ -160,7 +162,7 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                 <span>Ouvert</span>
                 <span>Public</span>
               </div>
-              
+
               <p className="text-sm text-muted-foreground mt-2">
                 {getVisibilityDescription(localSettings.visibilityLevel)}
               </p>
@@ -178,11 +180,7 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                 <Settings className="h-5 w-5" />
                 Options Avancées
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowAdvanced(!showAdvanced)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setShowAdvanced(!showAdvanced)}>
                 {showAdvanced ? 'Masquer' : 'Afficher'}
               </Button>
             </CardTitle>
@@ -193,7 +191,8 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                 <div className="space-y-0.5">
                   <Label>Visible uniquement pour les matchs</Label>
                   <p className="text-sm text-muted-foreground">
-                    Seuls les utilisateurs avec qui vous avez une compatibilité élevée peuvent voir votre profil
+                    Seuls les utilisateurs avec qui vous avez une compatibilité élevée peuvent voir
+                    votre profil
                   </p>
                 </div>
                 <Switch
@@ -238,11 +237,7 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                     {localSettings.temporaryHideUntil?.toLocaleString('fr-FR')}
                   </AlertDescription>
                 </Alert>
-                <Button 
-                  variant="outline" 
-                  onClick={clearTemporaryHide}
-                  className="w-full"
-                >
+                <Button variant="outline" onClick={clearTemporaryHide} className="w-full">
                   <Unlock className="mr-2 h-4 w-4" />
                   Réactiver Maintenant
                 </Button>
@@ -253,32 +248,16 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                   Masquez temporairement votre profil pendant une durée définie
                 </p>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setTemporaryHide(1)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setTemporaryHide(1)}>
                     1 heure
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setTemporaryHide(6)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setTemporaryHide(6)}>
                     6 heures
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setTemporaryHide(24)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setTemporaryHide(24)}>
                     1 jour
                   </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setTemporaryHide(168)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setTemporaryHide(168)}>
                     1 semaine
                   </Button>
                 </div>
@@ -309,7 +288,9 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                     <MapPin className="h-4 w-4" />
                     <div>
                       <div>Distance exacte</div>
-                      <div className="text-xs text-muted-foreground">Affiche la distance précise</div>
+                      <div className="text-xs text-muted-foreground">
+                        Affiche la distance précise
+                      </div>
                     </div>
                   </div>
                 </SelectItem>
@@ -327,7 +308,9 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                     <MapPin className="h-4 w-4" />
                     <div>
                       <div>Ville uniquement</div>
-                      <div className="text-xs text-muted-foreground">Affiche seulement votre ville</div>
+                      <div className="text-xs text-muted-foreground">
+                        Affiche seulement votre ville
+                      </div>
                     </div>
                   </div>
                 </SelectItem>
@@ -336,7 +319,9 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                     <MapPin className="h-4 w-4" />
                     <div>
                       <div>Région uniquement</div>
-                      <div className="text-xs text-muted-foreground">Affiche seulement votre région</div>
+                      <div className="text-xs text-muted-foreground">
+                        Affiche seulement votre région
+                      </div>
                     </div>
                   </div>
                 </SelectItem>
@@ -358,20 +343,18 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-sm">Statut du profil</span>
-              <Badge variant={localSettings.isVisible ? "default" : "destructive"}>
-                {localSettings.isVisible ? "Visible" : "Masqué"}
+              <Badge variant={localSettings.isVisible ? 'default' : 'destructive'}>
+                {localSettings.isVisible ? 'Visible' : 'Masqué'}
               </Badge>
             </div>
-            
+
             {localSettings.isVisible && (
               <>
                 <div className="flex items-center justify-between">
                   <span className="text-sm">Niveau de visibilité</span>
-                  <Badge variant="outline">
-                    {localSettings.visibilityLevel}%
-                  </Badge>
+                  <Badge variant="outline">{localSettings.visibilityLevel}%</Badge>
                 </div>
-                
+
                 {localSettings.showOnlyToMatches && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Restriction</span>
@@ -381,7 +364,7 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                     </Badge>
                   </div>
                 )}
-                
+
                 {localSettings.hideFromSearch && (
                   <div className="flex items-center justify-between">
                     <span className="text-sm">Recherche</span>
@@ -393,7 +376,7 @@ const ProfileVisibilityManager: React.FC<ProfileVisibilityManagerProps> = ({
                 )}
               </>
             )}
-            
+
             {localSettings.temporaryHide && (
               <div className="flex items-center justify-between">
                 <span className="text-sm">Masquage temporaire</span>

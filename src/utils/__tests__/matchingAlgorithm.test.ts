@@ -200,11 +200,7 @@ describe('matchingAlgorithm', () => {
       const culturalScore = 70;
       const personalityScore = 90;
 
-      const overall = calculateOverallCompatibility(
-        islamicScore,
-        culturalScore,
-        personalityScore
-      );
+      const overall = calculateOverallCompatibility(islamicScore, culturalScore, personalityScore);
 
       expect(overall).toBeGreaterThan(0);
       expect(overall).toBeLessThanOrEqual(100);
@@ -217,12 +213,11 @@ describe('matchingAlgorithm', () => {
       const personalityScore = 50;
 
       // Heavy weight on Islamic compatibility
-      const overall = calculateOverallCompatibility(
-        islamicScore,
-        culturalScore,
-        personalityScore,
-        { islamic: 0.7, cultural: 0.15, personality: 0.15 }
-      );
+      const overall = calculateOverallCompatibility(islamicScore, culturalScore, personalityScore, {
+        islamic: 0.7,
+        cultural: 0.15,
+        personality: 0.15,
+      });
 
       expect(overall).toBeGreaterThan(75); // Should be closer to Islamic score
     });
@@ -276,7 +271,7 @@ describe('matchingAlgorithm', () => {
       );
 
       expect(explanation.concerns.length).toBeGreaterThan(0);
-      expect(explanation.concerns.some(c => c.includes('religieuse'))).toBe(true);
+      expect(explanation.concerns.some((c) => c.includes('religieuse'))).toBe(true);
     });
 
     it('should identify high scores as strengths', () => {
@@ -291,7 +286,7 @@ describe('matchingAlgorithm', () => {
       );
 
       expect(explanation.strengths.length).toBeGreaterThan(0);
-      expect(explanation.strengths.some(s => s.includes('religieuse'))).toBe(true);
+      expect(explanation.strengths.some((s) => s.includes('religieuse'))).toBe(true);
     });
 
     it('should handle moderate scores', () => {

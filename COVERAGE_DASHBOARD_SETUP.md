@@ -5,6 +5,7 @@ Ce guide explique comment configurer le dashboard de couverture de tests avec hi
 ## 🎯 Vue d'ensemble
 
 Le dashboard affiche :
+
 - **Statistiques en temps réel** : Couverture actuelle avec tendances
 - **Graphiques d'évolution** : Visualisation temporelle de la couverture
 - **Historique détaillé** : Tableau avec tous les builds et leurs métriques
@@ -28,6 +29,7 @@ git push origin main
 ```
 
 Lors de la première exécution :
+
 - Une branche `gh-pages` est créée automatiquement
 - Le fichier `data/coverage-history.json` est initialisé
 - Les données de couverture sont enregistrées
@@ -59,6 +61,7 @@ const GITHUB_REPO = 'votre-username/votre-repo';
 ### Statistiques en temps réel
 
 Affiche pour chaque métrique :
+
 - **Valeur actuelle** en gros
 - **Tendance** par rapport au commit précédent (↗ ↘ →)
 - **Couleur** selon la performance
@@ -88,6 +91,7 @@ Affiche pour chaque métrique :
 ## 🔄 Mise à jour automatique
 
 Le workflow met à jour automatiquement :
+
 1. **À chaque push sur main** : Collecte et sauvegarde la couverture
 2. **Limite de 100 entrées** : Garde les 100 derniers builds
 3. **Commit automatique** : Pousse vers `gh-pages` branch
@@ -100,9 +104,9 @@ Dans `docs/coverage-dashboard.html`, ligne 218-222 :
 
 ```javascript
 function getBadgeClass(value) {
-    if (value >= 80) return 'badge-success';  // Vert
-    if (value >= 60) return 'badge-warning';  // Jaune
-    return 'badge-danger';                     // Rouge
+  if (value >= 80) return 'badge-success'; // Vert
+  if (value >= 60) return 'badge-warning'; // Jaune
+  return 'badge-danger'; // Rouge
 }
 ```
 
@@ -182,6 +186,7 @@ Le dashboard est compatible avec les notifications Slack/Discord déjà configur
 ## 🎨 Captures d'écran
 
 Le dashboard affiche :
+
 - En-tête avec titre et description
 - 4 cartes de statistiques avec tendances
 - Graphique d'évolution temporelle (ligne)

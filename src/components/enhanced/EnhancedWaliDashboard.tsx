@@ -8,13 +8,13 @@ import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Progress } from '@/components/ui/progress';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Shield, 
-  Users, 
-  MessageSquare, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Shield,
+  Users,
+  MessageSquare,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
   Clock,
   Eye,
   Heart,
@@ -23,19 +23,19 @@ import {
   Activity,
   Bell,
   Video,
-  Settings
+  Settings,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { RealtimeChannel } from '@supabase/supabase-js';
-import type { 
-  FamilyMemberRow, 
-  FamilyNotificationRow, 
-  MatchRow, 
-  MessageRow, 
-  SupervisionLogRow 
+import type {
+  FamilyMemberRow,
+  FamilyNotificationRow,
+  MatchRow,
+  MessageRow,
+  SupervisionLogRow,
 } from '@/types/supabase';
 
 // Import enhanced notification components
@@ -111,7 +111,7 @@ const EnhancedWaliDashboard: React.FC = () => {
     pendingApprovals: 0,
     approvalRate: 85,
     activeConversations: 0,
-    recentActivity: 0
+    recentActivity: 0,
   });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
@@ -122,10 +122,10 @@ const EnhancedWaliDashboard: React.FC = () => {
   useEffect(() => {
     loadWaliData();
     const channels = setupRealtimeSubscriptions();
-    
+
     return () => {
       // Cleanup specific subscriptions only
-      channels.forEach(channel => {
+      channels.forEach((channel) => {
         if (channel) {
           supabase.removeChannel(channel);
         }
@@ -135,32 +135,44 @@ const EnhancedWaliDashboard: React.FC = () => {
 
   const setupRealtimeSubscriptions = (): RealtimeChannel[] => {
     const channels: RealtimeChannel[] = [];
-    
+
     // Subscribe to family notifications
     const notificationChannel = supabase
       .channel('wali-notifications-enhanced')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'family_notifications'
-      }, (payload) => {
-        const newNotification = payload.new as FamilyNotification;
-        handleNewNotification(newNotification);
-      })
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages'
-      }, (payload) => {
-        handleNewMessage(payload.new as MessageRow);
-      })
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'matches'
-      }, (payload) => {
-        handleNewMatch(payload.new as MatchRow);
-      })
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'family_notifications',
+        },
+        (payload) => {
+          const newNotification = payload.new as FamilyNotification;
+          handleNewNotification(newNotification);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+        },
+        (payload) => {
+          handleNewMessage(payload.new as MessageRow);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'matches',
+        },
+        (payload) => {
+          handleNewMatch(payload.new as MatchRow);
+        }
+      )
       .subscribe();
 
     channels.push(notificationChannel);
@@ -168,23 +180,27 @@ const EnhancedWaliDashboard: React.FC = () => {
     // Subscribe to supervision logs for real-time activity
     const activityChannel = supabase
       .channel('supervision-activity')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'supervision_logs'
-      }, (payload) => {
-        handleSupervisionActivity(payload.new as SupervisionLogRow);
-      })
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'supervision_logs',
+        },
+        (payload) => {
+          handleSupervisionActivity(payload.new as SupervisionLogRow);
+        }
+      )
       .subscribe();
 
     channels.push(activityChannel);
-      
+
     return channels;
   };
 
   const handleNewNotification = (notification: FamilyNotification) => {
-    setNotifications(prev => [notification, ...prev]);
-    
+    setNotifications((prev) => [notification, ...prev]);
+
     // Add to real-time activity feed
     const activity: RealtimeActivity = {
       id: notification.id,
@@ -192,25 +208,26 @@ const EnhancedWaliDashboard: React.FC = () => {
       user_name: 'Système',
       content: notification.content,
       timestamp: notification.created_at,
-      severity: notification.severity as ModerationSeverity
+      severity: notification.severity as ModerationSeverity,
     };
-    
-    setRealtimeActivities(prev => [activity, ...prev.slice(0, 19)]);
-    
+
+    setRealtimeActivities((prev) => [activity, ...prev.slice(0, 19)]);
+
     // Show toast for critical alerts
     if (notification.severity === 'critical') {
       toast({
-        title: "🚨 Alerte Critique",
+        title: '🚨 Alerte Critique',
         description: notification.content,
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
-    
+
     // Update stats
-    setStats(prev => ({
+    setStats((prev) => ({
       ...prev,
-      criticalAlerts: notification.severity === 'critical' ? prev.criticalAlerts + 1 : prev.criticalAlerts,
-      recentActivity: prev.recentActivity + 1
+      criticalAlerts:
+        notification.severity === 'critical' ? prev.criticalAlerts + 1 : prev.criticalAlerts,
+      recentActivity: prev.recentActivity + 1,
     }));
   };
 
@@ -221,17 +238,19 @@ const EnhancedWaliDashboard: React.FC = () => {
       type: 'message',
       user_name: 'Utilisateur Supervisé',
       content: `Nouveau message: ${message.content.substring(0, 50)}...`,
-      timestamp: message.created_at
+      timestamp: message.created_at,
     };
-    
-    setRealtimeActivities(prev => [activity, ...prev.slice(0, 19)]);
-    
+
+    setRealtimeActivities((prev) => [activity, ...prev.slice(0, 19)]);
+
     // Update supervised users unread count
-    setSupervisedUsers(prev => prev.map(user => ({
-      ...user,
-      unread_messages: user.unread_messages + 1,
-      recent_activity: 'Message reçu'
-    })));
+    setSupervisedUsers((prev) =>
+      prev.map((user) => ({
+        ...user,
+        unread_messages: user.unread_messages + 1,
+        recent_activity: 'Message reçu',
+      }))
+    );
   };
 
   const handleNewMatch = (match: MatchRow) => {
@@ -241,11 +260,11 @@ const EnhancedWaliDashboard: React.FC = () => {
       type: 'match',
       user_name: 'Système de Match',
       content: 'Nouveau match nécessitant approbation familiale',
-      timestamp: match.created_at
+      timestamp: match.created_at,
     };
-    
-    setRealtimeActivities(prev => [activity, ...prev.slice(0, 19)]);
-    
+
+    setRealtimeActivities((prev) => [activity, ...prev.slice(0, 19)]);
+
     // Reload match data
     loadMatchesForApproval();
   };
@@ -257,26 +276,30 @@ const EnhancedWaliDashboard: React.FC = () => {
       type: 'alert',
       user_name: 'Supervision',
       content: `Activité: ${log.action_type || 'Activité de supervision'}`,
-      timestamp: log.created_at
+      timestamp: log.created_at,
     };
-    
-    setRealtimeActivities(prev => [activity, ...prev.slice(0, 19)]);
+
+    setRealtimeActivities((prev) => [activity, ...prev.slice(0, 19)]);
   };
 
   const loadWaliData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Load supervised users with enhanced data
       const { data: familyMembers } = await supabase
         .from('family_members')
-        .select(`
+        .select(
+          `
           id,
           full_name,
           user_id,
           relationship
-        `)
+        `
+        )
         .eq('invited_user_id', user.id)
         .eq('invitation_status', 'accepted')
         .eq('is_wali', true);
@@ -301,7 +324,7 @@ const EnhancedWaliDashboard: React.FC = () => {
             const { count: unreadCount } = await supabase
               .from('messages')
               .select('*', { count: 'exact', head: true })
-              .in('match_id', matches?.map(m => m.id) || [])
+              .in('match_id', matches?.map((m) => m.id) || [])
               .eq('is_read', false);
 
             return {
@@ -312,31 +335,33 @@ const EnhancedWaliDashboard: React.FC = () => {
               avatar_url: profile?.avatar_url || undefined,
               active_conversations: matches?.length || 0,
               unread_messages: unreadCount || 0,
-              recent_activity: 'En ligne'
+              recent_activity: 'En ligne',
             };
           })
         );
         setSupervisedUsers(enhancedUsers);
 
         // Calculate enhanced stats
-        const totalActiveConversations = enhancedUsers.reduce((sum, user) => sum + user.active_conversations, 0);
-        
-        setStats(prev => ({
+        const totalActiveConversations = enhancedUsers.reduce(
+          (sum, user) => sum + user.active_conversations,
+          0
+        );
+
+        setStats((prev) => ({
           ...prev,
           totalSupervised: enhancedUsers.length,
-          activeConversations: totalActiveConversations
+          activeConversations: totalActiveConversations,
         }));
       }
 
       await loadNotifications(familyMembers);
       await loadMatchesForApproval();
-
     } catch (error) {
       console.error('Error loading wali data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -349,24 +374,31 @@ const EnhancedWaliDashboard: React.FC = () => {
     const { data: notificationData } = await supabase
       .from('family_notifications')
       .select('*')
-      .in('family_member_id', familyMembers.map(fm => fm.id))
+      .in(
+        'family_member_id',
+        familyMembers.map((fm) => fm.id)
+      )
       .order('created_at', { ascending: false })
       .limit(50);
 
     if (notificationData) {
-      const mappedNotifications: FamilyNotification[] = notificationData.map(n => ({
+      const mappedNotifications: FamilyNotification[] = notificationData.map((n) => ({
         ...n,
-        original_message: n.original_message || undefined
+        original_message: n.original_message || undefined,
       }));
       setNotifications(mappedNotifications);
-      const criticalCount = notificationData.filter(n => n.severity === 'critical' && !n.is_read).length;
-      setStats(prev => ({ ...prev, criticalAlerts: criticalCount }));
+      const criticalCount = notificationData.filter(
+        (n) => n.severity === 'critical' && !n.is_read
+      ).length;
+      setStats((prev) => ({ ...prev, criticalAlerts: criticalCount }));
     }
   };
 
   const loadMatchesForApproval = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data: familyMembers } = await supabase
@@ -376,25 +408,38 @@ const EnhancedWaliDashboard: React.FC = () => {
         .eq('invitation_status', 'accepted')
         .eq('is_wali', true);
 
-      const userIds = familyMembers?.map(fm => fm.user_id) || [];
-      
+      const userIds = familyMembers?.map((fm) => fm.user_id) || [];
+
       if (userIds.length > 0) {
         const { data: matches } = await supabase
           .from('matches')
           .select('*')
           .or(`user1_id.in.(${userIds.join(',')}),user2_id.in.(${userIds.join(',')})`)
           .eq('family_supervision_required', true)
-          .or(`and(user1_id.in.(${userIds.join(',')}),family1_approved.is.null),and(user2_id.in.(${userIds.join(',')}),family2_approved.is.null)`);
+          .or(
+            `and(user1_id.in.(${userIds.join(',')}),family1_approved.is.null),and(user2_id.in.(${userIds.join(',')}),family2_approved.is.null)`
+          );
 
         if (matches) {
           const enrichedMatches: MatchForApproval[] = await Promise.all(
             matches.map(async (match) => {
-              const supervisedUserId = userIds.find(id => id === match.user1_id || id === match.user2_id);
-              const candidateId = supervisedUserId === match.user1_id ? match.user2_id : match.user1_id;
-              
+              const supervisedUserId = userIds.find(
+                (id) => id === match.user1_id || id === match.user2_id
+              );
+              const candidateId =
+                supervisedUserId === match.user1_id ? match.user2_id : match.user1_id;
+
               const [candidateProfile, supervisedProfile] = await Promise.all([
-                supabase.from('profiles').select('full_name').eq('user_id', candidateId).maybeSingle(),
-                supabase.from('profiles').select('full_name').eq('user_id', supervisedUserId || '').maybeSingle()
+                supabase
+                  .from('profiles')
+                  .select('full_name')
+                  .eq('user_id', candidateId)
+                  .maybeSingle(),
+                supabase
+                  .from('profiles')
+                  .select('full_name')
+                  .eq('user_id', supervisedUserId || '')
+                  .maybeSingle(),
               ]);
 
               return {
@@ -407,13 +452,13 @@ const EnhancedWaliDashboard: React.FC = () => {
                 candidate_name: candidateProfile.data?.full_name || 'Candidat inconnu',
                 candidate_id: candidateId,
                 supervised_user_name: supervisedProfile.data?.full_name || 'Utilisateur supervisé',
-                supervised_user_id: supervisedUserId
+                supervised_user_id: supervisedUserId,
               };
             })
           );
-          
+
           setMatchesForApproval(enrichedMatches);
-          setStats(prev => ({ ...prev, pendingApprovals: enrichedMatches.length }));
+          setStats((prev) => ({ ...prev, pendingApprovals: enrichedMatches.length }));
         }
       }
     } catch (error) {
@@ -423,10 +468,12 @@ const EnhancedWaliDashboard: React.FC = () => {
 
   const approveMatch = async (matchId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
-      const match = matchesForApproval.find(m => m.id === matchId);
+      const match = matchesForApproval.find((m) => m.id === matchId);
       if (!match) return;
 
       const { data: familyMembers } = await supabase
@@ -436,28 +483,28 @@ const EnhancedWaliDashboard: React.FC = () => {
         .eq('invitation_status', 'accepted')
         .eq('is_wali', true);
 
-      const supervisedUserIds = familyMembers?.map(fm => fm.user_id) || [];
+      const supervisedUserIds = familyMembers?.map((fm) => fm.user_id) || [];
       const isFamily1 = supervisedUserIds.includes(match.user1_id);
       const updateField = isFamily1 ? 'family1_approved' : 'family2_approved';
-      
+
       await supabase
         .from('matches')
-        .update({ 
+        .update({
           [updateField]: true,
           can_communicate: true,
-          family_reviewed_at: new Date().toISOString()
+          family_reviewed_at: new Date().toISOString(),
         })
         .eq('id', matchId);
 
-      setMatchesForApproval(prev => prev.filter(m => m.id !== matchId));
-      setStats(prev => ({
+      setMatchesForApproval((prev) => prev.filter((m) => m.id !== matchId));
+      setStats((prev) => ({
         ...prev,
-        pendingApprovals: prev.pendingApprovals - 1
+        pendingApprovals: prev.pendingApprovals - 1,
       }));
-      
+
       toast({
-        title: "Match approuvé",
-        description: "Le match a été approuvé avec succès"
+        title: 'Match approuvé',
+        description: 'Le match a été approuvé avec succès',
       });
 
       // Add to activity feed
@@ -466,26 +513,27 @@ const EnhancedWaliDashboard: React.FC = () => {
         type: 'match',
         user_name: 'Vous',
         content: `Match approuvé: ${match.candidate_name} ↔ ${match.supervised_user_name}`,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      setRealtimeActivities(prev => [activity, ...prev.slice(0, 19)]);
-
+      setRealtimeActivities((prev) => [activity, ...prev.slice(0, 19)]);
     } catch (error) {
       console.error('Error approving match:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'approuver le match",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
 
   const rejectMatch = async (matchId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
-      const match = matchesForApproval.find(m => m.id === matchId);
+      const match = matchesForApproval.find((m) => m.id === matchId);
       if (!match) return;
 
       const { data: familyMembers } = await supabase
@@ -495,27 +543,27 @@ const EnhancedWaliDashboard: React.FC = () => {
         .eq('invitation_status', 'accepted')
         .eq('is_wali', true);
 
-      const supervisedUserIds = familyMembers?.map(fm => fm.user_id) || [];
+      const supervisedUserIds = familyMembers?.map((fm) => fm.user_id) || [];
       const isFamily1 = supervisedUserIds.includes(match.user1_id);
       const updateField = isFamily1 ? 'family1_approved' : 'family2_approved';
-      
+
       await supabase
         .from('matches')
-        .update({ 
+        .update({
           [updateField]: false,
-          family_reviewed_at: new Date().toISOString()
+          family_reviewed_at: new Date().toISOString(),
         })
         .eq('id', matchId);
 
-      setMatchesForApproval(prev => prev.filter(m => m.id !== matchId));
-      setStats(prev => ({
+      setMatchesForApproval((prev) => prev.filter((m) => m.id !== matchId));
+      setStats((prev) => ({
         ...prev,
-        pendingApprovals: prev.pendingApprovals - 1
+        pendingApprovals: prev.pendingApprovals - 1,
       }));
-      
+
       toast({
-        title: "Match rejeté",
-        description: "Le match a été rejeté"
+        title: 'Match rejeté',
+        description: 'Le match a été rejeté',
       });
 
       // Add to activity feed
@@ -525,16 +573,15 @@ const EnhancedWaliDashboard: React.FC = () => {
         user_name: 'Vous',
         content: `Match rejeté: ${match.candidate_name} ↔ ${match.supervised_user_name}`,
         timestamp: new Date().toISOString(),
-        severity: 'medium'
+        severity: 'medium',
       };
-      setRealtimeActivities(prev => [activity, ...prev.slice(0, 19)]);
-
+      setRealtimeActivities((prev) => [activity, ...prev.slice(0, 19)]);
     } catch (error) {
       console.error('Error rejecting match:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de rejeter le match",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de rejeter le match',
+        variant: 'destructive',
       });
     }
   };
@@ -565,7 +612,7 @@ const EnhancedWaliDashboard: React.FC = () => {
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Activity className="h-4 w-4 text-emerald" />
@@ -585,10 +632,11 @@ const EnhancedWaliDashboard: React.FC = () => {
           <AlertDescription>
             <div className="flex items-center justify-between">
               <span>
-                <strong>🚨 {stats.criticalAlerts} alerte(s) critique(s)</strong> nécessitent votre attention immédiate !
+                <strong>🚨 {stats.criticalAlerts} alerte(s) critique(s)</strong> nécessitent votre
+                attention immédiate !
               </span>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => setActiveTab('notifications')}
                 className="border-red-500 text-red-600 hover:bg-red-50"
@@ -622,8 +670,12 @@ const EnhancedWaliDashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-red-600 dark:text-red-400">Alertes Critiques</p>
-                <p className="text-3xl font-bold text-red-700 dark:text-red-300">{stats.criticalAlerts}</p>
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                  Alertes Critiques
+                </p>
+                <p className="text-3xl font-bold text-red-700 dark:text-red-300">
+                  {stats.criticalAlerts}
+                </p>
               </div>
               <AlertTriangle className="h-8 w-8 text-red-500" />
             </div>
@@ -639,7 +691,9 @@ const EnhancedWaliDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-amber-600 dark:text-amber-400">En Attente</p>
-                <p className="text-3xl font-bold text-amber-700 dark:text-amber-300">{stats.pendingApprovals}</p>
+                <p className="text-3xl font-bold text-amber-700 dark:text-amber-300">
+                  {stats.pendingApprovals}
+                </p>
               </div>
               <Clock className="h-8 w-8 text-amber-500" />
             </div>
@@ -654,8 +708,12 @@ const EnhancedWaliDashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">Taux Approbation</p>
-                <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">{stats.approvalRate}%</p>
+                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                  Taux Approbation
+                </p>
+                <p className="text-3xl font-bold text-emerald-700 dark:text-emerald-300">
+                  {stats.approvalRate}%
+                </p>
               </div>
               <CheckCircle className="h-8 w-8 text-emerald-500" />
             </div>
@@ -673,7 +731,10 @@ const EnhancedWaliDashboard: React.FC = () => {
           <TabsTrigger value="notifications">
             Notifications
             {stats.criticalAlerts > 0 && (
-              <Badge variant="destructive" className="ml-2 h-5 w-5 p-0 text-xs flex items-center justify-center">
+              <Badge
+                variant="destructive"
+                className="ml-2 h-5 w-5 p-0 text-xs flex items-center justify-center"
+              >
                 {stats.criticalAlerts}
               </Badge>
             )}
@@ -711,28 +772,44 @@ const EnhancedWaliDashboard: React.FC = () => {
                 ) : (
                   <div className="space-y-2 max-h-96 overflow-y-auto">
                     {realtimeActivities.map((activity, index) => (
-                      <div key={activity.id} className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border">
-                        <div className={`p-1 rounded-full ${
-                          activity.type === 'alert' ? 'bg-red-100 text-red-600' :
-                          activity.type === 'message' ? 'bg-blue-100 text-blue-600' :
-                          'bg-green-100 text-green-600'
-                        }`}>
-                          {activity.type === 'alert' ? <AlertTriangle className="h-3 w-3" /> :
-                           activity.type === 'message' ? <MessageSquare className="h-3 w-3" /> :
-                           <Heart className="h-3 w-3" />}
+                      <div
+                        key={activity.id}
+                        className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border"
+                      >
+                        <div
+                          className={`p-1 rounded-full ${
+                            activity.type === 'alert'
+                              ? 'bg-red-100 text-red-600'
+                              : activity.type === 'message'
+                                ? 'bg-blue-100 text-blue-600'
+                                : 'bg-green-100 text-green-600'
+                          }`}
+                        >
+                          {activity.type === 'alert' ? (
+                            <AlertTriangle className="h-3 w-3" />
+                          ) : activity.type === 'message' ? (
+                            <MessageSquare className="h-3 w-3" />
+                          ) : (
+                            <Heart className="h-3 w-3" />
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium">{activity.user_name}</p>
                             {activity.severity && (
-                              <Badge variant={activity.severity === 'critical' ? 'destructive' : 'secondary'} className="text-xs">
+                              <Badge
+                                variant={
+                                  activity.severity === 'critical' ? 'destructive' : 'secondary'
+                                }
+                                className="text-xs"
+                              >
                                 {activity.severity}
                               </Badge>
                             )}
                           </div>
                           <p className="text-sm text-muted-foreground">{activity.content}</p>
                           <p className="text-xs text-muted-foreground mt-1">
-                            {format(new Date(activity.timestamp), "HH:mm", { locale: fr })}
+                            {format(new Date(activity.timestamp), 'HH:mm', { locale: fr })}
                           </p>
                         </div>
                       </div>
@@ -752,7 +829,10 @@ const EnhancedWaliDashboard: React.FC = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 {supervisedUsers.map((user) => (
-                  <div key={user.id} className="flex items-center gap-3 p-3 rounded-lg border bg-background/50">
+                  <div
+                    key={user.id}
+                    className="flex items-center gap-3 p-3 rounded-lg border bg-background/50"
+                  >
                     <Avatar>
                       <AvatarImage src={user.avatar_url} />
                       <AvatarFallback>{user.full_name.charAt(0)}</AvatarFallback>
@@ -776,7 +856,9 @@ const EnhancedWaliDashboard: React.FC = () => {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(`/family-supervision?supervised_user=${user.user_id}`)}
+                      onClick={() =>
+                        navigate(`/family-supervision?supervised_user=${user.user_id}`)
+                      }
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
@@ -789,7 +871,7 @@ const EnhancedWaliDashboard: React.FC = () => {
 
         {/* Enhanced Notifications Tab */}
         <TabsContent value="notifications">
-          <RealTimeNotifications 
+          <RealTimeNotifications
             notifications={notifications}
             onNotificationUpdate={setNotifications}
           />
@@ -807,9 +889,7 @@ const EnhancedWaliDashboard: React.FC = () => {
                   <div className="text-center py-8">
                     <CheckCircle className="h-16 w-16 text-emerald mx-auto mb-4 opacity-50" />
                     <h3 className="text-lg font-semibold mb-2">Aucun match en attente</h3>
-                    <p className="text-muted-foreground">
-                      Tous les matches ont été traités.
-                    </p>
+                    <p className="text-muted-foreground">Tous les matches ont été traités.</p>
                   </div>
                 ) : (
                   matchesForApproval.map((match) => (
@@ -827,12 +907,12 @@ const EnhancedWaliDashboard: React.FC = () => {
                               </span>
                               <span className="flex items-center gap-1">
                                 <Clock className="h-4 w-4" />
-                                {format(new Date(match.created_at), "d MMM yyyy", { locale: fr })}
+                                {format(new Date(match.created_at), 'd MMM yyyy', { locale: fr })}
                               </span>
                             </div>
                             <Progress value={match.match_score} className="h-2 mb-3" />
                           </div>
-                          
+
                           <div className="flex gap-2 ml-4">
                             <Button
                               variant="outline"
@@ -850,10 +930,7 @@ const EnhancedWaliDashboard: React.FC = () => {
                               <XCircle className="h-4 w-4 mr-1" />
                               Rejeter
                             </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => approveMatch(match.id)}
-                            >
+                            <Button size="sm" onClick={() => approveMatch(match.id)}>
                               <CheckCircle className="h-4 w-4 mr-1" />
                               Approuver
                             </Button>
@@ -889,10 +966,12 @@ const EnhancedWaliDashboard: React.FC = () => {
                           </Badge>
                         )}
                       </div>
-                      
+
                       <div className="grid grid-cols-2 gap-4 mb-4">
                         <div className="text-center p-3 bg-background/50 rounded">
-                          <p className="text-2xl font-bold text-primary">{user.active_conversations}</p>
+                          <p className="text-2xl font-bold text-primary">
+                            {user.active_conversations}
+                          </p>
                           <p className="text-xs text-muted-foreground">Conversations</p>
                         </div>
                         <div className="text-center p-3 bg-background/50 rounded">
@@ -900,7 +979,7 @@ const EnhancedWaliDashboard: React.FC = () => {
                           <p className="text-xs text-muted-foreground">Non lus</p>
                         </div>
                       </div>
-                      
+
                       <div className="flex gap-2">
                         <Button
                           variant="outline"
@@ -913,7 +992,9 @@ const EnhancedWaliDashboard: React.FC = () => {
                         </Button>
                         <Button
                           size="sm"
-                          onClick={() => navigate(`/family-supervision?supervised_user=${user.user_id}`)}
+                          onClick={() =>
+                            navigate(`/family-supervision?supervised_user=${user.user_id}`)
+                          }
                           className="flex-1"
                         >
                           <MessageSquare className="h-4 w-4 mr-1" />
@@ -935,7 +1016,7 @@ const EnhancedWaliDashboard: React.FC = () => {
 
         {/* Analytics Tab */}
         <TabsContent value="analytics">
-          <SupervisionAnalytics 
+          <SupervisionAnalytics
             supervisedUsers={supervisedUsers}
             notifications={notifications}
             stats={stats}

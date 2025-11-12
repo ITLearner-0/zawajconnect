@@ -144,7 +144,7 @@ export type EngagementLevel = 'low' | 'medium' | 'high';
 /**
  * Type d'action trackée
  */
-export type InsightActionType = 
+export type InsightActionType =
   | 'view_insights'
   | 'share_insights'
   | 'export_pdf'

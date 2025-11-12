@@ -5,7 +5,7 @@ import { MAPBOX_TOKEN_KEY, MAPBOX_PUBLIC_TOKEN } from './types';
 export const initializeMap = async ({
   mapContainer,
   userCoordinates,
-  token
+  token,
 }: {
   mapContainer: HTMLDivElement;
   userCoordinates: [number, number];
@@ -13,14 +13,14 @@ export const initializeMap = async ({
 }) => {
   // Always use the built-in public token
   mapboxgl.accessToken = MAPBOX_PUBLIC_TOKEN;
-  
+
   const map = new mapboxgl.Map({
     container: mapContainer,
     style: 'mapbox://styles/mapbox/streets-v11',
     center: userCoordinates,
-    zoom: 11
+    zoom: 11,
   });
-  
+
   return map;
 };
 
@@ -37,7 +37,7 @@ export const addMapCustomStyling = () => {
     .custom-marker { box-shadow: 0 0 0 4px rgba(255,255,255,0.5); }
   `;
   document.head.appendChild(style);
-  
+
   // Return cleanup function
   return () => {
     document.head.removeChild(style);

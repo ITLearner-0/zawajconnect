@@ -11,6 +11,7 @@
 **Qui:** Un développeur avec accès au repository et npm installé
 
 **Prérequis:**
+
 ```bash
 # Cloner le repository (si pas déjà fait)
 git clone <votre-repo-url>
@@ -24,6 +25,7 @@ npm install
 ```
 
 **Étapes de Test:**
+
 ```bash
 # 1. Démarrer le serveur de développement
 npm run dev
@@ -73,6 +75,7 @@ npm run dev
 ```
 
 **Checklist de Validation:**
+
 ```
 □ Appel audio fonctionne
 □ Appel vidéo fonctionne
@@ -96,10 +99,12 @@ npm run dev
 **Qui:** Toute personne avec accès à l'environnement staging/production
 
 **Prérequis:**
+
 - ✅ Application déployée avec HTTPS (obligatoire pour WebRTC)
 - ✅ Branche `claude/code-analysis-review-011CUpezU2yMpdA4Tw5Emid5` déployée
 
 **Étapes:**
+
 ```bash
 # 1. Merger la branche dans staging ou créer un déploiement de la branche
 git checkout staging  # ou main, selon votre workflow
@@ -116,6 +121,7 @@ git merge claude/code-analysis-review-011CUpezU2yMpdA4Tw5Emid5
 ```
 
 **⚠️ IMPORTANT pour Production:**
+
 - HTTPS est **OBLIGATOIRE** (WebRTC ne fonctionne pas en HTTP)
 - Les utilisateurs doivent autoriser micro/caméra
 - Tester sur différents navigateurs (Chrome, Firefox, Safari)
@@ -151,6 +157,7 @@ test('Audio call between two users', async () => {
 ## 🔍 Scénarios de Test Spécifiques
 
 ### Test 1: Appel Audio Basique
+
 ```
 1. User A ouvre chat avec User B
 2. User A clique sur 📞
@@ -167,6 +174,7 @@ test('Audio call between two users', async () => {
 ```
 
 ### Test 2: Appel Vidéo Complet
+
 ```
 1. User A ouvre chat avec User B
 2. User A clique sur 📹
@@ -187,6 +195,7 @@ test('Audio call between two users', async () => {
 ```
 
 ### Test 3: Rejet d'Appel
+
 ```
 1. User A clique sur 📞
 2. User B voit notification
@@ -196,6 +205,7 @@ test('Audio call between two users', async () => {
 ```
 
 ### Test 4: Timeout Automatique
+
 ```
 1. User A clique sur 📞
 2. User B voit notification
@@ -206,6 +216,7 @@ test('Audio call between two users', async () => {
 ```
 
 ### Test 5: Contrôles Pendant Appel
+
 ```
 1. Établir un appel vidéo
 2. User A clique sur icône micro (mute)
@@ -223,6 +234,7 @@ test('Audio call between two users', async () => {
 ## 🐛 Tests de Cas d'Erreur
 
 ### Test 6: Permission Micro Refusée
+
 ```
 1. User A clique sur 📞
 2. Navigateur demande permission micro
@@ -232,6 +244,7 @@ test('Audio call between two users', async () => {
 ```
 
 ### Test 7: Connexion Perdue
+
 ```
 1. Établir un appel actif
 2. Simuler perte de connexion (couper WiFi de User A)
@@ -241,6 +254,7 @@ test('Audio call between two users', async () => {
 ```
 
 ### Test 8: Fermeture d'Onglet Pendant Appel
+
 ```
 1. Établir un appel actif
 2. User A ferme l'onglet/navigateur
@@ -253,6 +267,7 @@ test('Audio call between two users', async () => {
 ## 📱 Tests Mobile
 
 ### iOS Safari
+
 ```
 1. Ouvrir https://votre-app.com sur iPhone/iPad
 2. Se connecter comme User A
@@ -263,6 +278,7 @@ test('Audio call between two users', async () => {
 ```
 
 ### Android Chrome
+
 ```
 1. Ouvrir https://votre-app.com sur Android
 2. Se connecter comme User B
@@ -279,6 +295,7 @@ test('Audio call between two users', async () => {
 ### Console Browser (DevTools)
 
 **Messages attendus (normaux):**
+
 ```
 ✅ Signaling channel initialized for match: xxx
 ✅ Call offer sent
@@ -289,6 +306,7 @@ test('Audio call between two users', async () => {
 ```
 
 **Messages d'erreur à investiguer:**
+
 ```
 ❌ Failed to initialize signaling channel
 ❌ Failed to initiate call
@@ -299,6 +317,7 @@ test('Audio call between two users', async () => {
 ### Logs Supabase Realtime
 
 **Dans Supabase Dashboard → Logs:**
+
 ```
 Vérifier les broadcasts sur le canal webrtc:{matchId}
 - Events: call-offer, call-answer, ice-candidate
@@ -310,28 +329,36 @@ Vérifier les broadcasts sur le canal webrtc:{matchId}
 ## 🔧 Dépannage Rapide
 
 ### Problème: Pas de son
+
 **Solutions:**
+
 1. Vérifier permissions micro dans navigateur
 2. Vérifier que micro n'est pas utilisé par autre app
 3. Vérifier console pour erreurs getUserMedia
 4. Tester avec écouteurs/casque
 
 ### Problème: Pas de vidéo
+
 **Solutions:**
+
 1. Vérifier permissions caméra
 2. Vérifier que caméra fonctionne (tester dans autre app)
 3. Vérifier que c'est bien un appel vidéo (icône 📹)
 4. Vérifier console pour erreurs
 
 ### Problème: Connexion échoue
+
 **Solutions:**
+
 1. Vérifier HTTPS (obligatoire en production)
 2. Vérifier firewall/réseau
 3. Vérifier console Supabase (canal créé?)
 4. Pour NAT strict: ajouter serveur TURN
 
 ### Problème: Notification n'apparaît pas
+
 **Solutions:**
+
 1. Vérifier que les deux users sont dans le même match
 2. Vérifier console: "Received call offer" doit apparaître
 3. Vérifier que IncomingCallNotification se rend
@@ -345,6 +372,7 @@ Vérifier les broadcasts sur le canal webrtc:{matchId}
 # Rapport de Test WebRTC - [Date]
 
 ## Environnement
+
 - URL: [localhost / staging / production]
 - Navigateur User A: [Chrome 120 / Firefox / Safari]
 - Navigateur User B: [Chrome 120 / Firefox / Safari]
@@ -353,6 +381,7 @@ Vérifier les broadcasts sur le canal webrtc:{matchId}
 ## Tests Effectués
 
 ### Appel Audio
+
 - [ ] Initiation: ✅ / ❌
 - [ ] Réception: ✅ / ❌
 - [ ] Audio bidirectionnel: ✅ / ❌
@@ -360,6 +389,7 @@ Vérifier les broadcasts sur le canal webrtc:{matchId}
 - [ ] Terminaison: ✅ / ❌
 
 ### Appel Vidéo
+
 - [ ] Initiation: ✅ / ❌
 - [ ] Réception: ✅ / ❌
 - [ ] Vidéo bidirectionnelle: ✅ / ❌
@@ -368,18 +398,22 @@ Vérifier les broadcasts sur le canal webrtc:{matchId}
 - [ ] Terminaison: ✅ / ❌
 
 ### Contrôles
+
 - [ ] Accepter appel: ✅ / ❌
 - [ ] Rejeter appel: ✅ / ❌
 - [ ] Timer durée: ✅ / ❌
 - [ ] Qualité connexion: ✅ / ❌
 
 ### Erreurs Rencontrées
+
 [Décrire ici...]
 
 ### Notes
+
 [Observations additionnelles...]
 
 ## Conclusion
+
 - [ ] Prêt pour production
 - [ ] Nécessite corrections
 - [ ] Nécessite tests supplémentaires

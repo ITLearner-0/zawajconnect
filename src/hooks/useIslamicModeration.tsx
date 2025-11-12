@@ -32,26 +32,28 @@ export const useIslamicModeration = () => {
     matchId?: string
   ): Promise<ModerationResult> => {
     setIsChecking(true);
-    
+
     try {
       console.log('🔒 Moderating content with JWT authentication...');
-      
+
       // Get the current session to extract JWT token
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!session?.access_token) {
         throw new Error('No authentication token available. Please sign in.');
       }
-      
+
       const { data, error } = await supabase.functions.invoke('moderate-content', {
         body: {
           content,
           matchId,
-          context
+          context,
         },
         headers: {
-          Authorization: `Bearer ${session.access_token}`
-        }
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
 
       if (error) {
@@ -65,17 +67,17 @@ export const useIslamicModeration = () => {
 
       const result = data as ModerationResult;
       setLastResult(result);
-      
+
       // Show user feedback based on moderation result
       if (!result.approved) {
         switch (result.action) {
           case 'blocked':
             toast({
-              title: "Message bloqué",
+              title: 'Message bloqué',
               description: result.reason,
-              variant: "destructive"
+              variant: 'destructive',
             });
-            
+
             // Send email notification for blocked content (server will use JWT user ID)
             try {
               await supabase.functions.invoke('send-moderation-notification-email', {
@@ -83,8 +85,8 @@ export const useIslamicModeration = () => {
                   action_taken: 'blocked',
                   reason: result.reason,
                   severity: result.confidence > 0.8 ? 'critical' : 'high',
-                  details: result.islamicGuidance || result.rulesTriggered.join(', ')
-                }
+                  details: result.islamicGuidance || result.rulesTriggered.join(', '),
+                },
               });
             } catch (emailError) {
               console.error('[useIslamicModeration] Failed to send moderation email:', emailError);
@@ -92,11 +94,12 @@ export const useIslamicModeration = () => {
             break;
           case 'warned':
             toast({
-              title: "Attention",
-              description: result.reason + (result.islamicGuidance ? `\n\n💡 ${result.islamicGuidance}` : ''),
-              variant: "default"
+              title: 'Attention',
+              description:
+                result.reason + (result.islamicGuidance ? `\n\n💡 ${result.islamicGuidance}` : ''),
+              variant: 'default',
             });
-            
+
             // Send email notification for warnings (if confidence is high)
             if (result.confidence > 0.7) {
               try {
@@ -105,8 +108,8 @@ export const useIslamicModeration = () => {
                     action_taken: 'warned',
                     reason: result.reason,
                     severity: 'medium',
-                    details: result.islamicGuidance
-                  }
+                    details: result.islamicGuidance,
+                  },
                 });
               } catch (emailError) {
                 console.error('[useIslamicModeration] Failed to send warning email:', emailError);
@@ -115,9 +118,9 @@ export const useIslamicModeration = () => {
             break;
           case 'escalated':
             toast({
-              title: "Contenu en révision",
-              description: "Votre message sera examiné par un modérateur.",
-              variant: "default"
+              title: 'Contenu en révision',
+              description: 'Votre message sera examiné par un modérateur.',
+              variant: 'default',
             });
             break;
         }
@@ -126,16 +129,16 @@ export const useIslamicModeration = () => {
       return result;
     } catch (error) {
       console.error('[useIslamicModeration] Error moderating content:', error);
-      
+
       // Return safe fallback
       const fallbackResult: ModerationResult = {
         approved: false,
         action: 'escalated',
         confidence: 0.0,
         rulesTriggered: ['system_error'],
-        reason: 'Erreur système - contenu escaladé par sécurité'
+        reason: 'Erreur système - contenu escaladé par sécurité',
       };
-      
+
       setLastResult(fallbackResult);
       return fallbackResult;
     } finally {
@@ -159,13 +162,13 @@ export const useIslamicModeration = () => {
         throw pgError;
       }
 
-      return (data ?? []).map(item => ({
+      return (data ?? []).map((item) => ({
         id: item.id,
         original_message: item.original_message,
         suggested_message: item.suggested_message,
         improvement_reason: item.improvement_reason,
         islamic_guidance: item.islamic_guidance ?? '',
-        created_at: item.created_at
+        created_at: item.created_at,
       }));
     } catch (error) {
       const pgError = error as PostgrestError;
@@ -188,7 +191,7 @@ export const useIslamicModeration = () => {
       }
 
       toast({
-        title: "Suggestion utilisée",
+        title: 'Suggestion utilisée',
         description: "Merci d'avoir amélioré votre message !",
       });
     } catch (error) {
@@ -226,6 +229,6 @@ export const useIslamicModeration = () => {
     applySuggestion,
     getModerationLogs,
     isChecking,
-    lastResult
+    lastResult,
   };
 };

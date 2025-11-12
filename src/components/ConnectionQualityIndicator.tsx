@@ -9,7 +9,10 @@ interface ConnectionQualityIndicatorProps {
   compact?: boolean;
 }
 
-export function ConnectionQualityIndicator({ metrics, compact = false }: ConnectionQualityIndicatorProps) {
+export function ConnectionQualityIndicator({
+  metrics,
+  compact = false,
+}: ConnectionQualityIndicatorProps) {
   const [showDetails, setShowDetails] = useState(false);
 
   if (!metrics) return null;
@@ -28,7 +31,7 @@ export function ConnectionQualityIndicator({ metrics, compact = false }: Connect
   };
 
   const getQualityIcon = (quality: ConnectionQuality) => {
-    const iconClass = "h-4 w-4";
+    const iconClass = 'h-4 w-4';
     switch (quality) {
       case 'excellent':
         return <SignalHigh className={iconClass} />;

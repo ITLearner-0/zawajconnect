@@ -1,5 +1,4 @@
-
-import { executeSql, columnExists } from "./core";
+import { executeSql, columnExists } from './core';
 
 /**
  * Creates the required moderation tables if they don't exist
@@ -22,7 +21,7 @@ export const setupModerationTables = async (): Promise<boolean> => {
         notes TEXT
       )
     `);
-    
+
     // Create content_reports table
     await executeSql(`
       CREATE TABLE IF NOT EXISTS content_reports (
@@ -39,7 +38,7 @@ export const setupModerationTables = async (): Promise<boolean> => {
         resolved_at TIMESTAMP WITH TIME ZONE
       )
     `);
-    
+
     // Create wali_profiles table
     await executeSql(`
       CREATE TABLE IF NOT EXISTS wali_profiles (
@@ -62,7 +61,7 @@ export const setupModerationTables = async (): Promise<boolean> => {
         }'::jsonb
       )
     `);
-    
+
     // Create chat_requests table with all required columns
     await executeSql(`
       CREATE TABLE IF NOT EXISTS chat_requests (
@@ -79,23 +78,23 @@ export const setupModerationTables = async (): Promise<boolean> => {
         suggested_time TEXT
       )
     `);
-    
+
     // Make sure to add the columns if they don't exist in the chat_requests table
     const hasMessageColumn = await columnExists('chat_requests', 'message');
     if (!hasMessageColumn) {
       await executeSql(`ALTER TABLE chat_requests ADD COLUMN message TEXT`);
     }
-    
+
     const hasRequestTypeColumn = await columnExists('chat_requests', 'request_type');
     if (!hasRequestTypeColumn) {
       await executeSql(`ALTER TABLE chat_requests ADD COLUMN request_type TEXT`);
     }
-    
+
     const hasSuggestedTimeColumn = await columnExists('chat_requests', 'suggested_time');
     if (!hasSuggestedTimeColumn) {
       await executeSql(`ALTER TABLE chat_requests ADD COLUMN suggested_time TEXT`);
     }
-    
+
     // Create supervision_sessions table
     await executeSql(`
       CREATE TABLE IF NOT EXISTS supervision_sessions (
@@ -108,10 +107,10 @@ export const setupModerationTables = async (): Promise<boolean> => {
         supervision_level TEXT DEFAULT 'passive'
       )
     `);
-    
+
     // Add extensions if needed
     await executeSql(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`);
-    
+
     return true;
   } catch (err) {
     console.error('Error setting up moderation tables:', err);

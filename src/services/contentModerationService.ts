@@ -21,18 +21,13 @@ import type {
   ModerationSeverity,
   ModerationAction,
   ModerationActionTaken,
-  ModerationContentType
+  ModerationContentType,
 } from '@/types/supabase';
 
 /**
  * Re-export types for backwards compatibility
  */
-export type {
-  ModerationRule,
-  ModerationViolation,
-  ModerationResult,
-  ModerationStats
-};
+export type { ModerationRule, ModerationViolation, ModerationResult, ModerationStats };
 
 class ContentModerationService {
   private rules: ModerationRule[] = [];
@@ -54,20 +49,22 @@ class ContentModerationService {
         throw error as PostgrestError;
       }
 
-      this.rules = (data ?? []).map((rule: ModerationRuleRow): ModerationRule => ({
-        id: rule.id ?? '',
-        rule_type: (rule.rule_type ?? 'keyword') as ModerationRuleType,
-        pattern: rule.pattern ?? '',
-        severity: (rule.severity ?? 'low') as ModerationSeverity,
-        action: (rule.action ?? 'warn') as ModerationAction,
-        is_active: rule.is_active ?? true,
-        description: rule.description ?? ''
-      }));
+      this.rules = (data ?? []).map(
+        (rule: ModerationRuleRow): ModerationRule => ({
+          id: rule.id ?? '',
+          rule_type: (rule.rule_type ?? 'keyword') as ModerationRuleType,
+          pattern: rule.pattern ?? '',
+          severity: (rule.severity ?? 'low') as ModerationSeverity,
+          action: (rule.action ?? 'warn') as ModerationAction,
+          is_active: rule.is_active ?? true,
+          description: rule.description ?? '',
+        })
+      );
       this.rulesLoaded = true;
 
       logger.log('Moderation rules loaded', {
         count: this.rules.length,
-        bySeverity: this.groupBy(this.rules, 'severity')
+        bySeverity: this.groupBy(this.rules, 'severity'),
       });
     } catch (error) {
       logger.error('Failed to load moderation rules', error as PostgrestError);
@@ -88,7 +85,7 @@ class ContentModerationService {
         severity: 'high',
         action: 'block',
         is_active: true,
-        description: 'Inappropriate relationship terminology'
+        description: 'Inappropriate relationship terminology',
       },
       {
         id: 'fb-2',
@@ -97,7 +94,7 @@ class ContentModerationService {
         severity: 'medium',
         action: 'warn',
         is_active: true,
-        description: 'References to non-Islamic activities'
+        description: 'References to non-Islamic activities',
       },
       {
         id: 'fb-3',
@@ -106,7 +103,7 @@ class ContentModerationService {
         severity: 'medium',
         action: 'escalate',
         is_active: true,
-        description: 'External links'
+        description: 'External links',
       },
       {
         id: 'fb-4',
@@ -115,8 +112,8 @@ class ContentModerationService {
         severity: 'low',
         action: 'warn',
         is_active: true,
-        description: 'Excessive message length'
-      }
+        description: 'Excessive message length',
+      },
     ];
   }
 
@@ -190,7 +187,8 @@ class ContentModerationService {
     }
 
     // Determine final action
-    const approved = violations.length === 0 || actionToTake === 'auto_moderated' || actionToTake === 'approved';
+    const approved =
+      violations.length === 0 || actionToTake === 'auto_moderated' || actionToTake === 'approved';
 
     // Log violation if any
     if (violations.length > 0) {
@@ -202,7 +200,7 @@ class ContentModerationService {
         severity: highestSeverity ?? 'low',
         action_taken: actionToTake as Exclude<ModerationActionTaken, 'approved'>,
         auto_moderated_content: moderatedContent,
-        created_at: new Date().toISOString()
+        created_at: new Date().toISOString(),
       });
 
       logger.log('Content moderation violation', {
@@ -210,7 +208,7 @@ class ContentModerationService {
         contentType,
         violations,
         action: actionToTake,
-        severity: highestSeverity
+        severity: highestSeverity,
       });
     }
 
@@ -223,7 +221,7 @@ class ContentModerationService {
       moderatedContent,
       violations,
       severity: highestSeverity,
-      reason
+      reason,
     };
   }
 
@@ -258,7 +256,7 @@ class ContentModerationService {
       low: 1,
       medium: 2,
       high: 3,
-      critical: 4
+      critical: 4,
     };
     return levels[severity || ''] || 0;
   }
@@ -275,7 +273,7 @@ class ContentModerationService {
         rules_violated: violation.rules_violated,
         severity: violation.severity,
         action_taken: violation.action_taken,
-        auto_moderated_content: violation.auto_moderated_content
+        auto_moderated_content: violation.auto_moderated_content,
       };
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -307,14 +305,14 @@ class ContentModerationService {
       low: 'Votre contenu pourrait être amélioré.',
       medium: 'Votre contenu viole les directives de la communauté.',
       high: 'Votre contenu viole gravement les directives islamiques.',
-      critical: 'Votre contenu est strictement interdit sur cette plateforme.'
+      critical: 'Votre contenu est strictement interdit sur cette plateforme.',
     };
 
     const actionMessages: Record<string, string> = {
       warn: 'Veuillez réviser votre message.',
       block: 'Votre contenu a été bloqué.',
       escalate: 'Votre contenu sera examiné par un modérateur.',
-      auto_moderated: 'Votre contenu a été automatiquement modéré.'
+      auto_moderated: 'Votre contenu a été automatiquement modéré.',
     };
 
     return `${severityMessages[severity || 'low']} ${actionMessages[action]}`;
@@ -326,9 +324,7 @@ class ContentModerationService {
   async getStats(startDate?: Date, endDate?: Date): Promise<ModerationStats> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      let query = (supabase as any)
-        .from('moderation_violations')
-        .select('*');
+      let query = (supabase as any).from('moderation_violations').select('*');
 
       if (startDate) {
         query = query.gte('created_at', startDate.toISOString());
@@ -343,37 +339,47 @@ class ContentModerationService {
         throw error as PostgrestError;
       }
 
-      const violations = (data ?? []).map((v: ModerationViolationRow): ModerationViolation => ({
-        user_id: v.user_id ?? '',
-        content: v.content ?? '',
-        content_type: (v.content_type ?? 'message') as ModerationContentType,
-        rules_violated: Array.isArray(v.rules_violated) ? v.rules_violated : [],
-        severity: (v.severity ?? 'low') as ModerationSeverity,
-        action_taken: (v.action_taken ?? 'warned') as Exclude<ModerationActionTaken, 'approved'>,
-        auto_moderated_content: v.auto_moderated_content ?? undefined,
-        created_at: v.created_at ?? new Date().toISOString()
-      }));
+      const violations = (data ?? []).map(
+        (v: ModerationViolationRow): ModerationViolation => ({
+          user_id: v.user_id ?? '',
+          content: v.content ?? '',
+          content_type: (v.content_type ?? 'message') as ModerationContentType,
+          rules_violated: Array.isArray(v.rules_violated) ? v.rules_violated : [],
+          severity: (v.severity ?? 'low') as ModerationSeverity,
+          action_taken: (v.action_taken ?? 'warned') as Exclude<ModerationActionTaken, 'approved'>,
+          auto_moderated_content: v.auto_moderated_content ?? undefined,
+          created_at: v.created_at ?? new Date().toISOString(),
+        })
+      );
 
       return {
         total_checks: violations.length,
         violations_found: violations.length,
-        content_blocked: violations.filter((v: ModerationViolation) => v.action_taken === 'blocked').length,
-        users_warned: violations.filter((v: ModerationViolation) => v.action_taken === 'warned').length,
-        escalations: violations.filter((v: ModerationViolation) => v.action_taken === 'escalated').length,
-        auto_moderated: violations.filter((v: ModerationViolation) => v.action_taken === 'auto_moderated').length,
+        content_blocked: violations.filter((v: ModerationViolation) => v.action_taken === 'blocked')
+          .length,
+        users_warned: violations.filter((v: ModerationViolation) => v.action_taken === 'warned')
+          .length,
+        escalations: violations.filter((v: ModerationViolation) => v.action_taken === 'escalated')
+          .length,
+        auto_moderated: violations.filter(
+          (v: ModerationViolation) => v.action_taken === 'auto_moderated'
+        ).length,
         by_severity: {
           low: violations.filter((v: ModerationViolation) => v.severity === 'low').length,
           medium: violations.filter((v: ModerationViolation) => v.severity === 'medium').length,
           high: violations.filter((v: ModerationViolation) => v.severity === 'high').length,
-          critical: violations.filter((v: ModerationViolation) => v.severity === 'critical').length
+          critical: violations.filter((v: ModerationViolation) => v.severity === 'critical').length,
         },
         by_content_type: {
-          message: violations.filter((v: ModerationViolation) => v.content_type === 'message').length,
-          profile: violations.filter((v: ModerationViolation) => v.content_type === 'profile').length,
+          message: violations.filter((v: ModerationViolation) => v.content_type === 'message')
+            .length,
+          profile: violations.filter((v: ModerationViolation) => v.content_type === 'profile')
+            .length,
           bio: violations.filter((v: ModerationViolation) => v.content_type === 'bio').length,
           photo: violations.filter((v: ModerationViolation) => v.content_type === 'photo').length,
-          comment: violations.filter((v: ModerationViolation) => v.content_type === 'comment').length
-        }
+          comment: violations.filter((v: ModerationViolation) => v.content_type === 'comment')
+            .length,
+        },
       };
     } catch (error) {
       logger.error('Failed to get moderation stats', error as PostgrestError);
@@ -385,11 +391,14 @@ class ContentModerationService {
    * Helper: Group array by key
    */
   private groupBy<T>(arr: T[], key: keyof T): Record<string, number> {
-    return arr.reduce((acc, item) => {
-      const value = String(item[key]);
-      acc[value] = (acc[value] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    return arr.reduce(
+      (acc, item) => {
+        const value = String(item[key]);
+        acc[value] = (acc[value] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>
+    );
   }
 }
 

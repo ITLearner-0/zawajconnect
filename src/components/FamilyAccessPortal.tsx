@@ -6,7 +6,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import FamilyNotificationCenter from '@/components/FamilyNotificationCenter';
-import { Shield, Users, Key, ArrowLeft, Eye, MessageCircle, CheckCircle, AlertCircle, UserPlus } from 'lucide-react';
+import {
+  Shield,
+  Users,
+  Key,
+  ArrowLeft,
+  Eye,
+  MessageCircle,
+  CheckCircle,
+  AlertCircle,
+  UserPlus,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface SupervisedPerson {
@@ -44,11 +54,12 @@ const FamilyAccessPortal = () => {
 
     try {
       setLoading(true);
-      
+
       // Récupérer les personnes supervisées par ce Wali
       const { data: familyMembers, error: familyError } = await supabase
         .from('family_members')
-        .select(`
+        .select(
+          `
           id,
           user_id,
           full_name,
@@ -57,7 +68,8 @@ const FamilyAccessPortal = () => {
           can_view_profile,
           can_communicate,
           invitation_status
-        `)
+        `
+        )
         .eq('invited_user_id', user.id)
         .eq('invitation_status', 'accepted')
         .eq('is_wali', true);
@@ -101,11 +113,13 @@ const FamilyAccessPortal = () => {
             is_wali: member.is_wali ?? false,
             can_communicate: member.can_communicate ?? false,
             can_view_profile: member.can_view_profile ?? false,
-            profile: profile ? {
-              avatar_url: profile.avatar_url ?? undefined,
-              age: profile.age ?? undefined,
-              location: profile.location ?? undefined
-            } : undefined,
+            profile: profile
+              ? {
+                  avatar_url: profile.avatar_url ?? undefined,
+                  age: profile.age ?? undefined,
+                  location: profile.location ?? undefined,
+                }
+              : undefined,
             activeMatches: activeMatches || 0,
             pendingApprovals: pendingApprovals || 0,
           };
@@ -116,9 +130,9 @@ const FamilyAccessPortal = () => {
     } catch (error) {
       console.error('Error fetching supervised persons:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les personnes supervisées",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les personnes supervisées',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -139,13 +153,12 @@ const FamilyAccessPortal = () => {
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
-              Vous devez être connecté avec un compte de supervision familiale pour accéder à cette page.
+              Vous devez être connecté avec un compte de supervision familiale pour accéder à cette
+              page.
             </p>
             <div className="space-y-2">
               <Link to="/auth">
-                <Button className="w-full bg-emerald hover:bg-emerald-dark">
-                  Se connecter
-                </Button>
+                <Button className="w-full bg-emerald hover:bg-emerald-dark">Se connecter</Button>
               </Link>
               <Link to="/">
                 <Button variant="outline" className="w-full">
@@ -189,13 +202,12 @@ const FamilyAccessPortal = () => {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Supervision Familiale</h1>
-                <p className="text-muted-foreground">Tableau de bord pour la supervision islamique</p>
+                <p className="text-muted-foreground">
+                  Tableau de bord pour la supervision islamique
+                </p>
               </div>
             </div>
-            <Button 
-              onClick={handleSignOut}
-              variant="outline"
-            >
+            <Button onClick={handleSignOut} variant="outline">
               Déconnexion
             </Button>
           </div>
@@ -211,7 +223,8 @@ const FamilyAccessPortal = () => {
                     Personnes Supervisées
                   </div>
                   <Badge variant="outline" className="text-emerald">
-                    {supervisedPersons.length} {supervisedPersons.length > 1 ? 'personnes' : 'personne'}
+                    {supervisedPersons.length}{' '}
+                    {supervisedPersons.length > 1 ? 'personnes' : 'personne'}
                   </Badge>
                 </CardTitle>
               </CardHeader>
@@ -224,7 +237,8 @@ const FamilyAccessPortal = () => {
                       Vous ne supervisez actuellement aucune personne.
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Les personnes que vous souhaitez superviser doivent vous inviter en tant que Wali depuis leur compte.
+                      Les personnes que vous souhaitez superviser doivent vous inviter en tant que
+                      Wali depuis leur compte.
                     </p>
                   </div>
                 ) : (
@@ -235,8 +249,8 @@ const FamilyAccessPortal = () => {
                           <div className="flex items-start gap-4">
                             <div className="h-14 w-14 rounded-full bg-gradient-to-br from-emerald/20 to-gold/20 flex items-center justify-center flex-shrink-0">
                               {person.profile?.avatar_url ? (
-                                <img 
-                                  src={person.profile.avatar_url} 
+                                <img
+                                  src={person.profile.avatar_url}
                                   alt={person.full_name}
                                   className="h-full w-full rounded-full object-cover"
                                 />
@@ -244,13 +258,16 @@ const FamilyAccessPortal = () => {
                                 <Users className="h-6 w-6 text-emerald" />
                               )}
                             </div>
-                            
+
                             <div className="flex-1 min-w-0">
                               <div className="flex items-start justify-between mb-2">
                                 <div>
                                   <h3 className="font-semibold text-lg">{person.full_name}</h3>
                                   <p className="text-sm text-muted-foreground">
-                                    {person.relationship} • {person.profile?.age ? `${person.profile.age} ans` : 'Âge non défini'}
+                                    {person.relationship} •{' '}
+                                    {person.profile?.age
+                                      ? `${person.profile.age} ans`
+                                      : 'Âge non défini'}
                                   </p>
                                   {person.profile?.location && (
                                     <p className="text-xs text-muted-foreground mt-1">
@@ -258,7 +275,10 @@ const FamilyAccessPortal = () => {
                                     </p>
                                   )}
                                 </div>
-                                <Badge variant={person.can_communicate ? "default" : "secondary"} className="ml-2">
+                                <Badge
+                                  variant={person.can_communicate ? 'default' : 'secondary'}
+                                  className="ml-2"
+                                >
                                   {person.can_communicate ? 'Actif' : 'En attente'}
                                 </Badge>
                               </div>
@@ -267,7 +287,9 @@ const FamilyAccessPortal = () => {
                                 <div className="flex items-center gap-2 text-sm">
                                   <MessageCircle className="h-4 w-4 text-emerald" />
                                   <span className="text-muted-foreground">
-                                    {person.activeMatches || 0} conversation{person.activeMatches !== 1 ? 's' : ''} active{person.activeMatches !== 1 ? 's' : ''}
+                                    {person.activeMatches || 0} conversation
+                                    {person.activeMatches !== 1 ? 's' : ''} active
+                                    {person.activeMatches !== 1 ? 's' : ''}
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
@@ -279,17 +301,19 @@ const FamilyAccessPortal = () => {
                               </div>
 
                               <div className="flex gap-2 mt-4">
-                                <Button 
-                                  size="sm" 
+                                <Button
+                                  size="sm"
                                   variant="outline"
-                                  onClick={() => window.location.href = `/family-supervision?user=${person.user_id}`}
+                                  onClick={() =>
+                                    (window.location.href = `/family-supervision?user=${person.user_id}`)
+                                  }
                                   disabled={!person.can_view_profile}
                                 >
                                   <Eye className="h-4 w-4 mr-2" />
                                   Voir le profil
                                 </Button>
-                                <Button 
-                                  size="sm" 
+                                <Button
+                                  size="sm"
                                   variant="outline"
                                   disabled={person.pendingApprovals === 0}
                                 >
@@ -307,7 +331,9 @@ const FamilyAccessPortal = () => {
 
                 <div className="mt-6 p-4 bg-emerald/10 border border-emerald/20 rounded-lg">
                   <p className="text-sm text-emerald-dark">
-                    <strong>📚 Principe islamique :</strong> La supervision familiale (notamment par le Wali) est essentielle pour maintenir les valeurs islamiques dans les communications pré-maritales.
+                    <strong>📚 Principe islamique :</strong> La supervision familiale (notamment par
+                    le Wali) est essentielle pour maintenir les valeurs islamiques dans les
+                    communications pré-maritales.
                   </p>
                 </div>
               </CardContent>

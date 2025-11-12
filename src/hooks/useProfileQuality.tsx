@@ -41,15 +41,12 @@ interface IslamicPreferences {
   importance_of_religion?: string;
 }
 
-export const useProfileQuality = (
-  profileData?: ProfileData,
-  islamicPrefs?: IslamicPreferences
-) => {
+export const useProfileQuality = (profileData?: ProfileData, islamicPrefs?: IslamicPreferences) => {
   const [quality, setQuality] = useState<ProfileQuality>({
     overallScore: 0,
     sections: [],
     completionPercentage: 0,
-    missingSections: []
+    missingSections: [],
   });
 
   useEffect(() => {
@@ -62,7 +59,7 @@ export const useProfileQuality = (
         weight: 20,
         score: calculateBasicInfoScore(profileData),
         completed: isBasicInfoComplete(profileData),
-        suggestions: getBasicInfoSuggestions(profileData)
+        suggestions: getBasicInfoSuggestions(profileData),
       },
       {
         id: 'bio',
@@ -70,15 +67,15 @@ export const useProfileQuality = (
         weight: 25,
         score: calculateBioScore(profileData),
         completed: isBioComplete(profileData),
-        suggestions: getBioSuggestions(profileData)
+        suggestions: getBioSuggestions(profileData),
       },
       {
         id: 'interests',
-        name: 'Centres d\'intérêt',
+        name: "Centres d'intérêt",
         weight: 15,
         score: calculateInterestsScore(profileData),
         completed: isInterestsComplete(profileData),
-        suggestions: getInterestsSuggestions(profileData)
+        suggestions: getInterestsSuggestions(profileData),
       },
       {
         id: 'islamic',
@@ -86,7 +83,7 @@ export const useProfileQuality = (
         weight: 25,
         score: calculateIslamicScore(islamicPrefs),
         completed: isIslamicComplete(islamicPrefs),
-        suggestions: getIslamicSuggestions(islamicPrefs)
+        suggestions: getIslamicSuggestions(islamicPrefs),
       },
       {
         id: 'photo',
@@ -94,26 +91,26 @@ export const useProfileQuality = (
         weight: 15,
         score: profileData.avatar_url ? 100 : 0,
         completed: !!profileData.avatar_url,
-        suggestions: profileData.avatar_url ? [] : ['Ajoutez une photo de profil claire et récente']
-      }
+        suggestions: profileData.avatar_url
+          ? []
+          : ['Ajoutez une photo de profil claire et récente'],
+      },
     ];
 
     const overallScore = sections.reduce((acc, section) => {
       return acc + (section.score * section.weight) / 100;
     }, 0);
 
-    const completedSections = sections.filter(s => s.completed).length;
+    const completedSections = sections.filter((s) => s.completed).length;
     const completionPercentage = (completedSections / sections.length) * 100;
 
-    const missingSections = sections
-      .filter(s => !s.completed)
-      .map(s => s.name);
+    const missingSections = sections.filter((s) => !s.completed).map((s) => s.name);
 
     setQuality({
       overallScore: Math.round(overallScore),
       sections,
       completionPercentage: Math.round(completionPercentage),
-      missingSections
+      missingSections,
     });
   }, [profileData, islamicPrefs]);
 
@@ -123,13 +120,19 @@ export const useProfileQuality = (
 // Helper functions
 const calculateBasicInfoScore = (profile: ProfileData): number => {
   const fields = ['full_name', 'age', 'gender', 'location', 'education', 'profession'];
-  const completed = fields.filter(field => profile[field as keyof ProfileData]).length;
+  const completed = fields.filter((field) => profile[field as keyof ProfileData]).length;
   return Math.round((completed / fields.length) * 100);
 };
 
 const isBasicInfoComplete = (profile: ProfileData): boolean => {
-  return !!(profile.full_name && profile.age && profile.gender && 
-            profile.location && profile.education && profile.profession);
+  return !!(
+    profile.full_name &&
+    profile.age &&
+    profile.gender &&
+    profile.location &&
+    profile.education &&
+    profile.profession
+  );
 };
 
 const getBasicInfoSuggestions = (profile: ProfileData): string[] => {
@@ -138,7 +141,7 @@ const getBasicInfoSuggestions = (profile: ProfileData): string[] => {
   if (!profile.age) suggestions.push('Indiquez votre âge');
   if (!profile.gender) suggestions.push('Sélectionnez votre genre');
   if (!profile.location) suggestions.push('Précisez votre localisation');
-  if (!profile.education) suggestions.push('Ajoutez votre niveau d\'éducation');
+  if (!profile.education) suggestions.push("Ajoutez votre niveau d'éducation");
   if (!profile.profession) suggestions.push('Indiquez votre profession');
   return suggestions;
 };
@@ -186,11 +189,11 @@ const getInterestsSuggestions = (profile: ProfileData): string[] => {
   const count = profile.interests?.length || 0;
   const suggestions: string[] = [];
   if (count === 0) {
-    suggestions.push('Ajoutez au moins 3 centres d\'intérêt');
+    suggestions.push("Ajoutez au moins 3 centres d'intérêt");
   } else if (count < 3) {
     suggestions.push(`Ajoutez ${3 - count} centre(s) d'intérêt supplémentaire(s)`);
   } else if (count < 5) {
-    suggestions.push('5+ centres d\'intérêt améliorent la précision du matching');
+    suggestions.push("5+ centres d'intérêt améliorent la précision du matching");
   }
   return suggestions;
 };
@@ -198,13 +201,17 @@ const getInterestsSuggestions = (profile: ProfileData): string[] => {
 const calculateIslamicScore = (prefs?: IslamicPreferences): number => {
   if (!prefs) return 0;
   const fields = ['prayer_frequency', 'quran_reading', 'sect', 'importance_of_religion'];
-  const completed = fields.filter(field => prefs[field as keyof IslamicPreferences]).length;
+  const completed = fields.filter((field) => prefs[field as keyof IslamicPreferences]).length;
   return Math.round((completed / fields.length) * 100);
 };
 
 const isIslamicComplete = (prefs?: IslamicPreferences): boolean => {
-  return !!(prefs?.prayer_frequency && prefs?.quran_reading && 
-            prefs?.sect && prefs?.importance_of_religion);
+  return !!(
+    prefs?.prayer_frequency &&
+    prefs?.quran_reading &&
+    prefs?.sect &&
+    prefs?.importance_of_religion
+  );
 };
 
 const getIslamicSuggestions = (prefs?: IslamicPreferences): string[] => {
@@ -216,6 +223,7 @@ const getIslamicSuggestions = (prefs?: IslamicPreferences): string[] => {
   if (!prefs.prayer_frequency) suggestions.push('Indiquez votre fréquence de prière');
   if (!prefs.quran_reading) suggestions.push('Précisez votre lecture du Coran');
   if (!prefs.sect) suggestions.push('Spécifiez votre courant islamique');
-  if (!prefs.importance_of_religion) suggestions.push('Indiquez l\'importance de la religion pour vous');
+  if (!prefs.importance_of_religion)
+    suggestions.push("Indiquez l'importance de la religion pour vous");
   return suggestions;
 };

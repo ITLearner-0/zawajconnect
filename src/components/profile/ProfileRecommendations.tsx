@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,11 +20,11 @@ interface ProfileRecommendationsProps {
   onRecommendationAction: (recommendationId: string) => void;
 }
 
-const ProfileRecommendations: React.FC<ProfileRecommendationsProps> = ({ 
+const ProfileRecommendations: React.FC<ProfileRecommendationsProps> = ({
   userId,
-  recommendations, 
+  recommendations,
   loading,
-  onRecommendationAction 
+  onRecommendationAction,
 }) => {
   const getIcon = (type: string) => {
     switch (type) {
@@ -89,15 +88,18 @@ const ProfileRecommendations: React.FC<ProfileRecommendationsProps> = ({
                   <h4 className="font-semibold text-gray-900">{recommendation.title}</h4>
                 </div>
                 <Badge className={`text-xs ${getPriorityColor(recommendation.priority)}`}>
-                  {recommendation.priority === 'high' ? 'Priorité élevée' : 
-                   recommendation.priority === 'medium' ? 'Priorité moyenne' : 'Priorité faible'}
+                  {recommendation.priority === 'high'
+                    ? 'Priorité élevée'
+                    : recommendation.priority === 'medium'
+                      ? 'Priorité moyenne'
+                      : 'Priorité faible'}
                 </Badge>
               </div>
-              
+
               <p className="text-sm text-gray-600">{recommendation.description}</p>
-              
-              <Button 
-                variant="outline" 
+
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => onRecommendationAction(recommendation.id)}
                 className="w-full"

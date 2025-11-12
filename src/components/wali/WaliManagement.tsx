@@ -1,13 +1,12 @@
-
-import React, { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import CustomButton from "@/components/CustomButton";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
-import { Plus, UserCheck, UserX, Mail } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import CustomButton from '@/components/CustomButton';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
+import { Plus, UserCheck, UserX, Mail } from 'lucide-react';
 
 interface ManagedUser {
   id: string;
@@ -21,7 +20,7 @@ interface ManagedUser {
 const WaliManagement: React.FC = () => {
   const { user } = useAuth();
   const [managedUsers, setManagedUsers] = useState<ManagedUser[]>([]);
-  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserEmail, setNewUserEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -66,7 +65,7 @@ const WaliManagement: React.FC = () => {
           last_name: profile.last_name || '',
           is_verified: profile.is_verified || false,
           wali_verified: profile.wali_verified || false,
-          email: `user-${profile.id.slice(0, 8)}@example.com` // Placeholder email
+          email: `user-${profile.id.slice(0, 8)}@example.com`, // Placeholder email
         }));
 
         setManagedUsers(managedUsersData);
@@ -84,7 +83,7 @@ const WaliManagement: React.FC = () => {
       // Call the database function to link wali to user
       const { data, error } = await supabase.rpc('link_wali_to_user', {
         wali_user_id: user.id,
-        managed_user_email: newUserEmail.trim()
+        managed_user_email: newUserEmail.trim(),
       });
 
       if (error) {
@@ -92,20 +91,20 @@ const WaliManagement: React.FC = () => {
       }
 
       if (data) {
-        toast.success("User Linked Successfully", {
-          description: `${newUserEmail} is now under your supervision`
+        toast.success('User Linked Successfully', {
+          description: `${newUserEmail} is now under your supervision`,
         });
-        setNewUserEmail("");
+        setNewUserEmail('');
         fetchManagedUsers();
       } else {
-        toast.error("User Not Found", {
-          description: "No user found with that email address"
+        toast.error('User Not Found', {
+          description: 'No user found with that email address',
         });
       }
     } catch (error: any) {
       console.error('Error linking user:', error);
-      toast.error("Failed to Link User", {
-        description: error.message
+      toast.error('Failed to Link User', {
+        description: error.message,
       });
     } finally {
       setLoading(false);
@@ -113,8 +112,8 @@ const WaliManagement: React.FC = () => {
   };
 
   const sendVerificationReminder = async (userEmail: string) => {
-    toast.info("Verification Reminder", {
-      description: `Reminder sent to ${userEmail} to complete verification`
+    toast.info('Verification Reminder', {
+      description: `Reminder sent to ${userEmail} to complete verification`,
     });
   };
 
@@ -135,7 +134,7 @@ const WaliManagement: React.FC = () => {
               placeholder="Enter user's email address"
               type="email"
             />
-            <CustomButton 
+            <CustomButton
               onClick={linkUserToWali}
               disabled={loading || !newUserEmail.trim()}
               isLoading={loading}
@@ -170,21 +169,19 @@ const WaliManagement: React.FC = () => {
                       <h3 className="font-medium">
                         {managedUser.first_name} {managedUser.last_name}
                       </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {managedUser.email}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{managedUser.email}</p>
                     </div>
                     <div className="flex gap-2">
-                      <Badge variant={managedUser.is_verified ? "default" : "secondary"}>
+                      <Badge variant={managedUser.is_verified ? 'default' : 'secondary'}>
                         {managedUser.is_verified ? (
                           <UserCheck className="h-3 w-3 mr-1" />
                         ) : (
                           <UserX className="h-3 w-3 mr-1" />
                         )}
-                        {managedUser.is_verified ? "Verified" : "Unverified"}
+                        {managedUser.is_verified ? 'Verified' : 'Unverified'}
                       </Badge>
-                      <Badge variant={managedUser.wali_verified ? "default" : "outline"}>
-                        Wali {managedUser.wali_verified ? "Verified" : "Pending"}
+                      <Badge variant={managedUser.wali_verified ? 'default' : 'outline'}>
+                        Wali {managedUser.wali_verified ? 'Verified' : 'Pending'}
                       </Badge>
                     </div>
                   </div>

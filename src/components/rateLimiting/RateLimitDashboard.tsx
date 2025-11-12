@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -36,9 +35,9 @@ export const RateLimitDashboard: React.FC = () => {
   const handleUnblockUser = async () => {
     if (!userToUnblock.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a user ID",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Please enter a user ID',
+        variant: 'destructive',
       });
       return;
     }
@@ -47,14 +46,14 @@ export const RateLimitDashboard: React.FC = () => {
       await rateLimitingService.unblockUser(userToUnblock.trim());
       setUserToUnblock('');
       toast({
-        title: "Success",
+        title: 'Success',
         description: `User ${userToUnblock} has been unblocked`,
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to unblock user",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to unblock user',
+        variant: 'destructive',
       });
     }
   };
@@ -62,9 +61,9 @@ export const RateLimitDashboard: React.FC = () => {
   const handleBlockUser = async () => {
     if (!userToBlock.trim() || !blockReason.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter user ID and reason",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Please enter user ID and reason',
+        variant: 'destructive',
       });
       return;
     }
@@ -75,14 +74,14 @@ export const RateLimitDashboard: React.FC = () => {
       setUserToBlock('');
       setBlockReason('');
       toast({
-        title: "Success",
+        title: 'Success',
         description: `User ${userToBlock} has been blocked for ${blockDuration} minutes`,
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to block user",
-        variant: "destructive"
+        title: 'Error',
+        description: 'Failed to block user',
+        variant: 'destructive',
       });
     }
   };
@@ -97,9 +96,7 @@ export const RateLimitDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalKeys}</div>
-            <p className="text-xs text-muted-foreground">
-              Total active tracking entries
-            </p>
+            <p className="text-xs text-muted-foreground">Total active tracking entries</p>
           </CardContent>
         </Card>
 
@@ -110,9 +107,7 @@ export const RateLimitDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.blockedUsers}</div>
-            <p className="text-xs text-muted-foreground">
-              Currently blocked
-            </p>
+            <p className="text-xs text-muted-foreground">Currently blocked</p>
           </CardContent>
         </Card>
 
@@ -123,9 +118,7 @@ export const RateLimitDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">Active</div>
-            <p className="text-xs text-muted-foreground">
-              Monitoring for suspicious activity
-            </p>
+            <p className="text-xs text-muted-foreground">Monitoring for suspicious activity</p>
           </CardContent>
         </Card>
 
@@ -140,9 +133,7 @@ export const RateLimitDashboard: React.FC = () => {
                 Operational
               </Badge>
             </div>
-            <p className="text-xs text-muted-foreground">
-              All systems running
-            </p>
+            <p className="text-xs text-muted-foreground">All systems running</p>
           </CardContent>
         </Card>
       </div>

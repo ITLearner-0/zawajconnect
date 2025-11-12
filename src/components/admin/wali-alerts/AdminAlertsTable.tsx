@@ -3,12 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import {
   AlertDialog,
@@ -23,14 +23,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { 
-  CheckCircle, 
-  Ban, 
-  Mail, 
-  FileText, 
-  MoreVertical,
-  AlertTriangle
-} from 'lucide-react';
+import { CheckCircle, Ban, Mail, FileText, MoreVertical, AlertTriangle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,9 +46,18 @@ interface AdminAlertsTableProps {
 
 const severityConfig = {
   low: { label: 'Faible', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-  medium: { label: 'Moyen', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' },
-  high: { label: 'Élevé', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' },
-  critical: { label: 'Critique', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' }
+  medium: {
+    label: 'Moyen',
+    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  },
+  high: {
+    label: 'Élevé',
+    color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
+  },
+  critical: {
+    label: 'Critique',
+    color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+  },
 };
 
 export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTableProps) => {
@@ -71,7 +73,7 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
   const [emailHistoryOpen, setEmailHistoryOpen] = useState(false);
   const [selectedWaliForHistory, setSelectedWaliForHistory] = useState<AdminWaliAlert | null>(null);
 
-  const filteredAlerts = alerts.filter(alert => {
+  const filteredAlerts = alerts.filter((alert) => {
     if (filterRisk !== 'all' && alert.risk_level !== filterRisk) return false;
     if (filterStatus === 'unacknowledged' && alert.acknowledged) return false;
     if (filterStatus === 'acknowledged' && !alert.acknowledged) return false;
@@ -87,9 +89,9 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
   const handleSuspend = async () => {
     if (!user?.id || !selectedWali || !suspendReason.trim()) {
       toast({
-        title: "Erreur",
-        description: "Veuillez fournir une raison de suspension",
-        variant: "destructive",
+        title: 'Erreur',
+        description: 'Veuillez fournir une raison de suspension',
+        variant: 'destructive',
       });
       return;
     }
@@ -101,7 +103,7 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
         suspendReason,
         parseInt(suspendDays)
       );
-      
+
       if (success) {
         // Récupérer le nom de l'admin
         const { data: adminProfile } = await supabase
@@ -110,7 +112,7 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
           .eq('id', user.id)
           .single();
 
-        const adminName = adminProfile?.full_name || 'L\'équipe Zawaj Connect';
+        const adminName = adminProfile?.full_name || "L'équipe Zawaj Connect";
 
         // Envoyer l'email de notification de suspension
         const { error: emailError } = await supabase.functions.invoke('send-wali-email', {
@@ -119,20 +121,21 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
             email_type: 'suspension',
             suspension_reason: suspendReason,
             suspension_duration_days: parseInt(suspendDays),
-            admin_name: adminName
-          }
+            admin_name: adminName,
+          },
         });
 
         if (emailError) {
           console.error('Erreur envoi email:', emailError);
           toast({
-            title: "Suspension effectuée",
-            description: "Le Wali a été suspendu mais l'email de notification n'a pas pu être envoyé",
-            variant: "default",
+            title: 'Suspension effectuée',
+            description:
+              "Le Wali a été suspendu mais l'email de notification n'a pas pu être envoyé",
+            variant: 'default',
           });
         } else {
           toast({
-            title: "Wali suspendu",
+            title: 'Wali suspendu',
             description: `Le Wali a été suspendu pour ${suspendDays} jours et notifié par email`,
           });
         }
@@ -145,9 +148,9 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
       }
     } catch (error: any) {
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: error.message,
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -178,7 +181,7 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
             <div>
               <CardTitle>Alertes Wali</CardTitle>
               <CardDescription>
-                {filteredAlerts.length} alerte{filteredAlerts.length > 1 ? 's' : ''} 
+                {filteredAlerts.length} alerte{filteredAlerts.length > 1 ? 's' : ''}
               </CardDescription>
             </div>
             <div className="flex gap-2">
@@ -194,7 +197,7 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
                   <SelectItem value="low">Faible</SelectItem>
                 </SelectContent>
               </Select>
-              
+
               <Select value={filterStatus} onValueChange={setFilterStatus}>
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Statut" />
@@ -219,14 +222,12 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
               <div className="space-y-4">
                 {filteredAlerts.map((alert) => {
                   const config = severityConfig[alert.risk_level];
-                  
+
                   return (
                     <div
                       key={alert.id}
                       className={`p-4 rounded-lg border ${
-                        alert.acknowledged 
-                          ? 'bg-muted/50 opacity-75' 
-                          : 'bg-background'
+                        alert.acknowledged ? 'bg-muted/50 opacity-75' : 'bg-background'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-4">
@@ -235,30 +236,29 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
                             <Badge variant="outline" className={config.color}>
                               {config.label}
                             </Badge>
-                            <Badge variant="outline">
-                              {alert.alert_type.replace('_', ' ')}
-                            </Badge>
+                            <Badge variant="outline">{alert.alert_type.replace('_', ' ')}</Badge>
                             {alert.acknowledged && (
-                              <Badge variant="outline" className="bg-green-50 text-green-700 dark:bg-green-950">
+                              <Badge
+                                variant="outline"
+                                className="bg-green-50 text-green-700 dark:bg-green-950"
+                              >
                                 Traité
                               </Badge>
                             )}
                           </div>
-                          
+
                           <p className="font-medium mb-1">
                             {alert.wali_profile?.first_name} {alert.wali_profile?.last_name}
                           </p>
                           <p className="text-sm text-muted-foreground mb-1">
                             {alert.wali_profile?.email}
                           </p>
-                          <p className="text-sm text-foreground mb-2">
-                            {alert.pattern_detected}
-                          </p>
+                          <p className="text-sm text-foreground mb-2">{alert.pattern_detected}</p>
                           <p className="text-xs text-muted-foreground">
                             {format(new Date(alert.created_at), 'PPp', { locale: fr })}
                           </p>
                         </div>
-                        
+
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm">
@@ -267,9 +267,7 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             {!alert.acknowledged && (
-                              <DropdownMenuItem
-                                onClick={() => handleAcknowledge(alert.id)}
-                              >
+                              <DropdownMenuItem onClick={() => handleAcknowledge(alert.id)}>
                                 <CheckCircle className="h-4 w-4 mr-2" />
                                 Marquer comme traité
                               </DropdownMenuItem>
@@ -286,8 +284,8 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
                             <DropdownMenuItem
                               onClick={async () => {
                                 if (!user?.id) return;
-                                
-                                const message = prompt("Message à envoyer au Wali :");
+
+                                const message = prompt('Message à envoyer au Wali :');
                                 if (!message?.trim()) return;
 
                                 try {
@@ -297,29 +295,33 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
                                     .eq('id', user.id)
                                     .single();
 
-                                  const adminName = adminProfile?.full_name || 'L\'équipe Zawaj Connect';
+                                  const adminName =
+                                    adminProfile?.full_name || "L'équipe Zawaj Connect";
 
-                                  const { error } = await supabase.functions.invoke('send-wali-email', {
-                                    body: {
-                                      wali_user_id: alert.wali_user_id,
-                                      email_type: 'contact',
-                                      subject: `Message de l'administration - Zawaj Connect`,
-                                      message: message,
-                                      admin_name: adminName
+                                  const { error } = await supabase.functions.invoke(
+                                    'send-wali-email',
+                                    {
+                                      body: {
+                                        wali_user_id: alert.wali_user_id,
+                                        email_type: 'contact',
+                                        subject: `Message de l'administration - Zawaj Connect`,
+                                        message: message,
+                                        admin_name: adminName,
+                                      },
                                     }
-                                  });
+                                  );
 
                                   if (error) throw error;
 
                                   toast({
-                                    title: "Email envoyé",
-                                    description: "Le Wali a été contacté par email",
+                                    title: 'Email envoyé',
+                                    description: 'Le Wali a été contacté par email',
                                   });
                                 } catch (error: any) {
                                   toast({
-                                    title: "Erreur",
+                                    title: 'Erreur',
                                     description: error.message,
-                                    variant: "destructive",
+                                    variant: 'destructive',
                                   });
                                 }
                               }}
@@ -357,10 +359,11 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
           <AlertDialogHeader>
             <AlertDialogTitle>Suspendre le Wali</AlertDialogTitle>
             <AlertDialogDescription>
-              Suspendre {selectedWali?.wali_profile?.first_name} {selectedWali?.wali_profile?.last_name}
+              Suspendre {selectedWali?.wali_profile?.first_name}{' '}
+              {selectedWali?.wali_profile?.last_name}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          
+
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="reason">Raison de la suspension</Label>
@@ -372,7 +375,7 @@ export const AdminAlertsTable = ({ alerts, loading, onRefresh }: AdminAlertsTabl
                 rows={3}
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="duration">Durée (jours)</Label>
               <Input

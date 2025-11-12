@@ -37,7 +37,7 @@ const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: 
 
   const handleViewProfile = () => {
     toast({
-      title: "Profil ouvert",
+      title: 'Profil ouvert',
       description: `Consultation du profil de ${match.full_name}`,
     });
     navigate(`/profile/${match.user_id}`);
@@ -45,10 +45,10 @@ const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: 
 
   const handleShowInterest = async () => {
     toast({
-      title: "Intérêt envoyé",
+      title: 'Intérêt envoyé',
       description: `Votre intérêt pour ${match.full_name} a été exprimé (Compatibilité: ${match.compatibility_score}%)`,
     });
-    
+
     // TODO: Implement actual interest logic with database
   };
 
@@ -63,56 +63,58 @@ const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: 
           cultural_score: match.cultural_score,
           personality_score: match.personality_score,
           matching_reasons: match.matching_reasons,
-          potential_concerns: match.potential_concerns
-        }
+          potential_concerns: match.potential_concerns,
+        },
       });
 
       if (error) {
         console.error('Full error details:', error);
-        
+
         // Handle specific error cases
         if (error.message?.includes('422')) {
           toast({
-            title: "Configuration manquante",
-            description: "Vous devez d'abord inviter un wali (tuteur) dans vos paramètres famille avant de demander une approbation.",
-            variant: "destructive",
+            title: 'Configuration manquante',
+            description:
+              "Vous devez d'abord inviter un wali (tuteur) dans vos paramètres famille avant de demander une approbation.",
+            variant: 'destructive',
           });
           return;
         }
-        
+
         throw error;
       }
-      
+
       if (data?.success) {
         toast({
-          title: "Demande envoyée avec succès",
+          title: 'Demande envoyée avec succès',
           description: `${data.notifications_sent} membre(s) de famille notifié(s)${data.ai_analysis_included ? ' avec analyse IA' : ''}`,
         });
       } else if (data?.error === 'no_family_members') {
         toast({
-          title: "Configuration manquante",
-          description: data.message || "Vous devez d'abord configurer un wali dans vos paramètres famille.",
-          variant: "destructive",
+          title: 'Configuration manquante',
+          description:
+            data.message || "Vous devez d'abord configurer un wali dans vos paramètres famille.",
+          variant: 'destructive',
         });
       } else {
         throw new Error(data?.error || 'Erreur inconnue');
       }
     } catch (error) {
       console.error('Error requesting family approval:', error);
-      
+
       // More specific error messages
       let errorMessage = "Impossible d'envoyer la demande d'approbation";
-      
+
       if (error.message?.includes('no_family_members')) {
-        errorMessage = "Aucun wali configuré. Rendez-vous dans vos paramètres famille.";
+        errorMessage = 'Aucun wali configuré. Rendez-vous dans vos paramètres famille.';
       } else if (error.message?.includes('Edge Function returned a non-2xx status code')) {
-        errorMessage = "Erreur de service. Vérifiez votre configuration famille.";
+        errorMessage = 'Erreur de service. Vérifiez votre configuration famille.';
       }
-      
+
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
@@ -123,9 +125,7 @@ const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: 
         <div className="flex items-start gap-4">
           <Avatar className="h-16 w-16">
             <AvatarImage src={match.avatar_url} />
-            <AvatarFallback>
-              {match.full_name?.charAt(0) || 'U'}
-            </AvatarFallback>
+            <AvatarFallback>{match.full_name?.charAt(0) || 'U'}</AvatarFallback>
           </Avatar>
 
           <div className="flex-1 space-y-3">
@@ -144,9 +144,11 @@ const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: 
                   <span>{match.profession}</span>
                 </div>
               </div>
-              
+
               <div className="text-right">
-                <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border ${getCompatibilityColor(match.compatibility_score)}`}>
+                <div
+                  className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border ${getCompatibilityColor(match.compatibility_score)}`}
+                >
                   {getScoreIcon(match.compatibility_score)}
                   {match.compatibility_score}% compatible
                 </div>
@@ -187,7 +189,11 @@ const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: 
                 <p className="text-sm font-medium text-emerald-700 mb-2">Points forts:</p>
                 <div className="flex flex-wrap gap-2">
                   {match.matching_reasons.map((reason: string, index: number) => (
-                    <Badge key={index} variant="secondary" className="text-xs bg-success/10 text-success border-success/20">
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="text-xs bg-success/10 text-success border-success/20"
+                    >
                       {reason}
                     </Badge>
                   ))}
@@ -201,7 +207,11 @@ const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: 
                 <p className="text-sm font-medium text-warning mb-2">À considérer:</p>
                 <div className="flex flex-wrap gap-2">
                   {match.potential_concerns.map((concern: string, index: number) => (
-                    <Badge key={index} variant="outline" className="text-xs text-warning border-warning/30">
+                    <Badge
+                      key={index}
+                      variant="outline"
+                      className="text-xs text-warning border-warning/30"
+                    >
                       {concern}
                     </Badge>
                   ))}
@@ -218,27 +228,14 @@ const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: 
               </div>
             ) : (
               <div className="flex gap-2 pt-2">
-                <Button 
-                  size="sm" 
-                  className="flex-1"
-                  onClick={handleViewProfile}
-                >
+                <Button size="sm" className="flex-1" onClick={handleViewProfile}>
                   Voir le profil
                 </Button>
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  className="flex-1"
-                  onClick={handleShowInterest}
-                >
+                <Button size="sm" variant="outline" className="flex-1" onClick={handleShowInterest}>
                   Montrer l'intérêt
                 </Button>
                 {familyApprovalRequired && (
-                  <Button 
-                    size="sm" 
-                    variant="secondary"
-                    onClick={handleFamilyApproval}
-                  >
+                  <Button size="sm" variant="secondary" onClick={handleFamilyApproval}>
                     Demander approbation famille
                   </Button>
                 )}

@@ -1,4 +1,3 @@
-
 import { DatabaseProfile } from '@/types/profile';
 import { User, MapPin } from 'lucide-react';
 
@@ -15,7 +14,11 @@ const BasicInformationSection = ({ profile }: BasicInformationSectionProps) => {
       <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="flex items-center text-sm">
           <span className="font-medium text-gray-500 w-24">Age:</span>
-          <span>{profile.birth_date ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear() : 'Not specified'}</span>
+          <span>
+            {profile.birth_date
+              ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear()
+              : 'Not specified'}
+          </span>
         </div>
         <div className="flex items-center text-sm">
           <span className="font-medium text-gray-500 w-24">Location:</span>

@@ -5,6 +5,7 @@ Ce guide explique comment configurer l'analyse de qualité de code avec ESLint, 
 ## 🎯 Vue d'ensemble
 
 Le workflow d'analyse de qualité vérifie :
+
 - **ESLint** : Détection d'erreurs et problèmes de code
 - **Prettier** : Vérification du formatage du code
 - **SonarCloud** : Analyse approfondie (bugs, vulnérabilités, code smells, couverture)
@@ -80,6 +81,7 @@ sonar.projectName=Votre Nom de Projet
 ```
 
 Pour trouver ces valeurs :
+
 - `projectKey` et `organization` : Disponibles dans SonarCloud après création du projet
 - `projectName` : Le nom affiché dans SonarCloud
 
@@ -88,6 +90,7 @@ Pour trouver ces valeurs :
 Si vous avez déjà configuré Slack/Discord pour d'autres workflows, les notifications fonctionneront automatiquement.
 
 Sinon, référez-vous à `NOTIFICATIONS_SETUP.md` pour configurer :
+
 - `SLACK_WEBHOOK_URL`
 - `DISCORD_WEBHOOK_URL`
 
@@ -124,6 +127,7 @@ Le workflow crée deux commentaires automatiques dans chaque PR :
 ### 1. Commentaire ESLint & Prettier
 
 Affiche :
+
 - Nombre d'erreurs et warnings ESLint
 - Top 5 des problèmes ESLint
 - Statut du formatage Prettier
@@ -132,6 +136,7 @@ Affiche :
 ### 2. Commentaire SonarCloud
 
 Affiche :
+
 - Statut du Quality Gate
 - Métriques détaillées (bugs, vulnérabilités, code smells)
 - Couverture de tests
@@ -155,6 +160,7 @@ Affiche :
 ### SonarCloud Quality Gate
 
 Critères de passage :
+
 - ✅ **0 bugs** sur nouveau code
 - ✅ **0 vulnérabilités** sur nouveau code
 - ✅ **Couverture ≥ 80%** sur nouveau code
@@ -171,9 +177,12 @@ Modifiez `.eslintrc.json` pour ajuster les règles :
 {
   "rules": {
     "no-console": ["warn", { "allow": ["warn", "error"] }],
-    "@typescript-eslint/no-unused-vars": ["error", { 
-      "argsIgnorePattern": "^_" 
-    }]
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ]
   }
 }
 ```
@@ -193,6 +202,7 @@ Modifiez `.prettierrc.json` :
 ### Seuils SonarCloud
 
 Modifiez dans SonarCloud :
+
 1. Allez dans **Project Settings** > **Quality Gate**
 2. Créez ou modifiez un Quality Gate personnalisé
 3. Ajustez les seuils selon vos besoins
@@ -226,15 +236,18 @@ npm install
 ## 📚 Ressources
 
 ### ESLint
+
 - [ESLint Documentation](https://eslint.org/docs/latest/)
 - [TypeScript ESLint](https://typescript-eslint.io/)
 - [React ESLint Plugin](https://github.com/jsx-eslint/eslint-plugin-react)
 
 ### Prettier
+
 - [Prettier Documentation](https://prettier.io/docs/en/)
 - [Options](https://prettier.io/docs/en/options.html)
 
 ### SonarCloud
+
 - [SonarCloud Documentation](https://docs.sonarcloud.io/)
 - [Quality Gates](https://docs.sonarcloud.io/improving/quality-gates/)
 - [GitHub Integration](https://docs.sonarcloud.io/advanced-setup/ci-based-analysis/github-actions-for-sonarcloud/)
@@ -242,11 +255,13 @@ npm install
 ## 🎯 Meilleures pratiques
 
 1. **Corrigez les erreurs avant de push** :
+
    ```bash
    npm run lint:fix && npm run format
    ```
 
 2. **Configurez pre-commit hooks** (optionnel avec Husky) :
+
    ```bash
    npm install --save-dev husky lint-staged
    npx husky install

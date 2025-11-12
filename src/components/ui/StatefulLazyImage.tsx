@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useStatefulLazyImage } from '@/hooks/useLazyLoading/state/useStatefulLazyImage';
 import { cn } from '@/lib/utils';
@@ -80,8 +79,8 @@ const StatefulLazyImage = ({
       {/* Global stats display */}
       {showGlobalStats && (
         <div className="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded z-10">
-          {globalLoadingState.loadedImages}/{globalLoadingState.totalImages} 
-          ({globalLoadingState.successRate.toFixed(1)}%)
+          {globalLoadingState.loadedImages}/{globalLoadingState.totalImages}(
+          {globalLoadingState.successRate.toFixed(1)}%)
         </div>
       )}
 
@@ -94,24 +93,30 @@ const StatefulLazyImage = ({
 
       {/* Loading state */}
       {isLoading && (
-        <div className={cn(
-          'flex items-center justify-center bg-gray-100 animate-pulse',
-          placeholderClassName
-        )}>
+        <div
+          className={cn(
+            'flex items-center justify-center bg-gray-100 animate-pulse',
+            placeholderClassName
+          )}
+        >
           <div className="text-gray-400 text-sm">Loading...</div>
         </div>
       )}
 
       {/* Error state with retry */}
       {hasFailed && (
-        <div className={cn(
-          'flex flex-col items-center justify-center bg-gray-100 p-4',
-          placeholderClassName
-        )}>
+        <div
+          className={cn(
+            'flex flex-col items-center justify-center bg-gray-100 p-4',
+            placeholderClassName
+          )}
+        >
           <AlertCircle className="h-8 w-8 text-red-500 mb-2" />
           <p className="text-red-600 text-sm mb-2">Failed to load image</p>
           {retryCount > 0 && (
-            <p className="text-xs text-gray-500 mb-2">Retries: {retryCount}/{maxRetries}</p>
+            <p className="text-xs text-gray-500 mb-2">
+              Retries: {retryCount}/{maxRetries}
+            </p>
           )}
           {canRetry && (
             <Button

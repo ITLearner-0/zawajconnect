@@ -25,17 +25,17 @@ const NoteTagSelector = ({ noteId }: NoteTagSelectorProps) => {
   };
 
   const handleTagToggle = async (tag: ProfileTag) => {
-    const isSelected = selectedTags.some(t => t.id === tag.id);
+    const isSelected = selectedTags.some((t) => t.id === tag.id);
 
     if (isSelected) {
       const success = await removeTagFromNote(noteId, tag.id);
       if (success) {
-        setSelectedTags(prev => prev.filter(t => t.id !== tag.id));
+        setSelectedTags((prev) => prev.filter((t) => t.id !== tag.id));
       }
     } else {
       const success = await addTagToNote(noteId, tag.id);
       if (success) {
-        setSelectedTags(prev => [...prev, tag]);
+        setSelectedTags((prev) => [...prev, tag]);
       }
     }
   };
@@ -53,7 +53,7 @@ const NoteTagSelector = ({ noteId }: NoteTagSelectorProps) => {
           {tag.tag_name}
         </Badge>
       ))}
-      
+
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
           <Button variant="outline" size="sm" className="h-6 gap-1">
@@ -66,14 +66,14 @@ const NoteTagSelector = ({ noteId }: NoteTagSelectorProps) => {
             <h4 className="font-semibold text-sm">Ajouter des tags</h4>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag) => {
-                const isSelected = selectedTags.some(t => t.id === tag.id);
+                const isSelected = selectedTags.some((t) => t.id === tag.id);
                 return (
                   <Badge
                     key={tag.id}
-                    style={{ 
+                    style={{
                       backgroundColor: isSelected ? tag.color : 'transparent',
                       color: isSelected ? 'white' : tag.color,
-                      borderColor: tag.color
+                      borderColor: tag.color,
                     }}
                     className="cursor-pointer border-2 hover:opacity-80 transition-opacity"
                     onClick={() => handleTagToggle(tag)}
@@ -90,7 +90,11 @@ const NoteTagSelector = ({ noteId }: NoteTagSelectorProps) => {
               </p>
             )}
             <div className="pt-2 border-t">
-              <TagManager compact onTagSelect={handleTagToggle} selectedTags={selectedTags.map(t => t.id)} />
+              <TagManager
+                compact
+                onTagSelect={handleTagToggle}
+                selectedTags={selectedTags.map((t) => t.id)}
+              />
             </div>
           </div>
         </PopoverContent>

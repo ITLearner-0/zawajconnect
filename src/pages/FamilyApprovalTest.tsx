@@ -7,14 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
-import { 
-  Brain, 
-  Users, 
-  Heart, 
-  CheckCircle,
-  Play,
-  Zap
-} from 'lucide-react';
+import { Brain, Users, Heart, CheckCircle, Play, Zap } from 'lucide-react';
 
 const FamilyApprovalTest = () => {
   const { user } = useAuth();
@@ -25,15 +18,15 @@ const FamilyApprovalTest = () => {
     compatibilityScore: 85,
     islamicScore: 90,
     culturalScore: 78,
-    personalityScore: 82
+    personalityScore: 82,
   });
 
   const handleTestApprovalRequest = async () => {
     if (!user) {
       toast({
-        title: "Erreur",
-        description: "Vous devez être connecté pour tester le système",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Vous devez être connecté pour tester le système',
+        variant: 'destructive',
       });
       return;
     }
@@ -51,13 +44,13 @@ const FamilyApprovalTest = () => {
           matching_reasons: [
             'Forte compatibilité religieuse',
             'Valeurs culturelles partagées',
-            'Proximité géographique'
+            'Proximité géographique',
           ],
           potential_concerns: [
-            'Différence d\'âge à considérer',
-            'Vérifier les objectifs matrimoniaux'
-          ]
-        }
+            "Différence d'âge à considérer",
+            'Vérifier les objectifs matrimoniaux',
+          ],
+        },
       });
 
       if (error) {
@@ -66,7 +59,7 @@ const FamilyApprovalTest = () => {
 
       if (data?.success) {
         toast({
-          title: "Test réussi ! ✅",
+          title: 'Test réussi ! ✅',
           description: `${data.notifications_sent} notification(s) créée(s)${data.ai_analysis_included ? ' avec analyse IA' : ''}`,
         });
       } else {
@@ -75,9 +68,9 @@ const FamilyApprovalTest = () => {
     } catch (error) {
       console.error('Test error:', error);
       toast({
-        title: "Erreur de test",
+        title: 'Erreur de test',
         description: error.message || "Une erreur s'est produite pendant le test",
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -97,7 +90,8 @@ const FamilyApprovalTest = () => {
           </CardHeader>
           <CardContent>
             <p className="text-muted-foreground">
-              Cette page permet de tester le workflow complet d'approbation familiale avec analyse IA intégrée.
+              Cette page permet de tester le workflow complet d'approbation familiale avec analyse
+              IA intégrée.
             </p>
           </CardContent>
         </Card>
@@ -163,10 +157,12 @@ const FamilyApprovalTest = () => {
                   id="matchUserId"
                   placeholder="ID utilisateur du match potentiel"
                   value={testData.matchUserId}
-                  onChange={(e) => setTestData(prev => ({ ...prev, matchUserId: e.target.value }))}
+                  onChange={(e) =>
+                    setTestData((prev) => ({ ...prev, matchUserId: e.target.value }))
+                  }
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="compatibility">Score de compatibilité (%)</Label>
                 <Input
@@ -175,10 +171,15 @@ const FamilyApprovalTest = () => {
                   min="50"
                   max="100"
                   value={testData.compatibilityScore}
-                  onChange={(e) => setTestData(prev => ({ ...prev, compatibilityScore: parseInt(e.target.value) }))}
+                  onChange={(e) =>
+                    setTestData((prev) => ({
+                      ...prev,
+                      compatibilityScore: parseInt(e.target.value),
+                    }))
+                  }
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="islamic">Score islamique (%)</Label>
                 <Input
@@ -187,10 +188,12 @@ const FamilyApprovalTest = () => {
                   min="50"
                   max="100"
                   value={testData.islamicScore}
-                  onChange={(e) => setTestData(prev => ({ ...prev, islamicScore: parseInt(e.target.value) }))}
+                  onChange={(e) =>
+                    setTestData((prev) => ({ ...prev, islamicScore: parseInt(e.target.value) }))
+                  }
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <Label htmlFor="cultural">Score culturel (%)</Label>
                 <Input
@@ -199,13 +202,15 @@ const FamilyApprovalTest = () => {
                   min="50"
                   max="100"
                   value={testData.culturalScore}
-                  onChange={(e) => setTestData(prev => ({ ...prev, culturalScore: parseInt(e.target.value) }))}
+                  onChange={(e) =>
+                    setTestData((prev) => ({ ...prev, culturalScore: parseInt(e.target.value) }))
+                  }
                 />
               </div>
             </div>
 
-            <Button 
-              onClick={handleTestApprovalRequest} 
+            <Button
+              onClick={handleTestApprovalRequest}
               disabled={loading}
               className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90"
               size="lg"

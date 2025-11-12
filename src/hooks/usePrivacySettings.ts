@@ -19,7 +19,7 @@ export const usePrivacySettings = () => {
   const [blockedUsers, setBlockedUsers] = useState<string[]>([]);
   const [isAccountVisible, setIsAccountVisible] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(true);
-  
+
   // Get current user ID
   useEffect(() => {
     const getUserId = async () => {
@@ -28,17 +28,17 @@ export const usePrivacySettings = () => {
         setUserId(data.session.user.id);
       }
     };
-    
+
     getUserId();
   }, []);
-  
+
   // Fetch privacy settings
   useEffect(() => {
     const fetchPrivacySettings = async () => {
       if (!userId) return;
-      
+
       setLoading(true);
-      
+
       // Ensure necessary columns exist
       await executeSql(`
         ALTER TABLE profiles ADD COLUMN IF NOT EXISTS privacy_settings JSONB 
@@ -48,34 +48,35 @@ export const usePrivacySettings = () => {
         
         ALTER TABLE profiles ADD COLUMN IF NOT EXISTS blocked_users TEXT[] DEFAULT '{}'::text[];
       `);
-      
+
       // Get the profile data
       const { data: profile, error } = await supabase
         .from('profiles')
         .select('privacy_settings, blocked_users, is_visible')
         .eq('id', userId)
         .single();
-      
+
       if (error) {
         console.error('Error fetching privacy settings:', error);
         setLoading(false);
         return;
       }
-      
+
       // Set privacy settings if they exist
       if (profile?.privacy_settings) {
         try {
-          const settings = typeof profile.privacy_settings === 'string' 
-            ? JSON.parse(profile.privacy_settings) 
-            : profile.privacy_settings;
-          
+          const settings =
+            typeof profile.privacy_settings === 'string'
+              ? JSON.parse(profile.privacy_settings)
+              : profile.privacy_settings;
+
           setPrivacySettings(settings);
         } catch (e) {
           console.error('Error parsing privacy settings:', e);
           setPrivacySettings(DEFAULT_PRIVACY_SETTINGS);
         }
       }
-      
+
       // Set blocked users if they exist
       if (profile?.blocked_users) {
         try {
@@ -84,23 +85,23 @@ export const usePrivacySettings = () => {
             : typeof profile.blocked_users === 'string'
               ? JSON.parse(profile.blocked_users)
               : [];
-          
+
           setBlockedUsers(blockedList);
         } catch (e) {
           console.error('Error parsing blocked users:', e);
           setBlockedUsers([]);
         }
       }
-      
+
       // Set account visibility
       setIsAccountVisible(profile?.is_visible !== false);
-      
+
       setLoading(false);
     };
-    
+
     fetchPrivacySettings();
   }, [userId]);
-  
+
   // Update privacy settings
   const updatePrivacySettings = async (newSettings: PrivacySettings) => {
     if (!userId) {
@@ -111,26 +112,26 @@ export const usePrivacySettings = () => {
       });
       return false;
     }
-    
+
     try {
       // Update the database
       const { error } = await supabase
         .from('profiles')
         .update({ privacy_settings: newSettings })
         .eq('id', userId);
-      
+
       if (error) {
         throw new Error(error.message);
       }
-      
+
       // Update local state
       setPrivacySettings(newSettings);
-      
+
       toast({
         title: 'Privacy Settings Updated',
         description: 'Your privacy settings have been updated successfully',
       });
-      
+
       return true;
     } catch (err: any) {
       console.error('Error updating privacy settings:', err);
@@ -142,7 +143,7 @@ export const usePrivacySettings = () => {
       return false;
     }
   };
-  
+
   // Toggle account visibility
   const toggleAccountVisibility = async () => {
     if (!userId) {
@@ -153,28 +154,28 @@ export const usePrivacySettings = () => {
       });
       return false;
     }
-    
+
     const newVisibility = !isAccountVisible;
-    
+
     try {
       // Update the database
       const { error } = await supabase
         .from('profiles')
         .update({ is_visible: newVisibility })
         .eq('id', userId);
-      
+
       if (error) {
         throw new Error(error.message);
       }
-      
+
       // Update local state
       setIsAccountVisible(newVisibility);
-      
+
       toast({
         title: newVisibility ? 'Profile Visible' : 'Profile Hidden',
         description: `Your profile is now ${newVisibility ? 'visible' : 'hidden'} to other users`,
       });
-      
+
       return true;
     } catch (err: any) {
       console.error('Error toggling account visibility:', err);
@@ -186,7 +187,7 @@ export const usePrivacySettings = () => {
       return false;
     }
   };
-  
+
   // Block user
   const blockUser = async (userIdToBlock: string) => {
     if (!userId) {
@@ -197,7 +198,7 @@ export const usePrivacySettings = () => {
       });
       return false;
     }
-    
+
     if (blockedUsers.includes(userIdToBlock)) {
       toast({
         title: 'Already Blocked',
@@ -206,28 +207,28 @@ export const usePrivacySettings = () => {
       });
       return false;
     }
-    
+
     const updatedBlockedUsers = [...blockedUsers, userIdToBlock];
-    
+
     try {
       // Update the database
       const { error } = await supabase
         .from('profiles')
         .update({ blocked_users: updatedBlockedUsers })
         .eq('id', userId);
-      
+
       if (error) {
         throw new Error(error.message);
       }
-      
+
       // Update local state
       setBlockedUsers(updatedBlockedUsers);
-      
+
       toast({
         title: 'User Blocked',
         description: 'You will no longer receive messages from this user',
       });
-      
+
       return true;
     } catch (err: any) {
       console.error('Error blocking user:', err);
@@ -239,7 +240,7 @@ export const usePrivacySettings = () => {
       return false;
     }
   };
-  
+
   // Unblock user
   const unblockUser = async (userIdToUnblock: string) => {
     if (!userId) {
@@ -250,28 +251,28 @@ export const usePrivacySettings = () => {
       });
       return false;
     }
-    
-    const updatedBlockedUsers = blockedUsers.filter(id => id !== userIdToUnblock);
-    
+
+    const updatedBlockedUsers = blockedUsers.filter((id) => id !== userIdToUnblock);
+
     try {
       // Update the database
       const { error } = await supabase
         .from('profiles')
         .update({ blocked_users: updatedBlockedUsers })
         .eq('id', userId);
-      
+
       if (error) {
         throw new Error(error.message);
       }
-      
+
       // Update local state
       setBlockedUsers(updatedBlockedUsers);
-      
+
       toast({
         title: 'User Unblocked',
         description: 'You can now receive messages from this user',
       });
-      
+
       return true;
     } catch (err: any) {
       console.error('Error unblocking user:', err);
@@ -283,7 +284,7 @@ export const usePrivacySettings = () => {
       return false;
     }
   };
-  
+
   return {
     privacySettings,
     updatePrivacySettings,
@@ -292,6 +293,6 @@ export const usePrivacySettings = () => {
     blockedUsers,
     blockUser,
     unblockUser,
-    loading
+    loading,
   };
 };

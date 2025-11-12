@@ -1,4 +1,3 @@
-
 import { RateLimitConfig } from './types';
 
 // Default rate limit configurations for different endpoints

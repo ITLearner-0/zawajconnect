@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { debugService } from '@/hooks/useLazyLoading/services/debug/debugService';
 import DevPanelToggle from './dev-panel/DevPanelToggle';
@@ -20,7 +19,7 @@ const LazyLoadingDevPanel = ({ show = false, onToggle }: LazyLoadingDevPanelProp
         setMetrics(debugService.getMetrics() as Map<string, any>);
         setEvents(debugService.getEvents());
       };
-      
+
       updateData();
       const interval = setInterval(updateData, 1000);
       return () => clearInterval(interval);
@@ -28,12 +27,12 @@ const LazyLoadingDevPanel = ({ show = false, onToggle }: LazyLoadingDevPanelProp
   }, [show, refreshKey]);
 
   const handleRefresh = () => {
-    setRefreshKey(prev => prev + 1);
+    setRefreshKey((prev) => prev + 1);
   };
 
   const handleClearMetrics = () => {
     debugService.clearMetrics();
-    setRefreshKey(prev => prev + 1);
+    setRefreshKey((prev) => prev + 1);
   };
 
   const handleDownloadReport = () => {

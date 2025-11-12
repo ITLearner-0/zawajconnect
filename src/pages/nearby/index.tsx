@@ -1,15 +1,14 @@
-
-import { useState } from "react";
-import { FilterCriteria } from "@/utils/location";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Settings } from "lucide-react";
-import CustomButton from "@/components/CustomButton";
-import { useIsMobile } from "@/hooks/use-mobile";
-import AuthCheck from "./AuthCheck";
-import NearbyHeader from "./NearbyHeader";
-import NearbySettings from "./NearbySettings";
-import NearbyMatchContent from "./NearbyMatchContent";
-import { useTranslation } from "react-i18next";
+import { useState } from 'react';
+import { FilterCriteria } from '@/utils/location';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Settings } from 'lucide-react';
+import CustomButton from '@/components/CustomButton';
+import { useIsMobile } from '@/hooks/use-mobile';
+import AuthCheck from './AuthCheck';
+import NearbyHeader from './NearbyHeader';
+import NearbySettings from './NearbySettings';
+import NearbyMatchContent from './NearbyMatchContent';
+import { useTranslation } from 'react-i18next';
 
 const NearbyMatches = () => {
   const [maxDistance, setMaxDistance] = useState(50);
@@ -38,17 +37,20 @@ const NearbyMatches = () => {
             <div className="mb-4 flex flex-col">
               <Sheet open={isSettingsOpen} onOpenChange={setIsSettingsOpen}>
                 <SheetTrigger asChild>
-                  <CustomButton 
-                    variant="outline" 
+                  <CustomButton
+                    variant="outline"
                     className="flex items-center gap-2 mb-4 w-full justify-center border-rose-300 text-rose-700 hover:bg-rose-100 dark:border-rose-600 dark:text-rose-300 dark:hover:bg-rose-800"
                   >
                     <Settings className="h-4 w-4" />
                     <span>{t('nearby.searchSettings')}</span>
                   </CustomButton>
                 </SheetTrigger>
-                <SheetContent side="left" className="w-[85vw] max-w-md p-0 pt-12 overflow-y-auto bg-white/95 dark:bg-rose-900/95 backdrop-blur-sm border-rose-200 dark:border-rose-700">
+                <SheetContent
+                  side="left"
+                  className="w-[85vw] max-w-md p-0 pt-12 overflow-y-auto bg-white/95 dark:bg-rose-900/95 backdrop-blur-sm border-rose-200 dark:border-rose-700"
+                >
                   <div className="p-4">
-                    <NearbySettings 
+                    <NearbySettings
                       maxDistance={maxDistance}
                       setMaxDistance={setMaxDistance}
                       showCompatibility={showCompatibility}
@@ -59,27 +61,27 @@ const NearbyMatches = () => {
                 </SheetContent>
               </Sheet>
 
-              <NearbyMatchContent 
-                maxDistance={maxDistance} 
-                filters={filters} 
+              <NearbyMatchContent
+                maxDistance={maxDistance}
+                filters={filters}
                 showCompatibility={showCompatibility}
               />
             </div>
           ) : (
             /* Desktop view with grid layout */
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <NearbySettings 
+              <NearbySettings
                 maxDistance={maxDistance}
                 setMaxDistance={setMaxDistance}
                 showCompatibility={showCompatibility}
                 setShowCompatibility={setShowCompatibility}
                 onApplyFilters={handleApplyFilters}
               />
-              
-              <NearbyMatchContent 
-                maxDistance={maxDistance} 
-                filters={filters} 
-                showCompatibility={showCompatibility} 
+
+              <NearbyMatchContent
+                maxDistance={maxDistance}
+                filters={filters}
+                showCompatibility={showCompatibility}
               />
             </div>
           )}

@@ -1,15 +1,14 @@
-
-import { useState, useEffect } from "react";
-import { RefreshCw } from "lucide-react";
-import { CompatibilityMatch } from "@/types/compatibility";
-import { MatchingFilters } from "@/hooks/compatibility/types/matchingTypes";
-import { PaginationOptions } from "@/hooks/compatibility/types/paginationTypes";
-import { useEnhancedCompatibilityMatching } from "@/hooks/compatibility/useEnhancedCompatibilityMatching";
-import MatchList from "./MatchList";
-import RealtimeNotifications from "./RealtimeNotifications";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from 'react';
+import { RefreshCw } from 'lucide-react';
+import { CompatibilityMatch } from '@/types/compatibility';
+import { MatchingFilters } from '@/hooks/compatibility/types/matchingTypes';
+import { PaginationOptions } from '@/hooks/compatibility/types/paginationTypes';
+import { useEnhancedCompatibilityMatching } from '@/hooks/compatibility/useEnhancedCompatibilityMatching';
+import MatchList from './MatchList';
+import RealtimeNotifications from './RealtimeNotifications';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface EnhancedMatchListProps {
   filters?: MatchingFilters;
@@ -77,34 +76,39 @@ const EnhancedMatchList = ({ filters, useVirtualScroll = false }: EnhancedMatchL
                 onClick={handleRefresh}
                 disabled={loading || backgroundProcessing}
               >
-                <RefreshCw className={`h-4 w-4 mr-2 ${backgroundProcessing ? 'animate-spin' : ''}`} />
+                <RefreshCw
+                  className={`h-4 w-4 mr-2 ${backgroundProcessing ? 'animate-spin' : ''}`}
+                />
                 Actualiser
               </Button>
             </div>
           </CardTitle>
         </CardHeader>
-        
+
         <CardContent className="pt-0">
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <span>Total: {totalCount}</span>
               {hasMore && <Badge variant="outline">Plus disponibles</Badge>}
             </div>
-            
+
             <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
+              <div
+                className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}
+              />
               <span>{isConnected ? 'Temps réel actif' : 'Hors ligne'}</span>
             </div>
-            
+
             {backgroundProcessing && (
               <Badge variant="secondary" className="animate-pulse">
                 Calcul en cours...
               </Badge>
             )}
-            
+
             {activeChannels > 0 && (
               <span className="text-xs">
-                {activeChannels} canal{activeChannels > 1 ? 'aux' : ''} actif{activeChannels > 1 ? 's' : ''}
+                {activeChannels} canal{activeChannels > 1 ? 'aux' : ''} actif
+                {activeChannels > 1 ? 's' : ''}
               </span>
             )}
           </div>
@@ -126,7 +130,9 @@ const EnhancedMatchList = ({ filters, useVirtualScroll = false }: EnhancedMatchL
           <CardContent className="pt-4">
             <div className="flex items-center gap-2 text-sm">
               <Badge variant="default">{unreadCount}</Badge>
-              <span>notification{unreadCount > 1 ? 's' : ''} non lue{unreadCount > 1 ? 's' : ''}</span>
+              <span>
+                notification{unreadCount > 1 ? 's' : ''} non lue{unreadCount > 1 ? 's' : ''}
+              </span>
             </div>
           </CardContent>
         </Card>

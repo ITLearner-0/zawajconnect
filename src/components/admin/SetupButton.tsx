@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { setupModerationTables } from '@/utils/database/moderationTables';
@@ -12,24 +11,25 @@ interface SetupButtonProps {
 
 const SetupButton: React.FC<SetupButtonProps> = ({ show, onSetupComplete }) => {
   const [loading, setLoading] = useState(false);
-  
+
   if (!show) return null;
-  
+
   const handleSetupTables = async () => {
     setLoading(true);
     try {
       // Setup moderation tables
       const moderationSuccess = await setupModerationTables();
-      
+
       // Check and setup RLS policies
       const rlsPolicies = await checkRLSPolicies();
-      const rlsExist = Object.keys(rlsPolicies).length > 0 && Object.values(rlsPolicies).every(Boolean);
+      const rlsExist =
+        Object.keys(rlsPolicies).length > 0 && Object.values(rlsPolicies).every(Boolean);
       let rlsSuccess = rlsExist;
-      
+
       if (!rlsExist) {
         rlsSuccess = await setupRLSPolicies();
       }
-      
+
       if (moderationSuccess && rlsSuccess) {
         toast.success('Database tables and security policies have been set up successfully!');
         // Notify parent component that setup is complete
@@ -46,11 +46,11 @@ const SetupButton: React.FC<SetupButtonProps> = ({ show, onSetupComplete }) => {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="mb-6">
-      <Button 
-        onClick={handleSetupTables} 
+      <Button
+        onClick={handleSetupTables}
         disabled={loading}
         className="flex items-center gap-2 bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-300"
       >

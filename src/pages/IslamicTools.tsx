@@ -16,29 +16,29 @@ const IslamicTools = () => {
       name: 'Heures de Prière',
       icon: Clock,
       description: 'Horaires de prière précis selon votre localisation',
-      component: <PrayerTimes />
+      component: <PrayerTimes />,
     },
     {
       id: 'qibla',
       name: 'Direction Qibla',
       icon: Compass,
       description: 'Boussole pour trouver la direction de la Mecque',
-      component: <QiblaDirection />
+      component: <QiblaDirection />,
     },
     {
       id: 'quotes',
       name: 'Citations Islamiques',
       icon: BookOpen,
       description: 'Citations du Coran et Hadiths inspirantes',
-      component: <IslamicQuotes />
+      component: <IslamicQuotes />,
     },
     {
       id: 'calendar',
       name: 'Calendrier Islamique',
       icon: Calendar,
       description: 'Dates importantes et événements islamiques',
-      component: <IslamicCalendarWidget />
-    }
+      component: <IslamicCalendarWidget />,
+    },
   ];
 
   return (
@@ -58,8 +58,8 @@ const IslamicTools = () => {
           {tools.map((tool) => {
             const Icon = tool.icon;
             return (
-              <TabsTrigger 
-                key={tool.id} 
+              <TabsTrigger
+                key={tool.id}
                 value={tool.id}
                 className="flex flex-col items-center gap-2 p-4 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
               >

@@ -54,7 +54,10 @@ const MatchingHistoryPanel = ({ className }: MatchingHistoryPanelProps) => {
         ) : (
           <div className="space-y-3">
             {history.map((entry: MatchingHistoryEntry) => (
-              <div key={entry.id} className="p-4 border rounded-lg hover:bg-muted/50 transition-colors">
+              <div
+                key={entry.id}
+                className="p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+              >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
@@ -67,8 +70,8 @@ const MatchingHistoryPanel = ({ className }: MatchingHistoryPanelProps) => {
                       <Users className="h-3 w-3 mr-1" />
                       {entry.total_matches} matches
                     </Badge>
-                    <Badge 
-                      variant="outline" 
+                    <Badge
+                      variant="outline"
                       className={`text-xs ${getScoreColor(entry.avg_compatibility_score)}`}
                     >
                       <TrendingUp className="h-3 w-3 mr-1" />
@@ -76,7 +79,7 @@ const MatchingHistoryPanel = ({ className }: MatchingHistoryPanelProps) => {
                     </Badge>
                   </div>
                 </div>
-                
+
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="text-muted-foreground">Islamique:</span>

@@ -11,6 +11,7 @@
 ## 🔍 Any implicites identifiés
 
 ### 1. Ligne 51 - Paramètre error dans catch (handleShare)
+
 ```typescript
 } catch (error) {
   toast({
@@ -20,7 +21,9 @@
   });
 }
 ```
+
 **Solution**: Typer explicitement comme `unknown`
+
 ```typescript
 } catch (error: unknown) {
   toast({
@@ -32,6 +35,7 @@
 ```
 
 ### 2. Ligne 71 - Paramètre error dans catch (handleExport)
+
 ```typescript
 } catch (error) {
   toast({
@@ -41,7 +45,9 @@
   });
 }
 ```
+
 **Solution**: Typer explicitement comme `unknown`
+
 ```typescript
 } catch (error: unknown) {
   toast({
@@ -53,19 +59,22 @@
 ```
 
 ### 3. Ligne 82 - Tableau nextSteps sans type explicite
+
 ```typescript
 const nextSteps = [
   {
     icon: Heart,
-    title: "Améliorer votre profil",
-    description: "Suivez les suggestions pour optimiser votre compatibilité",
+    title: 'Améliorer votre profil',
+    description: 'Suivez les suggestions pour optimiser votre compatibilité',
     action: () => navigate('/enhanced-profile'),
-    available: insightsAvailable
+    available: insightsAvailable,
   },
   // ...
 ];
 ```
+
 **Solution**: Créer une interface et typer le tableau
+
 ```typescript
 interface NextStep {
   icon: React.ComponentType<{ className?: string }>;
@@ -78,10 +87,10 @@ interface NextStep {
 const nextSteps: NextStep[] = [
   {
     icon: Heart,
-    title: "Améliorer votre profil",
-    description: "Suivez les suggestions pour optimiser votre compatibilité",
+    title: 'Améliorer votre profil',
+    description: 'Suivez les suggestions pour optimiser votre compatibilité',
     action: () => navigate('/enhanced-profile'),
-    available: insightsAvailable
+    available: insightsAvailable,
   },
   // ...
 ];
@@ -90,6 +99,7 @@ const nextSteps: NextStep[] = [
 ## 📦 Types bien définis
 
 Le composant a déjà :
+
 - ✅ `InsightsActionPanelProps` - Interface claire
 - ✅ `React.FC<InsightsActionPanelProps>` - Type explicite
 - ✅ Types de retour implicites corrects pour les fonctions async
@@ -97,6 +107,7 @@ Le composant a déjà :
 ## 🎨 Architecture du composant
 
 ### Fonctionnalités
+
 1. **Barre de progression**: Affiche le pourcentage de complétion du profil
 2. **Actions rapides**: Partager et Exporter les insights
 3. **Étapes suivantes**: 4 actions recommandées (profil, browse, guidance, refaire test)
@@ -104,21 +115,25 @@ Le composant a déjà :
 5. **Web Share API**: Utilisation native du partage navigateur
 
 ### Actions disponibles
+
 - **Partager**: Web Share API ou copie dans le presse-papiers
 - **Exporter**: Génération de PDF (simulée)
 - **Navigation**: 4 destinations avec états conditionnels
 
 ### État conditionnel
+
 Les actions sont désactivées si `insightsAvailable === false`
 
 ## 📈 Qualité du code
 
 ### Avant migration
+
 - **Any implicites**: 3 (2 catch blocks, 1 tableau)
 - **Types explicites**: 85%
 - **Architecture**: Excellente
 
 ### Après migration
+
 - **Any implicites**: 0
 - **Types explicites**: 100%
 - **Architecture**: Excellente
@@ -126,6 +141,7 @@ Les actions sont désactivées si `insightsAvailable === false`
 ## ✅ Plan de migration
 
 ### Étape 1: Créer l'interface NextStep
+
 ```typescript
 interface NextStep {
   icon: React.ComponentType<{ className?: string }>;
@@ -137,6 +153,7 @@ interface NextStep {
 ```
 
 ### Étape 2: Typer le tableau nextSteps
+
 ```typescript
 const nextSteps: NextStep[] = [
   // ...
@@ -144,6 +161,7 @@ const nextSteps: NextStep[] = [
 ```
 
 ### Étape 3: Typer les catch blocks
+
 ```typescript
 } catch (error: unknown) {
   // ...
@@ -151,6 +169,7 @@ const nextSteps: NextStep[] = [
 ```
 
 ### Étape 4: Ajouter des types de retour explicites (optionnel)
+
 ```typescript
 const handleShare = async (): Promise<void> => {
   // ...
@@ -172,27 +191,31 @@ const handleExport = async (): Promise<void> => {
 ## 🔗 Dépendances
 
 ### Dépend de:
+
 - Composants UI (Card, Button, Badge, Progress) ✅
 - `useToast` hook ✅
 - `useNavigate` hook (react-router-dom) ✅
 - Icons Lucide-react ✅
 
 ### Utilisé dans:
+
 - `CompatibilityInsights.tsx` ✅ (ligne 261)
 - Pages d'insights de compatibilité
 
 ## 📝 Notes supplémentaires
 
 ### Pattern d'utilisation observé
+
 ```typescript
 // Dans CompatibilityInsights.tsx (ligne 261)
-<InsightsActionPanel 
-  completionPercentage={100} 
-  insightsAvailable={true} 
+<InsightsActionPanel
+  completionPercentage={100}
+  insightsAvailable={true}
 />
 ```
 
 ### Points forts du composant
+
 1. **Web Share API**: Utilisation native avec fallback clipboard
 2. **UX excellente**: États de chargement, messages clairs
 3. **Responsive**: Grid 2 colonnes pour les boutons
@@ -200,27 +223,32 @@ const handleExport = async (): Promise<void> => {
 5. **Informative**: Progression visuelle, messages conditionnels
 
 ### API Web Share
+
 ```typescript
 if (navigator.share) {
   await navigator.share({
     title: 'Mes Insights de Compatibilité - ZawajConnect',
     text: 'Découvrez mes insights de compatibilité personnalisés sur ZawajConnect',
-    url: window.location.origin + '/compatibility-insights'
+    url: window.location.origin + '/compatibility-insights',
   });
 }
 ```
+
 ✅ Bon usage de la Web Share API avec fallback
 
 ### Simulation d'export PDF
+
 ```typescript
 // Simulate PDF generation
-await new Promise(resolve => setTimeout(resolve, 2000));
+await new Promise((resolve) => setTimeout(resolve, 2000));
 ```
+
 ⚠️ Placeholder - à implémenter en production
 
 ## 🎯 Améliorations recommandées (Phase 5)
 
 ### 1. Implémenter l'export PDF réel
+
 ```typescript
 const handleExport = async (): Promise<void> => {
   setIsExporting(true);
@@ -228,10 +256,10 @@ const handleExport = async (): Promise<void> => {
     // Utiliser une bibliothèque comme jsPDF ou react-pdf
     const pdf = await generateInsightsPDF(insights);
     pdf.save('insights-compatibilite.pdf');
-    
+
     toast({
-      title: "Export réussi",
-      description: "Vos insights ont été exportés en PDF",
+      title: 'Export réussi',
+      description: 'Vos insights ont été exportés en PDF',
     });
   } catch (error: unknown) {
     // ...
@@ -240,6 +268,7 @@ const handleExport = async (): Promise<void> => {
 ```
 
 ### 2. Intégrer useInsightsAnalytics
+
 ```typescript
 const { trackAction } = useInsightsAnalytics();
 
@@ -257,14 +286,16 @@ const handleExport = async (): Promise<void> => {
 ```
 
 ### 3. Ajouter des analytics pour les nextSteps
+
 ```typescript
 action: () => {
   trackAction(`next_step_${step.title.toLowerCase().replace(/\s+/g, '_')}`);
   navigate('/enhanced-profile');
-}
+};
 ```
 
 ### 4. Extraire nextSteps dans une constante
+
 ```typescript
 // constants/insightsActions.ts
 export const NEXT_STEPS_CONFIG = [
@@ -275,6 +306,7 @@ export const NEXT_STEPS_CONFIG = [
 ## 🎖️ Qualité du code
 
 ### Points forts
+
 - ✅ **85% typé** - Seulement 3 any implicites
 - ✅ **UX excellente** - États de chargement, feedback utilisateur
 - ✅ **API moderne** - Web Share API avec fallback
@@ -282,6 +314,7 @@ export const NEXT_STEPS_CONFIG = [
 - ✅ **Responsive** - Design adaptatif
 
 ### Migration
+
 - ⚡ **Rapide**: 5-7 minutes
 - ✅ **Faible risque**: Changements de typage uniquement
 - 🎯 **Impact maximal**: Complète le typage à 100%
@@ -289,6 +322,7 @@ export const NEXT_STEPS_CONFIG = [
 ## 🔍 Analyse des icons Lucide
 
 Le composant utilise correctement les icons Lucide-react :
+
 ```typescript
 const Icon = step.icon;
 // ...
@@ -296,8 +330,9 @@ const Icon = step.icon;
 ```
 
 Avec le typage proposé:
+
 ```typescript
-icon: React.ComponentType<{ className?: string }>
+icon: React.ComponentType<{ className?: string }>;
 ```
 
 Cela permet d'utiliser n'importe quel composant Lucide qui accepte `className` comme prop, ce qui est le cas de tous les icons Lucide.
@@ -319,6 +354,7 @@ Cela permet d'utiliser n'importe quel composant Lucide qui accepte `className` c
 ## 🚀 Intégration future
 
 Ce composant est un **candidat idéal** pour l'intégration de `useInsightsAnalytics`:
+
 - Track partages d'insights
 - Track exports PDF
 - Track navigation vers les prochaines étapes

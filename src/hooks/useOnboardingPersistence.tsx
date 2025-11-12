@@ -1,6 +1,6 @@
 /**
  * Unified Onboarding Persistence Hook
- * 
+ *
  * Replaces useFormAutoSave, useEmergencyBackup, and useFormPersistence
  * with a single optimized hook featuring:
  * - 1.5s debounce for optimal performance
@@ -81,7 +81,7 @@ export const useOnboardingPersistence = ({
   // Generate or retrieve session ID
   const getSessionId = useCallback(() => {
     if (sessionIdRef.current) return sessionIdRef.current;
-    
+
     const existing = sessionStorage.getItem('onboarding_session_id');
     if (existing) {
       sessionIdRef.current = existing;
@@ -132,26 +132,22 @@ export const useOnboardingPersistence = ({
       try {
         // Save profile data
         if (data.profileData.full_name) {
-          const { error: profileError } = await supabase
-            .from('profiles')
-            .upsert({
-              user_id: user.id,
-              ...data.profileData,
-              updated_at: new Date().toISOString(),
-            });
+          const { error: profileError } = await supabase.from('profiles').upsert({
+            user_id: user.id,
+            ...data.profileData,
+            updated_at: new Date().toISOString(),
+          });
 
           if (profileError) throw profileError;
         }
 
         // Save Islamic preferences
         if (data.islamicPrefs.prayer_frequency) {
-          const { error: prefsError } = await supabase
-            .from('islamic_preferences')
-            .upsert({
-              user_id: user.id,
-              ...data.islamicPrefs,
-              updated_at: new Date().toISOString(),
-            });
+          const { error: prefsError } = await supabase.from('islamic_preferences').upsert({
+            user_id: user.id,
+            ...data.islamicPrefs,
+            updated_at: new Date().toISOString(),
+          });
 
           if (prefsError) throw prefsError;
         }
@@ -207,7 +203,7 @@ export const useOnboardingPersistence = ({
           setLastSaveTime(new Date());
           setSaveStatus('saved');
           window.dispatchEvent(new CustomEvent('onboarding:save:success'));
-          
+
           // Reset to idle after 2 seconds
           setTimeout(() => setSaveStatus('idle'), 2000);
         } else {
@@ -217,7 +213,7 @@ export const useOnboardingPersistence = ({
         logger.error('Save failed', error);
         setSaveStatus('error');
         window.dispatchEvent(new CustomEvent('onboarding:save:error'));
-        
+
         // Reset to idle after 3 seconds
         setTimeout(() => setSaveStatus('idle'), 3000);
       }
@@ -255,17 +251,13 @@ export const useOnboardingPersistence = ({
       // Priority 1: Try database first
       const [profileResult, prefsResult] = await Promise.all([
         supabase.from('profiles').select('*').eq('user_id', user.id).single(),
-        supabase
-          .from('islamic_preferences')
-          .select('*')
-          .eq('user_id', user.id)
-          .single(),
+        supabase.from('islamic_preferences').select('*').eq('user_id', user.id).single(),
       ]);
 
       if (profileResult.data || prefsResult.data) {
         logger.log('Restored from database');
         sessionStorage.setItem(restoredKey, 'true');
-        
+
         return {
           profileData: profileResult.data as any,
           islamicPrefs: prefsResult.data as any,
@@ -286,7 +278,7 @@ export const useOnboardingPersistence = ({
         const data = localStorage.getItem(key);
         if (data) {
           const parsed = JSON.parse(data) as SavedData;
-          
+
           // Check if data is recent (within 24 hours)
           const timestamp = new Date(parsed.timestamp);
           if (Date.now() - timestamp.getTime() < 24 * 60 * 60 * 1000) {
@@ -302,7 +294,7 @@ export const useOnboardingPersistence = ({
       const standardData = localStorage.getItem(standardKey);
       if (standardData) {
         const parsed = JSON.parse(standardData) as SavedData;
-        
+
         // Check if data is recent (within 7 days)
         const timestamp = new Date(parsed.timestamp);
         if (Date.now() - timestamp.getTime() < 7 * 24 * 60 * 60 * 1000) {
@@ -328,8 +320,8 @@ export const useOnboardingPersistence = ({
 
     try {
       // Clear localStorage
-      const keysToRemove = Object.keys(localStorage).filter((key) =>
-        key.includes('onboarding') || key.includes('emergency')
+      const keysToRemove = Object.keys(localStorage).filter(
+        (key) => key.includes('onboarding') || key.includes('emergency')
       );
       keysToRemove.forEach((key) => localStorage.removeItem(key));
 

@@ -1,12 +1,15 @@
-import { CompatibilityMatch } from "@/types/compatibility";
-import { UserResultWithProfile } from "../types/matchingTypes";
-import { ValidatedUserResults } from "./dataFetchingService";
-import { UserAnswers, UserPreferences, AnswerValue } from "../types/validationTypes";
-import { logError, logInfo } from "./loggingService";
-import { calculateEnhancedCompatibilityScore, EnhancedCompatibilityMatch } from "../utils/enhancedCompatibilityScoring";
-import { polygamyCompatibilityService } from "./polygamyCompatibilityService";
-import { profileDataBuilder } from "./profileDataBuilder";
-import { scoringUtils } from "./scoringUtils";
+import { CompatibilityMatch } from '@/types/compatibility';
+import { UserResultWithProfile } from '../types/matchingTypes';
+import { ValidatedUserResults } from './dataFetchingService';
+import { UserAnswers, UserPreferences, AnswerValue } from '../types/validationTypes';
+import { logError, logInfo } from './loggingService';
+import {
+  calculateEnhancedCompatibilityScore,
+  EnhancedCompatibilityMatch,
+} from '../utils/enhancedCompatibilityScoring';
+import { polygamyCompatibilityService } from './polygamyCompatibilityService';
+import { profileDataBuilder } from './profileDataBuilder';
+import { scoringUtils } from './scoringUtils';
 
 export class CompatibilityCalculator {
   calculateCompatibilityScore(
@@ -24,8 +27,8 @@ export class CompatibilityCalculator {
         matchDetails: {
           strengths: [],
           differences: ['Error calculating compatibility'],
-          dealbreakers: ['Calculation error']
-        }
+          dealbreakers: ['Calculation error'],
+        },
       };
     }
   }
@@ -44,7 +47,10 @@ export class CompatibilityCalculator {
       const dealbreakers: string[] = [];
 
       // Check polygamy compatibility first as it's critical
-      const polygamyCompatibility = polygamyCompatibilityService.checkCompatibility(myResults, otherUser);
+      const polygamyCompatibility = polygamyCompatibilityService.checkCompatibility(
+        myResults,
+        otherUser
+      );
       if (polygamyCompatibility.isDealbreaker) {
         dealbreakers.push(polygamyCompatibility.reason);
         return {
@@ -53,37 +59,37 @@ export class CompatibilityCalculator {
           matchDetails: {
             strengths: [],
             differences: [polygamyCompatibility.reason],
-            dealbreakers
+            dealbreakers,
           },
-          profileData: profileDataBuilder.buildProfileData(otherUser)
+          profileData: profileDataBuilder.buildProfileData(otherUser),
         };
       } else if (polygamyCompatibility.isStrength) {
-        strengths.push("Compatible sur la polygamie");
+        strengths.push('Compatible sur la polygamie');
       }
 
       // Calculate category-based compatibility
       const categoryMap = scoringUtils.getCategoryMap();
-      
+
       for (const [categoryName, questions] of Object.entries(categoryMap)) {
         let categoryScore = 0;
         let categoryWeight = 0;
-        
+
         for (const questionId of questions) {
           const myAnswer = myResults.answers[questionId];
           const theirAnswer = otherUser.answers[questionId];
-          
+
           if (myAnswer && theirAnswer) {
             const questionScore = scoringUtils.calculateQuestionScore(myAnswer, theirAnswer);
             const weight = myAnswer.weight || 1;
-            
+
             categoryScore += questionScore * weight;
             categoryWeight += weight;
-            
+
             // Check for dealbreakers
             if (myAnswer.isBreaker && questionScore < (myAnswer.breakerThreshold || 70)) {
               dealbreakers.push(`Incompatible ${categoryName} values`);
             }
-            
+
             // Identify strengths and differences
             if (questionScore >= 80) {
               strengths.push(`Strong alignment in ${categoryName}`);
@@ -92,9 +98,9 @@ export class CompatibilityCalculator {
             }
           }
         }
-        
+
         if (categoryWeight > 0) {
-          const normalizedCategoryScore = (categoryScore / categoryWeight);
+          const normalizedCategoryScore = categoryScore / categoryWeight;
           categoryScores[categoryName] = { score: normalizedCategoryScore, weight: categoryWeight };
           totalScore += normalizedCategoryScore * categoryWeight;
           totalWeight += categoryWeight;
@@ -103,7 +109,7 @@ export class CompatibilityCalculator {
 
       // Apply user preferences
       let finalScore = scoringUtils.applyUserPreferences(
-        totalWeight > 0 ? (totalScore / totalWeight) : 0,
+        totalWeight > 0 ? totalScore / totalWeight : 0,
         myResults.preferences,
         categoryScores
       );
@@ -121,9 +127,9 @@ export class CompatibilityCalculator {
           strengths: [...new Set(strengths)],
           differences: [...new Set(differences)],
           dealbreakers: dealbreakers.length > 0 ? dealbreakers : undefined,
-          categoryScores
+          categoryScores,
         },
-        profileData: profileDataBuilder.buildProfileData(otherUser)
+        profileData: profileDataBuilder.buildProfileData(otherUser),
       };
     } catch (error) {
       logError('calculateBasicCompatibilityScore', error as Error);
@@ -133,8 +139,8 @@ export class CompatibilityCalculator {
         matchDetails: {
           strengths: [],
           differences: ['Error calculating compatibility'],
-          dealbreakers: ['Calculation error']
-        }
+          dealbreakers: ['Calculation error'],
+        },
       };
     }
   }

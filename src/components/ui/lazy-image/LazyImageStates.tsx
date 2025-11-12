@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNetworkStatus } from '@/hooks/useLazyLoading/useNetworkStatus';
 import EnhancedLoadingState from '@/components/ui/EnhancedLoadingState';
@@ -47,11 +46,12 @@ const LazyImageStates = ({
   const { isOnline } = useNetworkStatus();
 
   // Generate low quality src for progressive loading
-  const lowQualitySrc = enableProgressiveLoading && src.includes('?') 
-    ? `${src}&w=50&q=30` 
-    : enableProgressiveLoading 
-    ? `${src}?w=50&q=30` 
-    : undefined;
+  const lowQualitySrc =
+    enableProgressiveLoading && src.includes('?')
+      ? `${src}&w=50&q=30`
+      : enableProgressiveLoading
+        ? `${src}?w=50&q=30`
+        : undefined;
 
   return (
     <>
@@ -66,14 +66,16 @@ const LazyImageStates = ({
       )}
 
       {/* Loading State */}
-      {isOnline && (!monitoring.shouldLoad || (!actualIsLoaded && !actualHasError && !resilientLoading.isLoading)) && (
-        <EnhancedLoadingState
-          state="loading"
-          className={cn('w-full h-full', placeholderClassName)}
-          showText={showLoadingText}
-          reducedMotion={reducedMotion}
-        />
-      )}
+      {isOnline &&
+        (!monitoring.shouldLoad ||
+          (!actualIsLoaded && !actualHasError && !resilientLoading.isLoading)) && (
+          <EnhancedLoadingState
+            state="loading"
+            className={cn('w-full h-full', placeholderClassName)}
+            showText={showLoadingText}
+            reducedMotion={reducedMotion}
+          />
+        )}
 
       {/* Retry State */}
       {isOnline && (resilientLoading.isLoading || loadState === 'retry') && (
@@ -95,10 +97,13 @@ const LazyImageStates = ({
           reducedMotion={reducedMotion}
         />
       )}
-      
+
       {/* Image Display */}
-      {isOnline && monitoring.shouldLoad && actualImageSrc && !actualHasError && (
-        enableProgressiveLoading ? (
+      {isOnline &&
+        monitoring.shouldLoad &&
+        actualImageSrc &&
+        !actualHasError &&
+        (enableProgressiveLoading ? (
           <ProgressiveImage
             src={actualImageSrc}
             lowQualitySrc={lowQualitySrc}
@@ -125,8 +130,7 @@ const LazyImageStates = ({
             onError={handleImageError}
             loading="lazy"
           />
-        )
-      )}
+        ))}
     </>
   );
 };

@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { LazyLoadingMetrics } from '../services/analyticsService';
 
@@ -8,27 +7,27 @@ interface LazyLoadingState {
   loadingQueue: string[];
   loadedItems: Set<string>;
   failedItems: Set<string>;
-  
+
   // Performance metrics
   totalImages: number;
   loadedImages: number;
   failedImages: number;
   averageLoadTime: number;
-  
+
   // Configuration
   batchSize: number;
   preloadDistance: number;
   enableDebug: boolean;
   enableAnalytics: boolean;
-  
+
   // Network optimization
   networkOptimization: boolean;
   adaptiveQuality: boolean;
-  
+
   // Memory management
   memoryOptimization: boolean;
   cacheSize: number;
-  
+
   // Error handling
   maxRetries: number;
   retryDelay: number;
@@ -70,10 +69,10 @@ function lazyLoadingReducer(state: LazyLoadingState, action: LazyLoadingAction):
   switch (action.type) {
     case 'SET_LOADING':
       const { id, loading } = action.payload;
-      const newQueue = loading 
+      const newQueue = loading
         ? [...state.loadingQueue, id]
-        : state.loadingQueue.filter(item => item !== id);
-      
+        : state.loadingQueue.filter((item) => item !== id);
+
       return {
         ...state,
         loadingQueue: newQueue,
@@ -90,7 +89,7 @@ function lazyLoadingReducer(state: LazyLoadingState, action: LazyLoadingAction):
       };
 
     case 'REMOVE_FROM_QUEUE':
-      const filteredQueue = state.loadingQueue.filter(item => item !== action.payload);
+      const filteredQueue = state.loadingQueue.filter((item) => item !== action.payload);
       return {
         ...state,
         loadingQueue: filteredQueue,
@@ -100,25 +99,25 @@ function lazyLoadingReducer(state: LazyLoadingState, action: LazyLoadingAction):
     case 'MARK_LOADED':
       const newLoadedItems = new Set(state.loadedItems);
       newLoadedItems.add(action.payload);
-      
+
       return {
         ...state,
         loadedItems: newLoadedItems,
         loadedImages: state.loadedImages + 1,
-        loadingQueue: state.loadingQueue.filter(item => item !== action.payload),
-        isGlobalLoading: state.loadingQueue.filter(item => item !== action.payload).length > 0,
+        loadingQueue: state.loadingQueue.filter((item) => item !== action.payload),
+        isGlobalLoading: state.loadingQueue.filter((item) => item !== action.payload).length > 0,
       };
 
     case 'MARK_FAILED':
       const newFailedItems = new Set(state.failedItems);
       newFailedItems.add(action.payload);
-      
+
       return {
         ...state,
         failedItems: newFailedItems,
         failedImages: state.failedImages + 1,
-        loadingQueue: state.loadingQueue.filter(item => item !== action.payload),
-        isGlobalLoading: state.loadingQueue.filter(item => item !== action.payload).length > 0,
+        loadingQueue: state.loadingQueue.filter((item) => item !== action.payload),
+        isGlobalLoading: state.loadingQueue.filter((item) => item !== action.payload).length > 0,
       };
 
     case 'UPDATE_METRICS':
@@ -184,9 +183,9 @@ export const LazyLoadingProvider: React.FC<LazyLoadingProviderProps> = ({
     removeFromQueue: (id: string) => dispatch({ type: 'REMOVE_FROM_QUEUE', payload: id }),
     markLoaded: (id: string) => dispatch({ type: 'MARK_LOADED', payload: id }),
     markFailed: (id: string) => dispatch({ type: 'MARK_FAILED', payload: id }),
-    updateMetrics: (metrics: Partial<LazyLoadingMetrics>) => 
+    updateMetrics: (metrics: Partial<LazyLoadingMetrics>) =>
       dispatch({ type: 'UPDATE_METRICS', payload: metrics }),
-    updateConfig: (config: Partial<LazyLoadingState>) => 
+    updateConfig: (config: Partial<LazyLoadingState>) =>
       dispatch({ type: 'UPDATE_CONFIG', payload: config }),
     clearCache: () => dispatch({ type: 'CLEAR_CACHE' }),
     resetState: () => dispatch({ type: 'RESET_STATE' }),
@@ -195,10 +194,9 @@ export const LazyLoadingProvider: React.FC<LazyLoadingProviderProps> = ({
   // Performance monitoring
   useEffect(() => {
     if (state.enableAnalytics) {
-      const successRate = state.totalImages > 0 
-        ? (state.loadedImages / state.totalImages) * 100 
-        : 0;
-      
+      const successRate =
+        state.totalImages > 0 ? (state.loadedImages / state.totalImages) * 100 : 0;
+
       if (state.enableDebug) {
         console.log('Lazy Loading State:', {
           totalImages: state.totalImages,

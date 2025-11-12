@@ -68,7 +68,9 @@ class ComparisonPdfExportService {
     this.addRecommendationsPage(options.data);
 
     // Save PDF
-    this.pdf.save(`Comparaison_${options.comparisonName.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`);
+    this.pdf.save(
+      `Comparaison_${options.comparisonName.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`
+    );
   }
 
   private addCoverPage(comparisonName: string, date: string, profileCount: number): void {
@@ -105,8 +107,18 @@ class ComparisonPdfExportService {
     // Footer
     this.pdf.setFontSize(10);
     this.pdf.setTextColor(107, 114, 128);
-    this.pdf.text('Zawaj Connect - Plateforme de rencontre musulmane', this.pageWidth / 2, this.pageHeight - 15, { align: 'center' });
-    this.pdf.text('Document confidentiel - Ne pas diffuser', this.pageWidth / 2, this.pageHeight - 10, { align: 'center' });
+    this.pdf.text(
+      'Zawaj Connect - Plateforme de rencontre musulmane',
+      this.pageWidth / 2,
+      this.pageHeight - 15,
+      { align: 'center' }
+    );
+    this.pdf.text(
+      'Document confidentiel - Ne pas diffuser',
+      this.pageWidth / 2,
+      this.pageHeight - 10,
+      { align: 'center' }
+    );
   }
 
   private addProfilesSummaryPage(profiles: ProfileData[]): void {
@@ -127,11 +139,23 @@ class ComparisonPdfExportService {
     profiles.forEach((profile, index) => {
       // Profile card
       this.pdf.setFillColor(249, 250, 251);
-      this.pdf.roundedRect(this.margin, this.currentY, this.pageWidth - 2 * this.margin, 40, 3, 3, 'F');
+      this.pdf.roundedRect(
+        this.margin,
+        this.currentY,
+        this.pageWidth - 2 * this.margin,
+        40,
+        3,
+        3,
+        'F'
+      );
 
       this.pdf.setFontSize(14);
       this.pdf.setFont('helvetica', 'bold');
-      this.pdf.text(`Profil ${index + 1}: ${profile.full_name}`, this.margin + 5, this.currentY + 10);
+      this.pdf.text(
+        `Profil ${index + 1}: ${profile.full_name}`,
+        this.margin + 5,
+        this.currentY + 10
+      );
 
       this.pdf.setFontSize(11);
       this.pdf.setFont('helvetica', 'normal');
@@ -182,7 +206,9 @@ class ComparisonPdfExportService {
       console.error('Error capturing radar chart:', error);
       this.pdf.setTextColor(220, 38, 38);
       this.pdf.setFontSize(12);
-      this.pdf.text('Erreur lors de la capture du graphique', this.pageWidth / 2, 60, { align: 'center' });
+      this.pdf.text('Erreur lors de la capture du graphique', this.pageWidth / 2, 60, {
+        align: 'center',
+      });
     }
   }
 
@@ -218,7 +244,7 @@ class ComparisonPdfExportService {
 
     // Table rows
     data.scores.forEach((score, index) => {
-      const profile = data.profiles.find(p => p.id === score.profileId);
+      const profile = data.profiles.find((p) => p.id === score.profileId);
       const rowHeight = 10;
 
       if (index % 2 === 0) {
@@ -274,14 +300,22 @@ class ComparisonPdfExportService {
     this.pdf.setTextColor(31, 41, 55);
 
     // Find best match
-    const bestMatch = data.scores.reduce((prev, current) => 
-      (current.overall > prev.overall) ? current : prev
+    const bestMatch = data.scores.reduce((prev, current) =>
+      current.overall > prev.overall ? current : prev
     );
-    const bestProfile = data.profiles.find(p => p.id === bestMatch.profileId);
+    const bestProfile = data.profiles.find((p) => p.id === bestMatch.profileId);
 
     // Best match recommendation
     this.pdf.setFillColor(240, 253, 244);
-    this.pdf.roundedRect(this.margin, this.currentY, this.pageWidth - 2 * this.margin, 30, 3, 3, 'F');
+    this.pdf.roundedRect(
+      this.margin,
+      this.currentY,
+      this.pageWidth - 2 * this.margin,
+      30,
+      3,
+      3,
+      'F'
+    );
 
     this.pdf.setFontSize(12);
     this.pdf.setFont('helvetica', 'bold');
@@ -304,19 +338,19 @@ class ComparisonPdfExportService {
     const categories = [
       { name: 'Valeurs islamiques', key: 'islamic' as const },
       { name: 'Compatibilité culturelle', key: 'cultural' as const },
-      { name: 'Personnalité', key: 'personality' as const }
+      { name: 'Personnalité', key: 'personality' as const },
     ];
 
-    categories.forEach(category => {
-      const best = data.scores.reduce((prev, current) => 
-        (current[category.key] > prev[category.key]) ? current : prev
+    categories.forEach((category) => {
+      const best = data.scores.reduce((prev, current) =>
+        current[category.key] > prev[category.key] ? current : prev
       );
-      const profile = data.profiles.find(p => p.id === best.profileId);
+      const profile = data.profiles.find((p) => p.id === best.profileId);
 
       this.pdf.setFontSize(11);
       this.pdf.setFont('helvetica', 'bold');
       this.pdf.text(`• ${category.name}:`, this.margin + 5, this.currentY);
-      
+
       this.pdf.setFont('helvetica', 'normal');
       this.pdf.text(
         `${profile?.full_name} (${best[category.key]}%)`,
@@ -332,7 +366,7 @@ class ComparisonPdfExportService {
     this.pdf.setFontSize(10);
     this.pdf.setTextColor(107, 114, 128);
     const recommendation = this.pdf.splitTextToSize(
-      'Prenez le temps d\'analyser chaque profil en détail. Les scores sont des indicateurs, mais la compatibilité réelle se révèle dans l\'échange et la connaissance mutuelle. Impliquez votre famille dans le processus de décision conformément aux valeurs islamiques.',
+      "Prenez le temps d'analyser chaque profil en détail. Les scores sont des indicateurs, mais la compatibilité réelle se révèle dans l'échange et la connaissance mutuelle. Impliquez votre famille dans le processus de décision conformément aux valeurs islamiques.",
       this.pageWidth - 2 * this.margin
     );
     this.pdf.text(recommendation, this.margin, this.currentY);

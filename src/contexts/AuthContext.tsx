@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { useAuthState } from '@/hooks/auth/useAuthState';
@@ -22,7 +21,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
@@ -37,7 +36,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   }>({
     subscribed: false,
     subscription_tier: null,
-    subscription_end: null
+    subscription_end: null,
   });
 
   // Check subscription status when user changes
@@ -47,7 +46,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSubscriptionData({
           subscribed: false,
           subscription_tier: null,
-          subscription_end: null
+          subscription_end: null,
         });
         return;
       }
@@ -74,14 +73,10 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     signUp,
     signIn,
     signOut,
-    ...subscriptionData
+    ...subscriptionData,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;

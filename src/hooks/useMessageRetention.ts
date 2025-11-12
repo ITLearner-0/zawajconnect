@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { RetentionPolicy } from '@/types/profile';
 import { setRetentionPolicy } from '@/services/messageLifecycleService';
@@ -19,7 +18,7 @@ export const useMessageRetention = (conversationId: string | undefined) => {
       try {
         // Check if the retention_policy column exists
         const hasColumn = await columnExists('conversations', 'retention_policy');
-        
+
         if (hasColumn) {
           // Fetch the retention policy using safe SQL execution
           const result = await executeSql(`
@@ -27,7 +26,7 @@ export const useMessageRetention = (conversationId: string | undefined) => {
             FROM conversations 
             WHERE id = '${conversationId}'
           `);
-          
+
           // Since executeSql returns true or a data object, handle accordingly
           if (result && typeof result !== 'boolean') {
             // Check if there's data in the results and has the retention_policy field
@@ -38,7 +37,7 @@ export const useMessageRetention = (conversationId: string | undefined) => {
               // Set default policy if none exists
               const defaultPolicy: RetentionPolicy = {
                 type: 'permanent',
-                auto_delete: false
+                auto_delete: false,
               };
               setRetentionPolicyState(defaultPolicy);
             }
@@ -46,7 +45,7 @@ export const useMessageRetention = (conversationId: string | undefined) => {
             // Set default policy if no valid result
             const defaultPolicy: RetentionPolicy = {
               type: 'permanent',
-              auto_delete: false
+              auto_delete: false,
             };
             setRetentionPolicyState(defaultPolicy);
           }
@@ -54,7 +53,7 @@ export const useMessageRetention = (conversationId: string | undefined) => {
           // Set default policy if column doesn't exist
           const defaultPolicy: RetentionPolicy = {
             type: 'permanent',
-            auto_delete: false
+            auto_delete: false,
           };
           setRetentionPolicyState(defaultPolicy);
         }
@@ -71,16 +70,16 @@ export const useMessageRetention = (conversationId: string | undefined) => {
   // Update retention policy
   const updateRetentionPolicy = async (policy: RetentionPolicy): Promise<boolean> => {
     if (!conversationId) return false;
-    
+
     setLoading(true);
     try {
       const success = await setRetentionPolicy(conversationId, policy);
-      
+
       if (success) {
         setRetentionPolicyState(policy);
         return true;
       }
-      
+
       return false;
     } catch (err: any) {
       setError(err.message);
@@ -94,6 +93,6 @@ export const useMessageRetention = (conversationId: string | undefined) => {
     retentionPolicy,
     updateRetentionPolicy,
     loading,
-    error
+    error,
   };
 };

@@ -1,4 +1,3 @@
-
 import { logger } from '@/services/logging/LoggingService';
 
 export interface PageMetrics {
@@ -18,7 +17,7 @@ export class PageMetricsService {
 
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     const paintEntries = performance.getEntriesByType('paint');
-    
+
     if (!navigation) return null;
 
     const pageMetrics: PageMetrics = {
@@ -31,7 +30,7 @@ export class PageMetricsService {
     };
 
     // Get First Contentful Paint
-    const fcpEntry = paintEntries.find(entry => entry.name === 'first-contentful-paint');
+    const fcpEntry = paintEntries.find((entry) => entry.name === 'first-contentful-paint');
     if (fcpEntry) {
       pageMetrics.firstContentfulPaint = fcpEntry.startTime;
     }
@@ -52,15 +51,15 @@ export class PageMetricsService {
             onMetricUpdate({ largestContentfulPaint: entry.startTime });
             logger.logPerformance('largest-contentful-paint', entry.startTime);
             break;
-            
+
           case 'layout-shift':
             if (!(entry as any).hadRecentInput) {
-              onMetricUpdate({ 
-                cumulativeLayoutShift: (entry as any).value 
+              onMetricUpdate({
+                cumulativeLayoutShift: (entry as any).value,
               });
             }
             break;
-            
+
           case 'first-input':
             const firstInputDelay = (entry as any).processingStart - entry.startTime;
             onMetricUpdate({ firstInputDelay });
@@ -71,7 +70,9 @@ export class PageMetricsService {
     });
 
     try {
-      this.observer.observe({ entryTypes: ['largest-contentful-paint', 'layout-shift', 'first-input'] });
+      this.observer.observe({
+        entryTypes: ['largest-contentful-paint', 'layout-shift', 'first-input'],
+      });
     } catch (e) {
       console.warn('Some performance metrics not supported');
     }

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -21,13 +20,14 @@ interface FilterPanelProps {
 const FilterPanel: React.FC<FilterPanelProps> = ({ onApplyFilters }) => {
   const { t } = useTranslation();
   const [filters, setFilters] = useState<FilterCriteria>({});
-  const [savedFilters, setSavedFilters] = useState<Record<string, FilterCriteria>>(getSavedFilters());
+  const [savedFilters, setSavedFilters] =
+    useState<Record<string, FilterCriteria>>(getSavedFilters());
   const [showSaveForm, setShowSaveForm] = useState(false);
 
   const handleFilterChange = (key: keyof FilterCriteria, value: any) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
@@ -75,89 +75,80 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ onApplyFilters }) => {
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-semibold">{t('nearby.filterMatches')}</h3>
-      
+
       <Tabs defaultValue="basic" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="basic">{t('nearby.basicFilters')}</TabsTrigger>
           <TabsTrigger value="advanced">Avancés</TabsTrigger>
           <TabsTrigger value="enhanced">Complets</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="basic" className="space-y-4">
-          <AgeRangeFilter 
+          <AgeRangeFilter
             value={filters.ageRange}
             onChange={(range) => handleFilterChange('ageRange', range)}
           />
-          
-          <PracticeLevelFilter 
+
+          <PracticeLevelFilter
             value={filters.practiceLevel}
             onChange={(levels) => handleFilterChange('practiceLevel', levels)}
           />
-          
-          <EducationFilter 
+
+          <EducationFilter
             value={filters.education}
             onChange={(education) => handleFilterChange('education', education)}
           />
-          
-          <FilterActions 
+
+          <FilterActions
             onApply={handleApplyFilters}
             onReset={handleResetFilters}
             onShowSaveForm={handleShowSaveForm}
             showSaveForm={showSaveForm}
           />
-          
+
           {showSaveForm && (
-            <SaveFilterForm 
-              onSave={handleSaveFilter}
-              onCancel={() => setShowSaveForm(false)}
-            />
+            <SaveFilterForm onSave={handleSaveFilter} onCancel={() => setShowSaveForm(false)} />
           )}
         </TabsContent>
-        
+
         <TabsContent value="advanced" className="space-y-4">
-          <AdvancedFilterPanel 
+          <AdvancedFilterPanel
             filters={filters.advanced || {}}
             onFiltersChange={(advanced) => handleFilterChange('advanced', advanced)}
           />
-          
-          <FilterActions 
+
+          <FilterActions
             onApply={handleApplyFilters}
             onReset={handleResetFilters}
             onShowSaveForm={handleShowSaveForm}
             showSaveForm={showSaveForm}
           />
-          
+
           {showSaveForm && (
-            <SaveFilterForm 
-              onSave={handleSaveFilter}
-              onCancel={() => setShowSaveForm(false)}
-            />
+            <SaveFilterForm onSave={handleSaveFilter} onCancel={() => setShowSaveForm(false)} />
           )}
         </TabsContent>
 
         <TabsContent value="enhanced" className="space-y-4">
-          <EnhancedAdvancedFilterPanel 
+          <EnhancedAdvancedFilterPanel
             filters={filters.enhanced || {}}
             onFiltersChange={(enhanced) => handleFilterChange('enhanced', enhanced)}
           />
-          
-          <FilterActions 
+
+          <FilterActions
             onApply={handleApplyFilters}
             onReset={handleResetFilters}
             onShowSaveForm={handleShowSaveForm}
             showSaveForm={showSaveForm}
           />
-          
+
           {showSaveForm && (
-            <SaveFilterForm 
-              onSave={handleSaveFilter}
-              onCancel={() => setShowSaveForm(false)}
-            />
+            <SaveFilterForm onSave={handleSaveFilter} onCancel={() => setShowSaveForm(false)} />
           )}
         </TabsContent>
       </Tabs>
-      
-      <SavedFilters 
+
+      <SavedFilters
         savedFilters={savedFilters}
         onLoadFilter={handleLoadFilter}
         onDeleteFilter={handleDeleteFilter}

@@ -1,10 +1,10 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { sendEmail } from "../_shared/smtp.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { sendEmail } from '../_shared/smtp.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface ConversationEndedEmailRequest {
@@ -16,13 +16,13 @@ interface ConversationEndedEmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const {
@@ -34,36 +34,35 @@ const handler = async (req: Request): Promise<Response> => {
     }: ConversationEndedEmailRequest = await req.json();
 
     // Get recipient email and profile
-    const { data: userData, error: userError } = await supabase.auth.admin.getUserById(
-      recipient_user_id
-    );
+    const { data: userData, error: userError } =
+      await supabase.auth.admin.getUserById(recipient_user_id);
 
     if (userError || !userData.user) {
-      throw new Error("Recipient user not found");
+      throw new Error('Recipient user not found');
     }
 
     const recipientEmail = userData.user.email;
     if (!recipientEmail) {
-      throw new Error("Recipient email not found");
+      throw new Error('Recipient email not found');
     }
 
     // Get recipient profile for name
     const { data: recipientProfile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("user_id", recipient_user_id)
+      .from('profiles')
+      .select('full_name')
+      .eq('user_id', recipient_user_id)
       .maybeSingle();
 
-    const recipientName = recipientProfile?.full_name || "Cher(e) membre";
+    const recipientName = recipientProfile?.full_name || 'Cher(e) membre';
 
     // Prepare reason text in French
     const reasonTexts: Record<string, string> = {
-      incompatibilite_religieuse: "Incompatibilité religieuse",
-      valeurs_familiales: "Différences de valeurs familiales",
-      situation_personnelle: "Situation personnelle qui a changé",
-      besoin_reflexion: "Besoin de réflexion supplémentaire",
-      conseil_famille: "Conseil de la famille",
-      autre: "Autre raison",
+      incompatibilite_religieuse: 'Incompatibilité religieuse',
+      valeurs_familiales: 'Différences de valeurs familiales',
+      situation_personnelle: 'Situation personnelle qui a changé',
+      besoin_reflexion: 'Besoin de réflexion supplémentaire',
+      conseil_famille: 'Conseil de la famille',
+      autre: 'Autre raison',
     };
 
     const reasonText = reasonTexts[reason] || reason;
@@ -101,7 +100,9 @@ const handler = async (req: Request): Promise<Response> => {
 </td>
 </tr>
 </table>
-${courtesy_message ? `
+${
+  courtesy_message
+    ? `
 <!-- Personal Message Box -->
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
 <tr>
@@ -111,7 +112,9 @@ ${courtesy_message ? `
 </td>
 </tr>
 </table>
-` : ''}
+`
+    : ''
+}
 <!-- Islamic Message Box -->
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: 25px 0;">
 <tr>
@@ -159,7 +162,7 @@ ${courtesy_message ? `
       html: emailHtml,
     });
 
-    console.log("Conversation ended email sent successfully to:", recipientEmail);
+    console.log('Conversation ended email sent successfully to:', recipientEmail);
 
     return new Response(
       JSON.stringify({
@@ -168,13 +171,13 @@ ${courtesy_message ? `
       {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           ...corsHeaders,
         },
       }
     );
   } catch (error: any) {
-    console.error("Error sending conversation ended email:", error);
+    console.error('Error sending conversation ended email:', error);
     return new Response(
       JSON.stringify({
         error: error.message,
@@ -183,7 +186,7 @@ ${courtesy_message ? `
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           ...corsHeaders,
         },
       }

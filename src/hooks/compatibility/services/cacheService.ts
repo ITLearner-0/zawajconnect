@@ -1,6 +1,5 @@
-
-import { UserResultWithProfile } from "../types/matchingTypes";
-import { UserAnswers, UserPreferences } from "../types/validationTypes";
+import { UserResultWithProfile } from '../types/matchingTypes';
+import { UserAnswers, UserPreferences } from '../types/validationTypes';
 
 // Cache configuration
 const CACHE_CONFIG = {
@@ -8,7 +7,7 @@ const CACHE_CONFIG = {
   PROFILE_DATA_TTL: 15 * 60 * 1000, // 15 minutes
   USER_RESULTS_TTL: 60 * 60 * 1000, // 1 hour
   GENERIC_CACHE_TTL: 30 * 60 * 1000, // 30 minutes for generic cache
-  MAX_CACHE_SIZE: 1000 // Maximum number of cached items
+  MAX_CACHE_SIZE: 1000, // Maximum number of cached items
 };
 
 // Cache interfaces
@@ -58,12 +57,12 @@ export class CacheService {
   // Generic cache methods for background processing
   get(key: string): any | null {
     const item = this.genericCache[key];
-    
+
     if (!item || this.isExpired(item)) {
       delete this.genericCache[key];
       return null;
     }
-    
+
     return item.data;
   }
 
@@ -71,9 +70,9 @@ export class CacheService {
     this.genericCache[key] = {
       data: value,
       timestamp: Date.now(),
-      ttl: ttl || CACHE_CONFIG.GENERIC_CACHE_TTL
+      ttl: ttl || CACHE_CONFIG.GENERIC_CACHE_TTL,
     };
-    
+
     this.cleanupCache(this.genericCache, CACHE_CONFIG.MAX_CACHE_SIZE);
   }
 
@@ -85,12 +84,12 @@ export class CacheService {
   getCompatibilityScore(userId1: string, userId2: string): number | null {
     const key = this.generateUserPairKey(userId1, userId2);
     const item = this.compatibilityScores[key];
-    
+
     if (!item || this.isExpired(item)) {
       delete this.compatibilityScores[key];
       return null;
     }
-    
+
     return item.data;
   }
 
@@ -99,21 +98,21 @@ export class CacheService {
     this.compatibilityScores[key] = {
       data: score,
       timestamp: Date.now(),
-      ttl: CACHE_CONFIG.COMPATIBILITY_SCORES_TTL
+      ttl: CACHE_CONFIG.COMPATIBILITY_SCORES_TTL,
     };
-    
+
     this.cleanupCache(this.compatibilityScores, CACHE_CONFIG.MAX_CACHE_SIZE);
   }
 
   // Profile data caching
   getProfileData(userId: string): UserResultWithProfile['profiles'] | null {
     const item = this.profileData[userId];
-    
+
     if (!item || this.isExpired(item)) {
       delete this.profileData[userId];
       return null;
     }
-    
+
     return item.data;
   }
 
@@ -121,31 +120,34 @@ export class CacheService {
     this.profileData[userId] = {
       data,
       timestamp: Date.now(),
-      ttl: CACHE_CONFIG.PROFILE_DATA_TTL
+      ttl: CACHE_CONFIG.PROFILE_DATA_TTL,
     };
-    
+
     this.cleanupCache(this.profileData, CACHE_CONFIG.MAX_CACHE_SIZE);
   }
 
   // User results caching
   getUserResults(userId: string): { answers: UserAnswers; preferences: UserPreferences } | null {
     const item = this.userResults[userId];
-    
+
     if (!item || this.isExpired(item)) {
       delete this.userResults[userId];
       return null;
     }
-    
+
     return item.data;
   }
 
-  setUserResults(userId: string, data: { answers: UserAnswers; preferences: UserPreferences }): void {
+  setUserResults(
+    userId: string,
+    data: { answers: UserAnswers; preferences: UserPreferences }
+  ): void {
     this.userResults[userId] = {
       data,
       timestamp: Date.now(),
-      ttl: CACHE_CONFIG.USER_RESULTS_TTL
+      ttl: CACHE_CONFIG.USER_RESULTS_TTL,
     };
-    
+
     this.cleanupCache(this.userResults, CACHE_CONFIG.MAX_CACHE_SIZE);
   }
 
@@ -185,20 +187,20 @@ export class CacheService {
     return {
       compatibilityScores: {
         count: Object.keys(this.compatibilityScores).length,
-        size: Object.keys(this.compatibilityScores).length
+        size: Object.keys(this.compatibilityScores).length,
       },
       profileData: {
         count: Object.keys(this.profileData).length,
-        size: Object.keys(this.profileData).length
+        size: Object.keys(this.profileData).length,
       },
       userResults: {
         count: Object.keys(this.userResults).length,
-        size: Object.keys(this.userResults).length
+        size: Object.keys(this.userResults).length,
       },
       genericCache: {
         count: Object.keys(this.genericCache).length,
-        size: Object.keys(this.genericCache).length
-      }
+        size: Object.keys(this.genericCache).length,
+      },
     };
   }
 }

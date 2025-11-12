@@ -117,12 +117,8 @@ export const EndConversationDialog: React.FC<EndConversationDialogProps> = ({
               className="min-h-[100px]"
               maxLength={500}
             />
-            <p className="text-xs text-muted-foreground">
-              {details.length}/500 caractères
-            </p>
-            {errors.details && (
-              <p className="text-xs text-destructive">{errors.details}</p>
-            )}
+            <p className="text-xs text-muted-foreground">{details.length}/500 caractères</p>
+            {errors.details && <p className="text-xs text-destructive">{errors.details}</p>}
           </div>
 
           {/* Message de courtoisie optionnel */}
@@ -136,9 +132,7 @@ export const EndConversationDialog: React.FC<EndConversationDialogProps> = ({
               className="min-h-[80px]"
               maxLength={300}
             />
-            <p className="text-xs text-muted-foreground">
-              {courtesyMessage.length}/300 caractères
-            </p>
+            <p className="text-xs text-muted-foreground">{courtesyMessage.length}/300 caractères</p>
           </div>
 
           {/* Message islamique automatique */}
@@ -147,9 +141,9 @@ export const EndConversationDialog: React.FC<EndConversationDialogProps> = ({
             <AlertDescription className="text-sm">
               <strong>Message automatique qui sera ajouté :</strong>
               <p className="mt-2 italic text-muted-foreground">
-                "🤲 Qu'Allah vous guide vers ce qui est meilleur pour vous et facilite votre
-                chemin vers un mariage béni. Que cette recherche sincère soit acceptée et que
-                vous trouviez la quiétude du cœur. Ameen."
+                "🤲 Qu'Allah vous guide vers ce qui est meilleur pour vous et facilite votre chemin
+                vers un mariage béni. Que cette recherche sincère soit acceptée et que vous trouviez
+                la quiétude du cœur. Ameen."
               </p>
             </AlertDescription>
           </Alert>
@@ -158,9 +152,8 @@ export const EndConversationDialog: React.FC<EndConversationDialogProps> = ({
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Cette action est définitive. Après la clôture, vous ne pourrez plus communiquer
-              avec cette personne et elle ne vous sera plus proposée dans les résultats de
-              recherche.
+              Cette action est définitive. Après la clôture, vous ne pourrez plus communiquer avec
+              cette personne et elle ne vous sera plus proposée dans les résultats de recherche.
             </AlertDescription>
           </Alert>
         </div>
@@ -169,8 +162,8 @@ export const EndConversationDialog: React.FC<EndConversationDialogProps> = ({
           <Button variant="outline" onClick={handleClose} disabled={loading}>
             Annuler
           </Button>
-          <Button 
-            variant="destructive" 
+          <Button
+            variant="destructive"
             onClick={handleConfirm}
             disabled={loading || !reason || details.trim().length < 20}
           >

@@ -1,10 +1,9 @@
-
 // Secure environment configuration
 export const getSecureEnvironmentConfig = () => {
   // Check for required environment variables
   const requiredVars = {
     VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
-    VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY
+    VITE_SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
   };
 
   // Validate all required variables are present

@@ -1,99 +1,111 @@
-
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { EnhancedAdvancedFilters } from "@/types/filters";
-import { BookOpen, MessageCircle, Heart, Users } from "lucide-react";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { EnhancedAdvancedFilters } from '@/types/filters';
+import { BookOpen, MessageCircle, Heart, Users } from 'lucide-react';
 
 interface EnhancedAdvancedFilterPanelProps {
   filters: EnhancedAdvancedFilters;
   onFiltersChange: (filters: EnhancedAdvancedFilters) => void;
 }
 
-const MADHAB_OPTIONS = [
-  "Hanafi", "Maliki", "Shafi'i", "Hanbali", "Ja'fari", "Autre"
-];
+const MADHAB_OPTIONS = ['Hanafi', 'Maliki', "Shafi'i", 'Hanbali', "Ja'fari", 'Autre'];
 
 const LANGUAGE_OPTIONS = [
-  "Français", "Arabe", "Anglais", "Turc", "Ourdou", "Bengali", "Indonésien", "Malais"
+  'Français',
+  'Arabe',
+  'Anglais',
+  'Turc',
+  'Ourdou',
+  'Bengali',
+  'Indonésien',
+  'Malais',
 ];
 
-const MARITAL_STATUS_OPTIONS = [
-  "Célibataire", "Divorcé(e)", "Veuf/Veuve"
-];
+const MARITAL_STATUS_OPTIONS = ['Célibataire', 'Divorcé(e)', 'Veuf/Veuve'];
 
 const POLYGAMY_STANCE_OPTIONS = [
-  "Accepte", "Accepte conditionnellement", "N'accepte pas", "Préfère pratiquer", "Indifférent"
+  'Accepte',
+  'Accepte conditionnellement',
+  "N'accepte pas",
+  'Préfère pratiquer',
+  'Indifférent',
 ];
 
-const EnhancedAdvancedFilterPanel: React.FC<EnhancedAdvancedFilterPanelProps> = ({ 
-  filters, 
-  onFiltersChange 
+const EnhancedAdvancedFilterPanel: React.FC<EnhancedAdvancedFilterPanelProps> = ({
+  filters,
+  onFiltersChange,
 }) => {
   const updateMadhabFilter = (updates: Partial<typeof filters.madhab>) => {
     onFiltersChange({
       ...filters,
-      madhab: { ...filters.madhab, ...updates } as any
+      madhab: { ...filters.madhab, ...updates } as any,
     });
   };
 
   const updateLanguageFilter = (updates: Partial<typeof filters.languages>) => {
     onFiltersChange({
       ...filters,
-      languages: { ...filters.languages, ...updates } as any
+      languages: { ...filters.languages, ...updates } as any,
     });
   };
 
   const updateMaritalStatusFilter = (updates: Partial<typeof filters.maritalStatus>) => {
     onFiltersChange({
       ...filters,
-      maritalStatus: { ...filters.maritalStatus, ...updates } as any
+      maritalStatus: { ...filters.maritalStatus, ...updates } as any,
     });
   };
 
   const updatePolygamyStanceFilter = (updates: Partial<typeof filters.polygamyStance>) => {
     onFiltersChange({
       ...filters,
-      polygamyStance: { ...filters.polygamyStance, ...updates } as any
+      polygamyStance: { ...filters.polygamyStance, ...updates } as any,
     });
   };
 
   const toggleMadhabOption = (madhab: string) => {
     const currentMadhabs = filters.madhab?.madhabs || [];
     const newMadhabs = currentMadhabs.includes(madhab)
-      ? currentMadhabs.filter(m => m !== madhab)
+      ? currentMadhabs.filter((m) => m !== madhab)
       : [...currentMadhabs, madhab];
-    
+
     updateMadhabFilter({ madhabs: newMadhabs });
   };
 
   const toggleLanguageOption = (language: string) => {
     const currentLanguages = filters.languages?.languages || [];
     const newLanguages = currentLanguages.includes(language)
-      ? currentLanguages.filter(l => l !== language)
+      ? currentLanguages.filter((l) => l !== language)
       : [...currentLanguages, language];
-    
+
     updateLanguageFilter({ languages: newLanguages });
   };
 
   const toggleMaritalStatusOption = (status: string) => {
     const currentStatuses = filters.maritalStatus?.statuses || [];
     const newStatuses = currentStatuses.includes(status)
-      ? currentStatuses.filter(s => s !== status)
+      ? currentStatuses.filter((s) => s !== status)
       : [...currentStatuses, status];
-    
+
     updateMaritalStatusFilter({ statuses: newStatuses });
   };
 
   const togglePolygamyStanceOption = (stance: string) => {
     const currentStances = filters.polygamyStance?.acceptableStances || [];
     const newStances = currentStances.includes(stance)
-      ? currentStances.filter(s => s !== stance)
+      ? currentStances.filter((s) => s !== stance)
       : [...currentStances, stance];
-    
+
     updatePolygamyStanceFilter({ acceptableStances: newStances });
   };
 
@@ -116,15 +128,15 @@ const EnhancedAdvancedFilterPanel: React.FC<EnhancedAdvancedFilterPanelProps> = 
               onCheckedChange={(enabled) => updateMadhabFilter({ enabled })}
             />
           </div>
-          
+
           {filters.madhab?.enabled && (
             <div className="space-y-2">
               <Label>Madhabs acceptés</Label>
               <div className="flex flex-wrap gap-2">
-                {MADHAB_OPTIONS.map(madhab => (
+                {MADHAB_OPTIONS.map((madhab) => (
                   <Badge
                     key={madhab}
-                    variant={filters.madhab?.madhabs?.includes(madhab) ? "default" : "outline"}
+                    variant={filters.madhab?.madhabs?.includes(madhab) ? 'default' : 'outline'}
                     className="cursor-pointer"
                     onClick={() => toggleMadhabOption(madhab)}
                   >
@@ -154,16 +166,18 @@ const EnhancedAdvancedFilterPanel: React.FC<EnhancedAdvancedFilterPanelProps> = 
               onCheckedChange={(enabled) => updateLanguageFilter({ enabled })}
             />
           </div>
-          
+
           {filters.languages?.enabled && (
             <>
               <div className="space-y-2">
                 <Label>Langues parlées</Label>
                 <div className="flex flex-wrap gap-2">
-                  {LANGUAGE_OPTIONS.map(language => (
+                  {LANGUAGE_OPTIONS.map((language) => (
                     <Badge
                       key={language}
-                      variant={filters.languages?.languages?.includes(language) ? "default" : "outline"}
+                      variant={
+                        filters.languages?.languages?.includes(language) ? 'default' : 'outline'
+                      }
                       className="cursor-pointer"
                       onClick={() => toggleLanguageOption(language)}
                     >
@@ -172,7 +186,7 @@ const EnhancedAdvancedFilterPanel: React.FC<EnhancedAdvancedFilterPanelProps> = 
                   ))}
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <Label htmlFor="prefer-native">Préférer langue maternelle</Label>
                 <Switch
@@ -203,15 +217,17 @@ const EnhancedAdvancedFilterPanel: React.FC<EnhancedAdvancedFilterPanelProps> = 
               onCheckedChange={(enabled) => updateMaritalStatusFilter({ enabled })}
             />
           </div>
-          
+
           {filters.maritalStatus?.enabled && (
             <div className="space-y-2">
               <Label>Statuts acceptés</Label>
               <div className="flex flex-wrap gap-2">
-                {MARITAL_STATUS_OPTIONS.map(status => (
+                {MARITAL_STATUS_OPTIONS.map((status) => (
                   <Badge
                     key={status}
-                    variant={filters.maritalStatus?.statuses?.includes(status) ? "default" : "outline"}
+                    variant={
+                      filters.maritalStatus?.statuses?.includes(status) ? 'default' : 'outline'
+                    }
                     className="cursor-pointer"
                     onClick={() => toggleMaritalStatusOption(status)}
                   >
@@ -241,16 +257,20 @@ const EnhancedAdvancedFilterPanel: React.FC<EnhancedAdvancedFilterPanelProps> = 
               onCheckedChange={(enabled) => updatePolygamyStanceFilter({ enabled })}
             />
           </div>
-          
+
           {filters.polygamyStance?.enabled && (
             <>
               <div className="space-y-2">
                 <Label>Positions acceptables</Label>
                 <div className="flex flex-wrap gap-2">
-                  {POLYGAMY_STANCE_OPTIONS.map(stance => (
+                  {POLYGAMY_STANCE_OPTIONS.map((stance) => (
                     <Badge
                       key={stance}
-                      variant={filters.polygamyStance?.acceptableStances?.includes(stance) ? "default" : "outline"}
+                      variant={
+                        filters.polygamyStance?.acceptableStances?.includes(stance)
+                          ? 'default'
+                          : 'outline'
+                      }
                       className="cursor-pointer"
                       onClick={() => togglePolygamyStanceOption(stance)}
                     >
@@ -259,7 +279,7 @@ const EnhancedAdvancedFilterPanel: React.FC<EnhancedAdvancedFilterPanelProps> = 
                   ))}
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <Label htmlFor="strict-polygamy">Mode strict</Label>
                 <Switch

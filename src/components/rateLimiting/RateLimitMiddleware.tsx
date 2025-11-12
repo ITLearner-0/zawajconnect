@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useRateLimiting } from '@/hooks/useRateLimiting';
 
@@ -32,11 +31,7 @@ interface RateLimitProviderProps {
 export const RateLimitProvider: React.FC<RateLimitProviderProps> = ({ children }) => {
   const rateLimiting = useRateLimiting();
 
-  return (
-    <RateLimitContext.Provider value={rateLimiting}>
-      {children}
-    </RateLimitContext.Provider>
-  );
+  return <RateLimitContext.Provider value={rateLimiting}>{children}</RateLimitContext.Provider>;
 };
 
 export const useRateLimit = (): RateLimitContextType => {

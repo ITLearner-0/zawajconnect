@@ -1,4 +1,3 @@
-
 import { RateLimitStateEntry } from './types';
 
 export class MemoryStore {
@@ -34,7 +33,7 @@ export class MemoryStore {
       // Clean up expired windows and blocks
       if (data.blockedUntil && data.blockedUntil < now) {
         this.store.delete(key);
-      } else if (!data.blockedUntil && (now - data.windowStart) > 24 * 60 * 60 * 1000) {
+      } else if (!data.blockedUntil && now - data.windowStart > 24 * 60 * 60 * 1000) {
         // Clean up old windows after 24 hours
         this.store.delete(key);
       }

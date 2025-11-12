@@ -1,23 +1,26 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  BookOpen, 
-  Play, 
-  CheckCircle, 
-  Clock, 
+import {
+  BookOpen,
+  Play,
+  CheckCircle,
+  Clock,
   Award,
   ArrowRight,
   Video,
   FileText,
   Users,
-  Trophy
+  Trophy,
 } from 'lucide-react';
-import { OnboardingService, OnboardingModule, WaliOnboardingProgress } from '@/services/wali/onboardingService';
+import {
+  OnboardingService,
+  OnboardingModule,
+  WaliOnboardingProgress,
+} from '@/services/wali/onboardingService';
 import { useToast } from '@/hooks/use-toast';
 
 interface OnboardingProgressProps {
@@ -25,10 +28,7 @@ interface OnboardingProgressProps {
   onModuleComplete?: () => void;
 }
 
-const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
-  wali_id,
-  onModuleComplete
-}) => {
+const OnboardingProgress: React.FC<OnboardingProgressProps> = ({ wali_id, onModuleComplete }) => {
   const { toast } = useToast();
   const [modules, setModules] = useState<OnboardingModule[]>([]);
   const [progress, setProgress] = useState<WaliOnboardingProgress[]>([]);
@@ -44,15 +44,15 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
     try {
       const modulesList = OnboardingService.getModules();
       const progressList = await OnboardingService.getProgress(wali_id);
-      
+
       setModules(modulesList);
       setProgress(progressList);
     } catch (error) {
       console.error('Error loading onboarding data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données de formation",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données de formation',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -60,25 +60,40 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
   };
 
   const getModuleProgress = (moduleId: string): WaliOnboardingProgress | undefined => {
-    return progress.find(p => p.module_id === moduleId);
+    return progress.find((p) => p.module_id === moduleId);
   };
 
   const getModuleIcon = (contentType: string) => {
     switch (contentType) {
-      case 'video': return <Video className="h-4 w-4" />;
-      case 'text': return <FileText className="h-4 w-4" />;
-      case 'interactive': return <Users className="h-4 w-4" />;
-      case 'quiz': return <Trophy className="h-4 w-4" />;
-      default: return <BookOpen className="h-4 w-4" />;
+      case 'video':
+        return <Video className="h-4 w-4" />;
+      case 'text':
+        return <FileText className="h-4 w-4" />;
+      case 'interactive':
+        return <Users className="h-4 w-4" />;
+      case 'quiz':
+        return <Trophy className="h-4 w-4" />;
+      default:
+        return <BookOpen className="h-4 w-4" />;
     }
   };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
-        return <Badge variant="default" className="bg-green-500"><CheckCircle className="h-3 w-3 mr-1" />Terminé</Badge>;
+        return (
+          <Badge variant="default" className="bg-green-500">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Terminé
+          </Badge>
+        );
       case 'in_progress':
-        return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />En cours</Badge>;
+        return (
+          <Badge variant="secondary">
+            <Clock className="h-3 w-3 mr-1" />
+            En cours
+          </Badge>
+        );
       case 'failed':
         return <Badge variant="destructive">Échoué</Badge>;
       default:
@@ -90,18 +105,20 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
     try {
       await OnboardingService.updateProgress(wali_id, module.id, 'in_progress', 0);
       setSelectedModule(module);
-      
+
       // Update local progress
-      setProgress(prev => prev.map(p => 
-        p.module_id === module.id 
-          ? { ...p, status: 'in_progress', started_at: new Date().toISOString() }
-          : p
-      ));
+      setProgress((prev) =>
+        prev.map((p) =>
+          p.module_id === module.id
+            ? { ...p, status: 'in_progress', started_at: new Date().toISOString() }
+            : p
+        )
+      );
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Impossible de démarrer le module",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de démarrer le module',
+        variant: 'destructive',
       });
     }
   };
@@ -109,15 +126,23 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
   const completeModule = async (module: OnboardingModule, quizScore?: number) => {
     try {
       await OnboardingService.updateProgress(wali_id, module.id, 'completed', 100, quizScore);
-      
-      setProgress(prev => prev.map(p => 
-        p.module_id === module.id 
-          ? { ...p, status: 'completed', progress_percentage: 100, completed_at: new Date().toISOString(), quiz_score: quizScore }
-          : p
-      ));
+
+      setProgress((prev) =>
+        prev.map((p) =>
+          p.module_id === module.id
+            ? {
+                ...p,
+                status: 'completed',
+                progress_percentage: 100,
+                completed_at: new Date().toISOString(),
+                quiz_score: quizScore,
+              }
+            : p
+        )
+      );
 
       toast({
-        title: "Module terminé",
+        title: 'Module terminé',
         description: `Félicitations! Vous avez terminé "${module.title}"`,
       });
 
@@ -125,9 +150,9 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
       onModuleComplete?.();
     } catch (error) {
       toast({
-        title: "Erreur",
-        description: "Impossible de marquer le module comme terminé",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de marquer le module comme terminé',
+        variant: 'destructive',
       });
     }
   };
@@ -178,7 +203,11 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
             <Button onClick={() => setSelectedModule(null)} variant="outline">
               Retour
             </Button>
-            <Button onClick={() => completeModule(selectedModule, selectedModule.quiz_questions ? 85 : undefined)}>
+            <Button
+              onClick={() =>
+                completeModule(selectedModule, selectedModule.quiz_questions ? 85 : undefined)
+              }
+            >
               Marquer comme Terminé
             </Button>
           </div>
@@ -203,7 +232,7 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
             <span className="text-sm text-muted-foreground">{Math.round(overallProgress)}%</span>
           </div>
           <Progress value={overallProgress} className="w-full" />
-          
+
           {isComplete && (
             <Alert>
               <CheckCircle className="h-4 w-4" />
@@ -220,7 +249,7 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
         {modules.map((module) => {
           const moduleProgress = getModuleProgress(module.id);
           const status = moduleProgress?.status || 'not_started';
-          
+
           return (
             <Card key={module.id}>
               <CardContent className="p-4">
@@ -232,12 +261,18 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
                       <p className="text-sm text-muted-foreground">{module.description}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <Clock className="h-3 w-3" />
-                        <span className="text-xs text-muted-foreground">{module.duration_minutes} min</span>
-                        {module.required && <Badge variant="outline" className="text-xs">Requis</Badge>}
+                        <span className="text-xs text-muted-foreground">
+                          {module.duration_minutes} min
+                        </span>
+                        {module.required && (
+                          <Badge variant="outline" className="text-xs">
+                            Requis
+                          </Badge>
+                        )}
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-3">
                     {getStatusBadge(status)}
                     {status === 'not_started' && (
@@ -253,13 +288,11 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
                       </Button>
                     )}
                     {status === 'completed' && moduleProgress?.quiz_score && (
-                      <Badge variant="outline">
-                        Score: {moduleProgress.quiz_score}%
-                      </Badge>
+                      <Badge variant="outline">Score: {moduleProgress.quiz_score}%</Badge>
                     )}
                   </div>
                 </div>
-                
+
                 {status === 'in_progress' && moduleProgress && (
                   <div className="mt-3">
                     <Progress value={moduleProgress.progress_percentage} className="w-full" />

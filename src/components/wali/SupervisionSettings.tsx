@@ -1,9 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SupervisionSettings as SupervisionSettingsType } from '@/types/waliInvitation';
@@ -22,7 +27,7 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
   waliUserId,
   currentSettings,
   currentLevel = 'moderate',
-  onSettingsUpdate
+  onSettingsUpdate,
 }) => {
   const { toast } = useToast();
   const [supervisionLevel, setSupervisionLevel] = useState(currentLevel);
@@ -32,7 +37,7 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
       receive_all_messages: false,
       can_end_conversations: true,
       notification_frequency: 'immediate',
-      auto_approve_known_contacts: false
+      auto_approve_known_contacts: false,
     }
   );
   const [loading, setLoading] = useState(false);
@@ -47,8 +52,8 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
         receive_all_messages: false,
         can_end_conversations: false,
         notification_frequency: 'daily' as const,
-        auto_approve_known_contacts: true
-      }
+        auto_approve_known_contacts: true,
+      },
     },
     moderate: {
       label: 'Supervision Modérée',
@@ -59,8 +64,8 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
         receive_all_messages: false,
         can_end_conversations: true,
         notification_frequency: 'immediate' as const,
-        auto_approve_known_contacts: false
-      }
+        auto_approve_known_contacts: false,
+      },
     },
     strict: {
       label: 'Supervision Stricte',
@@ -71,9 +76,9 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
         receive_all_messages: true,
         can_end_conversations: true,
         notification_frequency: 'immediate' as const,
-        auto_approve_known_contacts: false
-      }
-    }
+        auto_approve_known_contacts: false,
+      },
+    },
   };
 
   const handleLevelChange = (newLevel: string) => {
@@ -85,9 +90,9 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
   };
 
   const handleSettingChange = (key: keyof SupervisionSettingsType, value: boolean | string) => {
-    setSettings(prev => ({
+    setSettings((prev) => ({
       ...prev,
-      [key]: value
+      [key]: value,
     }));
   };
 
@@ -98,15 +103,15 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
         .from('wali_profiles')
         .update({
           supervision_level: supervisionLevel,
-          supervision_settings: settings
+          supervision_settings: settings,
         })
         .eq('user_id', waliUserId);
 
       if (error) throw error;
 
       toast({
-        title: "Paramètres sauvegardés",
-        description: "Vos paramètres de supervision ont été mis à jour",
+        title: 'Paramètres sauvegardés',
+        description: 'Vos paramètres de supervision ont été mis à jour',
       });
 
       if (onSettingsUpdate) {
@@ -115,9 +120,9 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
     } catch (error: any) {
       console.error('Error updating supervision settings:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder les paramètres",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder les paramètres',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -159,7 +164,7 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
             <Settings className="h-4 w-4" />
             Paramètres Détaillés
           </Label>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-1">
@@ -170,7 +175,7 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
               </div>
               <Switch
                 checked={settings.require_approval_for_new_conversations}
-                onCheckedChange={(checked) => 
+                onCheckedChange={(checked) =>
                   handleSettingChange('require_approval_for_new_conversations', checked)
                 }
               />
@@ -188,9 +193,7 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
               </div>
               <Switch
                 checked={settings.receive_all_messages}
-                onCheckedChange={(checked) => 
-                  handleSettingChange('receive_all_messages', checked)
-                }
+                onCheckedChange={(checked) => handleSettingChange('receive_all_messages', checked)}
               />
             </div>
 
@@ -203,9 +206,7 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
               </div>
               <Switch
                 checked={settings.can_end_conversations}
-                onCheckedChange={(checked) => 
-                  handleSettingChange('can_end_conversations', checked)
-                }
+                onCheckedChange={(checked) => handleSettingChange('can_end_conversations', checked)}
               />
             </div>
 
@@ -218,7 +219,7 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
               </div>
               <Switch
                 checked={settings.auto_approve_known_contacts}
-                onCheckedChange={(checked) => 
+                onCheckedChange={(checked) =>
                   handleSettingChange('auto_approve_known_contacts', checked)
                 }
               />
@@ -229,8 +230,8 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
                 <Bell className="h-4 w-4" />
                 Fréquence des notifications
               </Label>
-              <Select 
-                value={settings.notification_frequency} 
+              <Select
+                value={settings.notification_frequency}
                 onValueChange={(value) => handleSettingChange('notification_frequency', value)}
               >
                 <SelectTrigger>

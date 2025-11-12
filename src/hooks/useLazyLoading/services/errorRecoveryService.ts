@@ -1,4 +1,3 @@
-
 interface ErrorRecoveryOptions {
   maxRetries?: number;
   baseDelay?: number;
@@ -41,45 +40,45 @@ class ErrorRecoveryService {
     options: Partial<ErrorRecoveryOptions> = {}
   ): Promise<T> {
     const config = { ...this.defaultOptions, ...options };
-    
+
     if (config.enableCircuitBreaker && this.isCircuitOpen(key, config)) {
       throw new Error(`Circuit breaker is open for ${key}`);
     }
 
     let lastError: Error;
-    
+
     for (let attempt = 0; attempt <= config.maxRetries; attempt++) {
       try {
         const result = await operation();
-        
+
         // Reset circuit breaker on success
         if (config.enableCircuitBreaker) {
           this.resetCircuitBreaker(key);
         }
-        
+
         return result;
       } catch (error) {
         lastError = error as Error;
-        
+
         if (config.enableCircuitBreaker) {
           this.recordFailure(key, config);
         }
-        
+
         // Don't retry on last attempt
         if (attempt === config.maxRetries) {
           break;
         }
-        
+
         // Calculate delay with exponential backoff
         const delay = Math.min(
           config.baseDelay * Math.pow(config.backoffFactor, attempt),
           config.maxDelay
         );
-        
+
         await this.delay(delay);
       }
     }
-    
+
     throw lastError!;
   }
 
@@ -88,7 +87,7 @@ class ErrorRecoveryService {
     if (!breaker) return false;
 
     const now = Date.now();
-    
+
     switch (breaker.state) {
       case 'open':
         if (now - breaker.lastFailureTime > config.circuitBreakerTimeout) {
@@ -97,10 +96,10 @@ class ErrorRecoveryService {
           return false;
         }
         return true;
-      
+
       case 'half-open':
         return false;
-      
+
       default:
         return false;
     }
@@ -109,15 +108,15 @@ class ErrorRecoveryService {
   private recordFailure(key: string, config: Required<ErrorRecoveryOptions>): void {
     const now = Date.now();
     let breaker = this.circuitBreakers.get(key);
-    
+
     if (!breaker) {
       breaker = { failures: 0, lastFailureTime: now, state: 'closed' };
       this.circuitBreakers.set(key, breaker);
     }
-    
+
     breaker.failures++;
     breaker.lastFailureTime = now;
-    
+
     if (breaker.failures >= config.circuitBreakerThreshold) {
       breaker.state = 'open';
     }
@@ -132,7 +131,7 @@ class ErrorRecoveryService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   getCircuitBreakerStatus(key: string): CircuitBreakerState | null {

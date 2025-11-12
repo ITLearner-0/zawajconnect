@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Select,
@@ -6,9 +5,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CircleOff, Clock, Radio } from "lucide-react";
+} from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CircleOff, Clock, Radio } from 'lucide-react';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
 
 interface AvailabilityControlsProps {
@@ -20,7 +19,7 @@ interface AvailabilityControlsProps {
 const AvailabilityControls: React.FC<AvailabilityControlsProps> = ({
   availabilityStatus,
   onUpdateAvailability,
-  loading = false
+  loading = false,
 }) => {
   const handleStatusChange = (value: string) => {
     onUpdateAvailability(value as 'online' | 'away' | 'busy' | 'offline');
@@ -36,11 +35,7 @@ const AvailabilityControls: React.FC<AvailabilityControlsProps> = ({
       </CardHeader>
       <CardContent>
         <div className="relative">
-          <Select
-            value={availabilityStatus}
-            onValueChange={handleStatusChange}
-            disabled={loading}
-          >
+          <Select value={availabilityStatus} onValueChange={handleStatusChange} disabled={loading}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Set your availability" />
             </SelectTrigger>
@@ -71,27 +66,26 @@ const AvailabilityControls: React.FC<AvailabilityControlsProps> = ({
               </SelectItem>
             </SelectContent>
           </Select>
-          
+
           {loading && (
             <div className="absolute right-10 top-3">
               <LoadingSpinner size="sm" />
             </div>
           )}
         </div>
-        
+
         <div className="mt-4 text-sm text-muted-foreground">
           <div className="flex items-start mb-2">
             <Clock className="h-4 w-4 mr-2 mt-0.5" />
             <p>
-              Your availability controls when users can reach you and how notifications are prioritized.
+              Your availability controls when users can reach you and how notifications are
+              prioritized.
             </p>
           </div>
-          
+
           <div className="flex items-start">
             <CircleOff className="h-4 w-4 mr-2 mt-0.5" />
-            <p>
-              Setting yourself to Offline will pause all new chat requests.
-            </p>
+            <p>Setting yourself to Offline will pause all new chat requests.</p>
           </div>
         </div>
       </CardContent>

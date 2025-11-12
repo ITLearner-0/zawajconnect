@@ -1,6 +1,5 @@
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -47,26 +46,20 @@ serve(async (req) => {
     } = await supabaseClient.auth.getSession();
 
     if (!session) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { 
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const { userId, targetUserIds, batchSize = 10 }: CompatibilityRequest = await req.json();
 
     // Verify the user is calculating for themselves
     if (session.user.id !== userId) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized to calculate for this user' }),
-        { 
-          status: 403, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+      return new Response(JSON.stringify({ error: 'Unauthorized to calculate for this user' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     console.log(`Starting compatibility calculation for user: ${userId}`);
@@ -81,13 +74,10 @@ serve(async (req) => {
       .single();
 
     if (userError || !userResults) {
-      return new Response(
-        JSON.stringify({ error: 'User compatibility results not found' }),
-        { 
-          status: 404, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+      return new Response(JSON.stringify({ error: 'User compatibility results not found' }), {
+        status: 404,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Fetch target users or all other users if not specified
@@ -104,13 +94,10 @@ serve(async (req) => {
 
     if (othersError) {
       console.error('Error fetching other users:', othersError);
-      return new Response(
-        JSON.stringify({ error: 'Failed to fetch other users' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+      return new Response(JSON.stringify({ error: 'Failed to fetch other users' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const results: CalculationResult[] = [];
@@ -135,27 +122,23 @@ serve(async (req) => {
     console.log(`Completed compatibility calculation for ${results.length} users`);
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         results,
         processed: results.length,
-        userId 
+        userId,
       }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     );
-
   } catch (error) {
     console.error('Error in calculate-compatibility function:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });
 
@@ -178,33 +161,37 @@ function calculateCompatibilityScore(
   const categoryMap: Record<string, string[]> = {
     'Religious Practice': ['1', '2', '3'],
     'Family Values': ['4', '5', '6'],
-    'Lifestyle': ['7', '8', '9'],
+    Lifestyle: ['7', '8', '9'],
     'Education & Career': ['10', '11', '12'],
-    'Personal Values': ['13', '14', '15']
+    'Personal Values': ['13', '14', '15'],
   };
 
   // Calculate category-based compatibility
   for (const [categoryName, questions] of Object.entries(categoryMap)) {
     let categoryScore = 0;
     let categoryWeight = 0;
-    
+
     for (const questionId of questions) {
       const myAnswer = myAnswers[questionId];
       const theirAnswer = otherAnswers[questionId];
-      
+
       if (myAnswer && theirAnswer) {
         const rawDifference = Math.abs(myAnswer.value - theirAnswer.value);
         const compatibility = Math.max(0, 100 - rawDifference);
         const weight = myAnswer.weight || 1;
-        
+
         categoryScore += compatibility * weight;
         categoryWeight += weight;
-        
+
         // Check for dealbreakers
-        if (myAnswer.isBreaker && myAnswer.breakerThreshold && theirAnswer.value < myAnswer.breakerThreshold) {
+        if (
+          myAnswer.isBreaker &&
+          myAnswer.breakerThreshold &&
+          theirAnswer.value < myAnswer.breakerThreshold
+        ) {
           dealbreakers.push(`Incompatible ${categoryName} values`);
         }
-        
+
         // Identify strengths and differences
         if (compatibility >= 80) {
           strengths.push(`Strong alignment in ${categoryName}`);
@@ -213,9 +200,9 @@ function calculateCompatibilityScore(
         }
       }
     }
-    
+
     if (categoryWeight > 0) {
-      const normalizedCategoryScore = (categoryScore / categoryWeight);
+      const normalizedCategoryScore = categoryScore / categoryWeight;
       categoryScores[categoryName] = { score: normalizedCategoryScore, weight: categoryWeight };
       totalCompatibility += normalizedCategoryScore * categoryWeight;
       totalWeight += categoryWeight;
@@ -223,22 +210,22 @@ function calculateCompatibilityScore(
   }
 
   // Calculate final score
-  let finalScore = totalWeight > 0 ? (totalCompatibility / totalWeight) : 0;
-  
+  let finalScore = totalWeight > 0 ? totalCompatibility / totalWeight : 0;
+
   // Apply Islamic priority bonuses
   const criticalCategories = ['Religious Practice', 'Family Values'];
   let categoryBonus = 0;
-  
-  criticalCategories.forEach(category => {
+
+  criticalCategories.forEach((category) => {
     if (categoryScores[category]) {
       const categoryPercentage = categoryScores[category].score;
       if (categoryPercentage >= 90) categoryBonus += 5;
       else if (categoryPercentage >= 80) categoryBonus += 2;
     }
   });
-  
+
   finalScore = Math.min(100, finalScore + categoryBonus);
-  
+
   // Apply dealbreaker penalty
   if (dealbreakers.length > 0) {
     finalScore = Math.max(0, finalScore - 25);
@@ -251,6 +238,6 @@ function calculateCompatibilityScore(
     categoryScores,
     strengths: [...new Set(strengths)],
     differences: [...new Set(differences)],
-    dealbreakers: dealbreakers.length > 0 ? [...new Set(dealbreakers)] : undefined
+    dealbreakers: dealbreakers.length > 0 ? [...new Set(dealbreakers)] : undefined,
   };
 }

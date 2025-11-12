@@ -9,8 +9,21 @@ import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { useToast } from '@/hooks/use-toast';
 import SecurityPrivacyPanel from '@/components/SecurityPrivacyPanel';
 import AnalyticsDashboard from '@/components/AnalyticsDashboard';
@@ -20,12 +33,12 @@ import CallAnalyticsDashboard from '@/components/admin/CallAnalyticsDashboard';
 import CallFeedbackDashboard from '@/components/admin/CallFeedbackDashboard';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import ABTestingDashboard from '@/pages/ABTestingDashboard';
-import { 
-  Users, 
-  Heart, 
-  MessageCircle, 
-  AlertTriangle, 
-  Shield, 
+import {
+  Users,
+  Heart,
+  MessageCircle,
+  AlertTriangle,
+  Shield,
   Crown,
   Eye,
   Ban,
@@ -37,7 +50,7 @@ import {
   Search,
   Lock,
   Trash2,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useUnacknowledgedAlertsCount } from '@/hooks/useUnacknowledgedAlertsCount';
@@ -53,9 +66,11 @@ interface User {
   age: number;
   location: string;
   created_at: string;
-  user_roles: {
-    role: string;
-  }[] | null;
+  user_roles:
+    | {
+        role: string;
+      }[]
+    | null;
   user_status?: {
     status: string;
     reason?: string;
@@ -95,7 +110,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
     activeMatches: 0,
     totalMessages: 0,
     pendingReports: 0,
-    verifiedUsers: 0
+    verifiedUsers: 0,
   });
   const [users, setUsers] = useState<User[]>([]);
   const [reports, setReports] = useState<Report[]>([]);
@@ -114,20 +129,30 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
   const loadAdminData = async () => {
     try {
       // Load statistics
-      const [usersCount, matchesCount, messagesCount, reportsCount, verifiedCount] = await Promise.all([
-        supabase.from('profiles').select('*', { count: 'exact', head: true }),
-        supabase.from('matches').select('*', { count: 'exact', head: true }).eq('is_mutual', true),
-        supabase.from('messages').select('*', { count: 'exact', head: true }),
-        supabase.from('reports').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-        supabase.from('user_verifications').select('*', { count: 'exact', head: true }).gte('verification_score', 80)
-      ]);
+      const [usersCount, matchesCount, messagesCount, reportsCount, verifiedCount] =
+        await Promise.all([
+          supabase.from('profiles').select('*', { count: 'exact', head: true }),
+          supabase
+            .from('matches')
+            .select('*', { count: 'exact', head: true })
+            .eq('is_mutual', true),
+          supabase.from('messages').select('*', { count: 'exact', head: true }),
+          supabase
+            .from('reports')
+            .select('*', { count: 'exact', head: true })
+            .eq('status', 'pending'),
+          supabase
+            .from('user_verifications')
+            .select('*', { count: 'exact', head: true })
+            .gte('verification_score', 80),
+        ]);
 
       setStats({
         totalUsers: usersCount.count || 0,
         activeMatches: matchesCount.count || 0,
         totalMessages: messagesCount.count || 0,
         pendingReports: reportsCount.count || 0,
-        verifiedUsers: verifiedCount.count || 0
+        verifiedUsers: verifiedCount.count || 0,
       });
 
       // Load users with profiles (separate from roles and status)
@@ -154,13 +179,13 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
       if (statusError) throw statusError;
 
       // Combine users with their roles and status
-      const usersWithRoles = (usersData || []).map(user => {
-        const userRole = rolesData?.find(role => role.user_id === user.user_id);
-        const userStatus = statusData?.find(status => status.user_id === user.user_id);
+      const usersWithRoles = (usersData || []).map((user) => {
+        const userRole = rolesData?.find((role) => role.user_id === user.user_id);
+        const userStatus = statusData?.find((status) => status.user_id === user.user_id);
         return {
           ...user,
           user_roles: userRole ? [{ role: userRole.role }] : [{ role: 'user' }],
-          user_status: userStatus || { status: 'active' }
+          user_status: userStatus || { status: 'active' },
         };
       });
 
@@ -179,26 +204,33 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
       const reportsWithProfiles = await Promise.all(
         (reportsData || []).map(async (report) => {
           const [reporterProfile, reportedProfile] = await Promise.all([
-            supabase.from('profiles').select('full_name').eq('user_id', report.reporter_id).maybeSingle(),
-            supabase.from('profiles').select('full_name').eq('user_id', report.reported_user_id).maybeSingle()
+            supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('user_id', report.reporter_id)
+              .maybeSingle(),
+            supabase
+              .from('profiles')
+              .select('full_name')
+              .eq('user_id', report.reported_user_id)
+              .maybeSingle(),
           ]);
 
           return {
             ...report,
             reporter: reporterProfile.data,
-            reported_user: reportedProfile.data
+            reported_user: reportedProfile.data,
           };
         })
       );
 
       setReports(reportsWithProfiles as any);
-
     } catch (error) {
       console.error('Error loading admin data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données administrateur",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données administrateur',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -208,27 +240,25 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
   const assignRole = async () => {
     if (!selectedUser || !selectedRole) {
       toast({
-        title: "Erreur",
-        description: "Veuillez sélectionner un utilisateur et un rôle",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Veuillez sélectionner un utilisateur et un rôle',
+        variant: 'destructive',
       });
       return;
     }
 
     try {
-      const { error } = await supabase
-        .from('user_roles')
-        .upsert({
-          user_id: selectedUser,
-          role: selectedRole as 'super_admin' | 'admin' | 'moderator' | 'user',
-          assigned_by: user?.id
-        });
+      const { error } = await supabase.from('user_roles').upsert({
+        user_id: selectedUser,
+        role: selectedRole as 'super_admin' | 'admin' | 'moderator' | 'user',
+        assigned_by: user?.id,
+      });
 
       if (error) throw error;
 
       toast({
-        title: "Succès",
-        description: "Rôle attribué avec succès"
+        title: 'Succès',
+        description: 'Rôle attribué avec succès',
       });
 
       loadAdminData();
@@ -237,9 +267,9 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
     } catch (error) {
       console.error('Error assigning role:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'attribuer le rôle",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -251,50 +281,56 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
     try {
       const { error } = await supabase
         .from('reports')
-        .update({ 
+        .update({
           status,
           resolved_at: new Date().toISOString(),
-          resolved_by: user?.id
+          resolved_by: user?.id,
         })
         .eq('id', reportId);
 
       if (error) throw error;
 
       toast({
-        title: "Succès",
-        description: `Rapport ${status === 'resolved' ? 'résolu' : 'rejeté'}`
+        title: 'Succès',
+        description: `Rapport ${status === 'resolved' ? 'résolu' : 'rejeté'}`,
       });
 
       loadAdminData();
     } catch (error) {
       console.error('Error updating report:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le rapport",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour le rapport',
+        variant: 'destructive',
       });
     } finally {
       setUpdatingReport(null);
     }
   };
 
-  const updateUserStatus = async (userId: string, status: 'active' | 'suspended' | 'blocked' | 'banned' | 'deleted', reason?: string, expiresAt?: string) => {
+  const updateUserStatus = async (
+    userId: string,
+    status: 'active' | 'suspended' | 'blocked' | 'banned' | 'deleted',
+    reason?: string,
+    expiresAt?: string
+  ) => {
     if (managingUser === userId) return; // Prevent double-click
     setManagingUser(userId);
 
     try {
-      const { error } = await supabase
-        .from('user_status')
-        .upsert({
+      const { error } = await supabase.from('user_status').upsert(
+        {
           user_id: userId,
           status,
           reason: reason || `Statut modifié par l'administrateur`,
           admin_notes: `Action effectuée par ${user?.email} le ${new Date().toLocaleDateString('fr-FR')}`,
           created_by: user?.id,
-          expires_at: expiresAt || null
-        }, {
-          onConflict: 'user_id'
-        });
+          expires_at: expiresAt || null,
+        },
+        {
+          onConflict: 'user_id',
+        }
+      );
 
       if (error) throw error;
 
@@ -303,21 +339,21 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
         suspended: 'suspendu',
         blocked: 'bloqué',
         banned: 'banni',
-        deleted: 'supprimé'
+        deleted: 'supprimé',
       };
 
       toast({
-        title: "Succès",
-        description: `Utilisateur ${statusLabels[status]} avec succès`
+        title: 'Succès',
+        description: `Utilisateur ${statusLabels[status]} avec succès`,
       });
 
       loadAdminData();
     } catch (error) {
       console.error('Error updating user status:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le statut utilisateur",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour le statut utilisateur',
+        variant: 'destructive',
       });
     } finally {
       setManagingUser(null);
@@ -331,7 +367,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
     try {
       // Call the edge function to permanently delete the user from auth.users
       const { data, error } = await supabase.functions.invoke('delete-user-permanently', {
-        body: { userId }
+        body: { userId },
       });
 
       if (error) throw error;
@@ -341,17 +377,17 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
       }
 
       toast({
-        title: "Suppression définitive",
-        description: `L'utilisateur ${userName} a été définitivement supprimé du système d'authentification et de la base de données`
+        title: 'Suppression définitive',
+        description: `L'utilisateur ${userName} a été définitivement supprimé du système d'authentification et de la base de données`,
       });
 
       loadAdminData();
     } catch (error) {
       console.error('Error permanently deleting user:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: error.message || "Impossible de supprimer définitivement l'utilisateur.",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setManagingUser(null);
@@ -360,36 +396,51 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
-      case 'super_admin': return 'default';
-      case 'admin': return 'secondary';
-      case 'moderator': return 'outline';
-      default: return 'outline';
+      case 'super_admin':
+        return 'default';
+      case 'admin':
+        return 'secondary';
+      case 'moderator':
+        return 'outline';
+      default:
+        return 'outline';
     }
   };
 
   const getRoleIcon = (role: string) => {
     switch (role) {
-      case 'super_admin': return Crown;
-      case 'admin': return Shield;
-      case 'moderator': return Eye;
-      default: return Users;
+      case 'super_admin':
+        return Crown;
+      case 'admin':
+        return Shield;
+      case 'moderator':
+        return Eye;
+      default:
+        return Users;
     }
   };
 
   const getStatusBadgeVariant = (status: string) => {
     switch (status) {
-      case 'active': return 'default';
-      case 'suspended': return 'secondary';
-      case 'blocked': return 'destructive';
-      case 'banned': return 'outline';
-      case 'deleted': return 'outline';
-      default: return 'outline';
+      case 'active':
+        return 'default';
+      case 'suspended':
+        return 'secondary';
+      case 'blocked':
+        return 'destructive';
+      case 'banned':
+        return 'outline';
+      case 'deleted':
+        return 'outline';
+      default:
+        return 'outline';
     }
   };
 
-  const filteredUsers = users.filter(user => 
-    user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.user_id?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredUsers = users.filter(
+    (user) =>
+      user.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.user_id?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -490,7 +541,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
             <TabsTrigger value="insights">Insights</TabsTrigger>
             <TabsTrigger value="settings">Paramètres</TabsTrigger>
           </ResponsiveTabsList>
-          
+
           <Button
             onClick={() => navigate('/admin/wali-alerts')}
             variant="destructive"
@@ -499,8 +550,8 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
             <AlertTriangle className="h-4 w-4 mr-2" />
             Alertes Wali
             {unacknowledgedCount > 0 && (
-              <Badge 
-                variant="secondary" 
+              <Badge
+                variant="secondary"
                 className="ml-2 bg-white text-destructive hover:bg-white animate-pulse"
               >
                 {unacknowledgedCount}
@@ -528,8 +579,8 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                   />
                 </div>
               </div>
-              
-                <Table>
+
+              <Table>
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nom</TableHead>
@@ -548,12 +599,10 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                     const status = user.user_status?.status || 'active';
                     const RoleIcon = getRoleIcon(role);
                     const isManaging = managingUser === user.user_id;
-                    
+
                     return (
                       <TableRow key={user.id}>
-                        <TableCell className="font-medium">
-                          {user.full_name || 'N/A'}
-                        </TableCell>
+                        <TableCell className="font-medium">{user.full_name || 'N/A'}</TableCell>
                         <TableCell className="font-mono text-xs">{user.user_id || 'N/A'}</TableCell>
                         <TableCell>{user.age || 'N/A'}</TableCell>
                         <TableCell>{user.location || 'N/A'}</TableCell>
@@ -604,8 +653,16 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                                   variant="outline"
                                   disabled={isManaging}
                                   onClick={() => {
-                                    if (window.confirm('Êtes-vous sûr de vouloir restaurer cet utilisateur ?')) {
-                                      updateUserStatus(user.user_id, 'active', 'Utilisateur restauré par l\'administrateur');
+                                    if (
+                                      window.confirm(
+                                        'Êtes-vous sûr de vouloir restaurer cet utilisateur ?'
+                                      )
+                                    ) {
+                                      updateUserStatus(
+                                        user.user_id,
+                                        'active',
+                                        "Utilisateur restauré par l'administrateur"
+                                      );
                                     }
                                   }}
                                   title="Restaurer l'utilisateur"
@@ -617,14 +674,23 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                                   variant="destructive"
                                   disabled={isManaging}
                                   onClick={() => {
-                                    if (window.confirm(`⚠️ ATTENTION ⚠️\n\nVoulez-vous DÉFINITIVEMENT supprimer ${user.full_name || 'cet utilisateur'} ?\n\nCette action est IRRÉVERSIBLE et supprimera :\n- Le profil utilisateur\n- Toutes ses données\n- Son historique\n\nTapez "SUPPRIMER" pour confirmer.`)) {
-                                      const confirmation = prompt('Pour confirmer la suppression définitive, tapez exactement "SUPPRIMER" (en majuscules) :');
+                                    if (
+                                      window.confirm(
+                                        `⚠️ ATTENTION ⚠️\n\nVoulez-vous DÉFINITIVEMENT supprimer ${user.full_name || 'cet utilisateur'} ?\n\nCette action est IRRÉVERSIBLE et supprimera :\n- Le profil utilisateur\n- Toutes ses données\n- Son historique\n\nTapez "SUPPRIMER" pour confirmer.`
+                                      )
+                                    ) {
+                                      const confirmation = prompt(
+                                        'Pour confirmer la suppression définitive, tapez exactement "SUPPRIMER" (en majuscules) :'
+                                      );
                                       if (confirmation === 'SUPPRIMER') {
-                                        deleteUserPermanently(user.user_id, user.full_name || 'Utilisateur');
+                                        deleteUserPermanently(
+                                          user.user_id,
+                                          user.full_name || 'Utilisateur'
+                                        );
                                       } else {
                                         toast({
-                                          title: "Suppression annulée",
-                                          description: "La confirmation n'était pas correcte."
+                                          title: 'Suppression annulée',
+                                          description: "La confirmation n'était pas correcte.",
                                         });
                                       }
                                     }
@@ -640,7 +706,13 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                                 size="sm"
                                 variant="outline"
                                 disabled={isManaging}
-                                onClick={() => updateUserStatus(user.user_id, 'suspended', 'Suspendu par l\'administrateur')}
+                                onClick={() =>
+                                  updateUserStatus(
+                                    user.user_id,
+                                    'suspended',
+                                    "Suspendu par l'administrateur"
+                                  )
+                                }
                                 title="Suspendre"
                               >
                                 <AlertTriangle className="h-3 w-3" />
@@ -651,7 +723,13 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                                 size="sm"
                                 variant="destructive"
                                 disabled={isManaging}
-                                onClick={() => updateUserStatus(user.user_id, 'blocked', 'Bloqué par l\'administrateur')}
+                                onClick={() =>
+                                  updateUserStatus(
+                                    user.user_id,
+                                    'blocked',
+                                    "Bloqué par l'administrateur"
+                                  )
+                                }
                                 title="Bloquer"
                               >
                                 <Ban className="h-3 w-3" />
@@ -663,8 +741,16 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                                 variant="destructive"
                                 disabled={isManaging}
                                 onClick={() => {
-                                  if (window.confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action ne peut pas être annulée.')) {
-                                    updateUserStatus(user.user_id, 'deleted', 'Utilisateur supprimé par l\'administrateur');
+                                  if (
+                                    window.confirm(
+                                      'Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action ne peut pas être annulée.'
+                                    )
+                                  ) {
+                                    updateUserStatus(
+                                      user.user_id,
+                                      'deleted',
+                                      "Utilisateur supprimé par l'administrateur"
+                                    );
                                   }
                                 }}
                                 title="Suppression soft (récupérable)"
@@ -729,12 +815,12 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                   </Select>
                 </div>
                 <div className="flex items-end">
-                  <Button 
-                    onClick={assignRole} 
+                  <Button
+                    onClick={assignRole}
                     disabled={assigningRole || !selectedUser || !selectedRole}
                     className="w-full"
                   >
-                    {assigningRole ? "Attribution..." : "Attribuer le rôle"}
+                    {assigningRole ? 'Attribution...' : 'Attribuer le rôle'}
                   </Button>
                 </div>
               </div>
@@ -806,43 +892,43 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
           <SecurityPrivacyPanel />
         </TabsContent>
 
-      {/* Analytics Tab */}
-      <TabsContent value="analytics" className="space-y-4">
-        <Tabs defaultValue="general" className="space-y-4">
-          <ResponsiveTabsList tabCount={3}>
-            <TabsTrigger value="general">Général</TabsTrigger>
-            <TabsTrigger value="calls">Appels</TabsTrigger>
-            <TabsTrigger value="feedback">Feedbacks</TabsTrigger>
-          </ResponsiveTabsList>
-          
-          <TabsContent value="general">
-            <AnalyticsDashboard />
-          </TabsContent>
-          
-          <TabsContent value="calls">
-            <CallAnalyticsDashboard />
-          </TabsContent>
-          
-          <TabsContent value="feedback">
-            <CallFeedbackDashboard />
-          </TabsContent>
-        </Tabs>
-      </TabsContent>
+        {/* Analytics Tab */}
+        <TabsContent value="analytics" className="space-y-4">
+          <Tabs defaultValue="general" className="space-y-4">
+            <ResponsiveTabsList tabCount={3}>
+              <TabsTrigger value="general">Général</TabsTrigger>
+              <TabsTrigger value="calls">Appels</TabsTrigger>
+              <TabsTrigger value="feedback">Feedbacks</TabsTrigger>
+            </ResponsiveTabsList>
 
-      {/* A/B Testing Tab */}
-      <TabsContent value="abtesting" className="space-y-4">
-        <ABTestingDashboard />
-      </TabsContent>
+            <TabsContent value="general">
+              <AnalyticsDashboard />
+            </TabsContent>
 
-      {/* Onboarding Analytics Tab */}
-      <TabsContent value="onboarding" className="space-y-4">
-        <OnboardingAnalyticsDashboard />
-      </TabsContent>
+            <TabsContent value="calls">
+              <CallAnalyticsDashboard />
+            </TabsContent>
 
-      {/* Insights Analytics Tab */}
-      <TabsContent value="insights" className="space-y-4">
-        <InsightsAnalyticsDashboard />
-      </TabsContent>
+            <TabsContent value="feedback">
+              <CallFeedbackDashboard />
+            </TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        {/* A/B Testing Tab */}
+        <TabsContent value="abtesting" className="space-y-4">
+          <ABTestingDashboard />
+        </TabsContent>
+
+        {/* Onboarding Analytics Tab */}
+        <TabsContent value="onboarding" className="space-y-4">
+          <OnboardingAnalyticsDashboard />
+        </TabsContent>
+
+        {/* Insights Analytics Tab */}
+        <TabsContent value="insights" className="space-y-4">
+          <InsightsAnalyticsDashboard />
+        </TabsContent>
 
         {/* Moderation Tab */}
         <TabsContent value="moderation" className="space-y-4">
@@ -862,12 +948,10 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                     {userRole === 'super_admin' && <Crown className="h-5 w-5 text-gold" />}
                     {userRole === 'admin' && <Shield className="h-5 w-5 text-emerald" />}
                     {userRole === 'moderator' && <Eye className="h-5 w-5 text-blue-500" />}
-                    <span className="capitalize font-medium">
-                      {userRole?.replace('_', ' ')}
-                    </span>
+                    <span className="capitalize font-medium">{userRole?.replace('_', ' ')}</span>
                   </div>
                 </div>
-                
+
                 <div className="p-4 border rounded-lg">
                   <h4 className="font-medium mb-2">Privilèges</h4>
                   <ul className="space-y-1 text-sm text-muted-foreground">
@@ -876,9 +960,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
                     <li>✅ Modération des rapports</li>
                     <li>✅ Accès aux statistiques avancées</li>
                     <li>✅ Configuration système</li>
-                    {userRole === 'super_admin' && (
-                      <li>✅ Privilèges Super Administrateur</li>
-                    )}
+                    {userRole === 'super_admin' && <li>✅ Privilèges Super Administrateur</li>}
                   </ul>
                 </div>
               </div>

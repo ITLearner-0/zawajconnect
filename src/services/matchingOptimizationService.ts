@@ -11,7 +11,7 @@ import type { PostgrestError } from '@supabase/supabase-js';
 import {
   calculateIslamicCompatibility,
   calculateCulturalCompatibility,
-  calculateOverallCompatibility
+  calculateOverallCompatibility,
 } from '@/utils/matchingAlgorithm';
 import type {
   MatchFilters,
@@ -23,17 +23,13 @@ import type {
   MatchingCacheStats,
   ProfileRow,
   IslamicPreferencesRow,
-  UserVerificationRow
+  UserVerificationRow,
 } from '@/types/supabase';
 
 /**
  * Re-export types for backwards compatibility
  */
-export type {
-  MatchFilters,
-  ScoredMatch,
-  CachedMatch
-};
+export type { MatchFilters, ScoredMatch, CachedMatch };
 
 class MatchingOptimizationService {
   private cache: Map<string, CachedMatch[]> = new Map();
@@ -62,12 +58,14 @@ class MatchingOptimizationService {
       const matches = await this.fetchOptimizedMatches(userId, filters);
 
       // Cache the results (convert to CachedMatch format)
-      const cachedMatches: CachedMatch[] = matches.map((m: ScoredMatch): CachedMatch => ({
-        profileId: m.user_id,
-        score: m.compatibility_score,
-        calculatedAt: new Date(),
-        expiresAt: new Date(Date.now() + this.CACHE_DURATION_MS)
-      }));
+      const cachedMatches: CachedMatch[] = matches.map(
+        (m: ScoredMatch): CachedMatch => ({
+          profileId: m.user_id,
+          score: m.compatibility_score,
+          calculatedAt: new Date(),
+          expiresAt: new Date(Date.now() + this.CACHE_DURATION_MS),
+        })
+      );
       this.cache.set(cacheKey, cachedMatches);
 
       return matches.slice(0, limit);
@@ -86,16 +84,8 @@ class MatchingOptimizationService {
   ): Promise<ScoredMatch[]> {
     // Step 1: Get user's profile and preferences in parallel
     const [myProfileResult, myIslamicPrefs] = await Promise.all([
-      supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle(),
-      supabase
-        .from('islamic_preferences')
-        .select('*')
-        .eq('user_id', userId)
-        .maybeSingle()
+      supabase.from('profiles').select('*').eq('user_id', userId).maybeSingle(),
+      supabase.from('islamic_preferences').select('*').eq('user_id', userId).maybeSingle(),
     ]);
 
     if (!myProfileResult.data) {
@@ -113,24 +103,27 @@ class MatchingOptimizationService {
       profession: myProfile.profession ?? undefined,
       bio: myProfile.bio ?? undefined,
       interests: myProfile.interests ?? undefined,
-      avatar_url: myProfile.avatar_url ?? undefined
+      avatar_url: myProfile.avatar_url ?? undefined,
     };
 
-    const islamicPrefs: MatchingIslamicPreferences | undefined = myIslamicPrefs.data ? {
-      user_id: myIslamicPrefs.data.user_id ?? '',
-      prayer_frequency: myIslamicPrefs.data.prayer_frequency ?? undefined,
-      sect: myIslamicPrefs.data.sect ?? undefined,
-      hijab_preference: myIslamicPrefs.data.hijab_preference ?? undefined,
-      // Note: religious_level not in IslamicPreferencesRow schema
-      religious_level: undefined
-    } : undefined;
+    const islamicPrefs: MatchingIslamicPreferences | undefined = myIslamicPrefs.data
+      ? {
+          user_id: myIslamicPrefs.data.user_id ?? '',
+          prayer_frequency: myIslamicPrefs.data.prayer_frequency ?? undefined,
+          sect: myIslamicPrefs.data.sect ?? undefined,
+          hijab_preference: myIslamicPrefs.data.hijab_preference ?? undefined,
+          // Note: religious_level not in IslamicPreferencesRow schema
+          religious_level: undefined,
+        }
+      : undefined;
 
     // Step 2: Build optimized query for potential matches
     const targetGender = profile.gender === 'male' ? 'female' : 'male';
 
     let query = supabase
       .from('profiles')
-      .select(`
+      .select(
+        `
         user_id,
         full_name,
         age,
@@ -141,7 +134,8 @@ class MatchingOptimizationService {
         bio,
         interests,
         avatar_url
-      `)
+      `
+      )
       .eq('gender', targetGender)
       .neq('user_id', userId);
 
@@ -172,27 +166,29 @@ class MatchingOptimizationService {
     }
 
     // Normalize potential matches
-    const normalizedMatches: MatchingProfile[] = (potentialMatches as unknown[]).map((p: unknown): MatchingProfile => {
-      const row = p as Partial<ProfileRow>;
-      return {
-        user_id: row.user_id ?? '',
-        full_name: row.full_name ?? undefined,
-        age: row.age ?? undefined,
-        gender: row.gender ?? undefined,
-        location: row.location ?? undefined,
-        education: row.education ?? undefined,
-        profession: row.profession ?? undefined,
-        bio: row.bio ?? undefined,
-        interests: row.interests ?? undefined,
-        avatar_url: row.avatar_url ?? undefined
-      };
-    });
+    const normalizedMatches: MatchingProfile[] = (potentialMatches as unknown[]).map(
+      (p: unknown): MatchingProfile => {
+        const row = p as Partial<ProfileRow>;
+        return {
+          user_id: row.user_id ?? '',
+          full_name: row.full_name ?? undefined,
+          age: row.age ?? undefined,
+          gender: row.gender ?? undefined,
+          location: row.location ?? undefined,
+          education: row.education ?? undefined,
+          profession: row.profession ?? undefined,
+          bio: row.bio ?? undefined,
+          interests: row.interests ?? undefined,
+          avatar_url: row.avatar_url ?? undefined,
+        };
+      }
+    );
 
     // Step 3: Batch fetch related data
-    const userIds = normalizedMatches.map(p => p.user_id);
+    const userIds = normalizedMatches.map((p) => p.user_id);
     const [islamicPrefsData, verificationsData] = await Promise.all([
       this.batchFetchIslamicPrefs(userIds),
-      this.batchFetchVerifications(userIds)
+      this.batchFetchVerifications(userIds),
     ]);
 
     // Step 4: Calculate compatibility scores in batches
@@ -208,7 +204,7 @@ class MatchingOptimizationService {
     let filteredMatches = scoredMatches;
     if (filters?.minCompatibility) {
       filteredMatches = scoredMatches.filter(
-        m => m.compatibility_score >= filters.minCompatibility!
+        (m) => m.compatibility_score >= filters.minCompatibility!
       );
     }
 
@@ -219,17 +215,16 @@ class MatchingOptimizationService {
   /**
    * Batch fetch Islamic preferences
    */
-  private async batchFetchIslamicPrefs(userIds: string[]): Promise<Map<string, MatchingIslamicPreferences>> {
+  private async batchFetchIslamicPrefs(
+    userIds: string[]
+  ): Promise<Map<string, MatchingIslamicPreferences>> {
     const prefsMap = new Map<string, MatchingIslamicPreferences>();
 
     // Process in batches to avoid query limits
     for (let i = 0; i < userIds.length; i += this.BATCH_SIZE) {
       const batch = userIds.slice(i, i + this.BATCH_SIZE);
 
-      const { data } = await supabase
-        .from('islamic_preferences')
-        .select('*')
-        .in('user_id', batch);
+      const { data } = await supabase.from('islamic_preferences').select('*').in('user_id', batch);
 
       if (data) {
         data.forEach((pref: IslamicPreferencesRow) => {
@@ -239,7 +234,7 @@ class MatchingOptimizationService {
             sect: pref.sect ?? undefined,
             hijab_preference: pref.hijab_preference ?? undefined,
             // Note: religious_level not in IslamicPreferencesRow schema
-            religious_level: undefined
+            religious_level: undefined,
           };
           prefsMap.set(pref.user_id, normalizedPref);
         });
@@ -252,7 +247,9 @@ class MatchingOptimizationService {
   /**
    * Batch fetch verification data
    */
-  private async batchFetchVerifications(userIds: string[]): Promise<Map<string, UserVerificationData>> {
+  private async batchFetchVerifications(
+    userIds: string[]
+  ): Promise<Map<string, UserVerificationData>> {
     const verificationsMap = new Map<string, UserVerificationData>();
 
     for (let i = 0; i < userIds.length; i += this.BATCH_SIZE) {
@@ -268,7 +265,7 @@ class MatchingOptimizationService {
           const row = v as Partial<UserVerificationRow>;
           const normalizedVerification: UserVerificationData = {
             user_id: row.user_id ?? '',
-            verification_score: row.verification_score ?? 0
+            verification_score: row.verification_score ?? 0,
           };
           verificationsMap.set(row.user_id ?? '', normalizedVerification);
         });
@@ -351,7 +348,7 @@ class MatchingOptimizationService {
         personality_score: personalityScore,
         shared_interests: sharedInterests,
         compatibility_reasons: reasons,
-        verification_score: verification?.verification_score ?? 0
+        verification_score: verification?.verification_score ?? 0,
       };
     });
   }
@@ -383,7 +380,7 @@ class MatchingOptimizationService {
         keysToDelete.push(key);
       }
     });
-    keysToDelete.forEach(key => this.cache.delete(key));
+    keysToDelete.forEach((key) => this.cache.delete(key));
 
     logger.log('Cache cleared for user', { userId, keysCleared: keysToDelete.length });
   }
@@ -396,7 +393,7 @@ class MatchingOptimizationService {
     let cleaned = 0;
 
     this.cache.forEach((matches, key) => {
-      const validMatches = matches.filter(m => m.expiresAt > now);
+      const validMatches = matches.filter((m) => m.expiresAt > now);
       if (validMatches.length === 0) {
         this.cache.delete(key);
         cleaned++;
@@ -428,7 +425,7 @@ class MatchingOptimizationService {
       totalEntries: this.cache.size,
       totalMatches,
       oldestEntry: oldest,
-      newestEntry: newest
+      newestEntry: newest,
     };
   }
 }
@@ -438,7 +435,10 @@ export const matchingOptimizationService = new MatchingOptimizationService();
 
 // Setup periodic cache cleanup (every 15 minutes)
 if (typeof window !== 'undefined') {
-  setInterval(() => {
-    matchingOptimizationService.cleanupCache();
-  }, 15 * 60 * 1000);
+  setInterval(
+    () => {
+      matchingOptimizationService.cleanupCache();
+    },
+    15 * 60 * 1000
+  );
 }

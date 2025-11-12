@@ -3,27 +3,27 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Brain, 
-  TrendingUp, 
-  Target, 
-  AlertTriangle, 
-  BookOpen, 
+import {
+  Brain,
+  TrendingUp,
+  Target,
+  AlertTriangle,
+  BookOpen,
   Share2,
   Download,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
-import { useCompatibilityInsights, type UseCompatibilityInsightsReturn } from '@/hooks/useCompatibilityInsights';
+import {
+  useCompatibilityInsights,
+  type UseCompatibilityInsightsReturn,
+} from '@/hooks/useCompatibilityInsights';
 
 interface InsightsSummaryCardProps {
   userId?: string;
   compact?: boolean;
 }
 
-const InsightsSummaryCard: React.FC<InsightsSummaryCardProps> = ({ 
-  userId, 
-  compact = false 
-}) => {
+const InsightsSummaryCard: React.FC<InsightsSummaryCardProps> = ({ userId, compact = false }) => {
   const { insights, loading }: UseCompatibilityInsightsReturn = useCompatibilityInsights(userId);
 
   if (loading) {
@@ -60,8 +60,9 @@ const InsightsSummaryCard: React.FC<InsightsSummaryCardProps> = ({
     return 'text-red-600';
   };
 
-  const compatibilityScores = insights.compatibilityAreas.map(area => area.score);
-  const averageScore = compatibilityScores.reduce((sum, score) => sum + score, 0) / compatibilityScores.length;
+  const compatibilityScores = insights.compatibilityAreas.map((area) => area.score);
+  const averageScore =
+    compatibilityScores.reduce((sum, score) => sum + score, 0) / compatibilityScores.length;
 
   return (
     <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
@@ -81,7 +82,7 @@ const InsightsSummaryCard: React.FC<InsightsSummaryCardProps> = ({
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-4">
         {/* Overall Compatibility Score */}
         <div className="text-center p-4 bg-white/60 rounded-lg">
@@ -101,7 +102,7 @@ const InsightsSummaryCard: React.FC<InsightsSummaryCardProps> = ({
             </div>
             <div className="text-[9px] sm:text-xs text-muted-foreground">Analysés</div>
           </div>
-          
+
           <div className="bg-white/40 p-2 sm:p-3 rounded-lg text-center min-h-[60px] flex flex-col justify-center">
             <Target className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600 mx-auto mb-1" />
             <div className="text-[10px] sm:text-xs font-medium text-blue-700 leading-tight">
@@ -109,19 +110,23 @@ const InsightsSummaryCard: React.FC<InsightsSummaryCardProps> = ({
             </div>
             <div className="text-[9px] sm:text-xs text-muted-foreground">Partenaire idéal</div>
           </div>
-          
+
           <div className="bg-white/40 p-2 sm:p-3 rounded-lg text-center min-h-[60px] flex flex-col justify-center">
-            <AlertTriangle className={`h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1 ${
-              insights.suggestions.length > 0 ? 'text-yellow-600' : 'text-green-600'
-            }`} />
-            <div className={`text-[10px] sm:text-xs font-medium leading-tight ${
-              insights.suggestions.length > 0 ? 'text-yellow-700' : 'text-green-700'
-            }`}>
+            <AlertTriangle
+              className={`h-3 w-3 sm:h-4 sm:w-4 mx-auto mb-1 ${
+                insights.suggestions.length > 0 ? 'text-yellow-600' : 'text-green-600'
+              }`}
+            />
+            <div
+              className={`text-[10px] sm:text-xs font-medium leading-tight ${
+                insights.suggestions.length > 0 ? 'text-yellow-700' : 'text-green-700'
+              }`}
+            >
               {insights.suggestions.length} Suggestions
             </div>
             <div className="text-[9px] sm:text-xs text-muted-foreground">D'amélioration</div>
           </div>
-          
+
           <div className="bg-white/40 p-2 sm:p-3 rounded-lg text-center min-h-[60px] flex flex-col justify-center">
             <BookOpen className="h-3 w-3 sm:h-4 sm:w-4 text-emerald-600 mx-auto mb-1" />
             <div className="text-[10px] sm:text-xs font-medium text-emerald-700 leading-tight">
@@ -156,7 +161,8 @@ const InsightsSummaryCard: React.FC<InsightsSummaryCardProps> = ({
               <h4 className="text-sm font-medium text-orange-800">Points d'Attention</h4>
             </div>
             <p className="text-xs text-orange-700">
-              {insights.redFlags.length} zone{insights.redFlags.length > 1 ? 's' : ''} d'amélioration identifiée{insights.redFlags.length > 1 ? 's' : ''}
+              {insights.redFlags.length} zone{insights.redFlags.length > 1 ? 's' : ''}{' '}
+              d'amélioration identifiée{insights.redFlags.length > 1 ? 's' : ''}
             </p>
           </div>
         )}

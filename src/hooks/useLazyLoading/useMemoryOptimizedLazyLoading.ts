@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { IntersectionObserverService } from './services/observerService';
 import { MemoryManagementService } from './services/memoryService';
@@ -31,32 +30,35 @@ export const useMemoryOptimizedLazyLoading = <T extends HTMLElement = HTMLDivEle
   const observerService = IntersectionObserverService.getInstance();
   const memoryService = enableMemoryCleanup ? MemoryManagementService.getInstance() : null;
 
-  const handleIntersection = useCallback((entry: IntersectionObserverEntry) => {
-    const isVisible = entry.isIntersecting;
-    setIsIntersecting(isVisible);
-    
-    if (isVisible) {
-      if (triggerOnce && !hasTriggered) {
-        setHasTriggered(true);
-      }
-      
-      // Cancel any pending unload
-      if (unloadTimeoutRef.current) {
-        clearTimeout(unloadTimeoutRef.current);
-        unloadTimeoutRef.current = undefined;
-      }
-    } else if (enableMemoryCleanup && !triggerOnce && isContentLoaded) {
-      // Schedule content unload after delay
-      unloadTimeoutRef.current = window.setTimeout(() => {
-        if (!isIntersecting) {
-          setIsContentLoaded(false);
-          if (process.env.NODE_ENV === 'development') {
-            console.log('Unloaded content to save memory');
-          }
+  const handleIntersection = useCallback(
+    (entry: IntersectionObserverEntry) => {
+      const isVisible = entry.isIntersecting;
+      setIsIntersecting(isVisible);
+
+      if (isVisible) {
+        if (triggerOnce && !hasTriggered) {
+          setHasTriggered(true);
         }
-      }, unloadDelay);
-    }
-  }, [triggerOnce, hasTriggered, enableMemoryCleanup, isContentLoaded, unloadDelay, isIntersecting]);
+
+        // Cancel any pending unload
+        if (unloadTimeoutRef.current) {
+          clearTimeout(unloadTimeoutRef.current);
+          unloadTimeoutRef.current = undefined;
+        }
+      } else if (enableMemoryCleanup && !triggerOnce && isContentLoaded) {
+        // Schedule content unload after delay
+        unloadTimeoutRef.current = window.setTimeout(() => {
+          if (!isIntersecting) {
+            setIsContentLoaded(false);
+            if (process.env.NODE_ENV === 'development') {
+              console.log('Unloaded content to save memory');
+            }
+          }
+        }, unloadDelay);
+      }
+    },
+    [triggerOnce, hasTriggered, enableMemoryCleanup, isContentLoaded, unloadDelay, isIntersecting]
+  );
 
   useEffect(() => {
     const element = elementRef.current;
@@ -82,12 +84,12 @@ export const useMemoryOptimizedLazyLoading = <T extends HTMLElement = HTMLDivEle
     setIsContentLoaded(true);
   }, []);
 
-  const shouldLoad = triggerOnce ? (hasTriggered || isIntersecting) : isIntersecting;
-  const shouldShowContent = enableMemoryCleanup ? (shouldLoad && isContentLoaded) : shouldLoad;
+  const shouldLoad = triggerOnce ? hasTriggered || isIntersecting : isIntersecting;
+  const shouldShowContent = enableMemoryCleanup ? shouldLoad && isContentLoaded : shouldLoad;
 
-  return { 
-    elementRef, 
-    isIntersecting, 
+  return {
+    elementRef,
+    isIntersecting,
     shouldLoad,
     shouldShowContent,
     markContentLoaded,

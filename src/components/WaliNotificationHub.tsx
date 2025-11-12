@@ -6,23 +6,29 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Bell, 
-  Heart, 
-  MessageCircle, 
-  UserCheck, 
+import {
+  Bell,
+  Heart,
+  MessageCircle,
+  UserCheck,
   AlertTriangle,
   Clock,
   CheckCircle,
   Eye,
   Users,
   Shield,
-  Star
+  Star,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 
@@ -73,7 +79,7 @@ const WaliNotificationHub = () => {
     active_matches: 0,
     pending_approvals: 0,
     unread_notifications: 0,
-    recent_activities: 0
+    recent_activities: 0,
   });
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'unread' | 'urgent'>('all');
@@ -81,17 +87,18 @@ const WaliNotificationHub = () => {
   useEffect(() => {
     fetchNotifications();
     fetchSupervisionSummary();
-    
+
     // Set up real-time subscription
     const channel = supabase
       .channel('wali-notifications')
-      .on('postgres_changes', 
-        { 
-          event: '*', 
-          schema: 'public', 
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
           table: 'family_notifications',
-          filter: `family_member_id=eq.${user?.id}`
-        }, 
+          filter: `family_member_id=eq.${user?.id}`,
+        },
         () => {
           fetchNotifications();
           fetchSupervisionSummary();
@@ -121,12 +128,13 @@ const WaliNotificationHub = () => {
         return;
       }
 
-      const familyMemberIds = familyMembers.map(fm => fm.id);
+      const familyMemberIds = familyMembers.map((fm) => fm.id);
 
       // Get notifications for this family member
       const { data: notificationsData, error } = await supabase
         .from('family_notifications')
-        .select(`
+        .select(
+          `
           *,
           match:matches(
             id,
@@ -137,27 +145,32 @@ const WaliNotificationHub = () => {
             user1:profiles!matches_user1_id_fkey(full_name, age, avatar_url),
             user2:profiles!matches_user2_id_fkey(full_name, age, avatar_url)
           )
-        `)
+        `
+        )
         .in('family_member_id', familyMemberIds)
         .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
 
-      setNotifications((notificationsData || []).map(n => ({
-        ...n,
-        match: n.match ? {
-          ...n.match,
-          user1: n.match.user1 || { full_name: 'User 1', age: 25, avatar_url: '' },
-          user2: n.match.user2 || { full_name: 'User 2', age: 25, avatar_url: '' }
-        } : null
-      })) as Notification[]);
+      setNotifications(
+        (notificationsData || []).map((n) => ({
+          ...n,
+          match: n.match
+            ? {
+                ...n.match,
+                user1: n.match.user1 || { full_name: 'User 1', age: 25, avatar_url: '' },
+                user2: n.match.user2 || { full_name: 'User 2', age: 25, avatar_url: '' },
+              }
+            : null,
+        })) as Notification[]
+      );
     } catch (error) {
       console.error('Error fetching notifications:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les notifications",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les notifications',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -175,7 +188,7 @@ const WaliNotificationHub = () => {
         .eq('invited_user_id', user.id)
         .eq('invitation_status', 'accepted');
 
-      const supervisedUserIds = supervisedUsers?.map(fm => fm.user_id) || [];
+      const supervisedUserIds = supervisedUsers?.map((fm) => fm.user_id) || [];
 
       if (supervisedUserIds.length === 0) {
         setSummary({
@@ -183,7 +196,7 @@ const WaliNotificationHub = () => {
           active_matches: 0,
           pending_approvals: 0,
           unread_notifications: 0,
-          recent_activities: 0
+          recent_activities: 0,
         });
         return;
       }
@@ -192,24 +205,24 @@ const WaliNotificationHub = () => {
       const { data: activeMatches } = await supabase
         .from('matches')
         .select('id')
-        .or(supervisedUserIds.map(id => `user1_id.eq.${id},user2_id.eq.${id}`).join(','))
+        .or(supervisedUserIds.map((id) => `user1_id.eq.${id},user2_id.eq.${id}`).join(','))
         .eq('is_mutual', true);
 
       // Get pending approvals
       const { data: pendingApprovals } = await supabase
         .from('matches')
         .select('id')
-        .or(supervisedUserIds.map(id => `user1_id.eq.${id},user2_id.eq.${id}`).join(','))
+        .or(supervisedUserIds.map((id) => `user1_id.eq.${id},user2_id.eq.${id}`).join(','))
         .eq('family_supervision_required', true)
         .is('family_approved', null);
 
       // Count unread notifications
-      const unreadCount = notifications.filter(n => !n.is_read).length;
+      const unreadCount = notifications.filter((n) => !n.is_read).length;
 
       // Get recent activities (last 7 days)
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      
+
       const { data: recentActivities } = await supabase
         .from('family_notifications')
         .select('id')
@@ -220,7 +233,7 @@ const WaliNotificationHub = () => {
         active_matches: activeMatches?.length || 0,
         pending_approvals: pendingApprovals?.length || 0,
         unread_notifications: unreadCount,
-        recent_activities: recentActivities?.length || 0
+        recent_activities: recentActivities?.length || 0,
       });
     } catch (error) {
       console.error('Error fetching supervision summary:', error);
@@ -231,19 +244,17 @@ const WaliNotificationHub = () => {
     try {
       const { error } = await supabase
         .from('family_notifications')
-        .update({ 
-          is_read: true, 
-          read_at: new Date().toISOString() 
+        .update({
+          is_read: true,
+          read_at: new Date().toISOString(),
         })
         .eq('id', notificationId);
 
       if (error) throw error;
 
-      setNotifications(prev => 
-        prev.map(n => 
-          n.id === notificationId 
-            ? { ...n, is_read: true, read_at: new Date().toISOString() }
-            : n
+      setNotifications((prev) =>
+        prev.map((n) =>
+          n.id === notificationId ? { ...n, is_read: true, read_at: new Date().toISOString() } : n
         )
       );
 
@@ -255,37 +266,37 @@ const WaliNotificationHub = () => {
 
   const markAllAsRead = async () => {
     try {
-      const unreadNotifications = notifications.filter(n => !n.is_read);
-      const notificationIds = unreadNotifications.map(n => n.id);
+      const unreadNotifications = notifications.filter((n) => !n.is_read);
+      const notificationIds = unreadNotifications.map((n) => n.id);
 
       if (notificationIds.length === 0) return;
 
       const { error } = await supabase
         .from('family_notifications')
-        .update({ 
-          is_read: true, 
-          read_at: new Date().toISOString() 
+        .update({
+          is_read: true,
+          read_at: new Date().toISOString(),
         })
         .in('id', notificationIds);
 
       if (error) throw error;
 
-      setNotifications(prev => 
-        prev.map(n => ({ ...n, is_read: true, read_at: new Date().toISOString() }))
+      setNotifications((prev) =>
+        prev.map((n) => ({ ...n, is_read: true, read_at: new Date().toISOString() }))
       );
 
       fetchSupervisionSummary();
-      
+
       toast({
-        title: "Notifications marquées comme lues",
+        title: 'Notifications marquées comme lues',
         description: `${notificationIds.length} notification(s) marquée(s) comme lue(s)`,
       });
     } catch (error) {
       console.error('Error marking all as read:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de marquer les notifications comme lues",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de marquer les notifications comme lues',
+        variant: 'destructive',
       });
     }
   };
@@ -319,9 +330,9 @@ const WaliNotificationHub = () => {
   const getFilteredNotifications = () => {
     switch (filter) {
       case 'unread':
-        return notifications.filter(n => !n.is_read);
+        return notifications.filter((n) => !n.is_read);
       case 'urgent':
-        return notifications.filter(n => n.severity === 'high' || n.action_required);
+        return notifications.filter((n) => n.severity === 'high' || n.action_required);
       default:
         return notifications;
     }
@@ -402,14 +413,13 @@ const WaliNotificationHub = () => {
         <CardContent className="p-4">
           <Tabs value={filter} onValueChange={(value) => setFilter(value as any)}>
             <ResponsiveTabsList tabCount={3}>
-              <TabsTrigger value="all">
-                Toutes ({notifications.length})
-              </TabsTrigger>
+              <TabsTrigger value="all">Toutes ({notifications.length})</TabsTrigger>
               <TabsTrigger value="unread">
-                Non lues ({notifications.filter(n => !n.is_read).length})
+                Non lues ({notifications.filter((n) => !n.is_read).length})
               </TabsTrigger>
               <TabsTrigger value="urgent">
-                Urgentes ({notifications.filter(n => n.severity === 'high' || n.action_required).length})
+                Urgentes (
+                {notifications.filter((n) => n.severity === 'high' || n.action_required).length})
               </TabsTrigger>
             </ResponsiveTabsList>
           </Tabs>
@@ -423,20 +433,25 @@ const WaliNotificationHub = () => {
             <CardContent className="p-8 text-center">
               <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-lg font-semibold mb-2">
-                {filter === 'all' ? 'Aucune notification' : 
-                 filter === 'unread' ? 'Aucune notification non lue' : 'Aucune notification urgente'}
+                {filter === 'all'
+                  ? 'Aucune notification'
+                  : filter === 'unread'
+                    ? 'Aucune notification non lue'
+                    : 'Aucune notification urgente'}
               </h3>
               <p className="text-muted-foreground">
-                {filter === 'all' ? 'Vous êtes à jour avec toutes les activités de supervision' :
-                 filter === 'unread' ? 'Toutes vos notifications ont été lues' :
-                 'Aucune action urgente requise pour le moment'}
+                {filter === 'all'
+                  ? 'Vous êtes à jour avec toutes les activités de supervision'
+                  : filter === 'unread'
+                    ? 'Toutes vos notifications ont été lues'
+                    : 'Aucune action urgente requise pour le moment'}
               </p>
             </CardContent>
           </Card>
         ) : (
           filteredNotifications.map((notification) => (
-            <Card 
-              key={notification.id} 
+            <Card
+              key={notification.id}
               className={`transition-all hover:shadow-md cursor-pointer ${
                 !notification.is_read ? 'ring-1 ring-emerald/20 bg-emerald/5' : ''
               }`}
@@ -447,7 +462,7 @@ const WaliNotificationHub = () => {
                   <div className="flex-shrink-0 mt-1">
                     {getNotificationIcon(notification.notification_type)}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="flex items-center gap-2">
@@ -464,16 +479,16 @@ const WaliNotificationHub = () => {
                       </div>
                       <div className="text-xs text-muted-foreground flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {formatDistanceToNow(new Date(notification.created_at), { 
-                          addSuffix: true, 
-                          locale: fr 
+                        {formatDistanceToNow(new Date(notification.created_at), {
+                          addSuffix: true,
+                          locale: fr,
                         })}
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       <p className="text-sm">{notification.content}</p>
-                      
+
                       {notification.match && (
                         <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                           <div className="flex items-center gap-2">

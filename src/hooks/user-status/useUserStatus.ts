@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useFetchUserStatus } from './useFetchUserStatus';
@@ -22,13 +21,17 @@ export const useUserStatus = (userId?: string | null) => {
     }
 
     const getCurrentUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setCurrentUserId(session?.user?.id || null);
     };
 
     getCurrentUser();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setCurrentUserId(session?.user?.id || null);
     });
 
@@ -50,9 +53,13 @@ export const useUserStatus = (userId?: string | null) => {
   }, []);
 
   // Use the custom hooks
-  const { userStatus, loading: fetchLoading, error: fetchError } = useFetchUserStatus(userId || currentUserId);
+  const {
+    userStatus,
+    loading: fetchLoading,
+    error: fetchError,
+  } = useFetchUserStatus(userId || currentUserId);
   const { updateStatus, loading: updateLoading } = useUpdateUserStatus();
-  
+
   // Pass both required arguments to useOfflineTracking
   useOfflineTracking(currentUserId, false); // assuming not a demo user by default
 
@@ -93,6 +100,6 @@ export const useUserStatus = (userId?: string | null) => {
     isOnline,
     setStatus: setUserStatus,
     loading: fetchLoading || updateLoading,
-    error: fetchError
+    error: fetchError,
   };
 };

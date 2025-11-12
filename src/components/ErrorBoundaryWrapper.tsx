@@ -47,8 +47,8 @@ class ErrorBoundaryWrapper extends Component<Props, State> {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Une erreur inattendue s'est produite. Cela peut être dû à un problème de sécurité du navigateur 
-              ou à un conflit avec les paramètres de sécurité.
+              Une erreur inattendue s'est produite. Cela peut être dû à un problème de sécurité du
+              navigateur ou à un conflit avec les paramètres de sécurité.
             </p>
             {this.state.error && (
               <details className="text-xs text-muted-foreground bg-muted p-2 rounded">

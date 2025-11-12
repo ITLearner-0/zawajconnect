@@ -11,6 +11,7 @@
 ### 🔴 Critical Priority
 
 #### 1. Test All New Features
+
 **Owner**: QA Team / Developer
 **Estimated Time**: 8-12 hours
 
@@ -32,6 +33,7 @@
   - Check invoice download buttons
 
 **Acceptance Criteria**:
+
 - All features work as documented
 - No console errors
 - Performance is acceptable
@@ -40,6 +42,7 @@
 ---
 
 #### 2. Run All Automated Tests
+
 **Owner**: Developer
 **Estimated Time**: 30 minutes
 
@@ -56,6 +59,7 @@ npm test -- --coverage
 ```
 
 **Action if tests fail**:
+
 - Fix immediately before proceeding
 - Document any skipped tests
 - Update tests if requirements changed
@@ -63,6 +67,7 @@ npm test -- --coverage
 ---
 
 #### 3. Review Environment Variables
+
 **Owner**: DevOps / Developer
 **Estimated Time**: 1 hour
 
@@ -74,6 +79,7 @@ npm test -- --coverage
 - [ ] Document any new environment variables
 
 **Required Variables**:
+
 ```env
 VITE_SUPABASE_URL=
 VITE_SUPABASE_PUBLISHABLE_KEY=
@@ -87,6 +93,7 @@ VITE_STRIPE_PUBLISHABLE_KEY=
 ### 🟠 High Priority
 
 #### 4. Set Up Database Indexes
+
 **Owner**: Database Administrator / Backend Developer
 **Estimated Time**: 2 hours
 
@@ -120,6 +127,7 @@ CREATE INDEX IF NOT EXISTS idx_payments_user_created
 ```
 
 **Verify Impact**:
+
 ```sql
 -- Before and after query performance
 EXPLAIN ANALYZE
@@ -130,6 +138,7 @@ WHERE gender = 'female' AND age BETWEEN 25 AND 35;
 ---
 
 #### 5. Configure Moderation Rules in Database
+
 **Owner**: Content Moderator / Admin
 **Estimated Time**: 3 hours
 
@@ -149,6 +158,7 @@ VALUES
 ```
 
 **Test Moderation**:
+
 - [ ] Send test messages with violations
 - [ ] Verify appropriate actions are taken
 - [ ] Check violation logs in database
@@ -157,6 +167,7 @@ VALUES
 ---
 
 #### 6. Set Up Error Monitoring
+
 **Owner**: DevOps
 **Estimated Time**: 4 hours
 
@@ -182,6 +193,7 @@ export default defineConfig({
 ```
 
 **Setup Steps**:
+
 - [ ] Create Sentry account
 - [ ] Create new project for ZawajConnect
 - [ ] Add DSN to environment variables
@@ -196,10 +208,12 @@ export default defineConfig({
 ### 🟡 Medium Priority
 
 #### 7. Complete Video Calling Integration
+
 **Owner**: Frontend Developer
 **Estimated Time**: 16 hours
 
 **Tasks**:
+
 - [ ] Finish Jitsi Meet integration in VideoCall component
 - [ ] Test video quality and connection stability
 - [ ] Implement wali participation logic
@@ -209,6 +223,7 @@ export default defineConfig({
 - [ ] Implement call history logging
 
 **Technical Notes**:
+
 - Use existing `VideoCall.tsx` as base
 - Integrate with `video_calls` table
 - Ensure Islamic compliance (wali presence)
@@ -217,12 +232,14 @@ export default defineConfig({
 ---
 
 #### 8. Implement Invoice PDF Generation
+
 **Owner**: Backend Developer
 **Estimated Time**: 8 hours
 
 **Current State**: UI ready, download stubbed
 
 **Tasks**:
+
 - [ ] Choose PDF library (recommended: jsPDF or PDFKit)
 - [ ] Design invoice template (professional, branded)
 - [ ] Implement PDF generation endpoint
@@ -233,6 +250,7 @@ export default defineConfig({
 - [ ] Update PaymentHistory component to use real PDFs
 
 **Template Requirements**:
+
 - Company information
 - User information
 - Transaction details (date, amount, payment method)
@@ -243,12 +261,14 @@ export default defineConfig({
 ---
 
 #### 9. Expand Admin Analytics
+
 **Owner**: Full-stack Developer
 **Estimated Time**: 12 hours
 
 **Current**: Basic moderation dashboard
 
 **Add**:
+
 - [ ] User growth metrics (signups per day/week/month)
 - [ ] Match success rate (matches → conversations → approvals)
 - [ ] Subscription revenue dashboard
@@ -259,6 +279,7 @@ export default defineConfig({
 - [ ] Cohort analysis
 
 **Visualizations**:
+
 - Line charts for trends
 - Bar charts for comparisons
 - Pie charts for distributions
@@ -267,16 +288,19 @@ export default defineConfig({
 ---
 
 #### 10. Mobile Responsiveness Audit
+
 **Owner**: UI/UX Developer
 **Estimated Time**: 8 hours
 
 **Test on devices**:
+
 - [ ] iPhone (Safari)
 - [ ] Android (Chrome)
 - [ ] Tablet (iPad, Android tablet)
 - [ ] Small screens (< 375px width)
 
 **Focus Areas**:
+
 - [ ] Navigation menu (hamburger vs. bottom nav)
 - [ ] Match cards (swipe gestures?)
 - [ ] Chat interface (message input at bottom)
@@ -285,6 +309,7 @@ export default defineConfig({
 - [ ] Touch targets (minimum 44x44px)
 
 **Tools**:
+
 - Chrome DevTools device emulation
 - Real device testing
 - Lighthouse mobile audit
@@ -292,10 +317,12 @@ export default defineConfig({
 ---
 
 #### 11. Email Template Creation
+
 **Owner**: Designer + Developer
 **Estimated Time**: 12 hours
 
 **Required Templates**:
+
 - [ ] Welcome email (post-signup)
 - [ ] Email verification
 - [ ] Password reset
@@ -308,6 +335,7 @@ export default defineConfig({
 - [ ] Moderation warning
 
 **Design Guidelines**:
+
 - Islamic-friendly design
 - Mobile-responsive (email clients)
 - Clear CTAs
@@ -315,6 +343,7 @@ export default defineConfig({
 - Include unsubscribe option
 
 **Tools**:
+
 - MJML for responsive emails
 - Supabase Edge Functions for sending
 - Test with Email on Acid or Litmus
@@ -326,13 +355,16 @@ export default defineConfig({
 ### 🟢 Low Priority (But Valuable)
 
 #### 12. Internationalization (i18n)
+
 **Estimated Time**: 24 hours
 
 **Languages to Add**:
+
 1. Arabic (RTL support needed)
 2. English (already French)
 
 **Implementation**:
+
 ```bash
 npm install react-i18next i18next
 
@@ -347,6 +379,7 @@ src/locales/
 ```
 
 **Considerations**:
+
 - RTL layout for Arabic
 - Date/time formatting per locale
 - Number formatting (European vs. Arabic numerals)
@@ -355,9 +388,11 @@ src/locales/
 ---
 
 #### 13. Advanced Search & Filters
+
 **Estimated Time**: 16 hours
 
 **New Filters**:
+
 - [ ] Marital status
 - [ ] Number of children
 - [ ] Willingness to relocate
@@ -369,6 +404,7 @@ src/locales/
 - [ ] Madhab preferences
 
 **UI Improvements**:
+
 - [ ] Save search filters
 - [ ] Search history
 - [ ] Advanced filter panel
@@ -377,13 +413,16 @@ src/locales/
 ---
 
 #### 14. User Blocking & Reporting System
+
 **Estimated Time**: 12 hours
 
 **Backend** (probably exists):
+
 - `blocked_users` table
 - `user_reports` table
 
 **Frontend Needed**:
+
 - [ ] Block user button on profiles
 - [ ] Report user flow (with reason selection)
 - [ ] View blocked users list
@@ -391,6 +430,7 @@ src/locales/
 - [ ] Admin review interface for reports
 
 **Report Reasons**:
+
 - Inappropriate behavior
 - Fake profile
 - Harassment
@@ -401,9 +441,11 @@ src/locales/
 ---
 
 #### 15. Gamification & Engagement
+
 **Estimated Time**: 20 hours
 
 **Ideas**:
+
 - [ ] Profile completion progress (with milestones)
 - [ ] Streak tracking (daily logins)
 - [ ] Badges/achievements
@@ -416,6 +458,7 @@ src/locales/
 - [ ] Congratulations on milestones
 
 **Careful Balance**:
+
 - Avoid making it feel like a game
 - Focus on Islamic values
 - Encourage meaningful connections, not just engagement
@@ -423,9 +466,11 @@ src/locales/
 ---
 
 #### 16. Success Stories Feature
+
 **Estimated Time**: 16 hours
 
 **Allow couples to**:
+
 - [ ] Submit success story
 - [ ] Upload wedding photo (moderated)
 - [ ] Share testimony
@@ -433,12 +478,14 @@ src/locales/
 - [ ] Moderate before publishing
 
 **Display**:
+
 - [ ] Dedicated success stories page
 - [ ] Featured stories on homepage
 - [ ] Filter by location, date
 - [ ] Social sharing buttons (privacy-conscious)
 
 **Moderation**:
+
 - Admin approval required
 - Photo verification
 - Content moderation for text
@@ -451,19 +498,23 @@ src/locales/
 ### 🎯 Strategic Initiatives
 
 #### 17. Native Mobile Apps
+
 **Estimated Time**: 3-6 months
 
 **Approach 1: React Native** (Recommended)
+
 - Reuse existing React components
 - Shared business logic
 - Platform-specific UI when needed
 
 **Approach 2: Flutter**
+
 - Better performance
 - Requires rewrite
 - More native feel
 
 **Features**:
+
 - Push notifications
 - Biometric auth (Face ID, Touch ID)
 - Camera integration for photos
@@ -473,25 +524,30 @@ src/locales/
 ---
 
 #### 18. Advanced Matching with ML
+
 **Estimated Time**: 4-6 months
 
 **Use machine learning for**:
+
 - Predict match success probability
 - Recommend profiles based on user behavior
 - Identify compatibility patterns
 - Optimize matching weights automatically
 
 **Data Required**:
+
 - Historical match data
 - User interactions (likes, messages, approvals)
 - Outcome data (successful matches)
 
 **Tools**:
+
 - TensorFlow.js
 - Python backend for model training
 - Feature engineering on user data
 
 **Ethical Considerations**:
+
 - Avoid bias in algorithms
 - Explainable AI (users should understand why they're matched)
 - Privacy-preserving ML
@@ -499,14 +555,17 @@ src/locales/
 ---
 
 #### 19. Video Profiles & Verified Photos
+
 **Estimated Time**: 2-3 months
 
 **Video Profiles**:
+
 - Short (15-30 second) intro videos
 - Moderated before publishing
 - Islamic guidelines enforced
 
 **Photo Verification**:
+
 - AI-powered face matching
 - Prevent catfishing
 - Verification badge for confirmed photos
@@ -515,9 +574,11 @@ src/locales/
 ---
 
 #### 20. Community Features
+
 **Estimated Time**: 3-4 months
 
 **Ideas**:
+
 - Islamic education resources
 - Marriage advice articles
 - Community forums (moderated)
@@ -532,6 +593,7 @@ src/locales/
 ### Before Production Deployment
 
 #### Security
+
 - [ ] All environment variables properly configured
 - [ ] No hardcoded secrets in code
 - [ ] HTTPS enforced
@@ -544,6 +606,7 @@ src/locales/
 - [ ] Penetration testing completed
 
 #### Performance
+
 - [ ] Lighthouse score > 90
 - [ ] Core Web Vitals pass
 - [ ] Database indexes created
@@ -554,6 +617,7 @@ src/locales/
 - [ ] Bundle size optimized
 
 #### Accessibility
+
 - [ ] WCAG 2.1 Level AA compliance
 - [ ] Keyboard navigation works
 - [ ] Screen reader tested
@@ -562,6 +626,7 @@ src/locales/
 - [ ] ARIA labels correct
 
 #### Testing
+
 - [ ] All 99 tests passing
 - [ ] E2E tests created (Playwright/Cypress)
 - [ ] Cross-browser testing complete
@@ -570,6 +635,7 @@ src/locales/
 - [ ] Stress testing completed
 
 #### Content & Legal
+
 - [ ] Terms of Service updated
 - [ ] Privacy Policy updated
 - [ ] Cookie Policy updated
@@ -579,6 +645,7 @@ src/locales/
 - [ ] Copyright notices added
 
 #### Monitoring & Logging
+
 - [ ] Error monitoring configured (Sentry)
 - [ ] Performance monitoring configured
 - [ ] User analytics configured (privacy-conscious)
@@ -595,6 +662,7 @@ src/locales/
 #### Technical Risks
 
 **1. Scalability Bottlenecks**
+
 - **Risk**: Database performance degrades with 10,000+ users
 - **Mitigation**:
   - Implement database indexes (in progress)
@@ -603,6 +671,7 @@ src/locales/
   - Monitor query performance
 
 **2. Cache Invalidation Issues**
+
 - **Risk**: Stale data shown to users
 - **Mitigation**:
   - Clear cache on profile updates
@@ -611,6 +680,7 @@ src/locales/
   - Monitor cache hit rates
 
 **3. Moderation System Overload**
+
 - **Risk**: Too many manual reviews needed
 - **Mitigation**:
   - Improve auto-moderation rules
@@ -621,6 +691,7 @@ src/locales/
 #### Business Risks
 
 **1. Low Adoption Rate**
+
 - **Risk**: Not enough users for effective matching
 - **Mitigation**:
   - Marketing campaign
@@ -629,6 +700,7 @@ src/locales/
   - Community building
 
 **2. Islamic Compliance Concerns**
+
 - **Risk**: Features not aligned with Islamic values
 - **Mitigation**:
   - Islamic scholar review
@@ -637,6 +709,7 @@ src/locales/
   - Wali involvement features
 
 **3. Competition**
+
 - **Risk**: Established competitors dominate
 - **Mitigation**:
   - Unique value proposition
@@ -651,31 +724,37 @@ src/locales/
 ### Key Performance Indicators (KPIs)
 
 #### User Acquisition
+
 - **Target**: 1,000 signups in first 3 months
 - **Metric**: New user registrations per week
 - **Tracking**: Google Analytics, Supabase
 
 #### Engagement
+
 - **Target**: 60% daily active users (DAU/MAU)
 - **Metric**: Login frequency, time spent
 - **Tracking**: Custom analytics
 
 #### Matching Success
+
 - **Target**: 40% match acceptance rate
 - **Metric**: Matches sent → accepted
 - **Tracking**: Database analytics
 
 #### Revenue
+
 - **Target**: 100 paying subscribers in 6 months
 - **Metric**: Subscription conversions
 - **Tracking**: Stripe dashboard
 
 #### Quality
+
 - **Target**: < 5% content moderation violations
 - **Metric**: Violations / total messages
 - **Tracking**: Moderation dashboard
 
 #### Technical Health
+
 - **Target**: 99.9% uptime
 - **Metric**: Service availability
 - **Tracking**: Monitoring tools
@@ -687,6 +766,7 @@ src/locales/
 ### Team Composition (Recommended)
 
 **Minimum Viable Team**:
+
 - 1 Full-stack Developer (40h/week)
 - 1 UI/UX Designer (20h/week)
 - 1 Content Moderator (20h/week)
@@ -694,6 +774,7 @@ src/locales/
 - 1 Product Manager (20h/week)
 
 **As You Scale**:
+
 - +1 Backend Developer
 - +1 Mobile Developer (React Native)
 - +2 Content Moderators
@@ -703,6 +784,7 @@ src/locales/
 ### Infrastructure Costs (Estimated)
 
 **Monthly Costs**:
+
 - Supabase Pro: $25/month (includes 100k MAU)
 - Stripe fees: 2.9% + $0.30 per transaction
 - Sentry: $26/month (10k events)
@@ -712,6 +794,7 @@ src/locales/
 - **Total**: ~$100-150/month (baseline)
 
 **Scaling Costs** (10,000 users):
+
 - Supabase: ~$100/month
 - Storage (images): ~$50/month
 - CDN: ~$100/month
@@ -724,6 +807,7 @@ src/locales/
 This action plan provides a clear roadmap from current state to production-ready platform. Prioritize critical tasks first, then systematically work through high and medium priority items.
 
 **Remember**:
+
 - Test thoroughly before each deployment
 - Monitor metrics continuously
 - Gather user feedback

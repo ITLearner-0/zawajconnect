@@ -1,9 +1,9 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { sendEmail } from "../_shared/smtp.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { sendEmail } from '../_shared/smtp.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface WeeklyTipsRequest {
@@ -17,49 +17,48 @@ interface WeeklyTipsRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { user_id, week_number, tips }: WeeklyTipsRequest = await req.json();
 
-    console.log("Sending weekly tips to user:", user_id);
+    console.log('Sending weekly tips to user:', user_id);
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
     const profileResponse = await fetch(
       `${supabaseUrl}/rest/v1/profiles?user_id=eq.${user_id}&select=full_name`,
       {
         headers: {
-          "apikey": supabaseKey!,
-          "Authorization": `Bearer ${supabaseKey}`,
+          apikey: supabaseKey!,
+          Authorization: `Bearer ${supabaseKey}`,
         },
       }
     );
 
     const profiles = await profileResponse.json();
-    const userName = profiles[0]?.full_name || "Cher membre";
+    const userName = profiles[0]?.full_name || 'Cher membre';
 
-    const userResponse = await fetch(
-      `${supabaseUrl}/auth/v1/admin/users/${user_id}`,
-      {
-        headers: {
-          "apikey": supabaseKey!,
-          "Authorization": `Bearer ${supabaseKey}`,
-        },
-      }
-    );
+    const userResponse = await fetch(`${supabaseUrl}/auth/v1/admin/users/${user_id}`, {
+      headers: {
+        apikey: supabaseKey!,
+        Authorization: `Bearer ${supabaseKey}`,
+      },
+    });
 
     const userData = await userResponse.json();
     const userEmail = userData.email;
 
     if (!userEmail) {
-      throw new Error("User email not found");
+      throw new Error('User email not found');
     }
 
-    const tipsHtml = tips.map(tip => `
+    const tipsHtml = tips
+      .map(
+        (tip) => `
       <div style="background: white; padding: 25px; margin: 15px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
         <div style="display: flex; align-items: center; margin-bottom: 12px;">
           <span style="font-size: 28px; margin-right: 12px;">${tip.icon}</span>
@@ -67,7 +66,9 @@ const handler = async (req: Request): Promise<Response> => {
         </div>
         <p style="color: #4A5568; margin: 0; line-height: 1.6; font-size: 15px;">${tip.content}</p>
       </div>
-    `).join('');
+    `
+      )
+      .join('');
 
     await sendEmail({
       to: userEmail,
@@ -134,24 +135,21 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Weekly tips sent successfully to:", userEmail);
+    console.log('Weekly tips sent successfully to:', userEmail);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         ...corsHeaders,
       },
     });
   } catch (error: any) {
-    console.error("Error in send-weekly-tips function:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    console.error('Error in send-weekly-tips function:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
   }
 };
 

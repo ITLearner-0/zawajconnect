@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 interface PWAInstallPrompt extends Event {
@@ -18,36 +17,37 @@ export const usePWA = () => {
     isInstallable: false,
     isInstalled: false,
     isOnline: navigator.onLine,
-    showInstallPrompt: false
+    showInstallPrompt: false,
   });
-  
+
   const [deferredPrompt, setDeferredPrompt] = useState<PWAInstallPrompt | null>(null);
 
   useEffect(() => {
     // Vérifier si l'app est déjà installée
-    const isInstalled = window.matchMedia('(display-mode: standalone)').matches ||
-                       (window.navigator as any).standalone === true;
-    
-    setState(prev => ({ ...prev, isInstalled }));
+    const isInstalled =
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true;
+
+    setState((prev) => ({ ...prev, isInstalled }));
 
     // Écouter l'événement beforeinstallprompt
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as PWAInstallPrompt);
-      setState(prev => ({ ...prev, isInstallable: true }));
+      setState((prev) => ({ ...prev, isInstallable: true }));
     };
 
     // Écouter les changements de connexion
-    const handleOnline = () => setState(prev => ({ ...prev, isOnline: true }));
-    const handleOffline = () => setState(prev => ({ ...prev, isOnline: false }));
+    const handleOnline = () => setState((prev) => ({ ...prev, isOnline: true }));
+    const handleOffline = () => setState((prev) => ({ ...prev, isOnline: false }));
 
     // Écouter l'installation de l'app
     const handleAppInstalled = () => {
-      setState(prev => ({ 
-        ...prev, 
-        isInstalled: true, 
+      setState((prev) => ({
+        ...prev,
+        isInstalled: true,
         isInstallable: false,
-        showInstallPrompt: false 
+        showInstallPrompt: false,
       }));
       setDeferredPrompt(null);
     };
@@ -71,16 +71,16 @@ export const usePWA = () => {
     try {
       await deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      
+
       if (outcome === 'accepted') {
-        setState(prev => ({ 
-          ...prev, 
-          isInstalled: true, 
+        setState((prev) => ({
+          ...prev,
+          isInstalled: true,
           isInstallable: false,
-          showInstallPrompt: false 
+          showInstallPrompt: false,
         }));
       }
-      
+
       setDeferredPrompt(null);
       return outcome === 'accepted';
     } catch (error) {
@@ -90,17 +90,17 @@ export const usePWA = () => {
   };
 
   const showInstallDialog = () => {
-    setState(prev => ({ ...prev, showInstallPrompt: true }));
+    setState((prev) => ({ ...prev, showInstallPrompt: true }));
   };
 
   const hideInstallDialog = () => {
-    setState(prev => ({ ...prev, showInstallPrompt: false }));
+    setState((prev) => ({ ...prev, showInstallPrompt: false }));
   };
 
   return {
     ...state,
     installApp,
     showInstallDialog,
-    hideInstallDialog
+    hideInstallDialog,
   };
 };

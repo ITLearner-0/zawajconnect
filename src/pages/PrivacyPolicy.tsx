@@ -11,12 +11,11 @@ const PrivacyPolicy = () => {
             <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
               <Shield className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-foreground">
-              Politique de Confidentialité
-            </h1>
+            <h1 className="text-4xl font-bold text-foreground">Politique de Confidentialité</h1>
           </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Votre confidentialité et la protection de vos données personnelles sont notre priorité absolue
+            Votre confidentialité et la protection de vos données personnelles sont notre priorité
+            absolue
           </p>
           <div className="mt-4 text-sm text-muted-foreground">
             Dernière mise à jour : 4 septembre 2024
@@ -26,13 +25,12 @@ const PrivacyPolicy = () => {
         {/* Islamic Values Notice */}
         <Card className="mb-8 bg-gradient-to-r from-gold/10 to-emerald/10 border-gold/20">
           <CardContent className="p-6 text-center">
-            <h3 className="text-lg font-semibold text-foreground mb-3">
-              Engagement Islamique
-            </h3>
+            <h3 className="text-lg font-semibold text-foreground mb-3">Engagement Islamique</h3>
             <p className="text-muted-foreground leading-relaxed">
-              Nous nous engageons à protéger votre vie privée conformément aux principes islamiques de 
-              respect, d'honnêteté et de protection de l'intimité (Hikmah). Vos informations personnelles 
-              sont traitées comme une Amana (dépôt de confiance) que nous devons préserver.
+              Nous nous engageons à protéger votre vie privée conformément aux principes islamiques
+              de respect, d'honnêteté et de protection de l'intimité (Hikmah). Vos informations
+              personnelles sont traitées comme une Amana (dépôt de confiance) que nous devons
+              préserver.
             </p>
           </CardContent>
         </Card>
@@ -48,18 +46,26 @@ const PrivacyPolicy = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h4 className="font-semibold text-foreground mb-2">Informations que nous collectons :</h4>
+                <h4 className="font-semibold text-foreground mb-2">
+                  Informations que nous collectons :
+                </h4>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
                   <li>Informations personnelles : nom, âge, localisation, profession, éducation</li>
-                  <li>Préférences religieuses : madhab, pratique religieuse, importance de la foi</li>
+                  <li>
+                    Préférences religieuses : madhab, pratique religieuse, importance de la foi
+                  </li>
                   <li>Photos de profil (respectant les directives islamiques de pudeur)</li>
                   <li>Préférences de recherche et critères de compatibilité</li>
                   <li>Historique d'activité sur la plateforme (visites, likes, messages)</li>
-                  <li>Données de vérification (email, téléphone, documents d'identité optionnels)</li>
+                  <li>
+                    Données de vérification (email, téléphone, documents d'identité optionnels)
+                  </li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-foreground mb-2">Comment nous collectons ces données :</h4>
+                <h4 className="font-semibold text-foreground mb-2">
+                  Comment nous collectons ces données :
+                </h4>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
                   <li>Lors de votre inscription et création de profil</li>
                   <li>Quand vous utilisez notre plateforme et ses fonctionnalités</li>
@@ -79,7 +85,9 @@ const PrivacyPolicy = () => {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-muted-foreground">Nous utilisons vos données personnelles uniquement pour :</p>
+              <p className="text-muted-foreground">
+                Nous utilisons vos données personnelles uniquement pour :
+              </p>
               <ul className="list-disc list-inside text-muted-foreground space-y-1">
                 <li>Créer et maintenir votre profil matrimonial</li>
                 <li>Vous proposer des matches compatibles selon vos critères islamiques</li>
@@ -91,8 +99,8 @@ const PrivacyPolicy = () => {
               </ul>
               <div className="bg-emerald/5 rounded-lg p-4 border border-emerald/20">
                 <p className="text-emerald-dark font-medium text-sm">
-                  <strong>Engagement :</strong> Nous ne vendons jamais vos données et ne les utilisons 
-                  jamais à des fins commerciales non liées au mariage halal.
+                  <strong>Engagement :</strong> Nous ne vendons jamais vos données et ne les
+                  utilisons jamais à des fins commerciales non liées au mariage halal.
                 </p>
               </div>
             </CardContent>
@@ -108,15 +116,25 @@ const PrivacyPolicy = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <h4 className="font-semibold text-foreground mb-2">Qui peut voir vos informations :</h4>
+                <h4 className="font-semibold text-foreground mb-2">
+                  Qui peut voir vos informations :
+                </h4>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                  <li><strong>Autres utilisateurs :</strong> Selon vos paramètres de confidentialité</li>
-                  <li><strong>Votre famille :</strong> Si vous activez l'implication familiale</li>
-                  <li><strong>Notre équipe :</strong> Uniquement pour la modération et le support</li>
+                  <li>
+                    <strong>Autres utilisateurs :</strong> Selon vos paramètres de confidentialité
+                  </li>
+                  <li>
+                    <strong>Votre famille :</strong> Si vous activez l'implication familiale
+                  </li>
+                  <li>
+                    <strong>Notre équipe :</strong> Uniquement pour la modération et le support
+                  </li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-foreground mb-2">Nous ne partageons JAMAIS vos données avec :</h4>
+                <h4 className="font-semibold text-foreground mb-2">
+                  Nous ne partageons JAMAIS vos données avec :
+                </h4>
                 <ul className="list-disc list-inside text-muted-foreground space-y-1">
                   <li>Des entreprises publicitaires ou de marketing</li>
                   <li>Des courtiers en données</li>
@@ -190,11 +208,21 @@ const PrivacyPolicy = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <ul className="list-disc list-inside text-muted-foreground space-y-1">
-                <li><strong>Profils actifs :</strong> Tant que votre compte est actif</li>
-                <li><strong>Profils supprimés :</strong> 30 jours puis suppression définitive</li>
-                <li><strong>Messages :</strong> Conservés selon vos paramètres (1 an maximum)</li>
-                <li><strong>Données de sécurité :</strong> 2 ans pour la protection de la communauté</li>
-                <li><strong>Données légales :</strong> Selon les obligations légales applicables</li>
+                <li>
+                  <strong>Profils actifs :</strong> Tant que votre compte est actif
+                </li>
+                <li>
+                  <strong>Profils supprimés :</strong> 30 jours puis suppression définitive
+                </li>
+                <li>
+                  <strong>Messages :</strong> Conservés selon vos paramètres (1 an maximum)
+                </li>
+                <li>
+                  <strong>Données de sécurité :</strong> 2 ans pour la protection de la communauté
+                </li>
+                <li>
+                  <strong>Données légales :</strong> Selon les obligations légales applicables
+                </li>
               </ul>
             </CardContent>
           </Card>
@@ -234,7 +262,8 @@ const PrivacyPolicy = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                Pour toute question concernant cette politique de confidentialité ou vos données personnelles :
+                Pour toute question concernant cette politique de confidentialité ou vos données
+                personnelles :
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex items-center gap-3">
@@ -262,9 +291,9 @@ const PrivacyPolicy = () => {
                 Modifications de cette Politique
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                Nous nous réservons le droit de modifier cette politique de confidentialité. 
-                Toute modification importante vous sera notifiée par email et via la plateforme. 
-                Nous vous encourageons à consulter régulièrement cette page.
+                Nous nous réservons le droit de modifier cette politique de confidentialité. Toute
+                modification importante vous sera notifiée par email et via la plateforme. Nous vous
+                encourageons à consulter régulièrement cette page.
               </p>
             </CardContent>
           </Card>

@@ -1,7 +1,6 @@
-
-import { Question } from "@/data/compatibilityQuestions";
-import { Answer } from "@/types/compatibility";
-import MobileOptimizedQuestion from "../MobileOptimizedQuestion";
+import { Question } from '@/data/compatibilityQuestions';
+import { Answer } from '@/types/compatibility';
+import MobileOptimizedQuestion from '../MobileOptimizedQuestion';
 
 interface TestQuestionProps {
   question: Question;

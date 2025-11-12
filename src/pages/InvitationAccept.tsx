@@ -8,17 +8,17 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { 
-  CheckCircle, 
-  XCircle, 
-  Shield, 
-  Users, 
-  Eye, 
+import {
+  CheckCircle,
+  XCircle,
+  Shield,
+  Users,
+  Eye,
   MessageCircle,
   Clock,
   Heart,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { invitationAuthSchema } from '@/lib/validation';
@@ -54,7 +54,7 @@ const InvitationAccept = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    fullName: ''
+    fullName: '',
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -66,9 +66,9 @@ const InvitationAccept = () => {
     } else {
       setLoading(false);
       toast({
-        title: "Lien invalide",
+        title: 'Lien invalide',
         description: "Le lien d'invitation est manquant ou invalide",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   }, [token]);
@@ -105,7 +105,7 @@ const InvitationAccept = () => {
 
     try {
       console.log('🔍 [VALIDATION] Validating invitation with token:', token);
-      
+
       // First, check if invitation exists (any status)
       const { data: existingInvitation, error: checkError } = await supabase
         .from('family_members')
@@ -115,13 +115,15 @@ const InvitationAccept = () => {
 
       if (checkError) {
         console.error('❌ [VALIDATION] Database error:', checkError);
-        throw new Error('Erreur lors de la récupération de l\'invitation');
+        throw new Error("Erreur lors de la récupération de l'invitation");
       }
 
       // Check if invitation was already accepted
       if (existingInvitation?.invitation_status === 'accepted') {
         console.warn('⚠️ [VALIDATION] Invitation already accepted:', token);
-        throw new Error('Cette invitation a déjà été acceptée. Vous ne pouvez pas l\'utiliser à nouveau.');
+        throw new Error(
+          "Cette invitation a déjà été acceptée. Vous ne pouvez pas l'utiliser à nouveau."
+        );
       }
 
       // Now get the full pending invitation
@@ -133,15 +135,15 @@ const InvitationAccept = () => {
         .not('invitation_sent_at', 'is', null)
         .maybeSingle();
 
-      console.log('📋 [VALIDATION] Invitation query result:', { 
-        hasData: !!invitationData, 
+      console.log('📋 [VALIDATION] Invitation query result:', {
+        hasData: !!invitationData,
         error: invitationError,
-        data: invitationData 
+        data: invitationData,
       });
 
       if (invitationError) {
         console.error('❌ [VALIDATION] Database error:', invitationError);
-        throw new Error('Erreur lors de la récupération de l\'invitation');
+        throw new Error("Erreur lors de la récupération de l'invitation");
       }
 
       if (!invitationData) {
@@ -162,14 +164,19 @@ const InvitationAccept = () => {
 
       const data = {
         ...invitationData,
-        inviter: profileData || { full_name: 'Unknown', age: 0, location: 'Unknown', profession: 'Unknown' }
+        inviter: profileData || {
+          full_name: 'Unknown',
+          age: 0,
+          location: 'Unknown',
+          profession: 'Unknown',
+        },
       };
 
       // Check if invitation is expired (30 days for better UX)
       if (!data.invitation_sent_at) {
         throw new Error('Invitation invalide - date manquante');
       }
-      
+
       const sentAt = new Date(data.invitation_sent_at);
       const now = new Date();
       const diffDays = (now.getTime() - sentAt.getTime()) / (1000 * 3600 * 24);
@@ -180,7 +187,12 @@ const InvitationAccept = () => {
 
       setInvitation({
         ...data,
-        inviter: data.inviter || { full_name: 'Unknown', age: 0, location: 'Unknown', profession: 'Unknown' }
+        inviter: data.inviter || {
+          full_name: 'Unknown',
+          age: 0,
+          location: 'Unknown',
+          profession: 'Unknown',
+        },
       } as FamilyInvitation);
 
       if (!user) {
@@ -189,9 +201,9 @@ const InvitationAccept = () => {
     } catch (error) {
       console.error('Error validating invitation:', error);
       toast({
-        title: "Invitation invalide",
+        title: 'Invitation invalide',
         description: error instanceof Error ? error.message : "Impossible de valider l'invitation",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -211,12 +223,14 @@ const InvitationAccept = () => {
         .single();
 
       // If already accepted by this user, just redirect
-      if (existingInvitation?.invitation_status === 'accepted' && 
-          existingInvitation?.invited_user_id === user.id) {
+      if (
+        existingInvitation?.invitation_status === 'accepted' &&
+        existingInvitation?.invited_user_id === user.id
+      ) {
         console.log('✅ [INVITATION] Already accepted by this user, redirecting...');
         toast({
-          title: "Invitation déjà acceptée",
-          description: "Vous avez déjà accepté cette invitation. Redirection vers votre espace...",
+          title: 'Invitation déjà acceptée',
+          description: 'Vous avez déjà accepté cette invitation. Redirection vers votre espace...',
         });
         navigate('/family-supervision');
         return;
@@ -225,7 +239,7 @@ const InvitationAccept = () => {
       // Try to accept the invitation
       const { data, error } = await supabase.rpc('accept_family_invitation', {
         p_invitation_token: token,
-        p_invited_user_id: user.id
+        p_invited_user_id: user.id,
       });
 
       if (error || !data) {
@@ -238,18 +252,18 @@ const InvitationAccept = () => {
 
         if (recheckInvitation?.invitation_status === 'accepted') {
           toast({
-            title: "Invitation acceptée",
+            title: 'Invitation acceptée',
             description: "L'invitation a été acceptée avec succès",
           });
           navigate('/family-supervision');
           return;
         }
 
-        throw new Error('Impossible d\'accepter l\'invitation');
+        throw new Error("Impossible d'accepter l'invitation");
       }
 
       toast({
-        title: "Invitation acceptée !",
+        title: 'Invitation acceptée !',
         description: `Vous supervisez maintenant ${invitation.inviter.full_name}`,
       });
 
@@ -258,9 +272,9 @@ const InvitationAccept = () => {
     } catch (error) {
       console.error('Error accepting invitation:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: error instanceof Error ? error.message : "Impossible d'accepter l'invitation",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setProcessing(false);
@@ -280,20 +294,20 @@ const InvitationAccept = () => {
         email: authForm.email,
         password: authForm.password,
         confirmPassword: authMode === 'signup' ? authForm.confirmPassword : undefined,
-        fullName: authMode === 'signup' ? authForm.fullName : undefined
+        fullName: authMode === 'signup' ? authForm.fullName : undefined,
       });
 
       setProcessing(true);
-      
+
       if (authMode === 'signup') {
         const { error } = await signUp(
-          validatedData.email, 
-          validatedData.password, 
+          validatedData.email,
+          validatedData.password,
           validatedData.fullName || invitation.full_name,
           {
             user_type: 'wali',
             invitation_token: token || '',
-            supervised_user_id: invitation.user_id
+            supervised_user_id: invitation.user_id,
           }
         );
         if (error) throw error;
@@ -302,10 +316,10 @@ const InvitationAccept = () => {
         sessionStorage.setItem('pending_invitation_token', token || '');
 
         toast({
-          title: "Compte Wali créé",
-          description: "Bienvenue ! Complétez votre profil en 3 étapes rapides.",
+          title: 'Compte Wali créé',
+          description: 'Bienvenue ! Complétez votre profil en 3 étapes rapides.',
         });
-        
+
         // Redirect to Wali onboarding
         navigate('/wali-onboarding');
       } else {
@@ -322,17 +336,17 @@ const InvitationAccept = () => {
           }
         });
         setFormErrors(errors);
-        
+
         toast({
-          title: "Données invalides",
-          description: "Veuillez corriger les erreurs dans le formulaire",
-          variant: "destructive"
+          title: 'Données invalides',
+          description: 'Veuillez corriger les erreurs dans le formulaire',
+          variant: 'destructive',
         });
       } else {
         toast({
           title: "Erreur d'authentification",
           description: error instanceof Error ? error.message : "Erreur lors de l'authentification",
-          variant: "destructive"
+          variant: 'destructive',
         });
       }
     } finally {
@@ -342,16 +356,16 @@ const InvitationAccept = () => {
 
   const getRelationshipLabel = (relationship: string) => {
     const labels: Record<string, string> = {
-      'father': 'Père',
-      'mother': 'Mère',
-      'brother': 'Frère',
-      'sister': 'Sœur',
-      'uncle': 'Oncle',
-      'aunt': 'Tante',
-      'cousin': 'Cousin/Cousine',
-      'wali': 'Wali',
-      'family_friend': 'Ami de la famille',
-      'other': 'Autre'
+      father: 'Père',
+      mother: 'Mère',
+      brother: 'Frère',
+      sister: 'Sœur',
+      uncle: 'Oncle',
+      aunt: 'Tante',
+      cousin: 'Cousin/Cousine',
+      wali: 'Wali',
+      family_friend: 'Ami de la famille',
+      other: 'Autre',
     };
     return labels[relationship] || relationship;
   };
@@ -392,9 +406,7 @@ const InvitationAccept = () => {
         <div className="container mx-auto max-w-md">
           <Card>
             <CardHeader>
-              <CardTitle className="text-center">
-                Authentification Requise
-              </CardTitle>
+              <CardTitle className="text-center">Authentification Requise</CardTitle>
               <p className="text-sm text-muted-foreground text-center">
                 Vous devez vous connecter ou créer un compte pour accepter cette invitation
               </p>
@@ -426,7 +438,7 @@ const InvitationAccept = () => {
                     id="email"
                     type="email"
                     value={authForm.email}
-                    onChange={(e) => setAuthForm(prev => ({ ...prev, email: e.target.value }))}
+                    onChange={(e) => setAuthForm((prev) => ({ ...prev, email: e.target.value }))}
                     className={`mt-1 ${formErrors.email ? 'border-red-500' : ''}`}
                     required
                     disabled={processing}
@@ -449,7 +461,9 @@ const InvitationAccept = () => {
                       id="fullName"
                       type="text"
                       value={authForm.fullName}
-                      onChange={(e) => setAuthForm(prev => ({ ...prev, fullName: e.target.value }))}
+                      onChange={(e) =>
+                        setAuthForm((prev) => ({ ...prev, fullName: e.target.value }))
+                      }
                       className={`mt-1 ${formErrors.fullName ? 'border-red-500' : ''}`}
                       placeholder={invitation.full_name}
                       disabled={processing}
@@ -472,7 +486,7 @@ const InvitationAccept = () => {
                     id="password"
                     type="password"
                     value={authForm.password}
-                    onChange={(e) => setAuthForm(prev => ({ ...prev, password: e.target.value }))}
+                    onChange={(e) => setAuthForm((prev) => ({ ...prev, password: e.target.value }))}
                     className={`mt-1 ${formErrors.password ? 'border-red-500' : ''}`}
                     required
                     disabled={processing}
@@ -500,7 +514,9 @@ const InvitationAccept = () => {
                       id="confirmPassword"
                       type="password"
                       value={authForm.confirmPassword}
-                      onChange={(e) => setAuthForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      onChange={(e) =>
+                        setAuthForm((prev) => ({ ...prev, confirmPassword: e.target.value }))
+                      }
                       className={`mt-1 ${formErrors.confirmPassword ? 'border-red-500' : ''}`}
                       required
                       disabled={processing}
@@ -537,10 +553,11 @@ const InvitationAccept = () => {
             </div>
             <CardTitle className="text-2xl">Invitation à la Supervision Familiale</CardTitle>
             <p className="text-muted-foreground">
-              Vous avez été invité à superviser les interactions matrimoniales selon les principes islamiques
+              Vous avez été invité à superviser les interactions matrimoniales selon les principes
+              islamiques
             </p>
           </CardHeader>
-          
+
           <CardContent className="space-y-6">
             {/* Invitation Details */}
             <div className="bg-gradient-to-r from-emerald/5 to-gold/5 p-6 rounded-lg border border-emerald/10">
@@ -548,16 +565,20 @@ const InvitationAccept = () => {
                 <Users className="h-5 w-5 text-emerald" />
                 Détails de l'invitation
               </h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Personne à superviser</label>
+                  <label className="text-sm font-medium text-muted-foreground">
+                    Personne à superviser
+                  </label>
                   <p className="font-semibold">{invitation.inviter.full_name}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-muted-foreground">Votre rôle</label>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold">{getRelationshipLabel(invitation.relationship)}</span>
+                    <span className="font-semibold">
+                      {getRelationshipLabel(invitation.relationship)}
+                    </span>
                     {invitation.is_wali && (
                       <Badge className="bg-gold/10 text-gold-dark border-gold/20">
                         <Shield className="h-3 w-3 mr-1" />
@@ -589,28 +610,36 @@ const InvitationAccept = () => {
                   <Eye className="h-5 w-5 text-blue-500" />
                   <div>
                     <p className="font-medium">Voir le profil</p>
-                    <p className="text-xs text-muted-foreground">Accès aux informations du profil</p>
+                    <p className="text-xs text-muted-foreground">
+                      Accès aux informations du profil
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <MessageCircle className="h-5 w-5 text-purple-500" />
                   <div>
                     <p className="font-medium">Superviser les conversations</p>
-                    <p className="text-xs text-muted-foreground">Recevoir des alertes de modération</p>
+                    <p className="text-xs text-muted-foreground">
+                      Recevoir des alertes de modération
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <Heart className="h-5 w-5 text-pink-500" />
                   <div>
                     <p className="font-medium">Approuver les matches</p>
-                    <p className="text-xs text-muted-foreground">Donner votre avis sur les compatibilités</p>
+                    <p className="text-xs text-muted-foreground">
+                      Donner votre avis sur les compatibilités
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                   <Shield className="h-5 w-5 text-emerald" />
                   <div>
                     <p className="font-medium">Guidance islamique</p>
-                    <p className="text-xs text-muted-foreground">Conseiller selon les valeurs islamiques</p>
+                    <p className="text-xs text-muted-foreground">
+                      Conseiller selon les valeurs islamiques
+                    </p>
                   </div>
                 </div>
               </div>
@@ -622,8 +651,9 @@ const InvitationAccept = () => {
             <div className="bg-gradient-to-r from-gold/5 to-emerald/5 p-4 rounded-lg border border-gold/10">
               <h4 className="font-medium text-sm mb-2 text-emerald">Guidance Islamique</h4>
               <p className="text-sm text-muted-foreground">
-                En acceptant cette invitation, vous vous engagez à guider et superviser selon les principes islamiques, 
-                en favorisant des relations halal et en préservant la pudeur (haya) et les bonnes mœurs.
+                En acceptant cette invitation, vous vous engagez à guider et superviser selon les
+                principes islamiques, en favorisant des relations halal et en préservant la pudeur
+                (haya) et les bonnes mœurs.
               </p>
             </div>
 
@@ -638,11 +668,7 @@ const InvitationAccept = () => {
                 <CheckCircle className="h-4 w-4 mr-2" />
                 Accepter l'invitation
               </Button>
-              <Button
-                variant="outline"
-                onClick={() => navigate('/')}
-                className="flex-1"
-              >
+              <Button variant="outline" onClick={() => navigate('/')} className="flex-1">
                 Décliner
               </Button>
             </div>
@@ -650,7 +676,8 @@ const InvitationAccept = () => {
             <div className="text-center">
               <p className="text-xs text-muted-foreground">
                 <Clock className="h-3 w-3 inline mr-1" />
-                Invitation envoyée le {new Date(invitation.invitation_sent_at).toLocaleDateString('fr-FR')}
+                Invitation envoyée le{' '}
+                {new Date(invitation.invitation_sent_at).toLocaleDateString('fr-FR')}
               </p>
             </div>
           </CardContent>

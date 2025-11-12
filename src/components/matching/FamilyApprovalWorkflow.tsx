@@ -10,8 +10,29 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Shield, Heart, Users, Clock, CheckCircle, XCircle, MessageSquare, Star, MapPin, Calendar } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import {
+  Shield,
+  Heart,
+  Users,
+  Clock,
+  CheckCircle,
+  XCircle,
+  MessageSquare,
+  Star,
+  MapPin,
+  Calendar,
+} from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface PendingMatch {
@@ -70,12 +91,13 @@ const FamilyApprovalWorkflow = () => {
 
   const fetchMatchesForApproval = async () => {
     if (!user) return;
-    
+
     try {
       // Fetch matches that need family approval
       const { data: matchesData } = await supabase
         .from('matches')
-        .select(`
+        .select(
+          `
           id,
           user1_id,
           user2_id,
@@ -85,7 +107,8 @@ const FamilyApprovalWorkflow = () => {
           family1_approved,
           family2_approved,
           is_mutual
-        `)
+        `
+        )
         .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
         .eq('is_mutual', true)
         .eq('family_supervision_required', true);
@@ -95,7 +118,7 @@ const FamilyApprovalWorkflow = () => {
         const matchesWithProfiles = await Promise.all(
           matchesData.map(async (match) => {
             const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
-            
+
             const { data: profileData } = await supabase
               .from('profiles')
               .select('user_id, full_name, age, location, profession, avatar_url, bio')
@@ -104,27 +127,27 @@ const FamilyApprovalWorkflow = () => {
 
             // Get real compatibility details using unified compatibility
             const compatibility_details = await calculateDetailedCompatibility(otherUserId);
-            
+
             const formattedDetails = {
               islamic_score: compatibility_details.islamic_score,
               cultural_score: compatibility_details.cultural_score,
               personality_score: compatibility_details.personality_score,
-              shared_values: compatibility_details.matching_reasons.slice(0, 3)
+              shared_values: compatibility_details.matching_reasons.slice(0, 3),
             };
 
             return {
               ...match,
               other_user: profileData,
-              compatibility_details: formattedDetails
+              compatibility_details: formattedDetails,
             };
           })
         );
 
         // Separate pending and approved matches
-        const pending = matchesWithProfiles.filter(match => 
+        const pending = matchesWithProfiles.filter((match) =>
           match.user1_id === user.id ? !match.family1_approved : !match.family2_approved
         );
-        const approved = matchesWithProfiles.filter(match => 
+        const approved = matchesWithProfiles.filter((match) =>
           match.user1_id === user.id ? match.family1_approved : match.family2_approved
         );
 
@@ -134,9 +157,9 @@ const FamilyApprovalWorkflow = () => {
     } catch (error) {
       console.error('Error fetching matches for approval:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les matches en attente",
-        variant: "destructive",
+        title: 'Erreur',
+        description: 'Impossible de charger les matches en attente',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -149,7 +172,8 @@ const FamilyApprovalWorkflow = () => {
     try {
       const { data: reviewsData } = await supabase
         .from('family_reviews')
-        .select(`
+        .select(
+          `
           id,
           match_id,
           family_member_id,
@@ -160,11 +184,15 @@ const FamilyApprovalWorkflow = () => {
             full_name,
             relationship
           )
-        `)
-        .in('match_id', pendingMatches.map(m => m.id));
+        `
+        )
+        .in(
+          'match_id',
+          pendingMatches.map((m) => m.id)
+        );
 
       if (reviewsData) {
-        const reviews: FamilyReview[] = reviewsData.map(review => ({
+        const reviews: FamilyReview[] = reviewsData.map((review) => ({
           id: review.id,
           match_id: review.match_id,
           family_member_id: review.family_member_id,
@@ -172,7 +200,7 @@ const FamilyApprovalWorkflow = () => {
           notes: review.notes || undefined,
           reviewed_at: review.reviewed_at,
           reviewer_name: (review.family_members as any)?.full_name || 'Famille',
-          reviewer_relationship: (review.family_members as any)?.relationship || 'Membre'
+          reviewer_relationship: (review.family_members as any)?.relationship || 'Membre',
         }));
 
         setFamilyReviews(reviews);
@@ -183,14 +211,14 @@ const FamilyApprovalWorkflow = () => {
   };
 
   const handleFamilyDecision = async (
-    matchId: string, 
+    matchId: string,
     decision: 'approved' | 'rejected' | 'needs_discussion'
   ) => {
     if (!user) return;
 
     try {
       // Update match approval status
-      const match = pendingMatches.find(m => m.id === matchId);
+      const match = pendingMatches.find((m) => m.id === matchId);
       if (!match) return;
 
       const updateField = match.user1_id === user.id ? 'family1_approved' : 'family2_approved';
@@ -212,51 +240,53 @@ const FamilyApprovalWorkflow = () => {
         .maybeSingle();
 
       if (familyMember) {
-        const { error: reviewError } = await supabase
-          .from('family_reviews')
-          .insert({
-            match_id: matchId,
-            family_member_id: familyMember.id,
-            status: decision,
-            notes: reviewNotes[matchId] || null
-          });
+        const { error: reviewError } = await supabase.from('family_reviews').insert({
+          match_id: matchId,
+          family_member_id: familyMember.id,
+          status: decision,
+          notes: reviewNotes[matchId] || null,
+        });
 
         if (reviewError) throw reviewError;
       }
 
       // Refresh data
       await fetchMatchesForApproval();
-      
+
       toast({
-        title: decision === 'approved' ? "Match approuvé" : "Décision enregistrée",
-        description: decision === 'approved' 
-          ? "Le match a été approuvé par la famille" 
-          : "Votre décision a été enregistrée",
+        title: decision === 'approved' ? 'Match approuvé' : 'Décision enregistrée',
+        description:
+          decision === 'approved'
+            ? 'Le match a été approuvé par la famille'
+            : 'Votre décision a été enregistrée',
       });
 
       // Clear notes
-      setReviewNotes(prev => {
+      setReviewNotes((prev) => {
         const updated = { ...prev };
         delete updated[matchId];
         return updated;
       });
-
     } catch (error) {
       console.error('Error updating family decision:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'enregistrer la décision",
-        variant: "destructive",
+        variant: 'destructive',
       });
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'approved': return 'text-success bg-success/10 border-success/20';
-      case 'rejected': return 'text-destructive bg-destructive/10 border-destructive/20';
-      case 'needs_discussion': return 'text-warning bg-warning/10 border-warning/20';
-      default: return 'text-muted-foreground bg-muted border-border';
+      case 'approved':
+        return 'text-success bg-success/10 border-success/20';
+      case 'rejected':
+        return 'text-destructive bg-destructive/10 border-destructive/20';
+      case 'needs_discussion':
+        return 'text-warning bg-warning/10 border-warning/20';
+      default:
+        return 'text-muted-foreground bg-muted border-border';
     }
   };
 
@@ -340,7 +370,7 @@ const FamilyApprovalWorkflow = () => {
                         {match.other_user.full_name?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    
+
                     <div className="flex-1 space-y-2">
                       <div>
                         <h4 className="font-semibold text-lg">{match.other_user.full_name}</h4>
@@ -353,11 +383,9 @@ const FamilyApprovalWorkflow = () => {
                           <span>{match.other_user.profession}</span>
                         </div>
                       </div>
-                      
+
                       {match.other_user.bio && (
-                        <p className="text-sm text-muted-foreground">
-                          {match.other_user.bio}
-                        </p>
+                        <p className="text-sm text-muted-foreground">{match.other_user.bio}</p>
                       )}
                     </div>
 
@@ -377,25 +405,31 @@ const FamilyApprovalWorkflow = () => {
                     </h5>
                     <div className="grid grid-cols-3 gap-4 text-sm">
                       <div className="text-center">
-                        <div className={`text-lg font-bold ${getScoreColor(match.compatibility_details.islamic_score)}`}>
+                        <div
+                          className={`text-lg font-bold ${getScoreColor(match.compatibility_details.islamic_score)}`}
+                        >
                           {match.compatibility_details.islamic_score}%
                         </div>
                         <p className="text-muted-foreground">Islamique</p>
                       </div>
                       <div className="text-center">
-                        <div className={`text-lg font-bold ${getScoreColor(match.compatibility_details.cultural_score)}`}>
+                        <div
+                          className={`text-lg font-bold ${getScoreColor(match.compatibility_details.cultural_score)}`}
+                        >
                           {match.compatibility_details.cultural_score}%
                         </div>
                         <p className="text-muted-foreground">Culturel</p>
                       </div>
                       <div className="text-center">
-                        <div className={`text-lg font-bold ${getScoreColor(match.compatibility_details.personality_score)}`}>
+                        <div
+                          className={`text-lg font-bold ${getScoreColor(match.compatibility_details.personality_score)}`}
+                        >
                           {match.compatibility_details.personality_score}%
                         </div>
                         <p className="text-muted-foreground">Personnalité</p>
                       </div>
                     </div>
-                    
+
                     {match.compatibility_details.shared_values.length > 0 && (
                       <div className="mt-3">
                         <p className="text-sm font-medium mb-2">Valeurs partagées:</p>
@@ -418,7 +452,9 @@ const FamilyApprovalWorkflow = () => {
                     <Textarea
                       placeholder="Ajoutez vos commentaires ou préoccupations sur ce match..."
                       value={reviewNotes[match.id] || ''}
-                      onChange={(e) => setReviewNotes(prev => ({ ...prev, [match.id]: e.target.value }))}
+                      onChange={(e) =>
+                        setReviewNotes((prev) => ({ ...prev, [match.id]: e.target.value }))
+                      }
                       className="min-h-[80px]"
                     />
                   </div>
@@ -436,12 +472,14 @@ const FamilyApprovalWorkflow = () => {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Approuver ce match ?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            En approuvant ce match, vous autorisez la communication entre votre proche et cette personne selon les valeurs islamiques de supervision familiale.
+                            En approuvant ce match, vous autorisez la communication entre votre
+                            proche et cette personne selon les valeurs islamiques de supervision
+                            familiale.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Annuler</AlertDialogCancel>
-                          <AlertDialogAction 
+                          <AlertDialogAction
                             onClick={() => handleFamilyDecision(match.id, 'approved')}
                             className="bg-success hover:bg-success/90"
                           >
@@ -451,8 +489,8 @@ const FamilyApprovalWorkflow = () => {
                       </AlertDialogContent>
                     </AlertDialog>
 
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       className="flex-1"
                       onClick={() => handleFamilyDecision(match.id, 'needs_discussion')}
                     >
@@ -471,12 +509,13 @@ const FamilyApprovalWorkflow = () => {
                         <AlertDialogHeader>
                           <AlertDialogTitle>Refuser ce match ?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            Cette action refusera définitivement ce match. Êtes-vous sûr de votre décision ?
+                            Cette action refusera définitivement ce match. Êtes-vous sûr de votre
+                            décision ?
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Annuler</AlertDialogCancel>
-                          <AlertDialogAction 
+                          <AlertDialogAction
                             onClick={() => handleFamilyDecision(match.id, 'rejected')}
                             className="bg-red-600 hover:bg-red-700"
                           >
@@ -520,7 +559,7 @@ const FamilyApprovalWorkflow = () => {
                         {match.other_user.full_name?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    
+
                     <div className="flex-1">
                       <h4 className="font-semibold">{match.other_user.full_name}</h4>
                       <p className="text-sm text-muted-foreground">
@@ -533,9 +572,7 @@ const FamilyApprovalWorkflow = () => {
                       Approuvé par la famille
                     </Badge>
 
-                    <Button>
-                      Voir la conversation
-                    </Button>
+                    <Button>Voir la conversation</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -566,19 +603,21 @@ const FamilyApprovalWorkflow = () => {
                           {review.reviewer_relationship}
                         </Badge>
                         <Badge className={getStatusColor(review.status)}>
-                          {review.status === 'approved' ? 'Approuvé' :
-                           review.status === 'rejected' ? 'Refusé' : 'Discussion nécessaire'}
+                          {review.status === 'approved'
+                            ? 'Approuvé'
+                            : review.status === 'rejected'
+                              ? 'Refusé'
+                              : 'Discussion nécessaire'}
                         </Badge>
                       </div>
-                      
+
                       {review.notes && (
-                        <p className="text-sm text-muted-foreground mb-2">
-                          "{review.notes}"
-                        </p>
+                        <p className="text-sm text-muted-foreground mb-2">"{review.notes}"</p>
                       )}
-                      
+
                       <p className="text-xs text-muted-foreground">
-                        {new Date(review.reviewed_at).toLocaleDateString('fr-FR')} à {new Date(review.reviewed_at).toLocaleTimeString('fr-FR')}
+                        {new Date(review.reviewed_at).toLocaleDateString('fr-FR')} à{' '}
+                        {new Date(review.reviewed_at).toLocaleTimeString('fr-FR')}
                       </p>
                     </div>
                   </div>

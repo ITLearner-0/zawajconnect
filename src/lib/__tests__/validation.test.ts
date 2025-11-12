@@ -12,11 +12,7 @@ import {
 describe('Validation Schemas', () => {
   describe('emailSchema', () => {
     it('should accept valid emails', () => {
-      const validEmails = [
-        'user@example.com',
-        'test.user@domain.co.uk',
-        'user+tag@example.com',
-      ];
+      const validEmails = ['user@example.com', 'test.user@domain.co.uk', 'user+tag@example.com'];
 
       validEmails.forEach((email) => {
         const result = emailSchema.safeParse(email);
@@ -25,12 +21,7 @@ describe('Validation Schemas', () => {
     });
 
     it('should reject invalid emails', () => {
-      const invalidEmails = [
-        'invalid',
-        '@example.com',
-        'user@',
-        'user @example.com',
-      ];
+      const invalidEmails = ['invalid', '@example.com', 'user@', 'user @example.com'];
 
       invalidEmails.forEach((email) => {
         const result = emailSchema.safeParse(email);
@@ -55,11 +46,7 @@ describe('Validation Schemas', () => {
 
   describe('passwordSchema', () => {
     it('should accept strong passwords', () => {
-      const validPasswords = [
-        'Password123',
-        'StrongP@ss1',
-        'MySecure1Pass',
-      ];
+      const validPasswords = ['Password123', 'StrongP@ss1', 'MySecure1Pass'];
 
       validPasswords.forEach((password) => {
         const result = passwordSchema.safeParse(password);
@@ -68,12 +55,7 @@ describe('Validation Schemas', () => {
     });
 
     it('should reject weak passwords', () => {
-      const weakPasswords = [
-        'short',
-        'nouppercaseordigit',
-        'NOLOWERCASE1',
-        'NoDigits',
-      ];
+      const weakPasswords = ['short', 'nouppercaseordigit', 'NOLOWERCASE1', 'NoDigits'];
 
       weakPasswords.forEach((password) => {
         const result = passwordSchema.safeParse(password);
@@ -92,13 +74,7 @@ describe('Validation Schemas', () => {
 
   describe('nameSchema', () => {
     it('should accept valid names', () => {
-      const validNames = [
-        'John Doe',
-        'Marie-Claire',
-        "O'Brien",
-        'José García',
-        'François',
-      ];
+      const validNames = ['John Doe', 'Marie-Claire', "O'Brien", 'José García', 'François'];
 
       validNames.forEach((name) => {
         const result = nameSchema.safeParse(name);
@@ -129,9 +105,7 @@ describe('Validation Schemas', () => {
     });
 
     it('should reject messages with script tags', () => {
-      const result = messageSchema.safeParse(
-        'Hello <script>alert("xss")</script>'
-      );
+      const result = messageSchema.safeParse('Hello <script>alert("xss")</script>');
       expect(result.success).toBe(false);
     });
 
@@ -141,16 +115,12 @@ describe('Validation Schemas', () => {
     });
 
     it('should reject messages with event handlers', () => {
-      const result = messageSchema.safeParse(
-        '<img src=x onerror=alert(1)>'
-      );
+      const result = messageSchema.safeParse('<img src=x onerror=alert(1)>');
       expect(result.success).toBe(false);
     });
 
     it('should reject messages with iframe tags', () => {
-      const result = messageSchema.safeParse(
-        'Test <iframe src="evil.com"></iframe>'
-      );
+      const result = messageSchema.safeParse('Test <iframe src="evil.com"></iframe>');
       expect(result.success).toBe(false);
     });
 

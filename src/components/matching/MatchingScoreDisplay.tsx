@@ -11,13 +11,13 @@ interface MatchingScoreDisplayProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export const MatchingScoreDisplay = ({ 
-  islamicScore, 
-  culturalScore, 
-  personalityScore, 
+export const MatchingScoreDisplay = ({
+  islamicScore,
+  culturalScore,
+  personalityScore,
   overallScore,
   showLabels = true,
-  size = 'md'
+  size = 'md',
 }: MatchingScoreDisplayProps) => {
   const getScoreColor = (score: number) => {
     if (score >= 85) return 'text-success';
@@ -38,20 +38,20 @@ export const MatchingScoreDisplay = ({
       progress: 'h-1',
       text: 'text-xs',
       icon: 'h-3 w-3',
-      badge: 'text-xs'
+      badge: 'text-xs',
     },
     md: {
       progress: 'h-2',
       text: 'text-sm',
       icon: 'h-4 w-4',
-      badge: 'text-sm'
+      badge: 'text-sm',
     },
     lg: {
       progress: 'h-3',
       text: 'text-base',
       icon: 'h-5 w-5',
-      badge: 'text-base'
-    }
+      badge: 'text-base',
+    },
   };
 
   const classes = sizeClasses[size];
@@ -69,42 +69,39 @@ export const MatchingScoreDisplay = ({
       {/* Individual Scores */}
       <div className="grid grid-cols-3 gap-3">
         <div className="text-center">
-          <div className={`flex items-center justify-center gap-1 mb-1 ${getScoreColor(islamicScore)}`}>
+          <div
+            className={`flex items-center justify-center gap-1 mb-1 ${getScoreColor(islamicScore)}`}
+          >
             <Shield className={classes.icon} />
             {showLabels && <span className={`font-medium ${classes.text}`}>Islamique</span>}
           </div>
-          <Progress 
-            value={islamicScore} 
-            className={classes.progress}
-          />
+          <Progress value={islamicScore} className={classes.progress} />
           <span className={`${classes.text} ${getScoreColor(islamicScore)} font-semibold`}>
             {islamicScore}%
           </span>
         </div>
 
         <div className="text-center">
-          <div className={`flex items-center justify-center gap-1 mb-1 ${getScoreColor(culturalScore)}`}>
+          <div
+            className={`flex items-center justify-center gap-1 mb-1 ${getScoreColor(culturalScore)}`}
+          >
             <Users className={classes.icon} />
             {showLabels && <span className={`font-medium ${classes.text}`}>Culturel</span>}
           </div>
-          <Progress 
-            value={culturalScore} 
-            className={classes.progress}
-          />
+          <Progress value={culturalScore} className={classes.progress} />
           <span className={`${classes.text} ${getScoreColor(culturalScore)} font-semibold`}>
             {culturalScore}%
           </span>
         </div>
 
         <div className="text-center">
-          <div className={`flex items-center justify-center gap-1 mb-1 ${getScoreColor(personalityScore)}`}>
+          <div
+            className={`flex items-center justify-center gap-1 mb-1 ${getScoreColor(personalityScore)}`}
+          >
             <Heart className={classes.icon} />
             {showLabels && <span className={`font-medium ${classes.text}`}>Personnalité</span>}
           </div>
-          <Progress 
-            value={personalityScore} 
-            className={classes.progress}
-          />
+          <Progress value={personalityScore} className={classes.progress} />
           <span className={`${classes.text} ${getScoreColor(personalityScore)} font-semibold`}>
             {personalityScore}%
           </span>

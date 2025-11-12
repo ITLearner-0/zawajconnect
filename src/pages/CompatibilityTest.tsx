@@ -18,34 +18,36 @@ const CompatibilityTest = () => {
     };
 
     window.addEventListener('auth:session-expired', handleSessionExpired);
-    
+
     // Check if user just logged back in and has backup data
     if (user && !loading) {
       const userEmail = user?.email || 'anonymous';
       const sessionId = localStorage.getItem('onboarding_session_id') || 'unknown';
       const today = new Date().toISOString().split('T')[0];
-      
+
       const backupKeys = [
         `emergency_compatibility_${sessionId}`,
         `emergency_compatibility_${userEmail.replace('@', '_')}`,
-        `emergency_compatibility_${today}`
+        `emergency_compatibility_${today}`,
       ];
-      
-      const hasBackup = backupKeys.some(key => {
+
+      const hasBackup = backupKeys.some((key) => {
         try {
           const backup = localStorage.getItem(key);
           if (backup) {
             const parsed = JSON.parse(backup);
             const backupAge = Date.now() - parsed.timestamp;
             // Show recovery if backup is less than 24 hours old
-            return backupAge < 24 * 60 * 60 * 1000 && parsed.data && Object.keys(parsed.data).length > 0;
+            return (
+              backupAge < 24 * 60 * 60 * 1000 && parsed.data && Object.keys(parsed.data).length > 0
+            );
           }
         } catch (error) {
           console.error('Error checking backup for key:', key);
         }
         return false;
       });
-      
+
       if (hasBackup) {
         setShowRecoveryModal(true);
       }
@@ -78,13 +80,11 @@ const CompatibilityTest = () => {
       <Header />
       <main className="pt-20">
         <ErrorBoundaryWrapper>
-          <CompatibilityQuestionnaire 
-            onComplete={handleComplete} 
-          />
+          <CompatibilityQuestionnaire onComplete={handleComplete} />
         </ErrorBoundaryWrapper>
       </main>
       <Footer />
-      
+
       <SessionRecoveryModal
         isOpen={showRecoveryModal}
         onRecover={() => {
@@ -97,14 +97,14 @@ const CompatibilityTest = () => {
           const userEmail = user?.email || 'anonymous';
           const sessionId = localStorage.getItem('onboarding_session_id') || 'unknown';
           const today = new Date().toISOString().split('T')[0];
-          
+
           const keysToClean = [
             `emergency_compatibility_${sessionId}`,
             `emergency_compatibility_${userEmail.replace('@', '_')}`,
-            `emergency_compatibility_${today}`
+            `emergency_compatibility_${today}`,
           ];
-          
-          keysToClean.forEach(key => localStorage.removeItem(key));
+
+          keysToClean.forEach((key) => localStorage.removeItem(key));
         }}
       />
     </div>

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { ChatRequest } from '@/types/wali';
@@ -29,7 +28,7 @@ const ChatRequestsPanel: React.FC<ChatRequestsPanelProps> = ({
   onApprove,
   onReject,
   onAddNote,
-  loading = false
+  loading = false,
 }) => {
   const [selectedRequest, setSelectedRequest] = useState<ChatRequest | null>(null);
   const [note, setNote] = useState('');
@@ -48,8 +47,8 @@ const ChatRequestsPanel: React.FC<ChatRequestsPanelProps> = ({
     setShowNoteDialog(true);
   };
 
-  const pendingRequests = chatRequests.filter(req => req.status === 'pending');
-  const otherRequests = chatRequests.filter(req => req.status !== 'pending');
+  const pendingRequests = chatRequests.filter((req) => req.status === 'pending');
+  const otherRequests = chatRequests.filter((req) => req.status !== 'pending');
 
   if (loading) {
     return (
@@ -83,17 +82,21 @@ const ChatRequestsPanel: React.FC<ChatRequestsPanelProps> = ({
                   <div className="flex items-start gap-4">
                     <Avatar>
                       <AvatarFallback className="bg-primary/10">
-                        {request.requester_profile?.first_name?.[0] || "U"}
+                        {request.requester_profile?.first_name?.[0] || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    
+
                     <div className="flex-1">
                       <div className="flex justify-between mb-1">
                         <div>
                           <span className="font-medium">
-                            {request.requester_profile?.first_name} {request.requester_profile?.last_name}
+                            {request.requester_profile?.first_name}{' '}
+                            {request.requester_profile?.last_name}
                           </span>
-                          <Badge className="ml-2" variant={request.request_type === 'video' ? 'destructive' : 'outline'}>
+                          <Badge
+                            className="ml-2"
+                            variant={request.request_type === 'video' ? 'destructive' : 'outline'}
+                          >
                             {request.request_type === 'video' ? (
                               <div className="flex items-center">
                                 <VideoIcon className="h-3 w-3 mr-1" />
@@ -112,20 +115,16 @@ const ChatRequestsPanel: React.FC<ChatRequestsPanelProps> = ({
                           {formatDistanceToNow(new Date(request.requested_at), { addSuffix: true })}
                         </span>
                       </div>
-                      
+
                       <p className="text-sm text-gray-600 mb-3">
-                        {request.message || "No message provided"}
+                        {request.message || 'No message provided'}
                       </p>
-                      
+
                       <div className="flex justify-between items-center">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => openNoteDialog(request)}
-                        >
+                        <Button variant="outline" size="sm" onClick={() => openNoteDialog(request)}>
                           Add Note
                         </Button>
-                        
+
                         <div className="flex space-x-2">
                           <Button
                             variant="outline"
@@ -154,7 +153,7 @@ const ChatRequestsPanel: React.FC<ChatRequestsPanelProps> = ({
           </div>
         </div>
       )}
-      
+
       {otherRequests.length > 0 && (
         <div>
           <h3 className="text-lg font-medium mb-4">Recent Requests</h3>
@@ -165,24 +164,28 @@ const ChatRequestsPanel: React.FC<ChatRequestsPanelProps> = ({
                   <div className="flex items-start gap-3">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="text-xs bg-primary/10">
-                        {request.requester_profile?.first_name?.[0] || "U"}
+                        {request.requester_profile?.first_name?.[0] || 'U'}
                       </AvatarFallback>
                     </Avatar>
-                    
+
                     <div className="flex-1">
                       <div className="flex justify-between mb-1">
                         <span className="font-medium text-sm">
-                          {request.requester_profile?.first_name} {request.requester_profile?.last_name}
+                          {request.requester_profile?.first_name}{' '}
+                          {request.requester_profile?.last_name}
                         </span>
-                        <Badge variant={request.status === 'approved' ? 'default' : 'secondary'} className="text-xs">
+                        <Badge
+                          variant={request.status === 'approved' ? 'default' : 'secondary'}
+                          className="text-xs"
+                        >
                           {request.status === 'approved' ? 'Approved' : 'Rejected'}
                         </Badge>
                       </div>
-                      
+
                       <div className="text-xs text-muted-foreground mb-1">
                         {format(new Date(request.requested_at), 'MMM d, yyyy')}
                       </div>
-                      
+
                       {request.wali_notes && (
                         <p className="text-xs bg-muted p-2 rounded mt-2">
                           <span className="font-medium">Note:</span> {request.wali_notes}
@@ -196,7 +199,7 @@ const ChatRequestsPanel: React.FC<ChatRequestsPanelProps> = ({
           </div>
         </div>
       )}
-      
+
       <Dialog open={showNoteDialog} onOpenChange={setShowNoteDialog}>
         <DialogContent>
           <DialogHeader>
@@ -212,9 +215,7 @@ const ChatRequestsPanel: React.FC<ChatRequestsPanelProps> = ({
             <Button variant="outline" onClick={() => setShowNoteDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleNoteSubmit}>
-              Save Note
-            </Button>
+            <Button onClick={handleNoteSubmit}>Save Note</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

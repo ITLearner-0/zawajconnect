@@ -1,11 +1,10 @@
-
-import { CompatibilityMatch } from "@/types/compatibility";
-import { MatchingFilters, UserResultWithProfile } from "../types/matchingTypes";
-import { ValidatedUserResults } from "./dataFetchingService";
-import { matchingFiltersService } from "./matchingFiltersService";
-import { compatibilityCalculator } from "./compatibilityCalculator";
-import { cacheService } from "./cacheService";
-import { logError, logInfo } from "./loggingService";
+import { CompatibilityMatch } from '@/types/compatibility';
+import { MatchingFilters, UserResultWithProfile } from '../types/matchingTypes';
+import { ValidatedUserResults } from './dataFetchingService';
+import { matchingFiltersService } from './matchingFiltersService';
+import { compatibilityCalculator } from './compatibilityCalculator';
+import { cacheService } from './cacheService';
+import { logError, logInfo } from './loggingService';
 
 export function processMatches(
   myResults: ValidatedUserResults,
@@ -18,7 +17,7 @@ export function processMatches(
 
     // Calculate compatibility scores
     const matches = filteredUsers
-      .map(user => {
+      .map((user) => {
         try {
           return compatibilityCalculator.calculateCompatibilityScore(myResults, user);
         } catch (error) {
@@ -27,11 +26,11 @@ export function processMatches(
         }
       })
       .filter((match): match is CompatibilityMatch => match !== null)
-      .filter(match => match.score >= (filters?.minCompatibilityScore || 50))
+      .filter((match) => match.score >= (filters?.minCompatibilityScore || 50))
       .sort((a, b) => b.score - a.score);
 
     logInfo('calculateScores', `Generated ${matches.length} final matches`);
-    
+
     return matches;
   } catch (error) {
     logError('calculateScores', error as Error);
@@ -39,14 +38,20 @@ export function processMatches(
   }
 }
 
-export function finalizePipeline(matches: CompatibilityMatch[], userId: string): CompatibilityMatch[] {
+export function finalizePipeline(
+  matches: CompatibilityMatch[],
+  userId: string
+): CompatibilityMatch[] {
   const finalMatches = matches.slice(0, 20);
-  
+
   // Log cache statistics
   const cacheStats = cacheService.getCacheStats();
   logInfo('cacheStatistics', 'Current cache state', cacheStats);
-  
-  logInfo('findCompatibilityMatches', `Returning ${finalMatches.length} matches for user: ${userId}`);
-  
+
+  logInfo(
+    'findCompatibilityMatches',
+    `Returning ${finalMatches.length} matches for user: ${userId}`
+  );
+
   return finalMatches;
 }

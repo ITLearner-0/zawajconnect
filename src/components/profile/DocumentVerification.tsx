@@ -1,9 +1,14 @@
-
 import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Upload, FileText, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -19,7 +24,7 @@ interface DocumentVerificationProps {
 const DocumentVerification: React.FC<DocumentVerificationProps> = ({
   userId,
   verifications,
-  onVerificationSubmitted
+  onVerificationSubmitted,
 }) => {
   const [selectedDocumentType, setSelectedDocumentType] = useState<string>('');
   const [uploading, setUploading] = useState(false);
@@ -27,19 +32,34 @@ const DocumentVerification: React.FC<DocumentVerificationProps> = ({
   const { toast } = useToast();
 
   const documentTypes = [
-    { value: 'id_card', label: 'Carte d\'identité' },
+    { value: 'id_card', label: "Carte d'identité" },
     { value: 'passport', label: 'Passeport' },
-    { value: 'driver_license', label: 'Permis de conduire' }
+    { value: 'driver_license', label: 'Permis de conduire' },
   ];
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'approved':
-        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="h-3 w-3 mr-1" />Approuvé</Badge>;
+        return (
+          <Badge className="bg-green-100 text-green-800">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Approuvé
+          </Badge>
+        );
       case 'rejected':
-        return <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" />Rejeté</Badge>;
+        return (
+          <Badge variant="destructive">
+            <XCircle className="h-3 w-3 mr-1" />
+            Rejeté
+          </Badge>
+        );
       default:
-        return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />En attente</Badge>;
+        return (
+          <Badge variant="secondary">
+            <Clock className="h-3 w-3 mr-1" />
+            En attente
+          </Badge>
+        );
     }
   };
 
@@ -49,9 +69,9 @@ const DocumentVerification: React.FC<DocumentVerificationProps> = ({
 
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: "Fichier trop volumineux",
-        description: "Le fichier ne doit pas dépasser 5 MB",
-        variant: "destructive"
+        title: 'Fichier trop volumineux',
+        description: 'Le fichier ne doit pas dépasser 5 MB',
+        variant: 'destructive',
       });
       return;
     }
@@ -59,9 +79,9 @@ const DocumentVerification: React.FC<DocumentVerificationProps> = ({
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
       toast({
-        title: "Type de fichier non supporté",
-        description: "Seuls les fichiers JPG, PNG, WebP et PDF sont acceptés",
-        variant: "destructive"
+        title: 'Type de fichier non supporté',
+        description: 'Seuls les fichiers JPG, PNG, WebP et PDF sont acceptés',
+        variant: 'destructive',
       });
       return;
     }
@@ -73,13 +93,11 @@ const DocumentVerification: React.FC<DocumentVerificationProps> = ({
       // For now, we'll simulate with a placeholder URL
       const documentUrl = `documents/${userId}/${Date.now()}_${file.name}`;
 
-      const { error } = await supabase
-        .from('document_verifications')
-        .insert({
-          user_id: userId,
-          document_type: selectedDocumentType,
-          document_url: documentUrl
-        });
+      const { error } = await supabase.from('document_verifications').insert({
+        user_id: userId,
+        document_type: selectedDocumentType,
+        document_url: documentUrl,
+      });
 
       if (error) throw error;
 
@@ -89,22 +107,22 @@ const DocumentVerification: React.FC<DocumentVerificationProps> = ({
         .update({
           document_verification_status: 'pending',
           document_verification_type: selectedDocumentType,
-          document_verification_submitted_at: new Date().toISOString()
+          document_verification_submitted_at: new Date().toISOString(),
         })
         .eq('id', userId);
 
       toast({
-        title: "Document soumis",
-        description: "Votre document a été soumis pour vérification"
+        title: 'Document soumis',
+        description: 'Votre document a été soumis pour vérification',
       });
 
       setSelectedDocumentType('');
       onVerificationSubmitted();
     } catch (error: any) {
       toast({
-        title: "Erreur",
-        description: error.message || "Erreur lors de la soumission du document",
-        variant: "destructive"
+        title: 'Erreur',
+        description: error.message || 'Erreur lors de la soumission du document',
+        variant: 'destructive',
       });
     } finally {
       setUploading(false);
@@ -124,10 +142,13 @@ const DocumentVerification: React.FC<DocumentVerificationProps> = ({
           <div className="space-y-3">
             <h4 className="font-medium">Documents soumis</h4>
             {verifications.map((verification) => (
-              <div key={verification.id} className="flex items-center justify-between p-3 border rounded-lg">
+              <div
+                key={verification.id}
+                className="flex items-center justify-between p-3 border rounded-lg"
+              >
                 <div>
                   <p className="font-medium">
-                    {documentTypes.find(t => t.value === verification.document_type)?.label}
+                    {documentTypes.find((t) => t.value === verification.document_type)?.label}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     Soumis le {new Date(verification.submitted_at).toLocaleDateString('fr-FR')}
@@ -146,7 +167,7 @@ const DocumentVerification: React.FC<DocumentVerificationProps> = ({
 
         <div className="space-y-4">
           <h4 className="font-medium">Soumettre un nouveau document</h4>
-          
+
           <div className="space-y-2">
             <Label>Type de document</Label>
             <Select value={selectedDocumentType} onValueChange={setSelectedDocumentType}>
@@ -185,8 +206,9 @@ const DocumentVerification: React.FC<DocumentVerificationProps> = ({
 
           <div className="bg-amber-50 p-4 rounded-lg">
             <p className="text-sm text-amber-800">
-              <strong>Important:</strong> Assurez-vous que votre document est lisible et que toutes les informations sont visibles. 
-              Les documents flous ou partiellement cachés seront rejetés.
+              <strong>Important:</strong> Assurez-vous que votre document est lisible et que toutes
+              les informations sont visibles. Les documents flous ou partiellement cachés seront
+              rejetés.
             </p>
           </div>
         </div>

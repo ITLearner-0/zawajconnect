@@ -19,7 +19,7 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
   prefix = '',
   className = '',
   decimals = 0,
-  onComplete
+  onComplete,
 }) => {
   const [count, setCount] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -34,11 +34,11 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
       const animate = () => {
         const elapsed = Date.now() - startTime;
         const progress = Math.min(elapsed / duration, 1);
-        
+
         // Easing function (ease-out)
         const easeOut = 1 - Math.pow(1 - progress, 3);
-        const currentValue = startValue + (difference * easeOut);
-        
+        const currentValue = startValue + difference * easeOut;
+
         setCount(currentValue);
 
         if (progress < 1) {
@@ -66,7 +66,9 @@ const AnimatedCounter: React.FC<AnimatedCounterProps> = ({
 
   return (
     <span className={`${className} ${isAnimating ? 'animate-pulse-gentle' : ''}`}>
-      {prefix}{formatNumber(count)}{suffix}
+      {prefix}
+      {formatNumber(count)}
+      {suffix}
     </span>
   );
 };

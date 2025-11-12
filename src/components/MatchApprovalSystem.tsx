@@ -7,12 +7,12 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Heart, 
-  Users, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
+import {
+  Heart,
+  Users,
+  CheckCircle,
+  XCircle,
+  Clock,
   MessageSquare,
   User,
   MapPin,
@@ -20,10 +20,16 @@ import {
   Briefcase,
   Star,
   Calendar,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 
@@ -102,13 +108,13 @@ const MatchApprovalSystem = () => {
         return;
       }
 
-      const supervisedUserIds = familyMembers.map(fm => fm.user_id);
+      const supervisedUserIds = familyMembers.map((fm) => fm.user_id);
 
       // Get matches for supervised users that need family approval
       const { data: matchesData, error } = await supabase
         .from('matches')
         .select('*')
-        .or(supervisedUserIds.map(id => `user1_id.eq.${id},user2_id.eq.${id}`).join(','))
+        .or(supervisedUserIds.map((id) => `user1_id.eq.${id},user2_id.eq.${id}`).join(','))
         .eq('family_supervision_required', true)
         .or('family1_approved.is.null,family2_approved.is.null,family_approved.is.null')
         .order('created_at', { ascending: false });
@@ -116,17 +122,19 @@ const MatchApprovalSystem = () => {
       if (error) throw error;
 
       // Get family reviews for these matches
-      const matchIds = matchesData?.map(m => m.id) || [];
+      const matchIds = matchesData?.map((m) => m.id) || [];
       const { data: reviewsData } = await supabase
         .from('family_reviews')
-        .select(`
+        .select(
+          `
           *,
           family_member:family_members(full_name, relationship, is_wali)
-        `)
+        `
+        )
         .in('match_id', matchIds);
 
       // Combine matches with their reviews
-      const matchesWithReviews = matchesData?.map(match => ({
+      const matchesWithReviews = matchesData?.map((match) => ({
         ...match,
         match_score: match.match_score ?? 0,
         is_mutual: match.is_mutual ?? false,
@@ -134,18 +142,34 @@ const MatchApprovalSystem = () => {
         family1_approved: match.family1_approved ?? false,
         family2_approved: match.family2_approved ?? false,
         can_communicate: match.can_communicate ?? false,
-        user1: { full_name: 'User 1', age: 25, location: 'Location', profession: 'Profession', education: 'Education', bio: 'Bio', avatar_url: '' },
-        user2: { full_name: 'User 2', age: 25, location: 'Location', profession: 'Profession', education: 'Education', bio: 'Bio', avatar_url: '' },
-        pending_reviews: reviewsData?.filter(r => r.match_id === match.id) || []
+        user1: {
+          full_name: 'User 1',
+          age: 25,
+          location: 'Location',
+          profession: 'Profession',
+          education: 'Education',
+          bio: 'Bio',
+          avatar_url: '',
+        },
+        user2: {
+          full_name: 'User 2',
+          age: 25,
+          location: 'Location',
+          profession: 'Profession',
+          education: 'Education',
+          bio: 'Bio',
+          avatar_url: '',
+        },
+        pending_reviews: reviewsData?.filter((r) => r.match_id === match.id) || [],
       })) as Match[];
 
       setMatches(matchesWithReviews || []);
     } catch (error) {
       console.error('Error fetching pending matches:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les matches en attente",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les matches en attente',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -169,15 +193,13 @@ const MatchApprovalSystem = () => {
       }
 
       // Submit the review
-      const { error: reviewError } = await supabase
-        .from('family_reviews')
-        .upsert({
-          match_id: matchId,
-          family_member_id: familyMember.id,
-          status,
-          notes: reviewNotes,
-          reviewed_at: new Date().toISOString()
-        });
+      const { error: reviewError } = await supabase.from('family_reviews').upsert({
+        match_id: matchId,
+        family_member_id: familyMember.id,
+        status,
+        notes: reviewNotes,
+        reviewed_at: new Date().toISOString(),
+      });
 
       if (reviewError) throw reviewError;
 
@@ -187,9 +209,10 @@ const MatchApprovalSystem = () => {
         .select('status, family_member:family_members(is_wali)')
         .eq('match_id', matchId);
 
-      const waliReviews = allReviews?.filter(r => r.family_member?.is_wali) || [];
-      const allWaliApproved = waliReviews.length > 0 && waliReviews.every(r => r.status === 'approved');
-      const anyWaliDeclined = waliReviews.some(r => r.status === 'declined');
+      const waliReviews = allReviews?.filter((r) => r.family_member?.is_wali) || [];
+      const allWaliApproved =
+        waliReviews.length > 0 && waliReviews.every((r) => r.status === 'approved');
+      const anyWaliDeclined = waliReviews.some((r) => r.status === 'declined');
 
       // Update match approval status
       const updateData: any = {};
@@ -201,14 +224,11 @@ const MatchApprovalSystem = () => {
       }
 
       if (Object.keys(updateData).length > 0) {
-        await supabase
-          .from('matches')
-          .update(updateData)
-          .eq('id', matchId);
+        await supabase.from('matches').update(updateData).eq('id', matchId);
       }
 
       toast({
-        title: status === 'approved' ? "Match approuvé" : "Match refusé",
+        title: status === 'approved' ? 'Match approuvé' : 'Match refusé',
         description: `Votre décision a été enregistrée${allWaliApproved ? ' et le couple peut maintenant communiquer' : ''}`,
       });
 
@@ -218,9 +238,9 @@ const MatchApprovalSystem = () => {
     } catch (error) {
       console.error('Error submitting review:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'enregistrer votre décision",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -285,7 +305,7 @@ const MatchApprovalSystem = () => {
             const matchStatus = getMatchStatus(match);
             const supervisedUser = match.user1_id !== user?.id ? match.user1 : match.user2;
             const otherUser = match.user1_id !== user?.id ? match.user2 : match.user1;
-            
+
             return (
               <Card key={match.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
@@ -293,7 +313,9 @@ const MatchApprovalSystem = () => {
                     <div className="flex items-center gap-3">
                       <Badge variant={matchStatus.color as any} className="mb-2">
                         {matchStatus.status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
-                        {matchStatus.status === 'approved' && <CheckCircle className="h-3 w-3 mr-1" />}
+                        {matchStatus.status === 'approved' && (
+                          <CheckCircle className="h-3 w-3 mr-1" />
+                        )}
                         {matchStatus.status === 'declined' && <XCircle className="h-3 w-3 mr-1" />}
                         {matchStatus.label}
                       </Badge>
@@ -380,12 +402,22 @@ const MatchApprovalSystem = () => {
                         {match.pending_reviews.map((review) => (
                           <Badge
                             key={review.id}
-                            variant={review.status === 'approved' ? 'default' : review.status === 'declined' ? 'destructive' : 'outline'}
+                            variant={
+                              review.status === 'approved'
+                                ? 'default'
+                                : review.status === 'declined'
+                                  ? 'destructive'
+                                  : 'outline'
+                            }
                             className="text-xs"
                           >
                             {review.family_member.full_name} ({review.family_member.relationship})
-                            {review.family_member.is_wali && ' - Wali'}
-                            : {review.status === 'approved' ? 'Approuvé' : review.status === 'declined' ? 'Refusé' : 'En attente'}
+                            {review.family_member.is_wali && ' - Wali'}:{' '}
+                            {review.status === 'approved'
+                              ? 'Approuvé'
+                              : review.status === 'declined'
+                                ? 'Refusé'
+                                : 'En attente'}
                           </Badge>
                         ))}
                       </div>
@@ -406,7 +438,7 @@ const MatchApprovalSystem = () => {
                         <DialogHeader>
                           <DialogTitle>Évaluation du Match</DialogTitle>
                         </DialogHeader>
-                        
+
                         <Tabs defaultValue="profiles" className="space-y-6">
                           <ResponsiveTabsList tabCount={3}>
                             <TabsTrigger value="profiles">Profils</TabsTrigger>
@@ -418,7 +450,9 @@ const MatchApprovalSystem = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                               <Card>
                                 <CardHeader>
-                                  <CardTitle className="text-lg">{supervisedUser.full_name}</CardTitle>
+                                  <CardTitle className="text-lg">
+                                    {supervisedUser.full_name}
+                                  </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                   <div className="space-y-2">
@@ -442,7 +476,9 @@ const MatchApprovalSystem = () => {
                                   <Separator />
                                   <div>
                                     <h4 className="font-medium mb-2">À propos</h4>
-                                    <p className="text-sm text-muted-foreground">{supervisedUser.bio}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      {supervisedUser.bio}
+                                    </p>
                                   </div>
                                 </CardContent>
                               </Card>
@@ -488,14 +524,15 @@ const MatchApprovalSystem = () => {
                               <CardContent>
                                 <div className="space-y-4">
                                   <div className="h-2 bg-muted rounded-full overflow-hidden">
-                                    <div 
+                                    <div
                                       className="h-full bg-gradient-to-r from-emerald to-gold transition-all"
                                       style={{ width: `${match.match_score}%` }}
                                     />
                                   </div>
                                   <p className="text-sm text-muted-foreground">
-                                    Ce score est basé sur la compatibilité des valeurs islamiques, des objectifs de vie, 
-                                    et des préférences personnelles des deux personnes.
+                                    Ce score est basé sur la compatibilité des valeurs islamiques,
+                                    des objectifs de vie, et des préférences personnelles des deux
+                                    personnes.
                                   </p>
                                 </div>
                               </CardContent>
@@ -506,7 +543,9 @@ const MatchApprovalSystem = () => {
                             {matchStatus.status === 'pending' && (
                               <Card>
                                 <CardHeader>
-                                  <CardTitle>Votre évaluation en tant que {getCurrentUserRole(match)}</CardTitle>
+                                  <CardTitle>
+                                    Votre évaluation en tant que {getCurrentUserRole(match)}
+                                  </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                   <div>
@@ -520,7 +559,7 @@ const MatchApprovalSystem = () => {
                                       rows={4}
                                     />
                                   </div>
-                                  
+
                                   <div className="flex gap-4 pt-4">
                                     <Button
                                       onClick={() => submitReview(match.id, 'approved')}
@@ -541,7 +580,7 @@ const MatchApprovalSystem = () => {
                                 </CardContent>
                               </Card>
                             )}
-                            
+
                             {matchStatus.status !== 'pending' && (
                               <Card>
                                 <CardContent className="pt-6 text-center">

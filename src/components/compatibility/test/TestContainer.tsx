@@ -1,14 +1,13 @@
-
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { questions } from "@/data/compatibilityQuestions";
-import { Answer } from "@/types/compatibility";
-import { Json } from "@/integrations/supabase/types";
-import TestHeader from "./TestHeader";
-import TestQuestion from "./TestQuestion";
-import TestNavigation from "./TestNavigation";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
+import { questions } from '@/data/compatibilityQuestions';
+import { Answer } from '@/types/compatibility';
+import { Json } from '@/integrations/supabase/types';
+import TestHeader from './TestHeader';
+import TestQuestion from './TestQuestion';
+import TestNavigation from './TestNavigation';
 
 interface TestContainerProps {
   onComplete: (score: number, answers: Record<number, Answer>) => void;
@@ -25,14 +24,16 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         toast({
-          title: "Authentication Required",
-          description: "Please sign in to take the compatibility test",
-          variant: "destructive",
+          title: 'Authentication Required',
+          description: 'Please sign in to take the compatibility test',
+          variant: 'destructive',
         });
-        navigate("/auth");
+        navigate('/auth');
       }
     };
 
@@ -43,24 +44,24 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
   }, [navigate, toast, currentQuestion]);
 
   const handleAnswer = (value: number[]) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
       [currentQuestion]: {
         ...prev[currentQuestion],
         value: value[0],
         isBreaker: isDealbreaker,
-        breakerThreshold: isDealbreaker ? breakerThreshold : undefined
-      }
+        breakerThreshold: isDealbreaker ? breakerThreshold : undefined,
+      },
     }));
   };
 
   const handleWeightChange = (value: number[]) => {
-    setAnswers(prev => ({
+    setAnswers((prev) => ({
       ...prev,
       [currentQuestion]: {
         ...prev[currentQuestion],
-        weight: value[0]
-      }
+        weight: value[0],
+      },
     }));
   };
 
@@ -73,8 +74,8 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
     for (const [index, answer] of Object.entries(answers)) {
       const question = questions[Number(index)];
       const effectiveWeight = answer.weight || question.weight;
-      
-      totalWeightedScore += (answer.value * effectiveWeight);
+
+      totalWeightedScore += answer.value * effectiveWeight;
       totalWeight += effectiveWeight;
 
       if (answer.isBreaker && answer.breakerThreshold && answer.value < answer.breakerThreshold) {
@@ -85,43 +86,40 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
     const finalScore = Math.round((totalWeightedScore / (totalWeight * 100)) * 100);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         const answersMap = Object.fromEntries(
-          Object.entries(answers).map(([qIndex, answer]) => [
-            questions[Number(qIndex)].id,
-            answer
-          ])
+          Object.entries(answers).map(([qIndex, answer]) => [questions[Number(qIndex)].id, answer])
         );
 
         const resultData = {
           answers: answersMap as unknown as Json,
           score: finalScore,
           dealbreakers: dealbreakers as unknown as Json,
-          preferences: questions.map(q => ({
+          preferences: questions.map((q) => ({
             category: q.id.toString(),
-            weight: answers[questions.findIndex(quest => quest.id === q.id)]?.weight || q.weight
+            weight: answers[questions.findIndex((quest) => quest.id === q.id)]?.weight || q.weight,
           })) as unknown as Json,
-          user_id: session.user.id
+          user_id: session.user.id,
         };
 
-        const { error } = await supabase
-          .from('compatibility_results')
-          .insert(resultData);
+        const { error } = await supabase.from('compatibility_results').insert(resultData);
 
         if (error) throw error;
 
         toast({
-          title: "Results Saved",
-          description: "Your compatibility preferences have been saved successfully",
+          title: 'Results Saved',
+          description: 'Your compatibility preferences have been saved successfully',
         });
       }
     } catch (error) {
       console.error('Error saving results:', error);
       toast({
-        title: "Error",
-        description: "Failed to save your results. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to save your results. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -147,7 +145,7 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
   return (
     <div className="space-y-6">
       <TestHeader currentQuestion={currentQuestion} answers={answers} />
-      
+
       <TestQuestion
         question={questions[currentQuestion]}
         answer={answers[currentQuestion]}
@@ -158,7 +156,7 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
         onThresholdChange={(value) => setBreakerthreshold(value[0])}
         onWeightChange={handleWeightChange}
       />
-      
+
       <TestNavigation
         currentQuestion={currentQuestion}
         totalQuestions={questions.length}

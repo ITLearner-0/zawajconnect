@@ -49,6 +49,7 @@ vercel --prod
 ```
 
 **Vérification:**
+
 - ✅ Doit afficher "Migrations Applied Successfully!"
 - ✅ Index créés: ~20+
 - ✅ Tables créées: moderation_rules, moderation_violations
@@ -62,6 +63,7 @@ vercel --prod
 ```
 
 **Vérification:**
+
 - ✅ Doit afficher "17 total rules, 17 active"
 
 ---
@@ -138,6 +140,7 @@ Project ID:         xxx-xxx-xxx
 #### Configurer dans Vercel
 
 **Via Dashboard:**
+
 ```
 Project Settings → Environment Variables → Add
 
@@ -149,6 +152,7 @@ VITE_APP_VERSION → Production → 1.0.0
 ```
 
 **Via CLI:**
+
 ```bash
 vercel env add VITE_SUPABASE_URL production
 # Coller la valeur quand demandé
@@ -160,6 +164,7 @@ vercel env add VITE_APP_VERSION production
 ```
 
 **⚠️ IMPORTANT:** Redéployer après avoir ajouté les variables
+
 ```bash
 vercel --prod
 ```
@@ -189,6 +194,7 @@ vercel --prod
 5. **Console navigateur** → Pas d'erreurs critiques (F12)
 
 **Vérifier Sentry (si configuré):**
+
 - Aller sur https://sentry.io
 - Vérifier que le projet reçoit des events
 - Pas d'erreurs critiques
@@ -222,18 +228,21 @@ SSL/TLS automatique activé
 Cocher au fur et à mesure:
 
 ### Supabase
+
 - [ ] Migrations appliquées (20+ index)
 - [ ] Tables modération créées
 - [ ] 17 règles de modération chargées
 - [ ] RLS activé (vérifier dans Dashboard)
 
 ### Frontend
+
 - [ ] Déployé sur Vercel/Netlify
 - [ ] Variables environnement configurées
 - [ ] Site accessible via HTTPS
 - [ ] Pas d'erreurs dans console
 
 ### Tests
+
 - [ ] Script verify-deployment.sh passé
 - [ ] Inscription fonctionnelle
 - [ ] Login fonctionnel
@@ -241,11 +250,13 @@ Cocher au fur et à mesure:
 - [ ] Browse profils fonctionne
 
 ### Monitoring
+
 - [ ] Sentry configuré (optionnel)
 - [ ] Première erreur reçue dans Sentry
 - [ ] Alertes configurées
 
 ### Documentation
+
 - [ ] URL production documentée
 - [ ] Credentials sauvegardés (coffre-fort)
 - [ ] Équipe informée
@@ -272,6 +283,7 @@ Version: 1.0.0
 ## 🆘 Aide Rapide
 
 ### Erreur: "Failed to fetch"
+
 ```bash
 # Vérifier les variables d'environnement
 vercel env ls
@@ -282,6 +294,7 @@ vercel env ls
 ```
 
 ### Erreur: "RLS Policy Violation"
+
 ```sql
 -- Dans Supabase SQL Editor
 -- Vérifier que RLS est activé
@@ -293,6 +306,7 @@ WHERE schemaname = 'public';
 ```
 
 ### Build échoue
+
 ```bash
 # Localement, tester le build
 npm run build
@@ -304,6 +318,7 @@ npm run build
 ```
 
 ### Site lent
+
 ```bash
 # Vérifier que les index sont appliqués
 # Supabase → Database → Query Performance
@@ -319,16 +334,19 @@ npm run build
 ## 📞 Support
 
 **Documentation Complète:**
+
 - `DEPLOYMENT_GUIDE.md` - Guide détaillé complet
 - `WORKFLOW_ANALYSIS.md` - Analyse fonctionnalités
 - `CODE_REVIEW_SUMMARY.md` - Résumé technique
 
 **Ressources Externes:**
+
 - Supabase: https://supabase.com/docs
 - Vercel: https://vercel.com/docs
 - Netlify: https://docs.netlify.com
 
 **En Cas de Problème Critique:**
+
 1. Rollback au déploiement précédent (Vercel/Netlify Dashboard)
 2. Vérifier logs Sentry / Supabase
 3. Consulter DEPLOYMENT_GUIDE.md → Section Rollback
@@ -340,6 +358,7 @@ npm run build
 Si toutes les étapes sont cochées ✅, votre application ZawajConnect est maintenant en production !
 
 **Prochaines étapes recommandées:**
+
 1. Monitorer les premiers utilisateurs (Sentry/Analytics)
 2. Collecter feedback utilisateurs
 3. Planifier itérations futures (voir NEXT_STEPS.md)

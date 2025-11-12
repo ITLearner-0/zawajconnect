@@ -50,9 +50,7 @@ const AdvancedMatching = () => {
     <div className="space-y-8">
       {/* Page Header */}
       <div className="bg-card rounded-lg border p-6">
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Matching Avancé
-        </h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Matching Avancé</h1>
         <p className="text-muted-foreground">
           Trouvez des profils compatibles grâce à notre système de matching intelligent
         </p>
@@ -60,12 +58,16 @@ const AdvancedMatching = () => {
 
       {/* Main Navigation */}
       <div className="bg-card rounded-lg border p-6">
-        <Tabs value={mainTab} onValueChange={(val) => {
-          setMainTab(val);
-          if (val === 'ai') setSubTab('ai-engine');
-          if (val === 'filters') setSubTab('islamic-filters');
-          if (val === 'family') setSubTab('islamic-calculator');
-        }} className="space-y-6">
+        <Tabs
+          value={mainTab}
+          onValueChange={(val) => {
+            setMainTab(val);
+            if (val === 'ai') setSubTab('ai-engine');
+            if (val === 'filters') setSubTab('islamic-filters');
+            if (val === 'family') setSubTab('islamic-calculator');
+          }}
+          className="space-y-6"
+        >
           {/* Main Categories */}
           <div>
             <h2 className="text-lg font-semibold mb-3">Catégories</h2>

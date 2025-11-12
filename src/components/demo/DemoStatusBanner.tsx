@@ -1,22 +1,21 @@
-
 import React from 'react';
 import { AlertTriangle, Info, Eye, Users } from 'lucide-react';
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
 
 interface DemoStatusBannerProps {
   variant?: 'default' | 'prominent' | 'minimal';
   showDetails?: boolean;
 }
 
-const DemoStatusBanner: React.FC<DemoStatusBannerProps> = ({ 
+const DemoStatusBanner: React.FC<DemoStatusBannerProps> = ({
   variant = 'default',
-  showDetails = true 
+  showDetails = true,
 }) => {
   if (variant === 'minimal') {
     return (
-      <Badge 
-        variant="outline" 
+      <Badge
+        variant="outline"
         className="bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900 dark:text-blue-200 dark:border-blue-700 fixed top-4 right-4 z-50 animate-pulse"
       >
         <Eye className="h-3 w-3 mr-1" />
@@ -58,11 +57,15 @@ const DemoStatusBanner: React.FC<DemoStatusBannerProps> = ({
             <strong>Mode Démo Actif</strong> - Vous utilisez une version de démonstration
             {showDetails && (
               <span className="block text-sm text-blue-600 dark:text-blue-300 mt-1">
-                • Profils fictifs représentatifs • Conversations pré-écrites • Toutes les fonctionnalités disponibles
+                • Profils fictifs représentatifs • Conversations pré-écrites • Toutes les
+                fonctionnalités disponibles
               </span>
             )}
           </div>
-          <Badge variant="outline" className="border-blue-300 text-blue-700 bg-blue-100 dark:border-blue-600 dark:text-blue-300 dark:bg-blue-900">
+          <Badge
+            variant="outline"
+            className="border-blue-300 text-blue-700 bg-blue-100 dark:border-blue-600 dark:text-blue-300 dark:bg-blue-900"
+          >
             Démo
           </Badge>
         </div>

@@ -1,10 +1,9 @@
-
-import React, { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useTranslation } from "react-i18next";
-import { Eye, EyeOff } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
+import React, { useState } from 'react';
+import { Input } from '@/components/ui/input';
+import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useTranslation } from 'react-i18next';
+import { Eye, EyeOff } from 'lucide-react';
+import { UseFormReturn } from 'react-hook-form';
 
 interface PasswordFieldProps {
   form: UseFormReturn<any>;
@@ -14,12 +13,12 @@ interface PasswordFieldProps {
   placeholder?: string;
 }
 
-const PasswordField: React.FC<PasswordFieldProps> = ({ 
-  form, 
-  loading, 
-  autoComplete = "new-password",
+const PasswordField: React.FC<PasswordFieldProps> = ({
+  form,
+  loading,
+  autoComplete = 'new-password',
   label,
-  placeholder 
+  placeholder,
 }) => {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
@@ -28,13 +27,13 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
 
   return (
     <FormItem>
-      <FormLabel>{label || t("auth.password")}</FormLabel>
+      <FormLabel>{label || t('auth.password')}</FormLabel>
       <div className="relative">
         <FormControl>
           <Input
-            {...form.register("password")}
-            type={showPassword ? "text" : "password"}
-            placeholder={placeholder || t("auth.passwordPlaceholder")}
+            {...form.register('password')}
+            type={showPassword ? 'text' : 'password'}
+            placeholder={placeholder || t('auth.passwordPlaceholder')}
             autoComplete={autoComplete}
             disabled={loading}
             aria-invalid={!!form.formState.errors.password}

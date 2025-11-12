@@ -7,7 +7,8 @@ import FamilyNotificationCard from '@/components/family-approval/FamilyNotificat
 
 const FamilyApprovalDashboard = () => {
   const { user } = useAuth();
-  const { notifications, loading, processingIds, loadNotifications, handleApprovalDecision } = useFamilyApproval();
+  const { notifications, loading, processingIds, loadNotifications, handleApprovalDecision } =
+    useFamilyApproval();
 
   useEffect(() => {
     if (user) {
@@ -27,7 +28,11 @@ const FamilyApprovalDashboard = () => {
     }
   };
 
-  const handleRequestDiscussion = async (notificationId: string, matchId: string, notes?: string) => {
+  const handleRequestDiscussion = async (
+    notificationId: string,
+    matchId: string,
+    notes?: string
+  ) => {
     if (user) {
       await handleApprovalDecision(user.id, notificationId, matchId, 'needs_discussion', notes);
     }
@@ -60,7 +65,8 @@ const FamilyApprovalDashboard = () => {
             <Bell className="h-12 w-12 text-muted-foreground mx-auto mb-4 opacity-50" />
             <h3 className="text-lg font-semibold mb-2">Aucune demande en attente</h3>
             <p className="text-muted-foreground">
-              Vous serez notifié lorsque votre famille aura besoin de votre approbation pour un match
+              Vous serez notifié lorsque votre famille aura besoin de votre approbation pour un
+              match
             </p>
           </CardContent>
         </Card>

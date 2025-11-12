@@ -34,7 +34,7 @@ export const AdminAlertsStatsCards = ({ statistics, loading }: AdminAlertsStatsC
       description: `${statistics.alerts_today} aujourd'hui`,
       icon: ShieldAlert,
       color: 'text-red-600 dark:text-red-400',
-      bgColor: 'bg-red-50 dark:bg-red-950'
+      bgColor: 'bg-red-50 dark:bg-red-950',
     },
     {
       title: 'Alertes Élevées',
@@ -42,7 +42,7 @@ export const AdminAlertsStatsCards = ({ statistics, loading }: AdminAlertsStatsC
       description: `${statistics.alerts_this_week} cette semaine`,
       icon: AlertTriangle,
       color: 'text-orange-600 dark:text-orange-400',
-      bgColor: 'bg-orange-50 dark:bg-orange-950'
+      bgColor: 'bg-orange-50 dark:bg-orange-950',
     },
     {
       title: 'Non Traitées',
@@ -50,7 +50,7 @@ export const AdminAlertsStatsCards = ({ statistics, loading }: AdminAlertsStatsC
       description: `sur ${statistics.total_alerts} total`,
       icon: Clock,
       color: 'text-blue-600 dark:text-blue-400',
-      bgColor: 'bg-blue-50 dark:bg-blue-950'
+      bgColor: 'bg-blue-50 dark:bg-blue-950',
     },
     {
       title: 'Traitées',
@@ -58,8 +58,8 @@ export const AdminAlertsStatsCards = ({ statistics, loading }: AdminAlertsStatsC
       description: `${statistics.alerts_this_month} ce mois`,
       icon: CheckCircle,
       color: 'text-green-600 dark:text-green-400',
-      bgColor: 'bg-green-50 dark:bg-green-950'
-    }
+      bgColor: 'bg-green-50 dark:bg-green-950',
+    },
   ];
 
   return (
@@ -69,18 +69,14 @@ export const AdminAlertsStatsCards = ({ statistics, loading }: AdminAlertsStatsC
         return (
           <Card key={card.title}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">
-                {card.title}
-              </CardTitle>
+              <CardTitle className="text-sm font-medium">{card.title}</CardTitle>
               <div className={`p-2 rounded-full ${card.bgColor}`}>
                 <Icon className={`h-4 w-4 ${card.color}`} />
               </div>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{card.value}</div>
-              <p className="text-xs text-muted-foreground">
-                {card.description}
-              </p>
+              <p className="text-xs text-muted-foreground">{card.description}</p>
             </CardContent>
           </Card>
         );

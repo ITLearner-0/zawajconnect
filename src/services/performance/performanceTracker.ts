@@ -1,4 +1,3 @@
-
 import { PageMetricsService, PageMetrics } from './pageMetricsService';
 import { ComponentMetricsService, ComponentMetrics } from './componentMetricsService';
 import { APIMetricsService, APIMetrics } from './apiMetricsService';
@@ -23,7 +22,7 @@ export class PerformanceTracker {
 
   // Expose service methods
   measurePageMetrics = () => this.pageMetricsService.measurePageMetrics();
-  setupPerformanceObserver = (callback: (metrics: Partial<PageMetrics>) => void) => 
+  setupPerformanceObserver = (callback: (metrics: Partial<PageMetrics>) => void) =>
     this.pageMetricsService.setupPerformanceObserver(callback);
   disconnectObserver = () => this.pageMetricsService.disconnect();
 
@@ -54,27 +53,33 @@ export class PerformanceTracker {
     const componentMetrics = this.getComponentMetrics();
     const apiMetrics = this.getAPIMetrics();
     const userInteractions = this.getUserInteractions();
-    
+
     return {
       components: {
         total: componentMetrics.size,
-        slowest: Array.from(componentMetrics.values()).sort((a, b) => b.renderTime - a.renderTime)[0],
-        mostUpdated: Array.from(componentMetrics.values()).sort((a, b) => b.updateCount - a.updateCount)[0],
+        slowest: Array.from(componentMetrics.values()).sort(
+          (a, b) => b.renderTime - a.renderTime
+        )[0],
+        mostUpdated: Array.from(componentMetrics.values()).sort(
+          (a, b) => b.updateCount - a.updateCount
+        )[0],
       },
       api: {
         total: apiMetrics.length,
-        averageResponseTime: apiMetrics.length > 0 
-          ? apiMetrics.reduce((sum, metric) => sum + metric.duration, 0) / apiMetrics.length 
-          : 0,
-        errorRate: apiMetrics.length > 0 
-          ? (apiMetrics.filter(metric => metric.status >= 400).length / apiMetrics.length) * 100 
-          : 0,
+        averageResponseTime:
+          apiMetrics.length > 0
+            ? apiMetrics.reduce((sum, metric) => sum + metric.duration, 0) / apiMetrics.length
+            : 0,
+        errorRate:
+          apiMetrics.length > 0
+            ? (apiMetrics.filter((metric) => metric.status >= 400).length / apiMetrics.length) * 100
+            : 0,
       },
       interactions: {
         total: userInteractions.length,
         averageResponseTime: userInteractions
-          .filter(i => i.duration)
-          .reduce((sum, i, _, arr) => sum + (i.duration! / arr.length), 0),
+          .filter((i) => i.duration)
+          .reduce((sum, i, _, arr) => sum + i.duration! / arr.length, 0),
       },
     };
   }

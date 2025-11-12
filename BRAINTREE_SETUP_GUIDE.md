@@ -1,6 +1,7 @@
 # Guide de Configuration Braintree - Étape par Étape
 
 ## Prérequis
+
 - Un compte Braintree (gratuit pour commencer)
 - Accès au tableau de bord Supabase de votre projet
 
@@ -34,6 +35,7 @@
 2. Cliquez sur **Create New Plan**
 
 ### Plan 3 mois
+
 - **Plan ID**: `premium_3_months`
 - **Name**: Abonnement 3 mois
 - **Price**: 29.99 EUR
@@ -41,12 +43,14 @@
 - **Number of Billing Cycles**: Leave blank for ongoing subscription
 
 ### Plan 6 mois
+
 - **Plan ID**: `premium_6_months`
 - **Name**: Abonnement 6 mois
 - **Price**: 49.99 EUR
 - **Billing Frequency**: Every 6 months
 
 ### Plan 12 mois
+
 - **Plan ID**: `premium_12_months`
 - **Name**: Abonnement 12 mois
 - **Price**: 79.99 EUR
@@ -70,6 +74,7 @@ Vous devez configurer ces secrets:
 ### Cartes de test en Sandbox
 
 Braintree fournit des cartes de test:
+
 - **Visa**: 4111 1111 1111 1111
 - **Mastercard**: 5555 5555 5555 4444
 - **CVV**: N'importe quel 3 chiffres

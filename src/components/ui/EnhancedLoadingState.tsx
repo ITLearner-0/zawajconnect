@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Loader2, WifiOff, RefreshCw } from 'lucide-react';
@@ -12,23 +11,20 @@ interface EnhancedLoadingStateProps {
   reducedMotion?: boolean;
 }
 
-const EnhancedLoadingState = ({ 
-  state, 
-  onRetry, 
-  className, 
+const EnhancedLoadingState = ({
+  state,
+  onRetry,
+  className,
   showText = false,
-  reducedMotion = false 
+  reducedMotion = false,
 }: EnhancedLoadingStateProps) => {
   const getContent = () => {
     switch (state) {
       case 'loading':
         return (
           <div className="flex flex-col items-center justify-center space-y-2">
-            <Loader2 
-              className={cn(
-                "h-6 w-6 text-muted-foreground",
-                !reducedMotion && "animate-spin"
-              )} 
+            <Loader2
+              className={cn('h-6 w-6 text-muted-foreground', !reducedMotion && 'animate-spin')}
               aria-hidden="true"
             />
             {showText && (
@@ -38,11 +34,13 @@ const EnhancedLoadingState = ({
             )}
           </div>
         );
-      
+
       case 'error':
         return (
           <div className="flex flex-col items-center justify-center space-y-2">
-            <div className="text-destructive" aria-hidden="true">⚠️</div>
+            <div className="text-destructive" aria-hidden="true">
+              ⚠️
+            </div>
             {showText && (
               <>
                 <span className="text-sm text-destructive text-center" role="alert">
@@ -61,15 +59,12 @@ const EnhancedLoadingState = ({
             )}
           </div>
         );
-      
+
       case 'retry':
         return (
           <div className="flex flex-col items-center justify-center space-y-2">
-            <RefreshCw 
-              className={cn(
-                "h-6 w-6 text-blue-500",
-                !reducedMotion && "animate-spin"
-              )} 
+            <RefreshCw
+              className={cn('h-6 w-6 text-blue-500', !reducedMotion && 'animate-spin')}
               aria-hidden="true"
             />
             {showText && (
@@ -79,7 +74,7 @@ const EnhancedLoadingState = ({
             )}
           </div>
         );
-      
+
       case 'offline':
         return (
           <div className="flex flex-col items-center justify-center space-y-2">
@@ -91,18 +86,15 @@ const EnhancedLoadingState = ({
             )}
           </div>
         );
-      
+
       default:
         return <Skeleton className="w-full h-full" />;
     }
   };
 
   return (
-    <div 
-      className={cn(
-        "flex items-center justify-center min-h-[100px] p-4",
-        className
-      )}
+    <div
+      className={cn('flex items-center justify-center min-h-[100px] p-4', className)}
       role={state === 'loading' ? 'status' : undefined}
       aria-label={state === 'loading' ? 'Content is loading' : undefined}
     >

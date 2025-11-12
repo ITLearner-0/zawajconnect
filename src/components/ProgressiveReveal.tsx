@@ -21,17 +21,17 @@ const ProgressiveReveal: React.FC<ProgressiveRevealProps> = ({
   staggerDelay = 200,
   trigger = true,
   onComplete,
-  className = ''
+  className = '',
 }) => {
   const animationSteps = items.map((item, index) => ({
     id: item.id,
-    delay: (item.delay || 0) + (index * staggerDelay),
-    className: item.animation || 'animate-fade-in animate-slide-up'
+    delay: (item.delay || 0) + index * staggerDelay,
+    className: item.animation || 'animate-fade-in animate-slide-up',
   }));
 
   const { getStepClassName, isComplete } = useAnimationSequence({
     steps: animationSteps,
-    trigger
+    trigger,
   });
 
   useEffect(() => {
@@ -45,10 +45,7 @@ const ProgressiveReveal: React.FC<ProgressiveRevealProps> = ({
       {items.map((item) => (
         <div
           key={item.id}
-          className={getStepClassName(
-            item.id,
-            'transition-all duration-500 ease-out'
-          )}
+          className={getStepClassName(item.id, 'transition-all duration-500 ease-out')}
         >
           {item.content}
         </div>

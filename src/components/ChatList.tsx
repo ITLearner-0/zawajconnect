@@ -40,7 +40,7 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
 
   useEffect(() => {
     if (!user) return;
-    
+
     fetchChats();
     setupRealtimeSubscription();
   }, [user]);
@@ -62,7 +62,7 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
       const chatPreviews = await Promise.all(
         (matches || []).map(async (match) => {
           const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
-          
+
           // Get other user profile
           const { data: otherProfile } = await supabase
             .from('profiles')
@@ -92,11 +92,11 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
             other_user: {
               id: otherProfile?.user_id || otherUserId,
               full_name: otherProfile?.full_name || 'Utilisateur inconnu',
-              avatar_url: otherProfile?.avatar_url || ''
+              avatar_url: otherProfile?.avatar_url || '',
             },
             last_message: lastMessage || undefined,
             unread_count: unreadCount || 0,
-            match_score: match.match_score || 0
+            match_score: match.match_score || 0,
           };
         })
       );
@@ -112,9 +112,9 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
     } catch (error) {
       console.error('Error fetching chats:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger vos conversations",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger vos conversations',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -143,7 +143,7 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
     };
   };
 
-  const filteredChats = chats.filter(chat =>
+  const filteredChats = chats.filter((chat) =>
     chat.other_user.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -186,9 +186,7 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
           <div className="text-center py-8">
             <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
             <p className="text-sm font-medium mb-1">Aucune conversation</p>
-            <p className="text-xs text-muted-foreground">
-              Créez des matches pour démarrer
-            </p>
+            <p className="text-xs text-muted-foreground">Créez des matches pour démarrer</p>
           </div>
         ) : (
           <div>
@@ -203,7 +201,7 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
                 <div className="flex items-center space-x-3">
                   <div className="relative">
                     {chat.other_user.avatar_url ? (
-                      <img 
+                      <img
                         src={chat.other_user.avatar_url}
                         alt={chat.other_user.full_name}
                         className="h-10 w-10 rounded-full object-cover"
@@ -219,7 +217,7 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
                       </span>
                     )}
                   </div>
-                  
+
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="text-sm font-semibold text-foreground truncate">
@@ -227,29 +225,25 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
                       </h4>
                       {chat.last_message && (
                         <span className="text-xs text-muted-foreground">
-                          {formatDistanceToNow(new Date(chat.last_message.created_at), { 
+                          {formatDistanceToNow(new Date(chat.last_message.created_at), {
                             addSuffix: true,
-                            locale: fr 
+                            locale: fr,
                           })}
                         </span>
                       )}
                     </div>
-                    
+
                     {chat.last_message ? (
                       <p className="text-xs text-muted-foreground truncate">
                         {chat.last_message.sender_id === user?.id ? 'Vous: ' : ''}
                         {chat.last_message.content}
                       </p>
                     ) : (
-                      <p className="text-xs text-muted-foreground italic">
-                        Nouvelle conversation
-                      </p>
+                      <p className="text-xs text-muted-foreground italic">Nouvelle conversation</p>
                     )}
                   </div>
-                  
-                  <span className="text-xs bg-muted px-2 py-1 rounded">
-                    {chat.match_score}%
-                  </span>
+
+                  <span className="text-xs bg-muted px-2 py-1 rounded">{chat.match_score}%</span>
                 </div>
               </div>
             ))}

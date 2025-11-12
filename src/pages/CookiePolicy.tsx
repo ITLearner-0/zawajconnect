@@ -34,8 +34,15 @@ const CookiePolicy = () => {
         <Card className="mb-8 border-emerald/20 shadow-lg">
           <CardContent className="p-6">
             <div className="space-y-2 text-sm">
-              <p><strong>ZawajConnect</strong></p>
-              <p>Email : <a href="mailto:contact@zawajconnect.me" className="text-emerald hover:underline">contact@zawajconnect.me</a></p>
+              <p>
+                <strong>ZawajConnect</strong>
+              </p>
+              <p>
+                Email :{' '}
+                <a href="mailto:contact@zawajconnect.me" className="text-emerald hover:underline">
+                  contact@zawajconnect.me
+                </a>
+              </p>
               <p className="text-muted-foreground mt-4">Dernière mise à jour : 17 octobre 2025</p>
             </div>
           </CardContent>
@@ -47,9 +54,9 @@ const CookiePolicy = () => {
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-4 text-emerald">1. Qu'est-ce qu'un Cookie ?</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Un cookie est un petit fichier texte stocké sur votre appareil (ordinateur, smartphone, tablette) 
-                lors de votre visite sur notre site. Il permet de mémoriser vos préférences et d'améliorer 
-                votre expérience utilisateur.
+                Un cookie est un petit fichier texte stocké sur votre appareil (ordinateur,
+                smartphone, tablette) lors de votre visite sur notre site. Il permet de mémoriser
+                vos préférences et d'améliorer votre expérience utilisateur.
               </p>
             </CardContent>
           </Card>
@@ -58,13 +65,16 @@ const CookiePolicy = () => {
           <Card>
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-4 text-emerald">2. Types de Cookies Utilisés</h2>
-              
+
               <div className="space-y-6">
                 {/* Essentiels */}
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">2.1 - Cookies Essentiels (Obligatoires)</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">
+                    2.1 - Cookies Essentiels (Obligatoires)
+                  </h3>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Ces cookies sont nécessaires au fonctionnement de la plateforme et ne peuvent pas être désactivés.
+                    Ces cookies sont nécessaires au fonctionnement de la plateforme et ne peuvent
+                    pas être désactivés.
                   </p>
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm border border-border rounded-lg">
@@ -98,7 +108,9 @@ const CookiePolicy = () => {
 
                 {/* Préférence */}
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">2.2 - Cookies de Préférence (Optionnels)</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">
+                    2.2 - Cookies de Préférence (Optionnels)
+                  </h3>
                   <p className="text-sm text-muted-foreground mb-3">
                     Ces cookies mémorisent vos choix et préférences.
                   </p>
@@ -134,7 +146,9 @@ const CookiePolicy = () => {
 
                 {/* Analytiques */}
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">2.3 - Cookies Analytiques (Avec Consentement)</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">
+                    2.3 - Cookies Analytiques (Avec Consentement)
+                  </h3>
                   <p className="text-sm text-muted-foreground mb-3">
                     Ces cookies nous aident à améliorer la plateforme.
                   </p>
@@ -165,16 +179,20 @@ const CookiePolicy = () => {
 
                 {/* Tiers */}
                 <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">2.4 - Cookies Tiers</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-3">
+                    2.4 - Cookies Tiers
+                  </h3>
                   <p className="text-sm text-muted-foreground mb-3">
                     Nous utilisons des services tiers qui déposent leurs propres cookies :
                   </p>
                   <ul className="space-y-2 text-muted-foreground list-disc list-inside ml-4">
                     <li>
-                      <strong>Stripe (Paiements) :</strong> Cookies de sécurité et de détection de fraude (obligatoires)
+                      <strong>Stripe (Paiements) :</strong> Cookies de sécurité et de détection de
+                      fraude (obligatoires)
                     </li>
                     <li>
-                      <strong>Google Meet (Visioconférence) :</strong> Cookies de session (si vous utilisez les réunions familiales)
+                      <strong>Google Meet (Visioconférence) :</strong> Cookies de session (si vous
+                      utilisez les réunions familiales)
                     </li>
                   </ul>
                 </div>
@@ -186,10 +204,12 @@ const CookiePolicy = () => {
           <Card>
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-4 text-emerald">3. Gestion de Vos Cookies</h2>
-              
+
               <div className="space-y-4 text-muted-foreground">
                 <div>
-                  <h3 className="font-semibold text-foreground mb-2">3.1 - Via Notre Banner de Consentement</h3>
+                  <h3 className="font-semibold text-foreground mb-2">
+                    3.1 - Via Notre Banner de Consentement
+                  </h3>
                   <p className="mb-3">
                     À votre première visite, un banner apparaît vous proposant :
                   </p>
@@ -203,16 +223,27 @@ const CookiePolicy = () => {
                 <div>
                   <h3 className="font-semibold text-foreground mb-2">3.2 - Via Votre Navigateur</h3>
                   <p className="mb-3">
-                    Vous pouvez bloquer ou supprimer les cookies via les paramètres de votre navigateur :
+                    Vous pouvez bloquer ou supprimer les cookies via les paramètres de votre
+                    navigateur :
                   </p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li><strong>Chrome :</strong> Paramètres {'>'} Confidentialité et sécurité {'>'} Cookies</li>
-                    <li><strong>Firefox :</strong> Paramètres {'>'} Vie privée et sécurité {'>'} Cookies</li>
-                    <li><strong>Safari :</strong> Préférences {'>'} Confidentialité {'>'} Gérer les cookies</li>
+                    <li>
+                      <strong>Chrome :</strong> Paramètres {'>'} Confidentialité et sécurité {'>'}{' '}
+                      Cookies
+                    </li>
+                    <li>
+                      <strong>Firefox :</strong> Paramètres {'>'} Vie privée et sécurité {'>'}{' '}
+                      Cookies
+                    </li>
+                    <li>
+                      <strong>Safari :</strong> Préférences {'>'} Confidentialité {'>'} Gérer les
+                      cookies
+                    </li>
                   </ul>
                   <div className="p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 rounded-lg mt-3">
                     <p className="text-sm text-amber-800 dark:text-amber-300">
-                      ⚠️ <strong>Attention :</strong> Bloquer les cookies essentiels empêchera l'utilisation de la plateforme.
+                      ⚠️ <strong>Attention :</strong> Bloquer les cookies essentiels empêchera
+                      l'utilisation de la plateforme.
                     </p>
                   </div>
                 </div>
@@ -225,9 +256,15 @@ const CookiePolicy = () => {
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-4 text-emerald">4. Durée de Conservation</h2>
               <ul className="space-y-2 text-muted-foreground list-disc list-inside ml-4">
-                <li><strong>Cookies de session :</strong> Jusqu'à déconnexion</li>
-                <li><strong>Cookies de préférence :</strong> 1 an</li>
-                <li><strong>Cookies analytiques :</strong> 13 mois maximum (conformité RGPD)</li>
+                <li>
+                  <strong>Cookies de session :</strong> Jusqu'à déconnexion
+                </li>
+                <li>
+                  <strong>Cookies de préférence :</strong> 1 an
+                </li>
+                <li>
+                  <strong>Cookies analytiques :</strong> 13 mois maximum (conformité RGPD)
+                </li>
               </ul>
             </CardContent>
           </Card>
@@ -247,7 +284,9 @@ const CookiePolicy = () => {
           {/* Section 6 - Modification */}
           <Card>
             <CardContent className="p-6">
-              <h2 className="text-2xl font-bold mb-4 text-emerald">6. Modification de la Politique</h2>
+              <h2 className="text-2xl font-bold mb-4 text-emerald">
+                6. Modification de la Politique
+              </h2>
               <ul className="space-y-2 text-muted-foreground list-disc list-inside ml-4">
                 <li>Mise à jour possible à tout moment pour refléter nos pratiques</li>
                 <li>Notification par banner si changements majeurs</li>
@@ -263,8 +302,8 @@ const CookiePolicy = () => {
               <p className="text-muted-foreground mb-4">
                 Pour toute question sur notre utilisation des cookies :
               </p>
-              <a 
-                href="mailto:contact@zawajconnect.me" 
+              <a
+                href="mailto:contact@zawajconnect.me"
                 className="text-emerald hover:underline text-lg font-semibold"
               >
                 contact@zawajconnect.me
@@ -276,7 +315,7 @@ const CookiePolicy = () => {
         <Card className="mt-12 bg-gradient-to-r from-emerald/10 to-gold/10 border-emerald/30">
           <CardContent className="p-8 text-center">
             <p className="text-muted-foreground">
-              Votre confiance est notre priorité. Nous nous engageons à protéger votre vie privée 
+              Votre confiance est notre priorité. Nous nous engageons à protéger votre vie privée
               conformément aux principes islamiques d'Amana (confiance) et de respect.
             </p>
             <Separator className="my-6" />
@@ -287,13 +326,21 @@ const CookiePolicy = () => {
         </Card>
 
         <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm">
-          <Link to="/terms-of-service" className="text-emerald hover:underline">Conditions d'Utilisation</Link>
+          <Link to="/terms-of-service" className="text-emerald hover:underline">
+            Conditions d'Utilisation
+          </Link>
           <span className="text-muted-foreground">•</span>
-          <Link to="/privacy-policy" className="text-emerald hover:underline">Politique de Confidentialité</Link>
+          <Link to="/privacy-policy" className="text-emerald hover:underline">
+            Politique de Confidentialité
+          </Link>
           <span className="text-muted-foreground">•</span>
-          <Link to="/refund-policy" className="text-emerald hover:underline">Remboursement</Link>
+          <Link to="/refund-policy" className="text-emerald hover:underline">
+            Remboursement
+          </Link>
           <span className="text-muted-foreground">•</span>
-          <Link to="/community-guidelines" className="text-emerald hover:underline">Charte Communautaire</Link>
+          <Link to="/community-guidelines" className="text-emerald hover:underline">
+            Charte Communautaire
+          </Link>
         </div>
       </div>
     </div>

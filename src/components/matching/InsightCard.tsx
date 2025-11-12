@@ -43,26 +43,20 @@ export const InsightCard = ({ insight }: InsightCardProps) => {
           {insight.category}
         </Badge>
       </div>
-      
-      <p className="text-sm text-muted-foreground mb-3">
-        {insight.description}
-      </p>
-      
+
+      <p className="text-sm text-muted-foreground mb-3">{insight.description}</p>
+
       <div className="space-y-3">
         <div className="p-3 bg-muted/30 rounded-md">
           <p className="text-xs font-medium mb-1">Conseil actionnable:</p>
-          <p className="text-sm">
-            {insight.actionable_tip}
-          </p>
+          <p className="text-sm">{insight.actionable_tip}</p>
         </div>
-        
+
         <div className="p-3 bg-muted/30 rounded-md">
           <p className="text-xs font-medium mb-1">Guidance islamique:</p>
-          <p className="text-sm italic">
-            {insight.islamic_guidance}
-          </p>
+          <p className="text-sm italic">{insight.islamic_guidance}</p>
         </div>
-        
+
         <Button variant="outline" size="sm" className="w-full">
           <ExternalLink className="h-3 w-3 mr-2" />
           En savoir plus

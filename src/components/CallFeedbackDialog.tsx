@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -27,33 +33,39 @@ const TECHNICAL_ISSUES = [
   { id: 'delay_lag', label: 'Délai/latence importante' },
   { id: 'no_audio', label: 'Pas de son' },
   { id: 'no_video', label: 'Pas de vidéo' },
-  { id: 'other', label: 'Autre problème' }
+  { id: 'other', label: 'Autre problème' },
 ];
 
-const CallFeedbackDialog = ({ open, onOpenChange, callId, callType, callDuration }: CallFeedbackDialogProps) => {
+const CallFeedbackDialog = ({
+  open,
+  onOpenChange,
+  callId,
+  callType,
+  callDuration,
+}: CallFeedbackDialogProps) => {
   const { toast } = useToast();
   const [rating, setRating] = useState<number | null>(null);
   const [audioQuality, setAudioQuality] = useState<string>('good');
-  const [videoQuality, setVideoQuality] = useState<string>(callType === 'audio' ? 'not_applicable' : 'good');
+  const [videoQuality, setVideoQuality] = useState<string>(
+    callType === 'audio' ? 'not_applicable' : 'good'
+  );
   const [connectionStability, setConnectionStability] = useState<string>('good');
   const [technicalIssues, setTechnicalIssues] = useState<string[]>([]);
   const [comments, setComments] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleTechnicalIssueToggle = (issueId: string) => {
-    setTechnicalIssues(prev =>
-      prev.includes(issueId)
-        ? prev.filter(id => id !== issueId)
-        : [...prev, issueId]
+    setTechnicalIssues((prev) =>
+      prev.includes(issueId) ? prev.filter((id) => id !== issueId) : [...prev, issueId]
     );
   };
 
   const handleSubmit = async () => {
     if (!rating) {
       toast({
-        title: "Évaluation requise",
-        description: "Veuillez donner une note globale avant de soumettre",
-        variant: "destructive"
+        title: 'Évaluation requise',
+        description: 'Veuillez donner une note globale avant de soumettre',
+        variant: 'destructive',
       });
       return;
     }
@@ -61,8 +73,10 @@ const CallFeedbackDialog = ({ open, onOpenChange, callId, callType, callDuration
     setIsSubmitting(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       if (!user) {
         throw new Error('User not authenticated');
       }
@@ -75,23 +89,23 @@ const CallFeedbackDialog = ({ open, onOpenChange, callId, callType, callDuration
         video_quality: videoQuality,
         connection_stability: connectionStability,
         technical_issues: technicalIssues.length > 0 ? technicalIssues : null,
-        comments: comments.trim() || null
+        comments: comments.trim() || null,
       });
 
       if (error) throw error;
 
       toast({
-        title: "Merci pour votre feedback !",
-        description: "Votre retour nous aide à améliorer la qualité des appels"
+        title: 'Merci pour votre feedback !',
+        description: 'Votre retour nous aide à améliorer la qualité des appels',
       });
 
       onOpenChange(false);
     } catch (error) {
       console.error('Error submitting feedback:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'envoyer le feedback",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -119,14 +133,18 @@ const CallFeedbackDialog = ({ open, onOpenChange, callId, callType, callDuration
           <div className="space-y-2">
             <Label className="text-base font-semibold">Évaluation globale *</Label>
             <div className="flex items-center gap-2">
-              <StarRating
-                rating={rating}
-                onRatingChange={setRating}
-                size="lg"
-              />
+              <StarRating rating={rating} onRatingChange={setRating} size="lg" />
               {rating && (
                 <span className="text-sm text-muted-foreground ml-2">
-                  {rating === 5 ? 'Excellent' : rating === 4 ? 'Bon' : rating === 3 ? 'Moyen' : rating === 2 ? 'Médiocre' : 'Mauvais'}
+                  {rating === 5
+                    ? 'Excellent'
+                    : rating === 4
+                      ? 'Bon'
+                      : rating === 3
+                        ? 'Moyen'
+                        : rating === 2
+                          ? 'Médiocre'
+                          : 'Mauvais'}
                 </span>
               )}
             </div>
@@ -141,19 +159,27 @@ const CallFeedbackDialog = ({ open, onOpenChange, callId, callType, callDuration
             <RadioGroup value={audioQuality} onValueChange={setAudioQuality}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="excellent" id="audio-excellent" />
-                <Label htmlFor="audio-excellent" className="font-normal cursor-pointer">Excellente</Label>
+                <Label htmlFor="audio-excellent" className="font-normal cursor-pointer">
+                  Excellente
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="good" id="audio-good" />
-                <Label htmlFor="audio-good" className="font-normal cursor-pointer">Bonne</Label>
+                <Label htmlFor="audio-good" className="font-normal cursor-pointer">
+                  Bonne
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="fair" id="audio-fair" />
-                <Label htmlFor="audio-fair" className="font-normal cursor-pointer">Correcte</Label>
+                <Label htmlFor="audio-fair" className="font-normal cursor-pointer">
+                  Correcte
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="poor" id="audio-poor" />
-                <Label htmlFor="audio-poor" className="font-normal cursor-pointer">Mauvaise</Label>
+                <Label htmlFor="audio-poor" className="font-normal cursor-pointer">
+                  Mauvaise
+                </Label>
               </div>
             </RadioGroup>
           </div>
@@ -168,19 +194,27 @@ const CallFeedbackDialog = ({ open, onOpenChange, callId, callType, callDuration
               <RadioGroup value={videoQuality} onValueChange={setVideoQuality}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="excellent" id="video-excellent" />
-                  <Label htmlFor="video-excellent" className="font-normal cursor-pointer">Excellente</Label>
+                  <Label htmlFor="video-excellent" className="font-normal cursor-pointer">
+                    Excellente
+                  </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="good" id="video-good" />
-                  <Label htmlFor="video-good" className="font-normal cursor-pointer">Bonne</Label>
+                  <Label htmlFor="video-good" className="font-normal cursor-pointer">
+                    Bonne
+                  </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="fair" id="video-fair" />
-                  <Label htmlFor="video-fair" className="font-normal cursor-pointer">Correcte</Label>
+                  <Label htmlFor="video-fair" className="font-normal cursor-pointer">
+                    Correcte
+                  </Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="poor" id="video-poor" />
-                  <Label htmlFor="video-poor" className="font-normal cursor-pointer">Mauvaise</Label>
+                  <Label htmlFor="video-poor" className="font-normal cursor-pointer">
+                    Mauvaise
+                  </Label>
                 </div>
               </RadioGroup>
             </div>
@@ -195,19 +229,27 @@ const CallFeedbackDialog = ({ open, onOpenChange, callId, callType, callDuration
             <RadioGroup value={connectionStability} onValueChange={setConnectionStability}>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="excellent" id="connection-excellent" />
-                <Label htmlFor="connection-excellent" className="font-normal cursor-pointer">Excellente</Label>
+                <Label htmlFor="connection-excellent" className="font-normal cursor-pointer">
+                  Excellente
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="good" id="connection-good" />
-                <Label htmlFor="connection-good" className="font-normal cursor-pointer">Bonne</Label>
+                <Label htmlFor="connection-good" className="font-normal cursor-pointer">
+                  Bonne
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="fair" id="connection-fair" />
-                <Label htmlFor="connection-fair" className="font-normal cursor-pointer">Correcte</Label>
+                <Label htmlFor="connection-fair" className="font-normal cursor-pointer">
+                  Correcte
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="poor" id="connection-poor" />
-                <Label htmlFor="connection-poor" className="font-normal cursor-pointer">Mauvaise</Label>
+                <Label htmlFor="connection-poor" className="font-normal cursor-pointer">
+                  Mauvaise
+                </Label>
               </div>
             </RadioGroup>
           </div>
@@ -219,7 +261,7 @@ const CallFeedbackDialog = ({ open, onOpenChange, callId, callType, callDuration
               Problèmes techniques rencontrés (optionnel)
             </Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {TECHNICAL_ISSUES.map(issue => (
+              {TECHNICAL_ISSUES.map((issue) => (
                 <div key={issue.id} className="flex items-center space-x-2">
                   <Checkbox
                     id={issue.id}
@@ -254,17 +296,10 @@ const CallFeedbackDialog = ({ open, onOpenChange, callId, callType, callDuration
         </div>
 
         <div className="flex gap-2 justify-end">
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isSubmitting}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isSubmitting}>
             Ignorer
           </Button>
-          <Button
-            onClick={handleSubmit}
-            disabled={!rating || isSubmitting}
-          >
+          <Button onClick={handleSubmit} disabled={!rating || isSubmitting}>
             {isSubmitting ? 'Envoi...' : 'Envoyer le feedback'}
           </Button>
         </div>

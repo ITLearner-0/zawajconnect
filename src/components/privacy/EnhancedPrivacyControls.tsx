@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -6,19 +5,25 @@ import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Eye, 
-  EyeOff, 
-  Shield, 
-  Clock, 
-  MapPin, 
+import {
+  Eye,
+  EyeOff,
+  Shield,
+  Clock,
+  MapPin,
   Image,
   Settings,
   UserX,
   Pause,
-  Play
+  Play,
 } from 'lucide-react';
 import { EnhancedPrivacySettings } from '@/types/enhancedPrivacy';
 
@@ -31,7 +36,7 @@ interface EnhancedPrivacyControlsProps {
 const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
   userId,
   currentSettings,
-  onSettingsChange
+  onSettingsChange,
 }) => {
   const [localSettings, setLocalSettings] = useState<EnhancedPrivacySettings>(currentSettings);
   const [isAccountPaused, setIsAccountPaused] = useState(false);
@@ -46,8 +51,8 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
     updateSettings({
       progressiveReveal: {
         ...localSettings.progressiveReveal,
-        [key]: value
-      }
+        [key]: value,
+      },
     });
   };
 
@@ -55,8 +60,8 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
     updateSettings({
       incognito: {
         ...localSettings.incognito,
-        [key]: value
-      }
+        [key]: value,
+      },
     });
   };
 
@@ -64,27 +69,27 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
     updateSettings({
       profileVisibility: {
         ...localSettings.profileVisibility,
-        [key]: value
-      }
+        [key]: value,
+      },
     });
   };
 
   const toggleAccountPause = () => {
     const newPauseState = !isAccountPaused;
     setIsAccountPaused(newPauseState);
-    
+
     if (newPauseState) {
       updateSettings({
         profileVisibility: {
           ...localSettings.profileVisibility,
           whoCanSeeProfile: 'custom',
-          showInSearchResults: false
+          showInSearchResults: false,
         },
         incognito: {
           ...localSettings.incognito,
           enabled: true,
-          hideFromSearch: true
-        }
+          hideFromSearch: true,
+        },
       });
     }
   };
@@ -122,10 +127,10 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
             </div>
             <Switch
               checked={localSettings.progressiveReveal.revealStages.personal}
-              onCheckedChange={(checked) => 
+              onCheckedChange={(checked) =>
                 updateProgressiveReveal('revealStages', {
                   ...localSettings.progressiveReveal.revealStages,
-                  personal: checked
+                  personal: checked,
                 })
               }
             />
@@ -135,7 +140,9 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
             <Label>Score de compatibilité requis pour révéler les photos</Label>
             <Slider
               value={[localSettings.progressiveReveal.requiresCompatibilityScore]}
-              onValueChange={([value]) => updateProgressiveReveal('requiresCompatibilityScore', value)}
+              onValueChange={([value]) =>
+                updateProgressiveReveal('requiresCompatibilityScore', value)
+              }
               max={100}
               min={0}
               step={5}
@@ -160,35 +167,37 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-3">
-            {Object.entries(localSettings.progressiveReveal.revealStages).map(([stage, enabled]) => (
-              <div key={stage} className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label className="capitalize">
-                    {stage === 'basic' && 'Informations de base'}
-                    {stage === 'education' && 'Éducation et profession'}
-                    {stage === 'religious' && 'Pratique religieuse'}
-                    {stage === 'personal' && 'À propos de moi'}
-                    {stage === 'contact' && 'Informations de contact'}
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    {stage === 'basic' && 'Nom, âge, localisation générale'}
-                    {stage === 'education' && 'Niveau d\'études, occupation'}
-                    {stage === 'religious' && 'Niveau de pratique, madhab'}
-                    {stage === 'personal' && 'Description personnelle, famille'}
-                    {stage === 'contact' && 'Informations du wali'}
-                  </p>
+            {Object.entries(localSettings.progressiveReveal.revealStages).map(
+              ([stage, enabled]) => (
+                <div key={stage} className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <Label className="capitalize">
+                      {stage === 'basic' && 'Informations de base'}
+                      {stage === 'education' && 'Éducation et profession'}
+                      {stage === 'religious' && 'Pratique religieuse'}
+                      {stage === 'personal' && 'À propos de moi'}
+                      {stage === 'contact' && 'Informations de contact'}
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      {stage === 'basic' && 'Nom, âge, localisation générale'}
+                      {stage === 'education' && "Niveau d'études, occupation"}
+                      {stage === 'religious' && 'Niveau de pratique, madhab'}
+                      {stage === 'personal' && 'Description personnelle, famille'}
+                      {stage === 'contact' && 'Informations du wali'}
+                    </p>
+                  </div>
+                  <Switch
+                    checked={enabled}
+                    onCheckedChange={(checked) =>
+                      updateProgressiveReveal('revealStages', {
+                        ...localSettings.progressiveReveal.revealStages,
+                        [stage]: checked,
+                      })
+                    }
+                  />
                 </div>
-                <Switch
-                  checked={enabled}
-                  onCheckedChange={(checked) =>
-                    updateProgressiveReveal('revealStages', {
-                      ...localSettings.progressiveReveal.revealStages,
-                      [stage]: checked
-                    })
-                  }
-                />
-              </div>
-            ))}
+              )
+            )}
           </div>
 
           <div className="space-y-2">
@@ -196,7 +205,9 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
             <Input
               type="number"
               value={localSettings.progressiveReveal.autoRevealAfterDays}
-              onChange={(e) => updateProgressiveReveal('autoRevealAfterDays', parseInt(e.target.value) || 7)}
+              onChange={(e) =>
+                updateProgressiveReveal('autoRevealAfterDays', parseInt(e.target.value) || 7)
+              }
               min={1}
               max={30}
             />
@@ -264,7 +275,9 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
                   <Input
                     type="number"
                     value={localSettings.incognito.maxProfileViewsPerDay}
-                    onChange={(e) => updateIncognito('maxProfileViewsPerDay', parseInt(e.target.value) || 5)}
+                    onChange={(e) =>
+                      updateIncognito('maxProfileViewsPerDay', parseInt(e.target.value) || 5)
+                    }
                     min={1}
                     max={50}
                   />
@@ -287,12 +300,16 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
           <div className="space-y-2">
             <Label>Précision de la localisation affichée</Label>
             <Select
-              value={localSettings.profileVisibility.customCriteria.allowedLocations.length > 0 ? 'city' : 'approximate'}
+              value={
+                localSettings.profileVisibility.customCriteria.allowedLocations.length > 0
+                  ? 'city'
+                  : 'approximate'
+              }
               onValueChange={(value) => {
                 if (value === 'approximate') {
                   updateProfileVisibility('customCriteria', {
                     ...localSettings.profileVisibility.customCriteria,
-                    allowedLocations: []
+                    allowedLocations: [],
                   });
                 }
               }}
@@ -312,9 +329,7 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <Label>Masquer la localisation exacte</Label>
-              <p className="text-sm text-muted-foreground">
-                Afficher uniquement une zone générale
-              </p>
+              <p className="text-sm text-muted-foreground">Afficher uniquement une zone générale</p>
             </div>
             <Switch
               checked={!localSettings.showLocation}
@@ -337,16 +352,15 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
             <div className="space-y-0.5">
               <Label>Mettre le compte en pause</Label>
               <p className="text-sm text-muted-foreground">
-                {isAccountPaused 
-                  ? "Votre profil est actuellement masqué" 
-                  : "Masquer temporairement votre profil de tous les utilisateurs"
-                }
+                {isAccountPaused
+                  ? 'Votre profil est actuellement masqué'
+                  : 'Masquer temporairement votre profil de tous les utilisateurs'}
               </p>
             </div>
             <Button
-              variant={isAccountPaused ? "default" : "outline"}
+              variant={isAccountPaused ? 'default' : 'outline'}
               onClick={toggleAccountPause}
-              className={isAccountPaused ? "bg-green-600 hover:bg-green-700" : ""}
+              className={isAccountPaused ? 'bg-green-600 hover:bg-green-700' : ''}
             >
               {isAccountPaused ? (
                 <>
@@ -369,8 +383,8 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
                 <div className="text-sm">
                   <p className="font-medium text-yellow-800">Compte en pause</p>
                   <p className="text-yellow-700">
-                    Votre profil est masqué et vous n'apparaissez plus dans les recherches.
-                    Vous pouvez réactiver votre compte à tout moment.
+                    Votre profil est masqué et vous n'apparaissez plus dans les recherches. Vous
+                    pouvez réactiver votre compte à tout moment.
                   </p>
                 </div>
               </div>
@@ -393,12 +407,14 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
             <Input
               type="number"
               value={localSettings.dataRetention.deleteViewHistoryAfterDays}
-              onChange={(e) => updateSettings({
-                dataRetention: {
-                  ...localSettings.dataRetention,
-                  deleteViewHistoryAfterDays: parseInt(e.target.value) || 30
-                }
-              })}
+              onChange={(e) =>
+                updateSettings({
+                  dataRetention: {
+                    ...localSettings.dataRetention,
+                    deleteViewHistoryAfterDays: parseInt(e.target.value) || 30,
+                  },
+                })
+              }
               min={1}
               max={365}
             />
@@ -409,12 +425,14 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
             <Input
               type="number"
               value={localSettings.dataRetention.deleteConversationsAfterDays}
-              onChange={(e) => updateSettings({
-                dataRetention: {
-                  ...localSettings.dataRetention,
-                  deleteConversationsAfterDays: parseInt(e.target.value) || 365
-                }
-              })}
+              onChange={(e) =>
+                updateSettings({
+                  dataRetention: {
+                    ...localSettings.dataRetention,
+                    deleteConversationsAfterDays: parseInt(e.target.value) || 365,
+                  },
+                })
+              }
               min={1}
               max={3650}
             />
@@ -429,12 +447,14 @@ const EnhancedPrivacyControls: React.FC<EnhancedPrivacyControlsProps> = ({
             </div>
             <Switch
               checked={localSettings.dataRetention.autoDeleteRejectedMatches}
-              onCheckedChange={(checked) => updateSettings({
-                dataRetention: {
-                  ...localSettings.dataRetention,
-                  autoDeleteRejectedMatches: checked
-                }
-              })}
+              onCheckedChange={(checked) =>
+                updateSettings({
+                  dataRetention: {
+                    ...localSettings.dataRetention,
+                    autoDeleteRejectedMatches: checked,
+                  },
+                })
+              }
             />
           </div>
         </CardContent>

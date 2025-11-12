@@ -1,4 +1,3 @@
-
 import { RateLimitConfig, RateLimitResult, RateLimitStateEntry } from './types';
 import { DEFAULT_RATE_LIMITS } from './config';
 import { MemoryStore } from './memoryStore';
@@ -24,15 +23,15 @@ export class RateLimitCore {
         remaining: 0,
         resetTime: data.blockedUntil,
         blocked: true,
-        blockUntil: data.blockedUntil
+        blockUntil: data.blockedUntil,
       };
     }
 
     // Initialize or reset window if expired
-    if (!data || (now - data.windowStart) >= config.windowMs) {
+    if (!data || now - data.windowStart >= config.windowMs) {
       data = {
         count: 0,
-        windowStart: now
+        windowStart: now,
       };
       this.memoryStore.set(key, data);
     }
@@ -52,7 +51,7 @@ export class RateLimitCore {
           remaining: 0,
           resetTime: data.windowStart + config.windowMs,
           blocked: true,
-          blockUntil: data.blockedUntil
+          blockUntil: data.blockedUntil,
         };
       }
 
@@ -60,7 +59,7 @@ export class RateLimitCore {
         allowed: false,
         remaining: 0,
         resetTime: data.windowStart + config.windowMs,
-        blocked: false
+        blocked: false,
       };
     }
 
@@ -72,12 +71,17 @@ export class RateLimitCore {
       allowed: true,
       remaining: config.maxRequests - data.count,
       resetTime: data.windowStart + config.windowMs,
-      blocked: false
+      blocked: false,
     };
   }
 
   async detectAbuse(userId: string, endpoint: string, requestData?: any) {
-    return this.abuseDetection.detectAbuse(userId, endpoint, requestData, new Map(this.memoryStore.entries()));
+    return this.abuseDetection.detectAbuse(
+      userId,
+      endpoint,
+      requestData,
+      new Map(this.memoryStore.entries())
+    );
   }
 
   async blockUser(userId: string, durationMs: number, reason: string): Promise<void> {
@@ -90,7 +94,7 @@ export class RateLimitCore {
       this.memoryStore.set(key, {
         count: 999,
         windowStart: now,
-        blockedUntil: blockUntil
+        blockedUntil: blockUntil,
       });
     }
 
@@ -109,7 +113,7 @@ export class RateLimitCore {
 
   getStats(): { totalKeys: number; blockedUsers: number } {
     this.memoryStore.cleanupExpiredEntries();
-    
+
     const totalKeys = this.memoryStore.size();
     const blockedUsers = this.memoryStore.getBlockedUsers().size;
 
@@ -123,7 +127,7 @@ export class RateLimitCore {
         userId,
         endpoint,
         violationType,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
 
       // You could also send this to your monitoring service

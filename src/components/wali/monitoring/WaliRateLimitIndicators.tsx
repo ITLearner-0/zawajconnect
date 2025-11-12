@@ -17,7 +17,7 @@ const RATE_LIMITS = {
   match_approval: { limit: 20, label: 'Approbations de matches', windowHours: 24 },
   profile_view: { limit: 50, label: 'Vues de profils', windowHours: 1 },
   settings_modification: { limit: 10, label: 'Modifications de paramètres', windowHours: 1 },
-  notification_send: { limit: 30, label: 'Envois de notifications', windowHours: 24 }
+  notification_send: { limit: 30, label: 'Envois de notifications', windowHours: 24 },
 };
 
 export const WaliRateLimitIndicators = ({ rateLimits, loading }: WaliRateLimitIndicatorsProps) => {
@@ -41,10 +41,13 @@ export const WaliRateLimitIndicators = ({ rateLimits, loading }: WaliRateLimitIn
     );
   }
 
-  const limitsMap = rateLimits.reduce((acc, limit) => {
-    acc[limit.action_type] = limit;
-    return acc;
-  }, {} as Record<string, RateLimitData>);
+  const limitsMap = rateLimits.reduce(
+    (acc, limit) => {
+      acc[limit.action_type] = limit;
+      return acc;
+    },
+    {} as Record<string, RateLimitData>
+  );
 
   return (
     <Card>
@@ -76,14 +79,14 @@ export const WaliRateLimitIndicators = ({ rateLimits, loading }: WaliRateLimitIn
                   {current} / {config.limit}
                 </span>
               </div>
-              <Progress 
-                value={Math.min(percentage, 100)} 
+              <Progress
+                value={Math.min(percentage, 100)}
                 className={`h-2 ${
-                  isAtLimit 
-                    ? '[&>div]:bg-destructive' 
-                    : isNearLimit 
-                    ? '[&>div]:bg-orange-500' 
-                    : '[&>div]:bg-green-500'
+                  isAtLimit
+                    ? '[&>div]:bg-destructive'
+                    : isNearLimit
+                      ? '[&>div]:bg-orange-500'
+                      : '[&>div]:bg-green-500'
                 }`}
               />
               <p className="text-xs text-muted-foreground">

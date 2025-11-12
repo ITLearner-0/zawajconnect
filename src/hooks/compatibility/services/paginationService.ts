@@ -1,7 +1,6 @@
-
-import { CompatibilityMatch } from "@/types/compatibility";
-import { PaginationCursor, PaginationOptions, PaginatedResult } from "../types/paginationTypes";
-import { logInfo, logError } from "./loggingService";
+import { CompatibilityMatch } from '@/types/compatibility';
+import { PaginationCursor, PaginationOptions, PaginatedResult } from '../types/paginationTypes';
+import { logInfo, logError } from './loggingService';
 
 export class PaginationService {
   private static readonly DEFAULT_PAGE_SIZE = 20;
@@ -12,43 +11,39 @@ export class PaginationService {
     return {
       score: match.score,
       userId: match.userId,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
   }
 
   // Paginate matches array
   static paginateMatches(
-    matches: CompatibilityMatch[], 
+    matches: CompatibilityMatch[],
     options: PaginationOptions = {}
   ): PaginatedResult<CompatibilityMatch> {
     try {
-      const limit = Math.min(
-        options.limit || this.DEFAULT_PAGE_SIZE, 
-        this.MAX_PAGE_SIZE
-      );
-      
+      const limit = Math.min(options.limit || this.DEFAULT_PAGE_SIZE, this.MAX_PAGE_SIZE);
+
       let startIndex = 0;
-      
+
       // Find cursor position if provided
       if (options.cursor) {
-        const cursorIndex = matches.findIndex(match => 
-          match.userId === options.cursor!.userId
-        );
-        
+        const cursorIndex = matches.findIndex((match) => match.userId === options.cursor!.userId);
+
         if (cursorIndex !== -1) {
-          startIndex = options.direction === 'backward' 
-            ? Math.max(0, cursorIndex - limit + 1)
-            : cursorIndex + 1;
+          startIndex =
+            options.direction === 'backward'
+              ? Math.max(0, cursorIndex - limit + 1)
+              : cursorIndex + 1;
         }
       }
 
       const endIndex = Math.min(startIndex + limit, matches.length);
       const data = matches.slice(startIndex, endIndex);
-      
+
       const result: PaginatedResult<CompatibilityMatch> = {
         data,
         hasMore: endIndex < matches.length,
-        totalCount: matches.length
+        totalCount: matches.length,
       };
 
       // Set cursors
@@ -61,7 +56,7 @@ export class PaginationService {
         startIndex,
         endIndex,
         dataLength: data.length,
-        hasMore: result.hasMore
+        hasMore: result.hasMore,
       });
 
       return result;
@@ -70,19 +65,19 @@ export class PaginationService {
       return {
         data: [],
         hasMore: false,
-        totalCount: 0
+        totalCount: 0,
       };
     }
   }
 
   // Merge paginated results (for "load more" functionality)
   static mergeResults(
-    existing: CompatibilityMatch[], 
+    existing: CompatibilityMatch[],
     newData: CompatibilityMatch[]
   ): CompatibilityMatch[] {
-    const existingIds = new Set(existing.map(match => match.userId));
-    const uniqueNewData = newData.filter(match => !existingIds.has(match.userId));
-    
+    const existingIds = new Set(existing.map((match) => match.userId));
+    const uniqueNewData = newData.filter((match) => !existingIds.has(match.userId));
+
     return [...existing, ...uniqueNewData];
   }
 
@@ -107,7 +102,7 @@ export class PaginationService {
       start,
       end,
       visibleStart,
-      visibleEnd
+      visibleEnd,
     };
   }
 }

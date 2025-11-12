@@ -8,15 +8,13 @@ interface ProtectedRouteWrapperProps {
   requireOnboarding?: boolean;
 }
 
-const ProtectedRouteWrapper: React.FC<ProtectedRouteWrapperProps> = ({ 
-  children, 
-  requireOnboarding = true 
+const ProtectedRouteWrapper: React.FC<ProtectedRouteWrapperProps> = ({
+  children,
+  requireOnboarding = true,
 }) => {
   return (
     <ProtectedRoute requireOnboarding={requireOnboarding}>
-      <RoleBasedLayout>
-        {children}
-      </RoleBasedLayout>
+      <RoleBasedLayout>{children}</RoleBasedLayout>
     </ProtectedRoute>
   );
 };

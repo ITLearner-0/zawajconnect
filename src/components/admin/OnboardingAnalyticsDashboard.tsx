@@ -28,7 +28,13 @@ import {
   Activity,
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface FunnelData {
   step_number: number;
@@ -136,9 +142,7 @@ export const OnboardingAnalyticsDashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold">Analytics Onboarding</h2>
-          <p className="text-muted-foreground">
-            Analyse détaillée du parcours d'inscription
-          </p>
+          <p className="text-muted-foreground">Analyse détaillée du parcours d'inscription</p>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-40">
@@ -161,9 +165,7 @@ export const OnboardingAnalyticsDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{summary.totalUsers}</div>
-            <p className="text-xs text-muted-foreground">
-              Ont commencé l'inscription
-            </p>
+            <p className="text-xs text-muted-foreground">Ont commencé l'inscription</p>
           </CardContent>
         </Card>
 
@@ -174,9 +176,7 @@ export const OnboardingAnalyticsDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{summary.completionRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              Ont terminé l'inscription
-            </p>
+            <p className="text-xs text-muted-foreground">Ont terminé l'inscription</p>
           </CardContent>
         </Card>
 
@@ -187,9 +187,7 @@ export const OnboardingAnalyticsDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{summary.avgTimeMinutes} min</div>
-            <p className="text-xs text-muted-foreground">
-              Par utilisateur
-            </p>
+            <p className="text-xs text-muted-foreground">Par utilisateur</p>
           </CardContent>
         </Card>
 
@@ -200,9 +198,7 @@ export const OnboardingAnalyticsDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{summary.abandonmentRate}%</div>
-            <p className="text-xs text-muted-foreground">
-              N'ont pas terminé
-            </p>
+            <p className="text-xs text-muted-foreground">N'ont pas terminé</p>
           </CardContent>
         </Card>
       </div>
@@ -241,9 +237,7 @@ export const OnboardingAnalyticsDashboard: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>Taux de complétion par étape</CardTitle>
-              <CardDescription>
-                Pourcentage d'utilisateurs complétant chaque étape
-              </CardDescription>
+              <CardDescription>Pourcentage d'utilisateurs complétant chaque étape</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
@@ -270,9 +264,7 @@ export const OnboardingAnalyticsDashboard: React.FC = () => {
           <Card>
             <CardHeader>
               <CardTitle>Temps moyen par étape</CardTitle>
-              <CardDescription>
-                Durée moyenne passée sur chaque section
-              </CardDescription>
+              <CardDescription>Durée moyenne passée sur chaque section</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
@@ -285,11 +277,7 @@ export const OnboardingAnalyticsDashboard: React.FC = () => {
                     labelFormatter={(label) => `Étape: ${label}`}
                   />
                   <Legend />
-                  <Bar
-                    dataKey="avg_time_seconds"
-                    fill="#f59e0b"
-                    name="Temps moyen"
-                  />
+                  <Bar dataKey="avg_time_seconds" fill="#f59e0b" name="Temps moyen" />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -305,9 +293,7 @@ export const OnboardingAnalyticsDashboard: React.FC = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-sm text-muted-foreground">Temps moyen:</span>
-                      <span className="font-semibold">
-                        {formatTime(step.avg_time_seconds)}
-                      </span>
+                      <span className="font-semibold">{formatTime(step.avg_time_seconds)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-muted-foreground">Complétion:</span>

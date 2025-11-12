@@ -11,15 +11,15 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Send, 
-  Mic, 
-  MicOff, 
-  Phone, 
-  Video, 
-  MoreVertical, 
-  Clock, 
-  Check, 
+import {
+  Send,
+  Mic,
+  MicOff,
+  Phone,
+  Video,
+  MoreVertical,
+  Clock,
+  Check,
   CheckCheck,
   User,
   Heart,
@@ -29,7 +29,7 @@ import {
   MessageCircle,
   Users,
   Shield,
-  AlertTriangle
+  AlertTriangle,
 } from 'lucide-react';
 import { format, isToday, isYesterday } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -75,7 +75,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
   const { toast } = useToast();
   const { moderateContent } = useIslamicModeration();
   const { supervisionStatus, familyMembers } = useFamilySupervision();
-  
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [match, setMatch] = useState<any>(null);
@@ -86,20 +86,20 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [islamicReminders, setIslamicReminders] = useState<IslamicReminder[]>([]);
   const [showReminders, setShowReminders] = useState(false);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
   const presenceChannelRef = useRef<any>();
 
   useEffect(() => {
     if (!user || !matchId) return;
-    
+
     fetchMatchData();
     fetchMessages();
     setupRealtimeSubscription();
     setupPresenceTracking();
     fetchIslamicReminders();
-    
+
     return () => {
       if (presenceChannelRef.current) {
         supabase.removeChannel(presenceChannelRef.current);
@@ -127,35 +127,37 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
     try {
       const { data, error } = await supabase
         .from('matches')
-        .select(`
+        .select(
+          `
           *,
           user1_profile:profiles!matches_user1_id_fkey(full_name, avatar_url),
           user2_profile:profiles!matches_user2_id_fkey(full_name, avatar_url)
-        `)
+        `
+        )
         .eq('id', matchId)
         .maybeSingle();
 
       if (error) throw error;
       if (data) {
         const otherUserId = data.user1_id === user.id ? data.user2_id : data.user1_id;
-        const otherProfile = data.user1_id === user.id ? 
-          (data.user2_profile as any) : (data.user1_profile as any);
-        
+        const otherProfile =
+          data.user1_id === user.id ? (data.user2_profile as any) : (data.user1_profile as any);
+
         setMatch({
           ...data,
           other_user: {
             id: otherUserId,
             full_name: otherProfile?.full_name || 'Utilisateur',
-            avatar_url: otherProfile?.avatar_url || ''
-          }
+            avatar_url: otherProfile?.avatar_url || '',
+          },
         });
       }
     } catch (error) {
       console.error('Error fetching match data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les informations du match",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les informations du match',
+        variant: 'destructive',
       });
     }
   };
@@ -169,7 +171,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
         .order('created_at', { ascending: true });
 
       if (error) throw error;
-      setMessages((data || []).map(msg => ({ ...msg, message_type: 'text' as const })));
+      setMessages((data || []).map((msg) => ({ ...msg, message_type: 'text' as const })));
     } catch (error) {
       console.error('Error fetching messages:', error);
     } finally {
@@ -191,8 +193,8 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
         },
         (payload) => {
           const newMessage = payload.new as Message;
-          setMessages(prev => [...prev, newMessage]);
-          
+          setMessages((prev) => [...prev, newMessage]);
+
           if (newMessage.sender_id !== user?.id) {
             markMessageAsRead(newMessage.id);
           }
@@ -208,9 +210,9 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
         },
         (payload) => {
           const updatedMessage = payload.new as Message;
-          setMessages(prev => prev.map(msg => 
-            msg.id === updatedMessage.id ? updatedMessage : msg
-          ));
+          setMessages((prev) =>
+            prev.map((msg) => (msg.id === updatedMessage.id ? updatedMessage : msg))
+          );
         }
       )
       .subscribe();
@@ -234,10 +236,10 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
     channel
       .on('presence', { event: 'sync' }, () => {
         const newState = channel.presenceState();
-        const users = Object.keys(newState).map(userId => ({
+        const users = Object.keys(newState).map((userId) => ({
           user_id: userId,
           last_seen: new Date().toISOString(),
-          status: 'online' as const
+          status: 'online' as const,
         }));
         setOnlineUsers(users);
       })
@@ -250,14 +252,17 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
       // Typing indicators
       .on('broadcast', { event: 'typing' }, (payload) => {
         if (payload.user_id !== user.id) {
-          setTypingUsers(prev => {
-            const filtered = prev.filter(u => u.user_id !== payload.user_id);
+          setTypingUsers((prev) => {
+            const filtered = prev.filter((u) => u.user_id !== payload.user_id);
             if (payload.typing) {
-              return [...filtered, {
-                user_id: payload.user_id,
-                user_name: payload.user_name,
-                timestamp: new Date().toISOString()
-              }];
+              return [
+                ...filtered,
+                {
+                  user_id: payload.user_id,
+                  user_name: payload.user_name,
+                  timestamp: new Date().toISOString(),
+                },
+              ];
             }
             return filtered;
           });
@@ -265,7 +270,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
       })
       .subscribe(async (status) => {
         if (status !== 'SUBSCRIBED') return;
-        
+
         await channel.track({
           user_id: user.id,
           user_name: user.email || 'Utilisateur',
@@ -277,10 +282,12 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
 
     // Clean up old typing indicators
     const typingCleanup = setInterval(() => {
-      setTypingUsers(prev => prev.filter(u => {
-        const timeDiff = Date.now() - new Date(u.timestamp).getTime();
-        return timeDiff < 3000; // Remove after 3 seconds
-      }));
+      setTypingUsers((prev) =>
+        prev.filter((u) => {
+          const timeDiff = Date.now() - new Date(u.timestamp).getTime();
+          return timeDiff < 3000; // Remove after 3 seconds
+        })
+      );
     }, 1000);
 
     return () => {
@@ -292,38 +299,40 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
   const fetchIslamicReminders = async () => {
     const now = new Date();
     const currentHour = now.getHours();
-    
+
     const reminders: IslamicReminder[] = [];
-    
+
     // Prayer time reminders
     if (currentHour === 5) {
       reminders.push({
         id: 'fajr',
         type: 'prayer_time',
         content: 'Il est temps de prier Fajr. Que votre conversation soit bénie.',
-        timing: 'Fajr'
+        timing: 'Fajr',
       });
     }
-    
+
     // Random Islamic verses or hadiths
     const verses = [
       {
         id: 'verse1',
         type: 'verse' as const,
-        content: 'Et parmi Ses signes Il a créé de vous, pour vous, des épouses pour que vous viviez en tranquillité avec elles et Il a mis entre vous de l\'affection et de la bonté.',
-        reference: 'Coran 30:21'
+        content:
+          "Et parmi Ses signes Il a créé de vous, pour vous, des épouses pour que vous viviez en tranquillité avec elles et Il a mis entre vous de l'affection et de la bonté.",
+        reference: 'Coran 30:21',
       },
       {
         id: 'hadith1',
         type: 'hadith' as const,
-        content: 'Les croyants les plus parfaits en matière de foi sont ceux d\'entre eux qui ont le meilleur caractère.',
-        reference: 'Abu Dawud'
-      }
+        content:
+          "Les croyants les plus parfaits en matière de foi sont ceux d'entre eux qui ont le meilleur caractère.",
+        reference: 'Abu Dawud',
+      },
     ];
-    
+
     const randomReminder = verses[Math.floor(Math.random() * verses.length)];
     reminders.push(randomReminder);
-    
+
     setIslamicReminders(reminders);
   };
 
@@ -336,20 +345,20 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
       payload: {
         user_id: user.id,
         user_name: user.email || 'Utilisateur',
-        typing
-      }
+        typing,
+      },
     });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNewMessage(e.target.value);
-    
+
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    
+
     handleTyping(true);
-    
+
     typingTimeoutRef.current = setTimeout(() => {
       handleTyping(false);
     }, 1000);
@@ -357,10 +366,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
 
   const markMessageAsRead = async (messageId: string) => {
     try {
-      await supabase
-        .from('messages')
-        .update({ is_read: true })
-        .eq('id', messageId);
+      await supabase.from('messages').update({ is_read: true }).eq('id', messageId);
     } catch (error) {
       console.error('Error marking message as read:', error);
     }
@@ -370,10 +376,10 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
     if (!newMessage.trim() || !user || !match) return;
 
     setSending(true);
-    
+
     try {
       const moderationResult = await moderateContent(newMessage.trim(), 'chat', matchId);
-      
+
       if (!moderationResult.approved) {
         if (moderationResult.action === 'blocked') {
           setSending(false);
@@ -386,7 +392,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
         sender_id: user.id,
         content: newMessage.trim(),
         message_type: 'text' as const,
-        family_supervised: supervisionStatus.supervisionRequired
+        family_supervised: supervisionStatus.supervisionRequired,
       };
 
       const { error } = await supabase.from('messages').insert(messageData);
@@ -398,9 +404,9 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'envoyer le message",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setSending(false);
@@ -427,7 +433,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
 
   const getMessageStatus = (message: Message) => {
     if (message.sender_id !== user?.id) return null;
-    
+
     if (message.is_read) {
       return <CheckCheck className="h-3 w-3 text-blue-500" />;
     } else {
@@ -436,7 +442,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
   };
 
   const isUserOnline = (userId: string) => {
-    return onlineUsers.some(u => u.user_id === userId && u.status === 'online');
+    return onlineUsers.some((u) => u.user_id === userId && u.status === 'online');
   };
 
   if (loading) {
@@ -489,7 +495,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
             <Popover open={showReminders} onOpenChange={setShowReminders}>
               <PopoverTrigger asChild>
@@ -503,13 +509,21 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
                   {islamicReminders.map((reminder) => (
                     <div key={reminder.id} className="p-3 bg-secondary/20 rounded-lg">
                       <div className="flex items-start gap-2">
-                        {reminder.type === 'prayer_time' && <Moon className="h-4 w-4 text-primary mt-0.5" />}
-                        {reminder.type === 'verse' && <BookOpen className="h-4 w-4 text-primary mt-0.5" />}
-                        {reminder.type === 'hadith' && <Heart className="h-4 w-4 text-primary mt-0.5" />}
+                        {reminder.type === 'prayer_time' && (
+                          <Moon className="h-4 w-4 text-primary mt-0.5" />
+                        )}
+                        {reminder.type === 'verse' && (
+                          <BookOpen className="h-4 w-4 text-primary mt-0.5" />
+                        )}
+                        {reminder.type === 'hadith' && (
+                          <Heart className="h-4 w-4 text-primary mt-0.5" />
+                        )}
                         <div>
                           <p className="text-sm">{reminder.content}</p>
                           {reminder.reference && (
-                            <p className="text-xs text-muted-foreground mt-1">- {reminder.reference}</p>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              - {reminder.reference}
+                            </p>
                           )}
                         </div>
                       </div>
@@ -519,7 +533,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
               </PopoverContent>
             </Popover>
 
-      {supervisionStatus.supervisionRequired && (
+            {supervisionStatus.supervisionRequired && (
               <Badge variant="outline" className="text-xs">
                 <Shield className="h-3 w-3 mr-1" />
                 Supervisé
@@ -549,7 +563,9 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
         <div className="px-4 py-2 bg-amber-50 border-b border-amber-200">
           <div className="flex items-center gap-2 text-sm text-amber-700">
             <Users className="h-4 w-4" />
-            <span>Cette conversation est supervisée par votre famille selon les principes islamiques</span>
+            <span>
+              Cette conversation est supervisée par votre famille selon les principes islamiques
+            </span>
           </div>
         </div>
       )}
@@ -559,9 +575,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
         {messages.length === 0 ? (
           <div className="text-center py-8">
             <Heart className="h-12 w-12 mx-auto text-primary/50 mb-4" />
-            <p className="text-muted-foreground">
-              C'est le début de votre conversation !
-            </p>
+            <p className="text-muted-foreground">C'est le début de votre conversation !</p>
             <p className="text-sm text-muted-foreground mt-1">
               Présentez-vous et commencez à faire connaissance de manière respectueuse.
             </p>
@@ -570,16 +584,21 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
           messages.map((message) => {
             const isMyMessage = message.sender_id === user?.id;
             return (
-              <div key={message.id} className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                  isMyMessage 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'bg-muted text-foreground'
-                }`}>
+              <div
+                key={message.id}
+                className={`flex ${isMyMessage ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                    isMyMessage ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'
+                  }`}
+                >
                   <p className="text-sm break-words">{message.content}</p>
-                  <div className={`flex items-center justify-between mt-1 gap-2 ${
-                    isMyMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                  }`}>
+                  <div
+                    className={`flex items-center justify-between mt-1 gap-2 ${
+                      isMyMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                    }`}
+                  >
                     <span className="text-xs">{formatMessageTime(message.created_at)}</span>
                     {getMessageStatus(message)}
                   </div>
@@ -594,7 +613,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
             );
           })
         )}
-        
+
         {/* Typing Indicators */}
         {typingUsers.length > 0 && (
           <div className="flex justify-start">
@@ -602,8 +621,14 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
               <div className="flex items-center gap-2">
                 <div className="flex gap-1">
                   <div className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                  <div className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div
+                    className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce"
+                    style={{ animationDelay: '0.1s' }}
+                  ></div>
+                  <div
+                    className="w-2 h-2 bg-muted-foreground/50 rounded-full animate-bounce"
+                    style={{ animationDelay: '0.2s' }}
+                  ></div>
                 </div>
                 <span className="text-xs text-muted-foreground">
                   {typingUsers[0].user_name} est en train d'écrire...
@@ -612,7 +637,7 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 

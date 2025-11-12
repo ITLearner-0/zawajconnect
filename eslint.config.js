@@ -25,6 +25,7 @@ export default tseslint.config(
       ],
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-explicit-any": "warn", // Changed from error to warn to allow gradual migration
+      "react-hooks/set-state-in-effect": "off", // Disabled - rule is overly strict for legitimate data loading patterns
     },
   }
 );

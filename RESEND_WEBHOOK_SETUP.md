@@ -15,6 +15,7 @@ Ce guide explique comment configurer le webhook Resend pour tracker automatiquem
 ### 2. Configurer l'URL du Webhook
 
 **URL du Webhook:**
+
 ```
 https://dgfctwtivkqcfhwqgkya.supabase.co/functions/v1/resend-webhook
 ```
@@ -38,6 +39,7 @@ Une fois le webhook créé, Resend va générer un **Signing Secret**.
 **IMPORTANT:** Ce secret a déjà été configuré dans les secrets de l'edge function sous le nom `RESEND_WEBHOOK_SECRET`.
 
 Si vous devez le mettre à jour:
+
 1. Copiez le secret depuis Resend Dashboard
 2. Allez dans Supabase: https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/settings/functions
 3. Mettez à jour le secret `RESEND_WEBHOOK_SECRET`
@@ -45,28 +47,31 @@ Si vous devez le mettre à jour:
 ### 5. Tester le Webhook
 
 Dans Resend, vous pouvez:
+
 1. Cliquer sur **Send test event** pour envoyer un événement de test
 2. Vérifier les logs de l'edge function pour confirmer la réception
 
 ## 📊 Événements Trackés
 
-| Événement | Description | Action |
-|-----------|-------------|--------|
-| `email.sent` | Email envoyé avec succès | Met à jour `delivery_status = 'sent'` |
-| `email.delivered` | Email délivré au serveur du destinataire | Met à jour `delivery_status = 'delivered'` et `delivered_at` |
-| `email.opened` | Email ouvert par le destinataire | Met à jour `opened_at` |
-| `email.clicked` | Lien cliqué dans l'email | Met à jour `clicked_at` |
-| `email.bounced` | Email rejeté (bounce) | Met à jour `delivery_status = 'bounced'` et `error_message` |
-| `email.complained` | Plainte pour spam | Met à jour `delivery_status = 'failed'` et `error_message` |
+| Événement          | Description                              | Action                                                       |
+| ------------------ | ---------------------------------------- | ------------------------------------------------------------ |
+| `email.sent`       | Email envoyé avec succès                 | Met à jour `delivery_status = 'sent'`                        |
+| `email.delivered`  | Email délivré au serveur du destinataire | Met à jour `delivery_status = 'delivered'` et `delivered_at` |
+| `email.opened`     | Email ouvert par le destinataire         | Met à jour `opened_at`                                       |
+| `email.clicked`    | Lien cliqué dans l'email                 | Met à jour `clicked_at`                                      |
+| `email.bounced`    | Email rejeté (bounce)                    | Met à jour `delivery_status = 'bounced'` et `error_message`  |
+| `email.complained` | Plainte pour spam                        | Met à jour `delivery_status = 'failed'` et `error_message`   |
 
 ## 🔐 Sécurité
 
 Le webhook utilise la vérification de signature Svix (utilisé par Resend) pour garantir:
+
 - L'authenticité des requêtes (proviennent bien de Resend)
 - L'intégrité des données (non modifiées en transit)
 - Protection contre les attaques replay
 
 La vérification se fait via:
+
 1. Header `svix-signature` - Signature HMAC-SHA256
 2. Header `svix-timestamp` - Timestamp de la requête
 3. Header `svix-id` - ID unique de la requête
@@ -81,6 +86,7 @@ https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/functions/resend-web
 ### Événements Logués
 
 Vous verrez des messages comme:
+
 ```
 📨 Webhook Resend reçu: email.delivered pour email em_1234567890
 ✅ Email em_1234567890 mis à jour: email.delivered
@@ -105,9 +111,10 @@ Vous verrez des messages comme:
 Pour vérifier que les webhooks fonctionnent:
 
 1. **Envoyer un email de test:**
+
    ```sql
-   SELECT * FROM wali_email_history 
-   WHERE resend_email_id = 'em_VOTRE_EMAIL_ID' 
+   SELECT * FROM wali_email_history
+   WHERE resend_email_id = 'em_VOTRE_EMAIL_ID'
    ORDER BY sent_at DESC;
    ```
 
@@ -117,7 +124,7 @@ Pour vérifier que les webhooks fonctionnent:
 
 3. **Voir les statistiques:**
    ```sql
-   SELECT 
+   SELECT
      COUNT(*) as total,
      COUNT(*) FILTER (WHERE delivery_status = 'delivered') as delivered,
      COUNT(*) FILTER (WHERE opened_at IS NOT NULL) as opened,
@@ -128,6 +135,7 @@ Pour vérifier que les webhooks fonctionnent:
 ## 🚀 Prochaines Étapes
 
 Une fois configuré, le système trackera automatiquement:
+
 - ✅ Tous les emails envoyés aux Walis
 - ✅ Leur statut de livraison en temps réel
 - ✅ Les ouvertures et clics
@@ -139,7 +147,7 @@ Ces données seront visibles dans le dashboard admin via le bouton "Voir histori
 
 Si vous rencontrez des problèmes:
 
-1. **Vérifier les logs Supabase:** 
+1. **Vérifier les logs Supabase:**
    https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/functions/resend-webhook/logs
 
 2. **Vérifier les webhooks Resend:**

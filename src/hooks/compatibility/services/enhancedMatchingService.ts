@@ -1,11 +1,11 @@
-import { CompatibilityMatch } from "@/types/compatibility";
-import { MatchingFilters } from "../types/matchingTypes";
-import { PaginatedResult, PaginationOptions } from "../types/paginationTypes";
-import { backgroundProcessingService } from "./backgroundProcessingService";
-import { cacheService } from "./cacheService";
-import { PaginationService } from "./paginationService";
-import { logInfo, logError, logWarning } from "./loggingService";
-import { findCompatibilityMatches } from "./matchingService";
+import { CompatibilityMatch } from '@/types/compatibility';
+import { MatchingFilters } from '../types/matchingTypes';
+import { PaginatedResult, PaginationOptions } from '../types/paginationTypes';
+import { backgroundProcessingService } from './backgroundProcessingService';
+import { cacheService } from './cacheService';
+import { PaginationService } from './paginationService';
+import { logInfo, logError, logWarning } from './loggingService';
+import { findCompatibilityMatches } from './matchingService';
 
 export class EnhancedMatchingService {
   // Find matches with pagination support
@@ -30,7 +30,7 @@ export class EnhancedMatchingService {
       logInfo('enhancedMatching', 'Paginated matches result', {
         totalMatches: allMatches.length,
         pageSize: paginatedResult.data.length,
-        hasMore: paginatedResult.hasMore
+        hasMore: paginatedResult.hasMore,
       });
 
       return paginatedResult;
@@ -39,7 +39,7 @@ export class EnhancedMatchingService {
       return {
         data: [],
         hasMore: false,
-        totalCount: 0
+        totalCount: 0,
       };
     }
   }
@@ -51,12 +51,15 @@ export class EnhancedMatchingService {
     useBackground = true
   ): Promise<CompatibilityMatch[]> {
     try {
-      logInfo('enhancedMatching', `Finding matches for user: ${userId}`, { useBackground, filters });
+      logInfo('enhancedMatching', `Finding matches for user: ${userId}`, {
+        useBackground,
+        filters,
+      });
 
       // Check for cached popular matches first
       const popularMatchesKey = `popular_matches_${userId}`;
       const cachedPopularMatches = cacheService.get(popularMatchesKey);
-      
+
       if (cachedPopularMatches && !filters) {
         logInfo('enhancedMatching', 'Returning cached popular matches', { userId });
         return cachedPopularMatches as CompatibilityMatch[];
@@ -82,7 +85,6 @@ export class EnhancedMatchingService {
       // For now, return regular matches but with smaller batch to be faster
       const limitedFilters = { ...filters, limit: filters?.pagination?.limit || 50 };
       return await findCompatibilityMatches(userId, limitedFilters);
-
     } catch (error) {
       logError('enhancedMatching', error as Error, { userId });
       // Fallback to regular matching on error
@@ -100,24 +102,24 @@ export class EnhancedMatchingService {
     try {
       const filtersWithPagination = {
         ...filters,
-        pagination: paginationOptions
+        pagination: paginationOptions,
       };
 
       const paginatedResult = await this.findMatchesWithPagination(userId, filtersWithPagination);
-      
+
       // Merge with existing matches
       const mergedMatches = PaginationService.mergeResults(existingMatches, paginatedResult.data);
-      
+
       return {
         ...paginatedResult,
-        data: mergedMatches
+        data: mergedMatches,
       };
     } catch (error) {
       logError('enhancedMatching', error as Error, { userId });
       return {
         data: existingMatches,
         hasMore: false,
-        totalCount: existingMatches.length
+        totalCount: existingMatches.length,
       };
     }
   }
@@ -140,7 +142,7 @@ export class EnhancedMatchingService {
   async getCachedMatches(userId: string): Promise<CompatibilityMatch[] | null> {
     const cacheKey = `popular_matches_${userId}`;
     const cached = cacheService.get(cacheKey);
-    
+
     if (cached) {
       logInfo('enhancedMatching', 'Retrieved cached matches', { userId });
       return cached as CompatibilityMatch[];
@@ -150,7 +152,10 @@ export class EnhancedMatchingService {
   }
 
   // Force refresh matches using background processing
-  async refreshMatches(userId: string, priority: 'low' | 'medium' | 'high' = 'high'): Promise<void> {
+  async refreshMatches(
+    userId: string,
+    priority: 'low' | 'medium' | 'high' = 'high'
+  ): Promise<void> {
     try {
       // Clear existing cache
       const cacheKey = `popular_matches_${userId}`;

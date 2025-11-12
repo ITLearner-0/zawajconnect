@@ -1,9 +1,8 @@
-
-import { CardContent } from "@/components/ui/card";
-import DemoLink from "@/components/demo/DemoLink";
-import { MessageSquare, Video, Shield, Heart, Users, Star } from "lucide-react";
-import OptimizedImage from "@/components/ui/OptimizedImage";
-import { useTranslation } from "react-i18next";
+import { CardContent } from '@/components/ui/card';
+import DemoLink from '@/components/demo/DemoLink';
+import { MessageSquare, Video, Shield, Heart, Users, Star } from 'lucide-react';
+import OptimizedImage from '@/components/ui/OptimizedImage';
+import { useTranslation } from 'react-i18next';
 
 const DemoSection = () => {
   const { t } = useTranslation();
@@ -12,23 +11,23 @@ const DemoSection = () => {
     {
       icon: MessageSquare,
       title: t('home.demoSection.features.secureMessaging.title'),
-      description: t('home.demoSection.features.secureMessaging.description')
+      description: t('home.demoSection.features.secureMessaging.description'),
     },
     {
       icon: Video,
       title: t('home.demoSection.features.videoCalls.title'),
-      description: t('home.demoSection.features.videoCalls.description')
+      description: t('home.demoSection.features.videoCalls.description'),
     },
     {
       icon: Shield,
       title: t('home.demoSection.features.waliSupervision.title'),
-      description: t('home.demoSection.features.waliSupervision.description')
+      description: t('home.demoSection.features.waliSupervision.description'),
     },
     {
       icon: Heart,
       title: t('home.demoSection.features.compatibility.title'),
-      description: t('home.demoSection.features.compatibility.description')
-    }
+      description: t('home.demoSection.features.compatibility.description'),
+    },
   ];
 
   return (
@@ -66,7 +65,7 @@ const DemoSection = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Demo Action */}
               <div className="p-8 text-center">
                 <DemoLink className="mb-4" />
@@ -84,8 +83,8 @@ const DemoSection = () => {
             </h3>
             <div className="space-y-6">
               {demoFeatures.map((feature, index) => (
-                <div 
-                  key={feature.title} 
+                <div
+                  key={feature.title}
                   className="flex items-start gap-4 p-4 bg-white/50 dark:bg-rose-900/30 rounded-xl border border-rose-200/50 dark:border-rose-700/50 hover:bg-white/70 dark:hover:bg-rose-900/50 transition-all duration-300"
                 >
                   <div className="bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-800 dark:to-pink-800 p-3 rounded-lg">
@@ -110,22 +109,30 @@ const DemoSection = () => {
           <div className="text-center">
             <Users className="h-8 w-8 text-rose-600 dark:text-rose-300 mx-auto mb-2" />
             <div className="text-2xl font-bold text-rose-800 dark:text-rose-200">1000+</div>
-            <div className="text-sm text-rose-600 dark:text-rose-400">{t('home.demoSection.stats.dailyTests')}</div>
+            <div className="text-sm text-rose-600 dark:text-rose-400">
+              {t('home.demoSection.stats.dailyTests')}
+            </div>
           </div>
           <div className="text-center">
             <Star className="h-8 w-8 text-rose-600 dark:text-rose-300 mx-auto mb-2" />
             <div className="text-2xl font-bold text-rose-800 dark:text-rose-200">4.9/5</div>
-            <div className="text-sm text-rose-600 dark:text-rose-400">{t('home.demoSection.stats.satisfaction')}</div>
+            <div className="text-sm text-rose-600 dark:text-rose-400">
+              {t('home.demoSection.stats.satisfaction')}
+            </div>
           </div>
           <div className="text-center">
             <MessageSquare className="h-8 w-8 text-rose-600 dark:text-rose-300 mx-auto mb-2" />
             <div className="text-2xl font-bold text-rose-800 dark:text-rose-200">24/7</div>
-            <div className="text-sm text-rose-600 dark:text-rose-400">{t('home.demoSection.stats.availability')}</div>
+            <div className="text-sm text-rose-600 dark:text-rose-400">
+              {t('home.demoSection.stats.availability')}
+            </div>
           </div>
           <div className="text-center">
             <Shield className="h-8 w-8 text-rose-600 dark:text-rose-300 mx-auto mb-2" />
             <div className="text-2xl font-bold text-rose-800 dark:text-rose-200">100%</div>
-            <div className="text-sm text-rose-600 dark:text-rose-400">{t('home.demoSection.stats.secure')}</div>
+            <div className="text-sm text-rose-600 dark:text-rose-400">
+              {t('home.demoSection.stats.secure')}
+            </div>
           </div>
         </div>
 

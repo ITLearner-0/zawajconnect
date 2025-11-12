@@ -21,12 +21,14 @@ This distinction is fundamental and we wish to provide you with the detailed inf
 ## 1. FUNDAMENTAL DIFFERENCES BETWEEN DATING AND MATRIMONIAL
 
 ### ❌ "Dating" Sites (Casual Relationships)
+
 - **Objective:** Casual dating, relationships without commitment
 - **Audience:** Individuals seeking various types of relationships
 - **Supervision:** No family involvement
 - **Nature:** Potentially non-serious relationships
 
 ### ✅ Matrimonial Platforms (Our Service)
+
 - **EXCLUSIVE Objective:** Marriage (Nikah) according to Islamic principles
 - **Audience:** Muslims and families seeking a spouse for marriage
 - **Supervision:** MANDATORY involvement of legal guardians (Wali)
@@ -37,6 +39,7 @@ This distinction is fundamental and we wish to provide you with the detailed inf
 ## 2. UNIQUE CHARACTERISTICS OF ZAWAJCONNECT
 
 ### A) Mandatory Wali (Legal Guardian) System
+
 - **Each user MUST invite their legal guardian (parent/family)**
 - Guardians have complete access to profiles and conversations
 - **No correspondence is possible without family approval**
@@ -44,23 +47,27 @@ This distinction is fundamental and we wish to provide you with the detailed inf
 - Automatic notifications to families for each match
 
 ### B) Strict Islamic Compliance
+
 - Conversations moderated according to Islamic principles (halal)
 - Prohibition of inappropriate content (provocative photos, inappropriate language)
 - Integrated Islamic guidance (Quran, Hadith)
 - Prayer reminders and Islamic tools
 
 ### C) Strict AI Moderation
+
 - Automatic moderation system powered by AI
 - Real-time detection of inappropriate content
 - Automatic sanctions for violations
 - Zero tolerance for non-matrimonial content
 
 ### D) Identity Verification
+
 - Identity verification with official documents
 - Photo verification for authenticity
 - Visible verification badge on verified profiles
 
 ### E) Feature Limitations
+
 - **No free chat**: limited and supervised conversations
 - Limited number of simultaneous conversations
 - Automatic conversation closure after inactivity period
@@ -71,6 +78,7 @@ This distinction is fundamental and we wish to provide you with the detailed inf
 ## 3. COMPARISON WITH SIMILAR SERVICES ACCEPTED BY STRIPE
 
 **Similar Muslim Matrimonial Platforms:**
+
 - **Muzz (formerly Muzmatch)** - Uses Stripe
 - **SingleMuslim** - Established matrimonial platform
 - **Salams** - Muslim matrimonial service
@@ -83,12 +91,14 @@ This distinction is fundamental and we wish to provide you with the detailed inf
 ## 4. LEGAL FRAMEWORK AND DOCUMENTATION
 
 ### A) European Regulatory Compliance
+
 - **GDPR**: Full compliance with data protection
 - **DSA** (Digital Services Act): Compliant content moderation
 - **LCEN**: Compliance with French law on online services
 - **PSD2**: European payment compliance
 
 ### B) Public Legal Documents
+
 All our documents are publicly available on our site:
 
 1. **Terms of Service**: https://dgfctwtivkqcfhwqgkya.supabase.co/terms
@@ -108,7 +118,9 @@ All our documents are publicly available on our site:
    - Sanctions for violations
 
 ### C) Detailed Technical Documentation
+
 We have prepared comprehensive technical documents:
+
 - Security architecture
 - AI moderation system
 - Family approval workflow
@@ -119,16 +131,19 @@ We have prepared comprehensive technical documents:
 ## 5. TRANSPARENT BUSINESS MODEL
 
 ### Freemium Model with Recurring Subscriptions
+
 - **Free**: Limited basic access
 - **Premium**: €29.99/month - Advanced features
 - **VIP**: €49.99/month - Priority access + premium services
 
 ### Financial Projections
+
 - **Year 1**: €50,000 revenue
 - **Year 2**: €200,000
 - **Year 3**: €500,000
 
 ### Refund Policy
+
 - Estimated refund rate: < 5%
 - 7-day "Satisfaction Guarantee"
 - Legal 14-day withdrawal right
@@ -139,11 +154,13 @@ We have prepared comprehensive technical documents:
 ## 6. SECURITY MEASURES AND FRAUD PREVENTION
 
 ### A) Technical Security
+
 - **TLS Encryption** for all communications
 - **Strong Authentication** (email + 2FA available)
 - **Secure Hosting** via Supabase (SOC 2 certified)
 
 ### B) Fraud Prevention
+
 - Mandatory identity verification for premium access
 - AI-powered fake profile detection
 - Reporting system and sanctions
@@ -151,6 +168,7 @@ We have prepared comprehensive technical documents:
 - Abnormal behavior monitoring
 
 ### C) Minor Protection
+
 - **Minimum age: 18 years strictly enforced**
 - Age verification at registration
 - Automatic ban if age is falsified
@@ -160,18 +178,22 @@ We have prepared comprehensive technical documents:
 ## 7. TARGET MARKET AND DEMOGRAPHICS
 
 ### Primary Audience
+
 - **French-speaking Muslims** (France, Belgium, Switzerland, Canada, Maghreb)
 - **Average age**: 25-40 years
 - **Education level**: Mostly graduates
 - **Intent**: Serious and halal marriage
 
 ### Differentiation from Dating
+
 Our audience is NOT seeking:
+
 - ❌ Casual dating or hookups
 - ❌ Relationships without commitment
 - ❌ Traditional dating
 
 Our audience is seeking:
+
 - ✅ Islamic marriage (Nikah)
 - ✅ Partner with shared values
 - ✅ Family approval and blessing
@@ -182,24 +204,28 @@ Our audience is seeking:
 ## 8. ROADMAP AND LONG-TERM VISION
 
 ### Phase 1 (Current): MVP Launch
+
 - Responsive web platform
 - Basic matching system
 - Manual + AI moderation
 - Premium subscriptions
 
 ### Phase 2 (3-6 months)
+
 - iOS/Android mobile application
 - Integrated supervised video calls
 - Advanced matching algorithm
 - Geographic expansion
 
 ### Phase 3 (6-12 months)
+
 - Premium services (matrimonial counselors)
 - Organization of physical matrimonial events
 - Partnerships with mosques and Islamic centers
 - Halal affiliate program
 
 ### 5-Year Vision
+
 - Leader in French-speaking Muslim matrimonial platforms
 - 100,000+ active users
 - International expansion (UK, USA, Middle East)
@@ -210,12 +236,14 @@ Our audience is seeking:
 ## 9. CUSTOMER SUPPORT AND DISPUTE MANAGEMENT
 
 ### Multi-Channel Support
+
 - Email: support@zawajconnect.me
 - Live chat (Premium/VIP)
 - Comprehensive online FAQ
 - Response time: < 24h
 
 ### Dispute Resolution
+
 - Free internal mediation
 - Transparent complaint process
 - Fast refunds when justified
@@ -269,6 +297,7 @@ Our audience is seeking:
 - **Availability**: We are available for a call or video conference
 
 **Technical Contact:**
+
 - Platform demonstration available upon request
 - Test access can be provided for verification
 

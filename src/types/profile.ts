@@ -1,5 +1,3 @@
-
-
 export interface VerificationStatus {
   email: boolean;
   phone: boolean;
@@ -151,7 +149,13 @@ export interface ContentReport {
   id?: string;
   reported_user_id: string;
   reporting_user_id: string;
-  report_type: 'inappropriate_message' | 'inappropriate_profile' | 'harassment' | 'spam' | 'impersonation' | 'other';
+  report_type:
+    | 'inappropriate_message'
+    | 'inappropriate_profile'
+    | 'harassment'
+    | 'spam'
+    | 'impersonation'
+    | 'other';
   content_reference?: string;
   report_details: string;
   status?: 'pending' | 'reviewed' | 'resolved';
@@ -160,4 +164,3 @@ export interface ContentReport {
   reviewed_by?: string;
   moderator_notes?: string;
 }
-

@@ -19,7 +19,7 @@ const DOC_FILES = [
   'DEPLOYMENT_GUIDE.md',
   'EMAIL_INTEGRATION_GUIDE.md',
   'MIGRATION_COMPLETE_SMTP.md',
-  'WORKFLOW_ANALYSIS.md'
+  'WORKFLOW_ANALYSIS.md',
 ];
 
 // Catégories de modifications
@@ -27,7 +27,7 @@ const CATEGORIES = {
   security: ['SECURITY', 'JWT', 'RATE LIMIT', 'VALIDATION', 'RLS'],
   infrastructure: ['SMTP', 'EMAIL', 'CRON', 'DEPLOYMENT', 'MIGRATION'],
   payment: ['BRAINTREE', 'STRIPE', 'PAYMENT', 'SUBSCRIPTION'],
-  workflow: ['WORKFLOW', 'PROCESS', 'AUTOMATION']
+  workflow: ['WORKFLOW', 'PROCESS', 'AUTOMATION'],
 };
 
 /**
@@ -43,7 +43,7 @@ function readDocFile(filename) {
         filename,
         content,
         lastModified: stats.mtime,
-        exists: true
+        exists: true,
       };
     }
   } catch (error) {
@@ -58,13 +58,13 @@ function readDocFile(filename) {
 function categorizeFile(fileData) {
   const content = fileData.content.toUpperCase();
   const categories = [];
-  
+
   for (const [category, keywords] of Object.entries(CATEGORIES)) {
-    if (keywords.some(keyword => content.includes(keyword))) {
+    if (keywords.some((keyword) => content.includes(keyword))) {
       categories.push(category);
     }
   }
-  
+
   return categories.length > 0 ? categories : ['other'];
 }
 
@@ -74,19 +74,17 @@ function categorizeFile(fileData) {
 function extractSummary(content, maxLength = 300) {
   // Enlever les titres markdown
   const withoutTitles = content.replace(/^#+\s+.+$/gm, '');
-  
+
   // Prendre le premier paragraphe non vide
   const paragraphs = withoutTitles
     .split('\n\n')
-    .map(p => p.trim())
-    .filter(p => p.length > 50);
-  
+    .map((p) => p.trim())
+    .filter((p) => p.length > 50);
+
   if (paragraphs.length === 0) return 'Aucun résumé disponible';
-  
+
   const summary = paragraphs[0];
-  return summary.length > maxLength 
-    ? summary.substring(0, maxLength) + '...' 
-    : summary;
+  return summary.length > maxLength ? summary.substring(0, maxLength) + '...' : summary;
 }
 
 /**
@@ -99,77 +97,77 @@ function generateMarkdownReport(filesData) {
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
-  
+
   let report = `# 📊 Rapport des Modifications du Projet\n\n`;
   report += `**Généré le:** ${reportDate}\n\n`;
   report += `---\n\n`;
-  
+
   // Statistiques générales
-  const existingFiles = filesData.filter(f => f.exists);
+  const existingFiles = filesData.filter((f) => f.exists);
   report += `## 📈 Statistiques\n\n`;
   report += `- **Fichiers analysés:** ${existingFiles.length}/${filesData.length}\n`;
-  report += `- **Dernière modification:** ${new Date(Math.max(...existingFiles.map(f => f.lastModified))).toLocaleDateString('fr-FR')}\n\n`;
-  
+  report += `- **Dernière modification:** ${new Date(Math.max(...existingFiles.map((f) => f.lastModified))).toLocaleDateString('fr-FR')}\n\n`;
+
   // Grouper par catégorie
   const categorized = {};
-  existingFiles.forEach(file => {
+  existingFiles.forEach((file) => {
     const categories = categorizeFile(file);
-    categories.forEach(cat => {
+    categories.forEach((cat) => {
       if (!categorized[cat]) categorized[cat] = [];
       categorized[cat].push(file);
     });
   });
-  
+
   // Rapport par catégorie
   report += `## 🗂️ Modifications par Catégorie\n\n`;
-  
+
   const categoryIcons = {
     security: '🔒',
     infrastructure: '⚙️',
     payment: '💳',
     workflow: '🔄',
-    other: '📄'
+    other: '📄',
   };
-  
+
   const categoryNames = {
     security: 'Sécurité',
     infrastructure: 'Infrastructure',
     payment: 'Paiements',
     workflow: 'Workflows',
-    other: 'Autres'
+    other: 'Autres',
   };
-  
+
   for (const [category, files] of Object.entries(categorized)) {
     const icon = categoryIcons[category] || '📄';
     const name = categoryNames[category] || category;
-    
+
     report += `### ${icon} ${name} (${files.length} fichier${files.length > 1 ? 's' : ''})\n\n`;
-    
-    files.forEach(file => {
+
+    files.forEach((file) => {
       report += `#### 📝 ${file.filename}\n\n`;
       report += `- **Modifié le:** ${file.lastModified.toLocaleDateString('fr-FR')}\n`;
       report += `- **Résumé:** ${extractSummary(file.content)}\n\n`;
     });
   }
-  
+
   // Section des fichiers détaillés
   report += `---\n\n## 📋 Détails Complets\n\n`;
-  
+
   existingFiles
     .sort((a, b) => b.lastModified - a.lastModified)
-    .forEach(file => {
+    .forEach((file) => {
       report += `### ${file.filename}\n\n`;
       report += `\`\`\`\n${file.content}\n\`\`\`\n\n`;
       report += `---\n\n`;
     });
-  
+
   // Footer
   report += `\n\n---\n`;
   report += `*Rapport généré automatiquement par scripts/generate-changelog-report.js*\n`;
   report += `*Timestamp: ${timestamp}*\n`;
-  
+
   return report;
 }
 
@@ -182,11 +180,11 @@ function generateHtmlReport(filesData) {
     month: 'long',
     day: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
   });
-  
-  const existingFiles = filesData.filter(f => f.exists);
-  
+
+  const existingFiles = filesData.filter((f) => f.exists);
+
   let html = `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -303,9 +301,9 @@ function generateHtmlReport(filesData) {
 
   // Grouper par catégorie
   const categorized = {};
-  existingFiles.forEach(file => {
+  existingFiles.forEach((file) => {
     const categories = categorizeFile(file);
-    categories.forEach(cat => {
+    categories.forEach((cat) => {
       if (!categorized[cat]) categorized[cat] = [];
       categorized[cat].push(file);
     });
@@ -316,18 +314,18 @@ function generateHtmlReport(filesData) {
     infrastructure: '⚙️ Infrastructure',
     payment: '💳 Paiements',
     workflow: '🔄 Workflows',
-    other: '📄 Autres'
+    other: '📄 Autres',
   };
 
   for (const [category, files] of Object.entries(categorized)) {
     const name = categoryNames[category] || category;
-    
+
     html += `
             <div class="category">
                 <h2>${name}</h2>
 `;
-    
-    files.forEach(file => {
+
+    files.forEach((file) => {
       html += `
                 <div class="file-card">
                     <h3>📝 ${file.filename}</h3>
@@ -336,7 +334,7 @@ function generateHtmlReport(filesData) {
                 </div>
 `;
     });
-    
+
     html += `
             </div>
 `;
@@ -361,31 +359,31 @@ function generateHtmlReport(filesData) {
  */
 function main() {
   console.log('🚀 Génération du rapport de modifications...\n');
-  
+
   // Lire tous les fichiers
   const filesData = DOC_FILES.map(readDocFile);
-  const existingFiles = filesData.filter(f => f.exists);
-  
+  const existingFiles = filesData.filter((f) => f.exists);
+
   console.log(`📄 Fichiers trouvés: ${existingFiles.length}/${DOC_FILES.length}\n`);
-  
+
   // Générer les rapports
   const markdownReport = generateMarkdownReport(filesData);
   const htmlReport = generateHtmlReport(filesData);
-  
+
   // Créer le dossier reports s'il n'existe pas
   const reportsDir = path.join(process.cwd(), 'reports');
   if (!fs.existsSync(reportsDir)) {
     fs.mkdirSync(reportsDir);
   }
-  
+
   // Sauvegarder les rapports
   const timestamp = new Date().toISOString().split('T')[0];
   const mdPath = path.join(reportsDir, `changelog-report-${timestamp}.md`);
   const htmlPath = path.join(reportsDir, `changelog-report-${timestamp}.html`);
-  
+
   fs.writeFileSync(mdPath, markdownReport, 'utf-8');
   fs.writeFileSync(htmlPath, htmlReport, 'utf-8');
-  
+
   console.log('✅ Rapports générés avec succès!\n');
   console.log(`📝 Markdown: ${mdPath}`);
   console.log(`🌐 HTML: ${htmlPath}\n`);

@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface WaliDelegation {
@@ -18,7 +17,12 @@ export interface WaliDelegation {
 }
 
 export interface DelegationPermission {
-  action: 'approve_conversations' | 'reject_requests' | 'end_conversations' | 'access_messages' | 'make_decisions';
+  action:
+    | 'approve_conversations'
+    | 'reject_requests'
+    | 'end_conversations'
+    | 'access_messages'
+    | 'make_decisions';
   granted: boolean;
 }
 
@@ -56,7 +60,7 @@ export class DelegationService {
           start_date: data.start_date,
           end_date: data.end_date,
           reason: data.reason,
-          status: 'pending'
+          status: 'pending',
         })
         .select('id')
         .single();
@@ -88,13 +92,15 @@ export class DelegationService {
     }
   }
 
-  static async acceptDelegation(delegationId: string): Promise<{ success: boolean; error?: string }> {
+  static async acceptDelegation(
+    delegationId: string
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await supabase
         .from('wali_delegations')
         .update({
           status: 'active',
-          activated_at: new Date().toISOString()
+          activated_at: new Date().toISOString(),
         })
         .eq('id', delegationId);
 
@@ -106,13 +112,15 @@ export class DelegationService {
     }
   }
 
-  static async revokeDelegation(delegationId: string): Promise<{ success: boolean; error?: string }> {
+  static async revokeDelegation(
+    delegationId: string
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       const { error } = await supabase
         .from('wali_delegations')
         .update({
           status: 'revoked',
-          revoked_at: new Date().toISOString()
+          revoked_at: new Date().toISOString(),
         })
         .eq('id', delegationId);
 
@@ -128,7 +136,9 @@ export class DelegationService {
     try {
       const { data, error } = await supabase
         .from('wali_profiles')
-        .select('id, user_id, first_name, last_name, relationship, contact_information, is_verified, availability_status')
+        .select(
+          'id, user_id, first_name, last_name, relationship, contact_information, is_verified, availability_status'
+        )
         .neq('user_id', excludeWaliId)
         .eq('is_verified', true)
         .in('availability_status', ['online', 'away']);
@@ -142,7 +152,7 @@ export class DelegationService {
   }
 
   static hasPermission(delegation: WaliDelegation, action: string): boolean {
-    const permission = delegation.permissions.find(p => p.action === action);
+    const permission = delegation.permissions.find((p) => p.action === action);
     return permission ? permission.granted : false;
   }
 

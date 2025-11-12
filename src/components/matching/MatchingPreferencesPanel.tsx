@@ -10,13 +10,17 @@ interface MatchingPreferencesPanelProps {
   loading: boolean;
 }
 
-const MatchingPreferencesPanel = ({ onRunMatching, analyzing, loading }: MatchingPreferencesPanelProps) => {
-  const { 
-    preferences, 
-    loading: prefsLoading, 
-    saving, 
-    updatePreferences, 
-    savePreferences 
+const MatchingPreferencesPanel = ({
+  onRunMatching,
+  analyzing,
+  loading,
+}: MatchingPreferencesPanelProps) => {
+  const {
+    preferences,
+    loading: prefsLoading,
+    saving,
+    updatePreferences,
+    savePreferences,
   } = useMatchingPreferences();
 
   const handleSliderChange = (key: keyof MatchingPreferences, value: number) => {
@@ -52,12 +56,7 @@ const MatchingPreferencesPanel = ({ onRunMatching, analyzing, loading }: Matchin
                 Sauvegarde...
               </Badge>
             )}
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={savePreferences}
-              disabled={saving}
-            >
+            <Button variant="outline" size="sm" onClick={savePreferences} disabled={saving}>
               <Save className="h-4 w-4 mr-2" />
               Sauvegarder
             </Button>
@@ -74,7 +73,9 @@ const MatchingPreferencesPanel = ({ onRunMatching, analyzing, loading }: Matchin
             <div className="space-y-3">
               <label className="text-sm font-medium flex items-center justify-between">
                 <span>Poids Islamique</span>
-                <Badge variant="secondary" className="font-mono">{preferences.weight_islamic}%</Badge>
+                <Badge variant="secondary" className="font-mono">
+                  {preferences.weight_islamic}%
+                </Badge>
               </label>
               <input
                 type="range"
@@ -89,11 +90,13 @@ const MatchingPreferencesPanel = ({ onRunMatching, analyzing, loading }: Matchin
                 <span>60%</span>
               </div>
             </div>
-            
+
             <div className="space-y-3">
               <label className="text-sm font-medium flex items-center justify-between">
                 <span>Poids Culturel</span>
-                <Badge variant="secondary" className="font-mono">{preferences.weight_cultural}%</Badge>
+                <Badge variant="secondary" className="font-mono">
+                  {preferences.weight_cultural}%
+                </Badge>
               </label>
               <input
                 type="range"
@@ -108,11 +111,13 @@ const MatchingPreferencesPanel = ({ onRunMatching, analyzing, loading }: Matchin
                 <span>50%</span>
               </div>
             </div>
-            
+
             <div className="space-y-3">
               <label className="text-sm font-medium flex items-center justify-between">
                 <span>Poids Personnalité</span>
-                <Badge variant="secondary" className="font-mono">{preferences.weight_personality}%</Badge>
+                <Badge variant="secondary" className="font-mono">
+                  {preferences.weight_personality}%
+                </Badge>
               </label>
               <input
                 type="range"
@@ -134,9 +139,7 @@ const MatchingPreferencesPanel = ({ onRunMatching, analyzing, loading }: Matchin
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-4 border-t">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-3">
-              <label className="text-sm font-medium whitespace-nowrap">
-                Compatibilité min:
-              </label>
+              <label className="text-sm font-medium whitespace-nowrap">Compatibilité min:</label>
               <Badge variant="outline" className="font-mono">
                 {preferences.min_compatibility}%
               </Badge>
@@ -149,7 +152,7 @@ const MatchingPreferencesPanel = ({ onRunMatching, analyzing, loading }: Matchin
                 className="w-24 h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-primary"
               />
             </div>
-            
+
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <input
                 type="checkbox"
@@ -161,8 +164,8 @@ const MatchingPreferencesPanel = ({ onRunMatching, analyzing, loading }: Matchin
             </label>
           </div>
 
-          <Button 
-            onClick={onRunMatching} 
+          <Button
+            onClick={onRunMatching}
             disabled={loading}
             size="lg"
             className="bg-gradient-to-r from-primary to-accent hover:opacity-90 transition-opacity shadow-md w-full sm:w-auto"

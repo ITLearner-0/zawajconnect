@@ -18,7 +18,9 @@ export const useLoginStreak = () => {
   }, []);
 
   const checkAndUpdateStreak = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       setLoading(false);
       return;
@@ -41,7 +43,7 @@ export const useLoginStreak = () => {
           user_id: user.id,
           current_streak: 1,
           longest_streak: 1,
-          last_login_date: today
+          last_login_date: today,
         })
         .select()
         .single();
@@ -50,9 +52,9 @@ export const useLoginStreak = () => {
         setStreak({
           current_streak: newStreak.current_streak,
           longest_streak: newStreak.longest_streak,
-          last_login_date: newStreak.last_login_date
+          last_login_date: newStreak.last_login_date,
         });
-        
+
         toast({
           title: '🔥 Streak commencée!',
           description: 'Connectez-vous chaque jour pour maintenir votre streak',
@@ -70,7 +72,7 @@ export const useLoginStreak = () => {
         setStreak({
           current_streak: streakData.current_streak,
           longest_streak: streakData.longest_streak,
-          last_login_date: streakData.last_login_date
+          last_login_date: streakData.last_login_date,
         });
       } else if (lastLoginDate === yesterdayStr) {
         // Consecutive day - increment streak
@@ -82,7 +84,7 @@ export const useLoginStreak = () => {
           .update({
             current_streak: newStreak,
             longest_streak: newLongest,
-            last_login_date: today
+            last_login_date: today,
           })
           .eq('user_id', user.id)
           .select()
@@ -92,7 +94,7 @@ export const useLoginStreak = () => {
           setStreak({
             current_streak: updatedStreak.current_streak,
             longest_streak: updatedStreak.longest_streak,
-            last_login_date: updatedStreak.last_login_date
+            last_login_date: updatedStreak.last_login_date,
           });
 
           // Celebrate milestone streaks
@@ -116,7 +118,7 @@ export const useLoginStreak = () => {
           .from('login_streaks')
           .update({
             current_streak: 1,
-            last_login_date: today
+            last_login_date: today,
           })
           .eq('user_id', user.id)
           .select()
@@ -126,7 +128,7 @@ export const useLoginStreak = () => {
           setStreak({
             current_streak: resetStreak.current_streak,
             longest_streak: resetStreak.longest_streak,
-            last_login_date: resetStreak.last_login_date
+            last_login_date: resetStreak.last_login_date,
           });
         }
       }
@@ -138,6 +140,6 @@ export const useLoginStreak = () => {
   return {
     streak,
     loading,
-    refreshStreak: checkAndUpdateStreak
+    refreshStreak: checkAndUpdateStreak,
   };
 };

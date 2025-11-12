@@ -10,9 +10,11 @@ interface AchievementNotificationProviderProps {
  * À placer au niveau de l'application pour que tous les utilisateurs
  * reçoivent des notifications en temps réel
  */
-export function AchievementNotificationProvider({ children }: AchievementNotificationProviderProps) {
+export function AchievementNotificationProvider({
+  children,
+}: AchievementNotificationProviderProps) {
   // Active automatiquement les notifications
   useAchievementNotifications();
-  
+
   return <>{children}</>;
 }

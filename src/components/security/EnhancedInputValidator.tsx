@@ -25,77 +25,81 @@ const defaultRules: Record<string, ValidationRule[]> = {
       name: 'format',
       test: (value) => /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(value),
       message: 'Format email invalide',
-      severity: 'error'
+      severity: 'error',
     },
     {
       name: 'length',
       test: (value) => value.length >= 5 && value.length <= 100,
-      message: 'L\'email doit contenir entre 5 et 100 caractères',
-      severity: 'error'
-    }
+      message: "L'email doit contenir entre 5 et 100 caractères",
+      severity: 'error',
+    },
   ],
   phone: [
     {
       name: 'format',
       test: (value) => /^\+?[1-9]\d{7,14}$/.test(value.replace(/\s/g, '')),
       message: 'Format de téléphone invalide',
-      severity: 'error'
-    }
+      severity: 'error',
+    },
   ],
   name: [
     {
       name: 'length',
       test: (value) => value.length >= 2 && value.length <= 100,
       message: 'Le nom doit contenir entre 2 et 100 caractères',
-      severity: 'error'
+      severity: 'error',
     },
     {
       name: 'characters',
       test: (value) => !/[<>{}()[\]\\/]/.test(value),
       message: 'Caractères spéciaux non autorisés',
-      severity: 'error'
+      severity: 'error',
     },
     {
       name: 'malicious',
-      test: (value) => !/(?:script|javascript|onclick|onerror|eval|alert|document|window)/i.test(value),
+      test: (value) =>
+        !/(?:script|javascript|onclick|onerror|eval|alert|document|window)/i.test(value),
       message: 'Contenu potentiellement dangereux détecté',
-      severity: 'error'
-    }
+      severity: 'error',
+    },
   ],
   message: [
     {
       name: 'length',
       test: (value) => value.length >= 1 && value.length <= 2000,
       message: 'Le message doit contenir entre 1 et 2000 caractères',
-      severity: 'error'
+      severity: 'error',
     },
     {
       name: 'malicious',
-      test: (value) => !/(?:script|javascript|onclick|onerror|eval|alert|document|window|<iframe|<embed|<object)/i.test(value),
+      test: (value) =>
+        !/(?:script|javascript|onclick|onerror|eval|alert|document|window|<iframe|<embed|<object)/i.test(
+          value
+        ),
       message: 'Contenu potentiellement dangereux détecté',
-      severity: 'error'
+      severity: 'error',
     },
     {
       name: 'personal_info',
       test: (value) => !/\b\d{4}\s?\d{4}\s?\d{4}\s?\d{4}\b|\b\d{10,}\b|@\w+\.\w+/.test(value),
       message: 'Évitez de partager des informations personnelles (numéros, emails)',
-      severity: 'warning'
+      severity: 'warning',
     },
     {
       name: 'inappropriate',
       test: (value) => !/\b(?:sexe|nude|rencontre privée|sans famille|secret|caché)\b/i.test(value),
       message: 'Contenu inapproprié ou contraire aux valeurs islamiques',
-      severity: 'warning'
-    }
+      severity: 'warning',
+    },
   ],
   general: [
     {
       name: 'xss',
       test: (value) => !/(?:<|>|&lt;|&gt;|javascript:|data:|vbscript:)/i.test(value),
       message: 'Contenu potentiellement dangereux',
-      severity: 'error'
-    }
-  ]
+      severity: 'error',
+    },
+  ],
 };
 
 export default function EnhancedInputValidator({
@@ -103,7 +107,7 @@ export default function EnhancedInputValidator({
   rules,
   fieldType,
   onValidationChange,
-  showDetails = false
+  showDetails = false,
 }: EnhancedInputValidatorProps) {
   const { logSecurityEvent } = useSecurityEvents();
   const [lastValidation, setLastValidation] = useState<Date>(new Date());
@@ -112,7 +116,7 @@ export default function EnhancedInputValidator({
     const applicableRules = rules || defaultRules[fieldType] || [];
     const errors: string[] = [];
     const warnings: string[] = [];
-    
+
     if (!value) {
       onValidationChange?.(true, []);
       return;
@@ -138,7 +142,7 @@ export default function EnhancedInputValidator({
                 field_type: fieldType,
                 rule_triggered: rule.name,
                 input_length: value.length,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
               }
             );
           } catch (error) {
@@ -236,9 +240,7 @@ function ValidationStatus({ value, fieldType }: { value: string; fieldType: stri
     return (
       <div className="flex items-center space-x-2">
         {getStatusIcon()}
-        <Badge variant="default">
-          Valide
-        </Badge>
+        <Badge variant="default">Valide</Badge>
       </div>
     );
   }

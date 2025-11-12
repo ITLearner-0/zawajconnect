@@ -1,15 +1,9 @@
-
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  EyeOff, 
-  MessageSquare, 
-  MessagesSquare, 
-  Users
-} from 'lucide-react';
+import { EyeOff, MessageSquare, MessagesSquare, Users } from 'lucide-react';
 import { SupervisedConversation } from '@/types/wali';
 
 interface ActiveConversationsPanelProps {
@@ -23,7 +17,7 @@ const ActiveConversationsPanel: React.FC<ActiveConversationsPanelProps> = ({
   conversations,
   onStartSupervision,
   onEndSupervision,
-  loading = false
+  loading = false,
 }) => {
   if (loading) {
     return (
@@ -63,7 +57,7 @@ const ActiveConversationsPanel: React.FC<ActiveConversationsPanelProps> = ({
       {conversations.map((conversation) => {
         // Extract participant names from participant_names array
         const participantNames = conversation.participant_names?.join(' & ') || 'Unknown Users';
-        
+
         return (
           <Card key={conversation.id}>
             <CardContent className="p-4">
@@ -74,12 +68,15 @@ const ActiveConversationsPanel: React.FC<ActiveConversationsPanelProps> = ({
                 </div>
                 {getSupervisionBadge(conversation.supervisionLevel)}
               </div>
-              
+
               <div className="text-sm text-muted-foreground mb-3 flex items-center">
-                <MessageSquare className="h-4 w-4 mr-1" /> 
-                Supervising since {formatDistanceToNow(new Date(conversation.supervisionStarted), { addSuffix: true })}
+                <MessageSquare className="h-4 w-4 mr-1" />
+                Supervising since{' '}
+                {formatDistanceToNow(new Date(conversation.supervisionStarted), {
+                  addSuffix: true,
+                })}
               </div>
-              
+
               <div className="flex justify-between">
                 <Button
                   variant="outline"
@@ -88,7 +85,7 @@ const ActiveConversationsPanel: React.FC<ActiveConversationsPanelProps> = ({
                 >
                   View Messages
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="sm"

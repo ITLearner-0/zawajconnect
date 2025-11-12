@@ -43,7 +43,7 @@ const MobileBottomNav = () => {
           event: '*',
           schema: 'public',
           table: 'messages',
-          filter: `sender_id=neq.${user.id}`
+          filter: `sender_id=neq.${user.id}`,
         },
         () => {
           fetchUnreadMessages();
@@ -58,19 +58,19 @@ const MobileBottomNav = () => {
 
   // Get main navigation routes for mobile
   const allRoutes = getNavigationRoutes();
-  const mobileRoutes = allRoutes.filter(route => 
-    ['dashboard', 'browse', 'matches', 'chat', 'enhanced-profile'].some(key => 
+  const mobileRoutes = allRoutes.filter((route) =>
+    ['dashboard', 'browse', 'matches', 'chat', 'enhanced-profile'].some((key) =>
       route.path.includes(key)
     )
   );
 
   // Map icons
   const iconMap: Record<string, any> = {
-    'Home': Home,
-    'User': User,
-    'Search': Search,
-    'Heart': Heart,
-    'MessageCircle': MessageCircle
+    Home: Home,
+    User: User,
+    Search: Search,
+    Heart: Heart,
+    MessageCircle: MessageCircle,
   };
 
   const navItems = [
@@ -78,37 +78,38 @@ const MobileBottomNav = () => {
       path: '/dashboard',
       icon: Home,
       label: 'Accueil',
-      badge: 0
+      badge: 0,
     },
     {
       path: '/browse',
       icon: Search,
       label: 'Découvrir',
-      badge: 0
+      badge: 0,
     },
     {
       path: '/matches',
       icon: Heart,
       label: 'Matches',
-      badge: 0
+      badge: 0,
     },
     {
       path: '/chat',
       icon: MessageCircle,
       label: 'Messages',
-      badge: unreadMessages
+      badge: unreadMessages,
     },
     {
       path: '/enhanced-profile',
       icon: User,
       label: 'Profil',
-      badge: 0
-    }
+      badge: 0,
+    },
   ];
 
   const isActive = (path: string) => {
     if (path === '/enhanced-profile' && location.pathname === '/profile') return true;
-    if (path === '/dashboard' && (location.pathname === '/dashboard' || location.pathname === '/')) return true;
+    if (path === '/dashboard' && (location.pathname === '/dashboard' || location.pathname === '/'))
+      return true;
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
@@ -122,7 +123,7 @@ const MobileBottomNav = () => {
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isActive(item.path);
-            
+
             return (
               <Button
                 key={item.path}
@@ -130,16 +131,14 @@ const MobileBottomNav = () => {
                 size="sm"
                 onClick={() => navigate(item.path)}
                 className={`relative flex flex-col items-center justify-center h-14 px-2 py-1 ${
-                  active 
+                  active
                     ? 'text-emerald bg-emerald/10'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <div className="relative">
-                  <Icon className={`h-5 w-5 ${
-                    active ? 'text-emerald' : ''
-                  }`} />
-                  
+                  <Icon className={`h-5 w-5 ${active ? 'text-emerald' : ''}`} />
+
                   {/* Badge for notifications/messages */}
                   {item.badge && item.badge > 0 && (
                     <Badge className="absolute -top-2 -right-2 h-4 w-4 p-0 text-xs bg-red-500 text-white flex items-center justify-center">
@@ -147,13 +146,15 @@ const MobileBottomNav = () => {
                     </Badge>
                   )}
                 </div>
-                
-                <span className={`text-xs mt-1 font-medium ${
-                  active ? 'text-emerald' : 'text-muted-foreground'
-                }`}>
+
+                <span
+                  className={`text-xs mt-1 font-medium ${
+                    active ? 'text-emerald' : 'text-muted-foreground'
+                  }`}
+                >
                   {item.label}
                 </span>
-                
+
                 {/* Active indicator */}
                 {active && (
                   <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 w-6 rounded-full bg-emerald"></div>

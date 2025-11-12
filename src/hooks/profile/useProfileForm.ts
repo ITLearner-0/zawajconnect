@@ -1,13 +1,12 @@
-
-import { ProfileFormData, VerificationStatus, PrivacySettings } from "@/types/profile";
-import { useProfileFormState } from "./useProfileFormState";
-import { useProfileVerification } from "./useProfileVerification";
-import { usePrivacyManagement } from "./usePrivacyManagement";
-import { useAccountVisibility } from "./useAccountVisibility";
-import { useBlockedUsers } from "./useBlockedUsers";
-import { useProfileSubmission } from "./useProfileSubmission";
-import { useAuthSignOut } from "./useAuthSignOut";
-import { useEffect } from "react";
+import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
+import { useProfileFormState } from './useProfileFormState';
+import { useProfileVerification } from './useProfileVerification';
+import { usePrivacyManagement } from './usePrivacyManagement';
+import { useAccountVisibility } from './useAccountVisibility';
+import { useBlockedUsers } from './useBlockedUsers';
+import { useProfileSubmission } from './useProfileSubmission';
+import { useAuthSignOut } from './useAuthSignOut';
+import { useEffect } from 'react';
 
 interface UseProfileFormProps {
   initialFormData: ProfileFormData | null;
@@ -24,16 +23,16 @@ const DEFAULT_PRIVACY_SETTINGS: PrivacySettings = {
   showAge: true,
   showLocation: true,
   showOccupation: true,
-  allowNonMatchMessages: true
+  allowNonMatchMessages: true,
 };
 
-export const useProfileForm = ({ 
-  initialFormData, 
+export const useProfileForm = ({
+  initialFormData,
   initialVerificationStatus,
   initialPrivacySettings,
   initialBlockedUsers,
   initialIsVisible,
-  userId
+  userId,
 }: UseProfileFormProps) => {
   // Form state management
   const { formData, handleChange, setFormData } = useProfileFormState({
@@ -53,37 +52,37 @@ export const useProfileForm = ({
       waliRelationship: '',
       waliContact: '',
       profilePicture: '',
-      gallery: []
-    }
+      gallery: [],
+    },
   });
 
   // Update form data when initial data changes (after fetching from DB)
   useEffect(() => {
     if (initialFormData && JSON.stringify(initialFormData) !== JSON.stringify(formData)) {
-      console.log("Updating form data with initial data:", initialFormData);
+      console.log('Updating form data with initial data:', initialFormData);
       setFormData(initialFormData);
     }
   }, [initialFormData, setFormData, formData]);
 
   // Verification status
   const { verificationStatus, handleVerificationChange } = useProfileVerification({
-    initialVerificationStatus
+    initialVerificationStatus,
   });
-  
+
   // Privacy settings - initialize with default values if null
   const { privacySettings, handlePrivacySettingsChange } = usePrivacyManagement({
     userId: userId || undefined,
-    initialPrivacySettings: initialPrivacySettings || DEFAULT_PRIVACY_SETTINGS
+    initialPrivacySettings: initialPrivacySettings || DEFAULT_PRIVACY_SETTINGS,
   });
 
   // Account visibility
   const { isAccountVisible, toggleAccountVisibility } = useAccountVisibility({
-    initialIsVisible
+    initialIsVisible,
   });
 
   // Blocked users
   const blockedUsersData = useBlockedUsers(userId);
-  
+
   useEffect(() => {
     if (userId) {
       blockedUsersData.fetchBlockedUsers();
@@ -92,31 +91,31 @@ export const useProfileForm = ({
 
   // Profile submission
   const { submitProfile } = useProfileSubmission();
-  
+
   const handleSubmit = async () => {
     if (!userId) {
-      console.error("No user ID available");
+      console.error('No user ID available');
       return false;
     }
-    
-    console.log("handleSubmit called with:", {
+
+    console.log('handleSubmit called with:', {
       userId,
       formData,
-      privacySettings: privacySettings || DEFAULT_PRIVACY_SETTINGS
+      privacySettings: privacySettings || DEFAULT_PRIVACY_SETTINGS,
     });
-    
+
     const success = await submitProfile(
-      userId, 
-      formData, 
+      userId,
+      formData,
       privacySettings || DEFAULT_PRIVACY_SETTINGS,
       (savedData) => {
         // Update form data with the saved data to retain the information
-        console.log("Profile saved, updating form data:", savedData);
+        console.log('Profile saved, updating form data:', savedData);
         setFormData(savedData);
       }
     );
-    
-    console.log("submitProfile returned:", success);
+
+    console.log('submitProfile returned:', success);
     return success;
   };
 

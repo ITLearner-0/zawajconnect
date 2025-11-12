@@ -1,10 +1,9 @@
-
 // Enhanced logging utility
 export const logError = (operation: string, error: Error, context?: any) => {
   console.error(`[CompatibilityService] ${operation} failed:`, {
     error: error.message,
     stack: error.stack,
-    context
+    context,
   });
 };
 

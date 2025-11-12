@@ -27,14 +27,14 @@ class NavigationAnalytics {
 
   trackPageView(route: string, userId?: string) {
     const routeConfig = getRouteByPath(route);
-    
+
     const event: NavigationEvent = {
       route,
       timestamp: Date.now(),
       user_id: userId,
       route_category: routeConfig?.category,
       previous_route: this.previousRoute,
-      session_id: this.sessionId
+      session_id: this.sessionId,
     };
 
     this.events.push(event);
@@ -54,7 +54,7 @@ class NavigationAnalytics {
       action,
       timestamp: Date.now(),
       session_id: this.sessionId,
-      ...details
+      ...details,
     };
 
     // Log user actions
@@ -79,14 +79,14 @@ class NavigationAnalytics {
       return {
         currentSession: this.events,
         allEvents: storedEvents,
-        sessionId: this.sessionId
+        sessionId: this.sessionId,
       };
     } catch (error) {
       console.error('Failed to retrieve navigation analytics:', error);
       return {
         currentSession: this.events,
         allEvents: [],
-        sessionId: this.sessionId
+        sessionId: this.sessionId,
       };
     }
   }
@@ -100,12 +100,12 @@ class NavigationAnalytics {
     });
 
     return Object.entries(routeCounts)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
       .map(([route, count]) => ({
         route,
         count,
-        routeConfig: getRouteByPath(route)
+        routeConfig: getRouteByPath(route),
       }));
   }
 }
@@ -123,7 +123,7 @@ export const useNavigationAnalytics = () => {
   return {
     trackAction: navigationAnalytics.trackUserAction.bind(navigationAnalytics),
     getAnalytics: navigationAnalytics.getAnalytics.bind(navigationAnalytics),
-    getMostVisited: navigationAnalytics.getMostVisitedRoutes.bind(navigationAnalytics)
+    getMostVisited: navigationAnalytics.getMostVisitedRoutes.bind(navigationAnalytics),
   };
 };
 

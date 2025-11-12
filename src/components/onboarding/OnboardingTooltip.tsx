@@ -23,7 +23,7 @@ const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
   isVisible,
   onClose,
   onMarkComplete,
-  position = 'bottom'
+  position = 'bottom',
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -39,11 +39,13 @@ const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
     top: 'bottom-full mb-2',
     bottom: 'top-full mt-2',
     left: 'right-full mr-2',
-    right: 'left-full ml-2'
+    right: 'left-full ml-2',
   };
 
   return (
-    <div className={`absolute z-50 ${positionClasses[position]} w-80 ${isAnimating ? 'animate-scale-in' : ''}`}>
+    <div
+      className={`absolute z-50 ${positionClasses[position]} w-80 ${isAnimating ? 'animate-scale-in' : ''}`}
+    >
       <Card className="border-2 border-primary shadow-lg bg-gradient-to-br from-background to-accent/5">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-start justify-between gap-2">
@@ -84,7 +86,10 @@ const OnboardingTooltip: React.FC<OnboardingTooltipProps> = ({
 
           {example && (
             <div className="space-y-1.5">
-              <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
+              <Badge
+                variant="outline"
+                className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200"
+              >
                 ✨ Exemple
               </Badge>
               <div className="p-2 bg-muted/50 rounded text-xs italic border border-muted">

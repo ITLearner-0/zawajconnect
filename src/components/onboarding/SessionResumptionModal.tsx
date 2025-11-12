@@ -59,9 +59,7 @@ export const SessionResumptionModal: React.FC<SessionResumptionModalProps> = ({
             <div className="space-y-3">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Progression globale</span>
-                <span className="font-semibold text-primary">
-                  {completionPercentage}%
-                </span>
+                <span className="font-semibold text-primary">{completionPercentage}%</span>
               </div>
               <Progress value={completionPercentage} className="h-2" />
             </div>
@@ -93,18 +91,14 @@ export const SessionResumptionModal: React.FC<SessionResumptionModalProps> = ({
           {/* Info Box */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
             <p className="text-xs text-blue-700 dark:text-blue-300">
-              💡 Vos données sont automatiquement sauvegardées. Vous pouvez continuer
-              votre inscription ou recommencer si vous préférez.
+              💡 Vos données sont automatiquement sauvegardées. Vous pouvez continuer votre
+              inscription ou recommencer si vous préférez.
             </p>
           </div>
         </div>
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
-          <Button
-            variant="outline"
-            onClick={onRestart}
-            className="w-full sm:w-auto"
-          >
+          <Button variant="outline" onClick={onRestart} className="w-full sm:w-auto">
             <RefreshCcw className="h-4 w-4 mr-2" />
             Recommencer
           </Button>

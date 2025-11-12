@@ -1,4 +1,3 @@
-
 export interface MatchNotification {
   id: string;
   user_id: string;

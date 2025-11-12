@@ -1,9 +1,9 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
 import { handleError, handleAIError, ErrorCode } from '../_shared/errorHandler.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface Message {
@@ -34,22 +34,22 @@ interface ChatRequest {
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { messages, profileContext }: ChatRequest = await req.json();
-    
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) {
       console.error('[PROFILE_CHAT] LOVABLE_API_KEY not configured');
       return handleError(new Error('API key missing'), ErrorCode.INTERNAL_ERROR, 'PROFILE_CHAT');
     }
 
     // Construire le contexte du profil
-    let contextMessage = "Contexte du profil utilisateur :\n";
-    
+    let contextMessage = 'Contexte du profil utilisateur :\n';
+
     if (profileContext?.profile) {
       const p = profileContext.profile;
       contextMessage += `- Nom : ${p.full_name || 'Non défini'}\n`;
@@ -91,18 +91,15 @@ Style de communication :
 
 Important : Reste concentré sur l'optimisation du profil et ne donne pas de conseils religieux profonds.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
+    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          ...messages
-        ],
+        model: 'google/gemini-2.5-flash',
+        messages: [{ role: 'system', content: systemPrompt }, ...messages],
         stream: true,
       }),
     });
@@ -114,14 +111,13 @@ Important : Reste concentré sur l'optimisation du profil et ne donne pas de con
 
     // Retourner le stream directement
     return new Response(response.body, {
-      headers: { 
-        ...corsHeaders, 
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        "Connection": "keep-alive"
+      headers: {
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
       },
     });
-
   } catch (error) {
     return handleError(error, ErrorCode.INTERNAL_ERROR, 'PROFILE_CHAT');
   }

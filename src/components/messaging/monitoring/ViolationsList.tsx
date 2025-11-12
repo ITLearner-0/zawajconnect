@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Violation } from '@/services/monitoring';  // Updated import path
+import { Violation } from '@/services/monitoring'; // Updated import path
 import ViolationItem from './ViolationItem';
 
 interface ViolationsListProps {

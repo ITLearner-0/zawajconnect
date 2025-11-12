@@ -1,4 +1,3 @@
-
 import { Conversation, VideoCallStatus, RetentionPolicy } from '@/types/profile';
 import MessagesContainer from '@/components/messaging/MessagesContainer';
 import VideoCallManager from '@/components/messaging/VideoCallManager';
@@ -47,7 +46,7 @@ const MessagingInterface = ({
   encryptionEnabled,
   toggleEncryption,
   retentionPolicy,
-  updateRetentionPolicy
+  updateRetentionPolicy,
 }: MessagingInterfaceProps) => {
   // Function to handle returning to conversation list
   const handleBackToList = () => {
@@ -56,7 +55,7 @@ const MessagingInterface = ({
       id: '',
       created_at: new Date().toISOString(),
       participants: [],
-      wali_supervised: false
+      wali_supervised: false,
     };
     selectConversation(emptyConversation);
   };
@@ -64,8 +63,8 @@ const MessagingInterface = ({
   // Function to handle starting a video call
   const handleStartVideoCall = () => {
     if (!currentConversation) return;
-    
-    const otherUserId = currentConversation.participants.find(id => id !== currentUserId);
+
+    const otherUserId = currentConversation.participants.find((id) => id !== currentUserId);
     if (otherUserId) {
       console.log('Starting video call with participant:', otherUserId);
       startVideoCall(otherUserId);
@@ -83,7 +82,7 @@ const MessagingInterface = ({
         errors={{
           conversations: null,
           messages: null,
-          videoCall: null
+          videoCall: null,
         }}
       >
         {videoCallStatus.isActive ? (

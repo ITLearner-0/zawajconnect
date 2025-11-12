@@ -14,21 +14,21 @@ const VerificationBadge = ({ verificationScore, className }: VerificationBadgePr
         label: 'Vérifié',
         icon: ShieldCheck,
         variant: 'default' as const,
-        className: 'bg-emerald/10 text-emerald border-emerald/20'
+        className: 'bg-emerald/10 text-emerald border-emerald/20',
       };
     } else if (score >= 50) {
       return {
         label: 'Partiellement vérifié',
         icon: Shield,
         variant: 'secondary' as const,
-        className: 'bg-gold/10 text-gold border-gold/20'
+        className: 'bg-gold/10 text-gold border-gold/20',
       };
     } else {
       return {
         label: 'Non vérifié',
         icon: ShieldAlert,
         variant: 'outline' as const,
-        className: 'bg-muted/10 text-muted-foreground border-muted-foreground/20'
+        className: 'bg-muted/10 text-muted-foreground border-muted-foreground/20',
       };
     }
   };
@@ -37,7 +37,7 @@ const VerificationBadge = ({ verificationScore, className }: VerificationBadgePr
   const Icon = status.icon;
 
   return (
-    <Badge 
+    <Badge
       variant={status.variant}
       className={cn(status.className, 'text-xs font-medium', className)}
     >

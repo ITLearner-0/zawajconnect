@@ -1,4 +1,3 @@
-
 // Common type definitions used across the application
 export interface BaseEntity {
   id: string;

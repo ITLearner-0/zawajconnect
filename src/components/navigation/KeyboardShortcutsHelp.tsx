@@ -36,7 +36,7 @@ const KeyboardShortcutsHelp = () => {
           <span className="hidden lg:inline">Raccourcis</span>
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -46,11 +46,11 @@ const KeyboardShortcutsHelp = () => {
         </DialogHeader>
 
         <div className="space-y-6">
-          {categories.map(category => {
+          {categories.map((category) => {
             const categoryShortcuts = getShortcutsByCategory(category);
-            
+
             if (categoryShortcuts.length === 0) return null;
-            
+
             return (
               <Card key={category}>
                 <CardHeader className="pb-3">
@@ -63,18 +63,16 @@ const KeyboardShortcutsHelp = () => {
                         key={index}
                         className="flex items-center justify-between p-2 rounded-lg bg-muted/30"
                       >
-                        <span className="text-sm text-foreground">
-                          {shortcut.description}
-                        </span>
-                        
+                        <span className="text-sm text-foreground">{shortcut.description}</span>
+
                         <div className="flex items-center gap-1">
                           {formatShortcut(shortcut).map((key, keyIndex) => (
                             <Badge
                               key={keyIndex}
                               variant="outline"
                               className={cn(
-                                "px-2 py-1 text-xs font-mono",
-                                "bg-background border-border"
+                                'px-2 py-1 text-xs font-mono',
+                                'bg-background border-border'
                               )}
                             >
                               {key}
@@ -96,14 +94,18 @@ const KeyboardShortcutsHelp = () => {
             <CardContent>
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-2 rounded-lg bg-muted/30">
-                  <span className="text-sm text-foreground">
-                    Ouvrir la navigation rapide
-                  </span>
+                  <span className="text-sm text-foreground">Ouvrir la navigation rapide</span>
                   <div className="flex items-center gap-1">
-                    <Badge variant="outline" className="px-2 py-1 text-xs font-mono bg-background border-border">
+                    <Badge
+                      variant="outline"
+                      className="px-2 py-1 text-xs font-mono bg-background border-border"
+                    >
                       ⌘
                     </Badge>
-                    <Badge variant="outline" className="px-2 py-1 text-xs font-mono bg-background border-border">
+                    <Badge
+                      variant="outline"
+                      className="px-2 py-1 text-xs font-mono bg-background border-border"
+                    >
                       K
                     </Badge>
                   </div>

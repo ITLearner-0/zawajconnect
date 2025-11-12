@@ -1,4 +1,3 @@
-
 import { DebugConfig } from './types';
 
 export class DebugLogger {
@@ -6,15 +5,15 @@ export class DebugLogger {
 
   log(level: 'error' | 'warn' | 'info' | 'debug', message: string, data?: any): void {
     if (!this.config.enableLogging) return;
-    
+
     const levels = ['error', 'warn', 'info', 'debug'];
     const currentLevelIndex = levels.indexOf(this.config.logLevel);
     const messageLevel = levels.indexOf(level);
-    
+
     if (messageLevel > currentLevelIndex) return;
-    
+
     const prefix = `${this.config.trackingPrefix} [${level.toUpperCase()}]`;
-    
+
     switch (level) {
       case 'error':
         console.error(prefix, message, data);

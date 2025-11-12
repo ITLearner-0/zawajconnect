@@ -3,33 +3,30 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  LineChart, 
-  Line, 
-  BarChart, 
-  Bar, 
-  PieChart, 
-  Pie, 
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
   Cell,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
-  ResponsiveContainer 
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from 'recharts';
-import { 
-  TrendingUp, 
-  Users, 
-  Eye, 
-  Share2, 
-  Download, 
-  Trophy,
-  Calendar,
-  Activity
-} from 'lucide-react';
+import { TrendingUp, Users, Eye, Share2, Download, Trophy, Calendar, Activity } from 'lucide-react';
 import { toast } from 'sonner';
 
 type TimePeriod = 'day' | 'week' | 'month';
@@ -59,7 +56,12 @@ interface AnalyticsOverview {
   avg_views_per_user: number;
 }
 
-const COLORS = ['hsl(var(--primary))', 'hsl(var(--accent))', 'hsl(var(--secondary))', 'hsl(var(--muted))'];
+const COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--accent))',
+  'hsl(var(--secondary))',
+  'hsl(var(--muted))',
+];
 
 export function InsightsAnalyticsDashboard() {
   const [period, setPeriod] = useState<TimePeriod>('week');
@@ -78,7 +80,7 @@ export function InsightsAnalyticsDashboard() {
       // Calculate date range based on period
       const now = new Date();
       const startDate = new Date();
-      
+
       switch (period) {
         case 'day':
           startDate.setDate(now.getDate() - 7); // Last 7 days
@@ -124,10 +126,10 @@ export function InsightsAnalyticsDashboard() {
 
       // Group actions by date
       const groupedData: Record<string, { views: number; shares: number; exports: number }> = {};
-      
+
       actionsData?.forEach((action) => {
         if (!action.created_at) return;
-        
+
         const date = new Date(action.created_at);
         let dateKey: string;
 
@@ -163,19 +165,21 @@ export function InsightsAnalyticsDashboard() {
       // Fetch top users with profiles
       const { data: usersData, error: usersError } = await supabase
         .from('insights_analytics')
-        .select(`
+        .select(
+          `
           user_id,
           view_count,
           share_count,
           export_count
-        `)
+        `
+        )
         .order('view_count', { ascending: false })
         .limit(10);
 
       if (usersError) throw usersError;
 
       // Fetch user profiles
-      const userIds = usersData?.map(u => u.user_id) || [];
+      const userIds = usersData?.map((u) => u.user_id) || [];
       const { data: profilesData } = await supabase
         .from('profiles')
         .select('id, full_name')
@@ -187,33 +191,39 @@ export function InsightsAnalyticsDashboard() {
         .select('user_id')
         .in('user_id', userIds);
 
-      const actionCountsByUser = actionsCountData?.reduce((acc, action) => {
-        acc[action.user_id] = (acc[action.user_id] || 0) + 1;
-        return acc;
-      }, {} as Record<string, number>) || {};
+      const actionCountsByUser =
+        actionsCountData?.reduce(
+          (acc, action) => {
+            acc[action.user_id] = (acc[action.user_id] || 0) + 1;
+            return acc;
+          },
+          {} as Record<string, number>
+        ) || {};
 
-      const topUsersData = usersData?.map((user) => {
-        const profile = profilesData?.find(p => p.id === user.user_id);
-        const totalActions = actionCountsByUser[user.user_id] || 0;
-        const engagementScore = 
-          (user.view_count || 0) * 1 +
-          (user.share_count || 0) * 3 +
-          (user.export_count || 0) * 2 +
-          totalActions * 0.5;
+      const topUsersData =
+        usersData
+          ?.map((user) => {
+            const profile = profilesData?.find((p) => p.id === user.user_id);
+            const totalActions = actionCountsByUser[user.user_id] || 0;
+            const engagementScore =
+              (user.view_count || 0) * 1 +
+              (user.share_count || 0) * 3 +
+              (user.export_count || 0) * 2 +
+              totalActions * 0.5;
 
-        return {
-          user_id: user.user_id,
-          full_name: profile?.full_name || 'Utilisateur inconnu',
-          total_views: user.view_count || 0,
-          total_shares: user.share_count || 0,
-          total_exports: user.export_count || 0,
-          total_actions: totalActions,
-          engagement_score: Math.round(engagementScore),
-        };
-      }).sort((a, b) => b.engagement_score - a.engagement_score) || [];
+            return {
+              user_id: user.user_id,
+              full_name: profile?.full_name || 'Utilisateur inconnu',
+              total_views: user.view_count || 0,
+              total_shares: user.share_count || 0,
+              total_exports: user.export_count || 0,
+              total_actions: totalActions,
+              engagement_score: Math.round(engagementScore),
+            };
+          })
+          .sort((a, b) => b.engagement_score - a.engagement_score) || [];
 
       setTopUsers(topUsersData);
-
     } catch (error) {
       console.error('Error loading analytics:', error);
       toast.error('Erreur lors du chargement des analytics');
@@ -222,11 +232,13 @@ export function InsightsAnalyticsDashboard() {
     }
   };
 
-  const actionTypeData = overview ? [
-    { name: 'Vues', value: overview.total_views, color: COLORS[0] },
-    { name: 'Partages', value: overview.total_shares, color: COLORS[1] },
-    { name: 'Exports', value: overview.total_exports, color: COLORS[2] },
-  ] : [];
+  const actionTypeData = overview
+    ? [
+        { name: 'Vues', value: overview.total_views, color: COLORS[0] },
+        { name: 'Partages', value: overview.total_shares, color: COLORS[1] },
+        { name: 'Exports', value: overview.total_exports, color: COLORS[2] },
+      ]
+    : [];
 
   return (
     <div className="space-y-6">
@@ -317,9 +329,13 @@ export function InsightsAnalyticsDashboard() {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-primary">
-                {overview.total_users > 0 
-                  ? Math.round(((overview.total_shares + overview.total_exports) / overview.total_users) * 100) 
-                  : 0}%
+                {overview.total_users > 0
+                  ? Math.round(
+                      ((overview.total_shares + overview.total_exports) / overview.total_users) *
+                        100
+                    )
+                  : 0}
+                %
               </div>
             </CardContent>
           </Card>
@@ -339,47 +355,44 @@ export function InsightsAnalyticsDashboard() {
             <CardHeader>
               <CardTitle>Évolution de l'engagement</CardTitle>
               <CardDescription>
-                Nombre d'actions par {period === 'day' ? 'jour' : period === 'week' ? 'semaine' : 'mois'}
+                Nombre d'actions par{' '}
+                {period === 'day' ? 'jour' : period === 'week' ? 'semaine' : 'mois'}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={350}>
                 <LineChart data={timeSeriesData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="date" 
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
-                  />
+                  <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                   <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
+                      borderRadius: '8px',
                     }}
                   />
                   <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="views" 
-                    stroke="hsl(var(--primary))" 
+                  <Line
+                    type="monotone"
+                    dataKey="views"
+                    stroke="hsl(var(--primary))"
                     strokeWidth={2}
                     name="Vues"
                     dot={{ fill: 'hsl(var(--primary))' }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="shares" 
-                    stroke="hsl(var(--accent))" 
+                  <Line
+                    type="monotone"
+                    dataKey="shares"
+                    stroke="hsl(var(--accent))"
                     strokeWidth={2}
                     name="Partages"
                     dot={{ fill: 'hsl(var(--accent))' }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="exports" 
-                    stroke="hsl(var(--secondary))" 
+                  <Line
+                    type="monotone"
+                    dataKey="exports"
+                    stroke="hsl(var(--secondary))"
                     strokeWidth={2}
                     name="Exports"
                     dot={{ fill: 'hsl(var(--secondary))' }}
@@ -392,25 +405,19 @@ export function InsightsAnalyticsDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Comparaison par type d'action</CardTitle>
-              <CardDescription>
-                Volume d'actions par catégorie
-              </CardDescription>
+              <CardDescription>Volume d'actions par catégorie</CardDescription>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={timeSeriesData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis 
-                    dataKey="date" 
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={12}
-                  />
+                  <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                   <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
+                      borderRadius: '8px',
                     }}
                   />
                   <Legend />
@@ -427,9 +434,7 @@ export function InsightsAnalyticsDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Distribution des actions</CardTitle>
-              <CardDescription>
-                Répartition des différents types d'engagement
-              </CardDescription>
+              <CardDescription>Répartition des différents types d'engagement</CardDescription>
             </CardHeader>
             <CardContent className="flex items-center justify-center">
               <ResponsiveContainer width="100%" height={400}>
@@ -448,11 +453,11 @@ export function InsightsAnalyticsDashboard() {
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'hsl(var(--card))', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: '8px'
+                      borderRadius: '8px',
                     }}
                   />
                 </PieChart>
@@ -483,9 +488,13 @@ export function InsightsAnalyticsDashboard() {
                       <Badge
                         variant={index < 3 ? 'default' : 'outline'}
                         className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                          index === 0 ? 'bg-amber-500 text-white' :
-                          index === 1 ? 'bg-gray-400 text-white' :
-                          index === 2 ? 'bg-orange-600 text-white' : ''
+                          index === 0
+                            ? 'bg-amber-500 text-white'
+                            : index === 1
+                              ? 'bg-gray-400 text-white'
+                              : index === 2
+                                ? 'bg-orange-600 text-white'
+                                : ''
                         }`}
                       >
                         {index + 1}

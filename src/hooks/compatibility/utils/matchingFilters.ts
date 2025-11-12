@@ -1,11 +1,10 @@
-
-import { MatchingFilters, UserResultWithProfile } from "../types/matchingTypes";
+import { MatchingFilters, UserResultWithProfile } from '../types/matchingTypes';
 
 export function applyFilters(user: UserResultWithProfile, filters?: MatchingFilters): boolean {
   if (!filters) return true;
 
   const profile = user.profiles;
-  
+
   // Age filter
   if (filters.ageRange && profile.birth_date) {
     const age = new Date().getFullYear() - new Date(profile.birth_date).getFullYear();
@@ -25,14 +24,15 @@ export function applyFilters(user: UserResultWithProfile, filters?: MatchingFilt
   }
 
   // Religious level filter
-  if (filters.religiousLevel?.length && 
-      !filters.religiousLevel.includes(profile.religious_practice_level)) {
+  if (
+    filters.religiousLevel?.length &&
+    !filters.religiousLevel.includes(profile.religious_practice_level)
+  ) {
     return false;
   }
 
   // Verification filter
-  if (filters.verifiedOnly && 
-      !(profile.email_verified && profile.phone_verified)) {
+  if (filters.verifiedOnly && !(profile.email_verified && profile.phone_verified)) {
     return false;
   }
 

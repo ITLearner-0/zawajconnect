@@ -1,19 +1,16 @@
-
 import React, { memo } from 'react';
 import { Shield, Heart, Users, CheckCircle } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useTranslation } from 'react-i18next';
 
-const TrustBadge = memo(({ badge, index }: { badge: any, index: number }) => {
+const TrustBadge = memo(({ badge, index }: { badge: any; index: number }) => {
   const { ref, hasIntersected } = useIntersectionObserver<HTMLDivElement>({ threshold: 0.2 });
 
   return (
-    <div 
+    <div
       ref={ref}
       className={`text-center group transition-all duration-500 ${
-        hasIntersected 
-          ? 'opacity-100 translate-y-0 scale-100' 
-          : 'opacity-0 translate-y-4 scale-95'
+        hasIntersected ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'
       }`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
@@ -35,23 +32,23 @@ const TrustBadges = memo(() => {
     {
       icon: Shield,
       title: t('home.trustBadges.respectValues.title'),
-      description: t('home.trustBadges.respectValues.description')
+      description: t('home.trustBadges.respectValues.description'),
     },
     {
       icon: Heart,
       title: t('home.trustBadges.waliSupervision.title'),
-      description: t('home.trustBadges.waliSupervision.description')
+      description: t('home.trustBadges.waliSupervision.description'),
     },
     {
       icon: Users,
       title: t('home.trustBadges.respectfulCommunity.title'),
-      description: t('home.trustBadges.respectfulCommunity.description')
+      description: t('home.trustBadges.respectfulCommunity.description'),
     },
     {
       icon: CheckCircle,
       title: t('home.trustBadges.securePlatform.title'),
-      description: t('home.trustBadges.securePlatform.description')
-    }
+      description: t('home.trustBadges.securePlatform.description'),
+    },
   ];
 
   return (

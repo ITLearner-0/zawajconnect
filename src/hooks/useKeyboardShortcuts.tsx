@@ -26,7 +26,7 @@ export const useKeyboardShortcuts = () => {
         trackAction('keyboard_navigation', { shortcut: 'alt+h', destination: '/dashboard' });
       },
       description: 'Aller au tableau de bord',
-      category: 'Navigation'
+      category: 'Navigation',
     },
     {
       key: 'p',
@@ -36,7 +36,7 @@ export const useKeyboardShortcuts = () => {
         trackAction('keyboard_navigation', { shortcut: 'alt+p', destination: '/enhanced-profile' });
       },
       description: 'Aller au profil',
-      category: 'Navigation'
+      category: 'Navigation',
     },
     {
       key: 'b',
@@ -46,7 +46,7 @@ export const useKeyboardShortcuts = () => {
         trackAction('keyboard_navigation', { shortcut: 'alt+b', destination: '/browse' });
       },
       description: 'Découvrir des profils',
-      category: 'Navigation'
+      category: 'Navigation',
     },
     {
       key: 'm',
@@ -56,7 +56,7 @@ export const useKeyboardShortcuts = () => {
         trackAction('keyboard_navigation', { shortcut: 'alt+m', destination: '/matches' });
       },
       description: 'Voir mes matches',
-      category: 'Navigation'
+      category: 'Navigation',
     },
     {
       key: 'c',
@@ -66,17 +66,20 @@ export const useKeyboardShortcuts = () => {
         trackAction('keyboard_navigation', { shortcut: 'alt+c', destination: '/chat' });
       },
       description: 'Ouvrir les messages',
-      category: 'Navigation'
+      category: 'Navigation',
     },
     {
       key: 't',
       altKey: true,
       action: () => {
         navigate('/compatibility-test');
-        trackAction('keyboard_navigation', { shortcut: 'alt+t', destination: '/compatibility-test' });
+        trackAction('keyboard_navigation', {
+          shortcut: 'alt+t',
+          destination: '/compatibility-test',
+        });
       },
       description: 'Test de compatibilité',
-      category: 'Navigation'
+      category: 'Navigation',
     },
     {
       key: 's',
@@ -86,7 +89,7 @@ export const useKeyboardShortcuts = () => {
         trackAction('keyboard_navigation', { shortcut: 'alt+s', destination: '/settings' });
       },
       description: 'Ouvrir les paramètres',
-      category: 'Navigation'
+      category: 'Navigation',
     },
     // Browser-like shortcuts
     {
@@ -97,7 +100,7 @@ export const useKeyboardShortcuts = () => {
         trackAction('keyboard_action', { shortcut: 'ctrl+r', action: 'page_refresh' });
       },
       description: 'Actualiser la page',
-      category: 'Actions'
+      category: 'Actions',
     },
     // Quick actions
     {
@@ -112,21 +115,23 @@ export const useKeyboardShortcuts = () => {
         }
       },
       description: 'Navigation rapide',
-      category: 'Actions'
+      category: 'Actions',
     },
     {
       key: 'Escape',
       action: () => {
         // Close any open modals or dialogs
-        const closeButtons = document.querySelectorAll('[data-dialog-close], [data-modal-close], button[aria-label*="close"]');
+        const closeButtons = document.querySelectorAll(
+          '[data-dialog-close], [data-modal-close], button[aria-label*="close"]'
+        );
         if (closeButtons.length > 0) {
           (closeButtons[0] as HTMLElement).click();
           trackAction('keyboard_action', { shortcut: 'escape', action: 'close_modal' });
         }
       },
       description: 'Fermer les modales',
-      category: 'Actions'
-    }
+      category: 'Actions',
+    },
   ];
 
   useEffect(() => {
@@ -141,7 +146,7 @@ export const useKeyboardShortcuts = () => {
         if (event.key !== 'Escape') return;
       }
 
-      const matchingShortcut = shortcuts.find(shortcut => {
+      const matchingShortcut = shortcuts.find((shortcut) => {
         return (
           shortcut.key === event.key &&
           !!shortcut.ctrlKey === event.ctrlKey &&
@@ -165,7 +170,6 @@ export const useKeyboardShortcuts = () => {
 
   return {
     shortcuts,
-    getShortcutsByCategory: (category: string) => 
-      shortcuts.filter(s => s.category === category)
+    getShortcutsByCategory: (category: string) => shortcuts.filter((s) => s.category === category),
   };
 };

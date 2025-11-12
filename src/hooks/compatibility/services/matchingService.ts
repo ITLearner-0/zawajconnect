@@ -1,22 +1,21 @@
-
-import { CompatibilityMatch } from "@/types/compatibility";
-import { MatchingFilters } from "../types/matchingTypes";
-import { EnhancedMatchingFilters } from "../types/advancedFilterTypes";
-import { userResultsService } from "./userResultsService";
-import { profileService } from "./profileService";
-import { combineUserDataWithProfiles } from "./dataProcessingService";
-import { processMatches, finalizePipeline } from "./matchProcessingService";
-import { advancedFiltersService } from "./advancedFiltersService";
-import { 
-  CompatibilityServiceError, 
-  UserNotFoundError, 
-  DatabaseConnectionError, 
-  NoMatchesFoundError 
-} from "./errorHandling";
-import { logError, logInfo } from "./loggingService";
+import { CompatibilityMatch } from '@/types/compatibility';
+import { MatchingFilters } from '../types/matchingTypes';
+import { EnhancedMatchingFilters } from '../types/advancedFilterTypes';
+import { userResultsService } from './userResultsService';
+import { profileService } from './profileService';
+import { combineUserDataWithProfiles } from './dataProcessingService';
+import { processMatches, finalizePipeline } from './matchProcessingService';
+import { advancedFiltersService } from './advancedFiltersService';
+import {
+  CompatibilityServiceError,
+  UserNotFoundError,
+  DatabaseConnectionError,
+  NoMatchesFoundError,
+} from './errorHandling';
+import { logError, logInfo } from './loggingService';
 
 // Export cache management functions for external use
-export { cacheService as compatibilityCache } from "./cacheService";
+export { cacheService as compatibilityCache } from './cacheService';
 
 export async function findCompatibilityMatches(
   userId: string,
@@ -35,7 +34,7 @@ export async function findCompatibilityMatches(
     }
 
     // Step 3: Get profiles with validation
-    const userIds = otherUsers.map(user => user.user_id);
+    const userIds = otherUsers.map((user) => user.user_id);
     const profiles = await profileService.fetchProfiles(userIds);
     if (profiles.length === 0) {
       return [];
@@ -55,32 +54,31 @@ export async function findCompatibilityMatches(
         matches,
         filters.advanced
       );
-      
+
       usersWithProfiles = filteredUsers;
       finalMatches = filteredMatches;
-      
+
       logInfo('findCompatibilityMatches', `Advanced filters applied`, {
         originalMatches: matches.length,
         filteredMatches: finalMatches.length,
-        filterSummary: advancedFiltersService.getFilterSummary(filters.advanced)
+        filterSummary: advancedFiltersService.getFilterSummary(filters.advanced),
       });
     }
 
     // Step 7: Finalize and return results
     return finalizePipeline(finalMatches, userId);
-
   } catch (error) {
     if (error instanceof CompatibilityServiceError) {
       logError('findCompatibilityMatches', error, { userId, filters });
       throw error;
     }
-    
+
     const serviceError = new CompatibilityServiceError(
-      'Une erreur inattendue s\'est produite lors de la recherche de correspondances',
+      "Une erreur inattendue s'est produite lors de la recherche de correspondances",
       'UNEXPECTED_ERROR',
       error as Error
     );
-    
+
     logError('findCompatibilityMatches', serviceError, { userId, filters });
     throw serviceError;
   }
@@ -91,9 +89,9 @@ export {
   CompatibilityServiceError,
   UserNotFoundError,
   DatabaseConnectionError,
-  NoMatchesFoundError
-} from "./errorHandling";
+  NoMatchesFoundError,
+} from './errorHandling';
 
 // Re-export enhanced matching service
-export { enhancedMatchingService } from "./enhancedMatchingService";
-export { backgroundProcessingService } from "./backgroundProcessingService";
+export { enhancedMatchingService } from './enhancedMatchingService';
+export { backgroundProcessingService } from './backgroundProcessingService';

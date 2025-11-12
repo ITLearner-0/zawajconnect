@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -24,7 +23,7 @@ const DEFAULT_SECURITY_SETTINGS: SecuritySettings = {
   lockoutDuration: 30,
   sessionTimeout: 60,
   requireMFA: false,
-  passwordExpiryDays: 90
+  passwordExpiryDays: 90,
 };
 
 export const useSecurityState = () => {
@@ -34,80 +33,83 @@ export const useSecurityState = () => {
     lockoutUntil: null,
     lastActivity: new Date(),
     deviceFingerprint: '',
-    sessionValid: true
+    sessionValid: true,
   });
 
   const [securitySettings] = useState<SecuritySettings>(DEFAULT_SECURITY_SETTINGS);
 
-  const recordFailedAttempt = useCallback(async (userId?: string) => {
-    if (!userId) return;
+  const recordFailedAttempt = useCallback(
+    async (userId?: string) => {
+      if (!userId) return;
 
-    try {
-      // Log the failed attempt
-      await supabase.rpc('log_security_event', {
-        p_user_id: userId,
-        p_action: 'failed_login_attempt',
-        p_resource_type: 'authentication',
-        p_success: false,
-        p_risk_level: 'medium'
-      });
+      try {
+        // Log the failed attempt
+        await supabase.rpc('log_security_event', {
+          p_user_id: userId,
+          p_action: 'failed_login_attempt',
+          p_resource_type: 'authentication',
+          p_success: false,
+          p_risk_level: 'medium',
+        });
 
-      setSecurityState(prev => {
-        const newFailedAttempts = prev.failedAttempts + 1;
-        const shouldLock = newFailedAttempts >= securitySettings.maxFailedAttempts;
-        
-        return {
-          ...prev,
-          failedAttempts: newFailedAttempts,
-          isLocked: shouldLock,
-          lockoutUntil: shouldLock 
-            ? new Date(Date.now() + securitySettings.lockoutDuration * 60000)
-            : null
-        };
-      });
-    } catch (error) {
-      console.error('Failed to record security event:', error);
-    }
-  }, [securitySettings.maxFailedAttempts, securitySettings.lockoutDuration]);
+        setSecurityState((prev) => {
+          const newFailedAttempts = prev.failedAttempts + 1;
+          const shouldLock = newFailedAttempts >= securitySettings.maxFailedAttempts;
+
+          return {
+            ...prev,
+            failedAttempts: newFailedAttempts,
+            isLocked: shouldLock,
+            lockoutUntil: shouldLock
+              ? new Date(Date.now() + securitySettings.lockoutDuration * 60000)
+              : null,
+          };
+        });
+      } catch (error) {
+        console.error('Failed to record security event:', error);
+      }
+    },
+    [securitySettings.maxFailedAttempts, securitySettings.lockoutDuration]
+  );
 
   const resetFailedAttempts = useCallback(() => {
-    setSecurityState(prev => ({
+    setSecurityState((prev) => ({
       ...prev,
       failedAttempts: 0,
       isLocked: false,
-      lockoutUntil: null
+      lockoutUntil: null,
     }));
   }, []);
 
   const isAccountLocked = useCallback(() => {
     if (!securityState.isLocked || !securityState.lockoutUntil) return false;
-    
+
     const now = new Date();
     if (now > securityState.lockoutUntil) {
       // Auto-unlock if lockout period has passed
-      setSecurityState(prev => ({
+      setSecurityState((prev) => ({
         ...prev,
         isLocked: false,
         lockoutUntil: null,
-        failedAttempts: 0
+        failedAttempts: 0,
       }));
       return false;
     }
-    
+
     return true;
   }, [securityState.isLocked, securityState.lockoutUntil]);
 
   const updateDeviceFingerprint = useCallback((fingerprint: string) => {
-    setSecurityState(prev => ({
+    setSecurityState((prev) => ({
       ...prev,
-      deviceFingerprint: fingerprint
+      deviceFingerprint: fingerprint,
     }));
   }, []);
 
   const updateLastActivity = useCallback(() => {
-    setSecurityState(prev => ({
+    setSecurityState((prev) => ({
       ...prev,
-      lastActivity: new Date()
+      lastActivity: new Date(),
     }));
   }, []);
 
@@ -118,6 +120,6 @@ export const useSecurityState = () => {
     resetFailedAttempts,
     isAccountLocked,
     updateDeviceFingerprint,
-    updateLastActivity
+    updateLastActivity,
   };
 };

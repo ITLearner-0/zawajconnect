@@ -17,6 +17,7 @@ Guide complet pour déployer automatiquement ZawajConnect sur Hostinger via FTP.
 ### Étape 1 : Créer le fichier de configuration FTP
 
 1. **Copier le fichier exemple :**
+
    ```bash
    cp .ftp-deploy.example.json .ftp-deploy.json
    ```
@@ -32,11 +33,7 @@ Guide complet pour déployer automatiquement ZawajConnect sur Hostinger via FTP.
      "remoteRoot": "/public_html",
      "siteUrl": "https://zawajconnect.me",
      "deleteRemote": true,
-     "exclude": [
-       "**/*.map",
-       ".git/**",
-       ".DS_Store"
-     ]
+     "exclude": ["**/*.map", ".git/**", ".DS_Store"]
    }
    ```
 
@@ -51,7 +48,7 @@ Guide complet pour déployer automatiquement ZawajConnect sur Hostinger via FTP.
    - **Nom d'utilisateur** : Votre username FTP
    - **Mot de passe** : Votre mot de passe FTP (ou créez-en un nouveau)
    - **Port** : `21` (FTP standard)
-   - **Dossier distant** : 
+   - **Dossier distant** :
      - `/public_html` (pour domaine principal)
      - `/public_html/sous-dossier` (pour sous-domaine)
 
@@ -77,6 +74,7 @@ npm run deploy:hostinger
 ```
 
 Cette commande va :
+
 1. ✅ Construire le projet (`npm run build`)
 2. ✅ Se connecter au serveur FTP Hostinger
 3. ✅ Uploader tous les fichiers du dossier `dist/`
@@ -125,16 +123,16 @@ node scripts/deploy-hostinger.js
 
 ### Options dans `.ftp-deploy.json`
 
-| Option | Type | Défaut | Description |
-|--------|------|--------|-------------|
-| `host` | string | **requis** | Adresse du serveur FTP |
-| `user` | string | **requis** | Nom d'utilisateur FTP |
-| `password` | string | **requis** | Mot de passe FTP |
-| `port` | number | `21` | Port FTP (21 standard, 22 pour SFTP) |
-| `remoteRoot` | string | **requis** | Dossier de destination sur le serveur |
-| `siteUrl` | string | optionnel | URL de votre site (affichée après deploy) |
-| `deleteRemote` | boolean | `true` | Supprimer les fichiers distants non présents localement |
-| `exclude` | array | `[]` | Fichiers/dossiers à exclure de l'upload |
+| Option         | Type    | Défaut     | Description                                             |
+| -------------- | ------- | ---------- | ------------------------------------------------------- |
+| `host`         | string  | **requis** | Adresse du serveur FTP                                  |
+| `user`         | string  | **requis** | Nom d'utilisateur FTP                                   |
+| `password`     | string  | **requis** | Mot de passe FTP                                        |
+| `port`         | number  | `21`       | Port FTP (21 standard, 22 pour SFTP)                    |
+| `remoteRoot`   | string  | **requis** | Dossier de destination sur le serveur                   |
+| `siteUrl`      | string  | optionnel  | URL de votre site (affichée après deploy)               |
+| `deleteRemote` | boolean | `true`     | Supprimer les fichiers distants non présents localement |
+| `exclude`      | array   | `[]`       | Fichiers/dossiers à exclure de l'upload                 |
 
 ### Exemple : Déployer sur un sous-domaine
 
@@ -153,12 +151,7 @@ node scripts/deploy-hostinger.js
 ```json
 {
   "deleteRemote": false,
-  "exclude": [
-    "**/*.map",
-    ".git/**",
-    ".htaccess",
-    "uploads/**"
-  ]
+  "exclude": ["**/*.map", ".git/**", ".htaccess", "uploads/**"]
 }
 ```
 
@@ -169,6 +162,7 @@ node scripts/deploy-hostinger.js
 ### ❌ Erreur : "Fichier de configuration introuvable"
 
 **Solution :**
+
 ```bash
 cp .ftp-deploy.example.json .ftp-deploy.json
 # Puis éditez .ftp-deploy.json avec vos identifiants
@@ -179,6 +173,7 @@ cp .ftp-deploy.example.json .ftp-deploy.json
 ### ❌ Erreur : "Le dossier dist/ n'existe pas"
 
 **Solution :**
+
 ```bash
 npm run build  # Construire le projet d'abord
 ```
@@ -190,6 +185,7 @@ npm run build  # Construire le projet d'abord
 **Cause :** Hôte FTP incorrect ou problème de connexion
 
 **Solutions :**
+
 1. Vérifiez l'orthographe de l'hôte dans `.ftp-deploy.json`
 2. Testez votre connexion internet
 3. Vérifiez que le serveur FTP est accessible :
@@ -204,6 +200,7 @@ npm run build  # Construire le projet d'abord
 **Cause :** Identifiants FTP incorrects
 
 **Solutions :**
+
 1. Vérifiez votre username et password dans `.ftp-deploy.json`
 2. Réinitialisez votre mot de passe FTP sur Hostinger :
    - hPanel → Fichiers → Gestionnaire FTP
@@ -216,6 +213,7 @@ npm run build  # Construire le projet d'abord
 **Cause :** Port FTP incorrect ou firewall
 
 **Solutions :**
+
 1. Vérifiez le port (21 pour FTP standard)
 2. Essayez le port 22 si SFTP est activé
 3. Vérifiez votre firewall local
@@ -225,11 +223,13 @@ npm run build  # Construire le projet d'abord
 ### ❌ Le site ne se met pas à jour après déploiement
 
 **Causes possibles :**
+
 1. **Cache du navigateur** : Faites Ctrl+F5 (Windows) ou Cmd+Shift+R (Mac)
 2. **Cache Hostinger** : Attendez 2-5 minutes
 3. **Mauvais dossier distant** : Vérifiez `remoteRoot` dans `.ftp-deploy.json`
 
 **Vérification :**
+
 ```bash
 # Vérifier que les fichiers sont bien uploadés
 # Connectez-vous via FTP (FileZilla) et vérifiez manuellement
@@ -242,6 +242,7 @@ npm run build  # Construire le projet d'abord
 **Optimisations :**
 
 1. **Exclure les fichiers inutiles :**
+
    ```json
    "exclude": [
      "**/*.map",
@@ -263,6 +264,7 @@ npm run build  # Construire le projet d'abord
 ### ✅ Bonnes Pratiques
 
 1. **Ne jamais committer `.ftp-deploy.json`**
+
    ```bash
    # Vérifier avant chaque commit
    git status
@@ -313,11 +315,13 @@ npm run deploy:hostinger  # Build + Deploy automatique
 ## 🆘 Support
 
 ### Hostinger Support
+
 - 📧 Email : support@hostinger.com
 - 💬 Live Chat : [hpanel.hostinger.com](https://hpanel.hostinger.com)
 - 📚 Documentation : [support.hostinger.com](https://support.hostinger.com)
 
 ### ZawajConnect
+
 - 📖 Voir aussi : `DEPLOYMENT_GUIDE.md`
 - 🐛 Issues : GitHub Issues (si configuré)
 

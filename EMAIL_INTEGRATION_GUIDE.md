@@ -13,6 +13,7 @@ Ce guide explique comment utiliser le système d'envoi d'e-mails automatiques de
 **Déclenché :** Lors de l'inscription d'un nouvel utilisateur
 
 **Contenu :**
+
 - Message de bienvenue personnalisé
 - Guide des prochaines étapes
 - Bouton CTA vers l'onboarding
@@ -21,7 +22,7 @@ Ce guide explique comment utiliser le système d'envoi d'e-mails automatiques de
 **Utilisation dans le code :**
 
 ```typescript
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 // Après l'inscription réussie
 const { data: user } = await supabase.auth.getUser();
@@ -31,8 +32,8 @@ if (user) {
     body: {
       userId: user.id,
       email: user.email,
-      fullName: user.user_metadata.full_name
-    }
+      fullName: user.user_metadata.full_name,
+    },
   });
 }
 ```
@@ -44,6 +45,7 @@ if (user) {
 **Déclenché :** Quand deux utilisateurs ont un match mutuel
 
 **Contenu :**
+
 - Annonce du nouveau match
 - Présentation du match
 - Bouton CTA vers le chat
@@ -52,7 +54,7 @@ if (user) {
 **Utilisation dans le code :**
 
 ```typescript
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from '@/integrations/supabase/client';
 
 // Quand un match devient mutuel
 await supabase.functions.invoke('send-match-notification', {
@@ -60,8 +62,8 @@ await supabase.functions.invoke('send-match-notification', {
     recipientEmail: recipient.email,
     recipientName: recipient.full_name,
     matchName: match.full_name,
-    matchId: match.id
-  }
+    matchId: match.id,
+  },
 });
 ```
 
@@ -84,7 +86,7 @@ await supabase.functions.invoke('send-match-notification', {
 const { data, error } = await supabase.functions.invoke('nom-fonction', {
   body: {
     // Paramètres requis
-  }
+  },
 });
 
 if (error) {
@@ -113,9 +115,9 @@ const handleSignUp = async (values) => {
       data: {
         full_name: values.fullName,
         terms_accepted_at: new Date().toISOString(),
-        terms_version: '1.0'
-      }
-    }
+        terms_version: '1.0',
+      },
+    },
   });
 
   if (!error && data.user) {
@@ -124,8 +126,8 @@ const handleSignUp = async (values) => {
       body: {
         userId: data.user.id,
         email: data.user.email,
-        fullName: values.fullName
-      }
+        fullName: values.fullName,
+      },
     });
   }
 };
@@ -140,16 +142,15 @@ const handleSignUp = async (values) => {
 const handleLike = async (userId: string) => {
   try {
     // ... logique de création/mise à jour du match ...
-    
+
     // Si le match est devenu mutuel, envoyer les notifications
     if (isNowMutual && match?.id) {
       // La fonction send-match-notifications gère automatiquement
       // l'envoi aux DEUX utilisateurs du match de manière sécurisée
-      const { error: emailError } = await supabase.functions.invoke(
-        'send-match-notifications',
-        { body: { matchId: match.id } }
-      );
-      
+      const { error: emailError } = await supabase.functions.invoke('send-match-notifications', {
+        body: { matchId: match.id },
+      });
+
       if (emailError) {
         console.error('Erreur notification email:', emailError);
       } else {
@@ -179,16 +180,17 @@ Les templates HTML sont dans les edge functions. Pour modifier :
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-  <!-- Meta tags -->
-</head>
-<body style="inline styles">
-  <table> <!-- Structure email -->
-    <!-- Header avec gradient -->
-    <!-- Contenu principal -->
-    <!-- Footer -->
-  </table>
-</body>
+  <head>
+    <!-- Meta tags -->
+  </head>
+  <body style="inline styles">
+    <table>
+      <!-- Structure email -->
+      <!-- Header avec gradient -->
+      <!-- Contenu principal -->
+      <!-- Footer -->
+    </table>
+  </body>
 </html>
 ```
 
@@ -201,11 +203,13 @@ Les templates HTML sont dans les edge functions. Pour modifier :
 ```typescript
 try {
   const { data, error } = await supabase.functions.invoke('send-email', {
-    body: { /* ... */ }
+    body: {
+      /* ... */
+    },
   });
-  
+
   if (error) throw error;
-  
+
   console.log('Email envoyé:', data.messageId);
 } catch (err) {
   console.error('Erreur email:', err);
@@ -229,6 +233,7 @@ if (!emailSent && shouldSendEmail) {
 ### 3. Logs et monitoring
 
 Les edge functions loguent automatiquement :
+
 - Succès de l'envoi
 - Erreurs avec détails
 - ID du message Resend
@@ -240,12 +245,14 @@ Consultez les logs : [Supabase Edge Functions Logs](https://supabase.com/dashboa
 ## 📧 Types d'e-mails recommandés (à implémenter)
 
 ### Priorité haute :
+
 - ✅ **Bienvenue** : Implémenté dans `src/pages/Auth.tsx`
 - ✅ **Match mutuel** : Implémenté dans `src/pages/Browse.tsx` et `src/pages/Profile.tsx`
 - ✅ **Fin de conversation** : Implémenté dans `src/hooks/useConversationStatus.tsx`
 - ✅ **Invitation famille** : Implémenté dans `src/components/FamilyInvitationForm.tsx` et `src/components/FamilyInvitationManager.tsx`
 
 ### Priorité moyenne :
+
 - ✅ **Vérification d'identité approuvée** : Implémenté dans `src/hooks/useIslamicModeration.tsx` et `src/utils/verificationEmailTrigger.ts`
 - ⏳ **Message important non lu (rappel)** : Edge function créée - Configuration Cron requise (voir `CRON_JOBS_SETUP.md`)
 - ⏳ **Expiration abonnement Premium** : Edge function créée - Configuration Cron requise (voir `CRON_JOBS_SETUP.md`)
@@ -291,6 +298,7 @@ L'edge function est prête, il suffit de configurer le cron job décrit dans le 
 **Configuration requise :** Cron job (voir `CRON_JOBS_SETUP.md`)
 
 Cette fonctionnalité nécessite la configuration d'une tâche programmée pour envoyer des rappels :
+
 - 7 jours avant expiration
 - 3 jours avant expiration
 - 1 jour avant expiration
@@ -302,12 +310,14 @@ L'edge function est prête, il suffit de configurer le cron job décrit dans le 
 **Implémentation automatique :**
 
 L'email de modération est **déjà intégré** dans `src/hooks/useIslamicModeration.tsx` et s'envoie automatiquement :
+
 - Quand un contenu est **bloqué** (severity: critical ou high selon confidence)
 - Quand un contenu reçoit un **avertissement** avec confidence > 0.7 (severity: medium)
 
 **Aucune action requise** - Le système fonctionne automatiquement !
 
 ### Priorité basse :
+
 - ✅ **Newsletter mensuelle** : Edge function créée - Configuration Cron recommandée (1er lundi du mois)
 - ✅ **Conseils hebdomadaires** : Edge function créée - Configuration Cron recommandée (tous les mercredis)
 - ✅ **Rappel de compléter le profil** : Edge function créée - Configuration Cron recommandée (tous les dimanches)
@@ -367,6 +377,7 @@ Consultez `CRON_JOBS_SETUP.md` pour les fonctions SQL complètes et instructions
 **Dashboard Resend :** https://resend.com/emails
 
 Consultez :
+
 - Taux de délivrabilité
 - E-mails ouverts
 - Clics sur les liens
@@ -384,9 +395,11 @@ Consultez :
 3. Vérifier le domaine validé sur Resend : [Domains](https://resend.com/domains)
 
 **Erreur commune :**
+
 ```
 Error: Domain not verified
 ```
+
 → Aller sur https://resend.com/domains et valider votre domaine
 
 ---
@@ -409,7 +422,9 @@ verify_jwt = false
 
 ```typescript
 await supabase.functions.invoke('mon-nouvel-email', {
-  body: { /* params */ }
+  body: {
+    /* params */
+  },
 });
 ```
 

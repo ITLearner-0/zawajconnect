@@ -1,4 +1,3 @@
-
 // Content Security Policy and XSS Protection utilities
 export const setupContentSecurityPolicy = () => {
   // Add CSP meta tag if it doesn't exist
@@ -12,7 +11,7 @@ export const setupContentSecurityPolicy = () => {
       "img-src 'self' data: https:",
       "connect-src 'self' https://*.supabase.co https://api.stripe.com",
       "font-src 'self' https://fonts.gstatic.com",
-      "frame-src 'self' https://js.stripe.com"
+      "frame-src 'self' https://js.stripe.com",
     ].join('; ');
     document.head.appendChild(meta);
   }

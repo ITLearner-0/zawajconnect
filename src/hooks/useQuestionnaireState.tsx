@@ -7,9 +7,9 @@ interface UseQuestionnaireStateProps {
   storageKey?: string;
 }
 
-export const useQuestionnaireState = ({ 
-  autoSaveDelay = 2000, 
-  storageKey = 'questionnaire_responses' 
+export const useQuestionnaireState = ({
+  autoSaveDelay = 2000,
+  storageKey = 'questionnaire_responses',
 }: UseQuestionnaireStateProps = {}) => {
   const { user } = useAuth();
   const [responses, setResponses] = useState<Record<string, string>>({});
@@ -49,12 +49,12 @@ export const useQuestionnaireState = ({
   // Auto-save to database with debouncing
   const autoSaveToDatabase = useCallback(async () => {
     if (!user || saving) return;
-    
+
     // Check if there are new responses to save
     const hasNewResponses = Object.keys(responses).some(
-      key => responses[key] !== lastSavedRef.current[key]
+      (key) => responses[key] !== lastSavedRef.current[key]
     );
-    
+
     if (!hasNewResponses || Object.keys(responses).length === 0) return;
 
     setSaving(true);
@@ -62,20 +62,17 @@ export const useQuestionnaireState = ({
       const responseArray = Object.entries(responses).map(([questionKey, responseValue]) => ({
         user_id: user.id,
         question_key: questionKey,
-        response_value: responseValue
+        response_value: responseValue,
       }));
 
-      const { error } = await supabase
-        .from('user_compatibility_responses')
-        .upsert(responseArray, {
-          onConflict: 'user_id,question_key',
-          ignoreDuplicates: false
-        });
+      const { error } = await supabase.from('user_compatibility_responses').upsert(responseArray, {
+        onConflict: 'user_id,question_key',
+        ignoreDuplicates: false,
+      });
 
       if (error) throw error;
 
       lastSavedRef.current = { ...responses };
-      
     } catch (error) {
       console.error('Auto-save error:', error);
       // Don't show toast for auto-save errors to avoid spam
@@ -85,21 +82,24 @@ export const useQuestionnaireState = ({
   }, [user, responses, saving]);
 
   // Update responses with auto-save
-  const updateResponse = useCallback((questionKey: string, value: string) => {
-    setResponses(prev => ({
-      ...prev,
-      [questionKey]: value
-    }));
-    
-    // Auto-save after delay
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-    
-    saveTimeoutRef.current = setTimeout(() => {
-      autoSaveToDatabase();
-    }, autoSaveDelay);
-  }, [autoSaveToDatabase, autoSaveDelay]);
+  const updateResponse = useCallback(
+    (questionKey: string, value: string) => {
+      setResponses((prev) => ({
+        ...prev,
+        [questionKey]: value,
+      }));
+
+      // Auto-save after delay
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      saveTimeoutRef.current = setTimeout(() => {
+        autoSaveToDatabase();
+      }, autoSaveDelay);
+    },
+    [autoSaveToDatabase, autoSaveDelay]
+  );
 
   // Manual save
   const saveToDatabase = useCallback(async (): Promise<boolean> => {
@@ -110,23 +110,21 @@ export const useQuestionnaireState = ({
       const responseArray = Object.entries(responses).map(([questionKey, responseValue]) => ({
         user_id: user.id,
         question_key: questionKey,
-        response_value: responseValue
+        response_value: responseValue,
       }));
 
-      const { error } = await supabase
-        .from('user_compatibility_responses')
-        .upsert(responseArray, {
-          onConflict: 'user_id,question_key',
-          ignoreDuplicates: false
-        });
+      const { error } = await supabase.from('user_compatibility_responses').upsert(responseArray, {
+        onConflict: 'user_id,question_key',
+        ignoreDuplicates: false,
+      });
 
       if (error) throw error;
 
       lastSavedRef.current = { ...responses };
-      
+
       // Clear localStorage backup since data is now saved
       localStorage.removeItem(fullStorageKey);
-      
+
       return true;
     } catch (error) {
       console.error('Save error:', error);
@@ -149,14 +147,14 @@ export const useQuestionnaireState = ({
       if (error) throw error;
 
       const existingResponses: Record<string, string> = {};
-      responsesData?.forEach(response => {
+      responsesData?.forEach((response) => {
         existingResponses[response.question_key] = response.response_value;
       });
-      
+
       // Merge with localStorage responses, prioritizing database responses
-      setResponses(prev => ({
+      setResponses((prev) => ({
         ...prev,
-        ...existingResponses
+        ...existingResponses,
       }));
       lastSavedRef.current = existingResponses;
     } catch (error) {
@@ -190,7 +188,7 @@ export const useQuestionnaireState = ({
     clearResponses,
     saving,
     hasUnsavedChanges: Object.keys(responses).some(
-      key => responses[key] !== lastSavedRef.current[key]
-    )
+      (key) => responses[key] !== lastSavedRef.current[key]
+    ),
   };
 };

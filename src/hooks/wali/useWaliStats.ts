@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { WaliDashboardStats } from '@/types/wali';
@@ -13,7 +12,7 @@ export const useWaliStats = (
     pendingRequests: 0,
     activeConversations: 0,
     flaggedMessages: 0,
-    totalSupervised: 0
+    totalSupervised: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +20,7 @@ export const useWaliStats = (
   useEffect(() => {
     const fetchStats = async () => {
       if (!userId) return;
-      
+
       setLoading(true);
       setError(null);
 
@@ -43,7 +42,7 @@ export const useWaliStats = (
           pendingRequests,
           activeConversations,
           flaggedMessages: flaggedItems,
-          totalSupervised: count || 0
+          totalSupervised: count || 0,
         });
       } catch (err: any) {
         console.error('Error fetching wali stats:', err);
@@ -59,6 +58,6 @@ export const useWaliStats = (
   return {
     stats,
     loading,
-    error
+    error,
   };
 };

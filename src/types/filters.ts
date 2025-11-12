@@ -1,4 +1,3 @@
-
 import { AdvancedFilters } from '@/hooks/compatibility/types/advancedFilterTypes';
 
 export interface MadhabFilter {

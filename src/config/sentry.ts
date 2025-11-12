@@ -20,7 +20,10 @@ const APP_VERSION = import.meta.env.VITE_APP_VERSION || '1.0.0';
 export function initSentry(): void {
   // Only initialize in production with valid DSN
   if (ENV !== 'production' || !SENTRY_DSN) {
-    console.log('Sentry not initialized:', ENV === 'production' ? 'Missing DSN' : 'Development mode');
+    console.log(
+      'Sentry not initialized:',
+      ENV === 'production' ? 'Missing DSN' : 'Development mode'
+    );
     return;
   }
 
@@ -107,11 +110,7 @@ export function initSentry(): void {
  * Set user context for error tracking
  * Call this after successful authentication
  */
-export function setSentryUser(user: {
-  id: string;
-  email?: string;
-  username?: string;
-}): void {
+export function setSentryUser(user: { id: string; email?: string; username?: string }): void {
   if (ENV !== 'production') return;
 
   Sentry.setUser({
@@ -158,11 +157,7 @@ export function captureMessage(message: string, level: Sentry.SeverityLevel = 'i
 /**
  * Add breadcrumb for debugging
  */
-export function addBreadcrumb(
-  message: string,
-  category: string,
-  data?: Record<string, any>
-): void {
+export function addBreadcrumb(message: string, category: string, data?: Record<string, any>): void {
   if (ENV !== 'production') return;
 
   Sentry.addBreadcrumb({

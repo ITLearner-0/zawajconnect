@@ -21,7 +21,8 @@ export function setupGlobalErrorHandler() {
 
 function showErrorPage(error: any) {
   const errorMessage = error?.message || error?.toString() || 'Une erreur inconnue est survenue';
-  const isEnvError = errorMessage.includes('environment variables') || errorMessage.includes('Supabase');
+  const isEnvError =
+    errorMessage.includes('environment variables') || errorMessage.includes('Supabase');
 
   // Remove any existing error page
   const existingError = document.getElementById('global-error-page');

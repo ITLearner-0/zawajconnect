@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types/profile';
@@ -23,7 +22,7 @@ const parseContentFlags = (flags: any): any[] => {
 const convertDbMessageToMessage = (dbMessage: any): Message => {
   return {
     ...dbMessage,
-    content_flags: parseContentFlags(dbMessage.content_flags)
+    content_flags: parseContentFlags(dbMessage.content_flags),
   };
 };
 
@@ -55,7 +54,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
     try {
       // First check if the messages table exists
       const messagesTableExists = await tableExists('messages');
-      
+
       if (!messagesTableExists) {
         setSearchResults([]);
         setLoading(false);
@@ -79,7 +78,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
       }
 
       // Get conversation IDs
-      const conversationIds = conversations.map(conv => conv.id);
+      const conversationIds = conversations.map((conv) => conv.id);
 
       // Search for messages containing the search term in these conversations
       const { data: messagesData, error: msgError } = await supabase
@@ -100,19 +99,19 @@ export const useMessageSearch = (currentUserId: string | null) => {
       if (messagesData && messagesData.length > 0) {
         // Build a map of conversation participants
         const participantsMap = new Map();
-        
-        conversations.forEach(conv => {
+
+        conversations.forEach((conv) => {
           participantsMap.set(conv.id, conv.participants);
         });
 
         // Process each message
         for (const messageData of messagesData) {
           const message = convertDbMessageToMessage(messageData);
-          
+
           // Get the other participant in this conversation
           const participants = participantsMap.get(message.conversation_id) || [];
-          const otherParticipantId = participants.find(id => id !== currentUserId);
-          
+          const otherParticipantId = participants.find((id) => id !== currentUserId);
+
           if (otherParticipantId) {
             // Fetch the other participant's profile
             const { data: profile } = await supabase
@@ -124,27 +123,28 @@ export const useMessageSearch = (currentUserId: string | null) => {
             results.push({
               message,
               conversationId: message.conversation_id,
-              otherParticipantName: profile ? `${profile.first_name} ${profile.last_name}` : 'Unknown User'
+              otherParticipantName: profile
+                ? `${profile.first_name} ${profile.last_name}`
+                : 'Unknown User',
             });
           } else {
             // No other participant found
             results.push({
               message,
-              conversationId: message.conversation_id
+              conversationId: message.conversation_id,
             });
           }
         }
       }
 
       setSearchResults(results);
-
     } catch (err: any) {
       console.error('Error searching messages:', err);
       setError(`Error searching messages: ${err.message}`);
       toast({
-        title: "Search Error",
+        title: 'Search Error',
         description: `Failed to search messages: ${err.message}`,
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -161,6 +161,6 @@ export const useMessageSearch = (currentUserId: string | null) => {
     clearSearch: () => {
       setSearchTerm('');
       setSearchResults([]);
-    }
+    },
   };
 };

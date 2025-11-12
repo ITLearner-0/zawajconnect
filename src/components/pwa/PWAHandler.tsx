@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { usePWA } from '@/hooks/usePWA';
 import PWAInstallPrompt from './PWAInstallPrompt';
@@ -11,10 +10,11 @@ const PWAHandler: React.FC = () => {
   useEffect(() => {
     // Enregistrer le service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
+      navigator.serviceWorker
+        .register('/sw.js')
         .then((registration) => {
           console.log('Service Worker registered:', registration);
-          
+
           // Vérifier les mises à jour
           registration.addEventListener('updatefound', () => {
             const newWorker = registration.installing;
@@ -22,16 +22,17 @@ const PWAHandler: React.FC = () => {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   toast({
-                    title: "Mise à jour disponible",
-                    description: "Une nouvelle version de l'application est disponible. Actualisez pour l'obtenir.",
+                    title: 'Mise à jour disponible',
+                    description:
+                      "Une nouvelle version de l'application est disponible. Actualisez pour l'obtenir.",
                     action: (
-                      <button 
+                      <button
                         onClick={() => window.location.reload()}
                         className="bg-rose-500 text-white px-3 py-1 rounded text-sm"
                       >
                         Actualiser
                       </button>
-                    )
+                    ),
                   });
                 }
               });
@@ -77,17 +78,17 @@ const PWAHandler: React.FC = () => {
     // Notifications de statut de connexion
     const handleOnline = () => {
       toast({
-        title: "Connexion rétablie",
-        description: "Vous êtes de nouveau en ligne",
-        className: "border-green-200 bg-green-50 text-green-800",
+        title: 'Connexion rétablie',
+        description: 'Vous êtes de nouveau en ligne',
+        className: 'border-green-200 bg-green-50 text-green-800',
       });
     };
 
     const handleOffline = () => {
       toast({
-        title: "Connexion perdue",
-        description: "Vous travaillez hors ligne. Certaines fonctionnalités peuvent être limitées.",
-        className: "border-orange-200 bg-orange-50 text-orange-800",
+        title: 'Connexion perdue',
+        description: 'Vous travaillez hors ligne. Certaines fonctionnalités peuvent être limitées.',
+        className: 'border-orange-200 bg-orange-50 text-orange-800',
       });
     };
 
@@ -128,9 +129,11 @@ const PWAHandler: React.FC = () => {
   return (
     <>
       {/* Indicateur de statut de connexion */}
-      <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isOnline ? 'translate-y-0' : 'translate-y-0'
-      }`}>
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          isOnline ? 'translate-y-0' : 'translate-y-0'
+        }`}
+      >
         {!isOnline && (
           <div className="bg-orange-500 text-white text-center py-2 px-4 text-sm flex items-center justify-center gap-2">
             <WifiOff className="h-4 w-4" />

@@ -3,7 +3,13 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Shield, Eye, Users, MessageCircle, Camera, Clock } from 'lucide-react';
@@ -44,15 +50,19 @@ const Privacy = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      setSettings(data ? {
-        profile_visibility: data.profile_visibility ?? 'public',
-        photo_visibility: data.photo_visibility ?? 'matches_only',
-        contact_visibility: data.contact_visibility ?? 'matches_only',
-        last_seen_visibility: data.last_seen_visibility ?? 'everyone',
-        allow_messages_from: data.allow_messages_from ?? 'matches_only',
-        allow_profile_views: !!data.allow_profile_views,
-        allow_family_involvement: !!data.allow_family_involvement
-      } : undefined);
+      setSettings(
+        data
+          ? {
+              profile_visibility: data.profile_visibility ?? 'public',
+              photo_visibility: data.photo_visibility ?? 'matches_only',
+              contact_visibility: data.contact_visibility ?? 'matches_only',
+              last_seen_visibility: data.last_seen_visibility ?? 'everyone',
+              allow_messages_from: data.allow_messages_from ?? 'matches_only',
+              allow_profile_views: !!data.allow_profile_views,
+              allow_family_involvement: !!data.allow_family_involvement,
+            }
+          : undefined
+      );
     } catch (error) {
       console.error('Error fetching privacy settings:', error);
     } finally {
@@ -65,10 +75,7 @@ const Privacy = () => {
 
     setSaving(true);
     try {
-      await supabase
-        .from('privacy_settings')
-        .update(settings)
-        .eq('user_id', user.id);
+      await supabase.from('privacy_settings').update(settings).eq('user_id', user.id);
 
       alert('Paramètres de confidentialité mis à jour avec succès !');
     } catch (error) {
@@ -80,7 +87,7 @@ const Privacy = () => {
   };
 
   const updateSetting = (key: keyof PrivacySettings, value: string | boolean) => {
-    setSettings(prev => prev ? { ...prev, [key]: value } : undefined);
+    setSettings((prev) => (prev ? { ...prev, [key]: value } : undefined));
   };
 
   if (loading) {
@@ -105,7 +112,10 @@ const Privacy = () => {
           <div className="max-w-4xl mx-auto">
             <div className="text-center">
               <h2 className="text-xl font-bold text-foreground mb-2">Paramètres non trouvés</h2>
-              <Button onClick={() => navigate('/enhanced-profile')} className="bg-emerald hover:bg-emerald-dark text-primary-foreground">
+              <Button
+                onClick={() => navigate('/enhanced-profile')}
+                className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+              >
                 Retour au profil
               </Button>
             </div>
@@ -141,8 +151,8 @@ const Privacy = () => {
               <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="profile-visibility">Qui peut voir votre profil complet</Label>
-                  <Select 
-                    value={settings.profile_visibility} 
+                  <Select
+                    value={settings.profile_visibility}
                     onValueChange={(value) => updateSetting('profile_visibility', value)}
                   >
                     <SelectTrigger>
@@ -150,7 +160,9 @@ const Privacy = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="public">Tout le monde</SelectItem>
-                      <SelectItem value="verified_only">Utilisateurs vérifiés uniquement</SelectItem>
+                      <SelectItem value="verified_only">
+                        Utilisateurs vérifiés uniquement
+                      </SelectItem>
                       <SelectItem value="private">Personne (profil privé)</SelectItem>
                     </SelectContent>
                   </Select>
@@ -159,7 +171,9 @@ const Privacy = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <Label>Autoriser les visites de profil</Label>
-                    <p className="text-sm text-muted-foreground">Permettre aux autres de voir que vous avez consulté leur profil</p>
+                    <p className="text-sm text-muted-foreground">
+                      Permettre aux autres de voir que vous avez consulté leur profil
+                    </p>
                   </div>
                   <Switch
                     checked={settings.allow_profile_views}
@@ -180,8 +194,8 @@ const Privacy = () => {
               <CardContent>
                 <div>
                   <Label htmlFor="photo-visibility">Qui peut voir vos photos</Label>
-                  <Select 
-                    value={settings.photo_visibility} 
+                  <Select
+                    value={settings.photo_visibility}
                     onValueChange={(value) => updateSetting('photo_visibility', value)}
                   >
                     <SelectTrigger>
@@ -190,7 +204,9 @@ const Privacy = () => {
                     <SelectContent>
                       <SelectItem value="public">Tout le monde</SelectItem>
                       <SelectItem value="matches_only">Mes matches uniquement</SelectItem>
-                      <SelectItem value="verified_only">Utilisateurs vérifiés uniquement</SelectItem>
+                      <SelectItem value="verified_only">
+                        Utilisateurs vérifiés uniquement
+                      </SelectItem>
                       <SelectItem value="private">Personne</SelectItem>
                     </SelectContent>
                   </Select>
@@ -209,8 +225,8 @@ const Privacy = () => {
               <CardContent className="space-y-4">
                 <div>
                   <Label htmlFor="messages-from">Qui peut m'envoyer des messages</Label>
-                  <Select 
-                    value={settings.allow_messages_from} 
+                  <Select
+                    value={settings.allow_messages_from}
                     onValueChange={(value) => updateSetting('allow_messages_from', value)}
                   >
                     <SelectTrigger>
@@ -218,7 +234,9 @@ const Privacy = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="everyone">Tout le monde</SelectItem>
-                      <SelectItem value="verified_only">Utilisateurs vérifiés uniquement</SelectItem>
+                      <SelectItem value="verified_only">
+                        Utilisateurs vérifiés uniquement
+                      </SelectItem>
                       <SelectItem value="matches_only">Mes matches uniquement</SelectItem>
                     </SelectContent>
                   </Select>
@@ -226,8 +244,8 @@ const Privacy = () => {
 
                 <div>
                   <Label htmlFor="contact-visibility">Visibilité des informations de contact</Label>
-                  <Select 
-                    value={settings.contact_visibility} 
+                  <Select
+                    value={settings.contact_visibility}
                     onValueChange={(value) => updateSetting('contact_visibility', value)}
                   >
                     <SelectTrigger>
@@ -244,8 +262,8 @@ const Privacy = () => {
 
                 <div>
                   <Label htmlFor="last-seen">Visibilité de la dernière connexion</Label>
-                  <Select 
-                    value={settings.last_seen_visibility} 
+                  <Select
+                    value={settings.last_seen_visibility}
                     onValueChange={(value) => updateSetting('last_seen_visibility', value)}
                   >
                     <SelectTrigger>
@@ -274,19 +292,22 @@ const Privacy = () => {
                   <div>
                     <Label>Autoriser l'implication de la famille</Label>
                     <p className="text-sm text-muted-foreground">
-                      Permettre aux membres de votre famille de voir votre profil et d'être impliqués dans le processus
+                      Permettre aux membres de votre famille de voir votre profil et d'être
+                      impliqués dans le processus
                     </p>
                   </div>
                   <Switch
                     checked={settings.allow_family_involvement}
-                    onCheckedChange={(checked) => updateSetting('allow_family_involvement', checked)}
+                    onCheckedChange={(checked) =>
+                      updateSetting('allow_family_involvement', checked)
+                    }
                   />
                 </div>
               </CardContent>
             </Card>
 
-            <Button 
-              onClick={saveSettings} 
+            <Button
+              onClick={saveSettings}
               disabled={saving}
               className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
             >

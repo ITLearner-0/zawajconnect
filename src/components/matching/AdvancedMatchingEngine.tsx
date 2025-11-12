@@ -31,14 +31,14 @@ const AdvancedMatchingEngine = () => {
 
   const runAdvancedMatching = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     setAnalyzing(true);
-    
+
     try {
       // Simulate AI-powered matching analysis
-      await new Promise(resolve => setTimeout(resolve, 3000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
       // Get current user's profile to determine gender
       const { data: currentUserProfile } = await supabase
         .from('profiles')
@@ -48,7 +48,7 @@ const AdvancedMatchingEngine = () => {
 
       // Determine opposite gender
       const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
-      
+
       // Get all Wali user IDs to exclude them from matching
       const { data: waliUsers } = await supabase
         .from('family_members')
@@ -57,12 +57,13 @@ const AdvancedMatchingEngine = () => {
         .eq('invitation_status', 'accepted')
         .not('invited_user_id', 'is', null);
 
-      const waliUserIds = waliUsers?.map(w => w.invited_user_id).filter(Boolean) || [];
-      
+      const waliUserIds = waliUsers?.map((w) => w.invited_user_id).filter(Boolean) || [];
+
       // Fetch potential matches with AI scoring (opposite gender only, excluding Walis)
       const { data: profiles } = await supabase
         .from('profiles')
-        .select(`
+        .select(
+          `
           user_id,
           full_name,
           age,
@@ -70,7 +71,8 @@ const AdvancedMatchingEngine = () => {
           profession,
           avatar_url,
           bio
-        `)
+        `
+        )
         .neq('user_id', user.id)
         .eq('gender', oppositeGender)
         .not('user_id', 'in', waliUserIds.length > 0 ? `(${waliUserIds.join(',')})` : '()')
@@ -78,47 +80,47 @@ const AdvancedMatchingEngine = () => {
 
       if (profiles) {
         // Use real unified compatibility scoring
-        const userIds = profiles.map(p => p.user_id);
+        const userIds = profiles.map((p) => p.user_id);
         const compatibilityResults = await batchCalculateCompatibility(userIds, preferences);
-        
-        const scoredMatches: MatchProfile[] = profiles.map(profile => {
+
+        const scoredMatches: MatchProfile[] = profiles.map((profile) => {
           const compatibilityData = compatibilityResults[profile.user_id] || {
             compatibility_score: 0,
             islamic_score: 0,
             cultural_score: 0,
             personality_score: 0,
             matching_reasons: [],
-            potential_concerns: []
+            potential_concerns: [],
           };
 
           return {
             ...profile,
-            ...compatibilityData
+            ...compatibilityData,
           };
         });
 
         // Filter by minimum compatibility
         const filteredMatches = scoredMatches
-          .filter(match => match.compatibility_score >= preferences.min_compatibility)
+          .filter((match) => match.compatibility_score >= preferences.min_compatibility)
           .sort((a, b) => b.compatibility_score - a.compatibility_score)
           .slice(0, 10);
 
         setMatches(filteredMatches);
-        
+
         // Save to history
         await saveSearchToHistory(filteredMatches, preferences);
-        
+
         toast({
-          title: "Analyse terminée",
+          title: 'Analyse terminée',
           description: `${filteredMatches.length} matches compatibles trouvés avec l'IA`,
         });
       }
     } catch (error) {
       console.error('Error running advanced matching:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'exécuter l'analyse de compatibilité",
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -130,11 +132,13 @@ const AdvancedMatchingEngine = () => {
     <div className="space-y-6">
       <div className="flex gap-6 relative">
         {/* Main Content Area - Flexible Width */}
-        <div className={`flex-1 space-y-6 transition-all duration-300 ${
-          !isMobile && historySidebarOpen ? 'lg:mr-80' : ''
-        }`}>
+        <div
+          className={`flex-1 space-y-6 transition-all duration-300 ${
+            !isMobile && historySidebarOpen ? 'lg:mr-80' : ''
+          }`}
+        >
           {/* AI Matching Controls */}
-          <MatchingPreferencesPanel 
+          <MatchingPreferencesPanel
             onRunMatching={runAdvancedMatching}
             analyzing={analyzing}
             loading={loading}
@@ -156,7 +160,7 @@ const AdvancedMatchingEngine = () => {
           )}
 
           {/* Matches Results */}
-          <MatchResultsGrid 
+          <MatchResultsGrid
             matches={matches}
             familyApprovalRequired={preferences.family_approval_required}
             analyzing={analyzing}

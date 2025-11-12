@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ProfileFormData, VerificationStatus, PrivacySettings } from '@/types/profile';
 import { StrictFormValidation } from '@/types/strictTypes';
@@ -42,72 +41,78 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
   const { validation, validateField, hasErrors } = useTypeValidation<ProfileFormData>();
   const { checkRateLimit } = useRateLimiting();
   const { toast } = useToast();
-  
+
   // Convert field-based handler to React event handler for section components
-  const handleSectionChange = React.useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    
-    console.log(`Form field change event: ${name} = ${value}`);
-    
-    // Optional validation - don't block form submission
-    switch (name as keyof ProfileFormData) {
-      case 'fullName':
-        if (value && typeof value === 'string' && value.length >= 2) {
-          validateField(name as keyof ProfileFormData, value, () => null);
-        }
-        break;
-      case 'age':
-        if (value) {
-          const age = parseInt(value as string);
-          if (age >= 18 && age <= 100) {
+  const handleSectionChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      const { name, value } = e.target;
+
+      console.log(`Form field change event: ${name} = ${value}`);
+
+      // Optional validation - don't block form submission
+      switch (name as keyof ProfileFormData) {
+        case 'fullName':
+          if (value && typeof value === 'string' && value.length >= 2) {
             validateField(name as keyof ProfileFormData, value, () => null);
           }
-        }
-        break;
-      case 'aboutMe':
-        if (value && typeof value === 'string' && value.length >= 10) {
-          validateField(name as keyof ProfileFormData, value, () => null);
-        }
-        break;
-      default:
-        // No validation required for other fields
-        break;
-    }
-    
-    // Always call handleChange regardless of validation
-    handleChange(name as keyof ProfileFormData, value);
-  }, [handleChange, validateField]);
+          break;
+        case 'age':
+          if (value) {
+            const age = parseInt(value as string);
+            if (age >= 18 && age <= 100) {
+              validateField(name as keyof ProfileFormData, value, () => null);
+            }
+          }
+          break;
+        case 'aboutMe':
+          if (value && typeof value === 'string' && value.length >= 10) {
+            validateField(name as keyof ProfileFormData, value, () => null);
+          }
+          break;
+        default:
+          // No validation required for other fields
+          break;
+      }
+
+      // Always call handleChange regardless of validation
+      handleChange(name as keyof ProfileFormData, value);
+    },
+    [handleChange, validateField]
+  );
 
   // Handle select changes (for components that use onValueChange)
-  const handleSelectChange = React.useCallback((field: keyof ProfileFormData, value: string) => {
-    console.log(`Form select change: ${field} = ${value}`);
-    handleChange(field, value);
-  }, [handleChange]);
-  
+  const handleSelectChange = React.useCallback(
+    (field: keyof ProfileFormData, value: string) => {
+      console.log(`Form select change: ${field} = ${value}`);
+      handleChange(field, value);
+    },
+    [handleChange]
+  );
+
   const handleFormSubmit = async (): Promise<boolean> => {
     if (isSubmitting) return false;
-    
-    console.log("ProfileForm handleFormSubmit called");
-    
+
+    console.log('ProfileForm handleFormSubmit called');
+
     // Check rate limiting for profile updates
     const rateLimitAllowed = await checkRateLimit('api/profile');
     if (!rateLimitAllowed) {
       toast({
-        title: "Rate Limit Exceeded",
-        description: "Too many profile updates. Please wait before trying again.",
-        variant: "destructive",
+        title: 'Rate Limit Exceeded',
+        description: 'Too many profile updates. Please wait before trying again.',
+        variant: 'destructive',
       });
       return false;
     }
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const result = await handleSubmit();
-      console.log("ProfileForm handleSubmit result:", result);
+      console.log('ProfileForm handleSubmit result:', result);
       return result;
     } catch (error) {
-      console.error("ProfileForm handleSubmit error:", error);
+      console.error('ProfileForm handleSubmit error:', error);
       return false;
     } finally {
       setIsSubmitting(false);
@@ -132,8 +137,8 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
           onUnblockUser={onUnblockUser}
           validation={validation}
         />
-        
-        <ProfileFormActions 
+
+        <ProfileFormActions
           onSubmit={handleFormSubmit}
           isSubmitting={isSubmitting}
           hasErrors={false}

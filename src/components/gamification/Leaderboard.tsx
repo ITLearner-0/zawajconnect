@@ -20,7 +20,7 @@ const LEVEL_COLORS = {
   bronze: 'text-amber-700 bg-amber-50 border-amber-300',
   argent: 'text-slate-600 bg-slate-50 border-slate-300',
   or: 'text-yellow-600 bg-yellow-50 border-yellow-300',
-  platine: 'text-cyan-600 bg-cyan-50 border-cyan-300'
+  platine: 'text-cyan-600 bg-cyan-50 border-cyan-300',
 };
 
 const Leaderboard: React.FC = () => {
@@ -48,8 +48,8 @@ const Leaderboard: React.FC = () => {
 
     if (levelData) {
       // Fetch related data separately
-      const userIds = levelData.map(l => l.user_id);
-      
+      const userIds = levelData.map((l) => l.user_id);
+
       const { data: profilesData } = await supabase
         .from('profiles')
         .select('user_id, full_name, avatar_url')
@@ -61,9 +61,9 @@ const Leaderboard: React.FC = () => {
         .in('user_id', userIds);
 
       const formattedData: LeaderboardEntry[] = levelData.map((entry, index) => {
-        const profile = profilesData?.find(p => p.user_id === entry.user_id);
-        const streak = streaksData?.find(s => s.user_id === entry.user_id);
-        
+        const profile = profilesData?.find((p) => p.user_id === entry.user_id);
+        const streak = streaksData?.find((s) => s.user_id === entry.user_id);
+
         return {
           user_id: entry.user_id,
           full_name: profile?.full_name || 'Anonyme',
@@ -71,7 +71,7 @@ const Leaderboard: React.FC = () => {
           current_level: entry.current_level,
           total_xp: entry.total_xp,
           current_streak: streak?.current_streak || null,
-          rank: index + 1
+          rank: index + 1,
         };
       });
 
@@ -84,9 +84,9 @@ const Leaderboard: React.FC = () => {
         .order('total_xp', { ascending: false });
 
       if (allLevels) {
-        const userIndex = allLevels.findIndex(u => u.user_id === user.id);
+        const userIndex = allLevels.findIndex((u) => u.user_id === user.id);
         if (userIndex !== -1) {
-          const userInTop10 = formattedData.find(u => u.user_id === user.id);
+          const userInTop10 = formattedData.find((u) => u.user_id === user.id);
           if (userInTop10) {
             setUserRank(userInTop10);
           } else {
@@ -96,7 +96,7 @@ const Leaderboard: React.FC = () => {
               setLoading(false);
               return;
             }
-            
+
             const { data: userProfile } = await supabase
               .from('profiles')
               .select('full_name, avatar_url')
@@ -116,7 +116,7 @@ const Leaderboard: React.FC = () => {
               current_level: userLevelData.current_level,
               total_xp: userLevelData.total_xp,
               current_streak: userStreak?.current_streak || null,
-              rank: userIndex + 1
+              rank: userIndex + 1,
             });
           }
         }
@@ -128,10 +128,14 @@ const Leaderboard: React.FC = () => {
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
-      case 1: return <Crown className="h-5 w-5 text-yellow-500" />;
-      case 2: return <Medal className="h-5 w-5 text-slate-400" />;
-      case 3: return <Award className="h-5 w-5 text-amber-600" />;
-      default: return <span className="text-muted-foreground font-semibold">#{rank}</span>;
+      case 1:
+        return <Crown className="h-5 w-5 text-yellow-500" />;
+      case 2:
+        return <Medal className="h-5 w-5 text-slate-400" />;
+      case 3:
+        return <Award className="h-5 w-5 text-amber-600" />;
+      default:
+        return <span className="text-muted-foreground font-semibold">#{rank}</span>;
     }
   };
 
@@ -185,7 +189,7 @@ const Leaderboard: React.FC = () => {
         <div className="space-y-2">
           {leaderboard.map((entry) => {
             const isCurrentUser = entry.user_id === user?.id;
-            
+
             return (
               <div
                 key={entry.user_id}
@@ -193,15 +197,13 @@ const Leaderboard: React.FC = () => {
                   isCurrentUser
                     ? 'bg-primary/5 border-primary/30'
                     : entry.rank <= 3
-                    ? 'bg-accent/20 border-accent/30'
-                    : 'bg-background border-border'
+                      ? 'bg-accent/20 border-accent/30'
+                      : 'bg-background border-border'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 flex justify-center">
-                    {getRankIcon(entry.rank)}
-                  </div>
-                  
+                  <div className="w-10 flex justify-center">{getRankIcon(entry.rank)}</div>
+
                   <Avatar className="h-10 w-10">
                     <AvatarImage src={entry.avatar_url || undefined} />
                     <AvatarFallback>
@@ -227,8 +229,8 @@ const Leaderboard: React.FC = () => {
                     </div>
                   </div>
 
-                  <Badge 
-                    variant="outline" 
+                  <Badge
+                    variant="outline"
                     className={`text-xs ${LEVEL_COLORS[entry.current_level as keyof typeof LEVEL_COLORS]}`}
                   >
                     {entry.current_level}

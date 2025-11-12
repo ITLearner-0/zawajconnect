@@ -1,9 +1,21 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,15 +38,15 @@ const ReportModal = ({ reportedUserId, reportedUserName, children }: ReportModal
     { value: 'fake_profile', label: 'Faux profil' },
     { value: 'harassment', label: 'Harcèlement' },
     { value: 'spam', label: 'Spam' },
-    { value: 'other', label: 'Autre' }
+    { value: 'other', label: 'Autre' },
   ];
 
   const handleSubmit = async () => {
     if (!reportType || !description.trim()) {
       toast({
-        title: "Informations manquantes",
-        description: "Veuillez sélectionner un type et décrire le problème",
-        variant: "destructive"
+        title: 'Informations manquantes',
+        description: 'Veuillez sélectionner un type et décrire le problème',
+        variant: 'destructive',
       });
       return;
     }
@@ -53,27 +65,25 @@ const ReportModal = ({ reportedUserId, reportedUserName, children }: ReportModal
 
       if (!reportedProfile) {
         toast({
-          title: "Utilisateur non trouvé",
+          title: 'Utilisateur non trouvé',
           description: "Cet utilisateur n'existe plus",
-          variant: "destructive"
+          variant: 'destructive',
         });
         return;
       }
 
-      const { error } = await supabase
-        .from('reports')
-        .insert({
-          reporter_id: user.user.id,
-          reported_user_id: reportedUserId,
-          report_type: reportType,
-          description: description.trim()
-        });
+      const { error } = await supabase.from('reports').insert({
+        reporter_id: user.user.id,
+        reported_user_id: reportedUserId,
+        report_type: reportType,
+        description: description.trim(),
+      });
 
       if (error) throw error;
 
       toast({
-        title: "Signalement envoyé",
-        description: "Merci, nous examinerons votre signalement"
+        title: 'Signalement envoyé',
+        description: 'Merci, nous examinerons votre signalement',
       });
 
       setOpen(false);
@@ -81,9 +91,9 @@ const ReportModal = ({ reportedUserId, reportedUserName, children }: ReportModal
       setDescription('');
     } catch (error) {
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'envoyer le signalement",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -100,7 +110,7 @@ const ReportModal = ({ reportedUserId, reportedUserName, children }: ReportModal
             Signaler {reportedUserName || 'cet utilisateur'}
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Type de problème</Label>
@@ -109,7 +119,7 @@ const ReportModal = ({ reportedUserId, reportedUserName, children }: ReportModal
                 <SelectValue placeholder="Sélectionner le type" />
               </SelectTrigger>
               <SelectContent>
-                {reportTypes.map(type => (
+                {reportTypes.map((type) => (
                   <SelectItem key={type.value} value={type.value}>
                     {type.label}
                   </SelectItem>
@@ -130,7 +140,7 @@ const ReportModal = ({ reportedUserId, reportedUserName, children }: ReportModal
 
           <div className="flex gap-2 pt-4">
             <Button onClick={handleSubmit} disabled={loading} className="flex-1">
-              {loading ? "Envoi..." : "Envoyer le signalement"}
+              {loading ? 'Envoi...' : 'Envoyer le signalement'}
             </Button>
             <Button variant="outline" onClick={() => setOpen(false)}>
               Annuler

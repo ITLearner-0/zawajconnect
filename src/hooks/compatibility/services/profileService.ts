@@ -1,8 +1,7 @@
-
-import { supabase } from "@/integrations/supabase/client";
-import { DatabaseConnectionError } from "./errorHandling";
-import { logInfo, logWarning, logError } from "./loggingService";
-import { compatibilityCache, logCacheOperation } from "./cachingService";
+import { supabase } from '@/integrations/supabase/client';
+import { DatabaseConnectionError } from './errorHandling';
+import { logInfo, logWarning, logError } from './loggingService';
+import { compatibilityCache, logCacheOperation } from './cachingService';
 
 export interface ValidatedProfileData {
   id: string;
@@ -25,7 +24,7 @@ export class ProfileService {
       // Check cache for profile data
       const cachedProfiles: ValidatedProfileData[] = [];
       const uncachedUserIds: string[] = [];
-      
+
       for (const userIdToCheck of userIds) {
         const cachedProfile = compatibilityCache.getProfileData(userIdToCheck);
         if (cachedProfile) {
@@ -34,14 +33,18 @@ export class ProfileService {
           uncachedUserIds.push(userIdToCheck);
         }
       }
-      
-      logInfo('profileCacheCheck', `Found ${cachedProfiles.length} cached profiles, need to fetch ${uncachedUserIds.length}`);
+
+      logInfo(
+        'profileCacheCheck',
+        `Found ${cachedProfiles.length} cached profiles, need to fetch ${uncachedUserIds.length}`
+      );
 
       let fetchedProfiles: ValidatedProfileData[] = [];
       if (uncachedUserIds.length > 0) {
         const { data, error } = await supabase
           .from('profiles')
-          .select(`
+          .select(
+            `
             id,
             first_name,
             last_name,
@@ -54,7 +57,8 @@ export class ProfileService {
             phone_verified,
             id_verified,
             is_visible
-          `)
+          `
+          )
           .in('id', uncachedUserIds)
           .eq('is_visible', true);
 
@@ -62,7 +66,7 @@ export class ProfileService {
           throw new DatabaseConnectionError('fetching profiles', error);
         }
 
-        fetchedProfiles = (data || []).map(profile => ({
+        fetchedProfiles = (data || []).map((profile) => ({
           id: profile.id,
           first_name: profile.first_name || '',
           last_name: profile.last_name || null,
@@ -74,9 +78,9 @@ export class ProfileService {
           email_verified: profile.email_verified || false,
           phone_verified: profile.phone_verified || false,
           id_verified: profile.id_verified || false,
-          is_visible: profile.is_visible || true
+          is_visible: profile.is_visible || true,
         }));
-        
+
         // Cache the fetched profiles
         for (const profile of fetchedProfiles) {
           const profileData = {
@@ -90,19 +94,22 @@ export class ProfileService {
             email_verified: profile.email_verified,
             phone_verified: profile.phone_verified,
             id_verified: profile.id_verified,
-            is_visible: profile.is_visible
+            is_visible: profile.is_visible,
           };
           compatibilityCache.setProfileData(profile.id, profileData);
         }
-        
-        logCacheOperation('cache-set-batch', { 
-          operation: 'profile-data', 
-          count: fetchedProfiles.length 
+
+        logCacheOperation('cache-set-batch', {
+          operation: 'profile-data',
+          count: fetchedProfiles.length,
         });
       }
 
       const profiles = [...cachedProfiles, ...fetchedProfiles];
-      logInfo('fetchProfiles', `Found ${profiles.length} visible profiles out of ${userIds.length} users`);
+      logInfo(
+        'fetchProfiles',
+        `Found ${profiles.length} visible profiles out of ${userIds.length} users`
+      );
 
       if (profiles.length === 0) {
         logWarning('fetchProfiles', 'No visible profiles found');

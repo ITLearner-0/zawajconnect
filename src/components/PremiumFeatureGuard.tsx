@@ -10,9 +10,9 @@ interface PremiumFeatureGuardProps {
   featureName?: string;
 }
 
-export const PremiumFeatureGuard = ({ 
-  children, 
-  featureName = "cette fonctionnalité"
+export const PremiumFeatureGuard = ({
+  children,
+  featureName = 'cette fonctionnalité',
 }: PremiumFeatureGuardProps) => {
   const { subscription } = useAuth();
   const navigate = useNavigate();
@@ -27,9 +27,7 @@ export const PremiumFeatureGuard = ({
               <Lock className="h-8 w-8 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">
-            Fonctionnalité Premium
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold">Fonctionnalité Premium</CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-4">
           <p className="text-muted-foreground">
@@ -44,10 +42,7 @@ export const PremiumFeatureGuard = ({
               <Crown className="h-4 w-4 mr-2" />
               Passer à Premium
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate('/')}
-            >
+            <Button variant="outline" onClick={() => navigate('/')}>
               Retour à l'accueil
             </Button>
           </div>

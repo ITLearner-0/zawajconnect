@@ -1,7 +1,6 @@
-
-import { supabase } from "@/integrations/supabase/client";
-import { logInfo, logError, logWarning } from "./loggingService";
-import { cacheService } from "./cacheService";
+import { supabase } from '@/integrations/supabase/client';
+import { logInfo, logError, logWarning } from './loggingService';
+import { cacheService } from './cacheService';
 
 export interface BackgroundTask {
   id: string;
@@ -28,12 +27,12 @@ export class BackgroundProcessingService {
 
   // Queue a compatibility calculation task
   async queueCompatibilityCalculation(
-    userId: string, 
+    userId: string,
     payload: CompatibilityCalculationPayload,
     priority: 'low' | 'medium' | 'high' = 'medium'
   ): Promise<string> {
     const taskId = `calc_${userId}_${Date.now()}`;
-    
+
     const task: BackgroundTask = {
       id: taskId,
       type: 'compatibility_calculation',
@@ -41,14 +40,17 @@ export class BackgroundProcessingService {
       payload,
       priority,
       status: 'pending',
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     this.taskQueue.push(task);
     this.sortTasksByPriority();
-    
-    logInfo('backgroundProcessing', `Queued compatibility calculation task: ${taskId}`, { userId, priority });
-    
+
+    logInfo('backgroundProcessing', `Queued compatibility calculation task: ${taskId}`, {
+      userId,
+      priority,
+    });
+
     // Start processing if not already running
     if (!this.isProcessing) {
       this.processQueue();
@@ -63,7 +65,7 @@ export class BackgroundProcessingService {
     priority: 'low' | 'medium' | 'high' = 'low'
   ): Promise<string> {
     const taskId = `popular_${userId}_${Date.now()}`;
-    
+
     const task: BackgroundTask = {
       id: taskId,
       type: 'popular_matches_precalc',
@@ -71,14 +73,14 @@ export class BackgroundProcessingService {
       payload: {},
       priority,
       status: 'pending',
-      createdAt: new Date()
+      createdAt: new Date(),
     };
 
     this.taskQueue.push(task);
     this.sortTasksByPriority();
-    
+
     logInfo('backgroundProcessing', `Queued popular matches calculation: ${taskId}`, { userId });
-    
+
     if (!this.isProcessing) {
       this.processQueue();
     }
@@ -93,11 +95,13 @@ export class BackgroundProcessingService {
     }
 
     this.isProcessing = true;
-    logInfo('backgroundProcessing', 'Starting queue processing', { queueLength: this.taskQueue.length });
+    logInfo('backgroundProcessing', 'Starting queue processing', {
+      queueLength: this.taskQueue.length,
+    });
 
     try {
       const activeTasks: Promise<void>[] = [];
-      
+
       while (this.taskQueue.length > 0 && activeTasks.length < this.maxConcurrentTasks) {
         const task = this.taskQueue.shift();
         if (task) {
@@ -144,7 +148,7 @@ export class BackgroundProcessingService {
     } catch (error) {
       task.status = 'failed';
       logError('backgroundProcessing', error as Error, { taskId: task.id });
-      
+
       // Retry logic could be implemented here
       if (this.shouldRetry(task)) {
         task.status = 'pending';
@@ -162,8 +166,8 @@ export class BackgroundProcessingService {
         body: {
           userId: task.userId,
           targetUserIds,
-          batchSize: batchSize || 20
-        }
+          batchSize: batchSize || 20,
+        },
       });
 
       if (error) {
@@ -179,10 +183,14 @@ export class BackgroundProcessingService {
           }
         }
 
-        logInfo('backgroundProcessing', `Processed ${data.results.length} compatibility calculations`, {
-          userId: task.userId,
-          taskId: task.id
-        });
+        logInfo(
+          'backgroundProcessing',
+          `Processed ${data.results.length} compatibility calculations`,
+          {
+            userId: task.userId,
+            taskId: task.id,
+          }
+        );
       }
     } catch (error) {
       logError('backgroundProcessing', error as Error, { taskId: task.id });
@@ -197,8 +205,8 @@ export class BackgroundProcessingService {
       const { data, error } = await supabase.functions.invoke('calculate-compatibility', {
         body: {
           userId: task.userId,
-          batchSize: 50 // Calculate more for popular matches
-        }
+          batchSize: 50, // Calculate more for popular matches
+        },
       });
 
       if (error) {
@@ -207,16 +215,14 @@ export class BackgroundProcessingService {
 
       if (data?.results) {
         // Sort and cache top matches
-        const topMatches = data.results
-          .sort((a: any, b: any) => b.score - a.score)
-          .slice(0, 10);
+        const topMatches = data.results.sort((a: any, b: any) => b.score - a.score).slice(0, 10);
 
         const cacheKey = `popular_matches_${task.userId}`;
         cacheService.set(cacheKey, topMatches, 60 * 60 * 1000); // Cache for 1 hour
 
         logInfo('backgroundProcessing', `Pre-calculated ${topMatches.length} popular matches`, {
           userId: task.userId,
-          taskId: task.id
+          taskId: task.id,
         });
       }
     } catch (error) {
@@ -239,19 +245,21 @@ export class BackgroundProcessingService {
 
   // Get queue status
   getQueueStatus(): { pending: number; processing: number; total: number } {
-    const pending = this.taskQueue.filter(t => t.status === 'pending').length;
-    const processing = this.taskQueue.filter(t => t.status === 'processing').length;
-    
+    const pending = this.taskQueue.filter((t) => t.status === 'pending').length;
+    const processing = this.taskQueue.filter((t) => t.status === 'processing').length;
+
     return {
       pending,
       processing,
-      total: this.taskQueue.length
+      total: this.taskQueue.length,
     };
   }
 
   // Clear completed tasks from memory
   clearCompletedTasks(): void {
-    this.taskQueue = this.taskQueue.filter(t => t.status !== 'completed' && t.status !== 'failed');
+    this.taskQueue = this.taskQueue.filter(
+      (t) => t.status !== 'completed' && t.status !== 'failed'
+    );
     logInfo('backgroundProcessing', 'Cleared completed tasks from queue');
   }
 }

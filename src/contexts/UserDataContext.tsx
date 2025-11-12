@@ -51,7 +51,7 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
           .from('profiles')
           .select('full_name, onboarding_completed')
           .eq('user_id', user.id)
-          .maybeSingle()
+          .maybeSingle(),
       ]);
 
       const adminData = adminResult.data;
@@ -60,12 +60,12 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
 
       setIsAdmin(!!adminData);
       setIsWali(!!waliData);
-      
+
       // Use onboarding_completed field for profile completion status
-      const isComplete = waliData 
+      const isComplete = waliData
         ? !!(profile?.full_name && profile.full_name.trim().length > 0)
-        : !!(profile?.onboarding_completed);
-      
+        : !!profile?.onboarding_completed;
+
       setProfileComplete(isComplete);
       lastUserIdRef.current = user.id;
     } catch (error) {
@@ -95,7 +95,9 @@ export const UserDataProvider = ({ children }: { children: ReactNode }) => {
   }, [user?.id]); // Dépendance sur user.id uniquement
 
   return (
-    <UserDataContext.Provider value={{ isAdmin, isWali, profileComplete, loading, refreshUserData }}>
+    <UserDataContext.Provider
+      value={{ isAdmin, isWali, profileComplete, loading, refreshUserData }}
+    >
       {children}
     </UserDataContext.Provider>
   );

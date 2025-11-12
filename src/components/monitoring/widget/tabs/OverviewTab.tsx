@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Clock, MemoryStick } from 'lucide-react';
@@ -31,7 +30,7 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
           <Clock className="h-3 w-3" />
           Page Performance
         </h4>
-        
+
         {pageMetrics && (
           <div className="grid grid-cols-2 gap-2 text-xs">
             <div>
@@ -73,8 +72,8 @@ const OverviewTab: React.FC<OverviewTabProps> = ({
             <span>Current:</span>
             <span>{formatMemory(memory)}</span>
           </div>
-          <Progress 
-            value={Math.min((memory / (50 * 1024 * 1024)) * 100, 100)} 
+          <Progress
+            value={Math.min((memory / (50 * 1024 * 1024)) * 100, 100)}
             className="h-1 mt-1"
           />
         </div>

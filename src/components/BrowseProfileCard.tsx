@@ -32,7 +32,7 @@ export const BrowseProfileCard = ({
   onToggleSelection,
   onToggleFavorite,
   onViewDetails,
-  onLike
+  onLike,
 }: BrowseProfileCardProps) => {
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -41,9 +41,9 @@ export const BrowseProfileCard = ({
           {/* Avatar with Selection */}
           <div className="relative flex-shrink-0">
             {profile.avatar_url ? (
-              <img 
-                src={profile.avatar_url} 
-                alt="Photo de profil" 
+              <img
+                src={profile.avatar_url}
+                alt="Photo de profil"
                 className="h-20 w-20 rounded-lg object-cover border"
               />
             ) : (
@@ -51,7 +51,7 @@ export const BrowseProfileCard = ({
                 <User className="h-10 w-10 text-muted-foreground" />
               </div>
             )}
-            
+
             {/* Favorite Star */}
             {onToggleFavorite && (
               <button
@@ -60,9 +60,7 @@ export const BrowseProfileCard = ({
               >
                 <Star
                   className={`h-3 w-3 ${
-                    isFavorite
-                      ? 'fill-yellow-500 text-yellow-500'
-                      : 'text-gray-400'
+                    isFavorite ? 'fill-yellow-500 text-yellow-500' : 'text-gray-400'
                   }`}
                 />
               </button>
@@ -85,9 +83,7 @@ export const BrowseProfileCard = ({
             <div className="flex items-start justify-between gap-2 mb-2">
               <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-base">Profil Anonyme</h3>
-                <p className="text-sm text-muted-foreground">
-                  {profile.age} ans
-                </p>
+                <p className="text-sm text-muted-foreground">{profile.age} ans</p>
               </div>
               <VerificationBadge verificationScore={profile.verification_score} />
             </div>
@@ -100,14 +96,14 @@ export const BrowseProfileCard = ({
                   <span className="truncate">{profile.city_only}</span>
                 </div>
               )}
-              
+
               {profile.education_level && (
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <GraduationCap className="h-3 w-3 flex-shrink-0" />
                   <span className="truncate">{profile.education_level}</span>
                 </div>
               )}
-              
+
               {profile.profession_category && (
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Briefcase className="h-3 w-3 flex-shrink-0" />
@@ -130,11 +126,7 @@ export const BrowseProfileCard = ({
                 </Button>
               )}
               {onLike && (
-                <Button
-                  size="sm"
-                  onClick={() => onLike(profile.user_id)}
-                  className="flex-1"
-                >
+                <Button size="sm" onClick={() => onLike(profile.user_id)} className="flex-1">
                   <Heart className="h-3 w-3 mr-1" />
                   J'aime
                 </Button>

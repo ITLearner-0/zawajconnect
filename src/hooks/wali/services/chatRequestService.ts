@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { ChatRequest } from '@/types/wali';
 import { setupModerationTables } from '@/utils/database/moderationTables';
@@ -7,11 +6,12 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
   try {
     // First, ensure the required tables and columns exist
     await setupModerationTables();
-    
+
     // Fetch chat requests from supabase
     const { data, error } = await supabase
       .from('chat_requests')
-      .select(`
+      .select(
+        `
         id,
         requester_id,
         recipient_id,
@@ -23,7 +23,8 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
         message,
         request_type,
         suggested_time
-      `)
+      `
+      )
       .eq('wali_id', userId)
       .order('requested_at', { ascending: false });
 
@@ -43,24 +44,24 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
         // Type assertion to ensure TypeScript knows this is a valid data object, not an error
         // This is safe since we've already checked for errors above
         const validRequest = request as any;
-        
+
         // Create a default request object with the data we have
         const chatRequest: ChatRequest = {
           id: validRequest.id || '',
           requester_id: validRequest.requester_id || '',
           recipient_id: validRequest.recipient_id || '',
           wali_id: validRequest.wali_id || '',
-          status: (validRequest.status as "pending" | "approved" | "rejected") || 'pending',
+          status: (validRequest.status as 'pending' | 'approved' | 'rejected') || 'pending',
           requested_at: validRequest.requested_at || new Date().toISOString(),
           reviewed_at: validRequest.reviewed_at || null,
           wali_notes: validRequest.wali_notes || '',
           message: validRequest.message || '',
-          request_type: validRequest.request_type as "message" | "video" | undefined,
+          request_type: validRequest.request_type as 'message' | 'video' | undefined,
           suggested_time: validRequest.suggested_time || '',
           requester_profile: {
             first_name: 'Unknown',
-            last_name: 'User'
-          }
+            last_name: 'User',
+          },
         };
 
         try {
@@ -76,7 +77,7 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
             if (!profileError && profileData) {
               chatRequest.requester_profile = {
                 first_name: profileData.first_name || 'Unknown',
-                last_name: profileData.last_name || 'User'
+                last_name: profileData.last_name || 'User',
               };
             }
           }
@@ -88,7 +89,7 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
         return chatRequest;
       })
     );
-    
+
     return transformedRequests;
   } catch (err) {
     console.error('Error in fetchChatRequests:', err);
@@ -97,24 +98,21 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
 };
 
 export const updateChatRequestStatus = async (
-  requestId: string, 
+  requestId: string,
   status: 'approved' | 'rejected',
   suggestedTime?: string
 ): Promise<void> => {
   try {
-    const updateData: any = { 
+    const updateData: any = {
       status,
-      reviewed_at: new Date().toISOString()
+      reviewed_at: new Date().toISOString(),
     };
-    
+
     if (suggestedTime) {
       updateData.suggested_time = suggestedTime;
     }
-    
-    const { error } = await supabase
-      .from('chat_requests')
-      .update(updateData)
-      .eq('id', requestId);
+
+    const { error } = await supabase.from('chat_requests').update(updateData).eq('id', requestId);
 
     if (error) throw error;
   } catch (error) {
@@ -144,7 +142,7 @@ export const createConversationForRequest = async (request: ChatRequest): Promis
         .insert({
           participants: [request.requester_id, request.recipient_id],
           created_at: new Date().toISOString(),
-          wali_supervised: true
+          wali_supervised: true,
         })
         .select('id')
         .single();
@@ -156,17 +154,15 @@ export const createConversationForRequest = async (request: ChatRequest): Promis
 
       // Create a system message
       if (newConversation) {
-        const { error: messageError } = await supabase
-          .from('messages')
-          .insert({
-            conversation_id: newConversation.id,
-            sender_id: 'system',
-            content: 'Conversation approved by wali',
-            created_at: new Date().toISOString(),
-            is_read: true,
-            is_wali_visible: true
-          });
-          
+        const { error: messageError } = await supabase.from('messages').insert({
+          conversation_id: newConversation.id,
+          sender_id: 'system',
+          content: 'Conversation approved by wali',
+          created_at: new Date().toISOString(),
+          is_read: true,
+          is_wali_visible: true,
+        });
+
         if (messageError) {
           console.error('Error creating system message:', messageError);
           throw messageError;

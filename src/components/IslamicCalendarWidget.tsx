@@ -40,7 +40,7 @@ const IslamicCalendarWidget = () => {
     { name: 'Dhuhr', arabicName: 'الظهر', icon: Sun, baseTime: '12:30' },
     { name: 'Asr', arabicName: 'العصر', icon: Sun, baseTime: '15:45' },
     { name: 'Maghrib', arabicName: 'المغرب', icon: Sun, baseTime: '18:20' },
-    { name: 'Isha', arabicName: 'العشاء', icon: Moon, baseTime: '19:45' }
+    { name: 'Isha', arabicName: 'العشاء', icon: Moon, baseTime: '19:45' },
   ];
 
   const islamicEvents: IslamicEvent[] = [
@@ -48,61 +48,64 @@ const IslamicCalendarWidget = () => {
       name: 'Ramadan',
       date: '2024-03-11',
       type: 'holy',
-      description: 'Mois de jeûne et de spiritualité'
+      description: 'Mois de jeûne et de spiritualité',
     },
     {
       name: 'Eid al-Fitr',
       date: '2024-04-10',
       type: 'festival',
-      description: 'Fête de la rupture du jeûne'
+      description: 'Fête de la rupture du jeûne',
     },
     {
       name: 'Hajj',
       date: '2024-06-14',
       type: 'holy',
-      description: 'Pèlerinage à La Mecque'
+      description: 'Pèlerinage à La Mecque',
     },
     {
       name: 'Eid al-Adha',
       date: '2024-06-16',
       type: 'festival',
-      description: 'Fête du sacrifice'
+      description: 'Fête du sacrifice',
     },
     {
       name: 'Muharram (Nouvel An Islamique)',
       date: '2024-07-07',
       type: 'important',
-      description: 'Début de la nouvelle année hijri'
+      description: 'Début de la nouvelle année hijri',
     },
     {
       name: 'Ashura',
       date: '2024-07-17',
       type: 'holy',
-      description: 'Jour de jeûne recommandé'
+      description: 'Jour de jeûne recommandé',
     },
     {
       name: 'Mawlid an-Nabi',
       date: '2024-09-15',
       type: 'important',
-      description: 'Naissance du Prophète Muhammad (PBSL)'
-    }
+      description: 'Naissance du Prophète Muhammad (PBSL)',
+    },
   ];
 
   const generatePrayerTimes = () => {
     // Simple prayer time calculation (in a real app, you'd use a proper Islamic calendar API)
-    const times = prayerNames.map(prayer => {
+    const times = prayerNames.map((prayer) => {
       // Add some variation based on date and location
       const baseHour = parseInt(prayer.baseTime.split(':')[0] || '0');
       const baseMinute = parseInt(prayer.baseTime.split(':')[1] || '0');
-      
+
       // Simulate seasonal changes
-      const dayOfYear = Math.floor((currentDate.getTime() - new Date(currentDate.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
+      const dayOfYear = Math.floor(
+        (currentDate.getTime() - new Date(currentDate.getFullYear(), 0, 0).getTime()) /
+          (1000 * 60 * 60 * 24)
+      );
       const seasonalOffset = Math.sin((dayOfYear / 365) * 2 * Math.PI) * 60; // ±60 minutes variation
-      
+
       const adjustedMinutes = baseMinute + Math.floor(seasonalOffset);
       let finalHour = baseHour;
       let finalMinute = adjustedMinutes;
-      
+
       if (finalMinute >= 60) {
         finalHour += 1;
         finalMinute -= 60;
@@ -110,15 +113,15 @@ const IslamicCalendarWidget = () => {
         finalHour -= 1;
         finalMinute += 60;
       }
-      
+
       return {
         name: prayer.name,
         time: `${finalHour.toString().padStart(2, '0')}:${finalMinute.toString().padStart(2, '0')}`,
         arabicName: prayer.arabicName,
-        icon: prayer.icon
+        icon: prayer.icon,
       };
     });
-    
+
     setPrayerTimes(times);
   };
 
@@ -126,49 +129,58 @@ const IslamicCalendarWidget = () => {
     // Simplified Hijri conversion (in a real app, use proper Islamic calendar library)
     const gregorianYear = currentDate.getFullYear();
     const hijriYear = gregorianYear - 579; // Approximate conversion
-    
+
     const islamicMonths = [
-      'Muharram', 'Safar', 'Rabi al-Awwal', 'Rabi al-Thani',
-      'Jumada al-Awwal', 'Jumada al-Thani', 'Rajab', 'Sha\'ban',
-      'Ramadan', 'Shawwal', 'Dhu al-Qi\'dah', 'Dhu al-Hijjah'
+      'Muharram',
+      'Safar',
+      'Rabi al-Awwal',
+      'Rabi al-Thani',
+      'Jumada al-Awwal',
+      'Jumada al-Thani',
+      'Rajab',
+      "Sha'ban",
+      'Ramadan',
+      'Shawwal',
+      "Dhu al-Qi'dah",
+      'Dhu al-Hijjah',
     ];
-    
+
     const currentMonth = currentDate.getMonth();
     const hijriMonth = islamicMonths[currentMonth] || '';
     const hijriDay = currentDate.getDate();
-    
+
     // Check for events on this date
     const todayEvents = islamicEvents
-      .filter(event => {
+      .filter((event) => {
         const eventDate = new Date(event.date);
         return (
           eventDate.getMonth() === currentDate.getMonth() &&
           eventDate.getDate() === currentDate.getDate()
         );
       })
-      .map(event => event.name);
-    
+      .map((event) => event.name);
+
     setIslamicDate({
       hijriDay,
       hijriMonth: hijriMonth || '',
       hijriYear,
       gregorianDate: format(currentDate, 'dd MMMM yyyy', { locale: fr }),
-      islamicEvents: todayEvents
+      islamicEvents: todayEvents,
     });
   };
 
   const loadUpcomingEvents = () => {
     const today = new Date();
     const nextMonth = addDays(today, 30);
-    
+
     const upcoming = islamicEvents
-      .filter(event => {
+      .filter((event) => {
         const eventDate = new Date(event.date);
         return eventDate >= today && eventDate <= nextMonth;
       })
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
       .slice(0, 3);
-    
+
     setUpcomingEvents(upcoming);
   };
 
@@ -183,18 +195,20 @@ const IslamicCalendarWidget = () => {
     if (!prayerTimes || prayerTimes.length === 0) {
       return null;
     }
-    
+
     const now = new Date();
     const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
+
     for (const prayer of prayerTimes) {
       if (prayer.time > currentTime) {
         return prayer;
       }
     }
-    
+
     // If no prayer left today, return Fajr of tomorrow
-    return prayerTimes[0] ? { ...prayerTimes[0], time: `Demain ${prayerTimes[0].time}` } : undefined;
+    return prayerTimes[0]
+      ? { ...prayerTimes[0], time: `Demain ${prayerTimes[0].time}` }
+      : undefined;
   };
 
   const nextPrayer = getNextPrayer();
@@ -211,9 +225,7 @@ const IslamicCalendarWidget = () => {
   };
 
   const navigateDate = (direction: 'prev' | 'next') => {
-    const newDate = direction === 'prev' 
-      ? subDays(currentDate, 1) 
-      : addDays(currentDate, 1);
+    const newDate = direction === 'prev' ? subDays(currentDate, 1) : addDays(currentDate, 1);
     setCurrentDate(newDate);
   };
 
@@ -262,11 +274,9 @@ const IslamicCalendarWidget = () => {
                 <div className="text-2xl font-bold text-emerald mb-1">
                   {islamicDate.hijriDay} {islamicDate.hijriMonth} {islamicDate.hijriYear} AH
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  {islamicDate.gregorianDate}
-                </div>
+                <div className="text-sm text-muted-foreground">{islamicDate.gregorianDate}</div>
               </div>
-              
+
               {islamicDate.islamicEvents.length > 0 && (
                 <div className="text-center">
                   {islamicDate.islamicEvents.map((event, index) => (
@@ -298,9 +308,7 @@ const IslamicCalendarWidget = () => {
         <CardContent>
           {nextPrayer ? (
             <div className="text-center">
-              <div className="text-3xl font-bold text-emerald mb-1">
-                {nextPrayer.time}
-              </div>
+              <div className="text-3xl font-bold text-emerald mb-1">{nextPrayer.time}</div>
               <div className="text-lg font-semibold mb-1">
                 {nextPrayer.name} - {nextPrayer.arabicName}
               </div>
@@ -326,30 +334,28 @@ const IslamicCalendarWidget = () => {
             {prayerTimes.map((prayer, index) => {
               const Icon = prayer.icon;
               const isNext = prayer === nextPrayer;
-              
+
               return (
                 <div
                   key={index}
                   className={`text-center p-3 rounded-lg transition-colors ${
-                    isNext 
-                      ? 'bg-emerald/10 border border-emerald/20' 
-                      : 'bg-muted/50'
+                    isNext ? 'bg-emerald/10 border border-emerald/20' : 'bg-muted/50'
                   }`}
                 >
-                  <Icon className={`h-5 w-5 mx-auto mb-2 ${
-                    isNext ? 'text-emerald' : 'text-muted-foreground'
-                  }`} />
-                  <div className={`text-sm font-medium ${
-                    isNext ? 'text-emerald' : 'text-foreground'
-                  }`}>
+                  <Icon
+                    className={`h-5 w-5 mx-auto mb-2 ${
+                      isNext ? 'text-emerald' : 'text-muted-foreground'
+                    }`}
+                  />
+                  <div
+                    className={`text-sm font-medium ${isNext ? 'text-emerald' : 'text-foreground'}`}
+                  >
                     {prayer.name}
                   </div>
-                  <div className="text-xs text-muted-foreground mb-1">
-                    {prayer.arabicName}
-                  </div>
-                  <div className={`text-sm font-bold ${
-                    isNext ? 'text-emerald' : 'text-foreground'
-                  }`}>
+                  <div className="text-xs text-muted-foreground mb-1">{prayer.arabicName}</div>
+                  <div
+                    className={`text-sm font-bold ${isNext ? 'text-emerald' : 'text-foreground'}`}
+                  >
                     {prayer.time}
                   </div>
                 </div>
@@ -371,7 +377,10 @@ const IslamicCalendarWidget = () => {
           <CardContent>
             <div className="space-y-3">
               {upcomingEvents.map((event, index) => (
-                <div key={index} className="flex items-start justify-between p-3 rounded-lg bg-muted/30 border border-border/50">
+                <div
+                  key={index}
+                  className="flex items-start justify-between p-3 rounded-lg bg-muted/30 border border-border/50"
+                >
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <h4 className="font-semibold text-foreground">{event.name}</h4>
@@ -379,9 +388,7 @@ const IslamicCalendarWidget = () => {
                         {event.type === 'festival' ? '🎉' : event.type === 'holy' ? '🕌' : '📅'}
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-1">
-                      {event.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground mb-1">{event.description}</p>
                     <p className="text-xs text-muted-foreground">
                       {format(new Date(event.date), 'dd MMMM yyyy', { locale: fr })}
                     </p>

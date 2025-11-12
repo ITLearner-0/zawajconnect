@@ -1,4 +1,3 @@
-
 import React, { Component, ReactNode } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -45,12 +44,7 @@ export class FormErrorBoundary extends Component<Props, State> {
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription className="flex items-center justify-between">
             <span>There was an error with this form. Please try again.</span>
-            <Button 
-              onClick={this.handleReset} 
-              variant="outline" 
-              size="sm"
-              className="ml-4"
-            >
+            <Button onClick={this.handleReset} variant="outline" size="sm" className="ml-4">
               <RefreshCw className="h-3 w-3 mr-1" />
               Retry
             </Button>

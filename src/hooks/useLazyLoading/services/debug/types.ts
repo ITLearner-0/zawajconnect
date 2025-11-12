@@ -1,4 +1,3 @@
-
 export interface DebugConfig {
   enableLogging: boolean;
   enablePerformanceTracking: boolean;

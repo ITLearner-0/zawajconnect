@@ -1,15 +1,14 @@
-
-import { useState, useEffect } from "react";
-import { FilterCriteria } from "@/utils/location";
-import { useCompatibilityMatches } from "@/hooks/useCompatibilityMatches";
-import { Card, CardContent } from "@/components/ui/card";
-import { IslamicPattern } from "@/components/ui/islamic-pattern";
-import { Heart, Users, Loader, RefreshCw } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useTranslation } from "react-i18next";
-import { Button } from "@/components/ui/button";
-import EnhancedMatchCard from "@/components/compatibility/EnhancedMatchCard";
-import { supabase } from "@/integrations/supabase/client";
+import { useState, useEffect } from 'react';
+import { FilterCriteria } from '@/utils/location';
+import { useCompatibilityMatches } from '@/hooks/useCompatibilityMatches';
+import { Card, CardContent } from '@/components/ui/card';
+import { IslamicPattern } from '@/components/ui/islamic-pattern';
+import { Heart, Users, Loader, RefreshCw } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
+import EnhancedMatchCard from '@/components/compatibility/EnhancedMatchCard';
+import { supabase } from '@/integrations/supabase/client';
 
 interface NearbyMatchContentProps {
   maxDistance: number;
@@ -17,7 +16,11 @@ interface NearbyMatchContentProps {
   showCompatibility: boolean;
 }
 
-const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyMatchContentProps) => {
+const NearbyMatchContent = ({
+  maxDistance,
+  filters,
+  showCompatibility,
+}: NearbyMatchContentProps) => {
   const { matchScores, loading } = useCompatibilityMatches();
   const [canShowSuggestions, setCanShowSuggestions] = useState(true);
   const [remainingCount, setRemainingCount] = useState(5);
@@ -28,10 +31,12 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
 
   const handleRefreshMatches = async () => {
     if (!canShowSuggestions) return;
-    
+
     setIsRefreshing(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         // Simuler un rafraîchissement des correspondances
         setDisplayedMatches(matchScores.slice(0, 5));
@@ -47,29 +52,29 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
   };
 
   useEffect(() => {
-    console.log("NearbyMatchContent - Real matchScores from database:", matchScores.length);
-    console.log("NearbyMatchContent - canShowSuggestions:", canShowSuggestions);
-    
+    console.log('NearbyMatchContent - Real matchScores from database:', matchScores.length);
+    console.log('NearbyMatchContent - canShowSuggestions:', canShowSuggestions);
+
     if (canShowSuggestions && matchScores.length > 0) {
-      console.log("Setting displayed matches:", matchScores.slice(0, 5));
+      console.log('Setting displayed matches:', matchScores.slice(0, 5));
       setDisplayedMatches(matchScores.slice(0, 5));
     } else {
-      console.log("No matches to display or suggestions disabled");
+      console.log('No matches to display or suggestions disabled');
     }
   }, [matchScores, canShowSuggestions]);
 
   const filteredMatches = displayedMatches;
 
-  console.log("NearbyMatchContent - Rendering with real data:", {
+  console.log('NearbyMatchContent - Rendering with real data:', {
     loading,
     totalMatches: matchScores.length,
     filteredMatches: filteredMatches.length,
     canShowSuggestions,
-    showCompatibility
+    showCompatibility,
   });
 
   return (
-    <div className={isMobile ? "w-full" : "lg:col-span-2"}>
+    <div className={isMobile ? 'w-full' : 'lg:col-span-2'}>
       <IslamicPattern variant="card" color="teal" className="overflow-hidden">
         <div className="bg-gradient-to-r from-rose-400 to-pink-400 text-white p-3 sm:p-4 flex items-center justify-between">
           <div className="flex items-center">
@@ -78,7 +83,7 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
               Correspondances compatibles {canShowSuggestions && `(${remainingCount} restantes)`}
             </h2>
           </div>
-          
+
           {canShowSuggestions && (
             <Button
               variant="ghost"
@@ -106,19 +111,20 @@ const NearbyMatchContent = ({ maxDistance, filters, showCompatibility }: NearbyM
                   Limite quotidienne atteinte
                 </h3>
                 <p className="text-red-600 mb-4">
-                  Vous avez consulté vos 5 suggestions quotidiennes. 
-                  Revenez demain pour découvrir de nouveaux profils compatibles !
+                  Vous avez consulté vos 5 suggestions quotidiennes. Revenez demain pour découvrir
+                  de nouveaux profils compatibles !
                 </p>
               </CardContent>
             </Card>
           ) : filteredMatches.length > 0 ? (
             <div className="space-y-4">
               <div className="text-sm text-gray-600 mb-2">
-                Affichage de {filteredMatches.length} correspondance(s) réelle(s) sur {matchScores.length} total
+                Affichage de {filteredMatches.length} correspondance(s) réelle(s) sur{' '}
+                {matchScores.length} total
               </div>
               {filteredMatches.map((match) => (
-                <EnhancedMatchCard 
-                  key={match.userId} 
+                <EnhancedMatchCard
+                  key={match.userId}
                   match={match}
                   onMessageClick={() => {
                     console.log('Message to user:', match.userId);

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,12 +15,7 @@ const WaliInvitationManager: React.FC = () => {
   const { user } = useAuth();
   const [newInvitationEmail, setNewInvitationEmail] = useState('');
   const [confirmationToken, setConfirmationToken] = useState('');
-  const { 
-    invitations, 
-    loading, 
-    sendInvitation, 
-    confirmInvitation 
-  } = useWaliInvitations(user?.id);
+  const { invitations, loading, sendInvitation, confirmInvitation } = useWaliInvitations(user?.id);
 
   const handleSendInvitation = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,30 +39,50 @@ const WaliInvitationManager: React.FC = () => {
 
   const getStatusBadge = (invitation: WaliInvitation) => {
     const isExpired = new Date(invitation.expires_at) < new Date();
-    
+
     if (isExpired && invitation.status === 'pending') {
-      return <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" />Expirée</Badge>;
+      return (
+        <Badge variant="destructive">
+          <XCircle className="h-3 w-3 mr-1" />
+          Expirée
+        </Badge>
+      );
     }
 
     switch (invitation.status) {
       case 'pending':
-        return <Badge variant="secondary"><Clock className="h-3 w-3 mr-1" />En attente</Badge>;
+        return (
+          <Badge variant="secondary">
+            <Clock className="h-3 w-3 mr-1" />
+            En attente
+          </Badge>
+        );
       case 'confirmed':
-        return <Badge variant="default"><CheckCircle className="h-3 w-3 mr-1" />Confirmée</Badge>;
+        return (
+          <Badge variant="default">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Confirmée
+          </Badge>
+        );
       case 'rejected':
-        return <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" />Rejetée</Badge>;
+        return (
+          <Badge variant="destructive">
+            <XCircle className="h-3 w-3 mr-1" />
+            Rejetée
+          </Badge>
+        );
       default:
         return <Badge variant="outline">Inconnue</Badge>;
     }
   };
 
   // Separate sent and received invitations
-  const sentInvitations = invitations.filter(inv => 
-    inv.wali_profile_id && user?.id // Invitations sent by this wali
+  const sentInvitations = invitations.filter(
+    (inv) => inv.wali_profile_id && user?.id // Invitations sent by this wali
   );
-  
-  const receivedInvitations = invitations.filter(inv => 
-    inv.managed_user_id === user?.id // Invitations received by this user
+
+  const receivedInvitations = invitations.filter(
+    (inv) => inv.managed_user_id === user?.id // Invitations received by this user
   );
 
   return (
@@ -145,27 +159,30 @@ const WaliInvitationManager: React.FC = () => {
           <CardContent>
             <div className="space-y-4">
               {sentInvitations.map((invitation) => (
-                <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div
+                  key={invitation.id}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
                   <div className="space-y-1">
                     <p className="font-medium">{invitation.email}</p>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="h-3 w-3" />
-                      Envoyée {formatDistanceToNow(new Date(invitation.sent_at), { 
-                        addSuffix: true, 
-                        locale: fr 
+                      Envoyée{' '}
+                      {formatDistanceToNow(new Date(invitation.sent_at), {
+                        addSuffix: true,
+                        locale: fr,
                       })}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock className="h-3 w-3" />
-                      Expire {formatDistanceToNow(new Date(invitation.expires_at), { 
-                        addSuffix: true, 
-                        locale: fr 
+                      Expire{' '}
+                      {formatDistanceToNow(new Date(invitation.expires_at), {
+                        addSuffix: true,
+                        locale: fr,
                       })}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {getStatusBadge(invitation)}
-                  </div>
+                  <div className="flex items-center gap-2">{getStatusBadge(invitation)}</div>
                 </div>
               ))}
             </div>
@@ -182,34 +199,40 @@ const WaliInvitationManager: React.FC = () => {
           <CardContent>
             <div className="space-y-4">
               {receivedInvitations.map((invitation) => (
-                <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-lg">
+                <div
+                  key={invitation.id}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
                   <div className="space-y-1">
                     <p className="font-medium">Invitation pour être supervisé(e)</p>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="h-3 w-3" />
-                      Reçue {formatDistanceToNow(new Date(invitation.sent_at), { 
-                        addSuffix: true, 
-                        locale: fr 
+                      Reçue{' '}
+                      {formatDistanceToNow(new Date(invitation.sent_at), {
+                        addSuffix: true,
+                        locale: fr,
                       })}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Clock className="h-3 w-3" />
-                      Expire {formatDistanceToNow(new Date(invitation.expires_at), { 
-                        addSuffix: true, 
-                        locale: fr 
+                      Expire{' '}
+                      {formatDistanceToNow(new Date(invitation.expires_at), {
+                        addSuffix: true,
+                        locale: fr,
                       })}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     {getStatusBadge(invitation)}
-                    {invitation.status === 'pending' && new Date(invitation.expires_at) > new Date() && (
-                      <Button 
-                        size="sm" 
-                        onClick={() => confirmInvitation(invitation.invitation_token)}
-                      >
-                        Confirmer
-                      </Button>
-                    )}
+                    {invitation.status === 'pending' &&
+                      new Date(invitation.expires_at) > new Date() && (
+                        <Button
+                          size="sm"
+                          onClick={() => confirmInvitation(invitation.invitation_token)}
+                        >
+                          Confirmer
+                        </Button>
+                      )}
                   </div>
                 </div>
               ))}

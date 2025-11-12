@@ -5,10 +5,12 @@ Ce guide explique comment configurer les notifications automatiques pour les tes
 ## 🎯 Notifications Configurées
 
 ### Workflow de Déploiement (`deploy-hostinger.yml`)
+
 - ✅ **Succès du déploiement** - Notification avec lien vers le site
 - ❌ **Échec des tests/couverture** - Alerte avec détails de l'erreur
 
 ### Workflow des Pull Requests (`pr-tests.yml`)
+
 - ⚠️ **Échec des tests sur PR** - Alerte avec pourcentages de couverture et lien vers la PR
 
 ## 🔧 Configuration Slack
@@ -65,9 +67,9 @@ Faites un commit ou créez une PR pour déclencher les workflows et vérifier qu
 
 ## 📋 Secrets GitHub Nécessaires
 
-| Secret | Description | Obligatoire |
-|--------|-------------|-------------|
-| `SLACK_WEBHOOK_URL` | URL du webhook Slack | Non (facultatif) |
+| Secret                | Description            | Obligatoire      |
+| --------------------- | ---------------------- | ---------------- |
+| `SLACK_WEBHOOK_URL`   | URL du webhook Slack   | Non (facultatif) |
 | `DISCORD_WEBHOOK_URL` | URL du webhook Discord | Non (facultatif) |
 
 **Note:** Vous pouvez configurer l'un, l'autre, ou les deux. Si un secret n'est pas configuré, les notifications correspondantes seront simplement ignorées.
@@ -77,28 +79,33 @@ Faites un commit ou créez une PR pour déclencher les workflows et vérifier qu
 ### Modifier les Messages Slack
 
 Les messages Slack utilisent le format Block Kit. Vous pouvez les personnaliser dans les workflows :
+
 - `.github/workflows/deploy-hostinger.yml` (lignes 64-116 et 114-146)
 - `.github/workflows/pr-tests.yml` (lignes 157-211)
 
 ### Modifier les Messages Discord
 
 Les messages Discord utilisent des embeds. Vous pouvez les personnaliser :
+
 - `.github/workflows/deploy-hostinger.yml` (lignes 118-154 et 148-169)
 - `.github/workflows/pr-tests.yml` (lignes 213-244)
 
 ## 📊 Types de Notifications
 
 ### ✅ Déploiement Réussi (Vert)
+
 - Lien vers le site en production
 - Informations du commit et de l'auteur
 - Horodatage du déploiement
 
 ### ❌ Déploiement Échoué (Rouge)
+
 - Raison de l'échec (tests ou couverture)
 - Message du commit
 - Lien vers les logs du workflow
 
 ### ⚠️ Tests PR Échoués (Orange)
+
 - Numéro et titre de la PR
 - Pourcentages de couverture actuels
 - Lien vers la PR et le workflow

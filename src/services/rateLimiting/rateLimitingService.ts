@@ -1,4 +1,3 @@
-
 import { RateLimitResult, AbuseDetectionResult } from './types';
 import { RateLimitCore } from './core';
 
@@ -9,7 +8,11 @@ class RateLimitingService {
     return this.core.checkRateLimit(userId, endpoint);
   }
 
-  async detectAbuse(userId: string, endpoint: string, requestData?: any): Promise<AbuseDetectionResult> {
+  async detectAbuse(
+    userId: string,
+    endpoint: string,
+    requestData?: any
+  ): Promise<AbuseDetectionResult> {
     return this.core.detectAbuse(userId, endpoint, requestData);
   }
 

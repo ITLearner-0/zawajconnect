@@ -1,4 +1,3 @@
-
 import { Conversation } from '@/types/profile';
 
 // Dummy conversations for demo
@@ -9,7 +8,7 @@ export const dummyConversations: Conversation[] = [
     participants: ['current-user', 'user-1'],
     profile: {
       first_name: 'Ahmed',
-      last_name: 'Khan'
+      last_name: 'Khan',
     },
     wali_supervised: false,
     last_message: {
@@ -19,8 +18,8 @@ export const dummyConversations: Conversation[] = [
       content: 'Looking forward to our coffee meetup tomorrow!',
       created_at: '2023-08-10T09:30:00Z',
       is_read: false,
-      is_wali_visible: false
-    }
+      is_wali_visible: false,
+    },
   },
   {
     id: 'conv-2',
@@ -28,7 +27,7 @@ export const dummyConversations: Conversation[] = [
     participants: ['current-user', 'user-2'],
     profile: {
       first_name: 'Fatima',
-      last_name: 'Rahman'
+      last_name: 'Rahman',
     },
     wali_supervised: true,
     last_message: {
@@ -38,8 +37,8 @@ export const dummyConversations: Conversation[] = [
       content: 'I agree, having strong Islamic values is very important in a marriage.',
       created_at: '2023-08-09T18:45:00Z',
       is_read: true,
-      is_wali_visible: true
-    }
+      is_wali_visible: true,
+    },
   },
   {
     id: 'conv-3',
@@ -47,7 +46,7 @@ export const dummyConversations: Conversation[] = [
     participants: ['current-user', 'user-3'],
     profile: {
       first_name: 'Yusuf',
-      last_name: 'Ali'
+      last_name: 'Ali',
     },
     wali_supervised: false,
     last_message: {
@@ -57,8 +56,8 @@ export const dummyConversations: Conversation[] = [
       content: 'I can share some books about Islamic marriage that I found helpful.',
       created_at: '2023-08-10T11:20:00Z',
       is_read: false,
-      is_wali_visible: false
-    }
+      is_wali_visible: false,
+    },
   },
   {
     id: 'conv-4',
@@ -66,7 +65,7 @@ export const dummyConversations: Conversation[] = [
     participants: ['current-user', 'user-4'],
     profile: {
       first_name: 'Aisha',
-      last_name: 'Mahmood'
+      last_name: 'Mahmood',
     },
     wali_supervised: true,
     last_message: {
@@ -76,7 +75,7 @@ export const dummyConversations: Conversation[] = [
       content: 'Would you be interested in having a video call with our families?',
       created_at: '2023-08-08T20:10:00Z',
       is_read: true,
-      is_wali_visible: true
-    }
-  }
+      is_wali_visible: true,
+    },
+  },
 ];

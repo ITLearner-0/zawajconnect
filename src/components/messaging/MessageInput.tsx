@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,7 +19,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
   sendMessage,
   sendingMessage,
   encryptionEnabled,
-  onSendMessage
+  onSendMessage,
 }) => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -63,9 +62,9 @@ const MessageInput: React.FC<MessageInputProps> = ({
           className="flex-grow"
           disabled={sendingMessage}
         />
-        <Button 
-          onClick={handleSend} 
-          disabled={sendingMessage || !messageInput.trim()} 
+        <Button
+          onClick={handleSend}
+          disabled={sendingMessage || !messageInput.trim()}
           className="ml-2"
         >
           {sendingMessage ? (
