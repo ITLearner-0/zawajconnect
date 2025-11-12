@@ -1,54 +1,124 @@
+import React, { Suspense } from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
+import { UserDataProvider } from "@/contexts/UserDataContext";
+import NavigationGuard from "@/components/navigation/NavigationGuard";
+import { NavigationProvider } from "@/components/navigation/NavigationProvider";
+import RouteTransition from "@/components/navigation/RouteTransition";
+import { publicRoutes, specialRoutes, protectedRoutes, notFoundRoute } from "@/config/appRoutes";
+import { Toaster } from "@/components/ui/toaster";
+import ProtectedRouteWrapper from "@/components/routing/ProtectedRouteWrapper";
+import { FreemiumBanner } from "@/components/FreemiumBanner";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
+import { AchievementNotificationProvider } from "@/components/AchievementNotificationProvider";
 
-import { Routes, Route } from "react-router-dom";
-import { Suspense } from "react";
-import Index from "./pages/Index";
-import Profile from "./pages/Profile";
-import Compatibility from "./pages/Compatibility";
-import Messages from "./pages/Messages";
-import NearbyMatches from "./pages/NearbyMatches";
-import Resources from "./pages/Resources";
-import Demo from "./pages/Demo";
-import WaliDashboard from "./pages/WaliDashboard";
-import WaliSetup from "./pages/WaliSetup";
-import AdminModeration from "./pages/AdminModeration";
-import NotFound from "./pages/NotFound";
-import Subscription from "./pages/Subscription";
-import Auth from "./pages/Auth";
-import UserProfile from "./pages/UserProfile";
-import StandardLoadingState from "./components/ui/StandardLoadingState";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import AdminRoute from "./components/auth/AdminRoute";
-import { AppProvider } from "./providers";
-import "./App.css";
+// Loading fallback component for lazy-loaded routes
+const RouteLoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="flex flex-col items-center gap-4">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+      <p className="text-sm text-gray-600">Chargement...</p>
+    </div>
+  </div>
+);
 
-console.log("App component rendering");
+// Create QueryClient outside component to avoid hook issues
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      staleTime: 5 * 60 * 1000,
+    },
+  },
+});
 
 function App() {
+  const NotFoundComponent = notFoundRoute.component;
+  
   return (
-    <AppProvider>
-      <div className="min-h-screen bg-background text-foreground">
-        <Suspense fallback={<StandardLoadingState loading={true} loadingText="Chargement de la page..." />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/wali/setup" element={<WaliSetup />} />
-            <Route path="/demo" element={<Demo />} />
-            <Route path="/resources" element={<Resources />} />
-            {/* Protected Routes */}
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-            <Route path="/user/:userId" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-            <Route path="/compatibility" element={<ProtectedRoute><Compatibility /></ProtectedRoute>} />
-            <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-            <Route path="/nearby" element={<ProtectedRoute><NearbyMatches /></ProtectedRoute>} />
-            <Route path="/wali" element={<ProtectedRoute><WaliDashboard /></ProtectedRoute>} />
-            <Route path="/subscription" element={<ProtectedRoute><Subscription /></ProtectedRoute>} />
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminRoute><AdminModeration /></AdminRoute>} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </div>
-    </AppProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <UserDataProvider>
+          <AchievementNotificationProvider>
+            <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true
+            }}
+          >
+            <NavigationProvider>
+              <NavigationGuard>
+              <FreemiumBanner />
+              <RouteTransition>
+                <Suspense fallback={<RouteLoadingFallback />}>
+                  <Routes>
+                    {/* Public routes */}
+                    {publicRoutes.map((route) => {
+                      const Component = route.component;
+                      return (
+                        <Route
+                          key={route.path}
+                          path={route.path}
+                          element={
+                            <Suspense fallback={<RouteLoadingFallback />}>
+                              <Component />
+                            </Suspense>
+                          }
+                        />
+                      );
+                    })}
+
+                    {/* Special routes (protected with different requirements) */}
+                    {specialRoutes.map((route) => {
+                      const Component = route.component;
+                      return (
+                        <Route
+                          key={route.path}
+                          path={route.path}
+                          element={
+                            <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
+                              <Suspense fallback={<RouteLoadingFallback />}>
+                                <Component />
+                              </Suspense>
+                            </ProtectedRouteWrapper>
+                          }
+                        />
+                      );
+                    })}
+
+                    {/* Protected routes */}
+                    {protectedRoutes.map((route) => {
+                      const Component = route.component;
+                      return (
+                        <Route
+                          key={route.path}
+                          path={route.path}
+                          element={
+                            <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
+                              <Suspense fallback={<RouteLoadingFallback />}>
+                                <Component />
+                              </Suspense>
+                            </ProtectedRouteWrapper>
+                          }
+                        />
+                      );
+                    })}
+
+                    {/* Catch all route */}
+                    <Route path={notFoundRoute.path} element={<NotFoundComponent />} />
+                  </Routes>
+                </Suspense>
+              </RouteTransition>
+              </NavigationGuard>
+            </NavigationProvider>
+            <CookieConsentBanner />
+            <Toaster />
+          </BrowserRouter>
+        </AchievementNotificationProvider>
+      </UserDataProvider>
+    </AuthProvider>
+  </QueryClientProvider>
   );
 }
 

@@ -1,0 +1,10 @@
+{
+  "host": "ftp.zawajconnect.me",
+  "user": "u120658822.contact",
+  "password": "4>Aqt:6b$K}]?Ec",
+  "port": 21,
+  "remoteRoot": "/public_html",
+  "siteUrl": "https://zawajconnect.me",
+  "deleteRemote": false,
+  "exclude": ["**/*.map", ".git/**", ".DS_Store", "node_modules/**", ".env", ".ftp-deploy.json"]
+}

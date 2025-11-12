@@ -28,8 +28,38 @@ export const signIn = async (data: SignInData, t: (key: string) => string) => {
           duration: 6000
         });
       } else if (error.message.includes("Email not confirmed")) {
+        // Offer to resend confirmation email
+        const resendConfirmation = async () => {
+          try {
+            const { error: resendError } = await supabase.auth.resend({
+              type: 'signup',
+              email: email,
+              options: {
+                emailRedirectTo: `${window.location.origin}/auth`
+              }
+            });
+            
+            if (resendError) {
+              toast.error("Erreur lors de l'envoi", {
+                description: resendError.message
+              });
+            } else {
+              toast.success("Email de confirmation renvoyé", {
+                description: "Vérifiez votre boîte mail et cliquez sur le lien de confirmation"
+              });
+            }
+          } catch (error) {
+            console.error("Resend error:", error);
+          }
+        };
+
         toast.error("Email non confirmé", {
-          description: "Veuillez vérifier votre email pour confirmer votre compte"
+          description: "Votre email n'est pas encore confirmé. Cliquez ici pour renvoyer l'email de confirmation.",
+          action: {
+            label: "Renvoyer",
+            onClick: resendConfirmation
+          },
+          duration: 10000
         });
       } else if (error.message.includes("Too many requests")) {
         toast.error("Trop de tentatives", {

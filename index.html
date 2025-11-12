@@ -1,110 +1,70 @@
-
 <!DOCTYPE html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nikah Connect - Mariage Islamique</title>
-    <meta name="description" content="Plateforme de mariage islamique construite sur les valeurs islamiques" />
-    <meta name="author" content="Nikah Connect" />
-    
-    <!-- PWA Metadata -->
-    <meta name="theme-color" content="#e11d48" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="NikahConnect" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="application-name" content="NikahConnect" />
-    
-    <!-- Open Graph -->
-    <meta property="og:title" content="Nikah Connect - Mariage Islamique" />
-    <meta property="og:description" content="Une plateforme de mariage construite sur les valeurs islamiques" />
-    <meta property="og:image" content="/og-image.png" />
+    <title>Zawaj-Connect Plateforme Matrimoniale Islamique</title>
+    <meta
+      name="description"
+      content="Plateforme matrimoniale moderne respectant les valeurs islamiques. Trouvez votre moitié dans le respect de la Shariah avec ZawajConnect."
+    />
+    <meta name="author" content="Zawaj-Connect" />
+    <meta name="keywords" content="mariage islamique, matrimonial halal, rencontre musulmane, nikah, shariah" />
+
+    <!-- Google Fonts - Optimized for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Preload critical font files directly to break dependency chains -->
+    <link
+      rel="preload"
+      href="https://fonts.gstatic.com/s/inter/v20/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="https://fonts.gstatic.com/s/amiri/v30/J7acnpd8CGxBHp2VkaY6zp5gGDAbnCA.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="https://fonts.gstatic.com/s/amiri/v30/J7aRnpd8CGxBHpUrtLMS7JNKIjk.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+    <!-- Preload critical fonts for LCP optimization -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" as="style" />
+    <link
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
+    />
+    <!-- Load critical font immediately -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" rel="stylesheet" />
+    <!-- Fallback for browsers that don't support preload -->
+    <noscript
+      ><link
+        href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    /></noscript>
+
+    <meta property="og:title" content="Zawaj-Connect - Mariage Halal et Respectueux" />
+    <meta property="og:description" content="Plateforme matrimoniale moderne respectant les valeurs islamiques" />
     <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Nikah Connect" />
-    
-    <!-- Twitter Card -->
+    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Nikah Connect - Mariage Islamique" />
-    <meta name="twitter:description" content="Une plateforme de mariage construite sur les valeurs islamiques" />
-    <meta name="twitter:image" content="/og-image.png" />
-    
-    <!-- Icons -->
-    <link rel="icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
-    <link rel="manifest" href="/manifest.json">
-    
-    <!-- Preconnect for performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://huozosbrlxayjkvakptu.supabase.co">
-    
-    <!-- DNS prefetch -->
-    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
-    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-    <link rel="dns-prefetch" href="https://huozosbrlxayjkvakptu.supabase.co">
-    
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- Performance hints -->
-    <link rel="preload" href="/src/main.tsx" as="script">
-    <link rel="preload" href="/src/index.css" as="style">
-    
-    <!-- Security headers -->
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="twitter:site" content="@Zawaj-Connect" />
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
   </head>
 
   <body>
     <div id="root"></div>
-    
-    <!-- Critical inline styles for PWA -->
-    <style>
-      /* Loading state for PWA */
-      #root:empty::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
-        z-index: 9999;
-      }
-      
-      #root:empty::after {
-        content: 'Chargement...';
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-family: 'Segoe UI', sans-serif;
-        color: #be185d;
-        font-size: 18px;
-        z-index: 10000;
-      }
-    </style>
-    
-    <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR THIS VERY COMMENT! -->
-    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
-    
-    <!-- Service Worker registration -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(registration => {
-              console.log('SW registered: ', registration);
-            })
-            .catch(registrationError => {
-              console.log('SW registration failed: ', registrationError);
-            });
-        });
-      }
-    </script>
   </body>
 </html>

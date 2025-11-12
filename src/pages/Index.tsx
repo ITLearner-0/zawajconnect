@@ -1,63 +1,48 @@
-
-import React from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import EnhancedHeroSection from '@/components/home/EnhancedHeroSection';
-import FeaturesSection from '@/components/home/FeaturesSection';
-import TestimonialsSection from '@/components/home/TestimonialsSection';
-import ResourcesSection from '@/components/home/ResourcesSection';
-import Footer from '@/components/home/Footer';
-import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import Hero from "@/components/Hero";
+import IslamicValues from "@/components/IslamicValues";
+import ProcessSection from "@/components/ProcessSection";
+import CompatibilitySection from "@/components/CompatibilitySection";
+import PrayerTimes from "@/components/PrayerTimes";
+import QiblaDirection from "@/components/QiblaDirection";
+import IslamicCalendar from "@/components/IslamicCalendar";
+import IslamicReminders from "@/components/IslamicReminders";
+import ContactSection from "@/components/ContactSection";
+import Footer from "@/components/Footer";
 
 const Index = () => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingSpinner size="lg" text="Chargement..." centered />;
-  }
-
-  // Si l'utilisateur est connecté, afficher une version simplifiée de la page
-  if (user) {
-    return (
-      <main className="container mx-auto px-4 py-8">
-        <div className="text-center space-y-6">
-          <h1 className="text-4xl font-bold text-primary">
-            Bienvenue sur Nikah Connect
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Vous êtes maintenant connecté(e). Utilisez la navigation ci-dessus pour accéder aux différentes fonctionnalités.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-            <div className="p-6 bg-card rounded-lg border">
-              <h3 className="text-xl font-semibold mb-3">Mon Profil</h3>
+  return (
+    <div className="min-h-screen">
+      <Hero />
+      <IslamicValues />
+      <ProcessSection />
+      <CompatibilitySection />
+      <section className="py-12 px-4 bg-gradient-to-br from-emerald/5 via-cream/20 to-sage/10">
+        <div className="container mx-auto">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mb-10 animate-fade-in">
+              <h2 className="text-3xl font-bold text-foreground mb-4">
+                Outils Islamiques du Quotidien
+              </h2>
               <p className="text-muted-foreground">
-                Complétez et gérez votre profil personnel
+                Restez connecté à votre foi pendant votre recherche du partenaire idéal
               </p>
             </div>
-            <div className="p-6 bg-card rounded-lg border">
-              <h3 className="text-xl font-semibold mb-3">Compatibilité</h3>
-              <p className="text-muted-foreground">
-                Découvrez vos compatibilités basées sur les valeurs islamiques
-              </p>
-            </div>
-            <div className="p-6 bg-card rounded-lg border">
-              <h3 className="text-xl font-semibold mb-3">Messages</h3>
-              <p className="text-muted-foreground">
-                Communiquez de manière respectueuse et supervisée
-              </p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-slide-up">
+              <div className="animate-fade-in">
+                <PrayerTimes />
+              </div>
+              <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                <QiblaDirection />
+              </div>
+              <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                <IslamicCalendar />
+              </div>
             </div>
           </div>
         </div>
-      </main>
-    );
-  }
-
-  // Si l'utilisateur n'est pas connecté, afficher la page d'accueil normale
-  return (
-    <div className="min-h-screen bg-background">
-      <EnhancedHeroSection />
-      <FeaturesSection />
-      <TestimonialsSection />
-      <ResourcesSection />
+      </section>
+      <IslamicReminders />
+      <ContactSection />
       <Footer />
     </div>
   );

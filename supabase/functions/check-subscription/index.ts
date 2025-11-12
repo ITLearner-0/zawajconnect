@@ -1,7 +1,6 @@
-
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import Stripe from "https://esm.sh/stripe@14.21.0";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -42,22 +41,13 @@ serve(async (req) => {
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
     const user = userData.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id, emailDomain: user.email.split('@')[1] });
 
-    const stripe = new Stripe(stripeKey, { apiVersion: "2023-10-16" });
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     
     if (customers.data.length === 0) {
       logStep("No customer found, updating unsubscribed state");
-      await supabaseClient.from("subscribers").upsert({
-        email: user.email,
-        user_id: user.id,
-        stripe_customer_id: null,
-        subscribed: false,
-        subscription_tier: null,
-        subscription_end: null,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'email' });
       return new Response(JSON.stringify({ subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,
@@ -65,7 +55,7 @@ serve(async (req) => {
     }
 
     const customerId = customers.data[0].id;
-    logStep("Found Stripe customer", { customerId });
+    logStep("Found Stripe customer", { customerId: `cus_***${customerId.slice(-4)}` });
 
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
@@ -73,45 +63,45 @@ serve(async (req) => {
       limit: 1,
     });
     const hasActiveSub = subscriptions.data.length > 0;
-    let subscriptionTier = null;
+    let productId = null;
     let subscriptionEnd = null;
+    let planDuration = null;
+    let monthsRemaining = null;
 
     if (hasActiveSub) {
       const subscription = subscriptions.data[0];
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
       logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
+      productId = subscription.items.data[0].price.product as string;
       
-      // Determine subscription tier from price
-      const priceId = subscription.items.data[0].price.id;
-      const price = await stripe.prices.retrieve(priceId);
-      const amount = price.unit_amount || 0;
-      if (amount <= 999) {
-        subscriptionTier = "Premium";
-      } else if (amount <= 1999) {
-        subscriptionTier = "VIP";
-      } else {
-        subscriptionTier = "Enterprise";
+      // Get plan duration from metadata
+      planDuration = subscription.metadata?.plan_duration ? parseInt(subscription.metadata.plan_duration) : null;
+      
+      // Calculate months remaining
+      if (subscription.cancel_at) {
+        const now = Math.floor(Date.now() / 1000);
+        const secondsRemaining = subscription.cancel_at - now;
+        monthsRemaining = Math.ceil(secondsRemaining / (30 * 24 * 60 * 60));
+      } else if (planDuration) {
+        const planStart = subscription.metadata?.plan_start_date 
+          ? new Date(subscription.metadata.plan_start_date).getTime() / 1000 
+          : subscription.created;
+        const now = Math.floor(Date.now() / 1000);
+        const monthsElapsed = Math.floor((now - planStart) / (30 * 24 * 60 * 60));
+        monthsRemaining = Math.max(0, planDuration - monthsElapsed);
       }
-      logStep("Determined subscription tier", { priceId, amount, subscriptionTier });
+      
+      logStep("Determined subscription tier", { productId, planDuration, monthsRemaining });
     } else {
       logStep("No active subscription found");
     }
 
-    await supabaseClient.from("subscribers").upsert({
-      email: user.email,
-      user_id: user.id,
-      stripe_customer_id: customerId,
-      subscribed: hasActiveSub,
-      subscription_tier: subscriptionTier,
-      subscription_end: subscriptionEnd,
-      updated_at: new Date().toISOString(),
-    }, { onConflict: 'email' });
-
-    logStep("Updated database with subscription info", { subscribed: hasActiveSub, subscriptionTier });
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
-      subscription_tier: subscriptionTier,
-      subscription_end: subscriptionEnd
+      product_id: productId,
+      subscription_end: subscriptionEnd,
+      plan_duration: planDuration,
+      months_remaining: monthsRemaining
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
@@ -119,7 +109,7 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR in check-subscription", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: "Failed to check subscription" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

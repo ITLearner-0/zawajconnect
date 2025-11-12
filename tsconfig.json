@@ -9,11 +9,14 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "noImplicitAny": false,
-    "noUnusedParameters": false,
-    "skipLibCheck": true,
-    "allowJs": true,
-    "noUnusedLocals": false,
-    "strictNullChecks": false
+    /* Progressive Strict Mode - Phase 1 Active */
+    "noImplicitAny": true,                    // Prevent implicit 'any' types
+    "strictNullChecks": true,                 // Strict null/undefined checks
+    "skipLibCheck": true,                     // Skip lib checks for faster builds
+    "allowJs": true,                          // Allow JS files during migration
+
+    /* Phase 2 - Enable later */
+    "noUnusedParameters": false,              // TODO: Enable after cleanup
+    "noUnusedLocals": false                  // TODO: Enable after cleanup
   }
 }
