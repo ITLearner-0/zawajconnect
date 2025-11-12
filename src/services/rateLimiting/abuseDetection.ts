@@ -34,7 +34,7 @@ export class AbuseDetectionService {
 
     let requestsInLastMinute = 0;
     let requestsInLastHour = 0;
-    let distinctEndpoints = new Set<string>();
+    const distinctEndpoints = new Set<string>();
     let failedAuthAttempts = 0;
 
     for (const [key, entry] of rateLimitState.entries()) {

@@ -1,0 +1,97 @@
+name: Coverage History Tracker
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  track-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Extract coverage data
+        id: coverage
+        run: |
+          LINES=$(grep -oP '"lines":\{"total":\d+,"covered":\d+,"skipped":\d+,"pct":\K[\d.]+' coverage/coverage-summary.json | head -1)
+          STATEMENTS=$(grep -oP '"statements":\{"total":\d+,"covered":\d+,"skipped":\d+,"pct":\K[\d.]+' coverage/coverage-summary.json | head -1)
+          FUNCTIONS=$(grep -oP '"functions":\{"total":\d+,"covered":\d+,"skipped":\d+,"pct":\K[\d.]+' coverage/coverage-summary.json | head -1)
+          BRANCHES=$(grep -oP '"branches":\{"total":\d+,"covered":\d+,"skipped":\d+,"pct":\K[\d.]+' coverage/coverage-summary.json | head -1)
+          
+          echo "lines=$LINES" >> $GITHUB_OUTPUT
+          echo "statements=$STATEMENTS" >> $GITHUB_OUTPUT
+          echo "functions=$FUNCTIONS" >> $GITHUB_OUTPUT
+          echo "branches=$BRANCHES" >> $GITHUB_OUTPUT
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Create gh-pages branch if not exists
+        run: |
+          cd gh-pages
+          if ! git rev-parse --verify gh-pages >/dev/null 2>&1; then
+            git checkout --orphan gh-pages
+            git rm -rf .
+          fi
+
+      - name: Update coverage history
+        run: |
+          cd gh-pages
+          mkdir -p data
+          
+          # Create or update coverage-history.json
+          if [ ! -f data/coverage-history.json ]; then
+            echo "[]" > data/coverage-history.json
+          fi
+          
+          # Add new entry
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          COMMIT_SHA="${{ github.sha }}"
+          COMMIT_MSG=$(git log -1 --pretty=%B $COMMIT_SHA | head -1 | sed 's/"/\\"/g')
+          
+          # Create new entry
+          NEW_ENTRY=$(cat <<EOF
+          {
+            "timestamp": "$TIMESTAMP",
+            "commit": "${COMMIT_SHA:0:7}",
+            "message": "$COMMIT_MSG",
+            "lines": ${{ steps.coverage.outputs.lines }},
+            "statements": ${{ steps.coverage.outputs.statements }},
+            "functions": ${{ steps.coverage.outputs.functions }},
+            "branches": ${{ steps.coverage.outputs.branches }}
+          }
+          EOF
+          )
+          
+          # Append to history (keep last 100 entries)
+          jq --argjson entry "$NEW_ENTRY" '. += [$entry] | .[-100:]' data/coverage-history.json > data/coverage-history.json.tmp
+          mv data/coverage-history.json.tmp data/coverage-history.json
+
+      - name: Commit and push to gh-pages
+        run: |
+          cd gh-pages
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add data/coverage-history.json
+          git commit -m "Update coverage history: ${{ steps.coverage.outputs.lines }}% lines" || echo "No changes to commit"
+          git push origin gh-pages --force

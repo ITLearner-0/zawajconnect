@@ -169,10 +169,10 @@ function calculateCompatibilityScore(
 ): CalculationResult {
   let totalCompatibility = 0;
   let totalWeight = 0;
-  let categoryScores: Record<string, { score: number; weight: number }> = {};
-  let strengths: string[] = [];
-  let differences: string[] = [];
-  let dealbreakers: string[] = [];
+  const categoryScores: Record<string, { score: number; weight: number }> = {};
+  const strengths: string[] = [];
+  const differences: string[] = [];
+  const dealbreakers: string[] = [];
 
   // Category mapping for Islamic compatibility
   const categoryMap: Record<string, string[]> = {

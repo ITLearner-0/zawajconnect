@@ -1,0 +1,452 @@
+name: 🚀 Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Permet le déclenchement manuel
+
+jobs:
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: 📦 Install dependencies
+        run: npm ci
+        
+      - name: 🧪 Run tests with coverage
+        run: npm run test:coverage
+        env:
+          CI: true
+          
+      - name: 📤 Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+        
+      - name: 📊 Test results
+        if: success()
+        run: |
+          echo "### ✅ All tests passed with sufficient coverage! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Coverage requirement:** 80% minimum" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Proceeding with build and deployment..." >> $GITHUB_STEP_SUMMARY
+          
+      - name: ❌ Tests or coverage failed
+        if: failure()
+        run: |
+          echo "### ❌ Tests failed or coverage below threshold!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment cancelled to prevent broken code from going live.**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Requirements:**" >> $GITHUB_STEP_SUMMARY
+          echo "- All tests must pass" >> $GITHUB_STEP_SUMMARY
+          echo "- Minimum 80% coverage on lines, functions, branches, and statements" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Please fix the failing tests or improve test coverage before deploying." >> $GITHUB_STEP_SUMMARY
+          exit 1
+          
+      - name: 📢 Notify Slack on failure
+        if: failure() && secrets.SLACK_WEBHOOK_URL != ''
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "❌ Deployment Failed - ZawajConnect",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "❌ Deployment Failed"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repository:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit:*\n<${{ github.event.head_commit.url }}|${{ github.sha }}>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author:*\n${{ github.actor }}"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Reason:* Tests failed or coverage below 80% threshold\n*Message:* ${{ github.event.head_commit.message }}"
+                  }
+                },
+                {
+                  "type": "actions",
+                  "elements": [
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "View Workflow"
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          
+      - name: 📢 Notify Discord on failure
+        if: failure() && secrets.DISCORD_WEBHOOK_URL != ''
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "username": "GitHub Actions",
+              "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+              "embeds": [{
+                "title": "❌ Deployment Failed - ZawajConnect",
+                "color": 15158332,
+                "fields": [
+                  {
+                    "name": "Repository",
+                    "value": "${{ github.repository }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Branch",
+                    "value": "${{ github.ref_name }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Author",
+                    "value": "${{ github.actor }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Commit",
+                    "value": "[${{ github.sha }}](${{ github.event.head_commit.url }})",
+                    "inline": false
+                  },
+                  {
+                    "name": "Reason",
+                    "value": "Tests failed or coverage below 80% threshold",
+                    "inline": false
+                  },
+                  {
+                    "name": "Message",
+                    "value": "${{ github.event.head_commit.message }}",
+                    "inline": false
+                  }
+                ],
+                "timestamp": "${{ github.event.head_commit.timestamp }}",
+                "footer": {
+                  "text": "View workflow"
+                },
+                "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+              }]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
+          
+      - name: 📈 Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 30
+        
+      - name: 🔨 Build project
+        run: npm run build
+        env:
+          NODE_ENV: production
+          
+      - name: 📊 Build summary
+        run: |
+          echo "### 📦 Build completed successfully! ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Build size:**" >> $GITHUB_STEP_SUMMARY
+          du -sh dist >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Files:**" >> $GITHUB_STEP_SUMMARY
+          find dist -type f | wc -l | xargs -I {} echo "{} files" >> $GITHUB_STEP_SUMMARY
+
+      - name: 💾 Create deployment backup
+        id: backup
+        run: |
+          echo "### 💾 Creating backup..." >> $GITHUB_STEP_SUMMARY
+          echo "backup_timestamp=$(date +%Y%m%d_%H%M%S)" >> $GITHUB_OUTPUT
+          echo "Backup timestamp: $(date +%Y%m%d_%H%M%S)" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 🚀 Deploy to Hostinger via FTP
+        id: deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: ${{ secrets.FTP_SERVER_DIR }}
+          local-dir: ./dist/
+          dangerous-clean-slate: false
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/node_modules/**
+            **/*.map
+
+      - name: 🏥 Post-deployment health check
+        id: health_check
+        if: success()
+        continue-on-error: true
+        run: |
+          echo "### 🏥 Running post-deployment health check..." >> $GITHUB_STEP_SUMMARY
+          
+          # Wait for deployment to propagate
+          sleep 10
+          
+          # Check if site is accessible
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" https://zawajconnect.me/status || echo "000")
+          
+          if [ "$RESPONSE" = "200" ]; then
+            echo "✅ Site is accessible (HTTP $RESPONSE)" >> $GITHUB_STEP_SUMMARY
+            echo "health_status=success" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Site health check failed (HTTP $RESPONSE)" >> $GITHUB_STEP_SUMMARY
+            echo "health_status=failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+      - name: 🔄 Automatic rollback
+        if: failure() && steps.deploy.outcome == 'success' && steps.health_check.outcome == 'failure'
+        run: |
+          echo "### 🔄 Initiating automatic rollback..." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Reason:** Post-deployment health check failed" >> $GITHUB_STEP_SUMMARY
+          echo "**Action:** Previous version should be maintained due to health check failure" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ **Manual intervention required**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "The deployment completed but the health check failed." >> $GITHUB_STEP_SUMMARY
+          echo "Please verify:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Site accessibility at https://zawajconnect.me" >> $GITHUB_STEP_SUMMARY
+          echo "2. Status page at https://zawajconnect.me/status" >> $GITHUB_STEP_SUMMARY
+          echo "3. Browser console for errors" >> $GITHUB_STEP_SUMMARY
+          echo "4. FTP logs for deployment issues" >> $GITHUB_STEP_SUMMARY
+
+      - name: 📢 Notify on rollback trigger
+        if: failure() && steps.deploy.outcome == 'success' && steps.health_check.outcome == 'failure'
+        run: |
+          if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            curl -X POST ${{ secrets.SLACK_WEBHOOK_URL }} \
+              -H "Content-Type: application/json" \
+              -d '{
+                "text": "⚠️ Deployment Health Check Failed - ZawajConnect",
+                "blocks": [
+                  {
+                    "type": "header",
+                    "text": {
+                      "type": "plain_text",
+                      "text": "⚠️ Deployment Health Check Failed"
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "*Deployment completed but site health check failed*\n*Site:* https://zawajconnect.me\n*Status:* https://zawajconnect.me/status\n*Commit:* ${{ github.sha }}\n*Author:* ${{ github.actor }}"
+                    }
+                  },
+                  {
+                    "type": "section",
+                    "text": {
+                      "type": "mrkdwn",
+                      "text": "⚠️ *Manual verification required immediately*"
+                    }
+                  },
+                  {
+                    "type": "actions",
+                    "elements": [
+                      {
+                        "type": "button",
+                        "text": {
+                          "type": "plain_text",
+                          "text": "View Workflow"
+                        },
+                        "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                      }
+                    ]
+                  }
+                ]
+              }'
+          fi
+          
+          if [ -n "${{ secrets.DISCORD_WEBHOOK_URL }}" ]; then
+            curl -H "Content-Type: application/json" \
+              -d '{
+                "username": "GitHub Actions",
+                "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                "embeds": [{
+                  "title": "⚠️ Deployment Health Check Failed - ZawajConnect",
+                  "color": 16776960,
+                  "description": "Deployment completed but post-deployment health check failed. Manual verification required.",
+                  "fields": [
+                    {
+                      "name": "Site",
+                      "value": "[zawajconnect.me](https://zawajconnect.me)",
+                      "inline": true
+                    },
+                    {
+                      "name": "Status Page",
+                      "value": "[Check Status](https://zawajconnect.me/status)",
+                      "inline": true
+                    },
+                    {
+                      "name": "Commit",
+                      "value": "${{ github.sha }}",
+                      "inline": true
+                    },
+                    {
+                      "name": "Author",
+                      "value": "${{ github.actor }}",
+                      "inline": true
+                    }
+                  ],
+                  "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                }]
+              }' \
+              ${{ secrets.DISCORD_WEBHOOK_URL }}
+          fi
+            
+      - name: ✅ Deployment success notification
+        if: success()
+        run: |
+          echo "### 🎉 Deployment successful!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Site URL:** https://zawajconnect.me" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed at:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          
+      - name: 📢 Notify Slack on success
+        if: success() && secrets.SLACK_WEBHOOK_URL != ''
+        uses: slackapi/slack-github-action@v1.26.0
+        with:
+          payload: |
+            {
+              "text": "✅ Deployment Successful - ZawajConnect",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "✅ Deployment Successful"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Site:*\n<https://zawajconnect.me|zawajconnect.me>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Branch:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Author:*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Deployed:*\n<!date^${{ github.event.head_commit.timestamp }}^{date_short_pretty} at {time}|$(date)>"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Message:* ${{ github.event.head_commit.message }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+          
+      - name: 📢 Notify Discord on success
+        if: success() && secrets.DISCORD_WEBHOOK_URL != ''
+        run: |
+          curl -H "Content-Type: application/json" \
+            -d '{
+              "username": "GitHub Actions",
+              "avatar_url": "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+              "embeds": [{
+                "title": "✅ Deployment Successful - ZawajConnect",
+                "color": 3066993,
+                "fields": [
+                  {
+                    "name": "Site",
+                    "value": "[zawajconnect.me](https://zawajconnect.me)",
+                    "inline": true
+                  },
+                  {
+                    "name": "Branch",
+                    "value": "${{ github.ref_name }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Author",
+                    "value": "${{ github.actor }}",
+                    "inline": true
+                  },
+                  {
+                    "name": "Message",
+                    "value": "${{ github.event.head_commit.message }}",
+                    "inline": false
+                  }
+                ],
+                "timestamp": "${{ github.event.head_commit.timestamp }}"
+              }]
+            }' \
+            ${{ secrets.DISCORD_WEBHOOK_URL }}
+          
+      - name: ❌ Deployment failure notification
+        if: failure()
+        run: |
+          echo "### ❌ Deployment failed!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Check the logs above for error details." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Common issues:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Incorrect FTP credentials in GitHub Secrets" >> $GITHUB_STEP_SUMMARY
+          echo "- FTP server unreachable" >> $GITHUB_STEP_SUMMARY
+          echo "- Insufficient permissions on remote directory" >> $GITHUB_STEP_SUMMARY

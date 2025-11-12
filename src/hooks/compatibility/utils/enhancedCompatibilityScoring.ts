@@ -20,10 +20,10 @@ export function calculateEnhancedCompatibilityScore(
 
   let totalCompatibility = 0;
   let totalWeight = 0;
-  let categoryScores: Record<string, { score: number; weight: number }> = {};
-  let strengths: string[] = [];
-  let differences: string[] = [];
-  let dealbreakers: string[] = [];
+  const categoryScores: Record<string, { score: number; weight: number }> = {};
+  const strengths: string[] = [];
+  const differences: string[] = [];
+  const dealbreakers: string[] = [];
   let hasDealbreaker = false;
 
   // Enhanced scoring algorithm with Islamic values emphasis
@@ -38,7 +38,7 @@ export function calculateEnhancedCompatibilityScore(
     
     // Calculate compatibility with Islamic emphasis
     const rawDifference = Math.abs(myAnswer.value - otherAnswer.value);
-    let compatibility = calculateCategoryCompatibility(questionObj, rawDifference);
+    const compatibility = calculateCategoryCompatibility(questionObj, rawDifference);
     
     // Category tracking
     if (!categoryScores[category]) {

@@ -26,7 +26,7 @@ export const useBatchLoading = (options: UseBatchLoadingOptions = {}) => {
     processingRef.current = true;
 
     // Sort queue by priority if enabled
-    let queueToProcess = [...state.loadingQueue];
+    const queueToProcess = [...state.loadingQueue];
     
     if (enablePriorityQueue) {
       queueToProcess.sort((a, b) => {
