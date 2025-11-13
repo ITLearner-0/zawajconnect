@@ -33,7 +33,7 @@ export const usePrivacyManagement = ({ userId, initialPrivacySettings }: UsePriv
     try {
       const updatedSettings = { ...privacySettings, ...newSettings };
       
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('profiles')
         .update({ privacy_settings: updatedSettings })
         .eq('id', userId)
@@ -47,7 +47,7 @@ export const usePrivacyManagement = ({ userId, initialPrivacySettings }: UsePriv
       }
 
       // Type assertion to ensure correct typing
-      setPrivacySettings(data.privacy_settings as PrivacySettings);
+      setPrivacySettings((data as any).privacy_settings as PrivacySettings);
       return true;
     } catch (err: any) {
       console.error('Error updating privacy settings:', err);

@@ -13,7 +13,7 @@ export const useBlockedUsers = (userId: string | null) => {
 
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('profiles')
         .select('blocked_users')
         .eq('id', userId)
@@ -24,7 +24,7 @@ export const useBlockedUsers = (userId: string | null) => {
         return;
       }
 
-      setBlockedUsers(data.blocked_users || []);
+      setBlockedUsers((data as any).blocked_users || []);
     } catch (err) {
       console.error('Unexpected error fetching blocked users:', err);
     } finally {
@@ -47,7 +47,7 @@ export const useBlockedUsers = (userId: string | null) => {
       // Filter out the user ID to unblock
       const updatedBlockedList = blockedUsers.filter(id => id !== userIdToUnblock);
       
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({ blocked_users: updatedBlockedList })
         .eq('id', userId);

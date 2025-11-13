@@ -82,7 +82,7 @@ export const useProfileAnalytics = (userId?: string) => {
       ];
 
       const completedFields = requiredFields.filter(field => 
-        profile[field] && profile[field].toString().trim() !== ''
+        (profile as any)[field] && (profile as any)[field].toString().trim() !== ''
       );
 
       return Math.round((completedFields.length / requiredFields.length) * 100);

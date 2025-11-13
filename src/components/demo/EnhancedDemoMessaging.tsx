@@ -88,7 +88,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
       "MashaAllah, vos valeurs semblent bien ancrées. Comment les mettez-vous en pratique au quotidien ?",
       "Qu'Allah vous bénisse. Cette conversation me permet de mieux comprendre votre personnalité."
     ];
-    return responses[Math.floor(Math.random() * responses.length)] || responses[0];
+    return (responses[Math.floor(Math.random() * responses.length)] || responses[0]) as string;
   };
 
   const formatTime = (dateString: string) => {

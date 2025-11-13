@@ -25,9 +25,10 @@ export const validateProfileForm = (data: Partial<ProfileFormValues>) => {
     return { isValid: true, errors: {} };
   } catch (error) {
     if (error instanceof z.ZodError) {
+      const zodError = error as z.ZodError<any>;
       return { 
         isValid: false, 
-        errors: error.errors.reduce((acc, err) => {
+        errors: zodError.issues.reduce((acc: Record<string, string>, err: any) => {
           acc[err.path[0]] = err.message;
           return acc;
         }, {} as Record<string, string>)

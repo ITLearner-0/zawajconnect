@@ -11,17 +11,17 @@ export class ProgressiveRevealService {
   ): Promise<keyof ProgressiveRevealSettings['revealStages']> {
     try {
       // Get target user's progressive reveal settings
-      const { data: targetProfile } = await supabase
+      const { data: targetProfile } = await (supabase as any)
         .from('profiles')
         .select('privacy_settings')
         .eq('id', targetUserId)
         .single();
 
-      if (!targetProfile?.privacy_settings?.progressiveReveal?.enabled) {
+      if (!(targetProfile as any)?.privacy_settings?.progressiveReveal?.enabled) {
         return 'contact'; // Full reveal if not enabled
       }
 
-      const settings = targetProfile.privacy_settings.progressiveReveal;
+      const settings = (targetProfile as any).privacy_settings.progressiveReveal;
 
       // Check compatibility score requirement
       if (compatibilityScore && compatibilityScore >= settings.requiresCompatibilityScore) {
@@ -48,7 +48,7 @@ export class ProgressiveRevealService {
 
   async getConversationDuration(userId1: string, userId2: string): Promise<number> {
     try {
-      const { data: conversation } = await supabase
+      const { data: conversation } = await (supabase as any)
         .from('conversations')
         .select('created_at')
         .contains('participants', [userId1])
@@ -57,7 +57,7 @@ export class ProgressiveRevealService {
 
       if (!conversation) return 0;
 
-      const createdAt = new Date(conversation.created_at);
+      const createdAt = new Date((conversation as any).created_at);
       const now = new Date();
       const diffTime = Math.abs(now.getTime() - createdAt.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -69,7 +69,7 @@ export class ProgressiveRevealService {
     }
   }
 
-  filterProfileData(profile: any, revealLevel: keyof ProgressiveRevealSettings['revealStages']) {
+  filterProfileData(profile: any, revealLevel: keyof ProgressiveRevealSettings['revealStages']): any {
     const filtered = { ...profile };
 
     switch (revealLevel) {

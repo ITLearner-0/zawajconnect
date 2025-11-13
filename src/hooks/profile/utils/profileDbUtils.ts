@@ -9,7 +9,7 @@ export const fetchProfileFromDb = async (userId: string) => {
 };
 
 export const createNewProfile = async (userId: string) => {
-  return await supabase
+  return await (supabase as any)
     .from('profiles')
     .insert({
       id: userId,

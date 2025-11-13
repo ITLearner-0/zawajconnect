@@ -125,7 +125,7 @@ export const useProfileSubmission = () => {
 
       if (dbError) {
         console.error("Database error:", dbError);
-        throw new Error(`Erreur de base de données: ${dbError.message}`);
+        throw new Error(`Erreur de base de données: ${(dbError as any).message}`);
       }
 
       if (!data) {

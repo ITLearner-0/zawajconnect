@@ -74,7 +74,7 @@ export const useProfileFetcher = (userId?: string | null) => {
           console.log("No profile found, creating new profile for user:", userId);
           setIsNewUser(true);
           
-          const { error: createError } = await supabase
+          const { error: createError } = await (supabase as any)
             .from('profiles')
             .insert({
               id: userId,
@@ -120,22 +120,22 @@ export const useProfileFetcher = (userId?: string | null) => {
           console.log("Found existing profile:", profile);
           
           const mappedData: ProfileFormData = {
-            fullName: `${profile.first_name || ''} ${profile.last_name || ''}`.trim(),
-            age: profile.birth_date || '',
-            gender: profile.gender || '',
-            location: profile.location || '',
-            education: profile.education_level || '',
-            occupation: profile.occupation || '',
-            religiousLevel: profile.religious_practice_level || '',
+            fullName: `${(profile as any).first_name || ''} ${(profile as any).last_name || ''}`.trim(),
+            age: (profile as any).birth_date || '',
+            gender: (profile as any).gender || '',
+            location: (profile as any).location || '',
+            education: (profile as any).education_level || '',
+            occupation: (profile as any).occupation || '',
+            religiousLevel: (profile as any).religious_practice_level || '',
             familyBackground: '',
-            aboutMe: profile.about_me || '',
-            prayerFrequency: profile.prayer_frequency || '',
-            polygamyStance: profile.polygamy_stance || '',
-            waliName: profile.wali_name || '',
-            waliRelationship: profile.wali_relationship || '',
-            waliContact: profile.wali_contact || '',
-            profilePicture: profile.profile_picture || '',
-            gallery: profile.gallery || []
+            aboutMe: (profile as any).about_me || '',
+            prayerFrequency: (profile as any).prayer_frequency || '',
+            polygamyStance: (profile as any).polygamy_stance || '',
+            waliName: (profile as any).wali_name || '',
+            waliRelationship: (profile as any).wali_relationship || '',
+            waliContact: (profile as any).wali_contact || '',
+            profilePicture: (profile as any).profile_picture || '',
+            gallery: (profile as any).gallery || []
           };
 
           console.log("Mapped profile data:", mappedData);
@@ -144,21 +144,21 @@ export const useProfileFetcher = (userId?: string | null) => {
 
           // Set verification status
           setVerificationStatus({
-            email: profile.email_verified || false,
-            phone: profile.phone_verified || false,
-            id: profile.id_verified || false,
-            wali: profile.wali_verified || false
+            email: (profile as any).email_verified || false,
+            phone: (profile as any).phone_verified || false,
+            id: (profile as any).id_verified || false,
+            wali: (profile as any).wali_verified || false
           });
 
           // Set privacy settings with fallback to defaults
-          const privacyData = profile.privacy_settings as PrivacySettings || DEFAULT_PRIVACY_SETTINGS;
+          const privacyData = (profile as any).privacy_settings as PrivacySettings || DEFAULT_PRIVACY_SETTINGS;
           setPrivacySettings(privacyData);
 
           // Set blocked users
-          setBlockedUsers(profile.blocked_users || []);
+          setBlockedUsers((profile as any).blocked_users || []);
           
           // Set account visibility
-          setIsAccountVisible(profile.is_visible !== false);
+          setIsAccountVisible((profile as any).is_visible !== false);
         }
       } catch (err: any) {
         console.error("Error in profile fetch:", err);

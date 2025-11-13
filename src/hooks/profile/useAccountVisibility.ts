@@ -37,7 +37,7 @@ export const useAccountVisibility = ({
       console.error("Error ensuring is_visible column exists:", err);
     }
     
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("profiles")
       .update({ is_visible: newVisibilityState })
       .eq("id", userId);

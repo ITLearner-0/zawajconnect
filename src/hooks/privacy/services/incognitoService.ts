@@ -11,7 +11,7 @@ export class IncognitoService {
       this.incognitoUsers.add(userId);
       
       // Update user's privacy settings
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({
           privacy_settings: {
@@ -45,7 +45,7 @@ export class IncognitoService {
       this.incognitoUsers.delete(userId);
       
       // Update user's privacy settings
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({
           privacy_settings: {
@@ -76,13 +76,13 @@ export class IncognitoService {
 
   async checkIncognitoStatus(userId: string): Promise<boolean> {
     try {
-      const { data: profile } = await supabase
+      const { data: profile } = await (supabase as any)
         .from('profiles')
         .select('privacy_settings')
         .eq('id', userId)
         .single();
 
-      return profile?.privacy_settings?.incognito?.enabled || false;
+      return (profile as any)?.privacy_settings?.incognito?.enabled || false;
     } catch (error) {
       console.error('Error checking incognito status:', error);
       return false;
@@ -91,19 +91,19 @@ export class IncognitoService {
 
   async checkDailyViewLimit(viewerId: string, targetUserId: string): Promise<boolean> {
     try {
-      const { data: viewerProfile } = await supabase
+      const { data: viewerProfile } = await (supabase as any)
         .from('profiles')
         .select('privacy_settings')
         .eq('id', viewerId)
         .single();
 
-      const incognitoSettings = viewerProfile?.privacy_settings?.incognito;
+      const incognitoSettings = (viewerProfile as any)?.privacy_settings?.incognito;
       
       if (!incognitoSettings?.limitProfileViews) {
         return true; // No limit set
       }
 
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split('T')[0] as string;
       const userViewData = this.dailyViewCounts.get(viewerId);
 
       if (!userViewData || userViewData.date !== today) {
@@ -128,7 +128,7 @@ export class IncognitoService {
 
   async hideFromSearchResults(userId: string): Promise<boolean> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({ is_visible: false })
         .eq('id', userId);
@@ -147,7 +147,7 @@ export class IncognitoService {
 
   async showInSearchResults(userId: string): Promise<boolean> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({ is_visible: true })
         .eq('id', userId);
@@ -181,7 +181,7 @@ export class IncognitoService {
 
     // Return actual last active time
     try {
-      const { data: session } = await supabase
+      const { data: session } = await (supabase as any)
         .from('user_sessions')
         .select('last_activity')
         .eq('user_id', userId)

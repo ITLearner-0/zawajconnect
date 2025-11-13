@@ -69,7 +69,7 @@ export const useEnhancedPrivacy = (userId?: string) => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('profiles')
         .select('privacy_settings')
         .eq('id', userId)
@@ -79,10 +79,10 @@ export const useEnhancedPrivacy = (userId?: string) => {
         throw new Error(error.message);
       }
 
-      if (data?.privacy_settings) {
-        const settings = typeof data.privacy_settings === 'string' 
-          ? JSON.parse(data.privacy_settings) 
-          : data.privacy_settings;
+      if ((data as any)?.privacy_settings) {
+        const settings = typeof (data as any).privacy_settings === 'string' 
+          ? JSON.parse((data as any).privacy_settings) 
+          : (data as any).privacy_settings;
         
         // Merge with defaults to ensure all fields exist
         setPrivacySettings({
@@ -105,7 +105,7 @@ export const useEnhancedPrivacy = (userId?: string) => {
       // Convert to a plain object that Supabase can handle
       const settingsJson = JSON.parse(JSON.stringify(newSettings));
       
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({ privacy_settings: settingsJson })
         .eq('id', userId);
@@ -201,7 +201,7 @@ export const useEnhancedPrivacy = (userId?: string) => {
 
       case 'matches_only':
         // Would need to check if users are matches
-        return compatibilityScore && compatibilityScore >= 60;
+        return !!(compatibilityScore && compatibilityScore >= 60);
 
       case 'verified_only':
         return viewerProfile?.email_verified || viewerProfile?.phone_verified || viewerProfile?.id_verified;
