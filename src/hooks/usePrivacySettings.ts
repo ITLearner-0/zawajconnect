@@ -63,11 +63,11 @@ export const usePrivacySettings = () => {
       }
       
       // Set privacy settings if they exist
-      if (profile?.privacy_settings) {
+      if ((profile as any)?.privacy_settings) {
         try {
-          const settings = typeof profile.privacy_settings === 'string' 
-            ? JSON.parse(profile.privacy_settings) 
-            : profile.privacy_settings;
+          const settings = typeof (profile as any).privacy_settings === 'string' 
+            ? JSON.parse((profile as any).privacy_settings) 
+            : (profile as any).privacy_settings;
           
           setPrivacySettings(settings);
         } catch (e) {
@@ -77,12 +77,12 @@ export const usePrivacySettings = () => {
       }
       
       // Set blocked users if they exist
-      if (profile?.blocked_users) {
+      if ((profile as any)?.blocked_users) {
         try {
-          const blockedList = Array.isArray(profile.blocked_users)
-            ? profile.blocked_users
-            : typeof profile.blocked_users === 'string'
-              ? JSON.parse(profile.blocked_users)
+          const blockedList = Array.isArray((profile as any).blocked_users)
+            ? (profile as any).blocked_users
+            : typeof (profile as any).blocked_users === 'string'
+              ? JSON.parse((profile as any).blocked_users)
               : [];
           
           setBlockedUsers(blockedList);
@@ -93,7 +93,7 @@ export const usePrivacySettings = () => {
       }
       
       // Set account visibility
-      setIsAccountVisible(profile?.is_visible !== false);
+      setIsAccountVisible((profile as any)?.is_visible !== false);
       
       setLoading(false);
     };
