@@ -43,12 +43,12 @@ export const useProfilePageLogic = () => {
   });
 
   // Analytics and recommendations - use userId instead of userEmail
-  const { analytics, loading: analyticsLoading } = useProfileAnalytics(userId);
+  const { analytics, loading: analyticsLoading } = useProfileAnalytics(userId ?? undefined);
   const { 
     recommendations, 
     loading: recommendationsLoading, 
     handleRecommendationAction 
-  } = useProfileRecommendations(userId);
+  } = useProfileRecommendations(userId ?? undefined);
   
   const {
     isOnboarding,
@@ -77,7 +77,7 @@ export const useProfilePageLogic = () => {
       
       try {
         console.log("Checking compatibility results for user:", userId);
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from('compatibility_results')
           .select('id')
           .eq('user_id', userId)
