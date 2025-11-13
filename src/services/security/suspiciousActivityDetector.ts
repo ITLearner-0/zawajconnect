@@ -111,7 +111,11 @@ export class SuspiciousActivityDetector {
     const threshold = 1000; // 1 second
 
     for (let i = 1; i < activities.length; i++) {
-      const timeDiff = activities[i].timestamp - activities[i - 1].timestamp;
+      const current = activities[i];
+      const previous = activities[i - 1];
+      if (!current || !previous) continue;
+      
+      const timeDiff = current.timestamp - previous.timestamp;
       if (timeDiff < threshold) {
         rapidCount++;
       }

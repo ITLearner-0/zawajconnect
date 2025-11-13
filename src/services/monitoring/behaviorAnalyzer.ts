@@ -16,9 +16,11 @@ export function analyzeBehavior(messages: Message[]): number {
   const flaggedWords = ['meet', 'alone', 'secret', 'private'];
   
   // Calculate time difference for rapid message detection
-  const patternOfRapidMessages = messages.length > 10 && (
-    new Date(messages[messages.length - 1].created_at).valueOf() - 
-    new Date(messages[messages.length - 10].created_at).valueOf()
+  const lastMsg = messages[messages.length - 1];
+  const tenthLastMsg = messages[messages.length - 10];
+  const patternOfRapidMessages = messages.length > 10 && lastMsg && tenthLastMsg && (
+    new Date(lastMsg.created_at).valueOf() - 
+    new Date(tenthLastMsg.created_at).valueOf()
   ) < 60000; // 10 messages in less than a minute
   
   // Check for flagged words

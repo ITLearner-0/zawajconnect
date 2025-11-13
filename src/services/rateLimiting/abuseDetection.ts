@@ -41,6 +41,8 @@ export class AbuseDetectionService {
       if (!key.startsWith(`${userId}:`)) continue;
 
       const endpoint = key.split(':')[1];
+      if (!endpoint) continue;
+      
       distinctEndpoints.add(endpoint);
 
       if (now - entry.windowStart < oneMinute) {

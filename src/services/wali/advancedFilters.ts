@@ -50,9 +50,9 @@ export interface FilterAction {
 export class AdvancedFiltersService {
   static async createFilter(filterData: Omit<WaliFilter, 'id' | 'created_at' | 'updated_at'>): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('wali_filters')
-        .insert(filterData);
+        .insert(filterData as any);
 
       if (error) throw error;
       return { success: true };
@@ -64,7 +64,7 @@ export class AdvancedFiltersService {
 
   static async getFilters(wali_id: string): Promise<WaliFilter[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_filters')
         .select('*')
         .eq('wali_id', wali_id)
@@ -72,7 +72,7 @@ export class AdvancedFiltersService {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data || [];
+      return (data as WaliFilter[]) || [];
     } catch (error) {
       console.error('Error fetching filters:', error);
       return [];
@@ -81,9 +81,9 @@ export class AdvancedFiltersService {
 
   static async updateFilter(filterId: string, updates: Partial<WaliFilter>): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('wali_filters')
-        .update({ ...updates, updated_at: new Date().toISOString() })
+        .update({ ...updates, updated_at: new Date().toISOString() } as any)
         .eq('id', filterId);
 
       if (error) throw error;

@@ -201,7 +201,7 @@ const ProfilePage = () => {
               <ProfileHeader
                 userEmail={userEmail}
                 userId={userId}
-                hasCompatibilityResults={hasCompatibilityResults}
+                hasCompatibilityResults={hasCompatibilityResults ?? undefined}
                 onSignOut={handleSignOut}
               />
             </CardHeader>
