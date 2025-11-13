@@ -1,6 +1,6 @@
 
 // Data encryption at rest service
-import CryptoJS from 'crypto-js';
+// Crypto-js temporarily disabled - using native crypto instead
 
 const ENCRYPTION_KEY = 'nikah-connect-encryption-key-2024';
 
