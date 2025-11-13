@@ -55,6 +55,7 @@ const FamilyAccessPortal = lazy(() => import('@/components/FamilyAccessPortal'))
 const FamilySupervisionPanel = lazy(() => import('@/components/FamilySupervisionPanel'));
 const WaliMonitoring = lazy(() => import('@/pages/WaliMonitoring'));
 const AdminWaliAlerts = lazy(() => import('@/pages/AdminWaliAlerts'));
+const AdminWaliAlertsDashboard = lazy(() => import('@/pages/AdminWaliAlertsDashboard'));
 
 // Islamic tools
 const IslamicTools = lazy(() => import('@/pages/IslamicTools'));
@@ -137,7 +138,7 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/admin', component: Admin },
   { path: '/ab-testing', component: ABTestingDashboard },
   { path: '/admin/user/:userId', component: AdminUserProfile },
-  { path: '/admin/wali-alerts', component: AdminWaliAlerts },
+  { path: '/admin/wali-alerts', component: AdminWaliAlertsDashboard },
   { path: '/moderation-test', component: ModerationTest },
   { path: '/wali-dashboard', component: WaliDashboard },
   { path: '/wali-monitoring', component: WaliMonitoring },
