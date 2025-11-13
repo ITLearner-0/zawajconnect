@@ -185,13 +185,15 @@ export class SecurityAuditLogger {
         byHour: Array(24).fill(0)
       };
 
-      data.forEach(event => {
+      data.forEach((event: any) => {
         // Count by type
         stats.byType[event.event_type] = (stats.byType[event.event_type] || 0) + 1;
         
         // Count by hour
-        const hour = new Date(event.created_at).getHours();
-        stats.byHour[hour]++;
+        if (event.created_at) {
+          const hour = new Date(event.created_at).getHours();
+          stats.byHour[hour]++;
+        }
       });
 
       return stats;

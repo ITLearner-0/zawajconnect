@@ -34,7 +34,7 @@ export const findNearbyProfiles = async (
     // Convert to Profile format and add mock coordinates
     const nearbyProfiles: Profile[] = filteredProfiles.map((profile: any, index: number) => {
       // Calculate age from birth_date if available
-      let age = null;
+      let age: number | undefined = undefined;
       if (profile.birth_date) {
         const birthDate = new Date(profile.birth_date);
         const today = new Date();

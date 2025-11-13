@@ -125,7 +125,7 @@ export class QueryOptimizer {
    */
   static async getUnreadNotifications(userId: string, limit: number = 20) {
     // Uses idx_match_notifications_user_unread composite index
-    return await supabase
+    return await (supabase as any)
       .from('match_notifications')
       .select('*')
       .eq('user_id', userId)
@@ -139,7 +139,7 @@ export class QueryOptimizer {
    */
   static async getPendingChatRequests(recipientId: string) {
     // Uses idx_chat_requests_recipient_id and idx_chat_requests_status
-    return await supabase
+    return await (supabase as any)
       .from('chat_requests')
       .select('*')
       .eq('recipient_id', recipientId)
@@ -152,7 +152,7 @@ export class QueryOptimizer {
    */
   static async getWaliChatRequests(waliId: string) {
     // Uses idx_chat_requests_wali_id
-    return await supabase
+    return await (supabase as any)
       .from('chat_requests')
       .select('*')
       .eq('wali_id', waliId)
@@ -197,9 +197,9 @@ export class QueryOptimizer {
       return { data: null, error: initiatedCalls.error || receivedCalls.error };
     }
 
-    // Combine and sort by started_at
+    // Combine and sort by created_at (fallback since started_at might not exist)
     const allCalls = [...(initiatedCalls.data || []), ...(receivedCalls.data || [])]
-      .sort((a, b) => new Date(b.started_at || '').getTime() - new Date(a.started_at || '').getTime())
+      .sort((a: any, b: any) => new Date(b.created_at || '').getTime() - new Date(a.created_at || '').getTime())
       .slice(0, limit);
 
     return { data: allCalls, error: null };
