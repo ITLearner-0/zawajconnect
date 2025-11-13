@@ -64,7 +64,7 @@ export const useMessageHandling = (conversationId?: string, currentUserId?: stri
         
         if (dummyMessages[demoConvId]) {
           console.log('Using demo messages for:', demoConvId);
-          setMessages(dummyMessages[demoConvId]);
+          setMessages(dummyMessages[demoConvId] || []);
         } else {
           console.log('No demo messages found for:', demoConvId);
           setMessages([]);
@@ -183,7 +183,7 @@ export const useMessageHandling = (conversationId?: string, currentUserId?: stri
       
       // Create a new message
       const newMessage = {
-        conversation_id: conversationId,
+        match_id: conversationId,
         sender_id: currentUserId,
         content: messageInput,
         created_at: new Date().toISOString(),
@@ -191,9 +191,9 @@ export const useMessageHandling = (conversationId?: string, currentUserId?: stri
         is_wali_visible: true
       };
       
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('messages')
-        .insert(newMessage);
+        .insert([newMessage]);
         
       if (error) {
         console.error('Error sending message:', error);

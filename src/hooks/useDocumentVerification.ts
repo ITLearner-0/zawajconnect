@@ -14,7 +14,7 @@ export const useDocumentVerification = (userId?: string) => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('document_verifications')
         .select('*')
         .eq('user_id', userId)
@@ -22,7 +22,7 @@ export const useDocumentVerification = (userId?: string) => {
 
       if (error) throw error;
       
-      setVerifications(data || []);
+      setVerifications((data as any) || []);
     } catch (error) {
       console.error('Error fetching document verifications:', error);
       toast({

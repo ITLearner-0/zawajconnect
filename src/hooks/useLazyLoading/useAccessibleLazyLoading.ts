@@ -42,7 +42,7 @@ export const useAccessibleLazyLoading = <T extends HTMLElement = HTMLDivElement>
 
   // Announce loading states for screen readers
   useEffect(() => {
-    if (!announceLoading) return;
+    if (!announceLoading) return undefined;
 
     if (isIntersecting && shouldLoad) {
       setAnnouncement('Loading content');
@@ -54,6 +54,7 @@ export const useAccessibleLazyLoading = <T extends HTMLElement = HTMLDivElement>
 
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isIntersecting, shouldLoad, announceLoading]);
 
   return {

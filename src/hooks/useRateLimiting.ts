@@ -27,14 +27,12 @@ export const useRateLimiting = () => {
       
       if (!result.allowed) {
         // Log rate limit violation
-        await supabase.rpc('log_security_event', {
+        await (supabase as any).rpc('log_security_event', {
           p_user_id: user.id,
-          p_action: 'rate_limit_exceeded',
-          p_resource_type: 'rate_limit',
-          p_resource_id: action,
-          p_success: false,
-          p_risk_level: 'medium',
-          p_details: {
+          p_event_type: 'rate_limit_exceeded',
+          p_description: `Rate limit exceeded for action: ${action}`,
+          p_severity: 'medium',
+          p_metadata: {
             action,
             remaining: result.remaining,
             reset_time: result.resetTime,

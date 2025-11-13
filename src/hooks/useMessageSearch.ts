@@ -63,7 +63,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
       }
 
       // Get all conversations that the user is part of
-      const { data: conversations, error: convError } = await supabase
+      const { data: conversations, error: convError } = await (supabase as any)
         .from('conversations')
         .select('id, participants')
         .contains('participants', [currentUserId]);
@@ -79,7 +79,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
       }
 
       // Get conversation IDs
-      const conversationIds = conversations.map(conv => conv.id);
+      const conversationIds = conversations.map((conv: any) => conv.id);
 
       // Search for messages containing the search term in these conversations
       const { data: messagesData, error: msgError } = await supabase
@@ -101,7 +101,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
         // Build a map of conversation participants
         const participantsMap = new Map();
         
-        conversations.forEach(conv => {
+        conversations.forEach((conv: any) => {
           participantsMap.set(conv.id, conv.participants);
         });
 
@@ -111,7 +111,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
           
           // Get the other participant in this conversation
           const participants = participantsMap.get(message.conversation_id) || [];
-          const otherParticipantId = participants.find(id => id !== currentUserId);
+          const otherParticipantId = participants.find((id: any) => id !== currentUserId);
           
           if (otherParticipantId) {
             // Fetch the other participant's profile
@@ -124,7 +124,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
             results.push({
               message,
               conversationId: message.conversation_id,
-              otherParticipantName: profile ? `${profile.first_name} ${profile.last_name}` : 'Unknown User'
+              otherParticipantName: profile ? `${(profile as any).first_name} ${(profile as any).last_name}` : 'Unknown User'
             });
           } else {
             // No other participant found

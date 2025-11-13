@@ -40,7 +40,7 @@ export const useDemoMessages = (conversationId: string | undefined) => {
       
       if (dummyMessages[demoConvId]) {
         console.log(`Loading demo messages for ${demoConvId}`);
-        setDemoMessages(dummyMessages[demoConvId]);
+        setDemoMessages(dummyMessages[demoConvId] || []);
       } else {
         console.log(`No demo messages found for ${demoConvId}, available conversations:`, Object.keys(dummyMessages));
         // Default to empty array if no messages found

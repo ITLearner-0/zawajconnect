@@ -60,7 +60,7 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
     sendMessage: sendMessageBase
   } = useMessageHandling(conversationId, currentUserId);
 
-  const { violations } = useMessageModeration(conversationId, messages, currentUserId);
+  const { violations } = useMessageModeration(conversationId, messages, currentUserId ?? null);
 
   // Load current conversation when conversationId changes
   useEffect(() => {

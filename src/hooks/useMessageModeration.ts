@@ -60,7 +60,7 @@ export const useMessageModeration = (
       
       // Alert about high severity violations
       const highSeverityViolations = newViolations.filter(v => v.severity === 'high');
-      if (highSeverityViolations.length > 0) {
+      if (highSeverityViolations.length > 0 && highSeverityViolations[0]) {
         toast({
           title: "Compliance Alert",
           description: highSeverityViolations[0].message,
