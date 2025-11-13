@@ -82,7 +82,7 @@ export class AppealSystem {
 
   static async getUserAppeals(userId: string): Promise<Appeal[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('moderation_appeals')
         .select(`
           *,
@@ -96,7 +96,7 @@ export class AppealSystem {
         return [];
       }
 
-      return data.map(appeal => ({
+      return (data || []).map((appeal: any) => ({
         id: appeal.id,
         userId: appeal.user_id,
         moderationActionId: appeal.moderation_action_id,
@@ -107,9 +107,9 @@ export class AppealSystem {
         reviewedAt: appeal.reviewed_at,
         reviewerNotes: appeal.reviewer_notes,
         originalAction: {
-          type: appeal.moderation_actions.action_type,
-          reason: appeal.moderation_actions.reason,
-          evidence: appeal.moderation_actions.evidence || []
+          type: appeal.moderation_actions?.action_type || 'warning',
+          reason: appeal.moderation_actions?.reason || '',
+          evidence: appeal.moderation_actions?.evidence || []
         }
       }));
     } catch (error) {
@@ -125,7 +125,7 @@ export class AppealSystem {
     reviewerNotes: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('moderation_appeals')
         .update({
           status: decision,
@@ -163,7 +163,7 @@ export class AppealSystem {
   private static async reverseModeration(appealId: string): Promise<void> {
     try {
       // Get the appeal and original moderation action
-      const { data: appeal } = await supabase
+      const { data: appeal } = await (supabase as any)
         .from('moderation_appeals')
         .select(`
           *,
@@ -175,25 +175,25 @@ export class AppealSystem {
       if (!appeal) return;
 
       // Mark the original moderation action as reversed
-      await supabase
+      await (supabase as any)
         .from('moderation_actions')
         .update({
           status: 'reversed',
           reversed_at: new Date().toISOString(),
           reversal_reason: 'Appeal approved'
         })
-        .eq('id', appeal.moderation_action_id);
+        .eq('id', (appeal as any).moderation_action_id);
 
       // If it was a ban, unban the user
-      if (appeal.moderation_actions.action_type.includes('ban')) {
-        await supabase
+      if ((appeal as any).moderation_actions?.action_type?.includes('ban')) {
+        await (supabase as any)
           .from('user_bans')
           .update({
             is_active: false,
             lifted_at: new Date().toISOString(),
             lift_reason: 'Appeal approved'
           })
-          .eq('user_id', appeal.user_id)
+          .eq('user_id', (appeal as any).user_id)
           .eq('is_active', true);
       }
     } catch (error) {

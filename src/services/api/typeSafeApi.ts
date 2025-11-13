@@ -93,7 +93,7 @@ class TypeSafeApiService {
         };
       }
 
-      const validatedMessages = (data || []).filter(validateMessage);
+      const validatedMessages = (data || []).filter(validateMessage) as any;
       
       if (validatedMessages.length !== (data?.length || 0)) {
         console.warn('Some messages failed validation and were filtered out');
@@ -132,7 +132,7 @@ class TypeSafeApiService {
    */
   async getConversations(userId: DatabaseId): Promise<StrictApiResponse<StrictConversation[]>> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('conversations')
         .select(`
           *,
@@ -150,7 +150,7 @@ class TypeSafeApiService {
         };
       }
 
-      const validatedConversations = (data || []).filter(validateConversation);
+      const validatedConversations = (data || []).filter(validateConversation) as any;
       
       if (validatedConversations.length !== (data?.length || 0)) {
         console.warn('Some conversations failed validation and were filtered out');

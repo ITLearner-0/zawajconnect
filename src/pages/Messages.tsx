@@ -104,11 +104,10 @@ const Messages = () => {
       
       // Create new conversation
       console.log("Creating new conversation...");
-      const { data: newConversation, error: createError } = await supabase
+      const { data: newConversation, error: createError } = await (supabase as any)
         .from('conversations')
         .insert({
-          participants: [currentUserId, otherUserId],
-          wali_supervised: false
+          participants: [currentUserId, otherUserId]
         })
         .select('id')
         .single();
