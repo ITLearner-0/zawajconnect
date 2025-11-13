@@ -242,6 +242,14 @@ const Profile = () => {
             console.error('Erreur envoi emails de match:', emailError);
           }
           
+          // Award match badges to both users
+          try {
+            const { awardMatchBadgesToBothUsers } = await import('@/utils/matchBadges');
+            await awardMatchBadgesToBothUsers(user.id, userId);
+          } catch (badgeError) {
+            console.error('Error awarding match badges:', badgeError);
+          }
+          
           navigate('/matches');
         } else {
           setIsLiked(true);
