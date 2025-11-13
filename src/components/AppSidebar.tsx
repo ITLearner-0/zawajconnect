@@ -17,7 +17,8 @@ import {
   Users,
   BookOpen,
   Brain,
-  Shield
+  Shield,
+  Award
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -68,6 +69,7 @@ export function AppSidebar() {
     { path: '/dashboard', icon: Home, label: 'Tableau de Bord', group: 'main' },
     { path: '/enhanced-profile', icon: User, label: 'Mon Profil', group: 'main' },
     { path: '/browse', icon: Search, label: 'Découvrir', group: 'main' },
+    { path: '/gamification', icon: Award, label: 'Récompenses', group: 'main' },
     { path: '/compatibility-test', icon: Heart, label: 'Test de Compatibilité', group: 'compatibility' },
     { path: '/advanced-matching', icon: Brain, label: 'Matching Avancé', group: 'compatibility' },
     { path: '/compatibility-insights', icon: Brain, label: 'Mes Insights', group: 'compatibility' },
