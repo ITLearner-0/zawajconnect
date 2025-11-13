@@ -224,7 +224,7 @@ export const BadgeShowcase: React.FC<BadgeShowcaseProps> = ({
                       {/* Shine effect for legendary */}
                       {badge.rarity === 'legendary' && (
                         <div className="absolute inset-0 rounded-lg overflow-hidden pointer-events-none">
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent animate-shine" />
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-30" />
                         </div>
                       )}
                     </div>

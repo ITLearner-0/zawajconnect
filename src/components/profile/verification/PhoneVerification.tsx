@@ -69,6 +69,15 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
         if (error) throw error;
         
         setShowVerificationInput(false);
+        
+        // Award phone verification badge
+        try {
+          const { awardBadgeSilent } = await import('@/utils/badgeAwards');
+          await awardBadgeSilent('phone_verified');
+        } catch (badgeError) {
+          console.error('Error awarding phone verification badge:', badgeError);
+        }
+        
         toast({
           title: "Phone verified",
           description: "Your phone number has been successfully verified",
