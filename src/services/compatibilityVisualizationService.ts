@@ -7,25 +7,40 @@ export class CompatibilityVisualizationService {
   static generateVisualization(match: CompatibilityMatch): CompatibilityVisualization {
     const { matchDetails } = match;
     
+    if (!matchDetails) {
+      return {
+        overallScore: match.score ?? 0,
+        strengths: [],
+        differences: [],
+        dealbreakers: [],
+        compatibilityBreakdown: {
+          religious: 0,
+          lifestyle: 0,
+          personal: 0,
+          family: 0
+        }
+      };
+    }
+    
     // Générer les points de force
-    const strengths: CompatibilityPoint[] = matchDetails.strengths?.map(category => ({
+    const strengths: CompatibilityPoint[] = (matchDetails.strengths?.map((category: string) => ({
       category,
       score: 85 + Math.random() * 15, // Score élevé pour les forces
       weight: this.getCategoryWeight(category),
       description: this.getCategoryDescription(category, true),
       isStrength: true,
       isDifference: false
-    })) || [];
+    })) || []) as CompatibilityPoint[];
 
     // Générer les différences
-    const differences: CompatibilityPoint[] = matchDetails.differences?.map(category => ({
+    const differences: CompatibilityPoint[] = (((matchDetails as any).differences ?? []).map((category: string) => ({
       category,
       score: 20 + Math.random() * 40, // Score plus faible pour les différences
       weight: this.getCategoryWeight(category),
       description: this.getCategoryDescription(category, false),
       isStrength: false,
       isDifference: true
-    })) || [];
+    })) || []) as CompatibilityPoint[];
 
     // Calculer le score de répartition par catégorie
     const compatibilityBreakdown = {
@@ -36,10 +51,10 @@ export class CompatibilityVisualizationService {
     };
 
     return {
-      overallScore: match.score,
+      overallScore: match.score ?? 0,
       strengths,
       differences,
-      dealbreakers: matchDetails.dealbreakers || [],
+      dealbreakers: (matchDetails as any).dealbreakers || [],
       compatibilityBreakdown
     };
   }
