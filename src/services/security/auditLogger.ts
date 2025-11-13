@@ -190,7 +190,7 @@ export class SecurityAuditLogger {
         stats.byType[event.event_type] = (stats.byType[event.event_type] || 0) + 1;
         
         // Count by hour
-        const hour = new Date(event.created_at).getHours();
+        const hour = new Date(event.created_at ?? '').getHours();
         stats.byHour[hour]++;
       });
 

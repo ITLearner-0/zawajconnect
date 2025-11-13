@@ -125,7 +125,7 @@ export class AppealSystem {
     reviewerNotes: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('moderation_appeals')
         .update({
           status: decision,
@@ -163,7 +163,7 @@ export class AppealSystem {
   private static async reverseModeration(appealId: string): Promise<void> {
     try {
       // Get the appeal and original moderation action
-      const { data: appeal } = await supabase
+      const { data: appeal } = await (supabase as any)
         .from('moderation_appeals')
         .select(`
           *,
@@ -175,25 +175,25 @@ export class AppealSystem {
       if (!appeal) return;
 
       // Mark the original moderation action as reversed
-      await supabase
+      await (supabase as any)
         .from('moderation_actions')
         .update({
           status: 'reversed',
           reversed_at: new Date().toISOString(),
           reversal_reason: 'Appeal approved'
         })
-        .eq('id', appeal.moderation_action_id);
+        .eq('id', (appeal as any).moderation_action_id);
 
       // If it was a ban, unban the user
-      if (appeal.moderation_actions.action_type.includes('ban')) {
-        await supabase
+      if ((appeal as any).moderation_actions?.action_type?.includes('ban')) {
+        await (supabase as any)
           .from('user_bans')
           .update({
             is_active: false,
             lifted_at: new Date().toISOString(),
             lift_reason: 'Appeal approved'
           })
-          .eq('user_id', appeal.user_id)
+          .eq('user_id', (appeal as any).user_id)
           .eq('is_active', true);
       }
     } catch (error) {
@@ -203,7 +203,7 @@ export class AppealSystem {
 
   private static async logAppealActivity(appealId: string, activity: string, userId: string): Promise<void> {
     try {
-      await supabase
+      await (supabase as any)
         .from('appeal_activities')
         .insert({
           appeal_id: appealId,
