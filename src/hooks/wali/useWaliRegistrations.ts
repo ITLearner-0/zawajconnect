@@ -62,9 +62,22 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
 
       if (updateError) throw updateError;
 
+      // Send notification email
+      try {
+        await supabase.functions.invoke('send-wali-status-notification', {
+          body: {
+            registration_id: id,
+            status: 'approved',
+          },
+        });
+      } catch (emailError) {
+        console.error('Failed to send notification email:', emailError);
+        // Don't fail the approval if email fails
+      }
+
       toast({
         title: 'Inscription approuvée',
-        description: 'Le Wali a été approuvé avec succès.',
+        description: 'Le Wali a été approuvé avec succès. Un email de confirmation a été envoyé.',
       });
 
       await fetchRegistrations();
@@ -98,9 +111,23 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
 
       if (updateError) throw updateError;
 
+      // Send notification email
+      try {
+        await supabase.functions.invoke('send-wali-status-notification', {
+          body: {
+            registration_id: id,
+            status: 'rejected',
+            rejection_reason: rejectionReason,
+          },
+        });
+      } catch (emailError) {
+        console.error('Failed to send notification email:', emailError);
+        // Don't fail the rejection if email fails
+      }
+
       toast({
         title: 'Inscription rejetée',
-        description: 'L\'inscription a été rejetée.',
+        description: 'L\'inscription a été rejetée. Un email a été envoyé au candidat.',
       });
 
       await fetchRegistrations();
