@@ -40,7 +40,7 @@ export class AbuseDetectionService {
     for (const [key, entry] of rateLimitState.entries()) {
       if (!key.startsWith(`${userId}:`)) continue;
 
-      const endpoint = key.split(':')[1];
+      const endpoint = key.split(':')[1] ?? '';
       distinctEndpoints.add(endpoint);
 
       if (now - entry.windowStart < oneMinute) {
@@ -50,7 +50,7 @@ export class AbuseDetectionService {
         requestsInLastHour += entry.count;
       }
 
-      if (endpoint.includes('auth') && entry.count > 3) {
+      if (endpoint && endpoint.includes('auth') && entry.count > 3) {
         failedAuthAttempts += entry.count;
       }
     }

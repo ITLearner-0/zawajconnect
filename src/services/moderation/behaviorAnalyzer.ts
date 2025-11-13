@@ -59,8 +59,15 @@ export class BehaviorAnalyzer {
     
     // Check last 10 messages timing
     const recentMessages = messages.slice(-10);
-    const timeSpan = new Date(recentMessages[recentMessages.length - 1].created_at).getTime() - 
-                    new Date(recentMessages[0].created_at).getTime();
+    if (recentMessages.length < 2) return null;
+    
+    const firstMsg = recentMessages[0];
+    const lastMsg = recentMessages[recentMessages.length - 1];
+    
+    if (!firstMsg || !lastMsg) return null;
+    
+    const timeSpan = new Date(lastMsg.created_at).getTime() - 
+                    new Date(firstMsg.created_at).getTime();
     
     if (timeSpan < 60000) { // Less than 1 minute
       return {

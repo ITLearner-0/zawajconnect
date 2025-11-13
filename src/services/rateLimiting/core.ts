@@ -12,6 +12,15 @@ export class RateLimitCore {
     this.memoryStore.cleanupExpiredEntries();
 
     const config = DEFAULT_RATE_LIMITS[endpoint] || DEFAULT_RATE_LIMITS['api/general'];
+    if (!config) {
+      return {
+        allowed: true,
+        remaining: 100,
+        resetTime: Date.now() + 60000,
+        blocked: false
+      };
+    }
+    
     const key = this.memoryStore.getKey(userId, endpoint);
     const now = Date.now();
 

@@ -44,19 +44,21 @@ export class SecurityAuditLogger {
     this.pendingEvents = [];
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('security_events')
-        .insert(events.map(event => ({
-          user_id: event.userId,
+        .insert(events.map((event: any) => ({
           event_type: event.action,
-          details: {
+          description: `${event.resource} - ${event.success ? 'success' : 'failed'}`,
+          severity: event.success ? 'low' : 'medium',
+          metadata: {
+            user_id: event.userId ?? '',
             resource: event.resource,
-            resource_id: event.resourceId,
+            resource_id: event.resourceId ?? '',
             success: event.success,
-            details: event.details,
-            ip_address: event.ip,
-            user_agent: event.userAgent,
-            timestamp: event.timestamp
+            details: event.details ?? {},
+            ip_address: event.ip ?? '',
+            user_agent: event.userAgent ?? '',
+            timestamp: event.timestamp ?? ''
           }
         })));
 

@@ -29,7 +29,7 @@ export class AppealSystem {
   static async submitAppeal(appeal: AppealSubmission, userId: string): Promise<{ success: boolean; appealId?: string; error?: string }> {
     try {
       // Check if user already has a pending appeal for this action
-      const { data: existingAppeals } = await supabase
+      const { data: existingAppeals } = await (supabase as any)
         .from('moderation_appeals')
         .select('id')
         .eq('user_id', userId)
@@ -44,7 +44,7 @@ export class AppealSystem {
       }
 
       // Submit new appeal
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('moderation_appeals')
         .insert({
           user_id: userId,
@@ -65,11 +65,11 @@ export class AppealSystem {
       }
 
       // Log the appeal submission
-      await this.logAppealActivity(data.id, 'submitted', userId);
+      await this.logAppealActivity((data as any).id, 'submitted', userId);
 
       return {
         success: true,
-        appealId: data.id
+        appealId: (data as any).id
       };
     } catch (error) {
       console.error('Error submitting appeal:', error);
@@ -82,7 +82,7 @@ export class AppealSystem {
 
   static async getUserAppeals(userId: string): Promise<Appeal[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('moderation_appeals')
         .select(`
           *,
@@ -96,7 +96,7 @@ export class AppealSystem {
         return [];
       }
 
-      return data.map(appeal => ({
+      return (data || []).map((appeal: any) => ({
         id: appeal.id,
         userId: appeal.user_id,
         moderationActionId: appeal.moderation_action_id,
@@ -107,9 +107,9 @@ export class AppealSystem {
         reviewedAt: appeal.reviewed_at,
         reviewerNotes: appeal.reviewer_notes,
         originalAction: {
-          type: appeal.moderation_actions.action_type,
-          reason: appeal.moderation_actions.reason,
-          evidence: appeal.moderation_actions.evidence || []
+          type: appeal.moderation_actions?.action_type ?? 'warning',
+          reason: appeal.moderation_actions?.reason ?? '',
+          evidence: appeal.moderation_actions?.evidence || []
         }
       }));
     } catch (error) {

@@ -14,7 +14,7 @@ export const flagContent = async (
 ): Promise<boolean> => {
   try {
     // Insert into content_flags table directly
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('content_flags')
       .insert({
         content_id: contentId,
@@ -47,7 +47,7 @@ export const resolveContentFlag = async (
   notes?: string
 ): Promise<boolean> => {
   try {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('content_flags')
       .update({
         resolved: true,
