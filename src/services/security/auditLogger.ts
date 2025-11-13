@@ -165,7 +165,7 @@ export class SecurityAuditLogger {
   // Get audit statistics
   static async getAuditStats(userId?: string): Promise<any> {
     try {
-      let query = supabase
+      let query = (supabase as any)
         .from('security_events')
         .select('event_type, created_at')
         .gte('created_at', new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString());
@@ -174,6 +174,49 @@ export class SecurityAuditLogger {
         query = query.eq('user_id', userId);
       }
 
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      // Process statistics
+      const stats = {
+        total: data?.length || 0,
+        byType: {} as Record<string, number>,
+        byHour: Array(24).fill(0)
+      };
+
+      data?.forEach((event: any) => {
+        // Count by type
+        stats.byType[event.event_type] = (stats.byType[event.event_type] || 0) + 1;
+        
+        // Count by hour
+        if (event.created_at) {
+          const hour = new Date(event.created_at).getHours();
+          stats.byHour[hour]++;
+        }
+      });
+
+      return stats;
+    } catch (error) {
+      console.error('Failed to get audit stats:', error);
+      return null;
+    }
+  }
+
+  // Get event count for rate limiting
+  static async getEventCount(eventType: string, userId?: string | null, since?: Date): Promise<number> {
+    try {
+      const sinceDate = since || new Date(Date.now() - 60 * 60 * 1000); // Default to 1 hour ago
+      
+      let query = (supabase as any)
+        .from('security_events')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', sinceDate.toISOString())
+        .eq('event_type', eventType);
+      
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
       
       const { count, error } = await query;
 
