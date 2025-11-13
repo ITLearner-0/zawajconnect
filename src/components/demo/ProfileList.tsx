@@ -125,14 +125,14 @@ const ProfileList: React.FC<ProfileListProps> = ({ profiles, onSelectProfile }) 
 
               {/* Badges */}
               <div className="flex flex-wrap gap-2">
-                <Badge className={getPracticeLevelColor(profile.religious_practice_level)}>
+                <Badge className={getPracticeLevelColor(profile.religious_practice_level || 'Not Specified')}>
                   <Heart className="h-3 w-3 mr-1" />
-                  {profile.religious_practice_level}
+                  {profile.religious_practice_level || 'Non spécifié'}
                 </Badge>
                 
                 <Badge variant="outline" className="border-rose-300 text-rose-600 bg-rose-50 dark:border-rose-600 dark:text-rose-300 dark:bg-rose-900/30">
-                  {getEducationIcon(profile.education_level)}
-                  <span className="ml-1">{profile.education_level}</span>
+                  {getEducationIcon(profile.education_level || 'Not Specified')}
+                  <span className="ml-1">{profile.education_level || 'Non spécifié'}</span>
                 </Badge>
 
                 {profile.wali_verified && (

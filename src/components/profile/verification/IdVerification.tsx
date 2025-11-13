@@ -26,13 +26,13 @@ const IdVerification = ({ isVerified, onVerificationChange }: IdVerificationProp
       
       // Update the profile with verification metadata
       const { error } = await supabase
-        .from("profiles")
+        .from("profiles" as any)
         .update({ 
           id_verified: true,
           is_verified: true,
           verification_document_url: "id:verified",
           document_verification_status: "approved"
-        })
+        } as any)
         .eq("id", user.id);
       
       if (error) throw error;

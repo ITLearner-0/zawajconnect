@@ -36,16 +36,12 @@ const MatchCardContent = ({ match, expanded, showQuality, reducedMotion }: Match
         </div>
       )}
 
-      {match.matchDetails ? (
-        <MatchDetails details={match.matchDetails} />
-      ) : (
-        enhancedMatch.details && (
-          <MatchDetails details={{
-            strengths: [`${enhancedMatch.details.shared_values} valeurs communes`],
-            differences: [`Différences dans ${enhancedMatch.details.key_differences}`],
-            dealbreakers: []
-          }} />
-        )
+      {match.matchDetails && (
+        <MatchDetails details={{
+          strengths: match.matchDetails.strengths || [],
+          differences: match.matchDetails.challenges || [],
+          dealbreakers: []
+        }} />
       )}
     </CardContent>
   );

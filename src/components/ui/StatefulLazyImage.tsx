@@ -130,7 +130,7 @@ const StatefulLazyImage = ({
       {/* Actual image */}
       {effectiveSrc && !hasFailed && (
         <img
-          ref={imageRef}
+          ref={imageRef as React.RefObject<HTMLImageElement>}
           src={effectiveSrc}
           alt={alt}
           className={cn(

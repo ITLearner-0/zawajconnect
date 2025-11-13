@@ -29,7 +29,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
   selectedPersona,
   onPersonaSelect
 }) => {
-  const [activeConversation, setActiveConversation] = useState<string>(selectedConversation || '');
+  const [activeConversation, setActiveConversation] = useState<string>(selectedPersona ? `demo-conv-${selectedPersona.split('-')[2]}` : '');
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
   const [typingIndicator, setTypingIndicator] = useState(false);
@@ -39,7 +39,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
 
   useEffect(() => {
     if (selectedPersona) {
-      const conversationKey = `demo-conv-${selectedPersona.split('-')[2]}`;
+      const conversationKey = `demo-conv-${selectedPersona.split('-')[2]}` as keyof typeof demoConversations;
       const conversationMessages = demoConversations[conversationKey] || [];
       setMessages(conversationMessages);
       setActiveConversation(conversationKey);
@@ -51,7 +51,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
 
     const newMessage = {
       id: `demo-msg-${Date.now()}`,
-      conversation_id: activeConversation,
+      conversation_id: activeConversation || '',
       sender_id: 'current-user',
       content: messageInput,
       created_at: new Date().toISOString(),
@@ -88,7 +88,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
       "MashaAllah, vos valeurs semblent bien ancrées. Comment les mettez-vous en pratique au quotidien ?",
       "Qu'Allah vous bénisse. Cette conversation me permet de mieux comprendre votre personnalité."
     ];
-    return responses[Math.floor(Math.random() * responses.length)];
+    return responses[Math.floor(Math.random() * responses.length)] || responses[0];
   };
 
   const formatTime = (dateString: string) => {

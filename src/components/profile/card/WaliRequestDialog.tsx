@@ -41,7 +41,7 @@ const WaliRequestDialog = ({
     try {
       // Get the wali ID from the profile's wali information
       const { data: waliData, error: waliError } = await supabase
-        .from('wali_profiles')
+        .from('wali_profiles' as any)
         .select('id')
         .eq('user_id', profile.id)
         .single();
@@ -55,7 +55,7 @@ const WaliRequestDialog = ({
       
       // Create a chat request in the database
       const { error: requestError } = await supabase
-        .from('chat_requests')
+        .from('chat_requests' as any)
         .insert({
           requester_id: currentUserId,
           recipient_id: profile.id,
@@ -63,7 +63,7 @@ const WaliRequestDialog = ({
           status: 'pending',
           message: requestMessage,
           request_type: requestType
-        });
+        } as any);
       
       if (requestError) {
         console.error("Error creating request:", requestError);

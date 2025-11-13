@@ -36,6 +36,7 @@ const LazyLoadingAnalyticsDashboard = ({ show = false, onToggle }: LazyLoadingAn
       const interval = setInterval(updateData, APP_CONSTANTS.ANALYTICS.REFRESH_INTERVAL);
       return () => clearInterval(interval);
     }
+    return undefined;
   }, [show, refreshKey]);
 
   const handleRefresh = () => {

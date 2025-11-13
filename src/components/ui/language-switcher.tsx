@@ -55,7 +55,7 @@ export const LanguageSwitcher = () => {
             key={language.code}
             onClick={() => handleLanguageChange(language.code)}
             className={`flex items-center gap-2 ${
-              currentLanguage.code === language.code ? 'bg-accent' : ''
+              currentLanguage?.code === language.code ? 'bg-accent' : ''
             }`}
           >
             <span>{language.flag}</span>

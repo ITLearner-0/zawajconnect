@@ -25,6 +25,7 @@ const LazyLoadingDevPanel = ({ show = false, onToggle }: LazyLoadingDevPanelProp
       const interval = setInterval(updateData, 1000);
       return () => clearInterval(interval);
     }
+    return undefined;
   }, [show, refreshKey]);
 
   const handleRefresh = () => {

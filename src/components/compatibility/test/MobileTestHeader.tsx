@@ -16,10 +16,11 @@ interface MobileTestHeaderProps {
 const MobileTestHeader = ({ currentQuestion, answers, onQuestionSelect }: MobileTestHeaderProps) => {
   // Group questions by category
   const questionsByCategory = questions.reduce((acc, question, index) => {
-    if (!acc[question.category]) {
-      acc[question.category] = [];
+    const category = question?.category || 'Other';
+    if (!acc[category]) {
+      acc[category] = [];
     }
-    acc[question.category].push({ ...question, originalIndex: index });
+    acc[category].push({ ...question, originalIndex: index });
     return acc;
   }, {} as Record<string, any[]>);
 

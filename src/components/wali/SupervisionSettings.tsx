@@ -95,11 +95,11 @@ const SupervisionSettings: React.FC<SupervisionSettingsProps> = ({
     setLoading(true);
     try {
       const { error } = await supabase
-        .from('wali_profiles')
+        .from('wali_profiles' as any)
         .update({
           supervision_level: supervisionLevel,
           supervision_settings: settings
-        })
+        } as any)
         .eq('user_id', waliUserId);
 
       if (error) throw error;
