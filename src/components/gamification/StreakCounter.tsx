@@ -3,15 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Flame, TrendingUp } from 'lucide-react';
 import { useLoginStreak } from '@/hooks/useLoginStreak';
+import { useAuth } from '@/hooks/useAuth';
 
 interface StreakCounterProps {
   compact?: boolean;
 }
 
 const StreakCounter: React.FC<StreakCounterProps> = ({ compact = false }) => {
-  const { streak, loading } = useLoginStreak();
+  const { user } = useAuth();
+  const { currentStreak, longestStreak, loading } = useLoginStreak(user?.id);
 
-  if (loading || !streak) {
+  if (loading || !currentStreak) {
     return null;
   }
 
@@ -31,17 +33,17 @@ const StreakCounter: React.FC<StreakCounterProps> = ({ compact = false }) => {
 
   if (compact) {
     return (
-      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border-2 ${getStreakColor(streak.current_streak)}`}>
+      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border-2 ${getStreakColor(currentStreak)}`}>
         <Flame className="h-4 w-4" />
         <span className="font-semibold text-sm">
-          {streak.current_streak} {getStreakEmoji(streak.current_streak)}
+          {currentStreak} {getStreakEmoji(currentStreak)}
         </span>
       </div>
     );
   }
 
   return (
-    <Card className={`border-2 ${getStreakColor(streak.current_streak)}`}>
+    <Card className={`border-2 ${getStreakColor(currentStreak)}`}>
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center justify-between">
           <span className="flex items-center gap-2 text-lg">
@@ -49,14 +51,14 @@ const StreakCounter: React.FC<StreakCounterProps> = ({ compact = false }) => {
             Streak de Connexion
           </span>
           <Badge variant="outline" className="text-base">
-            {getStreakEmoji(streak.current_streak)}
+            {getStreakEmoji(currentStreak)}
           </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-3xl font-bold">{streak.current_streak}</p>
+            <p className="text-3xl font-bold">{currentStreak}</p>
             <p className="text-sm text-muted-foreground">Jours consécutifs</p>
           </div>
           <div className="text-right">
@@ -64,15 +66,15 @@ const StreakCounter: React.FC<StreakCounterProps> = ({ compact = false }) => {
               <TrendingUp className="h-4 w-4" />
               <span className="text-sm">Record</span>
             </div>
-            <p className="text-2xl font-bold">{streak.longest_streak}</p>
+            <p className="text-2xl font-bold">{longestStreak}</p>
           </div>
         </div>
 
-        {streak.current_streak >= 7 && (
+        {currentStreak >= 7 && (
           <div className="p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-200">
             <p className="text-sm text-center font-medium text-orange-900">
-              {streak.current_streak >= 30 ? '🌟 Légende! 30+ jours!' :
-               streak.current_streak >= 14 ? '🔥 Incroyable! 2 semaines!' :
+              {currentStreak >= 30 ? '🌟 Légende! 30+ jours!' :
+               currentStreak >= 14 ? '🔥 Incroyable! 2 semaines!' :
                '💪 Super! 1 semaine complète!'}
             </p>
           </div>

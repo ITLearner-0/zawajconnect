@@ -6,3 +6,4 @@ export { default as GamificationAchievementsDashboard } from './GamificationAchi
 export { BadgeShowcase } from './BadgeShowcase';
 export { BadgeNotification } from './BadgeNotification';
 export { BadgeNotificationProvider } from './BadgeNotificationProvider';
+export { StreakDisplay } from './StreakDisplay';
