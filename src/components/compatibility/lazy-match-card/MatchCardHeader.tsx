@@ -89,7 +89,7 @@ const MatchCardHeader = ({
         </div>
       </div>
       
-      <CompatibilityScore score={match.score} />
+      <CompatibilityScore score={match.score ?? match.compatibilityScore} />
     </div>
   );
 };

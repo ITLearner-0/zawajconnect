@@ -72,11 +72,11 @@ const AnalyticsDashboard: React.FC = () => {
               <Users className="h-8 w-8 text-islamic-teal opacity-80" />
             </div>
             <Progress
-              value={(userActivityStats?.activeUsers / userActivityStats?.totalUsers) * 100 || 0}
+              value={((userActivityStats?.activeUsers ?? 0) / (userActivityStats?.totalUsers ?? 1)) * 100}
               className="h-1 mt-3"
             />
             <p className="text-xs text-muted-foreground mt-2">
-              {((userActivityStats?.activeUsers / userActivityStats?.totalUsers) * 100 || 0).toFixed(1)}% of total users
+              {(((userActivityStats?.activeUsers ?? 0) / (userActivityStats?.totalUsers ?? 1)) * 100).toFixed(1)}% of total users
             </p>
           </CardContent>
         </Card>
@@ -111,11 +111,11 @@ const AnalyticsDashboard: React.FC = () => {
               <Shield className="h-8 w-8 text-islamic-gold opacity-80" />
             </div>
             <Progress
-              value={(waliStats?.supervisedConversations / analytics?.totalConversations) * 100 || 0}
+              value={((waliStats?.supervisedConversations ?? 0) / (analytics?.totalConversations ?? 1)) * 100}
               className="h-1 mt-3"
             />
             <p className="text-xs text-muted-foreground mt-2">
-              {((waliStats?.supervisedConversations / analytics?.totalConversations) * 100 || 0).toFixed(1)}% of all conversations
+              {(((waliStats?.supervisedConversations ?? 0) / (analytics?.totalConversations ?? 1)) * 100).toFixed(1)}% of all conversations
             </p>
           </CardContent>
         </Card>
@@ -127,7 +127,7 @@ const AnalyticsDashboard: React.FC = () => {
                 <p className="text-sm font-medium text-muted-foreground">Emergency Reports</p>
                 <h3 className="text-2xl font-bold mt-1 flex items-center">
                   {emergencyStats?.totalReports || 0}
-                  {emergencyStats?.pendingHighPriority > 0 && (
+                  {(emergencyStats?.pendingHighPriority ?? 0) > 0 && emergencyStats && (
                     <Badge className="ml-2 bg-red-500">{emergencyStats.pendingHighPriority}</Badge>
                   )}
                 </h3>
@@ -135,7 +135,7 @@ const AnalyticsDashboard: React.FC = () => {
               <AlertTriangle className="h-8 w-8 text-red-500 opacity-80" />
             </div>
             <div className="flex items-center gap-2 mt-3">
-              <Badge variant={emergencyStats?.pendingReports > 0 ? "destructive" : "outline"} className={emergencyStats?.pendingReports > 0 ? "" : "bg-green-50 text-green-700 border-green-200"}>
+              <Badge variant={(emergencyStats?.pendingReports ?? 0) > 0 ? "destructive" : "outline"} className={(emergencyStats?.pendingReports ?? 0) > 0 ? "" : "bg-green-50 text-green-700 border-green-200"}>
                 {emergencyStats?.pendingReports || 0} pending
               </Badge>
               <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">

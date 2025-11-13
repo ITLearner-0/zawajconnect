@@ -43,11 +43,15 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
   }, [navigate, toast, currentQuestion]);
 
   const handleAnswer = (value: number[]) => {
+    const question = questions[currentQuestion];
+    if (!question) return;
+    
     setAnswers(prev => ({
       ...prev,
       [currentQuestion]: {
-        ...prev[currentQuestion],
+        questionId: question.id,
         value: value[0],
+        weight: prev[currentQuestion]?.weight ?? question.weight,
         isBreaker: isDealbreaker,
         breakerThreshold: isDealbreaker ? breakerThreshold : undefined
       }
@@ -55,11 +59,17 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
   };
 
   const handleWeightChange = (value: number[]) => {
+    const question = questions[currentQuestion];
+    if (!question) return;
+    
     setAnswers(prev => ({
       ...prev,
       [currentQuestion]: {
-        ...prev[currentQuestion],
-        weight: value[0]
+        questionId: prev[currentQuestion]?.questionId ?? question.id,
+        value: prev[currentQuestion]?.value ?? 50,
+        weight: value[0],
+        isBreaker: prev[currentQuestion]?.isBreaker ?? false,
+        breakerThreshold: prev[currentQuestion]?.breakerThreshold
       }
     }));
   };
@@ -72,6 +82,8 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
 
     for (const [index, answer] of Object.entries(answers)) {
       const question = questions[Number(index)];
+      if (!question) continue;
+      
       const effectiveWeight = answer.weight || question.weight;
       
       totalWeightedScore += (answer.value * effectiveWeight);
@@ -88,10 +100,10 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         const answersMap = Object.fromEntries(
-          Object.entries(answers).map(([qIndex, answer]) => [
-            questions[Number(qIndex)].id,
-            answer
-          ])
+          Object.entries(answers).map(([qIndex, answer]) => {
+            const question = questions[Number(qIndex)];
+            return question ? [question.id, answer] : null;
+          }).filter(Boolean) as Array<[string, Answer]>
         );
 
         const resultData = {

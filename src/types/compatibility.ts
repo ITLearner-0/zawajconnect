@@ -154,3 +154,64 @@ export type InsightActionType =
   | 'read_guidance'
   | 'retake_test'
   | 'achievement_unlocked';
+
+/**
+ * Réponse à une question du test de compatibilité
+ */
+export interface Answer {
+  questionId: string | number;
+  value: number;
+  weight?: number;
+  isBreaker?: boolean;
+  breakerThreshold?: number;
+}
+
+/**
+ * Match de compatibilité avec un autre utilisateur
+ */
+export interface CompatibilityMatch {
+  userId: string;
+  fullName: string;
+  firstName?: string;
+  lastName?: string;
+  avatarUrl?: string;
+  compatibilityScore: number;
+  score?: number;
+  matchingAreas?: string[];
+  differences?: string[];
+  location?: string;
+  gender?: string;
+  educationLevel?: string;
+  matchDetails?: {
+    strengths: string[];
+    challenges: string[];
+    compatibility: number;
+  };
+  profileData?: {
+    id: string;
+    first_name: string;
+    last_name?: string;
+    gender: string;
+    location?: string;
+    education_level?: string;
+    profile_picture?: string;
+    age?: number;
+    religious_practice_level?: string;
+    email_verified?: boolean;
+    phone_verified?: boolean;
+    id_verified?: boolean;
+  };
+}
+
+/**
+ * Match de compatibilité avec détails enrichis
+ */
+export interface EnhancedCompatibilityMatch extends CompatibilityMatch {
+  matchDetails: {
+    strengths: string[];
+    challenges: string[];
+    differences: string[];
+    dealbreakers?: string[];
+    compatibility: number;
+  };
+}

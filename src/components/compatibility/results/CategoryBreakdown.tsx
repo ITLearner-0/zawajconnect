@@ -17,9 +17,9 @@ const CategoryBreakdown = ({ answers }: CategoryBreakdownProps) => {
     const answer = answers[index];
     if (answer) {
       const effectiveWeight = answer.weight || question.weight;
-      acc[question.category].total += answer.value * effectiveWeight;
-      acc[question.category].weight += effectiveWeight;
-      acc[question.category].count++;
+      acc[question.category]!.total += answer.value * effectiveWeight;
+      acc[question.category]!.weight += effectiveWeight;
+      acc[question.category]!.count++;
     }
     
     return acc;

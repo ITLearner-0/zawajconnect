@@ -40,7 +40,7 @@ const MatchList = ({
       const lastMatch = matches[matches.length - 1];
       await onLoadMore({
         cursor: lastMatch ? {
-          score: lastMatch.score,
+          score: lastMatch.score ?? lastMatch.compatibilityScore,
           userId: lastMatch.userId
         } : undefined,
         limit: 20
