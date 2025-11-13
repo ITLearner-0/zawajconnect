@@ -114,7 +114,7 @@ export const usePrivacySettings = () => {
     
     try {
       // Update the database
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('profiles')
         .update({ privacy_settings: newSettings })
         .eq('id', userId);
@@ -158,7 +158,7 @@ export const usePrivacySettings = () => {
     
     try {
       // Update the database
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('profiles')
         .update({ is_visible: newVisibility })
         .eq('id', userId);
@@ -211,7 +211,7 @@ export const usePrivacySettings = () => {
     
     try {
       // Update the database
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('profiles')
         .update({ blocked_users: updatedBlockedUsers })
         .eq('id', userId);
@@ -255,7 +255,7 @@ export const usePrivacySettings = () => {
     
     try {
       // Update the database
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('profiles')
         .update({ blocked_users: updatedBlockedUsers })
         .eq('id', userId);
