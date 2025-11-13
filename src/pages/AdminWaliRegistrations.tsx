@@ -3,10 +3,16 @@ import { useWaliRegistrations } from '@/hooks/wali/useWaliRegistrations';
 import { WaliRegistration } from '@/hooks/wali/useWaliRegistration';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { RegistrationList } from '@/components/wali/admin/RegistrationList';
 import { RegistrationDetailModal } from '@/components/wali/admin/RegistrationDetailModal';
-import { Loader2, Shield, CheckCircle2, XCircle, Clock, Eye } from 'lucide-react';
+import { ExportMenu } from '@/components/wali/admin/ExportMenu';
+import { Loader2, Shield, CheckCircle2, XCircle, Clock, Eye, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import {
+  exportWaliRegistrationsToExcel,
+  exportWaliRegistrationsToCSV,
+} from '@/utils/waliExport';
 
 const AdminWaliRegistrations = () => {
   const [selectedTab, setSelectedTab] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
@@ -61,13 +67,28 @@ const AdminWaliRegistrations = () => {
   return (
     <div className="container max-w-7xl mx-auto py-8 px-4">
       <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <Shield className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold">Gestion des Inscriptions Wali</h1>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <Shield className="h-8 w-8 text-primary" />
+            <div>
+              <h1 className="text-3xl font-bold">Gestion des Inscriptions Wali</h1>
+              <p className="text-muted-foreground">
+                Approuvez ou rejetez les demandes d'inscription en tant que Wali après vérification des documents
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <ExportMenu
+              onExportExcel={() => exportWaliRegistrationsToExcel(registrations)}
+              onExportCSV={() => exportWaliRegistrationsToCSV(registrations)}
+              label="Exporter"
+            />
+            <Button onClick={refetch} disabled={loading} variant="outline" size="sm">
+              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Actualiser
+            </Button>
+          </div>
         </div>
-        <p className="text-muted-foreground">
-          Approuvez ou rejetez les demandes d'inscription en tant que Wali après vérification des documents
-        </p>
       </div>
 
       {/* Statistics Cards */}

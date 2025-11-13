@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Shield, RefreshCw } from 'lucide-react';
+import { Shield, RefreshCw, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,6 +11,14 @@ import { AlertsTable } from '@/components/wali/monitoring/AlertsTable';
 import { ActivityList } from '@/components/wali/monitoring/ActivityList';
 import { SuspendWaliDialog } from '@/components/wali/monitoring/SuspendWaliDialog';
 import { AlertDetailsDialog } from '@/components/wali/monitoring/AlertDetailsDialog';
+import { ExportMenu } from '@/components/wali/admin/ExportMenu';
+import {
+  exportWaliAlertsToExcel,
+  exportWaliAlertsToCSV,
+  exportWaliActivitiesToExcel,
+  exportComprehensiveWaliReport,
+} from '@/utils/waliExport';
+import { useWaliRegistrations } from '@/hooks/wali';
 
 const AdminWaliMonitoring = () => {
   const { user } = useAuth();
@@ -72,8 +80,14 @@ const AdminWaliMonitoring = () => {
     await suspendWali(suspendDialog.userId, user.id, reason, durationDays);
   };
 
+  const { registrations } = useWaliRegistrations();
+
   const unacknowledgedAlerts = alerts.filter((a) => !a.acknowledged);
   const acknowledgedAlerts = alerts.filter((a) => a.acknowledged);
+
+  const handleExportComprehensive = () => {
+    exportComprehensiveWaliReport(registrations, alerts, activities);
+  };
 
   return (
     <div className="container mx-auto py-8 space-y-6">
@@ -87,10 +101,16 @@ const AdminWaliMonitoring = () => {
             </p>
           </div>
         </div>
-        <Button onClick={refetch} disabled={loading} variant="outline">
-          <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-          Actualiser
-        </Button>
+        <div className="flex gap-2">
+          <Button onClick={handleExportComprehensive} variant="outline">
+            <FileText className="w-4 h-4 mr-2" />
+            Rapport Complet
+          </Button>
+          <Button onClick={refetch} disabled={loading} variant="outline">
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Actualiser
+          </Button>
+        </div>
       </div>
 
       <StatisticsCards statistics={statistics} />
@@ -110,17 +130,32 @@ const AdminWaliMonitoring = () => {
         </TabsList>
 
         <TabsContent value="alerts" className="space-y-4">
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Alertes Non Confirmées</h2>
-            <AlertsTable
-              alerts={unacknowledgedAlerts}
-              onAcknowledge={handleAcknowledge}
-              onViewDetails={setSelectedAlert}
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Alertes Non Confirmées</h2>
+            <ExportMenu
+              onExportExcel={() => exportWaliAlertsToExcel(alerts)}
+              onExportCSV={() => exportWaliAlertsToCSV(alerts)}
+              label="Exporter Alertes"
             />
           </div>
+          <AlertsTable
+            alerts={unacknowledgedAlerts}
+            onAcknowledge={handleAcknowledge}
+            onViewDetails={setSelectedAlert}
+          />
         </TabsContent>
 
         <TabsContent value="activity" className="space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Activité des Walis</h2>
+            <Button
+              variant="outline"
+              onClick={() => exportWaliActivitiesToExcel(activities)}
+            >
+              <FileText className="w-4 h-4 mr-2" />
+              Exporter Activités
+            </Button>
+          </div>
           <ActivityList activities={activities} onSuspend={handleSuspend} />
         </TabsContent>
 
