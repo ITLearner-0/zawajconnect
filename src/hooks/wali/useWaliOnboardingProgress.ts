@@ -39,7 +39,7 @@ export const useWaliOnboardingProgress = (waliId?: string) => {
     try {
       setLoading(true);
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_onboarding_progress')
         .select('*')
         .eq('wali_id', waliId)
@@ -47,7 +47,7 @@ export const useWaliOnboardingProgress = (waliId?: string) => {
 
       if (error && error.code !== 'PGRST116') throw error;
       
-      setProgress(data);
+      setProgress(data as WaliOnboardingProgress | null);
     } catch (err) {
       console.error('Error fetching onboarding progress:', err);
     } finally {
@@ -59,7 +59,7 @@ export const useWaliOnboardingProgress = (waliId?: string) => {
     if (!waliId) return null;
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_onboarding_progress')
         .insert({
           wali_id: waliId,
@@ -72,8 +72,8 @@ export const useWaliOnboardingProgress = (waliId?: string) => {
 
       if (error) throw error;
 
-      setProgress(data);
-      return data;
+      setProgress(data as WaliOnboardingProgress);
+      return data as WaliOnboardingProgress;
     } catch (err) {
       console.error('Error initializing progress:', err);
       return null;
@@ -106,7 +106,7 @@ export const useWaliOnboardingProgress = (waliId?: string) => {
     }
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_onboarding_progress')
         .update(updates)
         .eq('id', progress.id)
@@ -115,16 +115,17 @@ export const useWaliOnboardingProgress = (waliId?: string) => {
 
       if (error) throw error;
 
-      setProgress(data);
+      const typedData = data as WaliOnboardingProgress;
+      setProgress(typedData);
       
-      if (data.completion_percentage === 100) {
+      if (typedData.completion_percentage === 100) {
         toast({
           title: '🎉 Onboarding Complete!',
           description: 'You have completed the Wali onboarding process.',
         });
       }
 
-      return data;
+      return typedData;
     } catch (err) {
       console.error('Error updating step:', err);
       toast({
