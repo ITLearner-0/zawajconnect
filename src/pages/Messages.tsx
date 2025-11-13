@@ -77,7 +77,7 @@ const Messages = () => {
     try {
       // First, try to find existing conversation
       console.log("Searching for existing conversations...");
-      const { data: existingConversations, error: findError } = await supabase
+      const { data: existingConversations, error: findError } = await (supabase as any)
         .from('conversations')
         .select('id, participants')
         .contains('participants', [currentUserId])
@@ -91,10 +91,10 @@ const Messages = () => {
       console.log("Found conversations:", existingConversations);
       
       // Check if we found a conversation with exactly these two participants
-      const existingConv = existingConversations?.find(conv => 
-        conv.participants.length === 2 && 
-        conv.participants.includes(currentUserId) && 
-        conv.participants.includes(otherUserId)
+      const existingConv = existingConversations?.find((conv: any) => 
+        conv.participants?.length === 2 && 
+        conv.participants?.includes(currentUserId) && 
+        conv.participants?.includes(otherUserId)
       );
       
       if (existingConv) {

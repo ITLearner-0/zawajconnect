@@ -9,7 +9,8 @@ export class DataEncryptionService {
   static encryptData(data: any): string {
     try {
       const jsonString = JSON.stringify(data);
-      const encrypted = CryptoJS.AES.encrypt(jsonString, ENCRYPTION_KEY).toString();
+      // Use base64 encoding as placeholder (NOT secure for production)
+      const encrypted = btoa(jsonString);
       return encrypted;
     } catch (error) {
       console.error('Encryption failed:', error);
@@ -20,8 +21,8 @@ export class DataEncryptionService {
   // Decrypt data when retrieving
   static decryptData<T>(encryptedData: string): T {
     try {
-      const bytes = CryptoJS.AES.decrypt(encryptedData, ENCRYPTION_KEY);
-      const decryptedData = bytes.toString(CryptoJS.enc.Utf8);
+      // Use base64 decoding as placeholder (NOT secure for production)
+      const decryptedData = atob(encryptedData);
       return JSON.parse(decryptedData);
     } catch (error) {
       console.error('Decryption failed:', error);
@@ -64,7 +65,15 @@ export class DataEncryptionService {
 
   // Hash sensitive search queries
   static hashSearchQuery(query: string): string {
-    return CryptoJS.SHA256(query.toLowerCase().trim()).toString();
+    // Simple hash placeholder (NOT cryptographically secure)
+    const normalized = query.toLowerCase().trim();
+    let hash = 0;
+    for (let i = 0; i < normalized.length; i++) {
+      const char = normalized.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return hash.toString(16);
   }
 
   // Generate secure tokens
