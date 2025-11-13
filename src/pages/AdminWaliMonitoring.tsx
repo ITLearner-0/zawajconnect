@@ -6,11 +6,16 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useWaliMonitoring, type WaliAlert } from '@/hooks/wali/useWaliMonitoring';
+import { useWaliTrends } from '@/hooks/wali/useWaliTrends';
 import { StatisticsCards } from '@/components/wali/monitoring/StatisticsCards';
 import { AlertsTable } from '@/components/wali/monitoring/AlertsTable';
 import { ActivityList } from '@/components/wali/monitoring/ActivityList';
 import { SuspendWaliDialog } from '@/components/wali/monitoring/SuspendWaliDialog';
 import { AlertDetailsDialog } from '@/components/wali/monitoring/AlertDetailsDialog';
+import { AlertsTrendChart } from '@/components/wali/monitoring/AlertsTrendChart';
+import { ActivityTrendChart } from '@/components/wali/monitoring/ActivityTrendChart';
+import { RegistrationsTrendChart } from '@/components/wali/monitoring/RegistrationsTrendChart';
+import { TrendPeriodSelector } from '@/components/wali/monitoring/TrendPeriodSelector';
 import { ExportMenu } from '@/components/wali/admin/ExportMenu';
 import {
   exportWaliAlertsToExcel,
@@ -39,6 +44,8 @@ const AdminWaliMonitoring = () => {
     userId: string;
     name: string;
   }>({ open: false, userId: '', name: '' });
+  const [trendPeriod, setTrendPeriod] = useState(12);
+  const { alertsTrend, activityTrend, registrationsTrend, loading: trendsLoading } = useWaliTrends(trendPeriod);
 
   // Check admin access
   useEffect(() => {
@@ -125,6 +132,7 @@ const AdminWaliMonitoring = () => {
               </span>
             )}
           </TabsTrigger>
+          <TabsTrigger value="trends">Tendances</TabsTrigger>
           <TabsTrigger value="activity">Activité des Walis</TabsTrigger>
           <TabsTrigger value="history">Historique</TabsTrigger>
         </TabsList>
@@ -143,6 +151,18 @@ const AdminWaliMonitoring = () => {
             onAcknowledge={handleAcknowledge}
             onViewDetails={setSelectedAlert}
           />
+        </TabsContent>
+
+        <TabsContent value="trends" className="space-y-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Graphiques de Tendances</h2>
+            <TrendPeriodSelector value={trendPeriod} onChange={setTrendPeriod} />
+          </div>
+          <div className="grid gap-6">
+            <AlertsTrendChart data={alertsTrend} loading={trendsLoading} />
+            <ActivityTrendChart data={activityTrend} loading={trendsLoading} />
+            <RegistrationsTrendChart data={registrationsTrend} loading={trendsLoading} />
+          </div>
         </TabsContent>
 
         <TabsContent value="activity" className="space-y-4">
