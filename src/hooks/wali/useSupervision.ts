@@ -51,7 +51,7 @@ export const useSupervision = (waliId: string) => {
     try {
       // Since supervision_sessions table doesn't exist, we'll use a simpler approach
       // We'll just fetch conversations that are marked as wali_supervised
-      const { data: conversations, error: conversationsError} = await (supabase as any)
+      const { data: conversations, error: conversationsError} = await supabase
         .from('conversations')
         .select(`
           *,
@@ -111,7 +111,7 @@ export const useSupervision = (waliId: string) => {
 
     try {
       // Update the conversation to mark it as wali-supervised
-      const { error: updateError } = await (supabase as any)
+      const { error: updateError } = await supabase
         .from('conversations')
         .update({ wali_supervised: true })
         .eq('id', conversationId);
@@ -149,7 +149,7 @@ export const useSupervision = (waliId: string) => {
 
     try {
       // Update conversation to mark it as not supervised
-      const { error: convError } = await (supabase as any)
+      const { error: convError } = await supabase
         .from('conversations')
         .update({ wali_supervised: false })
         .eq('id', conversationId);
