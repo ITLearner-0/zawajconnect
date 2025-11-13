@@ -174,32 +174,15 @@ export class SecurityAuditLogger {
         query = query.eq('user_id', userId);
       }
 
-      const { data, error } = await query;
+      
+      const { count, error } = await query;
 
       if (error) throw error;
 
-      // Process statistics
-      const stats = {
-        total: data.length,
-        byType: {} as Record<string, number>,
-        byHour: Array(24).fill(0)
-      };
-
-      data.forEach((event: any) => {
-        // Count by type
-        stats.byType[event.event_type] = (stats.byType[event.event_type] || 0) + 1;
-        
-        // Count by hour
-        if (event.created_at) {
-          const hour = new Date(event.created_at).getHours();
-          stats.byHour[hour]++;
-        }
-      });
-
-      return stats;
+      return count || 0;
     } catch (error) {
-      console.error('Failed to get audit stats:', error);
-      return null;
+      console.error('Failed to get event count:', error);
+      return 0;
     }
   }
 }
