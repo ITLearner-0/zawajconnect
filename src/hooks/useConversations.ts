@@ -27,7 +27,7 @@ export const useConversations = (userId: string | null) => {
         console.log('Fetching conversations for user:', userId);
         
         // First, get conversations without trying to join messages
-        const { data: conversationsData, error: convError } = await (supabase as any)
+        const { data: conversationsData, error: convError } = await supabase
           .from('conversations')
           .select('id, created_at, participants, wali_supervised')
           .contains('participants', [userId])
@@ -49,7 +49,7 @@ export const useConversations = (userId: string | null) => {
             if (otherParticipantId) {
               try {
                 // Get other participant's profile details
-                const { data: profileData, error: profileError } = await (supabase as any)
+                const { data: profileData, error: profileError } = await supabase
                   .from('profiles')
                   .select('first_name, last_name, profile_picture')
                   .eq('id', otherParticipantId)
@@ -60,7 +60,7 @@ export const useConversations = (userId: string | null) => {
                 }
                 
                 // Get the most recent message for this conversation
-                const { data: messagesData, error: msgError } = await (supabase as any)
+                const { data: messagesData, error: msgError } = await supabase
                   .from('messages')
                   .select('id, content, created_at, sender_id, is_read, match_id, is_wali_visible')
                   .eq('match_id', (conv as any).id)
@@ -135,7 +135,7 @@ export const useConversations = (userId: string | null) => {
     
     try {
       // Get conversation details
-      const { data: convData, error: convError } = await (supabase as any)
+      const { data: convData, error: convError } = await supabase
         .from('conversations')
         .select('*')
         .eq('id', conversationId)
@@ -151,7 +151,7 @@ export const useConversations = (userId: string | null) => {
       // Set current conversation
       const otherParticipantId = (convData as any).participants.find((p: any) => p !== userId);
       if (otherParticipantId) {
-        const { data: profileData, error: profileError } = await (supabase as any)
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('first_name, last_name, profile_picture')
           .eq('id', otherParticipantId)

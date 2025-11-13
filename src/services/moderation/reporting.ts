@@ -14,7 +14,7 @@ export const reportContent = async (
 ): Promise<boolean> => {
   try {
     // Use content_flags table instead of content_reports
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('content_flags')
       .insert({
         content_id: contentReference || reportedUserId,
@@ -61,7 +61,7 @@ export const resolveContentReport = async (
   adminNotes?: string
 ): Promise<boolean> => {
   try {
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('content_flags')
       .update({
         resolved: true,
