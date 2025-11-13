@@ -14,6 +14,7 @@ import ProfileCard from '@/components/profile/ProfileCard';
 import ProfileDetails from '@/components/profile/ProfileDetails';
 import ProfileQuote from '@/components/profile/ProfileQuote';
 import StandardLoadingState from '@/components/ui/StandardLoadingState';
+import { BadgeShowcase } from '@/components/gamification/BadgeShowcase';
 
 const UserProfile = () => {
   const { id } = useParams<{ id: string }>();
@@ -252,8 +253,9 @@ const UserProfile = () => {
               )}
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-1">
+                <div className="md:col-span-1 space-y-6">
                   <ProfileCard profile={profile} />
+                  {id && <BadgeShowcase userId={id} maxBadges={5} />}
                 </div>
 
                 <div className="md:col-span-2">

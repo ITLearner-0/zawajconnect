@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
 import { useNavigate } from "react-router-dom";
 import ProfileHeader from "@/components/profile/ProfileHeader";
+import { BadgeShowcase } from "@/components/gamification/BadgeShowcase";
 import ProfileForm from "@/components/profile/ProfileForm";
 import ProfileOnboarding from "@/components/profile/ProfileOnboarding";
 import ProfileAnalytics from "@/components/profile/ProfileAnalytics";
@@ -234,11 +235,14 @@ const ProfilePage = () => {
 
                 <TabsContent value="analytics" className="space-y-6">
                   {userId && (
-                    <ProfileAnalytics
-                      userId={userId}
-                      analytics={analytics}
-                      loading={analyticsLoading}
-                    />
+                    <>
+                      <BadgeShowcase userId={userId} maxBadges={5} />
+                      <ProfileAnalytics
+                        userId={userId}
+                        analytics={analytics}
+                        loading={analyticsLoading}
+                      />
+                    </>
                   )}
                 </TabsContent>
 
