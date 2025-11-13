@@ -45,7 +45,7 @@ export class DelegationService {
     reason: string;
   }): Promise<{ success: boolean; error?: string; delegationId?: string }> {
     try {
-      const { data: delegation, error } = await supabase
+      const { data: delegation, error } = await (supabase as any)
         .from('wali_delegations')
         .insert({
           primary_wali_id: data.primary_wali_id,
@@ -63,7 +63,7 @@ export class DelegationService {
 
       if (error) throw error;
 
-      return { success: true, delegationId: delegation.id };
+      return { success: true, delegationId: (delegation as any).id };
     } catch (error: any) {
       console.error('Error creating delegation:', error);
       return { success: false, error: error.message };
@@ -72,7 +72,7 @@ export class DelegationService {
 
   static async getActiveDelegations(wali_id: string): Promise<WaliDelegation[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_delegations')
         .select('*')
         .or(`primary_wali_id.eq.${wali_id},delegate_wali_id.eq.${wali_id}`)
@@ -81,7 +81,7 @@ export class DelegationService {
         .gte('end_date', new Date().toISOString());
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as WaliDelegation[];
     } catch (error) {
       console.error('Error fetching active delegations:', error);
       return [];
@@ -90,7 +90,7 @@ export class DelegationService {
 
   static async acceptDelegation(delegationId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('wali_delegations')
         .update({
           status: 'active',
@@ -108,7 +108,7 @@ export class DelegationService {
 
   static async revokeDelegation(delegationId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('wali_delegations')
         .update({
           status: 'revoked',
