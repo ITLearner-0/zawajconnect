@@ -45,9 +45,9 @@ export class DelegationService {
     reason: string;
   }): Promise<{ success: boolean; error?: string; delegationId?: string }> {
     try {
-      const { data: delegation, error } = await supabase
+      const { data: delegation, error } = await (supabase as any)
         .from('wali_delegations')
-        .insert({
+        .insert([{
           primary_wali_id: data.primary_wali_id,
           delegate_wali_id: data.delegate_wali_id,
           managed_user_id: data.managed_user_id,

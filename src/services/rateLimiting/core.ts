@@ -29,7 +29,9 @@ export class RateLimitCore {
     }
 
     // Initialize or reset window if expired
-    if (!data || (now - data.windowStart) >= config.windowMs) {
+    if (!data || !config || (now - data.windowStart) >= config.windowMs) {
+      if (!config) return { allowed: true, remaining: 0, resetTime: now, blocked: false };
+      
       data = {
         count: 0,
         windowStart: now
@@ -38,7 +40,7 @@ export class RateLimitCore {
     }
 
     // Check if limit exceeded
-    if (data.count >= config.maxRequests) {
+    if (data.count >= (config?.maxRequests ?? 100)) {
       // Block user if block duration is configured
       if (config.blockDurationMs) {
         data.blockedUntil = now + config.blockDurationMs;
@@ -47,33 +49,33 @@ export class RateLimitCore {
         // Log rate limit violation
         this.logRateLimitViolation(userId, endpoint, 'rate_limit_exceeded');
 
-        return {
-          allowed: false,
-          remaining: 0,
-          resetTime: data.windowStart + config.windowMs,
-          blocked: true,
-          blockUntil: data.blockedUntil
-        };
-      }
-
       return {
         allowed: false,
         remaining: 0,
-        resetTime: data.windowStart + config.windowMs,
-        blocked: false
+        resetTime: data.windowStart + (config?.windowMs ?? 60000),
+        blocked: true,
+        blockUntil: data.blockedUntil
       };
     }
 
-    // Increment counter and allow request
-    data.count++;
-    this.memoryStore.set(key, data);
-
     return {
-      allowed: true,
-      remaining: config.maxRequests - data.count,
-      resetTime: data.windowStart + config.windowMs,
+      allowed: false,
+      remaining: 0,
+      resetTime: data.windowStart + (config?.windowMs ?? 60000),
       blocked: false
     };
+  }
+
+  // Increment counter and allow request
+  data.count++;
+  this.memoryStore.set(key, data);
+
+  return {
+    allowed: true,
+    remaining: (config?.maxRequests ?? 100) - data.count,
+    resetTime: data.windowStart + (config?.windowMs ?? 60000),
+    blocked: false
+  };
   }
 
   async detectAbuse(userId: string, endpoint: string, requestData?: any) {
