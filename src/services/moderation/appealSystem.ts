@@ -44,7 +44,7 @@ export class AppealSystem {
       }
 
       // Submit new appeal
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('moderation_appeals')
         .insert({
           user_id: userId,
@@ -82,7 +82,7 @@ export class AppealSystem {
 
   static async getUserAppeals(userId: string): Promise<Appeal[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('moderation_appeals')
         .select(`
           *,
@@ -125,7 +125,7 @@ export class AppealSystem {
     reviewerNotes: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('moderation_appeals')
         .update({
           status: decision,
@@ -163,7 +163,7 @@ export class AppealSystem {
   private static async reverseModeration(appealId: string): Promise<void> {
     try {
       // Get the appeal and original moderation action
-      const { data: appeal } = await supabase
+      const { data: appeal } = await (supabase as any)
         .from('moderation_appeals')
         .select(`
           *,
@@ -175,7 +175,7 @@ export class AppealSystem {
       if (!appeal) return;
 
       // Mark the original moderation action as reversed
-      await supabase
+      await (supabase as any)
         .from('moderation_actions')
         .update({
           status: 'reversed',

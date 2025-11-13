@@ -114,7 +114,7 @@ export const usePrivacySettings = () => {
     
     try {
       // Update the database
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({ privacy_settings: newSettings })
         .eq('id', userId);
