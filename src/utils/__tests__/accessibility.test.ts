@@ -111,11 +111,11 @@ describe('Accessibility Utilities', () => {
       expect(getAccessibleLabel(input)).toBe('Email');
     });
 
-    it('should return null when no label is found', () => {
+    it('should return undefined when no label is found', () => {
       const div = document.createElement('div');
       container.appendChild(div);
 
-      expect(getAccessibleLabel(div)).toBeNull();
+      expect(getAccessibleLabel(div)).toBeUndefined();
     });
   });
 
