@@ -18,7 +18,7 @@ const EducationCareer = ({ formData, handleChange }: EducationCareerProps) => (
         <div className="flex items-center">
           <Label htmlFor="education" className="text-islamic-burgundy dark:text-islamic-cream/90">Education Level</Label>
           <TooltipProvider>
-            <FieldTooltip text={fieldTooltips.education} />
+            <FieldTooltip content={fieldTooltips.education} />
           </TooltipProvider>
         </div>
         <Input
@@ -38,7 +38,7 @@ const EducationCareer = ({ formData, handleChange }: EducationCareerProps) => (
         <div className="flex items-center">
           <Label htmlFor="occupation" className="text-islamic-burgundy dark:text-islamic-cream/90">Occupation</Label>
           <TooltipProvider>
-            <FieldTooltip text={fieldTooltips.occupation} />
+            <FieldTooltip content={fieldTooltips.occupation} />
           </TooltipProvider>
         </div>
         <Input

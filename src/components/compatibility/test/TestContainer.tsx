@@ -118,7 +118,7 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
         };
 
         const { error } = await supabase
-          .from('compatibility_results')
+          .from('compatibility_results' as any)
           .insert(resultData);
 
         if (error) throw error;

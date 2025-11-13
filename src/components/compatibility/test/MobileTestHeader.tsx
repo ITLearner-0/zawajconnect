@@ -23,7 +23,6 @@ const MobileTestHeader = ({ currentQuestion, answers, onQuestionSelect }: Mobile
     return acc;
   }, {} as Record<string, any[]>);
 
-  const currentQuestionData = questions[currentQuestion];
   const progressPercentage = ((currentQuestion + 1) / questions.length) * 100;
 
   return (
@@ -58,7 +57,7 @@ const MobileTestHeader = ({ currentQuestion, answers, onQuestionSelect }: Mobile
             Question {currentQuestion + 1}/{questions.length}
           </div>
           <div className="text-xs text-gray-600 dark:text-gray-400">
-            {currentQuestionData?.category}
+            {questions[currentQuestion]?.category ?? 'Catégorie inconnue'}
           </div>
         </div>
       </div>

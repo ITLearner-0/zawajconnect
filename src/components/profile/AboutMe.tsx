@@ -16,7 +16,7 @@ const AboutMe = ({ formData, handleChange }: AboutMeProps) => (
       <div className="flex items-center">
         <Label htmlFor="aboutMe" className="text-islamic-burgundy dark:text-islamic-cream/90">Parlez-nous de vous</Label>
         <TooltipProvider>
-          <FieldTooltip text={fieldTooltips.aboutMe} />
+          <FieldTooltip content={fieldTooltips.aboutMe} />
         </TooltipProvider>
       </div>
       <textarea

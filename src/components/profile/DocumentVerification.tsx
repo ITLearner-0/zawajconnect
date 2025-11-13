@@ -71,10 +71,10 @@ const DocumentVerification: React.FC<DocumentVerificationProps> = ({
     try {
       // In a real implementation, you would upload to storage first
       // For now, we'll simulate with a placeholder URL
-      const documentUrl = `documents/${userId}/${Date.now()}_${file.name}`;
+      const documentUrl = `documents/${userId ?? 'anonymous'}/${Date.now()}_${file.name}`;
 
       const { error } = await supabase
-        .from('document_verifications')
+        .from('document_verifications' as any)
         .insert({
           user_id: userId,
           document_type: selectedDocumentType,
@@ -85,12 +85,12 @@ const DocumentVerification: React.FC<DocumentVerificationProps> = ({
 
       // Update profile verification status
       await supabase
-        .from('profiles')
+        .from('profiles' as any)
         .update({
           document_verification_status: 'pending',
           document_verification_type: selectedDocumentType,
           document_verification_submitted_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', userId);
 
       toast({

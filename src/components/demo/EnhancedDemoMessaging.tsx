@@ -29,7 +29,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
   selectedPersona,
   onPersonaSelect
 }) => {
-  const [activeConversation, setActiveConversation] = useState<string | null>(null);
+  const [activeConversation, setActiveConversation] = useState<string>(selectedConversation || '');
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
   const [typingIndicator, setTypingIndicator] = useState(false);

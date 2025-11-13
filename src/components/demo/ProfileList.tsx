@@ -103,14 +103,14 @@ const ProfileList: React.FC<ProfileListProps> = ({ profiles, onSelectProfile }) 
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-rose-600 dark:text-rose-400">
                       <MapPin className="h-4 w-4" />
-                      <span>{profile.location}</span>
+                      <span>{profile.location || 'Non spécifié'}</span>
                       <span>•</span>
-                      <span>{calculateAge(profile.birth_date)} ans</span>
+                      <span>{profile.birth_date ? calculateAge(profile.birth_date) : '--'} ans</span>
                     </div>
                     
                     <div className="flex items-center gap-2 text-sm text-rose-600 dark:text-rose-400">
                       <Briefcase className="h-4 w-4" />
-                      <span>{profile.occupation}</span>
+                      <span>{profile.occupation || 'Non spécifié'}</span>
                     </div>
                   </div>
                 </div>

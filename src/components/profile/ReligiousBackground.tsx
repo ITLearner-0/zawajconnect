@@ -27,10 +27,10 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
       <div className="grid grid-cols-1 gap-4">
         <div className="space-y-2">
           <div className="flex items-center">
-            <Label htmlFor="religiousLevel">Religious Practice Level</Label>
-            <TooltipProvider>
-              <FieldTooltip text={fieldTooltips.religiousLevel} />
-            </TooltipProvider>
+          <Label htmlFor="religiousLevel">Religious Practice Level</Label>
+          <TooltipProvider>
+            <FieldTooltip content={fieldTooltips.religiousLevel} />
+          </TooltipProvider>
           </div>
           <select
             id="religiousLevel"
@@ -58,10 +58,10 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
         
         <div className="space-y-2">
           <div className="flex items-center">
-            <Label htmlFor="prayerFrequency">Prayer Frequency</Label>
-            <TooltipProvider>
-              <FieldTooltip text={fieldTooltips.prayerFrequency} />
-            </TooltipProvider>
+          <Label htmlFor="prayerFrequency">Prayer Frequency</Label>
+          <TooltipProvider>
+            <FieldTooltip content={fieldTooltips.prayerFrequency} />
+          </TooltipProvider>
           </div>
           <select
             id="prayerFrequency"
@@ -82,10 +82,10 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
         </div>
         <div className="space-y-2">
           <div className="flex items-center">
-            <Label htmlFor="familyBackground">Family Background</Label>
-            <TooltipProvider>
-              <FieldTooltip text={fieldTooltips.familyBackground} />
-            </TooltipProvider>
+          <Label htmlFor="familyBackground">Family Background</Label>
+          <TooltipProvider>
+            <FieldTooltip content={fieldTooltips.familyBackground} />
+          </TooltipProvider>
           </div>
           <textarea
             id="familyBackground"

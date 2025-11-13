@@ -115,8 +115,8 @@ const EnhancedPrivacySettings = ({
                   min={0} 
                   max={2} 
                   step={1} 
-                  value={[privacySettings.profileVisibilityLevel]} 
-                  onValueChange={handleProfileVisibilityChange}
+                  value={[privacySettings.profileVisibilityLevel ?? 1]} 
+                  onValueChange={(value) => handleProfileVisibilityChange([value[0] ?? 1])}
                   className="w-full"
                 />
               </div>

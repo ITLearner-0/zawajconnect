@@ -111,7 +111,7 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
               sendingMessage={sendingMessage}
               error={normalizedErrors.messages}
               onStartVideoCall={() => {
-                const otherUserId = currentConversation.participants?.find(id => id !== currentUserId);
+                const otherUserId = currentConversation.participants?.find((id: string) => id !== currentUserId);
                 if (otherUserId) {
                   startVideoCall(otherUserId);
                 }

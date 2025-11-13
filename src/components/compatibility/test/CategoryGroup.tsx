@@ -74,7 +74,7 @@ const CategoryGroup = ({
           
           <div className="grid gap-2">
             {questions.map((question, localIdx) => {
-              const globalIdx = categoryQuestionIndices[localIdx];
+              const globalIdx = categoryQuestionIndices[localIdx] ?? 0;
               const isAnswered = !!answers[globalIdx];
               const isCurrent = globalIdx === currentQuestionIndex;
               
@@ -102,10 +102,10 @@ const CategoryGroup = ({
                       {question.question}
                     </span>
                   </div>
-                  {isAnswered && (
+                   {isAnswered && answers[globalIdx] && (
                     <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                      Réponse: {answers[globalIdx].value}% 
-                      {answers[globalIdx].isBreaker && " (Critère non négociable)"}
+                      Réponse: {answers[globalIdx]?.value ?? 0}% 
+                      {answers[globalIdx]?.isBreaker && " (Critère non négociable)"}
                     </div>
                   )}
                 </div>

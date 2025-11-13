@@ -154,12 +154,12 @@ const IslamicContentSharing: React.FC<IslamicContentSharingProps> = ({ onShareCo
             <div className="space-y-3">
               <div>
                 <label className="text-sm font-medium">Type</label>
-                <Tabs
-                  value={customContent.type}
-                  onValueChange={(value: 'quran' | 'hadith') => 
-                    setCustomContent(prev => ({ ...prev, type: value }))
-                  }
-                >
+            <Tabs
+              value={customContent.type}
+              onValueChange={(value) => 
+                setCustomContent(prev => ({ ...prev, type: value as 'quran' | 'hadith' }))
+              }
+            >
                   <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="quran">Coran</TabsTrigger>
                     <TabsTrigger value="hadith">Hadith</TabsTrigger>

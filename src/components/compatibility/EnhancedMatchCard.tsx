@@ -93,7 +93,7 @@ const EnhancedMatchCard: React.FC<EnhancedMatchCardProps> = ({
           </div>
           
           <div className="text-right">
-            <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full ${getScoreColor(match.score)}`}>
+            <div className={`inline-flex items-center gap-1 px-3 py-1 rounded-full ${getScoreColor((match.score ?? match.compatibilityScore) ?? 0)}`}>
               <Heart className="h-4 w-4" />
               <span className="font-bold">{(match.score ?? match.compatibilityScore) ?? 0}%</span>
             </div>

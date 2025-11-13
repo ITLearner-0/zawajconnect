@@ -45,6 +45,7 @@ const MobileOptimizedQuestion = ({
   const currentLevel = agreementLevels.find(level => 
     Math.abs(level.value - (answer?.value || 60)) <= 10
   ) || agreementLevels[2];
+  const categoryColor = compatibilityTranslations.categories[question.category as keyof typeof compatibilityTranslations.categories] || question.category;
 
   return (
     <TooltipProvider>
@@ -52,7 +53,7 @@ const MobileOptimizedQuestion = ({
         {/* Category and Info */}
         <div className="flex items-center justify-between">
           <Badge className="bg-rose-100 text-rose-800 border-rose-300 text-xs md:text-sm">
-            {compatibilityTranslations.categories[question.category] || question.category}
+            {categoryColor}
           </Badge>
           {question.description && (
             <Tooltip>
@@ -97,7 +98,7 @@ const MobileOptimizedQuestion = ({
 
         {/* Current Selection Display */}
         <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <div className={`text-lg md:text-xl font-bold ${currentLevel.color} ${currentLevel.textColor} inline-block px-3 py-1 rounded`}>
+          <div className={`text-lg md:text-xl font-bold ${currentLevel?.color ?? 'bg-gray-400'} ${currentLevel?.textColor ?? 'text-white'} inline-block px-3 py-1 rounded`}>
             {formatAgreementLevel(answer?.value || 60)}
           </div>
         </div>

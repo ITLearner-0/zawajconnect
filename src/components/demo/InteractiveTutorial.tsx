@@ -61,10 +61,10 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
 
   const nextStep = () => {
     if (currentStep < steps.length - 1) {
-      handleStepComplete(steps[currentStep].id);
+      if (steps[currentStep]) handleStepComplete(steps[currentStep].id);
       setCurrentStep(currentStep + 1);
     } else {
-      handleStepComplete(steps[currentStep].id);
+      if (steps[currentStep]) handleStepComplete(steps[currentStep].id);
       setIsActive(false);
     }
   };
@@ -129,7 +129,9 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
   }
 
   const currentStepData = steps[currentStep];
-  const StepIcon = getStepIcon(currentStepData.id);
+  const StepIcon = currentStepData ? getStepIcon(currentStepData.id) : Play;
+  
+  if (!currentStepData) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">

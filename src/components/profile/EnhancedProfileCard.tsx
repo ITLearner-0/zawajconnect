@@ -92,9 +92,19 @@ const EnhancedProfileCard: React.FC<EnhancedProfileCardProps> = ({
 
         {/* Verification Badges */}
         <div className="flex flex-wrap gap-1 mb-3">
-          <VerificationBadge type="email" verified={profile.email_verified} />
-          <VerificationBadge type="phone" verified={profile.phone_verified} />
-          <VerificationBadge type="id" verified={profile.id_verified} />
+          <VerificationBadge verificationScore={profile.email_verified ? 100 : 0} />
+          {profile.phone_verified && (
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              <Shield className="w-3 h-3 mr-1" />
+              Phone Verified
+            </Badge>
+          )}
+          {profile.id_verified && (
+            <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+              <Shield className="w-3 h-3 mr-1" />
+              ID Verified
+            </Badge>
+          )}
           {profile.wali_verified && (
             <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
               <Shield className="w-3 h-3 mr-1" />
