@@ -50,7 +50,7 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
       ...prev,
       [currentQuestion]: {
         questionId: question.id,
-        value: value[0],
+        value: value[0] ?? 50,
         weight: prev[currentQuestion]?.weight ?? question.weight,
         isBreaker: isDealbreaker,
         breakerThreshold: isDealbreaker ? breakerThreshold : undefined
@@ -161,13 +161,13 @@ const TestContainer = ({ onComplete }: TestContainerProps) => {
       <TestHeader currentQuestion={currentQuestion} answers={answers} />
       
       <TestQuestion
-        question={questions[currentQuestion]}
+        question={questions[currentQuestion]!}
         answer={answers[currentQuestion]}
         isDealbreaker={isDealbreaker}
         breakerThreshold={breakerThreshold}
         onAnswerChange={handleAnswer}
         onDealbreakerChange={setIsDealbreaker}
-        onThresholdChange={(value) => setBreakerthreshold(value[0])}
+        onThresholdChange={(value) => setBreakerthreshold(value[0] ?? 50)}
         onWeightChange={handleWeightChange}
       />
       
