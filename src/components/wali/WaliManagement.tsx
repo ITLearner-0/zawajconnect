@@ -48,7 +48,7 @@ const WaliManagement: React.FC = () => {
 
       if ((waliProfile as any)?.managed_users?.length) {
         // Fetch profiles of managed users with basic info
-        const { data: profiles, error: profilesError } = await (supabase as any)
+        const { data: profiles, error: profilesError} = await (supabase as any)
           .from('profiles')
           .select('id, first_name, last_name, is_verified, wali_verified')
           .in('id', (waliProfile as any).managed_users);
