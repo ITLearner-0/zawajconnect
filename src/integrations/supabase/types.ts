@@ -1408,6 +1408,44 @@ export type Database = {
         };
         Relationships: [];
       };
+      appeal_activities: {
+        Row: {
+          activity_type: string;
+          appeal_id: string;
+          created_at: string;
+          id: string;
+          metadata: Json | null;
+          notes: string | null;
+          performed_by: string;
+        };
+        Insert: {
+          activity_type: string;
+          appeal_id: string;
+          created_at?: string;
+          id?: string;
+          metadata?: Json | null;
+          notes?: string | null;
+          performed_by: string;
+        };
+        Update: {
+          activity_type?: string;
+          appeal_id?: string;
+          created_at?: string;
+          id?: string;
+          metadata?: Json | null;
+          notes?: string | null;
+          performed_by?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "appeal_activities_appeal_id_fkey";
+            columns: ["appeal_id"];
+            isOneToOne: false;
+            referencedRelation: "moderation_appeals";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       blocked_match_pairs: {
         Row: {
           blocked_at: string | null;
@@ -2843,7 +2881,10 @@ export type Database = {
           expires_at: string | null;
           id: string;
           reason: string;
+          reversal_reason: string | null;
+          reversed_at: string | null;
           severity: string;
+          status: string | null;
           user_id: string;
         };
         Insert: {
@@ -2852,7 +2893,10 @@ export type Database = {
           expires_at?: string | null;
           id?: string;
           reason: string;
+          reversal_reason?: string | null;
+          reversed_at?: string | null;
           severity: string;
+          status?: string | null;
           user_id: string;
         };
         Update: {
@@ -2861,13 +2905,17 @@ export type Database = {
           expires_at?: string | null;
           id?: string;
           reason?: string;
+          reversal_reason?: string | null;
+          reversed_at?: string | null;
           severity?: string;
+          status?: string | null;
           user_id?: string;
         };
         Relationships: [];
       };
       moderation_appeals: {
         Row: {
+          additional_context: string | null;
           appeal_reason: string;
           created_at: string | null;
           evidence: string | null;
@@ -2879,6 +2927,7 @@ export type Database = {
           user_id: string;
         };
         Insert: {
+          additional_context?: string | null;
           appeal_reason: string;
           created_at?: string | null;
           evidence?: string | null;
@@ -2890,6 +2939,7 @@ export type Database = {
           user_id: string;
         };
         Update: {
+          additional_context?: string | null;
           appeal_reason?: string;
           created_at?: string | null;
           evidence?: string | null;
@@ -3762,6 +3812,51 @@ export type Database = {
           family_member_id?: string;
           id?: string;
           supervised_user_id?: string;
+        };
+        Relationships: [];
+      };
+      user_bans: {
+        Row: {
+          ban_type: string;
+          banned_at: string;
+          banned_by: string | null;
+          created_at: string;
+          expires_at: string | null;
+          id: string;
+          is_active: boolean;
+          lift_reason: string | null;
+          lifted_at: string | null;
+          reason: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          ban_type: string;
+          banned_at?: string;
+          banned_by?: string | null;
+          created_at?: string;
+          expires_at?: string | null;
+          id?: string;
+          is_active?: boolean;
+          lift_reason?: string | null;
+          lifted_at?: string | null;
+          reason: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          ban_type?: string;
+          banned_at?: string;
+          banned_by?: string | null;
+          created_at?: string;
+          expires_at?: string | null;
+          id?: string;
+          is_active?: boolean;
+          lift_reason?: string | null;
+          lifted_at?: string | null;
+          reason?: string;
+          updated_at?: string;
+          user_id?: string;
         };
         Relationships: [];
       };
