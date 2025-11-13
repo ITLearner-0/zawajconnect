@@ -32,19 +32,23 @@ export const useLoginStreak = (userId?: string) => {
     if (!userId) return;
     
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('user_levels')
         .select('current_streak, longest_streak, last_login_date')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') throw error;
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error loading streak:', error);
+        setStreakData(prev => ({ ...prev, loading: false }));
+        return;
+      }
 
       if (data) {
         setStreakData({
           currentStreak: data.current_streak || 0,
           longestStreak: data.longest_streak || 0,
-          lastLoginDate: data.last_login_date,
+          lastLoginDate: data.last_login_date || null,
           loading: false,
         });
       } else {
