@@ -48,6 +48,7 @@ const Compare = lazy(() => import('@/pages/Compare'));
 const Family = lazy(() => import('@/pages/Family'));
 const WaliDashboard = lazy(() => import('@/pages/WaliDashboard'));
 const WaliAccess = lazy(() => import('@/pages/WaliAccess'));
+const WaliRegistration = lazy(() => import('@/pages/WaliRegistration'));
 const MatchApproval = lazy(() => import('@/pages/MatchApproval'));
 const FamilyAnalyticsPage = lazy(() => import('@/pages/FamilyAnalytics'));
 const FamilySupervision = lazy(() => import('@/pages/FamilySupervision'));
@@ -110,6 +111,12 @@ export const specialRoutes: AppRouteConfig[] = [
   { 
     path: '/wali-onboarding', 
     component: WaliOnboarding, 
+    protected: true, 
+    requiresOnboarding: false 
+  },
+  { 
+    path: '/wali-registration', 
+    component: WaliRegistration, 
     protected: true, 
     requiresOnboarding: false 
   },

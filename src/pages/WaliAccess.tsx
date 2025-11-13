@@ -79,6 +79,18 @@ const WaliAccess = () => {
                 </Link>
               </Button>
               
+              <Button 
+                variant="outline"
+                size="lg"
+                className="w-full border-emerald text-emerald hover:bg-emerald/5"
+                asChild
+              >
+                <Link to="/wali-registration" className="flex items-center justify-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Devenir Wali
+                </Link>
+              </Button>
+              
               <div className="text-center">
                 <p className="text-sm text-muted-foreground mb-2">
                   Vous avez reçu une invitation par email ?
