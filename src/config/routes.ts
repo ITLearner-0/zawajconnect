@@ -83,6 +83,14 @@ export const routes: RouteConfig[] = [
     category: 'main'
   },
   {
+    path: '/gamification',
+    component: 'Gamification',
+    label: 'Récompenses',
+    requiresAuth: true,
+    icon: 'Award',
+    category: 'main'
+  },
+  {
     path: '/matches',
     component: 'Matches',
     label: 'Mes Matches',
