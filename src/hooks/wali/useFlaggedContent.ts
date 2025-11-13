@@ -22,7 +22,7 @@ export const useFlaggedContent = (waliId: string) => {
 
     try {
       // First get conversations this wali is responsible for
-      const { data: waliProfile, error: waliError } = await (supabase as any)
+      const { data: waliProfile, error: waliError } = await supabase
         .from('wali_profiles')
         .select('managed_users')
         .eq('user_id', waliId)
@@ -40,7 +40,7 @@ export const useFlaggedContent = (waliId: string) => {
       }
 
       // Now get flagged content related to these users
-      const { data: flags, error: flagsError } = await (supabase as any)
+      const { data: flags, error: flagsError } = await supabase
         .from('content_flags')
         .select('*')
         .in('flagged_by', managedUsers)
@@ -102,7 +102,7 @@ export const useFlaggedContent = (waliId: string) => {
     if (!waliId) return false;
 
     try {
-      const { error: updateError } = await (supabase as any)
+      const { error: updateError } = await supabase
         .from('content_flags')
         .update({ 
           resolved: true,
