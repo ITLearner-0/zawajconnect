@@ -28,9 +28,9 @@ export interface DelegateWali {
   first_name: string;
   last_name: string;
   relationship: string;
-  contact_information: string;
-  is_verified: boolean;
-  availability_status: string;
+  contact_information: string | null;
+  is_verified: boolean | null;
+  availability_status: string | null;
 }
 
 export class DelegationService {
@@ -45,19 +45,19 @@ export class DelegationService {
     reason: string;
   }): Promise<{ success: boolean; error?: string; delegationId?: string }> {
     try {
-      const { data: delegation, error } = await supabase
+      const { data: delegation, error } = await (supabase as any)
         .from('wali_delegations')
         .insert({
           primary_wali_id: data.primary_wali_id,
           delegate_wali_id: data.delegate_wali_id,
           managed_user_id: data.managed_user_id,
           delegation_type: data.delegation_type,
-          permissions: data.permissions,
+          permissions: data.permissions as any,
           start_date: data.start_date,
           end_date: data.end_date,
           reason: data.reason,
           status: 'pending'
-        })
+        } as any)
         .select('id')
         .single();
 
@@ -72,7 +72,7 @@ export class DelegationService {
 
   static async getActiveDelegations(wali_id: string): Promise<WaliDelegation[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_delegations')
         .select('*')
         .or(`primary_wali_id.eq.${wali_id},delegate_wali_id.eq.${wali_id}`)
@@ -81,7 +81,7 @@ export class DelegationService {
         .gte('end_date', new Date().toISOString());
 
       if (error) throw error;
-      return data || [];
+      return (data as WaliDelegation[]) || [];
     } catch (error) {
       console.error('Error fetching active delegations:', error);
       return [];
@@ -90,12 +90,12 @@ export class DelegationService {
 
   static async acceptDelegation(delegationId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('wali_delegations')
         .update({
           status: 'active',
           activated_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', delegationId);
 
       if (error) throw error;
@@ -108,12 +108,12 @@ export class DelegationService {
 
   static async revokeDelegation(delegationId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('wali_delegations')
         .update({
           status: 'revoked',
           revoked_at: new Date().toISOString()
-        })
+        } as any)
         .eq('id', delegationId);
 
       if (error) throw error;
@@ -126,15 +126,15 @@ export class DelegationService {
 
   static async findAvailableWalis(excludeWaliId: string): Promise<DelegateWali[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_profiles')
         .select('id, user_id, first_name, last_name, relationship, contact_information, is_verified, availability_status')
         .neq('user_id', excludeWaliId)
         .eq('is_verified', true)
-        .in('availability_status', ['online', 'away']);
+        .in('availability_status', ['available']);
 
       if (error) throw error;
-      return data || [];
+      return (data as DelegateWali[]) || [];
     } catch (error) {
       console.error('Error finding available walis:', error);
       return [];

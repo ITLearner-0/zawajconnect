@@ -36,7 +36,7 @@ export class FamilyVerificationService {
     verification_notes: string;
   }): Promise<{ success: boolean; error?: string; verificationId?: string }> {
     try {
-      const { data: verification, error } = await supabase
+      const { data: verification, error } = await (supabase as any)
         .from('family_relationship_verifications')
         .insert({
           wali_id: data.wali_id,
@@ -48,7 +48,7 @@ export class FamilyVerificationService {
           community_references: data.community_references || [],
           verification_notes: data.verification_notes,
           verification_status: 'pending'
-        })
+        } as any)
         .select('id')
         .single();
 
@@ -63,7 +63,7 @@ export class FamilyVerificationService {
 
   static async getVerificationStatus(wali_id: string, managed_user_id: string): Promise<FamilyRelationshipVerification | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('family_relationship_verifications')
         .select('*')
         .eq('wali_id', wali_id)
@@ -73,7 +73,7 @@ export class FamilyVerificationService {
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      return data || null;
+      return (data as FamilyRelationshipVerification) || null;
     } catch (error) {
       console.error('Error fetching verification status:', error);
       return null;
@@ -87,14 +87,14 @@ export class FamilyVerificationService {
     verifiedBy?: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('family_relationship_verifications')
         .update({
           verification_status: status,
           verification_notes: notes,
           verified_by: verifiedBy,
           verified_at: status === 'verified' ? new Date().toISOString() : null
-        })
+        } as any)
         .eq('id', verificationId);
 
       if (error) throw error;
