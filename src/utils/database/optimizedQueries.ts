@@ -138,7 +138,7 @@ export const getUserConversations = async (userId: string) => {
 // Notification queries optimized for indexes
 export const getUnreadNotifications = async (userId: string, limit: number = 20) => {
   // Uses idx_match_notifications_user_unread composite index
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('match_notifications')
     .select('*')
     .eq('user_id', userId)
@@ -151,7 +151,7 @@ export const getUnreadNotifications = async (userId: string, limit: number = 20)
 
 export const getRecentNotifications = async (userId: string, limit: number = 50) => {
   // Uses idx_match_notifications_user_id and idx_match_notifications_created_at
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('match_notifications')
     .select('*')
     .eq('user_id', userId)
@@ -164,7 +164,7 @@ export const getRecentNotifications = async (userId: string, limit: number = 50)
 // Chat request queries optimized for indexes
 export const getPendingChatRequests = async (recipientId: string) => {
   // Uses idx_chat_requests_recipient_id and idx_chat_requests_status
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('chat_requests')
     .select('*')
     .eq('recipient_id', recipientId)
@@ -176,7 +176,7 @@ export const getPendingChatRequests = async (recipientId: string) => {
 
 export const getWaliChatRequests = async (waliId: string) => {
   // Uses idx_chat_requests_wali_id
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('chat_requests')
     .select('*')
     .eq('wali_id', waliId)
@@ -242,9 +242,9 @@ export const getUserVideoCallHistory = async (userId: string, limit: number = 20
     return { data: null, error: error1 || error2 };
   }
 
-  // Combine and sort by started_at
+  // Combine and sort by start_time
   const allCalls = [...(initiatedCalls || []), ...(receivedCalls || [])]
-    .sort((a, b) => new Date(b.started_at || '').getTime() - new Date(a.started_at || '').getTime())
+    .sort((a, b) => new Date(b.start_time || '').getTime() - new Date(a.start_time || '').getTime())
     .slice(0, limit);
 
   return { data: allCalls, error: null };

@@ -187,10 +187,12 @@ export class SuspiciousActivityDetector {
 
     try {
       // Log to security events
-      await supabase.from('security_events').insert({
-        user_id: userId,
+      await (supabase as any).from('security_events').insert({
         event_type: 'suspicious_activity',
-        details: {
+        description: `Suspicious activity detected - Threat level: ${threatLevel.level}`,
+        severity: threatLevel.level,
+        metadata: {
+          user_id: userId,
           threat_level: threatLevel.level,
           score: threatLevel.score,
           reasons: threatLevel.reasons,
@@ -215,10 +217,15 @@ export class SuspiciousActivityDetector {
   // Lock user account
   private static async lockAccount(userId: string, reason: string): Promise<void> {
     try {
-      await supabase.from('security_events').insert({
-        user_id: userId,
+      await (supabase as any).from('security_events').insert({
         event_type: 'account_locked',
-        details: { reason, timestamp: new Date().toISOString() }
+        description: `Account locked: ${reason}`,
+        severity: 'critical',
+        metadata: {
+          user_id: userId,
+          reason,
+          timestamp: new Date().toISOString()
+        }
       });
       
       // Force logout

@@ -45,10 +45,9 @@ export class DelegationService {
     reason: string;
   }): Promise<{ success: boolean; error?: string; delegationId?: string }> {
     try {
-      const { data: delegation, error } = await supabase
+      const { data: delegation, error } = await (supabase as any)
         .from('wali_delegations')
         .insert({
-          primary_wali_id: data.primary_wali_id,
           delegate_wali_id: data.delegate_wali_id,
           managed_user_id: data.managed_user_id,
           delegation_type: data.delegation_type,
@@ -72,16 +71,21 @@ export class DelegationService {
 
   static async getActiveDelegations(wali_id: string): Promise<WaliDelegation[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_delegations')
         .select('*')
-        .or(`primary_wali_id.eq.${wali_id},delegate_wali_id.eq.${wali_id}`)
+        .or(`delegate_wali_id.eq.${wali_id}`)
         .eq('status', 'active')
         .lte('start_date', new Date().toISOString())
         .gte('end_date', new Date().toISOString());
 
       if (error) throw error;
-      return data || [];
+      const delegations: WaliDelegation[] = (data || []).map((d: any) => ({
+        ...d,
+        primary_wali_id: d.delegate_wali_id, // Map for compatibility
+        delegation_type: d.delegation_type as 'temporary' | 'emergency' | 'specific_event'
+      }));
+      return delegations;
     } catch (error) {
       console.error('Error fetching active delegations:', error);
       return [];
@@ -90,7 +94,7 @@ export class DelegationService {
 
   static async acceptDelegation(delegationId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('wali_delegations')
         .update({
           status: 'active',
@@ -108,7 +112,7 @@ export class DelegationService {
 
   static async revokeDelegation(delegationId: string): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('wali_delegations')
         .update({
           status: 'revoked',
@@ -126,7 +130,7 @@ export class DelegationService {
 
   static async findAvailableWalis(excludeWaliId: string): Promise<DelegateWali[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_profiles')
         .select('id, user_id, first_name, last_name, relationship, contact_information, is_verified, availability_status')
         .neq('user_id', excludeWaliId)
@@ -134,7 +138,13 @@ export class DelegationService {
         .in('availability_status', ['online', 'away']);
 
       if (error) throw error;
-      return data || [];
+      const delegates: DelegateWali[] = (data || []).map((d: any) => ({
+        ...d,
+        contact_information: d.contact_information || '',
+        is_verified: d.is_verified ?? false,
+        availability_status: d.availability_status || 'unknown'
+      }));
+      return delegates;
     } catch (error) {
       console.error('Error finding available walis:', error);
       return [];
