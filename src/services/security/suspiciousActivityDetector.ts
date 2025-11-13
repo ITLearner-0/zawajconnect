@@ -188,10 +188,11 @@ export class SuspiciousActivityDetector {
 
     try {
       // Log to security events
-      await supabase.from('security_events').insert({
-        user_id: userId,
+      await (supabase as any).from('security_events').insert({
+        user_id: userId ?? '',
         event_type: 'suspicious_activity',
-        details: {
+        description: 'Suspicious activity detected',
+        metadata: {
           threat_level: threatLevel.level,
           score: threatLevel.score,
           reasons: threatLevel.reasons,
@@ -216,8 +217,8 @@ export class SuspiciousActivityDetector {
   // Lock user account
   private static async lockAccount(userId: string, reason: string): Promise<void> {
     try {
-      await supabase.from('security_events').insert({
-        user_id: userId,
+      await (supabase as any).from('security_events').insert({
+        user_id: userId ?? '',
         event_type: 'account_locked',
         details: { reason, timestamp: new Date().toISOString() }
       });

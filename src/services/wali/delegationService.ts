@@ -72,7 +72,7 @@ export class DelegationService {
 
   static async getActiveDelegations(wali_id: string): Promise<WaliDelegation[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_delegations')
         .select('*')
         .or(`primary_wali_id.eq.${wali_id},delegate_wali_id.eq.${wali_id}`)
@@ -81,7 +81,7 @@ export class DelegationService {
         .gte('end_date', new Date().toISOString());
 
       if (error) throw error;
-      return data || [];
+      return (data || []) as WaliDelegation[];
     } catch (error) {
       console.error('Error fetching active delegations:', error);
       return [];

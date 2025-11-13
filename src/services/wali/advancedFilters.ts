@@ -240,8 +240,8 @@ export class AdvancedFiltersService {
 
     // Check allowed hours
     if (config.allowed_hours_start && config.allowed_hours_end) {
-      const startHour = parseInt(config.allowed_hours_start.split(':')[0]);
-      const endHour = parseInt(config.allowed_hours_end.split(':')[0]);
+      const startHour = parseInt((config.allowed_hours_start ?? '0:0').split(':')[0] ?? '0');
+      const endHour = parseInt((config.allowed_hours_end ?? '23:59').split(':')[0] ?? '23');
       
       if (currentHour < startHour || currentHour > endHour) {
         actions.push({
