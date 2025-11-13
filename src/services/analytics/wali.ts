@@ -19,7 +19,7 @@ export const getWaliStats = async (
       const dateString = date.toISOString().split('T')[0];
       
       supervisionTrends.push({
-        date: dateString,
+        date: dateString ?? '',
         count: Math.floor(Math.random() * 20) + 5 // Random value for demo
       });
     }

@@ -27,7 +27,7 @@ export const getUserActivityStats = async (
       const dateString = date.toISOString().split('T')[0];
       
       messageTrends.push({
-        date: dateString,
+        date: dateString ?? '',
         count: Math.floor(Math.random() * 100) + 20 // Random value for demo
       });
     }

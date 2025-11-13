@@ -22,7 +22,7 @@ export class DailyLimitsService {
     const newLimits: DailyLimits = {
       suggestionsPerDay: this.SUGGESTIONS_LIMIT,
       currentDayCount: 0,
-      lastResetDate: today
+      lastResetDate: today ?? ''
     };
 
     localStorage.setItem(`${this.STORAGE_KEY}_${userId}`, JSON.stringify(newLimits));
