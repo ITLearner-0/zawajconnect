@@ -13,6 +13,7 @@ import ProtectedRouteWrapper from "@/components/routing/ProtectedRouteWrapper";
 import { FreemiumBanner } from "@/components/FreemiumBanner";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { AchievementNotificationProvider } from "@/components/AchievementNotificationProvider";
+import { EmailVerificationMonitor } from "@/components/EmailVerificationMonitor";
 
 // Loading fallback component for lazy-loaded routes
 const RouteLoadingFallback = () => (
@@ -43,6 +44,7 @@ function App() {
         <UserDataProvider>
           <AchievementNotificationProvider>
             <BadgeNotificationProvider>
+              <EmailVerificationMonitor />
               <BrowserRouter
                 future={{
                   v7_startTransition: true,

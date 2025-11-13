@@ -37,6 +37,14 @@ const IdVerification = ({ isVerified, onVerificationChange }: IdVerificationProp
       
       if (error) throw error;
       
+      // Award ID verification badge
+      try {
+        const { awardBadgeSilent } = await import('@/utils/badgeAwards');
+        await awardBadgeSilent('id_verified');
+      } catch (badgeError) {
+        console.error('Error awarding ID verification badge:', badgeError);
+      }
+      
       toast({
         title: "Vérification d'identité",
         description: "Votre identité a été vérifiée avec succès",
