@@ -68,6 +68,7 @@ const Guidance = lazy(() => import('@/pages/Guidance'));
 const Admin = lazy(() => import('@/pages/Admin'));
 const ABTestingDashboard = lazy(() => import('@/pages/ABTestingDashboard'));
 const AdminUserProfile = lazy(() => import('@/pages/AdminUserProfile'));
+const AdminWaliRegistrations = lazy(() => import('@/pages/AdminWaliRegistrations'));
 const ModerationTest = lazy(() => import('@/pages/ModerationTest'));
 const ModerationTests = lazy(() => import('@/pages/ModerationTests'));
 
@@ -147,6 +148,7 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/admin', component: Admin },
   { path: '/ab-testing', component: ABTestingDashboard },
   { path: '/admin/user/:userId', component: AdminUserProfile },
+  { path: '/admin/wali-registrations', component: AdminWaliRegistrations },
   { path: '/admin/wali-alerts', component: AdminWaliAlertsDashboard },
   { path: '/moderation-test', component: ModerationTest },
   { path: '/wali-dashboard', component: WaliDashboard },
