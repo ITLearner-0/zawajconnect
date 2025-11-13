@@ -1,5 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
 import GamificationAchievementsDashboard from '@/components/gamification/GamificationAchievementsDashboard';
+import { StreakDisplay } from '@/components/gamification';
 import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { LogIn } from 'lucide-react';
@@ -33,6 +34,12 @@ const GamificationPage = () => {
         <p className="text-muted-foreground">
           Track your badges, claim rewards, and view your progress
         </p>
+      </div>
+
+      <div className="grid gap-6 mb-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="lg:col-span-1">
+          <StreakDisplay />
+        </div>
       </div>
       
       <GamificationAchievementsDashboard userId={user.id} />
