@@ -11,10 +11,11 @@ export default defineConfig({
     css: false, // Disable CSS processing to speed up tests
     include: ['src/**/*.{test,spec}.{ts,tsx}'], // Only run tests in src directory
     exclude: ['node_modules', 'dist', '.git', '.cache'], // Exclude common directories
-    pool: 'forks', // Use forks pool for better isolation and performance
+    pool: 'threads', // Use threads pool for faster execution than forks
+    isolate: false, // Reuse environment between test files to reduce setup overhead
     poolOptions: {
-      forks: {
-        singleFork: true, // Use single fork to reduce overhead
+      threads: {
+        singleThread: true, // Use single thread to reduce overhead
       },
     },
     coverage: {
