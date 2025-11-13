@@ -149,7 +149,8 @@ const WaliEmailHistoryTable: React.FC<WaliEmailHistoryTableProps> = ({
       <Card className="p-6">
         <div className="text-center text-muted-foreground">
           <Mail className="h-12 w-12 mx-auto mb-2 opacity-50" />
-          <p>Aucun historique d'email disponible</p>
+          <p className="font-medium">Aucun email trouvé</p>
+          <p className="text-sm mt-1">Essayez d'ajuster vos filtres de recherche</p>
         </div>
       </Card>
     );
