@@ -30,13 +30,6 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifications, setShowNotifications] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      fetchNotifications();
-      subscribeToNotifications();
-    }
-  }, [user]);
-
   const fetchNotifications = async () => {
     if (!user) return;
 
@@ -95,6 +88,13 @@ const NotificationSystem = ({ onNotificationClick }: NotificationSystemProps) =>
       subscription.unsubscribe();
     };
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchNotifications();
+      subscribeToNotifications();
+    }
+  }, [user]);
 
   const markAsRead = async (notificationId: string) => {
     if (!user) return;

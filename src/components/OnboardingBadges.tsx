@@ -50,10 +50,6 @@ const OnboardingBadges: React.FC = () => {
   const [achievements, setAchievements] = useState<AchievementUnlock[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadAchievements();
-  }, []);
-
   const loadAchievements = async () => {
     const {
       data: { user },
@@ -74,6 +70,10 @@ const OnboardingBadges: React.FC = () => {
     }
     setLoading(false);
   };
+
+  useEffect(() => {
+    loadAchievements();
+  }, []);
 
   const unlockedIds = new Set(achievements.map((a) => a.achievement_id));
 

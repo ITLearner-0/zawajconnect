@@ -15,14 +15,14 @@ const NoteTagSelector = ({ noteId }: NoteTagSelectorProps) => {
   const [selectedTags, setSelectedTags] = useState<ProfileTag[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    loadNoteTags();
-  }, [noteId]);
-
   const loadNoteTags = async () => {
     const noteTags = await getNoteTags(noteId);
     setSelectedTags(noteTags);
   };
+
+  useEffect(() => {
+    loadNoteTags();
+  }, [noteId]);
 
   const handleTagToggle = async (tag: ProfileTag) => {
     const isSelected = selectedTags.some((t) => t.id === tag.id);

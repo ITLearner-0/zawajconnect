@@ -57,6 +57,16 @@ const VideoCall = ({
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [showCallOptions, setShowCallOptions] = useState(false);
 
+  const startCall = () => {
+    setIsCallActive(true);
+    setCallDuration(0);
+    setShowCallOptions(false);
+    toast({
+      title: 'Appel démarré',
+      description: `Connexion avec ${partnerName}...`,
+    });
+  };
+
   // Simulated call timer
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -112,16 +122,6 @@ const VideoCall = ({
       });
       setConnectionStatus('disconnected');
     }
-  };
-
-  const startCall = () => {
-    setIsCallActive(true);
-    setCallDuration(0);
-    setShowCallOptions(false);
-    toast({
-      title: 'Appel démarré',
-      description: `Connexion avec ${partnerName}...`,
-    });
   };
 
   const startGoogleMeetCall = () => {
