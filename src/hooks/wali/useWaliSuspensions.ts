@@ -40,7 +40,7 @@ export const useWaliSuspensions = (waliId?: string) => {
     try {
       setLoading(true);
 
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_suspensions')
         .select('*')
         .eq('wali_id', waliId)
@@ -48,10 +48,11 @@ export const useWaliSuspensions = (waliId?: string) => {
 
       if (error) throw error;
 
-      setSuspensions(data || []);
+      const typedData = (data || []) as WaliSuspension[];
+      setSuspensions(typedData);
 
       // Find active suspension
-      const active = data?.find(
+      const active = typedData?.find(
         (s) =>
           s.is_active &&
           (!s.expires_at || new Date(s.expires_at) > new Date())
@@ -69,7 +70,7 @@ export const useWaliSuspensions = (waliId?: string) => {
     if (!waliId) return null;
 
     try {
-      const { data: newSuspension, error } = await supabase
+      const { data: newSuspension, error } = await (supabase as any)
         .from('wali_suspensions')
         .insert({
           wali_id: waliId,
@@ -87,7 +88,7 @@ export const useWaliSuspensions = (waliId?: string) => {
         description: 'Wali has been suspended.',
       });
 
-      return newSuspension;
+      return newSuspension as WaliSuspension;
     } catch (err) {
       console.error('Error creating suspension:', err);
       toast({
@@ -101,7 +102,7 @@ export const useWaliSuspensions = (waliId?: string) => {
 
   const liftSuspension = async (suspensionId: string, liftedBy: string) => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_suspensions')
         .update({
           is_active: false,
@@ -121,7 +122,7 @@ export const useWaliSuspensions = (waliId?: string) => {
         description: 'Wali suspension has been lifted.',
       });
 
-      return data;
+      return data as WaliSuspension;
     } catch (err) {
       console.error('Error lifting suspension:', err);
       toast({
