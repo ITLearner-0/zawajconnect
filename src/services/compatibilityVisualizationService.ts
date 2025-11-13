@@ -8,7 +8,7 @@ export class CompatibilityVisualizationService {
     const { matchDetails } = match;
     
     // Générer les points de force
-    const strengths: CompatibilityPoint[] = matchDetails.strengths?.map(category => ({
+    const strengths: CompatibilityPoint[] = matchDetails?.strengths?.map(category => ({
       category,
       score: 85 + Math.random() * 15, // Score élevé pour les forces
       weight: this.getCategoryWeight(category),
@@ -18,7 +18,7 @@ export class CompatibilityVisualizationService {
     })) || [];
 
     // Générer les différences
-    const differences: CompatibilityPoint[] = matchDetails.differences?.map(category => ({
+    const differences: CompatibilityPoint[] = (matchDetails as any)?.differences?.map((category: any) => ({
       category,
       score: 20 + Math.random() * 40, // Score plus faible pour les différences
       weight: this.getCategoryWeight(category),
@@ -36,10 +36,10 @@ export class CompatibilityVisualizationService {
     };
 
     return {
-      overallScore: match.score,
+      overallScore: match.score ?? 0,
       strengths,
       differences,
-      dealbreakers: matchDetails.dealbreakers || [],
+      dealbreakers: (matchDetails as any)?.dealbreakers || [],
       compatibilityBreakdown
     };
   }

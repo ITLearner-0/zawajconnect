@@ -29,7 +29,7 @@ export class AppealSystem {
   static async submitAppeal(appeal: AppealSubmission, userId: string): Promise<{ success: boolean; appealId?: string; error?: string }> {
     try {
       // Check if user already has a pending appeal for this action
-      const { data: existingAppeals } = await supabase
+      const { data: existingAppeals } = await (supabase as any)
         .from('moderation_appeals')
         .select('id')
         .eq('user_id', userId)
@@ -44,7 +44,7 @@ export class AppealSystem {
       }
 
       // Submit new appeal
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('moderation_appeals')
         .insert({
           user_id: userId,

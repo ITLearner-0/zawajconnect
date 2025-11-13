@@ -16,7 +16,7 @@ export const getWaliStats = async (
     for (let i = 6; i >= 0; i--) {
       const date = new Date();
       date.setDate(today.getDate() - i);
-      const dateString = date.toISOString().split('T')[0];
+      const dateString = date.toISOString().split('T')[0] ?? '';
       
       supervisionTrends.push({
         date: dateString,

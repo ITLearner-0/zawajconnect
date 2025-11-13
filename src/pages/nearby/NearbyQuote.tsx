@@ -30,8 +30,8 @@ const NearbyQuote = () => {
       <div className="flex items-start">
         <QuoteIcon className="text-islamic-teal h-6 w-6 mr-3 flex-shrink-0 mt-1" />
         <div>
-          <p className="text-islamic-burgundy italic mb-2">{quote.text}</p>
-          <p className="text-islamic-teal text-sm font-medium text-right">— {quote.source}</p>
+          <p className="text-islamic-burgundy italic mb-2">{quote?.text ?? ''}</p>
+          <p className="text-islamic-teal text-sm font-medium text-right">— {quote?.source ?? ''}</p>
         </div>
       </div>
     </IslamicPattern>

@@ -101,10 +101,11 @@ export class JWTManager {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase.from('security_events').insert({
+        await (supabase as any).from('security_events').insert({
           user_id: user.id,
           event_type: 'force_logout',
-          details: { reason, timestamp: new Date().toISOString() }
+          description: reason,
+          metadata: { timestamp: new Date().toISOString() }
         });
       }
     } catch (error) {
