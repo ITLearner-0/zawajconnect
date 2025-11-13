@@ -177,6 +177,7 @@ export class SecurityAuditLogger {
       const { data, error } = await query;
 
       if (error) throw error;
+      if (!data) return null;
 
       // Process statistics
       const stats = {
@@ -190,8 +191,10 @@ export class SecurityAuditLogger {
         stats.byType[event.event_type] = (stats.byType[event.event_type] || 0) + 1;
         
         // Count by hour
-        const hour = new Date(event.created_at).getHours();
-        stats.byHour[hour]++;
+        if (event.created_at) {
+          const hour = new Date(event.created_at).getHours();
+          stats.byHour[hour]++;
+        }
       });
 
       return stats;

@@ -58,7 +58,7 @@ export const findNearbyProfiles = async (
         first_name: profile.first_name || 'Utilisateur',
         last_name: profile.last_name || '',
         name: `${profile.first_name || 'Utilisateur'} ${profile.last_name || ''}`.trim(),
-        age: age,
+        age: age ?? undefined,
         location: profile.location || 'Paris, France',
         education: profile.education_level || 'Non spécifié',
         occupation: profile.occupation || 'Non spécifié',
