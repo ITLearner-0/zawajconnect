@@ -149,7 +149,7 @@ export const useSupervision = (waliId: string) => {
 
     try {
       // Update conversation to mark it as not supervised
-      const { error: convError } = await supabase
+      const { error: convError } = await (supabase as any)
         .from('conversations')
         .update({ wali_supervised: false })
         .eq('id', conversationId);

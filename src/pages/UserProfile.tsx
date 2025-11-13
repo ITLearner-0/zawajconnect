@@ -105,7 +105,8 @@ const UserProfile = () => {
 
         console.log("Profile check result:", profileCheck);
 
-        if (!profileCheck.is_visible) {
+        const profileCheckAny = profileCheck as any;
+        if (!profileCheckAny.is_visible) {
           console.log("Profile exists but is not visible");
           toast({
             title: "Profil non disponible",
@@ -140,40 +141,41 @@ const UserProfile = () => {
 
         if (profileData) {
           // Convert database profile to DatabaseProfile format
+          const profileDataAny = profileData as any;
           const formattedProfile: DatabaseProfile = {
             id: profileData.id,
-            first_name: profileData.first_name || '',
-            last_name: profileData.last_name || '',
+            first_name: profileDataAny.first_name || '',
+            last_name: profileDataAny.last_name || '',
             gender: profileData.gender || '',
             location: profileData.location || '',
-            education_level: profileData.education_level || '',
-            occupation: profileData.occupation || '',
-            religious_practice_level: profileData.religious_practice_level || '',
-            birth_date: profileData.birth_date || '',
-            about_me: profileData.about_me || '',
-            prayer_frequency: profileData.prayer_frequency || '',
-            wali_name: profileData.wali_name || '',
-            wali_relationship: profileData.wali_relationship || '',
-            wali_contact: profileData.wali_contact || '',
-            profile_picture: profileData.profile_picture || '',
-            gallery: profileData.gallery || [],
-            email_verified: profileData.email_verified || false,
-            phone_verified: profileData.phone_verified || false,
-            id_verified: profileData.id_verified || false,
-            wali_verified: profileData.wali_verified || false,
-            is_visible: profileData.is_visible || false,
-            is_verified: profileData.is_verified || false,
-            privacy_settings: profileData.privacy_settings || {
+            education_level: profileDataAny.education_level || '',
+            occupation: profileDataAny.occupation || '',
+            religious_practice_level: profileDataAny.religious_practice_level || '',
+            birth_date: profileDataAny.birth_date || '',
+            about_me: profileDataAny.about_me || '',
+            prayer_frequency: profileDataAny.prayer_frequency || '',
+            wali_name: profileDataAny.wali_name || '',
+            wali_relationship: profileDataAny.wali_relationship || '',
+            wali_contact: profileDataAny.wali_contact || '',
+            profile_picture: profileDataAny.profile_picture || '',
+            gallery: profileDataAny.gallery || [],
+            email_verified: profileDataAny.email_verified || false,
+            phone_verified: profileDataAny.phone_verified || false,
+            id_verified: profileDataAny.id_verified || false,
+            wali_verified: profileDataAny.wali_verified || false,
+            is_visible: profileDataAny.is_visible || false,
+            is_verified: profileDataAny.is_verified || false,
+            privacy_settings: profileDataAny.privacy_settings || {
               profileVisibilityLevel: 1,
               showAge: true,
               showLocation: true,
               showOccupation: true,
               allowNonMatchMessages: true
             },
-            blocked_users: profileData.blocked_users || [],
+            blocked_users: profileDataAny.blocked_users || [],
             content_flags: [],
             moderation_status: 'approved',
-            last_moderation_date: null,
+            last_moderation_date: profileDataAny.last_moderation_date ?? undefined,
             created_at: profileData.created_at || '',
             updated_at: profileData.updated_at || ''
           };
