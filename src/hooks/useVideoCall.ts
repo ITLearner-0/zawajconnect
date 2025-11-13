@@ -42,10 +42,10 @@ export const useVideoCall = (conversationId: string | undefined, userId?: string
       });
       
       // Log video call start in database
-      const { error: insertError } = await supabase
+      const { error: insertError } = await (supabase as any)
         .from('video_calls')
         .insert({
-          conversation_id: conversationId,
+          match_id: conversationId,
           initiator_id: userId,
           receiver_id: participantId,
           wali_present: waliPresent
@@ -91,15 +91,15 @@ export const useVideoCall = (conversationId: string | undefined, userId?: string
       
       // Update video call record
       if (conversationId && videoCallStatus.participantId) {
-        const { error: updateError } = await supabase
+        const { error: updateError } = await (supabase as any)
           .from('video_calls')
           .update({
-            ended_at: new Date().toISOString(),
+            end_time: new Date().toISOString(),
             duration_seconds: duration
           })
-          .eq('conversation_id', conversationId)
+          .eq('match_id', conversationId)
           .eq('initiator_id', userId)
-          .is('ended_at', null);
+          .is('end_time', null);
           
         if (updateError) {
           throw updateError;

@@ -15,7 +15,7 @@ export const useWaliInvitations = (userId?: string) => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_invitations')
         .select('*')
         .or(`managed_user_id.eq.${userId},wali_profile_id.in.(select id from wali_profiles where user_id = '${userId}')`)
@@ -23,7 +23,7 @@ export const useWaliInvitations = (userId?: string) => {
 
       if (error) throw error;
       
-      setInvitations(data || []);
+      setInvitations(data as any || []);
     } catch (error) {
       console.error('Error fetching wali invitations:', error);
       toast({
@@ -41,7 +41,7 @@ export const useWaliInvitations = (userId?: string) => {
     if (!userId) return false;
 
     try {
-      const { data, error } = await supabase.rpc('generate_wali_invitation', {
+      const { data, error } = await (supabase as any).rpc('generate_wali_invitation', {
         wali_user_id: userId,
         managed_user_email: managedUserEmail
       });
@@ -71,7 +71,7 @@ export const useWaliInvitations = (userId?: string) => {
     if (!userId) return false;
 
     try {
-      const { data, error } = await supabase.rpc('confirm_wali_invitation', {
+      const { data, error } = await (supabase as any).rpc('confirm_wali_invitation', {
         token: token,
         confirming_user_id: userId
       });

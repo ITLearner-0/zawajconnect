@@ -22,7 +22,7 @@ export const useFlaggedContent = (waliId: string) => {
 
     try {
       // First get conversations this wali is responsible for
-      const { data: waliProfile, error: waliError } = await supabase
+      const { data: waliProfile, error: waliError } = await (supabase as any)
         .from('wali_profiles')
         .select('managed_users')
         .eq('user_id', waliId)
@@ -32,17 +32,18 @@ export const useFlaggedContent = (waliId: string) => {
         throw waliError;
       }
 
-      if (!waliProfile?.managed_users || !waliProfile.managed_users.length) {
+      const managedUsers = (waliProfile as any)?.managed_users;
+      if (!managedUsers || !managedUsers.length) {
         setFlaggedContent([]);
         setLoading(false);
         return;
       }
 
       // Now get flagged content related to these users
-      const { data: flags, error: flagsError } = await supabase
+      const { data: flags, error: flagsError } = await (supabase as any)
         .from('content_flags')
         .select('*')
-        .in('flagged_by', waliProfile.managed_users)
+        .in('flagged_by', managedUsers)
         .order('created_at', { ascending: false });
 
       if (flagsError) {
@@ -50,7 +51,7 @@ export const useFlaggedContent = (waliId: string) => {
       }
 
       // Process the data to match our FlaggedItem type
-      const processedFlags: FlaggedItem[] = flags.map(flag => ({
+      const processedFlags: FlaggedItem[] = flags.map((flag: any) => ({
         id: flag.id,
         message_id: flag.content_id,
         message: {} as Message, // We'll fetch this later if needed
@@ -76,23 +77,24 @@ export const useFlaggedContent = (waliId: string) => {
   useEffect(() => {
     fetchFlaggedContent();
 
-    // Set up real-time subscription for content flags
-    if (waliId) {
-      const channel = supabase
-        .channel(`flagged_content_${waliId}`)
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'content_flags'
-        }, () => {
-          fetchFlaggedContent();
-        })
-        .subscribe();
-        
-      return () => {
-        supabase.removeChannel(channel);
-      };
+    if (!waliId) {
+      return undefined;
     }
+
+    const channel = supabase
+      .channel(`flagged_content_${waliId}`)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'content_flags'
+      }, () => {
+        fetchFlaggedContent();
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [waliId, fetchFlaggedContent]);
 
   // Resolve a flagged item
@@ -100,7 +102,7 @@ export const useFlaggedContent = (waliId: string) => {
     if (!waliId) return false;
 
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('content_flags')
         .update({ 
           resolved: true,

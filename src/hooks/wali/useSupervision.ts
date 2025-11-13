@@ -51,7 +51,7 @@ export const useSupervision = (waliId: string) => {
     try {
       // Since supervision_sessions table doesn't exist, we'll use a simpler approach
       // We'll just fetch conversations that are marked as wali_supervised
-      const { data: conversations, error: conversationsError } = await supabase
+      const { data: conversations, error: conversationsError} = await (supabase as any)
         .from('conversations')
         .select(`
           *,
@@ -64,13 +64,13 @@ export const useSupervision = (waliId: string) => {
       }
 
       // Convert to supervised conversations with mock supervision data
-      const supervisedConversations = (conversations || []).map(conversation => ({
+      const supervisedConversations = (conversations || []).map((conversation: any) => ({
         ...conversation,
         supervisionId: `mock-${conversation.id}`,
         supervisionStarted: conversation.created_at || new Date().toISOString(),
         supervisionLevel: 'passive' as const,
         retention_policy: parseRetentionPolicy(conversation.retention_policy)
-      })) as SupervisedConversation[];
+      })) as any;
 
       setActiveConversations(supervisedConversations);
     } catch (err: any) {
@@ -84,24 +84,25 @@ export const useSupervision = (waliId: string) => {
   useEffect(() => {
     fetchActiveConversations();
 
-    // Set up real-time subscription for conversations
-    if (waliId) {
-      const channel = supabase
-        .channel(`wali_supervision_${waliId}`)
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'conversations',
-          filter: `wali_supervised=eq.true`
-        }, () => {
-          fetchActiveConversations();
-        })
-        .subscribe();
-        
-      return () => {
-        supabase.removeChannel(channel);
-      };
+    if (!waliId) {
+      return undefined;
     }
+
+    const channel = supabase
+      .channel(`wali_supervision_${waliId}`)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'conversations',
+        filter: `wali_supervised=eq.true`
+      }, () => {
+        fetchActiveConversations();
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [waliId, fetchActiveConversations]);
 
   // Start supervising a conversation
@@ -110,7 +111,7 @@ export const useSupervision = (waliId: string) => {
 
     try {
       // Update the conversation to mark it as wali-supervised
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('conversations')
         .update({ wali_supervised: true })
         .eq('id', conversationId);

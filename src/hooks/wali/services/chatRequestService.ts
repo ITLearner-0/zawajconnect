@@ -9,7 +9,7 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
     await setupModerationTables();
     
     // Fetch chat requests from supabase
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('chat_requests')
       .select(`
         id,
@@ -67,7 +67,7 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
           // Only proceed with profile fetch if we have a valid requester_id
           if (chatRequest.requester_id) {
             // Fetch requester profile data
-            const { data: profileData, error: profileError } = await supabase
+            const { data: profileData, error: profileError } = await (supabase as any)
               .from('profiles')
               .select('first_name, last_name')
               .eq('id', chatRequest.requester_id)
@@ -75,8 +75,8 @@ export const fetchChatRequests = async (userId: string): Promise<ChatRequest[]> 
 
             if (!profileError && profileData) {
               chatRequest.requester_profile = {
-                first_name: profileData.first_name || 'Unknown',
-                last_name: profileData.last_name || 'User'
+                first_name: (profileData as any).first_name || 'Unknown',
+                last_name: (profileData as any).last_name || 'User'
               };
             }
           }
@@ -111,7 +111,7 @@ export const updateChatRequestStatus = async (
       updateData.suggested_time = suggestedTime;
     }
     
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('chat_requests')
       .update(updateData)
       .eq('id', requestId);
@@ -126,7 +126,7 @@ export const updateChatRequestStatus = async (
 export const createConversationForRequest = async (request: ChatRequest): Promise<void> => {
   try {
     // Check if conversation already exists
-    const { data: existingConversation, error: checkError } = await supabase
+    const { data: existingConversation, error: checkError } = await (supabase as any)
       .from('conversations')
       .select('id')
       .contains('participants', [request.requester_id, request.recipient_id])
@@ -139,7 +139,7 @@ export const createConversationForRequest = async (request: ChatRequest): Promis
 
     if (!existingConversation) {
       // Create a new conversation
-      const { data: newConversation, error: conversationError } = await supabase
+      const { data: newConversation, error: conversationError } = await (supabase as any)
         .from('conversations')
         .insert({
           participants: [request.requester_id, request.recipient_id],
@@ -156,10 +156,10 @@ export const createConversationForRequest = async (request: ChatRequest): Promis
 
       // Create a system message
       if (newConversation) {
-        const { error: messageError } = await supabase
+        const { error: messageError } = await (supabase as any)
           .from('messages')
           .insert({
-            conversation_id: newConversation.id,
+            match_id: (newConversation as any).id,
             sender_id: 'system',
             content: 'Conversation approved by wali',
             created_at: new Date().toISOString(),
@@ -181,7 +181,7 @@ export const createConversationForRequest = async (request: ChatRequest): Promis
 
 export const updateChatRequestNote = async (requestId: string, note: string): Promise<void> => {
   try {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('chat_requests')
       .update({ wali_notes: note })
       .eq('id', requestId);

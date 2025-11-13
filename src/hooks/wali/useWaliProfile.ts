@@ -65,7 +65,7 @@ export const useWaliProfile = (userId: string) => {
       setError(null);
 
       try {
-        const { data, error: fetchError } = await supabase
+        const { data, error: fetchError } = await (supabase as any)
           .from('wali_profiles')
           .select('*')
           .eq('user_id', userId)
@@ -76,12 +76,12 @@ export const useWaliProfile = (userId: string) => {
         }
 
         // Convert the database record to WaliProfileExtended with proper type handling
-        const waliProfile: WaliProfileExtended = {
-          ...data,
-          availability_status: parseAvailabilityStatus(data.availability_status),
-          supervision_settings: parseSupervisionSettings(data.supervision_settings),
-          supervision_level: data.supervision_level || 'moderate',
-          invitation_status: data.invitation_status || 'pending'
+        const waliProfile: any = {
+          ...(data as any),
+          availability_status: parseAvailabilityStatus((data as any).availability_status),
+          supervision_settings: parseSupervisionSettings((data as any).supervision_settings),
+          supervision_level: (data as any).supervision_level || 'moderate',
+          invitation_status: (data as any).invitation_status || 'pending'
         };
 
         setWaliProfile(waliProfile);
@@ -101,7 +101,7 @@ export const useWaliProfile = (userId: string) => {
     if (!userId || !waliProfile) return false;
 
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('wali_profiles')
         .update({ availability_status: status, last_active: new Date().toISOString() })
         .eq('user_id', userId);
@@ -142,7 +142,7 @@ export const useWaliProfile = (userId: string) => {
     if (!userId || !waliProfile) return false;
 
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('wali_profiles')
         .update({ 
           supervision_settings: settings,

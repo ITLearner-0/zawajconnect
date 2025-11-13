@@ -22,7 +22,7 @@ export const useChatRequests = (waliId: string) => {
 
     try {
       // First fetch the chat requests
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError } = await (supabase as any)
         .from('chat_requests')
         .select('*')
         .eq('wali_id', waliId)
@@ -34,12 +34,12 @@ export const useChatRequests = (waliId: string) => {
 
       // Then fetch the requester profiles for each request
       const requestsWithProfiles = await Promise.all(
-        data.map(async (request) => {
+        data.map(async (request: any) => {
           try {
-            const { data: profileData, error: profileError } = await supabase
+            const { data: profileData, error: profileError } = await (supabase as any)
               .from('profiles')
               .select('first_name, last_name, profile_image')
-              .eq('id', request.requester_id)
+              .eq('id', (request as any).requester_id)
               .single();
 
             if (profileError) {
@@ -69,7 +69,7 @@ export const useChatRequests = (waliId: string) => {
         })
       );
 
-      setChatRequests(requestsWithProfiles as ChatRequest[]);
+      setChatRequests(requestsWithProfiles as any);
     } catch (err: any) {
       console.error('Error fetching chat requests:', err);
       setError(err.message || 'Failed to load chat requests');
@@ -80,25 +80,26 @@ export const useChatRequests = (waliId: string) => {
 
   useEffect(() => {
     fetchChatRequests();
-
-    // Set up real-time subscription
-    if (waliId) {
-      const channel = supabase
-        .channel(`chat_requests_${waliId}`)
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'chat_requests',
-          filter: `wali_id=eq.${waliId}`
-        }, () => {
-          fetchChatRequests();
-        })
-        .subscribe();
-        
-      return () => {
-        supabase.removeChannel(channel);
-      };
+    
+    if (!waliId) {
+      return undefined;
     }
+
+    const channel = supabase
+      .channel(`chat_requests_${waliId}`)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'chat_requests',
+        filter: `wali_id=eq.${waliId}`
+      }, () => {
+        fetchChatRequests();
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [waliId, fetchChatRequests]);
 
   // Handle chat requests (approve/reject)
@@ -106,7 +107,7 @@ export const useChatRequests = (waliId: string) => {
     if (!waliId) return false;
 
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('chat_requests')
         .update({ 
           status, 
@@ -155,7 +156,7 @@ export const useChatRequests = (waliId: string) => {
     if (!waliId) return false;
 
     try {
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('chat_requests')
         .update({ wali_notes: note })
         .eq('id', requestId)

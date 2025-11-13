@@ -42,18 +42,18 @@ export const useSecurityMiddleware = () => {
       const phoneVerified = session.user.phone_confirmed_at !== null;
 
       // Check profile verification status
-      const { data: profile } = await supabase
+      const { data: profile } = await (supabase as any)
         .from('profiles')
         .select('email_verified, phone_verified, id_verified')
         .eq('id', session.user.id)
         .single();
 
-      const isSecure = emailVerified && (profile?.email_verified || false);
+      const isSecure = emailVerified && ((profile as any)?.email_verified || false);
 
       setSecurityStatus({
         isSecure,
-        emailVerified: emailVerified || (profile?.email_verified || false),
-        phoneVerified: phoneVerified || (profile?.phone_verified || false),
+        emailVerified: emailVerified || ((profile as any)?.email_verified || false),
+        phoneVerified: phoneVerified || ((profile as any)?.phone_verified || false),
         loading: false
       });
     } catch (error) {
