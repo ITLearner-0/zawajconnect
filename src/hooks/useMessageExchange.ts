@@ -154,7 +154,7 @@ export const useMessageExchange = (conversationId: string | undefined) => {
         });
       }
 
-      const { data: newMessage, error: sendError } = await (supabase as any)
+      const { data: newMessage, error: sendError } = await supabase
         .from('messages')
         .insert([
           {

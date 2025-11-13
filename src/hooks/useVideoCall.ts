@@ -91,7 +91,7 @@ export const useVideoCall = (conversationId: string | undefined, userId?: string
       
       // Update video call record
       if (conversationId && videoCallStatus.participantId) {
-        const { error: updateError } = await (supabase as any)
+        const { error: updateError } = await supabase
           .from('video_calls')
           .update({
             end_time: new Date().toISOString(),
