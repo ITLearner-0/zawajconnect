@@ -8,6 +8,7 @@ import { NavigationProvider } from "@/components/navigation/NavigationProvider";
 import RouteTransition from "@/components/navigation/RouteTransition";
 import { publicRoutes, specialRoutes, protectedRoutes, notFoundRoute } from "@/config/appRoutes";
 import { Toaster } from "@/components/ui/toaster";
+import { BadgeNotificationProvider } from "@/components/gamification/BadgeNotificationProvider";
 import ProtectedRouteWrapper from "@/components/routing/ProtectedRouteWrapper";
 import { FreemiumBanner } from "@/components/FreemiumBanner";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
