@@ -5,6 +5,9 @@ import { useToast } from '@/hooks/use-toast';
 import { processFullName, processBirthDate, processGallery } from './utils/dataProcessing';
 import { mapProfileDataToDatabase } from './utils/fieldMapping';
 import { checkProfileExists, updateProfile, insertProfile } from './utils/databaseOperations';
+import { supabase } from '@/integrations/supabase/client';
+import { calculateProfileCompletionPercentage } from '@/utils/profileCompletion';
+import { checkAndAwardProfileCompletion } from '@/utils/badgeAwards';
 
 export const useProfileSubmission = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -135,6 +138,28 @@ export const useProfileSubmission = () => {
 
       console.log("=== PROFILE SAVED SUCCESSFULLY ===");
       console.log("Saved data:", JSON.stringify(data, null, 2));
+
+      // Calculate profile completion and award badges
+      try {
+        console.log("=== CHECKING BADGE AWARDS ===");
+        
+        // Fetch islamic preferences for completion calculation
+        const { data: islamicPrefs } = await supabase
+          .from('islamic_preferences')
+          .select('prayer_frequency, quran_reading, madhab')
+          .eq('user_id', userId)
+          .single();
+
+        const completionPercentage = calculateProfileCompletionPercentage(data, islamicPrefs || undefined);
+        console.log("Profile completion percentage:", completionPercentage);
+
+        // Award appropriate badge based on completion
+        await checkAndAwardProfileCompletion(completionPercentage);
+        console.log("Badge check completed");
+      } catch (badgeError) {
+        // Don't fail the profile save if badge awarding fails
+        console.error("Error awarding badge:", badgeError);
+      }
 
       if (onSuccess) {
         onSuccess(profileData);
