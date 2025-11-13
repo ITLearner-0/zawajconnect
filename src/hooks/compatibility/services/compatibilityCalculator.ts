@@ -20,12 +20,14 @@ export class CompatibilityCalculator {
       logError('calculateCompatibilityScore', error as Error);
       return {
         userId: otherUser.user_id,
+        fullName: otherUser.full_name || '',
         score: 0,
+        compatibilityScore: 0,
         matchDetails: {
           strengths: [],
           challenges: ['Error calculating compatibility']
         } as any
-      };
+      } as any;
     }
   }
 
@@ -48,13 +50,15 @@ export class CompatibilityCalculator {
         dealbreakers.push(polygamyCompatibility.reason);
         return {
           userId: otherUser.user_id,
+          fullName: otherUser.full_name || '',
           score: 0,
+          compatibilityScore: 0,
           matchDetails: {
             strengths: [],
             challenges: [polygamyCompatibility.reason]
           } as any,
           profileData: profileDataBuilder.buildProfileData(otherUser) as any
-        };
+        } as any;
       } else if (polygamyCompatibility.isStrength) {
         strengths.push("Compatible sur la polygamie");
       }
@@ -115,23 +119,27 @@ export class CompatibilityCalculator {
       return {
         userId: otherUser.user_id,
         score: Math.round(finalScore),
+        fullName: otherUser.full_name || '',
+        compatibilityScore: totalScore,
         matchDetails: {
           strengths: [...new Set(strengths)],
           challenges: [...new Set(differences)],
           compatibility: totalScore
         } as any,
         profileData: profileDataBuilder.buildProfileData(otherUser) as any
-      };
+      } as any;
     } catch (error) {
       logError('calculateBasicCompatibilityScore', error as Error);
       return {
         userId: otherUser.user_id,
+        fullName: otherUser.full_name || '',
         score: 0,
+        compatibilityScore: 0,
         matchDetails: {
           strengths: [],
           challenges: ['Error calculating compatibility']
         } as any
-      };
+      } as any;
     }
   }
 }
