@@ -8,14 +8,16 @@ export const useSecurityEventLogger = (currentUserId: string | null, deviceFinge
     if (!currentUserId) return;
     
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('security_events')
         .insert({
           user_id: currentUserId,
           event_type: eventType,
-          device_fingerprint: deviceFingerprint,
-          details: {
+          description: details.description || eventType,
+          severity: details.severity || 'low',
+          metadata: {
             ...details,
+            device_fingerprint: deviceFingerprint,
             timestamp: new Date().toISOString(),
             user_agent: navigator.userAgent
           }

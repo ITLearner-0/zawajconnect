@@ -21,12 +21,14 @@ export const useSecurityAudit = () => {
 
     setLogging(true);
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('security_events')
         .insert({
           user_id: user.id,
           event_type: event.actionType,
-          details: {
+          description: `${event.resourceType} ${event.actionType}`,
+          severity: event.success ? 'low' : 'medium',
+          metadata: {
             resource_type: event.resourceType,
             resource_id: event.resourceId,
             success: event.success,

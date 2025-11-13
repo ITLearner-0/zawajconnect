@@ -44,12 +44,11 @@ export const useSecurityState = () => {
 
     try {
       // Log the failed attempt
-      await supabase.rpc('log_security_event', {
+      await (supabase as any).rpc('log_security_event', {
         p_user_id: userId,
-        p_action: 'failed_login_attempt',
-        p_resource_type: 'authentication',
-        p_success: false,
-        p_risk_level: 'medium'
+        p_event_type: 'failed_login_attempt',
+        p_description: 'Failed login attempt',
+        p_severity: 'medium'
       });
 
       setSecurityState(prev => {

@@ -27,11 +27,11 @@ export const useConversations = (userId: string | null) => {
         console.log('Fetching conversations for user:', userId);
         
         // First, get conversations without trying to join messages
-        const { data: conversationsData, error: convError } = await supabase
+        const { data: conversationsData, error: convError } = await (supabase as any)
           .from('conversations')
           .select('id, created_at, participants, wali_supervised')
           .contains('participants', [userId])
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false});
 
         if (convError) {
           throw convError;
@@ -44,14 +44,14 @@ export const useConversations = (userId: string | null) => {
         
         if (conversationsData && conversationsData.length > 0) {
           for (const conv of conversationsData) {
-            const otherParticipantId = conv.participants.find(p => p !== userId);
+            const otherParticipantId = (conv as any).participants.find((p: any) => p !== userId);
             
             if (otherParticipantId) {
               try {
                 // Get other participant's profile details
-                const { data: profileData, error: profileError } = await supabase
+                const { data: profileData, error: profileError } = await (supabase as any)
                   .from('profiles')
-                  .select('first_name, last_name')
+                  .select('first_name, last_name, profile_picture')
                   .eq('id', otherParticipantId)
                   .single();
                 
@@ -60,47 +60,47 @@ export const useConversations = (userId: string | null) => {
                 }
                 
                 // Get the most recent message for this conversation
-                const { data: messagesData, error: msgError } = await supabase
+                const { data: messagesData, error: msgError } = await (supabase as any)
                   .from('messages')
-                  .select('id, content, created_at, sender_id, is_read, conversation_id, is_wali_visible')
-                  .eq('conversation_id', conv.id)
+                  .select('id, content, created_at, sender_id, is_read, match_id, is_wali_visible')
+                  .eq('match_id', (conv as any).id)
                   .order('created_at', { ascending: false })
                   .limit(1);
                 
                 if (msgError) {
-                  console.warn('Messages fetch error for conversation:', conv.id, msgError);
+                  console.warn('Messages fetch error for conversation:', (conv as any).id, msgError);
                 }
                 
                 // Create properly typed Message object
                 const lastMessage: Message | undefined = messagesData && messagesData.length > 0 ? {
-                  id: messagesData[0].id,
-                  content: messagesData[0].content,
-                  created_at: messagesData[0].created_at,
-                  sender_id: messagesData[0].sender_id,
-                  is_read: messagesData[0].is_read,
-                  conversation_id: messagesData[0].conversation_id,
-                  is_wali_visible: messagesData[0].is_wali_visible
+                  id: (messagesData[0] as any).id,
+                  content: (messagesData[0] as any).content,
+                  created_at: (messagesData[0] as any).created_at,
+                  sender_id: (messagesData[0] as any).sender_id,
+                  is_read: (messagesData[0] as any).is_read,
+                  conversation_id: (messagesData[0] as any).match_id,
+                  is_wali_visible: (messagesData[0] as any).is_wali_visible
                 } : undefined;
                 
                 processedConversations.push({
-                  id: conv.id,
-                  created_at: conv.created_at,
-                  participants: conv.participants,
+                  id: (conv as any).id,
+                  created_at: (conv as any).created_at,
+                  participants: (conv as any).participants,
                   last_message: lastMessage,
-                  profile: profileData || undefined,
-                  wali_supervised: conv.wali_supervised
+                  profile: profileData as any,
+                  wali_supervised: (conv as any).wali_supervised
                 });
               } catch (profileError: any) {
-                console.warn('Error loading profile for conversation:', conv.id, profileError);
+                console.warn('Error loading profile for conversation:', (conv as any).id, profileError);
                 
                 // Still add the conversation even if profile loading fails
                 processedConversations.push({
-                  id: conv.id,
-                  created_at: conv.created_at,
-                  participants: conv.participants,
+                  id: (conv as any).id,
+                  created_at: (conv as any).created_at,
+                  participants: (conv as any).participants,
                   last_message: undefined,
                   profile: undefined,
-                  wali_supervised: conv.wali_supervised
+                  wali_supervised: (conv as any).wali_supervised
                 });
               }
             }
@@ -135,7 +135,7 @@ export const useConversations = (userId: string | null) => {
     
     try {
       // Get conversation details
-      const { data: convData, error: convError } = await supabase
+      const { data: convData, error: convError } = await (supabase as any)
         .from('conversations')
         .select('*')
         .eq('id', conversationId)
@@ -149,11 +149,11 @@ export const useConversations = (userId: string | null) => {
       console.log('Found conversation:', convData);
 
       // Set current conversation
-      const otherParticipantId = convData.participants.find(p => p !== userId);
+      const otherParticipantId = (convData as any).participants.find((p: any) => p !== userId);
       if (otherParticipantId) {
-        const { data: profileData, error: profileError } = await supabase
+        const { data: profileData, error: profileError } = await (supabase as any)
           .from('profiles')
-          .select('first_name, last_name')
+          .select('first_name, last_name, profile_picture')
           .eq('id', otherParticipantId)
           .single();
           
@@ -162,15 +162,15 @@ export const useConversations = (userId: string | null) => {
         }
         
         const conversation = {
-          id: convData.id,
-          created_at: convData.created_at,
-          participants: convData.participants,
-          profile: profileData || undefined,
-          wali_supervised: convData.wali_supervised
+          id: (convData as any).id,
+          created_at: (convData as any).created_at,
+          participants: (convData as any).participants,
+          profile: profileData as any,
+          wali_supervised: (convData as any).wali_supervised
         };
         
         console.log('Setting current conversation:', conversation);
-        setCurrentConversation(conversation);
+        setCurrentConversation(conversation as any);
         return conversation;
       }
       

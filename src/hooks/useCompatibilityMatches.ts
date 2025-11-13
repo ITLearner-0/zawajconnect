@@ -65,7 +65,7 @@ export function useCompatibilityMatches() {
         console.log("ID utilisateur actuel:", session.user.id);
 
         // Récupérer les résultats de compatibilité de l'utilisateur actuel
-        const { data: myResults, error: myResultsError } = await supabase
+        const { data: myResults, error: myResultsError } = await (supabase as any)
           .from('compatibility_results')
           .select('answers, preferences, score')
           .eq('user_id', session.user.id)
@@ -94,7 +94,7 @@ export function useCompatibilityMatches() {
         console.log("Résultats utilisateur trouvés:", myResults);
 
         // Récupérer les résultats des autres utilisateurs
-        const { data: otherResults, error: otherResultsError } = await supabase
+        const { data: otherResults, error: otherResultsError } = await (supabase as any)
           .from('compatibility_results')
           .select('user_id, answers, preferences, score')
           .neq('user_id', session.user.id);
@@ -114,10 +114,10 @@ export function useCompatibilityMatches() {
         }
 
         // Récupérer les profils des utilisateurs
-        const userIds = otherResults.map(result => result.user_id);
+        const userIds = (otherResults as any[]).map(result => result.user_id);
         console.log("Récupération des profils pour les IDs utilisateur:", userIds);
 
-        const { data: profiles, error: profilesError } = await supabase
+        const { data: profiles, error: profilesError } = await (supabase as any)
           .from('profiles')
           .select(`
             id,
@@ -147,8 +147,8 @@ export function useCompatibilityMatches() {
         // Créer les correspondances avec les vraies données
         const matches: CompatibilityMatch[] = [];
         
-        for (const result of otherResults) {
-          const profile = profiles?.find(p => p.id === result.user_id);
+        for (const result of (otherResults as any[])) {
+          const profile = (profiles as any[])?.find(p => p.id === result.user_id);
           if (!profile) {
             console.log("Aucun profil trouvé pour l'utilisateur:", result.user_id);
             continue;
@@ -156,7 +156,7 @@ export function useCompatibilityMatches() {
 
           // Calculer le score de compatibilité réel
           const compatibilityScore = calculateCompatibility(
-            myResults.answers as Record<string, any>,
+            (myResults as any).answers as Record<string, any>,
             result.answers as Record<string, any>
           );
 
@@ -170,13 +170,14 @@ export function useCompatibilityMatches() {
             userId: result.user_id,
             score: compatibilityScore,
             profileData: {
+              id: profile.id,
               first_name: profile.first_name || 'Utilisateur',
               last_name: profile.last_name || undefined,
+              gender: profile.gender || 'non-spécifié',
               age,
               location: profile.location || undefined,
               religious_practice_level: profile.religious_practice_level || undefined,
               education_level: profile.education_level || undefined,
-              occupation: profile.occupation || undefined,
               email_verified: profile.email_verified || false,
               phone_verified: profile.phone_verified || false,
               id_verified: profile.id_verified || false,
@@ -184,23 +185,18 @@ export function useCompatibilityMatches() {
             },
             matchDetails: {
               strengths: ["Compatibilité calculée à partir des vraies données"],
-              differences: [],
-              categoryScores: {
-                religious: { score: Math.min(100, compatibilityScore + 10), weight: 1.0 },
-                lifestyle: { score: Math.max(60, compatibilityScore - 5), weight: 0.8 },
-                family: { score: Math.max(70, compatibilityScore), weight: 0.9 },
-                personal: { score: Math.max(50, compatibilityScore - 10), weight: 0.7 }
-              }
+              challenges: [],
+              compatibility: compatibilityScore
             }
-          };
+          } as any;
 
           matches.push(match);
         }
 
         // Filtrer les correspondances avec un score minimum et trier par score décroissant
         const filteredMatches = matches
-          .filter(match => match.score >= 50)
-          .sort((a, b) => b.score - a.score);
+          .filter(match => (match.score ?? 0) >= 50)
+          .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
         console.log("Correspondances finales créées:", filteredMatches.length);
         setMatchScores(filteredMatches);

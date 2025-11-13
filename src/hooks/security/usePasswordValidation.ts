@@ -18,7 +18,7 @@ export const usePasswordValidation = () => {
     
     try {
       // Use the database function for server-side validation
-      const { data, error } = await supabase.rpc('validate_password_strength', {
+      const { data, error } = await (supabase as any).rpc('validate_password_strength', {
         password: password
       });
 
@@ -28,7 +28,7 @@ export const usePasswordValidation = () => {
         return clientSideValidation(password);
       }
 
-      const result = data as PasswordValidationResult;
+      const result = data as unknown as PasswordValidationResult;
       setValidationResult(result);
       return result;
     } catch (error) {

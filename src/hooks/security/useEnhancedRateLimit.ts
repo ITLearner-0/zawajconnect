@@ -40,7 +40,7 @@ export const useEnhancedRateLimit = () => {
     }
 
     // Reset window if expired
-    if (now - state.windowStart > config.windowMs) {
+    if (now - state.windowStart > (config.windowMs ?? 60000)) {
       state.attempts = 0;
       state.windowStart = now;
       state.blockedUntil = 0;
@@ -51,7 +51,7 @@ export const useEnhancedRateLimit = () => {
 
     // Check if limit exceeded
     if (state.attempts > config.maxAttempts) {
-      state.blockedUntil = now + config.blockDurationMs;
+      state.blockedUntil = now + (config.blockDurationMs ?? 300000);
       
       // Clear existing cleanup timeout
       if (cleanupTimeouts.current[action]) {
@@ -66,9 +66,9 @@ export const useEnhancedRateLimit = () => {
           return newState;
         });
         delete cleanupTimeouts.current[action];
-      }, config.blockDurationMs + 60000); // Cleanup 1 minute after block expires
+      }, (config.blockDurationMs ?? 300000) + 60000); // Cleanup 1 minute after block expires
 
-      const blockDuration = Math.ceil(config.blockDurationMs / 1000);
+      const blockDuration = Math.ceil((config.blockDurationMs ?? 300000) / 1000);
       toast.error(`Trop de tentatives. Action bloquée pendant ${blockDuration} secondes.`);
       
       setRateLimitStates(prev => ({ ...prev, [action]: state }));

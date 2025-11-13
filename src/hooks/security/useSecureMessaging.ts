@@ -32,7 +32,7 @@ export const useSecureMessaging = () => {
       });
 
       if (!validationResult.success) {
-        const error = validationResult.error.errors[0]?.message || 'Invalid input';
+        const error = validationResult.error.issues[0]?.message || 'Invalid input';
         logMessageSent(conversationId, false, error);
         toast.error(error);
         setSending(false);
@@ -53,11 +53,11 @@ export const useSecureMessaging = () => {
       }
 
       // Send message to database
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('messages')
         .insert({
           content: sanitizedContent,
-          conversation_id: conversationId,
+          match_id: conversationId,
           sender_id: senderId,
           is_wali_visible: true
         })

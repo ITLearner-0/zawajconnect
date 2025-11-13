@@ -21,13 +21,12 @@ export const useDeviceFingerprintSync = ({
         if (!user) return;
 
         // Store device fingerprint in security events for tracking
-        await supabase.rpc('log_security_event', {
+        await (supabase as any).rpc('log_security_event', {
           p_user_id: user.id,
-          p_action: 'device_fingerprint_sync',
-          p_resource_type: 'device',
-          p_success: true,
-          p_risk_level: 'low',
-          p_details: {
+          p_event_type: 'device_fingerprint_sync',
+          p_description: 'Device fingerprint synced',
+          p_severity: 'low',
+          p_metadata: {
             device_fingerprint: deviceFingerprint,
             timestamp: new Date().toISOString()
           }

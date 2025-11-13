@@ -71,7 +71,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   
   // Use props if available, otherwise use the hook data
   const status = userStatus || userStatusInfo.status;
-  const lastActiveTime: string | undefined = lastActive !== null ? (lastActive || undefined) : userStatusInfo.lastActive;
+  const lastActiveTime: string | undefined = (lastActive ?? userStatusInfo.lastActive) || undefined;
   
   const openReportDialog = () => {
     setSelectedMessage(null);
