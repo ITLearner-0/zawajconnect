@@ -57,7 +57,7 @@ export class DelegationService {
           end_date: data.end_date,
           reason: data.reason,
           status: 'pending'
-        })
+        }])
         .select('id')
         .single();
 
