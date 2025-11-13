@@ -23,9 +23,8 @@ export class CompatibilityCalculator {
         score: 0,
         matchDetails: {
           strengths: [],
-          differences: ['Error calculating compatibility'],
-          dealbreakers: ['Calculation error']
-        }
+          challenges: ['Error calculating compatibility']
+        } as any
       };
     }
   }
@@ -52,10 +51,9 @@ export class CompatibilityCalculator {
           score: 0,
           matchDetails: {
             strengths: [],
-            differences: [polygamyCompatibility.reason],
-            dealbreakers
-          },
-          profileData: profileDataBuilder.buildProfileData(otherUser)
+            challenges: [polygamyCompatibility.reason]
+          } as any,
+          profileData: profileDataBuilder.buildProfileData(otherUser) as any
         };
       } else if (polygamyCompatibility.isStrength) {
         strengths.push("Compatible sur la polygamie");
@@ -119,11 +117,10 @@ export class CompatibilityCalculator {
         score: Math.round(finalScore),
         matchDetails: {
           strengths: [...new Set(strengths)],
-          differences: [...new Set(differences)],
-          dealbreakers: dealbreakers.length > 0 ? dealbreakers : undefined,
-          categoryScores
-        },
-        profileData: profileDataBuilder.buildProfileData(otherUser)
+          challenges: [...new Set(differences)],
+          compatibility: totalScore
+        } as any,
+        profileData: profileDataBuilder.buildProfileData(otherUser) as any
       };
     } catch (error) {
       logError('calculateBasicCompatibilityScore', error as Error);
@@ -132,9 +129,8 @@ export class CompatibilityCalculator {
         score: 0,
         matchDetails: {
           strengths: [],
-          differences: ['Error calculating compatibility'],
-          dealbreakers: ['Calculation error']
-        }
+          challenges: ['Error calculating compatibility']
+        } as any
       };
     }
   }

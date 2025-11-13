@@ -130,7 +130,7 @@ const DocumentVerification: React.FC<DocumentVerificationProps> = ({
                     {documentTypes.find(t => t.value === verification.document_type)?.label}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Soumis le {new Date(verification.submitted_at).toLocaleDateString('fr-FR')}
+                    Soumis le {verification?.submitted_at ? new Date(verification.submitted_at).toLocaleDateString('fr-FR') : 'Date inconnue'}
                   </p>
                   {verification.reviewer_notes && (
                     <p className="text-sm text-muted-foreground mt-1">

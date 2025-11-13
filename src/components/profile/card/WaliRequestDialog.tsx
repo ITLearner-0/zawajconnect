@@ -51,7 +51,7 @@ const WaliRequestDialog = ({
         throw new Error("Could not find the wali information");
       }
       
-      const waliId = waliData?.id;
+      const waliId = (waliData as any)?.id;
       
       // Create a chat request in the database
       const { error: requestError } = await supabase

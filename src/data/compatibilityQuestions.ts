@@ -862,10 +862,11 @@ export const questions: Question[] = [
 
 // Group questions by category for easier display
 export const questionsByCategory = questions.reduce((acc, question) => {
-  if (!acc[question.category]) {
-    acc[question.category] = [];
+  const category = question.category || 'other';
+  if (!acc[category]) {
+    acc[category] = [];
   }
-  acc[question.category].push(question);
+  acc[category].push(question);
   return acc;
 }, {} as Record<string, Question[]>);
 

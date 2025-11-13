@@ -65,9 +65,10 @@ export class AdvancedFiltersService {
       return matches;
     }
 
-    return matches.filter(match => 
-      match.score >= filter.minScore && match.score <= filter.maxScore
-    );
+    return matches.filter(match => {
+      const score = match.score ?? match.compatibilityScore ?? 0;
+      return score >= filter.minScore && score <= filter.maxScore;
+    });
   }
 
   applyDealBreakerFilter(matches: CompatibilityMatch[], filter: DealBreakerFilter): CompatibilityMatch[] {
@@ -76,20 +77,21 @@ export class AdvancedFiltersService {
     }
 
     return matches.filter(match => {
-      if (!match.matchDetails?.dealbreakers || match.matchDetails.dealbreakers.length === 0) {
+      const dealbreakers = (match.matchDetails as any)?.dealbreakers;
+      if (!dealbreakers || dealbreakers.length === 0) {
         return true; // No dealbreakers, so it passes
       }
 
       if (filter.strictMode) {
         // In strict mode, exclude any match that has dealbreakers in the selected categories
-        return !match.matchDetails.dealbreakers.some(dealbreaker => 
+        return !dealbreakers.some((dealbreaker: any) => 
           filter.categories.some(category => 
             dealbreaker.toLowerCase().includes(category.toLowerCase())
           )
         );
       } else {
         // In non-strict mode, only exclude if ALL dealbreakers are in selected categories
-        return !match.matchDetails.dealbreakers.every(dealbreaker => 
+        return !dealbreakers.every((dealbreaker: any) => 
           filter.categories.some(category => 
             dealbreaker.toLowerCase().includes(category.toLowerCase())
           )

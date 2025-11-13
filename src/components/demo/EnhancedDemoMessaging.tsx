@@ -51,7 +51,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
 
     const newMessage = {
       id: `demo-msg-${Date.now()}`,
-      conversation_id: activeConversation || '',
+      conversation_id: activeConversation || 'demo-conv-1',
       sender_id: 'current-user',
       content: messageInput,
       created_at: new Date().toISOString(),
