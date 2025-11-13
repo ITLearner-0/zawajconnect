@@ -393,6 +393,14 @@ const RealTimeChat: React.FC<RealTimeChatProps> = ({ matchId, onClose }) => {
 
       if (error) throw error;
 
+      // Award message badges after successful send
+      try {
+        const { checkAndAwardMessageMilestones } = await import('@/utils/messageBadges');
+        await checkAndAwardMessageMilestones(user.id);
+      } catch (badgeError) {
+        console.error('Error awarding message badges:', badgeError);
+      }
+
       setNewMessage('');
       handleTyping(false);
     } catch (error) {
