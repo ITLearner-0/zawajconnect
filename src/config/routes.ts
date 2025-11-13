@@ -91,6 +91,14 @@ export const routes: RouteConfig[] = [
     category: 'main'
   },
   {
+    path: '/badge-leaderboard',
+    component: 'BadgeLeaderboard',
+    label: 'Classement des Badges',
+    requiresAuth: true,
+    icon: 'Trophy',
+    category: 'main'
+  },
+  {
     path: '/matches',
     component: 'Matches',
     label: 'Mes Matches',

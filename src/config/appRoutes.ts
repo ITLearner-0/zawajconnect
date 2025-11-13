@@ -36,6 +36,7 @@ const PaymentHistory = lazy(() => import('@/pages/PaymentHistory'));
 const Favorites = lazy(() => import('@/pages/Favorites'));
 const NotesManager = lazy(() => import('@/pages/NotesManager'));
 const Gamification = lazy(() => import('@/pages/Gamification'));
+const BadgeLeaderboard = lazy(() => import('@/pages/BadgeLeaderboard'));
 
 // Matching & Compatibility
 const AdvancedMatching = lazy(() => import('@/pages/AdvancedMatching'));
@@ -159,6 +160,7 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/compatibility-insights', component: CompatibilityInsightsPage },
   { path: '/compare', component: Compare },
   { path: '/gamification', component: Gamification },
+  { path: '/badge-leaderboard', component: BadgeLeaderboard },
 ];
 
 // Catch all route
