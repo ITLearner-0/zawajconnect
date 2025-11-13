@@ -29,6 +29,7 @@ import WaliAlertsStatistics from './WaliAlertsStatistics';
 import WaliAlertsTrend from './WaliAlertsTrend';
 import WaliAlertFilters from './WaliAlertFilters';
 import WaliAlertQuickActions from './WaliAlertQuickActions';
+import WaliAlertContactModal from './WaliAlertContactModal';
 
 interface Filters {
   riskLevel?: string;
@@ -50,6 +51,7 @@ const WaliAlertsAdminDashboard: React.FC = () => {
   const [statistics, setStatistics] = useState<any>(null);
   const [trends, setTrends] = useState<any[]>([]);
   const [selectedAlert, setSelectedAlert] = useState<AdminWaliAlert | null>(null);
+  const [contactModalOpen, setContactModalOpen] = useState(false);
 
   // Load initial data
   useEffect(() => {
@@ -203,11 +205,7 @@ const WaliAlertsAdminDashboard: React.FC = () => {
 
   const handleContact = (alert: AdminWaliAlert) => {
     setSelectedAlert(alert);
-    // Open contact modal (to be implemented)
-    toast({
-      title: 'Fonctionnalité à venir',
-      description: 'L\'envoi d\'email sera bientôt disponible'
-    });
+    setContactModalOpen(true);
   };
 
   const unacknowledgedCount = alerts.filter(a => !a.acknowledged).length;
@@ -302,6 +300,13 @@ const WaliAlertsAdminDashboard: React.FC = () => {
           <WaliAlertsTrend trends={trends} />
         </TabsContent>
       </Tabs>
+
+      {/* Contact Modal */}
+      <WaliAlertContactModal
+        open={contactModalOpen}
+        onOpenChange={setContactModalOpen}
+        alert={selectedAlert}
+      />
     </div>
   );
 };
