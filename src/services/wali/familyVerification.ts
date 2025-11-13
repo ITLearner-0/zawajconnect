@@ -36,7 +36,7 @@ export class FamilyVerificationService {
     verification_notes: string;
   }): Promise<{ success: boolean; error?: string; verificationId?: string }> {
     try {
-      const { data: verification, error } = await supabase
+      const { data: verification, error } = await (supabase as any)
         .from('family_relationship_verifications')
         .insert({
           wali_id: data.wali_id,
@@ -54,7 +54,7 @@ export class FamilyVerificationService {
 
       if (error) throw error;
 
-      return { success: true, verificationId: verification.id };
+      return { success: true, verificationId: (verification as any).id };
     } catch (error: any) {
       console.error('Error submitting family verification:', error);
       return { success: false, error: error.message };
