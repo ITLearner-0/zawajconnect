@@ -13,6 +13,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   FileText,
   Download,
@@ -27,6 +28,9 @@ import {
 } from 'lucide-react';
 import { RegistrationStatusBadge } from '../registration/RegistrationStatusBadge';
 import { useAuth } from '@/hooks/useAuth';
+import { useWaliRegistrationComments } from '@/hooks/wali/useWaliRegistrationComments';
+import { CommentsSection } from './CommentsSection';
+import { ActivityTimeline } from './ActivityTimeline';
 
 interface RegistrationDetailModalProps {
   registration: WaliRegistration | null;
@@ -52,6 +56,14 @@ export const RegistrationDetailModal = ({
   );
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const {
+    comments,
+    activityLog,
+    addComment,
+    updateComment,
+    deleteComment,
+  } = useWaliRegistrationComments(registration?.id || '');
 
   if (!registration) return null;
 
@@ -85,7 +97,7 @@ export const RegistrationDetailModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh]">
+      <DialogContent className="max-w-5xl max-h-[90vh]">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2">
@@ -95,167 +107,210 @@ export const RegistrationDetailModal = ({
             <RegistrationStatusBadge status={registration.status} />
           </div>
           <DialogDescription>
-            Vérifiez les informations et les documents du candidat Wali
+            Vérifiez les informations, documents, commentaires et historique
           </DialogDescription>
         </DialogHeader>
 
-        <ScrollArea className="max-h-[60vh] pr-4">
-          <div className="space-y-6">
-            {/* Personal Information */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <User className="h-4 w-4" />
-                Informations Personnelles
-              </h3>
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div className="space-y-1">
-                  <Label className="text-muted-foreground">Nom complet</Label>
-                  <p className="font-medium">{registration.full_name}</p>
-                </div>
-                <div className="space-y-1">
-                  <Label className="text-muted-foreground">Email</Label>
-                  <div className="flex items-center gap-2">
-                    <Mail className="h-3 w-3" />
-                    <p className="font-medium">{registration.email}</p>
-                  </div>
-                </div>
-                {registration.phone && (
-                  <div className="space-y-1">
-                    <Label className="text-muted-foreground">Téléphone</Label>
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-3 w-3" />
-                      <p className="font-medium">{registration.phone}</p>
+        <Tabs defaultValue="details" className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="details">Informations</TabsTrigger>
+            <TabsTrigger value="comments">
+              Commentaires ({comments.length})
+            </TabsTrigger>
+            <TabsTrigger value="history">
+              Historique ({activityLog.length})
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="details" className="mt-4">
+            <ScrollArea className="max-h-[50vh] pr-4">
+              <div className="space-y-6">
+                {/* Personal Information */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    Informations Personnelles
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground">Nom complet</Label>
+                      <p className="font-medium">{registration.full_name}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground">Email</Label>
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-3 w-3" />
+                        <p className="font-medium">{registration.email}</p>
+                      </div>
+                    </div>
+                    {registration.phone && (
+                      <div className="space-y-1">
+                        <Label className="text-muted-foreground">Téléphone</Label>
+                        <div className="flex items-center gap-2">
+                          <Phone className="h-3 w-3" />
+                          <p className="font-medium">{registration.phone}</p>
+                        </div>
+                      </div>
+                    )}
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground">Date de soumission</Label>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-3 w-3" />
+                        <p className="font-medium">
+                          {new Date(registration.created_at).toLocaleDateString('fr-FR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                )}
-                <div className="space-y-1">
-                  <Label className="text-muted-foreground">Date de soumission</Label>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-3 w-3" />
-                    <p className="font-medium">
-                      {new Date(registration.created_at).toLocaleDateString('fr-FR', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                      })}
-                    </p>
-                  </div>
                 </div>
-              </div>
-            </div>
 
-            <Separator />
-
-            {/* Relationship Information */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-lg">Relation avec les membres</h3>
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-sm">{registration.relationship_to_user}</p>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Documents */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-lg flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Documents de Vérification
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {registration.id_document_url && (
-                  <div className="border rounded-lg p-4 space-y-2">
-                    <Label>Pièce d'identité</Label>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
-                        className="flex-1"
-                      >
-                        <a
-                          href={registration.id_document_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="h-3 w-3 mr-2" />
-                          Voir
-                        </a>
-                      </Button>
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={registration.id_document_url} download>
-                          <Download className="h-3 w-3" />
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                {registration.proof_of_relationship_url && (
-                  <div className="border rounded-lg p-4 space-y-2">
-                    <Label>Preuve de relation</Label>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        asChild
-                        className="flex-1"
-                      >
-                        <a
-                          href={registration.proof_of_relationship_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <ExternalLink className="h-3 w-3 mr-2" />
-                          Voir
-                        </a>
-                      </Button>
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={registration.proof_of_relationship_url} download>
-                          <Download className="h-3 w-3" />
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Verification Notes */}
-            <div className="space-y-3">
-              <Label htmlFor="notes">Notes de vérification (internes)</Label>
-              <Textarea
-                id="notes"
-                value={verificationNotes}
-                onChange={(e) => setVerificationNotes(e.target.value)}
-                placeholder="Ajoutez des notes sur la vérification de cette inscription..."
-                rows={4}
-              />
-              <Button
-                onClick={handleSaveNotes}
-                disabled={isProcessing}
-                variant="outline"
-                size="sm"
-              >
-                Enregistrer les notes
-              </Button>
-            </div>
-
-            {registration.rejection_reason && (
-              <>
                 <Separator />
-                <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-                  <Label className="text-destructive">Raison du rejet</Label>
-                  <p className="text-sm mt-2">{registration.rejection_reason}</p>
+
+                {/* Relationship Information */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-lg">Relation avec l'utilisateur</h3>
+                  <Badge variant="secondary" className="text-base px-4 py-1">
+                    {registration.relationship_to_user}
+                  </Badge>
                 </div>
-              </>
-            )}
-          </div>
-        </ScrollArea>
+
+                <Separator />
+
+                {/* Documents */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Documents Soumis
+                  </h3>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="border rounded-lg p-4 space-y-2">
+                      <Label className="text-sm font-medium">Document d'identité</Label>
+                      {registration.id_document_url ? (
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => window.open(registration.id_document_url, '_blank')}
+                          >
+                            <ExternalLink className="mr-2 h-3 w-3" />
+                            Voir
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const link = document.createElement('a');
+                              link.href = registration.id_document_url!;
+                              link.download = 'id_document';
+                              link.click();
+                            }}
+                          >
+                            <Download className="mr-2 h-3 w-3" />
+                            Télécharger
+                          </Button>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">Aucun document</p>
+                      )}
+                    </div>
+
+                    <div className="border rounded-lg p-4 space-y-2">
+                      <Label className="text-sm font-medium">Preuve de relation</Label>
+                      {registration.proof_of_relationship_url ? (
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() =>
+                              window.open(registration.proof_of_relationship_url, '_blank')
+                            }
+                          >
+                            <ExternalLink className="mr-2 h-3 w-3" />
+                            Voir
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const link = document.createElement('a');
+                              link.href = registration.proof_of_relationship_url!;
+                              link.download = 'proof_document';
+                              link.click();
+                            }}
+                          >
+                            <Download className="mr-2 h-3 w-3" />
+                            Télécharger
+                          </Button>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">Aucun document</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Verification Notes */}
+                <div className="space-y-3">
+                  <Label htmlFor="notes">Notes de vérification (internes)</Label>
+                  <Textarea
+                    id="notes"
+                    value={verificationNotes}
+                    onChange={(e) => setVerificationNotes(e.target.value)}
+                    placeholder="Ajoutez des notes sur la vérification de cette inscription..."
+                    rows={4}
+                  />
+                  <Button
+                    onClick={handleSaveNotes}
+                    disabled={isProcessing}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Enregistrer les notes
+                  </Button>
+                </div>
+
+                {registration.rejection_reason && (
+                  <>
+                    <Separator />
+                    <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+                      <Label className="text-destructive">Raison du rejet</Label>
+                      <p className="text-sm mt-2">{registration.rejection_reason}</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="comments" className="mt-4">
+            <ScrollArea className="max-h-[50vh]">
+              {user && (
+                <CommentsSection
+                  comments={comments}
+                  currentAdminId={user.id}
+                  onAddComment={addComment}
+                  onUpdateComment={updateComment}
+                  onDeleteComment={deleteComment}
+                />
+              )}
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="history" className="mt-4">
+            <ScrollArea className="max-h-[50vh]">
+              <ActivityTimeline activities={activityLog} />
+            </ScrollArea>
+          </TabsContent>
+        </Tabs>
 
         {registration.status === 'pending' && (
-          <div className="flex gap-3 pt-4 border-t">
+          <div className="flex gap-3 pt-4 border-t mt-4">
             {!showRejectForm ? (
               <>
                 <Button
