@@ -57,6 +57,7 @@ export class MemoryStore {
       Array.from(this.store.entries())
         .filter(([, data]) => data.blockedUntil && data.blockedUntil > now)
         .map(([key]) => key.split(':')[0])
+        .filter((userId): userId is string => userId !== undefined)
     );
   }
 }

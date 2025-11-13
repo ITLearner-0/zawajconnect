@@ -14,7 +14,7 @@ export const reportContent = async (
 ): Promise<boolean> => {
   try {
     // Use content_flags table instead of content_reports
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('content_flags')
       .insert({
         content_id: contentReference || reportedUserId,
@@ -25,7 +25,7 @@ export const reportContent = async (
         notes: reportDetails,
         created_at: new Date().toISOString(),
         resolved: false
-      });
+      } as any);
     
     if (error) {
       console.error("Error creating content flag:", error);
@@ -61,7 +61,7 @@ export const resolveContentReport = async (
   adminNotes?: string
 ): Promise<boolean> => {
   try {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('content_flags')
       .update({
         resolved: true,
