@@ -203,7 +203,7 @@ export class AppealSystem {
 
   private static async logAppealActivity(appealId: string, activity: string, userId: string): Promise<void> {
     try {
-      await supabase
+      await (supabase as any)
         .from('appeal_activities')
         .insert({
           appeal_id: appealId,
