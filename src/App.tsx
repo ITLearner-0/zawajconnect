@@ -42,12 +42,13 @@ function App() {
       <AuthProvider>
         <UserDataProvider>
           <AchievementNotificationProvider>
-            <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true
-            }}
-          >
+            <BadgeNotificationProvider>
+              <BrowserRouter
+                future={{
+                  v7_startTransition: true,
+                  v7_relativeSplatPath: true
+                }}
+              >
             <NavigationProvider>
               <NavigationGuard>
               <FreemiumBanner />
@@ -113,9 +114,10 @@ function App() {
               </RouteTransition>
               </NavigationGuard>
             </NavigationProvider>
-            <CookieConsentBanner />
-            <Toaster />
-          </BrowserRouter>
+              <CookieConsentBanner />
+              <Toaster />
+            </BrowserRouter>
+          </BadgeNotificationProvider>
         </AchievementNotificationProvider>
       </UserDataProvider>
     </AuthProvider>
