@@ -64,7 +64,7 @@ export const usePrivacySettings = () => {
       
       // Set privacy settings if they exist
       if ((profile as any)?.privacy_settings) {
-        try:
+        try {
           const settings = typeof (profile as any).privacy_settings === 'string' 
             ? JSON.parse((profile as any).privacy_settings) 
             : (profile as any).privacy_settings;
