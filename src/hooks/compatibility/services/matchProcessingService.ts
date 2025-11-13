@@ -27,8 +27,8 @@ export function processMatches(
         }
       })
       .filter((match): match is CompatibilityMatch => match !== null)
-      .filter(match => match.score >= (filters?.minCompatibilityScore || 50))
-      .sort((a, b) => b.score - a.score);
+      .filter(match => (match.score ?? match.compatibilityScore ?? 0) >= (filters?.minCompatibilityScore || 50))
+      .sort((a, b) => (b.score ?? b.compatibilityScore ?? 0) - (a.score ?? a.compatibilityScore ?? 0));
 
     logInfo('calculateScores', `Generated ${matches.length} final matches`);
     

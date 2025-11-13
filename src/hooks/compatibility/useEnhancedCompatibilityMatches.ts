@@ -44,15 +44,17 @@ export function useEnhancedCompatibilityMatches() {
 
           return {
             userId: otherResult.user_id,
+            fullName: profileData ? `${profileData.first_name} ${profileData.last_name || ''}`.trim() : 'Utilisateur',
             score: scoreResult.score,
+            compatibilityScore: scoreResult.score,
             profileData: profileData ? { ...profileData } : undefined,
             matchDetails: {
               strengths: scoreResult.strengths,
               differences: scoreResult.differences,
               dealbreakers: scoreResult.dealbreakers.length ? scoreResult.dealbreakers : undefined,
               categoryScores: scoreResult.categoryScores
-            }
-          };
+            } as any
+          } as any;
         });
 
         // Sort matches by compatibility and verification status

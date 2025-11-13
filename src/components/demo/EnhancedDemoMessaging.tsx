@@ -67,10 +67,10 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
     setTimeout(() => {
       setTypingIndicator(false);
       // Add an automatic response
-    const autoResponse = {
-      id: `demo-msg-${Date.now() + 1}`,
-      conversation_id: activeConversation || 'demo-conv-1',
-        sender_id: selectedPersona || '',
+      const conversationId = `${activeConversation || 'demo-conv-1'}`;
+      const autoResponse = {
+        id: `demo-msg-${Date.now() + 1}`,
+        conversation_id: conversationId,
         content: getAutoResponse(messageInput),
         created_at: new Date().toISOString(),
         is_read: true,

@@ -62,7 +62,7 @@ export class ProfileService {
           throw new DatabaseConnectionError('fetching profiles', error);
         }
 
-        fetchedProfiles = (data || []).map(profile => ({
+        fetchedProfiles = (data || []).map((profile: any) => ({
           id: profile.id,
           first_name: profile.first_name || '',
           last_name: profile.last_name || null,

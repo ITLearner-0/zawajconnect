@@ -53,7 +53,7 @@ const WaliDashboard: React.FC = () => {
       if (!user) return;
 
       // Charger le profil wali
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile, error: profileError } = await (supabase as any)
         .from('wali_profiles')
         .select('*')
         .eq('user_id', user.id)
@@ -68,33 +68,33 @@ const WaliDashboard: React.FC = () => {
 
       // Charger les statistiques
       const [verificationsResult, supervisionsResult, onboardingResult, delegationsResult] = await Promise.all([
-        supabase
+        (supabase as any)
           .from('family_relationship_verifications')
           .select('id', { count: 'exact' })
-          .eq('wali_id', profile.id)
+          .eq('wali_id', (profile as any).id)
           .eq('verification_status', 'pending'),
         
-        supabase
+        (supabase as any)
           .from('chat_requests')
           .select('id', { count: 'exact' })
-          .eq('wali_id', profile.user_id)
+          .eq('wali_id', (profile as any).user_id)
           .eq('status', 'approved'),
         
-        supabase
+        (supabase as any)
           .from('wali_onboarding_progress')
           .select('status')
-          .eq('wali_id', profile.id),
+          .eq('wali_id', (profile as any).id),
         
-        supabase
+        (supabase as any)
           .from('wali_delegations')
           .select('id', { count: 'exact' })
-          .or(`primary_wali_id.eq.${profile.id},delegate_wali_id.eq.${profile.id}`)
+          .or(`primary_wali_id.eq.${(profile as any).id},delegate_wali_id.eq.${(profile as any).id}`)
           .eq('status', 'active')
       ]);
 
       // Calculer le progrès de formation
       const onboardingData = onboardingResult.data || [];
-      const completedModules = onboardingData.filter(p => p.status === 'completed').length;
+      const completedModules = onboardingData.filter((p: any) => p.status === 'completed').length;
       const totalModules = Math.max(onboardingData.length, 5); // Au moins 5 modules
       const onboardingProgress = totalModules > 0 ? (completedModules / totalModules) * 100 : 0;
 

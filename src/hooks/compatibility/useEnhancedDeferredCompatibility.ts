@@ -33,7 +33,7 @@ export const useEnhancedDeferredCompatibility = ({
       
       if (aVerified && !bVerified) return -1;
       if (!aVerified && bVerified) return 1;
-      return b.score - a.score; // Fallback to score sorting
+      return (b.score ?? b.compatibilityScore ?? 0) - (a.score ?? a.compatibilityScore ?? 0); // Fallback to score sorting
     });
   }, [matches, prioritizeVerified]);
 

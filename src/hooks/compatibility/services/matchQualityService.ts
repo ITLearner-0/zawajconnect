@@ -39,26 +39,26 @@ export class MatchQualityService {
     otherUser: UserResultWithProfile,
     match: CompatibilityMatch
   ): number {
-    let confidence = match.score;
+    let confidence = match.score ?? match.compatibilityScore ?? 0;
 
     // Boost confidence based on profile completeness
     const profileCompleteness = this.getProfileCompleteness(otherUser);
-    confidence *= (0.7 + (profileCompleteness * 0.3));
+    confidence = (confidence ?? 0) * (0.7 + (profileCompleteness * 0.3));
 
     // Boost confidence based on verification status
     const verificationBonus = this.getVerificationBonus(otherUser);
-    confidence *= (0.8 + (verificationBonus * 0.2));
+    confidence = (confidence ?? 0) * (0.8 + (verificationBonus * 0.2));
 
     // Boost confidence based on answer quality
     const answerQuality = this.getAnswerQuality(myResults, otherUser);
-    confidence *= (0.85 + (answerQuality * 0.15));
+    confidence = (confidence ?? 0) * (0.85 + (answerQuality * 0.15));
 
     // Penalize if there are dealbreakers
-    if (match.matchDetails?.dealbreakers && match.matchDetails.dealbreakers.length > 0) {
-      confidence *= 0.7;
+    if ((match.matchDetails as any)?.dealbreakers && (match.matchDetails as any).dealbreakers.length > 0) {
+      confidence = (confidence ?? 0) * 0.7;
     }
 
-    return Math.min(100, Math.max(0, Math.round(confidence)));
+    return Math.min(100, Math.max(0, Math.round(confidence ?? 0)));
   }
 
   private generateCompatibilityReasons(match: CompatibilityMatch): string[] {
@@ -70,9 +70,9 @@ export class MatchQualityService {
       });
     }
 
-    if (match.matchDetails?.categoryScores) {
-      Object.entries(match.matchDetails.categoryScores).forEach(([category, data]) => {
-        const categoryPercentage = (data.score / (data.weight * 100)) * 100;
+    if ((match.matchDetails as any)?.categoryScores) {
+      Object.entries((match.matchDetails as any).categoryScores).forEach(([category, data]: [string, any]) => {
+        const categoryPercentage = ((data as any).score / ((data as any).weight * 100)) * 100;
         if (categoryPercentage >= 90) {
           reasons.push(`Exceptional compatibility in ${category} (${Math.round(categoryPercentage)}%)`);
         } else if (categoryPercentage >= 80) {
@@ -116,20 +116,21 @@ export class MatchQualityService {
     }
 
     // Suggestions based on differences
-    if (match.matchDetails?.differences) {
-      match.matchDetails.differences.forEach(difference => {
+    if ((match.matchDetails as any)?.differences || match.matchDetails?.challenges) {
+      const differences = (match.matchDetails as any)?.differences || match.matchDetails?.challenges || [];
+      differences.forEach((difference: any) => {
         suggestions.push(`Discuss your differences in ${difference} to understand each other better`);
       });
     }
 
     // Suggestions based on dealbreakers
-    if (match.matchDetails?.dealbreakers && match.matchDetails.dealbreakers.length > 0) {
+    if ((match.matchDetails as any)?.dealbreakers && (match.matchDetails as any).dealbreakers.length > 0) {
       suggestions.push("Address potential dealbreakers through open and honest communication");
       suggestions.push("Consider seeking guidance from a marriage counselor or imam");
     }
 
     // General suggestions for lower compatibility scores
-    if (match.score < 70) {
+    if ((match.score ?? match.compatibilityScore ?? 0) < 70) {
       suggestions.push("Take time to get to know each other before making any commitments");
       suggestions.push("Focus on building a strong friendship foundation");
     }

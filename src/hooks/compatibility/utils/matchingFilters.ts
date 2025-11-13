@@ -26,7 +26,7 @@ export function applyFilters(user: UserResultWithProfile, filters?: MatchingFilt
 
   // Religious level filter
   if (filters.religiousLevel?.length && 
-      !filters.religiousLevel.includes(profile.religious_practice_level)) {
+      !filters.religiousLevel.includes(profile.religious_practice_level || '')) {
     return false;
   }
 

@@ -33,7 +33,7 @@ export async function fetchCompatibilityResults(): Promise<{
   }
 
   // Fetch other users' results
-  const { data: results, error } = await supabase
+  const { data: results, error } = await (supabase as any)
     .from('compatibility_results')
     .select('user_id, answers, preferences')
     .neq('user_id', session.user.id);
@@ -47,7 +47,7 @@ export async function fetchCompatibilityResults(): Promise<{
   }
 
   // Get current user's latest results
-  const { data: myResults } = await supabase
+  const { data: myResults } = await (supabase as any)
     .from('compatibility_results')
     .select('answers, preferences')
     .eq('user_id', session.user.id)
@@ -57,10 +57,10 @@ export async function fetchCompatibilityResults(): Promise<{
 
   return {
     myResults: myResults ? {
-      answers: myResults.answers as Record<string, any>,
-      preferences: myResults.preferences
+      answers: (myResults as any).answers as Record<string, any>,
+      preferences: (myResults as any).preferences
     } : null,
-    otherResults: results.map(result => ({
+    otherResults: results.map((result: any) => ({
       user_id: result.user_id,
       answers: result.answers as Record<string, any>,
       preferences: result.preferences
@@ -69,7 +69,7 @@ export async function fetchCompatibilityResults(): Promise<{
 }
 
 export async function fetchProfilesData(): Promise<ProfileData[]> {
-  const { data: profiles, error } = await supabase
+  const { data: profiles, error } = await (supabase as any)
     .from('profiles')
     .select('id, first_name, last_name, gender, location, education_level, religious_practice_level, birth_date, email_verified, phone_verified, id_verified');
   
@@ -77,13 +77,20 @@ export async function fetchProfilesData(): Promise<ProfileData[]> {
     throw new Error("Error fetching profiles");
   }
 
-  return profiles?.map(profile => {
+  return profiles?.map((profile: any) => {
     let age;
     if (profile.birth_date) {
       const birthDate = new Date(profile.birth_date);
       const today = new Date();
       age = today.getFullYear() - birthDate.getFullYear();
     }
-    return { ...profile, age };
+    return { 
+      ...profile, 
+      age,
+      last_name: profile.last_name ?? undefined,
+      location: profile.location ?? undefined,
+      education_level: profile.education_level ?? undefined,
+      religious_practice_level: profile.religious_practice_level ?? undefined
+    };
   }) || [];
 }

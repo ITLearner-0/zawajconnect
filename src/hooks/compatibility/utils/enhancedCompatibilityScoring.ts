@@ -83,25 +83,28 @@ export function calculateEnhancedCompatibilityScore(
 
   const compatibilityMatch: CompatibilityMatch = {
     userId: otherUser.user_id,
+    fullName: `${profile.first_name} ${profile.last_name || ''}`.trim(),
     score: Math.round(finalScore),
+    compatibilityScore: Math.round(finalScore),
     profileData: {
+      id: otherUser.user_id,
       first_name: profile.first_name,
-      last_name: profile.last_name,
+      last_name: profile.last_name ?? undefined,
+      gender: profile.gender,
       age,
-      location: profile.location,
-      religious_practice_level: profile.religious_practice_level,
-      education_level: profile.education_level,
+      location: profile.location ?? undefined,
+      religious_practice_level: profile.religious_practice_level ?? undefined,
+      education_level: profile.education_level ?? undefined,
       email_verified: profile.email_verified,
       phone_verified: profile.phone_verified,
       id_verified: profile.id_verified
     },
     matchDetails: {
       strengths: [...new Set(strengths)],
-      differences: [...new Set(differences)],
-      dealbreakers: dealbreakers.length ? [...new Set(dealbreakers)] : undefined,
-      categoryScores
-    }
-  };
+      challenges: [...new Set(differences)],
+      compatibility: Math.round(finalScore)
+    } as any
+  } as any;
 
   // Calculate quality metrics
   const qualityMetrics = matchQualityService.calculateMatchQuality(

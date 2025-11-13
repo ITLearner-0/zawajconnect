@@ -10,7 +10,7 @@ export class PaginationService {
   // Create pagination cursor from match
   static createCursor(match: CompatibilityMatch): PaginationCursor {
     return {
-      score: match.score,
+      score: match.score ?? match.compatibilityScore ?? 0,
       userId: match.userId,
       timestamp: Date.now()
     };
@@ -53,8 +53,14 @@ export class PaginationService {
 
       // Set cursors
       if (data.length > 0) {
-        result.nextCursor = this.createCursor(data[data.length - 1]);
-        result.prevCursor = startIndex > 0 ? this.createCursor(data[0]) : undefined;
+        const lastItem = data[data.length - 1];
+        const firstItem = data[0];
+        if (lastItem) {
+          result.nextCursor = this.createCursor(lastItem);
+        }
+        if (startIndex > 0 && firstItem) {
+          result.prevCursor = this.createCursor(firstItem);
+        }
       }
 
       logInfo('paginationService', 'Paginated matches', {

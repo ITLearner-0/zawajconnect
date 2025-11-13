@@ -58,7 +58,7 @@ export class UserResultsService {
     logCacheOperation('cache-miss', { operation: 'user-results', userId });
     
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('compatibility_results')
         .select('answers, preferences')
         .eq('user_id', userId)
@@ -75,8 +75,8 @@ export class UserResultsService {
       }
 
       const results: ValidatedUserResults = {
-        answers: safeValidateUserAnswers(safeJsonToRecord(data.answers)),
-        preferences: safeValidateUserPreferences(safeJsonToAny(data.preferences))
+        answers: safeValidateUserAnswers(safeJsonToRecord((data as any).answers)),
+        preferences: safeValidateUserPreferences(safeJsonToAny((data as any).preferences))
       };
       
       // Cache the results
@@ -95,7 +95,7 @@ export class UserResultsService {
 
   async fetchOtherUsers(userId: string): Promise<ValidatedOtherUser[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('compatibility_results')
         .select('user_id, answers, preferences')
         .neq('user_id', userId);
@@ -104,7 +104,7 @@ export class UserResultsService {
         throw new DatabaseConnectionError('fetching other users results', error);
       }
 
-      const otherUsers: ValidatedOtherUser[] = (data || []).map(user => ({
+      const otherUsers: ValidatedOtherUser[] = (data || []).map((user: any) => ({
         user_id: user.user_id,
         answers: safeValidateUserAnswers(safeJsonToRecord(user.answers)),
         preferences: safeValidateUserPreferences(safeJsonToAny(user.preferences))

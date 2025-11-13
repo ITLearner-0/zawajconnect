@@ -7,7 +7,7 @@ import { logInfo, logError } from "../loggingService";
 export class NotificationService {
   async createNotification(notification: Omit<MatchNotification, 'id' | 'created_at' | 'is_read'>): Promise<void> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('match_notifications')
         .insert(notification);
 
@@ -25,7 +25,7 @@ export class NotificationService {
 
   async markNotificationAsRead(notificationId: string): Promise<void> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('match_notifications')
         .update({ is_read: true })
         .eq('id', notificationId);
@@ -42,7 +42,7 @@ export class NotificationService {
 
   async getUnreadNotifications(userId: string): Promise<MatchNotification[]> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('match_notifications')
         .select('*')
         .eq('user_id', userId)

@@ -35,7 +35,7 @@ const WaliManagement: React.FC = () => {
 
     try {
       // Get wali profile to find managed users
-      const { data: waliProfile, error: waliError } = await supabase
+      const { data: waliProfile, error: waliError } = await (supabase as any)
         .from('wali_profiles')
         .select('managed_users')
         .eq('user_id', user.id)
@@ -46,12 +46,12 @@ const WaliManagement: React.FC = () => {
         return;
       }
 
-      if (waliProfile?.managed_users?.length) {
+      if ((waliProfile as any)?.managed_users?.length) {
         // Fetch profiles of managed users with basic info
-        const { data: profiles, error: profilesError } = await supabase
+        const { data: profiles, error: profilesError } = await (supabase as any)
           .from('profiles')
           .select('id, first_name, last_name, is_verified, wali_verified')
-          .in('id', waliProfile.managed_users);
+          .in('id', (waliProfile as any).managed_users);
 
         if (profilesError) {
           console.error('Error fetching managed user profiles:', profilesError);
@@ -60,7 +60,7 @@ const WaliManagement: React.FC = () => {
 
         // For now, we'll use placeholder emails since we can't access auth.users from frontend
         // In a real implementation, you'd need to store email in profiles table or use an edge function
-        const managedUsersData: ManagedUser[] = (profiles || []).map((profile) => ({
+        const managedUsersData: ManagedUser[] = (profiles || []).map((profile: any) => ({
           id: profile.id,
           first_name: profile.first_name || '',
           last_name: profile.last_name || '',
@@ -82,7 +82,7 @@ const WaliManagement: React.FC = () => {
     setLoading(true);
     try {
       // Call the database function to link wali to user
-      const { data, error } = await supabase.rpc('link_wali_to_user', {
+      const { data, error } = await (supabase as any).rpc('link_wali_to_user', {
         wali_user_id: user.id,
         managed_user_email: newUserEmail.trim()
       });

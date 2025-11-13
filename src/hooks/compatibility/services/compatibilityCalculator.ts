@@ -20,7 +20,7 @@ export class CompatibilityCalculator {
       logError('calculateCompatibilityScore', error as Error);
       return {
         userId: otherUser.user_id,
-        fullName: otherUser.full_name || '',
+        fullName: `${otherUser.profiles.first_name} ${otherUser.profiles.last_name || ''}`.trim(),
         score: 0,
         compatibilityScore: 0,
         matchDetails: {
@@ -50,7 +50,7 @@ export class CompatibilityCalculator {
         dealbreakers.push(polygamyCompatibility.reason);
         return {
           userId: otherUser.user_id,
-          fullName: otherUser.full_name || '',
+          fullName: `${otherUser.profiles.first_name} ${otherUser.profiles.last_name || ''}`.trim(),
           score: 0,
           compatibilityScore: 0,
           matchDetails: {
@@ -119,7 +119,7 @@ export class CompatibilityCalculator {
       return {
         userId: otherUser.user_id,
         score: Math.round(finalScore),
-        fullName: otherUser.full_name || '',
+        fullName: `${otherUser.profiles.first_name} ${otherUser.profiles.last_name || ''}`.trim(),
         compatibilityScore: totalScore,
         matchDetails: {
           strengths: [...new Set(strengths)],
@@ -132,7 +132,7 @@ export class CompatibilityCalculator {
       logError('calculateBasicCompatibilityScore', error as Error);
       return {
         userId: otherUser.user_id,
-        fullName: otherUser.full_name || '',
+        fullName: `${otherUser.profiles.first_name} ${otherUser.profiles.last_name || ''}`.trim(),
         score: 0,
         compatibilityScore: 0,
         matchDetails: {
