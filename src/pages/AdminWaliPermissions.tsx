@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Shield, Users, Plus, Search, UserPlus, History } from 'lucide-react';
+import { Shield, Users, Plus, Search, UserPlus, History, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -13,7 +13,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { useWaliAdminPermissions } from '@/hooks/wali/useWaliAdminPermissions';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import {
   AssignPermissionDialog,
   UserSearchDialog,
@@ -224,13 +224,25 @@ const AdminWaliPermissions = () => {
                           {new Date(perm.assigned_at).toLocaleDateString('fr-FR')}
                         </TableCell>
                         <TableCell>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => revokePermission(perm.user_id)}
-                          >
-                            Révoquer
-                          </Button>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              asChild
+                            >
+                              <Link to={`/admin/wali-permissions/${perm.user_id}`}>
+                                <Eye className="w-4 h-4 mr-2" />
+                                Détails
+                              </Link>
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => revokePermission(perm.user_id)}
+                            >
+                              Révoquer
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))

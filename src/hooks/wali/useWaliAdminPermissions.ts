@@ -203,6 +203,69 @@ export const useWaliAdminPermissions = () => {
     }
   };
 
+  const fetchUserActions = async (adminUserId: string) => {
+    if (!permissions.canManagePermissions) {
+      return [];
+    }
+
+    try {
+      const { data, error } = await (supabase as any)
+        .from('wali_admin_audit_trail')
+        .select('*')
+        .eq('admin_user_id', adminUserId)
+        .order('created_at', { ascending: false })
+        .limit(100);
+
+      if (error) throw error;
+
+      return data || [];
+    } catch (err) {
+      console.error('Error fetching user actions:', err);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les actions de l\'utilisateur',
+        variant: 'destructive',
+      });
+      return [];
+    }
+  };
+
+  const fetchUserPermission = async (userId: string): Promise<WaliAdminPermission | null> => {
+    if (!permissions.canManagePermissions) {
+      return null;
+    }
+
+    try {
+      const { data, error } = await (supabase as any)
+        .from('wali_admin_permissions')
+        .select(`
+          *,
+          profiles!wali_admin_permissions_user_id_fkey(email, full_name)
+        `)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) return null;
+
+      return {
+        ...data,
+        user_email: data.profiles?.email,
+        user_name: data.profiles?.full_name || `Utilisateur ${data.user_id.substring(0, 8)}`,
+        profiles: undefined,
+      };
+    } catch (err) {
+      console.error('Error fetching user permission:', err);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger les informations de l\'utilisateur',
+        variant: 'destructive',
+      });
+      return null;
+    }
+  };
+
   const assignPermissionBulk = async (
     assignments: Array<{ userId: string; role: WaliAdminRole; notes?: string }>
   ): Promise<{ success: number; failed: number }> => {
@@ -339,5 +402,7 @@ export const useWaliAdminPermissions = () => {
     searchUsers,
     fetchAuditHistory,
     assignPermissionBulk,
+    fetchUserActions,
+    fetchUserPermission,
   };
 };
