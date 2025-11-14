@@ -11,6 +11,7 @@ import { RegistrationDetailModal } from '@/components/wali/admin/RegistrationDet
 import { ExportMenu } from '@/components/wali/admin/ExportMenu';
 import { PermissionBadge } from '@/components/wali/permissions';
 import { AdvancedFilters, SavedFiltersList } from '@/components/wali/filters';
+import { WaliAdminTabs } from '@/components/wali/navigation';
 import { Loader2, Shield, CheckCircle2, XCircle, Clock, Eye, RefreshCw, Filter } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
@@ -153,7 +154,7 @@ const AdminWaliRegistrations = () => {
   return (
     <div className="container max-w-7xl mx-auto py-8 px-4">
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <Shield className="h-8 w-8 text-primary" />
             <div>
@@ -186,6 +187,9 @@ const AdminWaliRegistrations = () => {
             </Button>
           </div>
         </div>
+
+        {/* Navigation Tabs */}
+        <WaliAdminTabs />
       </div>
 
       {/* Filters Section */}

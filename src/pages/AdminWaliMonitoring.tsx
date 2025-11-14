@@ -10,6 +10,7 @@ import { useWaliTrends } from '@/hooks/wali/useWaliTrends';
 import { useWaliRealtimeNotifications } from '@/hooks/wali/useWaliRealtimeNotifications';
 import { useWaliAdminPermissions } from '@/hooks/wali/useWaliAdminPermissions';
 import { PermissionBadge } from '@/components/wali/permissions';
+import { WaliAdminTabs } from '@/components/wali/navigation';
 import { StatisticsCards } from '@/components/wali/monitoring/StatisticsCards';
 import { AlertsTable } from '@/components/wali/monitoring/AlertsTable';
 import { ActivityList } from '@/components/wali/monitoring/ActivityList';
@@ -103,35 +104,40 @@ const AdminWaliMonitoring = () => {
 
   return (
     <div className="container mx-auto py-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Shield className="w-8 h-8 text-primary" />
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-3xl font-bold">Monitoring des Walis</h1>
-              <PermissionBadge role={permissions.role} />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Shield className="w-8 h-8 text-primary" />
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-3xl font-bold">Monitoring des Walis</h1>
+                <PermissionBadge role={permissions.role} />
+              </div>
+              <p className="text-muted-foreground">
+                Surveillance des activités et alertes de sécurité
+                {isConnected && (
+                  <span className="ml-2 inline-flex items-center gap-1 text-xs text-green-600">
+                    <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse" />
+                    Temps réel actif
+                  </span>
+                )}
+              </p>
             </div>
-            <p className="text-muted-foreground">
-              Surveillance des activités et alertes de sécurité
-              {isConnected && (
-                <span className="ml-2 inline-flex items-center gap-1 text-xs text-green-600">
-                  <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse" />
-                  Temps réel actif
-                </span>
-              )}
-            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handleExportComprehensive} variant="outline">
+              <FileText className="w-4 h-4 mr-2" />
+              Rapport Complet
+            </Button>
+            <Button onClick={refetch} disabled={loading} variant="outline">
+              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Actualiser
+            </Button>
           </div>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={handleExportComprehensive} variant="outline">
-            <FileText className="w-4 h-4 mr-2" />
-            Rapport Complet
-          </Button>
-          <Button onClick={refetch} disabled={loading} variant="outline">
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Actualiser
-          </Button>
-        </div>
+
+        {/* Navigation Tabs */}
+        <WaliAdminTabs />
       </div>
 
       <StatisticsCards statistics={statistics} />
