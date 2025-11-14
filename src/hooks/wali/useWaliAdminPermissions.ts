@@ -48,13 +48,13 @@ export const useWaliAdminPermissions = () => {
 
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_admin_permissions')
         .select('*')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (error && error.code !== 'PGRST116') {
+      if (error) {
         throw error;
       }
 
@@ -85,14 +85,14 @@ export const useWaliAdminPermissions = () => {
     }
 
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('wali_admin_permissions')
         .select('*')
         .order('assigned_at', { ascending: false });
 
       if (error) throw error;
 
-      const enrichedPermissions = data.map((perm) => ({
+      const enrichedPermissions = data.map((perm: any) => ({
         ...perm,
         user_email: undefined,
         user_name: `Utilisateur ${perm.user_id.substring(0, 8)}`,
@@ -124,7 +124,7 @@ export const useWaliAdminPermissions = () => {
     }
 
     try {
-      const { error } = await supabase.from('wali_admin_permissions').upsert({
+      const { error } = await (supabase as any).from('wali_admin_permissions').upsert({
         user_id: userId,
         role,
         assigned_by: user?.id,
@@ -162,7 +162,7 @@ export const useWaliAdminPermissions = () => {
     }
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('wali_admin_permissions')
         .delete()
         .eq('user_id', userId);

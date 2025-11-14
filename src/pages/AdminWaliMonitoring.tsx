@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useWaliMonitoring, type WaliAlert } from '@/hooks/wali/useWaliMonitoring';
 import { useWaliTrends } from '@/hooks/wali/useWaliTrends';
 import { useWaliRealtimeNotifications } from '@/hooks/wali/useWaliRealtimeNotifications';
+import { useWaliAdminPermissions } from '@/hooks/wali/useWaliAdminPermissions';
+import { PermissionBadge } from '@/components/wali/permissions';
 import { StatisticsCards } from '@/components/wali/monitoring/StatisticsCards';
 import { AlertsTable } from '@/components/wali/monitoring/AlertsTable';
 import { ActivityList } from '@/components/wali/monitoring/ActivityList';
@@ -29,6 +31,7 @@ import { useWaliRegistrations } from '@/hooks/wali';
 const AdminWaliMonitoring = () => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const { permissions } = useWaliAdminPermissions();
   const {
     alerts,
     statistics,
@@ -104,7 +107,10 @@ const AdminWaliMonitoring = () => {
         <div className="flex items-center gap-3">
           <Shield className="w-8 h-8 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold">Monitoring des Walis</h1>
+            <div className="flex items-center gap-2 mb-1">
+              <h1 className="text-3xl font-bold">Monitoring des Walis</h1>
+              <PermissionBadge role={permissions.role} />
+            </div>
             <p className="text-muted-foreground">
               Surveillance des activités et alertes de sécurité
               {isConnected && (

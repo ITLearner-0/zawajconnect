@@ -7,6 +7,7 @@ import { MessageSquare, Plus, Edit2, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import type { WaliComment } from '@/hooks/wali/useWaliRegistrationComments';
+import type { WaliPermissionCheck } from '@/hooks/wali/useWaliAdminPermissions';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +22,7 @@ import {
 interface CommentsSectionProps {
   comments: WaliComment[];
   currentAdminId: string;
+  permissions: WaliPermissionCheck;
   onAddComment: (text: string, isInternal: boolean) => Promise<boolean>;
   onUpdateComment: (id: string, text: string) => Promise<boolean>;
   onDeleteComment: (id: string) => Promise<boolean>;
@@ -29,6 +31,7 @@ interface CommentsSectionProps {
 export const CommentsSection = ({
   comments,
   currentAdminId,
+  permissions,
   onAddComment,
   onUpdateComment,
   onDeleteComment,
@@ -91,22 +94,24 @@ export const CommentsSection = ({
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Add new comment */}
-        <div className="space-y-2">
-          <Textarea
-            placeholder="Ajouter un commentaire interne..."
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            rows={3}
-          />
-          <Button
-            onClick={handleAdd}
-            disabled={!newComment.trim() || isSubmitting}
-            size="sm"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Ajouter un commentaire
-          </Button>
-        </div>
+        {permissions.canEdit && (
+          <div className="space-y-2">
+            <Textarea
+              placeholder="Ajouter un commentaire interne..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              rows={3}
+            />
+            <Button
+              onClick={handleAdd}
+              disabled={!newComment.trim() || isSubmitting}
+              size="sm"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Ajouter un commentaire
+            </Button>
+          </div>
+        )}
 
         {/* Comments list */}
         <div className="space-y-3">
@@ -174,6 +179,7 @@ export const CommentsSection = ({
                   </div>
 
                   {comment.admin_id === currentAdminId &&
+                    permissions.canEdit &&
                     editingId !== comment.id && (
                       <div className="flex gap-1">
                         <Button
