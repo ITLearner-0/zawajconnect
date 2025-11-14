@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Activity, Shield, AlertCircle } from 'lucide-react';
+import { LayoutDashboard, FileText, Activity, Shield, AlertCircle, Lock } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface WaliAdminTab {
@@ -40,6 +40,12 @@ const tabs: WaliAdminTab[] = [
     path: '/admin/wali-audit',
     icon: Shield,
   },
+  {
+    value: 'permissions',
+    label: 'Permissions',
+    path: '/admin/wali-permissions',
+    icon: Lock,
+  },
 ];
 
 export const WaliAdminTabs = () => {
@@ -48,7 +54,7 @@ export const WaliAdminTabs = () => {
 
   return (
     <Tabs value={currentTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-5 h-auto">
+      <TabsList className="grid w-full grid-cols-6 h-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (

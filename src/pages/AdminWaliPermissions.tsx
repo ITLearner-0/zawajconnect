@@ -15,6 +15,7 @@ import { useWaliAdminPermissions } from '@/hooks/wali/useWaliAdminPermissions';
 import { Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import { AssignPermissionDialog } from '@/components/wali/permissions/AssignPermissionDialog';
+import { WaliAdminTabs } from '@/components/wali/navigation';
 
 const AdminWaliPermissions = () => {
   const {
@@ -68,6 +69,8 @@ const AdminWaliPermissions = () => {
 
   return (
     <div className="container mx-auto py-8 space-y-6">
+      <WaliAdminTabs />
+      
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Shield className="w-8 h-8 text-primary" />
