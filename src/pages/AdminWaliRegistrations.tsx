@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useWaliRegistrations } from '@/hooks/wali/useWaliRegistrations';
 import { useWaliAdminPermissions } from '@/hooks/wali/useWaliAdminPermissions';
+import { useWaliFilters, WaliFilterValues } from '@/hooks/wali/useWaliFilters';
 import { WaliRegistration } from '@/hooks/wali/useWaliRegistration';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -9,7 +10,8 @@ import { RegistrationList } from '@/components/wali/admin/RegistrationList';
 import { RegistrationDetailModal } from '@/components/wali/admin/RegistrationDetailModal';
 import { ExportMenu } from '@/components/wali/admin/ExportMenu';
 import { PermissionBadge } from '@/components/wali/permissions';
-import { Loader2, Shield, CheckCircle2, XCircle, Clock, Eye, RefreshCw } from 'lucide-react';
+import { AdvancedFilters, SavedFiltersList } from '@/components/wali/filters';
+import { Loader2, Shield, CheckCircle2, XCircle, Clock, Eye, RefreshCw, Filter } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   exportWaliRegistrationsToExcel,
@@ -20,19 +22,100 @@ const AdminWaliRegistrations = () => {
   const [selectedTab, setSelectedTab] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
   const [selectedRegistration, setSelectedRegistration] = useState<WaliRegistration | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<WaliFilterValues>({ status: 'pending' });
   const { permissions } = useWaliAdminPermissions();
+  const {
+    savedFilters,
+    saveFilter,
+    deleteFilter,
+    setDefaultFilter,
+  } = useWaliFilters();
 
   const {
-    registrations,
+    registrations: allRegistrations,
     loading,
     error,
     refetch,
     approveRegistration,
     rejectRegistration,
     updateVerificationNotes,
-  } = useWaliRegistrations({
-    status: selectedTab === 'all' ? undefined : selectedTab === 'pending' ? 'pending' : selectedTab === 'approved' ? 'approved' : 'rejected',
-  });
+  } = useWaliRegistrations();
+
+  // Filter registrations based on active filters
+  const filteredRegistrations = useMemo(() => {
+    let filtered = allRegistrations;
+
+    // Tab filter
+    if (selectedTab !== 'all') {
+      filtered = filtered.filter((r) => r.status === selectedTab);
+    }
+
+    // Status filter
+    if (filters.status && filters.status !== 'all') {
+      filtered = filtered.filter((r) => r.status === filters.status);
+    }
+
+    // Search filter (searches in name, email, phone)
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(
+        (r) =>
+          r.full_name.toLowerCase().includes(searchLower) ||
+          r.email.toLowerCase().includes(searchLower) ||
+          r.phone?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Relationship filter - skip if property doesn't exist
+    if (filters.relationship && filters.relationship !== 'all') {
+      filtered = filtered.filter((r: any) => r.relationship === filters.relationship);
+    }
+
+    // Email filter
+    if (filters.email) {
+      filtered = filtered.filter((r) =>
+        r.email.toLowerCase().includes(filters.email!.toLowerCase())
+      );
+    }
+
+    // Phone filter
+    if (filters.phone) {
+      filtered = filtered.filter((r) =>
+        r.phone?.toLowerCase().includes(filters.phone!.toLowerCase())
+      );
+    }
+
+    // Date range filter
+    if (filters.dateFrom) {
+      filtered = filtered.filter(
+        (r) => new Date(r.created_at) >= new Date(filters.dateFrom!)
+      );
+    }
+
+    if (filters.dateTo) {
+      const dateTo = new Date(filters.dateTo);
+      dateTo.setHours(23, 59, 59, 999);
+      filtered = filtered.filter((r) => new Date(r.created_at) <= dateTo);
+    }
+
+    return filtered;
+  }, [allRegistrations, selectedTab, filters]);
+
+  const handleLoadFilter = (savedFilter: any) => {
+    setFilters(savedFilter.filters);
+    if (savedFilter.filters.status && savedFilter.filters.status !== 'all') {
+      setSelectedTab(savedFilter.filters.status);
+    }
+  };
+
+  const handleSaveFilter = (name: string) => {
+    saveFilter(name, filters);
+  };
+
+  const handleResetFilters = () => {
+    setFilters({ status: selectedTab === 'all' ? undefined : selectedTab });
+  };
 
   const handleViewDetails = (registration: WaliRegistration) => {
     setSelectedRegistration(registration);
@@ -45,9 +128,9 @@ const AdminWaliRegistrations = () => {
     refetch();
   };
 
-  const pendingCount = registrations.filter((r) => r.status === 'pending').length;
-  const approvedCount = registrations.filter((r) => r.status === 'approved').length;
-  const rejectedCount = registrations.filter((r) => r.status === 'rejected').length;
+  const pendingCount = allRegistrations.filter((r) => r.status === 'pending').length;
+  const approvedCount = allRegistrations.filter((r) => r.status === 'approved').length;
+  const rejectedCount = allRegistrations.filter((r) => r.status === 'rejected').length;
 
   if (loading) {
     return (
@@ -84,9 +167,17 @@ const AdminWaliRegistrations = () => {
             </div>
           </div>
           <div className="flex gap-2">
+            <Button
+              variant={showFilters ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              <Filter className="w-4 h-4 mr-2" />
+              Filtres
+            </Button>
             <ExportMenu
-              onExportExcel={() => exportWaliRegistrationsToExcel(registrations)}
-              onExportCSV={() => exportWaliRegistrationsToCSV(registrations)}
+              onExportExcel={() => exportWaliRegistrationsToExcel(filteredRegistrations)}
+              onExportCSV={() => exportWaliRegistrationsToCSV(filteredRegistrations)}
               label="Exporter"
             />
             <Button onClick={refetch} disabled={loading} variant="outline" size="sm">
@@ -97,12 +188,34 @@ const AdminWaliRegistrations = () => {
         </div>
       </div>
 
+      {/* Filters Section */}
+      {showFilters && (
+        <div className="grid gap-4 mb-6 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <AdvancedFilters
+              filters={filters}
+              onFiltersChange={setFilters}
+              onSaveFilter={handleSaveFilter}
+              onReset={handleResetFilters}
+            />
+          </div>
+          <div>
+            <SavedFiltersList
+              filters={savedFilters}
+              onLoadFilter={handleLoadFilter}
+              onDeleteFilter={deleteFilter}
+              onSetDefault={setDefaultFilter}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>Total</CardDescription>
-            <CardTitle className="text-2xl">{registrations.length}</CardTitle>
+            <CardTitle className="text-2xl">{filteredRegistrations.length}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center text-xs text-muted-foreground">
@@ -178,28 +291,28 @@ const AdminWaliRegistrations = () => {
 
             <TabsContent value="all" className="mt-6">
               <RegistrationList
-                registrations={registrations}
+                registrations={filteredRegistrations}
                 onViewDetails={handleViewDetails}
               />
             </TabsContent>
 
             <TabsContent value="pending" className="mt-6">
               <RegistrationList
-                registrations={registrations.filter((r) => r.status === 'pending')}
+                registrations={filteredRegistrations.filter((r: any) => r.status === 'pending')}
                 onViewDetails={handleViewDetails}
               />
             </TabsContent>
 
             <TabsContent value="approved" className="mt-6">
               <RegistrationList
-                registrations={registrations.filter((r) => r.status === 'approved')}
+                registrations={filteredRegistrations.filter((r: any) => r.status === 'approved')}
                 onViewDetails={handleViewDetails}
               />
             </TabsContent>
 
             <TabsContent value="rejected" className="mt-6">
               <RegistrationList
-                registrations={registrations.filter((r) => r.status === 'rejected')}
+                registrations={filteredRegistrations.filter((r: any) => r.status === 'rejected')}
                 onViewDetails={handleViewDetails}
               />
             </TabsContent>
