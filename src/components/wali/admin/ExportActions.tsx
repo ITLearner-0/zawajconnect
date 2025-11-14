@@ -10,7 +10,7 @@ import { WaliRegistration } from '@/hooks/wali/useWaliRegistration';
 import { Download, FileText, FileSpreadsheet, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
 
 interface ExportActionsProps {
   registrations: WaliRegistration[];
@@ -88,7 +88,7 @@ export const ExportActions = ({ registrations, selectedIds }: ExportActionsProps
         new Date(reg.submitted_at).toLocaleDateString('fr-FR'),
       ]);
 
-      (doc as any).autoTable({
+      autoTable(doc, {
         head: headers,
         body: rows,
         startY: 40,
