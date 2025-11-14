@@ -1408,6 +1408,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      advanced_matching_criteria: {
+        Row: {
+          age_range_max: number | null;
+          age_range_min: number | null;
+          created_at: string;
+          deal_breakers: Json | null;
+          education_preferences: string[] | null;
+          family_structure_preferences: string[] | null;
+          id: string;
+          location_radius_km: number | null;
+          preferred_traits: Json | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          age_range_max?: number | null;
+          age_range_min?: number | null;
+          created_at?: string;
+          deal_breakers?: Json | null;
+          education_preferences?: string[] | null;
+          family_structure_preferences?: string[] | null;
+          id?: string;
+          location_radius_km?: number | null;
+          preferred_traits?: Json | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          age_range_max?: number | null;
+          age_range_min?: number | null;
+          created_at?: string;
+          deal_breakers?: Json | null;
+          education_preferences?: string[] | null;
+          family_structure_preferences?: string[] | null;
+          id?: string;
+          location_radius_km?: number | null;
+          preferred_traits?: Json | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       appeal_activities: {
         Row: {
           activity_type: string;
@@ -1634,6 +1676,36 @@ export type Database = {
           score?: number;
           updated_at?: string | null;
           user_id?: string;
+        };
+        Relationships: [];
+      };
+      compatibility_score_breakdown: {
+        Row: {
+          calculated_at: string;
+          dimension: string;
+          factors: Json;
+          id: string;
+          score: number;
+          user1_id: string;
+          user2_id: string;
+        };
+        Insert: {
+          calculated_at?: string;
+          dimension: string;
+          factors?: Json;
+          id?: string;
+          score: number;
+          user1_id: string;
+          user2_id: string;
+        };
+        Update: {
+          calculated_at?: string;
+          dimension?: string;
+          factors?: Json;
+          id?: string;
+          score?: number;
+          user1_id?: string;
+          user2_id?: string;
         };
         Relationships: [];
       };
@@ -2073,7 +2145,10 @@ export type Database = {
       family_members: {
         Row: {
           allow_video_calls: boolean | null;
+          can_approve_matches: boolean | null;
           can_communicate: boolean | null;
+          can_supervise_calls: boolean | null;
+          can_view_messages: boolean | null;
           can_view_profile: boolean | null;
           created_at: string;
           full_name: string;
@@ -2088,11 +2163,16 @@ export type Database = {
           notify_on_calls: boolean | null;
           relationship: string;
           require_call_approval: boolean | null;
+          supervision_level: string | null;
           user_id: string;
+          wali_registration_id: string | null;
         };
         Insert: {
           allow_video_calls?: boolean | null;
+          can_approve_matches?: boolean | null;
           can_communicate?: boolean | null;
+          can_supervise_calls?: boolean | null;
+          can_view_messages?: boolean | null;
           can_view_profile?: boolean | null;
           created_at?: string;
           full_name: string;
@@ -2107,11 +2187,16 @@ export type Database = {
           notify_on_calls?: boolean | null;
           relationship: string;
           require_call_approval?: boolean | null;
+          supervision_level?: string | null;
           user_id: string;
+          wali_registration_id?: string | null;
         };
         Update: {
           allow_video_calls?: boolean | null;
+          can_approve_matches?: boolean | null;
           can_communicate?: boolean | null;
+          can_supervise_calls?: boolean | null;
+          can_view_messages?: boolean | null;
           can_view_profile?: boolean | null;
           created_at?: string;
           full_name?: string;
@@ -2126,9 +2211,19 @@ export type Database = {
           notify_on_calls?: boolean | null;
           relationship?: string;
           require_call_approval?: boolean | null;
+          supervision_level?: string | null;
           user_id?: string;
+          wali_registration_id?: string | null;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "family_members_wali_registration_id_fkey";
+            columns: ["wali_registration_id"];
+            isOneToOne: false;
+            referencedRelation: "wali_registrations";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       family_notifications: {
         Row: {
@@ -2382,6 +2477,45 @@ export type Database = {
           },
         ];
       };
+      gamification_rewards: {
+        Row: {
+          claimed: boolean | null;
+          claimed_at: string | null;
+          created_at: string;
+          expires_at: string | null;
+          id: string;
+          reward_amount: number | null;
+          reward_description: string;
+          reward_type: string;
+          source_action: string;
+          user_id: string;
+        };
+        Insert: {
+          claimed?: boolean | null;
+          claimed_at?: string | null;
+          created_at?: string;
+          expires_at?: string | null;
+          id?: string;
+          reward_amount?: number | null;
+          reward_description: string;
+          reward_type: string;
+          source_action: string;
+          user_id: string;
+        };
+        Update: {
+          claimed?: boolean | null;
+          claimed_at?: string | null;
+          created_at?: string;
+          expires_at?: string | null;
+          id?: string;
+          reward_amount?: number | null;
+          reward_description?: string;
+          reward_type?: string;
+          source_action?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       insight_actions: {
         Row: {
           action_type: string;
@@ -2598,6 +2732,50 @@ export type Database = {
         };
         Relationships: [];
       };
+      match_compatibility_details: {
+        Row: {
+          category: string;
+          category_score: number;
+          created_at: string;
+          differences: Json;
+          id: string;
+          match_id: string;
+          matching_points: Json;
+          updated_at: string;
+          weight: number;
+        };
+        Insert: {
+          category: string;
+          category_score: number;
+          created_at?: string;
+          differences?: Json;
+          id?: string;
+          match_id: string;
+          matching_points?: Json;
+          updated_at?: string;
+          weight?: number;
+        };
+        Update: {
+          category?: string;
+          category_score?: number;
+          created_at?: string;
+          differences?: Json;
+          id?: string;
+          match_id?: string;
+          matching_points?: Json;
+          updated_at?: string;
+          weight?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "match_compatibility_details_match_id_fkey";
+            columns: ["match_id"];
+            isOneToOne: false;
+            referencedRelation: "matches";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       match_notifications: {
         Row: {
           action_url: string | null;
@@ -2718,6 +2896,48 @@ export type Database = {
           user1_liked?: boolean | null;
           user2_id?: string;
           user2_liked?: boolean | null;
+        };
+        Relationships: [];
+      };
+      matching_algorithm_config: {
+        Row: {
+          activated_at: string | null;
+          config_name: string;
+          config_version: string;
+          created_at: string;
+          created_by: string | null;
+          deactivated_at: string | null;
+          filters: Json;
+          id: string;
+          is_active: boolean | null;
+          thresholds: Json;
+          weights: Json;
+        };
+        Insert: {
+          activated_at?: string | null;
+          config_name: string;
+          config_version: string;
+          created_at?: string;
+          created_by?: string | null;
+          deactivated_at?: string | null;
+          filters?: Json;
+          id?: string;
+          is_active?: boolean | null;
+          thresholds?: Json;
+          weights?: Json;
+        };
+        Update: {
+          activated_at?: string | null;
+          config_name?: string;
+          config_version?: string;
+          created_at?: string;
+          created_by?: string | null;
+          deactivated_at?: string | null;
+          filters?: Json;
+          id?: string;
+          is_active?: boolean | null;
+          thresholds?: Json;
+          weights?: Json;
         };
         Relationships: [];
       };
@@ -3245,6 +3465,39 @@ export type Database = {
         };
         Relationships: [];
       };
+      profile_activity_log: {
+        Row: {
+          activity_type: string;
+          created_at: string;
+          id: string;
+          ip_address: unknown;
+          metadata: Json | null;
+          target_user_id: string | null;
+          user_agent: string | null;
+          user_id: string;
+        };
+        Insert: {
+          activity_type: string;
+          created_at?: string;
+          id?: string;
+          ip_address?: unknown;
+          metadata?: Json | null;
+          target_user_id?: string | null;
+          user_agent?: string | null;
+          user_id: string;
+        };
+        Update: {
+          activity_type?: string;
+          created_at?: string;
+          id?: string;
+          ip_address?: unknown;
+          metadata?: Json | null;
+          target_user_id?: string | null;
+          user_agent?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       profile_comparison_history: {
         Row: {
           compared_profile_ids: string[];
@@ -3412,6 +3665,54 @@ export type Database = {
         };
         Relationships: [];
       };
+      profile_verification_documents: {
+        Row: {
+          created_at: string;
+          document_type: string;
+          document_url: string;
+          expiry_date: string | null;
+          id: string;
+          metadata: Json | null;
+          rejection_reason: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          updated_at: string;
+          uploaded_at: string;
+          user_id: string;
+          verification_status: string;
+        };
+        Insert: {
+          created_at?: string;
+          document_type: string;
+          document_url: string;
+          expiry_date?: string | null;
+          id?: string;
+          metadata?: Json | null;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          updated_at?: string;
+          uploaded_at?: string;
+          user_id: string;
+          verification_status?: string;
+        };
+        Update: {
+          created_at?: string;
+          document_type?: string;
+          document_url?: string;
+          expiry_date?: string | null;
+          id?: string;
+          metadata?: Json | null;
+          rejection_reason?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          updated_at?: string;
+          uploaded_at?: string;
+          user_id?: string;
+          verification_status?: string;
+        };
+        Relationships: [];
+      };
       profile_views: {
         Row: {
           created_at: string;
@@ -3470,16 +3771,21 @@ export type Database = {
           id: string;
           interests: string[] | null;
           is_visible: boolean | null;
+          is_wali: boolean | null;
           location: string | null;
           looking_for: string | null;
           onboarding_completed: boolean | null;
           phone: string | null;
           privacy_settings: Json | null;
           profession: string | null;
+          supervised_by_wali_id: string | null;
           terms_accepted_at: string | null;
           terms_version: string | null;
           updated_at: string;
           user_id: string;
+          wali_approval_required: boolean | null;
+          wali_registration_id: string | null;
+          wali_supervision_level: string | null;
         };
         Insert: {
           age?: number | null;
@@ -3493,16 +3799,21 @@ export type Database = {
           id?: string;
           interests?: string[] | null;
           is_visible?: boolean | null;
+          is_wali?: boolean | null;
           location?: string | null;
           looking_for?: string | null;
           onboarding_completed?: boolean | null;
           phone?: string | null;
           privacy_settings?: Json | null;
           profession?: string | null;
+          supervised_by_wali_id?: string | null;
           terms_accepted_at?: string | null;
           terms_version?: string | null;
           updated_at?: string;
           user_id: string;
+          wali_approval_required?: boolean | null;
+          wali_registration_id?: string | null;
+          wali_supervision_level?: string | null;
         };
         Update: {
           age?: number | null;
@@ -3516,16 +3827,68 @@ export type Database = {
           id?: string;
           interests?: string[] | null;
           is_visible?: boolean | null;
+          is_wali?: boolean | null;
           location?: string | null;
           looking_for?: string | null;
           onboarding_completed?: boolean | null;
           phone?: string | null;
           privacy_settings?: Json | null;
           profession?: string | null;
+          supervised_by_wali_id?: string | null;
           terms_accepted_at?: string | null;
           terms_version?: string | null;
           updated_at?: string;
           user_id?: string;
+          wali_approval_required?: boolean | null;
+          wali_registration_id?: string | null;
+          wali_supervision_level?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "profiles_wali_registration_id_fkey";
+            columns: ["wali_registration_id"];
+            isOneToOne: false;
+            referencedRelation: "wali_registrations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      rate_limiting: {
+        Row: {
+          action_count: number | null;
+          action_type: string;
+          created_at: string;
+          id: string;
+          limit_exceeded: boolean | null;
+          metadata: Json | null;
+          updated_at: string;
+          user_id: string;
+          window_end: string;
+          window_start: string;
+        };
+        Insert: {
+          action_count?: number | null;
+          action_type: string;
+          created_at?: string;
+          id?: string;
+          limit_exceeded?: boolean | null;
+          metadata?: Json | null;
+          updated_at?: string;
+          user_id: string;
+          window_end: string;
+          window_start?: string;
+        };
+        Update: {
+          action_count?: number | null;
+          action_type?: string;
+          created_at?: string;
+          id?: string;
+          limit_exceeded?: boolean | null;
+          metadata?: Json | null;
+          updated_at?: string;
+          user_id?: string;
+          window_end?: string;
+          window_start?: string;
         };
         Relationships: [];
       };
@@ -3815,6 +4178,99 @@ export type Database = {
         };
         Relationships: [];
       };
+      temporary_profile_access: {
+        Row: {
+          access_count: number | null;
+          access_type: string;
+          accessor_id: string;
+          created_at: string;
+          expires_at: string;
+          granted_at: string;
+          granted_by: string;
+          id: string;
+          last_accessed_at: string | null;
+          profile_owner_id: string;
+          reason: string | null;
+          revoked: boolean | null;
+          revoked_at: string | null;
+          revoked_by: string | null;
+        };
+        Insert: {
+          access_count?: number | null;
+          access_type: string;
+          accessor_id: string;
+          created_at?: string;
+          expires_at: string;
+          granted_at?: string;
+          granted_by: string;
+          id?: string;
+          last_accessed_at?: string | null;
+          profile_owner_id: string;
+          reason?: string | null;
+          revoked?: boolean | null;
+          revoked_at?: string | null;
+          revoked_by?: string | null;
+        };
+        Update: {
+          access_count?: number | null;
+          access_type?: string;
+          accessor_id?: string;
+          created_at?: string;
+          expires_at?: string;
+          granted_at?: string;
+          granted_by?: string;
+          id?: string;
+          last_accessed_at?: string | null;
+          profile_owner_id?: string;
+          reason?: string | null;
+          revoked?: boolean | null;
+          revoked_at?: string | null;
+          revoked_by?: string | null;
+        };
+        Relationships: [];
+      };
+      user_badges: {
+        Row: {
+          badge_description: string | null;
+          badge_icon: string | null;
+          badge_id: string;
+          badge_name: string;
+          created_at: string;
+          display_order: number | null;
+          earned_at: string;
+          id: string;
+          progress_value: number | null;
+          rarity: string;
+          user_id: string;
+        };
+        Insert: {
+          badge_description?: string | null;
+          badge_icon?: string | null;
+          badge_id: string;
+          badge_name: string;
+          created_at?: string;
+          display_order?: number | null;
+          earned_at?: string;
+          id?: string;
+          progress_value?: number | null;
+          rarity: string;
+          user_id: string;
+        };
+        Update: {
+          badge_description?: string | null;
+          badge_icon?: string | null;
+          badge_id?: string;
+          badge_name?: string;
+          created_at?: string;
+          display_order?: number | null;
+          earned_at?: string;
+          id?: string;
+          progress_value?: number | null;
+          rarity?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       user_bans: {
         Row: {
           ban_type: string;
@@ -3972,12 +4428,75 @@ export type Database = {
           },
         ];
       };
+      user_feedback: {
+        Row: {
+          admin_response: string | null;
+          category: string | null;
+          created_at: string;
+          feedback_type: string;
+          id: string;
+          message: string;
+          metadata: Json | null;
+          page_url: string | null;
+          priority: string | null;
+          rating: number | null;
+          responded_at: string | null;
+          responded_by: string | null;
+          screenshot_url: string | null;
+          status: string | null;
+          subject: string;
+          updated_at: string;
+          user_id: string | null;
+        };
+        Insert: {
+          admin_response?: string | null;
+          category?: string | null;
+          created_at?: string;
+          feedback_type: string;
+          id?: string;
+          message: string;
+          metadata?: Json | null;
+          page_url?: string | null;
+          priority?: string | null;
+          rating?: number | null;
+          responded_at?: string | null;
+          responded_by?: string | null;
+          screenshot_url?: string | null;
+          status?: string | null;
+          subject: string;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Update: {
+          admin_response?: string | null;
+          category?: string | null;
+          created_at?: string;
+          feedback_type?: string;
+          id?: string;
+          message?: string;
+          metadata?: Json | null;
+          page_url?: string | null;
+          priority?: string | null;
+          rating?: number | null;
+          responded_at?: string | null;
+          responded_by?: string | null;
+          screenshot_url?: string | null;
+          status?: string | null;
+          subject?: string;
+          updated_at?: string;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       user_levels: {
         Row: {
           created_at: string;
           current_level: string;
+          current_streak: number | null;
           id: string;
+          last_login_date: string | null;
           level_progress: number;
+          longest_streak: number | null;
           total_xp: number;
           updated_at: string;
           user_id: string;
@@ -3985,8 +4504,11 @@ export type Database = {
         Insert: {
           created_at?: string;
           current_level?: string;
+          current_streak?: number | null;
           id?: string;
+          last_login_date?: string | null;
           level_progress?: number;
+          longest_streak?: number | null;
           total_xp?: number;
           updated_at?: string;
           user_id: string;
@@ -3994,8 +4516,11 @@ export type Database = {
         Update: {
           created_at?: string;
           current_level?: string;
+          current_streak?: number | null;
           id?: string;
+          last_login_date?: string | null;
           level_progress?: number;
+          longest_streak?: number | null;
           total_xp?: number;
           updated_at?: string;
           user_id?: string;
@@ -4303,6 +4828,170 @@ export type Database = {
           },
         ];
       };
+      wali_admin_alerts: {
+        Row: {
+          acknowledged: boolean | null;
+          acknowledged_at: string | null;
+          acknowledged_by: string | null;
+          admin_notified: boolean | null;
+          admin_notified_at: string | null;
+          alert_type: string;
+          created_at: string;
+          description: string;
+          id: string;
+          metadata: Json | null;
+          risk_level: string;
+          suspicious_pattern: string | null;
+          updated_at: string;
+          wali_user_id: string;
+        };
+        Insert: {
+          acknowledged?: boolean | null;
+          acknowledged_at?: string | null;
+          acknowledged_by?: string | null;
+          admin_notified?: boolean | null;
+          admin_notified_at?: string | null;
+          alert_type: string;
+          created_at?: string;
+          description: string;
+          id?: string;
+          metadata?: Json | null;
+          risk_level: string;
+          suspicious_pattern?: string | null;
+          updated_at?: string;
+          wali_user_id: string;
+        };
+        Update: {
+          acknowledged?: boolean | null;
+          acknowledged_at?: string | null;
+          acknowledged_by?: string | null;
+          admin_notified?: boolean | null;
+          admin_notified_at?: string | null;
+          alert_type?: string;
+          created_at?: string;
+          description?: string;
+          id?: string;
+          metadata?: Json | null;
+          risk_level?: string;
+          suspicious_pattern?: string | null;
+          updated_at?: string;
+          wali_user_id?: string;
+        };
+        Relationships: [];
+      };
+      wali_admin_audit_trail: {
+        Row: {
+          action_details: Json | null;
+          action_type: string;
+          admin_user_id: string;
+          created_at: string | null;
+          error_message: string | null;
+          id: string;
+          ip_address: unknown;
+          new_values: Json | null;
+          old_values: Json | null;
+          registration_id: string | null;
+          success: boolean | null;
+          target_user_id: string | null;
+          user_agent: string | null;
+        };
+        Insert: {
+          action_details?: Json | null;
+          action_type: string;
+          admin_user_id: string;
+          created_at?: string | null;
+          error_message?: string | null;
+          id?: string;
+          ip_address?: unknown;
+          new_values?: Json | null;
+          old_values?: Json | null;
+          registration_id?: string | null;
+          success?: boolean | null;
+          target_user_id?: string | null;
+          user_agent?: string | null;
+        };
+        Update: {
+          action_details?: Json | null;
+          action_type?: string;
+          admin_user_id?: string;
+          created_at?: string | null;
+          error_message?: string | null;
+          id?: string;
+          ip_address?: unknown;
+          new_values?: Json | null;
+          old_values?: Json | null;
+          registration_id?: string | null;
+          success?: boolean | null;
+          target_user_id?: string | null;
+          user_agent?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "wali_admin_audit_trail_registration_id_fkey";
+            columns: ["registration_id"];
+            isOneToOne: false;
+            referencedRelation: "wali_registrations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      wali_admin_permission_audit: {
+        Row: {
+          changed_at: string | null;
+          changed_by: string;
+          id: string;
+          new_role: Database["public"]["Enums"]["wali_admin_role"];
+          old_role: Database["public"]["Enums"]["wali_admin_role"] | null;
+          reason: string | null;
+          user_id: string;
+        };
+        Insert: {
+          changed_at?: string | null;
+          changed_by: string;
+          id?: string;
+          new_role: Database["public"]["Enums"]["wali_admin_role"];
+          old_role?: Database["public"]["Enums"]["wali_admin_role"] | null;
+          reason?: string | null;
+          user_id: string;
+        };
+        Update: {
+          changed_at?: string | null;
+          changed_by?: string;
+          id?: string;
+          new_role?: Database["public"]["Enums"]["wali_admin_role"];
+          old_role?: Database["public"]["Enums"]["wali_admin_role"] | null;
+          reason?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      wali_admin_permissions: {
+        Row: {
+          assigned_at: string | null;
+          assigned_by: string | null;
+          id: string;
+          notes: string | null;
+          role: Database["public"]["Enums"]["wali_admin_role"];
+          user_id: string;
+        };
+        Insert: {
+          assigned_at?: string | null;
+          assigned_by?: string | null;
+          id?: string;
+          notes?: string | null;
+          role?: Database["public"]["Enums"]["wali_admin_role"];
+          user_id: string;
+        };
+        Update: {
+          assigned_at?: string | null;
+          assigned_by?: string | null;
+          id?: string;
+          notes?: string | null;
+          role?: Database["public"]["Enums"]["wali_admin_role"];
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       wali_delegations: {
         Row: {
           activated_at: string | null;
@@ -4353,6 +5042,7 @@ export type Database = {
       };
       wali_email_history: {
         Row: {
+          alert_id: string | null;
           clicked_at: string | null;
           created_at: string | null;
           delivered_at: string | null;
@@ -4370,6 +5060,7 @@ export type Database = {
           wali_user_id: string;
         };
         Insert: {
+          alert_id?: string | null;
           clicked_at?: string | null;
           created_at?: string | null;
           delivered_at?: string | null;
@@ -4387,6 +5078,7 @@ export type Database = {
           wali_user_id: string;
         };
         Update: {
+          alert_id?: string | null;
           clicked_at?: string | null;
           created_at?: string | null;
           delivered_at?: string | null;
@@ -4403,7 +5095,15 @@ export type Database = {
           subject?: string;
           wali_user_id?: string;
         };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "wali_email_history_alert_id_fkey";
+            columns: ["alert_id"];
+            isOneToOne: false;
+            referencedRelation: "wali_admin_alerts";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       wali_filters: {
         Row: {
@@ -4434,6 +5134,48 @@ export type Database = {
           id?: string;
           is_active?: boolean | null;
           updated_at?: string | null;
+          wali_id?: string;
+        };
+        Relationships: [];
+      };
+      wali_onboarding_progress: {
+        Row: {
+          completed_at: string | null;
+          completion_percentage: number;
+          created_at: string;
+          id: string;
+          status: string;
+          step_agreement: boolean;
+          step_personal_info: boolean;
+          step_training: boolean;
+          step_verification: boolean;
+          updated_at: string;
+          wali_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          completion_percentage?: number;
+          created_at?: string;
+          id?: string;
+          status?: string;
+          step_agreement?: boolean;
+          step_personal_info?: boolean;
+          step_training?: boolean;
+          step_verification?: boolean;
+          updated_at?: string;
+          wali_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          completion_percentage?: number;
+          created_at?: string;
+          id?: string;
+          status?: string;
+          step_agreement?: boolean;
+          step_personal_info?: boolean;
+          step_training?: boolean;
+          step_verification?: boolean;
+          updated_at?: string;
           wali_id?: string;
         };
         Relationships: [];
@@ -4474,6 +5216,211 @@ export type Database = {
           relationship?: string;
           updated_at?: string | null;
           user_id?: string;
+        };
+        Relationships: [];
+      };
+      wali_registration_activity_log: {
+        Row: {
+          action_description: string;
+          action_type: string;
+          admin_id: string | null;
+          created_at: string;
+          id: string;
+          metadata: Json | null;
+          new_value: Json | null;
+          old_value: Json | null;
+          registration_id: string;
+        };
+        Insert: {
+          action_description: string;
+          action_type: string;
+          admin_id?: string | null;
+          created_at?: string;
+          id?: string;
+          metadata?: Json | null;
+          new_value?: Json | null;
+          old_value?: Json | null;
+          registration_id: string;
+        };
+        Update: {
+          action_description?: string;
+          action_type?: string;
+          admin_id?: string | null;
+          created_at?: string;
+          id?: string;
+          metadata?: Json | null;
+          new_value?: Json | null;
+          old_value?: Json | null;
+          registration_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "wali_registration_activity_log_registration_id_fkey";
+            columns: ["registration_id"];
+            isOneToOne: false;
+            referencedRelation: "wali_registrations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      wali_registration_comments: {
+        Row: {
+          admin_id: string;
+          comment_text: string;
+          created_at: string;
+          id: string;
+          is_internal: boolean | null;
+          registration_id: string;
+          updated_at: string;
+        };
+        Insert: {
+          admin_id: string;
+          comment_text: string;
+          created_at?: string;
+          id?: string;
+          is_internal?: boolean | null;
+          registration_id: string;
+          updated_at?: string;
+        };
+        Update: {
+          admin_id?: string;
+          comment_text?: string;
+          created_at?: string;
+          id?: string;
+          is_internal?: boolean | null;
+          registration_id?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "wali_registration_comments_registration_id_fkey";
+            columns: ["registration_id"];
+            isOneToOne: false;
+            referencedRelation: "wali_registrations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      wali_registrations: {
+        Row: {
+          created_at: string;
+          email: string;
+          full_name: string;
+          id: string;
+          id_document_url: string | null;
+          phone: string | null;
+          proof_of_relationship_url: string | null;
+          rejection_reason: string | null;
+          relationship_to_members: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          status: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          email: string;
+          full_name: string;
+          id?: string;
+          id_document_url?: string | null;
+          phone?: string | null;
+          proof_of_relationship_url?: string | null;
+          rejection_reason?: string | null;
+          relationship_to_members?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          email?: string;
+          full_name?: string;
+          id?: string;
+          id_document_url?: string | null;
+          phone?: string | null;
+          proof_of_relationship_url?: string | null;
+          rejection_reason?: string | null;
+          relationship_to_members?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      wali_saved_filters: {
+        Row: {
+          created_at: string | null;
+          filters: Json;
+          id: string;
+          is_default: boolean | null;
+          name: string;
+          updated_at: string | null;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string | null;
+          filters: Json;
+          id?: string;
+          is_default?: boolean | null;
+          name: string;
+          updated_at?: string | null;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string | null;
+          filters?: Json;
+          id?: string;
+          is_default?: boolean | null;
+          name?: string;
+          updated_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      wali_suspensions: {
+        Row: {
+          created_at: string;
+          expires_at: string | null;
+          id: string;
+          is_active: boolean;
+          lifted_at: string | null;
+          lifted_by: string | null;
+          reason: string;
+          suspended_by: string;
+          suspension_type: string;
+          updated_at: string;
+          wali_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          expires_at?: string | null;
+          id?: string;
+          is_active?: boolean;
+          lifted_at?: string | null;
+          lifted_by?: string | null;
+          reason: string;
+          suspended_by: string;
+          suspension_type: string;
+          updated_at?: string;
+          wali_id: string;
+        };
+        Update: {
+          created_at?: string;
+          expires_at?: string | null;
+          id?: string;
+          is_active?: boolean;
+          lifted_at?: string | null;
+          lifted_by?: string | null;
+          reason?: string;
+          suspended_by?: string;
+          suspension_type?: string;
+          updated_at?: string;
+          wali_id?: string;
         };
         Relationships: [];
       };
@@ -4655,6 +5602,34 @@ export type Database = {
         };
         Relationships: [];
       };
+      wali_audit_trail_with_details: {
+        Row: {
+          action_details: Json | null;
+          action_type: string | null;
+          admin_name: string | null;
+          admin_user_id: string | null;
+          created_at: string | null;
+          error_message: string | null;
+          id: string | null;
+          ip_address: unknown;
+          new_values: Json | null;
+          old_values: Json | null;
+          registration_id: string | null;
+          registration_name: string | null;
+          success: boolean | null;
+          target_user_id: string | null;
+          user_agent: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "wali_admin_audit_trail_registration_id_fkey";
+            columns: ["registration_id"];
+            isOneToOne: false;
+            referencedRelation: "wali_registrations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Functions: {
       accept_family_invitation: {
@@ -4732,8 +5707,19 @@ export type Database = {
         Args: { viewer_uuid: string };
         Returns: boolean;
       };
+      check_rate_limit: {
+        Args: {
+          p_action_type: string;
+          p_limit: number;
+          p_user_id: string;
+          p_window_minutes?: number;
+        };
+        Returns: boolean;
+      };
       check_subscription_expiry_and_notify: { Args: never; Returns: undefined };
       check_unread_messages_and_notify: { Args: never; Returns: undefined };
+      cleanup_old_activity_logs: { Args: never; Returns: undefined };
+      cleanup_old_rate_limits: { Args: never; Returns: undefined };
       create_family_invitation: {
         Args: {
           p_email: string;
@@ -4851,6 +5837,7 @@ export type Database = {
       get_wali_email_history: {
         Args: { p_limit?: number; p_wali_user_id: string };
         Returns: {
+          alert_id: string;
           clicked_at: string;
           delivered_at: string;
           delivery_status: string;
@@ -4860,6 +5847,7 @@ export type Database = {
           message_content: string;
           metadata: Json;
           opened_at: string;
+          resend_email_id: string;
           sender_name: string;
           sent_at: string;
           sent_by: string;
@@ -4879,6 +5867,15 @@ export type Database = {
           total_emails: number;
         }[];
       };
+      get_wali_kpis: {
+        Args: {
+          p_current_end: string;
+          p_current_start: string;
+          p_previous_end: string;
+          p_previous_start: string;
+        };
+        Returns: Json;
+      };
       has_family_relationship_security_definer: {
         Args: { target_user_id: string };
         Returns: boolean;
@@ -4891,6 +5888,20 @@ export type Database = {
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"];
+          _user_id: string;
+        };
+        Returns: boolean;
+      };
+      has_wali_admin_permission: {
+        Args: {
+          _min_role: Database["public"]["Enums"]["wali_admin_role"];
+          _user_id: string;
+        };
+        Returns: boolean;
+      };
+      has_wali_admin_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["wali_admin_role"];
           _user_id: string;
         };
         Returns: boolean;
@@ -4936,6 +5947,28 @@ export type Database = {
         };
         Returns: string;
       };
+      log_user_activity: {
+        Args: {
+          p_activity_type: string;
+          p_metadata?: Json;
+          p_target_user_id?: string;
+          p_user_id: string;
+        };
+        Returns: undefined;
+      };
+      log_wali_admin_action: {
+        Args: {
+          p_action_details?: Json;
+          p_action_type: string;
+          p_error_message?: string;
+          p_new_values?: Json;
+          p_old_values?: Json;
+          p_registration_id?: string;
+          p_success?: boolean;
+          p_target_user_id?: string;
+        };
+        Returns: string;
+      };
       migrate_family_contact_data_secure: { Args: never; Returns: undefined };
       select_ab_test_variant: {
         Args: { p_reminder_type: string };
@@ -4965,6 +5998,7 @@ export type Database = {
     };
     Enums: {
       app_role: "super_admin" | "admin" | "moderator" | "user";
+      wali_admin_role: "viewer" | "editor" | "approver" | "super_admin";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -4973,39 +6007,6 @@ export type Database = {
   realtime: {
     Tables: {
       messages: {
-        Row: {
-          event: string | null;
-          extension: string;
-          id: string;
-          inserted_at: string;
-          payload: Json | null;
-          private: boolean | null;
-          topic: string;
-          updated_at: string;
-        };
-        Insert: {
-          event?: string | null;
-          extension: string;
-          id?: string;
-          inserted_at?: string;
-          payload?: Json | null;
-          private?: boolean | null;
-          topic: string;
-          updated_at?: string;
-        };
-        Update: {
-          event?: string | null;
-          extension?: string;
-          id?: string;
-          inserted_at?: string;
-          payload?: Json | null;
-          private?: boolean | null;
-          topic?: string;
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      messages_2025_11_10: {
         Row: {
           event: string | null;
           extension: string;
@@ -5204,6 +6205,39 @@ export type Database = {
         Relationships: [];
       };
       messages_2025_11_16: {
+        Row: {
+          event: string | null;
+          extension: string;
+          id: string;
+          inserted_at: string;
+          payload: Json | null;
+          private: boolean | null;
+          topic: string;
+          updated_at: string;
+        };
+        Insert: {
+          event?: string | null;
+          extension: string;
+          id?: string;
+          inserted_at?: string;
+          payload?: Json | null;
+          private?: boolean | null;
+          topic: string;
+          updated_at?: string;
+        };
+        Update: {
+          event?: string | null;
+          extension?: string;
+          id?: string;
+          inserted_at?: string;
+          payload?: Json | null;
+          private?: boolean | null;
+          topic?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      messages_2025_11_17: {
         Row: {
           event: string | null;
           extension: string;
@@ -6138,6 +7172,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "admin", "moderator", "user"],
+      wali_admin_role: ["viewer", "editor", "approver", "super_admin"],
     },
   },
   realtime: {
