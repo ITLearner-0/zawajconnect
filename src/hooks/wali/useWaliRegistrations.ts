@@ -51,6 +51,13 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
 
   const approveRegistration = async (id: string, reviewedBy: string) => {
     try {
+      // Get old values for audit
+      const { data: oldData } = await (supabase as any)
+        .from('wali_registrations')
+        .select('status')
+        .eq('id', id)
+        .single();
+
       const { error: updateError } = await (supabase as any)
         .from('wali_registrations')
         .update({
@@ -61,6 +68,15 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
         .eq('id', id);
 
       if (updateError) throw updateError;
+
+      // Log audit action
+      await (supabase as any).rpc('log_wali_admin_action', {
+        p_action_type: 'registration_approved',
+        p_registration_id: id,
+        p_action_details: { reviewed_by: reviewedBy },
+        p_old_values: oldData,
+        p_new_values: { status: 'approved' }
+      });
 
       // Send notification email
       try {
@@ -99,6 +115,13 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
     rejectionReason: string
   ) => {
     try {
+      // Get old values for audit
+      const { data: oldData } = await (supabase as any)
+        .from('wali_registrations')
+        .select('status, rejection_reason')
+        .eq('id', id)
+        .single();
+
       const { error: updateError } = await (supabase as any)
         .from('wali_registrations')
         .update({
@@ -110,6 +133,15 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
         .eq('id', id);
 
       if (updateError) throw updateError;
+
+      // Log audit action
+      await (supabase as any).rpc('log_wali_admin_action', {
+        p_action_type: 'registration_rejected',
+        p_registration_id: id,
+        p_action_details: { reviewed_by: reviewedBy, rejection_reason: rejectionReason },
+        p_old_values: oldData,
+        p_new_values: { status: 'rejected', rejection_reason: rejectionReason }
+      });
 
       // Send notification email
       try {
@@ -127,7 +159,7 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
 
       toast({
         title: 'Inscription rejetée',
-        description: 'L\'inscription a été rejetée. Un email a été envoyé au candidat.',
+        description: 'Le Wali a été rejeté. Un email de notification a été envoyé.',
       });
 
       await fetchRegistrations();
@@ -145,6 +177,13 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
 
   const updateVerificationNotes = async (id: string, notes: string) => {
     try {
+      // Get old values for audit
+      const { data: oldData } = await (supabase as any)
+        .from('wali_registrations')
+        .select('verification_notes')
+        .eq('id', id)
+        .single();
+
       const { error: updateError } = await (supabase as any)
         .from('wali_registrations')
         .update({
@@ -153,6 +192,14 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
         .eq('id', id);
 
       if (updateError) throw updateError;
+
+      // Log audit action
+      await (supabase as any).rpc('log_wali_admin_action', {
+        p_action_type: 'notes_updated',
+        p_registration_id: id,
+        p_old_values: oldData,
+        p_new_values: { verification_notes: notes }
+      });
 
       toast({
         title: 'Notes mises à jour',
