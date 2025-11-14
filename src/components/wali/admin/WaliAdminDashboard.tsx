@@ -7,19 +7,26 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { RegistrationList } from './RegistrationList';
 import { RegistrationDetailModal } from './RegistrationDetailModal';
 import { SuspensionManagementPanel } from '../suspension/SuspensionManagementPanel';
 import { OnboardingProgressTracker } from '../onboarding/OnboardingProgressTracker';
+import { BulkActions } from './BulkActions';
+import { ExportActions } from './ExportActions';
+import { NotificationSender } from './NotificationSender';
+import { AdvancedFilters, FilterValues } from './AdvancedFilters';
+import { SelectableRegistrationList } from './SelectableRegistrationList';
 import { WaliRegistration } from '@/hooks/wali/useWaliRegistration';
 import { Shield, AlertTriangle, TrendingUp, Users, Search } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export const WaliAdminDashboard = () => {
   const { user } = useAuth();
-  const [statusFilter, setStatusFilter] = useState<'pending' | 'approved' | 'rejected' | 'verified' | undefined>();
+  const { toast } = useToast();
+  const [filters, setFilters] = useState<FilterValues>({});
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRegistration, setSelectedRegistration] = useState<WaliRegistration | null>(null);
   const [selectedWaliId, setSelectedWaliId] = useState<string>('');
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   const {
     registrations,
@@ -28,16 +35,44 @@ export const WaliAdminDashboard = () => {
     approveRegistration,
     rejectRegistration,
     updateVerificationNotes,
-  } = useWaliRegistrations({ status: statusFilter });
+    refetch,
+  } = useWaliRegistrations({ status: filters.status as any });
 
   const filteredRegistrations = registrations.filter((reg) => {
-    if (!searchQuery) return true;
-    const query = searchQuery.toLowerCase();
-    return (
-      reg.full_name.toLowerCase().includes(query) ||
-      reg.email.toLowerCase().includes(query) ||
-      reg.phone?.toLowerCase().includes(query)
-    );
+    // Search query filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      const matchesSearch =
+        reg.full_name.toLowerCase().includes(query) ||
+        reg.email.toLowerCase().includes(query) ||
+        reg.phone?.toLowerCase().includes(query);
+      if (!matchesSearch) return false;
+    }
+
+    // Status filter
+    if (filters.status && filters.status !== 'all' && reg.status !== filters.status) {
+      return false;
+    }
+
+    // Relationship filter
+    if (
+      filters.relationship &&
+      filters.relationship !== 'all' &&
+      reg.relationship_to_user !== filters.relationship
+    ) {
+      return false;
+    }
+
+    // Date range filters
+    const regDate = new Date(reg.created_at);
+    if (filters.dateFrom && regDate < new Date(filters.dateFrom)) {
+      return false;
+    }
+    if (filters.dateTo && regDate > new Date(filters.dateTo)) {
+      return false;
+    }
+
+    return true;
   });
 
   const stats = {
@@ -46,6 +81,48 @@ export const WaliAdminDashboard = () => {
     approved: registrations.filter((r) => r.status === 'approved').length,
     rejected: registrations.filter((r) => r.status === 'rejected').length,
     verified: registrations.filter((r) => r.status === 'verified').length,
+  };
+
+  const handleToggleSelect = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleSelectAll = () => {
+    if (selectedIds.length === filteredRegistrations.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredRegistrations.map((r) => r.id));
+    }
+  };
+
+  const handleBulkApprove = async (ids: string[]) => {
+    if (!user?.id) return;
+    const results = await Promise.allSettled(
+      ids.map((id) => approveRegistration(id, user.id))
+    );
+    const successCount = results.filter((r) => r.status === 'fulfilled').length;
+    toast({
+      title: 'Approba tions en masse',
+      description: `${successCount}/${ids.length} inscriptions approuvées`,
+    });
+    setSelectedIds([]);
+    refetch();
+  };
+
+  const handleBulkReject = async (ids: string[], reason: string) => {
+    if (!user?.id) return;
+    const results = await Promise.allSettled(
+      ids.map((id) => rejectRegistration(id, user.id, reason))
+    );
+    const successCount = results.filter((r) => r.status === 'fulfilled').length;
+    toast({
+      title: 'Rejets en masse',
+      description: `${successCount}/${ids.length} inscriptions rejetées`,
+    });
+    setSelectedIds([]);
+    refetch();
   };
 
   const handleApprove = async (id: string, reviewedBy: string): Promise<boolean> => {
@@ -198,8 +275,8 @@ export const WaliAdminDashboard = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Filters */}
-              <div className="flex gap-4">
-                <div className="flex-1 relative">
+              <div className="flex gap-4 items-center flex-wrap">
+                <div className="flex-1 relative min-w-[250px]">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Rechercher par nom, email ou téléphone..."
@@ -208,27 +285,32 @@ export const WaliAdminDashboard = () => {
                     className="pl-9"
                   />
                 </div>
-                <Select
-                  value={statusFilter || 'all'}
-                  onValueChange={(value) =>
-                    setStatusFilter(value === 'all' ? undefined : (value as any))
-                  }
-                >
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Statut" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Tous</SelectItem>
-                    <SelectItem value="pending">En attente</SelectItem>
-                    <SelectItem value="approved">Approuvées</SelectItem>
-                    <SelectItem value="verified">Vérifiées</SelectItem>
-                    <SelectItem value="rejected">Rejetées</SelectItem>
-                  </SelectContent>
-                </Select>
+                <AdvancedFilters filters={filters} onFiltersChange={setFilters} />
+                <div className="flex gap-2">
+                  <ExportActions
+                    registrations={filteredRegistrations}
+                    selectedIds={selectedIds}
+                  />
+                  <NotificationSender
+                    registrations={filteredRegistrations}
+                    selectedIds={selectedIds}
+                  />
+                </div>
               </div>
 
-              <RegistrationList
+              <BulkActions
                 registrations={filteredRegistrations}
+                selectedIds={selectedIds}
+                onToggleSelect={handleToggleSelect}
+                onToggleSelectAll={handleToggleSelectAll}
+                onBulkApprove={handleBulkApprove}
+                onBulkReject={handleBulkReject}
+              />
+
+              <SelectableRegistrationList
+                registrations={filteredRegistrations}
+                selectedIds={selectedIds}
+                onToggleSelect={handleToggleSelect}
                 onViewDetails={setSelectedRegistration}
               />
             </CardContent>
