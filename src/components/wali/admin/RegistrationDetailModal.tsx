@@ -29,6 +29,7 @@ import {
 import { RegistrationStatusBadge } from '../registration/RegistrationStatusBadge';
 import { useAuth } from '@/hooks/useAuth';
 import { useWaliRegistrationComments } from '@/hooks/wali/useWaliRegistrationComments';
+import { useWaliAdminPermissions } from '@/hooks/wali/useWaliAdminPermissions';
 import { CommentsSection } from './CommentsSection';
 import { ActivityTimeline } from './ActivityTimeline';
 
@@ -50,6 +51,7 @@ export const RegistrationDetailModal = ({
   onUpdateNotes,
 }: RegistrationDetailModalProps) => {
   const { user } = useAuth();
+  const { permissions } = useWaliAdminPermissions();
   const [rejectionReason, setRejectionReason] = useState('');
   const [verificationNotes, setVerificationNotes] = useState(
     registration?.verification_notes || ''
@@ -264,15 +266,22 @@ export const RegistrationDetailModal = ({
                     onChange={(e) => setVerificationNotes(e.target.value)}
                     placeholder="Ajoutez des notes sur la vérification de cette inscription..."
                     rows={4}
+                    disabled={!permissions.canEdit}
                   />
-                  <Button
-                    onClick={handleSaveNotes}
-                    disabled={isProcessing}
-                    variant="outline"
-                    size="sm"
-                  >
-                    Enregistrer les notes
-                  </Button>
+                  {permissions.canEdit ? (
+                    <Button
+                      onClick={handleSaveNotes}
+                      disabled={isProcessing}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Enregistrer les notes
+                    </Button>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">
+                      Vous n'avez pas la permission de modifier les notes.
+                    </p>
+                  )}
                 </div>
 
                 {registration.rejection_reason && (
@@ -294,6 +303,7 @@ export const RegistrationDetailModal = ({
                 <CommentsSection
                   comments={comments}
                   currentAdminId={user.id}
+                  permissions={permissions}
                   onAddComment={addComment}
                   onUpdateComment={updateComment}
                   onDeleteComment={deleteComment}
@@ -309,7 +319,7 @@ export const RegistrationDetailModal = ({
           </TabsContent>
         </Tabs>
 
-        {registration.status === 'pending' && (
+        {registration.status === 'pending' && permissions.canApprove && (
           <div className="flex gap-3 pt-4 border-t mt-4">
             {!showRejectForm ? (
               <>
@@ -361,6 +371,19 @@ export const RegistrationDetailModal = ({
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {registration.status === 'pending' && !permissions.canApprove && permissions.canView && (
+          <div className="pt-4 border-t mt-4">
+            <div className="bg-muted/50 p-4 rounded-lg text-center">
+              <Shield className="w-5 h-5 mx-auto mb-2 text-muted-foreground" />
+              <p className="text-sm text-muted-foreground">
+                Vous n'avez pas la permission d'approuver ou rejeter les inscriptions.
+                <br />
+                Contactez un administrateur avec le rôle "Approbateur" ou "Super Admin".
+              </p>
+            </div>
           </div>
         )}
       </DialogContent>

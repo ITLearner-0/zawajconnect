@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useWaliRegistrations } from '@/hooks/wali/useWaliRegistrations';
+import { useWaliAdminPermissions } from '@/hooks/wali/useWaliAdminPermissions';
 import { WaliRegistration } from '@/hooks/wali/useWaliRegistration';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -7,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { RegistrationList } from '@/components/wali/admin/RegistrationList';
 import { RegistrationDetailModal } from '@/components/wali/admin/RegistrationDetailModal';
 import { ExportMenu } from '@/components/wali/admin/ExportMenu';
+import { PermissionBadge } from '@/components/wali/permissions';
 import { Loader2, Shield, CheckCircle2, XCircle, Clock, Eye, RefreshCw } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
@@ -18,6 +20,7 @@ const AdminWaliRegistrations = () => {
   const [selectedTab, setSelectedTab] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
   const [selectedRegistration, setSelectedRegistration] = useState<WaliRegistration | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { permissions } = useWaliAdminPermissions();
 
   const {
     registrations,
@@ -71,7 +74,10 @@ const AdminWaliRegistrations = () => {
           <div className="flex items-center gap-3">
             <Shield className="h-8 w-8 text-primary" />
             <div>
-              <h1 className="text-3xl font-bold">Gestion des Inscriptions Wali</h1>
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-3xl font-bold">Gestion des Inscriptions Wali</h1>
+                <PermissionBadge role={permissions.role} />
+              </div>
               <p className="text-muted-foreground">
                 Approuvez ou rejetez les demandes d'inscription en tant que Wali après vérification des documents
               </p>
