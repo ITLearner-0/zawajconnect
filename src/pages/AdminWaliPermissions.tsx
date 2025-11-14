@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { Shield, Users, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Shield, Users, Plus, Search, UserPlus, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -11,26 +11,45 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { useWaliAdminPermissions } from '@/hooks/wali/useWaliAdminPermissions';
 import { Navigate } from 'react-router-dom';
-import { useState } from 'react';
-import { AssignPermissionDialog } from '@/components/wali/permissions/AssignPermissionDialog';
+import {
+  AssignPermissionDialog,
+  UserSearchDialog,
+  BulkAssignDialog,
+  PermissionHistory,
+} from '@/components/wali/permissions';
 import { WaliAdminTabs } from '@/components/wali/navigation';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs';
 
 const AdminWaliPermissions = () => {
   const {
     permissions,
     loading,
     allPermissions,
+    auditHistory,
     fetchAllPermissions,
     assignPermission,
     revokePermission,
+    searchUsers,
+    fetchAuditHistory,
+    assignPermissionBulk,
   } = useWaliAdminPermissions();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [searchDialogOpen, setSearchDialogOpen] = useState(false);
+  const [bulkDialogOpen, setBulkDialogOpen] = useState(false);
+  const [searchFilter, setSearchFilter] = useState('');
 
   useEffect(() => {
     if (permissions.canManagePermissions) {
       fetchAllPermissions();
+      fetchAuditHistory();
     }
   }, [permissions.canManagePermissions]);
 
@@ -67,6 +86,16 @@ const AdminWaliPermissions = () => {
     return descriptions[role] || '';
   };
 
+  const filteredPermissions = allPermissions.filter((perm) => {
+    if (!searchFilter) return true;
+    const searchLower = searchFilter.toLowerCase();
+    return (
+      perm.user_email?.toLowerCase().includes(searchLower) ||
+      perm.user_name?.toLowerCase().includes(searchLower) ||
+      perm.user_id.toLowerCase().includes(searchLower)
+    );
+  });
+
   return (
     <div className="container mx-auto py-8 space-y-6">
       <WaliAdminTabs />
@@ -81,10 +110,20 @@ const AdminWaliPermissions = () => {
             </p>
           </div>
         </div>
-        <Button onClick={() => setDialogOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          Assigner Permission
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setSearchDialogOpen(true)}>
+            <Search className="w-4 h-4 mr-2" />
+            Rechercher
+          </Button>
+          <Button variant="outline" onClick={() => setBulkDialogOpen(true)}>
+            <UserPlus className="w-4 h-4 mr-2" />
+            En masse
+          </Button>
+          <Button onClick={() => setDialogOpen(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Assigner
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
@@ -128,62 +167,84 @@ const AdminWaliPermissions = () => {
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Permissions Actuelles</CardTitle>
-          <CardDescription>
-            Liste des administrateurs et leurs niveaux d'accès
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Utilisateur</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Rôle</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Assigné le</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {allPermissions.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground">
-                    Aucune permission configurée
-                  </TableCell>
-                </TableRow>
-              ) : (
-                allPermissions.map((perm) => (
-                  <TableRow key={perm.id}>
-                    <TableCell className="font-medium">
-                      {perm.user_name || 'Utilisateur inconnu'}
-                    </TableCell>
-                    <TableCell>{perm.user_email || '-'}</TableCell>
-                    <TableCell>{getRoleBadge(perm.role)}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {getRoleDescription(perm.role)}
-                    </TableCell>
-                    <TableCell>
-                      {new Date(perm.assigned_at).toLocaleDateString('fr-FR')}
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => revokePermission(perm.user_id)}
-                      >
-                        Révoquer
-                      </Button>
-                    </TableCell>
+      <Tabs defaultValue="permissions" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="permissions">Permissions</TabsTrigger>
+          <TabsTrigger value="history">Historique</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="permissions" className="space-y-4">
+          <div className="flex items-center justify-between mb-4">
+            <Input
+              placeholder="Rechercher par email ou nom..."
+              value={searchFilter}
+              onChange={(e) => setSearchFilter(e.target.value)}
+              className="max-w-sm"
+            />
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Permissions Actuelles</CardTitle>
+              <CardDescription>
+                Liste des administrateurs et leurs niveaux d'accès ({filteredPermissions.length})
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Utilisateur</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Rôle</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead>Assigné le</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                  {filteredPermissions.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center text-muted-foreground">
+                        {searchFilter ? 'Aucun résultat trouvé' : 'Aucune permission configurée'}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredPermissions.map((perm) => (
+                      <TableRow key={perm.id}>
+                        <TableCell className="font-medium">
+                          {perm.user_name || 'Utilisateur inconnu'}
+                        </TableCell>
+                        <TableCell>{perm.user_email || '-'}</TableCell>
+                        <TableCell>{getRoleBadge(perm.role)}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {getRoleDescription(perm.role)}
+                        </TableCell>
+                        <TableCell>
+                          {new Date(perm.assigned_at).toLocaleDateString('fr-FR')}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => revokePermission(perm.user_id)}
+                          >
+                            Révoquer
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="history">
+          <PermissionHistory history={auditHistory} />
+        </TabsContent>
+      </Tabs>
 
       <Card>
         <CardHeader>
@@ -234,6 +295,20 @@ const AdminWaliPermissions = () => {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         onAssign={assignPermission}
+      />
+
+      <UserSearchDialog
+        open={searchDialogOpen}
+        onOpenChange={setSearchDialogOpen}
+        onAssign={assignPermission}
+        onSearch={searchUsers}
+      />
+
+      <BulkAssignDialog
+        open={bulkDialogOpen}
+        onOpenChange={setBulkDialogOpen}
+        onAssign={assignPermissionBulk}
+        onSearchUser={searchUsers}
       />
     </div>
   );
