@@ -84,9 +84,10 @@ export const BulkAssignDialog = ({
     for (const assignment of validAssignments) {
       try {
         const results = await onSearchUser(assignment.email);
-        if (results && results.length > 0) {
+        const firstResult = results?.[0];
+        if (firstResult) {
           assignmentsWithIds.push({
-            userId: results[0].id,
+            userId: firstResult.id,
             role: assignment.role,
             notes: assignment.notes || undefined,
           });
