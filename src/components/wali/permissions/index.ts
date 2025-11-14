@@ -1,0 +1,1 @@
+export { AssignPermissionDialog } from './AssignPermissionDialog';
