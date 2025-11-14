@@ -11,6 +11,7 @@ import SupervisionMetrics from '@/components/SupervisionMetrics';
 import NotificationCenter from '@/components/NotificationCenter';
 import { SupervisedCallsHistory } from '@/components/wali/SupervisedCallsHistory';
 import { CallSupervisionSettings } from '@/components/wali/CallSupervisionSettings';
+import { KPITrendChart } from '@/components/wali/dashboard';
 import { 
   Shield, 
   Users, 
@@ -69,6 +70,7 @@ interface WaliStats {
 }
 
 const WaliDashboard: React.FC = () => {
+  const [userId, setUserId] = useState<string>('');
   const [supervisedUsers, setSupervisedUsers] = useState<SupervisedUser[]>([]);
   const [notifications, setNotifications] = useState<FamilyNotification[]>([]);
   const [matchesForApproval, setMatchesForApproval] = useState<MatchForApproval[]>([]);
@@ -148,6 +150,9 @@ const WaliDashboard: React.FC = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
+
+      // Set userId
+      setUserId(user.id);
 
       // Charger les utilisateurs supervisés (ceux que ce wali supervise)
       const { data: familyMembers } = await supabase
@@ -480,6 +485,9 @@ const WaliDashboard: React.FC = () => {
         moderationAlerts={stats.criticalAlerts}
         approvalsPending={stats.pendingApprovals}
       />
+
+      {/* KPI Trend Chart */}
+      <KPITrendChart userId={userId} />
 
       {/* Main Content */}
       <Tabs defaultValue="notifications" className="space-y-6">
