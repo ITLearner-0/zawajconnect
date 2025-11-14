@@ -70,6 +70,8 @@ const ABTestingDashboard = lazy(() => import('@/pages/ABTestingDashboard'));
 const AdminUserProfile = lazy(() => import('@/pages/AdminUserProfile'));
 const AdminWaliRegistrations = lazy(() => import('@/pages/AdminWaliRegistrations'));
 const AdminWaliMonitoring = lazy(() => import('@/pages/AdminWaliMonitoring'));
+const AdminWaliAuditTrail = lazy(() => import('@/pages/AdminWaliAuditTrail'));
+const AdminWaliDashboard = lazy(() => import('@/pages/AdminWaliDashboard'));
 const ModerationTest = lazy(() => import('@/pages/ModerationTest'));
 const ModerationTests = lazy(() => import('@/pages/ModerationTests'));
 
@@ -152,6 +154,8 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/admin/wali-registrations', component: AdminWaliRegistrations },
   { path: '/admin/wali-monitoring', component: AdminWaliMonitoring },
   { path: '/admin/wali-alerts', component: AdminWaliAlertsDashboard },
+  { path: '/admin/dashboard', component: AdminWaliDashboard },
+  { path: '/admin/wali-audit', component: AdminWaliAuditTrail },
   { path: '/moderation-test', component: ModerationTest },
   { path: '/wali-dashboard', component: WaliDashboard },
   { path: '/wali-monitoring', component: WaliMonitoring },

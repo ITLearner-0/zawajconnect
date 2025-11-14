@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useWaliAuditTrail, AuditFilters as AuditFiltersType } from '@/hooks/wali/useWaliAuditTrail';
 import { AuditFilters, AuditLogTable } from '@/components/wali/audit';
 import { PermissionBadge } from '@/components/wali/permissions';
+import { WaliAdminTabs } from '@/components/wali/navigation';
 import { useWaliAdminPermissions } from '@/hooks/wali/useWaliAdminPermissions';
 import { toast } from 'sonner';
 
@@ -45,22 +46,21 @@ const AdminWaliAuditTrail = () => {
   return (
     <div className="container mx-auto py-8 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link to="/admin/wali">
-            <Button variant="ghost" size="sm">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
-            </Button>
-          </Link>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Journal d'audit</h1>
+            <h1 className="text-3xl font-bold flex items-center gap-3">
+              Journal d'audit
+              <PermissionBadge role={permissions.role} />
+            </h1>
             <p className="text-muted-foreground">
               Historique complet des actions administratives
             </p>
           </div>
         </div>
-        <PermissionBadge role={permissions.role} />
+
+        {/* Navigation Tabs */}
+        <WaliAdminTabs />
       </div>
 
       {/* Stats */}

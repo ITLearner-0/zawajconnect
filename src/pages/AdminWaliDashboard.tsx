@@ -8,6 +8,7 @@ import { useWaliAdminPermissions } from '@/hooks/wali/useWaliAdminPermissions';
 import { useWaliKPIs, KPIPeriod } from '@/hooks/wali/useWaliKPIs';
 import { KPICard, PeriodSelector } from '@/components/wali/dashboard';
 import { PermissionBadge } from '@/components/wali/permissions';
+import { WaliAdminTabs } from '@/components/wali/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const AdminWaliDashboard = () => {
@@ -46,26 +47,31 @@ const AdminWaliDashboard = () => {
 
   return (
     <div className="container mx-auto py-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Shield className="w-8 h-8 text-primary" />
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <h1 className="text-3xl font-bold">Dashboard Wali</h1>
-              <PermissionBadge role={permissions.role} />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Shield className="w-8 h-8 text-primary" />
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <h1 className="text-3xl font-bold">Dashboard Wali</h1>
+                <PermissionBadge role={permissions.role} />
+              </div>
+              <p className="text-muted-foreground">
+                Métriques et KPIs en temps réel avec comparaison
+              </p>
             </div>
-            <p className="text-muted-foreground">
-              Métriques et KPIs en temps réel avec comparaison
-            </p>
+          </div>
+          <div className="flex gap-2">
+            <PeriodSelector value={period} onChange={setPeriod} />
+            <Button onClick={refetch} disabled={loading} variant="outline">
+              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Actualiser
+            </Button>
           </div>
         </div>
-        <div className="flex gap-2">
-          <PeriodSelector value={period} onChange={setPeriod} />
-          <Button onClick={refetch} disabled={loading} variant="outline">
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Actualiser
-          </Button>
-        </div>
+
+        {/* Navigation Tabs */}
+        <WaliAdminTabs />
       </div>
 
       <Card>

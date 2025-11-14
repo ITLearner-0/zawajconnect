@@ -1,0 +1,1 @@
+export { WaliAdminTabs } from './WaliAdminTabs';
