@@ -7,6 +7,7 @@ import { Navigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useWaliMonitoring, type WaliAlert } from '@/hooks/wali/useWaliMonitoring';
 import { useWaliTrends } from '@/hooks/wali/useWaliTrends';
+import { useWaliRealtimeNotifications } from '@/hooks/wali/useWaliRealtimeNotifications';
 import { StatisticsCards } from '@/components/wali/monitoring/StatisticsCards';
 import { AlertsTable } from '@/components/wali/monitoring/AlertsTable';
 import { ActivityList } from '@/components/wali/monitoring/ActivityList';
@@ -46,6 +47,7 @@ const AdminWaliMonitoring = () => {
   }>({ open: false, userId: '', name: '' });
   const [trendPeriod, setTrendPeriod] = useState(12);
   const { alertsTrend, activityTrend, registrationsTrend, loading: trendsLoading } = useWaliTrends(trendPeriod);
+  const { isConnected } = useWaliRealtimeNotifications();
 
   // Check admin access
   useEffect(() => {
@@ -105,6 +107,12 @@ const AdminWaliMonitoring = () => {
             <h1 className="text-3xl font-bold">Monitoring des Walis</h1>
             <p className="text-muted-foreground">
               Surveillance des activités et alertes de sécurité
+              {isConnected && (
+                <span className="ml-2 inline-flex items-center gap-1 text-xs text-green-600">
+                  <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse" />
+                  Temps réel actif
+                </span>
+              )}
             </p>
           </div>
         </div>
