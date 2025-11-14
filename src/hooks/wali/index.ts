@@ -7,6 +7,7 @@ export { useWaliRegistrationComments } from './useWaliRegistrationComments';
 export { useWaliTrends } from './useWaliTrends';
 export { useWaliRealtimeNotifications } from './useWaliRealtimeNotifications';
 export { useWaliAdminPermissions } from './useWaliAdminPermissions';
+export { useWaliKPIs } from './useWaliKPIs';
 export type { WaliRegistration } from './useWaliRegistration';
 export type { WaliOnboardingProgress } from './useWaliOnboardingProgress';
 export type { WaliSuspension } from './useWaliSuspensions';
@@ -14,3 +15,4 @@ export type { WaliAlert, WaliStatistics, WaliActivity } from './useWaliMonitorin
 export type { WaliComment, WaliActivityLog } from './useWaliRegistrationComments';
 export type { MonthlyTrend, ActivityTrend, RegistrationStatusTrend } from './useWaliTrends';
 export type { WaliAdminRole, WaliAdminPermission, WaliPermissionCheck } from './useWaliAdminPermissions';
+export type { WaliKPIs, WaliKPIData, WaliKPIComparison, KPIPeriod } from './useWaliKPIs';
