@@ -24,6 +24,25 @@ export interface WaliPermissionCheck {
   role: WaliAdminRole | null;
 }
 
+export interface WaliPermissionAudit {
+  id: string;
+  user_id: string;
+  old_role: WaliAdminRole | null;
+  new_role: WaliAdminRole | null;
+  changed_by: string;
+  changed_at: string;
+  reason?: string;
+  user_email?: string;
+  changed_by_email?: string;
+}
+
+export interface UserSearchResult {
+  id: string;
+  email: string;
+  full_name?: string;
+  created_at: string;
+}
+
 export const useWaliAdminPermissions = () => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -36,6 +55,7 @@ export const useWaliAdminPermissions = () => {
   });
   const [loading, setLoading] = useState(true);
   const [allPermissions, setAllPermissions] = useState<WaliAdminPermission[]>([]);
+  const [auditHistory, setAuditHistory] = useState<WaliPermissionAudit[]>([]);
 
   useEffect(() => {
     if (user) {
@@ -85,17 +105,22 @@ export const useWaliAdminPermissions = () => {
     }
 
     try {
+      // Fetch permissions with user emails from profiles
       const { data, error } = await (supabase as any)
         .from('wali_admin_permissions')
-        .select('*')
+        .select(`
+          *,
+          profiles!wali_admin_permissions_user_id_fkey(email, full_name)
+        `)
         .order('assigned_at', { ascending: false });
 
       if (error) throw error;
 
       const enrichedPermissions = data.map((perm: any) => ({
         ...perm,
-        user_email: undefined,
-        user_name: `Utilisateur ${perm.user_id.substring(0, 8)}`,
+        user_email: perm.profiles?.email,
+        user_name: perm.profiles?.full_name || `Utilisateur ${perm.user_id.substring(0, 8)}`,
+        profiles: undefined, // Remove nested object
       }));
 
       setAllPermissions(enrichedPermissions as WaliAdminPermission[]);
@@ -107,6 +132,121 @@ export const useWaliAdminPermissions = () => {
         variant: 'destructive',
       });
     }
+  };
+
+  const searchUsers = async (email: string): Promise<UserSearchResult[]> => {
+    if (!permissions.canManagePermissions || !email) {
+      return [];
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('user_id, email, full_name, created_at')
+        .ilike('email', `%${email}%`)
+        .limit(10);
+
+      if (error) throw error;
+
+      return (data || []).map((profile: any) => ({
+        id: profile.user_id,
+        email: profile.email,
+        full_name: profile.full_name,
+        created_at: profile.created_at,
+      }));
+    } catch (err) {
+      console.error('Error searching users:', err);
+      return [];
+    }
+  };
+
+  const fetchAuditHistory = async (userId?: string) => {
+    if (!permissions.canManagePermissions) {
+      return;
+    }
+
+    try {
+      let query = (supabase as any)
+        .from('wali_admin_permission_audit')
+        .select(`
+          *,
+          user:profiles!wali_admin_permission_audit_user_id_fkey(email),
+          changer:profiles!wali_admin_permission_audit_changed_by_fkey(email)
+        `)
+        .order('changed_at', { ascending: false })
+        .limit(100);
+
+      if (userId) {
+        query = query.eq('user_id', userId);
+      }
+
+      const { data, error } = await query;
+
+      if (error) throw error;
+
+      const enrichedHistory = (data || []).map((audit: any) => ({
+        ...audit,
+        user_email: audit.user?.email,
+        changed_by_email: audit.changer?.email,
+        user: undefined,
+        changer: undefined,
+      }));
+
+      setAuditHistory(enrichedHistory as WaliPermissionAudit[]);
+    } catch (err) {
+      console.error('Error fetching audit history:', err);
+      toast({
+        title: 'Erreur',
+        description: 'Impossible de charger l\'historique',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const assignPermissionBulk = async (
+    assignments: Array<{ userId: string; role: WaliAdminRole; notes?: string }>
+  ): Promise<{ success: number; failed: number }> => {
+    if (!permissions.canManagePermissions) {
+      toast({
+        title: 'Accès refusé',
+        description: 'Vous n\'avez pas la permission de gérer les rôles',
+        variant: 'destructive',
+      });
+      return { success: 0, failed: assignments.length };
+    }
+
+    let success = 0;
+    let failed = 0;
+
+    for (const assignment of assignments) {
+      try {
+        const { error } = await (supabase as any)
+          .from('wali_admin_permissions')
+          .upsert({
+            user_id: assignment.userId,
+            role: assignment.role,
+            assigned_by: user?.id,
+            notes: assignment.notes,
+          });
+
+        if (error) throw error;
+        success++;
+      } catch (err) {
+        console.error('Error assigning permission:', err);
+        failed++;
+      }
+    }
+
+    toast({
+      title: 'Assignation en masse terminée',
+      description: `${success} succès, ${failed} échecs`,
+      variant: failed > 0 ? 'destructive' : 'default',
+    });
+
+    await fetchAllPermissions();
+    await fetchAuditHistory();
+
+    return { success, failed };
   };
 
   const assignPermission = async (
@@ -191,9 +331,13 @@ export const useWaliAdminPermissions = () => {
     permissions,
     loading,
     allPermissions,
+    auditHistory,
     fetchAllPermissions,
     assignPermission,
     revokePermission,
     refetch: fetchUserPermissions,
+    searchUsers,
+    fetchAuditHistory,
+    assignPermissionBulk,
   };
 };
