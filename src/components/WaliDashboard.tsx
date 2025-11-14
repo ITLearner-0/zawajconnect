@@ -11,7 +11,7 @@ import SupervisionMetrics from '@/components/SupervisionMetrics';
 import NotificationCenter from '@/components/NotificationCenter';
 import { SupervisedCallsHistory } from '@/components/wali/SupervisedCallsHistory';
 import { CallSupervisionSettings } from '@/components/wali/CallSupervisionSettings';
-import { KPITrendChart } from '@/components/wali/dashboard';
+import { KPITrendChart, PredictiveDashboard } from '@/components/wali/dashboard';
 import { 
   Shield, 
   Users, 
@@ -491,7 +491,7 @@ const WaliDashboard: React.FC = () => {
 
       {/* Main Content */}
       <Tabs defaultValue="notifications" className="space-y-6">
-        <ResponsiveTabsList tabCount={5}>
+        <ResponsiveTabsList tabCount={6}>
           <TabsTrigger value="notifications">
             Notifications
             {stats.criticalAlerts > 0 && (
@@ -510,6 +510,7 @@ const WaliDashboard: React.FC = () => {
           </TabsTrigger>
           <TabsTrigger value="calls">Appels</TabsTrigger>
           <TabsTrigger value="supervised">Supervisés</TabsTrigger>
+          <TabsTrigger value="predictions">Prédictions</TabsTrigger>
           <TabsTrigger value="reports">Rapports</TabsTrigger>
         </ResponsiveTabsList>
 
@@ -663,6 +664,11 @@ const WaliDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Predictions Tab */}
+        <TabsContent value="predictions" className="space-y-4">
+          <PredictiveDashboard userId={userId} />
         </TabsContent>
 
         {/* Reports Tab */}
