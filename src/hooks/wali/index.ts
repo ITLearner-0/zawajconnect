@@ -5,6 +5,7 @@ export { useWaliRegistrations } from './useWaliRegistrations';
 export { useWaliMonitoring } from './useWaliMonitoring';
 export { useWaliRegistrationComments } from './useWaliRegistrationComments';
 export { useWaliTrends } from './useWaliTrends';
+export { useWaliRealtimeNotifications } from './useWaliRealtimeNotifications';
 export type { WaliRegistration } from './useWaliRegistration';
 export type { WaliOnboardingProgress } from './useWaliOnboardingProgress';
 export type { WaliSuspension } from './useWaliSuspensions';
