@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/hooks/useAuth";
+import AuthProvider from "@/contexts/AuthContext";
 import { UserDataProvider } from "@/contexts/UserDataContext";
 import NavigationGuard from "@/components/navigation/NavigationGuard";
 import { NavigationProvider } from "@/components/navigation/NavigationProvider";
