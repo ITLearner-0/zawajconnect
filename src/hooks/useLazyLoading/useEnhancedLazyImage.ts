@@ -90,6 +90,7 @@ export const useEnhancedLazyImage = (src: string, options: UseEnhancedLazyImageO
 
       return () => clearTimeout(unloadTimer);
     }
+    return undefined;
   }, [isIntersecting, options.triggerOnce, isLoaded, enableMemoryOptimization, src]);
 
   useEffect(() => {
@@ -125,6 +126,7 @@ export const useEnhancedLazyImage = (src: string, options: UseEnhancedLazyImageO
 
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [enableProgressiveLoading, shouldLoad, src, config.delay]);
 
   return {

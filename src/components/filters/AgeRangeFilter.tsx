@@ -9,7 +9,7 @@ interface AgeRangeFilterProps {
 
 const AgeRangeFilter: React.FC<AgeRangeFilterProps> = ({ value = [18, 50], onChange }) => {
   const handleValueChange = (newValue: number[]) => {
-    onChange([newValue[0], newValue[1]]);
+    onChange([newValue[0] ?? 18, newValue[1] ?? 50]);
   };
 
   return (

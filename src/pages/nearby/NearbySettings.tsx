@@ -48,7 +48,7 @@ const NearbySettings = ({
           min={1}
           max={100}
           step={1}
-          onValueChange={(value) => setMaxDistance(value[0])}
+          onValueChange={(value) => setMaxDistance(value[0] ?? 10)}
           className="py-4"
         />
 

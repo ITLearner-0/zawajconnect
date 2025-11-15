@@ -22,7 +22,7 @@ const AboutMe = ({ formData, handleChange }: AboutMeProps) => (
           Parlez-nous de vous
         </Label>
         <TooltipProvider>
-          <FieldTooltip text={fieldTooltips.aboutMe} />
+          <FieldTooltip content={fieldTooltips.aboutMe} />
         </TooltipProvider>
       </div>
       <textarea

@@ -21,6 +21,10 @@ export class VoiceMessageService {
         const result = reader.result as string;
         // Remove data URL prefix to get just the base64 data
         const base64Data = result.split(',')[1];
+        if (!base64Data) {
+          reject(new Error('Failed to extract base64 data'));
+          return;
+        }
         resolve(base64Data);
       };
       reader.onerror = reject;

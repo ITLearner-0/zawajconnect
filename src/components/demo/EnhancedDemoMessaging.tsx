@@ -28,7 +28,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
   selectedPersona,
   onPersonaSelect,
 }) => {
-  const [activeConversation, setActiveConversation] = useState<string | null>(null);
+  const [activeConversation, setActiveConversation] = useState<string>(selectedPersona ? `demo-conv-${selectedPersona.split('-')[2]}` : '');
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
   const [typingIndicator, setTypingIndicator] = useState(false);
@@ -38,7 +38,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
 
   useEffect(() => {
     if (selectedPersona) {
-      const conversationKey = `demo-conv-${selectedPersona.split('-')[2]}`;
+      const conversationKey = `demo-conv-${selectedPersona.split('-')[2]}` as keyof typeof demoConversations;
       const conversationMessages = demoConversations[conversationKey] || [];
       setMessages(conversationMessages);
       setActiveConversation(conversationKey);
@@ -50,7 +50,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
 
     const newMessage = {
       id: `demo-msg-${Date.now()}`,
-      conversation_id: activeConversation,
+      conversation_id: activeConversation || 'demo-conv-1',
       sender_id: 'current-user',
       content: messageInput,
       created_at: new Date().toISOString(),
@@ -66,10 +66,10 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
     setTimeout(() => {
       setTypingIndicator(false);
       // Add an automatic response
+      const conversationId = `${activeConversation || 'demo-conv-1'}`;
       const autoResponse = {
         id: `demo-msg-${Date.now() + 1}`,
-        conversation_id: activeConversation,
-        sender_id: selectedPersona || '',
+        conversation_id: conversationId,
         content: getAutoResponse(messageInput),
         created_at: new Date().toISOString(),
         is_read: true,
@@ -87,7 +87,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
       'MashaAllah, vos valeurs semblent bien ancrées. Comment les mettez-vous en pratique au quotidien ?',
       "Qu'Allah vous bénisse. Cette conversation me permet de mieux comprendre votre personnalité.",
     ];
-    return responses[Math.floor(Math.random() * responses.length)];
+    return (responses[Math.floor(Math.random() * responses.length)] || responses[0]) as string;
   };
 
   const formatTime = (dateString: string) => {

@@ -1,19 +1,20 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  Users,
-  Shield,
-  BookOpen,
+import { 
+  Users, 
+  Shield, 
+  BookOpen, 
   Settings,
   Bell,
   CheckCircle,
   AlertTriangle,
   Clock,
-  UserCheck,
+  UserCheck
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -35,7 +36,7 @@ const WaliDashboard: React.FC = () => {
     pendingVerifications: 0,
     activeSupervisions: 0,
     onboardingProgress: 0,
-    activeDelegations: 0,
+    activeDelegations: 0
   });
   const [waliProfile, setWaliProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -48,13 +49,11 @@ const WaliDashboard: React.FC = () => {
   const loadWaliData = async () => {
     setLoading(true);
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       // Charger le profil wali
-      const { data: profile, error: profileError } = await supabase
+      const { data: profile, error: profileError } = await (supabase as any)
         .from('wali_profiles')
         .select('*')
         .eq('user_id', user.id)
@@ -68,32 +67,34 @@ const WaliDashboard: React.FC = () => {
       setWaliProfile(profile);
 
       // Charger les statistiques
-      const [verificationsResult, supervisionsResult, onboardingResult, delegationsResult] =
-        await Promise.all([
-          supabase
-            .from('family_relationship_verifications')
-            .select('id', { count: 'exact' })
-            .eq('wali_id', profile.id)
-            .eq('verification_status', 'pending'),
-
-          supabase
-            .from('chat_requests')
-            .select('id', { count: 'exact' })
-            .eq('wali_id', profile.user_id)
-            .eq('status', 'approved'),
-
-          supabase.from('wali_onboarding_progress').select('status').eq('wali_id', profile.id),
-
-          supabase
-            .from('wali_delegations')
-            .select('id', { count: 'exact' })
-            .or(`primary_wali_id.eq.${profile.id},delegate_wali_id.eq.${profile.id}`)
-            .eq('status', 'active'),
-        ]);
+      const [verificationsResult, supervisionsResult, onboardingResult, delegationsResult] = await Promise.all([
+        (supabase as any)
+          .from('family_relationship_verifications')
+          .select('id', { count: 'exact' })
+          .eq('wali_id', (profile as any).id)
+          .eq('verification_status', 'pending'),
+        
+        (supabase as any)
+          .from('chat_requests')
+          .select('id', { count: 'exact' })
+          .eq('wali_id', (profile as any).user_id)
+          .eq('status', 'approved'),
+        
+        (supabase as any)
+          .from('wali_onboarding_progress')
+          .select('status')
+          .eq('wali_id', (profile as any).id),
+        
+        (supabase as any)
+          .from('wali_delegations')
+          .select('id', { count: 'exact' })
+          .or(`primary_wali_id.eq.${(profile as any).id},delegate_wali_id.eq.${(profile as any).id}`)
+          .eq('status', 'active')
+      ]);
 
       // Calculer le progrès de formation
       const onboardingData = onboardingResult.data || [];
-      const completedModules = onboardingData.filter((p) => p.status === 'completed').length;
+      const completedModules = onboardingData.filter((p: any) => p.status === 'completed').length;
       const totalModules = Math.max(onboardingData.length, 5); // Au moins 5 modules
       const onboardingProgress = totalModules > 0 ? (completedModules / totalModules) * 100 : 0;
 
@@ -101,14 +102,15 @@ const WaliDashboard: React.FC = () => {
         pendingVerifications: verificationsResult.count || 0,
         activeSupervisions: supervisionsResult.count || 0,
         onboardingProgress: Math.round(onboardingProgress),
-        activeDelegations: delegationsResult.count || 0,
+        activeDelegations: delegationsResult.count || 0
       });
+
     } catch (error) {
       console.error('Error loading wali data:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de charger les données du tableau de bord',
-        variant: 'destructive',
+        title: "Erreur",
+        description: "Impossible de charger les données du tableau de bord",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -143,8 +145,7 @@ const WaliDashboard: React.FC = () => {
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            Profil wali non trouvé. Veuillez vous assurer que votre compte est correctement
-            configuré.
+            Profil wali non trouvé. Veuillez vous assurer que votre compte est correctement configuré.
           </AlertDescription>
         </Alert>
       </div>
@@ -258,7 +259,9 @@ const WaliDashboard: React.FC = () => {
                   {stats.pendingVerifications === 0 && stats.onboardingProgress === 100 && (
                     <Alert>
                       <CheckCircle className="h-4 w-4" />
-                      <AlertDescription>Tous les éléments sont à jour !</AlertDescription>
+                      <AlertDescription>
+                        Tous les éléments sont à jour !
+                      </AlertDescription>
                     </Alert>
                   )}
                 </div>
@@ -273,24 +276,24 @@ const WaliDashboard: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button
-                  variant="outline"
+                <Button 
+                  variant="outline" 
                   className="w-full justify-start"
                   onClick={() => setActiveTab('verification')}
                 >
                   <UserCheck className="mr-2 h-4 w-4" />
                   Gérer les Vérifications
                 </Button>
-                <Button
-                  variant="outline"
+                <Button 
+                  variant="outline" 
                   className="w-full justify-start"
                   onClick={() => setActiveTab('training')}
                 >
                   <BookOpen className="mr-2 h-4 w-4" />
                   Continuer la Formation
                 </Button>
-                <Button
-                  variant="outline"
+                <Button 
+                  variant="outline" 
                   className="w-full justify-start"
                   onClick={() => setActiveTab('delegation')}
                 >
@@ -303,7 +306,7 @@ const WaliDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="verification">
-          <FamilyVerificationForm
+          <FamilyVerificationForm 
             wali_id={waliProfile.id}
             managed_user_id={waliProfile.managed_users?.[0] || ''}
             onVerificationSubmitted={loadWaliData}
@@ -311,11 +314,14 @@ const WaliDashboard: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="training">
-          <OnboardingProgress wali_id={waliProfile.id} onModuleComplete={loadWaliData} />
+          <OnboardingProgress 
+            wali_id={waliProfile.id}
+            onModuleComplete={loadWaliData}
+          />
         </TabsContent>
 
         <TabsContent value="delegation">
-          <DelegationManager
+          <DelegationManager 
             wali_id={waliProfile.id}
             managed_users={waliProfile.managed_users || []}
           />

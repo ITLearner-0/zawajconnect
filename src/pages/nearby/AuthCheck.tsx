@@ -37,7 +37,7 @@ const AuthCheck = ({ children }: AuthCheckProps) => {
       }
 
       // Check if user has taken compatibility test
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('compatibility_results')
         .select('id')
         .eq('user_id', session.user.id)

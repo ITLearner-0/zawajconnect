@@ -26,7 +26,7 @@ export const useWaliStats = (
 
       try {
         // Get total supervised conversations using existing conversations table
-        const { count, error: countError } = await supabase
+        const { count, error: countError } = await (supabase as any)
           .from('conversations')
           .select('*', { count: 'exact', head: true })
           .eq('wali_supervised', true);

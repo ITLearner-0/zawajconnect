@@ -19,7 +19,7 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
         <div className="flex items-center">
           <Label htmlFor="fullName">Full Name</Label>
           <TooltipProvider>
-            <FieldTooltip text={fieldTooltips.fullName} />
+            <FieldTooltip content={fieldTooltips.fullName} />
           </TooltipProvider>
         </div>
         <Input
@@ -39,7 +39,7 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
         <div className="flex items-center">
           <Label htmlFor="age">Age</Label>
           <TooltipProvider>
-            <FieldTooltip text={fieldTooltips.age} />
+            <FieldTooltip content={fieldTooltips.age} />
           </TooltipProvider>
         </div>
         <Input
@@ -62,7 +62,7 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
         <div className="flex items-center">
           <Label htmlFor="gender">Gender</Label>
           <TooltipProvider>
-            <FieldTooltip text={fieldTooltips.gender} />
+            <FieldTooltip content={fieldTooltips.gender} />
           </TooltipProvider>
         </div>
         <select
@@ -86,7 +86,7 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
         <div className="flex items-center">
           <Label htmlFor="location">Location</Label>
           <TooltipProvider>
-            <FieldTooltip text={fieldTooltips.location} />
+            <FieldTooltip content={fieldTooltips.location} />
           </TooltipProvider>
         </div>
         <Input

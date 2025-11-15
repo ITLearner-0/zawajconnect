@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { DocumentVerification } from '@/types/documents';
@@ -13,21 +14,21 @@ export const useDocumentVerification = (userId?: string) => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('document_verifications')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-
-      setVerifications(data || []);
+      
+      setVerifications((data as any) || []);
     } catch (error) {
       console.error('Error fetching document verifications:', error);
       toast({
-        title: 'Erreur',
-        description: 'Impossible de charger les vérifications de documents',
-        variant: 'destructive',
+        title: "Erreur",
+        description: "Impossible de charger les vérifications de documents",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -43,6 +44,6 @@ export const useDocumentVerification = (userId?: string) => {
   return {
     verifications,
     loading,
-    refetchVerifications: fetchVerifications,
+    refetchVerifications: fetchVerifications
   };
 };

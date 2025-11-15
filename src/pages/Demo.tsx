@@ -235,7 +235,7 @@ const Demo = () => {
 
           <TabsContent value="messaging">
             <EnhancedDemoMessaging
-              selectedPersona={selectedPersona}
+              selectedPersona={selectedPersona ?? undefined}
               onPersonaSelect={setSelectedPersona}
             />
           </TabsContent>

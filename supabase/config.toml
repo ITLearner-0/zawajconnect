@@ -92,3 +92,9 @@ verify_jwt = true
 
 [functions.generate-tutorial]
 verify_jwt = true
+
+[functions.award-badge]
+verify_jwt = true
+
+[functions.send-bulk-notifications]
+verify_jwt = true

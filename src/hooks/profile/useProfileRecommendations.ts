@@ -40,7 +40,7 @@ export const useProfileRecommendations = (userId?: string) => {
         const newRecommendations: Recommendation[] = [];
 
         // Check for missing profile information
-        if (!profile.about_me || profile.about_me.trim().length < 50) {
+        if (!(profile as any).about_me || (profile as any).about_me.trim().length < 50) {
           newRecommendations.push({
             id: 'about-me',
             type: 'content',
@@ -53,7 +53,7 @@ export const useProfileRecommendations = (userId?: string) => {
         }
 
         // Check for verification status
-        if (!profile.email_verified) {
+        if (!(profile as any).email_verified) {
           newRecommendations.push({
             id: 'email-verification',
             type: 'verification',
@@ -65,7 +65,7 @@ export const useProfileRecommendations = (userId?: string) => {
           });
         }
 
-        if (!profile.phone_verified) {
+        if (!(profile as any).phone_verified) {
           newRecommendations.push({
             id: 'phone-verification',
             type: 'verification',
@@ -77,7 +77,7 @@ export const useProfileRecommendations = (userId?: string) => {
         }
 
         // Check for wali information if female
-        if (profile.gender === 'female' && (!profile.wali_name || !profile.wali_contact)) {
+        if ((profile as any).gender === 'female' && (!(profile as any).wali_name || !(profile as any).wali_contact)) {
           newRecommendations.push({
             id: 'wali-info',
             type: 'content',

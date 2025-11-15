@@ -35,6 +35,8 @@ const Settings = lazy(() => import('@/pages/Settings'));
 const PaymentHistory = lazy(() => import('@/pages/PaymentHistory'));
 const Favorites = lazy(() => import('@/pages/Favorites'));
 const NotesManager = lazy(() => import('@/pages/NotesManager'));
+const Gamification = lazy(() => import('@/pages/Gamification'));
+const BadgeLeaderboard = lazy(() => import('@/pages/BadgeLeaderboard'));
 
 // Matching & Compatibility
 const AdvancedMatching = lazy(() => import('@/pages/AdvancedMatching'));
@@ -46,6 +48,7 @@ const Compare = lazy(() => import('@/pages/Compare'));
 const Family = lazy(() => import('@/pages/Family'));
 const WaliDashboard = lazy(() => import('@/pages/WaliDashboard'));
 const WaliAccess = lazy(() => import('@/pages/WaliAccess'));
+const WaliRegistration = lazy(() => import('@/pages/WaliRegistration'));
 const MatchApproval = lazy(() => import('@/pages/MatchApproval'));
 const FamilyAnalyticsPage = lazy(() => import('@/pages/FamilyAnalytics'));
 const FamilySupervision = lazy(() => import('@/pages/FamilySupervision'));
@@ -55,6 +58,8 @@ const FamilyAccessPortal = lazy(() => import('@/components/FamilyAccessPortal'))
 const FamilySupervisionPanel = lazy(() => import('@/components/FamilySupervisionPanel'));
 const WaliMonitoring = lazy(() => import('@/pages/WaliMonitoring'));
 const AdminWaliAlerts = lazy(() => import('@/pages/AdminWaliAlerts'));
+const AdminWaliAlertsDashboard = lazy(() => import('@/pages/AdminWaliAlertsDashboard'));
+const WaliAdmin = lazy(() => import('@/pages/WaliAdmin'));
 
 // Islamic tools
 const IslamicTools = lazy(() => import('@/pages/IslamicTools'));
@@ -64,6 +69,14 @@ const Guidance = lazy(() => import('@/pages/Guidance'));
 const Admin = lazy(() => import('@/pages/Admin'));
 const ABTestingDashboard = lazy(() => import('@/pages/ABTestingDashboard'));
 const AdminUserProfile = lazy(() => import('@/pages/AdminUserProfile'));
+const AdminWaliRegistrations = lazy(() => import('@/pages/AdminWaliRegistrations'));
+const AdminWaliMonitoring = lazy(() => import('@/pages/AdminWaliMonitoring'));
+const AdminWaliAuditTrail = lazy(() => import('@/pages/AdminWaliAuditTrail'));
+const AdminWaliDashboard = lazy(() => import('@/pages/AdminWaliDashboard'));
+const AdminWaliPermissions = lazy(() => import('@/pages/AdminWaliPermissions'));
+const AdminWaliUserDetails = lazy(() => import('@/pages/AdminWaliUserDetails'));
+const AdminMatchingConfig = lazy(() => import('@/pages/AdminMatchingConfig'));
+const AdminUsers = lazy(() => import('@/pages/AdminUsers'));
 const ModerationTest = lazy(() => import('@/pages/ModerationTest'));
 const ModerationTests = lazy(() => import('@/pages/ModerationTests'));
 
@@ -98,23 +111,29 @@ export const publicRoutes: AppRouteConfig[] = [
 
 // Special routes - protected but may have different requirements
 export const specialRoutes: AppRouteConfig[] = [
-  {
-    path: '/onboarding',
-    component: Onboarding,
-    protected: true,
-    requiresOnboarding: false,
+  { 
+    path: '/onboarding', 
+    component: Onboarding, 
+    protected: true, 
+    requiresOnboarding: false 
   },
-  {
-    path: '/wali-onboarding',
-    component: WaliOnboarding,
-    protected: true,
-    requiresOnboarding: false,
+  { 
+    path: '/wali-onboarding', 
+    component: WaliOnboarding, 
+    protected: true, 
+    requiresOnboarding: false 
   },
-  {
-    path: '/subscription-success',
-    component: SubscriptionSuccess,
-    protected: true,
-    requiresOnboarding: false,
+  { 
+    path: '/wali-registration', 
+    component: WaliRegistration, 
+    protected: true, 
+    requiresOnboarding: false 
+  },
+  { 
+    path: '/subscription-success', 
+    component: SubscriptionSuccess, 
+    protected: true, 
+    requiresOnboarding: false 
   },
 ];
 
@@ -137,7 +156,16 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/admin', component: Admin },
   { path: '/ab-testing', component: ABTestingDashboard },
   { path: '/admin/user/:userId', component: AdminUserProfile },
-  { path: '/admin/wali-alerts', component: AdminWaliAlerts },
+  { path: '/admin/wali-registrations', component: AdminWaliRegistrations },
+  { path: '/admin/wali-monitoring', component: AdminWaliMonitoring },
+  { path: '/admin/wali-alerts', component: AdminWaliAlertsDashboard },
+  { path: '/admin/wali', component: WaliAdmin },
+  { path: '/admin/dashboard', component: AdminWaliDashboard },
+  { path: '/admin/wali-audit', component: AdminWaliAuditTrail },
+  { path: '/admin/wali-permissions', component: AdminWaliPermissions },
+  { path: '/admin/wali-permissions/:userId', component: AdminWaliUserDetails },
+  { path: '/admin/matching-config', component: AdminMatchingConfig },
+  { path: '/admin/users', component: AdminUsers },
   { path: '/moderation-test', component: ModerationTest },
   { path: '/wali-dashboard', component: WaliDashboard },
   { path: '/wali-monitoring', component: WaliMonitoring },
@@ -156,6 +184,8 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/compatibility-test', component: CompatibilityTest },
   { path: '/compatibility-insights', component: CompatibilityInsightsPage },
   { path: '/compare', component: Compare },
+  { path: '/gamification', component: Gamification },
+  { path: '/badge-leaderboard', component: BadgeLeaderboard },
 ];
 
 // Catch all route

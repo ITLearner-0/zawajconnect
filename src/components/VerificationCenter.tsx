@@ -227,6 +227,14 @@ const VerificationCenter = () => {
       setShowPhoneVerification(false);
       setVerificationCode('');
 
+      // Award phone verification badge
+      try {
+        const { awardBadgeSilent } = await import('@/utils/badgeAwards');
+        await awardBadgeSilent('phone_verified');
+      } catch (badgeError) {
+        console.error('Error awarding phone verification badge:', badgeError);
+      }
+
       toast({
         title: 'Téléphone vérifié',
         description: 'Votre numéro de téléphone a été vérifié avec succès',
@@ -306,6 +314,16 @@ const VerificationCenter = () => {
         ...(documentType === 'id' && { id_verified: true }),
         ...(documentType === 'family' && { family_verified: true }),
       }));
+
+      // Award ID verification badge if verified
+      if (documentType === 'id') {
+        try {
+          const { awardBadgeSilent } = await import('@/utils/badgeAwards');
+          await awardBadgeSilent('id_verified');
+        } catch (badgeError) {
+          console.error('Error awarding ID verification badge:', badgeError);
+        }
+      }
 
       toast({
         title: 'Document téléchargé',

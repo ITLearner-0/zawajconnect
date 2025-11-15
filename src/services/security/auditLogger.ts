@@ -1,3 +1,4 @@
+
 // Security audit logging service
 import { supabase } from '@/integrations/supabase/client';
 
@@ -24,7 +25,7 @@ export class SecurityAuditLogger {
       timestamp: new Date().toISOString(),
       ip: await this.getClientIP(),
       userAgent: navigator.userAgent,
-      sessionId: this.getSessionId(),
+      sessionId: this.getSessionId()
     };
 
     this.pendingEvents.push(auditEvent);
@@ -43,21 +44,23 @@ export class SecurityAuditLogger {
     this.pendingEvents = [];
 
     try {
-      const { error } = await supabase.from('security_events').insert(
-        events.map((event) => ({
+      const { error } = await (supabase as any)
+        .from('security_events')
+        .insert(events.map(event => ({
           user_id: event.userId,
           event_type: event.action,
-          details: {
+          description: `${event.action} on ${event.resource}`,
+          severity: event.success ? 'low' : 'medium',
+          metadata: {
             resource: event.resource,
             resource_id: event.resourceId,
             success: event.success,
             details: event.details,
             ip_address: event.ip,
             user_agent: event.userAgent,
-            timestamp: event.timestamp,
-          },
-        }))
-      );
+            timestamp: event.timestamp
+          }
+        } as any)));
 
       if (error) {
         console.error('Failed to log audit events:', error);
@@ -71,80 +74,57 @@ export class SecurityAuditLogger {
   }
 
   // Log authentication events
-  static async logAuth(
-    action: string,
-    success: boolean,
-    details?: Record<string, any>
-  ): Promise<void> {
+  static async logAuth(action: string, success: boolean, details?: Record<string, any>): Promise<void> {
     await this.logEvent({
       action: `auth_${action}`,
       resource: 'authentication',
       success,
-      details,
+      details
     });
   }
 
   // Log profile access
-  static async logProfileAccess(
-    userId: string,
-    profileId: string,
-    success: boolean
-  ): Promise<void> {
+  static async logProfileAccess(userId: string, profileId: string, success: boolean): Promise<void> {
     await this.logEvent({
       userId,
       action: 'profile_access',
       resource: 'profile',
       resourceId: profileId,
-      success,
+      success
     });
   }
 
   // Log message events
-  static async logMessage(
-    userId: string,
-    conversationId: string,
-    action: string,
-    success: boolean
-  ): Promise<void> {
+  static async logMessage(userId: string, conversationId: string, action: string, success: boolean): Promise<void> {
     await this.logEvent({
       userId,
       action: `message_${action}`,
       resource: 'conversation',
       resourceId: conversationId,
-      success,
+      success
     });
   }
 
   // Log admin actions
-  static async logAdminAction(
-    userId: string,
-    action: string,
-    resource: string,
-    resourceId: string,
-    success: boolean
-  ): Promise<void> {
+  static async logAdminAction(userId: string, action: string, resource: string, resourceId: string, success: boolean): Promise<void> {
     await this.logEvent({
       userId,
       action: `admin_${action}`,
       resource,
       resourceId,
       success,
-      details: { admin_action: true },
+      details: { admin_action: true }
     });
   }
 
   // Log security violations
-  static async logSecurityViolation(
-    userId: string,
-    violation: string,
-    details: Record<string, any>
-  ): Promise<void> {
+  static async logSecurityViolation(userId: string, violation: string, details: Record<string, any>): Promise<void> {
     await this.logEvent({
       userId,
       action: 'security_violation',
       resource: 'security',
       success: false,
-      details: { violation, ...details },
+      details: { violation, ...details }
     });
   }
 
@@ -197,21 +177,24 @@ export class SecurityAuditLogger {
       const { data, error } = await query;
 
       if (error) throw error;
+      if (!data) return null;
 
       // Process statistics
       const stats = {
         total: data.length,
         byType: {} as Record<string, number>,
-        byHour: Array(24).fill(0),
+        byHour: Array(24).fill(0)
       };
 
-      data.forEach((event) => {
+      data.forEach(event => {
         // Count by type
         stats.byType[event.event_type] = (stats.byType[event.event_type] || 0) + 1;
-
+        
         // Count by hour
-        const hour = new Date(event.created_at).getHours();
-        stats.byHour[hour]++;
+        if (event.created_at) {
+          const hour = new Date(event.created_at).getHours();
+          stats.byHour[hour]++;
+        }
       });
 
       return stats;

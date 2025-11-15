@@ -50,7 +50,7 @@ export const useModerationData = () => {
   const fetchFlaggedContent = useCallback(async () => {
     try {
       const { data, error } = await supabase
-        .from('content_flags')
+        .from('content_flags' as any)
         .select('*')
         .eq('resolved', false)
         .order('created_at', { ascending: false });

@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { Conversation, Message, RetentionPolicy } from '@/types/profile';
 import ChatHeader from './ChatHeader';
@@ -37,7 +38,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   conversation,
   messages = [],
   currentUserId,
-  messageInput = '',
+  messageInput = "",
   setMessageInput = () => {},
   sendMessage = () => {},
   loading = false,
@@ -55,23 +56,23 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   retentionPolicy,
   updateRetentionPolicy = () => {},
   userStatus,
-  lastActive,
+  lastActive
 }) => {
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [showSecuritySettings, setShowSecuritySettings] = useState(false);
   const renderCount = useRef(0);
-
+  
   // Get the other user ID to fetch their status
-  const otherUserId = conversation?.participants?.find((id) => id !== currentUserId) || '';
-
+  const otherUserId = conversation?.participants?.find(id => id !== currentUserId) || '';
+  
   // Use our hook to get user status if not provided through props
   const userStatusInfo = useUserStatus(otherUserId);
-
+  
   // Use props if available, otherwise use the hook data
   const status = userStatus || userStatusInfo.status;
-  const lastActiveTime = lastActive || userStatusInfo.lastActive;
-
+  const lastActiveTime: string | undefined = (lastActive ?? userStatusInfo.lastActive) || undefined;
+  
   const openReportDialog = () => {
     setSelectedMessage(null);
     setIsReportDialogOpen(true);
@@ -88,7 +89,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
   return (
     <div className="flex flex-col h-full">
       {/* Chat header */}
-      <ChatHeader
+      <ChatHeader 
         conversation={conversation}
         currentUserId={currentUserId}
         backToList={backToList}
@@ -102,17 +103,17 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
         userStatus={status}
         lastActive={lastActiveTime}
       />
-
+      
       {/* Security settings panel (collapsible) */}
       {showSecuritySettings && (
-        <SecuritySettingsPanel
+        <SecuritySettingsPanel 
           encryptionEnabled={encryptionEnabled || false}
           toggleEncryption={toggleEncryption || (() => {})}
         />
       )}
 
       {/* Messages area */}
-      <MessagesList
+      <MessagesList 
         messages={messages}
         currentUserId={currentUserId}
         onReportMessage={handleReportMessage}
@@ -123,7 +124,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({
       />
 
       {/* Message input */}
-      <MessageInput
+      <MessageInput 
         messageInput={messageInput}
         setMessageInput={setMessageInput}
         sendMessage={sendMessage}

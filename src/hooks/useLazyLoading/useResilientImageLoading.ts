@@ -93,8 +93,8 @@ export const useResilientImageLoading = (options: ResilientImageLoadingOptions) 
 
       try {
         await errorRecoveryService.executeWithRetry(
-          () => loadImage(sourceToTry),
-          `image-${sourceToTry}`,
+          () => loadImage(sourceToTry ?? ''),
+          `image-${sourceToTry ?? ''}`,
           {
             maxRetries: maxRetries,
             enableCircuitBreaker,
@@ -147,6 +147,7 @@ export const useResilientImageLoading = (options: ResilientImageLoadingOptions) 
 
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [isOnline, hasError, loadAttempt, retry]);
 
   return {

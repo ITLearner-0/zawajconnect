@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import MessagesContainer from '@/components/messaging/MessagesContainer';
@@ -44,7 +45,7 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
   loading = false,
   sendingMessage = false,
   errors = {},
-  messageInput = '',
+  messageInput = "",
   setMessageInput,
   videoCallStatus = {},
   sendMessage,
@@ -57,7 +58,7 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
   encryptionEnabled = false,
   toggleEncryption = () => {},
   retentionPolicy = {},
-  updateRetentionPolicy = () => {},
+  updateRetentionPolicy = () => {}
 }) => {
   const navigate = useNavigate();
 
@@ -71,7 +72,7 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
     conversations: errors?.conversations || null,
     messages: errors?.messages || null,
     videoCall: errors?.videoCall || null,
-    monitoring: errors?.monitoring || null,
+    monitoring: errors?.monitoring || null
   };
 
   // Check if currentConversation is valid before rendering ChatWindow
@@ -82,7 +83,7 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
       <div className="bg-primary text-white p-4">
         <h1 className="text-xl font-bold">Messages</h1>
       </div>
-
+      
       <MessagesContainer
         loading={loading}
         conversations={conversations}
@@ -97,43 +98,43 @@ const RegularConversation: React.FC<RegularConversationProps> = ({
             onEndCall={endVideoCall}
             conversationId={conversationId}
           />
-        ) : isValidConversation ? (
-          <ChatWindow
-            conversation={currentConversation}
-            messages={messages}
-            currentUserId={currentUserId}
-            messageInput={messageInput}
-            setMessageInput={setMessageInput}
-            sendMessage={sendMessage}
-            loading={loading}
-            sendingMessage={sendingMessage}
-            error={normalizedErrors.messages}
-            onStartVideoCall={() => {
-              const otherUserId = currentConversation.participants?.find(
-                (id) => id !== currentUserId
-              );
-              if (otherUserId) {
-                startVideoCall(otherUserId);
-              }
-            }}
-            backToList={() => navigate('/messages')}
-            isWaliSupervised={currentConversation.wali_supervised || false}
-            report={latestReport}
-            monitoringEnabled={monitoringEnabled}
-            toggleMonitoring={toggleMonitoring}
-            monitoringLoading={monitoringLoading}
-            encryptionEnabled={encryptionEnabled}
-            toggleEncryption={toggleEncryption}
-            retentionPolicy={retentionPolicy}
-            updateRetentionPolicy={updateRetentionPolicy}
-          />
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-500">
-            <p>Select a conversation</p>
-          </div>
+          isValidConversation ? (
+            <ChatWindow
+              conversation={currentConversation}
+              messages={messages}
+              currentUserId={currentUserId}
+              messageInput={messageInput}
+              setMessageInput={setMessageInput}
+              sendMessage={sendMessage}
+              loading={loading}
+              sendingMessage={sendingMessage}
+              error={normalizedErrors.messages}
+              onStartVideoCall={() => {
+                const otherUserId = currentConversation.participants?.find((id: string) => id !== currentUserId);
+                if (otherUserId) {
+                  startVideoCall(otherUserId);
+                }
+              }}
+              backToList={() => navigate('/messages')}
+              isWaliSupervised={currentConversation.wali_supervised || false}
+              report={latestReport}
+              monitoringEnabled={monitoringEnabled}
+              toggleMonitoring={toggleMonitoring}
+              monitoringLoading={monitoringLoading}
+              encryptionEnabled={encryptionEnabled}
+              toggleEncryption={toggleEncryption}
+              retentionPolicy={retentionPolicy}
+              updateRetentionPolicy={updateRetentionPolicy}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500">
+              <p>Select a conversation</p>
+            </div>
+          )
         )}
       </MessagesContainer>
-
+      
       <Toaster />
     </div>
   );

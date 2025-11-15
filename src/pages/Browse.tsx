@@ -511,6 +511,14 @@ const Browse = () => {
           } catch (emailError) {
             console.error('Erreur envoi emails de match:', emailError);
           }
+          
+          // Award match badges to both users
+          try {
+            const { awardMatchBadgesToBothUsers } = await import('@/utils/matchBadges');
+            await awardMatchBadgesToBothUsers(user.id, profileId);
+          } catch (badgeError) {
+            console.error('Error awarding match badges:', badgeError);
+          }
         } else {
           toast({
             title: 'Profil liké',

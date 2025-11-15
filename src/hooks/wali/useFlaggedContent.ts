@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { FlaggedItem, Message } from '@/types/wali';
@@ -31,7 +32,8 @@ export const useFlaggedContent = (waliId: string) => {
         throw waliError;
       }
 
-      if (!waliProfile?.managed_users || !waliProfile.managed_users.length) {
+      const managedUsers = (waliProfile as any)?.managed_users;
+      if (!managedUsers || !managedUsers.length) {
         setFlaggedContent([]);
         setLoading(false);
         return;
@@ -41,7 +43,7 @@ export const useFlaggedContent = (waliId: string) => {
       const { data: flags, error: flagsError } = await supabase
         .from('content_flags')
         .select('*')
-        .in('flagged_by', waliProfile.managed_users)
+        .in('flagged_by', managedUsers)
         .order('created_at', { ascending: false });
 
       if (flagsError) {
@@ -49,7 +51,7 @@ export const useFlaggedContent = (waliId: string) => {
       }
 
       // Process the data to match our FlaggedItem type
-      const processedFlags: FlaggedItem[] = flags.map((flag) => ({
+      const processedFlags: FlaggedItem[] = flags.map((flag: any) => ({
         id: flag.id,
         message_id: flag.content_id,
         message: {} as Message, // We'll fetch this later if needed
@@ -60,7 +62,7 @@ export const useFlaggedContent = (waliId: string) => {
         status: flag.resolved ? 'resolved' : 'pending',
         resolved_at: flag.resolved_at,
         resolved_by: flag.resolved_by,
-        resolution_notes: flag.notes,
+        resolution_notes: flag.notes
       }));
 
       setFlaggedContent(processedFlags);
@@ -75,27 +77,24 @@ export const useFlaggedContent = (waliId: string) => {
   useEffect(() => {
     fetchFlaggedContent();
 
-    // Set up real-time subscription for content flags
-    if (waliId) {
-      const channel = supabase
-        .channel(`flagged_content_${waliId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'content_flags',
-          },
-          () => {
-            fetchFlaggedContent();
-          }
-        )
-        .subscribe();
-
-      return () => {
-        supabase.removeChannel(channel);
-      };
+    if (!waliId) {
+      return undefined;
     }
+
+    const channel = supabase
+      .channel(`flagged_content_${waliId}`)
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'content_flags'
+      }, () => {
+        fetchFlaggedContent();
+      })
+      .subscribe();
+      
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [waliId, fetchFlaggedContent]);
 
   // Resolve a flagged item
@@ -105,11 +104,11 @@ export const useFlaggedContent = (waliId: string) => {
     try {
       const { error: updateError } = await supabase
         .from('content_flags')
-        .update({
+        .update({ 
           resolved: true,
           resolved_at: new Date().toISOString(),
           resolved_by: waliId,
-          notes: notes,
+          notes: notes
         })
         .eq('id', flagId);
 
@@ -118,36 +117,36 @@ export const useFlaggedContent = (waliId: string) => {
       }
 
       // Update local state
-      setFlaggedContent((prev) =>
-        prev.map((item) =>
-          item.id === flagId
-            ? {
-                ...item,
+      setFlaggedContent(prev => 
+        prev.map(item => 
+          item.id === flagId 
+            ? { 
+                ...item, 
                 status: 'resolved',
                 resolved_at: new Date().toISOString(),
                 resolved_by: waliId,
-                resolution_notes: notes,
-              }
+                resolution_notes: notes
+              } 
             : item
         )
       );
 
       toast({
-        title: 'Flag Resolved',
-        description: 'You have resolved this flagged content',
-        variant: 'default',
+        title: "Flag Resolved",
+        description: "You have resolved this flagged content",
+        variant: "default"
       });
 
       return true;
     } catch (err: any) {
       console.error('Error resolving flagged content:', err);
-
+      
       toast({
-        title: 'Action Failed',
-        description: err.message || 'Could not resolve this flag',
-        variant: 'destructive',
+        title: "Action Failed",
+        description: err.message || "Could not resolve this flag",
+        variant: "destructive"
       });
-
+      
       return false;
     }
   };
@@ -157,6 +156,6 @@ export const useFlaggedContent = (waliId: string) => {
     loading,
     error,
     resolveFlaggedContent,
-    refreshFlaggedContent: fetchFlaggedContent,
+    refreshFlaggedContent: fetchFlaggedContent
   };
 };

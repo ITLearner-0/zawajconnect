@@ -65,7 +65,7 @@ export class FamilyVerificationService {
     managed_user_id: string
   ): Promise<FamilyRelationshipVerification | null> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('family_relationship_verifications')
         .select('*')
         .eq('wali_id', wali_id)
@@ -75,7 +75,13 @@ export class FamilyVerificationService {
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      return data || null;
+      const verification: FamilyRelationshipVerification | null = data ? {
+        ...data,
+        relationship_type: data.relationship_type as 'father' | 'brother' | 'uncle' | 'grandfather' | 'other',
+        verification_method: data.verification_method as 'document' | 'witness' | 'community' | 'self_declaration',
+        verification_status: data.verification_status as 'pending' | 'verified' | 'rejected' | 'requires_review'
+      } : null;
+      return verification;
     } catch (error) {
       console.error('Error fetching verification status:', error);
       return null;
@@ -89,7 +95,7 @@ export class FamilyVerificationService {
     verifiedBy?: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('family_relationship_verifications')
         .update({
           verification_status: status,

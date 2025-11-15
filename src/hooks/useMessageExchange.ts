@@ -174,13 +174,12 @@ export const useMessageExchange = (conversationId: string | undefined) => {
         .from('messages')
         .insert([
           {
-            conversation_id: conversationId,
+            match_id: conversationId,
             sender_id: userId,
             content: isFiltered ? filteredContent : content,
-            attachments: attachments,
             created_at: new Date().toISOString(),
             is_read: false,
-            is_wali_visible: true, // Default value
+            is_wali_visible: true,
             content_flags: flags,
             is_filtered: isFiltered,
           },

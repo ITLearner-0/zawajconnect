@@ -14,6 +14,7 @@ import ProfileCard from '@/components/profile/ProfileCard';
 import ProfileDetails from '@/components/profile/ProfileDetails';
 import ProfileQuote from '@/components/profile/ProfileQuote';
 import StandardLoadingState from '@/components/ui/StandardLoadingState';
+import { BadgeShowcase } from '@/components/gamification/BadgeShowcase';
 
 const UserProfile = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,51 +26,48 @@ const UserProfile = () => {
 
   useEffect(() => {
     const getCurrentUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.id) {
         setCurrentUserId(session.user.id);
-        console.log('Current user ID:', session.user.id);
+        console.log("Current user ID:", session.user.id);
       }
     };
-
+    
     getCurrentUser();
   }, []);
 
   useEffect(() => {
     const fetchProfile = async () => {
       if (!id) {
-        console.log('No profile ID provided');
+        console.log("No profile ID provided");
         setLoading(false);
         return;
       }
 
       setLoading(true);
-      console.log('Fetching profile with ID:', id);
-
+      console.log("Fetching profile with ID:", id);
+      
       try {
         // First check if this is a demo profile
-        const demoProfile = dummyProfiles.find((p) => p.id === id);
-
+        const demoProfile = dummyProfiles.find(p => p.id === id);
+        
         if (demoProfile) {
-          console.log('Found demo profile:', demoProfile);
+          console.log("Found demo profile:", demoProfile);
           setProfile(demoProfile);
           setLoading(false);
           return;
         }
 
-        console.log('Not a demo profile, checking database...');
-
+        console.log("Not a demo profile, checking database...");
+        
         // Check if the UUID is valid format
-        const uuidRegex =
-          /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
         if (!uuidRegex.test(id)) {
-          console.error('Invalid UUID format:', id);
+          console.error("Invalid UUID format:", id);
           toast({
-            title: 'Erreur',
+            title: "Erreur",
             description: "Format d'identifiant de profil invalide.",
-            variant: 'destructive',
+            variant: "destructive",
           });
           setProfile(null);
           setLoading(false);
@@ -77,7 +75,7 @@ const UserProfile = () => {
         }
 
         // First, let's check if the profile exists at all (ignoring visibility)
-        console.log('Checking if profile exists in database...');
+        console.log("Checking if profile exists in database...");
         const { data: profileCheck, error: checkError } = await supabase
           .from('profiles')
           .select('id, is_visible, first_name, last_name')
@@ -85,20 +83,20 @@ const UserProfile = () => {
           .single();
 
         if (checkError) {
-          console.error('Error checking profile existence:', checkError);
+          console.error("Error checking profile existence:", checkError);
           if (checkError.code === 'PGRST116') {
-            console.log('Profile does not exist in database');
+            console.log("Profile does not exist in database");
             toast({
-              title: 'Profil introuvable',
+              title: "Profil introuvable",
               description: "Ce profil n'existe pas ou a été supprimé.",
-              variant: 'destructive',
+              variant: "destructive",
             });
           } else {
-            console.error('Database error:', checkError);
+            console.error("Database error:", checkError);
             toast({
-              title: 'Erreur',
-              description: 'Erreur lors de la vérification du profil.',
-              variant: 'destructive',
+              title: "Erreur",
+              description: "Erreur lors de la vérification du profil.",
+              variant: "destructive",
             });
           }
           setProfile(null);
@@ -106,14 +104,15 @@ const UserProfile = () => {
           return;
         }
 
-        console.log('Profile check result:', profileCheck);
+        console.log("Profile check result:", profileCheck);
 
-        if (!profileCheck.is_visible) {
-          console.log('Profile exists but is not visible');
+        const profileCheckAny = profileCheck as any;
+        if (!profileCheckAny.is_visible) {
+          console.log("Profile exists but is not visible");
           toast({
-            title: 'Profil non disponible',
+            title: "Profil non disponible",
             description: "Ce profil n'est pas visible publiquement.",
-            variant: 'destructive',
+            variant: "destructive",
           });
           setProfile(null);
           setLoading(false);
@@ -121,7 +120,7 @@ const UserProfile = () => {
         }
 
         // Now fetch the full profile data
-        console.log('Fetching full profile data...');
+        console.log("Fetching full profile data...");
         const { data: profileData, error } = await supabase
           .from('profiles')
           .select('*')
@@ -130,11 +129,11 @@ const UserProfile = () => {
           .single();
 
         if (error) {
-          console.error('Error fetching full profile data:', error);
+          console.error("Error fetching full profile data:", error);
           toast({
-            title: 'Erreur',
-            description: 'Erreur lors de la récupération des données du profil.',
-            variant: 'destructive',
+            title: "Erreur",
+            description: "Erreur lors de la récupération des données du profil.",
+            variant: "destructive",
           });
           setProfile(null);
           setLoading(false);
@@ -143,56 +142,58 @@ const UserProfile = () => {
 
         if (profileData) {
           // Convert database profile to DatabaseProfile format
+          const profileDataAny = profileData as any;
           const formattedProfile: DatabaseProfile = {
             id: profileData.id,
-            first_name: profileData.first_name || '',
-            last_name: profileData.last_name || '',
+            first_name: profileDataAny.first_name || '',
+            last_name: profileDataAny.last_name || '',
             gender: profileData.gender || '',
             location: profileData.location || '',
-            education_level: profileData.education_level || '',
-            occupation: profileData.occupation || '',
-            religious_practice_level: profileData.religious_practice_level || '',
-            birth_date: profileData.birth_date || '',
-            about_me: profileData.about_me || '',
-            prayer_frequency: profileData.prayer_frequency || '',
-            wali_name: profileData.wali_name || '',
-            wali_relationship: profileData.wali_relationship || '',
-            wali_contact: profileData.wali_contact || '',
-            profile_picture: profileData.profile_picture || '',
-            gallery: profileData.gallery || [],
-            email_verified: profileData.email_verified || false,
-            phone_verified: profileData.phone_verified || false,
-            id_verified: profileData.id_verified || false,
-            wali_verified: profileData.wali_verified || false,
-            is_visible: profileData.is_visible || false,
-            is_verified: profileData.is_verified || false,
-            privacy_settings: profileData.privacy_settings || {
+            education_level: profileDataAny.education_level || '',
+            occupation: profileDataAny.occupation || '',
+            religious_practice_level: profileDataAny.religious_practice_level || '',
+            birth_date: profileDataAny.birth_date || '',
+            about_me: profileDataAny.about_me || '',
+            prayer_frequency: profileDataAny.prayer_frequency || '',
+            wali_name: profileDataAny.wali_name || '',
+            wali_relationship: profileDataAny.wali_relationship || '',
+            wali_contact: profileDataAny.wali_contact || '',
+            profile_picture: profileDataAny.profile_picture || '',
+            gallery: profileDataAny.gallery || [],
+            email_verified: profileDataAny.email_verified || false,
+            phone_verified: profileDataAny.phone_verified || false,
+            id_verified: profileDataAny.id_verified || false,
+            wali_verified: profileDataAny.wali_verified || false,
+            is_visible: profileDataAny.is_visible || false,
+            is_verified: profileDataAny.is_verified || false,
+            privacy_settings: profileDataAny.privacy_settings || {
               profileVisibilityLevel: 1,
               showAge: true,
               showLocation: true,
               showOccupation: true,
-              allowNonMatchMessages: true,
+              allowNonMatchMessages: true
             },
-            blocked_users: profileData.blocked_users || [],
+            blocked_users: profileDataAny.blocked_users || [],
             content_flags: [],
             moderation_status: 'approved',
-            last_moderation_date: null,
+            last_moderation_date: profileDataAny.last_moderation_date ?? undefined,
             created_at: profileData.created_at || '',
-            updated_at: profileData.updated_at || '',
+            updated_at: profileData.updated_at || ''
           };
-
-          console.log('Successfully formatted profile:', formattedProfile);
+          
+          console.log("Successfully formatted profile:", formattedProfile);
           setProfile(formattedProfile);
         } else {
-          console.log('No profile data returned');
+          console.log("No profile data returned");
           setProfile(null);
         }
+        
       } catch (error) {
-        console.error('Unexpected error fetching profile:', error);
+        console.error("Unexpected error fetching profile:", error);
         toast({
-          title: 'Erreur',
+          title: "Erreur",
           description: "Une erreur inattendue s'est produite lors du chargement du profil.",
-          variant: 'destructive',
+          variant: "destructive",
         });
         setProfile(null);
       } finally {
@@ -210,8 +211,8 @@ const UserProfile = () => {
   const handleSignOut = () => {
     navigate('/');
     toast({
-      title: 'Déconnecté',
-      description: 'Vous avez été déconnecté avec succès.',
+      title: "Déconnecté",
+      description: "Vous avez été déconnecté avec succès.",
     });
   };
 
@@ -224,25 +225,20 @@ const UserProfile = () => {
         <StandardLoadingState
           loading={loading}
           loadingText="Chargement du profil..."
-          error={!profile && !loading ? 'Profil introuvable' : null}
-          emptyState={
-            !profile && !loading
-              ? {
-                  title: 'Profil Introuvable',
-                  description:
-                    "Nous n'avons pas pu trouver le profil que vous recherchez. Il a peut-être été supprimé ou n'est plus visible.",
-                  action: {
-                    label: 'Parcourir les Profils',
-                    onClick: () => navigate('/nearby'),
-                  },
-                }
-              : undefined
-          }
+          error={!profile && !loading ? "Profil introuvable" : null}
+          emptyState={!profile && !loading ? {
+            title: "Profil Introuvable",
+            description: "Nous n'avons pas pu trouver le profil que vous recherchez. Il a peut-être été supprimé ou n'est plus visible.",
+            action: {
+              label: "Parcourir les Profils",
+              onClick: () => navigate('/nearby')
+            }
+          } : undefined}
         >
           {profile && (
             <>
               <ProfileHeader onSignOut={handleSignOut} />
-
+              
               {/* Add Edit Profile button if viewing own profile */}
               {isOwnProfile && (
                 <div className="mb-6 text-center">
@@ -255,10 +251,11 @@ const UserProfile = () => {
                   </Button>
                 </div>
               )}
-
+              
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="md:col-span-1">
+                <div className="md:col-span-1 space-y-6">
                   <ProfileCard profile={profile} />
+                  {id && <BadgeShowcase userId={id} maxBadges={5} />}
                 </div>
 
                 <div className="md:col-span-2">

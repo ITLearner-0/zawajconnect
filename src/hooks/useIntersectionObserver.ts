@@ -21,7 +21,7 @@ export const useIntersectionObserver = <T extends HTMLElement = HTMLDivElement>(
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        const isCurrentlyIntersecting = entry.isIntersecting;
+        const isCurrentlyIntersecting = entry?.isIntersecting ?? false;
         setIsIntersecting(isCurrentlyIntersecting);
 
         if (isCurrentlyIntersecting && !hasIntersected) {

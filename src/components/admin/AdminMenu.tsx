@@ -1,14 +1,10 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUserRoles } from '@/hooks/auth/useUserRoles';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Shield, Settings, BarChart3, AlertTriangle, Users } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Shield, Settings, BarChart3, AlertTriangle, Users, Sliders } from 'lucide-react';
 
 const AdminMenu: React.FC = () => {
   const { isAdmin, isModerator, hasAdminOrModerator, loading } = useUserRoles();
@@ -38,6 +34,12 @@ const AdminMenu: React.FC = () => {
               <Link to="/admin/analytics" className="flex items-center gap-2 w-full">
                 <BarChart3 className="h-4 w-4" />
                 Analytics
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/admin/matching-config" className="flex items-center gap-2 w-full">
+                <Sliders className="h-4 w-4" />
+                Algorithme Matching
               </Link>
             </DropdownMenuItem>
           </>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useUserRole } from '@/hooks/useUserRole';
 import { useAuth } from '@/hooks/useAuth';
+import { useUserRoles } from '@/hooks/auth/useUserRoles';
 import { Navigate, useLocation } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import FamilyAccessPortal from '@/components/FamilyAccessPortal';
@@ -21,10 +22,11 @@ const RoleBasedLayout: React.FC<RoleBasedLayoutProps> = ({ children }) => {
 const RoleBasedLayoutContent: React.FC<RoleBasedLayoutProps> = ({ children }) => {
   const { user, loading: authLoading } = useAuth();
   const { isWaliOnly, isRegularUser, isWali, loading: roleLoading } = useUserRole();
+  const { hasAdminOrModerator, loading: rolesLoading } = useUserRoles();
   const location = useLocation();
 
   // Attendre que l'authentification et les rôles soient chargés
-  if (authLoading || roleLoading) {
+  if (authLoading || roleLoading || rolesLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald"></div>
@@ -40,6 +42,15 @@ const RoleBasedLayoutContent: React.FC<RoleBasedLayoutProps> = ({ children }) =>
   // IMPORTANT: Allow access to onboarding pages even if user has no role yet
   if (location.pathname === '/onboarding' || location.pathname === '/wali-onboarding') {
     return <>{children}</>;
+  }
+
+  // Allow admin/moderator users to access admin routes without profile completion check
+  const isAdminRoute = location.pathname.startsWith('/admin') || 
+                       location.pathname === '/moderation-test' || 
+                       location.pathname === '/ab-testing';
+  
+  if (isAdminRoute && hasAdminOrModerator()) {
+    return <AppLayout>{children}</AppLayout>;
   }
 
   // CORRECTION: Les Walis ont maintenant accès à l'interface complète avec le menu de supervision

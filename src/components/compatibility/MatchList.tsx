@@ -1,11 +1,12 @@
-import { useState } from 'react';
-import { CompatibilityMatch } from '@/types/compatibility';
-import { PaginationOptions } from '@/hooks/compatibility/types/paginationTypes';
-import LazyMatchCard from './LazyMatchCard';
-import LazyMatchList from './LazyMatchList';
-import VirtualMatchList from './VirtualMatchList';
-import CustomButton from '@/components/CustomButton';
-import { useIsMobile } from '@/hooks/use-mobile';
+
+import { useState } from "react";
+import { CompatibilityMatch } from "@/types/compatibility";
+import { PaginationOptions } from "@/hooks/compatibility/types/paginationTypes";
+import LazyMatchCard from "./LazyMatchCard";
+import LazyMatchList from "./LazyMatchList";
+import VirtualMatchList from "./VirtualMatchList";
+import CustomButton from "@/components/CustomButton";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MatchListProps {
   matches: CompatibilityMatch[];
@@ -16,13 +17,13 @@ interface MatchListProps {
   useLazyLoading?: boolean;
 }
 
-const MatchList = ({
-  matches,
-  onLoadMore,
-  hasMore = false,
+const MatchList = ({ 
+  matches, 
+  onLoadMore, 
+  hasMore = false, 
   loading = false,
   useVirtualScroll = false,
-  useLazyLoading = true,
+  useLazyLoading = true
 }: MatchListProps) => {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const isMobile = useIsMobile();
@@ -33,18 +34,16 @@ const MatchList = ({
 
   const handleLoadMore = async () => {
     if (!onLoadMore || isLoadingMore) return;
-
+    
     setIsLoadingMore(true);
     try {
       const lastMatch = matches[matches.length - 1];
       await onLoadMore({
-        cursor: lastMatch
-          ? {
-              score: lastMatch.score,
-              userId: lastMatch.userId,
-            }
-          : undefined,
-        limit: 20,
+        cursor: lastMatch ? {
+          score: lastMatch.score ?? lastMatch.compatibilityScore,
+          userId: lastMatch.userId
+        } : undefined,
+        limit: 20
       });
     } finally {
       setIsLoadingMore(false);
@@ -53,7 +52,13 @@ const MatchList = ({
 
   // Use lazy loading for better performance on large lists
   if (useLazyLoading && matches.length > 20) {
-    return <LazyMatchList matches={matches} batchSize={10} delay={100} />;
+    return (
+      <LazyMatchList 
+        matches={matches}
+        batchSize={10}
+        delay={100}
+      />
+    );
   }
 
   // Use virtual scrolling for very large lists
@@ -64,7 +69,7 @@ const MatchList = ({
         config={{
           itemHeight: isMobile ? 280 : 320,
           containerHeight: isMobile ? 600 : 800,
-          overscan: 3,
+          overscan: 3
         }}
         onLoadMore={handleLoadMore}
         hasMore={hasMore}
@@ -79,13 +84,13 @@ const MatchList = ({
       {matches.map((match) => (
         <LazyMatchCard key={match.userId} match={match} />
       ))}
-
+      
       {loading && matches.length === 0 && (
         <div className="flex justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       )}
-
+      
       {hasMore && (
         <div className="flex justify-center pt-6">
           <CustomButton

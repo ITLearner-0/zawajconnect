@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { PrivacySettings } from '@/types/profile';
@@ -7,10 +8,7 @@ interface UsePrivacyManagementProps {
   initialPrivacySettings: PrivacySettings | null;
 }
 
-export const usePrivacyManagement = ({
-  userId,
-  initialPrivacySettings,
-}: UsePrivacyManagementProps) => {
+export const usePrivacyManagement = ({ userId, initialPrivacySettings }: UsePrivacyManagementProps) => {
   const [privacySettings, setPrivacySettings] = useState<PrivacySettings>(
     initialPrivacySettings || {
       profileVisibilityLevel: 1,
@@ -34,8 +32,8 @@ export const usePrivacyManagement = ({
 
     try {
       const updatedSettings = { ...privacySettings, ...newSettings };
-
-      const { data, error } = await supabase
+      
+      const { data, error } = await (supabase as any)
         .from('profiles')
         .update({ privacy_settings: updatedSettings })
         .eq('id', userId)
@@ -49,7 +47,7 @@ export const usePrivacyManagement = ({
       }
 
       // Type assertion to ensure correct typing
-      setPrivacySettings(data.privacy_settings as PrivacySettings);
+      setPrivacySettings((data as any).privacy_settings as PrivacySettings);
       return true;
     } catch (err: any) {
       console.error('Error updating privacy settings:', err);
@@ -59,14 +57,14 @@ export const usePrivacyManagement = ({
       setIsLoading(false);
     }
   };
-
+  
   const handlePrivacySettingsChange = (newSettings: Partial<PrivacySettings>) => {
     // Update local state first
-    setPrivacySettings((prevSettings) => ({
+    setPrivacySettings(prevSettings => ({
       ...prevSettings,
-      ...newSettings,
+      ...newSettings
     }));
-
+    
     // Then persist to database
     return updatePrivacySettings(newSettings);
   };
@@ -76,6 +74,6 @@ export const usePrivacyManagement = ({
     isLoading,
     error,
     updatePrivacySettings,
-    handlePrivacySettingsChange,
+    handlePrivacySettingsChange
   };
 };

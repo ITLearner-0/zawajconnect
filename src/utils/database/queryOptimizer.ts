@@ -1,25 +1,27 @@
+
 import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Query optimizer that leverages database indexes for better performance
  */
 export class QueryOptimizer {
+  
   /**
    * Optimized profile search using composite indexes
    */
-  static async searchProfiles(
-    filters: {
-      gender?: string;
-      location?: string;
-      minAge?: number;
-      maxAge?: number;
-      religiousPractice?: string;
-      educationLevel?: string;
-      verified?: boolean;
-    },
-    limit: number = 20
-  ) {
-    let query = supabase.from('profiles').select('*').eq('is_visible', true); // Uses idx_profiles_visible_gender/location
+  static async searchProfiles(filters: {
+    gender?: string;
+    location?: string;
+    minAge?: number;
+    maxAge?: number;
+    religiousPractice?: string;
+    educationLevel?: string;
+    verified?: boolean;
+  }, limit: number = 20) {
+    let query = supabase
+      .from('profiles')
+      .select('*')
+      .eq('is_visible', true); // Uses idx_profiles_visible_gender/location
 
     // Apply filters in order of index selectivity
     if (filters.gender) {
@@ -45,19 +47,21 @@ export class QueryOptimizer {
     // Age filtering using birth_date index
     if (filters.minAge || filters.maxAge) {
       const currentDate = new Date();
-
+      
       if (filters.maxAge) {
         const minBirthDate = new Date(currentDate.getFullYear() - filters.maxAge, 0, 1);
         query = query.gte('birth_date', minBirthDate.toISOString().split('T')[0]);
       }
-
+      
       if (filters.minAge) {
         const maxBirthDate = new Date(currentDate.getFullYear() - filters.minAge, 11, 31);
         query = query.lte('birth_date', maxBirthDate.toISOString().split('T')[0]);
       }
     }
 
-    return await query.order('created_at', { ascending: false }).limit(limit);
+    return await query
+      .order('created_at', { ascending: false })
+      .limit(limit);
   }
 
   /**
@@ -77,11 +81,7 @@ export class QueryOptimizer {
   /**
    * Optimized conversation messages with pagination
    */
-  static async getConversationMessages(
-    conversationId: string,
-    limit: number = 50,
-    before?: string
-  ) {
+  static async getConversationMessages(conversationId: string, limit: number = 50, before?: string) {
     let query = supabase
       .from('messages')
       .select('*')
@@ -102,8 +102,7 @@ export class QueryOptimizer {
     // Uses idx_conversations_participants GIN index
     return await supabase
       .from('conversations')
-      .select(
-        `
+      .select(`
         id,
         participants,
         wali_supervised,
@@ -116,8 +115,7 @@ export class QueryOptimizer {
           sender_id,
           is_read
         )
-      `
-      )
+      `)
       .contains('participants', [userId])
       .order('created_at', { ascending: false }); // Uses idx_conversations_created_at
   }
@@ -127,7 +125,7 @@ export class QueryOptimizer {
    */
   static async getUnreadNotifications(userId: string, limit: number = 20) {
     // Uses idx_match_notifications_user_unread composite index
-    return await supabase
+    return await (supabase as any)
       .from('match_notifications')
       .select('*')
       .eq('user_id', userId)
@@ -141,7 +139,7 @@ export class QueryOptimizer {
    */
   static async getPendingChatRequests(recipientId: string) {
     // Uses idx_chat_requests_recipient_id and idx_chat_requests_status
-    return await supabase
+    return await (supabase as any)
       .from('chat_requests')
       .select('*')
       .eq('recipient_id', recipientId)
@@ -154,7 +152,7 @@ export class QueryOptimizer {
    */
   static async getWaliChatRequests(waliId: string) {
     // Uses idx_chat_requests_wali_id
-    return await supabase
+    return await (supabase as any)
       .from('chat_requests')
       .select('*')
       .eq('wali_id', waliId)
@@ -192,18 +190,16 @@ export class QueryOptimizer {
         .select('*')
         .eq('receiver_id', userId)
         .order('started_at', { ascending: false })
-        .limit(limit),
+        .limit(limit)
     ]);
 
     if (initiatedCalls.error || receivedCalls.error) {
       return { data: null, error: initiatedCalls.error || receivedCalls.error };
     }
 
-    // Combine and sort by started_at
+    // Combine and sort by start_time
     const allCalls = [...(initiatedCalls.data || []), ...(receivedCalls.data || [])]
-      .sort(
-        (a, b) => new Date(b.started_at || '').getTime() - new Date(a.started_at || '').getTime()
-      )
+      .sort((a, b) => new Date(b.start_time || '').getTime() - new Date(a.start_time || '').getTime())
       .slice(0, limit);
 
     return { data: allCalls, error: null };

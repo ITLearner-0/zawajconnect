@@ -24,7 +24,7 @@ const EducationCareer = ({ formData, handleChange }: EducationCareerProps) => (
             Education Level
           </Label>
           <TooltipProvider>
-            <FieldTooltip text={fieldTooltips.education} />
+            <FieldTooltip content={fieldTooltips.education} />
           </TooltipProvider>
         </div>
         <Input
@@ -47,7 +47,7 @@ const EducationCareer = ({ formData, handleChange }: EducationCareerProps) => (
             Occupation
           </Label>
           <TooltipProvider>
-            <FieldTooltip text={fieldTooltips.occupation} />
+            <FieldTooltip content={fieldTooltips.occupation} />
           </TooltipProvider>
         </div>
         <Input

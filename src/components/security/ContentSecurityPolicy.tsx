@@ -25,10 +25,9 @@ export const ContentSecurityPolicy = () => {
     }
 
     return () => {
-      // Cleanup on unmount
-      const existingMeta = document.querySelector('meta[http-equiv="Content-Security-Policy"]');
-      if (existingMeta && existingMeta === cspMeta) {
-        document.head.removeChild(cspMeta);
+      // Cleanup on unmount - safely remove only if it's still in the DOM
+      if (cspMeta.parentNode) {
+        cspMeta.parentNode.removeChild(cspMeta);
       }
     };
   }, []);

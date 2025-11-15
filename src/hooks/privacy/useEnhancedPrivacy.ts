@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -18,10 +19,10 @@ const DEFAULT_ENHANCED_PRIVACY: EnhancedPrivacySettings = {
       education: true,
       religious: true,
       personal: true,
-      contact: false,
+      contact: false
     },
     requiresCompatibilityScore: 70,
-    autoRevealAfterDays: 7,
+    autoRevealAfterDays: 7
   },
   incognito: {
     enabled: false,
@@ -29,7 +30,7 @@ const DEFAULT_ENHANCED_PRIVACY: EnhancedPrivacySettings = {
     hideLastActive: false,
     hideViewHistory: false,
     limitProfileViews: false,
-    maxProfileViewsPerDay: 0,
+    maxProfileViewsPerDay: 0
   },
   profileVisibility: {
     whoCanSeeProfile: 'everyone',
@@ -39,22 +40,21 @@ const DEFAULT_ENHANCED_PRIVACY: EnhancedPrivacySettings = {
       requireWaliApproval: false,
       allowedAgeRange: [18, 50],
       allowedLocations: [],
-      blockedUsers: [],
+      blockedUsers: []
     },
     showInSearchResults: true,
-    allowProfileScreenshots: true,
+    allowProfileScreenshots: true
   },
   dataRetention: {
     deleteViewHistoryAfterDays: 30,
     deleteConversationsAfterDays: 365,
-    autoDeleteRejectedMatches: false,
-  },
+    autoDeleteRejectedMatches: false
+  }
 };
 
 export const useEnhancedPrivacy = (userId?: string) => {
   const { toast } = useToast();
-  const [privacySettings, setPrivacySettings] =
-    useState<EnhancedPrivacySettings>(DEFAULT_ENHANCED_PRIVACY);
+  const [privacySettings, setPrivacySettings] = useState<EnhancedPrivacySettings>(DEFAULT_ENHANCED_PRIVACY);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,7 +69,7 @@ export const useEnhancedPrivacy = (userId?: string) => {
 
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('profiles')
         .select('privacy_settings')
         .eq('id', userId)
@@ -79,16 +79,15 @@ export const useEnhancedPrivacy = (userId?: string) => {
         throw new Error(error.message);
       }
 
-      if (data?.privacy_settings) {
-        const settings =
-          typeof data.privacy_settings === 'string'
-            ? JSON.parse(data.privacy_settings)
-            : data.privacy_settings;
-
+      if ((data as any)?.privacy_settings) {
+        const settings = typeof (data as any).privacy_settings === 'string' 
+          ? JSON.parse((data as any).privacy_settings) 
+          : (data as any).privacy_settings;
+        
         // Merge with defaults to ensure all fields exist
         setPrivacySettings({
           ...DEFAULT_ENHANCED_PRIVACY,
-          ...settings,
+          ...settings
         });
       }
     } catch (err: any) {
@@ -105,8 +104,8 @@ export const useEnhancedPrivacy = (userId?: string) => {
     try {
       // Convert to a plain object that Supabase can handle
       const settingsJson = JSON.parse(JSON.stringify(newSettings));
-
-      const { error } = await supabase
+      
+      const { error } = await (supabase as any)
         .from('profiles')
         .update({ privacy_settings: settingsJson })
         .eq('id', userId);
@@ -116,12 +115,12 @@ export const useEnhancedPrivacy = (userId?: string) => {
       }
 
       setPrivacySettings(newSettings);
-
+      
       toast({
         title: 'Privacy Settings Updated',
         description: 'Your privacy preferences have been saved successfully.',
       });
-
+      
       return true;
     } catch (err: any) {
       setError(err.message);
@@ -144,7 +143,7 @@ export const useEnhancedPrivacy = (userId?: string) => {
     try {
       // Check if viewer is in incognito mode
       const viewerIncognito = await incognitoService.checkIncognitoStatus(viewerId);
-
+      
       if (viewerIncognito) {
         const canView = await incognitoService.checkDailyViewLimit(viewerId, targetProfile.id);
         if (!canView) {
@@ -176,7 +175,7 @@ export const useEnhancedPrivacy = (userId?: string) => {
       return {
         ...filteredProfile,
         revealLevel,
-        isFiltered: revealLevel !== 'contact',
+        isFiltered: revealLevel !== 'contact'
       };
     } catch (error) {
       console.error('Error filtering profile:', error);
@@ -202,23 +201,16 @@ export const useEnhancedPrivacy = (userId?: string) => {
 
       case 'matches_only':
         // Would need to check if users are matches
-        return compatibilityScore && compatibilityScore >= 60;
+        return !!(compatibilityScore && compatibilityScore >= 60);
 
       case 'verified_only':
-        return (
-          viewerProfile?.email_verified ||
-          viewerProfile?.phone_verified ||
-          viewerProfile?.id_verified
-        );
+        return viewerProfile?.email_verified || viewerProfile?.phone_verified || viewerProfile?.id_verified;
 
       case 'custom':
         const criteria = visibility.customCriteria;
-
+        
         // Check compatibility score
-        if (
-          criteria.minCompatibilityScore &&
-          (!compatibilityScore || compatibilityScore < criteria.minCompatibilityScore)
-        ) {
+        if (criteria.minCompatibilityScore && (!compatibilityScore || compatibilityScore < criteria.minCompatibilityScore)) {
           return false;
         }
 
@@ -247,6 +239,6 @@ export const useEnhancedPrivacy = (userId?: string) => {
     getFilteredProfile,
     checkProfileVisibility,
     progressiveRevealService,
-    incognitoService,
+    incognitoService
   };
 };

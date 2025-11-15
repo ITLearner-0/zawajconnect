@@ -72,11 +72,11 @@ const QuestionDisplay = ({
           <TabsContent value="response" className="py-6 space-y-6">
             <div className="space-y-4">
               <div className="text-center">
-                <div className={`text-2xl font-bold ${currentLevel.color} mb-2`}>
-                  {currentLevel.label}
+                <div className={`text-2xl font-bold ${currentLevel?.color ?? 'text-gray-500'} mb-2`}>
+                  {currentLevel?.label ?? 'N'}
                 </div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">
-                  {currentLevel.fullLabel}
+                  {currentLevel?.fullLabel ?? 'Neutre'}
                 </div>
               </div>
 

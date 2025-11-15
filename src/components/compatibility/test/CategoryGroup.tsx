@@ -1,8 +1,9 @@
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { ChevronDown, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { useState } from "react";
 
 interface CategoryGroupProps {
   category: string;
@@ -12,32 +13,32 @@ interface CategoryGroupProps {
   totalQuestions: number;
 }
 
-const CategoryGroup = ({
-  category,
-  questions,
-  currentQuestionIndex,
-  answers,
-  totalQuestions,
+const CategoryGroup = ({ 
+  category, 
+  questions, 
+  currentQuestionIndex, 
+  answers, 
+  totalQuestions 
 }: CategoryGroupProps) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  
   const categoryQuestionIndices = questions.map((_, idx) => idx);
-  const answeredInCategory = categoryQuestionIndices.filter((idx) => answers[idx]).length;
+  const answeredInCategory = categoryQuestionIndices.filter(idx => answers[idx]).length;
   const isCurrentCategory = categoryQuestionIndices.includes(currentQuestionIndex);
   const progress = (answeredInCategory / questions.length) * 100;
-
+  
   const getStatusColor = () => {
-    if (progress === 100) return 'bg-green-500';
-    if (isCurrentCategory) return 'bg-blue-500';
-    if (progress > 0) return 'bg-yellow-500';
-    return 'bg-gray-300';
+    if (progress === 100) return "bg-green-500";
+    if (isCurrentCategory) return "bg-blue-500";
+    if (progress > 0) return "bg-yellow-500";
+    return "bg-gray-300";
   };
 
   const getStatusText = () => {
-    if (progress === 100) return 'Terminé';
-    if (isCurrentCategory) return 'En cours';
-    if (progress > 0) return 'Commencé';
-    return 'À faire';
+    if (progress === 100) return "Terminé";
+    if (isCurrentCategory) return "En cours";
+    if (progress > 0) return "Commencé";
+    return "À faire";
   };
 
   return (
@@ -53,15 +54,15 @@ const CategoryGroup = ({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge
-            variant={isCurrentCategory ? 'default' : 'outline'}
+          <Badge 
+            variant={isCurrentCategory ? "default" : "outline"}
             className={`${getStatusColor()} text-white text-xs`}
           >
             {getStatusText()}
           </Badge>
         </div>
       </CollapsibleTrigger>
-
+      
       <CollapsibleContent className="px-4 pb-4">
         <div className="space-y-3">
           <div className="flex items-center gap-2">
@@ -70,45 +71,41 @@ const CategoryGroup = ({
               {Math.round(progress)}%
             </span>
           </div>
-
+          
           <div className="grid gap-2">
             {questions.map((question, localIdx) => {
-              const globalIdx = categoryQuestionIndices[localIdx];
+              const globalIdx = categoryQuestionIndices[localIdx] ?? 0;
               const isAnswered = !!answers[globalIdx];
               const isCurrent = globalIdx === currentQuestionIndex;
-
+              
               return (
                 <div
                   key={question.id}
                   className={`p-2 rounded text-sm border ${
-                    isCurrent
-                      ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700'
-                      : isAnswered
-                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700'
-                        : 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                    isCurrent 
+                      ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700" 
+                      : isAnswered 
+                        ? "bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700"
+                        : "bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <div
-                      className={`w-2 h-2 rounded-full ${
-                        isCurrent ? 'bg-blue-500' : isAnswered ? 'bg-green-500' : 'bg-gray-300'
-                      }`}
-                    />
+                    <div className={`w-2 h-2 rounded-full ${
+                      isCurrent ? "bg-blue-500" : isAnswered ? "bg-green-500" : "bg-gray-300"
+                    }`} />
                     <span className="text-xs text-gray-600 dark:text-gray-400">
                       Q{globalIdx + 1}
                     </span>
-                    <span
-                      className={`flex-1 ${
-                        isCurrent ? 'font-medium text-blue-900 dark:text-blue-100' : ''
-                      }`}
-                    >
+                    <span className={`flex-1 ${
+                      isCurrent ? "font-medium text-blue-900 dark:text-blue-100" : ""
+                    }`}>
                       {question.question}
                     </span>
                   </div>
-                  {isAnswered && (
+                   {isAnswered && answers[globalIdx] && (
                     <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
-                      Réponse: {answers[globalIdx].value}%
-                      {answers[globalIdx].isBreaker && ' (Critère non négociable)'}
+                      Réponse: {answers[globalIdx]?.value ?? 0}% 
+                      {answers[globalIdx]?.isBreaker && " (Critère non négociable)"}
                     </div>
                   )}
                 </div>
