@@ -223,6 +223,7 @@ jobs:
     needs: build
     permissions:
       contents: read
+      issues: write
       pull-requests: write
     steps:
       - name: Checkout code
