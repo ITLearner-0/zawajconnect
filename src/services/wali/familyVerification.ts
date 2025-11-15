@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface FamilyRelationshipVerification {
@@ -43,11 +42,11 @@ export class FamilyVerificationService {
           managed_user_id: data.managed_user_id,
           relationship_type: data.relationship_type,
           verification_method: data.verification_method,
-          documents_submitted: data.documents?.map(d => d.url) || [],
+          documents_submitted: data.documents?.map((d) => d.url) || [],
           witness_contacts: data.witness_contacts || [],
           community_references: data.community_references || [],
           verification_notes: data.verification_notes,
-          verification_status: 'pending'
+          verification_status: 'pending',
         })
         .select('id')
         .single();
@@ -61,7 +60,10 @@ export class FamilyVerificationService {
     }
   }
 
-  static async getVerificationStatus(wali_id: string, managed_user_id: string): Promise<FamilyRelationshipVerification | null> {
+  static async getVerificationStatus(
+    wali_id: string,
+    managed_user_id: string
+  ): Promise<FamilyRelationshipVerification | null> {
     try {
       const { data, error } = await (supabase as any)
         .from('family_relationship_verifications')
@@ -73,12 +75,27 @@ export class FamilyVerificationService {
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      const verification: FamilyRelationshipVerification | null = data ? {
-        ...data,
-        relationship_type: data.relationship_type as 'father' | 'brother' | 'uncle' | 'grandfather' | 'other',
-        verification_method: data.verification_method as 'document' | 'witness' | 'community' | 'self_declaration',
-        verification_status: data.verification_status as 'pending' | 'verified' | 'rejected' | 'requires_review'
-      } : null;
+      const verification: FamilyRelationshipVerification | null = data
+        ? {
+            ...data,
+            relationship_type: data.relationship_type as
+              | 'father'
+              | 'brother'
+              | 'uncle'
+              | 'grandfather'
+              | 'other',
+            verification_method: data.verification_method as
+              | 'document'
+              | 'witness'
+              | 'community'
+              | 'self_declaration',
+            verification_status: data.verification_status as
+              | 'pending'
+              | 'verified'
+              | 'rejected'
+              | 'requires_review',
+          }
+        : null;
       return verification;
     } catch (error) {
       console.error('Error fetching verification status:', error);
@@ -99,7 +116,7 @@ export class FamilyVerificationService {
           verification_status: status,
           verification_notes: notes,
           verified_by: verifiedBy,
-          verified_at: status === 'verified' ? new Date().toISOString() : null
+          verified_at: status === 'verified' ? new Date().toISOString() : null,
         })
         .eq('id', verificationId);
 

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 
 interface PerformanceMetrics {
@@ -14,8 +13,10 @@ const PerformanceMonitor = () => {
     if (typeof window === 'undefined' || !window.performance) return;
 
     const measurePerformance = () => {
-      const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      
+      const navigation = performance.getEntriesByType(
+        'navigation'
+      )[0] as PerformanceNavigationTiming;
+
       let fcp = 0;
       let lcp = 0;
 
@@ -33,7 +34,7 @@ const PerformanceMonitor = () => {
           }
         }
       });
-      
+
       try {
         observer.observe({ entryTypes: ['largest-contentful-paint'] });
       } catch (e) {
@@ -43,7 +44,7 @@ const PerformanceMonitor = () => {
       setMetrics({
         loadTime: navigation.loadEventEnd - navigation.fetchStart,
         firstContentfulPaint: fcp,
-        largestContentfulPaint: lcp
+        largestContentfulPaint: lcp,
       });
     };
 

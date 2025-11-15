@@ -9,7 +9,13 @@ import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import MatchReviewCard from '@/components/family-approval/MatchReviewCard';
 import {
@@ -27,7 +33,7 @@ import {
   Shield,
   ThumbsUp,
   ThumbsDown,
-  Eye
+  Eye,
 } from 'lucide-react';
 
 interface Match {
@@ -96,8 +102,8 @@ const ParentalApprovalWorkflow = () => {
       if (familyError) throw familyError;
 
       if (familyData && familyData.length > 0) {
-        const userIds = familyData.map(f => f.user_id);
-        
+        const userIds = familyData.map((f) => f.user_id);
+
         const { data: matchesData, error: matchesError } = await supabase
           .from('matches')
           .select('*')
@@ -124,28 +130,30 @@ const ParentalApprovalWorkflow = () => {
                 location: '',
                 profession: '',
                 avatar_url: undefined,
-                bio: ''
-              }
+                bio: '',
+              },
             };
           })
         );
 
-        setMatches(matchesWithProfiles.map(m => {
-          const profiles = m.profiles as any;
-          return {
-            ...m,
-            match_score: m.match_score ?? 0,
-            is_mutual: m.is_mutual ?? false,
-            profiles: {
-              full_name: profiles?.full_name ?? 'Utilisateur',
-              age: profiles?.age ?? 0,
-              location: profiles?.location ?? '',
-              profession: profiles?.profession ?? '',
-              avatar_url: profiles?.avatar_url ?? undefined,
-              bio: profiles?.bio ?? undefined
-            }
-          };
-        }) as Match[]);
+        setMatches(
+          matchesWithProfiles.map((m) => {
+            const profiles = m.profiles as any;
+            return {
+              ...m,
+              match_score: m.match_score ?? 0,
+              is_mutual: m.is_mutual ?? false,
+              profiles: {
+                full_name: profiles?.full_name ?? 'Utilisateur',
+                age: profiles?.age ?? 0,
+                location: profiles?.location ?? '',
+                profession: profiles?.profession ?? '',
+                avatar_url: profiles?.avatar_url ?? undefined,
+                bio: profiles?.bio ?? undefined,
+              },
+            };
+          }) as Match[]
+        );
       }
     } catch (error) {
       console.error('Error fetching matches:', error);
@@ -165,42 +173,46 @@ const ParentalApprovalWorkflow = () => {
         .eq('invitation_status', 'accepted');
 
       if (error) throw error;
-      setFamilyMembers((data || []).map(fm => ({
-        ...fm,
-        is_wali: fm.is_wali ?? false,
-        can_communicate: fm.can_communicate ?? false,
-        can_view_profile: fm.can_view_profile ?? false,
-        invitation_status: fm.invitation_status ?? 'pending',
-        invitation_sent_at: fm.invitation_sent_at ?? undefined,
-        invitation_accepted_at: fm.invitation_accepted_at ?? undefined,
-        invitation_token: fm.invitation_token ?? undefined
-      })));
+      setFamilyMembers(
+        (data || []).map((fm) => ({
+          ...fm,
+          is_wali: fm.is_wali ?? false,
+          can_communicate: fm.can_communicate ?? false,
+          can_view_profile: fm.can_view_profile ?? false,
+          invitation_status: fm.invitation_status ?? 'pending',
+          invitation_sent_at: fm.invitation_sent_at ?? undefined,
+          invitation_accepted_at: fm.invitation_accepted_at ?? undefined,
+          invitation_token: fm.invitation_token ?? undefined,
+        }))
+      );
     } catch (error) {
       console.error('Error fetching family members:', error);
     }
   };
 
-  const handleApproval = async (requestId: string, status: 'approved' | 'rejected', notes?: string) => {
+  const handleApproval = async (
+    requestId: string,
+    status: 'approved' | 'rejected',
+    notes?: string
+  ) => {
     try {
       // Insert into family_reviews table
-      const familyMemberId = familyMembers.find(fm => fm.id === user?.id)?.id;
+      const familyMemberId = familyMembers.find((fm) => fm.id === user?.id)?.id;
       if (!familyMemberId) {
         throw new Error('Family member not found');
       }
 
-      const { error } = await supabase
-        .from('family_reviews')
-        .insert({
-          match_id: requestId,
-          family_member_id: familyMemberId,
-          status,
-          notes: notes || null
-        });
+      const { error } = await supabase.from('family_reviews').insert({
+        match_id: requestId,
+        family_member_id: familyMemberId,
+        status,
+        notes: notes || null,
+      });
 
       if (error) throw error;
 
       // Update the overall match status if this is from a Wali
-      const familyMember = familyMembers.find(fm => fm.id === user?.id);
+      const familyMember = familyMembers.find((fm) => fm.id === user?.id);
       if (familyMember?.is_wali) {
         await supabase
           .from('matches')
@@ -208,51 +220,50 @@ const ParentalApprovalWorkflow = () => {
             family_approved: status === 'approved',
             family_notes: notes,
             family_reviewed_at: new Date().toISOString(),
-            family_reviewer_id: familyMember.id
+            family_reviewer_id: familyMember.id,
           })
           .eq('id', requestId);
       }
 
       toast({
-        title: status === 'approved' ? "Approuvé" : "Réserves exprimées",
-        description: `Votre avis a été enregistré avec succès.`
+        title: status === 'approved' ? 'Approuvé' : 'Réserves exprimées',
+        description: `Votre avis a été enregistré avec succès.`,
       });
 
       fetchMatches();
     } catch (error) {
       console.error('Error recording approval decision:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'enregistrer votre décision",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
 
   const scheduleDiscussion = async (matchId: string) => {
     try {
-      const targetMatch = matches.find(m => m.id === matchId);
+      const targetMatch = matches.find((m) => m.id === matchId);
       if (targetMatch && user?.id) {
         await supabase.rpc('create_notification', {
           target_user_id: targetMatch.user1_id,
           notification_type: 'family_meeting',
           notification_title: 'Réunion familiale programmée',
           notification_content: 'Une discussion familiale a été programmée pour examiner ce match.',
-          sender_user_id: user.id
+          sender_user_id: user.id,
         });
       }
 
       toast({
-        title: "Discussion programmée",
-        description: "Une réunion familiale a été programmée"
+        title: 'Discussion programmée',
+        description: 'Une réunion familiale a été programmée',
       });
-
     } catch (error) {
       console.error('Error scheduling discussion:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de programmer la discussion",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de programmer la discussion',
+        variant: 'destructive',
       });
     }
   };
@@ -263,7 +274,7 @@ const ParentalApprovalWorkflow = () => {
         <div className="animate-pulse">
           <div className="h-8 bg-muted rounded w-1/3 mb-4"></div>
           <div className="space-y-4">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="h-32 bg-muted rounded"></div>
             ))}
           </div>
@@ -272,8 +283,8 @@ const ParentalApprovalWorkflow = () => {
     );
   }
 
-  const pendingMatches = matches.filter(m => !reviews[m.id]?.length);
-  const reviewedMatches = matches.filter(m => reviews[m.id]?.length);
+  const pendingMatches = matches.filter((m) => !reviews[m.id]?.length);
+  const reviewedMatches = matches.filter((m) => reviews[m.id]?.length);
 
   return (
     <div className="space-y-6">
@@ -344,15 +355,9 @@ const ParentalApprovalWorkflow = () => {
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <ResponsiveTabsList tabCount={3}>
-          <TabsTrigger value="pending">
-            À examiner ({pendingMatches.length})
-          </TabsTrigger>
-          <TabsTrigger value="reviewed">
-            Examinés ({reviewedMatches.length})
-          </TabsTrigger>
-          <TabsTrigger value="guidance">
-            Guidance islamique
-          </TabsTrigger>
+          <TabsTrigger value="pending">À examiner ({pendingMatches.length})</TabsTrigger>
+          <TabsTrigger value="reviewed">Examinés ({reviewedMatches.length})</TabsTrigger>
+          <TabsTrigger value="guidance">Guidance islamique</TabsTrigger>
         </ResponsiveTabsList>
 
         <TabsContent value="pending" className="space-y-4">
@@ -405,24 +410,33 @@ const ParentalApprovalWorkflow = () => {
                   <h4 className="font-semibold text-foreground mb-3">Critères Prioritaires</h4>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
-                    <div className="h-1.5 w-1.5 bg-success rounded-full mt-2 flex-shrink-0"></div>
-                      <span><strong>Dīn (Religion):</strong> Piété, pratique religieuse, connaissance islamique</span>
+                      <div className="h-1.5 w-1.5 bg-success rounded-full mt-2 flex-shrink-0"></div>
+                      <span>
+                        <strong>Dīn (Religion):</strong> Piété, pratique religieuse, connaissance
+                        islamique
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="h-1.5 w-1.5 bg-success rounded-full mt-2 flex-shrink-0"></div>
-                      <span><strong>Akhlāq (Caractère):</strong> Comportement, éthique, respect</span>
+                      <span>
+                        <strong>Akhlāq (Caractère):</strong> Comportement, éthique, respect
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="h-1.5 w-1.5 bg-emerald rounded-full mt-2 flex-shrink-0"></div>
-                      <span><strong>Compatibilité:</strong> Objectifs de vie, valeurs familiales</span>
+                      <span>
+                        <strong>Compatibilité:</strong> Objectifs de vie, valeurs familiales
+                      </span>
                     </li>
                     <li className="flex items-start gap-2">
                       <div className="h-1.5 w-1.5 bg-emerald rounded-full mt-2 flex-shrink-0"></div>
-                      <span><strong>Stabilité:</strong> Situation professionnelle et personnelle</span>
+                      <span>
+                        <strong>Stabilité:</strong> Situation professionnelle et personnelle
+                      </span>
                     </li>
                   </ul>
                 </div>
-                
+
                 <div>
                   <h4 className="font-semibold text-foreground mb-3">Points d'Attention</h4>
                   <ul className="space-y-2 text-sm">
@@ -457,8 +471,9 @@ const ParentalApprovalWorkflow = () => {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground mb-4">
-                Le wali (tuteur) a la responsabilité religieuse d'approuver le mariage et de s'assurer 
-                que le candidat convient selon les critères islamiques. Cette responsabilité implique :
+                Le wali (tuteur) a la responsabilité religieuse d'approuver le mariage et de
+                s'assurer que le candidat convient selon les critères islamiques. Cette
+                responsabilité implique :
               </p>
               <ul className="space-y-2 text-sm">
                 <li className="flex items-start gap-2">

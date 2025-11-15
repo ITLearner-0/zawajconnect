@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useEnhancedLazyLoading } from './useEnhancedLazyLoading';
 
@@ -14,11 +13,7 @@ interface UseAccessibleLazyLoadingOptions {
 export const useAccessibleLazyLoading = <T extends HTMLElement = HTMLDivElement>(
   options: UseAccessibleLazyLoadingOptions = {}
 ) => {
-  const {
-    respectReducedMotion = true,
-    announceLoading = true,
-    ...lazyOptions
-  } = options;
+  const { respectReducedMotion = true, announceLoading = true, ...lazyOptions } = options;
 
   const [reducedMotion, setReducedMotion] = useState(false);
   const [announcement, setAnnouncement] = useState<string>('');
@@ -46,7 +41,7 @@ export const useAccessibleLazyLoading = <T extends HTMLElement = HTMLDivElement>
 
     if (isIntersecting && shouldLoad) {
       setAnnouncement('Loading content');
-      
+
       // Clear announcement after a delay
       const timer = setTimeout(() => {
         setAnnouncement('');

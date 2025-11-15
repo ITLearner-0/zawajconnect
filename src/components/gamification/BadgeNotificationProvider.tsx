@@ -6,15 +6,15 @@ import { useBadgeNotifications } from '@/hooks/gamification/useBadgeNotification
  * Provider component that handles badge notifications globally
  * Should be placed in the app layout to show notifications across all pages
  */
-export const BadgeNotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
-  children 
+export const BadgeNotificationProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
 }) => {
   const { currentNotification, closeNotification } = useBadgeNotifications();
 
   return (
     <>
       {children}
-      
+
       {currentNotification && (
         <BadgeNotification
           badge={currentNotification.badge}

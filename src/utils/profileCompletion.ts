@@ -36,10 +36,10 @@ export const calculateProfileCompletionPercentage = (
 
   // Section 1: Basic Info (full_name, education, profession, location)
   const hasBasicInfo = Boolean(
-    profile.full_name && 
-    (profile.education || profile.education_level) && 
-    (profile.profession || profile.occupation) && 
-    profile.location
+    profile.full_name &&
+      (profile.education || profile.education_level) &&
+      (profile.profession || profile.occupation) &&
+      profile.location
   );
   if (hasBasicInfo) completedSections++;
 
@@ -50,17 +50,12 @@ export const calculateProfileCompletionPercentage = (
 
   // Section 3: Interests
   const hasInterests = Boolean(
-    profile.interests && 
-    Array.isArray(profile.interests) && 
-    profile.interests.length >= 3
+    profile.interests && Array.isArray(profile.interests) && profile.interests.length >= 3
   );
   if (hasInterests) completedSections++;
 
   // Section 4: Islamic Preferences
-  const hasIslamicPrefs = Boolean(
-    islamicPrefs?.prayer_frequency && 
-    islamicPrefs?.quran_reading
-  );
+  const hasIslamicPrefs = Boolean(islamicPrefs?.prayer_frequency && islamicPrefs?.quran_reading);
   if (hasIslamicPrefs) completedSections++;
 
   // Section 5: Profile Photo

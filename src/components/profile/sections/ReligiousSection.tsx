@@ -1,66 +1,88 @@
-
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ProfileFormData } from "@/types/profile";
-import { Badge } from "@/components/ui/badge";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { ProfileFormData } from '@/types/profile';
+import { Badge } from '@/components/ui/badge';
 
 interface ReligiousSectionProps {
   formData: ProfileFormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => void;
   handleSelectChange: (field: keyof ProfileFormData, value: string) => void;
 }
 
-const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleChange, handleSelectChange }) => {
+const ReligiousSection: React.FC<ReligiousSectionProps> = ({
+  formData,
+  handleChange,
+  handleSelectChange,
+}) => {
   const religiousLevels = [
-    { value: "tres_pratiquant", label: "Très pratiquant" },
-    { value: "pratiquant", label: "Pratiquant" },
-    { value: "modere", label: "Modéré" },
-    { value: "peu_pratiquant", label: "Peu pratiquant" },
-    { value: "en_apprentissage", label: "En apprentissage" }
+    { value: 'tres_pratiquant', label: 'Très pratiquant' },
+    { value: 'pratiquant', label: 'Pratiquant' },
+    { value: 'modere', label: 'Modéré' },
+    { value: 'peu_pratiquant', label: 'Peu pratiquant' },
+    { value: 'en_apprentissage', label: 'En apprentissage' },
   ];
 
   const prayerFrequencies = [
-    { value: "5_fois", label: "5 fois par jour" },
-    { value: "irregulier", label: "Irrégulier" },
-    { value: "vendredi", label: "Vendredi seulement" },
-    { value: "occasions", label: "Lors d'occasions spéciales" },
-    { value: "rarement", label: "Rarement" }
+    { value: '5_fois', label: '5 fois par jour' },
+    { value: 'irregulier', label: 'Irrégulier' },
+    { value: 'vendredi', label: 'Vendredi seulement' },
+    { value: 'occasions', label: "Lors d'occasions spéciales" },
+    { value: 'rarement', label: 'Rarement' },
   ];
 
   const polygamyOptionsForMen = [
-    { value: "oui", label: "Oui, je souhaite pratiquer la polygamie" },
-    { value: "peut_etre", label: "Peut-être, selon les circonstances" },
-    { value: "non", label: "Non, je préfère la monogamie" }
+    { value: 'oui', label: 'Oui, je souhaite pratiquer la polygamie' },
+    { value: 'peut_etre', label: 'Peut-être, selon les circonstances' },
+    { value: 'non', label: 'Non, je préfère la monogamie' },
   ];
 
   const polygamyOptionsForWomen = [
-    { value: "accepte", label: "J'accepte la polygamie" },
-    { value: "conditionnelle", label: "J'accepte sous certaines conditions" },
-    { value: "refuse", label: "Je refuse la polygamie" }
+    { value: 'accepte', label: "J'accepte la polygamie" },
+    { value: 'conditionnelle', label: "J'accepte sous certaines conditions" },
+    { value: 'refuse', label: 'Je refuse la polygamie' },
   ];
 
   const madhabOptions = [
-    { value: "hanafi", label: "Hanafi" },
-    { value: "maliki", label: "Maliki" },
-    { value: "shafii", label: "Shafi'i" },
-    { value: "hanbali", label: "Hanbali" },
-    { value: "jafari", label: "Ja'fari" },
-    { value: "autre", label: "Autre" }
+    { value: 'hanafi', label: 'Hanafi' },
+    { value: 'maliki', label: 'Maliki' },
+    { value: 'shafii', label: "Shafi'i" },
+    { value: 'hanbali', label: 'Hanbali' },
+    { value: 'jafari', label: "Ja'fari" },
+    { value: 'autre', label: 'Autre' },
   ];
 
   const languageOptions = [
-    "Français", "Arabe", "Anglais", "Turc", "Ourdou", "Bengali", "Indonésien", "Malais", "Espagnol", "Allemand"
+    'Français',
+    'Arabe',
+    'Anglais',
+    'Turc',
+    'Ourdou',
+    'Bengali',
+    'Indonésien',
+    'Malais',
+    'Espagnol',
+    'Allemand',
   ];
 
-  const [selectedLanguages, setSelectedLanguages] = React.useState<string[]>(formData.languages || []);
+  const [selectedLanguages, setSelectedLanguages] = React.useState<string[]>(
+    formData.languages || []
+  );
 
   const toggleLanguage = (language: string) => {
     const newLanguages = selectedLanguages.includes(language)
-      ? selectedLanguages.filter(l => l !== language)
+      ? selectedLanguages.filter((l) => l !== language)
       : [...selectedLanguages, language];
-    
+
     setSelectedLanguages(newLanguages);
     handleSelectChange('languages', newLanguages.join(','));
   };
@@ -71,7 +93,10 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="religiousLevel">Niveau de Pratique Religieuse</Label>
-          <Select value={formData.religiousLevel || ""} onValueChange={(value) => handleSelectChange("religiousLevel", value)}>
+          <Select
+            value={formData.religiousLevel || ''}
+            onValueChange={(value) => handleSelectChange('religiousLevel', value)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Sélectionnez votre niveau de pratique" />
             </SelectTrigger>
@@ -87,7 +112,10 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
 
         <div className="space-y-2">
           <Label htmlFor="madhab">École Juridique (Madhab)</Label>
-          <Select value={formData.madhab || ""} onValueChange={(value) => handleSelectChange("madhab", value)}>
+          <Select
+            value={formData.madhab || ''}
+            onValueChange={(value) => handleSelectChange('madhab', value)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Sélectionnez votre madhab" />
             </SelectTrigger>
@@ -103,7 +131,10 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
 
         <div className="space-y-2">
           <Label htmlFor="prayerFrequency">Fréquence de Prière</Label>
-          <Select value={formData.prayerFrequency || ""} onValueChange={(value) => handleSelectChange("prayerFrequency", value)}>
+          <Select
+            value={formData.prayerFrequency || ''}
+            onValueChange={(value) => handleSelectChange('prayerFrequency', value)}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Sélectionnez votre fréquence de prière" />
             </SelectTrigger>
@@ -122,10 +153,10 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
       <div className="space-y-2">
         <Label>Langues parlées</Label>
         <div className="flex flex-wrap gap-2">
-          {languageOptions.map(language => (
+          {languageOptions.map((language) => (
             <Badge
               key={language}
-              variant={selectedLanguages.includes(language) ? "default" : "outline"}
+              variant={selectedLanguages.includes(language) ? 'default' : 'outline'}
               className="cursor-pointer"
               onClick={() => toggleLanguage(language)}
             >
@@ -142,24 +173,31 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
       {formData.gender && (
         <div className="space-y-2">
           <Label htmlFor="polygamyStance">
-            {formData.gender === "male" 
-              ? "Souhaitez-vous pratiquer la polygamie ?" 
-              : "Acceptez-vous la polygamie ?"}
+            {formData.gender === 'male'
+              ? 'Souhaitez-vous pratiquer la polygamie ?'
+              : 'Acceptez-vous la polygamie ?'}
           </Label>
-          <Select value={formData.polygamyStance || ""} onValueChange={(value) => handleSelectChange("polygamyStance", value)}>
+          <Select
+            value={formData.polygamyStance || ''}
+            onValueChange={(value) => handleSelectChange('polygamyStance', value)}
+          >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder={
-                formData.gender === "male" 
-                  ? "Sélectionnez votre position sur la polygamie" 
-                  : "Sélectionnez votre position sur la polygamie"
-              } />
+              <SelectValue
+                placeholder={
+                  formData.gender === 'male'
+                    ? 'Sélectionnez votre position sur la polygamie'
+                    : 'Sélectionnez votre position sur la polygamie'
+                }
+              />
             </SelectTrigger>
             <SelectContent className="bg-white dark:bg-gray-800 border shadow-lg z-50">
-              {(formData.gender === "male" ? polygamyOptionsForMen : polygamyOptionsForWomen).map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
+              {(formData.gender === 'male' ? polygamyOptionsForMen : polygamyOptionsForWomen).map(
+                (option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                )
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -170,7 +208,7 @@ const ReligiousSection: React.FC<ReligiousSectionProps> = ({ formData, handleCha
         <Input
           id="familyBackground"
           name="familyBackground"
-          value={formData.familyBackground || ""}
+          value={formData.familyBackground || ''}
           onChange={handleChange}
           placeholder="Décrivez votre contexte familial"
           className="w-full"

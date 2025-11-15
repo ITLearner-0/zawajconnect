@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -46,9 +45,10 @@ export const useProfileRecommendations = (userId?: string) => {
             id: 'about-me',
             type: 'content',
             title: 'Complétez votre description',
-            description: 'Une description détaillée augmente vos chances de trouver des correspondances compatibles.',
+            description:
+              'Une description détaillée augmente vos chances de trouver des correspondances compatibles.',
             priority: 'high',
-            actionText: 'Ajouter une description'
+            actionText: 'Ajouter une description',
           });
         }
 
@@ -58,9 +58,10 @@ export const useProfileRecommendations = (userId?: string) => {
             id: 'email-verification',
             type: 'verification',
             title: 'Vérifiez votre email',
-            description: 'La vérification de votre email augmente la confiance des autres utilisateurs.',
+            description:
+              'La vérification de votre email augmente la confiance des autres utilisateurs.',
             priority: 'high',
-            actionText: 'Vérifier mon email'
+            actionText: 'Vérifier mon email',
           });
         }
 
@@ -71,19 +72,23 @@ export const useProfileRecommendations = (userId?: string) => {
             title: 'Vérifiez votre téléphone',
             description: 'La vérification du téléphone améliore la sécurité de votre compte.',
             priority: 'medium',
-            actionText: 'Vérifier mon téléphone'
+            actionText: 'Vérifier mon téléphone',
           });
         }
 
         // Check for wali information if female
-        if ((profile as any).gender === 'female' && (!(profile as any).wali_name || !(profile as any).wali_contact)) {
+        if (
+          (profile as any).gender === 'female' &&
+          (!(profile as any).wali_name || !(profile as any).wali_contact)
+        ) {
           newRecommendations.push({
             id: 'wali-info',
             type: 'content',
             title: 'Ajoutez les informations de votre wali',
-            description: 'Les informations du wali facilitent la communication selon les principes islamiques.',
+            description:
+              'Les informations du wali facilitent la communication selon les principes islamiques.',
             priority: 'medium',
-            actionText: 'Ajouter les infos du wali'
+            actionText: 'Ajouter les infos du wali',
           });
         }
 
@@ -92,9 +97,10 @@ export const useProfileRecommendations = (userId?: string) => {
           id: 'take-compatibility-test',
           type: 'activity',
           title: 'Passez le test de compatibilité',
-          description: 'Le test de compatibilité vous aide à trouver des partenaires plus compatibles.',
+          description:
+            'Le test de compatibilité vous aide à trouver des partenaires plus compatibles.',
           priority: 'low',
-          actionText: 'Passer le test'
+          actionText: 'Passer le test',
         });
 
         setRecommendations(newRecommendations);
@@ -110,15 +116,15 @@ export const useProfileRecommendations = (userId?: string) => {
 
   const handleRecommendationAction = (recommendationId: string) => {
     // Remove the recommendation once action is taken
-    setRecommendations(prev => prev.filter(rec => rec.id !== recommendationId));
-    
+    setRecommendations((prev) => prev.filter((rec) => rec.id !== recommendationId));
+
     // In a real implementation, you would handle the specific action here
     console.log(`Action taken for recommendation: ${recommendationId}`);
   };
 
-  return { 
-    recommendations, 
-    loading, 
-    handleRecommendationAction 
+  return {
+    recommendations,
+    loading,
+    handleRecommendationAction,
   };
 };

@@ -1,10 +1,10 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { sendEmail } from "../_shared/smtp.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { sendEmail } from '../_shared/smtp.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface UnreadMessagesRequest {
@@ -15,35 +15,36 @@ interface UnreadMessagesRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { user_id, unread_count, sender_name, match_id }: UnreadMessagesRequest = await req.json();
+    const { user_id, unread_count, sender_name, match_id }: UnreadMessagesRequest =
+      await req.json();
 
     // Get user email and profile
     const { data: userData, error: userError } = await supabase.auth.admin.getUserById(user_id);
     if (userError || !userData.user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
 
     const userEmail = userData.user.email;
     if (!userEmail) {
-      throw new Error("User email not found");
+      throw new Error('User email not found');
     }
 
     const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("user_id", user_id)
+      .from('profiles')
+      .select('full_name')
+      .eq('user_id', user_id)
       .maybeSingle();
 
-    const userName = profile?.full_name || "Cher(e) membre";
+    const userName = profile?.full_name || 'Cher(e) membre';
 
     const emailHtml = `<!DOCTYPE html>
 <html>
@@ -98,7 +99,7 @@ const handler = async (req: Request): Promise<Response> => {
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
 <tr>
 <td style="text-align: center; padding: 30px 0;">
-<a href="${Deno.env.get("SUPABASE_URL") || 'https://dgfctwtivkqcfhwqgkya.supabase.co'}/chat/${match_id}" style="display: inline-block; background: #3b82f6; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px;">📬 Lire les messages</a>
+<a href="${Deno.env.get('SUPABASE_URL') || 'https://dgfctwtivkqcfhwqgkya.supabase.co'}/chat/${match_id}" style="display: inline-block; background: #3b82f6; color: #ffffff; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 16px;">📬 Lire les messages</a>
 </td>
 </tr>
 </table>
@@ -140,7 +141,7 @@ const handler = async (req: Request): Promise<Response> => {
       html: emailHtml,
     });
 
-    console.log("Unread messages reminder sent successfully to:", userEmail);
+    console.log('Unread messages reminder sent successfully to:', userEmail);
 
     return new Response(
       JSON.stringify({
@@ -149,13 +150,13 @@ const handler = async (req: Request): Promise<Response> => {
       {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           ...corsHeaders,
         },
       }
     );
   } catch (error: any) {
-    console.error("Error sending unread messages reminder:", error);
+    console.error('Error sending unread messages reminder:', error);
     return new Response(
       JSON.stringify({
         error: error.message,
@@ -164,7 +165,7 @@ const handler = async (req: Request): Promise<Response> => {
       {
         status: 500,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           ...corsHeaders,
         },
       }

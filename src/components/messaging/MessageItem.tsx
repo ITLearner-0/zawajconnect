@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Message } from '@/types/profile';
 import { format } from 'date-fns';
@@ -14,16 +13,16 @@ interface MessageItemProps {
 
 const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) => {
   // Format deletion date for display
-  const formattedDeletionDate = message.scheduled_deletion 
+  const formattedDeletionDate = message.scheduled_deletion
     ? format(new Date(message.scheduled_deletion), 'MMM d, yyyy')
     : null;
-    
+
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-      <div 
+      <div
         className={`max-w-[75%] rounded-lg p-3 relative group ${
-          isOwn 
-            ? 'bg-islamic-teal text-white dark:bg-islamic-darkTeal' 
+          isOwn
+            ? 'bg-islamic-teal text-white dark:bg-islamic-darkTeal'
             : 'bg-islamic-cream/70 text-islamic-burgundy dark:bg-islamic-darkCard/70 dark:text-islamic-cream'
         }`}
       >
@@ -32,7 +31,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) =
             <span className="text-xs opacity-70">
               {format(new Date(message.created_at), 'MMM d, h:mm a')}
             </span>
-            
+
             {/* Encryption indicator */}
             {message.encrypted && (
               <TooltipProvider>
@@ -46,7 +45,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) =
                 </Tooltip>
               </TooltipProvider>
             )}
-            
+
             {/* Expiration indicator */}
             {formattedDeletionDate && (
               <TooltipProvider>
@@ -61,7 +60,7 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) =
               </TooltipProvider>
             )}
           </div>
-          
+
           {/* Show filtered tag if message was filtered */}
           {message.is_filtered && (
             <span className="text-xs bg-islamic-brightGold/80 text-islamic-burgundy px-1 rounded dark:bg-islamic-darkBrightGold/80 dark:text-islamic-cream">
@@ -69,11 +68,13 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, isOwn, onReport }) =
             </span>
           )}
         </div>
-        
-        <p className={`${isOwn ? 'text-white dark:text-white' : 'text-islamic-burgundy dark:text-islamic-cream'}`}>
+
+        <p
+          className={`${isOwn ? 'text-white dark:text-white' : 'text-islamic-burgundy dark:text-islamic-cream'}`}
+        >
           {message.content}
         </p>
-        
+
         {/* Report button - only show for messages that aren't yours */}
         {!isOwn && onReport && (
           <Button

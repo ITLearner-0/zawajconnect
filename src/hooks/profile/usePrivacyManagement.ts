@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { PrivacySettings } from '@/types/profile';
@@ -8,7 +7,10 @@ interface UsePrivacyManagementProps {
   initialPrivacySettings: PrivacySettings | null;
 }
 
-export const usePrivacyManagement = ({ userId, initialPrivacySettings }: UsePrivacyManagementProps) => {
+export const usePrivacyManagement = ({
+  userId,
+  initialPrivacySettings,
+}: UsePrivacyManagementProps) => {
   const [privacySettings, setPrivacySettings] = useState<PrivacySettings>(
     initialPrivacySettings || {
       profileVisibilityLevel: 1,
@@ -32,7 +34,7 @@ export const usePrivacyManagement = ({ userId, initialPrivacySettings }: UsePriv
 
     try {
       const updatedSettings = { ...privacySettings, ...newSettings };
-      
+
       const { data, error } = await (supabase as any)
         .from('profiles')
         .update({ privacy_settings: updatedSettings })
@@ -57,14 +59,14 @@ export const usePrivacyManagement = ({ userId, initialPrivacySettings }: UsePriv
       setIsLoading(false);
     }
   };
-  
+
   const handlePrivacySettingsChange = (newSettings: Partial<PrivacySettings>) => {
     // Update local state first
-    setPrivacySettings(prevSettings => ({
+    setPrivacySettings((prevSettings) => ({
       ...prevSettings,
-      ...newSettings
+      ...newSettings,
     }));
-    
+
     // Then persist to database
     return updatePrivacySettings(newSettings);
   };
@@ -74,6 +76,6 @@ export const usePrivacyManagement = ({ userId, initialPrivacySettings }: UsePriv
     isLoading,
     error,
     updatePrivacySettings,
-    handlePrivacySettingsChange
+    handlePrivacySettingsChange,
   };
 };

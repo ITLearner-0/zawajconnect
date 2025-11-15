@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
-import { useAdminWaliAlerts, AdminWaliAlert, AlertsStatistics, AlertTrend } from '@/hooks/useAdminWaliAlerts';
+import {
+  useAdminWaliAlerts,
+  AdminWaliAlert,
+  AlertsStatistics,
+  AlertTrend,
+} from '@/hooks/useAdminWaliAlerts';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { ShieldAlert, RefreshCw, ArrowLeft } from 'lucide-react';
@@ -29,7 +34,7 @@ const AdminWaliAlertsPage = () => {
       const [alertsData, statsData, trendsData] = await Promise.all([
         getAlerts({ limit: 100 }),
         getStatistics(),
-        getTrends(30)
+        getTrends(30),
       ]);
 
       setAlerts(alertsData);
@@ -78,27 +83,16 @@ const AdminWaliAlertsPage = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate(-1)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour
           </Button>
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Alertes Wali</h1>
-            <p className="text-muted-foreground">
-              Gestion centralisée des alertes de sécurité
-            </p>
+            <p className="text-muted-foreground">Gestion centralisée des alertes de sécurité</p>
           </div>
         </div>
-        <Button
-          onClick={loadData}
-          disabled={refreshing || loading}
-          variant="outline"
-          size="sm"
-        >
+        <Button onClick={loadData} disabled={refreshing || loading} variant="outline" size="sm">
           <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
           Actualiser
         </Button>
@@ -111,11 +105,7 @@ const AdminWaliAlertsPage = () => {
       <AdminAlertsTrendChart trends={trends} loading={loading} />
 
       {/* Alerts Table */}
-      <AdminAlertsTable 
-        alerts={alerts} 
-        loading={loading}
-        onRefresh={loadData}
-      />
+      <AdminAlertsTable alerts={alerts} loading={loading} onRefresh={loadData} />
     </div>
   );
 };

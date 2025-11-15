@@ -35,6 +35,7 @@ This project follows Islamic principles and values. All contributors are expecte
 ### Initial Setup
 
 1. **Fork the repository**
+
    ```bash
    # Click "Fork" on GitHub
    # Then clone your fork
@@ -43,17 +44,20 @@ This project follows Islamic principles and values. All contributors are expecte
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set up environment**
+
    ```bash
    cp .env.example .env
    # Edit .env with your Supabase credentials
    ```
 
 4. **Start development server**
+
    ```bash
    npm run dev
    ```
@@ -295,20 +299,24 @@ Closes #123"
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 - [ ] All tests pass
 - [ ] New tests added
 - [ ] Manual testing completed
 
 ## Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Documentation updated
@@ -374,6 +382,7 @@ A clear description of what the bug is.
 
 **To Reproduce**
 Steps to reproduce:
+
 1. Go to '...'
 2. Click on '....'
 3. See error
@@ -385,6 +394,7 @@ What you expected to happen.
 If applicable, add screenshots.
 
 **Environment**
+
 - Browser: [e.g., Chrome 120]
 - OS: [e.g., Windows 11]
 - Device: [e.g., Desktop]

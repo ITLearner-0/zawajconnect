@@ -30,12 +30,14 @@ const AdminUsers = () => {
       if (error) throw error;
 
       // Fetch email from auth.users separately
-      const userIds = profiles?.map(p => p.user_id) || [];
-      const { data: { users: authUsers } } = await supabase.auth.admin.listUsers();
-      
-      const usersWithEmail = profiles?.map(profile => ({
+      const userIds = profiles?.map((p) => p.user_id) || [];
+      const {
+        data: { users: authUsers },
+      } = await supabase.auth.admin.listUsers();
+
+      const usersWithEmail = profiles?.map((profile) => ({
         ...profile,
-        email: authUsers?.find(u => u.id === profile.user_id)?.email || 'N/A'
+        email: authUsers?.find((u) => u.id === profile.user_id)?.email || 'N/A',
       }));
 
       return usersWithEmail;
@@ -45,14 +47,12 @@ const AdminUsers = () => {
   const { data: userRoles } = useQuery({
     queryKey: ['admin-user-roles'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
+      const { data, error } = await supabase.from('user_roles').select('user_id, role');
       if (error) throw error;
-      
+
       const rolesMap: Record<string, string[]> = {};
       if (data) {
-        data.forEach(ur => {
+        data.forEach((ur) => {
           const userId = ur.user_id;
           if (!rolesMap[userId]) {
             rolesMap[userId] = [];
@@ -66,16 +66,31 @@ const AdminUsers = () => {
 
   const getRoleBadge = (userId: string) => {
     if (!userRoles) return <Badge variant="outline">User</Badge>;
-    
+
     const roles = userRoles[userId] || [];
     if (roles.includes('super_admin')) {
-      return <Badge variant="destructive"><Shield className="h-3 w-3 mr-1" />Super Admin</Badge>;
+      return (
+        <Badge variant="destructive">
+          <Shield className="h-3 w-3 mr-1" />
+          Super Admin
+        </Badge>
+      );
     }
     if (roles.includes('admin')) {
-      return <Badge variant="default"><Shield className="h-3 w-3 mr-1" />Admin</Badge>;
+      return (
+        <Badge variant="default">
+          <Shield className="h-3 w-3 mr-1" />
+          Admin
+        </Badge>
+      );
     }
     if (roles.includes('moderator')) {
-      return <Badge variant="secondary"><UserCog className="h-3 w-3 mr-1" />Moderator</Badge>;
+      return (
+        <Badge variant="secondary">
+          <UserCog className="h-3 w-3 mr-1" />
+          Moderator
+        </Badge>
+      );
     }
     return <Badge variant="outline">User</Badge>;
   };
@@ -88,9 +103,7 @@ const AdminUsers = () => {
             <UserCog className="h-6 w-6" />
             Gestion des Utilisateurs
           </CardTitle>
-          <CardDescription>
-            Gérez les utilisateurs, leurs rôles et permissions
-          </CardDescription>
+          <CardDescription>Gérez les utilisateurs, leurs rôles et permissions</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="mb-6">
@@ -131,28 +144,30 @@ const AdminUsers = () => {
                   <div className="flex items-center gap-4">
                     <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                       {user.avatar_url ? (
-                        <img src={user.avatar_url} alt="" className="h-12 w-12 rounded-full object-cover" />
+                        <img
+                          src={user.avatar_url}
+                          alt=""
+                          className="h-12 w-12 rounded-full object-cover"
+                        />
                       ) : (
                         <span className="text-lg font-semibold text-primary">
-                          {user.full_name?.split(' ').map(n => n[0]).join('').slice(0, 2) || 'U'}
+                          {user.full_name
+                            ?.split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .slice(0, 2) || 'U'}
                         </span>
                       )}
                     </div>
                     <div>
-                      <div className="font-medium">
-                        {user.full_name || 'Nom non renseigné'}
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {user.email}
-                      </div>
+                      <div className="font-medium">{user.full_name || 'Nom non renseigné'}</div>
+                      <div className="text-sm text-muted-foreground">{user.email}</div>
                       <div className="text-xs text-muted-foreground mt-1">
                         Inscrit le {new Date(user.created_at).toLocaleDateString('fr-FR')}
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    {getRoleBadge(user.id)}
-                  </div>
+                  <div className="flex items-center gap-2">{getRoleBadge(user.id)}</div>
                 </div>
               ))}
             </div>

@@ -42,18 +42,21 @@ export const FamilyContactSecure = ({ familyMemberId }: Props) => {
 
     try {
       // Call the secure function to get contact info
-      const { data, error } = await supabase
-        .rpc('get_family_contact_secure', {
-          family_member_uuid: familyMemberId
-        });
+      const { data, error } = await supabase.rpc('get_family_contact_secure', {
+        family_member_uuid: familyMemberId,
+      });
 
       if (error) {
-        if (error.message.includes('Access denied') || error.message.includes('Insufficient verification')) {
+        if (
+          error.message.includes('Access denied') ||
+          error.message.includes('Insufficient verification')
+        ) {
           setAccessDenied(true);
           toast({
-            title: "Accès refusé",
-            description: "Vous devez être un Wali vérifié (score ≥85, ID vérifiée) pour accéder aux coordonnées.",
-            variant: "destructive"
+            title: 'Accès refusé',
+            description:
+              'Vous devez être un Wali vérifié (score ≥85, ID vérifiée) pour accéder aux coordonnées.',
+            variant: 'destructive',
           });
         } else {
           throw error;
@@ -64,9 +67,9 @@ export const FamilyContactSecure = ({ familyMemberId }: Props) => {
     } catch (error) {
       console.error('Error loading secure contact:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les informations de contact sécurisées",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les informations de contact sécurisées',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -106,9 +109,7 @@ export const FamilyContactSecure = ({ familyMemberId }: Props) => {
     return (
       <Card className="border-muted">
         <CardContent className="p-4">
-          <p className="text-sm text-muted-foreground">
-            Aucune information de contact disponible
-          </p>
+          <p className="text-sm text-muted-foreground">Aucune information de contact disponible</p>
         </CardContent>
       </Card>
     );

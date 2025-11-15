@@ -1,4 +1,3 @@
-
 import React, { Component, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -50,9 +49,10 @@ export class ErrorBoundary extends Component<Props, State> {
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-gray-600">
-              An unexpected error occurred. Please try refreshing the page or contact support if the problem persists.
+              An unexpected error occurred. Please try refreshing the page or contact support if the
+              problem persists.
             </p>
-            
+
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="text-xs bg-gray-100 p-2 rounded">
                 <summary>Error Details (Development only)</summary>
@@ -62,7 +62,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 )}
               </details>
             )}
-            
+
             <Button onClick={this.handleReset} className="w-full">
               <RefreshCw className="h-4 w-4 mr-2" />
               Try Again

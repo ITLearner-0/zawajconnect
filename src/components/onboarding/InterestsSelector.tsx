@@ -4,7 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { X, Plus, Heart, Book, Music, Camera, Plane, Code, Palette, Trophy, Coffee, Gamepad2 } from 'lucide-react';
+import {
+  X,
+  Plus,
+  Heart,
+  Book,
+  Music,
+  Camera,
+  Plane,
+  Code,
+  Palette,
+  Trophy,
+  Coffee,
+  Gamepad2,
+} from 'lucide-react';
 
 interface InterestsSelectorProps {
   interests: string[];
@@ -12,20 +25,24 @@ interface InterestsSelectorProps {
   className?: string;
 }
 
-const InterestsSelector = ({ interests, onInterestsChange, className = "" }: InterestsSelectorProps) => {
+const InterestsSelector = ({
+  interests,
+  onInterestsChange,
+  className = '',
+}: InterestsSelectorProps) => {
   const [newInterest, setNewInterest] = useState('');
 
   const suggestedInterests = [
-    { name: "Lecture", icon: <Book className="w-3 h-3" /> },
-    { name: "Voyage", icon: <Plane className="w-3 h-3" /> },
-    { name: "Cuisine", icon: <Coffee className="w-3 h-3" /> },
-    { name: "Sport", icon: <Trophy className="w-3 h-3" /> },
-    { name: "Musique", icon: <Music className="w-3 h-3" /> },
-    { name: "Photographie", icon: <Camera className="w-3 h-3" /> },
-    { name: "Art", icon: <Palette className="w-3 h-3" /> },
-    { name: "Technologie", icon: <Code className="w-3 h-3" /> },
-    { name: "Jeux", icon: <Gamepad2 className="w-3 h-3" /> },
-    { name: "Nature", icon: <Heart className="w-3 h-3" /> }
+    { name: 'Lecture', icon: <Book className="w-3 h-3" /> },
+    { name: 'Voyage', icon: <Plane className="w-3 h-3" /> },
+    { name: 'Cuisine', icon: <Coffee className="w-3 h-3" /> },
+    { name: 'Sport', icon: <Trophy className="w-3 h-3" /> },
+    { name: 'Musique', icon: <Music className="w-3 h-3" /> },
+    { name: 'Photographie', icon: <Camera className="w-3 h-3" /> },
+    { name: 'Art', icon: <Palette className="w-3 h-3" /> },
+    { name: 'Technologie', icon: <Code className="w-3 h-3" /> },
+    { name: 'Jeux', icon: <Gamepad2 className="w-3 h-3" /> },
+    { name: 'Nature', icon: <Heart className="w-3 h-3" /> },
   ];
 
   const addInterest = () => {
@@ -37,7 +54,7 @@ const InterestsSelector = ({ interests, onInterestsChange, className = "" }: Int
   };
 
   const removeInterest = (interestToRemove: string) => {
-    onInterestsChange(interests.filter(interest => interest !== interestToRemove));
+    onInterestsChange(interests.filter((interest) => interest !== interestToRemove));
   };
 
   const addSuggestedInterest = (interest: string) => {
@@ -61,9 +78,9 @@ const InterestsSelector = ({ interests, onInterestsChange, className = "" }: Int
           <Label>Vos centres d'intérêt ({interests.length}/10)</Label>
           <div className="flex flex-wrap gap-2">
             {interests.map((interest, index) => (
-              <Badge 
-                key={index} 
-                variant="secondary" 
+              <Badge
+                key={index}
+                variant="secondary"
                 className="flex items-center space-x-1 py-1 px-3 animate-scale-in hover:bg-muted cursor-pointer"
               >
                 <span>{interest}</span>
@@ -93,10 +110,14 @@ const InterestsSelector = ({ interests, onInterestsChange, className = "" }: Int
             maxLength={30}
             disabled={interests.length >= 10}
           />
-          <Button 
+          <Button
             type="button"
             onClick={addInterest}
-            disabled={!newInterest.trim() || interests.includes(newInterest.trim()) || interests.length >= 10}
+            disabled={
+              !newInterest.trim() ||
+              interests.includes(newInterest.trim()) ||
+              interests.length >= 10
+            }
             size="sm"
             variant="outline"
           >
@@ -104,9 +125,7 @@ const InterestsSelector = ({ interests, onInterestsChange, className = "" }: Int
           </Button>
         </div>
         {interests.length >= 10 && (
-          <p className="text-xs text-muted-foreground">
-            Maximum 10 centres d'intérêt atteint
-          </p>
+          <p className="text-xs text-muted-foreground">Maximum 10 centres d'intérêt atteint</p>
         )}
       </div>
 
@@ -117,7 +136,7 @@ const InterestsSelector = ({ interests, onInterestsChange, className = "" }: Int
           <CardContent className="p-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {suggestedInterests
-                .filter(suggested => !interests.includes(suggested.name))
+                .filter((suggested) => !interests.includes(suggested.name))
                 .map((suggested, index) => (
                   <Button
                     key={index}
@@ -140,10 +159,15 @@ const InterestsSelector = ({ interests, onInterestsChange, className = "" }: Int
       {/* Progress Indicator */}
       <div className="text-center">
         <p className="text-sm text-muted-foreground">
-          {interests.length === 0 && "Ajoutez au moins 3 centres d'intérêt pour de meilleurs matches"}
-          {interests.length > 0 && interests.length < 3 && `Plus ${3 - interests.length} centre(s) d'intérêt recommandé(s)`}
-          {interests.length >= 3 && interests.length < 5 && "Bon début ! Vous pouvez en ajouter d'autres"}
-          {interests.length >= 5 && "Excellent ! Votre profil sera très attractif"}
+          {interests.length === 0 &&
+            "Ajoutez au moins 3 centres d'intérêt pour de meilleurs matches"}
+          {interests.length > 0 &&
+            interests.length < 3 &&
+            `Plus ${3 - interests.length} centre(s) d'intérêt recommandé(s)`}
+          {interests.length >= 3 &&
+            interests.length < 5 &&
+            "Bon début ! Vous pouvez en ajouter d'autres"}
+          {interests.length >= 5 && 'Excellent ! Votre profil sera très attractif'}
         </p>
       </div>
     </div>

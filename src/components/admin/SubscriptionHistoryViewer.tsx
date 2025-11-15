@@ -3,7 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -36,7 +42,7 @@ const SubscriptionHistoryViewer = () => {
   const [loading, setLoading] = useState(true);
   const [selectedEntry, setSelectedEntry] = useState<HistoryEntry | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  
+
   // Filters
   const [searchUser, setSearchUser] = useState('');
   const [actionFilter, setActionFilter] = useState('all');
@@ -86,19 +92,19 @@ const SubscriptionHistoryViewer = () => {
               .maybeSingle();
             adminProfile = admin;
           }
-            
+
           return {
             ...entry,
             user_profile: userProfile,
-            admin_profile: adminProfile
+            admin_profile: adminProfile,
           };
         })
       );
 
       setHistory(enrichedData);
     } catch (error) {
-      console.error('Erreur lors du chargement de l\'historique:', error);
-      toast.error('Impossible de charger l\'historique');
+      console.error("Erreur lors du chargement de l'historique:", error);
+      toast.error("Impossible de charger l'historique");
     } finally {
       setLoading(false);
     }
@@ -109,25 +115,23 @@ const SubscriptionHistoryViewer = () => {
 
     // Filter by user name
     if (searchUser) {
-      filtered = filtered.filter(entry => 
+      filtered = filtered.filter((entry) =>
         entry.user_profile?.full_name?.toLowerCase().includes(searchUser.toLowerCase())
       );
     }
 
     // Filter by action
     if (actionFilter !== 'all') {
-      filtered = filtered.filter(entry => entry.action === actionFilter);
+      filtered = filtered.filter((entry) => entry.action === actionFilter);
     }
 
     // Filter by date range
     if (dateFrom) {
-      filtered = filtered.filter(entry => 
-        new Date(entry.created_at) >= new Date(dateFrom)
-      );
+      filtered = filtered.filter((entry) => new Date(entry.created_at) >= new Date(dateFrom));
     }
     if (dateTo) {
-      filtered = filtered.filter(entry => 
-        new Date(entry.created_at) <= new Date(dateTo + 'T23:59:59')
+      filtered = filtered.filter(
+        (entry) => new Date(entry.created_at) <= new Date(dateTo + 'T23:59:59')
       );
     }
 
@@ -142,23 +146,19 @@ const SubscriptionHistoryViewer = () => {
       activated: { color: 'bg-green-500', label: 'Activé' },
       cancelled: { color: 'bg-red-500', label: 'Annulé' },
       expired: { color: 'bg-gray-500', label: 'Expiré' },
-      updated: { color: 'bg-purple-500', label: 'Modifié' }
+      updated: { color: 'bg-purple-500', label: 'Modifié' },
     };
 
     const config = configs[action] || { color: 'bg-gray-500', label: action };
-    return (
-      <Badge className={`${config.color} text-white`}>
-        {config.label}
-      </Badge>
-    );
+    return <Badge className={`${config.color} text-white`}>{config.label}</Badge>;
   };
 
   const renderValueDiff = (oldVal: any, newVal: any, key: string) => {
     if (key === 'user_id' || key === 'id' || key === 'subscription_id') return null;
-    
+
     const oldValue = oldVal?.[key];
     const newValue = newVal?.[key];
-    
+
     if (oldValue === newValue) return null;
 
     const formatValue = (val: any) => {
@@ -172,21 +172,19 @@ const SubscriptionHistoryViewer = () => {
 
     const getFieldLabel = (key: string) => {
       const labels: Record<string, string> = {
-        plan_type: 'Type d\'abonnement',
+        plan_type: "Type d'abonnement",
         status: 'Statut',
-        expires_at: 'Date d\'expiration',
+        expires_at: "Date d'expiration",
         notes: 'Notes',
         granted_by: 'Accordé par',
-        granted_at: 'Date d\'attribution'
+        granted_at: "Date d'attribution",
       };
       return labels[key] || key;
     };
 
     return (
       <div key={key} className="flex items-center gap-2 text-sm py-2 border-b last:border-b-0">
-        <div className="font-medium min-w-[140px] text-muted-foreground">
-          {getFieldLabel(key)}
-        </div>
+        <div className="font-medium min-w-[140px] text-muted-foreground">{getFieldLabel(key)}</div>
         <div className="flex items-center gap-2 flex-1">
           <div className="px-3 py-1 bg-red-50 dark:bg-red-950 rounded text-red-700 dark:text-red-300 flex-1">
             {formatValue(oldValue)}
@@ -203,16 +201,18 @@ const SubscriptionHistoryViewer = () => {
   const exportToCSV = () => {
     const csvContent = [
       ['Date', 'Action', 'Utilisateur', 'Administrateur', 'Ancien Plan', 'Nouveau Plan', 'Raison'],
-      ...filteredHistory.map(entry => [
+      ...filteredHistory.map((entry) => [
         format(new Date(entry.created_at), 'dd/MM/yyyy HH:mm'),
         entry.action,
         entry.user_profile?.full_name || 'N/A',
         entry.admin_profile?.full_name || 'Système',
         entry.old_values?.plan_type || 'N/A',
         entry.new_values?.plan_type || 'N/A',
-        entry.reason || ''
-      ])
-    ].map(row => row.join(',')).join('\n');
+        entry.reason || '',
+      ]),
+    ]
+      .map((row) => row.join(','))
+      .join('\n');
 
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -232,7 +232,8 @@ const SubscriptionHistoryViewer = () => {
             Historique des Modifications
           </h3>
           <p className="text-muted-foreground">
-            {filteredHistory.length} modification{filteredHistory.length > 1 ? 's' : ''} trouvée{filteredHistory.length > 1 ? 's' : ''}
+            {filteredHistory.length} modification{filteredHistory.length > 1 ? 's' : ''} trouvée
+            {filteredHistory.length > 1 ? 's' : ''}
           </p>
         </div>
         <Button onClick={exportToCSV} variant="outline" className="gap-2">
@@ -260,7 +261,7 @@ const SubscriptionHistoryViewer = () => {
                 onChange={(e) => setSearchUser(e.target.value)}
               />
             </div>
-            
+
             <div>
               <Label htmlFor="actionFilter">Type d'action</Label>
               <Select value={actionFilter} onValueChange={setActionFilter}>
@@ -279,7 +280,7 @@ const SubscriptionHistoryViewer = () => {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div>
               <Label htmlFor="dateFrom">Date début</Label>
               <Input
@@ -289,7 +290,7 @@ const SubscriptionHistoryViewer = () => {
                 onChange={(e) => setDateFrom(e.target.value)}
               />
             </div>
-            
+
             <div>
               <Label htmlFor="dateTo">Date fin</Label>
               <Input
@@ -300,7 +301,7 @@ const SubscriptionHistoryViewer = () => {
               />
             </div>
           </div>
-          
+
           {(searchUser || actionFilter !== 'all' || dateFrom || dateTo) && (
             <Button
               variant="ghost"
@@ -355,11 +356,13 @@ const SubscriptionHistoryViewer = () => {
                             • {entry.new_values?.plan_type || 'N/A'}
                           </span>
                         </div>
-                        
+
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <div className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {format(new Date(entry.created_at), 'dd MMM yyyy à HH:mm', { locale: fr })}
+                            {format(new Date(entry.created_at), 'dd MMM yyyy à HH:mm', {
+                              locale: fr,
+                            })}
                           </div>
                           {entry.admin_profile && (
                             <div className="flex items-center gap-1">
@@ -368,14 +371,12 @@ const SubscriptionHistoryViewer = () => {
                             </div>
                           )}
                         </div>
-                        
+
                         {entry.reason && (
-                          <p className="text-sm text-muted-foreground italic">
-                            "{entry.reason}"
-                          </p>
+                          <p className="text-sm text-muted-foreground italic">"{entry.reason}"</p>
                         )}
                       </div>
-                      
+
                       <Button variant="ghost" size="sm">
                         Détails
                       </Button>
@@ -397,7 +398,7 @@ const SubscriptionHistoryViewer = () => {
               {selectedEntry && getActionBadge(selectedEntry.action)}
             </DialogTitle>
           </DialogHeader>
-          
+
           {selectedEntry && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
@@ -410,7 +411,9 @@ const SubscriptionHistoryViewer = () => {
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">Date</div>
                   <div className="text-lg font-semibold">
-                    {format(new Date(selectedEntry.created_at), 'dd MMMM yyyy à HH:mm', { locale: fr })}
+                    {format(new Date(selectedEntry.created_at), 'dd MMMM yyyy à HH:mm', {
+                      locale: fr,
+                    })}
                   </div>
                 </div>
                 <div>
@@ -430,9 +433,7 @@ const SubscriptionHistoryViewer = () => {
                   <div className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
                     Raison / Notes
                   </div>
-                  <div className="text-blue-800 dark:text-blue-200">
-                    {selectedEntry.reason}
-                  </div>
+                  <div className="text-blue-800 dark:text-blue-200">{selectedEntry.reason}</div>
                 </div>
               )}
 
@@ -440,7 +441,7 @@ const SubscriptionHistoryViewer = () => {
                 <h4 className="font-semibold mb-3">Modifications apportées</h4>
                 <div className="border rounded-lg divide-y">
                   {selectedEntry.old_values && selectedEntry.new_values ? (
-                    Object.keys(selectedEntry.new_values).map(key =>
+                    Object.keys(selectedEntry.new_values).map((key) =>
                       renderValueDiff(selectedEntry.old_values, selectedEntry.new_values, key)
                     )
                   ) : (

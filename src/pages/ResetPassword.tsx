@@ -44,7 +44,7 @@ const ResetPassword = () => {
     }
 
     const { error: updateError } = await supabase.auth.updateUser({
-      password: password
+      password: password,
     });
 
     if (updateError) {
@@ -74,7 +74,8 @@ const ResetPassword = () => {
               Mot de passe mis à jour !
             </CardTitle>
             <CardDescription className="text-muted-foreground">
-              Votre mot de passe a été modifié avec succès. Vous allez être redirigé vers la page de connexion...
+              Votre mot de passe a été modifié avec succès. Vous allez être redirigé vers la page de
+              connexion...
             </CardDescription>
           </CardHeader>
         </Card>
@@ -87,7 +88,10 @@ const ResetPassword = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="w-full max-w-md mx-auto">
           <div className="flex items-center gap-2 mb-8 justify-center">
-            <Link to="/auth" className="flex items-center gap-2 text-emerald hover:text-emerald-dark transition-colors">
+            <Link
+              to="/auth"
+              className="flex items-center gap-2 text-emerald hover:text-emerald-dark transition-colors"
+            >
               <ArrowLeft className="h-4 w-4" />
               Retour à la connexion
             </Link>
@@ -115,7 +119,7 @@ const ResetPassword = () => {
                   <div className="relative">
                     <Input
                       id="password"
-                      type={showPassword ? "text" : "password"}
+                      type={showPassword ? 'text' : 'password'}
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -143,7 +147,7 @@ const ResetPassword = () => {
                   <div className="relative">
                     <Input
                       id="confirm-password"
-                      type={showConfirmPassword ? "text" : "password"}
+                      type={showConfirmPassword ? 'text' : 'password'}
                       placeholder="••••••••"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -157,7 +161,11 @@ const ResetPassword = () => {
                       className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
-                      {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      {showConfirmPassword ? (
+                        <EyeOff className="h-4 w-4" />
+                      ) : (
+                        <Eye className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
                 </div>
@@ -168,8 +176,8 @@ const ResetPassword = () => {
                   </div>
                 )}
 
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
                   disabled={loading}
                 >

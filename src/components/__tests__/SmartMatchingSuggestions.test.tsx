@@ -14,7 +14,7 @@ vi.mock('@/hooks/useAuth', () => ({
     user: {
       id: 'test-user-id',
       email: 'test@example.com',
-      user_metadata: { full_name: 'Test User' }
+      user_metadata: { full_name: 'Test User' },
     },
     isAuthenticated: true,
   }),
@@ -39,7 +39,7 @@ const mockProfiles = [
     education: 'Masters in Computer Science',
     bio: 'Passionate about technology and Islam',
     interests: ['reading', 'coding', 'hiking'],
-    avatar_url: null
+    avatar_url: null,
   },
   {
     user_id: 'match2',
@@ -51,8 +51,8 @@ const mockProfiles = [
     education: 'Bachelors in Education',
     bio: 'Love teaching and learning',
     interests: ['reading', 'teaching', 'travel'],
-    avatar_url: null
-  }
+    avatar_url: null,
+  },
 ];
 
 const mockIslamicPrefs = [
@@ -64,7 +64,7 @@ const mockIslamicPrefs = [
     quran_reading: 'daily',
     importance_of_religion: 'very_important',
     halal_diet: true,
-    smoking: false
+    smoking: false,
   },
   {
     user_id: 'match2',
@@ -74,13 +74,13 @@ const mockIslamicPrefs = [
     quran_reading: 'weekly',
     importance_of_religion: 'important',
     halal_diet: true,
-    smoking: false
-  }
+    smoking: false,
+  },
 ];
 
 const mockVerifications = [
   { user_id: 'match1', verification_score: 85 },
-  { user_id: 'match2', verification_score: 70 }
+  { user_id: 'match2', verification_score: 70 },
 ];
 
 const mockMyProfile = {
@@ -93,7 +93,7 @@ const mockMyProfile = {
   education: 'Masters',
   bio: 'Looking for a practicing Muslim',
   interests: ['reading', 'sports', 'coding'],
-  avatar_url: null
+  avatar_url: null,
 };
 
 const mockMyIslamicPrefs = {
@@ -104,7 +104,7 @@ const mockMyIslamicPrefs = {
   quran_reading: 'daily',
   importance_of_religion: 'very_important',
   halal_diet: true,
-  smoking: false
+  smoking: false,
 };
 
 vi.mock('@/integrations/supabase/client', () => ({
@@ -116,23 +116,21 @@ vi.mock('@/integrations/supabase/client', () => ({
             eq: vi.fn((field: string, value: string) => {
               if (field === 'user_id' && value === 'test-user-id') {
                 return {
-                  maybeSingle: vi.fn(() =>
-                    Promise.resolve({ data: mockMyProfile, error: null })
-                  )
+                  maybeSingle: vi.fn(() => Promise.resolve({ data: mockMyProfile, error: null })),
                 };
               }
               // Handle gender filter
               if (field === 'gender') {
                 return {
-                  neq: vi.fn(() => Promise.resolve({ data: mockProfiles, error: null }))
+                  neq: vi.fn(() => Promise.resolve({ data: mockProfiles, error: null })),
                 };
               }
               return {
-                neq: vi.fn(() => Promise.resolve({ data: mockProfiles, error: null }))
+                neq: vi.fn(() => Promise.resolve({ data: mockProfiles, error: null })),
               };
             }),
-            neq: vi.fn(() => Promise.resolve({ data: mockProfiles, error: null }))
-          }))
+            neq: vi.fn(() => Promise.resolve({ data: mockProfiles, error: null })),
+          })),
         };
       }
 
@@ -144,15 +142,15 @@ vi.mock('@/integrations/supabase/client', () => ({
                 return {
                   maybeSingle: vi.fn(() =>
                     Promise.resolve({ data: mockMyIslamicPrefs, error: null })
-                  )
+                  ),
                 };
               }
               return {
-                in: vi.fn(() => Promise.resolve({ data: mockIslamicPrefs, error: null }))
+                in: vi.fn(() => Promise.resolve({ data: mockIslamicPrefs, error: null })),
               };
             }),
-            in: vi.fn(() => Promise.resolve({ data: mockIslamicPrefs, error: null }))
-          }))
+            in: vi.fn(() => Promise.resolve({ data: mockIslamicPrefs, error: null })),
+          })),
         };
       }
 
@@ -161,23 +159,21 @@ vi.mock('@/integrations/supabase/client', () => ({
           select: vi.fn((fields: string) => ({
             in: vi.fn((field: string, values: string[]) => {
               // Filter verifications to match the requested user IDs
-              const filtered = mockVerifications.filter(v =>
-                values.includes(v.user_id)
-              );
+              const filtered = mockVerifications.filter((v) => values.includes(v.user_id));
               return Promise.resolve({ data: filtered, error: null });
-            })
-          }))
+            }),
+          })),
         };
       }
 
       return {
         select: vi.fn(() => ({
           eq: vi.fn(() => Promise.resolve({ data: null, error: null })),
-          maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null }))
-        }))
+          maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
+        })),
       };
-    })
-  }
+    }),
+  },
 }));
 
 const renderWithRouter = (component: React.ReactElement) => {
@@ -334,7 +330,7 @@ describe('SmartMatchingSuggestions', () => {
             matchId: expect.any(String),
             islamicScore: expect.any(Number),
             culturalScore: expect.any(Number),
-            overallScore: expect.any(Number)
+            overallScore: expect.any(Number),
           })
         );
       },

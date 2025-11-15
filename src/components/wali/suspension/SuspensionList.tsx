@@ -77,9 +77,7 @@ export const SuspensionList = ({ suspensions, onLift, canManage = false }: Suspe
                   <CardTitle className="text-lg">
                     {getTypeLabel(suspension.suspension_type)}
                   </CardTitle>
-                  {suspension.is_active && (
-                    <Badge variant="destructive">Active</Badge>
-                  )}
+                  {suspension.is_active && <Badge variant="destructive">Active</Badge>}
                   {!suspension.is_active && suspension.lifted_at && (
                     <Badge variant="secondary">Levée</Badge>
                   )}
@@ -91,11 +89,7 @@ export const SuspensionList = ({ suspensions, onLift, canManage = false }: Suspe
                 )}
               </div>
               {canManage && suspension.is_active && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onLift(suspension.id)}
-                >
+                <Button size="sm" variant="outline" onClick={() => onLift(suspension.id)}>
                   Lever la suspension
                 </Button>
               )}

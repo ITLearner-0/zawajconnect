@@ -12,7 +12,7 @@ interface ProgressCelebrationProps {
 const ProgressCelebration: React.FC<ProgressCelebrationProps> = ({
   message,
   isVisible,
-  onComplete
+  onComplete,
 }) => {
   useEffect(() => {
     if (isVisible) {
@@ -39,12 +39,12 @@ const ProgressCelebration: React.FC<ProgressCelebrationProps> = ({
         confetti({
           ...defaults,
           particleCount,
-          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+          origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
         });
         confetti({
           ...defaults,
           particleCount,
-          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+          origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
         });
       }, 250);
 
@@ -61,17 +61,21 @@ const ProgressCelebration: React.FC<ProgressCelebrationProps> = ({
         <div className="text-center space-y-4">
           <div className="flex justify-center items-center gap-2">
             <Trophy className="h-12 w-12 text-gold animate-pulse" />
-            <Star className="h-8 w-8 text-primary animate-pulse" style={{ animationDelay: '0.2s' }} />
-            <Sparkles className="h-10 w-10 text-emerald animate-pulse" style={{ animationDelay: '0.4s' }} />
+            <Star
+              className="h-8 w-8 text-primary animate-pulse"
+              style={{ animationDelay: '0.2s' }}
+            />
+            <Sparkles
+              className="h-10 w-10 text-emerald animate-pulse"
+              style={{ animationDelay: '0.4s' }}
+            />
           </div>
-          
+
           <div className="space-y-2">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-primary via-gold to-emerald bg-clip-text text-transparent">
               Félicitations !
             </h2>
-            <p className="text-lg font-medium text-foreground">
-              {message}
-            </p>
+            <p className="text-lg font-medium text-foreground">{message}</p>
           </div>
 
           <div className="pt-4">

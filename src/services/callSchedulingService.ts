@@ -1,4 +1,3 @@
-
 // Service for managing scheduled calls
 
 export interface ScheduledCall {
@@ -28,7 +27,6 @@ export interface CallReminder {
 }
 
 export class CallSchedulingService {
-  
   // Create a new scheduled call
   static async createScheduledCall(
     conversationId: string,
@@ -59,15 +57,15 @@ export class CallSchedulingService {
       status: 'pending',
       reminderSent: false,
       createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     };
 
     // Here you would typically save to database
     console.log('Creating scheduled call:', scheduledCall);
-    
+
     // Schedule reminders
     this.scheduleReminders(scheduledCall);
-    
+
     return scheduledCall;
   }
 
@@ -83,7 +81,7 @@ export class CallSchedulingService {
         callId: call.id,
         reminderTime: reminder24h.toISOString(),
         type: '24h',
-        sent: false
+        sent: false,
       });
     }
 
@@ -94,7 +92,7 @@ export class CallSchedulingService {
         callId: call.id,
         reminderTime: reminder1h.toISOString(),
         type: '1h',
-        sent: false
+        sent: false,
       });
     }
 
@@ -105,7 +103,7 @@ export class CallSchedulingService {
         callId: call.id,
         reminderTime: reminder15min.toISOString(),
         type: '15min',
-        sent: false
+        sent: false,
       });
     }
 
@@ -114,10 +112,7 @@ export class CallSchedulingService {
   }
 
   // Update call status
-  static async updateCallStatus(
-    callId: string, 
-    status: ScheduledCall['status']
-  ): Promise<boolean> {
+  static async updateCallStatus(callId: string, status: ScheduledCall['status']): Promise<boolean> {
     console.log('Updating call status:', callId, status);
     // Here you would update the database
     return true;
@@ -152,7 +147,7 @@ export class CallSchedulingService {
       day: 'numeric',
       hour: '2-digit',
       minute: '2-digit',
-      timeZone: call.timezone
+      timeZone: call.timezone,
     }).format(date);
   }
 
@@ -178,20 +173,23 @@ export class CallSchedulingService {
   }
 
   // Generate call notification message
-  static generateCallNotification(call: ScheduledCall, type: 'scheduled' | 'reminder' | 'starting'): string {
+  static generateCallNotification(
+    call: ScheduledCall,
+    type: 'scheduled' | 'reminder' | 'starting'
+  ): string {
     const callTypeText = call.type === 'video' ? 'vidéo' : 'audio';
     const timeText = this.formatCallTime(call);
-    
+
     switch (type) {
       case 'scheduled':
         return `📞 Appel ${callTypeText} planifié pour ${timeText} (${call.duration}min)${call.includeWali ? ' avec supervision du Wali' : ''}`;
-      
+
       case 'reminder':
         return `🔔 Rappel: Appel ${callTypeText} dans ${this.getTimeUntilCall(call)}`;
-      
+
       case 'starting':
         return `📞 Votre appel ${callTypeText} commence maintenant !`;
-      
+
       default:
         return `📞 Appel ${callTypeText} programmé`;
     }

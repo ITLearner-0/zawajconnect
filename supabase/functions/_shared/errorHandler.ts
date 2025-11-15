@@ -35,11 +35,7 @@ const genericMessages: Record<ErrorCode, string> = {
 /**
  * Log error details server-side and return generic message to client
  */
-export function handleError(
-  error: unknown,
-  errorCode: ErrorCode,
-  context?: string
-): Response {
+export function handleError(error: unknown, errorCode: ErrorCode, context?: string): Response {
   // Detailed server-side logging
   const logPrefix = context ? `[${context}]` : '[ERROR]';
   console.error(logPrefix, {
@@ -53,9 +49,9 @@ export function handleError(
   const userMessage = genericMessages[errorCode];
 
   return new Response(
-    JSON.stringify({ 
+    JSON.stringify({
       error: userMessage,
-      errorCode 
+      errorCode,
     }),
     {
       status: getHttpStatus(errorCode),
@@ -70,11 +66,7 @@ export function handleError(
 /**
  * Handle AI Gateway specific errors with proper status codes
  */
-export function handleAIError(
-  status: number,
-  errorText: string,
-  context?: string
-): Response {
+export function handleAIError(status: number, errorText: string, context?: string): Response {
   console.error(`[${context || 'AI'}]`, {
     status,
     errorText,
@@ -84,7 +76,7 @@ export function handleAIError(
   if (status === 429) {
     return handleError(new Error('Rate limit'), ErrorCode.RATE_LIMIT, context);
   }
-  
+
   if (status === 402) {
     return handleError(new Error('Insufficient credits'), ErrorCode.INSUFFICIENT_CREDITS, context);
   }
@@ -115,14 +107,11 @@ function getHttpStatus(errorCode: ErrorCode): number {
  * Success response helper
  */
 export function successResponse(data: unknown, status = 200): Response {
-  return new Response(
-    JSON.stringify(data),
-    {
-      status,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-      },
-    }
-  );
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Content-Type': 'application/json',
+    },
+  });
 }

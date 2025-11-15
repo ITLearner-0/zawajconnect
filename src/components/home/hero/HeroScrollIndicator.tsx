@@ -1,11 +1,10 @@
-
 import React from 'react';
-import { ChevronDown } from "lucide-react";
-import SmoothScrollButton from "../SmoothScrollButton";
+import { ChevronDown } from 'lucide-react';
+import SmoothScrollButton from '../SmoothScrollButton';
 
 const HeroScrollIndicator = () => {
   return (
-    <SmoothScrollButton 
+    <SmoothScrollButton
       targetSection="trust"
       variant="ghost"
       className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-rose-600 dark:text-rose-300 animate-bounce p-2"

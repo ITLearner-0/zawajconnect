@@ -5,15 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Sparkles, 
-  AlertCircle, 
-  CheckCircle2, 
-  Info,
-  Loader2,
-  TrendingUp,
-  Zap
-} from 'lucide-react';
+import { Sparkles, AlertCircle, CheckCircle2, Info, Loader2, TrendingUp, Zap } from 'lucide-react';
 
 interface Suggestion {
   type: 'urgent' | 'important' | 'optional';
@@ -91,22 +83,22 @@ const AISuggestions = ({ profile, islamicPrefs, completionStats }: AISuggestions
         body: {
           profile,
           islamicPrefs,
-          completionStats
-        }
+          completionStats,
+        },
       });
 
       if (error) {
         if (error.message.includes('429')) {
           toast({
-            title: "Limite atteinte",
-            description: "Trop de requêtes. Veuillez réessayer dans quelques instants.",
-            variant: "destructive"
+            title: 'Limite atteinte',
+            description: 'Trop de requêtes. Veuillez réessayer dans quelques instants.',
+            variant: 'destructive',
           });
         } else if (error.message.includes('402')) {
           toast({
-            title: "Crédits épuisés",
-            description: "Les crédits AI sont épuisés. Contactez le support.",
-            variant: "destructive"
+            title: 'Crédits épuisés',
+            description: 'Les crédits AI sont épuisés. Contactez le support.',
+            variant: 'destructive',
           });
         } else {
           throw error;
@@ -117,16 +109,16 @@ const AISuggestions = ({ profile, islamicPrefs, completionStats }: AISuggestions
       if (data?.suggestions) {
         setSuggestions(data.suggestions);
         toast({
-          title: "Analyse terminée",
+          title: 'Analyse terminée',
           description: `${data.suggestions.length} suggestions personnalisées générées !`,
         });
       }
     } catch (error) {
       console.error('Error analyzing profile:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'analyser le profil. Réessayez plus tard.",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -155,13 +147,10 @@ const AISuggestions = ({ profile, islamicPrefs, completionStats }: AISuggestions
             </motion.div>
             <h3 className="font-semibold mb-2">Obtenez des suggestions personnalisées</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Notre IA analyse votre profil et vous propose des améliorations sur mesure pour maximiser vos chances de match.
+              Notre IA analyse votre profil et vous propose des améliorations sur mesure pour
+              maximiser vos chances de match.
             </p>
-            <Button
-              onClick={analyzeProfil}
-              disabled={loading}
-              className="gap-2"
-            >
+            <Button onClick={analyzeProfil} disabled={loading} className="gap-2">
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -179,7 +168,8 @@ const AISuggestions = ({ profile, islamicPrefs, completionStats }: AISuggestions
           <div className="space-y-3">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm text-muted-foreground">
-                {suggestions.length} suggestion{suggestions.length > 1 ? 's' : ''} personnalisée{suggestions.length > 1 ? 's' : ''}
+                {suggestions.length} suggestion{suggestions.length > 1 ? 's' : ''} personnalisée
+                {suggestions.length > 1 ? 's' : ''}
               </p>
               <Button
                 variant="outline"
@@ -196,7 +186,7 @@ const AISuggestions = ({ profile, islamicPrefs, completionStats }: AISuggestions
                 Rafraîchir
               </Button>
             </div>
-            
+
             <AnimatePresence mode="popLayout">
               {suggestions.map((suggestion, index) => (
                 <motion.div
@@ -209,9 +199,7 @@ const AISuggestions = ({ profile, islamicPrefs, completionStats }: AISuggestions
                   className={`p-4 rounded-lg border ${getSuggestionColor(suggestion.type)} transition-all`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className="mt-0.5">
-                      {getSuggestionIcon(suggestion.type)}
-                    </div>
+                    <div className="mt-0.5">{getSuggestionIcon(suggestion.type)}</div>
                     <div className="flex-1 space-y-2">
                       <div className="flex items-start justify-between gap-2">
                         <h4 className="font-semibold">{suggestion.title}</h4>
@@ -219,20 +207,20 @@ const AISuggestions = ({ profile, islamicPrefs, completionStats }: AISuggestions
                           {suggestion.category}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">
-                        {suggestion.description}
-                      </p>
+                      <p className="text-sm text-muted-foreground">{suggestion.description}</p>
                       <div className="pt-2 space-y-1">
                         <div className="flex items-start gap-2 text-sm">
                           <CheckCircle2 className="h-4 w-4 text-emerald mt-0.5 flex-shrink-0" />
                           <span className="text-muted-foreground">
-                            <span className="font-medium text-foreground">Action :</span> {suggestion.action}
+                            <span className="font-medium text-foreground">Action :</span>{' '}
+                            {suggestion.action}
                           </span>
                         </div>
                         <div className="flex items-start gap-2 text-sm">
                           <TrendingUp className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                           <span className="text-muted-foreground">
-                            <span className="font-medium text-foreground">Impact :</span> {suggestion.impact}
+                            <span className="font-medium text-foreground">Impact :</span>{' '}
+                            {suggestion.impact}
                           </span>
                         </div>
                       </div>

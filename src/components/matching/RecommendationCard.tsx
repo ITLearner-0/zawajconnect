@@ -37,15 +37,15 @@ export const RecommendationCard = ({ recommendation }: RecommendationCardProps) 
               </AvatarFallback>
             </Avatar>
             <div>
-              <CardTitle className="text-base mb-0.5">{recommendation.full_name ?? 'Profil Anonyme'}</CardTitle>
+              <CardTitle className="text-base mb-0.5">
+                {recommendation.full_name ?? 'Profil Anonyme'}
+              </CardTitle>
               <p className="text-sm text-muted-foreground">
                 {recommendation.age ?? '−'} ans • {recommendation.location ?? 'Non spécifié'}
               </p>
             </div>
           </div>
-          <Badge variant="outline">
-            {recommendation.recommendation_score}%
-          </Badge>
+          <Badge variant="outline">{recommendation.recommendation_score}%</Badge>
         </div>
       </CardHeader>
 
@@ -80,11 +80,13 @@ export const RecommendationCard = ({ recommendation }: RecommendationCardProps) 
           <div>
             <p className="text-sm font-medium mb-2">Points forts:</p>
             <div className="flex flex-wrap gap-1">
-              {recommendation.recommendation_reasons.slice(0, 3).map((reason: string, index: number) => (
-                <Badge key={index} variant="secondary" className="text-xs">
-                  {reason}
-                </Badge>
-              ))}
+              {recommendation.recommendation_reasons
+                .slice(0, 3)
+                .map((reason: string, index: number) => (
+                  <Badge key={index} variant="secondary" className="text-xs">
+                    {reason}
+                  </Badge>
+                ))}
             </div>
           </div>
         )}
@@ -96,23 +98,20 @@ export const RecommendationCard = ({ recommendation }: RecommendationCardProps) 
               Intérêts partagés ({recommendation.shared_interests.length}):
             </p>
             <div className="flex flex-wrap gap-1">
-              {recommendation.shared_interests.slice(0, 4).map((interest: string, index: number) => (
-                <Badge key={index} variant="outline" className="text-xs">
-                  {interest}
-                </Badge>
-              ))}
+              {recommendation.shared_interests
+                .slice(0, 4)
+                .map((interest: string, index: number) => (
+                  <Badge key={index} variant="outline" className="text-xs">
+                    {interest}
+                  </Badge>
+                ))}
             </div>
           </div>
         )}
 
         {/* Actions */}
         <div className="flex gap-2 pt-2 border-t">
-          <Button 
-            variant="outline" 
-            size="sm" 
-            className="flex-1"
-            onClick={handleViewProfile}
-          >
+          <Button variant="outline" size="sm" className="flex-1" onClick={handleViewProfile}>
             Voir le profil
           </Button>
           <Button size="sm" className="flex-1">

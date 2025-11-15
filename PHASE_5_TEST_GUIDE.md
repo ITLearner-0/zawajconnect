@@ -1,4 +1,5 @@
 # 🧪 GUIDE DE TEST - PHASE 5
+
 ## Système Complet d'Analytics et Gamification
 
 ---
@@ -6,6 +7,7 @@
 ## 📋 Vue d'ensemble du test
 
 Ce guide vous permet de tester **tous les aspects** du système Phase 5 :
+
 - ✅ Création de compte et authentification
 - ✅ Test de compatibilité complet
 - ✅ Tracking analytics en temps réel
@@ -21,16 +23,19 @@ Ce guide vous permet de tester **tous les aspects** du système Phase 5 :
 ## 🎯 Prérequis
 
 ### 1. Application lancée
+
 ```bash
 npm run dev
 ```
 
 ### 2. Supabase Dashboard ouvert
+
 1. Aller sur [Supabase Dashboard](https://supabase.com/dashboard)
 2. Sélectionner le projet: `dgfctwtivkqcfhwqgkya`
 3. Ouvrir l'onglet **Table Editor**
 
 ### 3. Fenêtres à préparer
+
 - **Fenêtre 1:** Application (localhost:8080)
 - **Fenêtre 2:** Supabase Dashboard (Table Editor)
 - **Fenêtre 3:** Browser DevTools Console (pour logs)
@@ -65,6 +70,7 @@ npm run dev
 
 **Si redirection automatique:** Passez à l'Étape 1.4  
 **Si message "Vérifiez votre email":**
+
 1. Aller dans Supabase Dashboard → Authentication → Users
 2. Trouver l'utilisateur `test-phase5@example.com`
 3. Cliquer sur les 3 points → "Verify email"
@@ -72,6 +78,7 @@ npm run dev
 ### Étape 1.4: Vérifier la connexion
 
 ✅ **Checklist:**
+
 - [ ] Redirection automatique vers le dashboard
 - [ ] Nom d'utilisateur affiché dans le header
 - [ ] Menu utilisateur accessible
@@ -94,28 +101,38 @@ npm run dev
 **Catégories à compléter:**
 
 #### 🕌 Pratique religieuse (5-7 questions)
+
 Exemples de réponses pour débloquer achievements:
+
 - Fréquence de prière: "5 fois par jour"
 - Lecture du Coran: "Quotidienne"
 - Madhab: "Maliki" (ou autre)
 
 #### 💑 Vision du mariage (5-7 questions)
+
 Exemples:
+
 - Rôle dans la famille: "Partenaires égaux avec responsabilités complémentaires"
 - Gestion financière: "Compte commun avec contributions proportionnelles"
 
 #### 🏠 Style de vie (5-7 questions)
+
 Exemples:
+
 - Type de logement: "Appartement en ville"
 - Vie sociale: "Équilibrée entre famille et amis"
 
 #### 👨‍👩‍👧 Famille (5-7 questions)
+
 Exemples:
+
 - Implication des parents: "Consultation sur décisions importantes"
 - Nombre d'enfants souhaités: "2-3 enfants"
 
 #### 🎓 Éducation & Carrière (4-6 questions)
+
 Exemples:
+
 - Importance de l'éducation: "Très importante"
 - Carrière après mariage: "Je souhaite continuer à travailler"
 
@@ -135,6 +152,7 @@ Exemples:
 ### Étape 3.1: Page Insights
 
 ✅ **Checklist de la page:**
+
 - [ ] Titre: "Vos Insights de Compatibilité"
 - [ ] Onglets: "Insights Détaillés" et "Progression & Récompenses"
 - [ ] Carte de résumé de personnalité
@@ -147,12 +165,15 @@ Exemples:
 2. Vérifier les éléments suivants:
 
 #### 🏆 Niveau et Points
+
 - [ ] Affichage du niveau actuel (niveau 1 au début)
 - [ ] Total de points affichés
 - [ ] Barre de progression vers le niveau suivant
 
 #### 🎖️ Achievements débloqués
+
 ✅ **Achievement automatique:**
+
 - **"Premier Test"** devrait être débloqué ✅
   - Titre: "Premier Pas"
   - Description: "Test de compatibilité complété"
@@ -160,6 +181,7 @@ Exemples:
   - Récompense: +50 points
 
 ✅ **Achievements potentiels (selon vos réponses):**
+
 - **"Perfect Match"** si score ≥ 90 dans un domaine
   - Récompense: +200 points
 - **"Insight Master"** si tous les domaines analysés
@@ -168,6 +190,7 @@ Exemples:
 ### Étape 3.3: Analytics automatiques
 
 **🔍 En coulisses (vérifier plus tard dans Supabase):**
+
 - ✅ Vue d'insights automatiquement trackée
 - ✅ Action "complete_test" enregistrée
 - ✅ Action "view_insights" enregistrée
@@ -182,15 +205,18 @@ Exemples:
 2. Cliquer sur **"Partager mes insights"** 🔗
 
 **Scénario A - Web Share API disponible:**
+
 - Popup de partage natif s'ouvre
 - Choisir une app ou annuler
 - Toast: "Insights partagés avec succès !"
 
 **Scénario B - Fallback clipboard:**
+
 - Lien copié dans le presse-papier
 - Toast: "Lien copié dans le presse-papier !"
 
-✅ **Vérification:** 
+✅ **Vérification:**
+
 - [ ] Action trackée en DB (vérifier plus tard)
 - [ ] Compteur `share_count` incrémenté
 
@@ -201,6 +227,7 @@ Exemples:
 3. Fichier `mes-insights-compatibilite.pdf` téléchargé
 
 **Vérifier le contenu du PDF:**
+
 - [ ] Titre: "Mes Insights de Compatibilité"
 - [ ] Date de génération
 - [ ] Score de progression (%)
@@ -211,6 +238,7 @@ Exemples:
 - [ ] Footer avec branding
 
 ✅ **Vérification:**
+
 - [ ] Toast: "PDF téléchargé avec succès !"
 - [ ] Compteur `export_count` incrémenté en DB
 
@@ -243,8 +271,9 @@ Exemples:
 **Accès:** Supabase Dashboard → Table Editor → `insights_analytics`
 
 **Requête SQL:**
+
 ```sql
-SELECT 
+SELECT
   id,
   user_id,
   view_count,
@@ -259,6 +288,7 @@ LIMIT 5;
 ```
 
 ✅ **Vérifier:**
+
 - [ ] Une ligne pour votre `user_id`
 - [ ] `view_count` ≥ 1 (au moins une vue)
 - [ ] `share_count` ≥ 1 (si vous avez partagé)
@@ -268,8 +298,9 @@ LIMIT 5;
 ### Étape 5.2: Table `insight_actions`
 
 **Requête SQL:**
+
 ```sql
-SELECT 
+SELECT
   id,
   user_id,
   action_type,
@@ -282,6 +313,7 @@ LIMIT 20;
 ```
 
 ✅ **Actions attendues (minimum):**
+
 - [ ] `complete_test` - Complétion du test
 - [ ] `view_insights` - Vue des insights (peut être multiple)
 - [ ] `share_insights` - Partage (si testé)
@@ -289,14 +321,16 @@ LIMIT 20;
 - [ ] Actions de navigation (`improve_profile`, `browse_profiles`, etc.)
 
 **Vérifier les timestamps:**
+
 - Toutes les actions devraient être récentes (dernière heure)
 - Les actions doivent être dans l'ordre chronologique
 
 ### Étape 5.3: Table `achievement_unlocks`
 
 **Requête SQL:**
+
 ```sql
-SELECT 
+SELECT
   id,
   user_id,
   achievement_id,
@@ -310,6 +344,7 @@ ORDER BY unlocked_at DESC;
 ```
 
 ✅ **Achievement minimum garanti:**
+
 - [ ] `first_test` - Premier Test
   - `achievement_title`: contient "Premier" ou "First"
   - `rarity`: 'common'
@@ -317,6 +352,7 @@ ORDER BY unlocked_at DESC;
   - `unlocked_at`: timestamp récent
 
 ✅ **Achievements possibles:**
+
 - [ ] `perfect_match` (si score ≥ 90)
   - `points_awarded`: 200
   - `rarity`: 'epic'
@@ -328,8 +364,9 @@ ORDER BY unlocked_at DESC;
 ### Étape 5.4: Table `user_progression`
 
 **Requête SQL:**
+
 ```sql
-SELECT 
+SELECT
   id,
   user_id,
   current_level,
@@ -344,6 +381,7 @@ WHERE user_id = 'YOUR_USER_ID_HERE';
 ```
 
 ✅ **Vérifier les valeurs:**
+
 - [ ] `current_level`: 1 (au début)
 - [ ] `total_points`: Somme des points des achievements (minimum 50)
 - [ ] `achievements_count`: Nombre d'achievements débloqués (minimum 1)
@@ -353,9 +391,10 @@ WHERE user_id = 'YOUR_USER_ID_HERE';
 ### Étape 5.5: Vérifier l'intégrité des données
 
 **Requête de vérification croisée:**
+
 ```sql
 -- Vérifier que tous les compteurs sont cohérents
-SELECT 
+SELECT
   u.email,
   ia.view_count,
   ia.share_count,
@@ -369,11 +408,12 @@ LEFT JOIN insights_analytics ia ON ia.user_id = u.id
 LEFT JOIN user_progression up ON up.user_id = u.id
 LEFT JOIN achievement_unlocks au ON au.user_id = u.id
 WHERE u.email = 'test-phase5@example.com'
-GROUP BY u.email, ia.view_count, ia.share_count, ia.export_count, 
+GROUP BY u.email, ia.view_count, ia.share_count, ia.export_count,
          up.achievements_count, up.total_points;
 ```
 
 ✅ **Cohérence attendue:**
+
 - `up.achievements_count` = `actual_achievements`
 - `up.total_points` = `actual_points`
 - Pas de valeurs NULL inattendues
@@ -389,6 +429,7 @@ GROUP BY u.email, ia.view_count, ia.share_count, ia.export_count,
 3. Noter les recommandations affichées
 
 **Recommandations attendues (scénario initial):**
+
 - ✅ "Partagez vos insights avec votre famille..." (si `share_count = 0`)
 - ✅ "Exportez vos insights en PDF..." (si `export_count = 0`)
 - ✅ "Explorez davantage vos insights..." (si engagement = 'low')
@@ -404,12 +445,14 @@ GROUP BY u.email, ia.view_count, ia.share_count, ia.export_count,
 **Attendu:** Les recommandations devraient changer !
 
 **Si vous avez partagé ET exporté:**
+
 - ❌ Recommandations de partage/export disparues
 - ✅ Nouvelles recommandations apparues:
   - "Découvrez des profils compatibles..."
   - "Revisitez vos insights régulièrement..."
 
 **Calcul du niveau d'engagement:**
+
 - **Low**: < 5 actions totales
 - **Medium**: 5-9 actions totales
 - **High**: ≥ 10 actions totales
@@ -423,6 +466,7 @@ GROUP BY u.email, ia.view_count, ia.share_count, ia.export_count,
 **Objectif:** Débloquer en visitant les insights 5 fois
 
 **Actions:**
+
 1. Visiter `/compatibility-insights` (compteur = 1)
 2. Naviguer ailleurs (ex: `/dashboard`)
 3. Revenir à `/compatibility-insights` (compteur = 2)
@@ -430,12 +474,14 @@ GROUP BY u.email, ia.view_count, ia.share_count, ia.export_count,
 5. Au 5ème retour → Achievement débloqué ! 🎉
 
 ✅ **Vérifications:**
+
 - [ ] Toast de déblocage affiché
 - [ ] Points ajoutés (+100 points)
 - [ ] Badge "Insights Explorer" visible dans l'interface
 - [ ] Entrée dans `achievement_unlocks`
 
 **Requête de vérification:**
+
 ```sql
 SELECT achievement_id, unlocked_at, points_awarded
 FROM achievement_unlocks
@@ -448,17 +494,20 @@ WHERE user_id = 'YOUR_USER_ID'
 **Si vous avez débloqué plusieurs achievements:**
 
 **Calcul des points:**
+
 - `first_test`: +50
 - `insights_explorer`: +100
 - `perfect_match` (si applicable): +200
 - **Total**: 150-350+ points
 
 **Niveaux:**
+
 - Niveau 1: 0-249 points
 - Niveau 2: 250-499 points
 - Niveau 3: 500-999 points
 
 ✅ **Vérifier:**
+
 - [ ] Barre de progression mise à jour
 - [ ] Niveau affiché correctement
 - [ ] Animation de montée de niveau (si changement)
@@ -479,6 +528,7 @@ WHERE user_id = 'YOUR_USER_ID'
 2. Naviguer vers `/compatibility-insights`
 
 ✅ **Persistance des données:**
+
 - [ ] Achievements toujours présents
 - [ ] Points toujours affichés
 - [ ] Niveau conservé
@@ -488,10 +538,12 @@ WHERE user_id = 'YOUR_USER_ID'
 ### Étape 8.3: Vérifier l'incrémentation
 
 **Nouvelle visite = nouveau tracking:**
+
 - `view_count` devrait être incrémenté (+1)
 - Nouvelle entrée dans `insight_actions` avec `action_type = 'view_insights'`
 
 **Requête:**
+
 ```sql
 SELECT view_count, last_viewed_at
 FROM insights_analytics
@@ -509,6 +561,7 @@ WHERE user_id = 'YOUR_USER_ID';
 3. Aller directement à `/compatibility-insights`
 
 ✅ **Comportement attendu:**
+
 - [ ] Message: "Complétez d'abord le test de compatibilité"
 - [ ] Bouton pour démarrer le test
 - [ ] Pas d'erreur de chargement
@@ -517,9 +570,11 @@ WHERE user_id = 'YOUR_USER_ID';
 ### Étape 9.2: Test de l'export PDF sans insights
 
 **Avec le compte vide:**
+
 1. Essayer d'exporter le PDF
 
 ✅ **Comportement attendu:**
+
 - [ ] PDF généré quand même (avec données par défaut)
 - [ ] Message d'avertissement ou PDF minimal
 - [ ] Pas de crash de l'application
@@ -531,6 +586,7 @@ WHERE user_id = 'YOUR_USER_ID';
 3. Essayer de partager
 
 ✅ **Comportement attendu:**
+
 - [ ] Message d'erreur approprié
 - [ ] Pas de crash
 - [ ] Fallback graceful (ex: copy link toujours fonctionne)
@@ -540,18 +596,21 @@ WHERE user_id = 'YOUR_USER_ID';
 ## ✅ CHECKLIST FINALE
 
 ### Infrastructure ✅
+
 - [ ] 4 tables Supabase créées et accessibles
 - [ ] RLS policies fonctionnelles
 - [ ] Indexes présents et performants
 - [ ] Fonction RPC `increment_insight_views` fonctionne
 
 ### Tracking Analytics ✅
+
 - [ ] Vues trackées automatiquement
 - [ ] Actions enregistrées dans `insight_actions`
 - [ ] Compteurs incrémentés correctement
 - [ ] Timestamps cohérents
 
 ### Achievements ✅
+
 - [ ] "Premier Test" débloqué automatiquement
 - [ ] Autres achievements débloqués selon conditions
 - [ ] Points attribués correctement
@@ -559,12 +618,14 @@ WHERE user_id = 'YOUR_USER_ID';
 - [ ] Persistence en base de données
 
 ### Export & Partage ✅
+
 - [ ] PDF généré avec contenu réel
 - [ ] Recommandations dynamiques dans le PDF
 - [ ] Web Share API fonctionne (ou fallback)
 - [ ] Actions trackées dans la DB
 
 ### UX & Performance ✅
+
 - [ ] Pas d'erreurs dans la console
 - [ ] Chargement rapide (< 1s)
 - [ ] Animations fluides
@@ -579,7 +640,7 @@ WHERE user_id = 'YOUR_USER_ID';
 
 ```sql
 -- Stats complètes d'un utilisateur
-SELECT 
+SELECT
   u.email,
   p.full_name,
   ia.view_count,
@@ -596,8 +657,8 @@ LEFT JOIN insights_analytics ia ON ia.user_id = u.id
 LEFT JOIN user_progression up ON up.user_id = u.id
 LEFT JOIN achievement_unlocks au ON au.user_id = u.id
 WHERE u.email LIKE '%test-phase5%'
-GROUP BY u.email, p.full_name, ia.view_count, ia.share_count, 
-         ia.export_count, up.current_level, up.total_points, 
+GROUP BY u.email, p.full_name, ia.view_count, ia.share_count,
+         ia.export_count, up.current_level, up.total_points,
          up.achievements_count;
 ```
 
@@ -605,7 +666,7 @@ GROUP BY u.email, p.full_name, ia.view_count, ia.share_count,
 
 ```sql
 -- Historique chronologique
-SELECT 
+SELECT
   TO_CHAR(created_at, 'HH24:MI:SS') as time,
   action_type,
   metadata
@@ -618,7 +679,7 @@ ORDER BY created_at ASC;
 
 ```sql
 -- Top utilisateurs par points
-SELECT 
+SELECT
   p.full_name,
   up.total_points,
   up.current_level,
@@ -636,12 +697,14 @@ LIMIT 10;
 ### Après test complet, vous devriez avoir:
 
 **Dans Supabase:**
+
 - ✅ 1 entrée dans `insights_analytics`
 - ✅ 5-15 entrées dans `insight_actions`
 - ✅ 1-4 entrées dans `achievement_unlocks`
 - ✅ 1 entrée dans `user_progression`
 
 **Dans l'interface:**
+
 - ✅ Badges d'achievements visibles
 - ✅ Score de progression affiché
 - ✅ Niveau utilisateur correct
@@ -649,6 +712,7 @@ LIMIT 10;
 - ✅ PDF téléchargé avec contenu réel
 
 **Performance:**
+
 - ✅ Chargement insights < 1s
 - ✅ Génération PDF < 2s
 - ✅ Tracking actions < 100ms
@@ -661,18 +725,22 @@ LIMIT 10;
 ### Problème: Achievements non débloqués
 
 **Solution:**
+
 1. Vérifier les logs console pour erreurs
 2. Requête SQL pour vérifier les conditions:
+
 ```sql
 SELECT * FROM compatibility_responses
 WHERE user_id = 'YOUR_USER_ID'
 ORDER BY created_at DESC;
 ```
+
 3. Vérifier que `useCompatibilityInsights` retourne des données
 
 ### Problème: PDF vide ou erreur
 
 **Solution:**
+
 1. Vérifier que jsPDF est installé: `npm list jspdf`
 2. Vérifier les logs console
 3. Tester avec un PDF minimal
@@ -680,16 +748,20 @@ ORDER BY created_at DESC;
 ### Problème: Analytics non trackées
 
 **Solution:**
+
 1. Vérifier RLS policies dans Supabase
 2. Tester la fonction RPC manuellement:
+
 ```sql
 SELECT increment_insight_views('YOUR_USER_ID');
 ```
+
 3. Vérifier les erreurs dans le hook `useInsightsAnalytics`
 
 ### Problème: Recommandations ne changent pas
 
 **Solution:**
+
 1. Forcer un refresh: `analytics.refresh()`
 2. Vérifier que les compteurs sont bien incrémentés en DB
 3. Clear cache et recharger
@@ -700,47 +772,57 @@ SELECT increment_insight_views('YOUR_USER_ID');
 
 ```markdown
 # Rapport de Test Phase 5
-Date: __________
-Testeur: __________
+
+Date: \***\*\_\_\*\***
+Testeur: \***\*\_\_\*\***
 
 ## Résumé
+
 - [ ] Tous les tests passés ✅
 - [ ] Problèmes mineurs trouvés ⚠️
 - [ ] Problèmes majeurs trouvés ❌
 
 ## Détails
+
 ### Authentification
+
 - Compte créé: ✅ / ❌
 - Connexion: ✅ / ❌
 
 ### Test de Compatibilité
+
 - Test complété: ✅ / ❌
 - Insights générés: ✅ / ❌
 
 ### Achievements
+
 - first_test débloqué: ✅ / ❌
-- Points attribués: _____ points
-- Niveau atteint: _____
+- Points attribués: **\_** points
+- Niveau atteint: **\_**
 
 ### Analytics
+
 - Vues trackées: ✅ / ❌
-- Actions enregistrées: _____ actions
+- Actions enregistrées: **\_** actions
 - Export PDF: ✅ / ❌
 - Partage: ✅ / ❌
 
 ### Base de données
+
 - insights_analytics: ✅ / ❌
 - insight_actions: ✅ / ❌
 - achievement_unlocks: ✅ / ❌
 - user_progression: ✅ / ❌
 
 ## Bugs trouvés
-1. __________
-2. __________
+
+1. ***
+2. ***
 
 ## Suggestions d'amélioration
-1. __________
-2. __________
+
+1. ***
+2. ***
 ```
 
 ---
@@ -750,6 +832,7 @@ Testeur: __________
 Si tous les tests passent, **la Phase 5 est un succès complet** ! 🎉
 
 Vous avez maintenant :
+
 - ✅ Un système d'analytics production-ready
 - ✅ Une gamification engageante et persistée
 - ✅ Un export PDF fonctionnel
@@ -760,4 +843,4 @@ Vous avez maintenant :
 
 ---
 
-*Guide de test généré - Phase 5 - 6 janvier 2025*
+_Guide de test généré - Phase 5 - 6 janvier 2025_

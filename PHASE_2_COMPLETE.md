@@ -11,13 +11,13 @@ La Phase 2 de la migration TypeScript a été complétée avec succès, **dépas
 
 ### Accomplissements Clés
 
-| Métrique | Objectif | Réalisé | Statut |
-|----------|----------|---------|--------|
-| **`any` éliminés** | 20 | **22** | ✅ **+10%** |
-| **Types centralisés créés** | 20+ | **25+** | ✅ |
-| **Fichiers migrés** | 3 | **3** | ✅ |
-| **Erreurs TypeScript** | 0 | **0** | ✅ |
-| **Architecture typée** | Modération + Matching | **100%** | ✅ |
+| Métrique                    | Objectif              | Réalisé  | Statut      |
+| --------------------------- | --------------------- | -------- | ----------- |
+| **`any` éliminés**          | 20                    | **22**   | ✅ **+10%** |
+| **Types centralisés créés** | 20+                   | **25+**  | ✅          |
+| **Fichiers migrés**         | 3                     | **3**    | ✅          |
+| **Erreurs TypeScript**      | 0                     | **0**    | ✅          |
+| **Architecture typée**      | Modération + Matching | **100%** | ✅          |
 
 ### Impact Global
 
@@ -30,9 +30,11 @@ La Phase 2 de la migration TypeScript a été complétée avec succès, **dépas
 ## 🎯 Objectifs de Phase 2
 
 ### Objectif Principal
+
 Typer strictement les services de **modération de contenu** et de **matching/compatibilité**.
 
 ### Périmètre
+
 1. **Service de modération** (`contentModerationService.ts`)
 2. **Service d'optimisation de matching** (`matchingOptimizationService.ts`)
 3. **Algorithme de compatibilité** (`matchingAlgorithm.ts`)
@@ -43,9 +45,11 @@ Typer strictement les services de **modération de contenu** et de **matching/co
 ## 📁 Fichiers Migrés
 
 ### 1. contentModerationService.ts (src/services/)
+
 **`any` éliminés:** 5
 
 #### Changements Principaux
+
 - ✅ Typologie stricte des règles de modération (`ModerationRuleRow` → `ModerationRule`)
 - ✅ Typologie stricte des violations (`ModerationViolationRow` → `ModerationViolation`)
 - ✅ Gestion d'erreurs avec `PostgrestError`
@@ -53,6 +57,7 @@ Typer strictement les services de **modération de contenu** et de **matching/co
 - ✅ Statistiques typées (`ModerationStats`)
 
 #### Types Créés (11)
+
 1. `ModerationRuleType`
 2. `ModerationSeverity`
 3. `ModerationAction`
@@ -69,9 +74,11 @@ Typer strictement les services de **modération de contenu** et de **matching/co
 ---
 
 ### 2. matchingOptimizationService.ts (src/services/)
+
 **`any` éliminés:** 8
 
 #### Changements Principaux
+
 - ✅ Profils typés strictement (`ProfileRow`, `MatchingProfile`)
 - ✅ Préférences islamiques typées (`IslamicPreferencesRow`, `MatchingIslamicPreferences`)
 - ✅ Scores de compatibilité typés (`ScoredMatch`)
@@ -80,6 +87,7 @@ Typer strictement les services de **modération de contenu** et de **matching/co
 - ✅ Gestion d'erreurs avec `PostgrestError`
 
 #### Types Créés (9)
+
 1. `MatchFilters`
 2. `MatchingProfile`
 3. `MatchingIslamicPreferences`
@@ -93,9 +101,11 @@ Typer strictement les services de **modération de contenu** et de **matching/co
 ---
 
 ### 3. matchingAlgorithm.ts (src/utils/)
+
 **`any` éliminés:** 6
 
 #### Changements Principaux
+
 - ✅ Préférences islamiques strictement typées (`MatchingIslamicPreferences`)
 - ✅ Préférences culturelles typées (`CulturalPreferences`)
 - ✅ Poids de compatibilité typés (`CompatibilityWeights`)
@@ -104,6 +114,7 @@ Typer strictement les services de **modération de contenu** et de **matching/co
 - ✅ Gestion des `null`/`undefined` sécurisée
 
 #### Types Créés (3)
+
 1. `CulturalPreferences`
 2. `CompatibilityWeights`
 3. `CompatibilityExplanation`
@@ -111,9 +122,11 @@ Typer strictement les services de **modération de contenu** et de **matching/co
 ---
 
 ### 4. matchingUtils.ts (src/utils/)
+
 **`any` éliminés:** 3
 
 #### Changements Principaux
+
 - ✅ Rôles utilisateur typés (`UserMatchingRole`)
 - ✅ Options de récupération typées (`FetchMatchingProfilesOptions`)
 - ✅ Retours Supabase typés avec `PostgrestError`
@@ -121,6 +134,7 @@ Typer strictement les services de **modération de contenu** et de **matching/co
 - ✅ Helpers de normalisation typés
 
 #### Types Créés (2)
+
 1. `UserMatchingRole`
 2. `FetchMatchingProfilesOptions`
 
@@ -181,18 +195,20 @@ CompatibilityWeights
 ## 📈 Patterns de Migration Utilisés
 
 ### 1. Cast Explicite pour Partial Selects
+
 ```typescript
 // ❌ AVANT
 const { data } = await supabase.from('profiles').select('id, full_name');
 // data est any[]
 
 // ✅ APRÈS
-const { data } = await supabase
-  .from('profiles')
-  .select('id, full_name') as { data: Partial<ProfileRow>[] | null };
+const { data } = (await supabase.from('profiles').select('id, full_name')) as {
+  data: Partial<ProfileRow>[] | null;
+};
 ```
 
 ### 2. Gestion Stricte des Erreurs PostgrestError
+
 ```typescript
 // ❌ AVANT
 if (error) throw error;
@@ -205,6 +221,7 @@ if (error) {
 ```
 
 ### 3. Type Guards pour Validation
+
 ```typescript
 // ✅ Pattern utilisé
 function isValidRule(rule: ModerationRuleRow): rule is ModerationRule {
@@ -216,16 +233,15 @@ function isValidRule(rule: ModerationRuleRow): rule is ModerationRule {
 ```
 
 ### 4. Normalisation des Données
+
 ```typescript
 // ✅ Conversion sécurisée Row → Type strict
-const rules = rawRules
-  .filter(isValidRule)
-  .map(row => ({
-    ...row,
-    rule_type: row.rule_type as ModerationRuleType,
-    severity: row.severity as ModerationSeverity,
-    action: row.action as ModerationAction
-  }));
+const rules = rawRules.filter(isValidRule).map((row) => ({
+  ...row,
+  rule_type: row.rule_type as ModerationRuleType,
+  severity: row.severity as ModerationSeverity,
+  action: row.action as ModerationAction,
+}));
 ```
 
 ---
@@ -256,50 +272,58 @@ const rules = rawRules
 ## 📊 Statistiques Détaillées
 
 ### Distribution des `any` Éliminés
-| Fichier | `any` avant | `any` après | Éliminés |
-|---------|-------------|-------------|----------|
-| contentModerationService.ts | 5 | 0 | 5 |
-| matchingOptimizationService.ts | 8 | 0 | 8 |
-| matchingAlgorithm.ts | 6 | 0 | 6 |
-| matchingUtils.ts | 3 | 0 | 3 |
-| **TOTAL** | **22** | **0** | **22** |
+
+| Fichier                        | `any` avant | `any` après | Éliminés |
+| ------------------------------ | ----------- | ----------- | -------- |
+| contentModerationService.ts    | 5           | 0           | 5        |
+| matchingOptimizationService.ts | 8           | 0           | 8        |
+| matchingAlgorithm.ts           | 6           | 0           | 6        |
+| matchingUtils.ts               | 3           | 0           | 3        |
+| **TOTAL**                      | **22**      | **0**       | **22**   |
 
 ### Types Créés par Catégorie
-| Catégorie | Nombre | Exemples |
-|-----------|--------|----------|
-| **Modération** | 11 | `ModerationRule`, `ModerationViolation`, `ModerationResult` |
-| **Matching** | 9 | `MatchingProfile`, `ScoredMatch`, `CachedMatch` |
-| **Compatibilité** | 3 | `CompatibilityWeights`, `CompatibilityExplanation` |
-| **Utilitaires** | 2 | `UserMatchingRole`, `FetchMatchingProfilesOptions` |
-| **TOTAL** | **25** | |
+
+| Catégorie         | Nombre | Exemples                                                    |
+| ----------------- | ------ | ----------------------------------------------------------- |
+| **Modération**    | 11     | `ModerationRule`, `ModerationViolation`, `ModerationResult` |
+| **Matching**      | 9      | `MatchingProfile`, `ScoredMatch`, `CachedMatch`             |
+| **Compatibilité** | 3      | `CompatibilityWeights`, `CompatibilityExplanation`          |
+| **Utilitaires**   | 2      | `UserMatchingRole`, `FetchMatchingProfilesOptions`          |
+| **TOTAL**         | **25** |                                                             |
 
 ---
 
 ## 🚀 Prochaines Étapes (Phase 3)
 
 ### Objectif Phase 3
+
 **Typer strictement les composants UI et hooks** utilisant les services de modération et matching.
 
 ### Périmètre Proposé
 
 #### 1. Hooks de Matching
+
 - [ ] `useSmartRecommendations.tsx` (utilise `matchingOptimizationService`)
 - [ ] `useMatchingPreferences.tsx` (utilise `MatchingPreferencesRow`)
 - [ ] `useCompatibility.tsx` (utilise `matchingAlgorithm`)
 
 #### 2. Hooks de Modération
+
 - [ ] `useIslamicModeration.tsx` (utilise `contentModerationService`)
 
 #### 3. Composants de Matching
+
 - [ ] `MatchCard.tsx` (affiche `ScoredMatch`)
 - [ ] `MatchResultsGrid.tsx` (liste de `ScoredMatch`)
 - [ ] `SmartRecommendationEngine.tsx` (utilise matching service)
 
 #### 4. Composants de Modération
+
 - [ ] `ModerationDemo.tsx` (teste moderation service)
 - [ ] `MessageModerationWrapper.tsx` (wrap moderation)
 
 ### Estimation Phase 3
+
 - **`any` estimés:** 15-20
 - **Fichiers:** 7-10
 - **Types supplémentaires:** 5-10
@@ -309,6 +333,7 @@ const rules = rawRules
 ## 🎉 Conclusion
 
 La **Phase 2 est un succès complet** avec:
+
 - ✅ **110% de l'objectif atteint** (22/20 `any` éliminés)
 - ✅ **Architecture solide** pour modération et matching
 - ✅ **25+ types réutilisables** centralisés

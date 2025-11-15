@@ -1,9 +1,8 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export const checkProfileExists = async (userId: string) => {
   console.log('Checking if profile exists for user:', userId);
-  
+
   if (!userId || typeof userId !== 'string' || userId.length < 30) {
     throw new Error('Invalid user ID format');
   }
@@ -15,7 +14,7 @@ export const checkProfileExists = async (userId: string) => {
     .maybeSingle();
 
   if (checkError) {
-    console.error("Error checking existing profile:", checkError);
+    console.error('Error checking existing profile:', checkError);
     throw new Error(`Erreur lors de la vérification du profil: ${checkError.message}`);
   }
 
@@ -24,9 +23,9 @@ export const checkProfileExists = async (userId: string) => {
 };
 
 export const updateProfile = async (userId: string, updateData: any) => {
-  console.log("Updating profile for user:", userId);
-  console.log("Update data:", JSON.stringify(updateData, null, 2));
-  
+  console.log('Updating profile for user:', userId);
+  console.log('Update data:', JSON.stringify(updateData, null, 2));
+
   // Clean data - remove undefined values
   const cleanUpdateData = Object.keys(updateData).reduce((acc, key) => {
     if (updateData[key] !== undefined && updateData[key] !== null) {
@@ -43,18 +42,18 @@ export const updateProfile = async (userId: string, updateData: any) => {
     .single();
 
   if (result.error) {
-    console.error("Error updating profile:", result.error);
+    console.error('Error updating profile:', result.error);
     throw new Error(`Erreur lors de la mise à jour: ${result.error.message}`);
   }
 
-  console.log("Profile updated successfully");
+  console.log('Profile updated successfully');
   return result;
 };
 
 export const insertProfile = async (updateData: any) => {
-  console.log("Creating new profile");
-  console.log("Insert data:", JSON.stringify(updateData, null, 2));
-  
+  console.log('Creating new profile');
+  console.log('Insert data:', JSON.stringify(updateData, null, 2));
+
   // Clean data - remove undefined values
   const cleanInsertData = Object.keys(updateData).reduce((acc, key) => {
     if (updateData[key] !== undefined && updateData[key] !== null) {
@@ -63,17 +62,13 @@ export const insertProfile = async (updateData: any) => {
     return acc;
   }, {} as any);
 
-  const result = await supabase
-    .from('profiles')
-    .insert(cleanInsertData)
-    .select()
-    .single();
+  const result = await supabase.from('profiles').insert(cleanInsertData).select().single();
 
   if (result.error) {
-    console.error("Error inserting profile:", result.error);
+    console.error('Error inserting profile:', result.error);
     throw new Error(`Erreur lors de la création: ${result.error.message}`);
   }
 
-  console.log("Profile created successfully");
+  console.log('Profile created successfully');
   return result;
 };

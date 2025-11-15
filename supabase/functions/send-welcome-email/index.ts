@@ -1,10 +1,10 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { sendEmail } from "../_shared/smtp.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.2';
+import { sendEmail } from '../_shared/smtp.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface WelcomeEmailRequest {
@@ -14,7 +14,7 @@ interface WelcomeEmailRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
@@ -23,18 +23,18 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Validate required fields
     if (!email) {
-      throw new Error("Email is required");
-    }
-    
-    if (!fullName) {
-      throw new Error("Full name is required");
+      throw new Error('Email is required');
     }
 
-    console.log("Sending welcome email to:", email);
+    if (!fullName) {
+      throw new Error('Full name is required');
+    }
+
+    console.log('Sending welcome email to:', email);
 
     await sendEmail({
       to: email,
-      subject: "Bienvenue sur Zawaj-Connect ! 🌙",
+      subject: 'Bienvenue sur Zawaj-Connect ! 🌙',
       html: `
         <!DOCTYPE html>
         <html lang="fr">
@@ -77,7 +77,7 @@ const handler = async (req: Request): Promise<Response> => {
                       </div>
                       
                       <div style="text-align: center; margin: 30px 0;">
-                        <a href="${Deno.env.get("SUPABASE_URL")}/onboarding" 
+                        <a href="${Deno.env.get('SUPABASE_URL')}/onboarding" 
                            style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: bold; font-size: 16px;">
                           Compléter mon profil
                         </a>
@@ -107,8 +107,8 @@ const handler = async (req: Request): Promise<Response> => {
                         © 2025 Zawaj-Connect. Tous droits réservés.
                       </p>
                       <p style="color: #999999; font-size: 12px; margin: 0;">
-                        <a href="${Deno.env.get("SUPABASE_URL")}/privacy-policy" style="color: #667eea; text-decoration: none;">Politique de confidentialité</a> | 
-                        <a href="${Deno.env.get("SUPABASE_URL")}/terms-of-service" style="color: #667eea; text-decoration: none;">Conditions d'utilisation</a>
+                        <a href="${Deno.env.get('SUPABASE_URL')}/privacy-policy" style="color: #667eea; text-decoration: none;">Politique de confidentialité</a> | 
+                        <a href="${Deno.env.get('SUPABASE_URL')}/terms-of-service" style="color: #667eea; text-decoration: none;">Conditions d'utilisation</a>
                       </p>
                     </td>
                   </tr>
@@ -121,21 +121,18 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Welcome email sent successfully to:", email);
+    console.log('Welcome email sent successfully to:', email);
 
     return new Response(JSON.stringify({ success: true, email }), {
       status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    console.error("Error in send-welcome-email function:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    console.error('Error in send-welcome-email function:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
   }
 };
 

@@ -10,17 +10,24 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Camera, 
-  Upload, 
-  Check, 
-  X, 
-  Eye, 
-  EyeOff, 
-  Shield, 
-  Users, 
+import {
+  Camera,
+  Upload,
+  Check,
+  X,
+  Eye,
+  EyeOff,
+  Shield,
+  Users,
   Star,
   AlertTriangle,
   FileImage,
@@ -29,7 +36,7 @@ import {
   CheckCircle,
   Clock,
   Heart,
-  Settings
+  Settings,
 } from 'lucide-react';
 
 interface PhotoUpload {
@@ -58,14 +65,14 @@ interface PhotoVerificationSystemProps {
   maxPhotos?: number;
 }
 
-const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({ 
-  onComplete, 
-  maxPhotos = 6 
+const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
+  onComplete,
+  maxPhotos = 6,
 }) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { familyMembers, supervisionStatus } = useFamilySupervision();
-  
+
   const [photos, setPhotos] = useState<PhotoUpload[]>([]);
   const [uploading, setUploading] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<PhotoUpload | null>(null);
@@ -79,43 +86,43 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
       name: 'Visage clairement visible',
       description: 'Votre visage doit être clairement visible et reconnaissable',
       required: true,
-      islamic_guideline: 'Transparence et honnêteté dans la présentation'
+      islamic_guideline: 'Transparence et honnêteté dans la présentation',
     },
     {
       id: 'modest_clothing',
       name: 'Tenue modeste',
       description: 'La tenue doit respecter les principes de pudeur islamique',
       required: true,
-      islamic_guideline: 'Respect de la pudeur (Haya) selon les enseignements islamiques'
+      islamic_guideline: 'Respect de la pudeur (Haya) selon les enseignements islamiques',
     },
     {
       id: 'appropriate_setting',
       name: 'Environnement approprié',
       description: 'Photo prise dans un environnement respectable et approprié',
       required: true,
-      islamic_guideline: 'Éviter les environnements qui pourraient être mal interprétés'
+      islamic_guideline: 'Éviter les environnements qui pourraient être mal interprétés',
     },
     {
       id: 'recent_photo',
       name: 'Photo récente',
       description: 'La photo doit dater de moins de 6 mois',
       required: true,
-      islamic_guideline: 'Honnêteté dans la représentation actuelle'
+      islamic_guideline: 'Honnêteté dans la représentation actuelle',
     },
     {
       id: 'no_filters',
       name: 'Pas de filtres excessifs',
-      description: 'Éviter les filtres qui altèrent significativement l\'apparence',
+      description: "Éviter les filtres qui altèrent significativement l'apparence",
       required: false,
-      islamic_guideline: 'Sincérité et authenticité dans la présentation'
+      islamic_guideline: 'Sincérité et authenticité dans la présentation',
     },
     {
       id: 'family_appropriate',
       name: 'Approprié pour la famille',
       description: 'Photo que vous seriez fier de montrer à votre famille',
       required: true,
-      islamic_guideline: 'Respect des valeurs familiales islamiques'
-    }
+      islamic_guideline: 'Respect des valeurs familiales islamiques',
+    },
   ];
 
   useEffect(() => {
@@ -145,7 +152,7 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
           verification_status: 'admin_approved',
           is_primary: true,
           visibility: 'matches_only',
-          islamic_compliance: true
+          islamic_compliance: true,
         };
         setPhotos([existingPhoto]);
       }
@@ -161,9 +168,9 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
     Array.from(files).forEach((file) => {
       if (photos.length >= maxPhotos) {
         toast({
-          title: "Limite atteinte",
+          title: 'Limite atteinte',
           description: `Vous ne pouvez télécharger que ${maxPhotos} photos maximum`,
-          variant: "destructive"
+          variant: 'destructive',
         });
         return;
       }
@@ -178,9 +185,9 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
           verification_status: 'pending',
           is_primary: photos.length === 0,
           visibility: 'matches_only',
-          islamic_compliance: false
+          islamic_compliance: false,
         };
-        setPhotos(prev => [...prev, newPhoto]);
+        setPhotos((prev) => [...prev, newPhoto]);
       };
       reader.readAsDataURL(file);
     });
@@ -200,16 +207,14 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
 
       if (uploadError) throw uploadError;
 
-      const { data: urlData } = supabase.storage
-        .from('profile-photos')
-        .getPublicUrl(fileName);
+      const { data: urlData } = supabase.storage.from('profile-photos').getPublicUrl(fileName);
 
       // Update photo status
-      setPhotos(prev => prev.map(p => 
-        p.id === photo.id 
-          ? { ...p, status: 'uploaded', url: urlData.publicUrl }
-          : p
-      ));
+      setPhotos((prev) =>
+        prev.map((p) =>
+          p.id === photo.id ? { ...p, status: 'uploaded', url: urlData.publicUrl } : p
+        )
+      );
 
       // If this is the primary photo, update profile
       if (photo.is_primary) {
@@ -229,15 +234,15 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
       }
 
       toast({
-        title: "Photo téléchargée",
-        description: "Votre photo a été soumise pour vérification"
+        title: 'Photo téléchargée',
+        description: 'Votre photo a été soumise pour vérification',
       });
     } catch (error) {
       console.error('Error uploading photo:', error);
       toast({
-        title: "Erreur de téléchargement",
-        description: "Impossible de télécharger la photo",
-        variant: "destructive"
+        title: 'Erreur de téléchargement',
+        description: 'Impossible de télécharger la photo',
+        variant: 'destructive',
       });
     } finally {
       setUploading(false);
@@ -247,13 +252,13 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
   const submitForFamilyVerification = async (photoId: string, photoUrl: string) => {
     // Create a notification for family members to review the photo
     const familyReviews = familyMembers
-      .filter(fm => fm.is_wali && fm.can_view_profile)
-      .map(fm => ({
+      .filter((fm) => fm.is_wali && fm.can_view_profile)
+      .map((fm) => ({
         family_member_id: fm.id,
         content_type: 'photo_verification',
         content_url: photoUrl,
         requires_action: true,
-        islamic_compliance_check: true
+        islamic_compliance_check: true,
       }));
 
     // In a real implementation, you would insert these into a family_photo_reviews table
@@ -267,32 +272,35 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
   };
 
   const deletePhoto = (photoId: string) => {
-    setPhotos(prev => prev.filter(p => p.id !== photoId));
+    setPhotos((prev) => prev.filter((p) => p.id !== photoId));
     toast({
-      title: "Photo supprimée",
-      description: "La photo a été retirée de votre profil"
+      title: 'Photo supprimée',
+      description: 'La photo a été retirée de votre profil',
     });
   };
 
   const setPrimaryPhoto = (photoId: string) => {
-    setPhotos(prev => prev.map(p => ({
-      ...p,
-      is_primary: p.id === photoId
-    })));
+    setPhotos((prev) =>
+      prev.map((p) => ({
+        ...p,
+        is_primary: p.id === photoId,
+      }))
+    );
   };
 
-  const updatePhotoVisibility = (photoId: string, visibility: 'public' | 'family_only' | 'matches_only') => {
-    setPhotos(prev => prev.map(p => 
-      p.id === photoId ? { ...p, visibility } : p
-    ));
+  const updatePhotoVisibility = (
+    photoId: string,
+    visibility: 'public' | 'family_only' | 'matches_only'
+  ) => {
+    setPhotos((prev) => prev.map((p) => (p.id === photoId ? { ...p, visibility } : p)));
   };
 
   const appealRejection = async (photoId: string) => {
     if (!rejectionAppeal.trim()) {
       toast({
-        title: "Appel requis",
-        description: "Veuillez expliquer pourquoi cette photo devrait être approuvée",
-        variant: "destructive"
+        title: 'Appel requis',
+        description: 'Veuillez expliquer pourquoi cette photo devrait être approuvée',
+        variant: 'destructive',
       });
       return;
     }
@@ -300,24 +308,22 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
     try {
       // In a real implementation, this would create an appeal record
       console.log('Photo appeal submitted:', photoId, rejectionAppeal);
-      
-      setPhotos(prev => prev.map(p => 
-        p.id === photoId 
-          ? { ...p, verification_status: 'pending' }
-          : p
-      ));
+
+      setPhotos((prev) =>
+        prev.map((p) => (p.id === photoId ? { ...p, verification_status: 'pending' } : p))
+      );
 
       setRejectionAppeal('');
       toast({
-        title: "Appel soumis",
-        description: "Votre appel a été soumis pour révision"
+        title: 'Appel soumis',
+        description: 'Votre appel a été soumis pour révision',
       });
     } catch (error) {
       console.error('Error submitting appeal:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible de soumettre l'appel",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -325,11 +331,26 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
   const getVerificationStatus = (photo: PhotoUpload) => {
     switch (photo.verification_status) {
       case 'pending':
-        return { icon: Clock, color: 'text-yellow-500', bg: 'bg-yellow-50', text: 'En attente de vérification' };
+        return {
+          icon: Clock,
+          color: 'text-yellow-500',
+          bg: 'bg-yellow-50',
+          text: 'En attente de vérification',
+        };
       case 'family_approved':
-        return { icon: Users, color: 'text-blue-500', bg: 'bg-blue-50', text: 'Approuvée par la famille' };
+        return {
+          icon: Users,
+          color: 'text-blue-500',
+          bg: 'bg-blue-50',
+          text: 'Approuvée par la famille',
+        };
       case 'admin_approved':
-        return { icon: CheckCircle, color: 'text-green-500', bg: 'bg-green-50', text: 'Approuvée par l\'administration' };
+        return {
+          icon: CheckCircle,
+          color: 'text-green-500',
+          bg: 'bg-green-50',
+          text: "Approuvée par l'administration",
+        };
       case 'rejected':
         return { icon: X, color: 'text-red-500', bg: 'bg-red-50', text: 'Rejetée' };
       default:
@@ -338,7 +359,10 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
   };
 
   const calculateComplianceScore = () => {
-    const approvedPhotos = photos.filter(p => p.verification_status === 'admin_approved' || p.verification_status === 'family_approved');
+    const approvedPhotos = photos.filter(
+      (p) =>
+        p.verification_status === 'admin_approved' || p.verification_status === 'family_approved'
+    );
     const totalPhotos = photos.length;
     return totalPhotos > 0 ? Math.round((approvedPhotos.length / totalPhotos) * 100) : 0;
   };
@@ -369,7 +393,8 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
                 <DialogHeader>
                   <DialogTitle>Directives Islamiques pour les Photos</DialogTitle>
                   <DialogDescription>
-                    Respectez ces principes pour une vérification rapide et une présentation authentique
+                    Respectez ces principes pour une vérification rapide et une présentation
+                    authentique
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
@@ -377,7 +402,11 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
                     <div key={rule.id} className="border-l-4 border-primary pl-4">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold">{rule.name}</h4>
-                        {rule.required && <Badge variant="destructive" className="text-xs">Requis</Badge>}
+                        {rule.required && (
+                          <Badge variant="destructive" className="text-xs">
+                            Requis
+                          </Badge>
+                        )}
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">{rule.description}</p>
                       <p className="text-xs text-primary italic">{rule.islamic_guideline}</p>
@@ -392,7 +421,9 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
               <div className="text-center">
-                <p className="text-2xl font-bold">{photos.length}/{maxPhotos}</p>
+                <p className="text-2xl font-bold">
+                  {photos.length}/{maxPhotos}
+                </p>
                 <p className="text-xs text-muted-foreground">Photos</p>
               </div>
               <div className="text-center">
@@ -411,10 +442,9 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
           </div>
           <Progress value={(photos.length / maxPhotos) * 100} className="mb-2" />
           <p className="text-xs text-muted-foreground text-center">
-            {photos.length < maxPhotos 
+            {photos.length < maxPhotos
               ? `Vous pouvez ajouter ${maxPhotos - photos.length} photo(s) supplémentaire(s)`
-              : 'Limite de photos atteinte'
-            }
+              : 'Limite de photos atteinte'}
           </p>
         </CardContent>
       </Card>
@@ -424,7 +454,7 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
         <Alert>
           <Users className="h-4 w-4" />
           <AlertDescription>
-            Vos photos seront d'abord examinées par votre famille selon les principes islamiques, 
+            Vos photos seront d'abord examinées par votre famille selon les principes islamiques,
             puis vérifiées par notre équipe de modération.
           </AlertDescription>
         </Alert>
@@ -439,12 +469,8 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
           return (
             <Card key={photo.id} className="overflow-hidden">
               <div className="relative aspect-square">
-                <img 
-                  src={photo.url} 
-                  alt="Profile" 
-                  className="w-full h-full object-cover"
-                />
-                
+                <img src={photo.url} alt="Profile" className="w-full h-full object-cover" />
+
                 {/* Status Overlay */}
                 <div className={`absolute top-2 right-2 p-1 rounded-full ${status.bg}`}>
                   <StatusIcon className={`h-4 w-4 ${status.color}`} />
@@ -462,26 +488,18 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
                 <div className="absolute inset-0 bg-black/50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
                   <div className="flex gap-2">
                     {!photo.is_primary && (
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         variant="secondary"
                         onClick={() => setPrimaryPhoto(photo.id)}
                       >
                         <Star className="h-4 w-4" />
                       </Button>
                     )}
-                    <Button 
-                      size="sm" 
-                      variant="secondary"
-                      onClick={() => setSelectedPhoto(photo)}
-                    >
+                    <Button size="sm" variant="secondary" onClick={() => setSelectedPhoto(photo)}>
                       <Settings className="h-4 w-4" />
                     </Button>
-                    <Button 
-                      size="sm" 
-                      variant="destructive"
-                      onClick={() => deletePhoto(photo.id)}
-                    >
+                    <Button size="sm" variant="destructive" onClick={() => deletePhoto(photo.id)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -491,7 +509,7 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
               <CardContent className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm font-medium">{status.text}</p>
-                  <Badge 
+                  <Badge
                     variant={photo.visibility === 'public' ? 'default' : 'secondary'}
                     className="text-xs"
                   >
@@ -502,8 +520,8 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
                 </div>
 
                 {photo.status === 'pending' && (
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     onClick={() => uploadPhoto(photo)}
                     disabled={uploading}
                     className="w-full"
@@ -515,8 +533,8 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
                 {photo.verification_status === 'rejected' && (
                   <div className="space-y-2">
                     <p className="text-xs text-red-600">{photo.rejection_reason}</p>
-                    <Button 
-                      size="sm" 
+                    <Button
+                      size="sm"
                       variant="outline"
                       onClick={() => setSelectedPhoto(photo)}
                       className="w-full"
@@ -541,15 +559,13 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
         {/* Add Photo Card */}
         {photos.length < maxPhotos && (
           <Card className="border-dashed border-2 hover:border-primary cursor-pointer transition-colors">
-            <div 
+            <div
               className="aspect-square flex flex-col items-center justify-center p-6 text-center"
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="h-12 w-12 text-muted-foreground mb-4" />
               <p className="text-sm font-medium mb-2">Ajouter une photo</p>
-              <p className="text-xs text-muted-foreground">
-                Respectez les directives islamiques
-              </p>
+              <p className="text-xs text-muted-foreground">Respectez les directives islamiques</p>
             </div>
           </Card>
         )}
@@ -564,9 +580,9 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
             </DialogHeader>
             <div className="space-y-4">
               <div className="aspect-square w-48 mx-auto">
-                <img 
-                  src={selectedPhoto.url} 
-                  alt="Preview" 
+                <img
+                  src={selectedPhoto.url}
+                  alt="Preview"
                   className="w-full h-full object-cover rounded-lg"
                 />
               </div>
@@ -595,7 +611,7 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
                     <p className="text-sm font-medium text-red-800 mb-1">Raison du rejet:</p>
                     <p className="text-sm text-red-600">{selectedPhoto.rejection_reason}</p>
                   </div>
-                  
+
                   <div>
                     <Label htmlFor="appeal">Faire appel de la décision</Label>
                     <Textarea
@@ -606,13 +622,10 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
                       rows={4}
                     />
                   </div>
-                  
-                  <Button 
-                    onClick={() => appealRejection(selectedPhoto.id)}
-                    className="w-full"
-                  >
+
+                  <Button onClick={() => appealRejection(selectedPhoto.id)} className="w-full">
                     Soumettre l'appel
-                  </Button>  
+                  </Button>
                 </div>
               )}
             </div>
@@ -639,15 +652,13 @@ const PhotoVerificationSystem: React.FC<PhotoVerificationSystemProps> = ({
               <div>
                 <p className="font-medium text-green-800">Profil photo conforme !</p>
                 <p className="text-sm text-green-600">
-                  Vos photos respectent les directives islamiques et sont prêtes pour la vérification.
+                  Vos photos respectent les directives islamiques et sont prêtes pour la
+                  vérification.
                 </p>
               </div>
             </div>
             {onComplete && (
-              <Button 
-                onClick={onComplete}
-                className="mt-3 bg-green-600 hover:bg-green-700"
-              >
+              <Button onClick={onComplete} className="mt-3 bg-green-600 hover:bg-green-700">
                 Continuer vers l'étape suivante
               </Button>
             )}

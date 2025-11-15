@@ -1,5 +1,4 @@
-
-import { Message } from "@/types/profile";
+import { Message } from '@/types/profile';
 
 export interface WaliProfile {
   id: string;

@@ -9,11 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Badge } from '@/components/ui/badge';
 import { Search, Calendar as CalendarIcon, X, Filter } from 'lucide-react';
@@ -40,7 +36,7 @@ interface WaliEmailHistoryFiltersProps {
 const WaliEmailHistoryFilters: React.FC<WaliEmailHistoryFiltersProps> = ({
   filters,
   onFiltersChange,
-  onReset
+  onReset,
 }) => {
   const updateFilter = (key: keyof EmailFilters, value: any) => {
     onFiltersChange({ ...filters, [key]: value });
@@ -51,7 +47,7 @@ const WaliEmailHistoryFilters: React.FC<WaliEmailHistoryFiltersProps> = ({
     filters.status !== 'all',
     filters.emailType !== 'all',
     filters.dateFrom,
-    filters.dateTo
+    filters.dateTo,
   ].filter(Boolean).length;
 
   return (
@@ -67,12 +63,7 @@ const WaliEmailHistoryFilters: React.FC<WaliEmailHistoryFiltersProps> = ({
           )}
         </div>
         {activeFilterCount > 0 && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onReset}
-            className="h-8"
-          >
+          <Button variant="ghost" size="sm" onClick={onReset} className="h-8">
             <X className="h-4 w-4 mr-1" />
             Réinitialiser
           </Button>
@@ -97,10 +88,7 @@ const WaliEmailHistoryFilters: React.FC<WaliEmailHistoryFiltersProps> = ({
         {/* Status Filter */}
         <div className="space-y-2">
           <Label>Statut</Label>
-          <Select
-            value={filters.status}
-            onValueChange={(value) => updateFilter('status', value)}
-          >
+          <Select value={filters.status} onValueChange={(value) => updateFilter('status', value)}>
             <SelectTrigger>
               <SelectValue placeholder="Tous les statuts" />
             </SelectTrigger>
@@ -157,7 +145,9 @@ const WaliEmailHistoryFilters: React.FC<WaliEmailHistoryFiltersProps> = ({
             <Button
               variant="outline"
               size="icon"
-              onClick={() => updateFilter('sortOrder', filters.sortOrder === 'asc' ? 'desc' : 'asc')}
+              onClick={() =>
+                updateFilter('sortOrder', filters.sortOrder === 'asc' ? 'desc' : 'asc')
+              }
               title={filters.sortOrder === 'asc' ? 'Croissant' : 'Décroissant'}
             >
               {filters.sortOrder === 'asc' ? '↑' : '↓'}
@@ -175,8 +165,8 @@ const WaliEmailHistoryFilters: React.FC<WaliEmailHistoryFiltersProps> = ({
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !filters.dateFrom && "text-muted-foreground"
+                  'w-full justify-start text-left font-normal',
+                  !filters.dateFrom && 'text-muted-foreground'
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
@@ -193,7 +183,7 @@ const WaliEmailHistoryFilters: React.FC<WaliEmailHistoryFiltersProps> = ({
                 selected={filters.dateFrom}
                 onSelect={(date) => updateFilter('dateFrom', date)}
                 initialFocus
-                className={cn("p-3 pointer-events-auto")}
+                className={cn('p-3 pointer-events-auto')}
               />
             </PopoverContent>
           </Popover>
@@ -206,8 +196,8 @@ const WaliEmailHistoryFilters: React.FC<WaliEmailHistoryFiltersProps> = ({
               <Button
                 variant="outline"
                 className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !filters.dateTo && "text-muted-foreground"
+                  'w-full justify-start text-left font-normal',
+                  !filters.dateTo && 'text-muted-foreground'
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
@@ -223,9 +213,9 @@ const WaliEmailHistoryFilters: React.FC<WaliEmailHistoryFiltersProps> = ({
                 mode="single"
                 selected={filters.dateTo}
                 onSelect={(date) => updateFilter('dateTo', date)}
-                disabled={(date) => filters.dateFrom ? date < filters.dateFrom : false}
+                disabled={(date) => (filters.dateFrom ? date < filters.dateFrom : false)}
                 initialFocus
-                className={cn("p-3 pointer-events-auto")}
+                className={cn('p-3 pointer-events-auto')}
               />
             </PopoverContent>
           </Popover>

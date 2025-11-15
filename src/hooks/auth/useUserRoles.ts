@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -29,7 +28,7 @@ export const useUserRoles = () => {
         throw error;
       }
 
-      setRoles(data?.map(item => item.role as UserRole) || []);
+      setRoles(data?.map((item) => item.role as UserRole) || []);
       setError(null);
     } catch (err: any) {
       console.error('Error fetching user roles:', err);
@@ -68,6 +67,6 @@ export const useUserRoles = () => {
     isAdmin,
     isModerator,
     hasAdminOrModerator,
-    refetch: fetchUserRoles
+    refetch: fetchUserRoles,
   };
 };

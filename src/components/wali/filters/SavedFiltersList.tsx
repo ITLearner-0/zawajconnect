@@ -92,11 +92,7 @@ export const SavedFiltersList = ({
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onLoadFilter(filter)}
-                  >
+                  <Button size="sm" variant="ghost" onClick={() => onLoadFilter(filter)}>
                     <Check className="w-4 h-4" />
                   </Button>
                   {!filter.is_default && (
@@ -109,11 +105,7 @@ export const SavedFiltersList = ({
                       <Star className="w-4 h-4" />
                     </Button>
                   )}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleDeleteClick(filter.id)}
-                  >
+                  <Button size="sm" variant="ghost" onClick={() => handleDeleteClick(filter.id)}>
                     <Trash2 className="w-4 h-4 text-destructive" />
                   </Button>
                 </div>
@@ -133,9 +125,7 @@ export const SavedFiltersList = ({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete}>
-              Supprimer
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleConfirmDelete}>Supprimer</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

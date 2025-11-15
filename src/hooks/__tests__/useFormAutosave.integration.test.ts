@@ -21,12 +21,12 @@ const mockLocalStorage = (() => {
     },
     clear: () => {
       store = {};
-    }
+    },
   };
 })();
 
 Object.defineProperty(window, 'localStorage', {
-  value: mockLocalStorage
+  value: mockLocalStorage,
 });
 
 // Mock Supabase
@@ -103,9 +103,7 @@ describe('useFormAutosave Integration Tests', () => {
       })
     );
 
-    const { result } = renderHook(() =>
-      useFormAutosave({}, { storageKey })
-    );
+    const { result } = renderHook(() => useFormAutosave({}, { storageKey }));
 
     const loaded = result.current.loadSaved();
     expect(loaded).toEqual(savedData);
@@ -120,9 +118,7 @@ describe('useFormAutosave Integration Tests', () => {
       })
     );
 
-    const { result } = renderHook(() =>
-      useFormAutosave({}, { storageKey })
-    );
+    const { result } = renderHook(() => useFormAutosave({}, { storageKey }));
 
     expect(result.current.hasSavedData()).toBe(true);
 
@@ -144,7 +140,7 @@ describe('useFormAutosave Integration Tests', () => {
       })
     );
 
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise((resolve) => setTimeout(resolve, 600));
 
     const saved = mockLocalStorage.getItem(storageKey);
     expect(saved).toBeNull();
@@ -216,9 +212,7 @@ describe('useFormAutosave Integration Tests', () => {
       })
     );
 
-    const { result } = renderHook(() =>
-      useFormAutosave({}, { storageKey })
-    );
+    const { result } = renderHook(() => useFormAutosave({}, { storageKey }));
 
     const loaded = result.current.loadSaved();
     expect(loaded).toBeNull();
@@ -244,7 +238,7 @@ describe('useFormAutosave Integration Tests', () => {
     );
 
     // Wait for attempted save
-    await new Promise(resolve => setTimeout(resolve, 400));
+    await new Promise((resolve) => setTimeout(resolve, 400));
 
     // Restore
     mockLocalStorage.setItem = originalSetItem;
@@ -258,7 +252,7 @@ describe('useFormAutosave Integration Tests', () => {
       useFormAutosave(formData, {
         storageKey,
         debounceMs: 300,
-        saveToDatabase: true,  // onSuccess is only called when saving to database
+        saveToDatabase: true, // onSuccess is only called when saving to database
         tableName: 'test_table',
         userId: 'test-user',
         onSuccess,
@@ -293,7 +287,7 @@ describe('useFormAutosave Integration Tests', () => {
     for (let i = 1; i <= 10; i++) {
       formData = { count: i };
       rerender({ data: formData });
-      await new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise((resolve) => setTimeout(resolve, 50));
     }
 
     // Wait for final save
@@ -315,9 +309,7 @@ describe('useFormAutosave Integration Tests', () => {
   it('should save on unmount', () => {
     const formData = { unmount: 'test' };
 
-    const { unmount } = renderHook(() =>
-      useFormAutosave(formData, { storageKey })
-    );
+    const { unmount } = renderHook(() => useFormAutosave(formData, { storageKey }));
 
     unmount();
 

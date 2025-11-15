@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useRef } from 'react';
 import { useLazyLoadingContext } from '../context/LazyLoadingContext';
 import { useEnhancedLazyLoading } from '../useEnhancedLazyLoading';
@@ -19,7 +18,7 @@ export const useCentralizedLazyLoading = <T extends HTMLElement = HTMLDivElement
   const { state, actions } = useLazyLoadingContext();
   const { id, priority = 'medium', ...lazyOptions } = options;
   const loadStartTime = useRef<number>();
-  
+
   const { elementRef, isIntersecting, shouldLoad, config } = useEnhancedLazyLoading<T>(lazyOptions);
 
   // Track loading state in global context
@@ -35,8 +34,8 @@ export const useCentralizedLazyLoading = <T extends HTMLElement = HTMLDivElement
     if (loadStartTime.current) {
       const loadTime = performance.now() - loadStartTime.current;
       // Update the state's averageLoadTime directly
-      actions.updateConfig({ 
-        averageLoadTime: (state.averageLoadTime + loadTime) / 2 
+      actions.updateConfig({
+        averageLoadTime: (state.averageLoadTime + loadTime) / 2,
       });
     }
     actions.markLoaded(id);
@@ -55,17 +54,18 @@ export const useCentralizedLazyLoading = <T extends HTMLElement = HTMLDivElement
   // Priority-based loading
   const effectiveShouldLoad = useCallback(() => {
     if (isLoaded || hasFailed) return false;
-    
+
     // High priority items load immediately when in view
     if (priority === 'high') return shouldLoad;
-    
+
     // Medium priority items respect batch size
     if (priority === 'medium') {
-      const highPriorityCount = state.loadingQueue.filter(item => 
-        item.includes('high-priority')).length;
-      return shouldLoad && (state.loadingQueue.length - highPriorityCount) < state.batchSize;
+      const highPriorityCount = state.loadingQueue.filter((item) =>
+        item.includes('high-priority')
+      ).length;
+      return shouldLoad && state.loadingQueue.length - highPriorityCount < state.batchSize;
     }
-    
+
     // Low priority items load only when queue is small
     return shouldLoad && state.loadingQueue.length < Math.floor(state.batchSize / 2);
   }, [shouldLoad, priority, isLoaded, hasFailed, state.loadingQueue, state.batchSize]);

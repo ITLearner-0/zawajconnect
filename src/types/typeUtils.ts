@@ -1,4 +1,3 @@
-
 // Type utility functions for better type safety across the app
 
 // Strict utility types
@@ -13,7 +12,10 @@ export type PhoneNumber = string & { readonly __brand: unique symbol };
 
 // Type guards for runtime validation
 export const isValidUuid = (value: unknown): value is DatabaseId => {
-  return typeof value === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+  return (
+    typeof value === 'string' &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+  );
 };
 
 export const isValidEmail = (value: unknown): value is EmailAddress => {
@@ -45,5 +47,7 @@ export const isApiError = (response: unknown): response is { error: string } => 
 };
 
 export const isApiSuccess = <T>(response: unknown): response is { data: T; success: true } => {
-  return typeof response === 'object' && response !== null && 'data' in response && 'success' in response;
+  return (
+    typeof response === 'object' && response !== null && 'data' in response && 'success' in response
+  );
 };

@@ -5,7 +5,9 @@ This directory contains comprehensive security tests for all SECURITY DEFINER da
 ## Test Structure
 
 ### securityDefinerFunctions.test.tsx
+
 Tests core SECURITY DEFINER functions including:
+
 - `is_user_in_active_conversation` - Conversation access validation
 - `has_previous_conversation` - Conversation history checks
 - `get_user_verification_status_secure` - Verification status access
@@ -17,7 +19,9 @@ Tests core SECURITY DEFINER functions including:
 - `increment_insight_views` - Insight view tracking
 
 ### roleBasedSecurityDefiner.test.tsx
+
 Tests role-based access control functions including:
+
 - `get_current_user_role_secure` - Current user role retrieval
 - `get_user_role` - User role queries with authorization
 - `get_validation_error_stats` - Admin-only statistics
@@ -27,20 +31,26 @@ Tests role-based access control functions including:
 ## Test Categories
 
 ### Authentication Tests
+
 Verify that all functions:
+
 - ✅ Reject unauthenticated calls (no auth.uid())
 - ✅ Require valid user session
 - ✅ Return appropriate error messages
 
 ### Authorization Tests
+
 Verify that functions:
+
 - ✅ Enforce ownership checks (users can only access their own data)
 - ✅ Validate relationship requirements (e.g., match participation)
 - ✅ Respect role-based permissions (admin vs. regular user)
 - ✅ Prevent privilege escalation
 
 ### Edge Case Tests
+
 Verify proper handling of:
+
 - ✅ SQL injection attempts
 - ✅ Extremely long inputs
 - ✅ Malformed UUIDs
@@ -51,16 +61,19 @@ Verify proper handling of:
 ## Running Tests
 
 ### Run all security tests:
+
 ```bash
 npm test src/test/security
 ```
 
 ### Run specific test file:
+
 ```bash
 npm test src/test/security/securityDefinerFunctions.test.tsx
 ```
 
 ### Run with coverage:
+
 ```bash
 npm test -- --coverage src/test/security
 ```
@@ -99,6 +112,7 @@ Before deploying a SECURITY DEFINER function:
 ## Monitoring
 
 These tests should be:
+
 - ✅ Run on every commit (CI/CD pipeline)
 - ✅ Run before every deployment
 - ✅ Reviewed quarterly as part of security audits

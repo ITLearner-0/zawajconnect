@@ -1,9 +1,8 @@
-
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Answer } from "@/types/compatibility";
-import TestContainer from "./compatibility/test/TestContainer";
-import EnhancedResultsDisplay from "./compatibility/EnhancedResultsDisplay";
+import { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { Answer } from '@/types/compatibility';
+import TestContainer from './compatibility/test/TestContainer';
+import EnhancedResultsDisplay from './compatibility/EnhancedResultsDisplay';
 
 const CompatibilityTest = () => {
   const [showResult, setShowResult] = useState(false);
@@ -28,11 +27,7 @@ const CompatibilityTest = () => {
         {!showResult ? (
           <TestContainer onComplete={handleTestComplete} />
         ) : (
-          <EnhancedResultsDisplay 
-            score={score} 
-            answers={answers}
-            onRetake={handleRetake} 
-          />
+          <EnhancedResultsDisplay score={score} answers={answers} onRetake={handleRetake} />
         )}
       </Card>
     </div>

@@ -20,10 +20,11 @@ const SecurityGuard: React.FC<SecurityGuardProps> = ({
   requiredOperation = 'message',
   requiredScore = 60,
   fallbackComponent,
-  showUpgrade = true
+  showUpgrade = true,
 }) => {
   const { securityStatus, loading } = useSecurityMonitor();
-  const { validateFamilyOperation, validateMessagePermissions, validateProfileAccess } = useSecurityValidation();
+  const { validateFamilyOperation, validateMessagePermissions, validateProfileAccess } =
+    useSecurityValidation();
 
   if (loading) {
     return (
@@ -43,29 +44,29 @@ const SecurityGuard: React.FC<SecurityGuardProps> = ({
   // Check if user meets requirements
   const meetsRequirements = () => {
     if (!emailVerified) return false;
-    
+
     if (requiredOperation === 'family' && requiredScore >= 80 && !idVerified) {
       return false;
     }
-    
+
     return currentScore >= requiredScore;
   };
 
   const getUpgradeSteps = () => {
     const steps = [];
-    
+
     if (!emailVerified) {
       steps.push('Vérifiez votre adresse email');
     }
-    
+
     if (requiredOperation === 'family' && !idVerified) {
-      steps.push('Vérifiez votre identité avec une pièce d\'identité');
+      steps.push("Vérifiez votre identité avec une pièce d'identité");
     }
-    
+
     if (currentScore < requiredScore) {
       steps.push(`Améliorez votre score de sécurité (${currentScore}/${requiredScore})`);
     }
-    
+
     return steps;
   };
 
@@ -82,7 +83,7 @@ const SecurityGuard: React.FC<SecurityGuardProps> = ({
               <Lock className="h-8 w-8 text-amber-600" />
             </div>
           </div>
-          
+
           <div>
             <h3 className="text-lg font-semibold">Vérification Requise</h3>
             <p className="text-muted-foreground">
@@ -124,9 +125,7 @@ const SecurityGuard: React.FC<SecurityGuardProps> = ({
                 Vérifier Identité
               </Button>
             )}
-            <Button size="sm">
-              Améliorer Sécurité
-            </Button>
+            <Button size="sm">Améliorer Sécurité</Button>
           </div>
         </div>
       </Card>

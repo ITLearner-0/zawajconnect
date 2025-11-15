@@ -33,16 +33,19 @@ Les identifiants FTP sont stockés de manière sécurisée dans **GitHub Secrets
 Créez ces **4 secrets** un par un :
 
 #### 1️⃣ `FTP_SERVER`
+
 **Valeur :** Adresse de votre serveur FTP Hostinger
 
 ```
 ftp.zawajconnect.me
 ```
+
 OU l'adresse IP fournie par Hostinger (ex: `154.56.78.90`)
 
 ---
 
 #### 2️⃣ `FTP_USERNAME`
+
 **Valeur :** Votre nom d'utilisateur FTP
 
 ```
@@ -50,12 +53,14 @@ votre_username_ftp
 ```
 
 **Comment l'obtenir :**
+
 - [hPanel Hostinger](https://hpanel.hostinger.com) → **Fichiers → Gestionnaire FTP**
 - Copiez le **Username**
 
 ---
 
 #### 3️⃣ `FTP_PASSWORD`
+
 **Valeur :** Votre mot de passe FTP
 
 ```
@@ -65,25 +70,30 @@ votre_password_ftp
 ⚠️ **IMPORTANT** : Utilisez un mot de passe fort !
 
 **Comment l'obtenir :**
+
 - Utilisez votre mot de passe FTP existant
 - OU créez un nouveau compte FTP sur hPanel
 
 ---
 
 #### 4️⃣ `FTP_SERVER_DIR`
+
 **Valeur :** Chemin du dossier distant sur Hostinger
 
 Pour un domaine principal :
+
 ```
 /public_html
 ```
 
 Pour un sous-domaine (exemple: `app.zawajconnect.me`) :
+
 ```
 /public_html/app
 ```
 
 Pour un dossier spécifique :
+
 ```
 /public_html/mon-site
 ```
@@ -92,12 +102,12 @@ Pour un dossier spécifique :
 
 ## 📋 Résumé des Secrets à Créer
 
-| Secret Name | Exemple de Valeur | Où le trouver |
-|-------------|-------------------|---------------|
-| `FTP_SERVER` | `ftp.zawajconnect.me` | hPanel → Gestionnaire FTP |
-| `FTP_USERNAME` | `zawaj_ftp` | hPanel → Gestionnaire FTP |
-| `FTP_PASSWORD` | `VotreMotDePasse123!` | Votre mot de passe FTP |
-| `FTP_SERVER_DIR` | `/public_html` | Chemin de destination |
+| Secret Name      | Exemple de Valeur     | Où le trouver             |
+| ---------------- | --------------------- | ------------------------- |
+| `FTP_SERVER`     | `ftp.zawajconnect.me` | hPanel → Gestionnaire FTP |
+| `FTP_USERNAME`   | `zawaj_ftp`           | hPanel → Gestionnaire FTP |
+| `FTP_PASSWORD`   | `VotreMotDePasse123!` | Votre mot de passe FTP    |
+| `FTP_SERVER_DIR` | `/public_html`        | Chemin de destination     |
 
 ---
 
@@ -121,6 +131,7 @@ Pour un dossier spécifique :
 5. Cliquez sur **"Run workflow"** (bouton vert)
 
 Le workflow devrait :
+
 - ✅ S'exécuter en 2-4 minutes
 - ✅ Afficher un ✅ vert si succès
 - ✅ Déployer votre site sur Hostinger
@@ -180,6 +191,7 @@ git push origin main
 **Cause :** Adresse FTP incorrecte ou serveur inaccessible
 
 **Solutions :**
+
 1. Vérifiez `FTP_SERVER` dans les secrets GitHub
 2. Testez la connexion FTP avec FileZilla
 3. Vérifiez que le port 21 n'est pas bloqué
@@ -191,6 +203,7 @@ git push origin main
 **Cause :** Identifiants FTP incorrects
 
 **Solutions :**
+
 1. Vérifiez `FTP_USERNAME` et `FTP_PASSWORD` dans les secrets
 2. Testez la connexion avec FileZilla
 3. Réinitialisez votre mot de passe FTP sur hPanel
@@ -202,6 +215,7 @@ git push origin main
 **Cause :** Permissions insuffisantes ou dossier inexistant
 
 **Solutions :**
+
 1. Vérifiez que `FTP_SERVER_DIR` existe sur le serveur
 2. Assurez-vous que le compte FTP a les permissions d'écriture
 3. Créez le dossier manuellement via hPanel si nécessaire
@@ -211,6 +225,7 @@ git push origin main
 ### ❌ Le site ne se met pas à jour après un déploiement réussi
 
 **Solutions :**
+
 1. **Cache navigateur** : Ctrl+F5 (Windows) ou Cmd+Shift+R (Mac)
 2. **Cache Cloudflare/CDN** : Purgez le cache sur Hostinger
 3. **Vérification** : Affichez la source de la page (Ctrl+U) pour voir si le code est à jour
@@ -233,7 +248,7 @@ Si un déploiement échoue sans raison claire :
     password: ${{ secrets.FTP_PASSWORD }}
     server-dir: ${{ secrets.FTP_SERVER_DIR }}
     local-dir: ./dist/
-    log-level: verbose  # ← Ajouter cette ligne
+    log-level: verbose # ← Ajouter cette ligne
 ```
 
 ---
@@ -275,7 +290,7 @@ jobs:
       - run: npm test
 
   build-and-deploy:
-    needs: test  # ← Attend que les tests passent
+    needs: test # ← Attend que les tests passent
     runs-on: ubuntu-latest
     # ... reste du workflow
 ```
@@ -312,6 +327,7 @@ on:
 ### Temps de Build Moyen
 
 Surveillez les temps de build dans Actions → Insights :
+
 - **Normal** : 2-4 minutes
 - **Lent** : > 5 minutes → Optimiser les dépendances
 

@@ -23,11 +23,11 @@ interface SwipeableProfileCardProps {
   onDoubleTap?: () => void;
 }
 
-export const SwipeableProfileCard = ({ 
-  profile, 
-  onSwipeLeft, 
+export const SwipeableProfileCard = ({
+  profile,
+  onSwipeLeft,
   onSwipeRight,
-  onDoubleTap 
+  onDoubleTap,
 }: SwipeableProfileCardProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -50,7 +50,7 @@ export const SwipeableProfileCard = ({
 
     const deltaX = clientX - startPosition.x;
     const deltaY = clientY - startPosition.y;
-    
+
     setPosition({ x: deltaX, y: deltaY });
   };
 
@@ -66,12 +66,12 @@ export const SwipeableProfileCard = ({
       } else {
         hapticMedium(); // Medium vibration for pass
       }
-      
+
       // Animate out
       setIsAnimatingOut(true);
       const direction = position.x > 0 ? 1 : -1;
       setPosition({ x: direction * window.innerWidth, y: position.y });
-      
+
       // Trigger callback after animation
       setTimeout(() => {
         if (direction > 0) {
@@ -97,7 +97,7 @@ export const SwipeableProfileCard = ({
     const touch = e.touches[0];
     if (!touch) return;
     handleStart(touch.clientX, touch.clientY);
-    
+
     // Double tap detection with haptic
     const now = Date.now();
     if (now - lastTap < 300 && onDoubleTap) {
@@ -177,7 +177,7 @@ export const SwipeableProfileCard = ({
         style={{
           transform: `translateX(${position.x}px) translateY(${position.y}px) rotate(${rotation}deg)`,
           transition: isDragging || isAnimatingOut ? 'none' : 'all 0.3s ease-out',
-          touchAction: 'none'
+          touchAction: 'none',
         }}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -189,7 +189,7 @@ export const SwipeableProfileCard = ({
       >
         <CardContent className="p-0 h-full relative overflow-hidden">
           {/* Swipe Indicators */}
-          <div 
+          <div
             className="absolute top-8 left-8 z-10 pointer-events-none transition-opacity duration-200"
             style={{ opacity: likeOpacity }}
           >
@@ -199,7 +199,7 @@ export const SwipeableProfileCard = ({
             </div>
           </div>
 
-          <div 
+          <div
             className="absolute top-8 right-8 z-10 pointer-events-none transition-opacity duration-200"
             style={{ opacity: nopeOpacity }}
           >
@@ -212,9 +212,9 @@ export const SwipeableProfileCard = ({
           {/* Profile Image */}
           <div className="relative h-96 bg-gradient-to-br from-muted to-muted/50">
             {profile.avatar_url ? (
-              <img 
-                src={profile.avatar_url} 
-                alt="Photo de profil" 
+              <img
+                src={profile.avatar_url}
+                alt="Photo de profil"
                 className="w-full h-full object-cover"
                 draggable="false"
               />
@@ -223,10 +223,10 @@ export const SwipeableProfileCard = ({
                 <User className="h-24 w-24 text-muted-foreground" />
               </div>
             )}
-            
+
             {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            
+
             {/* Verification Badge */}
             <div className="absolute top-4 left-4">
               <VerificationBadge verificationScore={profile.verification_score} />
@@ -247,14 +247,14 @@ export const SwipeableProfileCard = ({
                   <span className="text-sm">{profile.city_only}</span>
                 </div>
               )}
-              
+
               {profile.education_level && (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <GraduationCap className="h-4 w-4 flex-shrink-0" />
                   <span className="text-sm">{profile.education_level}</span>
                 </div>
               )}
-              
+
               {profile.profession_category && (
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Briefcase className="h-4 w-4 flex-shrink-0" />
@@ -264,9 +264,7 @@ export const SwipeableProfileCard = ({
             </div>
 
             {profile.looking_for && (
-              <p className="text-sm text-muted-foreground line-clamp-3">
-                {profile.looking_for}
-              </p>
+              <p className="text-sm text-muted-foreground line-clamp-3">{profile.looking_for}</p>
             )}
 
             {profile.interests && profile.interests.length > 0 && (

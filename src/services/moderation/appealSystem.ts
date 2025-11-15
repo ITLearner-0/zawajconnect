@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface Appeal {
@@ -26,7 +25,10 @@ export interface AppealSubmission {
 }
 
 export class AppealSystem {
-  static async submitAppeal(appeal: AppealSubmission, userId: string): Promise<{ success: boolean; appealId?: string; error?: string }> {
+  static async submitAppeal(
+    appeal: AppealSubmission,
+    userId: string
+  ): Promise<{ success: boolean; appealId?: string; error?: string }> {
     try {
       // Check if user already has a pending appeal for this action
       const { data: existingAppeals } = await supabase
@@ -39,7 +41,7 @@ export class AppealSystem {
       if (existingAppeals && existingAppeals.length > 0) {
         return {
           success: false,
-          error: 'Un appel est déjà en cours pour cette action'
+          error: 'Un appel est déjà en cours pour cette action',
         };
       }
 
@@ -52,7 +54,7 @@ export class AppealSystem {
           appeal_reason: appeal.appealReason,
           evidence: appeal.evidence || [],
           additional_context: appeal.additionalContext,
-          status: 'pending'
+          status: 'pending',
         })
         .select()
         .single();
@@ -60,7 +62,7 @@ export class AppealSystem {
       if (error) {
         return {
           success: false,
-          error: 'Erreur lors de la soumission de l\'appel'
+          error: "Erreur lors de la soumission de l'appel",
         };
       }
 
@@ -69,13 +71,13 @@ export class AppealSystem {
 
       return {
         success: true,
-        appealId: data.id
+        appealId: data.id,
       };
     } catch (error) {
       console.error('Error submitting appeal:', error);
       return {
         success: false,
-        error: 'Erreur technique lors de la soumission'
+        error: 'Erreur technique lors de la soumission',
       };
     }
   }
@@ -84,10 +86,12 @@ export class AppealSystem {
     try {
       const { data, error } = await (supabase as any)
         .from('moderation_appeals')
-        .select(`
+        .select(
+          `
           *,
           moderation_actions!inner(*)
-        `)
+        `
+        )
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
@@ -109,8 +113,8 @@ export class AppealSystem {
         originalAction: {
           type: appeal.moderation_actions?.action_type || 'warning',
           reason: appeal.moderation_actions?.reason || '',
-          evidence: appeal.moderation_actions?.evidence || []
-        }
+          evidence: appeal.moderation_actions?.evidence || [],
+        },
       }));
     } catch (error) {
       console.error('Error fetching user appeals:', error);
@@ -119,9 +123,9 @@ export class AppealSystem {
   }
 
   static async reviewAppeal(
-    appealId: string, 
-    reviewerId: string, 
-    decision: 'approved' | 'rejected', 
+    appealId: string,
+    reviewerId: string,
+    decision: 'approved' | 'rejected',
     reviewerNotes: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
@@ -131,14 +135,14 @@ export class AppealSystem {
           status: decision,
           reviewer_id: reviewerId,
           reviewer_notes: reviewerNotes,
-          reviewed_at: new Date().toISOString()
+          reviewed_at: new Date().toISOString(),
         })
         .eq('id', appealId);
 
       if (error) {
         return {
           success: false,
-          error: 'Erreur lors de la révision de l\'appel'
+          error: "Erreur lors de la révision de l'appel",
         };
       }
 
@@ -155,7 +159,7 @@ export class AppealSystem {
       console.error('Error reviewing appeal:', error);
       return {
         success: false,
-        error: 'Erreur technique lors de la révision'
+        error: 'Erreur technique lors de la révision',
       };
     }
   }
@@ -165,10 +169,12 @@ export class AppealSystem {
       // Get the appeal and original moderation action
       const { data: appeal } = await (supabase as any)
         .from('moderation_appeals')
-        .select(`
+        .select(
+          `
           *,
           moderation_actions!inner(*)
-        `)
+        `
+        )
         .eq('id', appealId)
         .single();
 
@@ -180,7 +186,7 @@ export class AppealSystem {
         .update({
           status: 'reversed',
           reversed_at: new Date().toISOString(),
-          reversal_reason: 'Appeal approved'
+          reversal_reason: 'Appeal approved',
         })
         .eq('id', appeal?.moderation_action_id);
 
@@ -191,7 +197,7 @@ export class AppealSystem {
           .update({
             is_active: false,
             lifted_at: new Date().toISOString(),
-            lift_reason: 'Appeal approved'
+            lift_reason: 'Appeal approved',
           })
           .eq('user_id', appeal.user_id)
           .eq('is_active', true);
@@ -201,16 +207,18 @@ export class AppealSystem {
     }
   }
 
-  private static async logAppealActivity(appealId: string, activity: string, userId: string): Promise<void> {
+  private static async logAppealActivity(
+    appealId: string,
+    activity: string,
+    userId: string
+  ): Promise<void> {
     try {
-      await (supabase as any)
-        .from('appeal_activities')
-        .insert({
-          appeal_id: appealId,
-          activity_type: activity,
-          performed_by: userId,
-          created_at: new Date().toISOString()
-        });
+      await (supabase as any).from('appeal_activities').insert({
+        appeal_id: appealId,
+        activity_type: activity,
+        performed_by: userId,
+        created_at: new Date().toISOString(),
+      });
     } catch (error) {
       console.error('Error logging appeal activity:', error);
     }
@@ -228,22 +236,22 @@ export class AppealSystem {
         'Preuve insuffisante',
         'Circonstances atténuantes',
         'Malentendu culturel',
-        'Problème technique'
+        'Problème technique',
       ],
       evidenceTypes: [
-        'Captures d\'écran du contexte',
+        "Captures d'écran du contexte",
         'Messages précédents',
         'Témoignages de témoins',
         'Preuves de malentendus',
-        'Documentation des circonstances'
+        'Documentation des circonstances',
       ],
       tips: [
         'Soyez respectueux et professionnel',
         'Fournissez des preuves concrètes',
         'Expliquez clairement le contexte',
         'Admettez vos erreurs le cas échéant',
-        'Proposez des mesures correctives'
-      ]
+        'Proposez des mesures correctives',
+      ],
     };
   }
 }

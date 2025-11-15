@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useEnhancedLazyLoading } from './useEnhancedLazyLoading';
 import { debugService } from './services/debug/debugService';
@@ -25,13 +24,8 @@ export const useDebuggedLazyLoading = <T extends HTMLElement = HTMLDivElement>(
   const debugIdRef = useRef(debugId);
   const [debugMetrics, setDebugMetrics] = useState<any>(null);
 
-  const {
-    elementRef,
-    isIntersecting,
-    shouldLoad,
-    isPreloading,
-    config,
-  } = useEnhancedLazyLoading<T>(lazyOptions);
+  const { elementRef, isIntersecting, shouldLoad, isPreloading, config } =
+    useEnhancedLazyLoading<T>(lazyOptions);
 
   // Debug intersection observer
   useEffect(() => {
@@ -83,38 +77,44 @@ export const useDebuggedLazyLoading = <T extends HTMLElement = HTMLDivElement>(
     debugService.startTracking(debugIdRef.current, 'load');
   }, [enableDebug]);
 
-  const logLoadEnd = useCallback((success: boolean = true) => {
-    if (!enableDebug) return;
-    
-    const duration = debugService.endTracking(debugIdRef.current, 'load');
-    debugService.logEvent(debugIdRef.current, {
-      type: success ? 'load' : 'error',
-      data: { duration, success },
-    });
+  const logLoadEnd = useCallback(
+    (success: boolean = true) => {
+      if (!enableDebug) return;
 
-    if (!success) {
-      debugService.incrementError(debugIdRef.current);
-    }
-  }, [enableDebug]);
+      const duration = debugService.endTracking(debugIdRef.current, 'load');
+      debugService.logEvent(debugIdRef.current, {
+        type: success ? 'load' : 'error',
+        data: { duration, success },
+      });
+
+      if (!success) {
+        debugService.incrementError(debugIdRef.current);
+      }
+    },
+    [enableDebug]
+  );
 
   const logRetry = useCallback(() => {
     if (!enableDebug) return;
-    
+
     debugService.incrementRetry(debugIdRef.current);
     debugService.logEvent(debugIdRef.current, {
       type: 'retry',
     });
   }, [enableDebug]);
 
-  const logError = useCallback((error: Error) => {
-    if (!enableDebug) return;
-    
-    debugService.incrementError(debugIdRef.current, error);
-    debugService.logEvent(debugIdRef.current, {
-      type: 'error',
-      data: { error: error.message, stack: error.stack },
-    });
-  }, [enableDebug]);
+  const logError = useCallback(
+    (error: Error) => {
+      if (!enableDebug) return;
+
+      debugService.incrementError(debugIdRef.current, error);
+      debugService.logEvent(debugIdRef.current, {
+        type: 'error',
+        data: { error: error.message, stack: error.stack },
+      });
+    },
+    [enableDebug]
+  );
 
   return {
     elementRef,

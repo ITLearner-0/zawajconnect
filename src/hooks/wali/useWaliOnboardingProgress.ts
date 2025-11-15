@@ -46,7 +46,7 @@ export const useWaliOnboardingProgress = (waliId?: string) => {
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
-      
+
       setProgress(data as WaliOnboardingProgress | null);
     } catch (err) {
       console.error('Error fetching onboarding progress:', err);
@@ -96,7 +96,7 @@ export const useWaliOnboardingProgress = (waliId?: string) => {
       progress.step_family_setup,
       progress.step_guidelines,
     ];
-    
+
     const completedSteps = steps.filter(Boolean).length + (completed ? 1 : 0);
     updates.completion_percentage = Math.round((completedSteps / 5) * 100);
 
@@ -117,7 +117,7 @@ export const useWaliOnboardingProgress = (waliId?: string) => {
 
       const typedData = data as WaliOnboardingProgress;
       setProgress(typedData);
-      
+
       if (typedData.completion_percentage === 100) {
         toast({
           title: '🎉 Onboarding Complete!',

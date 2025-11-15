@@ -97,13 +97,11 @@ export function useFormAutosave<T extends Record<string, any>>(
       }
 
       try {
-        const { error } = await supabase
-          .from(tableName as any)
-          .upsert({
-            user_id: userId,
-            data: data,
-            updated_at: new Date().toISOString(),
-          });
+        const { error } = await supabase.from(tableName as any).upsert({
+          user_id: userId,
+          data: data,
+          updated_at: new Date().toISOString(),
+        });
 
         if (error) throw error;
 

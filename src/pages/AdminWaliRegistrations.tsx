@@ -12,26 +12,29 @@ import { ExportMenu } from '@/components/wali/admin/ExportMenu';
 import { PermissionBadge } from '@/components/wali/permissions';
 import { AdvancedFilters, SavedFiltersList } from '@/components/wali/filters';
 import { WaliAdminTabs } from '@/components/wali/navigation';
-import { Loader2, Shield, CheckCircle2, XCircle, Clock, Eye, RefreshCw, Filter } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
-  exportWaliRegistrationsToExcel,
-  exportWaliRegistrationsToCSV,
-} from '@/utils/waliExport';
+  Loader2,
+  Shield,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Eye,
+  RefreshCw,
+  Filter,
+} from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { exportWaliRegistrationsToExcel, exportWaliRegistrationsToCSV } from '@/utils/waliExport';
 
 const AdminWaliRegistrations = () => {
-  const [selectedTab, setSelectedTab] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  const [selectedTab, setSelectedTab] = useState<'all' | 'pending' | 'approved' | 'rejected'>(
+    'pending'
+  );
   const [selectedRegistration, setSelectedRegistration] = useState<WaliRegistration | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<WaliFilterValues>({ status: 'pending' });
   const { permissions } = useWaliAdminPermissions();
-  const {
-    savedFilters,
-    saveFilter,
-    deleteFilter,
-    setDefaultFilter,
-  } = useWaliFilters();
+  const { savedFilters, saveFilter, deleteFilter, setDefaultFilter } = useWaliFilters();
 
   const {
     registrations: allRegistrations,
@@ -89,9 +92,7 @@ const AdminWaliRegistrations = () => {
 
     // Date range filter
     if (filters.dateFrom) {
-      filtered = filtered.filter(
-        (r) => new Date(r.created_at) >= new Date(filters.dateFrom!)
-      );
+      filtered = filtered.filter((r) => new Date(r.created_at) >= new Date(filters.dateFrom!));
     }
 
     if (filters.dateTo) {
@@ -163,7 +164,8 @@ const AdminWaliRegistrations = () => {
                 <PermissionBadge role={permissions.role} />
               </div>
               <p className="text-muted-foreground">
-                Approuvez ou rejetez les demandes d'inscription en tant que Wali après vérification des documents
+                Approuvez ou rejetez les demandes d'inscription en tant que Wali après vérification
+                des documents
               </p>
             </div>
           </div>
@@ -228,7 +230,7 @@ const AdminWaliRegistrations = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardDescription>En attente</CardDescription>
@@ -236,8 +238,7 @@ const AdminWaliRegistrations = () => {
           </CardHeader>
           <CardContent>
             <div className="flex items-center text-xs text-yellow-600">
-              <Clock className="mr-1 h-3 w-3" />
-              À traiter
+              <Clock className="mr-1 h-3 w-3" />À traiter
             </div>
           </CardContent>
         </Card>

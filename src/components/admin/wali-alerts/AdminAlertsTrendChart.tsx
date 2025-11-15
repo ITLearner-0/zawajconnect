@@ -1,5 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AlertTrend } from '@/hooks/useAdminWaliAlerts';
@@ -24,13 +33,13 @@ export const AdminAlertsTrendChart = ({ trends, loading }: AdminAlertsTrendChart
     );
   }
 
-  const chartData = trends.map(trend => ({
+  const chartData = trends.map((trend) => ({
     date: format(new Date(trend.date), 'dd MMM', { locale: fr }),
     Critique: trend.critical_count,
     Élevé: trend.high_count,
     Moyen: trend.medium_count,
     Faible: trend.low_count,
-    Total: trend.total_count
+    Total: trend.total_count,
   }));
 
   return (
@@ -43,48 +52,41 @@ export const AdminAlertsTrendChart = ({ trends, loading }: AdminAlertsTrendChart
         <ResponsiveContainer width="100%" height={350}>
           <LineChart data={chartData}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey="date" 
-              className="text-xs"
-              stroke="hsl(var(--muted-foreground))"
-            />
-            <YAxis 
-              className="text-xs"
-              stroke="hsl(var(--muted-foreground))"
-            />
-            <Tooltip 
+            <XAxis dataKey="date" className="text-xs" stroke="hsl(var(--muted-foreground))" />
+            <YAxis className="text-xs" stroke="hsl(var(--muted-foreground))" />
+            <Tooltip
               contentStyle={{
                 backgroundColor: 'hsl(var(--background))',
                 border: '1px solid hsl(var(--border))',
-                borderRadius: '8px'
+                borderRadius: '8px',
               }}
             />
             <Legend />
-            <Line 
-              type="monotone" 
-              dataKey="Critique" 
-              stroke="hsl(var(--destructive))" 
+            <Line
+              type="monotone"
+              dataKey="Critique"
+              stroke="hsl(var(--destructive))"
               strokeWidth={2}
               dot={{ r: 3 }}
             />
-            <Line 
-              type="monotone" 
-              dataKey="Élevé" 
-              stroke="hsl(20, 100%, 50%)" 
+            <Line
+              type="monotone"
+              dataKey="Élevé"
+              stroke="hsl(20, 100%, 50%)"
               strokeWidth={2}
               dot={{ r: 3 }}
             />
-            <Line 
-              type="monotone" 
-              dataKey="Moyen" 
-              stroke="hsl(45, 100%, 50%)" 
+            <Line
+              type="monotone"
+              dataKey="Moyen"
+              stroke="hsl(45, 100%, 50%)"
               strokeWidth={2}
               dot={{ r: 3 }}
             />
-            <Line 
-              type="monotone" 
-              dataKey="Faible" 
-              stroke="hsl(210, 100%, 50%)" 
+            <Line
+              type="monotone"
+              dataKey="Faible"
+              stroke="hsl(210, 100%, 50%)"
               strokeWidth={2}
               dot={{ r: 3 }}
             />

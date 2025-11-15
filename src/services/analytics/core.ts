@@ -1,4 +1,3 @@
-
 import { AnalyticsData } from '@/types/analytics';
 
 /**
@@ -14,7 +13,7 @@ export const getAnalyticsData = async (
       totalConversations: 250,
       newConversations: 35,
       totalUsers: 450,
-      totalMessages: 8750
+      totalMessages: 8750,
     };
   } catch (err) {
     console.error('Error getting analytics data:', err);
@@ -22,7 +21,7 @@ export const getAnalyticsData = async (
       totalConversations: 0,
       newConversations: 0,
       totalUsers: 0,
-      totalMessages: 0
+      totalMessages: 0,
     };
   }
 };

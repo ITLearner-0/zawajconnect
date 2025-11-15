@@ -1,4 +1,3 @@
-
 import React from 'react';
 import MessagesList from '../MessagesList';
 import WaliSupervisor from '../WaliSupervisor';
@@ -40,11 +39,11 @@ const ChatBody: React.FC<ChatBodyProps> = ({
   toggleMonitoring,
   monitoringLoading,
   monitoringError,
-  onCloseMonitoring
+  onCloseMonitoring,
 }) => {
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
-      <ChatControlPanel 
+      <ChatControlPanel
         showRetentionSettings={showRetentionSettings}
         showSecuritySettings={showSecuritySettings}
         showMonitoring={showMonitoring}
@@ -59,8 +58,8 @@ const ChatBody: React.FC<ChatBodyProps> = ({
         monitoringError={monitoringError}
         onCloseMonitoring={onCloseMonitoring}
       />
-      
-      <MessagesList 
+
+      <MessagesList
         messages={messages}
         currentUserId={currentUserId}
         onReportMessage={onReportMessage}
@@ -69,7 +68,7 @@ const ChatBody: React.FC<ChatBodyProps> = ({
         loading={false}
         error={null}
       />
-      
+
       {isWaliSupervised && <WaliSupervisor conversationId={conversationId} />}
     </div>
   );

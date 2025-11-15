@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 
 interface ErrorInfo {
@@ -20,7 +19,7 @@ export const useErrorBoundary = () => {
       stack: error.stack,
       componentStack: errorInfo?.componentStack,
     });
-    
+
     // Log to console in development
     if (process.env.NODE_ENV === 'development') {
       console.error('Error captured by boundary:', error);

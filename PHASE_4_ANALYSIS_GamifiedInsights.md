@@ -11,19 +11,25 @@
 ## 🔍 Any implicites identifiés
 
 ### 1. Ligne 52 - Retour du hook useCompatibilityInsights non typé
+
 ```typescript
 const { insights, loading } = useCompatibilityInsights(userId);
 ```
+
 **Solution**: Importer et utiliser `UseCompatibilityInsightsReturn`
+
 ```typescript
 const { insights, loading }: UseCompatibilityInsightsReturn = useCompatibilityInsights(userId);
 ```
 
 ### 2. Ligne 149 - Fonction initializeGamification sans type de retour
+
 ```typescript
 const initializeGamification = () => {
 ```
+
 **Solution**: Ajouter un type de retour explicite
+
 ```typescript
 const initializeGamification = (): void => {
 ```
@@ -31,6 +37,7 @@ const initializeGamification = (): void => {
 ## 📦 Types locaux bien définis
 
 Le composant a d'excellentes interfaces locales :
+
 - `Achievement` ✓ - Très bien structuré avec types précis
 - `GamificationLevel` ✓ - Interface complète
 - `GamifiedInsightsProps` ✓ - Simple et clair
@@ -47,23 +54,23 @@ import { useInsightsAnalytics } from '@/hooks/useInsightsAnalytics';
 const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
   const { insights, loading }: UseCompatibilityInsightsReturn = useCompatibilityInsights(userId);
   const { trackAction, analytics } = useInsightsAnalytics();
-  
+
   // Track when achievements are unlocked
   useEffect(() => {
-    achievements.forEach(achievement => {
+    achievements.forEach((achievement) => {
       if (achievement.unlocked) {
         trackAction(`achievement_unlocked_${achievement.id}`);
       }
     });
   }, [achievements]);
-  
+
   // Track level ups
   useEffect(() => {
     if (showLevelUp) {
       trackAction(`level_up_${userLevel}`);
     }
   }, [showLevelUp, userLevel]);
-  
+
   // Track insights views
   useEffect(() => {
     if (insights) {
@@ -83,23 +90,30 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
 ## ✅ Plan de migration
 
 ### Étape 1: Importer les types nécessaires
+
 ```typescript
-import { useCompatibilityInsights, type UseCompatibilityInsightsReturn } from '@/hooks/useCompatibilityInsights';
+import {
+  useCompatibilityInsights,
+  type UseCompatibilityInsightsReturn,
+} from '@/hooks/useCompatibilityInsights';
 import { useInsightsAnalytics } from '@/hooks/useInsightsAnalytics';
 ```
 
 ### Étape 2: Typer le retour du hook useCompatibilityInsights
+
 ```typescript
 const { insights, loading }: UseCompatibilityInsightsReturn = useCompatibilityInsights(userId);
 ```
 
 ### Étape 3: Ajouter des types de retour explicites
+
 ```typescript
 const initializeGamification = (): void => {
 const getRarityColor = (rarity: Achievement['rarity']): string => {
 ```
 
 ### Étape 4: Intégrer useInsightsAnalytics (optionnel mais recommandé)
+
 - Ajouter le hook au composant
 - Tracker les achievements débloqués
 - Tracker les montées de niveau
@@ -115,12 +129,14 @@ const getRarityColor = (rarity: Achievement['rarity']): string => {
 ## 🔗 Dépendances
 
 ### Dépend de:
+
 - `useCompatibilityInsights` (déjà migré avec UseCompatibilityInsightsReturn)
 - Types d'interfaces locales bien définies
 - Composants UI (Card, Badge, Progress, etc.)
 - `AnimatedCounter` et `ProgressiveReveal` components
 
 ### Utilisé dans:
+
 - `CompatibilityInsightsPage.tsx` (via Tabs)
 - Probablement d'autres pages de profil/insights
 
@@ -142,20 +158,22 @@ const getRarityColor = (rarity: Achievement['rarity']): string => {
 ## 🎯 Améliorations suggérées (au-delà de la migration TypeScript)
 
 ### 1. Extraire la logique d'achievements dans un hook custom
+
 ```typescript
 // useGamificationSystem.tsx
 export const useGamificationSystem = (insights: CompatibilityInsights | null) => {
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [userLevel, setUserLevel] = useState(1);
   const [totalPoints, setTotalPoints] = useState(0);
-  
+
   // Logique d'initialisation et calculs
-  
+
   return { achievements, userLevel, totalPoints };
 };
 ```
 
 ### 2. Ajouter la validation des reward.value
+
 ```typescript
 const parseRewardValue = (value: string): number => {
   const parsed = parseInt(value, 10);
@@ -164,22 +182,28 @@ const parseRewardValue = (value: string): number => {
 ```
 
 ### 3. Mémoriser les calculs coûteux
+
 ```typescript
 const levelProgress = useMemo(() => {
   if (!nextLevelInfo || !currentLevelInfo) return 100;
-  return ((totalPoints - currentLevelInfo.minPoints) / 
-          (nextLevelInfo.minPoints - currentLevelInfo.minPoints)) * 100;
+  return (
+    ((totalPoints - currentLevelInfo.minPoints) /
+      (nextLevelInfo.minPoints - currentLevelInfo.minPoints)) *
+    100
+  );
 }, [totalPoints, currentLevelInfo, nextLevelInfo]);
 ```
 
 ## 🔧 Migration recommandée
 
 **Migration simple** (types seulement):
+
 - Ajouter UseCompatibilityInsightsReturn
 - Ajouter types de retour aux fonctions
 - Temps: 15 minutes
 
 **Migration complète** (avec analytics):
+
 - Migration simple +
 - Intégrer useInsightsAnalytics
 - Tracker tous les événements pertinents

@@ -3,15 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { 
-  ChevronDown, 
-  ChevronUp, 
-  Star, 
-  Heart, 
+import {
+  ChevronDown,
+  ChevronUp,
+  Star,
+  Heart,
   Lightbulb,
   BookOpen,
   Users,
-  TrendingUp
+  TrendingUp,
 } from 'lucide-react';
 
 interface InteractiveInsightCardProps {
@@ -37,7 +37,7 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
   icon,
   variant = 'default',
   showExpand = true,
-  className = ""
+  className = '',
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -84,7 +84,9 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
   };
 
   return (
-    <Card className={`w-full transition-all duration-200 hover:shadow-lg ${getVariantStyles()} ${className}`}>
+    <Card
+      className={`w-full transition-all duration-200 hover:shadow-lg ${getVariantStyles()} ${className}`}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between space-x-3">
           <div className="flex items-start space-x-3 flex-1 min-w-0">
@@ -98,13 +100,11 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
                 {title}
               </CardTitle>
               {subtitle && (
-                <p className="text-xs sm:text-sm text-muted-foreground break-words">
-                  {subtitle}
-                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground break-words">{subtitle}</p>
               )}
             </div>
           </div>
-          
+
           {showExpand && (expandedContent || insights.length > 0 || recommendations.length > 0) && (
             <Button
               variant="ghost"
@@ -112,23 +112,17 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
               onClick={() => setIsExpanded(!isExpanded)}
               className="flex-shrink-0"
             >
-              {isExpanded ? (
-                <ChevronUp className="w-4 h-4" />
-              ) : (
-                <ChevronDown className="w-4 h-4" />
-              )}
+              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             </Button>
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent className="pt-0">
         <div className="space-y-4 relative">
           {/* Main Content */}
-          <div className="relative z-10">
-            {renderContent(mainContent)}
-          </div>
-          
+          <div className="relative z-10">{renderContent(mainContent)}</div>
+
           {/* Expanded Content */}
           {isExpanded && (
             <div className="space-y-4 relative z-10 mt-4">
@@ -144,7 +138,7 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
                   </div>
                 </>
               )}
-              
+
               {insights.length > 0 && (
                 <>
                   <Separator />
@@ -155,11 +149,7 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {insights.map((insight, index) => (
-                        <Badge
-                          key={index}
-                          variant="secondary"
-                          className="text-xs"
-                        >
+                        <Badge key={index} variant="secondary" className="text-xs">
                           {insight}
                         </Badge>
                       ))}
@@ -167,7 +157,7 @@ const InteractiveInsightCard: React.FC<InteractiveInsightCardProps> = ({
                   </div>
                 </>
               )}
-              
+
               {recommendations.length > 0 && (
                 <>
                   <Separator />

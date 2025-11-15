@@ -27,13 +27,12 @@ const SubscriptionSuccess = () => {
               <CheckCircle className="h-12 w-12 text-primary-foreground" />
             </div>
           </div>
-          <CardTitle className="text-3xl font-bold text-emerald-dark">
-            Paiement Réussi !
-          </CardTitle>
+          <CardTitle className="text-3xl font-bold text-emerald-dark">Paiement Réussi !</CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-6">
           <p className="text-lg text-muted-foreground">
-            Votre abonnement premium est maintenant actif. Profitez de toutes les fonctionnalités exclusives !
+            Votre abonnement premium est maintenant actif. Profitez de toutes les fonctionnalités
+            exclusives !
           </p>
 
           <div className="bg-gold/10 rounded-lg p-4 border border-gold/20">
@@ -58,11 +57,7 @@ const SubscriptionSuccess = () => {
               <Crown className="h-4 w-4 mr-2" />
               Voir Mon Profil
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate('/browse')}
-              className="flex-1"
-            >
+            <Button variant="outline" onClick={() => navigate('/browse')} className="flex-1">
               Commencer à Explorer
             </Button>
           </div>

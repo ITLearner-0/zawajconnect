@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Conversation, RetentionPolicy } from '@/types/profile';
@@ -51,12 +50,14 @@ export const useSupervision = (waliId: string) => {
     try {
       // Since supervision_sessions table doesn't exist, we'll use a simpler approach
       // We'll just fetch conversations that are marked as wali_supervised
-      const { data: conversations, error: conversationsError} = await supabase
+      const { data: conversations, error: conversationsError } = await supabase
         .from('conversations')
-        .select(`
+        .select(
+          `
           *,
           profiles:profiles(*)
-        `)
+        `
+        )
         .eq('wali_supervised', true);
 
       if (conversationsError) {
@@ -69,7 +70,7 @@ export const useSupervision = (waliId: string) => {
         supervisionId: `mock-${conversation.id}`,
         supervisionStarted: conversation.created_at || new Date().toISOString(),
         supervisionLevel: 'passive' as const,
-        retention_policy: parseRetentionPolicy(conversation.retention_policy)
+        retention_policy: parseRetentionPolicy(conversation.retention_policy),
       })) as any;
 
       setActiveConversations(supervisedConversations);
@@ -90,23 +91,30 @@ export const useSupervision = (waliId: string) => {
 
     const channel = supabase
       .channel(`wali_supervision_${waliId}`)
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'conversations',
-        filter: `wali_supervised=eq.true`
-      }, () => {
-        fetchActiveConversations();
-      })
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'conversations',
+          filter: `wali_supervised=eq.true`,
+        },
+        () => {
+          fetchActiveConversations();
+        }
+      )
       .subscribe();
-      
+
     return () => {
       supabase.removeChannel(channel);
     };
   }, [waliId, fetchActiveConversations]);
 
   // Start supervising a conversation
-  const startSupervision = async (conversationId: string, level: 'active' | 'passive' | 'minimal' = 'passive') => {
+  const startSupervision = async (
+    conversationId: string,
+    level: 'active' | 'passive' | 'minimal' = 'passive'
+  ) => {
     if (!waliId) return false;
 
     try {
@@ -121,9 +129,9 @@ export const useSupervision = (waliId: string) => {
       }
 
       toast({
-        title: "Supervision Started",
+        title: 'Supervision Started',
         description: `You are now supervising this conversation (${level} mode)`,
-        variant: "default"
+        variant: 'default',
       });
 
       // Refresh the list
@@ -132,13 +140,13 @@ export const useSupervision = (waliId: string) => {
       return true;
     } catch (err: any) {
       console.error('Error starting supervision:', err);
-      
+
       toast({
-        title: "Supervision Failed",
-        description: err.message || "Could not start supervision",
-        variant: "destructive"
+        title: 'Supervision Failed',
+        description: err.message || 'Could not start supervision',
+        variant: 'destructive',
       });
-      
+
       return false;
     }
   };
@@ -159,26 +167,24 @@ export const useSupervision = (waliId: string) => {
       }
 
       toast({
-        title: "Supervision Ended",
-        description: "You are no longer supervising this conversation",
-        variant: "default"
+        title: 'Supervision Ended',
+        description: 'You are no longer supervising this conversation',
+        variant: 'default',
       });
 
       // Update local state
-      setActiveConversations(prev => 
-        prev.filter(conv => conv.supervisionId !== supervisionId)
-      );
+      setActiveConversations((prev) => prev.filter((conv) => conv.supervisionId !== supervisionId));
 
       return true;
     } catch (err: any) {
       console.error('Error ending supervision:', err);
-      
+
       toast({
-        title: "Action Failed",
-        description: err.message || "Could not end supervision",
-        variant: "destructive"
+        title: 'Action Failed',
+        description: err.message || 'Could not end supervision',
+        variant: 'destructive',
       });
-      
+
       return false;
     }
   };
@@ -189,6 +195,6 @@ export const useSupervision = (waliId: string) => {
     error,
     startSupervision,
     endSupervision,
-    refreshSupervisions: fetchActiveConversations
+    refreshSupervisions: fetchActiveConversations,
   };
 };

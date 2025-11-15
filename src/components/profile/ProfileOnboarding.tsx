@@ -1,20 +1,21 @@
-
-import React from "react";
-import OnboardingWrapper from "@/components/onboarding/OnboardingWrapper";
-import BasicInformation from "@/components/profile/BasicInformation";
-import EducationCareer from "@/components/profile/EducationCareer";
-import ReligiousBackground from "@/components/profile/ReligiousBackground";
-import AboutMe from "@/components/profile/AboutMe";
-import WaliInformation from "@/components/profile/WaliInformation";
-import { ProfileFormData } from "@/types/profile";
-import { IslamicPattern } from "@/components/ui/islamic-pattern";
+import React from 'react';
+import OnboardingWrapper from '@/components/onboarding/OnboardingWrapper';
+import BasicInformation from '@/components/profile/BasicInformation';
+import EducationCareer from '@/components/profile/EducationCareer';
+import ReligiousBackground from '@/components/profile/ReligiousBackground';
+import AboutMe from '@/components/profile/AboutMe';
+import WaliInformation from '@/components/profile/WaliInformation';
+import { ProfileFormData } from '@/types/profile';
+import { IslamicPattern } from '@/components/ui/islamic-pattern';
 
 interface ProfileOnboardingProps {
   isOnboarding: boolean;
   currentStep: number;
   steps: string[];
   formData: ProfileFormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => void;
   handleNext: () => void;
   handlePrevious: () => void;
   completeOnboarding: () => void;
@@ -36,31 +37,51 @@ const ProfileOnboarding = ({
     switch (currentStep) {
       case 0:
         return (
-          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard">
+          <IslamicPattern
+            variant="background"
+            intensity="light"
+            className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard"
+          >
             <BasicInformation formData={formData} handleChange={handleChange} />
           </IslamicPattern>
         );
       case 1:
         return (
-          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard">
+          <IslamicPattern
+            variant="background"
+            intensity="light"
+            className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard"
+          >
             <EducationCareer formData={formData} handleChange={handleChange} />
           </IslamicPattern>
         );
       case 2:
         return (
-          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard">
+          <IslamicPattern
+            variant="background"
+            intensity="light"
+            className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard"
+          >
             <ReligiousBackground formData={formData} handleChange={handleChange} />
           </IslamicPattern>
         );
       case 3:
         return (
-          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard">
+          <IslamicPattern
+            variant="background"
+            intensity="light"
+            className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard"
+          >
             <AboutMe formData={formData} handleChange={handleChange} />
           </IslamicPattern>
         );
       case 4:
-        return formData.gender === "female" ? (
-          <IslamicPattern variant="background" intensity="light" className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard">
+        return formData.gender === 'female' ? (
+          <IslamicPattern
+            variant="background"
+            intensity="light"
+            className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard"
+          >
             <WaliInformation formData={formData} handleChange={handleChange} showRequired={true} />
           </IslamicPattern>
         ) : null;

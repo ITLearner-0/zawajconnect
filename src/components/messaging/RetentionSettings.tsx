@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -7,12 +6,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { RetentionPolicy } from '@/types/profile';
 import { Clock } from 'lucide-react';
 import { setRetentionPolicy } from '@/services/messageLifecycleService';
@@ -27,7 +32,7 @@ interface RetentionSettingsProps {
 const RetentionSettings: React.FC<RetentionSettingsProps> = ({
   conversationId,
   currentPolicy,
-  onPolicyChanged
+  onPolicyChanged,
 }) => {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
@@ -42,32 +47,32 @@ const RetentionSettings: React.FC<RetentionSettingsProps> = ({
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    
+
     const newPolicy: RetentionPolicy = {
       type: retentionType,
       auto_delete: autoDelete,
-      duration_days: retentionType === 'temporary' ? parseInt(durationDays) : undefined
+      duration_days: retentionType === 'temporary' ? parseInt(durationDays) : undefined,
     };
-    
+
     const success = await setRetentionPolicy(conversationId, newPolicy);
-    
+
     if (success) {
       onPolicyChanged(newPolicy);
       toast({
-        title: "Retention policy updated",
+        title: 'Retention policy updated',
         description: autoDelete
           ? `Messages will automatically delete after ${durationDays} days`
-          : "Messages will be stored indefinitely",
+          : 'Messages will be stored indefinitely',
       });
       setIsOpen(false);
     } else {
       toast({
-        title: "Failed to update retention policy",
-        description: "There was an error saving your settings. Please try again.",
-        variant: "destructive"
+        title: 'Failed to update retention policy',
+        description: 'There was an error saving your settings. Please try again.',
+        variant: 'destructive',
       });
     }
-    
+
     setIsSubmitting(false);
   };
 
@@ -86,7 +91,7 @@ const RetentionSettings: React.FC<RetentionSettingsProps> = ({
             Configure how long messages are stored in this conversation
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-4 py-4">
           <div className="flex items-center justify-between">
             <Label htmlFor="auto-delete" className="flex flex-col space-y-1">
@@ -95,13 +100,9 @@ const RetentionSettings: React.FC<RetentionSettingsProps> = ({
                 Automatically delete messages after a specific time period
               </span>
             </Label>
-            <Switch
-              id="auto-delete"
-              checked={autoDelete}
-              onCheckedChange={setAutoDelete}
-            />
+            <Switch id="auto-delete" checked={autoDelete} onCheckedChange={setAutoDelete} />
           </div>
-          
+
           {autoDelete && (
             <>
               <div className="space-y-2">
@@ -119,14 +120,11 @@ const RetentionSettings: React.FC<RetentionSettingsProps> = ({
                   </SelectContent>
                 </Select>
               </div>
-              
+
               {retentionType === 'temporary' && (
                 <div className="space-y-2">
                   <Label htmlFor="duration-days">Retention Period (days)</Label>
-                  <Select
-                    value={durationDays}
-                    onValueChange={setDurationDays}
-                  >
+                  <Select value={durationDays} onValueChange={setDurationDays}>
                     <SelectTrigger id="duration-days">
                       <SelectValue placeholder="Select days" />
                     </SelectTrigger>
@@ -144,7 +142,7 @@ const RetentionSettings: React.FC<RetentionSettingsProps> = ({
             </>
           )}
         </div>
-        
+
         <DialogFooter>
           <Button variant="outline" onClick={() => setIsOpen(false)}>
             Cancel

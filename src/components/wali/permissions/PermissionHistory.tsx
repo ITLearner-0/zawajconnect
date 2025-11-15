@@ -21,14 +21,17 @@ interface PermissionHistoryProps {
 export const PermissionHistory = ({ history, loading }: PermissionHistoryProps) => {
   const getRoleBadge = (role: string | null) => {
     if (!role) return <Badge variant="outline">Aucun</Badge>;
-    
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {
+
+    const variants: Record<
+      string,
+      { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }
+    > = {
       super_admin: { variant: 'destructive', label: 'Super Admin' },
       approver: { variant: 'default', label: 'Approbateur' },
       editor: { variant: 'secondary', label: 'Éditeur' },
       viewer: { variant: 'outline', label: 'Visualiseur' },
     };
-    
+
     const config = variants[role] ?? { variant: 'outline' as const, label: 'Visualiseur' };
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
@@ -76,9 +79,7 @@ export const PermissionHistory = ({ history, loading }: PermissionHistoryProps) 
           <History className="w-5 h-5" />
           Historique des Changements
         </CardTitle>
-        <CardDescription>
-          Dernières modifications de permissions ({history.length})
-        </CardDescription>
+        <CardDescription>Dernières modifications de permissions ({history.length})</CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
@@ -104,9 +105,7 @@ export const PermissionHistory = ({ history, loading }: PermissionHistoryProps) 
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">
-                    {getActionType(audit.old_role, audit.new_role)}
-                  </Badge>
+                  <Badge variant="outline">{getActionType(audit.old_role, audit.new_role)}</Badge>
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">

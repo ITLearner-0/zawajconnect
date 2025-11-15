@@ -1,18 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Heart, 
-  MapPin, 
-  Book, 
-  User, 
-  Users,
-  CheckCircle,
-  Info
-} from 'lucide-react';
+import { Heart, MapPin, Book, User, Users, CheckCircle, Info } from 'lucide-react';
 
 interface IslamicPreferences {
   prayer_frequency: string;
@@ -34,64 +32,63 @@ interface IslamicPreferencesStepProps {
   className?: string;
 }
 
-const IslamicPreferencesStep = ({ 
-  preferences, 
-  onPreferencesChange, 
+const IslamicPreferencesStep = ({
+  preferences,
+  onPreferencesChange,
   gender,
-  className = "" 
+  className = '',
 }: IslamicPreferencesStepProps) => {
-
   const updatePreference = (key: keyof IslamicPreferences, value: any) => {
     onPreferencesChange({
       ...preferences,
-      [key]: value
+      [key]: value,
     });
   };
 
   const prayerOptions = [
-    { value: "5_times_daily", label: "5 fois par jour", icon: "🕌" },
-    { value: "often", label: "Régulièrement", icon: "🤲" },
-    { value: "sometimes", label: "Parfois", icon: "⭐" },
-    { value: "rarely", label: "Rarement", icon: "🌙" },
-    { value: "never", label: "Jamais", icon: "❌" }
+    { value: '5_times_daily', label: '5 fois par jour', icon: '🕌' },
+    { value: 'often', label: 'Régulièrement', icon: '🤲' },
+    { value: 'sometimes', label: 'Parfois', icon: '⭐' },
+    { value: 'rarely', label: 'Rarement', icon: '🌙' },
+    { value: 'never', label: 'Jamais', icon: '❌' },
   ];
 
   const quranOptions = [
-    { value: "daily", label: "Quotidiennement", icon: "📖" },
-    { value: "weekly", label: "Hebdomadairement", icon: "📚" },
-    { value: "monthly", label: "Mensuellement", icon: "📜" },
-    { value: "occasionally", label: "Occasionnellement", icon: "📋" },
-    { value: "rarely", label: "Rarement", icon: "📄" }
+    { value: 'daily', label: 'Quotidiennement', icon: '📖' },
+    { value: 'weekly', label: 'Hebdomadairement', icon: '📚' },
+    { value: 'monthly', label: 'Mensuellement', icon: '📜' },
+    { value: 'occasionally', label: 'Occasionnellement', icon: '📋' },
+    { value: 'rarely', label: 'Rarement', icon: '📄' },
   ];
 
   const sectOptions = [
-    { value: "sunni", label: "Sunnite" },
-    { value: "shia", label: "Chiite" },
-    { value: "other", label: "Autre" },
-    { value: "prefer_not_to_say", label: "Préfère ne pas dire" }
+    { value: 'sunni', label: 'Sunnite' },
+    { value: 'shia', label: 'Chiite' },
+    { value: 'other', label: 'Autre' },
+    { value: 'prefer_not_to_say', label: 'Préfère ne pas dire' },
   ];
 
   const madhabOptions = [
-    { value: "hanafi", label: "Hanafi" },
-    { value: "maliki", label: "Maliki" },
-    { value: "shafii", label: "Chafi'i" },
-    { value: "hanbali", label: "Hanbali" },
-    { value: "salafi", label: "Salafi" },
-    { value: "other", label: "Autre" },
-    { value: "none", label: "Aucune préférence" }
+    { value: 'hanafi', label: 'Hanafi' },
+    { value: 'maliki', label: 'Maliki' },
+    { value: 'shafii', label: "Chafi'i" },
+    { value: 'hanbali', label: 'Hanbali' },
+    { value: 'salafi', label: 'Salafi' },
+    { value: 'other', label: 'Autre' },
+    { value: 'none', label: 'Aucune préférence' },
   ];
 
   const importanceOptions = [
-    { value: "very_important", label: "Très important", color: "bg-emerald" },
-    { value: "important", label: "Important", color: "bg-blue-500" },
-    { value: "somewhat_important", label: "Assez important", color: "bg-gold" },
-    { value: "not_important", label: "Peu important", color: "bg-orange-500" }
+    { value: 'very_important', label: 'Très important', color: 'bg-emerald' },
+    { value: 'important', label: 'Important', color: 'bg-blue-500' },
+    { value: 'somewhat_important', label: 'Assez important', color: 'bg-gold' },
+    { value: 'not_important', label: 'Peu important', color: 'bg-orange-500' },
   ];
 
   const smokingOptions = [
-    { value: "never", label: "Jamais", color: "bg-emerald" },
-    { value: "occasionally", label: "Socialement", color: "bg-gold" },
-    { value: "regularly", label: "Régulièrement", color: "bg-orange-500" }
+    { value: 'never', label: 'Jamais', color: 'bg-emerald' },
+    { value: 'occasionally', label: 'Socialement', color: 'bg-gold' },
+    { value: 'regularly', label: 'Régulièrement', color: 'bg-orange-500' },
   ];
 
   return (
@@ -118,9 +115,7 @@ const IslamicPreferencesStep = ({
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <Label className="text-base font-medium mb-3 block">
-              Fréquence de prière *
-            </Label>
+            <Label className="text-base font-medium mb-3 block">Fréquence de prière *</Label>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {prayerOptions.map((option) => (
                 <button
@@ -146,9 +141,7 @@ const IslamicPreferencesStep = ({
           </div>
 
           <div>
-            <Label className="text-base font-medium mb-3 block">
-              Lecture du Coran
-            </Label>
+            <Label className="text-base font-medium mb-3 block">Lecture du Coran</Label>
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
               {quranOptions.map((option) => (
                 <button
@@ -184,8 +177,8 @@ const IslamicPreferencesStep = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="sect">Secte *</Label>
-              <Select 
-                value={preferences.sect} 
+              <Select
+                value={preferences.sect}
                 onValueChange={(value) => updatePreference('sect', value)}
               >
                 <SelectTrigger>
@@ -203,8 +196,8 @@ const IslamicPreferencesStep = ({
 
             <div>
               <Label htmlFor="madhab">École juridique (Madhab)</Label>
-              <Select 
-                value={preferences.madhab} 
+              <Select
+                value={preferences.madhab}
                 onValueChange={(value) => updatePreference('madhab', value)}
               >
                 <SelectTrigger>
@@ -222,9 +215,7 @@ const IslamicPreferencesStep = ({
           </div>
 
           <div>
-            <Label className="text-base font-medium mb-3 block">
-              Importance de la religion *
-            </Label>
+            <Label className="text-base font-medium mb-3 block">Importance de la religion *</Label>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {importanceOptions.map((option) => (
                 <button
@@ -259,8 +250,8 @@ const IslamicPreferencesStep = ({
           {gender === 'female' && (
             <div>
               <Label htmlFor="hijab">Port du hijab</Label>
-              <Select 
-                value={preferences.hijab_preference} 
+              <Select
+                value={preferences.hijab_preference}
                 onValueChange={(value) => updatePreference('hijab_preference', value)}
               >
                 <SelectTrigger>
@@ -280,30 +271,28 @@ const IslamicPreferencesStep = ({
           {gender === 'male' && (
             <div>
               <Label htmlFor="beard">Port de la barbe</Label>
-              <Select 
-                value={preferences.beard_preference} 
+              <Select
+                value={preferences.beard_preference}
                 onValueChange={(value) => updatePreference('beard_preference', value)}
               >
-              <SelectTrigger>
-                <SelectValue placeholder="Votre préférence" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="full_beard">Barbe complète</SelectItem>
-                <SelectItem value="trimmed_beard">Barbe taillée</SelectItem>
-                <SelectItem value="goatee">Bouc</SelectItem>
-                <SelectItem value="mustache_only">Moustache seulement</SelectItem>
-                <SelectItem value="clean_shaven">Rasé de près</SelectItem>
-                <SelectItem value="not_applicable">Non applicable</SelectItem>
-              </SelectContent>
+                <SelectTrigger>
+                  <SelectValue placeholder="Votre préférence" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="full_beard">Barbe complète</SelectItem>
+                  <SelectItem value="trimmed_beard">Barbe taillée</SelectItem>
+                  <SelectItem value="goatee">Bouc</SelectItem>
+                  <SelectItem value="mustache_only">Moustache seulement</SelectItem>
+                  <SelectItem value="clean_shaven">Rasé de près</SelectItem>
+                  <SelectItem value="not_applicable">Non applicable</SelectItem>
+                </SelectContent>
               </Select>
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="text-base font-medium mb-3 block">
-                Tabagisme
-              </Label>
+              <Label className="text-base font-medium mb-3 block">Tabagisme</Label>
               <div className="space-y-2">
                 {smokingOptions.map((option) => (
                   <button
@@ -355,8 +344,8 @@ const IslamicPreferencesStep = ({
         <CardContent>
           <div>
             <Label htmlFor="desired_partner_sect">Secte préférée du partenaire</Label>
-            <Select 
-              value={preferences.desired_partner_sect} 
+            <Select
+              value={preferences.desired_partner_sect}
               onValueChange={(value) => updatePreference('desired_partner_sect', value)}
             >
               <SelectTrigger>
@@ -377,12 +366,10 @@ const IslamicPreferencesStep = ({
       <div className="flex items-start space-x-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
         <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
         <div className="text-sm">
-          <p className="font-medium text-blue-900 mb-1">
-            Confidentialité et respect
-          </p>
+          <p className="font-medium text-blue-900 mb-1">Confidentialité et respect</p>
           <p className="text-blue-700">
-            Vos préférences religieuses sont privées et ne seront utilisées que pour améliorer la compatibilité. 
-            Vous pouvez les modifier à tout moment dans vos paramètres.
+            Vos préférences religieuses sont privées et ne seront utilisées que pour améliorer la
+            compatibilité. Vous pouvez les modifier à tout moment dans vos paramètres.
           </p>
         </div>
       </div>

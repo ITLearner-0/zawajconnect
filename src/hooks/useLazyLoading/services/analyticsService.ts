@@ -122,7 +122,7 @@ class LazyLoadingAnalyticsService {
 
   getAggregatedMetrics(timeRange?: number): AggregatedMetrics {
     const cutoff = timeRange ? Date.now() - timeRange : 0;
-    const relevantMetrics = this.metrics.filter(m => m.timestamp > cutoff);
+    const relevantMetrics = this.metrics.filter((m) => m.timestamp > cutoff);
 
     if (relevantMetrics.length === 0) {
       return this.getEmptyMetrics();
@@ -130,11 +130,12 @@ class LazyLoadingAnalyticsService {
 
     const totalElements = relevantMetrics.length;
     const averageLoadTime = relevantMetrics.reduce((sum, m) => sum + m.loadTime, 0) / totalElements;
-    const averageIntersectionTime = relevantMetrics.reduce((sum, m) => sum + m.intersectionTime, 0) / totalElements;
-    const successCount = relevantMetrics.filter(m => m.success).length;
-    const cacheHits = relevantMetrics.filter(m => m.cacheHit).length;
-    const errors = relevantMetrics.filter(m => m.errorCount > 0).length;
-    const retries = relevantMetrics.filter(m => m.retryCount > 0).length;
+    const averageIntersectionTime =
+      relevantMetrics.reduce((sum, m) => sum + m.intersectionTime, 0) / totalElements;
+    const successCount = relevantMetrics.filter((m) => m.success).length;
+    const cacheHits = relevantMetrics.filter((m) => m.cacheHit).length;
+    const errors = relevantMetrics.filter((m) => m.errorCount > 0).length;
+    const retries = relevantMetrics.filter((m) => m.retryCount > 0).length;
 
     const successRate = (successCount / totalElements) * 100;
     const cacheHitRate = (cacheHits / totalElements) * 100;
@@ -159,14 +160,16 @@ class LazyLoadingAnalyticsService {
     return new Map(this.usagePatterns);
   }
 
-  getPerformanceTrends(interval: number = 3600000): { timestamp: number; metrics: AggregatedMetrics }[] {
+  getPerformanceTrends(
+    interval: number = 3600000
+  ): { timestamp: number; metrics: AggregatedMetrics }[] {
     const trends: { timestamp: number; metrics: AggregatedMetrics }[] = [];
     const now = Date.now();
-    const oldest = Math.min(...this.metrics.map(m => m.timestamp));
+    const oldest = Math.min(...this.metrics.map((m) => m.timestamp));
 
     for (let time = oldest; time <= now; time += interval) {
       const windowMetrics = this.metrics.filter(
-        m => m.timestamp >= time && m.timestamp < time + interval
+        (m) => m.timestamp >= time && m.timestamp < time + interval
       );
 
       if (windowMetrics.length > 0) {
@@ -233,15 +236,22 @@ class LazyLoadingAnalyticsService {
 
   private logMetric(metrics: LazyLoadingMetrics): void {
     if (metrics.loadTime > 1000) {
-      console.warn(`[Analytics] Slow loading detected for ${metrics.elementId}: ${metrics.loadTime}ms`);
+      console.warn(
+        `[Analytics] Slow loading detected for ${metrics.elementId}: ${metrics.loadTime}ms`
+      );
     }
-    
+
     if (metrics.errorCount > 0) {
-      console.error(`[Analytics] Errors detected for ${metrics.elementId}: ${metrics.errorCount} errors`);
+      console.error(
+        `[Analytics] Errors detected for ${metrics.elementId}: ${metrics.errorCount} errors`
+      );
     }
   }
 
-  private calculatePerformanceGrade(avgLoadTime: number, successRate: number): 'excellent' | 'good' | 'fair' | 'poor' {
+  private calculatePerformanceGrade(
+    avgLoadTime: number,
+    successRate: number
+  ): 'excellent' | 'good' | 'fair' | 'poor' {
     if (avgLoadTime < 500 && successRate > 95) return 'excellent';
     if (avgLoadTime < 1000 && successRate > 90) return 'good';
     if (avgLoadTime < 2000 && successRate > 80) return 'fair';
@@ -251,17 +261,17 @@ class LazyLoadingAnalyticsService {
   private identifyBottlenecks(metrics: LazyLoadingMetrics[]): string[] {
     const bottlenecks: string[] = [];
 
-    const slowLoads = metrics.filter(m => m.loadTime > 2000).length;
+    const slowLoads = metrics.filter((m) => m.loadTime > 2000).length;
     if (slowLoads > metrics.length * 0.1) {
       bottlenecks.push('High number of slow loads detected');
     }
 
-    const lowCacheHitRate = metrics.filter(m => m.cacheHit).length / metrics.length;
+    const lowCacheHitRate = metrics.filter((m) => m.cacheHit).length / metrics.length;
     if (lowCacheHitRate < 0.3) {
       bottlenecks.push('Low cache hit rate');
     }
 
-    const highErrorRate = metrics.filter(m => m.errorCount > 0).length / metrics.length;
+    const highErrorRate = metrics.filter((m) => m.errorCount > 0).length / metrics.length;
     if (highErrorRate > 0.05) {
       bottlenecks.push('High error rate detected');
     }
@@ -277,15 +287,16 @@ class LazyLoadingAnalyticsService {
       recommendations.push('Consider implementing image compression or CDN');
     }
 
-    const mobileMetrics = metrics.filter(m => m.deviceType === 'mobile');
+    const mobileMetrics = metrics.filter((m) => m.deviceType === 'mobile');
     if (mobileMetrics.length > 0) {
-      const avgMobileLoadTime = mobileMetrics.reduce((sum, m) => sum + m.loadTime, 0) / mobileMetrics.length;
+      const avgMobileLoadTime =
+        mobileMetrics.reduce((sum, m) => sum + m.loadTime, 0) / mobileMetrics.length;
       if (avgMobileLoadTime > avgLoadTime * 1.5) {
         recommendations.push('Optimize for mobile devices with responsive images');
       }
     }
 
-    const cacheHitRate = metrics.filter(m => m.cacheHit).length / metrics.length;
+    const cacheHitRate = metrics.filter((m) => m.cacheHit).length / metrics.length;
     if (cacheHitRate < 0.5) {
       recommendations.push('Improve caching strategy');
     }

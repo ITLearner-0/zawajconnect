@@ -8,7 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -33,7 +39,7 @@ import {
   Lock,
   Eye,
   Save,
-  Clock
+  Clock,
 } from 'lucide-react';
 
 interface ProfileData {
@@ -43,18 +49,18 @@ interface ProfileData {
   gender: 'male' | 'female';
   location: string;
   phone: string;
-  
+
   // Professional & Education
   education: string;
   profession: string;
   income_range?: string;
-  
+
   // Physical & Personal
   height?: string;
   marital_status: string;
   children?: string;
   disabilities?: string;
-  
+
   // Islamic Information
   sect: string;
   madhab: string;
@@ -66,13 +72,13 @@ interface ProfileData {
   importance_of_religion: string;
   islamic_education: string;
   memorized_quran?: string;
-  
+
   // Family & Background
   family_background: string;
   parents_occupation?: string;
   siblings?: string;
   family_religiosity: string;
-  
+
   // Partner Preferences
   looking_for: string;
   desired_partner_age_min: number;
@@ -81,13 +87,13 @@ interface ProfileData {
   desired_partner_education?: string;
   desired_partner_sect?: string;
   desired_partner_qualities: string[];
-  
+
   // About & Biography
   bio: string;
   interests: string[];
   hobbies: string[];
   languages: string[];
-  
+
   // Privacy & Verification
   profile_visibility: 'public' | 'family_only' | 'matches_only';
   contact_visibility: 'family_only' | 'matches_only' | 'after_approval';
@@ -116,20 +122,17 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
   const progress = (currentStep / totalSteps) * 100;
 
   // Auto-save functionality
-  const { loadSaved, clearSaved, hasSavedData, getLastSaveTime } = useFormAutosave(
-    profileData,
-    {
-      storageKey: `profile-wizard-${user?.id}`,
-      debounceMs: 2000,
-      announceChanges: true,
-      onSuccess: () => {
-        // Silent success - user sees the auto-save indicator
-      },
-      onError: (error) => {
-        console.error('Auto-save error:', error);
-      }
-    }
-  );
+  const { loadSaved, clearSaved, hasSavedData, getLastSaveTime } = useFormAutosave(profileData, {
+    storageKey: `profile-wizard-${user?.id}`,
+    debounceMs: 2000,
+    announceChanges: true,
+    onSuccess: () => {
+      // Silent success - user sees the auto-save indicator
+    },
+    onError: (error) => {
+      console.error('Auto-save error:', error);
+    },
+  });
 
   const lastSaveTime = getLastSaveTime();
 
@@ -146,8 +149,8 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
       const savedData = loadSaved();
       if (savedData && Object.keys(savedData).length > 0) {
         toast({
-          title: "Données sauvegardées trouvées",
-          description: "Voulez-vous restaurer votre brouillon précédent ?",
+          title: 'Données sauvegardées trouvées',
+          description: 'Voulez-vous restaurer votre brouillon précédent ?',
           action: (
             <div className="flex gap-2">
               <Button
@@ -155,8 +158,8 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
                 onClick={() => {
                   setProfileData(savedData as Partial<ProfileData>);
                   toast({
-                    title: "Brouillon restauré",
-                    description: "Vos données ont été restaurées avec succès"
+                    title: 'Brouillon restauré',
+                    description: 'Vos données ont été restaurées avec succès',
                   });
                 }}
               >
@@ -168,15 +171,15 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
                 onClick={() => {
                   clearSaved();
                   toast({
-                    title: "Brouillon supprimé",
-                    description: "Le brouillon a été supprimé"
+                    title: 'Brouillon supprimé',
+                    description: 'Le brouillon a été supprimé',
                   });
                 }}
               >
                 Ignorer
               </Button>
             </div>
-          ) as any
+          ) as any,
         });
       }
     }
@@ -208,7 +211,7 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
         setProfileData({
           ...(profile as any),
           ...(islamicPrefs as any),
-          ...(privacySettings as any)
+          ...(privacySettings as any),
         });
       }
     } catch (error) {
@@ -226,35 +229,39 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
         if (!profileData.gender) errors.gender = 'Genre requis';
         if (!profileData.location) errors.location = 'Localisation requise';
         break;
-      
+
       case 2: // Islamic Information
         if (!profileData.sect) errors.sect = 'Secte religieuse requise';
         if (!profileData.prayer_frequency) errors.prayer_frequency = 'Fréquence de prière requise';
-        if (!profileData.importance_of_religion) errors.importance_of_religion = 'Importance de la religion requise';
+        if (!profileData.importance_of_religion)
+          errors.importance_of_religion = 'Importance de la religion requise';
         break;
-      
+
       case 3: // Education & Profession
-        if (!profileData.education) errors.education = 'Niveau d\'éducation requis';
+        if (!profileData.education) errors.education = "Niveau d'éducation requis";
         if (!profileData.profession) errors.profession = 'Profession requise';
         break;
-      
+
       case 4: // Family & Background
         if (!profileData.family_background) errors.family_background = 'Contexte familial requis';
-        if (!profileData.family_religiosity) errors.family_religiosity = 'Religiosité familiale requise';
+        if (!profileData.family_religiosity)
+          errors.family_religiosity = 'Religiosité familiale requise';
         break;
-      
+
       case 5: // Partner Preferences
         if (!profileData.looking_for) errors.looking_for = 'Type de partenaire recherché requis';
-        if (!profileData.desired_partner_age_min) errors.desired_partner_age_min = 'Âge minimum requis';
-        if (!profileData.desired_partner_age_max) errors.desired_partner_age_max = 'Âge maximum requis';
+        if (!profileData.desired_partner_age_min)
+          errors.desired_partner_age_min = 'Âge minimum requis';
+        if (!profileData.desired_partner_age_max)
+          errors.desired_partner_age_max = 'Âge maximum requis';
         break;
-      
+
       case 6: // About & Interests
         if (!profileData.bio || profileData.bio.length < 50) {
-          errors.bio = 'Biographie d\'au moins 50 caractères requise';
+          errors.bio = "Biographie d'au moins 50 caractères requise";
         }
         break;
-      
+
       case 7: // Privacy & Verification
         if (profileData.profile_visibility === undefined) {
           errors.profile_visibility = 'Visibilité du profil requise';
@@ -273,15 +280,15 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
         const moderationResult = await moderateContent(profileData.bio, 'profile');
         if (!moderationResult.approved) {
           toast({
-            title: "Contenu non conforme",
+            title: 'Contenu non conforme',
             description: moderationResult.reason,
-            variant: "destructive"
+            variant: 'destructive',
           });
           return;
         }
       }
 
-      setCompletedSteps(prev => [...prev, currentStep]);
+      setCompletedSteps((prev) => [...prev, currentStep]);
       if (currentStep < totalSteps) {
         setCurrentStep(currentStep + 1);
       } else {
@@ -297,10 +304,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
   };
 
   const updateProfileData = (field: string, value: any) => {
-    setProfileData(prev => ({ ...prev, [field]: value }));
+    setProfileData((prev) => ({ ...prev, [field]: value }));
     // Clear validation error when field is updated
     if (validationErrors[field]) {
-      setValidationErrors(prev => {
+      setValidationErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[field];
         return newErrors;
@@ -325,15 +332,13 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
         profession: profileData.profession,
         bio: profileData.bio,
         interests: profileData.interests || [],
-        looking_for: profileData.looking_for
+        looking_for: profileData.looking_for,
       };
 
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert(profileUpdateData, {
-          onConflict: 'user_id',
-          ignoreDuplicates: false
-        });
+      const { error: profileError } = await supabase.from('profiles').upsert(profileUpdateData, {
+        onConflict: 'user_id',
+        ignoreDuplicates: false,
+      });
 
       if (profileError) throw profileError;
 
@@ -348,14 +353,14 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
         beard_preference: profileData.beard_preference,
         halal_diet: profileData.halal_diet || true,
         importance_of_religion: profileData.importance_of_religion,
-        desired_partner_sect: profileData.desired_partner_sect
+        desired_partner_sect: profileData.desired_partner_sect,
       };
 
       const { error: islamicError } = await supabase
         .from('islamic_preferences')
         .upsert(islamicPrefsData, {
           onConflict: 'user_id',
-          ignoreDuplicates: false
+          ignoreDuplicates: false,
         });
 
       if (islamicError) throw islamicError;
@@ -366,15 +371,13 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
         profile_visibility: profileData.profile_visibility || 'matches_only',
         contact_visibility: profileData.contact_visibility || 'family_only',
         photo_visibility: profileData.photo_visibility || 'matches_only',
-        allow_family_involvement: profileData.family_involvement || false
+        allow_family_involvement: profileData.family_involvement || false,
       };
 
-      const { error: privacyError } = await supabase
-        .from('privacy_settings')
-        .upsert(privacyData, {
-          onConflict: 'user_id',
-          ignoreDuplicates: false
-        });
+      const { error: privacyError } = await supabase.from('privacy_settings').upsert(privacyData, {
+        onConflict: 'user_id',
+        ignoreDuplicates: false,
+      });
 
       if (privacyError) throw privacyError;
 
@@ -382,8 +385,8 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
       clearSaved();
 
       toast({
-        title: "Profil sauvegardé",
-        description: "Votre profil a été créé avec succès selon les valeurs islamiques"
+        title: 'Profil sauvegardé',
+        description: 'Votre profil a été créé avec succès selon les valeurs islamiques',
       });
 
       if (onComplete) {
@@ -392,9 +395,9 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
     } catch (error) {
       console.error('Error saving profile:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder le profil",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder le profil',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -455,7 +458,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
         <div>
           <Label htmlFor="gender">Genre *</Label>
-          <Select value={profileData.gender} onValueChange={(value) => updateProfileData('gender', value)}>
+          <Select
+            value={profileData.gender}
+            onValueChange={(value) => updateProfileData('gender', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Sélectionnez votre genre" />
             </SelectTrigger>
@@ -491,7 +497,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
         <div>
           <Label htmlFor="marital_status">Statut matrimonial</Label>
-          <Select value={profileData.marital_status} onValueChange={(value) => updateProfileData('marital_status', value)}>
+          <Select
+            value={profileData.marital_status}
+            onValueChange={(value) => updateProfileData('marital_status', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Sélectionnez votre statut" />
             </SelectTrigger>
@@ -512,13 +521,18 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
       <div className="text-center mb-6">
         <Moon className="h-12 w-12 mx-auto mb-4 text-primary" />
         <h3 className="text-xl font-semibold">Informations islamiques</h3>
-        <p className="text-muted-foreground">Partagez votre parcours spirituel et vos pratiques religieuses</p>
+        <p className="text-muted-foreground">
+          Partagez votre parcours spirituel et vos pratiques religieuses
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="sect">Secte religieuse *</Label>
-          <Select value={profileData.sect} onValueChange={(value) => updateProfileData('sect', value)}>
+          <Select
+            value={profileData.sect}
+            onValueChange={(value) => updateProfileData('sect', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Sélectionnez votre secte" />
             </SelectTrigger>
@@ -535,7 +549,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
         <div>
           <Label htmlFor="madhab">École juridique (Madhab)</Label>
-          <Select value={profileData.madhab} onValueChange={(value) => updateProfileData('madhab', value)}>
+          <Select
+            value={profileData.madhab}
+            onValueChange={(value) => updateProfileData('madhab', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Sélectionnez votre madhab" />
             </SelectTrigger>
@@ -552,7 +569,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
         <div>
           <Label htmlFor="prayer_frequency">Fréquence de prière *</Label>
-          <Select value={profileData.prayer_frequency} onValueChange={(value) => updateProfileData('prayer_frequency', value)}>
+          <Select
+            value={profileData.prayer_frequency}
+            onValueChange={(value) => updateProfileData('prayer_frequency', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Sélectionnez la fréquence" />
             </SelectTrigger>
@@ -573,7 +593,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
         <div>
           <Label htmlFor="quran_reading">Lecture du Coran</Label>
-          <Select value={profileData.quran_reading} onValueChange={(value) => updateProfileData('quran_reading', value)}>
+          <Select
+            value={profileData.quran_reading}
+            onValueChange={(value) => updateProfileData('quran_reading', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Fréquence de lecture" />
             </SelectTrigger>
@@ -590,7 +613,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
         <div>
           <Label htmlFor="importance_of_religion">Importance de la religion *</Label>
-          <Select value={profileData.importance_of_religion} onValueChange={(value) => updateProfileData('importance_of_religion', value)}>
+          <Select
+            value={profileData.importance_of_religion}
+            onValueChange={(value) => updateProfileData('importance_of_religion', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Niveau d'importance" />
             </SelectTrigger>
@@ -603,7 +629,9 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
             </SelectContent>
           </Select>
           {validationErrors.importance_of_religion && (
-            <p className="text-sm text-destructive mt-1">{validationErrors.importance_of_religion}</p>
+            <p className="text-sm text-destructive mt-1">
+              {validationErrors.importance_of_religion}
+            </p>
           )}
         </div>
 
@@ -620,7 +648,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
         {profileData.gender === 'female' && (
           <div>
             <Label htmlFor="hijab_preference">Port du hijab</Label>
-            <Select value={profileData.hijab_preference} onValueChange={(value) => updateProfileData('hijab_preference', value)}>
+            <Select
+              value={profileData.hijab_preference}
+              onValueChange={(value) => updateProfileData('hijab_preference', value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Votre pratique" />
               </SelectTrigger>
@@ -638,7 +669,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
         {profileData.gender === 'male' && (
           <div>
             <Label htmlFor="beard_preference">Port de la barbe</Label>
-            <Select value={profileData.beard_preference} onValueChange={(value) => updateProfileData('beard_preference', value)}>
+            <Select
+              value={profileData.beard_preference}
+              onValueChange={(value) => updateProfileData('beard_preference', value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Votre pratique" />
               </SelectTrigger>
@@ -678,7 +712,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <Label htmlFor="education">Niveau d'éducation *</Label>
-          <Select value={profileData.education} onValueChange={(value) => updateProfileData('education', value)}>
+          <Select
+            value={profileData.education}
+            onValueChange={(value) => updateProfileData('education', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Sélectionnez votre niveau" />
             </SelectTrigger>
@@ -708,7 +745,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
         <div>
           <Label htmlFor="income_range">Tranche de revenus (optionnel)</Label>
-          <Select value={profileData.income_range} onValueChange={(value) => updateProfileData('income_range', value)}>
+          <Select
+            value={profileData.income_range}
+            onValueChange={(value) => updateProfileData('income_range', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Sélectionnez une tranche" />
             </SelectTrigger>
@@ -738,7 +778,12 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
           <Input
             id="languages"
             value={profileData.languages?.join(', ') || ''}
-            onChange={(e) => updateProfileData('languages', e.target.value.split(',').map(l => l.trim()))}
+            onChange={(e) =>
+              updateProfileData(
+                'languages',
+                e.target.value.split(',').map((l) => l.trim())
+              )
+            }
             placeholder="Français, Arabe, Anglais..."
           />
         </div>
@@ -761,7 +806,9 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
       <div className="text-center mb-6">
         <Users className="h-12 w-12 mx-auto mb-4 text-primary" />
         <h3 className="text-xl font-semibold">Famille et Contexte</h3>
-        <p className="text-muted-foreground">Partagez des informations sur votre famille et votre contexte</p>
+        <p className="text-muted-foreground">
+          Partagez des informations sur votre famille et votre contexte
+        </p>
       </div>
 
       <div className="space-y-4">
@@ -781,7 +828,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
         <div>
           <Label htmlFor="family_religiosity">Religiosité de la famille *</Label>
-          <Select value={profileData.family_religiosity} onValueChange={(value) => updateProfileData('family_religiosity', value)}>
+          <Select
+            value={profileData.family_religiosity}
+            onValueChange={(value) => updateProfileData('family_religiosity', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Niveau religieux de votre famille" />
             </SelectTrigger>
@@ -838,13 +888,18 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
       <div className="text-center mb-6">
         <Heart className="h-12 w-12 mx-auto mb-4 text-primary" />
         <h3 className="text-xl font-semibold">Préférences de partenaire</h3>
-        <p className="text-muted-foreground">Décrivez votre partenaire idéal selon les valeurs islamiques</p>
+        <p className="text-muted-foreground">
+          Décrivez votre partenaire idéal selon les valeurs islamiques
+        </p>
       </div>
 
       <div className="space-y-4">
         <div>
           <Label htmlFor="looking_for">Type de relation recherchée *</Label>
-          <Select value={profileData.looking_for} onValueChange={(value) => updateProfileData('looking_for', value)}>
+          <Select
+            value={profileData.looking_for}
+            onValueChange={(value) => updateProfileData('looking_for', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Que recherchez-vous ?" />
             </SelectTrigger>
@@ -867,7 +922,9 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
               min="18"
               max="100"
               value={profileData.desired_partner_age_min || ''}
-              onChange={(e) => updateProfileData('desired_partner_age_min', parseInt(e.target.value))}
+              onChange={(e) =>
+                updateProfileData('desired_partner_age_min', parseInt(e.target.value))
+              }
             />
           </div>
 
@@ -879,7 +936,9 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
               min="18"
               max="100"
               value={profileData.desired_partner_age_max || ''}
-              onChange={(e) => updateProfileData('desired_partner_age_max', parseInt(e.target.value))}
+              onChange={(e) =>
+                updateProfileData('desired_partner_age_max', parseInt(e.target.value))
+              }
             />
           </div>
         </div>
@@ -897,7 +956,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
           <div>
             <Label htmlFor="desired_partner_education">Éducation souhaitée</Label>
-            <Select value={profileData.desired_partner_education} onValueChange={(value) => updateProfileData('desired_partner_education', value)}>
+            <Select
+              value={profileData.desired_partner_education}
+              onValueChange={(value) => updateProfileData('desired_partner_education', value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Niveau d'éducation" />
               </SelectTrigger>
@@ -914,7 +976,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
         <div>
           <Label htmlFor="desired_partner_sect">Secte religieuse préférée</Label>
-          <Select value={profileData.desired_partner_sect} onValueChange={(value) => updateProfileData('desired_partner_sect', value)}>
+          <Select
+            value={profileData.desired_partner_sect}
+            onValueChange={(value) => updateProfileData('desired_partner_sect', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Préférence religieuse" />
             </SelectTrigger>
@@ -931,9 +996,21 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
           <Label htmlFor="desired_partner_qualities">Qualités importantes recherchées</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
             {[
-              'Religieux/se', 'Éduqué(e)', 'Respectueux/se', 'Honnête', 'Généreux/se',
-              'Patient(e)', 'Compréhensif/ve', 'Travailleur/se', 'Fidèle', 'Humble',
-              'Drôle', 'Intelligent(e)', 'Bienveillant(e)', 'Responsable', 'Famille-oriented'
+              'Religieux/se',
+              'Éduqué(e)',
+              'Respectueux/se',
+              'Honnête',
+              'Généreux/se',
+              'Patient(e)',
+              'Compréhensif/ve',
+              'Travailleur/se',
+              'Fidèle',
+              'Humble',
+              'Drôle',
+              'Intelligent(e)',
+              'Bienveillant(e)',
+              'Responsable',
+              'Famille-oriented',
             ].map((quality) => (
               <div key={quality} className="flex items-center space-x-2">
                 <Checkbox
@@ -942,13 +1019,21 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
                   onCheckedChange={(checked) => {
                     const currentQualities = profileData.desired_partner_qualities || [];
                     if (checked) {
-                      updateProfileData('desired_partner_qualities', [...currentQualities, quality]);
+                      updateProfileData('desired_partner_qualities', [
+                        ...currentQualities,
+                        quality,
+                      ]);
                     } else {
-                      updateProfileData('desired_partner_qualities', currentQualities.filter(q => q !== quality));
+                      updateProfileData(
+                        'desired_partner_qualities',
+                        currentQualities.filter((q) => q !== quality)
+                      );
                     }
                   }}
                 />
-                <Label htmlFor={quality} className="text-sm">{quality}</Label>
+                <Label htmlFor={quality} className="text-sm">
+                  {quality}
+                </Label>
               </div>
             ))}
           </div>
@@ -990,10 +1075,26 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
           <Label htmlFor="interests">Centres d'intérêt</Label>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-2">
             {[
-              'Lecture', 'Voyage', 'Cuisine', 'Sport', 'Nature', 'Art',
-              'Musique', 'Photographie', 'Écriture', 'Bénévolat', 'Technologie',
-              'Histoire islamique', 'Calligraphie', 'Jardinage', 'Films',
-              'Langues', 'Méditation', 'Famille', 'Études islamiques', 'Artisanat'
+              'Lecture',
+              'Voyage',
+              'Cuisine',
+              'Sport',
+              'Nature',
+              'Art',
+              'Musique',
+              'Photographie',
+              'Écriture',
+              'Bénévolat',
+              'Technologie',
+              'Histoire islamique',
+              'Calligraphie',
+              'Jardinage',
+              'Films',
+              'Langues',
+              'Méditation',
+              'Famille',
+              'Études islamiques',
+              'Artisanat',
             ].map((interest) => (
               <div key={interest} className="flex items-center space-x-2">
                 <Checkbox
@@ -1004,11 +1105,16 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
                     if (checked) {
                       updateProfileData('interests', [...currentInterests, interest]);
                     } else {
-                      updateProfileData('interests', currentInterests.filter(i => i !== interest));
+                      updateProfileData(
+                        'interests',
+                        currentInterests.filter((i) => i !== interest)
+                      );
                     }
                   }}
                 />
-                <Label htmlFor={interest} className="text-sm">{interest}</Label>
+                <Label htmlFor={interest} className="text-sm">
+                  {interest}
+                </Label>
               </div>
             ))}
           </div>
@@ -1019,7 +1125,15 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
           <Input
             id="hobbies"
             value={profileData.hobbies?.join(', ') || ''}
-            onChange={(e) => updateProfileData('hobbies', e.target.value.split(',').map(h => h.trim()).filter(h => h))}
+            onChange={(e) =>
+              updateProfileData(
+                'hobbies',
+                e.target.value
+                  .split(',')
+                  .map((h) => h.trim())
+                  .filter((h) => h)
+              )
+            }
             placeholder="Ajoutez vos loisirs spécifiques, séparés par des virgules"
           />
         </div>
@@ -1032,13 +1146,18 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
       <div className="text-center mb-6">
         <Shield className="h-12 w-12 mx-auto mb-4 text-primary" />
         <h3 className="text-xl font-semibold">Confidentialité et Vérification</h3>
-        <p className="text-muted-foreground">Configurez vos paramètres de confidentialité selon vos préférences</p>
+        <p className="text-muted-foreground">
+          Configurez vos paramètres de confidentialité selon vos préférences
+        </p>
       </div>
 
       <div className="space-y-6">
         <div>
           <Label htmlFor="profile_visibility">Visibilité du profil *</Label>
-          <Select value={profileData.profile_visibility} onValueChange={(value) => updateProfileData('profile_visibility', value)}>
+          <Select
+            value={profileData.profile_visibility}
+            onValueChange={(value) => updateProfileData('profile_visibility', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Qui peut voir votre profil ?" />
             </SelectTrigger>
@@ -1070,7 +1189,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
         <div>
           <Label htmlFor="photo_visibility">Visibilité des photos</Label>
-          <Select value={profileData.photo_visibility || 'matches_only'} onValueChange={(value) => updateProfileData('photo_visibility', value)}>
+          <Select
+            value={profileData.photo_visibility || 'matches_only'}
+            onValueChange={(value) => updateProfileData('photo_visibility', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Qui peut voir vos photos ?" />
             </SelectTrigger>
@@ -1099,7 +1221,10 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
 
         <div>
           <Label htmlFor="contact_visibility">Visibilité des informations de contact</Label>
-          <Select value={profileData.contact_visibility || 'family_only'} onValueChange={(value) => updateProfileData('contact_visibility', value)}>
+          <Select
+            value={profileData.contact_visibility || 'family_only'}
+            onValueChange={(value) => updateProfileData('contact_visibility', value)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Qui peut voir vos contacts ?" />
             </SelectTrigger>
@@ -1188,7 +1313,9 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
             Assistant de Création de Profil Islamique
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Badge variant="secondary">{currentStep}/{totalSteps}</Badge>
+            <Badge variant="secondary">
+              {currentStep}/{totalSteps}
+            </Badge>
           </div>
         </div>
         <div className="flex items-center justify-between mt-2">
@@ -1222,11 +1349,7 @@ const ProfileWizard: React.FC<ProfileWizardProps> = ({ onComplete, existingProfi
             ))}
           </div>
 
-          <Button
-            onClick={nextStep}
-            disabled={loading}
-            className="flex items-center gap-2"
-          >
+          <Button onClick={nextStep} disabled={loading} className="flex items-center gap-2">
             {loading ? (
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground border-t-transparent" />
             ) : currentStep === totalSteps ? (

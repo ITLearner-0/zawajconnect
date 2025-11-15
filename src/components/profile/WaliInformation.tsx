@@ -1,20 +1,31 @@
-
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { InfoIcon } from "lucide-react";
-import { ProfileFormData } from "@/types/profile";
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { InfoIcon } from 'lucide-react';
+import { ProfileFormData } from '@/types/profile';
 
 interface WaliInformationProps {
   formData: ProfileFormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void;
+  handleChange: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => void;
   showRequired?: boolean;
 }
 
-const WaliInformation = ({ formData, handleChange, showRequired = false }: WaliInformationProps) => {
+const WaliInformation = ({
+  formData,
+  handleChange,
+  showRequired = false,
+}: WaliInformationProps) => {
   // Only show for female users
-  if (formData.gender !== "female") {
+  if (formData.gender !== 'female') {
     return null;
   }
 
@@ -30,8 +41,8 @@ const WaliInformation = ({ formData, handleChange, showRequired = false }: WaliI
               </TooltipTrigger>
               <TooltipContent>
                 <p className="max-w-xs">
-                  Conformément aux valeurs islamiques, les femmes doivent désigner un wali 
-                  (tuteur). Il peut s'agir de votre père, frère, oncle ou d'un autre parent masculin.
+                  Conformément aux valeurs islamiques, les femmes doivent désigner un wali (tuteur).
+                  Il peut s'agir de votre père, frère, oncle ou d'un autre parent masculin.
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -42,13 +53,13 @@ const WaliInformation = ({ formData, handleChange, showRequired = false }: WaliI
       <div className="space-y-4">
         <div>
           <Label htmlFor="waliName" className="flex items-center">
-            Nom du Wali 
+            Nom du Wali
             {showRequired && <span className="text-red-500 ml-1">*</span>}
           </Label>
           <Input
             id="waliName"
             name="waliName"
-            value={formData.waliName || ""}
+            value={formData.waliName || ''}
             onChange={handleChange}
             placeholder="Nom complet de votre wali"
             required={showRequired}
@@ -58,16 +69,16 @@ const WaliInformation = ({ formData, handleChange, showRequired = false }: WaliI
 
         <div>
           <Label htmlFor="waliRelationship" className="flex items-center">
-            Relation 
+            Relation
             {showRequired && <span className="text-red-500 ml-1">*</span>}
           </Label>
-          <Select 
-            name="waliRelationship" 
-            value={formData.waliRelationship || ""} 
+          <Select
+            name="waliRelationship"
+            value={formData.waliRelationship || ''}
             onValueChange={(value) => {
               handleChange({
-                target: { name: "waliRelationship", value }
-              } as React.ChangeEvent<HTMLSelectElement>)
+                target: { name: 'waliRelationship', value },
+              } as React.ChangeEvent<HTMLSelectElement>);
             }}
           >
             <SelectTrigger id="waliRelationship" className="mt-1">
@@ -91,7 +102,7 @@ const WaliInformation = ({ formData, handleChange, showRequired = false }: WaliI
           <Input
             id="waliContact"
             name="waliContact"
-            value={formData.waliContact || ""}
+            value={formData.waliContact || ''}
             onChange={handleChange}
             placeholder="Numéro de contact du wali"
             required={showRequired}

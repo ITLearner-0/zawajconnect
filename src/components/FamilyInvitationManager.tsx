@@ -7,22 +7,34 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { 
-  UserPlus, 
-  Mail, 
-  Phone, 
-  Users, 
-  Clock, 
-  CheckCircle, 
+import {
+  UserPlus,
+  Mail,
+  Phone,
+  Users,
+  Clock,
+  CheckCircle,
   XCircle,
   Settings,
   Eye,
   MessageCircle,
-  Shield
+  Shield,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
@@ -55,7 +67,7 @@ const FamilyInvitationManager = () => {
     relationship: '',
     is_wali: false,
     can_view_profile: true,
-    can_communicate: false
+    can_communicate: false,
   });
 
   useEffect(() => {
@@ -73,22 +85,22 @@ const FamilyInvitationManager = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      const normalizedMembers = (data || []).map(m => ({
+      const normalizedMembers = (data || []).map((m) => ({
         ...m,
         is_wali: m.is_wali ?? false,
         can_communicate: m.can_communicate ?? false,
         can_view_profile: m.can_view_profile ?? false,
         invitation_status: m.invitation_status ?? 'pending',
         invitation_sent_at: m.invitation_sent_at ?? '',
-        invitation_accepted_at: m.invitation_accepted_at ?? undefined
+        invitation_accepted_at: m.invitation_accepted_at ?? undefined,
       }));
       setFamilyMembers(normalizedMembers);
     } catch (error) {
       console.error('Error fetching family members:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les membres de la famille",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les membres de la famille',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -111,45 +123,52 @@ const FamilyInvitationManager = () => {
       email: inviteForm.email,
       phone: inviteForm.phone || '',
       relationship: inviteForm.relationship,
-      isWali: inviteForm.is_wali
+      isWali: inviteForm.is_wali,
     });
 
     if (!validationResult.success) {
       const fieldErrors: Record<string, string> = {};
-      validationResult.error.issues.forEach(issue => {
+      validationResult.error.issues.forEach((issue) => {
         if (issue.path[0]) {
           fieldErrors[issue.path[0].toString()] = issue.message;
         }
       });
       setValidationErrors(fieldErrors);
       toast({
-        title: "Erreur de validation",
-        description: "Veuillez corriger les erreurs dans le formulaire",
-        variant: "destructive"
+        title: 'Erreur de validation',
+        description: 'Veuillez corriger les erreurs dans le formulaire',
+        variant: 'destructive',
       });
       return;
     }
 
     setIsSubmitting(true);
-    console.log('🚀 [INVITATION] Début envoi invitation pour:', inviteForm.full_name, '- Email:', inviteForm.email);
+    console.log(
+      '🚀 [INVITATION] Début envoi invitation pour:',
+      inviteForm.full_name,
+      '- Email:',
+      inviteForm.email
+    );
 
     try {
       // Send invitation email via edge function
       // The edge function will create the family_members entry via create_family_invitation RPC
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!session?.access_token) {
         throw new Error('Session invalide ou expirée');
       }
 
       console.log('📤 [INVITATION] Appel edge function send-family-invitation...');
-      
+
       const { data, error } = await supabase.functions.invoke('send-family-invitation', {
         body: {
           fullName: inviteForm.full_name,
           email: inviteForm.email,
           relationship: inviteForm.relationship,
-          isWali: inviteForm.is_wali
+          isWali: inviteForm.is_wali,
         },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
@@ -158,27 +177,28 @@ const FamilyInvitationManager = () => {
 
       if (error) {
         console.error('❌ [INVITATION] Edge function error:', error);
-        
+
         // Extract error message from response
         let errorMessage = "Impossible d'envoyer l'invitation";
         if (error.context?.body) {
           try {
-            const errorBody = typeof error.context.body === 'string' 
-              ? JSON.parse(error.context.body) 
-              : error.context.body;
+            const errorBody =
+              typeof error.context.body === 'string'
+                ? JSON.parse(error.context.body)
+                : error.context.body;
             errorMessage = errorBody.error || errorMessage;
           } catch (e) {
             console.error('Failed to parse error body:', e);
           }
         }
-        
+
         throw new Error(errorMessage);
       }
-      
+
       console.log('✅ [INVITATION] Invitation response:', data);
 
       toast({
-        title: "✅ Invitation envoyée",
+        title: '✅ Invitation envoyée',
         description: `L'invitation a été envoyée à ${inviteForm.full_name} (${inviteForm.email})`,
       });
 
@@ -191,21 +211,21 @@ const FamilyInvitationManager = () => {
         relationship: '',
         is_wali: false,
         can_view_profile: true,
-        can_communicate: false
+        can_communicate: false,
       });
-      
+
       // Attendre 500ms avant de recharger pour laisser le temps à la DB de se mettre à jour
       setTimeout(() => {
         fetchFamilyMembers();
       }, 500);
-      
     } catch (error: unknown) {
       console.error('❌ [INVITATION] Error sending invitation:', error);
-      const errorMessage = error instanceof Error ? error.message : "Impossible d'envoyer l'invitation";
+      const errorMessage =
+        error instanceof Error ? error.message : "Impossible d'envoyer l'invitation";
       toast({
         title: "❌ Erreur d'envoi",
         description: errorMessage,
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -214,25 +234,22 @@ const FamilyInvitationManager = () => {
 
   const updateMemberPermissions = async (memberId: string, updates: Partial<FamilyMember>) => {
     try {
-      const { error } = await supabase
-        .from('family_members')
-        .update(updates)
-        .eq('id', memberId);
+      const { error } = await supabase.from('family_members').update(updates).eq('id', memberId);
 
       if (error) throw error;
 
       toast({
-        title: "Permissions mises à jour",
-        description: "Les autorisations du membre ont été modifiées",
+        title: 'Permissions mises à jour',
+        description: 'Les autorisations du membre ont été modifiées',
       });
 
       fetchFamilyMembers();
     } catch (error) {
       console.error('Error updating permissions:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour les permissions",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour les permissions',
+        variant: 'destructive',
       });
     }
   };
@@ -240,15 +257,15 @@ const FamilyInvitationManager = () => {
   const resendInvitation = async (memberId: string, member: FamilyMember) => {
     try {
       console.log('📤 [RESEND] Renvoi invitation à:', member.full_name);
-      
+
       toast({
-        title: "Fonctionnalité non disponible",
+        title: 'Fonctionnalité non disponible',
         description: "Le renvoi d'invitation nécessite que l'email soit stocké",
-        variant: "destructive"
+        variant: 'destructive',
       });
-      
+
       return;
-      
+
       /* TODO: Implement resend when email is available
       const { data: { session } } = await supabase.auth.getSession();
       await supabase.functions.invoke('send-family-invitation', {
@@ -278,34 +295,31 @@ const FamilyInvitationManager = () => {
     } catch (error) {
       console.error('Error resending invitation:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible de renvoyer l'invitation",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
 
   const removeMember = async (memberId: string) => {
     try {
-      const { error } = await supabase
-        .from('family_members')
-        .delete()
-        .eq('id', memberId);
+      const { error } = await supabase.from('family_members').delete().eq('id', memberId);
 
       if (error) throw error;
 
       toast({
-        title: "Membre supprimé",
-        description: "Le membre a été retiré de votre famille",
+        title: 'Membre supprimé',
+        description: 'Le membre a été retiré de votre famille',
       });
 
       fetchFamilyMembers();
     } catch (error) {
       console.error('Error removing member:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de supprimer le membre",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de supprimer le membre',
+        variant: 'destructive',
       });
     }
   };
@@ -313,26 +327,41 @@ const FamilyInvitationManager = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'accepted':
-        return <Badge className="bg-emerald/10 text-emerald border-emerald/20"><CheckCircle className="h-3 w-3 mr-1" />Accepté</Badge>;
+        return (
+          <Badge className="bg-emerald/10 text-emerald border-emerald/20">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Accepté
+          </Badge>
+        );
       case 'declined':
-        return <Badge variant="destructive"><XCircle className="h-3 w-3 mr-1" />Refusé</Badge>;
+        return (
+          <Badge variant="destructive">
+            <XCircle className="h-3 w-3 mr-1" />
+            Refusé
+          </Badge>
+        );
       default:
-        return <Badge variant="outline"><Clock className="h-3 w-3 mr-1" />En attente</Badge>;
+        return (
+          <Badge variant="outline">
+            <Clock className="h-3 w-3 mr-1" />
+            En attente
+          </Badge>
+        );
     }
   };
 
   const getRelationshipLabel = (relationship: string) => {
     const labels: Record<string, string> = {
-      'father': 'Père',
-      'mother': 'Mère',
-      'brother': 'Frère',
-      'sister': 'Sœur',
-      'uncle': 'Oncle',
-      'aunt': 'Tante',
-      'cousin': 'Cousin/Cousine',
-      'family_friend': 'Ami de la famille',
-      'wali': 'Wali',
-      'other': 'Autre'
+      father: 'Père',
+      mother: 'Mère',
+      brother: 'Frère',
+      sister: 'Sœur',
+      uncle: 'Oncle',
+      aunt: 'Tante',
+      cousin: 'Cousin/Cousine',
+      family_friend: 'Ami de la famille',
+      wali: 'Wali',
+      other: 'Autre',
     };
     return labels[relationship] || relationship;
   };
@@ -391,9 +420,9 @@ const FamilyInvitationManager = () => {
                       id="full_name"
                       value={inviteForm.full_name}
                       onChange={(e) => {
-                        setInviteForm(prev => ({ ...prev, full_name: e.target.value }));
+                        setInviteForm((prev) => ({ ...prev, full_name: e.target.value }));
                         if (validationErrors.full_name) {
-                          setValidationErrors(prev => ({ ...prev, full_name: '' }));
+                          setValidationErrors((prev) => ({ ...prev, full_name: '' }));
                         }
                       }}
                       placeholder="Nom du membre de la famille"
@@ -410,9 +439,9 @@ const FamilyInvitationManager = () => {
                       type="email"
                       value={inviteForm.email}
                       onChange={(e) => {
-                        setInviteForm(prev => ({ ...prev, email: e.target.value }));
+                        setInviteForm((prev) => ({ ...prev, email: e.target.value }));
                         if (validationErrors.email) {
-                          setValidationErrors(prev => ({ ...prev, email: '' }));
+                          setValidationErrors((prev) => ({ ...prev, email: '' }));
                         }
                       }}
                       placeholder="email@exemple.com"
@@ -428,9 +457,9 @@ const FamilyInvitationManager = () => {
                       id="phone"
                       value={inviteForm.phone}
                       onChange={(e) => {
-                        setInviteForm(prev => ({ ...prev, phone: e.target.value }));
+                        setInviteForm((prev) => ({ ...prev, phone: e.target.value }));
                         if (validationErrors.phone) {
-                          setValidationErrors(prev => ({ ...prev, phone: '' }));
+                          setValidationErrors((prev) => ({ ...prev, phone: '' }));
                         }
                       }}
                       placeholder="+33 6 12 34 56 78"
@@ -442,16 +471,18 @@ const FamilyInvitationManager = () => {
                   </div>
                   <div>
                     <Label htmlFor="relationship">Relation familiale</Label>
-                    <Select 
-                      value={inviteForm.relationship} 
+                    <Select
+                      value={inviteForm.relationship}
                       onValueChange={(value) => {
-                        setInviteForm(prev => ({ ...prev, relationship: value }));
+                        setInviteForm((prev) => ({ ...prev, relationship: value }));
                         if (validationErrors.relationship) {
-                          setValidationErrors(prev => ({ ...prev, relationship: '' }));
+                          setValidationErrors((prev) => ({ ...prev, relationship: '' }));
                         }
                       }}
                     >
-                      <SelectTrigger className={validationErrors.relationship ? 'border-destructive' : ''}>
+                      <SelectTrigger
+                        className={validationErrors.relationship ? 'border-destructive' : ''}
+                      >
                         <SelectValue placeholder="Choisissez la relation" />
                       </SelectTrigger>
                       <SelectContent>
@@ -467,12 +498,14 @@ const FamilyInvitationManager = () => {
                       </SelectContent>
                     </Select>
                     {validationErrors.relationship && (
-                      <p className="text-sm text-destructive mt-1">{validationErrors.relationship}</p>
+                      <p className="text-sm text-destructive mt-1">
+                        {validationErrors.relationship}
+                      </p>
                     )}
                   </div>
-                  
+
                   <Separator />
-                  
+
                   <div className="space-y-3">
                     <Label>Autorisations</Label>
                     <div className="flex items-center justify-between">
@@ -482,7 +515,9 @@ const FamilyInvitationManager = () => {
                       </div>
                       <Switch
                         checked={inviteForm.is_wali}
-                        onCheckedChange={(checked) => setInviteForm(prev => ({ ...prev, is_wali: checked }))}
+                        onCheckedChange={(checked) =>
+                          setInviteForm((prev) => ({ ...prev, is_wali: checked }))
+                        }
                       />
                     </div>
                     <div className="flex items-center justify-between">
@@ -492,7 +527,9 @@ const FamilyInvitationManager = () => {
                       </div>
                       <Switch
                         checked={inviteForm.can_view_profile}
-                        onCheckedChange={(checked) => setInviteForm(prev => ({ ...prev, can_view_profile: checked }))}
+                        onCheckedChange={(checked) =>
+                          setInviteForm((prev) => ({ ...prev, can_view_profile: checked }))
+                        }
                       />
                     </div>
                     <div className="flex items-center justify-between">
@@ -502,14 +539,16 @@ const FamilyInvitationManager = () => {
                       </div>
                       <Switch
                         checked={inviteForm.can_communicate}
-                        onCheckedChange={(checked) => setInviteForm(prev => ({ ...prev, can_communicate: checked }))}
+                        onCheckedChange={(checked) =>
+                          setInviteForm((prev) => ({ ...prev, can_communicate: checked }))
+                        }
                       />
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-end gap-2 pt-4">
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       onClick={() => {
                         setInviteModalOpen(false);
                         setValidationErrors({});
@@ -517,9 +556,14 @@ const FamilyInvitationManager = () => {
                     >
                       Annuler
                     </Button>
-                    <Button 
+                    <Button
                       onClick={sendInvitation}
-                      disabled={!inviteForm.full_name || !inviteForm.email || !inviteForm.relationship || isSubmitting}
+                      disabled={
+                        !inviteForm.full_name ||
+                        !inviteForm.email ||
+                        !inviteForm.relationship ||
+                        isSubmitting
+                      }
                       className="bg-emerald hover:bg-emerald-dark"
                     >
                       {isSubmitting ? (
@@ -528,7 +572,7 @@ const FamilyInvitationManager = () => {
                           Envoi en cours...
                         </div>
                       ) : (
-                        'Envoyer l\'invitation'
+                        "Envoyer l'invitation"
                       )}
                     </Button>
                   </div>
@@ -596,7 +640,7 @@ const FamilyInvitationManager = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center gap-2">
                     {member.invitation_status === 'pending' && (
                       <Button
@@ -624,32 +668,35 @@ const FamilyInvitationManager = () => {
                               <span className="text-sm">Wali (tuteur islamique)</span>
                               <Switch
                                 checked={member.is_wali}
-                                onCheckedChange={(checked) => updateMemberPermissions(member.id, { is_wali: checked })}
+                                onCheckedChange={(checked) =>
+                                  updateMemberPermissions(member.id, { is_wali: checked })
+                                }
                               />
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-sm">Voir le profil</span>
                               <Switch
                                 checked={member.can_view_profile}
-                                onCheckedChange={(checked) => updateMemberPermissions(member.id, { can_view_profile: checked })}
+                                onCheckedChange={(checked) =>
+                                  updateMemberPermissions(member.id, { can_view_profile: checked })
+                                }
                               />
                             </div>
                             <div className="flex items-center justify-between">
                               <span className="text-sm">Participer aux conversations</span>
                               <Switch
                                 checked={member.can_communicate}
-                                onCheckedChange={(checked) => updateMemberPermissions(member.id, { can_communicate: checked })}
+                                onCheckedChange={(checked) =>
+                                  updateMemberPermissions(member.id, { can_communicate: checked })
+                                }
                               />
                             </div>
                           </div>
-                          
+
                           <Separator />
-                          
+
                           <div className="flex justify-between">
-                            <Button
-                              variant="destructive"
-                              onClick={() => removeMember(member.id)}
-                            >
+                            <Button variant="destructive" onClick={() => removeMember(member.id)}>
                               Supprimer le membre
                             </Button>
                           </div>

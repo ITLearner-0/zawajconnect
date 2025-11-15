@@ -33,7 +33,7 @@ export const useUnacknowledgedAlertsCount = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'wali_admin_alerts'
+          table: 'wali_admin_alerts',
         },
         () => {
           fetchCount();

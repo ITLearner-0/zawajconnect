@@ -7,19 +7,19 @@ import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  MessageCircle, 
-  Users, 
-  BookOpen, 
-  Settings, 
-  Shield, 
+import {
+  MessageCircle,
+  Users,
+  BookOpen,
+  Settings,
+  Shield,
   Heart,
   Bell,
   Eye,
   Mic,
   Video,
   Star,
-  Clock
+  Clock,
 } from 'lucide-react';
 
 import RealTimeChat from './RealTimeChat';
@@ -47,7 +47,7 @@ const ChatEnhancementHub: React.FC<ChatEnhancementHubProps> = ({ matchId, onClos
   const { user } = useAuth();
   const { toast } = useToast();
   const { supervisionStatus, familyMembers } = useFamilySupervision();
-  
+
   const [match, setMatch] = useState<Match | null>(null);
   const [activeTab, setActiveTab] = useState('chat');
   const [loading, setLoading] = useState(true);
@@ -56,7 +56,7 @@ const ChatEnhancementHub: React.FC<ChatEnhancementHubProps> = ({ matchId, onClos
 
   useEffect(() => {
     if (!user || !matchId) return;
-    
+
     fetchMatchData();
     determineUserRole();
     fetchConversationContext();
@@ -70,21 +70,22 @@ const ChatEnhancementHub: React.FC<ChatEnhancementHubProps> = ({ matchId, onClos
       other_user: {
         id: 'other-user-id',
         full_name: 'Utilisateur',
-        avatar_url: ''
+        avatar_url: '',
       },
       match_score: 85,
       family_supervision_required: supervisionStatus.supervisionRequired,
-      can_communicate: supervisionStatus.canCommunicate
+      can_communicate: supervisionStatus.canCommunicate,
     });
     setLoading(false);
   };
 
   const determineUserRole = () => {
     // Check if current user is a family supervisor
-    const isSupervising = familyMembers.some(fm => 
-      (fm.user_id === user?.id || fm.invited_user_id === user?.id) && 
-      fm.is_wali && 
-      fm.can_view_profile
+    const isSupervising = familyMembers.some(
+      (fm) =>
+        (fm.user_id === user?.id || fm.invited_user_id === user?.id) &&
+        fm.is_wali &&
+        fm.can_view_profile
     );
     setIsWaliView(isSupervising);
   };
@@ -96,15 +97,15 @@ const ChatEnhancementHub: React.FC<ChatEnhancementHubProps> = ({ matchId, onClos
       duration_days: 5,
       message_count: 23,
       last_topics: ['family', 'values', 'education'],
-      relationship_level: 'interested'
+      relationship_level: 'interested',
     });
   };
 
   const handleGuidanceApply = (guidance: any) => {
     // This would apply the guidance to the current conversation
     toast({
-      title: "Guidance appliquée",
-      description: "La guidance islamique a été intégrée à votre conversation"
+      title: 'Guidance appliquée',
+      description: 'La guidance islamique a été intégrée à votre conversation',
     });
   };
 
@@ -145,7 +146,9 @@ const ChatEnhancementHub: React.FC<ChatEnhancementHubProps> = ({ matchId, onClos
             </div>
             <div>
               <h2 className="font-semibold">
-                {isWaliView ? 'Supervision Familiale' : `Conversation avec ${match.other_user.full_name}`}
+                {isWaliView
+                  ? 'Supervision Familiale'
+                  : `Conversation avec ${match.other_user.full_name}`}
               </h2>
               <div className="flex items-center gap-2">
                 <Badge variant="secondary" className="text-xs">
@@ -160,7 +163,7 @@ const ChatEnhancementHub: React.FC<ChatEnhancementHubProps> = ({ matchId, onClos
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-2">
             {/* Quick Actions */}
             <Button variant="ghost" size="sm" title="Notifications">
@@ -213,7 +216,7 @@ const ChatEnhancementHub: React.FC<ChatEnhancementHubProps> = ({ matchId, onClos
                   <RealTimeChat matchId={matchId} />
                 </div>
                 <div className="w-1/3">
-                  <IslamicGuidanceChat 
+                  <IslamicGuidanceChat
                     matchId={matchId}
                     conversationContext={conversationContext}
                     onApplyGuidance={handleGuidanceApply}
@@ -280,11 +283,15 @@ const ChatEnhancementHub: React.FC<ChatEnhancementHubProps> = ({ matchId, onClos
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span>Messages échangés:</span>
-                        <span className="font-medium">{conversationContext?.message_count || 0}</span>
+                        <span className="font-medium">
+                          {conversationContext?.message_count || 0}
+                        </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span>Durée:</span>
-                        <span className="font-medium">{conversationContext?.duration_days || 0} jours</span>
+                        <span className="font-medium">
+                          {conversationContext?.duration_days || 0} jours
+                        </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span>Niveau:</span>

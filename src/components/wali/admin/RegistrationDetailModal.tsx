@@ -59,13 +59,8 @@ export const RegistrationDetailModal = ({
   const [showRejectForm, setShowRejectForm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const {
-    comments,
-    activityLog,
-    addComment,
-    updateComment,
-    deleteComment,
-  } = useWaliRegistrationComments(registration?.id || '');
+  const { comments, activityLog, addComment, updateComment, deleteComment } =
+    useWaliRegistrationComments(registration?.id || '');
 
   if (!registration) return null;
 
@@ -116,12 +111,8 @@ export const RegistrationDetailModal = ({
         <Tabs defaultValue="details" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="details">Informations</TabsTrigger>
-            <TabsTrigger value="comments">
-              Commentaires ({comments.length})
-            </TabsTrigger>
-            <TabsTrigger value="history">
-              Historique ({activityLog.length})
-            </TabsTrigger>
+            <TabsTrigger value="comments">Commentaires ({comments.length})</TabsTrigger>
+            <TabsTrigger value="history">Historique ({activityLog.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="details" className="mt-4">

@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { CardFooter } from "@/components/ui/card";
+import { CardFooter } from '@/components/ui/card';
 
 interface MonitoringFooterProps {
   report: any;

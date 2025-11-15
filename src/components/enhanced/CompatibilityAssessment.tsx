@@ -9,17 +9,17 @@ import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import CompatibilityQuestionnaire from '@/components/CompatibilityQuestionnaire';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Heart, 
-  TrendingUp, 
-  Users, 
-  Star, 
+import {
+  Heart,
+  TrendingUp,
+  Users,
+  Star,
   Target,
   BarChart3,
   CheckCircle,
   Clock,
   Lightbulb,
-  ArrowRight
+  ArrowRight,
 } from 'lucide-react';
 
 interface CompatibilityMatch {
@@ -43,7 +43,10 @@ interface CompatibilityAssessmentProps {
   embedded?: boolean;
 }
 
-const CompatibilityAssessment = ({ onComplete, embedded = false }: CompatibilityAssessmentProps) => {
+const CompatibilityAssessment = ({
+  onComplete,
+  embedded = false,
+}: CompatibilityAssessmentProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const { stats, responses, loading, refreshData }: UseCompatibilityReturn = useCompatibility();
@@ -68,11 +71,12 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
         {
           category: 'Valeurs Religieuses',
           strength: 85,
-          description: 'Vous avez des valeurs religieuses bien définies qui correspondent à la plupart des profils islamiques.',
+          description:
+            'Vous avez des valeurs religieuses bien définies qui correspondent à la plupart des profils islamiques.',
           recommendations: [
             'Recherchez des partenaires avec des pratiques religieuses similaires',
-            'Mettez en avant votre engagement religieux dans votre profil'
-          ]
+            'Mettez en avant votre engagement religieux dans votre profil',
+          ],
         },
         {
           category: 'Style de Vie',
@@ -80,18 +84,19 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
           description: 'Votre style de vie est équilibré entre tradition et modernité.',
           recommendations: [
             'Soyez ouvert aux discussions sur les attentes de style de vie',
-            'Clarifiez vos priorités entre carrière et famille'
-          ]
+            'Clarifiez vos priorités entre carrière et famille',
+          ],
         },
         {
           category: 'Objectifs Familiaux',
           strength: 90,
-          description: 'Vous avez des objectifs familiaux clairs et bien alignés avec les valeurs islamiques.',
+          description:
+            'Vous avez des objectifs familiaux clairs et bien alignés avec les valeurs islamiques.',
           recommendations: [
             'Discutez ouvertement de vos plans familiaux',
-            'Recherchez des partenaires avec des objectifs similaires'
-          ]
-        }
+            'Recherchez des partenaires avec des objectifs similaires',
+          ],
+        },
       ];
 
       setCompatibilityInsights(insights);
@@ -103,9 +108,11 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
   };
 
   const getCompatibilityLevel = (score: number) => {
-    if (score >= 80) return { level: 'Excellente', color: 'text-emerald', bgColor: 'bg-emerald/10' };
+    if (score >= 80)
+      return { level: 'Excellente', color: 'text-emerald', bgColor: 'bg-emerald/10' };
     if (score >= 60) return { level: 'Bonne', color: 'text-gold', bgColor: 'bg-gold/10' };
-    if (score >= 40) return { level: 'Moyenne', color: 'text-orange-500', bgColor: 'bg-orange-100' };
+    if (score >= 40)
+      return { level: 'Moyenne', color: 'text-orange-500', bgColor: 'bg-orange-100' };
     return { level: 'Faible', color: 'text-red-500', bgColor: 'bg-red-100' };
   };
 
@@ -113,10 +120,10 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
     refreshData();
     generateCompatibilityInsights();
     toast({
-      title: "Analyse terminée",
-      description: "Votre profil de compatibilité a été mis à jour",
+      title: 'Analyse terminée',
+      description: 'Votre profil de compatibilité a été mis à jour',
     });
-    
+
     if (onComplete) {
       onComplete();
     }
@@ -136,7 +143,13 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
   }
 
   return (
-    <div className={embedded ? 'space-y-6' : 'min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4'}>
+    <div
+      className={
+        embedded
+          ? 'space-y-6'
+          : 'min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4'
+      }
+    >
       <div className={`container mx-auto ${embedded ? 'max-w-full' : 'max-w-6xl'}`}>
         {/* Header */}
         <Card className={embedded ? '' : 'shadow-lg mb-6'}>
@@ -148,9 +161,10 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
             </div>
             <CardTitle className="text-2xl mb-2">Évaluation de Compatibilité</CardTitle>
             <p className="text-muted-foreground">
-              Découvrez votre profil de compatibilité et améliorez vos chances de trouver le partenaire idéal
+              Découvrez votre profil de compatibilité et améliorez vos chances de trouver le
+              partenaire idéal
             </p>
-            
+
             {/* Overall Progress */}
             <div className="space-y-2 mt-6">
               <div className="flex justify-between text-sm">
@@ -158,7 +172,9 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
                   <CheckCircle className="h-4 w-4 text-emerald" />
                   Progression globale
                 </span>
-                <span>{stats.answeredQuestions}/{stats.totalQuestions} questions</span>
+                <span>
+                  {stats.answeredQuestions}/{stats.totalQuestions} questions
+                </span>
               </div>
               <Progress value={stats.completionPercentage} className="w-full" />
               <div className="flex justify-between items-center text-xs">
@@ -198,10 +214,7 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
           </ResponsiveTabsList>
 
           <TabsContent value="questionnaire" className="space-y-0">
-            <CompatibilityQuestionnaire 
-              onComplete={handleQuestionnaireComplete}
-              embedded={true}
-            />
+            <CompatibilityQuestionnaire onComplete={handleQuestionnaireComplete} embedded={true} />
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-6">
@@ -233,9 +246,7 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
                               </Badge>
                             </div>
                             <Progress value={insight.strength} className="h-2" />
-                            <p className="text-xs text-muted-foreground">
-                              {insight.description}
-                            </p>
+                            <p className="text-xs text-muted-foreground">{insight.description}</p>
                           </div>
                         );
                       })}
@@ -255,17 +266,18 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
                 <CardContent>
                   <div className="space-y-3">
                     {compatibilityInsights
-                      .filter(insight => insight.strength >= 70)
+                      .filter((insight) => insight.strength >= 70)
                       .map((insight, index) => (
-                      <div key={index} className="flex items-start gap-3">
-                        <div className="h-2 w-2 bg-emerald rounded-full mt-2"></div>
-                        <div>
-                          <h4 className="font-medium text-sm">{insight.category}</h4>
-                          <p className="text-xs text-muted-foreground">{insight.description}</p>
+                        <div key={index} className="flex items-start gap-3">
+                          <div className="h-2 w-2 bg-emerald rounded-full mt-2"></div>
+                          <div>
+                            <h4 className="font-medium text-sm">{insight.category}</h4>
+                            <p className="text-xs text-muted-foreground">{insight.description}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                    {compatibilityInsights.filter(insight => insight.strength >= 70).length === 0 && (
+                      ))}
+                    {compatibilityInsights.filter((insight) => insight.strength >= 70).length ===
+                      0 && (
                       <p className="text-sm text-muted-foreground text-center py-4">
                         Complétez plus de questions pour voir vos points forts
                       </p>
@@ -287,12 +299,15 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
                       </Badge>
                     </div>
                     <p className="text-muted-foreground mb-4">{insight.description}</p>
-                    
+
                     <div className="space-y-2">
                       <h4 className="font-medium text-sm">Recommandations :</h4>
                       <ul className="space-y-1">
                         {insight.recommendations.map((rec, recIndex) => (
-                          <li key={recIndex} className="text-sm text-muted-foreground flex items-start gap-2">
+                          <li
+                            key={recIndex}
+                            className="text-sm text-muted-foreground flex items-start gap-2"
+                          >
                             <ArrowRight className="h-3 w-3 mt-0.5 text-emerald shrink-0" />
                             {rec}
                           </li>
@@ -341,7 +356,10 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
               <CardContent>
                 <div className="space-y-6">
                   {compatibilityInsights.map((insight, index) => (
-                    <div key={index} className="p-4 bg-gradient-to-r from-emerald/5 to-gold/5 rounded-lg border border-emerald/10">
+                    <div
+                      key={index}
+                      className="p-4 bg-gradient-to-r from-emerald/5 to-gold/5 rounded-lg border border-emerald/10"
+                    >
                       <h3 className="font-semibold mb-3 flex items-center gap-2">
                         <Lightbulb className="h-4 w-4 text-emerald" />
                         {insight.category}
@@ -370,8 +388,8 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
                 <div>
                   <h3 className="font-semibold">Prêt à continuer ?</h3>
                   <p className="text-sm text-muted-foreground">
-                    {stats.completionPercentage < 100 
-                      ? `Complétez les ${stats.totalQuestions - stats.answeredQuestions} questions restantes` 
+                    {stats.completionPercentage < 100
+                      ? `Complétez les ${stats.totalQuestions - stats.answeredQuestions} questions restantes`
                       : 'Votre profil est complet ! Explorez vos matches.'}
                   </p>
                 </div>
@@ -381,9 +399,9 @@ const CompatibilityAssessment = ({ onComplete, embedded = false }: Compatibility
                       Continuer le Questionnaire
                     </Button>
                   )}
-                  <Button 
+                  <Button
                     variant="outline"
-                    onClick={() => window.location.href = '/matches'}
+                    onClick={() => (window.location.href = '/matches')}
                     disabled={stats.completionPercentage < 70}
                   >
                     Voir les Matches

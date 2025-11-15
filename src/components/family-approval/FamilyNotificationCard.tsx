@@ -5,13 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
-import { 
-  CheckCircle, 
-  XCircle, 
-  MessageSquare,
-  AlertCircle,
-  Heart
-} from 'lucide-react';
+import { CheckCircle, XCircle, MessageSquare, AlertCircle, Heart } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
@@ -57,14 +51,18 @@ const FamilyNotificationCard: React.FC<FamilyNotificationCardProps> = ({
   onApprove,
   onReject,
   onRequestDiscussion,
-  isProcessing
+  isProcessing,
 }) => {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'border-l-destructive bg-destructive/5';
-      case 'high': return 'border-l-warning bg-warning/5';
-      case 'medium': return 'border-l-warning bg-warning/5';
-      default: return 'border-l-primary bg-primary/5';
+      case 'critical':
+        return 'border-l-destructive bg-destructive/5';
+      case 'high':
+        return 'border-l-warning bg-warning/5';
+      case 'medium':
+        return 'border-l-warning bg-warning/5';
+      default:
+        return 'border-l-primary bg-primary/5';
     }
   };
 
@@ -73,8 +71,9 @@ const FamilyNotificationCard: React.FC<FamilyNotificationCardProps> = ({
   };
 
   const handleAction = async (action: 'approve' | 'reject' | 'discuss') => {
-    const notes = (document.getElementById(`notes-${notification.id}`) as HTMLTextAreaElement)?.value;
-    
+    const notes = (document.getElementById(`notes-${notification.id}`) as HTMLTextAreaElement)
+      ?.value;
+
     switch (action) {
       case 'approve':
         await onApprove(notification.id, notification.match_id, notes);
@@ -97,7 +96,9 @@ const FamilyNotificationCard: React.FC<FamilyNotificationCardProps> = ({
             <div className="flex items-center gap-2">
               <AlertCircle className="h-4 w-4 text-warning" />
               <span className="font-semibold">
-                {notification.notification_type === 'approval_request' ? 'Demande d\'approbation' : 'Notification famille'}
+                {notification.notification_type === 'approval_request'
+                  ? "Demande d'approbation"
+                  : 'Notification famille'}
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -123,7 +124,8 @@ const FamilyNotificationCard: React.FC<FamilyNotificationCardProps> = ({
                 <div>
                   <p className="font-medium">{notification.match.user1_profile?.full_name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {notification.match.user1_profile?.age} ans • {notification.match.user1_profile?.location}
+                    {notification.match.user1_profile?.age} ans •{' '}
+                    {notification.match.user1_profile?.location}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {notification.match.user1_profile?.profession}
@@ -141,7 +143,8 @@ const FamilyNotificationCard: React.FC<FamilyNotificationCardProps> = ({
                 <div>
                   <p className="font-medium">{notification.match.user2_profile?.full_name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {notification.match.user2_profile?.age} ans • {notification.match.user2_profile?.location}
+                    {notification.match.user2_profile?.age} ans •{' '}
+                    {notification.match.user2_profile?.location}
                   </p>
                   <p className="text-sm text-muted-foreground">
                     {notification.match.user2_profile?.profession}
@@ -153,7 +156,9 @@ const FamilyNotificationCard: React.FC<FamilyNotificationCardProps> = ({
                 <div className="col-span-full">
                   <div className="flex items-center gap-2 mb-2">
                     <Heart className="h-4 w-4 text-primary" />
-                    <span className="font-medium">Score de compatibilité: {notification.match.match_score}%</span>
+                    <span className="font-medium">
+                      Score de compatibilité: {notification.match.match_score}%
+                    </span>
                   </div>
                   <Progress value={notification.match.match_score} className="h-2" />
                 </div>
@@ -173,15 +178,15 @@ const FamilyNotificationCard: React.FC<FamilyNotificationCardProps> = ({
                 <label className="text-sm font-medium mb-2 block">
                   Notes additionnelles (optionnel)
                 </label>
-                <Textarea 
+                <Textarea
                   id={`notes-${notification.id}`}
                   placeholder="Ajoutez vos commentaires ou questions..."
                   className="min-h-[80px]"
                 />
               </div>
-              
+
               <div className="flex gap-2">
-                <Button 
+                <Button
                   size="sm"
                   className="bg-success hover:bg-success/90"
                   disabled={isProcessing}
@@ -190,7 +195,7 @@ const FamilyNotificationCard: React.FC<FamilyNotificationCardProps> = ({
                   <CheckCircle className="h-4 w-4 mr-2" />
                   Approuver
                 </Button>
-                <Button 
+                <Button
                   size="sm"
                   variant="destructive"
                   disabled={isProcessing}
@@ -199,7 +204,7 @@ const FamilyNotificationCard: React.FC<FamilyNotificationCardProps> = ({
                   <XCircle className="h-4 w-4 mr-2" />
                   Refuser
                 </Button>
-                <Button 
+                <Button
                   size="sm"
                   variant="outline"
                   disabled={isProcessing}

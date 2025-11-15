@@ -1,11 +1,10 @@
-
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import CustomButton from "@/components/CustomButton";
-import { Mail, Check } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import CustomButton from '@/components/CustomButton';
+import { Mail, Check } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface EmailVerificationProps {
   isVerified: boolean;
@@ -20,25 +19,25 @@ const EmailVerification = ({ isVerified, userEmail }: EmailVerificationProps) =>
     setLoading(true);
     try {
       const { error } = await supabase.auth.resend({
-        type: "signup",
+        type: 'signup',
         email: userEmail,
         options: {
-          emailRedirectTo: `${window.location.origin}/profile`
-        }
+          emailRedirectTo: `${window.location.origin}/profile`,
+        },
       });
-      
+
       if (error) throw error;
-      
+
       toast({
-        title: "Email de vérification envoyé",
-        description: "Veuillez vérifier votre boîte mail et cliquer sur le lien de vérification",
+        title: 'Email de vérification envoyé',
+        description: 'Veuillez vérifier votre boîte mail et cliquer sur le lien de vérification',
       });
     } catch (error: any) {
-      console.error("Email verification error:", error);
+      console.error('Email verification error:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: error.message || "Impossible d'envoyer l'email. Veuillez réessayer.",
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -50,8 +49,12 @@ const EmailVerification = ({ isVerified, userEmail }: EmailVerificationProps) =>
       <div className="flex items-center gap-2">
         <Mail className="h-5 w-5 text-islamic-teal dark:text-islamic-brightGold" />
         <div>
-          <Label className="text-islamic-burgundy dark:text-islamic-cream">Email Verification</Label>
-          <p className="text-xs text-gray-500 dark:text-islamic-cream/70">Verify your email address</p>
+          <Label className="text-islamic-burgundy dark:text-islamic-cream">
+            Email Verification
+          </Label>
+          <p className="text-xs text-gray-500 dark:text-islamic-cream/70">
+            Verify your email address
+          </p>
         </div>
       </div>
       <div>
@@ -64,12 +67,7 @@ const EmailVerification = ({ isVerified, userEmail }: EmailVerificationProps) =>
             Verified
           </Badge>
         ) : (
-          <CustomButton
-            size="sm"
-            variant="gold"
-            onClick={sendEmailVerification}
-            disabled={loading}
-          >
+          <CustomButton size="sm" variant="gold" onClick={sendEmailVerification} disabled={loading}>
             Verify Email
           </CustomButton>
         )}

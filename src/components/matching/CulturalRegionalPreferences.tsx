@@ -6,7 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Globe, MapPin, Users, Languages, Heart, Star, Flag, Compass } from 'lucide-react';
@@ -57,24 +63,24 @@ const CulturalRegionalPreferences = () => {
     max_distance: 100,
     willing_to_relocate: false,
     family_traditions: [],
-    diaspora_connection: []
+    diaspora_connection: [],
   });
-  
+
   const [culturalMatches, setCulturalMatches] = useState<CulturalMatch[]>([]);
   const [loading, setLoading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
 
   const culturalBackgrounds = [
     'Maghreb (Maroc, Algérie, Tunisie)',
-    'Afrique de l\'Ouest',
-    'Afrique de l\'Est',
+    "Afrique de l'Ouest",
+    "Afrique de l'Est",
     'Moyen-Orient',
     'Asie du Sud (Pakistan, Inde, Bangladesh)',
     'Asie du Sud-Est',
     'Turquie',
     'Europe (Convertis)',
     'Amérique du Nord',
-    'Autres'
+    'Autres',
   ];
 
   const languages = [
@@ -89,7 +95,7 @@ const CulturalRegionalPreferences = () => {
     'Indonésien',
     'Malais',
     'Persan',
-    'Autres'
+    'Autres',
   ];
 
   const regionalPreferences = [
@@ -106,7 +112,7 @@ const CulturalRegionalPreferences = () => {
     'Amérique du Nord',
     'Pays du Golfe',
     'Maghreb',
-    'Autres pays musulmans'
+    'Autres pays musulmans',
   ];
 
   const culturalPractices = [
@@ -117,19 +123,19 @@ const CulturalRegionalPreferences = () => {
     'Langues ancestrales',
     'Traditions familiales',
     'Célébrations communautaires',
-    'Arts et littérature'
+    'Arts et littérature',
   ];
 
   const findCulturalMatches = async () => {
     if (!user) return;
-    
+
     setLoading(true);
     setAnalyzing(true);
-    
+
     try {
       // Simulate cultural matching analysis
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+
       // Get current user's gender first
       const { data: currentUserProfile } = await supabase
         .from('profiles')
@@ -139,7 +145,7 @@ const CulturalRegionalPreferences = () => {
 
       // Determine opposite gender
       const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
-      
+
       // Fetch potential matches (opposite gender only)
       const { data: profiles } = await supabase
         .from('profiles')
@@ -150,13 +156,16 @@ const CulturalRegionalPreferences = () => {
 
       if (profiles) {
         // Simulate cultural compatibility scoring
-        const scoredMatches: CulturalMatch[] = profiles.map(profile => {
+        const scoredMatches: CulturalMatch[] = profiles.map((profile) => {
           // Simulate cultural data for each profile
           const culturalDetails = {
-            background: ['Maghreb (Maroc, Algérie, Tunisie)', 'Europe (Convertis)'].slice(0, Math.floor(Math.random() * 2) + 1),
+            background: ['Maghreb (Maroc, Algérie, Tunisie)', 'Europe (Convertis)'].slice(
+              0,
+              Math.floor(Math.random() * 2) + 1
+            ),
             languages: ['Français', 'Arabe', 'Anglais'].slice(0, Math.floor(Math.random() * 2) + 1),
             region: profile.location || 'Paris',
-            traditions: culturalPractices.slice(0, Math.floor(Math.random() * 4) + 2)
+            traditions: culturalPractices.slice(0, Math.floor(Math.random() * 4) + 2),
           };
 
           // Calculate compatibility scores
@@ -165,10 +174,10 @@ const CulturalRegionalPreferences = () => {
           const language_score = calculateLanguageScore(culturalDetails.languages);
 
           // Find shared elements
-          const shared_background = preferences.cultural_background.filter(bg => 
+          const shared_background = preferences.cultural_background.filter((bg) =>
             culturalDetails.background.includes(bg)
           );
-          const shared_languages = preferences.languages_spoken.filter(lang => 
+          const shared_languages = preferences.languages_spoken.filter((lang) =>
             culturalDetails.languages.includes(lang)
           );
 
@@ -188,15 +197,16 @@ const CulturalRegionalPreferences = () => {
             shared_background,
             shared_languages,
             distance_km,
-            cultural_details: culturalDetails
+            cultural_details: culturalDetails,
           };
         });
 
         // Filter and sort by cultural compatibility
         const filteredMatches = scoredMatches
-          .filter(match => 
-            match.distance_km <= preferences.max_distance &&
-            (match.cultural_score >= 60 || match.shared_languages.length > 0)
+          .filter(
+            (match) =>
+              match.distance_km <= preferences.max_distance &&
+              (match.cultural_score >= 60 || match.shared_languages.length > 0)
           )
           .sort((a, b) => {
             const aTotal = (a.cultural_score + a.regional_score + a.language_score) / 3;
@@ -206,18 +216,18 @@ const CulturalRegionalPreferences = () => {
           .slice(0, 15);
 
         setCulturalMatches(filteredMatches);
-        
+
         toast({
-          title: "Analyse culturelle terminée",
+          title: 'Analyse culturelle terminée',
           description: `${filteredMatches.length} matches trouvés selon vos préférences culturelles`,
         });
       }
     } catch (error) {
       console.error('Error finding cultural matches:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de trouver des matches culturels",
-        variant: "destructive",
+        title: 'Erreur',
+        description: 'Impossible de trouver des matches culturels',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -227,45 +237,53 @@ const CulturalRegionalPreferences = () => {
 
   const calculateCulturalScore = (details: any): number => {
     let score = 50; // Base score
-    
+
     // Shared cultural background
-    const sharedBg = preferences.cultural_background.filter(bg => 
+    const sharedBg = preferences.cultural_background.filter((bg) =>
       details.background.includes(bg)
     ).length;
     score += sharedBg * 15;
-    
+
     // Shared traditions
-    const sharedTraditions = preferences.family_traditions.filter(tradition => 
+    const sharedTraditions = preferences.family_traditions.filter((tradition) =>
       details.traditions.includes(tradition)
     ).length;
     score += sharedTraditions * 8;
-    
+
     return Math.min(100, score);
   };
 
   const calculateRegionalScore = (location: string): number => {
     if (preferences.regional_preferences.includes(location)) return 95;
-    if (location.includes('Paris') && preferences.regional_preferences.includes('Paris et région parisienne')) return 90;
+    if (
+      location.includes('Paris') &&
+      preferences.regional_preferences.includes('Paris et région parisienne')
+    )
+      return 90;
     if (preferences.willing_to_relocate) return 75;
     return 60;
   };
 
   const calculateLanguageScore = (languages: string[]): number => {
-    const sharedLang = preferences.languages_spoken.filter(lang => 
+    const sharedLang = preferences.languages_spoken.filter((lang) =>
       languages.includes(lang)
     ).length;
-    
+
     if (sharedLang >= 2) return 95;
     if (sharedLang === 1) return 80;
     return 50;
   };
 
-  const updateArrayPreference = (key: keyof CulturalPreferences, value: string, checked: boolean) => {
-    setPreferences(prev => ({
+  const updateArrayPreference = (
+    key: keyof CulturalPreferences,
+    value: string,
+    checked: boolean
+  ) => {
+    setPreferences((prev) => ({
       ...prev,
-      [key]: checked 
+      [key]: checked
         ? [...(prev[key] as string[]), value]
-        : (prev[key] as string[]).filter(item => item !== value)
+        : (prev[key] as string[]).filter((item) => item !== value),
     }));
   };
 
@@ -294,12 +312,14 @@ const CulturalRegionalPreferences = () => {
               Origines culturelles recherchées
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {culturalBackgrounds.map(background => (
+              {culturalBackgrounds.map((background) => (
                 <div key={background} className="flex items-center space-x-2">
                   <Checkbox
                     id={`bg-${background}`}
                     checked={preferences.cultural_background.includes(background)}
-                    onCheckedChange={(checked) => updateArrayPreference('cultural_background', background, checked as boolean)}
+                    onCheckedChange={(checked) =>
+                      updateArrayPreference('cultural_background', background, checked as boolean)
+                    }
                   />
                   <label htmlFor={`bg-${background}`} className="text-sm">
                     {background}
@@ -316,12 +336,14 @@ const CulturalRegionalPreferences = () => {
               Langues parlées
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {languages.map(language => (
+              {languages.map((language) => (
                 <div key={language} className="flex items-center space-x-2">
                   <Checkbox
                     id={`lang-${language}`}
                     checked={preferences.languages_spoken.includes(language)}
-                    onCheckedChange={(checked) => updateArrayPreference('languages_spoken', language, checked as boolean)}
+                    onCheckedChange={(checked) =>
+                      updateArrayPreference('languages_spoken', language, checked as boolean)
+                    }
                   />
                   <label htmlFor={`lang-${language}`} className="text-sm">
                     {language}
@@ -338,12 +360,14 @@ const CulturalRegionalPreferences = () => {
               Préférences régionales
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {regionalPreferences.map(region => (
+              {regionalPreferences.map((region) => (
                 <div key={region} className="flex items-center space-x-2">
                   <Checkbox
                     id={`region-${region}`}
                     checked={preferences.regional_preferences.includes(region)}
-                    onCheckedChange={(checked) => updateArrayPreference('regional_preferences', region, checked as boolean)}
+                    onCheckedChange={(checked) =>
+                      updateArrayPreference('regional_preferences', region, checked as boolean)
+                    }
                   />
                   <label htmlFor={`region-${region}`} className="text-sm">
                     {region}
@@ -361,19 +385,23 @@ const CulturalRegionalPreferences = () => {
               </label>
               <Slider
                 value={[preferences.max_distance]}
-                onValueChange={(value) => setPreferences(prev => ({ ...prev, max_distance: value[0] }))}
+                onValueChange={(value) =>
+                  setPreferences((prev) => ({ ...prev, max_distance: value[0] }))
+                }
                 max={500}
                 min={10}
                 step={10}
                 className="w-full"
               />
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="relocate"
                 checked={preferences.willing_to_relocate}
-                onCheckedChange={(checked) => setPreferences(prev => ({ ...prev, willing_to_relocate: checked as boolean }))}
+                onCheckedChange={(checked) =>
+                  setPreferences((prev) => ({ ...prev, willing_to_relocate: checked as boolean }))
+                }
               />
               <label htmlFor="relocate" className="text-sm font-medium">
                 Prêt(e) à déménager pour la bonne personne
@@ -388,12 +416,14 @@ const CulturalRegionalPreferences = () => {
               Pratiques culturelles importantes
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {culturalPractices.map(practice => (
+              {culturalPractices.map((practice) => (
                 <div key={practice} className="flex items-center space-x-2">
                   <Checkbox
                     id={`practice-${practice}`}
                     checked={preferences.family_traditions.includes(practice)}
-                    onCheckedChange={(checked) => updateArrayPreference('family_traditions', practice, checked as boolean)}
+                    onCheckedChange={(checked) =>
+                      updateArrayPreference('family_traditions', practice, checked as boolean)
+                    }
                   />
                   <label htmlFor={`practice-${practice}`} className="text-sm">
                     {practice}
@@ -404,8 +434,8 @@ const CulturalRegionalPreferences = () => {
           </div>
 
           {/* Search Button */}
-          <Button 
-            onClick={findCulturalMatches} 
+          <Button
+            onClick={findCulturalMatches}
             disabled={loading}
             className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90"
             size="lg"
@@ -444,11 +474,9 @@ const CulturalRegionalPreferences = () => {
                   <div className="flex items-start gap-4">
                     <Avatar className="h-14 w-14">
                       <AvatarImage src={match.avatar_url} />
-                      <AvatarFallback>
-                        {match.full_name?.charAt(0) || 'U'}
-                      </AvatarFallback>
+                      <AvatarFallback>{match.full_name?.charAt(0) || 'U'}</AvatarFallback>
                     </Avatar>
-                    
+
                     <div className="flex-1 space-y-2">
                       <div className="flex items-center justify-between">
                         <div>
@@ -467,19 +495,25 @@ const CulturalRegionalPreferences = () => {
                       {/* Cultural Scores */}
                       <div className="grid grid-cols-3 gap-4 text-sm">
                         <div className="text-center">
-                          <div className={`text-lg font-bold ${getScoreColor(match.cultural_score)}`}>
+                          <div
+                            className={`text-lg font-bold ${getScoreColor(match.cultural_score)}`}
+                          >
                             {match.cultural_score}%
                           </div>
                           <p className="text-xs text-muted-foreground">Culturel</p>
                         </div>
                         <div className="text-center">
-                          <div className={`text-lg font-bold ${getScoreColor(match.regional_score)}`}>
+                          <div
+                            className={`text-lg font-bold ${getScoreColor(match.regional_score)}`}
+                          >
                             {match.regional_score}%
                           </div>
                           <p className="text-xs text-muted-foreground">Régional</p>
                         </div>
                         <div className="text-center">
-                          <div className={`text-lg font-bold ${getScoreColor(match.language_score)}`}>
+                          <div
+                            className={`text-lg font-bold ${getScoreColor(match.language_score)}`}
+                          >
                             {match.language_score}%
                           </div>
                           <p className="text-xs text-muted-foreground">Linguistique</p>
@@ -490,23 +524,35 @@ const CulturalRegionalPreferences = () => {
                       <div className="space-y-2">
                         {match.shared_background.length > 0 && (
                           <div>
-                            <p className="text-sm font-medium text-emerald-700 mb-1">Origines partagées:</p>
+                            <p className="text-sm font-medium text-emerald-700 mb-1">
+                              Origines partagées:
+                            </p>
                             <div className="flex flex-wrap gap-1">
                               {match.shared_background.map((bg, index) => (
-                                <Badge key={index} variant="secondary" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
+                                <Badge
+                                  key={index}
+                                  variant="secondary"
+                                  className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200"
+                                >
                                   {bg}
                                 </Badge>
                               ))}
                             </div>
                           </div>
                         )}
-                        
+
                         {match.shared_languages.length > 0 && (
                           <div>
-                            <p className="text-sm font-medium text-sage-700 mb-1">Langues communes:</p>
+                            <p className="text-sm font-medium text-sage-700 mb-1">
+                              Langues communes:
+                            </p>
                             <div className="flex flex-wrap gap-1">
                               {match.shared_languages.map((lang, index) => (
-                                <Badge key={index} variant="outline" className="text-xs text-sage-700 border-sage-300">
+                                <Badge
+                                  key={index}
+                                  variant="outline"
+                                  className="text-xs text-sage-700 border-sage-300"
+                                >
                                   {lang}
                                 </Badge>
                               ))}
@@ -519,10 +565,12 @@ const CulturalRegionalPreferences = () => {
                       <div className="bg-muted/30 p-3 rounded-lg text-sm">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           <div>
-                            <span className="font-medium">Origines:</span> {match.cultural_details.background.join(', ')}
+                            <span className="font-medium">Origines:</span>{' '}
+                            {match.cultural_details.background.join(', ')}
                           </div>
                           <div>
-                            <span className="font-medium">Langues:</span> {match.cultural_details.languages.join(', ')}
+                            <span className="font-medium">Langues:</span>{' '}
+                            {match.cultural_details.languages.join(', ')}
                           </div>
                         </div>
                       </div>
@@ -550,10 +598,12 @@ const CulturalRegionalPreferences = () => {
             <Globe className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Découvrez vos Affinités Culturelles</h3>
             <p className="text-muted-foreground mb-4">
-              Configurez vos préférences culturelles et régionales pour trouver des personnes partageant vos valeurs et traditions
+              Configurez vos préférences culturelles et régionales pour trouver des personnes
+              partageant vos valeurs et traditions
             </p>
             <p className="text-sm text-muted-foreground">
-              Notre système prend en compte les origines, langues, traditions et préférences géographiques
+              Notre système prend en compte les origines, langues, traditions et préférences
+              géographiques
             </p>
           </CardContent>
         </Card>

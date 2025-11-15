@@ -5,26 +5,32 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Shield, 
-  Eye, 
-  MessageCircle, 
-  Users, 
-  Heart, 
+import {
+  Shield,
+  Eye,
+  MessageCircle,
+  Users,
+  Heart,
   Clock,
   Lock,
   Globe,
   UserCheck,
   Bell,
   Camera,
-  Info
+  Info,
 } from 'lucide-react';
 
 interface EnhancedPrivacySettings {
@@ -36,7 +42,7 @@ interface EnhancedPrivacySettings {
   allow_messages_from: string;
   allow_profile_views: boolean;
   allow_family_involvement: boolean;
-  
+
   // Enhanced privacy controls
   location_sharing: string;
   online_status_visibility: string;
@@ -44,20 +50,20 @@ interface EnhancedPrivacySettings {
   typing_indicators: boolean;
   allow_screenshots: boolean;
   content_sharing_outside: boolean;
-  
+
   // Islamic-specific privacy
   family_approval_required: boolean;
   wali_involvement_level: string;
   conversation_monitoring: string;
   islamic_content_filtering: boolean;
   modesty_guidelines_strict: boolean;
-  
+
   // Advanced controls
   block_non_islamic_content: boolean;
   require_verified_users: boolean;
   auto_delete_messages: string;
   privacy_score_threshold: number;
-  
+
   // Notification preferences
   family_notification_types: string[];
   privacy_alerts: boolean;
@@ -69,7 +75,10 @@ interface EnhancedPrivacyControlsProps {
   embedded?: boolean;
 }
 
-const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPrivacyControlsProps) => {
+const EnhancedPrivacyControls = ({
+  onComplete,
+  embedded = false,
+}: EnhancedPrivacyControlsProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [settings, setSettings] = useState<EnhancedPrivacySettings>({
@@ -97,9 +106,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
     privacy_score_threshold: 70,
     family_notification_types: [],
     privacy_alerts: true,
-    interaction_summaries: false
+    interaction_summaries: false,
   });
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [currentSection, setCurrentSection] = useState('basic');
@@ -125,14 +134,14 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
       }
 
       if (data) {
-        setSettings(prev => ({ ...prev, ...data }));
+        setSettings((prev) => ({ ...prev, ...data }));
       }
     } catch (error) {
       console.error('Error loading privacy settings:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger vos paramètres de confidentialité",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger vos paramètres de confidentialité',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -144,19 +153,17 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
 
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('privacy_settings')
-        .upsert({
-          user_id: user.id,
-          ...settings,
-          updated_at: new Date().toISOString()
-        });
+      const { error } = await supabase.from('privacy_settings').upsert({
+        user_id: user.id,
+        ...settings,
+        updated_at: new Date().toISOString(),
+      });
 
       if (error) throw error;
 
       toast({
-        title: "Paramètres sauvegardés",
-        description: "Vos paramètres de confidentialité ont été mis à jour",
+        title: 'Paramètres sauvegardés',
+        description: 'Vos paramètres de confidentialité ont été mis à jour',
       });
 
       if (onComplete) {
@@ -165,9 +172,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
     } catch (error) {
       console.error('Error saving privacy settings:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder vos paramètres",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder vos paramètres',
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
@@ -175,58 +182,68 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
   };
 
   const updateSetting = <K extends keyof EnhancedPrivacySettings>(
-    key: K, 
+    key: K,
     value: EnhancedPrivacySettings[K]
   ) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+    setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   const getPrivacyScore = () => {
     let score = 0;
     const weights = {
-      photo_visibility: settings.photo_visibility === 'private' ? 20 : settings.photo_visibility === 'matches_only' ? 15 : 5,
+      photo_visibility:
+        settings.photo_visibility === 'private'
+          ? 20
+          : settings.photo_visibility === 'matches_only'
+            ? 15
+            : 5,
       family_involvement: settings.allow_family_involvement ? 15 : 0,
       islamic_filtering: settings.islamic_content_filtering ? 15 : 0,
       modesty_guidelines: settings.modesty_guidelines_strict ? 10 : 5,
       verified_users: settings.require_verified_users ? 15 : 0,
-      message_control: settings.allow_messages_from === 'family_supervised' ? 20 : settings.allow_messages_from === 'matches_only' ? 10 : 0
+      message_control:
+        settings.allow_messages_from === 'family_supervised'
+          ? 20
+          : settings.allow_messages_from === 'matches_only'
+            ? 10
+            : 0,
     };
-    
+
     score = Object.values(weights).reduce((sum, weight) => sum + weight, 0);
     return Math.min(score, 100);
   };
 
   const sections = [
-    { 
-      id: 'basic', 
-      title: 'Visibilité de Base', 
+    {
+      id: 'basic',
+      title: 'Visibilité de Base',
       icon: Eye,
-      description: 'Contrôles de visibilité essentiels'
+      description: 'Contrôles de visibilité essentiels',
     },
-    { 
-      id: 'islamic', 
-      title: 'Valeurs Islamiques', 
+    {
+      id: 'islamic',
+      title: 'Valeurs Islamiques',
       icon: Heart,
-      description: 'Paramètres selon les principes islamiques'
+      description: 'Paramètres selon les principes islamiques',
     },
-    { 
-      id: 'family', 
-      title: 'Supervision Familiale', 
+    {
+      id: 'family',
+      title: 'Supervision Familiale',
       icon: Users,
-      description: 'Implication et approbation familiale'
+      description: 'Implication et approbation familiale',
     },
-    { 
-      id: 'advanced', 
-      title: 'Contrôles Avancés', 
+    {
+      id: 'advanced',
+      title: 'Contrôles Avancés',
       icon: Shield,
-      description: 'Sécurité et confidentialité renforcées'
+      description: 'Sécurité et confidentialité renforcées',
     },
-    { 
-      id: 'notifications', 
-      title: 'Notifications', 
+    {
+      id: 'notifications',
+      title: 'Notifications',
       icon: Bell,
-      description: 'Alertes et notifications de confidentialité'
-    }
+      description: 'Alertes et notifications de confidentialité',
+    },
   ];
 
   if (loading) {
@@ -242,12 +259,18 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
     );
   }
 
-  const currentSectionData = sections.find(s => s.id === currentSection);
+  const currentSectionData = sections.find((s) => s.id === currentSection);
   const SectionIcon = currentSectionData?.icon || Shield;
   const privacyScore = getPrivacyScore();
 
   return (
-    <div className={embedded ? 'space-y-6' : 'min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4'}>
+    <div
+      className={
+        embedded
+          ? 'space-y-6'
+          : 'min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4'
+      }
+    >
       <div className={`container mx-auto ${embedded ? 'max-w-full' : 'max-w-4xl'}`}>
         <Card className={embedded ? '' : 'shadow-lg'}>
           <CardHeader className="text-center">
@@ -260,7 +283,7 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
             <p className="text-muted-foreground mb-4">
               {currentSectionData?.description || 'Paramètres de confidentialité détaillés'}
             </p>
-            
+
             {/* Privacy Score */}
             <div className="space-y-2">
               <div className="flex justify-between items-center text-sm">
@@ -268,24 +291,36 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                   <Shield className="h-4 w-4 text-primary" />
                   Score de Confidentialité
                 </span>
-                <Badge variant={privacyScore >= 80 ? 'default' : privacyScore >= 60 ? 'secondary' : 'destructive'}>
+                <Badge
+                  variant={
+                    privacyScore >= 80
+                      ? 'default'
+                      : privacyScore >= 60
+                        ? 'secondary'
+                        : 'destructive'
+                  }
+                >
                   {privacyScore}/100
                 </Badge>
               </div>
               <div className="w-full bg-muted rounded-full h-3">
-                <div 
+                <div
                   className={`h-3 rounded-full transition-all duration-300 ${
-                    privacyScore >= 80 ? 'bg-gradient-primary' : 
-                    privacyScore >= 60 ? 'bg-gradient-secondary' : 
-                    'bg-gradient-accent'
+                    privacyScore >= 80
+                      ? 'bg-gradient-primary'
+                      : privacyScore >= 60
+                        ? 'bg-gradient-secondary'
+                        : 'bg-gradient-accent'
                   }`}
                   style={{ width: `${privacyScore}%` }}
                 />
               </div>
               <p className="text-xs text-muted-foreground">
-                {privacyScore >= 80 ? 'Excellente protection' : 
-                 privacyScore >= 60 ? 'Protection correcte' : 
-                 'Protection à améliorer'}
+                {privacyScore >= 80
+                  ? 'Excellente protection'
+                  : privacyScore >= 60
+                    ? 'Protection correcte'
+                    : 'Protection à améliorer'}
               </p>
             </div>
           </CardHeader>
@@ -293,13 +328,13 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
           <CardContent>
             {/* Section Navigation */}
             <div className="flex flex-wrap gap-2 mb-6">
-              {sections.map(section => {
+              {sections.map((section) => {
                 const Icon = section.icon;
-                
+
                 return (
                   <Button
                     key={section.id}
-                    variant={currentSection === section.id ? "default" : "outline"}
+                    variant={currentSection === section.id ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setCurrentSection(section.id)}
                     className="flex items-center gap-2"
@@ -321,8 +356,8 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         <Globe className="h-4 w-4 text-primary" />
                         Visibilité du Profil
                       </Label>
-                      <Select 
-                        value={settings.profile_visibility} 
+                      <Select
+                        value={settings.profile_visibility}
                         onValueChange={(value) => updateSetting('profile_visibility', value)}
                       >
                         <SelectTrigger>
@@ -338,13 +373,17 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                           <SelectItem value="matches_only">
                             <div>
                               <div className="font-medium">Matches uniquement</div>
-                              <div className="text-xs text-muted-foreground">Seulement vos matches</div>
+                              <div className="text-xs text-muted-foreground">
+                                Seulement vos matches
+                              </div>
                             </div>
                           </SelectItem>
                           <SelectItem value="family_approved">
                             <div>
                               <div className="font-medium">Approuvé par la famille</div>
-                              <div className="text-xs text-muted-foreground">Avec accord familial</div>
+                              <div className="text-xs text-muted-foreground">
+                                Avec accord familial
+                              </div>
                             </div>
                           </SelectItem>
                           <SelectItem value="private">
@@ -362,8 +401,8 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         <Camera className="h-4 w-4 text-secondary" />
                         Visibilité des Photos
                       </Label>
-                      <Select 
-                        value={settings.photo_visibility} 
+                      <Select
+                        value={settings.photo_visibility}
                         onValueChange={(value) => updateSetting('photo_visibility', value)}
                       >
                         <SelectTrigger>
@@ -383,8 +422,8 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         Statut En Ligne
                       </Label>
-                      <Select 
-                        value={settings.online_status_visibility} 
+                      <Select
+                        value={settings.online_status_visibility}
                         onValueChange={(value) => updateSetting('online_status_visibility', value)}
                       >
                         <SelectTrigger>
@@ -404,8 +443,8 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         <MessageCircle className="h-4 w-4 text-primary" />
                         Messages de
                       </Label>
-                      <Select 
-                        value={settings.allow_messages_from} 
+                      <Select
+                        value={settings.allow_messages_from}
                         onValueChange={(value) => updateSetting('allow_messages_from', value)}
                       >
                         <SelectTrigger>
@@ -436,7 +475,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                       </div>
                       <Switch
                         checked={settings.message_read_receipts}
-                        onCheckedChange={(checked) => updateSetting('message_read_receipts', checked)}
+                        onCheckedChange={(checked) =>
+                          updateSetting('message_read_receipts', checked)
+                        }
                       />
                     </div>
 
@@ -473,7 +514,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         <div className="flex items-center gap-2">
                           <Shield className="h-4 w-4 text-emerald" />
                           <div>
-                            <Label className="text-base font-medium">Filtrage de Contenu Islamique</Label>
+                            <Label className="text-base font-medium">
+                              Filtrage de Contenu Islamique
+                            </Label>
                             <p className="text-sm text-muted-foreground">
                               Filtrer automatiquement le contenu non-islamique
                             </p>
@@ -481,7 +524,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         </div>
                         <Switch
                           checked={settings.islamic_content_filtering}
-                          onCheckedChange={(checked) => updateSetting('islamic_content_filtering', checked)}
+                          onCheckedChange={(checked) =>
+                            updateSetting('islamic_content_filtering', checked)
+                          }
                         />
                       </div>
 
@@ -489,7 +534,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         <div className="flex items-center gap-2">
                           <Heart className="h-4 w-4 text-gold" />
                           <div>
-                            <Label className="text-base font-medium">Directives de Modestie Strictes</Label>
+                            <Label className="text-base font-medium">
+                              Directives de Modestie Strictes
+                            </Label>
                             <p className="text-sm text-muted-foreground">
                               Appliquer les principes islamiques de modestie
                             </p>
@@ -497,7 +544,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         </div>
                         <Switch
                           checked={settings.modesty_guidelines_strict}
-                          onCheckedChange={(checked) => updateSetting('modesty_guidelines_strict', checked)}
+                          onCheckedChange={(checked) =>
+                            updateSetting('modesty_guidelines_strict', checked)
+                          }
                         />
                       </div>
 
@@ -505,7 +554,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         <div className="flex items-center gap-2">
                           <Lock className="h-4 w-4 text-emerald" />
                           <div>
-                            <Label className="text-base font-medium">Bloquer Contenu Non-Islamique</Label>
+                            <Label className="text-base font-medium">
+                              Bloquer Contenu Non-Islamique
+                            </Label>
                             <p className="text-sm text-muted-foreground">
                               Bloquer complètement le contenu contraire aux valeurs islamiques
                             </p>
@@ -513,7 +564,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         </div>
                         <Switch
                           checked={settings.block_non_islamic_content}
-                          onCheckedChange={(checked) => updateSetting('block_non_islamic_content', checked)}
+                          onCheckedChange={(checked) =>
+                            updateSetting('block_non_islamic_content', checked)
+                          }
                         />
                       </div>
 
@@ -521,7 +574,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         <div className="flex items-center gap-2">
                           <UserCheck className="h-4 w-4 text-gold" />
                           <div>
-                            <Label className="text-base font-medium">Utilisateurs Vérifiés Uniquement</Label>
+                            <Label className="text-base font-medium">
+                              Utilisateurs Vérifiés Uniquement
+                            </Label>
                             <p className="text-sm text-muted-foreground">
                               Interaction seulement avec des profils vérifiés
                             </p>
@@ -529,7 +584,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         </div>
                         <Switch
                           checked={settings.require_verified_users}
-                          onCheckedChange={(checked) => updateSetting('require_verified_users', checked)}
+                          onCheckedChange={(checked) =>
+                            updateSetting('require_verified_users', checked)
+                          }
                         />
                       </div>
                     </CardContent>
@@ -545,8 +602,8 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         <Users className="h-4 w-4 text-emerald" />
                         Niveau d'Implication du Wali
                       </Label>
-                      <Select 
-                        value={settings.wali_involvement_level} 
+                      <Select
+                        value={settings.wali_involvement_level}
                         onValueChange={(value) => updateSetting('wali_involvement_level', value)}
                       >
                         <SelectTrigger>
@@ -566,8 +623,8 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                         <MessageCircle className="h-4 w-4 text-gold" />
                         Surveillance des Conversations
                       </Label>
-                      <Select 
-                        value={settings.conversation_monitoring} 
+                      <Select
+                        value={settings.conversation_monitoring}
                         onValueChange={(value) => updateSetting('conversation_monitoring', value)}
                       >
                         <SelectTrigger>
@@ -588,7 +645,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-emerald" />
                         <div>
-                          <Label className="text-base font-medium">Approbation Familiale Requise</Label>
+                          <Label className="text-base font-medium">
+                            Approbation Familiale Requise
+                          </Label>
                           <p className="text-sm text-muted-foreground">
                             Exiger l'accord de la famille pour les matches
                           </p>
@@ -596,7 +655,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                       </div>
                       <Switch
                         checked={settings.family_approval_required}
-                        onCheckedChange={(checked) => updateSetting('family_approval_required', checked)}
+                        onCheckedChange={(checked) =>
+                          updateSetting('family_approval_required', checked)
+                        }
                       />
                     </div>
 
@@ -604,7 +665,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                       <div className="flex items-center gap-2">
                         <Users className="h-4 w-4 text-gold" />
                         <div>
-                          <Label className="text-base font-medium">Supervision Familiale Active</Label>
+                          <Label className="text-base font-medium">
+                            Supervision Familiale Active
+                          </Label>
                           <p className="text-sm text-muted-foreground">
                             Permettre à la famille de superviser les interactions
                           </p>
@@ -612,7 +675,9 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
                       </div>
                       <Switch
                         checked={settings.allow_family_involvement}
-                        onCheckedChange={(checked) => updateSetting('allow_family_involvement', checked)}
+                        onCheckedChange={(checked) =>
+                          updateSetting('allow_family_involvement', checked)
+                        }
                       />
                     </div>
                   </div>
@@ -625,29 +690,25 @@ const EnhancedPrivacyControls = ({ onComplete, embedded = false }: EnhancedPriva
               <Button
                 variant="outline"
                 onClick={() => {
-                  const currentIndex = sections.findIndex(s => s.id === currentSection);
+                  const currentIndex = sections.findIndex((s) => s.id === currentSection);
                   if (currentIndex > 0) {
                     setCurrentSection(sections[currentIndex - 1].id);
                   }
                 }}
-                disabled={sections.findIndex(s => s.id === currentSection) === 0}
+                disabled={sections.findIndex((s) => s.id === currentSection) === 0}
               >
                 Section Précédente
               </Button>
-              
+
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={savePrivacySettings}
-                  disabled={saving}
-                >
+                <Button variant="outline" onClick={savePrivacySettings} disabled={saving}>
                   {saving ? 'Sauvegarde...' : 'Sauvegarder'}
                 </Button>
-                
-                {sections.findIndex(s => s.id === currentSection) < sections.length - 1 ? (
+
+                {sections.findIndex((s) => s.id === currentSection) < sections.length - 1 ? (
                   <Button
                     onClick={() => {
-                      const currentIndex = sections.findIndex(s => s.id === currentSection);
+                      const currentIndex = sections.findIndex((s) => s.id === currentSection);
                       setCurrentSection(sections[currentIndex + 1].id);
                     }}
                   >

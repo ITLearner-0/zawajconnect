@@ -1,4 +1,3 @@
-
 import { DatabaseProfile } from '@/types/profile';
 
 // Dummy profiles for demo purposes
@@ -31,14 +30,14 @@ export const dummyProfiles: DatabaseProfile[] = [
       showAge: true,
       showLocation: true,
       showOccupation: true,
-      allowNonMatchMessages: true
+      allowNonMatchMessages: true,
     },
     blocked_users: [],
     content_flags: [],
     moderation_status: 'approved',
     last_moderation_date: '2023-08-10',
     created_at: '2023-08-01T10:00:00Z',
-    updated_at: '2023-08-10T15:30:00Z'
+    updated_at: '2023-08-10T15:30:00Z',
   },
   {
     id: 'user-2',
@@ -68,14 +67,14 @@ export const dummyProfiles: DatabaseProfile[] = [
       showAge: false,
       showLocation: true,
       showOccupation: true,
-      allowNonMatchMessages: false
+      allowNonMatchMessages: false,
     },
     blocked_users: [],
     content_flags: [],
     moderation_status: 'approved',
     last_moderation_date: '2023-08-12',
     created_at: '2023-08-02T09:15:00Z',
-    updated_at: '2023-08-12T14:20:00Z'
+    updated_at: '2023-08-12T14:20:00Z',
   },
   {
     id: 'user-3',
@@ -105,14 +104,14 @@ export const dummyProfiles: DatabaseProfile[] = [
       showAge: true,
       showLocation: true,
       showOccupation: true,
-      allowNonMatchMessages: true
+      allowNonMatchMessages: true,
     },
     blocked_users: [],
     content_flags: [],
     moderation_status: 'approved',
     last_moderation_date: '2023-07-22',
     created_at: '2023-07-01T11:30:00Z',
-    updated_at: '2023-07-22T16:45:00Z'
+    updated_at: '2023-07-22T16:45:00Z',
   },
   {
     id: 'user-4',
@@ -142,14 +141,14 @@ export const dummyProfiles: DatabaseProfile[] = [
       showAge: true,
       showLocation: true,
       showOccupation: true,
-      allowNonMatchMessages: true
+      allowNonMatchMessages: true,
     },
     blocked_users: [],
     content_flags: [],
     moderation_status: 'approved',
     last_moderation_date: '2023-08-01',
     created_at: '2023-07-15T08:20:00Z',
-    updated_at: '2023-08-01T13:10:00Z'
+    updated_at: '2023-08-01T13:10:00Z',
   },
   {
     id: 'user-5',
@@ -162,7 +161,8 @@ export const dummyProfiles: DatabaseProfile[] = [
     occupation: 'Business Owner',
     religious_practice_level: 'Very Practicing',
     prayer_frequency: 'Five times daily',
-    about_me: 'I run my own halal food business and am looking for someone who shares my entrepreneurial spirit.',
+    about_me:
+      'I run my own halal food business and am looking for someone who shares my entrepreneurial spirit.',
     email_verified: true,
     phone_verified: true,
     id_verified: true,
@@ -179,13 +179,13 @@ export const dummyProfiles: DatabaseProfile[] = [
       showAge: true,
       showLocation: true,
       showOccupation: true,
-      allowNonMatchMessages: true
+      allowNonMatchMessages: true,
     },
     blocked_users: [],
     content_flags: [],
     moderation_status: 'approved',
     last_moderation_date: '2023-07-15',
     created_at: '2023-06-20T12:45:00Z',
-    updated_at: '2023-07-15T17:30:00Z'
-  }
+    updated_at: '2023-07-15T17:30:00Z',
+  },
 ];

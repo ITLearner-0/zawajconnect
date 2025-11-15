@@ -1,6 +1,5 @@
-
-import { lazy, Suspense } from "react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { lazy, Suspense } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Import direct du composant au lieu de lazy loading pour éviter les problèmes de hooks
 import NearbyMatchesContent from './nearby';

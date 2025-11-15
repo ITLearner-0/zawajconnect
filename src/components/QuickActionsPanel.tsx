@@ -8,33 +8,33 @@ const QuickActionsPanel = () => {
 
   const actions = [
     {
-      title: "Découvrir",
-      description: "Parcourir les profils",
+      title: 'Découvrir',
+      description: 'Parcourir les profils',
       icon: Search,
-      color: "bg-emerald hover:bg-emerald-dark",
-      path: "/browse"
+      color: 'bg-emerald hover:bg-emerald-dark',
+      path: '/browse',
     },
     {
-      title: "Mes Matches",
-      description: "Voir vos compatibilités",
+      title: 'Mes Matches',
+      description: 'Voir vos compatibilités',
       icon: Heart,
-      color: "bg-gold hover:bg-gold-dark",
-      path: "/matches"
+      color: 'bg-gold hover:bg-gold-dark',
+      path: '/matches',
     },
     {
-      title: "Messages",
-      description: "Discuter avec vos matches",
+      title: 'Messages',
+      description: 'Discuter avec vos matches',
       icon: MessageCircle,
-      color: "bg-primary hover:bg-primary-dark",
-      path: "/chat"
+      color: 'bg-primary hover:bg-primary-dark',
+      path: '/chat',
     },
     {
-      title: "Matching IA",
-      description: "Système avancé",
+      title: 'Matching IA',
+      description: 'Système avancé',
       icon: Compass,
-      color: "bg-sage hover:bg-sage-dark",
-      path: "/advanced-matching"
-    }
+      color: 'bg-sage hover:bg-sage-dark',
+      path: '/advanced-matching',
+    },
   ];
 
   return (
@@ -54,7 +54,9 @@ const QuickActionsPanel = () => {
               onClick={() => navigate(action.path)}
               className="h-auto p-4 flex items-center gap-3 justify-start hover:shadow-md transition-all"
             >
-              <div className={`h-10 w-10 rounded-full flex items-center justify-center ${action.color}`}>
+              <div
+                className={`h-10 w-10 rounded-full flex items-center justify-center ${action.color}`}
+              >
                 <action.icon className="h-5 w-5 text-white" />
               </div>
               <div className="text-left">
@@ -64,7 +66,7 @@ const QuickActionsPanel = () => {
             </Button>
           ))}
         </div>
-        
+
         <div className="mt-4 pt-4 border-t">
           <Button
             variant="ghost"

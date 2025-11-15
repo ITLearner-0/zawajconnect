@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,32 +21,32 @@ interface PasswordValidation {
 
 const validatePasswordStrength = (password: string): PasswordValidation => {
   const errors: string[] = [];
-  
+
   if (password.length < 8) errors.push('At least 8 characters');
   if (!/[A-Z]/.test(password)) errors.push('One uppercase letter');
   if (!/[a-z]/.test(password)) errors.push('One lowercase letter');
   if (!/\d/.test(password)) errors.push('One number');
   if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) errors.push('One special character');
-  
+
   return {
     isValid: errors.length === 0,
     errors,
-    score: Math.max(0, 100 - (errors.length * 20))
+    score: Math.max(0, 100 - errors.length * 20),
   };
 };
 
 export const EnhancedPasswordField: React.FC<EnhancedPasswordFieldProps> = ({
   value,
   onChange,
-  label = "Password",
-  placeholder = "Enter your password",
+  label = 'Password',
+  placeholder = 'Enter your password',
   required = false,
-  showStrengthIndicator = false
+  showStrengthIndicator = false,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const passwordValidation = validatePasswordStrength(value);
-  
+
   const getStrengthColor = () => {
     if (!value) return 'bg-gray-200';
     const errorCount = passwordValidation.errors.length;
@@ -71,7 +70,7 @@ export const EnhancedPasswordField: React.FC<EnhancedPasswordFieldProps> = ({
         {label}
         {required && <span className="text-red-500">*</span>}
       </Label>
-      
+
       <div className="relative">
         <Input
           id="password"
@@ -89,11 +88,7 @@ export const EnhancedPasswordField: React.FC<EnhancedPasswordFieldProps> = ({
           className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
           onClick={() => setShowPassword(!showPassword)}
         >
-          {showPassword ? (
-            <EyeOff className="h-4 w-4" />
-          ) : (
-            <Eye className="h-4 w-4" />
-          )}
+          {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </Button>
       </div>
 
@@ -102,7 +97,7 @@ export const EnhancedPasswordField: React.FC<EnhancedPasswordFieldProps> = ({
           {/* Strength bar */}
           <div className="flex items-center gap-2">
             <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div 
+              <div
                 className={`h-full transition-all duration-300 ${getStrengthColor()}`}
                 style={{ width: `${Math.max(20, passwordValidation.score)}%` }}
               />
@@ -117,7 +112,7 @@ export const EnhancedPasswordField: React.FC<EnhancedPasswordFieldProps> = ({
               { test: /[A-Z]/.test(value), text: 'One uppercase letter' },
               { test: /[a-z]/.test(value), text: 'One lowercase letter' },
               { test: /\d/.test(value), text: 'One number' },
-              { test: /[!@#$%^&*(),.?":{}|<>]/.test(value), text: 'One special character' }
+              { test: /[!@#$%^&*(),.?":{}|<>]/.test(value), text: 'One special character' },
             ].map((requirement, index) => (
               <div key={index} className="flex items-center gap-2 text-sm">
                 {requirement.test ? (

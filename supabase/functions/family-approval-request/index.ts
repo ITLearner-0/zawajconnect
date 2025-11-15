@@ -1,7 +1,7 @@
-import "https://deno.land/x/xhr@0.1.0/mod.ts";
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import 'https://deno.land/x/xhr@0.1.0/mod.ts';
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,7 +21,7 @@ const ApprovalRequestSchema = z.object({
   cultural_score: z.number().min(0).max(100).optional(),
   personality_score: z.number().min(0).max(100).optional(),
   matching_reasons: z.array(z.string().max(500)).optional(),
-  potential_concerns: z.array(z.string().max(500)).optional()
+  potential_concerns: z.array(z.string().max(500)).optional(),
 });
 
 serve(async (req) => {
@@ -31,24 +31,27 @@ serve(async (req) => {
 
   try {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-    
+
     // Get user from auth header (JWT verified by Supabase)
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Authentication requise' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Authentication requise' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
+
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Authentication invalide' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Authentication invalide' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Validate input
@@ -58,10 +61,10 @@ serve(async (req) => {
       validatedInput = ApprovalRequestSchema.parse(rawInput);
     } catch (validationError) {
       console.error('Validation error:', validationError);
-      return new Response(
-        JSON.stringify({ error: 'Données invalides' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Données invalides' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Rate limiting: Check recent approval requests (max 10 per hour)
@@ -87,23 +90,23 @@ serve(async (req) => {
       );
     }
 
-    const { 
-      user_id, 
-      match_user_id, 
+    const {
+      user_id,
+      match_user_id,
       compatibility_score,
       islamic_score,
       cultural_score,
       personality_score,
       matching_reasons,
-      potential_concerns 
+      potential_concerns,
     } = validatedInput;
 
     // Verify requesting user owns the profile
     if (user.id !== user_id) {
-      return new Response(
-        JSON.stringify({ error: 'Non autorisé' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Non autorisé' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     console.log('Family approval request initiated');
@@ -123,10 +126,10 @@ serve(async (req) => {
 
     if (userError || matchError) {
       console.error('Profile fetch error:', userError || matchError);
-      return new Response(
-        JSON.stringify({ error: 'Impossible de récupérer les profils' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Impossible de récupérer les profils' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Get Islamic preferences for both users
@@ -152,19 +155,19 @@ serve(async (req) => {
 
     if (familyError) {
       console.error('Error fetching family members:', familyError);
-      return new Response(
-        JSON.stringify({ error: 'Erreur système' }), 
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Erreur système' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     if (!familyMembers || familyMembers.length === 0) {
       console.log('No wali found for user');
       return new Response(
-        JSON.stringify({ 
+        JSON.stringify({
           error: 'no_family_members',
           message: 'Aucun membre de famille (wali) trouvé. Veuillez inviter un wali.',
-        }), 
+        }),
         { status: 422, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -211,20 +214,21 @@ Fournir une analyse respectueuse en français comprenant:
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
-            'Authorization': `Bearer ${openAIApiKey}`,
+            Authorization: `Bearer ${openAIApiKey}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             model: 'gpt-4o-mini',
             messages: [
-              { 
-                role: 'system', 
-                content: 'Tu es un conseiller islamique spécialisé dans le mariage halal. Réponds de manière respectueuse, en tenant compte des valeurs islamiques et de l\'importance du rôle de la famille dans le choix du conjoint.' 
+              {
+                role: 'system',
+                content:
+                  "Tu es un conseiller islamique spécialisé dans le mariage halal. Réponds de manière respectueuse, en tenant compte des valeurs islamiques et de l'importance du rôle de la famille dans le choix du conjoint.",
               },
-              { role: 'user', content: prompt }
+              { role: 'user', content: prompt },
             ],
             max_tokens: 800,
-            temperature: 0.7
+            temperature: 0.7,
           }),
         });
 
@@ -243,7 +247,9 @@ Fournir une analyse respectueuse en français comprenant:
     let { data: matchRecord } = await supabase
       .from('matches')
       .select('id')
-      .or(`and(user1_id.eq.${user_id},user2_id.eq.${match_user_id}),and(user1_id.eq.${match_user_id},user2_id.eq.${user_id})`)
+      .or(
+        `and(user1_id.eq.${user_id},user2_id.eq.${match_user_id}),and(user1_id.eq.${match_user_id},user2_id.eq.${user_id})`
+      )
       .single();
 
     if (!matchRecord) {
@@ -254,17 +260,17 @@ Fournir une analyse respectueuse en français comprenant:
           user2_id: match_user_id,
           match_score: compatibility_score,
           family_supervision_required: true,
-          can_communicate: false
+          can_communicate: false,
         })
         .select('id')
         .single();
 
       if (matchError) {
         console.error('Match creation failed:', matchError);
-        return new Response(
-          JSON.stringify({ error: 'Impossible de créer le match' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return new Response(JSON.stringify({ error: 'Impossible de créer le match' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
       matchRecord = newMatch;
     }
@@ -288,7 +294,7 @@ ${aiAnalysis ? `Analyse IA:\n${aiAnalysis}` : ''}
           notification_type: 'approval_request',
           content: notificationContent,
           severity: 'high',
-          action_required: true
+          action_required: true,
         })
         .select()
         .single();
@@ -303,20 +309,19 @@ ${aiAnalysis ? `Analyse IA:\n${aiAnalysis}` : ''}
     console.log('Approval request processed successfully');
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         notifications_sent: notifications.length,
         ai_analysis_included: !!aiAnalysis,
-        match_id: matchRecord.id
+        match_id: matchRecord.id,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-
   } catch (error) {
     console.error('Error in family-approval-request:', error);
-    return new Response(
-      JSON.stringify({ error: 'Une erreur est survenue. Veuillez réessayer.' }), 
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: 'Une erreur est survenue. Veuillez réessayer.' }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });

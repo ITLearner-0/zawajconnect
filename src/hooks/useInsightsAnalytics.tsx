@@ -23,7 +23,7 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
     lastViewed: undefined,
     shareCount: 0,
     exportCount: 0,
-    actionsTaken: []
+    actionsTaken: [],
   });
   const [loading, setLoading] = useState(true);
 
@@ -38,7 +38,7 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
    */
   const loadAnalytics = async (): Promise<void> => {
     if (!user) return;
-    
+
     setLoading(true);
     try {
       // Charger les analytics de base
@@ -69,14 +69,12 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
 
       // Si pas d'analytics, créer une entrée
       if (!analyticsData) {
-        const { error: insertError } = await supabase
-          .from('insights_analytics')
-          .insert({
-            user_id: user.id,
-            view_count: 0,
-            share_count: 0,
-            export_count: 0
-          });
+        const { error: insertError } = await supabase.from('insights_analytics').insert({
+          user_id: user.id,
+          view_count: 0,
+          share_count: 0,
+          export_count: 0,
+        });
 
         if (insertError) {
           throw insertError;
@@ -87,7 +85,7 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
           lastViewed: undefined,
           shareCount: 0,
           exportCount: 0,
-          actionsTaken: []
+          actionsTaken: [],
         });
       } else {
         setAnalytics({
@@ -95,7 +93,7 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
           lastViewed: analyticsData.last_viewed_at || undefined,
           shareCount: analyticsData.share_count || 0,
           exportCount: analyticsData.export_count || 0,
-          actionsTaken: actionsData?.map(a => a.action_type) || []
+          actionsTaken: actionsData?.map((a) => a.action_type) || [],
         });
       }
     } catch (error: unknown) {
@@ -110,26 +108,24 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
    * Track une action générique
    */
   const trackAction = async (
-    action: string, 
+    action: string,
     metadata: Record<string, unknown> = {}
   ): Promise<void> => {
     if (!user) return;
 
     try {
-      const { error } = await supabase
-        .from('insight_actions')
-        .insert({
-          user_id: user.id,
-          action_type: action,
-          metadata: metadata as never
-        });
+      const { error } = await supabase.from('insight_actions').insert({
+        user_id: user.id,
+        action_type: action,
+        metadata: metadata as never,
+      });
 
       if (error) throw error;
 
       // Mettre à jour l'état local
-      setAnalytics(prev => ({
+      setAnalytics((prev) => ({
         ...prev,
-        actionsTaken: [action, ...prev.actionsTaken]
+        actionsTaken: [action, ...prev.actionsTaken],
       }));
     } catch (error: unknown) {
       console.error('Error tracking action:', error);
@@ -145,7 +141,7 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
     try {
       // Incrémenter le compteur de vues
       const { error } = await supabase.rpc('increment_insight_views', {
-        p_user_id: user.id
+        p_user_id: user.id,
       });
 
       if (error) {
@@ -154,7 +150,7 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
           .from('insights_analytics')
           .update({
             view_count: analytics.viewCount + 1,
-            last_viewed_at: new Date().toISOString()
+            last_viewed_at: new Date().toISOString(),
           })
           .eq('user_id', user.id);
 
@@ -165,10 +161,10 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
       await trackAction('view_insights');
 
       // Mettre à jour l'état local
-      setAnalytics(prev => ({
+      setAnalytics((prev) => ({
         ...prev,
         viewCount: prev.viewCount + 1,
-        lastViewed: new Date().toISOString()
+        lastViewed: new Date().toISOString(),
       }));
     } catch (error: unknown) {
       console.error('Error tracking view:', error);
@@ -185,7 +181,7 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
       const { error } = await supabase
         .from('insights_analytics')
         .update({
-          share_count: analytics.shareCount + 1
+          share_count: analytics.shareCount + 1,
         })
         .eq('user_id', user.id);
 
@@ -193,9 +189,9 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
 
       await trackAction('share_insights');
 
-      setAnalytics(prev => ({
+      setAnalytics((prev) => ({
         ...prev,
-        shareCount: prev.shareCount + 1
+        shareCount: prev.shareCount + 1,
       }));
 
       toast.success('Partage enregistré !');
@@ -214,7 +210,7 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
       const { error } = await supabase
         .from('insights_analytics')
         .update({
-          export_count: analytics.exportCount + 1
+          export_count: analytics.exportCount + 1,
         })
         .eq('user_id', user.id);
 
@@ -222,9 +218,9 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
 
       await trackAction('export_pdf');
 
-      setAnalytics(prev => ({
+      setAnalytics((prev) => ({
         ...prev,
-        exportCount: prev.exportCount + 1
+        exportCount: prev.exportCount + 1,
       }));
 
       toast.success('Export enregistré !');
@@ -237,7 +233,8 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
    * Calcule le niveau d'engagement
    */
   const getInsightEngagement = (): EngagementLevel => {
-    const totalActions = analytics.shareCount + analytics.exportCount + analytics.actionsTaken.length;
+    const totalActions =
+      analytics.shareCount + analytics.exportCount + analytics.actionsTaken.length;
     if (totalActions >= 10) return 'high';
     if (totalActions >= 5) return 'medium';
     return 'low';
@@ -282,6 +279,6 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
     getInsightEngagement,
     getRecommendations,
     refresh: loadAnalytics,
-    loading
+    loading,
   };
 };

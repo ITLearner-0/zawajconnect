@@ -1,4 +1,3 @@
-
 import { Message } from '@/types/profile';
 
 export interface FilterResult {
@@ -27,7 +26,7 @@ export class ProactiveFilter {
       severity: 'high',
       pattern: /\b(meet\s+alone|private\s+meeting|secret\s+meet|without\s+wali)\b/i,
       description: 'Inappropriate meeting suggestions',
-      action: 'block'
+      action: 'block',
     },
     {
       id: 'personal_info_request',
@@ -35,7 +34,7 @@ export class ProactiveFilter {
       severity: 'medium',
       pattern: /\b(phone\s+number|address|home|location|where\s+do\s+you\s+live)\b/i,
       description: 'Personal information requests',
-      action: 'warn'
+      action: 'warn',
     },
     {
       id: 'romantic_language',
@@ -43,7 +42,7 @@ export class ProactiveFilter {
       severity: 'medium',
       pattern: /\b(love|darling|sweetheart|baby|honey|sexy|beautiful)\b/i,
       description: 'Inappropriate romantic language',
-      action: 'review'
+      action: 'review',
     },
     {
       id: 'religious_violations',
@@ -51,9 +50,9 @@ export class ProactiveFilter {
       severity: 'high',
       pattern: /\b(dating|girlfriend|boyfriend|haram\s+relationship)\b/i,
       description: 'Religious compliance violations',
-      action: 'escalate'
+      action: 'escalate',
     },
-    
+
     // Pattern-based rules
     {
       id: 'repetitive_contact',
@@ -61,7 +60,7 @@ export class ProactiveFilter {
       severity: 'medium',
       pattern: 'repetitive_messaging',
       description: 'Repetitive contact attempts',
-      action: 'warn'
+      action: 'warn',
     },
     {
       id: 'pressure_tactics',
@@ -69,17 +68,20 @@ export class ProactiveFilter {
       severity: 'high',
       pattern: /\b(hurry|quick|fast|now|immediately|urgent)\b/i,
       description: 'Pressure tactics detected',
-      action: 'review'
-    }
+      action: 'review',
+    },
   ];
-  
-  static filterMessage(content: string, context: {
-    userId: string;
-    conversationHistory: Message[];
-    isFirstMessage: boolean;
-  }): FilterResult {
+
+  static filterMessage(
+    content: string,
+    context: {
+      userId: string;
+      conversationHistory: Message[];
+      isFirstMessage: boolean;
+    }
+  ): FilterResult {
     const results: FilterResult[] = [];
-    
+
     // Apply content filters
     for (const rule of this.FILTER_RULES) {
       if (rule.type === 'content') {
@@ -89,85 +91,90 @@ export class ProactiveFilter {
         }
       }
     }
-    
+
     // Apply pattern filters
     const patternResult = this.applyPatternFilters(content, context);
     if (patternResult.isBlocked) {
       results.push(patternResult);
     }
-    
+
     // Apply frequency filters
     const frequencyResult = this.applyFrequencyFilters(context);
     if (frequencyResult.isBlocked) {
       results.push(frequencyResult);
     }
-    
+
     // Return most severe result
     if (results.length === 0) {
       return {
         isBlocked: false,
         confidence: 1.0,
         reason: 'Content approved',
-        suggestedAction: 'warn'
+        suggestedAction: 'warn',
       };
     }
-    
+
     // Find the most severe result
     const mostSevere = results.reduce((prev, current) => {
-      const severityOrder = { 'critical': 4, 'high': 3, 'medium': 2, 'low': 1 };
+      const severityOrder = { critical: 4, high: 3, medium: 2, low: 1 };
       const prevSeverity = this.getSeverityFromAction(prev.suggestedAction);
       const currentSeverity = this.getSeverityFromAction(current.suggestedAction);
-      
-      return severityOrder[currentSeverity as keyof typeof severityOrder] > 
-             severityOrder[prevSeverity as keyof typeof severityOrder] ? current : prev;
+
+      return severityOrder[currentSeverity as keyof typeof severityOrder] >
+        severityOrder[prevSeverity as keyof typeof severityOrder]
+        ? current
+        : prev;
     });
-    
+
     return mostSevere;
   }
-  
+
   private static applyContentRule(content: string, rule: FilterRule): FilterResult {
     const pattern = rule.pattern as RegExp;
     const match = pattern.test(content);
-    
+
     if (match) {
       return {
         isBlocked: true,
         confidence: 0.9,
         reason: rule.description,
         suggestedAction: rule.action,
-        filteredContent: content.replace(pattern, '[FILTERED]')
+        filteredContent: content.replace(pattern, '[FILTERED]'),
       };
     }
-    
+
     return {
       isBlocked: false,
       confidence: 1.0,
       reason: 'No content violations',
-      suggestedAction: 'warn'
+      suggestedAction: 'warn',
     };
   }
-  
-  private static applyPatternFilters(content: string, context: {
-    conversationHistory: Message[];
-    isFirstMessage: boolean;
-  }): FilterResult {
+
+  private static applyPatternFilters(
+    content: string,
+    context: {
+      conversationHistory: Message[];
+      isFirstMessage: boolean;
+    }
+  ): FilterResult {
     // Check for repetitive patterns
     if (context.conversationHistory.length > 0) {
       const recentMessages = context.conversationHistory.slice(-5);
-      const similarMessages = recentMessages.filter(msg => 
-        this.calculateSimilarity(msg.content, content) > 0.8
+      const similarMessages = recentMessages.filter(
+        (msg) => this.calculateSimilarity(msg.content, content) > 0.8
       );
-      
+
       if (similarMessages.length > 2) {
         return {
           isBlocked: true,
           confidence: 0.8,
           reason: 'Repetitive messaging pattern detected',
-          suggestedAction: 'warn'
+          suggestedAction: 'warn',
         };
       }
     }
-    
+
     // Check for first message appropriateness
     if (context.isFirstMessage) {
       const inappropriateFirstMessage = /\b(hey\s+beautiful|gorgeous|stunning)\b/i;
@@ -176,58 +183,58 @@ export class ProactiveFilter {
           isBlocked: true,
           confidence: 0.9,
           reason: 'Inappropriate first message',
-          suggestedAction: 'review'
+          suggestedAction: 'review',
         };
       }
     }
-    
+
     return {
       isBlocked: false,
       confidence: 1.0,
       reason: 'No pattern violations',
-      suggestedAction: 'warn'
+      suggestedAction: 'warn',
     };
   }
-  
+
   private static applyFrequencyFilters(context: {
     userId: string;
     conversationHistory: Message[];
   }): FilterResult {
-    const userMessages = context.conversationHistory.filter(msg => msg.sender_id === context.userId);
-    
+    const userMessages = context.conversationHistory.filter(
+      (msg) => msg.sender_id === context.userId
+    );
+
     // Check message frequency in last hour
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
-    const recentMessages = userMessages.filter(msg => 
-      new Date(msg.created_at) > oneHourAgo
-    );
-    
+    const recentMessages = userMessages.filter((msg) => new Date(msg.created_at) > oneHourAgo);
+
     if (recentMessages.length > 20) {
       return {
         isBlocked: true,
         confidence: 0.9,
         reason: 'Excessive messaging frequency',
-        suggestedAction: 'block'
+        suggestedAction: 'block',
       };
     }
-    
+
     return {
       isBlocked: false,
       confidence: 1.0,
       reason: 'Normal frequency',
-      suggestedAction: 'warn'
+      suggestedAction: 'warn',
     };
   }
-  
+
   private static calculateSimilarity(text1: string, text2: string): number {
     const words1 = text1.toLowerCase().split(/\s+/);
     const words2 = text2.toLowerCase().split(/\s+/);
-    
-    const intersection = words1.filter(word => words2.includes(word));
+
+    const intersection = words1.filter((word) => words2.includes(word));
     const union = [...new Set([...words1, ...words2])];
-    
+
     return intersection.length / union.length;
   }
-  
+
   private static getSeverityFromAction(action: string): string {
     switch (action) {
       case 'escalate':

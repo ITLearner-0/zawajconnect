@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { Button } from '@/components/ui/button';
@@ -40,14 +39,14 @@ const ProviderErrorFallback: React.FC<{
 
 export const ProviderErrorBoundary: React.FC<ProviderErrorBoundaryProps> = ({
   children,
-  fallbackTitle = "Application Error",
-  fallbackDescription = "Something went wrong. Please try refreshing the page.",
-  onReset
+  fallbackTitle = 'Application Error',
+  fallbackDescription = 'Something went wrong. Please try refreshing the page.',
+  onReset,
 }) => {
   return (
     <ErrorBoundary
       fallback={
-        <ProviderErrorFallback 
+        <ProviderErrorFallback
           title={fallbackTitle}
           description={fallbackDescription}
           onReset={onReset}

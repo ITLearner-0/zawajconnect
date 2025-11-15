@@ -2,23 +2,33 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Eye, MessageCircle, Edit, CheckCircle, LogIn, Camera, 
-  Heart, Brain, BookOpen, Settings, Sparkles, Clock
+import {
+  Eye,
+  MessageCircle,
+  Edit,
+  CheckCircle,
+  LogIn,
+  Camera,
+  Heart,
+  Brain,
+  BookOpen,
+  Settings,
+  Sparkles,
+  Clock,
 } from 'lucide-react';
 import { useDailyQuests } from '@/hooks/useDailyQuests';
 
 const ICON_MAP = {
-  'eye': Eye,
+  eye: Eye,
   'message-circle': MessageCircle,
-  'edit': Edit,
+  edit: Edit,
   'check-circle': CheckCircle,
   'log-in': LogIn,
-  'camera': Camera,
-  'heart': Heart,
-  'brain': Brain,
+  camera: Camera,
+  heart: Heart,
+  brain: Brain,
   'book-open': BookOpen,
-  'settings': Settings,
+  settings: Settings,
 };
 
 interface DailyQuestsProps {
@@ -26,7 +36,8 @@ interface DailyQuestsProps {
 }
 
 const DailyQuests: React.FC<DailyQuestsProps> = ({ compact = false }) => {
-  const { quests, loading, getQuestProgress, getCompletedCount, getTotalXPEarned } = useDailyQuests();
+  const { quests, loading, getQuestProgress, getCompletedCount, getTotalXPEarned } =
+    useDailyQuests();
 
   if (loading) {
     return (
@@ -35,7 +46,7 @@ const DailyQuests: React.FC<DailyQuestsProps> = ({ compact = false }) => {
           <div className="animate-pulse space-y-4">
             <div className="h-4 bg-muted rounded w-32"></div>
             <div className="space-y-3">
-              {[1, 2, 3].map(i => (
+              {[1, 2, 3].map((i) => (
                 <div key={i} className="h-16 bg-muted rounded"></div>
               ))}
             </div>
@@ -65,11 +76,11 @@ const DailyQuests: React.FC<DailyQuestsProps> = ({ compact = false }) => {
     const tomorrow = new Date(now);
     tomorrow.setDate(tomorrow.getDate() + 1);
     tomorrow.setHours(0, 0, 0, 0);
-    
+
     const diff = tomorrow.getTime() - now.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    
+
     return `${hours}h ${minutes}m`;
   };
 
@@ -134,23 +145,28 @@ const DailyQuests: React.FC<DailyQuestsProps> = ({ compact = false }) => {
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  <div className={`p-2 rounded-lg ${
-                    isCompleted 
-                      ? 'bg-green-100 dark:bg-green-900/30' 
-                      : 'bg-primary/10'
-                  }`}>
-                    <Icon className={`h-5 w-5 ${
-                      isCompleted ? 'text-green-600 dark:text-green-400' : 'text-primary'
-                    }`} />
+                  <div
+                    className={`p-2 rounded-lg ${
+                      isCompleted ? 'bg-green-100 dark:bg-green-900/30' : 'bg-primary/10'
+                    }`}
+                  >
+                    <Icon
+                      className={`h-5 w-5 ${
+                        isCompleted ? 'text-green-600 dark:text-green-400' : 'text-primary'
+                      }`}
+                    />
                   </div>
-                  
+
                   <div className="flex-1 space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <h4 className="font-semibold flex items-center gap-2">
                           {quest.title}
                           {isCompleted && (
-                            <Badge variant="secondary" className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300">
+                            <Badge
+                              variant="secondary"
+                              className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                            >
                               ✓ Complétée
                             </Badge>
                           )}
@@ -167,12 +183,10 @@ const DailyQuests: React.FC<DailyQuestsProps> = ({ compact = false }) => {
                         <span className="text-muted-foreground">
                           {progress?.current_progress || 0} / {quest.target_value}
                         </span>
-                        <span className="font-medium">
-                          {Math.round(progressPercent)}%
-                        </span>
+                        <span className="font-medium">{Math.round(progressPercent)}%</span>
                       </div>
-                      <Progress 
-                        value={progressPercent} 
+                      <Progress
+                        value={progressPercent}
                         className={`h-2 ${isCompleted ? '[&>div]:bg-green-500' : ''}`}
                       />
                     </div>
@@ -186,7 +200,8 @@ const DailyQuests: React.FC<DailyQuestsProps> = ({ compact = false }) => {
         {/* Footer Info */}
         <div className="pt-3 border-t">
           <p className="text-xs text-center text-muted-foreground">
-            Les quêtes se renouvellent chaque jour à minuit. Complétez-les toutes pour maximiser vos gains XP!
+            Les quêtes se renouvellent chaque jour à minuit. Complétez-les toutes pour maximiser vos
+            gains XP!
           </p>
         </div>
       </CardContent>

@@ -6,46 +6,46 @@ import { Trophy, Star, Award, Crown } from 'lucide-react';
 import { useUserLevel } from '@/hooks/useUserLevel';
 
 const LEVEL_CONFIG = {
-  bronze: { 
-    icon: Award, 
+  bronze: {
+    icon: Award,
     color: 'from-amber-700 to-amber-900',
     textColor: 'text-amber-700',
     bgColor: 'bg-amber-50',
     borderColor: 'border-amber-300',
     label: 'Bronze',
     next: 'Argent',
-    xpNeeded: 2000
+    xpNeeded: 2000,
   },
-  argent: { 
-    icon: Star, 
+  argent: {
+    icon: Star,
     color: 'from-slate-400 to-slate-600',
     textColor: 'text-slate-600',
     bgColor: 'bg-slate-50',
     borderColor: 'border-slate-300',
     label: 'Argent',
     next: 'Or',
-    xpNeeded: 5000
+    xpNeeded: 5000,
   },
-  or: { 
-    icon: Trophy, 
+  or: {
+    icon: Trophy,
     color: 'from-yellow-400 to-yellow-600',
     textColor: 'text-yellow-600',
     bgColor: 'bg-yellow-50',
     borderColor: 'border-yellow-300',
     label: 'Or',
     next: 'Platine',
-    xpNeeded: 10000
+    xpNeeded: 10000,
   },
-  platine: { 
-    icon: Crown, 
+  platine: {
+    icon: Crown,
     color: 'from-cyan-400 to-blue-600',
     textColor: 'text-cyan-600',
     bgColor: 'bg-cyan-50',
     borderColor: 'border-cyan-300',
     label: 'Platine',
     next: 'Maximum',
-    xpNeeded: 10000
-  }
+    xpNeeded: 10000,
+  },
 };
 
 interface UserLevelBadgeProps {
@@ -74,11 +74,11 @@ const UserLevelBadge: React.FC<UserLevelBadgeProps> = ({ compact = false }) => {
 
   if (compact) {
     return (
-      <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border-2 ${config.borderColor} ${config.bgColor}`}>
+      <div
+        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border-2 ${config.borderColor} ${config.bgColor}`}
+      >
         <Icon className={`h-4 w-4 ${config.textColor}`} />
-        <span className={`font-semibold text-sm ${config.textColor}`}>
-          {config.label}
-        </span>
+        <span className={`font-semibold text-sm ${config.textColor}`}>{config.label}</span>
         <Badge variant="secondary" className="text-xs">
           {level.total_xp} XP
         </Badge>
@@ -110,12 +110,8 @@ const UserLevelBadge: React.FC<UserLevelBadgeProps> = ({ compact = false }) => {
         {!isMaxLevel && (
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="text-muted-foreground">
-                Progression vers {config.next}
-              </span>
-              <span className="font-medium">
-                {level.level_progress}%
-              </span>
+              <span className="text-muted-foreground">Progression vers {config.next}</span>
+              <span className="font-medium">{level.level_progress}%</span>
             </div>
             <Progress value={level.level_progress} className="h-2" />
             <p className="text-xs text-muted-foreground">

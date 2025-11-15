@@ -295,21 +295,20 @@ Deno.serve(async (req) => {
     }
 
     // Update user progression total_xp
-    const { error: progressionError } = await supabaseClient.rpc(
-      'increment_user_xp',
-      {
+    const { error: progressionError } = await supabaseClient
+      .rpc('increment_user_xp', {
         p_user_id: user.id,
         p_xp_amount: badgeInfo.xp_reward,
-      }
-    ).catch(() => {
-      // If RPC doesn't exist, try direct update
-      return supabaseClient
-        .from('user_progression')
-        .update({
-          total_xp: supabaseClient.raw(`total_xp + ${badgeInfo.xp_reward}`),
-        })
-        .eq('user_id', user.id);
-    });
+      })
+      .catch(() => {
+        // If RPC doesn't exist, try direct update
+        return supabaseClient
+          .from('user_progression')
+          .update({
+            total_xp: supabaseClient.raw(`total_xp + ${badgeInfo.xp_reward}`),
+          })
+          .eq('user_id', user.id);
+      });
 
     if (progressionError) {
       console.error('[award-badge] Error updating progression:', progressionError);

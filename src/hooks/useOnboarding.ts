@@ -1,7 +1,6 @@
-
-import { useState, useEffect } from "react";
-import { isFieldRequired } from "@/utils/profileTooltips";
-import { ProfileFormData } from "@/types/profile";
+import { useState, useEffect } from 'react';
+import { isFieldRequired } from '@/utils/profileTooltips';
+import { ProfileFormData } from '@/types/profile';
 
 export const useOnboarding = (formData: ProfileFormData, isNewUser: boolean) => {
   const [isOnboarding, setIsOnboarding] = useState(isNewUser);
@@ -10,17 +9,17 @@ export const useOnboarding = (formData: ProfileFormData, isNewUser: boolean) => 
   // Get base steps
   const getSteps = () => {
     const baseSteps = [
-      "Basic Information",
-      "Education & Career",
-      "Religious Background",
-      "About Me"
+      'Basic Information',
+      'Education & Career',
+      'Religious Background',
+      'About Me',
     ];
-    
+
     // Add Wali Information step only for female users
-    if (formData.gender === "female") {
-      baseSteps.push("Wali Information");
+    if (formData.gender === 'female') {
+      baseSteps.push('Wali Information');
     }
-    
+
     return baseSteps;
   };
 
@@ -29,16 +28,18 @@ export const useOnboarding = (formData: ProfileFormData, isNewUser: boolean) => 
   // Check if the current step is complete enough to proceed
   const canProceedCurrentStep = (): boolean => {
     const requiredFieldsByStep: Record<number, string[]> = {
-      0: ["fullName", "gender", "location"],
+      0: ['fullName', 'gender', 'location'],
       1: [],
-      2: ["religiousLevel"],
-      3: ["aboutMe"],
-      4: formData.gender === "female" ? ["waliName", "waliRelationship", "waliContact"] : []
+      2: ['religiousLevel'],
+      3: ['aboutMe'],
+      4: formData.gender === 'female' ? ['waliName', 'waliRelationship', 'waliContact'] : [],
     };
 
-    return requiredFieldsByStep[currentStep]?.every(
-      (field) => formData[field as keyof ProfileFormData]
-    ) ?? true;
+    return (
+      requiredFieldsByStep[currentStep]?.every(
+        (field) => formData[field as keyof ProfileFormData]
+      ) ?? true
+    );
   };
 
   const handleNext = () => {
@@ -61,7 +62,7 @@ export const useOnboarding = (formData: ProfileFormData, isNewUser: boolean) => 
   useEffect(() => {
     const newSteps = getSteps();
     // If user changed from female to male and we're on the Wali step, go back to About Me
-    if (formData.gender !== "female" && currentStep >= newSteps.length) {
+    if (formData.gender !== 'female' && currentStep >= newSteps.length) {
       setCurrentStep(newSteps.length - 1);
     }
   }, [formData.gender, currentStep]);
@@ -74,6 +75,6 @@ export const useOnboarding = (formData: ProfileFormData, isNewUser: boolean) => 
     handleNext,
     handlePrevious,
     completeOnboarding,
-    canProceedCurrentStep
+    canProceedCurrentStep,
   };
 };

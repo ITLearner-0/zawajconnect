@@ -42,12 +42,12 @@ const RouteLoadingIndicator = () => {
 
   return (
     <div className="fixed top-16 left-0 right-0 z-50">
-      <Progress 
-        value={progress} 
+      <Progress
+        value={progress}
         className={cn(
-          "h-1 rounded-none border-none bg-transparent",
-          "[&>div]:bg-gradient-to-r [&>div]:from-emerald [&>div]:to-emerald-light",
-          "[&>div]:transition-all [&>div]:duration-300"
+          'h-1 rounded-none border-none bg-transparent',
+          '[&>div]:bg-gradient-to-r [&>div]:from-emerald [&>div]:to-emerald-light',
+          '[&>div]:transition-all [&>div]:duration-300'
         )}
       />
     </div>

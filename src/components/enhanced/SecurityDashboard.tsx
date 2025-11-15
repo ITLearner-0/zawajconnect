@@ -2,15 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Shield, 
-  AlertTriangle, 
-  Users, 
-  CheckCircle, 
-  XCircle,
-  Activity,
-  Clock
-} from 'lucide-react';
+import { Shield, AlertTriangle, Users, CheckCircle, XCircle, Activity, Clock } from 'lucide-react';
 import { useIsAdmin } from '@/hooks/useIsAdmin';
 import { useSecurityMonitor } from '@/hooks/useSecurityMonitor';
 import { useUserRole } from '@/hooks/useUserRole';
@@ -62,10 +54,14 @@ export const SecurityDashboard = () => {
             </div>
             <div className="flex items-center gap-2 mt-2">
               {securityStatus?.email_verified && (
-                <Badge variant="secondary" className="text-xs">Email ✓</Badge>
+                <Badge variant="secondary" className="text-xs">
+                  Email ✓
+                </Badge>
               )}
               {securityStatus?.id_verified && (
-                <Badge variant="secondary" className="text-xs">ID ✓</Badge>
+                <Badge variant="secondary" className="text-xs">
+                  ID ✓
+                </Badge>
               )}
             </div>
           </CardContent>
@@ -76,12 +72,8 @@ export const SecurityDashboard = () => {
             <CardTitle className="text-sm font-medium">Sessions Actives</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {activeSessions.length}
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Sessions en cours
-            </p>
+            <div className="text-2xl font-bold">{activeSessions.length}</div>
+            <p className="text-xs text-muted-foreground mt-2">Sessions en cours</p>
           </CardContent>
         </Card>
 
@@ -90,12 +82,8 @@ export const SecurityDashboard = () => {
             <CardTitle className="text-sm font-medium">Événements Sécurité</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-amber-600">
-              0
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">
-              Non résolus
-            </p>
+            <div className="text-2xl font-bold text-amber-600">0</div>
+            <p className="text-xs text-muted-foreground mt-2">Non résolus</p>
           </CardContent>
         </Card>
 
@@ -110,9 +98,7 @@ export const SecurityDashboard = () => {
             <Badge variant="outline" className="text-emerald-700">
               Renforcé
             </Badge>
-            <p className="text-xs text-muted-foreground mt-2">
-              Sécurité niveau entreprise
-            </p>
+            <p className="text-xs text-muted-foreground mt-2">Sécurité niveau entreprise</p>
           </CardContent>
         </Card>
       </div>
@@ -131,7 +117,7 @@ export const SecurityDashboard = () => {
             <div className="lg:col-span-2">
               <SecurityAlertPanel />
             </div>
-            
+
             {/* Rate Limiting Status */}
             <div>
               <FamilyRateLimitIndicator />
@@ -196,9 +182,7 @@ export const SecurityDashboard = () => {
                 <Activity className="h-5 w-5 text-emerald" />
                 Sessions Actives
               </CardTitle>
-              <CardDescription>
-                Surveillance des sessions utilisateur en temps réel
-              </CardDescription>
+              <CardDescription>Surveillance des sessions utilisateur en temps réel</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -207,8 +191,8 @@ export const SecurityDashboard = () => {
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-medium">Session {index + 1}</span>
                       <div className="flex items-center gap-2">
-                        <Badge variant={session.is_active ? "outline" : "secondary"}>
-                          {session.is_active ? "Active" : "Inactive"}
+                        <Badge variant={session.is_active ? 'outline' : 'secondary'}>
+                          {session.is_active ? 'Active' : 'Inactive'}
                         </Badge>
                         <span className="text-xs text-muted-foreground flex items-center gap-1">
                           <Clock className="h-3 w-3" />
@@ -220,21 +204,15 @@ export const SecurityDashboard = () => {
                       {session.device_fingerprint && (
                         <p>Empreinte: {session.device_fingerprint.slice(0, 12)}...</p>
                       )}
-                      {session.user_agent && (
-                        <p>Navigateur: {session.user_agent.split(' ')[0]}</p>
-                      )}
-                      {session.ip_address && (
-                        <p>IP: {session.ip_address}</p>
-                      )}
+                      {session.user_agent && <p>Navigateur: {session.user_agent.split(' ')[0]}</p>}
+                      {session.ip_address && <p>IP: {session.ip_address}</p>}
                     </div>
                   </div>
                 ))}
                 {activeSessions.length === 0 && (
                   <div className="text-center py-8">
                     <Activity className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-                    <p className="text-muted-foreground">
-                      Aucune session active détectée
-                    </p>
+                    <p className="text-muted-foreground">Aucune session active détectée</p>
                   </div>
                 )}
               </div>
@@ -258,21 +236,21 @@ export const SecurityDashboard = () => {
                     Score de vérification 85+ requis avec ID vérifié
                   </p>
                 </div>
-                
+
                 <div className="p-3 border rounded">
                   <p className="font-medium">Supervision Familiale</p>
                   <p className="text-sm text-muted-foreground">
                     Accès limité dans le temps avec vérification renforcée
                   </p>
                 </div>
-                
+
                 <div className="p-3 border rounded">
                   <p className="font-medium">Limitation de Taux</p>
                   <p className="text-sm text-muted-foreground">
                     Maximum 3 invitations familiales par jour
                   </p>
                 </div>
-                
+
                 <div className="p-3 border rounded">
                   <p className="font-medium">Audit de Sécurité</p>
                   <p className="text-sm text-muted-foreground">

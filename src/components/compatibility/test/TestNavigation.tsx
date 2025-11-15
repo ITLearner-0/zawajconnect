@@ -1,5 +1,4 @@
-
-import CustomButton from "../../CustomButton";
+import CustomButton from '../../CustomButton';
 
 interface TestNavigationProps {
   currentQuestion: number;
@@ -10,13 +9,13 @@ interface TestNavigationProps {
   onNext: () => void;
 }
 
-const TestNavigation = ({ 
-  currentQuestion, 
-  totalQuestions, 
-  hasAnswer, 
-  loading, 
-  onPrevious, 
-  onNext 
+const TestNavigation = ({
+  currentQuestion,
+  totalQuestions,
+  hasAnswer,
+  loading,
+  onPrevious,
+  onNext,
 }: TestNavigationProps) => {
   const isLastQuestion = currentQuestion === totalQuestions - 1;
 
@@ -29,11 +28,8 @@ const TestNavigation = ({
           </CustomButton>
         )}
       </div>
-      <CustomButton 
-        onClick={onNext} 
-        disabled={loading || !hasAnswer}
-      >
-        {isLastQuestion ? (loading ? "Calcul..." : "Voir les Résultats") : "Suivant"}
+      <CustomButton onClick={onNext} disabled={loading || !hasAnswer}>
+        {isLastQuestion ? (loading ? 'Calcul...' : 'Voir les Résultats') : 'Suivant'}
       </CustomButton>
     </div>
   );

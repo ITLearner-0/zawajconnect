@@ -1,9 +1,4 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
@@ -72,9 +67,7 @@ export const AlertDetailsDialog = ({ alert, open, onOpenChange }: AlertDetailsDi
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="text-muted-foreground">Créée le:</span>
-                <p>
-                  {format(new Date(alert.created_at), 'PPP à HH:mm', { locale: fr })}
-                </p>
+                <p>{format(new Date(alert.created_at), 'PPP à HH:mm', { locale: fr })}</p>
               </div>
               {alert.acknowledged_at && (
                 <div>

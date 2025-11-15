@@ -1,9 +1,8 @@
-
 import React, { Suspense } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Toaster } from "@/components/ui/toaster";
-import StandardLoadingState from "@/components/ui/StandardLoadingState";
+import { Toaster } from '@/components/ui/toaster';
+import StandardLoadingState from '@/components/ui/StandardLoadingState';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import AuthProvider from '@/contexts/AuthContext';
@@ -22,12 +21,14 @@ interface AppProviderProps {
 }
 
 const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  console.log("AppProvider rendering");
-  
+  console.log('AppProvider rendering');
+
   return (
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <Suspense fallback={<StandardLoadingState loading={true} loadingText="Initialisation..." />}>
+        <Suspense
+          fallback={<StandardLoadingState loading={true} loadingText="Initialisation..." />}
+        >
           <ThemeProvider>
             <AccessibilityProvider>
               <AuthProvider>

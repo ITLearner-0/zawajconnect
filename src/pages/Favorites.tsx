@@ -59,7 +59,7 @@ export default function Favorites() {
 
     try {
       const favoriteIds = Array.from(favorites);
-      
+
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -68,7 +68,7 @@ export default function Favorites() {
       if (error) throw error;
 
       setProfiles(data || []);
-      
+
       // Fetch tags for each favorite
       const tagsMap = new Map<string, ProfileTag[]>();
       for (const profile of data || []) {
@@ -84,14 +84,14 @@ export default function Favorites() {
   };
 
   const filteredProfiles = selectedTagFilter
-    ? profiles.filter(profile => 
-        profileTags.get(profile.user_id)?.some(tag => tag.id === selectedTagFilter)
+    ? profiles.filter((profile) =>
+        profileTags.get(profile.user_id)?.some((tag) => tag.id === selectedTagFilter)
       )
     : profiles;
 
   const handleExportSingle = async (profileId: string) => {
     if (!user) return;
-    
+
     setIsExporting(true);
     try {
       const exportService = new FavoritesPdfExportService();
@@ -99,7 +99,7 @@ export default function Favorites() {
       toast.success('PDF exporté avec succès');
     } catch (error) {
       console.error('Error exporting PDF:', error);
-      toast.error('Erreur lors de l\'export PDF');
+      toast.error("Erreur lors de l'export PDF");
     } finally {
       setIsExporting(false);
     }
@@ -117,7 +117,7 @@ export default function Favorites() {
       setSelectionMode(false);
     } catch (error) {
       console.error('Error exporting PDFs:', error);
-      toast.error('Erreur lors de l\'export PDF');
+      toast.error("Erreur lors de l'export PDF");
     } finally {
       setIsExporting(false);
     }
@@ -129,19 +129,19 @@ export default function Favorites() {
     setIsExporting(true);
     try {
       const exportService = new FavoritesPdfExportService();
-      const profileIds = filteredProfiles.map(p => p.user_id);
+      const profileIds = filteredProfiles.map((p) => p.user_id);
       await exportService.exportMultipleProfiles(user.id, profileIds);
       toast.success(`${filteredProfiles.length} profil(s) exporté(s) avec succès`);
     } catch (error) {
       console.error('Error exporting all PDFs:', error);
-      toast.error('Erreur lors de l\'export PDF');
+      toast.error("Erreur lors de l'export PDF");
     } finally {
       setIsExporting(false);
     }
   };
 
   const toggleProfileSelection = (profileId: string) => {
-    setSelectedProfiles(prev => {
+    setSelectedProfiles((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(profileId)) {
         newSet.delete(profileId);
@@ -156,7 +156,7 @@ export default function Favorites() {
     if (selectedProfiles.size === filteredProfiles.length) {
       setSelectedProfiles(new Set());
     } else {
-      setSelectedProfiles(new Set(filteredProfiles.map(p => p.user_id)));
+      setSelectedProfiles(new Set(filteredProfiles.map((p) => p.user_id)));
     }
   };
 
@@ -178,24 +178,16 @@ export default function Favorites() {
       <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/notes')}
-            className="mb-4"
-          >
+          <Button variant="outline" onClick={() => navigate('/notes')} className="mb-4">
             <StickyNote className="h-4 w-4 mr-2" />
             Gérer mes notes
           </Button>
-          
-          <Button
-            variant="outline"
-            onClick={() => navigate('/browse')}
-            className="mb-4 ml-2"
-          >
+
+          <Button variant="outline" onClick={() => navigate('/browse')} className="mb-4 ml-2">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour à la recherche
           </Button>
-          
+
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -203,14 +195,16 @@ export default function Favorites() {
                 <h1 className="text-3xl font-bold">Mes Favoris</h1>
               </div>
               <p className="text-muted-foreground">
-                {filteredProfiles.length} profil{filteredProfiles.length > 1 ? 's' : ''} 
-                {selectedTagFilter ? ' avec ce tag' : ' favori' + (filteredProfiles.length > 1 ? 's' : '')}
+                {filteredProfiles.length} profil{filteredProfiles.length > 1 ? 's' : ''}
+                {selectedTagFilter
+                  ? ' avec ce tag'
+                  : ' favori' + (filteredProfiles.length > 1 ? 's' : '')}
               </p>
             </div>
-            
+
             <div className="flex gap-2 flex-wrap">
               <TagManager />
-              
+
               {filteredProfiles.length > 0 && (
                 <>
                   <Button
@@ -225,7 +219,7 @@ export default function Favorites() {
                     <Download className="h-4 w-4" />
                     {selectionMode ? 'Annuler' : 'Sélectionner'}
                   </Button>
-                  
+
                   {!selectionMode && (
                     <Button
                       variant="default"
@@ -238,7 +232,7 @@ export default function Favorites() {
                       {isExporting ? 'Export...' : `Tout exporter (${filteredProfiles.length})`}
                     </Button>
                   )}
-                  
+
                   {selectionMode && selectedProfiles.size > 0 && (
                     <Button
                       variant="default"
@@ -293,13 +287,15 @@ export default function Favorites() {
                 {tags.map((tag) => (
                   <Badge
                     key={tag.id}
-                    style={{ 
+                    style={{
                       backgroundColor: selectedTagFilter === tag.id ? tag.color : 'transparent',
                       color: selectedTagFilter === tag.id ? 'white' : tag.color,
-                      borderColor: tag.color
+                      borderColor: tag.color,
                     }}
                     className="cursor-pointer border-2 hover:opacity-80 transition-opacity"
-                    onClick={() => setSelectedTagFilter(selectedTagFilter === tag.id ? null : tag.id)}
+                    onClick={() =>
+                      setSelectedTagFilter(selectedTagFilter === tag.id ? null : tag.id)
+                    }
                   >
                     {tag.tag_name}
                   </Badge>
@@ -316,19 +312,16 @@ export default function Favorites() {
               {selectedTagFilter ? 'Aucun favori avec ce tag' : 'Aucun favori'}
             </h2>
             <p className="text-muted-foreground mb-6">
-              {selectedTagFilter 
+              {selectedTagFilter
                 ? 'Aucun profil favori ne correspond à ce filtre.'
-                : 'Commencez à ajouter des profils à vos favoris pour les retrouver facilement ici.'
-              }
+                : 'Commencez à ajouter des profils à vos favoris pour les retrouver facilement ici.'}
             </p>
             {selectedTagFilter ? (
               <Button onClick={() => setSelectedTagFilter(null)} variant="outline">
                 Voir tous les favoris
               </Button>
             ) : (
-              <Button onClick={() => navigate('/browse')}>
-                Explorer les profils
-              </Button>
+              <Button onClick={() => navigate('/browse')}>Explorer les profils</Button>
             )}
           </div>
         ) : (
@@ -344,7 +337,7 @@ export default function Favorites() {
                     />
                   </div>
                 )}
-                
+
                 <div className="relative">
                   <ProfileCard
                     profile={{
@@ -355,16 +348,16 @@ export default function Favorites() {
                       profession: profile.profession ?? '',
                       bio: profile.bio ?? '',
                       avatar_url: profile.avatar_url ?? '',
-                      interests: profile.interests ?? []
+                      interests: profile.interests ?? [],
                     }}
                     showActions={false}
                     compact={true}
                   />
                 </div>
-                
+
                 <div className="p-4 border-t space-y-3">
                   <FavoriteTagSelector profileId={profile.user_id} />
-                  
+
                   {!selectionMode && (
                     <Button
                       variant="outline"

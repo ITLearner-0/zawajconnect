@@ -1,4 +1,3 @@
-
 import { ModerationStats, FlagByType } from '@/types/analytics';
 
 /**
@@ -14,20 +13,20 @@ export const getModerationStats = async (
       { type: 'inappropriate', count: 32 },
       { type: 'harassment', count: 18 },
       { type: 'religious_violation', count: 24 },
-      { type: 'suspicious', count: 12 }
+      { type: 'suspicious', count: 12 },
     ];
-    
+
     return {
       totalFlags: 86,
       totalReports: 42,
-      flagsByType
+      flagsByType,
     };
   } catch (err) {
     console.error('Error getting moderation stats:', err);
     return {
       totalFlags: 0,
       totalReports: 0,
-      flagsByType: []
+      flagsByType: [],
     };
   }
 };

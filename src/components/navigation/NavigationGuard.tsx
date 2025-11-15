@@ -37,17 +37,17 @@ const NavigationGuard = ({ children }: NavigationGuardProps) => {
     if (loading || adminLoading) return;
 
     const currentRoute = getRouteByPath(location.pathname);
-    
+
     // Check if route requires authentication
     if (currentRoute?.requiresAuth && !user) {
       toast({
-        title: "Authentification requise",
-        description: "Vous devez être connecté pour accéder à cette page.",
-        variant: "destructive"
+        title: 'Authentification requise',
+        description: 'Vous devez être connecté pour accéder à cette page.',
+        variant: 'destructive',
       });
-      navigate('/auth', { 
+      navigate('/auth', {
         state: { from: location.pathname },
-        replace: true 
+        replace: true,
       });
       return;
     }
@@ -55,8 +55,8 @@ const NavigationGuard = ({ children }: NavigationGuardProps) => {
     // Check if route requires onboarding completion
     if (currentRoute?.requiresOnboarding && user && !user.user_metadata?.onboarding_completed) {
       toast({
-        title: "Profil incomplet",
-        description: "Veuillez compléter votre profil pour continuer.",
+        title: 'Profil incomplet',
+        description: 'Veuillez compléter votre profil pour continuer.',
       });
       navigate('/onboarding', { replace: true });
       return;
@@ -68,9 +68,9 @@ const NavigationGuard = ({ children }: NavigationGuardProps) => {
       if (currentRoute.roles.includes('admin')) {
         if (!isAdmin) {
           toast({
-            title: "Accès refusé",
+            title: 'Accès refusé',
             description: "Vous n'avez pas les permissions administrateur nécessaires.",
-            variant: "destructive"
+            variant: 'destructive',
           });
           navigate('/enhanced-profile', { replace: true });
           return;

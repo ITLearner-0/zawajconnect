@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -15,7 +14,7 @@ const VoiceMessagePlayer: React.FC<VoiceMessagePlayerProps> = ({
   audioUrl,
   duration,
   isOwn = false,
-  className = ''
+  className = '',
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -85,14 +84,13 @@ const VoiceMessagePlayer: React.FC<VoiceMessagePlayerProps> = ({
   };
 
   return (
-    <div className={`
+    <div
+      className={`
       flex items-center gap-3 p-3 rounded-lg max-w-xs
-      ${isOwn 
-        ? 'bg-primary text-primary-foreground ml-auto' 
-        : 'bg-muted text-muted-foreground'
-      }
+      ${isOwn ? 'bg-primary text-primary-foreground ml-auto' : 'bg-muted text-muted-foreground'}
       ${className}
-    `}>
+    `}
+    >
       {/* Play/Pause Button */}
       <Button
         variant="ghost"
@@ -101,11 +99,7 @@ const VoiceMessagePlayer: React.FC<VoiceMessagePlayerProps> = ({
         disabled={!isLoaded}
         className={isOwn ? 'text-primary-foreground hover:bg-primary-foreground/20' : ''}
       >
-        {isPlaying ? (
-          <Pause className="h-4 w-4" />
-        ) : (
-          <Play className="h-4 w-4" />
-        )}
+        {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
       </Button>
 
       {/* Waveform/Progress */}
@@ -116,13 +110,10 @@ const VoiceMessagePlayer: React.FC<VoiceMessagePlayerProps> = ({
             className="flex-1 h-2 bg-black/20 rounded-full cursor-pointer overflow-hidden"
             onClick={handleProgressClick}
           >
-            <Progress
-              value={(currentTime / duration) * 100}
-              className="h-full"
-            />
+            <Progress value={(currentTime / duration) * 100} className="h-full" />
           </div>
         </div>
-        
+
         <div className="flex justify-between text-xs opacity-70">
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>

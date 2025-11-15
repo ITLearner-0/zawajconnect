@@ -5,20 +5,20 @@ import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { 
-  User, 
-  Search, 
-  Heart, 
-  MessageCircle, 
-  Bell, 
-  Clock, 
-  Home, 
+import {
+  User,
+  Search,
+  Heart,
+  MessageCircle,
+  Bell,
+  Clock,
+  Home,
   Settings,
   Users,
   BookOpen,
   Brain,
   Shield,
-  Award
+  Award,
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -70,7 +70,12 @@ export function AppSidebar() {
     { path: '/enhanced-profile', icon: User, label: 'Mon Profil', group: 'main' },
     { path: '/browse', icon: Search, label: 'Découvrir', group: 'main' },
     { path: '/gamification', icon: Award, label: 'Récompenses', group: 'main' },
-    { path: '/compatibility-test', icon: Heart, label: 'Test de Compatibilité', group: 'compatibility' },
+    {
+      path: '/compatibility-test',
+      icon: Heart,
+      label: 'Test de Compatibilité',
+      group: 'compatibility',
+    },
     { path: '/advanced-matching', icon: Brain, label: 'Matching Avancé', group: 'compatibility' },
     { path: '/compatibility-insights', icon: Brain, label: 'Mes Insights', group: 'compatibility' },
     { path: '/matches', icon: Users, label: 'Mes Matches', group: 'social' },
@@ -86,19 +91,17 @@ export function AppSidebar() {
     { path: '/match-approval', icon: Heart, label: 'Approbation Matches', group: 'family' },
     { path: '/family-analytics', icon: Brain, label: 'Analytics Famille', group: 'family' },
     { path: '/moderation-tests', icon: Settings, label: 'Tests Modération', group: 'family' },
-    { path: '/family-supervision', icon: Users, label: 'Supervision Familiale', group: 'family' }
+    { path: '/family-supervision', icon: Users, label: 'Supervision Familiale', group: 'family' },
   ];
 
-  const navItems = isWali
-    ? [...baseNavItems, ...waliNavItems]
-    : baseNavItems;
+  const navItems = isWali ? [...baseNavItems, ...waliNavItems] : baseNavItems;
 
   const groupedNavItems = {
-    main: navItems.filter(item => item.group === 'main'),
-    compatibility: navItems.filter(item => item.group === 'compatibility'),
-    social: navItems.filter(item => item.group === 'social'),
-    family: navItems.filter(item => item.group === 'family'),
-    resources: navItems.filter(item => item.group === 'resources')
+    main: navItems.filter((item) => item.group === 'main'),
+    compatibility: navItems.filter((item) => item.group === 'compatibility'),
+    social: navItems.filter((item) => item.group === 'social'),
+    family: navItems.filter((item) => item.group === 'family'),
+    resources: navItems.filter((item) => item.group === 'resources'),
   };
 
   useEffect(() => {
@@ -109,7 +112,7 @@ export function AppSidebar() {
 
   const fetchNotifications = async () => {
     if (!user?.id) return;
-    
+
     try {
       const { data, error } = await supabase
         .from('notifications')
@@ -120,9 +123,9 @@ export function AppSidebar() {
         .limit(3);
 
       if (error) throw error;
-      const notifications = (data || []).map(n => ({
+      const notifications = (data || []).map((n) => ({
         ...n,
-        is_read: n.is_read ?? false
+        is_read: n.is_read ?? false,
       }));
       setNotifications(notifications);
     } catch (error) {
@@ -132,7 +135,7 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? "bg-primary/10 text-primary font-medium" : "hover:bg-muted/50";
+    isActive ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted/50';
 
   // Don't render sidebar if still loading roles to prevent errors
   if (!user || roleLoading) return null;
@@ -280,8 +283,8 @@ export function AppSidebar() {
                 </div>
                 <div className="space-y-2">
                   {prayerTimes.map((prayer) => (
-                    <div 
-                      key={prayer.name} 
+                    <div
+                      key={prayer.name}
                       className={`flex justify-between items-center text-sm ${
                         prayer.next ? 'text-emerald font-medium' : 'text-muted-foreground'
                       }`}

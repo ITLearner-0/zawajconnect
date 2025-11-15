@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import ChatHeader from './ChatHeader';
 import MessageInput from './MessageInput';
@@ -32,12 +31,12 @@ const ChatContainer = ({
   onSendMessage,
   onStartVideoCall,
   isWaliSupervised = false,
-  isSupervisor = false
+  isSupervisor = false,
 }: ChatContainerProps) => {
-  const [messageInput, setMessageInput] = useState("");
-  
+  const [messageInput, setMessageInput] = useState('');
+
   // Use our custom hooks
-  const { 
+  const {
     showRetentionSettings,
     showSecuritySettings,
     showMonitoring,
@@ -47,39 +46,40 @@ const ChatContainer = ({
     toggleRetentionSettings,
     toggleSecuritySettings,
     toggleMonitoringPanel,
-    toggleEmergencyPanel
+    toggleEmergencyPanel,
   } = useChatControls();
-  
-  const { 
+
+  const {
     latestReport,
     monitoringEnabled,
     toggleMonitoring,
     loading: monitoringLoading,
-    error: monitoringError
+    error: monitoringError,
   } = useAIMonitoring(conversationId);
-  
-  const { 
-    moderateMessageContent, 
-    processContentFlags 
-  } = useMessageModeration(conversationId, messages, userId);
+
+  const { moderateMessageContent, processContentFlags } = useMessageModeration(
+    conversationId,
+    messages,
+    userId
+  );
 
   // Initialize message handler using the hook
   const { handleSendMessage } = useChatMessageHandler({
     conversationId,
     onSendMessage,
     moderateMessageContent,
-    processContentFlags
+    processContentFlags,
   });
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-islamic-darkCard">
-      <ChatHeader 
+      <ChatHeader
         conversation={{
           id: conversationId,
           profile: { first_name: otherUserName, last_name: '' },
           participants: [userId, otherUserId],
           created_at: new Date().toISOString(),
-          wali_supervised: isWaliSupervised
+          wali_supervised: isWaliSupervised,
         }}
         currentUserId={userId}
         backToList={() => {}}
@@ -89,8 +89,8 @@ const ChatContainer = ({
         setShowSecuritySettings={toggleSecuritySettings}
         openReportDialog={() => setShowReportDialog(true)}
       />
-      
-      <ChatBody 
+
+      <ChatBody
         messages={messages}
         currentUserId={userId}
         conversationId={conversationId}
@@ -108,21 +108,21 @@ const ChatContainer = ({
         monitoringError={monitoringError}
         onCloseMonitoring={() => toggleMonitoringPanel()}
       />
-      
-      <MessageInput 
+
+      <MessageInput
         messageInput={messageInput}
         setMessageInput={setMessageInput}
         sendMessage={() => {
           if (messageInput.trim()) {
             handleSendMessage(messageInput);
-            setMessageInput("");
+            setMessageInput('');
           }
         }}
         sendingMessage={false}
         encryptionEnabled={true}
       />
-      
-      <ReportDialog 
+
+      <ReportDialog
         isOpen={showReportDialog}
         onClose={() => setShowReportDialog(false)}
         userId={otherUserId}

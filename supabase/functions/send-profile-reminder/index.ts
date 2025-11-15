@@ -1,9 +1,9 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { sendEmail } from "../_shared/smtp.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { sendEmail } from '../_shared/smtp.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface ProfileReminderRequest {
@@ -13,69 +13,71 @@ interface ProfileReminderRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { user_id, missing_fields, completion_percentage }: ProfileReminderRequest = await req.json();
+    const { user_id, missing_fields, completion_percentage }: ProfileReminderRequest =
+      await req.json();
 
-    console.log("Sending profile completion reminder to user:", user_id);
+    console.log('Sending profile completion reminder to user:', user_id);
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
     const profileResponse = await fetch(
       `${supabaseUrl}/rest/v1/profiles?user_id=eq.${user_id}&select=full_name`,
       {
         headers: {
-          "apikey": supabaseKey!,
-          "Authorization": `Bearer ${supabaseKey}`,
+          apikey: supabaseKey!,
+          Authorization: `Bearer ${supabaseKey}`,
         },
       }
     );
 
     const profiles = await profileResponse.json();
-    const userName = profiles[0]?.full_name || "Cher membre";
+    const userName = profiles[0]?.full_name || 'Cher membre';
 
-    const userResponse = await fetch(
-      `${supabaseUrl}/auth/v1/admin/users/${user_id}`,
-      {
-        headers: {
-          "apikey": supabaseKey!,
-          "Authorization": `Bearer ${supabaseKey}`,
-        },
-      }
-    );
+    const userResponse = await fetch(`${supabaseUrl}/auth/v1/admin/users/${user_id}`, {
+      headers: {
+        apikey: supabaseKey!,
+        Authorization: `Bearer ${supabaseKey}`,
+      },
+    });
 
     const userData = await userResponse.json();
     const userEmail = userData.email;
 
     if (!userEmail) {
-      throw new Error("User email not found");
+      throw new Error('User email not found');
     }
 
     const fieldLabels: Record<string, string> = {
-      bio: "Biographie",
-      avatar_url: "Photo de profil",
+      bio: 'Biographie',
+      avatar_url: 'Photo de profil',
       education: "Niveau d'éducation",
-      profession: "Profession",
+      profession: 'Profession',
       interests: "Centres d'intérêt",
-      location: "Localisation",
-      prayer_frequency: "Fréquence de prière",
-      quran_reading: "Lecture du Coran",
-      madhab: "Madhab"
+      location: 'Localisation',
+      prayer_frequency: 'Fréquence de prière',
+      quran_reading: 'Lecture du Coran',
+      madhab: 'Madhab',
     };
 
-    const missingFieldsHtml = missing_fields.map(field => `
+    const missingFieldsHtml = missing_fields
+      .map(
+        (field) => `
       <li style="color: #4A5568; padding: 8px 0; font-size: 15px;">
         <span style="color: #7C3AED; font-weight: 600;">→</span> ${fieldLabels[field] || field}
       </li>
-    `).join('');
+    `
+      )
+      .join('');
 
     await sendEmail({
       to: userEmail,
-      subject: "✨ Complétez votre profil pour plus de matchs !",
+      subject: '✨ Complétez votre profil pour plus de matchs !',
       html: `
         <!DOCTYPE html>
         <html>
@@ -149,24 +151,21 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Profile reminder sent successfully to:", userEmail);
+    console.log('Profile reminder sent successfully to:', userEmail);
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         ...corsHeaders,
       },
     });
   } catch (error: any) {
-    console.error("Error in send-profile-reminder function:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    console.error('Error in send-profile-reminder function:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
   }
 };
 

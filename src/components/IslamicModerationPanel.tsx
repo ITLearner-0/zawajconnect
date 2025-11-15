@@ -7,11 +7,30 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Shield, Plus, Edit, Eye, Trash2, Activity } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 
 interface ModerationRule {
   id: string;
@@ -58,7 +77,7 @@ const IslamicModerationPanel: React.FC = () => {
     keywords: '',
     severity: 'medium',
     action: 'warn',
-    islamic_value: 'respect'
+    islamic_value: 'respect',
   });
 
   useEffect(() => {
@@ -84,26 +103,37 @@ const IslamicModerationPanel: React.FC = () => {
 
       if (logsError) throw logsError;
 
-      setRules(rulesData?.map(rule => ({
-        ...rule,
-        keywords: (Array.isArray(rule.keywords) ? rule.keywords : []).map(k => String(k)),
-        created_by: rule.created_by || undefined,
-        severity: rule.severity as 'low' | 'medium' | 'high',
-        action: rule.action as 'warn' | 'block' | 'escalate',
-        islamic_value: rule.islamic_value as 'respect' | 'modesty' | 'truthfulness' | 'no_vulgarity' | 'kindness'
-      })) || []);
-      setLogs(logsData?.map(log => ({
-        ...log,
-        rules_triggered: (Array.isArray(log.rules_triggered) ? log.rules_triggered : []).map(r => String(r)),
-        human_decision: log.human_decision || undefined,
-        human_reviewer_id: log.human_reviewer_id || undefined
-      })) || []);
+      setRules(
+        rulesData?.map((rule) => ({
+          ...rule,
+          keywords: (Array.isArray(rule.keywords) ? rule.keywords : []).map((k) => String(k)),
+          created_by: rule.created_by || undefined,
+          severity: rule.severity as 'low' | 'medium' | 'high',
+          action: rule.action as 'warn' | 'block' | 'escalate',
+          islamic_value: rule.islamic_value as
+            | 'respect'
+            | 'modesty'
+            | 'truthfulness'
+            | 'no_vulgarity'
+            | 'kindness',
+        })) || []
+      );
+      setLogs(
+        logsData?.map((log) => ({
+          ...log,
+          rules_triggered: (Array.isArray(log.rules_triggered) ? log.rules_triggered : []).map(
+            (r) => String(r)
+          ),
+          human_decision: log.human_decision || undefined,
+          human_reviewer_id: log.human_reviewer_id || undefined,
+        })) || []
+      );
     } catch (error) {
       console.error('Error loading moderation data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données de modération",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données de modération',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -112,8 +142,11 @@ const IslamicModerationPanel: React.FC = () => {
 
   const saveRule = async () => {
     try {
-      const keywordsArray = newRule.keywords.split(',').map(k => k.trim()).filter(k => k);
-      
+      const keywordsArray = newRule.keywords
+        .split(',')
+        .map((k) => k.trim())
+        .filter((k) => k);
+
       const ruleData = {
         rule_name: newRule.rule_name,
         rule_description: newRule.rule_description,
@@ -121,7 +154,7 @@ const IslamicModerationPanel: React.FC = () => {
         severity: newRule.severity,
         action: newRule.action,
         islamic_value: newRule.islamic_value,
-        is_active: true
+        is_active: true,
       };
 
       let error;
@@ -132,17 +165,17 @@ const IslamicModerationPanel: React.FC = () => {
           .eq('id', editingRule.id);
         error = result.error;
       } else {
-        const result = await supabase
-          .from('islamic_moderation_rules')
-          .insert(ruleData);
+        const result = await supabase.from('islamic_moderation_rules').insert(ruleData);
         error = result.error;
       }
 
       if (error) throw error;
 
       toast({
-        title: "Succès",
-        description: editingRule ? "Règle modifiée avec succès" : "Nouvelle règle créée avec succès"
+        title: 'Succès',
+        description: editingRule
+          ? 'Règle modifiée avec succès'
+          : 'Nouvelle règle créée avec succès',
       });
 
       setNewRule({
@@ -151,7 +184,7 @@ const IslamicModerationPanel: React.FC = () => {
         keywords: '',
         severity: 'medium',
         action: 'warn',
-        islamic_value: 'respect'
+        islamic_value: 'respect',
       });
       setEditingRule(null);
       setIsDialogOpen(false);
@@ -159,9 +192,9 @@ const IslamicModerationPanel: React.FC = () => {
     } catch (error) {
       console.error('Error saving rule:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder la règle",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder la règle',
+        variant: 'destructive',
       });
     }
   };
@@ -176,17 +209,17 @@ const IslamicModerationPanel: React.FC = () => {
       if (error) throw error;
 
       toast({
-        title: "Succès",
-        description: `Règle ${isActive ? 'activée' : 'désactivée'}`
+        title: 'Succès',
+        description: `Règle ${isActive ? 'activée' : 'désactivée'}`,
       });
 
       loadData();
     } catch (error) {
       console.error('Error toggling rule:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de modifier le statut de la règle",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de modifier le statut de la règle',
+        variant: 'destructive',
       });
     }
   };
@@ -195,25 +228,22 @@ const IslamicModerationPanel: React.FC = () => {
     if (!confirm('Êtes-vous sûr de vouloir supprimer cette règle ?')) return;
 
     try {
-      const { error } = await supabase
-        .from('islamic_moderation_rules')
-        .delete()
-        .eq('id', ruleId);
+      const { error } = await supabase.from('islamic_moderation_rules').delete().eq('id', ruleId);
 
       if (error) throw error;
 
       toast({
-        title: "Succès",
-        description: "Règle supprimée avec succès"
+        title: 'Succès',
+        description: 'Règle supprimée avec succès',
       });
 
       loadData();
     } catch (error) {
       console.error('Error deleting rule:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la règle",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de supprimer la règle',
+        variant: 'destructive',
       });
     }
   };
@@ -226,37 +256,51 @@ const IslamicModerationPanel: React.FC = () => {
       keywords: Array.isArray(rule.keywords) ? rule.keywords.join(', ') : '',
       severity: rule.severity,
       action: rule.action,
-      islamic_value: rule.islamic_value
+      islamic_value: rule.islamic_value,
     });
     setIsDialogOpen(true);
   };
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'low': return 'bg-green-100 text-green-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      case 'high': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'low':
+        return 'bg-green-100 text-green-800';
+      case 'medium':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'high':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getActionColor = (action: string) => {
     switch (action) {
-      case 'warn': return 'bg-blue-100 text-blue-800';
-      case 'block': return 'bg-red-100 text-red-800';
-      case 'escalate': return 'bg-orange-100 text-orange-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'warn':
+        return 'bg-blue-100 text-blue-800';
+      case 'block':
+        return 'bg-red-100 text-red-800';
+      case 'escalate':
+        return 'bg-orange-100 text-orange-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
   const getIslamicValueEmoji = (value: string) => {
     switch (value) {
-      case 'respect': return '🤝';
-      case 'modesty': return '🕊️';
-      case 'truthfulness': return '✨';
-      case 'no_vulgarity': return '🚫';
-      case 'kindness': return '💚';
-      default: return '📜';
+      case 'respect':
+        return '🤝';
+      case 'modesty':
+        return '🕊️';
+      case 'truthfulness':
+        return '✨';
+      case 'no_vulgarity':
+        return '🚫';
+      case 'kindness':
+        return '💚';
+      default:
+        return '📜';
     }
   };
 
@@ -275,7 +319,7 @@ const IslamicModerationPanel: React.FC = () => {
           <Shield className="h-6 w-6 text-emerald" />
           <h2 className="text-2xl font-bold">Modération Islamique</h2>
         </div>
-        
+
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-emerald hover:bg-emerald-dark">
@@ -289,40 +333,44 @@ const IslamicModerationPanel: React.FC = () => {
                 {editingRule ? 'Modifier la Règle' : 'Nouvelle Règle de Modération'}
               </DialogTitle>
             </DialogHeader>
-            
+
             <div className="grid grid-cols-2 gap-4">
               <div className="col-span-2">
                 <label className="text-sm font-medium">Nom de la règle</label>
                 <Input
                   value={newRule.rule_name}
-                  onChange={(e) => setNewRule(prev => ({ ...prev, rule_name: e.target.value }))}
+                  onChange={(e) => setNewRule((prev) => ({ ...prev, rule_name: e.target.value }))}
                   placeholder="Ex: Détection de vulgarité"
                 />
               </div>
-              
+
               <div className="col-span-2">
                 <label className="text-sm font-medium">Description</label>
                 <Textarea
                   value={newRule.rule_description}
-                  onChange={(e) => setNewRule(prev => ({ ...prev, rule_description: e.target.value }))}
+                  onChange={(e) =>
+                    setNewRule((prev) => ({ ...prev, rule_description: e.target.value }))
+                  }
                   placeholder="Description détaillée de la règle..."
                 />
               </div>
-              
+
               <div className="col-span-2">
                 <label className="text-sm font-medium">Mots-clés (séparés par des virgules)</label>
                 <Input
                   value={newRule.keywords}
-                  onChange={(e) => setNewRule(prev => ({ ...prev, keywords: e.target.value }))}
+                  onChange={(e) => setNewRule((prev) => ({ ...prev, keywords: e.target.value }))}
                   placeholder="vulgar, inappropriate, offensive"
                 />
               </div>
-              
+
               <div>
                 <label className="text-sm font-medium">Valeur islamique</label>
                 <Select
                   value={newRule.islamic_value}
-                  onValueChange={(value: 'respect' | 'modesty' | 'truthfulness' | 'no_vulgarity' | 'kindness') => setNewRule(prev => ({ ...prev, islamic_value: value }))}
+                  onValueChange={(
+                    value: 'respect' | 'modesty' | 'truthfulness' | 'no_vulgarity' | 'kindness'
+                  ) => setNewRule((prev) => ({ ...prev, islamic_value: value }))}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -336,12 +384,14 @@ const IslamicModerationPanel: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div>
                 <label className="text-sm font-medium">Sévérité</label>
                 <Select
                   value={newRule.severity}
-                  onValueChange={(value: 'low' | 'medium' | 'high') => setNewRule(prev => ({ ...prev, severity: value }))}
+                  onValueChange={(value: 'low' | 'medium' | 'high') =>
+                    setNewRule((prev) => ({ ...prev, severity: value }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -353,12 +403,14 @@ const IslamicModerationPanel: React.FC = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="col-span-2">
                 <label className="text-sm font-medium">Action</label>
                 <Select
                   value={newRule.action}
-                  onValueChange={(value: 'warn' | 'block' | 'escalate') => setNewRule(prev => ({ ...prev, action: value }))}
+                  onValueChange={(value: 'warn' | 'block' | 'escalate') =>
+                    setNewRule((prev) => ({ ...prev, action: value }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -371,20 +423,23 @@ const IslamicModerationPanel: React.FC = () => {
                 </Select>
               </div>
             </div>
-            
+
             <div className="flex justify-end gap-2 pt-4">
-              <Button variant="outline" onClick={() => {
-                setIsDialogOpen(false);
-                setEditingRule(null);
-                setNewRule({
-                  rule_name: '',
-                  rule_description: '',
-                  keywords: '',
-                  severity: 'medium',
-                  action: 'warn',
-                  islamic_value: 'respect'
-                });
-              }}>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsDialogOpen(false);
+                  setEditingRule(null);
+                  setNewRule({
+                    rule_name: '',
+                    rule_description: '',
+                    keywords: '',
+                    severity: 'medium',
+                    action: 'warn',
+                    islamic_value: 'respect',
+                  });
+                }}
+              >
                 Annuler
               </Button>
               <Button onClick={saveRule} className="bg-emerald hover:bg-emerald-dark">
@@ -434,14 +489,10 @@ const IslamicModerationPanel: React.FC = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge className={getSeverityColor(rule.severity)}>
-                          {rule.severity}
-                        </Badge>
+                        <Badge className={getSeverityColor(rule.severity)}>{rule.severity}</Badge>
                       </TableCell>
                       <TableCell>
-                        <Badge className={getActionColor(rule.action)}>
-                          {rule.action}
-                        </Badge>
+                        <Badge className={getActionColor(rule.action)}>{rule.action}</Badge>
                       </TableCell>
                       <TableCell>
                         <Switch
@@ -454,9 +505,9 @@ const IslamicModerationPanel: React.FC = () => {
                           <Button size="sm" variant="outline" onClick={() => startEdit(rule)}>
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline" 
+                          <Button
+                            size="sm"
+                            variant="outline"
                             onClick={() => deleteRule(rule.id)}
                             className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
                           >
@@ -494,9 +545,7 @@ const IslamicModerationPanel: React.FC = () => {
                 <TableBody>
                   {logs.map((log) => (
                     <TableRow key={log.id}>
-                      <TableCell>
-                        {new Date(log.created_at).toLocaleString('fr-FR')}
-                      </TableCell>
+                      <TableCell>{new Date(log.created_at).toLocaleString('fr-FR')}</TableCell>
                       <TableCell>
                         <p className="max-w-xs truncate">{log.content_analyzed}</p>
                       </TableCell>
@@ -505,9 +554,7 @@ const IslamicModerationPanel: React.FC = () => {
                           {log.action_taken}
                         </Badge>
                       </TableCell>
-                      <TableCell>
-                        {Math.round(log.confidence_score * 100)}%
-                      </TableCell>
+                      <TableCell>{Math.round(log.confidence_score * 100)}%</TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
                           {log.rules_triggered.map((rule, index) => (

@@ -1,11 +1,10 @@
-
 import React from 'react';
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Crown, LogIn } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import AccessibilityControls from "@/components/AccessibilityControls";
-import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Crown, LogIn } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import AccessibilityControls from '@/components/AccessibilityControls';
+import { LanguageSwitcher } from '@/components/ui/language-switcher';
 
 const HeroNavigation = () => {
   return (
@@ -17,8 +16,8 @@ const HeroNavigation = () => {
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <Button 
-            asChild 
+          <Button
+            asChild
             variant="ghost"
             size="sm"
             className="text-purple-600 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-800/30"
@@ -28,8 +27,8 @@ const HeroNavigation = () => {
               Premium
             </Link>
           </Button>
-          <Button 
-            asChild 
+          <Button
+            asChild
             variant="ghost"
             size="sm"
             className="text-rose-600 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-800/30"

@@ -1,4 +1,3 @@
-
 import { logger } from '@/services/logging/LoggingService';
 
 export interface UserInteractionMetrics {
@@ -19,7 +18,7 @@ export class UserInteractionService {
       timestamp: Date.now(),
       duration,
     };
-    
+
     this.userInteractions = [...this.userInteractions.slice(-199), interaction]; // Keep last 200 interactions
     logger.logUserAction(action, element, { duration });
   }

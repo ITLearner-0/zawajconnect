@@ -1,6 +1,5 @@
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -37,27 +36,21 @@ serve(async (req) => {
     } = await supabaseClient.auth.getSession();
 
     if (!session) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { 
-          status: 401,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Parse request data
-    const { userId, latitude, longitude } = await req.json() as RequestPayload;
+    const { userId, latitude, longitude } = (await req.json()) as RequestPayload;
 
     // Verify the user is updating their own profile
     if (session.user.id !== userId) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized to update this profile' }),
-        { 
-          status: 403, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        }
-      );
+      return new Response(JSON.stringify({ error: 'Unauthorized to update this profile' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     // Check if the user profile exists, create if needed
@@ -66,54 +59,43 @@ serve(async (req) => {
       .select('id')
       .eq('id', userId)
       .maybeSingle();
-      
+
     if (checkError) {
       console.error('Error checking profile:', checkError);
     }
-    
+
     if (!profileExists) {
       // Create basic profile if it doesn't exist
-      const { error: insertError } = await supabaseClient
-        .from('profiles')
-        .insert({
-          id: userId,
-          is_visible: true
-        });
-        
+      const { error: insertError } = await supabaseClient.from('profiles').insert({
+        id: userId,
+        is_visible: true,
+      });
+
       if (insertError) {
         console.error('Error creating profile:', insertError);
       }
     }
 
     // Create a PostGIS point and update the profile
-    const { data, error } = await supabaseClient.rpc(
-      'update_user_coordinates',
-      {
-        user_id: userId,
-        lat: latitude,
-        lng: longitude
-      }
-    );
+    const { data, error } = await supabaseClient.rpc('update_user_coordinates', {
+      user_id: userId,
+      lat: latitude,
+      lng: longitude,
+    });
 
     if (error) {
       throw error;
     }
 
-    return new Response(
-      JSON.stringify({ success: true, data }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
+    return new Response(JSON.stringify({ success: true, data }), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   } catch (error) {
     console.error('Error updating coordinates:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });

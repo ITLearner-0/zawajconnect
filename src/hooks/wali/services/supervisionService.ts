@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export const startSupervisionSession = async (conversationId: string, waliId: string) => {
@@ -8,7 +7,7 @@ export const startSupervisionSession = async (conversationId: string, waliId: st
     console.log('Starting supervision session:', {
       conversation_id: conversationId,
       wali_id: waliId,
-      started_at: new Date().toISOString()
+      started_at: new Date().toISOString(),
     });
 
     return { success: true };
@@ -25,7 +24,7 @@ export const endSupervisionSession = async (conversationId: string, waliId: stri
     console.log('Ending supervision session:', {
       conversation_id: conversationId,
       wali_id: waliId,
-      ended_at: new Date().toISOString()
+      ended_at: new Date().toISOString(),
     });
 
     return { success: true };
@@ -40,7 +39,7 @@ export const getActiveSupervisionSessions = async (waliId: string) => {
     // For now, return empty array since we don't have the table
     // In a real implementation, you'd query the supervision_sessions table
     console.log('Getting active supervision sessions for wali:', waliId);
-    
+
     return [];
   } catch (error: any) {
     console.error('Error getting supervision sessions:', error);

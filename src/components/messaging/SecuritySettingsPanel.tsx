@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Lock } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
@@ -10,10 +9,10 @@ interface SecuritySettingsPanelProps {
 
 const SecuritySettingsPanel: React.FC<SecuritySettingsPanelProps> = ({
   encryptionEnabled,
-  toggleEncryption
+  toggleEncryption,
 }) => {
   if (!encryptionEnabled && !toggleEncryption) return null;
-  
+
   return (
     <div className="bg-muted/30 p-3 border-b">
       <div className="flex items-center justify-between">
@@ -26,10 +25,7 @@ const SecuritySettingsPanel: React.FC<SecuritySettingsPanelProps> = ({
             </p>
           </div>
         </div>
-        <Switch 
-          checked={encryptionEnabled} 
-          onCheckedChange={toggleEncryption}
-        />
+        <Switch checked={encryptionEnabled} onCheckedChange={toggleEncryption} />
       </div>
     </div>
   );

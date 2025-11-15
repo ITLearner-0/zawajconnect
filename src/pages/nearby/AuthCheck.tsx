@@ -1,12 +1,11 @@
-
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/components/ui/use-toast";
-import { useRLSSetup } from "@/hooks/useRLSSetup";
-import CustomButton from "@/components/CustomButton";
-import { Card, CardContent } from "@/components/ui/card";
-import { TestTube, User } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/components/ui/use-toast';
+import { useRLSSetup } from '@/hooks/useRLSSetup';
+import CustomButton from '@/components/CustomButton';
+import { Card, CardContent } from '@/components/ui/card';
+import { TestTube, User } from 'lucide-react';
 
 interface AuthCheckProps {
   children: React.ReactNode;
@@ -22,19 +21,21 @@ const AuthCheck = ({ children }: AuthCheckProps) => {
   useEffect(() => {
     // Check authentication status and compatibility test
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
-      
+
       if (!session) {
         toast({
-          title: "Authentication required",
-          description: "You need to sign in to view matches near you.",
-          variant: "destructive",
+          title: 'Authentication required',
+          description: 'You need to sign in to view matches near you.',
+          variant: 'destructive',
         });
-        navigate("/auth");
+        navigate('/auth');
         return;
       }
-      
+
       // Check if user has taken compatibility test
       const { data, error } = await (supabase as any)
         .from('compatibility_results')
@@ -43,7 +44,7 @@ const AuthCheck = ({ children }: AuthCheckProps) => {
         .limit(1);
 
       if (error) {
-        console.error("Error checking compatibility results:", error);
+        console.error('Error checking compatibility results:', error);
         return;
       }
 
@@ -73,9 +74,7 @@ const AuthCheck = ({ children }: AuthCheckProps) => {
         <p className="text-center max-w-md">
           There was a problem setting up database security. Please contact the administrator.
         </p>
-        <CustomButton onClick={() => navigate("/")}>
-          Return to Home
-        </CustomButton>
+        <CustomButton onClick={() => navigate('/')}>Return to Home</CustomButton>
       </div>
     );
   }
@@ -90,34 +89,36 @@ const AuthCheck = ({ children }: AuthCheckProps) => {
               <div className="flex justify-center">
                 <TestTube className="h-16 w-16 text-rose-600 dark:text-rose-300" />
               </div>
-              
+
               <div>
                 <h2 className="text-xl font-semibold text-rose-800 dark:text-rose-200 mb-2">
                   Compatibility Test Required
                 </h2>
                 <p className="text-rose-600 dark:text-rose-300 text-sm">
-                  To view profiles with compatibility percentages and find meaningful matches, you need to complete the compatibility test first.
+                  To view profiles with compatibility percentages and find meaningful matches, you
+                  need to complete the compatibility test first.
                 </p>
               </div>
 
               <div className="bg-rose-50 dark:bg-rose-900/50 p-4 rounded-lg border border-rose-200 dark:border-rose-700">
                 <p className="text-xs text-rose-700 dark:text-rose-300">
-                  This test helps us match you with people who share similar Islamic values and life goals.
+                  This test helps us match you with people who share similar Islamic values and life
+                  goals.
                 </p>
               </div>
 
               <div className="flex flex-col gap-3">
                 <CustomButton
-                  onClick={() => navigate("/compatibility")}
+                  onClick={() => navigate('/compatibility')}
                   variant="gold"
                   className="w-full flex items-center gap-2"
                 >
                   <TestTube className="h-4 w-4" />
                   Take Compatibility Test
                 </CustomButton>
-                
+
                 <CustomButton
-                  onClick={() => navigate("/profile")}
+                  onClick={() => navigate('/profile')}
                   variant="outline"
                   className="w-full flex items-center gap-2"
                 >

@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -11,7 +17,11 @@ interface SessionRecoveryModalProps {
   onIgnore: () => void;
 }
 
-export const SessionRecoveryModal = ({ isOpen, onRecover, onIgnore }: SessionRecoveryModalProps) => {
+export const SessionRecoveryModal = ({
+  isOpen,
+  onRecover,
+  onIgnore,
+}: SessionRecoveryModalProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [hasBackupData, setHasBackupData] = useState(false);
@@ -22,17 +32,17 @@ export const SessionRecoveryModal = ({ isOpen, onRecover, onIgnore }: SessionRec
       const userEmail = user?.email || 'anonymous';
       const sessionId = localStorage.getItem('onboarding_session_id') || 'unknown';
       const today = new Date().toISOString().split('T')[0];
-      
+
       const backupKeys = [
         `emergency_compatibility_${sessionId}`,
         `emergency_compatibility_${userEmail.replace('@', '_')}`,
         `emergency_compatibility_${today}`,
         `emergency_onboarding_${sessionId}`,
         `emergency_onboarding_${userEmail.replace('@', '_')}`,
-        `emergency_onboarding_${today}`
+        `emergency_onboarding_${today}`,
       ];
-      
-      const hasBackup = backupKeys.some(key => {
+
+      const hasBackup = backupKeys.some((key) => {
         try {
           const backup = localStorage.getItem(key);
           if (backup) {
@@ -44,7 +54,7 @@ export const SessionRecoveryModal = ({ isOpen, onRecover, onIgnore }: SessionRec
         }
         return false;
       });
-      
+
       setHasBackupData(hasBackup);
     }
   }, [isOpen, user]);
@@ -52,9 +62,9 @@ export const SessionRecoveryModal = ({ isOpen, onRecover, onIgnore }: SessionRec
   const handleRecover = () => {
     if (hasBackupData) {
       toast({
-        title: "Données récupérées",
-        description: "Vos réponses précédentes ont été restaurées avec succès.",
-        variant: "default"
+        title: 'Données récupérées',
+        description: 'Vos réponses précédentes ont été restaurées avec succès.',
+        variant: 'default',
       });
     }
     onRecover();
@@ -77,13 +87,11 @@ export const SessionRecoveryModal = ({ isOpen, onRecover, onIgnore }: SessionRec
                 ✅ Bonne nouvelle ! Nous avons automatiquement sauvegardé vos données.
               </p>
             ) : (
-              <p className="text-amber-600">
-                ⚠️ Aucune sauvegarde automatique détectée.
-              </p>
+              <p className="text-amber-600">⚠️ Aucune sauvegarde automatique détectée.</p>
             )}
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="flex flex-col gap-2 mt-4">
           <Button onClick={handleRecover} className="flex items-center gap-2">
             <RefreshCw className="h-4 w-4" />
@@ -93,11 +101,11 @@ export const SessionRecoveryModal = ({ isOpen, onRecover, onIgnore }: SessionRec
             Recommencer à zéro
           </Button>
         </div>
-        
+
         <div className="text-xs text-muted-foreground mt-2">
           <p>
-            Pour éviter ce problème à l'avenir, nous recommandons de remplir le formulaire 
-            par étapes et de sauvegarder régulièrement vos progrès.
+            Pour éviter ce problème à l'avenir, nous recommandons de remplir le formulaire par
+            étapes et de sauvegarder régulièrement vos progrès.
           </p>
         </div>
       </DialogContent>

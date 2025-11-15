@@ -95,6 +95,7 @@ npm run dev
 #### Test de Production
 
 **Prérequis:**
+
 - ✅ HTTPS activé (WebRTC requiert HTTPS ou localhost)
 - ✅ Permissions micro/caméra autorisées par le navigateur
 - ✅ Navigateurs compatibles WebRTC (Chrome, Firefox, Safari, Edge)
@@ -102,6 +103,7 @@ npm run dev
 **Scénarios de Test:**
 
 1. **Test Appel Audio**
+
    ```
    - User A initie appel audio
    - User B reçoit notification
@@ -112,6 +114,7 @@ npm run dev
    ```
 
 2. **Test Appel Vidéo**
+
    ```
    - User A initie appel vidéo
    - User B reçoit notification
@@ -123,6 +126,7 @@ npm run dev
    ```
 
 3. **Test Rejet d'Appel**
+
    ```
    - User A initie appel
    - User B clique "Refuser"
@@ -171,19 +175,23 @@ User A (Caller)                 Supabase Realtime                User B (Receive
 **Canal:** `webrtc:{matchId}`
 
 **Événements Broadcast:**
+
 ```typescript
-call-offer       // SDP offer + type d'appel (audio/video)
-call-answer      // SDP answer
-ice-candidate    // Candidats ICE
-call-end         // Terminer l'appel
-call-reject      // Rejeter l'appel
+call - offer; // SDP offer + type d'appel (audio/video)
+call - answer; // SDP answer
+ice - candidate; // Candidats ICE
+call - end; // Terminer l'appel
+call - reject; // Rejeter l'appel
 ```
 
 **Configuration:**
+
 ```typescript
 {
   config: {
-    broadcast: { self: false } // Ne pas recevoir ses propres messages
+    broadcast: {
+      self: false;
+    } // Ne pas recevoir ses propres messages
   }
 }
 ```
@@ -192,14 +200,14 @@ call-reject      // Rejeter l'appel
 
 ```typescript
 type CallState =
-  | 'idle'        // Pas d'appel actif
-  | 'calling'     // Appel sortant en cours
-  | 'ringing'     // Appel entrant (sonnerie)
-  | 'connecting'  // Connexion en établissement
-  | 'connected'   // Appel actif
-  | 'ended'       // Appel terminé
-  | 'rejected'    // Appel rejeté
-  | 'failed'      // Échec de connexion
+  | 'idle' // Pas d'appel actif
+  | 'calling' // Appel sortant en cours
+  | 'ringing' // Appel entrant (sonnerie)
+  | 'connecting' // Connexion en établissement
+  | 'connected' // Appel actif
+  | 'ended' // Appel terminé
+  | 'rejected' // Appel rejeté
+  | 'failed'; // Échec de connexion
 ```
 
 ---
@@ -208,19 +216,19 @@ type CallState =
 
 ### Nouveaux Fichiers (1,367 lignes de code)
 
-| Fichier | Lignes | Description |
-|---------|--------|-------------|
-| `src/services/webrtc-signaling.ts` | 550+ | Service de signalisation WebRTC complet |
-| `src/hooks/useWebRTCCall.ts` | 300+ | Hook React pour gestion d'appels |
-| `src/components/IncomingCallNotification.tsx` | 200+ | UI notification d'appel entrant |
-| `src/components/ActiveCallWindow.tsx` | 300+ | Interface d'appel actif plein écran |
+| Fichier                                       | Lignes | Description                             |
+| --------------------------------------------- | ------ | --------------------------------------- |
+| `src/services/webrtc-signaling.ts`            | 550+   | Service de signalisation WebRTC complet |
+| `src/hooks/useWebRTCCall.ts`                  | 300+   | Hook React pour gestion d'appels        |
+| `src/components/IncomingCallNotification.tsx` | 200+   | UI notification d'appel entrant         |
+| `src/components/ActiveCallWindow.tsx`         | 300+   | Interface d'appel actif plein écran     |
 
 ### Fichiers Modifiés
 
-| Fichier | Changements |
-|---------|-------------|
+| Fichier                         | Changements                                              |
+| ------------------------------- | -------------------------------------------------------- |
 | `src/components/ChatWindow.tsx` | Intégration WebRTC, remplacement toast par vraie logique |
-| `package.json` | Ajout de framer-motion |
+| `package.json`                  | Ajout de framer-motion                                   |
 
 ---
 
@@ -229,11 +237,13 @@ type CallState =
 ### Problème: Pas de Son/Vidéo
 
 **Causes Possibles:**
+
 1. Permissions micro/caméra refusées
 2. Micro/caméra utilisés par une autre application
 3. Navigateur non compatible WebRTC
 
 **Solutions:**
+
 ```bash
 # Vérifier les permissions dans le navigateur
 chrome://settings/content/camera
@@ -248,11 +258,13 @@ chrome://settings/content/microphone
 ### Problème: Connexion Échoue
 
 **Causes Possibles:**
+
 1. Firewall bloquant WebRTC
 2. NAT strict (besoin de TURN server)
 3. Problèmes réseau
 
 **Solutions:**
+
 ```typescript
 // Ajouter des serveurs TURN (optionnel, pour NAT strict)
 // Dans src/services/webrtc-signaling.ts:
@@ -273,9 +285,11 @@ private rtcConfig: RTCConfiguration = {
 ### Problème: Appel Ne Sonne Pas
 
 **Cause:**
+
 - Notification bloquée ou pas affichée
 
 **Solution:**
+
 ```javascript
 // Vérifier dans la console:
 console.log('Incoming call:', incomingCall);
@@ -291,6 +305,7 @@ console.log('Incoming call:', incomingCall);
 ### Permissions
 
 **getUserMedia() requiert:**
+
 - HTTPS en production (ou localhost en dev)
 - Consentement utilisateur explicite
 - Permissions navigateur pour micro/caméra
@@ -314,10 +329,10 @@ console.log('Incoming call:', incomingCall);
 ### Bande Passante Typique
 
 | Type d'Appel | Montant (upload/download) |
-|--------------|---------------------------|
-| Audio seul | ~50-100 Kbps |
-| Vidéo 480p | ~500 Kbps - 1 Mbps |
-| Vidéo 720p | ~1.5 - 2.5 Mbps |
+| ------------ | ------------------------- |
+| Audio seul   | ~50-100 Kbps              |
+| Vidéo 480p   | ~500 Kbps - 1 Mbps        |
+| Vidéo 720p   | ~1.5 - 2.5 Mbps           |
 
 ### Latence
 
@@ -332,6 +347,7 @@ console.log('Incoming call:', incomingCall);
 ### Améliorations Recommandées
 
 1. **Enregistrement d'Appels** (avec consentement)
+
    ```typescript
    // À implémenter dans ActiveCallWindow
    - MediaRecorder API
@@ -340,6 +356,7 @@ console.log('Incoming call:', incomingCall);
    ```
 
 2. **Historique d'Appels**
+
    ```sql
    -- Table à créer
    CREATE TABLE call_history (
@@ -354,6 +371,7 @@ console.log('Incoming call:', incomingCall);
    ```
 
 3. **Serveurs TURN pour NAT Traversal**
+
    ```bash
    # Si certains utilisateurs ne peuvent pas se connecter
    # Implémenter coturn ou utiliser un service TURN
@@ -363,6 +381,7 @@ console.log('Incoming call:', incomingCall);
    ```
 
 4. **Qualité Adaptative**
+
    ```typescript
    // Ajuster qualité vidéo selon bande passante
    - Détecter stats de connexion
@@ -424,15 +443,18 @@ npm run build
 ## 🎓 Ressources
 
 ### Documentation WebRTC
+
 - [WebRTC Official](https://webrtc.org/)
 - [MDN WebRTC Guide](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API)
 - [Perfect Negotiation Pattern](https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Perfect_negotiation)
 
 ### Supabase Realtime
+
 - [Supabase Realtime Docs](https://supabase.com/docs/guides/realtime)
 - [Broadcast API](https://supabase.com/docs/guides/realtime/broadcast)
 
 ### Framer Motion
+
 - [Framer Motion Docs](https://www.framer.com/motion/)
 
 ---
@@ -440,6 +462,7 @@ npm run build
 ## ✅ Validation Finale
 
 **Ce qui fonctionne maintenant:**
+
 - ✅ Initiation d'appels audio
 - ✅ Initiation d'appels vidéo
 - ✅ Réception d'appels avec notification

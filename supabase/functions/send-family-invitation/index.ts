@@ -1,24 +1,33 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.0';
-import { sendEmail } from "../_shared/smtp.ts";
-import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { sendEmail } from '../_shared/smtp.ts';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 // Input validation schema
 const FamilyInvitationSchema = z.object({
   fullName: z.string().trim().min(2).max(100),
   email: z.string().email().max(255),
-  relationship: z.enum(['father', 'mother', 'brother', 'sister', 'uncle', 'aunt', 'grandfather', 'grandmother', 'guardian']),
-  isWali: z.boolean()
+  relationship: z.enum([
+    'father',
+    'mother',
+    'brother',
+    'sister',
+    'uncle',
+    'aunt',
+    'grandfather',
+    'grandmother',
+    'guardian',
+  ]),
+  isWali: z.boolean(),
 });
 
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
@@ -30,20 +39,23 @@ const handler = async (req: Request): Promise<Response> => {
     // Get user from auth header (JWT verified by Supabase)
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Authentication requise' }),
-        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+      return new Response(JSON.stringify({ error: 'Authentication requise' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
+
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Authentication invalide' }),
-        { status: 401, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+      return new Response(JSON.stringify({ error: 'Authentication invalide' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
     }
 
     // Validate input
@@ -53,10 +65,10 @@ const handler = async (req: Request): Promise<Response> => {
       validatedInput = FamilyInvitationSchema.parse(rawInput);
     } catch (validationError) {
       console.error('Validation error:', validationError);
-      return new Response(
-        JSON.stringify({ error: 'Données invalides' }),
-        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
-      );
+      return new Response(JSON.stringify({ error: 'Données invalides' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
+      });
     }
 
     // Rate limiting: Check recent invitations (max 5 per day)
@@ -70,35 +82,37 @@ const handler = async (req: Request): Promise<Response> => {
       console.error('Rate limit check failed:', rateLimitError);
       return new Response(
         JSON.stringify({ error: 'Une erreur est survenue. Veuillez réessayer.' }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
     if (recentInvitations && recentInvitations.length >= 5) {
       console.warn(`Rate limit exceeded for user ${user.id}`);
       return new Response(
-        JSON.stringify({ error: 'Limite d\'invitations atteinte. Maximum 5 invitations par jour.' }),
-        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        JSON.stringify({ error: "Limite d'invitations atteinte. Maximum 5 invitations par jour." }),
+        { status: 429, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
     const { fullName, email, relationship, isWali } = validatedInput;
 
     // Create family invitation
-    const { data: invitationToken, error: invitationError } = await supabase
-      .rpc('create_family_invitation', {
+    const { data: invitationToken, error: invitationError } = await supabase.rpc(
+      'create_family_invitation',
+      {
         p_user_id: user.id,
         p_full_name: fullName,
         p_email: email,
         p_relationship: relationship,
-        p_is_wali: isWali
-      });
-    
+        p_is_wali: isWali,
+      }
+    );
+
     if (invitationError) {
       console.error('Failed to create invitation:', invitationError);
       return new Response(
-        JSON.stringify({ error: 'Impossible de créer l\'invitation. Veuillez réessayer.' }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        JSON.stringify({ error: "Impossible de créer l'invitation. Veuillez réessayer." }),
+        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
 
@@ -110,18 +124,23 @@ const handler = async (req: Request): Promise<Response> => {
       .single();
 
     const inviterName = profile?.full_name || 'Un membre de famille';
-    
+
     // Construct invitation URL dynamically
-    const baseUrl = req.headers.get('origin') || req.headers.get('referer')?.split('/')[0] + '//' + req.headers.get('referer')?.split('/')[2] || 'https://preview--deen-dates-platform.lovable.app';
+    const baseUrl =
+      req.headers.get('origin') ||
+      req.headers.get('referer')?.split('/')[0] +
+        '//' +
+        req.headers.get('referer')?.split('/')[2] ||
+      'https://preview--deen-dates-platform.lovable.app';
     const invitationUrl = `${baseUrl}/invitation-accept?token=${invitationToken}`;
-    
+
     console.log('Sending invitation (token redacted)');
 
     // Send invitation email
     try {
       await sendEmail({
         to: email,
-        subject: "🕌 Invitation Wali - Zawaj-Connect",
+        subject: '🕌 Invitation Wali - Zawaj-Connect',
         html: `<!DOCTYPE html>
 <html>
 <head>
@@ -213,48 +232,48 @@ ${isWali ? '<li>✅ <strong>Approuver les matches</strong> - Pouvoir de décisio
     } catch (emailError) {
       console.error('Email sending failed:', emailError);
       return new Response(
-        JSON.stringify({ error: 'Erreur lors de l\'envoi de l\'email. Veuillez réessayer.' }),
-        { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
+        JSON.stringify({ error: "Erreur lors de l'envoi de l'email. Veuillez réessayer." }),
+        { status: 500, headers: { 'Content-Type': 'application/json', ...corsHeaders } }
       );
     }
-    
+
     function getRelationshipLabel(relationship: string): string {
       const labels: Record<string, string> = {
-        'father': 'Père',
-        'mother': 'Mère', 
-        'brother': 'Frère',
-        'sister': 'Sœur',
-        'uncle': 'Oncle',
-        'aunt': 'Tante',
-        'grandfather': 'Grand-père',
-        'grandmother': 'Grand-mère',
-        'guardian': 'Tuteur légal'
+        father: 'Père',
+        mother: 'Mère',
+        brother: 'Frère',
+        sister: 'Sœur',
+        uncle: 'Oncle',
+        aunt: 'Tante',
+        grandfather: 'Grand-père',
+        grandmother: 'Grand-mère',
+        guardian: 'Tuteur légal',
       };
       return labels[relationship] || relationship;
     }
 
-    console.log("Invitation sent successfully");
+    console.log('Invitation sent successfully');
 
-    return new Response(JSON.stringify({ 
-      success: true, 
-      invitationToken,
-      message: "Invitation envoyée avec succès" 
-    }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
-    });
-  } catch (error: any) {
-    console.error("Error in send-family-invitation function:", error);
     return new Response(
-      JSON.stringify({ error: 'Une erreur est survenue. Veuillez réessayer.' }),
+      JSON.stringify({
+        success: true,
+        invitationToken,
+        message: 'Invitation envoyée avec succès',
+      }),
       {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders,
+        },
       }
     );
+  } catch (error: any) {
+    console.error('Error in send-family-invitation function:', error);
+    return new Response(JSON.stringify({ error: 'Une erreur est survenue. Veuillez réessayer.' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
   }
 };
 

@@ -44,7 +44,7 @@ const WeeklyChallenges: React.FC = () => {
     const endDate = new Date(end);
     return {
       start: startDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
-      end: endDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
+      end: endDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
     };
   };
 
@@ -65,7 +65,7 @@ const WeeklyChallenges: React.FC = () => {
       <CardContent className="space-y-4">
         {challenges.map((challenge) => {
           const progress = userProgress.get(challenge.id);
-          const progressPercentage = progress 
+          const progressPercentage = progress
             ? Math.min((progress.current_progress / challenge.target_value) * 100, 100)
             : 0;
           const isCompleted = progress?.completed || false;
@@ -75,26 +75,19 @@ const WeeklyChallenges: React.FC = () => {
             <div
               key={challenge.id}
               className={`p-4 rounded-lg border-2 transition-all ${
-                isCompleted
-                  ? 'bg-emerald-50 border-emerald-300'
-                  : 'bg-background border-border'
+                isCompleted ? 'bg-emerald-50 border-emerald-300' : 'bg-background border-border'
               }`}
             >
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-semibold text-sm">{challenge.title}</h4>
-                    {isCompleted && (
-                      <CheckCircle className="h-4 w-4 text-emerald-600" />
-                    )}
+                    {isCompleted && <CheckCircle className="h-4 w-4 text-emerald-600" />}
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {challenge.description}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{challenge.description}</p>
                 </div>
                 <Badge variant="secondary" className="flex items-center gap-1 flex-shrink-0">
-                  <Trophy className="h-3 w-3" />
-                  +{challenge.xp_reward} XP
+                  <Trophy className="h-3 w-3" />+{challenge.xp_reward} XP
                 </Badge>
               </div>
 

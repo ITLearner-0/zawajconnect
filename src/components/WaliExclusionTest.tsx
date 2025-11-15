@@ -51,10 +51,10 @@ const WaliExclusionTest: React.FC = () => {
         .eq('invitation_status', 'accepted')
         .not('invited_user_id', 'is', null);
 
-      const waliUserIds = waliUsers?.map(w => w.invited_user_id).filter(Boolean) || [];
+      const waliUserIds = waliUsers?.map((w) => w.invited_user_id).filter(Boolean) || [];
 
       // Test 3: Check how many of the profiles are Walis
-      const walisInProfiles = allProfiles?.filter(p => waliUserIds.includes(p.user_id)) || [];
+      const walisInProfiles = allProfiles?.filter((p) => waliUserIds.includes(p.user_id)) || [];
 
       // Test 4: Get filtered profiles (excluding Walis)
       let filteredQuery = supabase
@@ -74,37 +74,38 @@ const WaliExclusionTest: React.FC = () => {
         totalProfiles: allProfiles?.length || 0,
         walisFound: walisInProfiles.length,
         walisExcluded: walisInProfiles.length,
-        success: walisInProfiles.length === 0 || filteredProfiles?.length === (allProfiles?.length || 0) - walisInProfiles.length,
+        success:
+          walisInProfiles.length === 0 ||
+          filteredProfiles?.length === (allProfiles?.length || 0) - walisInProfiles.length,
         details: [
           `${allProfiles?.length || 0} profils ${oppositeGender}s trouvés au total`,
           `${walisInProfiles.length} Walis identifiés parmi ces profils`,
           `${filteredProfiles?.length || 0} profils dans les résultats filtrés`,
-          `Exclusion ${walisInProfiles.length === 0 || filteredProfiles?.length === (allProfiles?.length || 0) - walisInProfiles.length ? 'réussie' : 'échouée'}`
-        ]
+          `Exclusion ${walisInProfiles.length === 0 || filteredProfiles?.length === (allProfiles?.length || 0) - walisInProfiles.length ? 'réussie' : 'échouée'}`,
+        ],
       };
 
       setTestResult(result);
 
       if (result.success) {
         toast({
-          title: "✅ Test réussi !",
+          title: '✅ Test réussi !',
           description: `Les Walis sont correctement exclus du matching (${result.walisExcluded} exclus)`,
         });
       } else {
         toast({
-          title: "❌ Test échoué",
-          description: "Des Walis apparaissent encore dans les résultats de matching",
-          variant: "destructive",
+          title: '❌ Test échoué',
+          description: 'Des Walis apparaissent encore dans les résultats de matching',
+          variant: 'destructive',
         });
       }
-
     } catch (error: unknown) {
       console.error('Test Wali exclusion error:', error);
       const errorMessage = error instanceof Error ? error.message : "Impossible d'exécuter le test";
       toast({
-        title: "❌ Erreur de test",
+        title: '❌ Erreur de test',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -127,13 +128,14 @@ const WaliExclusionTest: React.FC = () => {
               <div>
                 <p className="text-sm font-medium text-amber-dark">Test de validation</p>
                 <p className="text-sm text-amber-dark/70">
-                  Vérifie que les Walis (tuteurs/superviseurs) n'apparaissent pas comme candidats dans le système de matching.
+                  Vérifie que les Walis (tuteurs/superviseurs) n'apparaissent pas comme candidats
+                  dans le système de matching.
                 </p>
               </div>
             </div>
           </div>
 
-          <Button 
+          <Button
             onClick={runWaliExclusionTest}
             disabled={loading}
             className="w-full bg-emerald hover:bg-emerald-dark"
@@ -152,11 +154,13 @@ const WaliExclusionTest: React.FC = () => {
           </Button>
 
           {testResult && (
-            <div className={`p-4 rounded-lg border ${
-              testResult.success 
-                ? 'bg-green-50 border-green-200 text-green-700'
-                : 'bg-red-50 border-red-200 text-red-700'
-            }`}>
+            <div
+              className={`p-4 rounded-lg border ${
+                testResult.success
+                  ? 'bg-green-50 border-green-200 text-green-700'
+                  : 'bg-red-50 border-red-200 text-red-700'
+              }`}
+            >
               <div className="flex items-center gap-2 mb-3">
                 {testResult.success ? (
                   <>
@@ -170,7 +174,7 @@ const WaliExclusionTest: React.FC = () => {
                   </>
                 )}
               </div>
-              
+
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
@@ -182,7 +186,7 @@ const WaliExclusionTest: React.FC = () => {
                     <span className="ml-2">{testResult.walisFound}</span>
                   </div>
                 </div>
-                
+
                 <div className="mt-3">
                   <p className="text-sm font-medium mb-2">Détails du test:</p>
                   <ul className="text-xs space-y-1">
@@ -199,7 +203,9 @@ const WaliExclusionTest: React.FC = () => {
           )}
 
           <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
-            <p><strong>Corrections appliquées :</strong></p>
+            <p>
+              <strong>Corrections appliquées :</strong>
+            </p>
             <ul className="mt-1 space-y-1">
               <li>✅ Browse.tsx - Exclusion des Walis dans fetchProfiles</li>
               <li>✅ AdvancedMatchingEngine.tsx - Exclusion des Walis</li>

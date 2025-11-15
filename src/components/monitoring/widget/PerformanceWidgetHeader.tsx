@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,18 +20,13 @@ const PerformanceWidgetHeader: React.FC<PerformanceWidgetHeaderProps> = ({
       <CardTitle className="text-sm flex items-center gap-2">
         <Gauge className="h-4 w-4" />
         Performance
-        <Badge variant={isTracking ? "default" : "secondary"} className="text-xs">
+        <Badge variant={isTracking ? 'default' : 'secondary'} className="text-xs">
           {isTracking ? 'ON' : 'OFF'}
         </Badge>
       </CardTitle>
-      
+
       <div className="flex gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggleExpand}
-          className="h-6 w-6 p-0"
-        >
+        <Button variant="ghost" size="sm" onClick={onToggleExpand} className="h-6 w-6 p-0">
           {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
         </Button>
       </div>

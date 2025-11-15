@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { RetentionPolicy } from '@/types/profile';
 import { columnExists, executeSql } from '@/utils/database';
@@ -7,7 +6,7 @@ import { columnExists, executeSql } from '@/utils/database';
  * Sets the retention policy for a conversation
  */
 export const setRetentionPolicy = async (
-  conversationId: string, 
+  conversationId: string,
   policy: RetentionPolicy
 ): Promise<boolean> => {
   try {
@@ -16,33 +15,33 @@ export const setRetentionPolicy = async (
       console.log(`Setting retention policy for demo conversation ${conversationId}:`, policy);
       return true;
     }
-    
+
     // Check if the column exists
     const hasColumn = await columnExists('conversations', 'retention_policy');
-    
+
     if (!hasColumn) {
       console.log("Retention policy column doesn't exist, cannot update");
       return false;
     }
-    
+
     // Safe SQL execution
     const result = await executeSql(`
       UPDATE conversations 
       SET retention_policy = '${JSON.stringify(policy)}'::jsonb 
       WHERE id = '${conversationId}'
     `);
-    
+
     if (!result) {
-      console.error("Error updating retention policy");
+      console.error('Error updating retention policy');
       return false;
     }
-    
+
     // If auto-delete is enabled, schedule message deletion
     if (policy.auto_delete && policy.type === 'temporary' && policy.duration_days) {
       // Schedule messages for deletion
       await scheduleMessageDeletion(conversationId, policy.duration_days);
     }
-    
+
     return true;
   } catch (err) {
     console.error('Error setting retention policy:', err);
@@ -54,28 +53,30 @@ export const setRetentionPolicy = async (
  * Schedules messages for deletion after the specified number of days
  */
 const scheduleMessageDeletion = async (
-  conversationId: string, 
+  conversationId: string,
   durationDays: number
 ): Promise<boolean> => {
   try {
     // For demo conversations, just return success
     if (conversationId.startsWith('user-') || conversationId.startsWith('conv-')) {
-      console.log(`Scheduling message deletion for demo conversation ${conversationId} after ${durationDays} days`);
+      console.log(
+        `Scheduling message deletion for demo conversation ${conversationId} after ${durationDays} days`
+      );
       return true;
     }
-    
+
     // Check if scheduled_deletion column exists
     const hasColumn = await columnExists('messages', 'scheduled_deletion');
-    
+
     if (!hasColumn) {
       console.log("Scheduled deletion column doesn't exist, cannot schedule");
       return false;
     }
-    
+
     // Calculate deletion date
     const deletionDate = new Date();
     deletionDate.setDate(deletionDate.getDate() + durationDays);
-    
+
     // Update messages with scheduled deletion date
     const result = await executeSql(`
       UPDATE messages 
@@ -83,12 +84,12 @@ const scheduleMessageDeletion = async (
       WHERE conversation_id = '${conversationId}'
       AND (scheduled_deletion IS NULL OR scheduled_deletion > '${deletionDate.toISOString()}')
     `);
-    
+
     if (!result) {
-      console.error("Error scheduling message deletion");
+      console.error('Error scheduling message deletion');
       return false;
     }
-    
+
     return true;
   } catch (err) {
     console.error('Error scheduling message deletion:', err);
@@ -103,23 +104,23 @@ export const deleteExpiredMessages = async (): Promise<boolean> => {
   try {
     // Check if scheduled_deletion column exists
     const hasColumn = await columnExists('messages', 'scheduled_deletion');
-    
+
     if (!hasColumn) {
       return false;
     }
-    
+
     // Delete expired messages
     const result = await executeSql(`
       DELETE FROM messages
       WHERE scheduled_deletion IS NOT NULL
       AND scheduled_deletion < NOW()
     `);
-    
+
     if (!result) {
-      console.error("Error deleting expired messages");
+      console.error('Error deleting expired messages');
       return false;
     }
-    
+
     return true;
   } catch (err) {
     console.error('Error deleting expired messages:', err);
@@ -137,17 +138,17 @@ export const deleteAllMessages = async (conversationId: string): Promise<boolean
       console.log(`Deleting all messages for demo conversation ${conversationId}`);
       return true;
     }
-    
+
     const result = await executeSql(`
       DELETE FROM messages
       WHERE conversation_id = '${conversationId}'
     `);
-    
+
     if (!result) {
-      console.error("Error deleting all messages");
+      console.error('Error deleting all messages');
       return false;
     }
-    
+
     return true;
   } catch (err) {
     console.error('Error deleting all messages:', err);

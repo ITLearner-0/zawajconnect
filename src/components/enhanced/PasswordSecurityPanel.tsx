@@ -35,7 +35,7 @@ export const PasswordSecurityPanel = () => {
       uppercase: /[A-Z]/.test(password),
       lowercase: /[a-z]/.test(password),
       numbers: /\d/.test(password),
-      symbols: /[^A-Za-z0-9]/.test(password)
+      symbols: /[^A-Za-z0-9]/.test(password),
     };
 
     const feedback: string[] = [];
@@ -89,27 +89,27 @@ export const PasswordSecurityPanel = () => {
   const handlePasswordUpdate = async () => {
     if (!newPassword || !currentPassword) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in both current and new passwords.",
-        variant: "destructive",
+        title: 'Missing Information',
+        description: 'Please fill in both current and new passwords.',
+        variant: 'destructive',
       });
       return;
     }
 
     if (newPassword !== confirmPassword) {
       toast({
-        title: "Password Mismatch",
+        title: 'Password Mismatch',
         description: "New password and confirmation don't match.",
-        variant: "destructive",
+        variant: 'destructive',
       });
       return;
     }
 
     if (!strength || strength.score < 70) {
       toast({
-        title: "Password Too Weak",
-        description: "Please create a stronger password following the requirements.",
-        variant: "destructive",
+        title: 'Password Too Weak',
+        description: 'Please create a stronger password following the requirements.',
+        variant: 'destructive',
       });
       return;
     }
@@ -117,14 +117,14 @@ export const PasswordSecurityPanel = () => {
     setLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({
-        password: newPassword
+        password: newPassword,
       });
 
       if (error) throw error;
 
       toast({
-        title: "Password Updated",
-        description: "Your password has been successfully updated.",
+        title: 'Password Updated',
+        description: 'Your password has been successfully updated.',
       });
 
       // Clear form
@@ -133,11 +133,12 @@ export const PasswordSecurityPanel = () => {
       setConfirmPassword('');
       setStrength(null);
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to update password. Please try again.";
+      const errorMessage =
+        error instanceof Error ? error.message : 'Failed to update password. Please try again.';
       toast({
-        title: "Update Failed",
+        title: 'Update Failed',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -174,8 +175,9 @@ export const PasswordSecurityPanel = () => {
           <Alert>
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>
-              <strong>Important:</strong> Leaked password protection is currently disabled in your Supabase project. 
-              Please enable it in the Supabase dashboard under Authentication → Settings → Password Protection.
+              <strong>Important:</strong> Leaked password protection is currently disabled in your
+              Supabase project. Please enable it in the Supabase dashboard under Authentication →
+              Settings → Password Protection.
             </AlertDescription>
           </Alert>
 
@@ -214,11 +216,7 @@ export const PasswordSecurityPanel = () => {
                   className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 p-0"
                   onClick={() => setShowPasswords(!showPasswords)}
                 >
-                  {showPasswords ? (
-                    <EyeOff className="h-4 w-4" />
-                  ) : (
-                    <Eye className="h-4 w-4" />
-                  )}
+                  {showPasswords ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
@@ -232,7 +230,7 @@ export const PasswordSecurityPanel = () => {
                   </span>
                 </div>
                 <Progress value={strength.score} className="h-2" />
-                
+
                 <div className="grid grid-cols-2 gap-2 mt-3">
                   {Object.entries(strength.requirements).map(([key, met]) => (
                     <div key={key} className="flex items-center gap-2 text-sm">
@@ -278,7 +276,7 @@ export const PasswordSecurityPanel = () => {
               />
             </div>
 
-            <Button 
+            <Button
               onClick={handlePasswordUpdate}
               disabled={loading || !strength || strength.score < 70}
               className="w-full"
@@ -306,7 +304,9 @@ export const PasswordSecurityPanel = () => {
               <Shield className="w-4 h-4 mt-0.5 text-blue-500" />
               <div>
                 <p className="font-medium">Enable two-factor authentication</p>
-                <p className="text-muted-foreground">Add an extra layer of security to your account</p>
+                <p className="text-muted-foreground">
+                  Add an extra layer of security to your account
+                </p>
               </div>
             </div>
             <div className="flex items-start gap-2">

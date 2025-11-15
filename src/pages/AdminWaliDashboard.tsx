@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Shield, RefreshCw, Clock, CheckCircle, XCircle, AlertTriangle, TrendingUp, Users } from 'lucide-react';
+import {
+  Shield,
+  RefreshCw,
+  Clock,
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useAuth } from '@/contexts/AuthContext';
@@ -34,7 +43,7 @@ const AdminWaliDashboard = () => {
       '7days': '7 derniers jours',
       '30days': '30 derniers jours',
       '90days': '90 derniers jours',
-      'custom': 'Période personnalisée',
+      custom: 'Période personnalisée',
     };
     return labels[period];
   };
@@ -77,9 +86,7 @@ const AdminWaliDashboard = () => {
       <Card>
         <CardHeader>
           <CardTitle>Vue d'ensemble - {getPeriodLabel()}</CardTitle>
-          <CardDescription>
-            Comparaison avec la période précédente
-          </CardDescription>
+          <CardDescription>Comparaison avec la période précédente</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -106,7 +113,7 @@ const AdminWaliDashboard = () => {
                 changeLabel="vs période précédente"
                 trend={getTrend(kpis.comparison.registrations_change)}
               />
-              
+
               <KPICard
                 title="Taux d'Approbation"
                 value={kpis.current.approval_rate}
@@ -116,7 +123,7 @@ const AdminWaliDashboard = () => {
                 changeLabel="vs période précédente"
                 trend={getTrend(kpis.comparison.approval_rate_change)}
               />
-              
+
               <KPICard
                 title="Temps Moyen de Traitement"
                 value={kpis.current.avg_processing_time_hours.toFixed(1)}
@@ -127,7 +134,7 @@ const AdminWaliDashboard = () => {
                 trend={getTrend(kpis.comparison.processing_time_change)}
                 invertColors
               />
-              
+
               <KPICard
                 title="Alertes par Jour"
                 value={kpis.current.alerts_per_day?.toFixed(1) || 0}
@@ -143,34 +150,49 @@ const AdminWaliDashboard = () => {
                 value={kpis.current.approved_count}
                 subtitle={`${kpis.previous.approved_count} période précédente`}
                 icon={CheckCircle}
-                trend={kpis.current.approved_count > kpis.previous.approved_count ? 'up' : 
-                       kpis.current.approved_count < kpis.previous.approved_count ? 'down' : 'neutral'}
+                trend={
+                  kpis.current.approved_count > kpis.previous.approved_count
+                    ? 'up'
+                    : kpis.current.approved_count < kpis.previous.approved_count
+                      ? 'down'
+                      : 'neutral'
+                }
               />
-              
+
               <KPICard
                 title="Inscriptions Rejetées"
                 value={kpis.current.rejected_count}
                 subtitle={`${kpis.previous.rejected_count} période précédente`}
                 icon={XCircle}
-                trend={kpis.current.rejected_count > kpis.previous.rejected_count ? 'up' : 
-                       kpis.current.rejected_count < kpis.previous.rejected_count ? 'down' : 'neutral'}
+                trend={
+                  kpis.current.rejected_count > kpis.previous.rejected_count
+                    ? 'up'
+                    : kpis.current.rejected_count < kpis.previous.rejected_count
+                      ? 'down'
+                      : 'neutral'
+                }
                 invertColors
               />
-              
+
               <KPICard
                 title="En Attente"
                 value={kpis.current.pending_count || 0}
                 subtitle="Inscriptions à traiter"
                 icon={Clock}
               />
-              
+
               <KPICard
                 title="Alertes Critiques"
                 value={kpis.current.critical_alerts}
                 subtitle={`${kpis.current.total_alerts} alertes totales`}
                 icon={AlertTriangle}
-                trend={kpis.current.critical_alerts > kpis.previous.critical_alerts ? 'up' : 
-                       kpis.current.critical_alerts < kpis.previous.critical_alerts ? 'down' : 'neutral'}
+                trend={
+                  kpis.current.critical_alerts > kpis.previous.critical_alerts
+                    ? 'up'
+                    : kpis.current.critical_alerts < kpis.previous.critical_alerts
+                      ? 'down'
+                      : 'neutral'
+                }
                 invertColors
               />
             </div>
@@ -194,24 +216,23 @@ const AdminWaliDashboard = () => {
                 <div>
                   <p className="font-medium">Performance de Traitement</p>
                   <p className="text-sm text-muted-foreground">
-                    {kpis.comparison.processing_time_change < 0 
+                    {kpis.comparison.processing_time_change < 0
                       ? `Le temps de traitement s'est amélioré de ${Math.abs(kpis.comparison.processing_time_change).toFixed(1)}%`
                       : kpis.comparison.processing_time_change > 0
-                      ? `Le temps de traitement a augmenté de ${kpis.comparison.processing_time_change.toFixed(1)}%`
-                      : 'Le temps de traitement est stable'}
+                        ? `Le temps de traitement a augmenté de ${kpis.comparison.processing_time_change.toFixed(1)}%`
+                        : 'Le temps de traitement est stable'}
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex items-start gap-3">
                 <CheckCircle className="w-5 h-5 text-blue-600 mt-0.5" />
                 <div>
                   <p className="font-medium">Taux d'Approbation</p>
                   <p className="text-sm text-muted-foreground">
                     {kpis.current.approval_rate.toFixed(1)}% des inscriptions sont approuvées
-                    {kpis.comparison.approval_rate_change !== 0 && 
-                      ` (${kpis.comparison.approval_rate_change > 0 ? '+' : ''}${kpis.comparison.approval_rate_change.toFixed(1)}%)`
-                    }
+                    {kpis.comparison.approval_rate_change !== 0 &&
+                      ` (${kpis.comparison.approval_rate_change > 0 ? '+' : ''}${kpis.comparison.approval_rate_change.toFixed(1)}%)`}
                   </p>
                 </div>
               </div>
@@ -221,8 +242,9 @@ const AdminWaliDashboard = () => {
                 <div>
                   <p className="font-medium">Alertes de Sécurité</p>
                   <p className="text-sm text-muted-foreground">
-                    {kpis.current.total_alerts} alertes détectées 
-                    {kpis.current.critical_alerts > 0 && ` dont ${kpis.current.critical_alerts} critiques`}
+                    {kpis.current.total_alerts} alertes détectées
+                    {kpis.current.critical_alerts > 0 &&
+                      ` dont ${kpis.current.critical_alerts} critiques`}
                   </p>
                 </div>
               </div>
@@ -245,11 +267,15 @@ const AdminWaliDashboard = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Approuvées</span>
-                  <span className="text-sm font-bold text-green-600">{kpis.current.approved_count}</span>
+                  <span className="text-sm font-bold text-green-600">
+                    {kpis.current.approved_count}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Rejetées</span>
-                  <span className="text-sm font-bold text-red-600">{kpis.current.rejected_count}</span>
+                  <span className="text-sm font-bold text-red-600">
+                    {kpis.current.rejected_count}
+                  </span>
                 </div>
               </div>
 
@@ -264,11 +290,15 @@ const AdminWaliDashboard = () => {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Approuvées</span>
-                  <span className="text-sm font-bold text-green-600">{kpis.previous.approved_count}</span>
+                  <span className="text-sm font-bold text-green-600">
+                    {kpis.previous.approved_count}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Rejetées</span>
-                  <span className="text-sm font-bold text-red-600">{kpis.previous.rejected_count}</span>
+                  <span className="text-sm font-bold text-red-600">
+                    {kpis.previous.rejected_count}
+                  </span>
                 </div>
               </div>
             </CardContent>

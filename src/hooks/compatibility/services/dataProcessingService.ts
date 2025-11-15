@@ -1,8 +1,7 @@
-
-import { UserResultWithProfile } from "../types/matchingTypes";
-import { ValidatedOtherUser } from "./userResultsService";
-import { ValidatedProfileData } from "./profileService";
-import { logWarning, logError, logInfo } from "./loggingService";
+import { UserResultWithProfile } from '../types/matchingTypes';
+import { ValidatedOtherUser } from './userResultsService';
+import { ValidatedProfileData } from './profileService';
+import { logWarning, logError, logInfo } from './loggingService';
 
 export function combineUserDataWithProfiles(
   otherUsers: ValidatedOtherUser[],
@@ -12,14 +11,14 @@ export function combineUserDataWithProfiles(
 
   try {
     const usersWithProfiles = otherUsers
-      .map(user => {
+      .map((user) => {
         try {
-          const profile = profiles.find(p => p.id === user.user_id);
+          const profile = profiles.find((p) => p.id === user.user_id);
           if (!profile) {
             logWarning('combineUserData', `No profile found for user: ${user.user_id}`);
             return null;
           }
-          
+
           return {
             user_id: user.user_id,
             answers: user.answers,
@@ -35,8 +34,8 @@ export function combineUserDataWithProfiles(
               email_verified: profile.email_verified,
               phone_verified: profile.phone_verified,
               id_verified: profile.id_verified,
-              is_visible: profile.is_visible
-            }
+              is_visible: profile.is_visible,
+            },
           };
         } catch (error) {
           logError('combineUserData', error as Error, { userId: user.user_id });

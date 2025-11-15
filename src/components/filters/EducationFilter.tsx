@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
@@ -14,12 +13,12 @@ const EducationFilter: React.FC<EducationFilterProps> = ({ value = [], onChange 
     { key: 'bachelors', label: 'Licence' },
     { key: 'masters', label: 'Master' },
     { key: 'phd', label: 'Doctorat' },
-    { key: 'other', label: 'Autre' }
+    { key: 'other', label: 'Autre' },
   ];
 
   const toggleEducation = (education: string) => {
     const newValue = value.includes(education)
-      ? value.filter(e => e !== education)
+      ? value.filter((e) => e !== education)
       : [...value, education];
     onChange(newValue);
   };
@@ -28,10 +27,10 @@ const EducationFilter: React.FC<EducationFilterProps> = ({ value = [], onChange 
     <div className="space-y-3">
       <Label className="text-sm font-medium">Éducation</Label>
       <div className="flex flex-wrap gap-2">
-        {educationLevels.map(education => (
+        {educationLevels.map((education) => (
           <Badge
             key={education.key}
-            variant={value.includes(education.key) ? "default" : "outline"}
+            variant={value.includes(education.key) ? 'default' : 'outline'}
             className="cursor-pointer"
             onClick={() => toggleEducation(education.key)}
           >

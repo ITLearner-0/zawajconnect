@@ -1,4 +1,3 @@
-
 import { EmergencyStats, EmergencyReport } from '@/types/analytics';
 
 /**
@@ -19,7 +18,7 @@ export const getEmergencyStats = async (
         emergency_type: 'immediate_threat',
         created_at: new Date().toISOString(),
         status: 'pending',
-        priority: 'high'
+        priority: 'high',
       },
       {
         id: '2',
@@ -29,7 +28,7 @@ export const getEmergencyStats = async (
         emergency_type: 'harassment',
         created_at: new Date(Date.now() - 8600000).toISOString(),
         status: 'pending',
-        priority: 'medium'
+        priority: 'medium',
       },
       {
         id: '3',
@@ -43,16 +42,16 @@ export const getEmergencyStats = async (
         resolved_by: 'admin-1',
         resolved_at: new Date(Date.now() - 86400000).toISOString(),
         resolution_notes: 'False alarm',
-        action_taken: 'no_action'
-      }
+        action_taken: 'no_action',
+      },
     ];
-    
+
     return {
       totalReports: 35,
       pendingReports: 12,
       resolvedReports: 23,
       pendingHighPriority: 3,
-      recentReports: mockReports
+      recentReports: mockReports,
     };
   } catch (err) {
     console.error('Error getting emergency stats:', err);
@@ -61,7 +60,7 @@ export const getEmergencyStats = async (
       pendingReports: 0,
       resolvedReports: 0,
       pendingHighPriority: 0,
-      recentReports: []
+      recentReports: [],
     };
   }
 };

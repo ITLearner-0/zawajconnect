@@ -1,13 +1,13 @@
-import Hero from "@/components/Hero";
-import IslamicValues from "@/components/IslamicValues";
-import ProcessSection from "@/components/ProcessSection";
-import CompatibilitySection from "@/components/CompatibilitySection";
-import PrayerTimes from "@/components/PrayerTimes";
-import QiblaDirection from "@/components/QiblaDirection";
-import IslamicCalendar from "@/components/IslamicCalendar";
-import IslamicReminders from "@/components/IslamicReminders";
-import ContactSection from "@/components/ContactSection";
-import Footer from "@/components/Footer";
+import Hero from '@/components/Hero';
+import IslamicValues from '@/components/IslamicValues';
+import ProcessSection from '@/components/ProcessSection';
+import CompatibilitySection from '@/components/CompatibilitySection';
+import PrayerTimes from '@/components/PrayerTimes';
+import QiblaDirection from '@/components/QiblaDirection';
+import IslamicCalendar from '@/components/IslamicCalendar';
+import IslamicReminders from '@/components/IslamicReminders';
+import ContactSection from '@/components/ContactSection';
+import Footer from '@/components/Footer';
 
 const Index = () => {
   return (

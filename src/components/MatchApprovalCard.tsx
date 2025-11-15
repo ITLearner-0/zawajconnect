@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
+import {
   Heart,
   User,
   MapPin,
@@ -12,7 +12,7 @@ import {
   MessageSquare,
   CheckCircle,
   XCircle,
-  Shield
+  Shield,
 } from 'lucide-react';
 import { MatchApprovalData } from '@/types/match-approval';
 
@@ -22,11 +22,7 @@ interface MatchApprovalCardProps {
   onReject: (match: MatchApprovalData) => void;
 }
 
-const MatchApprovalCard: React.FC<MatchApprovalCardProps> = ({
-  match,
-  onApprove,
-  onReject
-}) => {
+const MatchApprovalCard: React.FC<MatchApprovalCardProps> = ({ match, onApprove, onReject }) => {
   const getCompatibilityColor = (score: number) => {
     if (score >= 80) return 'text-success';
     if (score >= 60) return 'text-warning';
@@ -154,18 +150,11 @@ const MatchApprovalCard: React.FC<MatchApprovalCardProps> = ({
 
         {/* Actions */}
         <div className="flex gap-3 pt-4 border-t">
-          <Button
-            variant="outline"
-            onClick={() => onReject(match)}
-            className="flex-1"
-          >
+          <Button variant="outline" onClick={() => onReject(match)} className="flex-1">
             <XCircle className="h-4 w-4 mr-2" />
             Refuser le Match
           </Button>
-          <Button
-            onClick={() => onApprove(match)}
-            className="flex-1"
-          >
+          <Button onClick={() => onApprove(match)} className="flex-1">
             <CheckCircle className="h-4 w-4 mr-2" />
             Approuver le Match
           </Button>

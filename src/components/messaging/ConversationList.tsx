@@ -1,12 +1,11 @@
-
-import { useState } from "react";
-import { Conversation } from "@/types/profile";
-import { formatDistanceToNow } from "date-fns";
-import { Search, Loader } from "lucide-react";
-import { Input } from "../ui/input";
-import { Skeleton } from "../ui/skeleton";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { dummyProfiles } from "@/data/dummyData";
+import { useState } from 'react';
+import { Conversation } from '@/types/profile';
+import { formatDistanceToNow } from 'date-fns';
+import { Search, Loader } from 'lucide-react';
+import { Input } from '../ui/input';
+import { Skeleton } from '../ui/skeleton';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { dummyProfiles } from '@/data/dummyData';
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -16,28 +15,29 @@ interface ConversationListProps {
   error?: string | null;
 }
 
-const ConversationList = ({ 
-  conversations, 
+const ConversationList = ({
+  conversations,
   onSelectConversation,
   selectedConversationId,
   loading = false,
-  error = null
+  error = null,
 }: ConversationListProps) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  
-  const filteredConversations = conversations.filter(conv => {
-    const fullName = `${conv.profile?.first_name || ''} ${conv.profile?.last_name || ''}`.toLowerCase();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredConversations = conversations.filter((conv) => {
+    const fullName =
+      `${conv.profile?.first_name || ''} ${conv.profile?.last_name || ''}`.toLowerCase();
     return fullName.includes(searchTerm.toLowerCase());
   });
 
   const getProfilePicture = (conversationId: string) => {
-    const conversation = conversations.find(c => c.id === conversationId);
+    const conversation = conversations.find((c) => c.id === conversationId);
     if (!conversation) return null;
-    
-    const participantId = conversation.participants.find(id => id !== 'current-user');
+
+    const participantId = conversation.participants.find((id) => id !== 'current-user');
     if (!participantId) return null;
-    
-    const profile = dummyProfiles.find(p => p.id === participantId);
+
+    const profile = dummyProfiles.find((p) => p.id === participantId);
     return profile?.profile_picture || null;
   };
 
@@ -55,20 +55,22 @@ const ConversationList = ({
           />
         </div>
       </div>
-      
+
       <div className="overflow-y-auto flex-grow">
         {loading ? (
-          Array(5).fill(0).map((_, index) => (
-            <div key={index} className="p-3 border-b">
-              <div className="flex items-center space-x-3">
-                <Skeleton className="w-10 h-10 rounded-full" />
-                <div className="flex-1">
-                  <Skeleton className="h-4 w-3/4 mb-2" />
-                  <Skeleton className="h-3 w-1/2" />
+          Array(5)
+            .fill(0)
+            .map((_, index) => (
+              <div key={index} className="p-3 border-b">
+                <div className="flex items-center space-x-3">
+                  <Skeleton className="w-10 h-10 rounded-full" />
+                  <div className="flex-1">
+                    <Skeleton className="h-4 w-3/4 mb-2" />
+                    <Skeleton className="h-3 w-1/2" />
+                  </div>
                 </div>
               </div>
-            </div>
-          ))
+            ))
         ) : error ? (
           <div className="text-center p-6 text-red-500">
             <p>Error loading conversations</p>
@@ -80,11 +82,11 @@ const ConversationList = ({
             <p className="text-sm">Start a conversation from the Nearby page</p>
           </div>
         ) : (
-          filteredConversations.map(conversation => {
+          filteredConversations.map((conversation) => {
             const profilePicture = getProfilePicture(conversation.id);
-            
+
             return (
-              <div 
+              <div
                 key={conversation.id}
                 className={`p-3 border-b cursor-pointer transition-colors hover:bg-gray-50 ${
                   selectedConversationId === conversation.id ? 'bg-gray-100' : ''
@@ -95,9 +97,9 @@ const ConversationList = ({
                   <div className="flex items-center space-x-3">
                     <Avatar className="w-10 h-10 rounded-full">
                       {profilePicture ? (
-                        <AvatarImage 
-                          src={profilePicture} 
-                          alt={`${conversation.profile?.first_name || 'User'}'s profile`} 
+                        <AvatarImage
+                          src={profilePicture}
+                          alt={`${conversation.profile?.first_name || 'User'}'s profile`}
                         />
                       ) : null}
                       <AvatarFallback className="bg-primary text-white">
@@ -109,17 +111,19 @@ const ConversationList = ({
                         {conversation.profile?.first_name} {conversation.profile?.last_name}
                       </p>
                       <p className="text-sm text-gray-500 truncate">
-                        {conversation.last_message?.content || "No messages yet"}
+                        {conversation.last_message?.content || 'No messages yet'}
                       </p>
                     </div>
                   </div>
                   <div className="text-xs text-gray-400">
-                    {conversation.last_message ? 
-                      formatDistanceToNow(new Date(conversation.last_message.created_at), { addSuffix: true }) : 
-                      formatDistanceToNow(new Date(conversation.created_at), { addSuffix: true })}
+                    {conversation.last_message
+                      ? formatDistanceToNow(new Date(conversation.last_message.created_at), {
+                          addSuffix: true,
+                        })
+                      : formatDistanceToNow(new Date(conversation.created_at), { addSuffix: true })}
                   </div>
                 </div>
-                
+
                 {conversation.wali_supervised && (
                   <div className="mt-1 text-xs text-primary-foreground bg-primary/20 px-2 py-0.5 rounded-full inline-block">
                     Wali Supervised

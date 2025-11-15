@@ -3,7 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
@@ -32,22 +38,22 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
       full_name: fullName,
       email: email,
       relationship: relationship,
-      isWali: isWali
+      isWali: isWali,
     });
 
     if (!validationResult.success) {
       // Extract and display errors
       const fieldErrors: Record<string, string> = {};
-      validationResult.error.issues.forEach(issue => {
+      validationResult.error.issues.forEach((issue) => {
         if (issue.path[0]) {
           fieldErrors[issue.path[0].toString()] = issue.message;
         }
       });
       setErrors(fieldErrors);
       toast({
-        title: "Erreur de validation",
-        description: "Veuillez corriger les erreurs dans le formulaire",
-        variant: "destructive",
+        title: 'Erreur de validation',
+        description: 'Veuillez corriger les erreurs dans le formulaire',
+        variant: 'destructive',
       });
       return;
     }
@@ -55,7 +61,9 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
     setLoading(true);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (!session) {
         throw new Error('Non authentifié');
       }
@@ -65,7 +73,7 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
           fullName,
           email,
           relationship,
-          isWali
+          isWali,
         },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
@@ -77,7 +85,7 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
       }
 
       toast({
-        title: "Invitation envoyée !",
+        title: 'Invitation envoyée !',
         description: `Une invitation a été envoyée à ${email}`,
       });
 
@@ -86,15 +94,16 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
       setEmail('');
       setRelationship('');
       setIsWali(false);
-      
+
       onInvitationSent?.();
     } catch (error: unknown) {
       console.error('Error sending invitation:', error);
-      const errorMessage = error instanceof Error ? error.message : "Impossible d'envoyer l'invitation";
+      const errorMessage =
+        error instanceof Error ? error.message : "Impossible d'envoyer l'invitation";
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -119,7 +128,7 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
               onChange={(e) => {
                 setFullName(e.target.value);
                 if (errors.full_name) {
-                  setErrors(prev => ({ ...prev, full_name: '' }));
+                  setErrors((prev) => ({ ...prev, full_name: '' }));
                 }
               }}
               placeholder="Ex: Ahmed Ben Ali"
@@ -142,7 +151,7 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
               onChange={(e) => {
                 setEmail(e.target.value);
                 if (errors.email) {
-                  setErrors(prev => ({ ...prev, email: '' }));
+                  setErrors((prev) => ({ ...prev, email: '' }));
                 }
               }}
               placeholder="ahmed@example.com"
@@ -158,12 +167,12 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
 
           <div className="space-y-2">
             <Label htmlFor="relationship">Relation familiale</Label>
-            <Select 
-              value={relationship} 
+            <Select
+              value={relationship}
               onValueChange={(value) => {
                 setRelationship(value);
                 if (errors.relationship) {
-                  setErrors(prev => ({ ...prev, relationship: '' }));
+                  setErrors((prev) => ({ ...prev, relationship: '' }));
                 }
               }}
             >
@@ -207,14 +216,15 @@ const FamilyInvitationForm: React.FC<FamilyInvitationFormProps> = ({ onInvitatio
               <div>
                 <p className="text-sm font-medium text-amber-800">Information importante</p>
                 <p className="text-sm text-amber-700">
-                  Cette personne recevra un email d'invitation pour créer un compte et superviser vos interactions selon les principes islamiques.
+                  Cette personne recevra un email d'invitation pour créer un compte et superviser
+                  vos interactions selon les principes islamiques.
                 </p>
               </div>
             </div>
           </div>
 
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             disabled={loading}
             className="w-full bg-emerald hover:bg-emerald-dark"
           >

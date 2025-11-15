@@ -1,4 +1,3 @@
-
 // Data encryption at rest service
 // Crypto-js temporarily disabled - using native crypto instead
 
@@ -34,23 +33,23 @@ export class DataEncryptionService {
   static encryptProfileData(profile: any) {
     const sensitiveFields = ['phone', 'address', 'wali_contact', 'birth_date'];
     const encrypted = { ...profile };
-    
-    sensitiveFields.forEach(field => {
+
+    sensitiveFields.forEach((field) => {
       if (encrypted[field]) {
         encrypted[`${field}_encrypted`] = this.encryptData(encrypted[field]);
         delete encrypted[field];
       }
     });
-    
+
     return encrypted;
   }
 
   // Decrypt profile data
   static decryptProfileData(encryptedProfile: any) {
     const decrypted = { ...encryptedProfile };
-    const encryptedFields = Object.keys(decrypted).filter(key => key.endsWith('_encrypted'));
-    
-    encryptedFields.forEach(field => {
+    const encryptedFields = Object.keys(decrypted).filter((key) => key.endsWith('_encrypted'));
+
+    encryptedFields.forEach((field) => {
       const originalField = field.replace('_encrypted', '');
       try {
         decrypted[originalField] = this.decryptData(decrypted[field]);
@@ -59,7 +58,7 @@ export class DataEncryptionService {
         console.warn(`Failed to decrypt ${originalField}:`, error);
       }
     });
-    
+
     return decrypted;
   }
 
@@ -70,7 +69,7 @@ export class DataEncryptionService {
     let hash = 0;
     for (let i = 0; i < normalized.length; i++) {
       const char = normalized.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return hash.toString(16);

@@ -4,17 +4,20 @@ import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Heart, 
-  User, 
-  Target, 
-  Lightbulb, 
-  AlertTriangle, 
+import {
+  Heart,
+  User,
+  Target,
+  Lightbulb,
+  AlertTriangle,
   BookOpen,
   TrendingUp,
-  Star
+  Star,
 } from 'lucide-react';
-import { useCompatibilityInsights, type UseCompatibilityInsightsReturn } from '@/hooks/useCompatibilityInsights';
+import {
+  useCompatibilityInsights,
+  type UseCompatibilityInsightsReturn,
+} from '@/hooks/useCompatibilityInsights';
 import MobileCompatibilityCard from '@/components/MobileCompatibilityCard';
 import InteractiveInsightCard from '@/components/InteractiveInsightCard';
 
@@ -64,10 +67,18 @@ const MobileInsightsDashboard: React.FC<MobileInsightsDashboardProps> = ({ userI
     <div className="w-full max-w-sm mx-auto">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <ResponsiveTabsList tabCount={4} className="mb-4">
-          <TabsTrigger value="overview" className="text-xs">Vue</TabsTrigger>
-          <TabsTrigger value="scores" className="text-xs">Scores</TabsTrigger>
-          <TabsTrigger value="tips" className="text-xs">Conseils</TabsTrigger>
-          <TabsTrigger value="guidance" className="text-xs">Guide</TabsTrigger>
+          <TabsTrigger value="overview" className="text-xs">
+            Vue
+          </TabsTrigger>
+          <TabsTrigger value="scores" className="text-xs">
+            Scores
+          </TabsTrigger>
+          <TabsTrigger value="tips" className="text-xs">
+            Conseils
+          </TabsTrigger>
+          <TabsTrigger value="guidance" className="text-xs">
+            Guide
+          </TabsTrigger>
         </ResponsiveTabsList>
 
         {/* Overview Tab */}
@@ -105,8 +116,10 @@ const MobileInsightsDashboard: React.FC<MobileInsightsDashboardProps> = ({ userI
             <InteractiveInsightCard
               title="Points d'Attention"
               subtitle={`${insights.redFlags.length} point(s) à considérer`}
-              mainContent={insights.redFlags.slice(0, 2).map(flag => flag.title)}
-              expandedContent={insights.redFlags.map(flag => `${flag.title}: ${flag.description}`)}
+              mainContent={insights.redFlags.slice(0, 2).map((flag) => flag.title)}
+              expandedContent={insights.redFlags.map(
+                (flag) => `${flag.title}: ${flag.description}`
+              )}
               icon={<AlertTriangle className="w-4 h-4" />}
               variant="warning"
               showExpand={insights.redFlags.length > 2}
@@ -144,9 +157,9 @@ const MobileInsightsDashboard: React.FC<MobileInsightsDashboardProps> = ({ userI
           <InteractiveInsightCard
             title="Suggestions d'Amélioration"
             subtitle={`${insights.suggestions.length} conseil(s)`}
-            mainContent={insights.suggestions.slice(0, 2).map(s => s.title)}
-            expandedContent={insights.suggestions.map(s => `${s.title}: ${s.description}`)}
-            recommendations={insights.suggestions.map(s => s.description)}
+            mainContent={insights.suggestions.slice(0, 2).map((s) => s.title)}
+            expandedContent={insights.suggestions.map((s) => `${s.title}: ${s.description}`)}
+            recommendations={insights.suggestions.map((s) => s.description)}
             icon={<Lightbulb className="w-4 h-4" />}
             variant="success"
           />

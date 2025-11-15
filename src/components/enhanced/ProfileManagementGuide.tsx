@@ -4,18 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  User, 
-  Heart, 
-  Shield, 
-  Camera, 
-  Brain, 
+import {
+  User,
+  Heart,
+  Shield,
+  Camera,
+  Brain,
   CheckCircle,
   ArrowRight,
   Star,
   Lightbulb,
   Users,
-  Lock
+  Lock,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,7 +49,8 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
     {
       id: 'wizard',
       title: 'Assistant de Profil Intelligent',
-      description: 'Créez votre profil étape par étape avec notre assistant IA qui respecte les valeurs islamiques.',
+      description:
+        'Créez votre profil étape par étape avec notre assistant IA qui respecte les valeurs islamiques.',
       icon: User,
       route: '/enhanced-profile?tab=wizard',
       completed: (completionStats?.basicInfo || 0) >= 80,
@@ -58,13 +59,14 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
         'Profil optimisé automatiquement',
         'Suggestions personnalisées',
         'Respect des valeurs islamiques',
-        'Amélioration des matches'
-      ]
+        'Amélioration des matches',
+      ],
     },
     {
       id: 'photos',
       title: 'Vérification Photos Avancée',
-      description: 'Système de vérification intelligent avec approbation familiale et conformité islamique.',
+      description:
+        'Système de vérification intelligent avec approbation familiale et conformité islamique.',
       icon: Camera,
       route: '/enhanced-profile?tab=photos',
       completed: (completionStats?.photos || 0) >= 100,
@@ -73,13 +75,14 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
         'Confiance augmentée de 300%',
         'Approbation familiale automatique',
         'Conformité aux valeurs islamiques',
-        'Protection contre les faux profils'
-      ]
+        'Protection contre les faux profils',
+      ],
     },
     {
       id: 'islamic',
       title: 'Préférences Islamiques Détaillées',
-      description: 'Configuration complète de vos valeurs et pratiques islamiques pour des matches parfaits.',
+      description:
+        'Configuration complète de vos valeurs et pratiques islamiques pour des matches parfaits.',
       icon: Heart,
       route: '/enhanced-profile?tab=islamic',
       completed: (completionStats?.islamicPrefs || 0) >= 80,
@@ -88,13 +91,14 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
         'Matches plus compatibles religieusement',
         'Préférences détaillées par catégorie',
         'Respect des différentes écoles',
-        'Guidance islamique intégrée'
-      ]
+        'Guidance islamique intégrée',
+      ],
     },
     {
       id: 'compatibility',
       title: 'Test de Compatibilité IA',
-      description: 'Intelligence artificielle avancée pour analyser votre compatibilité avec des partenaires potentiels.',
+      description:
+        'Intelligence artificielle avancée pour analyser votre compatibilité avec des partenaires potentiels.',
       icon: Brain,
       route: '/enhanced-profile?tab=compatibility',
       completed: (completionStats?.compatibility || 0) >= 70,
@@ -102,14 +106,15 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
       benefits: [
         'Algorithme IA de matching avancé',
         'Analyse de compatibilité personnalisée',
-        'Recommandations d\'amélioration',
-        'Scores de compatibilité précis'
-      ]
+        "Recommandations d'amélioration",
+        'Scores de compatibilité précis',
+      ],
     },
     {
       id: 'privacy',
       title: 'Contrôles de Confidentialité Avancés',
-      description: 'Protection complète de vos données avec paramètres islamiques et supervision familiale.',
+      description:
+        'Protection complète de vos données avec paramètres islamiques et supervision familiale.',
       icon: Shield,
       route: '/enhanced-profile?tab=privacy',
       completed: (completionStats?.privacy || 0) >= 70,
@@ -118,29 +123,37 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
         'Protection maximale des données',
         'Supervision familiale intégrée',
         'Contrôles de visibilité granulaires',
-        'Score de confidentialité en temps réel'
-      ]
-    }
+        'Score de confidentialité en temps réel',
+      ],
+    },
   ];
 
   const overallProgress = completionStats?.overall || 0;
-  const completedSteps = steps.filter(step => step.completed).length;
+  const completedSteps = steps.filter((step) => step.completed).length;
 
   const getImportanceColor = (importance: string) => {
     switch (importance) {
-      case 'high': return 'text-red-500 bg-red-50 border-red-200';
-      case 'medium': return 'text-orange-500 bg-orange-50 border-orange-200';
-      case 'low': return 'text-blue-500 bg-blue-50 border-blue-200';
-      default: return 'text-gray-500 bg-gray-50 border-gray-200';
+      case 'high':
+        return 'text-red-500 bg-red-50 border-red-200';
+      case 'medium':
+        return 'text-orange-500 bg-orange-50 border-orange-200';
+      case 'low':
+        return 'text-blue-500 bg-blue-50 border-blue-200';
+      default:
+        return 'text-gray-500 bg-gray-50 border-gray-200';
     }
   };
 
   const getImportanceLabel = (importance: string) => {
     switch (importance) {
-      case 'high': return 'Essentiel';
-      case 'medium': return 'Important';
-      case 'low': return 'Recommandé';
-      default: return '';
+      case 'high':
+        return 'Essentiel';
+      case 'medium':
+        return 'Important';
+      case 'low':
+        return 'Recommandé';
+      default:
+        return '';
     }
   };
 
@@ -175,11 +188,11 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
             <Progress value={overallProgress} className="h-3" />
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">
-                {overallProgress >= 80 
+                {overallProgress >= 80
                   ? '🎉 Excellent ! Votre profil est optimisé.'
                   : overallProgress >= 60
-                  ? '👍 Bon progrès ! Continuez.'
-                  : '🚀 Commencez votre transformation !'}
+                    ? '👍 Bon progrès ! Continuez.'
+                    : '🚀 Commencez votre transformation !'}
               </span>
               <Button
                 onClick={() => navigate('/enhanced-profile')}
@@ -198,40 +211,42 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
         {steps.map((step, index) => {
           const Icon = step.icon;
           const isExpanded = expandedStep === step.id;
-          
+
           return (
-            <Card 
-              key={step.id} 
+            <Card
+              key={step.id}
               className={`transition-all duration-300 ${
                 step.completed ? 'border-emerald/30 bg-emerald/5' : 'hover:shadow-md'
               }`}
             >
               <CardContent className="p-0">
-                <div 
+                <div
                   className="p-6 cursor-pointer"
                   onClick={() => setExpandedStep(isExpanded ? null : step.id)}
                 >
                   <div className="flex items-start gap-4">
                     <div className="flex flex-col items-center gap-2">
-                      <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                        step.completed 
-                          ? 'bg-emerald text-primary-foreground' 
-                          : 'bg-muted text-muted-foreground'
-                      }`}>
+                      <div
+                        className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                          step.completed
+                            ? 'bg-emerald text-primary-foreground'
+                            : 'bg-muted text-muted-foreground'
+                        }`}
+                      >
                         {step.completed ? (
                           <CheckCircle className="h-5 w-5" />
                         ) : (
                           <Icon className="h-5 w-5" />
                         )}
                       </div>
-                      <Badge 
-                        variant="outline" 
+                      <Badge
+                        variant="outline"
                         className={`text-xs ${getImportanceColor(step.importance)}`}
                       >
                         {getImportanceLabel(step.importance)}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-2">
                         <h3 className="font-semibold flex items-center gap-2">
@@ -244,15 +259,15 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
                               Terminé
                             </Badge>
                           )}
-                          <ArrowRight className={`h-4 w-4 transition-transform ${
-                            isExpanded ? 'rotate-90' : ''
-                          }`} />
+                          <ArrowRight
+                            className={`h-4 w-4 transition-transform ${
+                              isExpanded ? 'rotate-90' : ''
+                            }`}
+                          />
                         </div>
                       </div>
-                      
-                      <p className="text-muted-foreground text-sm mb-3">
-                        {step.description}
-                      </p>
+
+                      <p className="text-muted-foreground text-sm mb-3">{step.description}</p>
 
                       {isExpanded && (
                         <div className="space-y-4 animate-in slide-in-from-top-2">
@@ -270,7 +285,7 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
                               ))}
                             </div>
                           </div>
-                          
+
                           <Button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -304,26 +319,29 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
           <CardContent>
             <div className="space-y-3">
               {steps
-                .filter(step => !step.completed && step.importance === 'high')
+                .filter((step) => !step.completed && step.importance === 'high')
                 .slice(0, 2)
-                .map(step => (
-                <div key={step.id} className="flex items-center justify-between p-3 bg-background/50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <step.icon className="h-5 w-5 text-emerald" />
-                    <div>
-                      <p className="font-medium text-sm">{step.title}</p>
-                      <p className="text-xs text-muted-foreground">{step.description}</p>
-                    </div>
-                  </div>
-                  <Button 
-                    size="sm" 
-                    onClick={() => navigate(step.route)}
-                    className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                .map((step) => (
+                  <div
+                    key={step.id}
+                    className="flex items-center justify-between p-3 bg-background/50 rounded-lg"
                   >
-                    Commencer
-                  </Button>
-                </div>
-              ))}
+                    <div className="flex items-center gap-3">
+                      <step.icon className="h-5 w-5 text-emerald" />
+                      <div>
+                        <p className="font-medium text-sm">{step.title}</p>
+                        <p className="text-xs text-muted-foreground">{step.description}</p>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      onClick={() => navigate(step.route)}
+                      className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                    >
+                      Commencer
+                    </Button>
+                  </div>
+                ))}
             </div>
           </CardContent>
         </Card>
@@ -339,11 +357,14 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
             </div>
             <h3 className="font-semibold text-lg mb-2">Félicitations ! 🎉</h3>
             <p className="text-muted-foreground mb-4">
-              Votre profil est maintenant optimisé pour des matches de haute qualité. 
-              Les utilisateurs avec des profils complets reçoivent 5x plus de matches compatibles.
+              Votre profil est maintenant optimisé pour des matches de haute qualité. Les
+              utilisateurs avec des profils complets reçoivent 5x plus de matches compatibles.
             </p>
             <div className="flex gap-2 justify-center">
-              <Button onClick={() => navigate('/matches')} className="bg-gradient-to-r from-emerald to-gold text-primary-foreground">
+              <Button
+                onClick={() => navigate('/matches')}
+                className="bg-gradient-to-r from-emerald to-gold text-primary-foreground"
+              >
                 <Users className="h-4 w-4 mr-2" />
                 Voir Mes Matches
               </Button>

@@ -1,4 +1,3 @@
-
 interface RateLimitConfig {
   maxRequests: number;
   windowMs: number;
@@ -11,29 +10,29 @@ interface RateLimitEntry {
 
 class RateLimiter {
   private limits: Map<string, RateLimitEntry> = new Map();
-  
+
   isAllowed(identifier: string, config: RateLimitConfig): boolean {
     const now = Date.now();
     const entry = this.limits.get(identifier);
-    
+
     if (!entry || now > entry.resetTime) {
       // Reset or create new entry
       this.limits.set(identifier, {
         requests: 1,
-        resetTime: now + config.windowMs
+        resetTime: now + config.windowMs,
       });
       return true;
     }
-    
+
     if (entry.requests >= config.maxRequests) {
       return false;
     }
-    
+
     entry.requests++;
     this.limits.set(identifier, entry);
     return true;
   }
-  
+
   cleanup(): void {
     const now = Date.now();
     for (const [key, entry] of this.limits.entries()) {

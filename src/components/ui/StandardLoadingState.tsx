@@ -1,4 +1,3 @@
-
 import React from 'react';
 import LoadingSpinner from './LoadingSpinner';
 import { Button } from './button';
@@ -23,13 +22,13 @@ interface StandardLoadingStateProps {
   children?: React.ReactNode;
 }
 
-const StandardLoadingState: React.FC<StandardLoadingStateProps> = ({ 
+const StandardLoadingState: React.FC<StandardLoadingStateProps> = ({
   loading = false,
   error = null,
-  message = "Chargement...",
+  message = 'Chargement...',
   loadingText,
   emptyState,
-  children
+  children,
 }) => {
   // Show loading state
   if (loading) {
@@ -63,9 +62,7 @@ const StandardLoadingState: React.FC<StandardLoadingStateProps> = ({
           <h3 className="text-lg font-semibold">{emptyState.title}</h3>
           <p className="text-muted-foreground">{emptyState.description}</p>
           {emptyState.action && (
-            <Button onClick={emptyState.action.onClick}>
-              {emptyState.action.label}
-            </Button>
+            <Button onClick={emptyState.action.onClick}>{emptyState.action.label}</Button>
           )}
         </div>
       </div>

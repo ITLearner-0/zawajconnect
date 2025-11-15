@@ -1,4 +1,3 @@
-
 import { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -36,15 +35,17 @@ const AdminRoute = ({ children, requireModerator = false }: AdminRouteProps) => 
             <CardTitle>Authentication Required</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
-            <p className="text-muted-foreground">
-              You need to be logged in to access this page.
-            </p>
+            <p className="text-muted-foreground">You need to be logged in to access this page.</p>
             <div className="flex gap-2 justify-center">
               <Button onClick={() => navigate('/auth')} className="flex items-center gap-2">
                 <Shield className="h-4 w-4" />
                 Sign In
               </Button>
-              <Button variant="outline" onClick={() => navigate('/')} className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/')}
+                className="flex items-center gap-2"
+              >
                 <Home className="h-4 w-4" />
                 Home
               </Button>
@@ -68,10 +69,16 @@ const AdminRoute = ({ children, requireModerator = false }: AdminRouteProps) => 
           <CardContent className="text-center space-y-4">
             <p className="text-muted-foreground">
               You don't have the required permissions to access this page.
-              {requireModerator ? ' Moderator or Admin access required.' : ' Admin access required.'}
+              {requireModerator
+                ? ' Moderator or Admin access required.'
+                : ' Admin access required.'}
             </p>
             <div className="flex gap-2 justify-center">
-              <Button variant="outline" onClick={() => navigate(-1)} className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2"
+              >
                 <ArrowLeft className="h-4 w-4" />
                 Go Back
               </Button>

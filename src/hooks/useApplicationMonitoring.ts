@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { logger } from '@/services/logging/LoggingService';
 
@@ -63,13 +62,13 @@ export const useApplicationMonitoring = () => {
 
   // Start monitoring
   const startMonitoring = useCallback(() => {
-    setMonitoringState(prev => ({ ...prev, isMonitoring: true }));
+    setMonitoringState((prev) => ({ ...prev, isMonitoring: true }));
     logger.info('Application monitoring started');
   }, []);
 
   // Stop monitoring
   const stopMonitoring = useCallback(() => {
-    setMonitoringState(prev => ({ ...prev, isMonitoring: false }));
+    setMonitoringState((prev) => ({ ...prev, isMonitoring: false }));
     if (performanceObserver.current) {
       performanceObserver.current.disconnect();
     }
@@ -78,32 +77,35 @@ export const useApplicationMonitoring = () => {
 
   // Track page view
   const trackPageView = useCallback((page: string) => {
-    setMonitoringState(prev => ({
+    setMonitoringState((prev) => ({
       ...prev,
       userSession: {
         ...prev.userSession,
         pageViews: prev.userSession.pageViews + 1,
         lastActivity: new Date().toISOString(),
-      }
+      },
     }));
-    
+
     logger.logPageView(page);
   }, []);
 
   // Track user action
-  const trackUserAction = useCallback((action: string, component: string, metadata?: Record<string, any>) => {
-    setMonitoringState(prev => ({
-      ...prev,
-      userSession: {
-        ...prev.userSession,
-        actionsCount: prev.userSession.actionsCount + 1,
-        lastActivity: new Date().toISOString(),
-      }
-    }));
-    
-    lastActivityTime.current = Date.now();
-    logger.logUserAction(action, component, metadata);
-  }, []);
+  const trackUserAction = useCallback(
+    (action: string, component: string, metadata?: Record<string, any>) => {
+      setMonitoringState((prev) => ({
+        ...prev,
+        userSession: {
+          ...prev.userSession,
+          actionsCount: prev.userSession.actionsCount + 1,
+          lastActivity: new Date().toISOString(),
+        },
+      }));
+
+      lastActivityTime.current = Date.now();
+      logger.logUserAction(action, component, metadata);
+    },
+    []
+  );
 
   // Track error
   const trackError = useCallback((error: Error, componentStack?: string) => {
@@ -116,7 +118,7 @@ export const useApplicationMonitoring = () => {
       userAgent: navigator.userAgent,
     };
 
-    setMonitoringState(prev => ({
+    setMonitoringState((prev) => ({
       ...prev,
       errors: [...prev.errors.slice(-49), errorInfo], // Keep last 50 errors
     }));
@@ -130,7 +132,7 @@ export const useApplicationMonitoring = () => {
 
     const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
     const paintEntries = performance.getEntriesByType('paint');
-    
+
     const metrics: Partial<PerformanceMetrics> = {
       pageLoadTime: navigation?.loadEventEnd - navigation?.fetchStart || 0,
       timeToFirstByte: navigation?.responseStart - navigation?.fetchStart || 0,
@@ -139,7 +141,7 @@ export const useApplicationMonitoring = () => {
     };
 
     // First Contentful Paint
-    const fcpEntry = paintEntries.find(entry => entry.name === 'first-contentful-paint');
+    const fcpEntry = paintEntries.find((entry) => entry.name === 'first-contentful-paint');
     if (fcpEntry) {
       metrics.firstContentfulPaint = fcpEntry.startTime;
     }
@@ -153,7 +155,7 @@ export const useApplicationMonitoring = () => {
           }
         }
       });
-      
+
       try {
         observer.observe({ entryTypes: ['largest-contentful-paint'] });
         performanceObserver.current = observer;
@@ -162,7 +164,7 @@ export const useApplicationMonitoring = () => {
       }
     }
 
-    setMonitoringState(prev => ({
+    setMonitoringState((prev) => ({
       ...prev,
       performanceMetrics: { ...prev.performanceMetrics, ...metrics } as PerformanceMetrics,
     }));
@@ -179,19 +181,20 @@ export const useApplicationMonitoring = () => {
   const checkNetworkSpeed = useCallback(() => {
     if ('connection' in navigator) {
       const connection = (navigator as any).connection;
-      const isSlowConnection = connection.effectiveType === 'slow-2g' || 
-                              connection.effectiveType === '2g' ||
-                              connection.downlink < 1.5;
-      
-      setMonitoringState(prev => ({
+      const isSlowConnection =
+        connection.effectiveType === 'slow-2g' ||
+        connection.effectiveType === '2g' ||
+        connection.downlink < 1.5;
+
+      setMonitoringState((prev) => ({
         ...prev,
         isSlowConnection,
       }));
 
       if (isSlowConnection) {
-        logger.warn('Slow network connection detected', { 
+        logger.warn('Slow network connection detected', {
           effectiveType: connection.effectiveType,
-          downlink: connection.downlink 
+          downlink: connection.downlink,
         });
       }
     }
@@ -201,13 +204,13 @@ export const useApplicationMonitoring = () => {
   const updateSessionTime = useCallback(() => {
     const now = Date.now();
     const totalTimeSpent = Math.floor((now - sessionStartTime.current) / 1000);
-    
-    setMonitoringState(prev => ({
+
+    setMonitoringState((prev) => ({
       ...prev,
       userSession: {
         ...prev.userSession,
         totalTimeSpent,
-      }
+      },
     }));
   }, []);
 
@@ -235,12 +238,12 @@ export const useApplicationMonitoring = () => {
 
     // Network status listeners
     const handleOnline = () => {
-      setMonitoringState(prev => ({ ...prev, networkStatus: 'online' }));
+      setMonitoringState((prev) => ({ ...prev, networkStatus: 'online' }));
       logger.info('Network connection restored');
     };
 
     const handleOffline = () => {
-      setMonitoringState(prev => ({ ...prev, networkStatus: 'offline' }));
+      setMonitoringState((prev) => ({ ...prev, networkStatus: 'offline' }));
       logger.warn('Network connection lost');
     };
 
@@ -286,12 +289,18 @@ export const useApplicationMonitoring = () => {
       window.removeEventListener('unhandledrejection', handleUnhandledRejection);
       clearInterval(sessionInterval);
       clearInterval(networkInterval);
-      
+
       if (performanceObserver.current) {
         performanceObserver.current.disconnect();
       }
     };
-  }, [monitoringState.isMonitoring, trackError, updateSessionTime, checkNetworkSpeed, measurePerformance]);
+  }, [
+    monitoringState.isMonitoring,
+    trackError,
+    updateSessionTime,
+    checkNetworkSpeed,
+    measurePerformance,
+  ]);
 
   return {
     ...monitoringState,

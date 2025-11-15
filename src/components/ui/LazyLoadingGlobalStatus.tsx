@@ -1,6 +1,8 @@
-
 import React from 'react';
-import { useLazyLoadingState, useLazyLoadingActions } from '@/hooks/useLazyLoading/context/LazyLoadingContext';
+import {
+  useLazyLoadingState,
+  useLazyLoadingActions,
+} from '@/hooks/useLazyLoading/context/LazyLoadingContext';
 import { useBatchLoading } from '@/hooks/useLazyLoading/state/useBatchLoading';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,23 +15,22 @@ interface LazyLoadingGlobalStatusProps {
   className?: string;
 }
 
-const LazyLoadingGlobalStatus = ({ 
-  showAdvanced = false, 
-  className 
+const LazyLoadingGlobalStatus = ({
+  showAdvanced = false,
+  className,
 }: LazyLoadingGlobalStatusProps) => {
   const state = useLazyLoadingState();
   const actions = useLazyLoadingActions();
   const { getBatchStatus, updateBatchSize } = useBatchLoading();
 
   const batchStatus = getBatchStatus();
-  
-  const successRate = state.totalImages > 0 
-    ? (state.loadedImages / state.totalImages) * 100 
-    : 0;
 
-  const loadingProgress = state.totalImages > 0
-    ? ((state.loadedImages + state.failedImages) / state.totalImages) * 100
-    : 0;
+  const successRate = state.totalImages > 0 ? (state.loadedImages / state.totalImages) * 100 : 0;
+
+  const loadingProgress =
+    state.totalImages > 0
+      ? ((state.loadedImages + state.failedImages) / state.totalImages) * 100
+      : 0;
 
   return (
     <Card className={className}>
@@ -64,7 +65,9 @@ const LazyLoadingGlobalStatus = ({
         <div className="space-y-2">
           <div className="flex justify-between text-xs">
             <span>Loading Progress</span>
-            <span>{state.loadedImages}/{state.totalImages}</span>
+            <span>
+              {state.loadedImages}/{state.totalImages}
+            </span>
           </div>
           <Progress value={loadingProgress} className="h-2" />
         </div>
@@ -76,21 +79,9 @@ const LazyLoadingGlobalStatus = ({
               Loading
             </Badge>
           )}
-          {state.networkOptimization && (
-            <Badge variant="secondary">
-              Network Optimized
-            </Badge>
-          )}
-          {state.memoryOptimization && (
-            <Badge variant="secondary">
-              Memory Optimized
-            </Badge>
-          )}
-          {state.enableAnalytics && (
-            <Badge variant="outline">
-              Analytics
-            </Badge>
-          )}
+          {state.networkOptimization && <Badge variant="secondary">Network Optimized</Badge>}
+          {state.memoryOptimization && <Badge variant="secondary">Memory Optimized</Badge>}
+          {state.enableAnalytics && <Badge variant="outline">Analytics</Badge>}
         </div>
 
         {/* Advanced Status */}
@@ -108,7 +99,7 @@ const LazyLoadingGlobalStatus = ({
                   <div className="text-muted-foreground">{batchStatus.estimatedBatches}</div>
                 </div>
               </div>
-              
+
               {batchStatus.isProcessing && (
                 <Badge variant="default" className="bg-green-500">
                   Processing Batch
@@ -143,7 +134,7 @@ const LazyLoadingGlobalStatus = ({
             <RotateCcw className="h-3 w-3" />
             Clear Cache
           </Button>
-          
+
           {showAdvanced && (
             <Button
               size="sm"

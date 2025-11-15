@@ -11,7 +11,10 @@ interface UserDetailsCardProps {
 
 export const UserDetailsCard = ({ permission }: UserDetailsCardProps) => {
   const getRoleBadge = (role: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {
+    const variants: Record<
+      string,
+      { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }
+    > = {
       super_admin: { variant: 'destructive', label: 'Super Admin' },
       approver: { variant: 'default', label: 'Approbateur' },
       editor: { variant: 'secondary', label: 'Éditeur' },
@@ -63,9 +66,7 @@ export const UserDetailsCard = ({ permission }: UserDetailsCardProps) => {
               <Shield className="w-4 h-4" />
               <span>Rôle actuel</span>
             </div>
-            <div className="flex items-center gap-2">
-              {getRoleBadge(permission.role)}
-            </div>
+            <div className="flex items-center gap-2">{getRoleBadge(permission.role)}</div>
           </div>
 
           <div className="space-y-2">

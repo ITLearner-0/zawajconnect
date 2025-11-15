@@ -11,31 +11,33 @@
 ## 🔍 Any implicites identifiés
 
 ### 1. Ligne 35 - Upsert avec type any
+
 ```typescript
-const { error } = await supabase
-  .from('user_settings')
-  .upsert({
-    user_id: user?.id,
-    updated_at: new Date().toISOString()
-  } as any);
+const { error } = await supabase.from('user_settings').upsert({
+  user_id: user?.id,
+  updated_at: new Date().toISOString(),
+} as any);
 ```
+
 **Solution**: Créer une interface propre pour l'upsert ou utiliser les types Supabase
+
 ```typescript
-const { error } = await supabase
-  .from('user_settings')
-  .upsert({
-    user_id: user!.id,
-    updated_at: new Date().toISOString()
-  });
+const { error } = await supabase.from('user_settings').upsert({
+  user_id: user!.id,
+  updated_at: new Date().toISOString(),
+});
 ```
 
 ### 2. Ligne 40 - Paramètre error dans catch
+
 ```typescript
 } catch (error) {
   console.error('Error tracking insight view:', error);
 }
 ```
+
 **Solution**: Typer explicitement comme `unknown`
+
 ```typescript
 } catch (error: unknown) {
   console.error('Error tracking insight view:', error);
@@ -43,12 +45,15 @@ const { error } = await supabase
 ```
 
 ### 3. Ligne 53 - Paramètre error dans catch (fonction trackAction)
+
 ```typescript
 } catch (error) {
   console.error('Error tracking action:', error);
 }
 ```
+
 **Solution**: Typer explicitement comme `unknown`
+
 ```typescript
 } catch (error: unknown) {
   console.error('Error tracking action:', error);
@@ -56,12 +61,15 @@ const { error } = await supabase
 ```
 
 ### 4. Ligne 69 - Paramètre error dans catch (fonction loadAnalytics)
+
 ```typescript
 } catch (error) {
   console.error('Error loading analytics:', error);
 }
 ```
+
 **Solution**: Typer explicitement comme `unknown`
+
 ```typescript
 } catch (error: unknown) {
   console.error('Error loading analytics:', error);
@@ -76,6 +84,7 @@ const { error } = await supabase
 ## 🎯 Améliorations recommandées
 
 ### Ajouter un type de retour explicite pour le hook
+
 ```typescript
 export interface UseInsightsAnalyticsReturn {
   analytics: InsightsAnalytics;
@@ -87,27 +96,29 @@ export interface UseInsightsAnalyticsReturn {
 
 export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
   // ...
-}
+};
 ```
 
 ### Ajouter des types explicites pour les fonctions asynchrones
+
 ```typescript
 const trackInsightView = async (): Promise<void> => {
   // ...
-}
+};
 
 const trackAction = async (action: string): Promise<void> => {
   // ...
-}
+};
 
 const loadAnalytics = async (): Promise<void> => {
   // ...
-}
+};
 ```
 
 ## ✅ Plan de migration
 
 ### Étape 1: Supprimer le cast `as any`
+
 ```typescript
 // Ligne 35 - Remplacer
 .upsert({
@@ -123,17 +134,21 @@ const loadAnalytics = async (): Promise<void> => {
 ```
 
 ### Étape 2: Typer tous les catch blocks
+
 Remplacer tous les `catch (error)` par `catch (error: unknown)`
 
 ### Étape 3: Ajouter des types de retour explicites
+
 - `trackInsightView(): Promise<void>`
 - `trackAction(action: string): Promise<void>`
 - `loadAnalytics(): Promise<void>`
 
 ### Étape 4: Créer l'interface UseInsightsAnalyticsReturn
+
 Définir une interface pour le retour du hook et l'exporter
 
 ### Étape 5: Typer le retour du hook
+
 ```typescript
 export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
 ```
@@ -144,17 +159,19 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
 - **Complexité**: Faible
 - **Risque de régression**: Très faible
 - **Fichiers affectés**: 1 (ce hook)
-- **Composants utilisant ce hook**: 
+- **Composants utilisant ce hook**:
   - À identifier (probablement utilisé dans les pages d'insights)
 
 ## 🔗 Dépendances
 
 ### Dépend de:
+
 - `useAuth` (hook standard)
 - `supabase client`
 - Types Supabase
 
 ### Utilisé par:
+
 - **⚠️ AUCUN COMPOSANT ACTUELLEMENT**
 - Ce hook n'est pas encore utilisé dans le codebase
 - Hook préparé pour des fonctionnalités futures d'analytics
@@ -176,6 +193,7 @@ export const useInsightsAnalytics = (): UseInsightsAnalyticsReturn => {
 ## 🎯 Prochaines étapes suggérées
 
 Après migration de ce hook:
+
 1. Migrer les composants qui utilisent ce hook
 2. Créer les tables d'analytics appropriées dans Supabase
 3. Remplacer les données mockées par de vraies requêtes
@@ -184,6 +202,7 @@ Après migration de ce hook:
 ## 🔍 Recherche de composants utilisant ce hook
 
 Besoin de rechercher dans le codebase:
+
 ```bash
 grep -r "useInsightsAnalytics" src/
 ```

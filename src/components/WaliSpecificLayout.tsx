@@ -3,17 +3,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Shield, 
-  Users, 
-  Heart, 
-  TrendingUp, 
-  Settings,
-  Eye,
-  Bell,
-  LogOut,
-  Home
-} from 'lucide-react';
+import { Shield, Users, Heart, TrendingUp, Settings, Eye, Bell, LogOut, Home } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 interface WaliSpecificLayoutProps {
@@ -25,36 +15,36 @@ const WaliSpecificLayout: React.FC<WaliSpecificLayoutProps> = ({ children }) => 
   const location = useLocation();
 
   const waliMenuItems = [
-    { 
-      path: '/wali-dashboard', 
-      icon: Shield, 
+    {
+      path: '/wali-dashboard',
+      icon: Shield,
       label: 'Tableau de Bord Wali',
-      description: 'Vue d\'ensemble de vos supervisions'
+      description: "Vue d'ensemble de vos supervisions",
     },
-    { 
-      path: '/match-approval', 
-      icon: Heart, 
+    {
+      path: '/match-approval',
+      icon: Heart,
       label: 'Approbation Matches',
-      description: 'Approuver ou rejeter les compatibilités'
+      description: 'Approuver ou rejeter les compatibilités',
     },
-    { 
-      path: '/family-analytics', 
-      icon: TrendingUp, 
+    {
+      path: '/family-analytics',
+      icon: TrendingUp,
       label: 'Analytics Famille',
-      description: 'Statistiques et métriques'
+      description: 'Statistiques et métriques',
     },
-    { 
-      path: '/moderation-tests', 
-      icon: Settings, 
+    {
+      path: '/moderation-tests',
+      icon: Settings,
       label: 'Tests Modération',
-      description: 'Vérifier les règles islamiques'
+      description: 'Vérifier les règles islamiques',
     },
-    { 
-      path: '/family-supervision', 
-      icon: Users, 
+    {
+      path: '/family-supervision',
+      icon: Users,
       label: 'Supervision Familiale',
-      description: 'Superviser les conversations'
-    }
+      description: 'Superviser les conversations',
+    },
   ];
 
   const isActive = (path: string) => location.pathname === path;
@@ -88,7 +78,9 @@ const WaliSpecificLayout: React.FC<WaliSpecificLayoutProps> = ({ children }) => 
                     <Shield className="h-5 w-5 text-primary-foreground" />
                   </div>
                   <div className="flex-1">
-                    <p className="font-medium text-foreground">{user?.user_metadata?.full_name || 'Wali'}</p>
+                    <p className="font-medium text-foreground">
+                      {user?.user_metadata?.full_name || 'Wali'}
+                    </p>
                     <Badge className="bg-gold/10 text-gold-dark border-gold/20 text-xs">
                       Tuteur Islamique
                     </Badge>
@@ -130,7 +122,8 @@ const WaliSpecificLayout: React.FC<WaliSpecificLayoutProps> = ({ children }) => 
                   <Eye className="h-8 w-8 text-gold mx-auto mb-2" />
                   <p className="text-sm font-medium text-foreground mb-1">Supervision Islamique</p>
                   <p className="text-xs text-muted-foreground">
-                    Guidez selon les principes de l'Islam et veillez à la préservation de la pudeur (Haya).
+                    Guidez selon les principes de l'Islam et veillez à la préservation de la pudeur
+                    (Haya).
                   </p>
                 </div>
               </CardContent>
@@ -139,11 +132,7 @@ const WaliSpecificLayout: React.FC<WaliSpecificLayoutProps> = ({ children }) => 
 
           {/* Footer with logout */}
           <div className="absolute bottom-0 left-0 w-80 p-6 border-t border-border/40">
-            <Button
-              onClick={handleSignOut}
-              variant="outline"
-              className="w-full"
-            >
+            <Button onClick={handleSignOut} variant="outline" className="w-full">
               <LogOut className="h-4 w-4 mr-2" />
               Déconnexion
             </Button>
@@ -151,9 +140,7 @@ const WaliSpecificLayout: React.FC<WaliSpecificLayoutProps> = ({ children }) => 
         </div>
 
         {/* Main Content */}
-        <div className="flex-1">
-          {children}
-        </div>
+        <div className="flex-1">{children}</div>
       </div>
     </div>
   );

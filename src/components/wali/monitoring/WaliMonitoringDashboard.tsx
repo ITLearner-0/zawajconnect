@@ -14,7 +14,13 @@ import { WaliAlertPanel } from './WaliAlertPanel';
 
 export const WaliMonitoringDashboard = () => {
   const { user } = useAuth();
-  const { isVerifiedWali, verificationScore, emailVerified, idVerified, loading: roleLoading } = useUserRole();
+  const {
+    isVerifiedWali,
+    verificationScore,
+    emailVerified,
+    idVerified,
+    loading: roleLoading,
+  } = useUserRole();
   const { getAuditLog, getActionStatistics } = useWaliAudit();
   const { getRateLimitStats } = useWaliRateLimit();
 
@@ -32,7 +38,7 @@ export const WaliMonitoringDashboard = () => {
       const [stats, audit, limits] = await Promise.all([
         getActionStatistics(user.id),
         getAuditLog(user.id, 100),
-        getRateLimitStats(user.id)
+        getRateLimitStats(user.id),
       ]);
 
       setStatistics(stats);
@@ -72,9 +78,10 @@ export const WaliMonitoringDashboard = () => {
           <AlertTitle>Accès refusé</AlertTitle>
           <AlertDescription>
             Vous devez être un Wali vérifié pour accéder à ce dashboard.
-            {!emailVerified && ' Votre email n\'est pas vérifié.'}
-            {!idVerified && ' Votre identité n\'est pas vérifiée.'}
-            {verificationScore < 85 && ` Score de vérification insuffisant (${verificationScore}/85).`}
+            {!emailVerified && " Votre email n'est pas vérifié."}
+            {!idVerified && " Votre identité n'est pas vérifiée."}
+            {verificationScore < 85 &&
+              ` Score de vérification insuffisant (${verificationScore}/85).`}
           </AlertDescription>
         </Alert>
       </div>
@@ -87,36 +94,31 @@ export const WaliMonitoringDashboard = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Dashboard de Supervision</h1>
-          <p className="text-muted-foreground">
-            Monitoring de vos activités en tant que Wali
-          </p>
+          <p className="text-muted-foreground">Monitoring de vos activités en tant que Wali</p>
         </div>
-        <Button 
-          onClick={loadData} 
-          disabled={refreshing}
-          variant="outline"
-          size="sm"
-        >
+        <Button onClick={loadData} disabled={refreshing} variant="outline" size="sm">
           <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
           Actualiser
         </Button>
       </div>
 
       {/* Warning si proche des limites */}
-      {rateLimits.some(limit => {
-        const config = {
-          match_approval: 20,
-          profile_view: 50,
-          settings_modification: 10,
-          notification_send: 30
-        }[limit.action_type as string] || 100;
-        return (limit.action_count / config) >= 0.8;
+      {rateLimits.some((limit) => {
+        const config =
+          {
+            match_approval: 20,
+            profile_view: 50,
+            settings_modification: 10,
+            notification_send: 30,
+          }[limit.action_type as string] || 100;
+        return limit.action_count / config >= 0.8;
       }) && (
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertTitle>Attention</AlertTitle>
           <AlertDescription>
-            Vous approchez de certaines limites d'utilisation. Consultez les indicateurs ci-dessous pour plus de détails.
+            Vous approchez de certaines limites d'utilisation. Consultez les indicateurs ci-dessous
+            pour plus de détails.
           </AlertDescription>
         </Alert>
       )}

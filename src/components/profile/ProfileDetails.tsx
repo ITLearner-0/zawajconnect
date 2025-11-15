@@ -1,4 +1,3 @@
-
 import { DatabaseProfile } from '@/types/profile';
 import { IslamicPattern } from '@/components/ui/islamic-pattern';
 import BasicInformationSection from './BasicInformationSection';

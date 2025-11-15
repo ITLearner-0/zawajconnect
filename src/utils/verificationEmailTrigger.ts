@@ -15,8 +15,8 @@ export const triggerVerificationApprovedEmail = async (
       body: {
         user_id: userId,
         verification_type: verificationType,
-        verification_score: verificationScore
-      }
+        verification_score: verificationScore,
+      },
     });
 
     if (error) {

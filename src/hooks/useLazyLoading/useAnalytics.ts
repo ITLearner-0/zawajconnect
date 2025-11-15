@@ -1,6 +1,10 @@
-
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { analyticsService, LazyLoadingMetrics, AggregatedMetrics, UsagePattern } from './services/analyticsService';
+import {
+  analyticsService,
+  LazyLoadingMetrics,
+  AggregatedMetrics,
+  UsagePattern,
+} from './services/analyticsService';
 
 interface UseAnalyticsOptions {
   elementId?: string;
@@ -28,24 +32,30 @@ export const useAnalytics = (options: UseAnalyticsOptions = {}) => {
     analyticsService.trackViewportEntry(elementIdRef.current, Date.now());
   }, []);
 
-  const trackLoadEnd = useCallback((success: boolean = true, additionalMetrics: Partial<LazyLoadingMetrics> = {}) => {
-    const loadTime = performance.now() - startTimeRef.current;
-    
-    analyticsService.trackLoadEvent(elementIdRef.current, {
-      type: elementType,
-      loadTime,
-      success,
-      ...additionalMetrics,
-    });
-  }, [elementType]);
+  const trackLoadEnd = useCallback(
+    (success: boolean = true, additionalMetrics: Partial<LazyLoadingMetrics> = {}) => {
+      const loadTime = performance.now() - startTimeRef.current;
 
-  const trackError = useCallback((error: Error) => {
-    analyticsService.trackLoadEvent(elementIdRef.current, {
-      type: elementType,
-      success: false,
-      errorCount: 1,
-    });
-  }, [elementType]);
+      analyticsService.trackLoadEvent(elementIdRef.current, {
+        type: elementType,
+        loadTime,
+        success,
+        ...additionalMetrics,
+      });
+    },
+    [elementType]
+  );
+
+  const trackError = useCallback(
+    (error: Error) => {
+      analyticsService.trackLoadEvent(elementIdRef.current, {
+        type: elementType,
+        success: false,
+        errorCount: 1,
+      });
+    },
+    [elementType]
+  );
 
   const trackConversion = useCallback(() => {
     if (trackConversions) {

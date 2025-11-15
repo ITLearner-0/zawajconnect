@@ -16,19 +16,19 @@
 
     /* Linting - Progressive Strict Mode Activation */
     /* Step 1: Enable basic type safety (ACTIVE) */
-    "noImplicitAny": true,                    // Prevent implicit 'any' types
-    "strictNullChecks": true,                 // Strict null and undefined checks
-    "noFallthroughCasesInSwitch": true,      // Prevent switch fallthrough bugs
+    "noImplicitAny": true, // Prevent implicit 'any' types
+    "strictNullChecks": true, // Strict null and undefined checks
+    "noFallthroughCasesInSwitch": true, // Prevent switch fallthrough bugs
 
     /* Step 2: Enable soon (fix existing issues first) */
-    "strict": false,                          // TODO: Enable after fixing existing issues
-    "noUnusedLocals": false,                  // TODO: Enable and clean up unused variables
-    "noUnusedParameters": false,              // TODO: Enable and clean up unused parameters
+    "strict": false, // TODO: Enable after fixing existing issues
+    "noUnusedLocals": false, // TODO: Enable and clean up unused variables
+    "noUnusedParameters": false, // TODO: Enable and clean up unused parameters
 
     /* Additional safety features */
-    "strictFunctionTypes": true,              // Strict function type checking
-    "noImplicitReturns": true,               // Ensure all code paths return a value
-    "noUncheckedIndexedAccess": true,        // Add undefined to index signature results
+    "strictFunctionTypes": true, // Strict function type checking
+    "noImplicitReturns": true, // Ensure all code paths return a value
+    "noUncheckedIndexedAccess": true, // Add undefined to index signature results
 
     "baseUrl": ".",
     "paths": {

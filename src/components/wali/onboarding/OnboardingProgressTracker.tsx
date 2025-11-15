@@ -65,7 +65,9 @@ export const OnboardingProgressTracker = ({ waliId, userId }: OnboardingProgress
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Progression de l'intégration</CardTitle>
-              <CardDescription>Complétez toutes les étapes pour activer votre compte Wali</CardDescription>
+              <CardDescription>
+                Complétez toutes les étapes pour activer votre compte Wali
+              </CardDescription>
             </div>
             {isComplete && (
               <Badge variant="secondary" className="flex items-center gap-1">
@@ -101,7 +103,8 @@ export const OnboardingProgressTracker = ({ waliId, userId }: OnboardingProgress
         <Alert className="border-success bg-success/10">
           <CheckCircle className="h-4 w-4 text-success" />
           <AlertDescription className="text-success">
-            Félicitations ! Vous avez complété toutes les étapes d'intégration. Votre compte Wali est maintenant actif.
+            Félicitations ! Vous avez complété toutes les étapes d'intégration. Votre compte Wali
+            est maintenant actif.
           </AlertDescription>
         </Alert>
       )}
@@ -110,7 +113,8 @@ export const OnboardingProgressTracker = ({ waliId, userId }: OnboardingProgress
         {steps.map((step, index) => {
           const isCompleted = Boolean(progress?.[step.key]);
           const prevStep = index > 0 ? steps[index - 1] : null;
-          const previousStepCompleted = index === 0 || Boolean(prevStep && progress?.[prevStep.key]);
+          const previousStepCompleted =
+            index === 0 || Boolean(prevStep && progress?.[prevStep.key]);
           const isCurrent = !isCompleted && previousStepCompleted;
           const isLocked = !previousStepCompleted && !isCompleted;
 

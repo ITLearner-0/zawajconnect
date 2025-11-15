@@ -34,8 +34,15 @@ const CommunityGuidelines = () => {
         <Card className="mb-8 border-emerald/20 shadow-lg">
           <CardContent className="p-6">
             <div className="space-y-2 text-sm">
-              <p><strong>ZawajConnect</strong></p>
-              <p>Email : <a href="mailto:contact@zawajconnect.me" className="text-emerald hover:underline">contact@zawajconnect.me</a></p>
+              <p>
+                <strong>ZawajConnect</strong>
+              </p>
+              <p>
+                Email :{' '}
+                <a href="mailto:contact@zawajconnect.me" className="text-emerald hover:underline">
+                  contact@zawajconnect.me
+                </a>
+              </p>
               <p className="text-muted-foreground mt-4">Dernière mise à jour : 17 octobre 2025</p>
             </div>
           </CardContent>
@@ -47,9 +54,10 @@ const CommunityGuidelines = () => {
             <CardContent className="p-6">
               <h2 className="text-2xl font-bold mb-4 text-emerald">Notre Objectif</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Créer un espace sûr, respectueux et conforme aux valeurs islamiques pour faciliter 
-                des unions matrimoniales halal et durables. Notre communauté est fondée sur les principes 
-                de pudeur (Haya), respect (Ihtiram), honnêteté (Sidq) et confiance (Amana).
+                Créer un espace sûr, respectueux et conforme aux valeurs islamiques pour faciliter
+                des unions matrimoniales halal et durables. Notre communauté est fondée sur les
+                principes de pudeur (Haya), respect (Ihtiram), honnêteté (Sidq) et confiance
+                (Amana).
               </p>
             </CardContent>
           </Card>
@@ -67,31 +75,46 @@ const CommunityGuidelines = () => {
               <div className="space-y-3 text-muted-foreground">
                 <div className="flex items-start gap-2">
                   <span className="text-emerald font-bold">✅</span>
-                  <p><strong>Honnêteté totale (Sidq)</strong> dans la présentation de soi</p>
+                  <p>
+                    <strong>Honnêteté totale (Sidq)</strong> dans la présentation de soi
+                  </p>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-emerald font-bold">✅</span>
-                  <p><strong>Respect mutuel</strong> dans tous les échanges</p>
+                  <p>
+                    <strong>Respect mutuel</strong> dans tous les échanges
+                  </p>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-emerald font-bold">✅</span>
-                  <p><strong>Communication pudique</strong> et appropriée</p>
+                  <p>
+                    <strong>Communication pudique</strong> et appropriée
+                  </p>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-emerald font-bold">✅</span>
-                  <p><strong>Transparence</strong> sur vos intentions matrimoniales</p>
+                  <p>
+                    <strong>Transparence</strong> sur vos intentions matrimoniales
+                  </p>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-emerald font-bold">✅</span>
-                  <p><strong>Implication familiale (Wali)</strong> dès le début du processus</p>
+                  <p>
+                    <strong>Implication familiale (Wali)</strong> dès le début du processus
+                  </p>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-emerald font-bold">✅</span>
-                  <p><strong>Patience</strong> et respect du rythme de chacun</p>
+                  <p>
+                    <strong>Patience</strong> et respect du rythme de chacun
+                  </p>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-emerald font-bold">✅</span>
-                  <p><strong>Prière de consultation (Istikharah)</strong> avant les décisions importantes</p>
+                  <p>
+                    <strong>Prière de consultation (Istikharah)</strong> avant les décisions
+                    importantes
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -105,11 +128,15 @@ const CommunityGuidelines = () => {
                   <AlertTriangle className="h-6 w-6 text-red-600 dark:text-red-400" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Comportements Strictement Interdits</h2>
-                  <p className="text-sm text-muted-foreground">Violations entraînant des sanctions</p>
+                  <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">
+                    Comportements Strictement Interdits
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    Violations entraînant des sanctions
+                  </p>
                 </div>
               </div>
-              
+
               <div className="space-y-4">
                 <div>
                   <p className="font-semibold text-foreground mb-2">3.1 - Contenus Inappropriés</p>
@@ -134,11 +161,16 @@ const CommunityGuidelines = () => {
                 </div>
 
                 <div>
-                  <p className="font-semibold text-foreground mb-2">3.2 - Comportements Contraires à la Sécurité</p>
+                  <p className="font-semibold text-foreground mb-2">
+                    3.2 - Comportements Contraires à la Sécurité
+                  </p>
                   <div className="space-y-2 ml-4 text-muted-foreground">
                     <p className="flex items-start gap-2">
                       <span className="text-red-500 font-bold">❌</span>
-                      <span>Partage d'informations personnelles (numéro, adresse) avant approbation familiale</span>
+                      <span>
+                        Partage d'informations personnelles (numéro, adresse) avant approbation
+                        familiale
+                      </span>
                     </p>
                     <p className="flex items-start gap-2">
                       <span className="text-red-500 font-bold">❌</span>
@@ -156,7 +188,9 @@ const CommunityGuidelines = () => {
                 </div>
 
                 <div>
-                  <p className="font-semibold text-foreground mb-2">3.3 - Comportements Frauduleux</p>
+                  <p className="font-semibold text-foreground mb-2">
+                    3.3 - Comportements Frauduleux
+                  </p>
                   <div className="space-y-2 ml-4 text-muted-foreground">
                     <p className="flex items-start gap-2">
                       <span className="text-red-500 font-bold">❌</span>
@@ -164,7 +198,9 @@ const CommunityGuidelines = () => {
                     </p>
                     <p className="flex items-start gap-2">
                       <span className="text-red-500 font-bold">❌</span>
-                      <span>Mensonges sur situation matrimoniale (déjà marié, divorcé non déclaré)</span>
+                      <span>
+                        Mensonges sur situation matrimoniale (déjà marié, divorcé non déclaré)
+                      </span>
                     </p>
                     <p className="flex items-start gap-2">
                       <span className="text-red-500 font-bold">❌</span>
@@ -174,7 +210,9 @@ const CommunityGuidelines = () => {
                 </div>
 
                 <div>
-                  <p className="font-semibold text-foreground mb-2">3.4 - Harcèlement et Discrimination</p>
+                  <p className="font-semibold text-foreground mb-2">
+                    3.4 - Harcèlement et Discrimination
+                  </p>
                   <div className="space-y-2 ml-4 text-muted-foreground">
                     <p className="flex items-start gap-2">
                       <span className="text-red-500 font-bold">❌</span>
@@ -204,10 +242,12 @@ const CommunityGuidelines = () => {
                   <p className="text-sm text-muted-foreground">Protection active 24/7</p>
                 </div>
               </div>
-              
+
               <div className="space-y-4 text-muted-foreground">
                 <div>
-                  <p className="font-semibold text-foreground mb-2">4.1 - Modération IA en Temps Réel</p>
+                  <p className="font-semibold text-foreground mb-2">
+                    4.1 - Modération IA en Temps Réel
+                  </p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
                     <li>Analyse automatique de tous les messages avant envoi</li>
                     <li>Détection des contenus inappropriés avec 95% de précision</li>
@@ -229,9 +269,19 @@ const CommunityGuidelines = () => {
                   <p className="font-semibold text-foreground mb-2">4.3 - Système de Signalement</p>
                   <div className="p-4 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/30 rounded-lg">
                     <ul className="text-sm space-y-2">
-                      <li><Flag className="h-4 w-4 inline mr-2 text-blue-600" />Bouton "Signaler" sur chaque profil et message</li>
-                      <li><Shield className="h-4 w-4 inline mr-2 text-blue-600" />Confidentialité absolue : L'utilisateur signalé ne saura jamais qui l'a signalé</li>
-                      <li><Clock className="h-4 w-4 inline mr-2 text-blue-600" />Délai de traitement : 24-48h</li>
+                      <li>
+                        <Flag className="h-4 w-4 inline mr-2 text-blue-600" />
+                        Bouton "Signaler" sur chaque profil et message
+                      </li>
+                      <li>
+                        <Shield className="h-4 w-4 inline mr-2 text-blue-600" />
+                        Confidentialité absolue : L'utilisateur signalé ne saura jamais qui l'a
+                        signalé
+                      </li>
+                      <li>
+                        <Clock className="h-4 w-4 inline mr-2 text-blue-600" />
+                        Délai de traitement : 24-48h
+                      </li>
                     </ul>
                   </div>
                 </div>
@@ -245,7 +295,9 @@ const CommunityGuidelines = () => {
               <h2 className="text-2xl font-bold mb-4 text-emerald">Sanctions Graduées ⚠️</h2>
               <div className="space-y-4">
                 <div className="p-4 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-900/30 rounded-lg">
-                  <p className="font-semibold text-yellow-900 dark:text-yellow-200 mb-2">Niveau 1 : Avertissement</p>
+                  <p className="font-semibold text-yellow-900 dark:text-yellow-200 mb-2">
+                    Niveau 1 : Avertissement
+                  </p>
                   <ul className="text-sm text-yellow-800 dark:text-yellow-300 space-y-1 ml-4">
                     <li>• 1ère violation mineure</li>
                     <li>• Email explicatif envoyé</li>
@@ -255,7 +307,9 @@ const CommunityGuidelines = () => {
                 </div>
 
                 <div className="p-4 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900/30 rounded-lg">
-                  <p className="font-semibold text-orange-900 dark:text-orange-200 mb-2">Niveau 2 : Suspension Temporaire (7 jours)</p>
+                  <p className="font-semibold text-orange-900 dark:text-orange-200 mb-2">
+                    Niveau 2 : Suspension Temporaire (7 jours)
+                  </p>
                   <ul className="text-sm text-orange-800 dark:text-orange-300 space-y-1 ml-4">
                     <li>• 2ème violation ou violation modérée</li>
                     <li>• Compte suspendu pendant 7 jours</li>
@@ -266,7 +320,9 @@ const CommunityGuidelines = () => {
                 </div>
 
                 <div className="p-4 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 rounded-lg">
-                  <p className="font-semibold text-red-900 dark:text-red-200 mb-2">Niveau 3 : Bannissement Définitif</p>
+                  <p className="font-semibold text-red-900 dark:text-red-200 mb-2">
+                    Niveau 3 : Bannissement Définitif
+                  </p>
                   <ul className="text-sm text-red-800 dark:text-red-300 space-y-1 ml-4">
                     <li>• 3ème violation ou violation grave</li>
                     <li>• Suppression immédiate du compte</li>
@@ -277,7 +333,9 @@ const CommunityGuidelines = () => {
                 </div>
 
                 <div className="p-4 bg-red-100 dark:bg-red-950/40 border-2 border-red-300 dark:border-red-900/50 rounded-lg">
-                  <p className="font-semibold text-red-900 dark:text-red-200 mb-2">🚨 Violations Graves (Bannissement Immédiat)</p>
+                  <p className="font-semibold text-red-900 dark:text-red-200 mb-2">
+                    🚨 Violations Graves (Bannissement Immédiat)
+                  </p>
                   <ul className="text-sm text-red-800 dark:text-red-300 space-y-1 ml-4">
                     <li>• Harcèlement sexuel</li>
                     <li>• Partage de contenus pornographiques</li>
@@ -298,10 +356,17 @@ const CommunityGuidelines = () => {
                 <p>Vous pouvez contester toute sanction en respectant la procédure suivante :</p>
                 <ol className="list-decimal list-inside space-y-2 ml-4">
                   <li>
-                    <strong>Délai :</strong> Contestation possible sous <strong>48 heures</strong> après réception de la sanction
+                    <strong>Délai :</strong> Contestation possible sous <strong>48 heures</strong>{' '}
+                    après réception de la sanction
                   </li>
                   <li>
-                    <strong>Email :</strong> <a href="mailto:contact@zawajconnect.me" className="text-emerald hover:underline">contact@zawajconnect.me</a>
+                    <strong>Email :</strong>{' '}
+                    <a
+                      href="mailto:contact@zawajconnect.me"
+                      className="text-emerald hover:underline"
+                    >
+                      contact@zawajconnect.me
+                    </a>
                   </li>
                   <li>
                     <strong>Objet :</strong> "Contestation - [Type de sanction]"
@@ -320,7 +385,9 @@ const CommunityGuidelines = () => {
           {/* Section 7 - Confidentialité */}
           <Card>
             <CardContent className="p-6">
-              <h2 className="text-2xl font-bold mb-4 text-emerald">Protection de Votre Vie Privée 🔒</h2>
+              <h2 className="text-2xl font-bold mb-4 text-emerald">
+                Protection de Votre Vie Privée 🔒
+              </h2>
               <ul className="space-y-2 text-muted-foreground list-disc list-inside ml-4">
                 <li>Toutes les modérations sont confidentielles</li>
                 <li>Aucun utilisateur ne saura qui l'a signalé</li>
@@ -372,7 +439,7 @@ const CommunityGuidelines = () => {
         <Card className="mt-12 bg-gradient-to-r from-emerald/10 to-gold/10 border-emerald/30">
           <CardContent className="p-8 text-center">
             <p className="text-lg italic text-muted-foreground mb-4">
-              "Ne vous moquez pas les uns des autres, et ne vous dénigrez pas. Ô vous qui croyez ! 
+              "Ne vous moquez pas les uns des autres, et ne vous dénigrez pas. Ô vous qui croyez !
               Évitez de trop conjecturer [sur autrui] car une partie des conjectures est péché."
             </p>
             <p className="text-emerald font-semibold">- Sourate Al-Hujurat (49:11-12)</p>
@@ -384,13 +451,21 @@ const CommunityGuidelines = () => {
         </Card>
 
         <div className="mt-8 flex flex-wrap justify-center gap-4 text-sm">
-          <Link to="/terms-of-service" className="text-emerald hover:underline">Conditions d'Utilisation</Link>
+          <Link to="/terms-of-service" className="text-emerald hover:underline">
+            Conditions d'Utilisation
+          </Link>
           <span className="text-muted-foreground">•</span>
-          <Link to="/privacy-policy" className="text-emerald hover:underline">Politique de Confidentialité</Link>
+          <Link to="/privacy-policy" className="text-emerald hover:underline">
+            Politique de Confidentialité
+          </Link>
           <span className="text-muted-foreground">•</span>
-          <Link to="/refund-policy" className="text-emerald hover:underline">Remboursement</Link>
+          <Link to="/refund-policy" className="text-emerald hover:underline">
+            Remboursement
+          </Link>
           <span className="text-muted-foreground">•</span>
-          <Link to="/cookie-policy" className="text-emerald hover:underline">Cookies</Link>
+          <Link to="/cookie-policy" className="text-emerald hover:underline">
+            Cookies
+          </Link>
         </div>
       </div>
     </div>

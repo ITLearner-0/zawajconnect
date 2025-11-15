@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useAnalytics } from './useAnalytics';
 import { usePerformanceMonitor } from './usePerformanceMonitor';
@@ -47,9 +46,7 @@ export const useEnhancedMonitoring = <T extends HTMLElement = HTMLDivElement>(
   });
 
   // Performance monitoring
-  const performance = usePerformanceMonitor(
-    enablePerformanceMonitoring ? elementId : undefined
-  );
+  const performance = usePerformanceMonitor(enablePerformanceMonitoring ? elementId : undefined);
 
   // Debug monitoring
   const debug = useDebuggedLazyLoading<T>({
@@ -61,7 +58,7 @@ export const useEnhancedMonitoring = <T extends HTMLElement = HTMLDivElement>(
   });
 
   const startMonitoring = useCallback(() => {
-    setMonitoringState(prev => ({
+    setMonitoringState((prev) => ({
       ...prev,
       isActive: true,
       lastEventTime: Date.now(),
@@ -79,45 +76,58 @@ export const useEnhancedMonitoring = <T extends HTMLElement = HTMLDivElement>(
     if (enableDebugMode) {
       debug.debug.logLoadStart();
     }
-  }, [enableAnalytics, enablePerformanceMonitoring, enableDebugMode, analytics, performance, debug]);
+  }, [
+    enableAnalytics,
+    enablePerformanceMonitoring,
+    enableDebugMode,
+    analytics,
+    performance,
+    debug,
+  ]);
 
-  const endMonitoring = useCallback((success: boolean = true) => {
-    setMonitoringState(prev => ({
-      ...prev,
-      isActive: false,
-      totalEvents: prev.totalEvents + 1,
-    }));
+  const endMonitoring = useCallback(
+    (success: boolean = true) => {
+      setMonitoringState((prev) => ({
+        ...prev,
+        isActive: false,
+        totalEvents: prev.totalEvents + 1,
+      }));
 
-    if (enableAnalytics) {
-      analytics.trackLoadEnd(success, {
-        cacheHit: performance.metrics?.cacheHit || false,
-        networkSpeed: navigator.onLine ? 'fast' : 'offline',
-      });
-    }
+      if (enableAnalytics) {
+        analytics.trackLoadEnd(success, {
+          cacheHit: performance.metrics?.cacheHit || false,
+          networkSpeed: navigator.onLine ? 'fast' : 'offline',
+        });
+      }
 
-    if (enablePerformanceMonitoring) {
-      performance.endMonitoring(success);
-    }
+      if (enablePerformanceMonitoring) {
+        performance.endMonitoring(success);
+      }
 
-    if (enableDebugMode) {
-      debug.debug.logLoadEnd(success);
-    }
-  }, [enableAnalytics, enablePerformanceMonitoring, enableDebugMode, analytics, performance, debug]);
+      if (enableDebugMode) {
+        debug.debug.logLoadEnd(success);
+      }
+    },
+    [enableAnalytics, enablePerformanceMonitoring, enableDebugMode, analytics, performance, debug]
+  );
 
-  const trackError = useCallback((error: Error) => {
-    setMonitoringState(prev => ({
-      ...prev,
-      errors: [...prev.errors, error.message],
-    }));
+  const trackError = useCallback(
+    (error: Error) => {
+      setMonitoringState((prev) => ({
+        ...prev,
+        errors: [...prev.errors, error.message],
+      }));
 
-    if (enableAnalytics) {
-      analytics.trackError(error);
-    }
+      if (enableAnalytics) {
+        analytics.trackError(error);
+      }
 
-    if (enableDebugMode) {
-      debug.debug.logError(error);
-    }
-  }, [enableAnalytics, enableDebugMode, analytics, debug]);
+      if (enableDebugMode) {
+        debug.debug.logError(error);
+      }
+    },
+    [enableAnalytics, enableDebugMode, analytics, debug]
+  );
 
   const trackConversion = useCallback(() => {
     if (trackConversions && enableAnalytics) {
@@ -137,17 +147,29 @@ export const useEnhancedMonitoring = <T extends HTMLElement = HTMLDivElement>(
         errorRate: monitoringState.errors.length / Math.max(monitoringState.totalEvents, 1),
       },
     };
-  }, [monitoringState, analytics, performance, debug, enableAnalytics, enablePerformanceMonitoring, enableDebugMode]);
+  }, [
+    monitoringState,
+    analytics,
+    performance,
+    debug,
+    enableAnalytics,
+    enablePerformanceMonitoring,
+    enableDebugMode,
+  ]);
 
   const exportMonitoringData = useCallback(() => {
     const report = getMonitoringReport();
     const analyticsData = enableAnalytics ? analytics.exportAnalytics() : null;
-    
-    return JSON.stringify({
-      report,
-      analyticsData: analyticsData ? JSON.parse(analyticsData) : null,
-      exportedAt: new Date().toISOString(),
-    }, null, 2);
+
+    return JSON.stringify(
+      {
+        report,
+        analyticsData: analyticsData ? JSON.parse(analyticsData) : null,
+        exportedAt: new Date().toISOString(),
+      },
+      null,
+      2
+    );
   }, [getMonitoringReport, analytics, enableAnalytics]);
 
   const clearMonitoringData = useCallback(() => {
@@ -176,19 +198,19 @@ export const useEnhancedMonitoring = <T extends HTMLElement = HTMLDivElement>(
     isIntersecting: debug.isIntersecting,
     shouldLoad: debug.shouldLoad,
     isPreloading: debug.isPreloading,
-    
+
     // Monitoring controls
     startMonitoring,
     endMonitoring,
     trackError,
     trackConversion,
-    
+
     // Monitoring data
     monitoringState,
     analytics: enableAnalytics ? analytics : null,
     performance: enablePerformanceMonitoring ? performance : null,
     debug: enableDebugMode ? debug.debug : null,
-    
+
     // Reports and export
     getMonitoringReport,
     exportMonitoringData,

@@ -1,6 +1,12 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useAchievementNotifications } from '@/hooks/useAchievementNotifications';
 import { Sparkles } from 'lucide-react';
 import { useState } from 'react';
@@ -11,7 +17,9 @@ import { useState } from 'react';
  */
 export function AchievementTestButton() {
   const { triggerTestNotification } = useAchievementNotifications();
-  const [selectedRarity, setSelectedRarity] = useState<'common' | 'rare' | 'epic' | 'legendary'>('common');
+  const [selectedRarity, setSelectedRarity] = useState<'common' | 'rare' | 'epic' | 'legendary'>(
+    'common'
+  );
 
   // Seulement visible en mode dev
   if (import.meta.env.VITE_DEV_MODE !== 'true') {
@@ -30,7 +38,10 @@ export function AchievementTestButton() {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        <Select value={selectedRarity} onValueChange={(v) => setSelectedRarity(v as typeof selectedRarity)}>
+        <Select
+          value={selectedRarity}
+          onValueChange={(v) => setSelectedRarity(v as typeof selectedRarity)}
+        >
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -42,7 +53,7 @@ export function AchievementTestButton() {
           </SelectContent>
         </Select>
 
-        <Button 
+        <Button
           onClick={() => triggerTestNotification(selectedRarity)}
           className="w-full"
           size="sm"

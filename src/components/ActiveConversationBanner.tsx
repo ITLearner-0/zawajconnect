@@ -25,8 +25,9 @@ export const ActiveConversationBanner = ({ matchId }: ActiveConversationBannerPr
         Vous êtes actuellement en discussion
       </AlertTitle>
       <AlertDescription className="text-muted-foreground">
-        Selon les principes islamiques, vous devez terminer votre échange actuel avant de chercher d'autres profils. 
-        Vous pourrez à nouveau liker des profils une fois la conversation clôturée.
+        Selon les principes islamiques, vous devez terminer votre échange actuel avant de chercher
+        d'autres profils. Vous pourrez à nouveau liker des profils une fois la conversation
+        clôturée.
       </AlertDescription>
       <Button
         size="sm"

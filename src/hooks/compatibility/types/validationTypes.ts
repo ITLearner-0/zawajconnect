@@ -1,4 +1,3 @@
-
 // Runtime validation schemas and types
 export interface AnswerValue {
   value: number;
@@ -73,7 +72,11 @@ export type TypedQuestion = ScaleQuestion | ChoiceQuestion | BooleanQuestion | R
 
 // Validation error types
 export class ValidationError extends Error {
-  constructor(message: string, public field: string, public value: unknown) {
+  constructor(
+    message: string,
+    public field: string,
+    public value: unknown
+  ) {
     super(message);
     this.name = 'ValidationError';
   }

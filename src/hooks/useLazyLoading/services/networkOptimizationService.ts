@@ -1,4 +1,3 @@
-
 interface NetworkOptimizationConfig {
   imageOptimization: {
     enableWebP: boolean;
@@ -45,7 +44,8 @@ interface NetworkOptimizationConfig {
 class NetworkOptimizationService {
   private static instance: NetworkOptimizationService;
   private config: NetworkOptimizationConfig;
-  private networkMetrics: Map<string, { bandwidth: number; latency: number; timestamp: number }> = new Map();
+  private networkMetrics: Map<string, { bandwidth: number; latency: number; timestamp: number }> =
+    new Map();
   private contentCache: Map<string, { data: any; timestamp: number; size: number }> = new Map();
 
   constructor() {
@@ -134,10 +134,10 @@ class NetworkOptimizationService {
     const dimensions = this.getDimensionsForQuality(quality);
 
     const params = new URLSearchParams();
-    
+
     // Add quality parameter
     params.set('q', imageOptimization.qualityLevels[quality].toString());
-    
+
     // Add dimensions
     if (options.width || dimensions.width) {
       params.set('w', (options.width || dimensions.width).toString());
@@ -145,7 +145,7 @@ class NetworkOptimizationService {
     if (options.height || dimensions.height) {
       params.set('h', (options.height || dimensions.height).toString());
     }
-    
+
     // Add format
     if (format !== 'auto') {
       params.set('f', format);
@@ -160,10 +160,14 @@ class NetworkOptimizationService {
 
   private getQualityForSpeed(speed: 'fast' | 'medium' | 'slow'): 'high' | 'medium' | 'low' {
     switch (speed) {
-      case 'fast': return 'high';
-      case 'medium': return 'medium';
-      case 'slow': return 'low';
-      default: return 'medium';
+      case 'fast':
+        return 'high';
+      case 'medium':
+        return 'medium';
+      case 'slow':
+        return 'low';
+      default:
+        return 'medium';
     }
   }
 
@@ -179,7 +183,7 @@ class NetworkOptimizationService {
 
   getLoadingStrategy(networkSpeed: 'fast' | 'medium' | 'slow') {
     const { loadingOptimization } = this.config;
-    
+
     return {
       batchSize: loadingOptimization.batchSizes[networkSpeed],
       preloadDistance: loadingOptimization.preloadDistances[networkSpeed],
@@ -191,23 +195,23 @@ class NetworkOptimizationService {
   async measureBandwidth(testUrl?: string): Promise<number> {
     const url = testUrl || this.generateTestUrl();
     const startTime = performance.now();
-    
+
     try {
       const response = await fetch(url, { mode: 'no-cors' });
       const endTime = performance.now();
       const duration = (endTime - startTime) / 1000; // seconds
-      
+
       // Estimate bandwidth based on known test file size
       const testFileSize = 0.5; // MB (estimated)
       const bandwidth = (testFileSize / duration) * 8; // Mbps
-      
+
       // Store metric
       this.networkMetrics.set('bandwidth', {
         bandwidth,
         latency: duration * 1000,
         timestamp: Date.now(),
       });
-      
+
       return bandwidth;
     } catch (error) {
       console.warn('Bandwidth measurement failed:', error);
@@ -223,15 +227,18 @@ class NetworkOptimizationService {
   // Content caching
   cacheContent(key: string, data: any, size: number = 0): void {
     const { cacheOptimization } = this.config;
-    const totalSize = Array.from(this.contentCache.values()).reduce((sum, item) => sum + item.size, 0);
-    
+    const totalSize = Array.from(this.contentCache.values()).reduce(
+      (sum, item) => sum + item.size,
+      0
+    );
+
     // Check if adding this content would exceed cache size limit
     const maxSizeBytes = cacheOptimization.maxCacheSize * 1024 * 1024; // Convert MB to bytes
-    
+
     if (totalSize + size > maxSizeBytes) {
       this.evictOldestCacheEntries(size);
     }
-    
+
     this.contentCache.set(key, {
       data,
       timestamp: Date.now(),
@@ -241,29 +248,30 @@ class NetworkOptimizationService {
 
   getCachedContent(key: string): any | null {
     const item = this.contentCache.get(key);
-    
+
     if (!item) return null;
-    
+
     const { cacheOptimization } = this.config;
     const isExpired = Date.now() - item.timestamp > cacheOptimization.cacheTTL * 1000;
-    
+
     if (isExpired) {
       this.contentCache.delete(key);
       return null;
     }
-    
+
     return item.data;
   }
 
   private evictOldestCacheEntries(neededSpace: number): void {
-    const entries = Array.from(this.contentCache.entries())
-      .sort(([, a], [, b]) => a.timestamp - b.timestamp);
-    
+    const entries = Array.from(this.contentCache.entries()).sort(
+      ([, a], [, b]) => a.timestamp - b.timestamp
+    );
+
     let freedSpace = 0;
     for (const [key, item] of entries) {
       this.contentCache.delete(key);
       freedSpace += item.size;
-      
+
       if (freedSpace >= neededSpace) break;
     }
   }
@@ -277,13 +285,17 @@ class NetworkOptimizationService {
   }
 
   getCacheStats() {
-    const totalSize = Array.from(this.contentCache.values()).reduce((sum, item) => sum + item.size, 0);
-    
+    const totalSize = Array.from(this.contentCache.values()).reduce(
+      (sum, item) => sum + item.size,
+      0
+    );
+
     return {
       entriesCount: this.contentCache.size,
       totalSize: totalSize / (1024 * 1024), // MB
       maxSize: this.config.cacheOptimization.maxCacheSize,
-      utilizationPercentage: (totalSize / (this.config.cacheOptimization.maxCacheSize * 1024 * 1024)) * 100,
+      utilizationPercentage:
+        (totalSize / (this.config.cacheOptimization.maxCacheSize * 1024 * 1024)) * 100,
     };
   }
 }

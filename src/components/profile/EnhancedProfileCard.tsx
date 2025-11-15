@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -20,10 +19,11 @@ const EnhancedProfileCard: React.FC<EnhancedProfileCardProps> = ({
   compatibilityScore,
   onMessage,
   onLike,
-  isLiked = false
+  isLiked = false,
 }) => {
-  const age = profile.birth_date ? 
-    new Date().getFullYear() - new Date(profile.birth_date).getFullYear() : null;
+  const age = profile.birth_date
+    ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear()
+    : null;
 
   const getCompatibilityColor = (score?: number) => {
     if (!score) return 'bg-gray-100 text-gray-600';
@@ -38,18 +38,16 @@ const EnhancedProfileCard: React.FC<EnhancedProfileCardProps> = ({
         {/* Profile Picture */}
         <div className="aspect-square bg-gradient-to-br from-rose-100 to-pink-100 flex items-center justify-center">
           {profile.profile_picture ? (
-            <img 
-              src={profile.profile_picture} 
+            <img
+              src={profile.profile_picture}
               alt={`${profile.first_name} ${profile.last_name}`}
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="text-6xl text-rose-300">
-              {profile.first_name?.charAt(0)}
-            </div>
+            <div className="text-6xl text-rose-300">{profile.first_name?.charAt(0)}</div>
           )}
         </div>
-        
+
         {/* Compatibility Score */}
         {compatibilityScore && (
           <div className="absolute top-3 right-3">
@@ -116,7 +114,8 @@ const EnhancedProfileCard: React.FC<EnhancedProfileCardProps> = ({
         {/* Religious Info */}
         <div className="mb-3 text-sm">
           <div className="text-gray-600">
-            <span className="font-medium">Pratique:</span> {profile.religious_practice_level || 'Non spécifié'}
+            <span className="font-medium">Pratique:</span>{' '}
+            {profile.religious_practice_level || 'Non spécifié'}
           </div>
           {profile.prayer_frequency && (
             <div className="text-gray-600">
@@ -144,27 +143,17 @@ const EnhancedProfileCard: React.FC<EnhancedProfileCardProps> = ({
         {/* About Me Preview */}
         {profile.about_me && (
           <div className="mb-4">
-            <p className="text-sm text-gray-700 line-clamp-2">
-              {profile.about_me}
-            </p>
+            <p className="text-sm text-gray-700 line-clamp-2">{profile.about_me}</p>
           </div>
         )}
 
         {/* Action Buttons */}
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            className="flex-1"
-            onClick={onMessage}
-          >
+          <Button variant="outline" size="sm" className="flex-1" onClick={onMessage}>
             <MessageCircle className="w-4 h-4 mr-2" />
             Message
           </Button>
-          <Button
-            size="sm"
-            className="flex-1 bg-rose-500 hover:bg-rose-600 text-white"
-          >
+          <Button size="sm" className="flex-1 bg-rose-500 hover:bg-rose-600 text-white">
             Voir Profil
           </Button>
         </div>

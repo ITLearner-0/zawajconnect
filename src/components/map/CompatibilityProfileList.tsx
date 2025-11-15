@@ -1,4 +1,3 @@
-
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { MapPin, Heart, CheckCircle } from 'lucide-react';
@@ -25,7 +24,10 @@ interface CompatibilityProfileListProps {
   onNavigateToProfile: (profileId: string) => void;
 }
 
-const CompatibilityProfileList = ({ matches, onNavigateToProfile }: CompatibilityProfileListProps) => {
+const CompatibilityProfileList = ({
+  matches,
+  onNavigateToProfile,
+}: CompatibilityProfileListProps) => {
   if (matches.length === 0) {
     return (
       <div className="text-center py-8">
@@ -48,7 +50,7 @@ const CompatibilityProfileList = ({ matches, onNavigateToProfile }: Compatibilit
         const isNew = Math.random() > 0.7; // Mock "new" status
 
         return (
-          <Card 
+          <Card
             key={match.userId}
             className="cursor-pointer hover:shadow-lg transition-shadow border-rose-200 hover:border-rose-300"
             onClick={() => onNavigateToProfile(match.userId)}
@@ -59,7 +61,7 @@ const CompatibilityProfileList = ({ matches, onNavigateToProfile }: Compatibilit
                   Nouveau
                 </Badge>
               )}
-              
+
               <div className="flex items-start gap-3 mb-3">
                 <div className="w-12 h-12 rounded-full overflow-hidden bg-gradient-to-br from-rose-400 to-pink-500 flex items-center justify-center text-white font-semibold">
                   {profile.profile_picture ? (
@@ -72,11 +74,12 @@ const CompatibilityProfileList = ({ matches, onNavigateToProfile }: Compatibilit
                     />
                   ) : (
                     <>
-                      {profile.first_name?.charAt(0)}{profile.last_name?.charAt(0)}
+                      {profile.first_name?.charAt(0)}
+                      {profile.last_name?.charAt(0)}
                     </>
                   )}
                 </div>
-                
+
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="w-6 h-4 rounded-sm bg-gray-200 flex items-center justify-center text-xs">
@@ -94,9 +97,11 @@ const CompatibilityProfileList = ({ matches, onNavigateToProfile }: Compatibilit
                     </span>
                   </div>
                 </div>
-                
+
                 <div className="text-right">
-                  <div className="text-sm font-medium">{profile.location?.split(',')[0] || 'France'}</div>
+                  <div className="text-sm font-medium">
+                    {profile.location?.split(',')[0] || 'France'}
+                  </div>
                   <div className="text-xs text-gray-500">France</div>
                 </div>
               </div>
@@ -106,16 +111,13 @@ const CompatibilityProfileList = ({ matches, onNavigateToProfile }: Compatibilit
                   {profile.first_name} | {profile.age || '25'}ans
                   <CheckCircle className="inline h-4 w-4 text-blue-500 ml-1" />
                 </h3>
-                <div className="text-sm text-green-600">
-                  Profil rempli à {profileCompletion}%
-                </div>
+                <div className="text-sm text-green-600">Profil rempli à {profileCompletion}%</div>
               </div>
 
               <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                {profile.religious_practice_level === 'high' 
+                {profile.religious_practice_level === 'high'
                   ? "Je suis une personne de nature calme, à l'écoute, généreuse, j'ai également un côté taquin tout en étant sérieuse, je suis..."
-                  : "Je pense être quelqu'un à l'écoute et sincère. J'essaye constamment d'évoluer et j'aime apprendre. Mon entourage me décrit..."
-                }
+                  : "Je pense être quelqu'un à l'écoute et sincère. J'essaye constamment d'évoluer et j'aime apprendre. Mon entourage me décrit..."}
               </p>
 
               <div className="flex items-center justify-between">

@@ -1,4 +1,3 @@
-
 // Export all database utilities from their respective modules
 export { tableExists, columnExists, executeSql } from './core';
 export { setupModerationTables } from './moderationTables';

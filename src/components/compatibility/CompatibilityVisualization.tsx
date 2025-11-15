@@ -1,10 +1,9 @@
-
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { CompatibilityVisualization } from "@/types/filters";
-import { Heart, AlertTriangle, TrendingUp, Users, BookOpen, Home, User } from "lucide-react";
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { CompatibilityVisualization } from '@/types/filters';
+import { Heart, AlertTriangle, TrendingUp, Users, BookOpen, Home, User } from 'lucide-react';
 
 interface CompatibilityVisualizationProps {
   visualization: CompatibilityVisualization;
@@ -13,20 +12,21 @@ interface CompatibilityVisualizationProps {
 
 const CompatibilityVisualizationComponent: React.FC<CompatibilityVisualizationProps> = ({
   visualization,
-  className = ""
+  className = '',
 }) => {
-  const { overallScore, strengths, differences, dealbreakers, compatibilityBreakdown } = visualization;
+  const { overallScore, strengths, differences, dealbreakers, compatibilityBreakdown } =
+    visualization;
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600";
-    if (score >= 60) return "text-yellow-600";
-    return "text-red-600";
+    if (score >= 80) return 'text-green-600';
+    if (score >= 60) return 'text-yellow-600';
+    return 'text-red-600';
   };
 
   const getProgressColor = (score: number) => {
-    if (score >= 80) return "bg-green-500";
-    if (score >= 60) return "bg-yellow-500";
-    return "bg-red-500";
+    if (score >= 80) return 'bg-green-500';
+    if (score >= 60) return 'bg-yellow-500';
+    return 'bg-red-500';
   };
 
   const getCategoryIcon = (category: string) => {
@@ -53,11 +53,8 @@ const CompatibilityVisualizationComponent: React.FC<CompatibilityVisualizationPr
             </div>
             <p className="text-muted-foreground">Compatibilité globale</p>
           </div>
-          
-          <Progress 
-            value={overallScore} 
-            className="h-3"
-          />
+
+          <Progress value={overallScore} className="h-3" />
         </CardContent>
       </Card>
 
@@ -78,7 +75,7 @@ const CompatibilityVisualizationComponent: React.FC<CompatibilityVisualizationPr
                 {compatibilityBreakdown.religious}%
               </span>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
@@ -89,7 +86,7 @@ const CompatibilityVisualizationComponent: React.FC<CompatibilityVisualizationPr
                 {compatibilityBreakdown.lifestyle}%
               </span>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
@@ -100,7 +97,7 @@ const CompatibilityVisualizationComponent: React.FC<CompatibilityVisualizationPr
                 {compatibilityBreakdown.personal}%
               </span>
             </div>
-            
+
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Home className="h-4 w-4" />
@@ -136,9 +133,7 @@ const CompatibilityVisualizationComponent: React.FC<CompatibilityVisualizationPr
                         {Math.round(strength.score)}%
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {strength.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{strength.description}</p>
                   </div>
                 </div>
               ))}
@@ -168,9 +163,7 @@ const CompatibilityVisualizationComponent: React.FC<CompatibilityVisualizationPr
                         {Math.round(difference.score)}%
                       </Badge>
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {difference.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{difference.description}</p>
                   </div>
                 </div>
               ))}

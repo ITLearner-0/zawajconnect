@@ -36,7 +36,7 @@ export const useWaliRealtimeNotifications = () => {
           (payload) => {
             logger.realtime.log('New Wali registration received:', payload);
             const registration = payload.new as any;
-            
+
             toast({
               title: '🆕 Nouvelle inscription Wali',
               description: `${registration.first_name} ${registration.last_name} a soumis une demande d'inscription.`,
@@ -55,7 +55,7 @@ export const useWaliRealtimeNotifications = () => {
           (payload) => {
             const oldData = payload.old as any;
             const newData = payload.new as any;
-            
+
             // Only notify if status changed to pending (resubmission)
             if (oldData.status !== 'pending' && newData.status === 'pending') {
               toast({
@@ -86,14 +86,13 @@ export const useWaliRealtimeNotifications = () => {
           (payload) => {
             logger.realtime.log('New Wali alert received:', payload);
             const alert = payload.new as any;
-            
+
             // Only show toast for high and critical alerts
             if (alert.risk_level === 'high' || alert.risk_level === 'critical') {
               const emoji = alert.risk_level === 'critical' ? '🚨' : '⚠️';
-              const title = alert.risk_level === 'critical' 
-                ? 'Alerte CRITIQUE Wali' 
-                : 'Alerte Importante Wali';
-              
+              const title =
+                alert.risk_level === 'critical' ? 'Alerte CRITIQUE Wali' : 'Alerte Importante Wali';
+
               toast({
                 title: `${emoji} ${title}`,
                 description: alert.alert_type.replace('_', ' ').toUpperCase(),

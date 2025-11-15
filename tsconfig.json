@@ -1,22 +1,19 @@
 {
   "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
     /* Progressive Strict Mode - Phase 1 Active */
-    "noImplicitAny": true,                    // Prevent implicit 'any' types
-    "strictNullChecks": true,                 // Strict null/undefined checks
-    "skipLibCheck": true,                     // Skip lib checks for faster builds
-    "allowJs": true,                          // Allow JS files during migration
+    "noImplicitAny": true, // Prevent implicit 'any' types
+    "strictNullChecks": true, // Strict null/undefined checks
+    "skipLibCheck": true, // Skip lib checks for faster builds
+    "allowJs": true, // Allow JS files during migration
 
     /* Phase 2 - Enable later */
-    "noUnusedParameters": false,              // TODO: Enable after cleanup
-    "noUnusedLocals": false                  // TODO: Enable after cleanup
+    "noUnusedParameters": false, // TODO: Enable after cleanup
+    "noUnusedLocals": false // TODO: Enable after cleanup
   }
 }

@@ -1,4 +1,5 @@
 # ZawajConnect - Documentation complète pour Stripe
+
 ## Plateforme de rencontres matrimoniales musulmanes
 
 **Document préparé par:** Anthelme KAWA  
@@ -56,7 +57,8 @@ ZawajConnect est une plateforme innovante de rencontres matrimoniales musulmanes
 **Email professionnel:** contact@zawajconnect.me  
 **Site web:** https://zawajconnect.me
 
-**Représentant légal:** Anthelme KAWA (identité protégée publiquement sous "A.K.")  
+**Représentant légal:** Anthelme KAWA (identité protégée publiquement sous "A.K.")
+
 - **Fonction:** Fondateur & CEO
 - **Responsabilités:** Direction générale, développement produit, conformité légale
 
@@ -65,11 +67,13 @@ ZawajConnect est une plateforme innovante de rencontres matrimoniales musulmanes
 ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : offrir aux musulmans francophones une plateforme de rencontres matrimoniales qui respecte leurs valeurs tout en étant moderne et sécurisée.
 
 **Notre vision:**
+
 - Devenir la référence des rencontres matrimoniales musulmanes en Europe francophone
 - Faciliter 10,000+ mariages d'ici 2030
 - Maintenir un taux de satisfaction utilisateur supérieur à 90%
 
 **Nos valeurs:**
+
 1. **Respect:** Des utilisateurs, de leurs valeurs, de leur vie privée
 2. **Sécurité:** Protection maximale des données et des personnes
 3. **Transparence:** Communication claire sur nos pratiques et nos tarifs
@@ -79,12 +83,14 @@ ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : o
 ### 2.3 Équipe
 
 **Anthelme KAWA - Fondateur & CEO**
+
 - Développement produit et technique
 - Stratégie d'entreprise
 - Relations avec les partenaires (Stripe, Supabase)
 - Conformité légale et RGPD
 
 **Équipe support (prestataires)**
+
 - Modérateurs (3 personnes à terme)
 - Support client (2 personnes)
 - Conseiller juridique (externe)
@@ -96,9 +102,11 @@ ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : o
 ### 3.1 Offres et tarification
 
 #### 3.1.1 Offre Gratuite (Freemium)
+
 **Tarif:** 0€/mois
 
 **Fonctionnalités incluses:**
+
 - Création de profil complet
 - Test de compatibilité (5 questions/jour)
 - Consultation de 5 profils/jour
@@ -108,10 +116,12 @@ ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : o
 **Objectif:** Permettre aux utilisateurs de découvrir la plateforme et de commencer à créer des connexions.
 
 #### 3.1.2 Abonnement Premium
+
 **Tarif:** 29,99€/mois  
 **Prix Stripe ID:** `price_premium_monthly`
 
 **Fonctionnalités premium:**
+
 - Likes illimités
 - Consultation de profils illimitée
 - Test de compatibilité complet
@@ -122,15 +132,18 @@ ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : o
 - Support client prioritaire
 
 **Avantages pour l'utilisateur:**
+
 - Augmentation de 300% des chances de match
 - Accès à des profils plus qualifiés
 - Fonctionnalités de matching avancées basées sur l'IA
 
 #### 3.1.3 Abonnement Famille
+
 **Tarif:** 49,99€/mois  
 **Prix Stripe ID:** `price_family_monthly`
 
 **Toutes les fonctionnalités Premium +:**
+
 - Dashboard famille pour supervision
 - Invitations wali (3 membres famille)
 - Notifications famille sur les matchs
@@ -144,6 +157,7 @@ ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : o
 ### 3.2 Projections financières
 
 #### Année 1 (2025-2026)
+
 - **Utilisateurs gratuits:** 1,000
 - **Abonnés Premium:** 100 (10% conversion)
 - **Abonnés Famille:** 30 (3% conversion)
@@ -151,6 +165,7 @@ ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : o
 - **Revenu annuel estimé:** 53,964€
 
 #### Année 2 (2026-2027)
+
 - **Utilisateurs gratuits:** 5,000
 - **Abonnés Premium:** 750 (15% conversion)
 - **Abonnés Famille:** 200 (4% conversion)
@@ -158,6 +173,7 @@ ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : o
 - **Revenu annuel estimé:** 389,664€
 
 #### Année 3 (2027-2028)
+
 - **Utilisateurs gratuits:** 15,000
 - **Abonnés Premium:** 3,000 (20% conversion)
 - **Abonnés Famille:** 750 (5% conversion)
@@ -167,6 +183,7 @@ ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : o
 ### 3.3 Coûts opérationnels
 
 #### Coûts fixes mensuels
+
 - **Infrastructure (Supabase, hébergement):** 200€/mois
 - **Stripe (frais de traitement ~2.9% + 0.25€):** Variable
 - **Outils SaaS (email, analytics, etc.):** 100€/mois
@@ -175,6 +192,7 @@ ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : o
 - **Total coûts fixes:** ~500€/mois
 
 #### Coûts variables
+
 - **Support client:** 15€/heure (externe)
 - **Modération:** 20€/heure (externe)
 - **Marketing:** 20% du revenu
@@ -182,16 +200,19 @@ ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : o
 ### 3.4 Métriques de succès
 
 **Métriques d'acquisition:**
+
 - Coût d'acquisition client (CAC): Cible < 30€
 - Taux de conversion freemium → premium: Cible 15%
 - Taux de rétention mensuel: Cible > 85%
 
 **Métriques d'engagement:**
+
 - Utilisateurs actifs quotidiens (DAU): Cible 40% des inscrits
 - Nombre moyen de messages/utilisateur/jour: Cible 5
 - Temps moyen sur la plateforme: Cible 20 min/jour
 
 **Métriques de satisfaction:**
+
 - Net Promoter Score (NPS): Cible > 50
 - Taux de satisfaction support: Cible > 95%
 - Nombre de mariages facilités: Cible 100/an (année 2)
@@ -205,6 +226,7 @@ ZawajConnect a été fondée en 2025 pour répondre à un besoin spécifique : o
 ZawajConnect est entièrement conforme au RGPD. Nous prenons la protection des données personnelles très au sérieux.
 
 #### 4.1.1 Base légale du traitement
+
 - **Consentement explicite:** Pour le traitement des données sensibles (origines, religion)
 - **Exécution du contrat:** Pour la fourniture du service de matching
 - **Intérêt légitime:** Pour la sécurité et la prévention de la fraude
@@ -212,6 +234,7 @@ ZawajConnect est entièrement conforme au RGPD. Nous prenons la protection des d
 #### 4.1.2 Données collectées
 
 **Données obligatoires:**
+
 - Email (vérification obligatoire)
 - Nom complet
 - Date de naissance
@@ -219,6 +242,7 @@ ZawajConnect est entièrement conforme au RGPD. Nous prenons la protection des d
 - Localisation (ville uniquement, pas d'adresse complète)
 
 **Données optionnelles:**
+
 - Numéro de téléphone (pour vérification supplémentaire)
 - Photos (maximum 6)
 - Préférences islamiques (niveau de pratique, madhhab, etc.)
@@ -226,6 +250,7 @@ ZawajConnect est entièrement conforme au RGPD. Nous prenons la protection des d
 - Centres d'intérêt
 
 **Données sensibles (avec consentement explicite):**
+
 - Pratique religieuse
 - Préférences matrimoniales
 - Données familiales (si option famille activée)
@@ -254,6 +279,7 @@ Nous garantissons tous les droits RGPD:
 #### 4.1.5 Sous-traitants
 
 Tous nos sous-traitants sont conformes RGPD:
+
 - **Supabase:** Hébergement base de données (EU)
 - **Stripe:** Traitement des paiements (certifié PCI DSS)
 - **Resend:** Envoi d'emails transactionnels (EU)
@@ -265,6 +291,7 @@ Des accords de traitement de données (DPA) sont en place avec tous les sous-tra
 #### 4.2.1 Loi pour la confiance dans l'économie numérique (LCEN)
 
 **Mentions légales complètes:**
+
 - Identité du responsable (avec protection identité publique)
 - SIRET et adresse
 - Email de contact
@@ -277,18 +304,21 @@ Des accords de traitement de données (DPA) sont en place avec tous les sous-tra
 ZawajConnect applique strictement la réglementation française sur les sites de rencontres:
 
 **Vérification d'identité:**
+
 1. **Email:** Vérification obligatoire via lien de confirmation
 2. **Téléphone:** Optionnel mais fortement recommandé (SMS)
 3. **Document d'identité:** Optionnel pour badge "Vérifié"
 4. **Photo de profil:** Vérification anti-deepfake en cours de déploiement
 
 **Indicateurs de vérification:**
+
 - Badge "Email vérifié" (vert)
 - Badge "Téléphone vérifié" (bleu)
 - Badge "Identité vérifiée" (or)
 - Score de vérification (0-100)
 
 **Modération:**
+
 - Tous les profils sont vérifiés avant publication
 - Système de signalement accessible en 1 clic
 - Traitement des signalements sous 24h
@@ -297,6 +327,7 @@ ZawajConnect applique strictement la réglementation française sur les sites de
 #### 4.2.3 Protection des mineurs
 
 **Interdiction stricte des mineurs:**
+
 - Âge minimum: 18 ans révolus
 - Vérification date de naissance obligatoire
 - Case à cocher "Je confirme avoir 18 ans ou plus"
@@ -304,6 +335,7 @@ ZawajConnect applique strictement la réglementation française sur les sites de
 - Signalement prioritaire de tout profil suspect
 
 **En cas de détection d'un mineur:**
+
 1. Suspension immédiate du compte
 2. Suppression de toutes les données
 3. Signalement aux autorités si nécessaire
@@ -313,16 +345,19 @@ ZawajConnect applique strictement la réglementation française sur les sites de
 ZawajConnect respecte le DSA (applicable dès février 2024):
 
 **Transparence:**
+
 - Algorithmes de matching expliqués
 - Modération humaine et automatique documentée
 - Rapports de transparence publiés annuellement
 
 **Point de contact:**
+
 - Email dédié: legal@zawajconnect.me
 - Formulaire de contact sur le site
 - Réponse garantie sous 48h
 
 **Signalements:**
+
 - Système de signalement facile d'accès
 - Catégories claires (faux profil, contenu inapproprié, harcèlement)
 - Suivi transparent du traitement
@@ -330,12 +365,14 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 4.4 PSD2 et traitement des paiements
 
 **Conformité Stripe:**
+
 - Stripe est notre seul processeur de paiement
 - Certifié PCI DSS Level 1
 - Strong Customer Authentication (SCA) activée
 - 3D Secure 2.0 pour tous les paiements
 
 **Nous ne stockons AUCUNE donnée bancaire:**
+
 - Tous les paiements via Stripe Checkout
 - Pas de numéros de carte sur nos serveurs
 - Pas de CVV, dates d'expiration stockés
@@ -344,12 +381,14 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 4.5 Conditions Générales d'Utilisation (CGU)
 
 **Acceptation obligatoire:**
+
 - Case à cocher lors de l'inscription
 - Stockage de la date d'acceptation
 - Version des CGU enregistrée (v1.0)
 - Re-consentement si modifications majeures
 
 **Contenu des CGU:**
+
 1. Description du service
 2. Conditions d'inscription
 3. Obligations des utilisateurs
@@ -359,6 +398,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 7. Loi applicable et juridiction
 
 **Accessibilité:**
+
 - Disponibles sur `/terms-of-service`
 - Téléchargeables en PDF
 - Version archivée de chaque révision
@@ -366,6 +406,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 4.6 Politique de Confidentialité
 
 **Transparence totale sur:**
+
 - Données collectées et finalités
 - Base légale de chaque traitement
 - Durée de conservation
@@ -374,6 +415,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 - Cookies et trackers
 
 **Mise à jour:**
+
 - Révision annuelle minimum
 - Notification si changements substantiels
 - Historique des versions conservé
@@ -381,12 +423,14 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 4.7 Politique de Cookies
 
 **Gestion conforme:**
+
 - Banner de consentement au premier accès
 - Catégories: essentiels, analytiques, marketing
 - Refus possible sans impact sur le service
 - Révocation facile du consentement
 
 **Cookies utilisés:**
+
 - **Essentiels:** Session, authentification, sécurité
 - **Analytiques:** Google Analytics (avec anonymisation IP)
 - **Préférences:** Langue, thème, préférences UI
@@ -394,21 +438,25 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 4.8 Politique de Remboursement
 
 **Période de rétractation légale:**
+
 - 14 jours conformément au droit européen
 - Remboursement intégral sans justification
 - Traitement sous 5 jours ouvrés
 
 **Garantie "Satisfait ou Remboursé":**
+
 - 7 jours supplémentaires après la période légale
 - Remboursement intégral si aucun match
 - Process simple via email
 
 **Cas exceptionnels:**
+
 - Problèmes techniques majeurs: remboursement prorata
 - Fermeture de compte par la plateforme: remboursement intégral
 - Abonnement annuel: remboursement prorata après 14 jours
 
 **Exclusions:**
+
 - Violations des CGU
 - Abus avéré du système de remboursement
 - Utilisation intensive du service avant demande
@@ -422,12 +470,14 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.1.1 Infrastructure
 
 **Hébergement:**
+
 - **Base de données:** Supabase (serveurs EU)
 - **Stockage fichiers:** Supabase Storage (EU)
 - **CDN:** Cloudflare (avec DDoS protection)
 - **Backup:** Quotidien, rétention 30 jours
 
 **Certifications:**
+
 - ISO 27001 (Supabase)
 - SOC 2 Type II (Supabase)
 - PCI DSS Level 1 (Stripe)
@@ -435,16 +485,19 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.1.2 Chiffrement
 
 **En transit:**
+
 - TLS 1.3 obligatoire
 - HSTS activé
 - Certificats SSL/TLS gérés automatiquement
 
 **Au repos:**
+
 - Chiffrement AES-256
 - Clés de chiffrement gérées par Supabase
 - Pas de données sensibles en clair
 
 **Mots de passe:**
+
 - Bcrypt avec salt unique
 - Coût factor: 12
 - Jamais stockés en clair, jamais loggés
@@ -452,11 +505,13 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.1.3 Authentification
 
 **Méthodes supportées:**
+
 - Email + mot de passe (primary)
 - Magic links (sans mot de passe)
-- OAuth social (Google, Facebook) - *en préparation*
+- OAuth social (Google, Facebook) - _en préparation_
 
 **Politique de mots de passe:**
+
 - Minimum 8 caractères
 - Au moins 1 majuscule
 - Au moins 1 chiffre
@@ -464,6 +519,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 - Vérification contre mots de passe connus (Have I Been Pwned)
 
 **2FA (Two-Factor Authentication):**
+
 - Activable sur demande
 - Via SMS ou application (TOTP)
 - Obligatoire pour accès admin
@@ -471,11 +527,13 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.1.4 Contrôles d'accès
 
 **Row Level Security (RLS):**
+
 - Activé sur toutes les tables sensibles
 - Les utilisateurs ne peuvent accéder qu'à leurs données
 - Vérifications au niveau base de données
 
 **Principe du moindre privilège:**
+
 - Rôles utilisateurs: user, moderator, admin, super_admin
 - Permissions granulaires par table
 - Audit de tous les accès administrateurs
@@ -485,12 +543,14 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.2.1 Modération automatique
 
 **Analyse des messages:**
+
 - IA de détection de contenu inapproprié
 - Filtrage des coordonnées personnelles
 - Détection de demandes de rencontre privée
 - Identification de propos contraires aux valeurs islamiques
 
 **Catégories surveillées:**
+
 1. Vulgarité et grossièreté
 2. Partage d'informations personnelles (email, téléphone, adresse)
 3. Demandes de rencontre sans présence familiale
@@ -499,6 +559,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 6. Contenu commercial ou spam
 
 **Actions automatiques:**
+
 - **Warn:** Avertissement utilisateur + modération humaine
 - **Block:** Blocage du message + notification
 - **Suspend:** Suspension temporaire du compte (cas graves)
@@ -506,17 +567,20 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.2.2 Modération humaine
 
 **Équipe:**
+
 - 3 modérateurs (objectif fin 2025)
 - Disponibilité 7j/7, 9h-21h
 - Formation sur les valeurs islamiques et la législation
 
 **Process:**
+
 1. Review des contenus signalés (priorité haute)
 2. Vérification des nouveaux profils (24h max)
 3. Analyse des conversations signalées
 4. Décision: approbation, modification, suppression, sanction
 
 **Temps de réponse:**
+
 - Contenus signalés urgents: < 2h
 - Contenus signalés standards: < 24h
 - Nouveaux profils: < 24h
@@ -524,11 +588,13 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.2.3 Système de signalement
 
 **Accessibilité:**
+
 - Bouton "Signaler" sur chaque profil et message
 - Formulaire simple et rapide
 - Catégories prédéfinies
 
 **Catégories de signalement:**
+
 - Faux profil / usurpation d'identité
 - Contenu inapproprié
 - Harcèlement
@@ -538,6 +604,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 - Autre (avec description)
 
 **Suivi:**
+
 - Confirmation de réception immédiate
 - Notification du résultat sous 48h
 - Anonymat du signalant garanti
@@ -545,6 +612,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.2.4 Sanctions
 
 **Échelle de sanctions:**
+
 1. **Avertissement:** 1ère infraction mineure
 2. **Restriction:** Limitation des fonctionnalités (7 jours)
 3. **Suspension:** Compte gelé (14-30 jours)
@@ -552,6 +620,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 5. **Signalement autorités:** Cas illégaux (mineurs, escroquerie)
 
 **Registre des sanctions:**
+
 - Historique conservé par utilisateur
 - Audit trail complet
 - Révision possible sur demande
@@ -561,6 +630,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.3.1 Détection de faux profils
 
 **Indicateurs:**
+
 - Photos de stock ou célébrités (détection IA)
 - Informations incohérentes
 - Activité suspecte (like spam, messages identiques)
@@ -568,6 +638,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 - Demandes d'argent ou coordonnées externes
 
 **Actions:**
+
 - Vérification manuelle obligatoire
 - Limitation des actions (pas de messages avant validation)
 - Suspension si suspicion confirmée
@@ -575,12 +646,14 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.3.2 Protection financière
 
 **Prévention fraude paiement:**
+
 - Stripe Radar activé (machine learning anti-fraude)
 - 3D Secure obligatoire
 - Détection de cartes volées
 - Limitation des tentatives de paiement
 
 **Remboursements frauduleux:**
+
 - Limite: 1 remboursement par 6 mois
 - Analyse de l'utilisation avant remboursement
 - Blacklist en cas d'abus avéré
@@ -588,12 +661,14 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.3.3 Protection vie privée
 
 **Données minimales:**
+
 - Pas de localisation GPS
 - Ville uniquement, pas d'adresse
 - Téléphone optionnel et jamais visible
 - Email jamais partagé avec autres utilisateurs
 
 **Contrôle utilisateur:**
+
 - Blocage d'utilisateurs
 - Invisibilité temporaire
 - Filtres de qui peut voir le profil
@@ -604,6 +679,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.4.1 Plan de réponse aux incidents
 
 **Étapes:**
+
 1. **Détection:** Monitoring 24/7, alertes automatiques
 2. **Confinement:** Isolation de la menace
 3. **Éradication:** Suppression de la vulnérabilité
@@ -611,6 +687,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 5. **Post-mortem:** Analyse et amélioration
 
 **Délais cibles:**
+
 - Détection: < 15 minutes
 - Première réponse: < 30 minutes
 - Confinement: < 2 heures
@@ -619,11 +696,13 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 5.4.2 Breach notification
 
 **Obligation légale:**
+
 - CNIL sous 72h en cas de breach
 - Utilisateurs affectés sous 72h
 - Documentation complète de l'incident
 
 **Communication:**
+
 - Email à tous les utilisateurs affectés
 - Banner sur le site
 - Page dédiée avec FAQ
@@ -632,12 +711,14 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 5.5 Audits et certifications
 
 **Programme d'audit:**
+
 - **Audit de sécurité:** Trimestriel (interne)
 - **Penetration testing:** Annuel (externe)
 - **Audit RGPD:** Annuel
 - **Revue RLS policies:** Mensuelle
 
 **Certifications visées:**
+
 - ISO 27001 (2026)
 - SOC 2 Type II (2027)
 
@@ -650,6 +731,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 6.1.1 Risques légaux
 
 **Risque: Non-conformité RGPD**
+
 - **Impact:** Amendes jusqu'à 20M€ ou 4% du CA
 - **Probabilité:** Faible (conformité stricte)
 - **Mitigation:**
@@ -659,6 +741,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
   - Documentation exhaustive
 
 **Risque: Violation droits utilisateurs**
+
 - **Impact:** Poursuites, réputation
 - **Probabilité:** Très faible
 - **Mitigation:**
@@ -668,6 +751,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
   - Sanctions claires et appliquées
 
 **Risque: Présence de mineurs**
+
 - **Impact:** Fermeture, poursuites pénales
 - **Probabilité:** Très faible
 - **Mitigation:**
@@ -679,6 +763,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 6.1.2 Risques financiers
 
 **Risque: Chargebacks excessifs**
+
 - **Impact:** Frais Stripe, suspension compte
 - **Probabilité:** Faible
 - **Mitigation:**
@@ -688,6 +773,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
   - Stripe Radar pour fraude
 
 **Risque: Modèle économique non viable**
+
 - **Impact:** Fermeture
 - **Probabilité:** Moyenne (nouveau marché)
 - **Mitigation:**
@@ -699,6 +785,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 6.1.3 Risques techniques
 
 **Risque: Breach de données**
+
 - **Impact:** Réputation, légal, financier
 - **Probabilité:** Faible (infrastructure sécurisée)
 - **Mitigation:**
@@ -708,6 +795,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
   - Assurance cyber en cours
 
 **Risque: Downtime**
+
 - **Impact:** Perte utilisateurs, réputation
 - **Probabilité:** Faible (Supabase SLA 99.9%)
 - **Mitigation:**
@@ -719,6 +807,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 #### 6.1.4 Risques réputationnels
 
 **Risque: Bad press (échecs matching, scams)**
+
 - **Impact:** Perte utilisateurs, confiance
 - **Probabilité:** Moyenne (inhérent au secteur)
 - **Mitigation:**
@@ -728,6 +817,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
   - Gestion de crise préparée
 
 **Risque: Controverse religieuse**
+
 - **Impact:** Boycott, critiques communautaires
 - **Probabilité:** Faible
 - **Mitigation:**
@@ -739,11 +829,13 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 6.2 Assurances
 
 **Assurances souscrites:**
+
 1. **Responsabilité Civile Professionnelle:** 1M€
 2. **Protection Juridique:** 50k€
 3. **Cyber-assurance:** En cours de souscription (500k€)
 
 **Couverture:**
+
 - Erreurs et omissions
 - Violation de données
 - Réclamations clients
@@ -756,20 +848,24 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 7.1 Canaux de support
 
 **Email:** support@zawajconnect.me
+
 - Réponse sous 24h (jours ouvrés)
 - Support en français
 - Suivi de ticket avec numéro
 
 **Formulaire de contact:** Sur le site
+
 - Catégorisation automatique
 - Accusé réception immédiat
 
 **FAQ complète:** /faq
+
 - 50+ questions courantes
 - Mise à jour mensuelle
 - Recherche intégrée
 
 **Centre d'aide:** /help
+
 - Guides pas à pas
 - Vidéos tutoriels
 - Troubleshooting
@@ -777,16 +873,19 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 7.2 Niveaux de support
 
 #### Utilisateurs gratuits
+
 - Support email sous 48h
 - Accès à la FAQ et centre d'aide
 - Formulaire de contact standard
 
 #### Utilisateurs Premium
+
 - Support email sous 24h
 - Badge "Support prioritaire"
 - Réponse week-ends (48h)
 
 #### Utilisateurs Famille
+
 - Support dédié sous 12h
 - Email direct support famille
 - Assistance téléphonique (sur RDV)
@@ -794,23 +893,27 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 7.3 Types de demandes
 
 **Technique:**
+
 - Problèmes de connexion
 - Bugs d'affichage
 - Paiements non fonctionnels
 - Performance
 
 **Compte:**
+
 - Modification profil
 - Suppression compte
 - Export données
 - Remboursements
 
 **Modération:**
+
 - Contestation de sanction
 - Signalement non traité
 - Questions sur les règles
 
 **Matching:**
+
 - Problèmes d'algorithme
 - Questions sur compatibilité
 - Suggestions d'amélioration
@@ -818,12 +921,14 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 7.4 Satisfaction client
 
 **Objectifs:**
+
 - Taux de résolution au premier contact: > 70%
 - Temps de résolution moyen: < 48h
 - Satisfaction support: > 90%
 - NPS global: > 50
 
 **Mesures:**
+
 - Enquête de satisfaction après chaque ticket
 - Revue mensuelle des feedbacks
 - Amélioration continue des process
@@ -835,11 +940,13 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 8.1 Période de rétractation (14 jours)
 
 **Droit légal européen:**
+
 - 14 jours à compter de la souscription
 - Remboursement intégral sans justification
 - Aucune condition d'utilisation
 
 **Process:**
+
 1. Email à refunds@zawajconnect.me
 2. Confirmation sous 24h
 3. Remboursement traité sous 5 jours
@@ -848,11 +955,13 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 8.2 Garantie "Satisfait ou Remboursé" (7 jours)
 
 **Conditions:**
+
 - Applicable après la période légale (jours 15-21)
 - Remboursement si aucun match ou insatisfaction
 - Explication simple demandée (amélioration service)
 
 **Exclusions:**
+
 - Violations CGU avérées
 - Compte suspendu pour mauvais comportement
 - Abus répété du système
@@ -860,22 +969,26 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 8.3 Remboursements exceptionnels
 
 **Problèmes techniques majeurs:**
+
 - Service indisponible > 48h: remboursement prorata
 - Bug empêchant utilisation: remboursement intégral
 - Perte de données par notre faute: remboursement + compensation
 
 **Fermeture de compte par la plateforme:**
+
 - Si fermeture abusive: remboursement intégral + excuses
 - Si fermeture pour violation CGU: pas de remboursement
 
 ### 8.4 Annulation d'abonnement
 
 **Pas de remboursement pour:**
+
 - Annulation durant un cycle en cours
 - Le service reste accessible jusqu'à la fin
 - Pas de renouvellement automatique après annulation
 
 **Facilité d'annulation:**
+
 - En 2 clics depuis les paramètres
 - Pas de justification demandée
 - Confirmation immédiate
@@ -884,16 +997,19 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 8.5 Litiges et médiation
 
 **Résolution amiable:**
+
 - Premier contact: support@zawajconnect.me
 - Escalade: legal@zawajconnect.me
 - Délai réponse: 10 jours maximum
 
 **Médiation consommateur:**
+
 - Plateforme RLL (Règlement en Ligne des Litiges)
 - Médiateur de la consommation agréé
 - Gratuit pour le consommateur
 
 **Juridiction:**
+
 - Droit français applicable
 - Tribunaux de Paris compétents
 - Médiation préalable fortement recommandée
@@ -905,6 +1021,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 9.1 Stack technologique
 
 **Frontend:**
+
 - React 18 avec TypeScript
 - Vite (build tool)
 - Tailwind CSS (design system)
@@ -912,16 +1029,19 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 - React Router (navigation)
 
 **Backend:**
+
 - Supabase (PostgreSQL + Auth + Storage)
 - Edge Functions (Deno)
 - Row Level Security (RLS)
 
 **Paiements:**
+
 - Stripe Checkout
 - Stripe Billing (abonnements)
 - Stripe Customer Portal
 
 **Infrastructure:**
+
 - Hébergement: Lovable/Vercel
 - CDN: Cloudflare
 - Email: Resend
@@ -930,6 +1050,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 9.2 Base de données
 
 **Tables principales:**
+
 - `profiles`: Données utilisateurs
 - `islamic_preferences`: Préférences religieuses
 - `matches`: Matchs et likes
@@ -940,6 +1061,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 - `moderation_logs`: Logs modération
 
 **Sécurité:**
+
 - RLS activé sur toutes les tables
 - Politique zero-trust
 - Audit trail sur tables sensibles
@@ -947,6 +1069,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 9.3 Algorithme de matching
 
 **Critères de compatibilité:**
+
 1. **Préférences islamiques (40%):**
    - Niveau de pratique
    - Madhhab (école juridique)
@@ -966,6 +1089,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
    - Valeurs familiales
 
 **IA et Machine Learning:**
+
 - Amélioration continue basée sur les succès
 - Pondération adaptive des critères
 - Détection de patterns de matches réussis
@@ -973,16 +1097,19 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 9.4 Performance et scalabilité
 
 **Métriques actuelles:**
+
 - Page load: < 2s (3G)
 - Time to Interactive: < 3s
 - Core Web Vitals: Tous verts
 
 **Capacité:**
+
 - Infrastructure: 10,000 utilisateurs simultanés
 - Base de données: Scaling automatique Supabase
 - CDN: Distribution mondiale via Cloudflare
 
 **Monitoring:**
+
 - Uptime monitoring (UptimeRobot)
 - Performance monitoring (Lighthouse CI)
 - Error tracking (Sentry)
@@ -995,6 +1122,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 10.1 Roadmap produit
 
 #### Q4 2025 (Actuel)
+
 - ✅ MVP fonctionnel
 - ✅ Système de matching basique
 - ✅ Abonnements Stripe
@@ -1003,6 +1131,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 - 🔄 Supervision familiale
 
 #### Q1 2026
+
 - Appli mobile (iOS + Android)
 - Amélioration algorithme IA
 - Système de notation profils
@@ -1010,6 +1139,7 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 - Programme de parrainage
 
 #### Q2 2026
+
 - Événements communautaires
 - Webinaires matrimoniaux
 - Conseils d'experts (imams, psychologues)
@@ -1017,12 +1147,14 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 - Traduction arabe
 
 #### Q3 2026
+
 - Expansion Belgique, Suisse
 - Partenariats mosquées
 - Blog conseils matrimoniaux
 - API pour intégrations tierces
 
 #### Q4 2026
+
 - Offre entreprise (événements)
 - Service concierge premium
 - Coaching personnalisé
@@ -1031,24 +1163,28 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 10.2 Vision à 5 ans
 
 **2027:** Leader européen rencontres musulmanes francophones
+
 - 50,000+ utilisateurs actifs
 - 500+ mariages facilités par an
 - Présence dans 5 pays européens
 - Équipe de 15 personnes
 
 **2028:** Expansion internationale
+
 - Lancement UK et USA
 - 150,000+ utilisateurs
 - Partenariats avec organisations islamiques majeures
 - Certifications et labels qualité
 
 **2029:** Plateforme complète écosystème matrimonial
+
 - Services pré-mariage (formation, conseils)
 - Services post-mariage (support, communauté)
 - Marketplace prestataires mariages halal
 - 500,000+ utilisateurs, 2,000+ mariages/an
 
 **2030:** Référence mondiale rencontres matrimoniales musulmanes
+
 - 1M+ utilisateurs
 - Présence sur 4 continents
 - 5,000+ mariages facilités par an
@@ -1057,11 +1193,13 @@ ZawajConnect respecte le DSA (applicable dès février 2024):
 ### 10.3 Engagement développement durable
 
 **Impact social positif:**
+
 - Faciliter des unions stables et heureuses
 - Réduire le célibat prolongé dans la communauté
 - Promouvoir des valeurs saines
 
 **Responsabilité:**
+
 - Infrastructure bas carbone (EU)
 - Politique de travail éthique
 - Transparence financière
@@ -1085,6 +1223,7 @@ ZawajConnect n'est pas simplement une plateforme de rencontres. C'est une soluti
 **Partenariat Stripe:**
 
 Nous avons choisi Stripe car:
+
 - Infrastructure de paiement la plus sécurisée (PCI DSS Level 1)
 - Conformité PSD2 et SCA
 - Support excellent pour abonnements récurrents
@@ -1096,6 +1235,7 @@ Nous sommes engagés à maintenir un taux de chargeback < 0.5% et à traiter tou
 **Engagement:**
 
 Nous nous engageons à:
+
 - Respecter scrupuleusement toutes les réglementations
 - Protéger les données de nos utilisateurs comme nos propres données
 - Fournir un service de qualité supérieure
@@ -1106,6 +1246,7 @@ Nous nous engageons à:
 **Contact:**
 
 Pour toute question concernant cette soumission:
+
 - **Email:** contact@zawajconnect.me
 - **Nom:** Anthelme KAWA
 - **Fonction:** Fondateur & CEO
@@ -1122,7 +1263,7 @@ Nous sommes impatients de collaborer avec Stripe pour offrir le meilleur service
 
 ---
 
-*Signature électronique:*
+_Signature électronique:_
 
 **Anthelme KAWA**  
 Fondateur & CEO, ZawajConnect  

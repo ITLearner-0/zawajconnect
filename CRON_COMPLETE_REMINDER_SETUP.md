@@ -4,12 +4,12 @@
 
 Ce système de rappels automatiques en **3 étapes** maximise les taux de renouvellement avec une **urgence croissante** :
 
-| Timing | Fonction | Urgence | Heure | Description |
-|--------|----------|---------|-------|-------------|
-| **J-7** | `remind-expiring-subscriptions` | 🟡 Modérée | 09:00 | Premier rappel avec offre exclusive |
-| **J-3** | `remind-expiring-3days` | 🟠 Élevée | 09:00 | Rappel urgent avec compte à rebours |
-| **J-1** | `remind-expiring-1day` | 🔴 Critique | 09:00 | Dernière chance avec animations visuelles |
-| **J** | `expire-subscriptions` | ⚫ Expiration | 00:00 | Expiration automatique + notification |
+| Timing  | Fonction                        | Urgence       | Heure | Description                               |
+| ------- | ------------------------------- | ------------- | ----- | ----------------------------------------- |
+| **J-7** | `remind-expiring-subscriptions` | 🟡 Modérée    | 09:00 | Premier rappel avec offre exclusive       |
+| **J-3** | `remind-expiring-3days`         | 🟠 Élevée     | 09:00 | Rappel urgent avec compte à rebours       |
+| **J-1** | `remind-expiring-1day`          | 🔴 Critique   | 09:00 | Dernière chance avec animations visuelles |
+| **J**   | `expire-subscriptions`          | ⚫ Expiration | 00:00 | Expiration automatique + notification     |
 
 ## 🚀 Configuration Rapide - Exécuter tout le SQL en une fois
 
@@ -80,7 +80,7 @@ SELECT cron.schedule(
 
 ```sql
 -- Voir tous les cron jobs de rappels configurés
-SELECT 
+SELECT
   jobid,
   jobname,
   schedule,
@@ -94,6 +94,7 @@ ORDER BY jobname;
 ## 📊 Caractéristiques des Emails par Étape
 
 ### 🟡 J-7 : Premier Rappel (Modéré)
+
 - **Design** : Orange/Jaune, professionnel
 - **Ton** : Informatif et engageant
 - **Éléments visuels** :
@@ -105,6 +106,7 @@ ORDER BY jobname;
 - **Objectif** : Informer et proposer l'offre
 
 ### 🟠 J-3 : Rappel Urgent (Élevé)
+
 - **Design** : Orange vif avec bordures, plus dynamique
 - **Ton** : Plus urgent, rappel des pertes
 - **Éléments visuels** :
@@ -118,6 +120,7 @@ ORDER BY jobname;
 - **Objectif** : Créer un sentiment d'urgence
 
 ### 🔴 J-1 : Dernière Chance (Critique)
+
 - **Design** : Rouge intense avec animations
 - **Ton** : Très urgent, dramatique
 - **Éléments visuels** :
@@ -140,7 +143,7 @@ J-7:  🟡 Calm & Professional
       └─ Animations subtiles
       └─ Ton informatif
 
-J-3:  🟠 Warning & Urgent  
+J-3:  🟠 Warning & Urgent
       └─ Gradient orange
       └─ Animations pulse
       └─ Ton pressant
@@ -184,22 +187,24 @@ SELECT net.http_post(
 
 ## 📈 KPIs à Suivre par Étape
 
-| Métrique | J-7 | J-3 | J-1 | Objectif |
-|----------|-----|-----|-----|----------|
-| **Taux d'ouverture** | 35-45% | 45-55% | 55-70% | Augmentation progressive |
-| **Taux de clic** | 15-20% | 20-30% | 30-45% | Plus d'urgence = plus de clics |
-| **Taux de conversion** | 8-12% | 12-18% | 18-30% | Maximiser à J-1 |
-| **Délai de conversion** | 2-4 jours | 1-2 jours | < 24h | Réaction plus rapide |
+| Métrique                | J-7       | J-3       | J-1    | Objectif                       |
+| ----------------------- | --------- | --------- | ------ | ------------------------------ |
+| **Taux d'ouverture**    | 35-45%    | 45-55%    | 55-70% | Augmentation progressive       |
+| **Taux de clic**        | 15-20%    | 20-30%    | 30-45% | Plus d'urgence = plus de clics |
+| **Taux de conversion**  | 8-12%     | 12-18%    | 18-30% | Maximiser à J-1                |
+| **Délai de conversion** | 2-4 jours | 1-2 jours | < 24h  | Réaction plus rapide           |
 
 ## 🎯 Optimisations Recommandées
 
 ### Tests A/B suggérés
+
 1. **Offre de réduction** : Tester -20% vs -15%
 2. **Heure d'envoi** : 9h vs 18h vs 20h
 3. **Fréquence J-1** : Un seul email vs deux emails (matin + soir)
 4. **Subject line** : Tester différentes formulations
 
 ### Segmentation avancée
+
 ```sql
 -- Segmenter par valeur client
 -- Clients premium 12 mois = plus de valeur = offre spéciale
@@ -209,6 +214,7 @@ SELECT net.http_post(
 ## 🗑️ Gestion des Cron Jobs
 
 ### Désactiver tous les rappels temporairement
+
 ```sql
 -- Désactiver J-7
 SELECT cron.alter_job(
@@ -230,6 +236,7 @@ SELECT cron.alter_job(
 ```
 
 ### Supprimer tous les rappels
+
 ```sql
 SELECT cron.unschedule('remind-expiring-subscriptions-daily');
 SELECT cron.unschedule('remind-expiring-3days-daily');
@@ -240,6 +247,7 @@ SELECT cron.unschedule('expire-subscriptions-daily');
 ## 📧 Configuration Email Domaine
 
 **Important** : Remplacez `onboarding@resend.dev` par votre domaine vérifié dans les 3 fichiers :
+
 - `supabase/functions/remind-expiring-subscriptions/index.ts`
 - `supabase/functions/remind-expiring-3days/index.ts`
 - `supabase/functions/remind-expiring-1day/index.ts`

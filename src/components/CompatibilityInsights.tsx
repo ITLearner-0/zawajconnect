@@ -4,18 +4,21 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Heart, 
-  AlertTriangle, 
-  Lightbulb, 
-  TrendingUp, 
+import {
+  Heart,
+  AlertTriangle,
+  Lightbulb,
+  TrendingUp,
   BookOpen,
   Star,
   Target,
   Users,
-  Brain
+  Brain,
 } from 'lucide-react';
-import { useCompatibilityInsights, type UseCompatibilityInsightsReturn } from '@/hooks/useCompatibilityInsights';
+import {
+  useCompatibilityInsights,
+  type UseCompatibilityInsightsReturn,
+} from '@/hooks/useCompatibilityInsights';
 import CompatibilityScoreChart from '@/components/CompatibilityScoreChart';
 import InsightsActionPanel from '@/components/InsightsActionPanel';
 import InsightsSummaryCard from '@/components/InsightsSummaryCard';
@@ -30,9 +33,9 @@ interface CompatibilityInsightsProps {
   showActions?: boolean;
 }
 
-const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({ 
-  userId, 
-  showActions = true 
+const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
+  userId,
+  showActions = true,
 }) => {
   const { insights, loading }: UseCompatibilityInsightsReturn = useCompatibilityInsights(userId);
   const navigate = useNavigate();
@@ -67,7 +70,7 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
             Complétez le test de compatibilité pour obtenir des insights personnalisés.
           </p>
           {showActions && (
-            <Button 
+            <Button
               onClick={() => navigate('/compatibility-test')}
               className="animate-pulse-gentle hover:animate-none"
             >
@@ -85,10 +88,7 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
       <InsightsSummaryCard userId={userId} />
 
       {/* Detailed Compatibility Chart */}
-      <CompatibilityScoreChart 
-        areas={insights.compatibilityAreas} 
-        showTrends={true} 
-      />
+      <CompatibilityScoreChart areas={insights.compatibilityAreas} showTrends={true} />
 
       {/* Profile Summary */}
       <Card>
@@ -112,9 +112,7 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
             </div>
             <div>
               <h4 className="font-semibold mb-2">Style de Relation</h4>
-              <p className="text-sm text-muted-foreground">
-                {insights.relationshipStyle}
-              </p>
+              <p className="text-sm text-muted-foreground">{insights.relationshipStyle}</p>
             </div>
           </div>
           <Separator />
@@ -166,9 +164,7 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
               {insights.suggestions.map((suggestion, index) => (
                 <Alert key={index}>
                   <Lightbulb className="h-4 w-4" />
-                  <AlertDescription className="font-medium">
-                    {suggestion.title}
-                  </AlertDescription>
+                  <AlertDescription className="font-medium">{suggestion.title}</AlertDescription>
                   <AlertDescription className="text-sm text-muted-foreground mt-1">
                     {suggestion.description}
                   </AlertDescription>
@@ -240,14 +236,14 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
             <Card>
               <CardContent className="p-4">
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button 
+                  <Button
                     onClick={() => navigate('/compatibility-test')}
                     variant="outline"
                     className="w-full sm:w-auto"
                   >
                     Modifier mes réponses
                   </Button>
-                  <Button 
+                  <Button
                     onClick={() => navigate('/browse')}
                     className="bg-gradient-to-r from-primary to-primary/80 w-full sm:w-auto"
                   >
@@ -257,11 +253,8 @@ const CompatibilityInsights: React.FC<CompatibilityInsightsProps> = ({
                 </div>
               </CardContent>
             </Card>
-            
-            <InsightsActionPanel 
-              completionPercentage={100} 
-              insightsAvailable={true} 
-            />
+
+            <InsightsActionPanel completionPercentage={100} insightsAvailable={true} />
           </div>
         </div>
       )}

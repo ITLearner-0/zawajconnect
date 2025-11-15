@@ -16,7 +16,9 @@ export const useMatchApproval = () => {
   const loadMatchesForApproval = async () => {
     try {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Récupérer les family_members où l'utilisateur actuel est le wali invité
@@ -32,12 +34,13 @@ export const useMatchApproval = () => {
         return;
       }
 
-      const supervisedUserIds = familyMembers.map(fm => fm.user_id);
+      const supervisedUserIds = familyMembers.map((fm) => fm.user_id);
 
       // Récupérer les matches nécessitant approbation
       const { data: matchesData } = await supabase
         .from('matches')
-        .select(`
+        .select(
+          `
           id,
           user1_id,
           user2_id,
@@ -46,7 +49,8 @@ export const useMatchApproval = () => {
           can_communicate,
           family_approved,
           family_notes
-        `)
+        `
+        )
         .in('user1_id', supervisedUserIds)
         .eq('is_mutual', true)
         .is('family_approved', null)
@@ -59,8 +63,8 @@ export const useMatchApproval = () => {
 
       // Récupérer tous les profils en une seule requête
       const allUserIds = [
-        ...matchesData.map(m => m.user1_id),
-        ...matchesData.map(m => m.user2_id)
+        ...matchesData.map((m) => m.user1_id),
+        ...matchesData.map((m) => m.user2_id),
       ];
 
       const { data: profiles } = await supabase
@@ -74,14 +78,17 @@ export const useMatchApproval = () => {
       }
 
       // Créer un map des profils pour un accès rapide
-      const profileMap = profiles.reduce((acc, profile) => {
-        acc[profile.user_id] = profile;
-        return acc;
-      }, {} as Record<string, any>);
+      const profileMap = profiles.reduce(
+        (acc, profile) => {
+          acc[profile.user_id] = profile;
+          return acc;
+        },
+        {} as Record<string, any>
+      );
 
       // Formater les matches avec les vraies données de profil
-      const formattedMatches: MatchApprovalData[] = matchesData.map(match => {
-        const familyMember = familyMembers.find(fm => fm.user_id === match.user1_id);
+      const formattedMatches: MatchApprovalData[] = matchesData.map((match) => {
+        const familyMember = familyMembers.find((fm) => fm.user_id === match.user1_id);
         const user1Profile = profileMap[match.user1_id];
         const user2Profile = profileMap[match.user2_id];
 
@@ -103,7 +110,7 @@ export const useMatchApproval = () => {
             profession: user1Profile?.profession,
             location: user1Profile?.location,
             bio: user1Profile?.bio,
-            avatar_url: user1Profile?.avatar_url
+            avatar_url: user1Profile?.avatar_url,
           },
           user2_profile: {
             id: match.user2_id,
@@ -112,8 +119,8 @@ export const useMatchApproval = () => {
             profession: user2Profile?.profession,
             location: user2Profile?.location,
             bio: user2Profile?.bio,
-            avatar_url: user2Profile?.avatar_url
-          }
+            avatar_url: user2Profile?.avatar_url,
+          },
         };
       });
 
@@ -121,9 +128,9 @@ export const useMatchApproval = () => {
     } catch (error) {
       console.error('Error loading matches for approval:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les matches pour approbation",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les matches pour approbation',
+        variant: 'destructive',
       });
       setMatches([]);
     } finally {
@@ -134,18 +141,20 @@ export const useMatchApproval = () => {
   const processApprovalDecision = async (match: MatchApprovalData, decision: ApprovalDecision) => {
     if (!match.family_member_id) {
       toast({
-        title: "Erreur",
-        description: "Impossible de traiter cette décision",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de traiter cette décision',
+        variant: 'destructive',
       });
       return false;
     }
 
     try {
       setProcessingId(match.id);
-      
+
       // Récupérer l'utilisateur actuel
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         throw new Error('User not authenticated');
       }
@@ -157,15 +166,13 @@ export const useMatchApproval = () => {
       }
 
       // Créer une révision familiale avec le bon family_member_id
-      const { error: reviewError } = await supabase
-        .from('family_reviews')
-        .insert({
-          match_id: match.id,
-          family_member_id: match.family_member_id,
-          status: decision.approved ? 'approved' : 'rejected',
-          notes: decision.notes,
-          reviewed_at: new Date().toISOString()
-        });
+      const { error: reviewError } = await supabase.from('family_reviews').insert({
+        match_id: match.id,
+        family_member_id: match.family_member_id,
+        status: decision.approved ? 'approved' : 'rejected',
+        notes: decision.notes,
+        reviewed_at: new Date().toISOString(),
+      });
 
       if (reviewError) throw reviewError;
 
@@ -176,7 +183,7 @@ export const useMatchApproval = () => {
           family_approved: decision.approved,
           can_communicate: decision.approved,
           family_reviewed_at: new Date().toISOString(),
-          family_notes: decision.notes
+          family_notes: decision.notes,
         })
         .eq('id', match.id);
 
@@ -187,14 +194,16 @@ export const useMatchApproval = () => {
         body: {
           userId: match.supervised_user_id,
           type: decision.approved ? 'match_approved' : 'match_rejected',
-          title: decision.approved ? 'Match approuvé par votre famille' : 'Match refusé par votre famille',
+          title: decision.approved
+            ? 'Match approuvé par votre famille'
+            : 'Match refusé par votre famille',
           content: `Votre famille a ${decision.approved ? 'approuvé' : 'refusé'} le match avec ${match.user2_profile.full_name}. ${decision.notes}`,
-          matchId: match.id
-        }
+          matchId: match.id,
+        },
       });
 
       // Supprimer de la liste locale
-      setMatches(prev => prev.filter(m => m.id !== match.id));
+      setMatches((prev) => prev.filter((m) => m.id !== match.id));
 
       // AUDIT: Logger l'action avec succès
       await logAction({
@@ -206,30 +215,32 @@ export const useMatchApproval = () => {
           user2_name: match.user2_profile.full_name,
           notes: decision.notes,
           conditions: decision.conditions,
-          meeting_required: decision.meetingRequired
+          meeting_required: decision.meetingRequired,
         },
         matchId: match.id,
         familyMemberId: match.family_member_id,
-        success: true
+        success: true,
       });
 
       // RATE LIMIT: Incrémenter le compteur
       await incrementRateLimit(user.id, 'match_approval');
 
       toast({
-        title: decision.approved ? "Match approuvé" : "Match refusé",
-        description: decision.approved 
-          ? "La communication est maintenant autorisée"
-          : "Le match a été refusé selon vos directives",
-        variant: decision.approved ? "default" : "destructive"
+        title: decision.approved ? 'Match approuvé' : 'Match refusé',
+        description: decision.approved
+          ? 'La communication est maintenant autorisée'
+          : 'Le match a été refusé selon vos directives',
+        variant: decision.approved ? 'default' : 'destructive',
       });
 
       return true;
     } catch (error) {
       console.error('Error processing approval decision:', error);
-      
+
       // AUDIT: Logger l'échec
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         await logAction({
           waliUserId: user.id,
@@ -238,14 +249,14 @@ export const useMatchApproval = () => {
           matchId: match.id,
           familyMemberId: match.family_member_id,
           success: false,
-          errorMessage: error instanceof Error ? error.message : 'Unknown error'
+          errorMessage: error instanceof Error ? error.message : 'Unknown error',
         });
       }
-      
+
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible de traiter la décision d'approbation",
-        variant: "destructive"
+        variant: 'destructive',
       });
       return false;
     } finally {
@@ -262,6 +273,6 @@ export const useMatchApproval = () => {
     loading,
     processingId,
     processApprovalDecision,
-    reloadMatches: loadMatchesForApproval
+    reloadMatches: loadMatchesForApproval,
   };
 };

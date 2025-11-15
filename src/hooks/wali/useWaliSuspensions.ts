@@ -52,12 +52,11 @@ export const useWaliSuspensions = (waliId?: string) => {
       setSuspensions(typedData);
 
       // Find active suspension
-      const active = typedData?.find(
-        (s) =>
-          s.is_active &&
-          (!s.expires_at || new Date(s.expires_at) > new Date())
-      ) || null;
-      
+      const active =
+        typedData?.find(
+          (s) => s.is_active && (!s.expires_at || new Date(s.expires_at) > new Date())
+        ) || null;
+
       setActiveSuspension(active);
     } catch (err) {
       console.error('Error fetching suspensions:', err);
@@ -82,7 +81,7 @@ export const useWaliSuspensions = (waliId?: string) => {
       if (error) throw error;
 
       await fetchSuspensions();
-      
+
       toast({
         title: 'Suspension Created',
         description: 'Wali has been suspended.',
@@ -116,7 +115,7 @@ export const useWaliSuspensions = (waliId?: string) => {
       if (error) throw error;
 
       await fetchSuspensions();
-      
+
       toast({
         title: 'Suspension Lifted',
         description: 'Wali suspension has been lifted.',

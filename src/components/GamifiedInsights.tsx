@@ -3,21 +3,27 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
-import { 
-  Trophy, 
-  Star, 
-  Target, 
-  Award, 
+import {
+  Trophy,
+  Star,
+  Target,
+  Award,
   TrendingUp,
   Crown,
   Zap,
   Medal,
   Gift,
   Sparkles,
-  Heart
+  Heart,
 } from 'lucide-react';
-import { useCompatibilityInsights, type UseCompatibilityInsightsReturn } from '@/hooks/useCompatibilityInsights';
-import { useInsightsAnalytics, type UseInsightsAnalyticsReturn } from '@/hooks/useInsightsAnalytics';
+import {
+  useCompatibilityInsights,
+  type UseCompatibilityInsightsReturn,
+} from '@/hooks/useCompatibilityInsights';
+import {
+  useInsightsAnalytics,
+  type UseInsightsAnalyticsReturn,
+} from '@/hooks/useInsightsAnalytics';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -50,7 +56,7 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
       minPoints: 0,
       maxPoints: 100,
       benefits: ['Profil de base', 'Test de compatibilité'],
-      icon: <Heart className="w-4 h-4" />
+      icon: <Heart className="w-4 h-4" />,
     },
     {
       level: 2,
@@ -58,7 +64,7 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
       minPoints: 100,
       maxPoints: 300,
       benefits: ['Insights détaillés', 'Recherche avancée'],
-      icon: <Target className="w-4 h-4" />
+      icon: <Target className="w-4 h-4" />,
     },
     {
       level: 3,
@@ -66,7 +72,7 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
       minPoints: 300,
       maxPoints: 600,
       benefits: ['Analyses approfondies', 'Matches premium'],
-      icon: <Star className="w-4 h-4" />
+      icon: <Star className="w-4 h-4" />,
     },
     {
       level: 4,
@@ -74,8 +80,8 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
       minPoints: 600,
       maxPoints: 1000,
       benefits: ['Consultations personnalisées', 'Priorité de matching'],
-      icon: <Crown className="w-4 h-4" />
-    }
+      icon: <Crown className="w-4 h-4" />,
+    },
   ];
 
   const allAchievements: Achievement[] = [
@@ -86,18 +92,18 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
       icon: <Zap className="w-4 h-4" />,
       unlocked: false,
       rarity: 'common',
-      reward: { type: 'points', value: '50' }
+      reward: { type: 'points', value: '50' },
     },
     {
       id: 'insights_explorer',
-      title: 'Explorateur d\'Insights',
+      title: "Explorateur d'Insights",
       description: 'Consultez vos insights de compatibilité 5 fois',
       icon: <Target className="w-4 h-4" />,
       unlocked: false,
       progress: 0,
       maxProgress: 5,
       rarity: 'common',
-      reward: { type: 'points', value: '75' }
+      reward: { type: 'points', value: '75' },
     },
     {
       id: 'perfect_match',
@@ -106,7 +112,7 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
       icon: <Medal className="w-4 h-4" />,
       unlocked: false,
       rarity: 'rare',
-      reward: { type: 'badge', value: 'Match Parfait' }
+      reward: { type: 'badge', value: 'Match Parfait' },
     },
     {
       id: 'insight_master',
@@ -117,7 +123,7 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
       progress: 0,
       maxProgress: 8,
       rarity: 'epic',
-      reward: { type: 'unlock', value: 'Mode Expert' }
+      reward: { type: 'unlock', value: 'Mode Expert' },
     },
     {
       id: 'guidance_seeker',
@@ -128,18 +134,18 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
       progress: 0,
       maxProgress: 10,
       rarity: 'rare',
-      reward: { type: 'points', value: '100' }
-    }
+      reward: { type: 'points', value: '100' },
+    },
   ];
 
   useEffect(() => {
     // Initialize achievements and check progress
     const initializeGamification = async (): Promise<void> => {
       if (!user) return;
-      
+
       const currentAchievements = [...allAchievements];
       let points = 0;
-      
+
       // Charger la progression depuis Supabase
       const { data: progression } = await supabase
         .from('user_progression')
@@ -152,20 +158,20 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
         setUserLevel(progression.current_level);
         points = progression.total_points;
       }
-      
+
       // Charger les achievements depuis Supabase
       const { data: unlockedAchievements } = await supabase
         .from('achievement_unlocks')
         .select('achievement_id, points_awarded')
         .eq('user_id', user.id);
 
-      const unlockedIds = new Set(unlockedAchievements?.map(ua => ua.achievement_id) || []);
-      
+      const unlockedIds = new Set(unlockedAchievements?.map((ua) => ua.achievement_id) || []);
+
       if (insights) {
         // Check achievements based on insights data
-        currentAchievements.forEach(achievement => {
+        currentAchievements.forEach((achievement) => {
           const isUnlocked = unlockedIds.has(achievement.id);
-          
+
           switch (achievement.id) {
             case 'first_test':
               achievement.unlocked = isUnlocked || true;
@@ -174,7 +180,7 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
               }
               break;
             case 'perfect_match': {
-              const maxScore = Math.max(...insights.compatibilityAreas.map(area => area.score));
+              const maxScore = Math.max(...insights.compatibilityAreas.map((area) => area.score));
               achievement.unlocked = maxScore >= 90;
               if (achievement.unlocked && !isUnlocked) {
                 unlockAchievement(achievement);
@@ -202,11 +208,11 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
       }
 
       setAchievements(currentAchievements);
-      
+
       // Determine level if not loaded from DB
       if (!progression) {
-        const currentLevel = levels.find(level => 
-          points >= level.minPoints && points < level.maxPoints
+        const currentLevel = levels.find(
+          (level) => points >= level.minPoints && points < level.maxPoints
         );
         if (currentLevel) {
           setUserLevel(currentLevel.level);
@@ -219,35 +225,30 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
 
   const unlockAchievement = async (achievement: Achievement): Promise<void> => {
     if (!user) return;
-    
+
     try {
-      const pointsToAward = achievement.reward.type === 'points' 
-        ? parseInt(achievement.reward.value) 
-        : 0;
+      const pointsToAward =
+        achievement.reward.type === 'points' ? parseInt(achievement.reward.value) : 0;
 
       // Enregistrer l'achievement débloqué
-      const { error: achievementError } = await supabase
-        .from('achievement_unlocks')
-        .insert({
-          user_id: user.id,
-          achievement_id: achievement.id,
-          achievement_title: achievement.title,
-          rarity: achievement.rarity,
-          points_awarded: pointsToAward
-        });
+      const { error: achievementError } = await supabase.from('achievement_unlocks').insert({
+        user_id: user.id,
+        achievement_id: achievement.id,
+        achievement_title: achievement.title,
+        rarity: achievement.rarity,
+        points_awarded: pointsToAward,
+      });
 
       if (achievementError && achievementError.code !== '23505') throw achievementError;
 
       // Mettre à jour la progression
       const newTotalPoints = totalPoints + pointsToAward;
-      const { error: progressionError } = await supabase
-        .from('user_progression')
-        .upsert({
-          user_id: user.id,
-          total_points: newTotalPoints,
-          achievements_count: achievements.filter(a => a.unlocked).length + 1,
-          insights_viewed_count: analytics.viewCount
-        });
+      const { error: progressionError } = await supabase.from('user_progression').upsert({
+        user_id: user.id,
+        total_points: newTotalPoints,
+        achievements_count: achievements.filter((a) => a.unlocked).length + 1,
+        insights_viewed_count: analytics.viewCount,
+      });
 
       if (progressionError) throw progressionError;
 
@@ -256,16 +257,15 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
         achievement_id: achievement.id,
         achievement_title: achievement.title,
         rarity: achievement.rarity,
-        points_awarded: pointsToAward
+        points_awarded: pointsToAward,
       });
 
       setTotalPoints(newTotalPoints);
 
       // Afficher notification
       toast.success(`Achievement débloqué: ${achievement.title}!`, {
-        description: `+${pointsToAward} points`
+        description: `+${pointsToAward} points`,
       });
-
     } catch (error: unknown) {
       console.error('Error unlocking achievement:', error);
     }
@@ -273,19 +273,27 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
 
   const getRarityColor = (rarity: Achievement['rarity']): string => {
     switch (rarity) {
-      case 'common': return 'text-muted-foreground border-muted';
-      case 'rare': return 'text-blue-600 border-blue-200 bg-blue-50';
-      case 'epic': return 'text-purple-600 border-purple-200 bg-purple-50';
-      case 'legendary': return 'text-gold border-gold/20 bg-gold/5';
-      default: return 'text-muted-foreground border-muted';
+      case 'common':
+        return 'text-muted-foreground border-muted';
+      case 'rare':
+        return 'text-blue-600 border-blue-200 bg-blue-50';
+      case 'epic':
+        return 'text-purple-600 border-purple-200 bg-purple-50';
+      case 'legendary':
+        return 'text-gold border-gold/20 bg-gold/5';
+      default:
+        return 'text-muted-foreground border-muted';
     }
   };
 
-  const currentLevelInfo = levels.find(level => level.level === userLevel);
-  const nextLevelInfo = levels.find(level => level.level === userLevel + 1);
-  const levelProgress = nextLevelInfo && currentLevelInfo
-    ? ((totalPoints - currentLevelInfo.minPoints) / (nextLevelInfo.minPoints - currentLevelInfo.minPoints)) * 100
-    : 100;
+  const currentLevelInfo = levels.find((level) => level.level === userLevel);
+  const nextLevelInfo = levels.find((level) => level.level === userLevel + 1);
+  const levelProgress =
+    nextLevelInfo && currentLevelInfo
+      ? ((totalPoints - currentLevelInfo.minPoints) /
+          (nextLevelInfo.minPoints - currentLevelInfo.minPoints)) *
+        100
+      : 100;
 
   if (loading) {
     return (
@@ -312,7 +320,9 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center space-x-2">
               {currentLevelInfo?.icon}
-              <span>Niveau {userLevel}: {currentLevelInfo?.title}</span>
+              <span>
+                Niveau {userLevel}: {currentLevelInfo?.title}
+              </span>
             </CardTitle>
             <Badge variant="secondary" className="animate-pulse-gentle">
               <AnimatedCounter target={totalPoints} suffix=" points" />
@@ -321,19 +331,18 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Progression vers le niveau suivant</span>
-                  {nextLevelInfo && (
-                    <span><AnimatedCounter target={Math.round(levelProgress)} suffix="%" /></span>
-                  )}
-                </div>
-                <Progress 
-                  value={levelProgress} 
-                  className="h-3 animate-slide-in-right" 
-                />
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Progression vers le niveau suivant</span>
+                {nextLevelInfo && (
+                  <span>
+                    <AnimatedCounter target={Math.round(levelProgress)} suffix="%" />
+                  </span>
+                )}
               </div>
-            
+              <Progress value={levelProgress} className="h-3 animate-slide-in-right" />
+            </div>
+
             {nextLevelInfo && (
               <div className="p-3 bg-background/50 rounded-lg border">
                 <h4 className="text-sm font-medium mb-2 flex items-center space-x-2">
@@ -370,24 +379,22 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
               content: (
                 <div
                   className={`p-3 rounded-lg border transition-all duration-300 ${
-                    achievement.unlocked 
-                      ? `${getRarityColor(achievement.rarity)} opacity-100` 
+                    achievement.unlocked
+                      ? `${getRarityColor(achievement.rarity)} opacity-100`
                       : 'border-muted bg-muted/20 opacity-60'
                   }`}
                 >
                   <div className="flex items-center space-x-3">
-                    <div className={`p-2 rounded-full ${
-                      achievement.unlocked 
-                        ? 'bg-emerald text-white' 
-                        : 'bg-muted text-muted-foreground'
-                    }`}>
-                      {achievement.unlocked ? (
-                        <Trophy className="w-4 h-4" />
-                      ) : (
-                        achievement.icon
-                      )}
+                    <div
+                      className={`p-2 rounded-full ${
+                        achievement.unlocked
+                          ? 'bg-emerald text-white'
+                          : 'bg-muted text-muted-foreground'
+                      }`}
+                    >
+                      {achievement.unlocked ? <Trophy className="w-4 h-4" /> : achievement.icon}
                     </div>
-                    
+
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
                         <h4 className="text-sm font-medium">{achievement.title}</h4>
@@ -396,8 +403,8 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
                             ✓ Débloqué
                           </Badge>
                         )}
-                        <Badge 
-                          variant="outline" 
+                        <Badge
+                          variant="outline"
                           className={`text-xs ${getRarityColor(achievement.rarity)}`}
                         >
                           {achievement.rarity}
@@ -406,30 +413,36 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
                       <p className="text-xs text-muted-foreground mb-2">
                         {achievement.description}
                       </p>
-                      
+
                       {achievement.progress !== undefined && achievement.maxProgress && (
                         <div className="space-y-1">
-                          <Progress 
-                            value={(achievement.progress / achievement.maxProgress) * 100} 
-                            className="h-2" 
+                          <Progress
+                            value={(achievement.progress / achievement.maxProgress) * 100}
+                            className="h-2"
                           />
                           <div className="flex justify-between text-xs text-muted-foreground">
-                            <span>{achievement.progress}/{achievement.maxProgress}</span>
-                            <span>+{achievement.reward.value} {achievement.reward.type}</span>
+                            <span>
+                              {achievement.progress}/{achievement.maxProgress}
+                            </span>
+                            <span>
+                              +{achievement.reward.value} {achievement.reward.type}
+                            </span>
                           </div>
                         </div>
                       )}
-                      
+
                       {achievement.unlocked && (
                         <div className="flex items-center space-x-1 text-xs text-emerald">
                           <TrendingUp className="w-3 h-3" />
-                          <span>+{achievement.reward.value} {achievement.reward.type}</span>
+                          <span>
+                            +{achievement.reward.value} {achievement.reward.type}
+                          </span>
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
-              )
+              ),
             }))}
             staggerDelay={100}
             className="space-y-3"
@@ -444,13 +457,11 @@ const GamifiedInsights: React.FC<GamifiedInsightsProps> = ({ userId }) => {
             <div className="animate-float mb-4">
               <Crown className="w-16 h-16 mx-auto" />
             </div>
-            <h2 className="text-2xl font-bold mb-2">
-              Niveau supérieur ! 🎉
-            </h2>
+            <h2 className="text-2xl font-bold mb-2">Niveau supérieur ! 🎉</h2>
             <p className="text-emerald-light mb-4">
               Vous avez atteint le niveau {userLevel}: {currentLevelInfo?.title}
             </p>
-            <Button 
+            <Button
               variant="secondary"
               onClick={() => setShowLevelUp(false)}
               className="bg-white text-emerald hover:bg-emerald-light hover:text-white"

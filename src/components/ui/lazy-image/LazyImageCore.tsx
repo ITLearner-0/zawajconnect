@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useEnhancedLazyImage } from '@/hooks/useLazyLoading/useEnhancedLazyImage';
 import { useAccessibleLazyLoading } from '@/hooks/useLazyLoading/useAccessibleLazyLoading';
@@ -59,13 +58,7 @@ const LazyImageCore = ({
     triggerOnce: true,
   });
 
-  const {
-    imageSrc,
-    isLoaded,
-    hasError,
-    handleLoad,
-    handleError,
-  } = useEnhancedLazyImage(src, {
+  const { imageSrc, isLoaded, hasError, handleLoad, handleError } = useEnhancedLazyImage(src, {
     enableMemoryOptimization,
     enableProgressiveLoading: false,
     fallbackSources: fallbackSrc ? [fallbackSrc] : [],
@@ -102,7 +95,7 @@ const LazyImageCore = ({
     handleError();
     const error = new Error('Image failed to load');
     monitoring.trackError(error);
-    
+
     if (enableRetry && resilientLoading.loadAttempt < maxRetries) {
       setLoadState('retry');
       resilientLoading.retry();
@@ -120,7 +113,9 @@ const LazyImageCore = ({
 
   // Use resilient loading when enabled
   const actualImageSrc = enableResilientLoading ? resilientLoading.currentSrc : imageSrc;
-  const actualIsLoaded = enableResilientLoading ? !resilientLoading.isLoading && !resilientLoading.hasError : isLoaded;
+  const actualIsLoaded = enableResilientLoading
+    ? !resilientLoading.isLoading && !resilientLoading.hasError
+    : isLoaded;
   const actualHasError = enableResilientLoading ? resilientLoading.hasError : hasError;
 
   return {

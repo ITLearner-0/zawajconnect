@@ -10,16 +10,21 @@ const SecurityAlertPanel = () => {
   const { events, loading } = useSecurityEvents();
   const { activeSessions, isSessionNearExpiry } = useEnhancedSessionMonitor();
 
-  const criticalEvents = events.filter(e => e.severity === 'critical' || e.severity === 'high');
-  const unresolvedEvents = events.filter(e => !e.resolved);
+  const criticalEvents = events.filter((e) => e.severity === 'critical' || e.severity === 'high');
+  const unresolvedEvents = events.filter((e) => !e.resolved);
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'destructive';
-      case 'high': return 'destructive';
-      case 'medium': return 'default';
-      case 'low': return 'secondary';
-      default: return 'secondary';
+      case 'critical':
+        return 'destructive';
+      case 'high':
+        return 'destructive';
+      case 'medium':
+        return 'default';
+      case 'low':
+        return 'secondary';
+      default:
+        return 'secondary';
     }
   };
 
@@ -28,8 +33,8 @@ const SecurityAlertPanel = () => {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    
-    if (diffMins < 1) return 'À l\'instant';
+
+    if (diffMins < 1) return "À l'instant";
     if (diffMins < 60) return `Il y a ${diffMins} min`;
     if (diffMins < 1440) return `Il y a ${Math.floor(diffMins / 60)} h`;
     return `Il y a ${Math.floor(diffMins / 1440)} j`;
@@ -92,24 +97,20 @@ const SecurityAlertPanel = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <Badge variant={getSeverityColor(event.severity)}>
-                        {event.severity}
-                      </Badge>
+                      <Badge variant={getSeverityColor(event.severity)}>{event.severity}</Badge>
                       <span className="text-xs text-muted-foreground">
                         {formatEventTime(event.created_at)}
                       </span>
                     </div>
                     <p className="text-sm">{event.description}</p>
                     {event.event_type && (
-                      <p className="text-xs text-muted-foreground mt-1">
-                        Type: {event.event_type}
-                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">Type: {event.event_type}</p>
                     )}
                   </div>
                 </div>
               </div>
             ))}
-            
+
             {unresolvedEvents.length > 3 && (
               <Button variant="outline" size="sm" className="w-full">
                 Voir tous les événements ({unresolvedEvents.length})
@@ -119,12 +120,8 @@ const SecurityAlertPanel = () => {
         ) : (
           <div className="text-center py-6">
             <Shield className="h-8 w-8 text-emerald mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">
-              Aucune alerte de sécurité récente
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Votre compte est sécurisé
-            </p>
+            <p className="text-sm text-muted-foreground">Aucune alerte de sécurité récente</p>
+            <p className="text-xs text-muted-foreground mt-1">Votre compte est sécurisé</p>
           </div>
         )}
 

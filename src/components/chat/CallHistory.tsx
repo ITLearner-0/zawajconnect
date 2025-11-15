@@ -57,7 +57,7 @@ export function CallHistory({ matchId }: CallHistoryProps) {
           event: '*',
           schema: 'public',
           table: 'webrtc_calls',
-          filter: `match_id=eq.${matchId}`
+          filter: `match_id=eq.${matchId}`,
         },
         () => {
           fetchCalls();
@@ -81,7 +81,11 @@ export function CallHistory({ matchId }: CallHistoryProps) {
     switch (status) {
       case 'connected':
       case 'ended':
-        return <Badge variant="default" className="bg-green-500">Terminé</Badge>;
+        return (
+          <Badge variant="default" className="bg-green-500">
+            Terminé
+          </Badge>
+        );
       case 'rejected':
         return <Badge variant="destructive">Rejeté</Badge>;
       case 'missed':
@@ -96,15 +100,15 @@ export function CallHistory({ matchId }: CallHistoryProps) {
   const getCallIcon = (call: CallRecord) => {
     const isOutgoing = call.caller_id === user?.id;
     const Icon = call.call_type === 'video' ? Video : Phone;
-    
+
     if (call.status === 'missed' && !isOutgoing) {
       return <PhoneMissed className="h-5 w-5 text-destructive" />;
     }
-    
+
     if (call.status === 'rejected' || call.status === 'failed') {
       return <PhoneOff className="h-5 w-5 text-destructive" />;
     }
-    
+
     return <Icon className={`h-5 w-5 ${isOutgoing ? 'text-blue-500' : 'text-green-500'}`} />;
   };
 
@@ -129,13 +133,13 @@ export function CallHistory({ matchId }: CallHistoryProps) {
     <div className="space-y-2">
       {calls.map((call) => {
         const isOutgoing = call.caller_id === user?.id;
-        
+
         return (
           <Card key={call.id} className="p-4 hover:bg-accent/50 transition-colors">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3 flex-1">
                 {getCallIcon(call)}
-                
+
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium">
@@ -145,10 +149,15 @@ export function CallHistory({ matchId }: CallHistoryProps) {
                       {isOutgoing ? 'sortant' : 'entrant'}
                     </span>
                   </div>
-                  
+
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Clock className="h-3 w-3" />
-                    <span>{formatDistanceToNow(new Date(call.started_at), { addSuffix: true, locale: fr })}</span>
+                    <span>
+                      {formatDistanceToNow(new Date(call.started_at), {
+                        addSuffix: true,
+                        locale: fr,
+                      })}
+                    </span>
                     <span>•</span>
                     <span>{format(new Date(call.started_at), 'HH:mm', { locale: fr })}</span>
                   </div>
@@ -157,9 +166,7 @@ export function CallHistory({ matchId }: CallHistoryProps) {
 
               <div className="flex items-center gap-3">
                 {call.duration_seconds !== null && (
-                  <div className="text-sm font-medium">
-                    {formatDuration(call.duration_seconds)}
-                  </div>
+                  <div className="text-sm font-medium">{formatDuration(call.duration_seconds)}</div>
                 )}
                 {getStatusBadge(call.status)}
               </div>

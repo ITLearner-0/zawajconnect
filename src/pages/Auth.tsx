@@ -10,7 +10,17 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserData } from '@/contexts/UserDataContext';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Heart, ArrowLeft, Eye, EyeOff, Mail, Shield, Smartphone, CheckCircle, AlertCircle } from 'lucide-react';
+import {
+  Heart,
+  ArrowLeft,
+  Eye,
+  EyeOff,
+  Mail,
+  Shield,
+  Smartphone,
+  CheckCircle,
+  AlertCircle,
+} from 'lucide-react';
 import AuthPreview from '@/components/AuthPreview';
 
 const Auth = () => {
@@ -31,7 +41,7 @@ const Auth = () => {
   const [emailVerificationSent, setEmailVerificationSent] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [enablePhoneVerification, setEnablePhoneVerification] = useState(false);
-  
+
   const { signIn, signUp, user } = useAuth();
   const { isWali, profileComplete, loading: userDataLoading } = useUserData();
   const navigate = useNavigate();
@@ -68,31 +78,30 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     const { error } = await signIn(email, password);
-    
+
     if (error) {
       const frenchError = translateAuthError(error.message);
       setError(frenchError);
     }
-    
+
     setLoading(false);
   };
-
 
   const resendVerificationEmail = async () => {
     setLoading(true);
     const { error } = await supabase.auth.resend({
       type: 'signup',
-      email: email
+      email: email,
     });
-    
+
     if (error) {
-      setError('Erreur lors de l\'envoi de l\'email');
+      setError("Erreur lors de l'envoi de l'email");
     } else {
       toast({
-        title: "Email renvoyé",
-        description: "Un nouvel email de vérification a été envoyé",
+        title: 'Email renvoyé',
+        description: 'Un nouvel email de vérification a été envoyé',
       });
     }
     setLoading(false);
@@ -104,32 +113,32 @@ const Auth = () => {
     setError(null);
     setSuccess(null);
     setAttemptedSignUp(true);
-    
+
     // Validation
     if (!fullName.trim()) {
       setError('Le nom complet est requis');
       setLoading(false);
       return;
     }
-    
+
     if (password.length < 6) {
       setError('Le mot de passe doit contenir au moins 6 caractères');
       setLoading(false);
       return;
     }
-    
+
     if (password !== confirmPassword) {
       setError('Les mots de passe ne correspondent pas');
       setLoading(false);
       return;
     }
-    
+
     if (!acceptTerms || !confirmedAge) {
-      setError('Vous devez accepter les Conditions d\'Utilisation et confirmer votre âge');
+      setError("Vous devez accepter les Conditions d'Utilisation et confirmer votre âge");
       setLoading(false);
       return;
     }
-    
+
     // Utiliser directement supabase.auth.signUp avec les métadonnées complètes
     const redirectUrl = `${window.location.origin}/onboarding`;
     const { data, error: signUpError } = await supabase.auth.signUp({
@@ -140,31 +149,33 @@ const Auth = () => {
         data: {
           full_name: fullName,
           terms_accepted_at: new Date().toISOString(),
-          terms_version: '1.0'
+          terms_version: '1.0',
         },
       },
     });
-    
+
     if (signUpError) {
       const frenchError = translateAuthError(signUpError.message);
       setError(frenchError);
     } else if (data?.user) {
       setEmailVerificationSent(true);
-      setSuccess('Inscription réussie ! Un email de vérification a été envoyé à votre adresse. Vérifiez votre boîte mail (y compris les spams) et cliquez sur le lien pour activer votre compte.');
-      
+      setSuccess(
+        'Inscription réussie ! Un email de vérification a été envoyé à votre adresse. Vérifiez votre boîte mail (y compris les spams) et cliquez sur le lien pour activer votre compte.'
+      );
+
       // Envoyer l'email de bienvenue
       try {
         await supabase.functions.invoke('send-welcome-email', {
           body: {
             userId: data.user.id,
             email: data.user.email,
-            fullName: fullName
-          }
+            fullName: fullName,
+          },
         });
       } catch (emailError) {
         console.error('Erreur envoi email de bienvenue:', emailError);
       }
-      
+
       // Clear form
       setEmail('');
       setPassword('');
@@ -173,7 +184,7 @@ const Auth = () => {
       setAcceptTerms(false);
       setConfirmedAge(false);
     }
-    
+
     setLoading(false);
   };
 
@@ -181,37 +192,40 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     if (!resetEmail) {
       setError('Veuillez saisir votre adresse email');
       setLoading(false);
       return;
     }
-    
+
     try {
       // Appeler notre edge function personnalisée qui utilise SMTP
-      const { error: functionError } = await supabase.functions.invoke('send-password-reset-email', {
-        body: {
-          email: resetEmail,
-          redirectUrl: `${window.location.origin}/reset-password`
+      const { error: functionError } = await supabase.functions.invoke(
+        'send-password-reset-email',
+        {
+          body: {
+            email: resetEmail,
+            redirectUrl: `${window.location.origin}/reset-password`,
+          },
         }
-      });
-      
+      );
+
       if (functionError) {
         throw functionError;
       }
-      
+
       toast({
-        title: "Email envoyé",
-        description: "Vérifiez votre boîte email pour réinitialiser votre mot de passe",
+        title: 'Email envoyé',
+        description: 'Vérifiez votre boîte email pour réinitialiser votre mot de passe',
       });
       setShowForgotPassword(false);
       setResetEmail('');
     } catch (error: unknown) {
       console.error('Password reset error:', error);
-      setError('Erreur lors de l\'envoi de l\'email. Veuillez réessayer.');
+      setError("Erreur lors de l'envoi de l'email. Veuillez réessayer.");
     }
-    
+
     setLoading(false);
   };
 
@@ -241,7 +255,10 @@ const Auth = () => {
           {/* Auth Form */}
           <div className="w-full max-w-md mx-auto lg:mx-0">
             <div className="flex items-center gap-2 mb-8 justify-center lg:justify-start">
-              <Link to="/" className="flex items-center gap-2 text-emerald hover:text-emerald-dark transition-colors animate-fade-in">
+              <Link
+                to="/"
+                className="flex items-center gap-2 text-emerald hover:text-emerald-dark transition-colors animate-fade-in"
+              >
                 <ArrowLeft className="h-4 w-4" />
                 Retour à l'accueil
               </Link>
@@ -273,332 +290,361 @@ const Auth = () => {
                   {isWaliMode ? 'Supervision Familiale' : 'Bienvenue sur ZawajConnect (v1.0)'}
                 </CardTitle>
                 <CardDescription className="text-muted-foreground">
-                  {isWaliMode 
+                  {isWaliMode
                     ? 'Accédez à votre espace de supervision et guidance islamique'
-                    : 'Votre plateforme de rencontres islamiques'
-                  }
+                    : 'Votre plateforme de rencontres islamiques'}
                 </CardDescription>
               </CardHeader>
-          
-          <CardContent className="animate-slide-up">
-            <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
-                <TabsTrigger value="signin" className="transition-smooth">Se connecter</TabsTrigger>
-                <TabsTrigger value="signup" className="transition-smooth">S'inscrire</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="signin">
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-email">Email</Label>
-                    <Input
-                      id="signin-email"
-                      type="email"
-                      placeholder="votre@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="focus:ring-emerald"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signin-password">Mot de passe</Label>
-                    <div className="relative">
-                      <Input
-                        id="signin-password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        className="focus:ring-emerald pr-10"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                  {error && (
-                    <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
-                      {error}
-                    </div>
-                  )}
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
-                    disabled={loading}
-                  >
-                    {loading ? 'Connexion...' : 'Se connecter'}
-                  </Button>
-                  
-                  <div className="text-center">
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="text-emerald hover:text-emerald-dark"
-                      onClick={() => setShowForgotPassword(true)}
-                    >
-                      Mot de passe oublié ?
-                    </Button>
-                  </div>
-                </form>
-              </TabsContent>
-              
-              <TabsContent value="signup">
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-name">Nom complet</Label>
-                    <Input
-                      id="signup-name"
-                      type="text"
-                      placeholder="Votre nom complet"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required
-                      className="focus:ring-emerald"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      placeholder="votre@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="focus:ring-emerald"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="signup-password">Mot de passe</Label>
-                    <div className="relative">
-                      <Input
-                        id="signup-password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        minLength={6}
-                        className="focus:ring-emerald pr-10"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
-                    <div className="relative">
-                      <Input
-                        id="confirm-password"
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="••••••••"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        required
-                        className="focus:ring-emerald pr-10"
-                      />
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      >
-                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                      </Button>
-                    </div>
-                   </div>
-                   
-                   {enablePhoneVerification && (
-                     <div className="space-y-2">
-                       <Label htmlFor="phone">Numéro de téléphone (optionnel)</Label>
-                       <div className="relative">
-                         <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                         <Input
-                           id="phone"
-                           type="tel"
-                           placeholder="+33 6 12 34 56 78"
-                           value={phoneNumber}
-                           onChange={(e) => setPhoneNumber(e.target.value)}
-                           className="focus:ring-emerald pl-10"
-                         />
-                       </div>
-                       <p className="text-xs text-muted-foreground">
-                         Ajouter votre numéro pour une sécurité renforcée
-                       </p>
-                     </div>
-                   )}
-                   
-                   <div className="flex items-center justify-between">
-                     <div className="flex items-center space-x-2">
-                       <Checkbox
-                         id="phone-verification"
-                         checked={enablePhoneVerification}
-                         onCheckedChange={(checked) => setEnablePhoneVerification(checked === true)}
-                       />
-                       <Label htmlFor="phone-verification" className="text-sm flex items-center gap-1">
-                         <Shield className="h-3 w-3" />
-                         Vérification par SMS
-                       </Label>
-                     </div>
-                   </div>
-                   
-                   <div className="flex items-center space-x-2">
-                     <Checkbox
-                       id="terms"
-                       checked={acceptTerms}
-                       onCheckedChange={(checked) => setAcceptTerms(checked === true)}
-                     />
-                     <Label htmlFor="terms" className="text-sm">
-                       J'accepte les{' '}
-                       <Link to="/terms-of-service" target="_blank" className="text-emerald hover:underline">
-                         Conditions d'Utilisation
-                       </Link>{' '}
-                       et la{' '}
-                       <Link to="/privacy-policy" target="_blank" className="text-emerald hover:underline">
-                         Politique de Confidentialité
-                       </Link>
-                     </Label>
-                   </div>
-                   
-                   <div className="flex items-center space-x-2">
-                     <Checkbox
-                       id="age-confirm"
-                       checked={confirmedAge}
-                       onCheckedChange={(checked) => setConfirmedAge(checked === true)}
-                     />
-                     <Label htmlFor="age-confirm" className="text-sm">
-                       Je confirme avoir au moins <strong>18 ans révolus</strong>
-                     </Label>
-                   </div>
-                   
-                   {(!acceptTerms || !confirmedAge) && attemptedSignUp && (
-                     <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-                       <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-                       <p className="text-red-600 text-sm">
-                         Vous devez accepter les CGU et confirmer votre âge.
-                       </p>
-                     </div>
-                   )}
-                  {error && (
-                    <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
-                      {error}
-                    </div>
-                  )}
-                   {success && (
-                     <div className="p-3 text-sm text-emerald-dark bg-emerald/10 border border-emerald/20 rounded-md">
-                       <div className="flex items-start gap-2">
-                         <CheckCircle className="h-4 w-4 mt-0.5 text-emerald" />
-                         <div>
-                           {success}
-                           {emailVerificationSent && (
-                             <div className="mt-2">
-                               <Button
-                                 type="button"
-                                 variant="link"
-                                 size="sm"
-                                 className="text-emerald hover:text-emerald-dark p-0 h-auto"
-                                 onClick={resendVerificationEmail}
-                                 disabled={loading}
-                               >
-                                 Renvoyer l'email de vérification
-                               </Button>
-                             </div>
-                           )}
-                         </div>
-                       </div>
-                     </div>
-                   )}
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
-                    disabled={loading}
-                  >
-                    {loading ? 'Inscription...' : "S'inscrire"}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
 
-        {/* Forgot Password Modal */}
-        {showForgotPassword && (
-          <Card className="border-border/50 shadow-soft bg-card/95 backdrop-blur-sm mt-6 animate-scale-in">
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl font-bold text-foreground flex items-center justify-center gap-2">
-                <Mail className="h-5 w-5 text-emerald" />
-                Réinitialiser le mot de passe
-              </CardTitle>
-              <CardDescription className="text-muted-foreground">
-                Saisissez votre email pour recevoir un lien de réinitialisation
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleForgotPassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="reset-email">Adresse email</Label>
-                  <Input
-                    id="reset-email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
-                    required
-                    className="focus:ring-emerald"
-                  />
-                </div>
-                
-                {error && (
-                  <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
-                    {error}
-                  </div>
-                )}
-                
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="flex-1"
-                    onClick={() => {
-                      setShowForgotPassword(false);
-                      setError(null);
-                      setResetEmail('');
-                    }}
-                  >
-                    Annuler
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    className="flex-1 bg-emerald hover:bg-emerald-dark text-primary-foreground"
-                    disabled={loading}
-                  >
-                    {loading ? 'Envoi...' : 'Envoyer'}
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-        )}
-        
+              <CardContent className="animate-slide-up">
+                <Tabs defaultValue="signin" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 mb-6">
+                    <TabsTrigger value="signin" className="transition-smooth">
+                      Se connecter
+                    </TabsTrigger>
+                    <TabsTrigger value="signup" className="transition-smooth">
+                      S'inscrire
+                    </TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="signin">
+                    <form onSubmit={handleSignIn} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signin-email">Email</Label>
+                        <Input
+                          id="signin-email"
+                          type="email"
+                          placeholder="votre@email.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          className="focus:ring-emerald"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signin-password">Mot de passe</Label>
+                        <div className="relative">
+                          <Input
+                            id="signin-password"
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            className="focus:ring-emerald pr-10"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                      {error && (
+                        <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+                          {error}
+                        </div>
+                      )}
+                      <Button
+                        type="submit"
+                        className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                        disabled={loading}
+                      >
+                        {loading ? 'Connexion...' : 'Se connecter'}
+                      </Button>
+
+                      <div className="text-center">
+                        <Button
+                          type="button"
+                          variant="link"
+                          className="text-emerald hover:text-emerald-dark"
+                          onClick={() => setShowForgotPassword(true)}
+                        >
+                          Mot de passe oublié ?
+                        </Button>
+                      </div>
+                    </form>
+                  </TabsContent>
+
+                  <TabsContent value="signup">
+                    <form onSubmit={handleSignUp} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-name">Nom complet</Label>
+                        <Input
+                          id="signup-name"
+                          type="text"
+                          placeholder="Votre nom complet"
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          required
+                          className="focus:ring-emerald"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-email">Email</Label>
+                        <Input
+                          id="signup-email"
+                          type="email"
+                          placeholder="votre@email.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                          className="focus:ring-emerald"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-password">Mot de passe</Label>
+                        <div className="relative">
+                          <Input
+                            id="signup-password"
+                            type={showPassword ? 'text' : 'password'}
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            minLength={6}
+                            className="focus:ring-emerald pr-10"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
+                            onClick={() => setShowPassword(!showPassword)}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+                        <div className="relative">
+                          <Input
+                            id="confirm-password"
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            placeholder="••••••••"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                            className="focus:ring-emerald pr-10"
+                          />
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 h-auto p-1"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-4 w-4" />
+                            ) : (
+                              <Eye className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+
+                      {enablePhoneVerification && (
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Numéro de téléphone (optionnel)</Label>
+                          <div className="relative">
+                            <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                              id="phone"
+                              type="tel"
+                              placeholder="+33 6 12 34 56 78"
+                              value={phoneNumber}
+                              onChange={(e) => setPhoneNumber(e.target.value)}
+                              className="focus:ring-emerald pl-10"
+                            />
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            Ajouter votre numéro pour une sécurité renforcée
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="phone-verification"
+                            checked={enablePhoneVerification}
+                            onCheckedChange={(checked) =>
+                              setEnablePhoneVerification(checked === true)
+                            }
+                          />
+                          <Label
+                            htmlFor="phone-verification"
+                            className="text-sm flex items-center gap-1"
+                          >
+                            <Shield className="h-3 w-3" />
+                            Vérification par SMS
+                          </Label>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="terms"
+                          checked={acceptTerms}
+                          onCheckedChange={(checked) => setAcceptTerms(checked === true)}
+                        />
+                        <Label htmlFor="terms" className="text-sm">
+                          J'accepte les{' '}
+                          <Link
+                            to="/terms-of-service"
+                            target="_blank"
+                            className="text-emerald hover:underline"
+                          >
+                            Conditions d'Utilisation
+                          </Link>{' '}
+                          et la{' '}
+                          <Link
+                            to="/privacy-policy"
+                            target="_blank"
+                            className="text-emerald hover:underline"
+                          >
+                            Politique de Confidentialité
+                          </Link>
+                        </Label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="age-confirm"
+                          checked={confirmedAge}
+                          onCheckedChange={(checked) => setConfirmedAge(checked === true)}
+                        />
+                        <Label htmlFor="age-confirm" className="text-sm">
+                          Je confirme avoir au moins <strong>18 ans révolus</strong>
+                        </Label>
+                      </div>
+
+                      {(!acceptTerms || !confirmedAge) && attemptedSignUp && (
+                        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                          <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
+                          <p className="text-red-600 text-sm">
+                            Vous devez accepter les CGU et confirmer votre âge.
+                          </p>
+                        </div>
+                      )}
+                      {error && (
+                        <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+                          {error}
+                        </div>
+                      )}
+                      {success && (
+                        <div className="p-3 text-sm text-emerald-dark bg-emerald/10 border border-emerald/20 rounded-md">
+                          <div className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 mt-0.5 text-emerald" />
+                            <div>
+                              {success}
+                              {emailVerificationSent && (
+                                <div className="mt-2">
+                                  <Button
+                                    type="button"
+                                    variant="link"
+                                    size="sm"
+                                    className="text-emerald hover:text-emerald-dark p-0 h-auto"
+                                    onClick={resendVerificationEmail}
+                                    disabled={loading}
+                                  >
+                                    Renvoyer l'email de vérification
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <Button
+                        type="submit"
+                        className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                        disabled={loading}
+                      >
+                        {loading ? 'Inscription...' : "S'inscrire"}
+                      </Button>
+                    </form>
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+
+            {/* Forgot Password Modal */}
+            {showForgotPassword && (
+              <Card className="border-border/50 shadow-soft bg-card/95 backdrop-blur-sm mt-6 animate-scale-in">
+                <CardHeader className="text-center">
+                  <CardTitle className="text-xl font-bold text-foreground flex items-center justify-center gap-2">
+                    <Mail className="h-5 w-5 text-emerald" />
+                    Réinitialiser le mot de passe
+                  </CardTitle>
+                  <CardDescription className="text-muted-foreground">
+                    Saisissez votre email pour recevoir un lien de réinitialisation
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleForgotPassword} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="reset-email">Adresse email</Label>
+                      <Input
+                        id="reset-email"
+                        type="email"
+                        placeholder="votre@email.com"
+                        value={resetEmail}
+                        onChange={(e) => setResetEmail(e.target.value)}
+                        required
+                        className="focus:ring-emerald"
+                      />
+                    </div>
+
+                    {error && (
+                      <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
+                        {error}
+                      </div>
+                    )}
+
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1"
+                        onClick={() => {
+                          setShowForgotPassword(false);
+                          setError(null);
+                          setResetEmail('');
+                        }}
+                      >
+                        Annuler
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="flex-1 bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                        disabled={loading}
+                      >
+                        {loading ? 'Envoi...' : 'Envoyer'}
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
+
             <p className="text-center text-sm text-muted-foreground mt-4">
-              En vous inscrivant, vous acceptez nos conditions d'utilisation et notre politique de confidentialité.
+              En vous inscrivant, vous acceptez nos conditions d'utilisation et notre politique de
+              confidentialité.
             </p>
           </div>
 

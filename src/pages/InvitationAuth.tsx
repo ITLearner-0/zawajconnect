@@ -17,14 +17,14 @@ export default function InvitationAuth() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    fullName: ''
+    fullName: '',
   });
 
   const token = searchParams.get('token');
 
   useEffect(() => {
     if (!token) {
-      toast.error('Token d\'invitation manquant');
+      toast.error("Token d'invitation manquant");
       navigate('/');
     }
   }, [token, navigate]);
@@ -43,9 +43,12 @@ export default function InvitationAuth() {
           toast.error(error.message);
           return;
         }
-        
+
         // Get the newly created user
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
         if (userError || !user) {
           toast.error('Erreur lors de la création du compte');
           return;
@@ -57,8 +60,11 @@ export default function InvitationAuth() {
           toast.error(error.message);
           return;
         }
-        
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
         if (userError || !user) {
           toast.error('Erreur lors de la connexion');
           return;
@@ -67,14 +73,16 @@ export default function InvitationAuth() {
       }
 
       // Accept the family invitation
-      const { data: success, error: invitationError } = await supabase
-        .rpc('accept_family_invitation', {
+      const { data: success, error: invitationError } = await supabase.rpc(
+        'accept_family_invitation',
+        {
           p_invitation_token: token,
-          p_invited_user_id: userId
-        });
+          p_invited_user_id: userId,
+        }
+      );
 
       if (invitationError || !success) {
-        toast.error('Erreur lors de l\'acceptation de l\'invitation');
+        toast.error("Erreur lors de l'acceptation de l'invitation");
         return;
       }
 
@@ -96,9 +104,7 @@ export default function InvitationAuth() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="text-center">
-            🕌 Invitation familiale
-          </CardTitle>
+          <CardTitle className="text-center">🕌 Invitation familiale</CardTitle>
           <p className="text-center text-muted-foreground">
             Vous avez été invité(e) à superviser un membre de votre famille sur ZawajConnect
           </p>
@@ -106,14 +112,14 @@ export default function InvitationAuth() {
         <CardContent>
           <div className="flex gap-2 mb-6">
             <Button
-              variant={isSignUp ? "default" : "outline"}
+              variant={isSignUp ? 'default' : 'outline'}
               onClick={() => setIsSignUp(true)}
               className="flex-1"
             >
               Créer un compte
             </Button>
             <Button
-              variant={!isSignUp ? "default" : "outline"}
+              variant={!isSignUp ? 'default' : 'outline'}
               onClick={() => setIsSignUp(false)}
               className="flex-1"
             >
@@ -134,7 +140,7 @@ export default function InvitationAuth() {
                 />
               </div>
             )}
-            
+
             <div>
               <Label htmlFor="email">Email</Label>
               <Input
@@ -145,7 +151,7 @@ export default function InvitationAuth() {
                 required
               />
             </div>
-            
+
             <div>
               <Label htmlFor="password">Mot de passe</Label>
               <Input
@@ -157,9 +163,9 @@ export default function InvitationAuth() {
                 minLength={6}
               />
             </div>
-            
+
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Traitement...' : 'Accepter l\'invitation'}
+              {loading ? 'Traitement...' : "Accepter l'invitation"}
             </Button>
           </form>
         </CardContent>

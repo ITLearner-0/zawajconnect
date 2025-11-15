@@ -44,7 +44,7 @@ const IslamicCompatibilityCalculator = () => {
 
   const fetchProfiles = async () => {
     if (!user) return;
-    
+
     try {
       // Get current user's gender first
       const { data: currentUserProfile } = await supabase
@@ -55,7 +55,7 @@ const IslamicCompatibilityCalculator = () => {
 
       // Determine opposite gender
       const oppositeGender = currentUserProfile?.gender === 'male' ? 'female' : 'male';
-      
+
       // Get all Wali user IDs to exclude them from matching
       const { data: waliUsers } = await supabase
         .from('family_members')
@@ -64,8 +64,8 @@ const IslamicCompatibilityCalculator = () => {
         .eq('invitation_status', 'accepted')
         .not('invited_user_id', 'is', null);
 
-      const waliUserIds = waliUsers?.map(w => w.invited_user_id).filter(Boolean) || [];
-      
+      const waliUserIds = waliUsers?.map((w) => w.invited_user_id).filter(Boolean) || [];
+
       // Build query to exclude current user, same gender, and Walis
       let query = supabase
         .from('profiles')
@@ -73,13 +73,13 @@ const IslamicCompatibilityCalculator = () => {
         .neq('user_id', user.id)
         .eq('gender', oppositeGender);
 
-      // Exclude Walis if any exist  
+      // Exclude Walis if any exist
       if (waliUserIds.length > 0) {
         query = query.not('user_id', 'in', `(${waliUserIds.join(',')})`);
       }
 
       const { data } = await query.limit(10);
-      
+
       if (data) {
         setProfiles(data);
       }
@@ -92,9 +92,9 @@ const IslamicCompatibilityCalculator = () => {
   const calculateIslamicCompatibility = async () => {
     if (!user || !selectedUserId) {
       toast({
-        title: "Sélection requise",
-        description: "Veuillez sélectionner un profil pour calculer la compatibilité",
-        variant: "destructive",
+        title: 'Sélection requise',
+        description: 'Veuillez sélectionner un profil pour calculer la compatibilité',
+        variant: 'destructive',
       });
       return;
     }
@@ -103,7 +103,7 @@ const IslamicCompatibilityCalculator = () => {
 
     try {
       // Simulate Islamic compatibility calculation
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       // Get both users' Islamic preferences
       const { data: myPrefs } = await supabase
@@ -127,7 +127,7 @@ const IslamicCompatibilityCalculator = () => {
         family_values: Math.floor(Math.random() * 15) + 80,
         halal_lifestyle: calculateHalalCompatibility(myPrefs, theirPrefs),
         community_involvement: Math.floor(Math.random() * 25) + 70,
-        spiritual_growth: Math.floor(Math.random() * 20) + 75
+        spiritual_growth: Math.floor(Math.random() * 20) + 75,
       };
 
       const overall_score = Math.floor(
@@ -155,22 +155,21 @@ const IslamicCompatibilityCalculator = () => {
         strengths,
         growth_areas,
         recommendations,
-        islamic_guidance
+        islamic_guidance,
       };
 
       setResult(compatibilityResult);
 
       toast({
-        title: "Analyse terminée",
+        title: 'Analyse terminée',
         description: `Compatibilité islamique calculée: ${overall_score}%`,
       });
-
     } catch (error) {
       console.error('Error calculating Islamic compatibility:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de calculer la compatibilité islamique",
-        variant: "destructive",
+        title: 'Erreur',
+        description: 'Impossible de calculer la compatibilité islamique',
+        variant: 'destructive',
       });
     } finally {
       setCalculating(false);
@@ -178,18 +177,19 @@ const IslamicCompatibilityCalculator = () => {
   };
 
   const calculatePrayerCompatibility = (myPrefs: any, theirPrefs: any) => {
-    const prayerLevels = { 'daily': 100, 'often': 80, 'sometimes': 60, 'rarely': 40, 'never': 20 };
+    const prayerLevels = { daily: 100, often: 80, sometimes: 60, rarely: 40, never: 20 };
     const myLevel = prayerLevels[myPrefs?.prayer_frequency as keyof typeof prayerLevels] || 50;
-    const theirLevel = prayerLevels[theirPrefs?.prayer_frequency as keyof typeof prayerLevels] || 50;
-    
+    const theirLevel =
+      prayerLevels[theirPrefs?.prayer_frequency as keyof typeof prayerLevels] || 50;
+
     return Math.max(20, 100 - Math.abs(myLevel - theirLevel));
   };
 
   const calculateQuranCompatibility = (myPrefs: any, theirPrefs: any) => {
-    const quranLevels = { 'daily': 100, 'weekly': 80, 'monthly': 60, 'rarely': 40, 'never': 20 };
+    const quranLevels = { daily: 100, weekly: 80, monthly: 60, rarely: 40, never: 20 };
     const myLevel = quranLevels[myPrefs?.quran_reading as keyof typeof quranLevels] || 50;
     const theirLevel = quranLevels[theirPrefs?.quran_reading as keyof typeof quranLevels] || 50;
-    
+
     return Math.max(20, 100 - Math.abs(myLevel - theirLevel));
   };
 
@@ -214,40 +214,42 @@ const IslamicCompatibilityCalculator = () => {
       family_values: 'Valeurs familiales',
       halal_lifestyle: 'Mode de vie halal',
       community_involvement: 'Engagement communautaire',
-      spiritual_growth: 'Croissance spirituelle'
+      spiritual_growth: 'Croissance spirituelle',
     };
     return labels[key] || key;
   };
 
   const generateRecommendations = (scores: IslamicCriteria): string[] => {
     const recommendations = [];
-    
+
     if (scores.prayer_frequency < 75) {
-      recommendations.push("Discuter de vos pratiques de prière respectives");
+      recommendations.push('Discuter de vos pratiques de prière respectives');
     }
     if (scores.quran_reading < 75) {
       recommendations.push("Planifier des sessions d'étude du Coran ensemble");
     }
     if (scores.family_values < 80) {
-      recommendations.push("Échanger sur vos visions de la famille islamique");
+      recommendations.push('Échanger sur vos visions de la famille islamique');
     }
     if (scores.spiritual_growth < 75) {
-      recommendations.push("Organiser des activités spirituelles communes");
+      recommendations.push('Organiser des activités spirituelles communes');
     }
 
-    return recommendations.length > 0 ? recommendations : [
-      "Votre compatibilité islamique is excellente",
-      "Continuez à vous soutenir mutuellement dans la foi",
-      "Planifiez des activités religieuses ensemble"
-    ];
+    return recommendations.length > 0
+      ? recommendations
+      : [
+          'Votre compatibilité islamique is excellente',
+          'Continuez à vous soutenir mutuellement dans la foi',
+          'Planifiez des activités religieuses ensemble',
+        ];
   };
 
   const generateIslamicGuidance = (scores: IslamicCriteria): string[] => {
     return [
-      "« Et parmi Ses signes Il a créé de vous, pour vous, des épouses pour que vous viviez en tranquillité avec elles » - Coran 30:21",
+      '« Et parmi Ses signes Il a créé de vous, pour vous, des épouses pour que vous viviez en tranquillité avec elles » - Coran 30:21',
       "L'importance de la compatibilité religieuse dans le mariage islamique",
       "Chercher un partenaire qui vous aide à vous rapprocher d'Allah",
-      "La beauté d'une union basée sur les valeurs islamiques partagées"
+      "La beauté d'une union basée sur les valeurs islamiques partagées",
     ];
   };
 
@@ -293,8 +295,8 @@ const IslamicCompatibilityCalculator = () => {
             </select>
           </div>
 
-          <Button 
-            onClick={calculateIslamicCompatibility} 
+          <Button
+            onClick={calculateIslamicCompatibility}
             disabled={calculating || !selectedUserId}
             className="w-full bg-gradient-to-r from-primary to-primary-glow hover:opacity-90"
           >
@@ -320,7 +322,9 @@ const IslamicCompatibilityCalculator = () => {
           <Card>
             <CardContent className="pt-6">
               <div className="text-center space-y-4">
-                <div className={`inline-flex items-center gap-2 text-3xl font-bold ${getScoreColor(result.overall_score)}`}>
+                <div
+                  className={`inline-flex items-center gap-2 text-3xl font-bold ${getScoreColor(result.overall_score)}`}
+                >
                   {getScoreIcon(result.overall_score)}
                   {result.overall_score}%
                 </div>
@@ -346,13 +350,9 @@ const IslamicCompatibilityCalculator = () => {
                         {index === 2 && <Star className="h-4 w-4 text-gold-600" />}
                         {index === 3 && <Shield className="h-4 w-4 text-emerald-600" />}
                         {index >= 4 && <Heart className="h-4 w-4 text-primary" />}
-                        <span className="text-sm font-medium">
-                          {getIslamicCriteriaLabel(key)}
-                        </span>
+                        <span className="text-sm font-medium">{getIslamicCriteriaLabel(key)}</span>
                       </div>
-                      <span className={`text-sm font-bold ${getScoreColor(score)}`}>
-                        {score}%
-                      </span>
+                      <span className={`text-sm font-bold ${getScoreColor(score)}`}>{score}%</span>
                     </div>
                     <Progress value={score} className="h-2" />
                   </div>
@@ -374,7 +374,11 @@ const IslamicCompatibilityCalculator = () => {
                 <CardContent>
                   <div className="space-y-2">
                     {result.strengths.map((strength, index) => (
-                      <Badge key={index} variant="secondary" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="bg-emerald-50 text-emerald-700 border-emerald-200"
+                      >
                         {strength}
                       </Badge>
                     ))}
@@ -394,7 +398,11 @@ const IslamicCompatibilityCalculator = () => {
                 <CardContent>
                   <div className="space-y-2">
                     {result.growth_areas.map((area, index) => (
-                      <Badge key={index} variant="outline" className="text-amber-700 border-amber-300">
+                      <Badge
+                        key={index}
+                        variant="outline"
+                        className="text-amber-700 border-amber-300"
+                      >
                         {area}
                       </Badge>
                     ))}
@@ -435,9 +443,7 @@ const IslamicCompatibilityCalculator = () => {
             <CardContent className="space-y-4">
               {result.islamic_guidance.map((guidance, index) => (
                 <div key={index}>
-                  <p className="text-sm text-sage-700 italic leading-relaxed">
-                    {guidance}
-                  </p>
+                  <p className="text-sm text-sage-700 italic leading-relaxed">{guidance}</p>
                   {index < result.islamic_guidance.length - 1 && (
                     <Separator className="my-3 bg-sage-200" />
                   )}

@@ -7,7 +7,7 @@ import type {
   UserCompatibilityResponseRow,
   CompatibilityResponse,
   CompatibilityStats,
-  WeightedQuestion
+  WeightedQuestion,
 } from '@/types/supabase';
 
 /**
@@ -35,7 +35,7 @@ export const useCompatibility = (): UseCompatibilityReturn => {
     totalQuestions: 0,
     answeredQuestions: 0,
     completionPercentage: 0,
-    lastUpdated: null
+    lastUpdated: null,
   });
   const [loading, setLoading] = useState(true);
 
@@ -85,20 +85,21 @@ export const useCompatibility = (): UseCompatibilityReturn => {
       const lastUpdated = userResponses?.[0]?.updated_at ?? null;
 
       // Normalize responses to match CompatibilityResponse interface
-      const normalizedResponses: CompatibilityResponse[] = (userResponses ?? []).map(response => ({
-        question_key: response.question_key,
-        response_value: response.response_value,
-        updated_at: response.updated_at
-      }));
+      const normalizedResponses: CompatibilityResponse[] = (userResponses ?? []).map(
+        (response) => ({
+          question_key: response.question_key,
+          response_value: response.response_value,
+          updated_at: response.updated_at,
+        })
+      );
 
       setResponses(normalizedResponses);
       setStats({
         totalQuestions: totalQuestions ?? 0,
         answeredQuestions,
         completionPercentage,
-        lastUpdated
+        lastUpdated,
       });
-
     } catch (err) {
       const error = err as PostgrestError;
       console.error('[useCompatibility] Error fetching compatibility data:', error.message);
@@ -113,7 +114,7 @@ export const useCompatibility = (): UseCompatibilityReturn => {
    * @returns La valeur de la réponse ou null si non trouvée
    */
   const getResponseValue = (questionKey: string): string | null => {
-    const response = responses.find(r => r.question_key === questionKey);
+    const response = responses.find((r) => r.question_key === questionKey);
     return response?.response_value ?? null;
   };
 
@@ -171,18 +172,18 @@ export const useCompatibility = (): UseCompatibilityReturn => {
       let matchedWeight = 0;
 
       // Normalize questions to WeightedQuestion type
-      const weightedQuestions: WeightedQuestion[] = questions.map(q => ({
+      const weightedQuestions: WeightedQuestion[] = questions.map((q) => ({
         question_key: q.question_key,
-        weight: q.weight ?? 1 // Default weight to 1 if null
+        weight: q.weight ?? 1, // Default weight to 1 if null
       }));
 
-      weightedQuestions.forEach(question => {
-        const myResponse = myResponses.find(r => r.question_key === question.question_key);
-        const theirResponse = theirResponses.find(r => r.question_key === question.question_key);
+      weightedQuestions.forEach((question) => {
+        const myResponse = myResponses.find((r) => r.question_key === question.question_key);
+        const theirResponse = theirResponses.find((r) => r.question_key === question.question_key);
 
         if (myResponse && theirResponse) {
           totalWeight += question.weight;
-          
+
           // Simple matching - exact match scores full weight
           if (myResponse.response_value === theirResponse.response_value) {
             matchedWeight += question.weight;
@@ -193,7 +194,6 @@ export const useCompatibility = (): UseCompatibilityReturn => {
       });
 
       return totalWeight > 0 ? Math.round((matchedWeight / totalWeight) * 100) : 0;
-
     } catch (err) {
       const error = err as PostgrestError;
       console.error('[useCompatibility] Error calculating compatibility score:', error.message);
@@ -216,6 +216,6 @@ export const useCompatibility = (): UseCompatibilityReturn => {
     loading,
     getResponseValue,
     calculateCompatibilityScore,
-    refreshData
+    refreshData,
   };
 };

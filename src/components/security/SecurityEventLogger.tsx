@@ -1,10 +1,15 @@
-
 import { useEffect } from 'react';
 import { useEnhancedAuth } from '@/hooks/useEnhancedAuth';
 import { useUserSession } from '@/hooks/useUserSession';
 
 interface SecurityEvent {
-  type: 'login' | 'logout' | 'failed_login' | 'password_change' | 'profile_update' | 'suspicious_activity';
+  type:
+    | 'login'
+    | 'logout'
+    | 'failed_login'
+    | 'password_change'
+    | 'profile_update'
+    | 'suspicious_activity';
   severity: 'low' | 'medium' | 'high' | 'critical';
   details?: any;
 }
@@ -23,15 +28,18 @@ export const SecurityEventLogger = () => {
     const monitorSuspiciousActivity = () => {
       // Detect rapid page navigation
       let pageChangeCount = 0;
-      const resetPageCount = () => { pageChangeCount = 0; };
-      
+      const resetPageCount = () => {
+        pageChangeCount = 0;
+      };
+
       const handlePageChange = () => {
         pageChangeCount++;
-        if (pageChangeCount > 20) { // More than 20 page changes in 1 minute
+        if (pageChangeCount > 20) {
+          // More than 20 page changes in 1 minute
           logSecurityEvent('suspicious_activity', {
             severity: 'medium',
             type: 'rapid_navigation',
-            count: pageChangeCount
+            count: pageChangeCount,
           });
         }
       };
@@ -39,14 +47,15 @@ export const SecurityEventLogger = () => {
       // Monitor for unusual API request patterns
       const originalFetch = window.fetch;
       let apiCallCount = 0;
-      
+
       window.fetch = async (...args) => {
         apiCallCount++;
-        if (apiCallCount > 100) { // More than 100 API calls in 1 minute
+        if (apiCallCount > 100) {
+          // More than 100 API calls in 1 minute
           logSecurityEvent('suspicious_activity', {
             severity: 'high',
             type: 'excessive_api_calls',
-            count: apiCallCount
+            count: apiCallCount,
           });
         }
         return originalFetch(...args);
@@ -85,7 +94,7 @@ export const SecurityEventLogger = () => {
         if (attempts >= 3) {
           logSecurityEvent('failed_login', {
             severity: 'medium',
-            attempts
+            attempts,
           });
         }
       }

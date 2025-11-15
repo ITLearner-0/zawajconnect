@@ -1,7 +1,7 @@
 /**
  * Types réutilisables extraits de la base de données Supabase
  * et des hooks de l'application.
- * 
+ *
  * Ce fichier centralise les types pour éviter la duplication
  * et améliorer la maintenabilité du code.
  */
@@ -25,8 +25,10 @@ export type MessageRow = Database['public']['Tables']['messages']['Row'];
 export type FamilyMemberRow = Database['public']['Tables']['family_members']['Row'];
 export type FamilyNotificationRow = Database['public']['Tables']['family_notifications']['Row'];
 export type FamilyReviewRow = Database['public']['Tables']['family_reviews']['Row'];
-export type CompatibilityQuestionRow = Database['public']['Tables']['compatibility_questions']['Row'];
-export type UserCompatibilityResponseRow = Database['public']['Tables']['user_compatibility_responses']['Row'];
+export type CompatibilityQuestionRow =
+  Database['public']['Tables']['compatibility_questions']['Row'];
+export type UserCompatibilityResponseRow =
+  Database['public']['Tables']['user_compatibility_responses']['Row'];
 export type ProfileViewRow = Database['public']['Tables']['profile_views']['Row'];
 export type SupervisionLogRow = Database['public']['Tables']['supervision_logs']['Row'];
 
@@ -44,7 +46,7 @@ export type FamilyReviewInsert = Database['public']['Tables']['family_reviews'][
  * (sans les champs générés automatiquement)
  */
 export type MatchingPreferencesUpdate = Omit<
-  MatchingPreferencesRow, 
+  MatchingPreferencesRow,
   'id' | 'created_at' | 'updated_at' | 'user_id'
 >;
 
@@ -166,9 +168,18 @@ export interface ValidationResult {
  * Interface du hook de validation de sécurité
  */
 export interface SecurityValidationHook {
-  validateFamilyOperationEnhanced: (operationType: string, requiredScore?: number) => Promise<ValidationResult>;
-  validateMessagePermissionsEnhanced: (matchId: string, requiredScore?: number) => Promise<ValidationResult>;
-  validateProfileAccessEnhanced: (targetUserId: string, requiredScore?: number) => Promise<ValidationResult>;
+  validateFamilyOperationEnhanced: (
+    operationType: string,
+    requiredScore?: number
+  ) => Promise<ValidationResult>;
+  validateMessagePermissionsEnhanced: (
+    matchId: string,
+    requiredScore?: number
+  ) => Promise<ValidationResult>;
+  validateProfileAccessEnhanced: (
+    targetUserId: string,
+    requiredScore?: number
+  ) => Promise<ValidationResult>;
   validateContactInfoAccess: (familyMemberId: string) => Promise<ValidationResult>;
   validateWithFeedback: (validationFn: () => Promise<ValidationResult>) => Promise<boolean>;
   showValidationError: (result: ValidationResult) => void;
@@ -234,7 +245,12 @@ export type ModerationAction = 'warn' | 'block' | 'escalate' | 'auto_moderate';
 /**
  * Actions prises après modération
  */
-export type ModerationActionTaken = 'approved' | 'warned' | 'blocked' | 'escalated' | 'auto_moderated';
+export type ModerationActionTaken =
+  | 'approved'
+  | 'warned'
+  | 'blocked'
+  | 'escalated'
+  | 'auto_moderated';
 
 /**
  * Types de contenu modéré

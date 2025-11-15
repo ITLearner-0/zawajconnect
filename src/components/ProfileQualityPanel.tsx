@@ -3,18 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  TrendingUp, 
-  CheckCircle, 
-  AlertCircle, 
-  User, 
-  FileText, 
-  Heart, 
+import {
+  TrendingUp,
+  CheckCircle,
+  AlertCircle,
+  User,
+  FileText,
+  Heart,
   Image as ImageIcon,
   Star,
   Sparkles,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react';
 import { useProfileQuality } from '@/hooks/useProfileQuality';
 import { supabase } from '@/integrations/supabase/client';
@@ -31,7 +31,7 @@ const SECTION_ICONS: Record<string, React.ElementType> = {
   bio: FileText,
   interests: Star,
   islamic: Heart,
-  photo: ImageIcon
+  photo: ImageIcon,
 };
 
 const getScoreColor = (score: number) => {
@@ -53,7 +53,7 @@ const getScoreLabel = (score: number) => {
 const ProfileQualityPanel: React.FC<ProfileQualityPanelProps> = ({
   profileData,
   islamicPrefs,
-  onNavigateToSection
+  onNavigateToSection,
 }) => {
   const quality = useProfileQuality(profileData, islamicPrefs);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
@@ -70,8 +70,8 @@ const ProfileQualityPanel: React.FC<ProfileQualityPanelProps> = ({
           profileData,
           islamicPrefs,
           currentScore: quality.overallScore,
-          missingSections: quality.missingSections
-        }
+          missingSections: quality.missingSections,
+        },
       });
 
       if (error) throw error;
@@ -84,7 +84,7 @@ const ProfileQualityPanel: React.FC<ProfileQualityPanelProps> = ({
       toast({
         title: 'Erreur',
         description: 'Impossible de générer les recommandations IA',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoadingAI(false);
@@ -107,7 +107,7 @@ const ProfileQualityPanel: React.FC<ProfileQualityPanelProps> = ({
             {quality.overallScore}/100
           </Badge>
         </div>
-        
+
         <div className="mt-4 space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">Score global</span>
@@ -178,11 +178,13 @@ const ProfileQualityPanel: React.FC<ProfileQualityPanelProps> = ({
                   onClick={() => toggleSection(section.id)}
                 >
                   <div className="flex items-center gap-3 flex-1">
-                    <div className={`p-2 rounded-full ${
-                      section.completed
-                        ? 'bg-emerald-100 text-emerald-600'
-                        : 'bg-slate-200 text-slate-500'
-                    }`}>
+                    <div
+                      className={`p-2 rounded-full ${
+                        section.completed
+                          ? 'bg-emerald-100 text-emerald-600'
+                          : 'bg-slate-200 text-slate-500'
+                      }`}
+                    >
                       {section.completed ? (
                         <CheckCircle className="h-4 w-4" />
                       ) : (
@@ -191,9 +193,7 @@ const ProfileQualityPanel: React.FC<ProfileQualityPanelProps> = ({
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h5 className="font-medium text-sm truncate">
-                          {section.name}
-                        </h5>
+                        <h5 className="font-medium text-sm truncate">{section.name}</h5>
                         <Badge variant="secondary" className="text-xs">
                           {section.score}%
                         </Badge>
@@ -215,7 +215,10 @@ const ProfileQualityPanel: React.FC<ProfileQualityPanelProps> = ({
                 {isExpanded && section.suggestions.length > 0 && (
                   <div className="mt-3 pl-12 space-y-1">
                     {section.suggestions.map((suggestion, idx) => (
-                      <div key={idx} className="flex items-start gap-2 text-xs text-muted-foreground">
+                      <div
+                        key={idx}
+                        className="flex items-start gap-2 text-xs text-muted-foreground"
+                      >
                         <span className="text-amber-600">→</span>
                         <span>{suggestion}</span>
                       </div>
@@ -246,12 +249,10 @@ const ProfileQualityPanel: React.FC<ProfileQualityPanelProps> = ({
             <div className="flex items-start gap-2">
               <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
               <div className="text-xs space-y-1">
-                <p className="font-medium text-blue-900">
-                  Augmentez vos chances de match
-                </p>
+                <p className="font-medium text-blue-900">Augmentez vos chances de match</p>
                 <p className="text-blue-700">
-                  Les profils avec un score de 80+ reçoivent 3x plus de correspondances. 
-                  Complétez les sections manquantes pour améliorer votre visibilité.
+                  Les profils avec un score de 80+ reçoivent 3x plus de correspondances. Complétez
+                  les sections manquantes pour améliorer votre visibilité.
                 </p>
               </div>
             </div>

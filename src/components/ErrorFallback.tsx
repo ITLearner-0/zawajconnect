@@ -7,7 +7,8 @@ interface ErrorFallbackProps {
 
 export const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorBoundary }) => {
   const errorMessage = error.message || 'Une erreur inconnue est survenue';
-  const isEnvError = errorMessage.includes('environment variables') || errorMessage.includes('Supabase');
+  const isEnvError =
+    errorMessage.includes('environment variables') || errorMessage.includes('Supabase');
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-emerald-50 to-teal-50 p-4">
@@ -29,20 +30,17 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorB
             </svg>
           </div>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Erreur de Configuration
-            </h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Erreur de Configuration</h1>
 
             {isEnvError ? (
               <>
                 <p className="text-gray-600 mb-4">
-                  Le site ne peut pas démarrer car les variables d'environnement Supabase sont manquantes.
+                  Le site ne peut pas démarrer car les variables d'environnement Supabase sont
+                  manquantes.
                 </p>
 
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-red-800 font-mono break-all">
-                    {errorMessage}
-                  </p>
+                  <p className="text-sm text-red-800 font-mono break-all">{errorMessage}</p>
                 </div>
 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
@@ -50,9 +48,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorB
                     🔧 Solution pour l'administrateur :
                   </h2>
                   <ol className="text-sm text-blue-800 space-y-2 list-decimal list-inside">
-                    <li>
-                      Allez sur votre plateforme de déploiement (Netlify ou Vercel)
-                    </li>
+                    <li>Allez sur votre plateforme de déploiement (Netlify ou Vercel)</li>
                     <li>
                       Ajoutez les variables d'environnement suivantes :
                       <div className="bg-white rounded p-2 mt-1 font-mono text-xs">
@@ -78,8 +74,8 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorB
 
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                   <p className="text-sm text-yellow-800">
-                    ⚠️ <strong>Note importante :</strong> Les variables doivent être ajoutées sur
-                    la plateforme de déploiement (Netlify/Vercel), pas seulement dans le code GitHub.
+                    ⚠️ <strong>Note importante :</strong> Les variables doivent être ajoutées sur la
+                    plateforme de déploiement (Netlify/Vercel), pas seulement dans le code GitHub.
                   </p>
                 </div>
               </>
@@ -90,9 +86,7 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorB
                 </p>
 
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-red-800 font-mono break-all">
-                    {errorMessage}
-                  </p>
+                  <p className="text-sm text-red-800 font-mono break-all">{errorMessage}</p>
                   {error.stack && (
                     <details className="mt-2">
                       <summary className="text-xs text-red-600 cursor-pointer">
@@ -121,10 +115,8 @@ export const ErrorFallback: React.FC<ErrorFallbackProps> = ({ error, resetErrorB
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500">
             Pour plus d'aide, consultez la documentation dans le fichier{' '}
-            <code className="bg-gray-100 px-1 py-0.5 rounded">
-              PRODUCTION_WHITE_PAGE_FIX.md
-            </code>{' '}
-            du projet.
+            <code className="bg-gray-100 px-1 py-0.5 rounded">PRODUCTION_WHITE_PAGE_FIX.md</code> du
+            projet.
           </p>
         </div>
       </div>

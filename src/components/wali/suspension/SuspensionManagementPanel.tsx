@@ -16,14 +16,8 @@ interface SuspensionManagementPanelProps {
 export const SuspensionManagementPanel = ({ waliId }: SuspensionManagementPanelProps) => {
   const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
-  const {
-    suspensions,
-    activeSuspension,
-    loading,
-    createSuspension,
-    liftSuspension,
-    isSuspended,
-  } = useWaliSuspensions(waliId);
+  const { suspensions, activeSuspension, loading, createSuspension, liftSuspension, isSuspended } =
+    useWaliSuspensions(waliId);
 
   const activeSuspensions = suspensions.filter((s) => s.is_active);
   const historicalSuspensions = suspensions.filter((s) => !s.is_active);
@@ -59,9 +53,7 @@ export const SuspensionManagementPanel = ({ waliId }: SuspensionManagementPanelP
                 <AlertTriangle className="h-5 w-5" />
                 Gestion des Suspensions
               </CardTitle>
-              <CardDescription>
-                Gérer les suspensions et avertissements du Wali
-              </CardDescription>
+              <CardDescription>Gérer les suspensions et avertissements du Wali</CardDescription>
             </div>
             {!showForm && (
               <Button onClick={() => setShowForm(true)}>

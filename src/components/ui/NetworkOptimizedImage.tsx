@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNetworkOptimization } from '@/hooks/useLazyLoading/useNetworkOptimization';
 import LazyImage from './LazyImage';
@@ -34,19 +33,19 @@ const NetworkOptimizedImage = ({
 }: NetworkOptimizedImageProps) => {
   const [optimizedSrc, setOptimizedSrc] = useState<string>(src);
   const [isOptimized, setIsOptimized] = useState<boolean>(false);
-  
+
   const networkOptimization = useNetworkOptimization({
     enableAdaptiveLoading: enableNetworkOptimization,
     enableDataSaver: false,
   });
 
-  const { 
-    optimizeImageUrl, 
-    getPreloadStrategy, 
+  const {
+    optimizeImageUrl,
+    getPreloadStrategy,
     isOptimizedForPerformance,
     loadingStrategy,
     isSlowConnection,
-    saveData
+    saveData,
   } = networkOptimization;
 
   // Optimize image URL based on network conditions
@@ -70,7 +69,7 @@ const NetworkOptimizedImage = ({
           {loadingStrategy.imageQuality}
         </div>
       )}
-      
+
       {showNetworkIndicator && (isSlowConnection || saveData) && (
         <div className="absolute top-1 left-1 z-10 bg-orange-500 text-white text-xs px-1 rounded">
           {saveData ? 'Data Saver' : 'Slow Connection'}

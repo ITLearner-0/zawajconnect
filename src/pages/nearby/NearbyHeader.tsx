@@ -1,14 +1,13 @@
-
-import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Star, Home } from "lucide-react";
-import CustomButton from "@/components/CustomButton";
-import { Button } from "@/components/ui/button";
-import { IslamicPattern } from "@/components/ui/islamic-pattern";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import AccessibilityControls from "@/components/AccessibilityControls";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useTranslation } from "react-i18next";
-import { LanguageSwitcher } from "@/components/ui/language-switcher";
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Star, Home } from 'lucide-react';
+import CustomButton from '@/components/CustomButton';
+import { Button } from '@/components/ui/button';
+import { IslamicPattern } from '@/components/ui/islamic-pattern';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import AccessibilityControls from '@/components/AccessibilityControls';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '@/components/ui/language-switcher';
 
 const NearbyHeader = () => {
   const navigate = useNavigate();
@@ -21,7 +20,7 @@ const NearbyHeader = () => {
         <div className="flex items-center gap-2">
           <Button
             variant="ghost"
-            onClick={() => navigate("/")}
+            onClick={() => navigate('/')}
             className="flex items-center gap-2 hover:bg-islamic-teal/10 group p-2"
             aria-label="Back to home"
           >

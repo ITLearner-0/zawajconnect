@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -48,10 +47,15 @@ const Navigation: React.FC = () => {
               </Button>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <AdminMenu />
-            <Button variant="outline" size="sm" onClick={signOut} className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={signOut}
+              className="flex items-center gap-2"
+            >
               <LogOut className="h-4 w-4" />
               Sign Out
             </Button>

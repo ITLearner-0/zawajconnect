@@ -6,7 +6,11 @@ import { Badge } from '@/components/ui/badge';
 
 export const DailyLimitIndicator = () => {
   const { user, subscription } = useAuth();
-  const [dailyStatus, setDailyStatus] = useState({ views_today: 0, remaining: 5, limit_reached: false });
+  const [dailyStatus, setDailyStatus] = useState({
+    views_today: 0,
+    remaining: 5,
+    limit_reached: false,
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,13 +50,17 @@ export const DailyLimitIndicator = () => {
             <>
               <Eye className="h-4 w-4 text-emerald" />
               <span className="text-sm text-muted-foreground">
-                <span className="font-medium text-foreground">{dailyStatus.remaining}/5</span> profils détaillés restants aujourd'hui
+                <span className="font-medium text-foreground">{dailyStatus.remaining}/5</span>{' '}
+                profils détaillés restants aujourd'hui
               </span>
             </>
           )}
         </div>
-        <Badge variant={dailyStatus.limit_reached ? "destructive" : "secondary"} className="text-xs">
-          {dailyStatus.limit_reached ? "Passez Premium" : "Gratuit"}
+        <Badge
+          variant={dailyStatus.limit_reached ? 'destructive' : 'secondary'}
+          className="text-xs"
+        >
+          {dailyStatus.limit_reached ? 'Passez Premium' : 'Gratuit'}
         </Badge>
       </div>
     </div>

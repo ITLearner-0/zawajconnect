@@ -4,7 +4,15 @@ import { Progress } from '@/components/ui/progress';
 import { Sparkles, Brain } from 'lucide-react';
 import type { MatchProfile } from '@/types/supabase';
 import MatchCard from './MatchCard';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 
 interface MatchResultsGridProps {
   matches: MatchProfile[];
@@ -12,7 +20,11 @@ interface MatchResultsGridProps {
   analyzing: boolean;
 }
 
-const MatchResultsGrid = ({ matches, familyApprovalRequired, analyzing }: MatchResultsGridProps) => {
+const MatchResultsGrid = ({
+  matches,
+  familyApprovalRequired,
+  analyzing,
+}: MatchResultsGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const matchesPerPage = 10;
 
@@ -41,9 +53,7 @@ const MatchResultsGrid = ({ matches, familyApprovalRequired, analyzing }: MatchR
     <div className="space-y-4">
       {/* Header */}
       <div className="border-b pb-3">
-        <h3 className="text-lg font-semibold">
-          Résultats du Matching
-        </h3>
+        <h3 className="text-lg font-semibold">Résultats du Matching</h3>
         <p className="text-sm text-muted-foreground mt-1">
           {matches.length} profils compatibles trouvés
         </p>
@@ -52,9 +62,9 @@ const MatchResultsGrid = ({ matches, familyApprovalRequired, analyzing }: MatchR
       {/* List of Matches */}
       <div className="space-y-3">
         {currentMatches.map((match) => (
-          <MatchCard 
-            key={match.user_id} 
-            match={match} 
+          <MatchCard
+            key={match.user_id}
+            match={match}
             familyApprovalRequired={familyApprovalRequired}
           />
         ))}
@@ -65,15 +75,15 @@ const MatchResultsGrid = ({ matches, familyApprovalRequired, analyzing }: MatchR
         <Pagination>
           <PaginationContent>
             <PaginationItem>
-              <PaginationPrevious 
-                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              <PaginationPrevious
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
               />
             </PaginationItem>
-            
+
             {Array.from({ length: totalPages }, (_, i) => {
               const pageNumber = i + 1;
-              
+
               if (
                 pageNumber === 1 ||
                 pageNumber === totalPages ||
@@ -90,19 +100,18 @@ const MatchResultsGrid = ({ matches, familyApprovalRequired, analyzing }: MatchR
                     </PaginationLink>
                   </PaginationItem>
                 );
-              } else if (
-                pageNumber === currentPage - 2 ||
-                pageNumber === currentPage + 2
-              ) {
+              } else if (pageNumber === currentPage - 2 || pageNumber === currentPage + 2) {
                 return <PaginationEllipsis key={i} />;
               }
               return null;
             })}
-            
+
             <PaginationItem>
-              <PaginationNext 
-                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+              <PaginationNext
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                className={
+                  currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'
+                }
               />
             </PaginationItem>
           </PaginationContent>

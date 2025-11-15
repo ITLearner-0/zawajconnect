@@ -1,6 +1,6 @@
 /**
  * MobileCallInterface Component
- * 
+ *
  * Mobile-optimized call interface with:
  * - Picture-in-Picture support
  * - Touch gestures (swipe, double-tap, pinch-to-zoom)
@@ -22,7 +22,7 @@ import {
   PictureInPicture,
   Maximize2,
   Battery,
-  BatteryLow
+  BatteryLow,
 } from 'lucide-react';
 import { CallState, QualityMetrics } from '@/services/webrtc-signaling';
 import { ConnectionQualityIndicator } from '@/components/ConnectionQualityIndicator';
@@ -61,16 +61,16 @@ export function MobileCallInterface({
   qualityMetrics,
   onToggleAudio,
   onToggleVideo,
-  onEndCall
+  onEndCall,
 }: MobileCallInterfaceProps) {
   const { toast } = useToast();
   const containerRef = useRef<HTMLDivElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  
+
   const { orientation, isPortrait, isLandscape } = useOrientation();
   const { isInPiP, isSupported: pipSupported, togglePiP } = usePictureInPicture(remoteVideoRef);
-  
+
   const [showControls, setShowControls] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [batterySaving, setBatterySaving] = useState(false);
@@ -79,27 +79,27 @@ export function MobileCallInterface({
   // Auto-hide controls after 3 seconds
   React.useEffect(() => {
     if (!showControls) return;
-    
+
     const timer = setTimeout(() => {
       if (callState === 'connected') {
         setShowControls(false);
       }
     }, 3000);
-    
+
     return () => clearTimeout(timer);
   }, [showControls, callState]);
 
   // Touch gesture handlers
   useTouchGestures(containerRef, {
     onSwipeUp: () => {
-      setShowControls(prev => !prev);
+      setShowControls((prev) => !prev);
       toast({
-        title: showControls ? "Contrôles masqués" : "Contrôles affichés",
-        duration: 1000
+        title: showControls ? 'Contrôles masqués' : 'Contrôles affichés',
+        duration: 1000,
       });
     },
     onSwipeDown: () => {
-      setShowControls(prev => !prev);
+      setShowControls((prev) => !prev);
     },
     onDoubleTap: () => {
       toggleFullscreen();
@@ -113,7 +113,7 @@ export function MobileCallInterface({
       if (pipSupported && isVideoCall) {
         togglePiP();
       }
-    }
+    },
   });
 
   // Attach streams to video elements
@@ -140,10 +140,12 @@ export function MobileCallInterface({
   }, []);
 
   const toggleBatterySaving = useCallback(() => {
-    setBatterySaving(prev => !prev);
+    setBatterySaving((prev) => !prev);
     toast({
-      title: batterySaving ? "Mode normal" : "Mode économie d'énergie",
-      description: batterySaving ? "Qualité vidéo restaurée" : "Résolution réduite pour économiser la batterie"
+      title: batterySaving ? 'Mode normal' : "Mode économie d'énergie",
+      description: batterySaving
+        ? 'Qualité vidéo restaurée'
+        : 'Résolution réduite pour économiser la batterie',
     });
   }, [batterySaving, toast]);
 
@@ -155,7 +157,7 @@ export function MobileCallInterface({
 
   const partnerInitials = partnerName
     .split(' ')
-    .map(n => n[0])
+    .map((n) => n[0])
     .join('')
     .toUpperCase();
 
@@ -165,14 +167,14 @@ export function MobileCallInterface({
         container: 'flex-col',
         remoteVideo: 'h-2/3',
         localVideo: 'bottom-4 right-4 w-32 h-40',
-        controls: 'bottom-4'
+        controls: 'bottom-4',
       };
     } else {
       return {
         container: 'flex-row',
         remoteVideo: 'w-full',
         localVideo: 'top-4 right-4 w-40 h-32',
-        controls: 'bottom-4'
+        controls: 'bottom-4',
       };
     }
   };
@@ -183,10 +185,12 @@ export function MobileCallInterface({
     <div
       ref={containerRef}
       className="fixed inset-0 z-50 bg-black touch-none"
-      onClick={() => setShowControls(prev => !prev)}
+      onClick={() => setShowControls((prev) => !prev)}
     >
       {/* Remote Video/Avatar */}
-      <div className={`relative w-full h-full flex items-center justify-center ${layout.remoteVideo}`}>
+      <div
+        className={`relative w-full h-full flex items-center justify-center ${layout.remoteVideo}`}
+      >
         {isVideoCall && remoteStream ? (
           <video
             ref={remoteVideoRef}
@@ -196,7 +200,7 @@ export function MobileCallInterface({
             style={{
               transform: `scale(${videoScale})`,
               transition: 'transform 0.3s ease',
-              filter: batterySaving ? 'blur(1px)' : 'none'
+              filter: batterySaving ? 'blur(1px)' : 'none',
             }}
           />
         ) : (
@@ -213,7 +217,9 @@ export function MobileCallInterface({
 
         {/* Local Video - PiP Style */}
         {isVideoCall && localStream && isVideoEnabled && (
-          <Card className={`absolute ${layout.localVideo} overflow-hidden border-2 border-white/30 shadow-2xl`}>
+          <Card
+            className={`absolute ${layout.localVideo} overflow-hidden border-2 border-white/30 shadow-2xl`}
+          >
             <video
               ref={localVideoRef}
               autoPlay
@@ -333,11 +339,7 @@ export function MobileCallInterface({
                   }}
                   className="rounded-full w-14 h-14 p-0 touch-manipulation"
                 >
-                  {isAudioEnabled ? (
-                    <Mic className="w-5 h-5" />
-                  ) : (
-                    <MicOff className="w-5 h-5" />
-                  )}
+                  {isAudioEnabled ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
                 </Button>
 
                 {/* Video Toggle */}

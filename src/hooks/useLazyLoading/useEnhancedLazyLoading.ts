@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { PerformanceConfigService } from './services/performanceConfig';
 import { IntersectionObserverService } from './services/observerService';
@@ -44,20 +43,23 @@ export const useEnhancedLazyLoading = <T extends HTMLElement = HTMLDivElement>(
   const finalThreshold = threshold ?? config.threshold;
   const finalRootMargin = rootMargin ?? config.rootMargin;
 
-  const handleIntersection = useCallback((entry: IntersectionObserverEntry) => {
-    const isVisible = entry.isIntersecting;
-    setIsIntersecting(isVisible);
-    
-    if (isVisible && triggerOnce && !hasTriggered) {
-      setHasTriggered(true);
-    }
+  const handleIntersection = useCallback(
+    (entry: IntersectionObserverEntry) => {
+      const isVisible = entry.isIntersecting;
+      setIsIntersecting(isVisible);
 
-    // Preload logic for better UX
-    if (enablePreload && isVisible && !isPreloading) {
-      setIsPreloading(true);
-      // Preload will be handled by parent component
-    }
-  }, [triggerOnce, hasTriggered, enablePreload, isPreloading]);
+      if (isVisible && triggerOnce && !hasTriggered) {
+        setHasTriggered(true);
+      }
+
+      // Preload logic for better UX
+      if (enablePreload && isVisible && !isPreloading) {
+        setIsPreloading(true);
+        // Preload will be handled by parent component
+      }
+    },
+    [triggerOnce, hasTriggered, enablePreload, isPreloading]
+  );
 
   useEffect(() => {
     const element = elementRef.current;
@@ -75,17 +77,17 @@ export const useEnhancedLazyLoading = <T extends HTMLElement = HTMLDivElement>(
     };
   }, [finalThreshold, finalRootMargin, handleIntersection]);
 
-  const shouldLoad = triggerOnce ? (hasTriggered || isIntersecting) : isIntersecting;
+  const shouldLoad = triggerOnce ? hasTriggered || isIntersecting : isIntersecting;
 
-  return { 
-    elementRef, 
-    isIntersecting, 
+  return {
+    elementRef,
+    isIntersecting,
     shouldLoad,
     isPreloading,
     config: {
       batchSize: config.batchSize,
       delay: config.delay,
       preloadDistance: config.preloadDistance,
-    }
+    },
   };
 };

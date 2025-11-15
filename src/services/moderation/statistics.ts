@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { columnExists, executeSql } from '@/utils/database';
 
@@ -10,13 +9,13 @@ export const getModeratedContentCount = async (): Promise<number> => {
       FROM content_flags
       WHERE resolved = true
     `);
-    
+
     // Handle different return types from executeSql
     if (result && typeof result !== 'boolean') {
       const data = Array.isArray(result) ? result[0] : result;
       return data?.count ? parseInt(data.count, 10) : 0;
     }
-    
+
     return 0;
   } catch (error) {
     console.error('Error getting moderated content count:', error);
@@ -32,12 +31,12 @@ export const getPendingReportsCount = async (): Promise<number> => {
       FROM content_reports
       WHERE status = 'pending'
     `);
-    
+
     if (result && typeof result !== 'boolean') {
       const data = Array.isArray(result) ? result[0] : result;
       return data?.count ? parseInt(data.count, 10) : 0;
     }
-    
+
     return 0;
   } catch (error) {
     console.error('Error getting pending reports count:', error);
@@ -53,12 +52,12 @@ export const getFlaggedContentCount = async (): Promise<number> => {
       FROM content_flags
       WHERE resolved = false
     `);
-    
+
     if (result && typeof result !== 'boolean') {
       const data = Array.isArray(result) ? result[0] : result;
       return data?.count ? parseInt(data.count, 10) : 0;
     }
-    
+
     return 0;
   } catch (error) {
     console.error('Error getting flagged content count:', error);
@@ -75,12 +74,12 @@ export const getResolvedTodayCount = async (): Promise<number> => {
       WHERE resolved = true
       AND DATE(resolved_at) = CURRENT_DATE
     `);
-    
+
     if (result && typeof result !== 'boolean') {
       const data = Array.isArray(result) ? result[0] : result;
       return data?.count ? parseInt(data.count, 10) : 0;
     }
-    
+
     return 0;
   } catch (error) {
     console.error('Error getting resolved today count:', error);
@@ -95,14 +94,14 @@ export const getModerationStats = async () => {
       getPendingReportsCount(),
       getFlaggedContentCount(),
       getModeratedContentCount(),
-      getResolvedTodayCount()
+      getResolvedTodayCount(),
     ]);
-    
+
     return {
       pendingReports,
       flaggedContent,
       totalProcessed,
-      resolvedToday
+      resolvedToday,
     };
   } catch (error) {
     console.error('Error getting moderation stats:', error);
@@ -110,7 +109,7 @@ export const getModerationStats = async () => {
       pendingReports: 0,
       flaggedContent: 0,
       totalProcessed: 0,
-      resolvedToday: 0
+      resolvedToday: 0,
     };
   }
 };

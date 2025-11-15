@@ -1,7 +1,6 @@
-
-import React from "react";
-import CustomButton from "@/components/CustomButton";
-import { Save } from "lucide-react";
+import React from 'react';
+import CustomButton from '@/components/CustomButton';
+import { Save } from 'lucide-react';
 
 interface FilterActionsProps {
   onReset: () => void;
@@ -14,7 +13,7 @@ const FilterActions: React.FC<FilterActionsProps> = ({
   onReset,
   onApply,
   onShowSaveForm,
-  showSaveForm
+  showSaveForm,
 }) => {
   return (
     <div className="flex justify-between">
@@ -22,9 +21,7 @@ const FilterActions: React.FC<FilterActionsProps> = ({
         <CustomButton variant="outline" onClick={onReset}>
           Réinitialiser
         </CustomButton>
-        <CustomButton onClick={onApply}>
-          Appliquer les Filtres
-        </CustomButton>
+        <CustomButton onClick={onApply}>Appliquer les Filtres</CustomButton>
       </div>
       {!showSaveForm && (
         <CustomButton variant="outline" onClick={onShowSaveForm}>

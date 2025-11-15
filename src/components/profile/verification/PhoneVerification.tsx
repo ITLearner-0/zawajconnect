@@ -1,12 +1,11 @@
-
-import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import CustomButton from "@/components/CustomButton";
-import { Phone, Check } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import CustomButton from '@/components/CustomButton';
+import { Phone, Check } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 interface PhoneVerificationProps {
   isVerified: boolean;
@@ -14,8 +13,8 @@ interface PhoneVerificationProps {
 
 const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
   const { toast } = useToast();
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
   const [showVerificationInput, setShowVerificationInput] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -23,21 +22,21 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
     setLoading(true);
     // In a real app, you would integrate with a service like Twilio
     // For this demo, we'll simulate sending a code
-    
+
     try {
       // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       setShowVerificationInput(true);
       toast({
-        title: "Verification code sent",
+        title: 'Verification code sent',
         description: "We've sent a code to your phone number",
       });
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Could not send verification code. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Could not send verification code. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -46,30 +45,32 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
 
   const verifyPhone = async () => {
     setLoading(true);
-    
+
     try {
       // In a real app, verify the code with backend
       // For this demo, accept any 6-digit code
       if (verificationCode.length === 6 && /^\d+$/.test(verificationCode)) {
         // Update verification status using the is_verified field with a phone_method metadata
-        const { data: { user } } = await supabase.auth.getUser();
-        
-        if (!user) throw new Error("User not found");
-        
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) throw new Error('User not found');
+
         // Update the profile with verification metadata
         const { error } = await supabase
-          .from("profiles" as any)
-          .update({ 
+          .from('profiles' as any)
+          .update({
             phone_verified: true,
             is_verified: true,
-            verification_document_url: `phone:${phoneNumber}`
+            verification_document_url: `phone:${phoneNumber}`,
           } as any)
-          .eq("id", user.id);
-        
+          .eq('id', user.id);
+
         if (error) throw error;
-        
+
         setShowVerificationInput(false);
-        
+
         // Award phone verification badge
         try {
           const { awardBadgeSilent } = await import('@/utils/badgeAwards');
@@ -77,26 +78,26 @@ const PhoneVerification = ({ isVerified }: PhoneVerificationProps) => {
         } catch (badgeError) {
           console.error('Error awarding phone verification badge:', badgeError);
         }
-        
+
         toast({
-          title: "Phone verified",
-          description: "Your phone number has been successfully verified",
+          title: 'Phone verified',
+          description: 'Your phone number has been successfully verified',
         });
-        
+
         // Refresh the page to update the verification status
         window.location.reload();
       } else {
         toast({
-          title: "Invalid code",
-          description: "Please enter a valid 6-digit code",
-          variant: "destructive",
+          title: 'Invalid code',
+          description: 'Please enter a valid 6-digit code',
+          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Could not verify phone. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Could not verify phone. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);

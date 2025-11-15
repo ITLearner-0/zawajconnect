@@ -20,12 +20,12 @@ interface FamilyNotification {
 }
 
 const FamilyNotificationCenter: React.FC = () => {
-  const { 
-    notifications, 
-    loading, 
+  const {
+    notifications,
+    loading,
     markNotificationAsRead,
     getUnreadNotifications,
-    getCriticalNotifications 
+    getCriticalNotifications,
   } = useFamilySupervision();
 
   const unreadNotifications = getUnreadNotifications();
@@ -48,7 +48,7 @@ const FamilyNotificationCenter: React.FC = () => {
     if (severity === 'critical') {
       return <AlertTriangle className="h-4 w-4 text-red-500" />;
     }
-    
+
     switch (type) {
       case 'inappropriate_content':
         return <Shield className="h-4 w-4 text-red-500" />;
@@ -81,7 +81,8 @@ const FamilyNotificationCenter: React.FC = () => {
         <Alert className="border-red-500 bg-red-50 dark:bg-red-900/10">
           <AlertTriangle className="h-4 w-4 text-red-500" />
           <AlertDescription>
-            <strong>🚨 {criticalNotifications.length} alerte(s) critique(s)</strong> nécessitent votre attention immédiate !
+            <strong>🚨 {criticalNotifications.length} alerte(s) critique(s)</strong> nécessitent
+            votre attention immédiate !
           </AlertDescription>
         </Alert>
       )}
@@ -94,9 +95,7 @@ const FamilyNotificationCenter: React.FC = () => {
               <Bell className="h-5 w-5 text-emerald" />
               Centre de Notifications Familiales
               {unreadNotifications.length > 0 && (
-                <Badge variant="destructive">
-                  {unreadNotifications.length}
-                </Badge>
+                <Badge variant="destructive">{unreadNotifications.length}</Badge>
               )}
             </CardTitle>
           </div>
@@ -104,7 +103,7 @@ const FamilyNotificationCenter: React.FC = () => {
             Surveillance et notifications pour la supervision islamique des communications
           </p>
         </CardHeader>
-        
+
         <CardContent className="space-y-4">
           {notifications.length === 0 ? (
             <div className="text-center py-8">
@@ -117,8 +116,8 @@ const FamilyNotificationCenter: React.FC = () => {
           ) : (
             <div className="space-y-3">
               {notifications.map((notification) => (
-                <Card 
-                  key={notification.id} 
+                <Card
+                  key={notification.id}
                   className={`
                     ${notification.is_read ? 'opacity-75' : 'border-l-4 border-l-emerald'}
                     ${getSeverityColor(notification.severity)}
@@ -128,43 +127,48 @@ const FamilyNotificationCenter: React.FC = () => {
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-3 flex-1">
                         {getNotificationIcon(notification.notification_type, notification.severity)}
-                        
+
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <Badge 
-                              variant={notification.severity === 'critical' ? 'destructive' : 'secondary'}
+                            <Badge
+                              variant={
+                                notification.severity === 'critical' ? 'destructive' : 'secondary'
+                              }
                               className="text-xs"
                             >
                               {notification.severity.toUpperCase()}
                             </Badge>
-                            
+
                             {notification.action_required && (
-                              <Badge variant="outline" className="text-xs border-red-500 text-red-600">
+                              <Badge
+                                variant="outline"
+                                className="text-xs border-red-500 text-red-600"
+                              >
                                 ACTION REQUISE
                               </Badge>
                             )}
-                            
+
                             {!notification.is_read && (
                               <div className="h-2 w-2 bg-emerald rounded-full"></div>
                             )}
                           </div>
-                          
-                          <p className="text-sm font-medium mb-1">
-                            {notification.content}
-                          </p>
-                          
+
+                          <p className="text-sm font-medium mb-1">{notification.content}</p>
+
                           {notification.original_message && (
                             <div className="mt-2 p-2 bg-background/50 rounded text-xs border border-border/50">
                               <strong>Message concerné :</strong> "{notification.original_message}"
                             </div>
                           )}
-                          
+
                           <p className="text-xs text-muted-foreground mt-2">
-                            {format(new Date(notification.created_at), "d MMM yyyy 'à' HH:mm", { locale: fr })}
+                            {format(new Date(notification.created_at), "d MMM yyyy 'à' HH:mm", {
+                              locale: fr,
+                            })}
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center gap-2 ml-4">
                         {!notification.is_read && (
                           <Button
@@ -176,10 +180,8 @@ const FamilyNotificationCenter: React.FC = () => {
                             <Eye className="h-4 w-4" />
                           </Button>
                         )}
-                        
-                        {notification.is_read && (
-                          <CheckCircle className="h-4 w-4 text-emerald" />
-                        )}
+
+                        {notification.is_read && <CheckCircle className="h-4 w-4 text-emerald" />}
                       </div>
                     </div>
                   </CardContent>
@@ -203,14 +205,12 @@ const FamilyNotificationCenter: React.FC = () => {
                   {unreadNotifications.length} notification(s) non lue(s)
                 </p>
               </div>
-              
+
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  unreadNotifications.forEach(notif => 
-                    markNotificationAsRead(notif.id)
-                  );
+                  unreadNotifications.forEach((notif) => markNotificationAsRead(notif.id));
                 }}
                 className="border-emerald text-emerald hover:bg-emerald/10"
               >

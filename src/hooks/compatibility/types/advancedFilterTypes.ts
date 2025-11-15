@@ -1,4 +1,3 @@
-
 export interface LocationFilter {
   enabled: boolean;
   latitude?: number;

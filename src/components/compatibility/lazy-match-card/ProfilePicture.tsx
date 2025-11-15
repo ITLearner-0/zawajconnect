@@ -1,4 +1,3 @@
-
 import React from 'react';
 import LazyImage from '@/components/ui/LazyImage';
 
@@ -8,7 +7,8 @@ interface ProfilePictureProps {
 }
 
 const ProfilePicture = ({ profileImageSrc, firstName }: ProfilePictureProps) => {
-  const fallbackImageSrc = "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=48&h=48&fit=crop&crop=face";
+  const fallbackImageSrc =
+    'https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=48&h=48&fit=crop&crop=face';
 
   if (!profileImageSrc) return null;
 

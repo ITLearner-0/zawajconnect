@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 interface NetworkStatus {
@@ -18,9 +17,10 @@ export const useNetworkStatus = () => {
 
   useEffect(() => {
     const updateNetworkStatus = () => {
-      const connection = (navigator as any).connection || 
-                        (navigator as any).mozConnection || 
-                        (navigator as any).webkitConnection;
+      const connection =
+        (navigator as any).connection ||
+        (navigator as any).mozConnection ||
+        (navigator as any).webkitConnection;
 
       setNetworkStatus({
         isOnline: navigator.onLine,
@@ -33,11 +33,11 @@ export const useNetworkStatus = () => {
     };
 
     const handleOnline = () => {
-      setNetworkStatus(prev => ({ ...prev, isOnline: true }));
+      setNetworkStatus((prev) => ({ ...prev, isOnline: true }));
     };
 
     const handleOffline = () => {
-      setNetworkStatus(prev => ({ ...prev, isOnline: false }));
+      setNetworkStatus((prev) => ({ ...prev, isOnline: false }));
     };
 
     const handleConnectionChange = () => {
@@ -52,9 +52,10 @@ export const useNetworkStatus = () => {
     window.addEventListener('offline', handleOffline);
 
     // Connection API listeners
-    const connection = (navigator as any).connection || 
-                      (navigator as any).mozConnection || 
-                      (navigator as any).webkitConnection;
+    const connection =
+      (navigator as any).connection ||
+      (navigator as any).mozConnection ||
+      (navigator as any).webkitConnection;
 
     if (connection) {
       connection.addEventListener('change', handleConnectionChange);

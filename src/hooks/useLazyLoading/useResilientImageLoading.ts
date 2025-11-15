@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 import { useNetworkStatus } from './useNetworkStatus';
 import { errorRecoveryService } from './services/errorRecoveryService';
@@ -57,7 +56,7 @@ export const useResilientImageLoading = (options: ResilientImageLoadingOptions) 
   const loadImage = useCallback(async (imageSrc: string): Promise<void> => {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      
+
       const timeoutId = setTimeout(() => {
         reject(new Error(`Image load timeout: ${imageSrc}`));
       }, 15000); // 15 second timeout
@@ -91,7 +90,7 @@ export const useResilientImageLoading = (options: ResilientImageLoadingOptions) 
 
     for (let i = 0; i < sourcesToTry.length; i++) {
       const sourceToTry = sourcesToTry[i];
-      
+
       try {
         await errorRecoveryService.executeWithRetry(
           () => loadImage(sourceToTry ?? ''),
@@ -106,21 +105,23 @@ export const useResilientImageLoading = (options: ResilientImageLoadingOptions) 
 
         setCurrentSrc(sourceToTry);
         setIsLoading(false);
-        setLoadAttempt(prev => prev + 1);
-        onLoad?.(
-        );
+        setLoadAttempt((prev) => prev + 1);
+        onLoad?.();
         return;
-        
       } catch (error) {
         lastError = error as Error;
-        console.warn(`Failed to load image source ${i + 1}/${sourcesToTry.length}:`, sourceToTry, error);
+        console.warn(
+          `Failed to load image source ${i + 1}/${sourcesToTry.length}:`,
+          sourceToTry,
+          error
+        );
       }
     }
 
     // All sources failed
     setHasError(true);
     setIsLoading(false);
-    setLoadAttempt(prev => prev + 1);
+    setLoadAttempt((prev) => prev + 1);
     onError?.(lastError! || new Error('All image sources failed to load'));
   }, [
     networkOptimizedSrc,
@@ -157,6 +158,8 @@ export const useResilientImageLoading = (options: ResilientImageLoadingOptions) 
     isOnline,
     attemptLoad,
     retry,
-    circuitBreakerStatus: errorRecoveryService.getCircuitBreakerStatus(`image-${networkOptimizedSrc}`),
+    circuitBreakerStatus: errorRecoveryService.getCircuitBreakerStatus(
+      `image-${networkOptimizedSrc}`
+    ),
   };
 };

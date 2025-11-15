@@ -28,7 +28,9 @@ const CompatibilityPrompt = ({ onDismiss, compact = false }: CompatibilityPrompt
   const isStarted = stats.answeredQuestions > 0;
 
   return (
-    <Card className={`border-l-4 border-l-gold bg-gradient-to-r from-gold/5 to-emerald/5 ${compact ? 'mb-4' : 'mb-6'}`}>
+    <Card
+      className={`border-l-4 border-l-gold bg-gradient-to-r from-gold/5 to-emerald/5 ${compact ? 'mb-4' : 'mb-6'}`}
+    >
       <CardContent className={compact ? 'p-4' : 'p-6'}>
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -46,12 +48,11 @@ const CompatibilityPrompt = ({ onDismiss, compact = false }: CompatibilityPrompt
                 </button>
               )}
             </div>
-            
+
             <p className="text-sm text-muted-foreground mb-4">
-              {isStarted 
+              {isStarted
                 ? `Vous avez répondu à ${stats.answeredQuestions}/${stats.totalQuestions} questions. Terminez pour des suggestions plus précises.`
-                : 'Répondez à notre questionnaire détaillé pour des suggestions de partenaires plus compatibles avec vos valeurs islamiques.'
-              }
+                : 'Répondez à notre questionnaire détaillé pour des suggestions de partenaires plus compatibles avec vos valeurs islamiques.'}
             </p>
 
             {isStarted && (
@@ -61,7 +62,7 @@ const CompatibilityPrompt = ({ onDismiss, compact = false }: CompatibilityPrompt
                   <span>{Math.round(stats.completionPercentage)}%</span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-gradient-to-r from-gold to-emerald h-2 rounded-full transition-all duration-300"
                     style={{ width: `${stats.completionPercentage}%` }}
                   />
@@ -76,7 +77,7 @@ const CompatibilityPrompt = ({ onDismiss, compact = false }: CompatibilityPrompt
                   {isStarted ? 'Continuer le test' : 'Commencer le test'}
                 </Button>
               </Link>
-              
+
               {!compact && (
                 <Badge variant="outline" className="text-xs">
                   {stats.totalQuestions} questions

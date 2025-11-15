@@ -14,7 +14,7 @@ interface ModerationSuggestionProps {
 const ModerationSuggestion: React.FC<ModerationSuggestionProps> = ({
   suggestion,
   onAccept,
-  onDismiss
+  onDismiss,
 }) => {
   return (
     <Card className="border-amber-200 bg-amber-50/50 dark:bg-amber-900/10 dark:border-amber-800">
@@ -72,11 +72,7 @@ const ModerationSuggestion: React.FC<ModerationSuggestionProps> = ({
             <CheckCircle className="h-4 w-4 mr-2" />
             Utiliser cette version
           </Button>
-          <Button
-            onClick={() => onDismiss(suggestion.id)}
-            variant="outline"
-            size="sm"
-          >
+          <Button onClick={() => onDismiss(suggestion.id)} variant="outline" size="sm">
             Ignorer
           </Button>
         </div>

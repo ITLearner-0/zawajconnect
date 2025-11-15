@@ -45,7 +45,8 @@ const WaliRegistrationPage = () => {
               <Alert>
                 <Clock className="h-4 w-4" />
                 <AlertDescription>
-                  Votre demande est en attente d'examen. Notre équipe vérifie vos documents et vous contactera sous 48-72h.
+                  Votre demande est en attente d'examen. Notre équipe vérifie vos documents et vous
+                  contactera sous 48-72h.
                 </AlertDescription>
               </Alert>
             )}
@@ -63,7 +64,8 @@ const WaliRegistrationPage = () => {
               <Alert className="border-success bg-success/10">
                 <CheckCircle2 className="h-4 w-4 text-success" />
                 <AlertDescription className="text-success-foreground">
-                  Félicitations! Votre inscription a été approuvée. Vous pouvez maintenant accéder au tableau de bord Wali.
+                  Félicitations! Votre inscription a été approuvée. Vous pouvez maintenant accéder
+                  au tableau de bord Wali.
                 </AlertDescription>
               </Alert>
             )}
@@ -72,9 +74,8 @@ const WaliRegistrationPage = () => {
               <Alert variant="destructive">
                 <XCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Votre demande a été rejetée. {registration.rejection_reason && (
-                    <>Raison: {registration.rejection_reason}</>
-                  )}
+                  Votre demande a été rejetée.{' '}
+                  {registration.rejection_reason && <>Raison: {registration.rejection_reason}</>}
                 </AlertDescription>
               </Alert>
             )}
@@ -140,8 +141,8 @@ const WaliRegistrationPage = () => {
         </div>
         <h1 className="text-3xl font-bold mb-2">Devenir Wali</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          En tant que Wali, vous aurez la responsabilité de superviser et guider les membres de votre famille 
-          dans leur recherche de mariage, conformément aux valeurs islamiques.
+          En tant que Wali, vous aurez la responsabilité de superviser et guider les membres de
+          votre famille dans leur recherche de mariage, conformément aux valeurs islamiques.
         </p>
       </div>
 

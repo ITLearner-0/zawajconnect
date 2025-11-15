@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface CompactViewProps {
@@ -26,12 +25,12 @@ const CompactView: React.FC<CompactViewProps> = ({
           {formatTime(pageLoadTime)}
         </span>
       </div>
-      
+
       <div className="flex justify-between text-xs">
         <span>Memory:</span>
         <span>{formatMemory(memory)}</span>
       </div>
-      
+
       <div className="flex justify-between text-xs">
         <span>API Avg:</span>
         <span className={getScoreColor(apiAverageTime, [500, 1000])}>

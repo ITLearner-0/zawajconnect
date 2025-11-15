@@ -3,15 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Video, 
-  ExternalLink, 
-  Calendar, 
-  Users,
-  Clock,
-  Copy,
-  CheckCircle
-} from 'lucide-react';
+import { Video, ExternalLink, Calendar, Users, Clock, Copy, CheckCircle } from 'lucide-react';
 
 interface GoogleMeetIntegrationProps {
   matchId: string;
@@ -24,7 +16,7 @@ const GoogleMeetIntegration: React.FC<GoogleMeetIntegrationProps> = ({
   matchId,
   partnerId,
   partnerName,
-  onMeetingCreated
+  onMeetingCreated,
 }) => {
   const { toast } = useToast();
   const [isCreating, setIsCreating] = useState(false);
@@ -34,32 +26,31 @@ const GoogleMeetIntegration: React.FC<GoogleMeetIntegrationProps> = ({
 
   const createGoogleMeetLink = async () => {
     setIsCreating(true);
-    
+
     try {
       // Simulation de création de lien Google Meet
       // Dans une vraie implémentation, ceci appellerait l'API Google Meet
       const simulatedMeetingId = `meet-${Date.now()}`;
       const simulatedMeetingLink = `https://meet.google.com/${simulatedMeetingId}`;
-      
+
       // Simuler un délai d'API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       setMeetingId(simulatedMeetingId);
       setMeetingLink(simulatedMeetingLink);
-      
+
       toast({
-        title: "Réunion Google Meet créée",
-        description: "Le lien de la réunion a été généré avec succès"
+        title: 'Réunion Google Meet créée',
+        description: 'Le lien de la réunion a été généré avec succès',
       });
-      
+
       onMeetingCreated?.(simulatedMeetingLink);
-      
     } catch (error) {
       console.error('Erreur lors de la création de la réunion:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de créer la réunion Google Meet",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de créer la réunion Google Meet',
+        variant: 'destructive',
       });
     } finally {
       setIsCreating(false);
@@ -72,16 +63,16 @@ const GoogleMeetIntegration: React.FC<GoogleMeetIntegrationProps> = ({
         await navigator.clipboard.writeText(meetingLink);
         setCopied(true);
         toast({
-          title: "Lien copié",
-          description: "Le lien de la réunion a été copié dans le presse-papiers"
+          title: 'Lien copié',
+          description: 'Le lien de la réunion a été copié dans le presse-papiers',
         });
-        
+
         setTimeout(() => setCopied(false), 2000);
       } catch (error) {
         toast({
-          title: "Erreur",
-          description: "Impossible de copier le lien",
-          variant: "destructive"
+          title: 'Erreur',
+          description: 'Impossible de copier le lien',
+          variant: 'destructive',
         });
       }
     }
@@ -119,15 +110,8 @@ const GoogleMeetIntegration: React.FC<GoogleMeetIntegrationProps> = ({
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">Lien de la réunion:</p>
             <div className="flex items-center gap-2 p-2 bg-muted rounded-md">
-              <code className="flex-1 text-sm font-mono truncate">
-                {meetingLink}
-              </code>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={copyMeetingLink}
-                className="shrink-0"
-              >
+              <code className="flex-1 text-sm font-mono truncate">{meetingLink}</code>
+              <Button variant="ghost" size="sm" onClick={copyMeetingLink} className="shrink-0">
                 {copied ? (
                   <CheckCircle className="h-4 w-4 text-green-600" />
                 ) : (
@@ -138,7 +122,7 @@ const GoogleMeetIntegration: React.FC<GoogleMeetIntegrationProps> = ({
           </div>
 
           <div className="flex gap-2">
-            <Button 
+            <Button
               onClick={joinMeeting}
               className="flex-1 bg-blue-600 hover:bg-blue-700"
               size="lg"
@@ -171,9 +155,7 @@ const GoogleMeetIntegration: React.FC<GoogleMeetIntegrationProps> = ({
             <Video className="h-10 w-10 text-blue-600" />
           </div>
           <h3 className="text-lg font-semibold">{partnerName}</h3>
-          <p className="text-sm text-muted-foreground">
-            Créer une réunion Google Meet sécurisée
-          </p>
+          <p className="text-sm text-muted-foreground">Créer une réunion Google Meet sécurisée</p>
         </div>
 
         <div className="space-y-2 text-sm text-muted-foreground">
@@ -191,12 +173,7 @@ const GoogleMeetIntegration: React.FC<GoogleMeetIntegrationProps> = ({
           </div>
         </div>
 
-        <Button 
-          onClick={createGoogleMeetLink}
-          disabled={isCreating}
-          className="w-full"
-          size="lg"
-        >
+        <Button onClick={createGoogleMeetLink} disabled={isCreating} className="w-full" size="lg">
           {isCreating ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

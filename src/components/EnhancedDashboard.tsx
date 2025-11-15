@@ -8,10 +8,10 @@ import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Heart, 
-  MessageCircle, 
-  Star, 
+import {
+  Heart,
+  MessageCircle,
+  Star,
   TrendingUp,
   Calendar,
   Crown,
@@ -20,7 +20,7 @@ import {
   Bell,
   Eye,
   Shield,
-  Zap
+  Zap,
 } from 'lucide-react';
 import MobileProfileHeader from './MobileProfileHeader';
 import SuccessStoriesShowcase from './SuccessStoriesShowcase';
@@ -55,7 +55,7 @@ const EnhancedDashboard = () => {
     messages_count: 0,
     profile_views: 0,
     likes_received: 0,
-    verification_score: 0
+    verification_score: 0,
   });
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -87,18 +87,17 @@ const EnhancedDashboard = () => {
       // Load dashboard stats
       await Promise.all([
         loadMatches(),
-        loadMessages(), 
+        loadMessages(),
         loadProfileViews(),
         loadVerificationScore(),
-        loadRecentActivity()
+        loadRecentActivity(),
       ]);
-      
     } catch (error) {
       console.error('Error loading dashboard data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données du tableau de bord",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données du tableau de bord',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -115,12 +114,12 @@ const EnhancedDashboard = () => {
         .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`);
 
       const totalMatches = matches?.length || 0;
-      const mutualMatches = matches?.filter(m => m.is_mutual)?.length || 0;
+      const mutualMatches = matches?.filter((m) => m.is_mutual)?.length || 0;
 
-      setStats(prev => ({
+      setStats((prev) => ({
         ...prev,
         total_matches: totalMatches,
-        mutual_matches: mutualMatches
+        mutual_matches: mutualMatches,
       }));
     } catch (error) {
       console.error('Error loading matches:', error);
@@ -136,9 +135,9 @@ const EnhancedDashboard = () => {
         .select('*')
         .eq('sender_id', user.id);
 
-      setStats(prev => ({
+      setStats((prev) => ({
         ...prev,
-        messages_count: messages?.length || 0
+        messages_count: messages?.length || 0,
       }));
     } catch (error) {
       console.error('Error loading messages:', error);
@@ -154,9 +153,9 @@ const EnhancedDashboard = () => {
         .select('*', { count: 'exact', head: true })
         .eq('viewed_id', user.id);
 
-      setStats(prev => ({
+      setStats((prev) => ({
         ...prev,
-        profile_views: count || 0
+        profile_views: count || 0,
       }));
     } catch (error) {
       console.error('Error loading profile views:', error);
@@ -173,9 +172,9 @@ const EnhancedDashboard = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      setStats(prev => ({
+      setStats((prev) => ({
         ...prev,
-        verification_score: data?.verification_score || 0
+        verification_score: data?.verification_score || 0,
       }));
     } catch (error) {
       console.error('Error loading verification score:', error);
@@ -190,7 +189,7 @@ const EnhancedDashboard = () => {
   const getActivityIcon = (type: string) => {
     switch (type) {
       case 'like':
-                        return <Heart className="h-4 w-4 text-destructive" />;
+        return <Heart className="h-4 w-4 text-destructive" />;
       case 'match':
         return <Star className="h-4 w-4 text-gold" />;
       case 'message':
@@ -251,7 +250,10 @@ const EnhancedDashboard = () => {
             <Button variant="outline" onClick={() => navigate('/settings')}>
               Paramètres
             </Button>
-            <Button className="bg-emerald hover:bg-emerald-dark" onClick={() => navigate('/browse')}>
+            <Button
+              className="bg-emerald hover:bg-emerald-dark"
+              onClick={() => navigate('/browse')}
+            >
               Découvrir des profils
             </Button>
           </div>
@@ -280,31 +282,39 @@ const EnhancedDashboard = () => {
                     <Card className="hover:shadow-md transition-shadow">
                       <CardContent className="p-4 text-center">
                         <Heart className="h-8 w-8 text-emerald mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-emerald">{stats.mutual_matches}</div>
+                        <div className="text-2xl font-bold text-emerald">
+                          {stats.mutual_matches}
+                        </div>
                         <div className="text-sm text-muted-foreground">Matches Mutuels</div>
                       </CardContent>
                     </Card>
-                    
+
                     <Card className="hover:shadow-md transition-shadow">
-                       <CardContent className="p-4 text-center">
-                         <MessageCircle className="h-8 w-8 text-primary mx-auto mb-2" />
-                         <div className="text-2xl font-bold text-primary">{stats.messages_count}</div>
-                         <div className="text-sm text-muted-foreground">Messages Envoyés</div>
-                       </CardContent>
+                      <CardContent className="p-4 text-center">
+                        <MessageCircle className="h-8 w-8 text-primary mx-auto mb-2" />
+                        <div className="text-2xl font-bold text-primary">
+                          {stats.messages_count}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Messages Envoyés</div>
+                      </CardContent>
                     </Card>
-                    
+
                     <Card className="hover:shadow-md transition-shadow">
-                       <CardContent className="p-4 text-center">
-                         <Eye className="h-8 w-8 text-secondary mx-auto mb-2" />
-                         <div className="text-2xl font-bold text-secondary">{stats.profile_views}</div>
-                         <div className="text-sm text-muted-foreground">Vues de Profil</div>
-                       </CardContent>
+                      <CardContent className="p-4 text-center">
+                        <Eye className="h-8 w-8 text-secondary mx-auto mb-2" />
+                        <div className="text-2xl font-bold text-secondary">
+                          {stats.profile_views}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Vues de Profil</div>
+                      </CardContent>
                     </Card>
-                    
+
                     <Card className="hover:shadow-md transition-shadow">
                       <CardContent className="p-4 text-center">
                         <Shield className="h-8 w-8 text-gold mx-auto mb-2" />
-                        <div className="text-2xl font-bold text-gold">{stats.verification_score}%</div>
+                        <div className="text-2xl font-bold text-gold">
+                          {stats.verification_score}%
+                        </div>
                         <div className="text-sm text-muted-foreground">Vérification</div>
                       </CardContent>
                     </Card>
@@ -320,8 +330,8 @@ const EnhancedDashboard = () => {
                     </CardHeader>
                     <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Button 
-                          variant="outline" 
+                        <Button
+                          variant="outline"
                           onClick={() => navigate('/browse')}
                           className="justify-start h-auto p-4 flex-col items-start"
                         >
@@ -331,21 +341,23 @@ const EnhancedDashboard = () => {
                             <div className="text-sm text-muted-foreground">Nouveaux profils</div>
                           </div>
                         </Button>
-                        
-                        <Button 
-                          variant="outline" 
+
+                        <Button
+                          variant="outline"
                           onClick={() => navigate('/matches')}
                           className="justify-start h-auto p-4 flex-col items-start"
                         >
                           <Star className="h-6 w-6 text-gold mb-2" />
                           <div>
                             <div className="font-semibold">Matches</div>
-                            <div className="text-sm text-muted-foreground">{stats.mutual_matches} mutuels</div>
+                            <div className="text-sm text-muted-foreground">
+                              {stats.mutual_matches} mutuels
+                            </div>
                           </div>
                         </Button>
-                        
-                        <Button 
-                          variant="outline" 
+
+                        <Button
+                          variant="outline"
                           onClick={() => navigate('/chat')}
                           className="justify-start h-auto p-4 flex-col items-start"
                         >
@@ -369,32 +381,28 @@ const EnhancedDashboard = () => {
                       {recentActivity.length > 0 ? (
                         <div className="space-y-4">
                           {recentActivity.map((activity) => (
-                            <div 
-                              key={activity.id} 
+                            <div
+                              key={activity.id}
                               className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                                !activity.read ? 'bg-emerald/5 border border-emerald/20' : 'hover:bg-muted/50'
+                                !activity.read
+                                  ? 'bg-emerald/5 border border-emerald/20'
+                                  : 'hover:bg-muted/50'
                               }`}
                             >
-                              <div className="flex-shrink-0">
-                                {getActivityIcon(activity.type)}
-                              </div>
+                              <div className="flex-shrink-0">{getActivityIcon(activity.type)}</div>
                               <div className="flex-1">
-                                <p className="text-sm font-medium">
-                                  {getActivityText(activity)}
-                                </p>
+                                <p className="text-sm font-medium">{getActivityText(activity)}</p>
                                 <p className="text-xs text-muted-foreground">
                                   {new Date(activity.timestamp).toLocaleDateString('fr-FR', {
                                     day: 'numeric',
                                     month: 'short',
                                     hour: '2-digit',
-                                    minute: '2-digit'
+                                    minute: '2-digit',
                                   })}
                                 </p>
                               </div>
                               {!activity.read && (
-                                <Badge className="bg-emerald text-white text-xs">
-                                  Nouveau
-                                </Badge>
+                                <Badge className="bg-emerald text-white text-xs">Nouveau</Badge>
                               )}
                             </div>
                           ))}

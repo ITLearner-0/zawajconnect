@@ -32,10 +32,8 @@ const RouteTransition = ({ children }: RouteTransitionProps) => {
   return (
     <div
       className={cn(
-        "transition-all duration-300 ease-in-out",
-        isTransitioning 
-          ? "opacity-0 translate-y-2" 
-          : "opacity-100 translate-y-0"
+        'transition-all duration-300 ease-in-out',
+        isTransitioning ? 'opacity-0 translate-y-2' : 'opacity-100 translate-y-0'
       )}
     >
       {children}

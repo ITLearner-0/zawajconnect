@@ -34,34 +34,37 @@ interface BroadcastEvent<T> {
 
 export const useChatPresence = (matchId: string | null) => {
   const { user } = useAuth();
-  
+
   const [typingUsers, setTypingUsers] = useState<TypingUser[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
-  
+
   const presenceChannelRef = useRef<RealtimeChannel | undefined>(undefined);
   const typingTimeoutRef = useRef<NodeJS.Timeout>();
 
-  const handleTyping = useCallback((typing: boolean) => {
-    if (!presenceChannelRef.current || !user) return;
+  const handleTyping = useCallback(
+    (typing: boolean) => {
+      if (!presenceChannelRef.current || !user) return;
 
-    presenceChannelRef.current.send({
-      type: 'broadcast',
-      event: 'typing',
-      payload: {
-        user_id: user.id,
-        user_name: user.email || 'Utilisateur',
-        typing
-      }
-    });
-  }, [user]);
+      presenceChannelRef.current.send({
+        type: 'broadcast',
+        event: 'typing',
+        payload: {
+          user_id: user.id,
+          user_name: user.email || 'Utilisateur',
+          typing,
+        },
+      });
+    },
+    [user]
+  );
 
   const startTyping = useCallback(() => {
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
-    
+
     handleTyping(true);
-    
+
     typingTimeoutRef.current = setTimeout(() => {
       handleTyping(false);
     }, 1000);
@@ -95,10 +98,10 @@ export const useChatPresence = (matchId: string | null) => {
     channel
       .on('presence', { event: 'sync' }, () => {
         const newState = channel.presenceState();
-        const users = Object.keys(newState).map(userId => ({
+        const users = Object.keys(newState).map((userId) => ({
           user_id: userId,
           last_seen: new Date().toISOString(),
-          status: 'online' as const
+          status: 'online' as const,
         }));
         setOnlineUsers(users);
       })
@@ -107,30 +110,33 @@ export const useChatPresence = (matchId: string | null) => {
       })
       .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
         console.log('User left:', key, leftPresences);
-        setOnlineUsers(prev => prev.filter(u => u.user_id !== key));
+        setOnlineUsers((prev) => prev.filter((u) => u.user_id !== key));
       })
       .on('broadcast', { event: 'typing' }, (event: BroadcastEvent<TypingBroadcastPayload>) => {
         const typingPayload = event.payload;
-        
+
         if (typingPayload?.user_id && typingPayload.user_id !== user.id) {
-          setTypingUsers(prev => {
-            const filtered = prev.filter(u => u.user_id !== typingPayload.user_id);
-            
+          setTypingUsers((prev) => {
+            const filtered = prev.filter((u) => u.user_id !== typingPayload.user_id);
+
             if (typingPayload.typing) {
-              return [...filtered, {
-                user_id: typingPayload.user_id,
-                user_name: typingPayload.user_name || 'Utilisateur',
-                timestamp: new Date().toISOString()
-              }];
+              return [
+                ...filtered,
+                {
+                  user_id: typingPayload.user_id,
+                  user_name: typingPayload.user_name || 'Utilisateur',
+                  timestamp: new Date().toISOString(),
+                },
+              ];
             }
-            
+
             return filtered;
           });
         }
       })
       .subscribe(async (status) => {
         if (status !== 'SUBSCRIBED') return;
-        
+
         await channel.track({
           user_id: user.id,
           user_name: user.email || 'Utilisateur',
@@ -142,10 +148,12 @@ export const useChatPresence = (matchId: string | null) => {
 
     // Clean up old typing indicators
     const typingCleanup = setInterval(() => {
-      setTypingUsers(prev => prev.filter(u => {
-        const timeDiff = Date.now() - new Date(u.timestamp).getTime();
-        return timeDiff < 3000;
-      }));
+      setTypingUsers((prev) =>
+        prev.filter((u) => {
+          const timeDiff = Date.now() - new Date(u.timestamp).getTime();
+          return timeDiff < 3000;
+        })
+      );
     }, 1000);
 
     return () => {
@@ -156,10 +164,13 @@ export const useChatPresence = (matchId: string | null) => {
     };
   }, [user, matchId]);
 
-  const isUserOnline = useCallback((userId: string): boolean => {
-    if (!userId) return false;
-    return !!onlineUsers.some(u => u.user_id === userId && u.status === 'online');
-  }, [onlineUsers]);
+  const isUserOnline = useCallback(
+    (userId: string): boolean => {
+      if (!userId) return false;
+      return !!onlineUsers.some((u) => u.user_id === userId && u.status === 'online');
+    },
+    [onlineUsers]
+  );
 
   useEffect(() => {
     if (matchId) {
@@ -185,6 +196,6 @@ export const useChatPresence = (matchId: string | null) => {
     onlineUsers,
     isUserOnline,
     startTyping,
-    stopTyping
+    stopTyping,
   };
 };

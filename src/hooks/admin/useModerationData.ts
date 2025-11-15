@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { getModerationStats } from '@/services/moderation/statistics';
@@ -9,7 +8,7 @@ export const useModerationData = () => {
     pendingReports: 0,
     flaggedContent: 0,
     totalProcessed: 0,
-    resolvedToday: 0
+    resolvedToday: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +35,7 @@ export const useModerationData = () => {
     try {
       const flagsTableExists = await tableExists('content_flags');
       const reportsTableExists = await tableExists('content_reports');
-      
+
       setShowSetupButton(!flagsTableExists || !reportsTableExists);
       setError(null);
     } catch (err: any) {
@@ -55,13 +54,13 @@ export const useModerationData = () => {
         .select('*')
         .eq('resolved', false)
         .order('created_at', { ascending: false });
-      
+
       if (error) {
         console.error('Error fetching flagged content:', error);
         setError('Failed to load flagged content');
         return;
       }
-      
+
       setFlaggedContent(data || []);
       setError(null);
     } catch (err: any) {
@@ -74,14 +73,10 @@ export const useModerationData = () => {
   const refreshData = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Run these in parallel for better performance
-      await Promise.all([
-        checkModerationTables(),
-        fetchModerationStats(),
-        fetchFlaggedContent()
-      ]);
+      await Promise.all([checkModerationTables(), fetchModerationStats(), fetchFlaggedContent()]);
     } catch (err: any) {
       console.error('Error refreshing data:', err);
       setError(err.message || 'Failed to refresh data');
@@ -101,6 +96,6 @@ export const useModerationData = () => {
     error,
     showSetupButton,
     flaggedContent,
-    refreshData
+    refreshData,
   };
 };

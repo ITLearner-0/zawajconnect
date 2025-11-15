@@ -1,4 +1,3 @@
-
 interface ObserverCallback {
   (entry: IntersectionObserverEntry): void;
 }
@@ -46,7 +45,7 @@ export class IntersectionObserverService {
 
   observe(element: Element, config: ObserverConfig, callback: ObserverCallback): void {
     const key = this.getObserverKey(config);
-    
+
     if (!this.observers.has(key)) {
       this.observers.set(key, this.createObserver(config));
       this.elementCounts.set(key, 0);
@@ -64,7 +63,7 @@ export class IntersectionObserverService {
   unobserve(element: Element, config: ObserverConfig): void {
     const key = this.getObserverKey(config);
     const observer = this.observers.get(key);
-    
+
     if (observer) {
       observer.unobserve(element);
       this.callbacks.delete(element);
@@ -89,7 +88,7 @@ export class IntersectionObserverService {
 
   // Enhanced cleanup with memory optimization
   cleanup(): void {
-    this.observers.forEach(observer => observer.disconnect());
+    this.observers.forEach((observer) => observer.disconnect());
     this.observers.clear();
     this.callbacks.clear();
     this.elementCounts.clear();
@@ -99,8 +98,10 @@ export class IntersectionObserverService {
   getObserverStats() {
     return {
       totalObservers: this.observers.size,
-      totalObservedElements: Array.from(this.elementCounts.values())
-        .reduce((total, count) => total + count, 0),
+      totalObservedElements: Array.from(this.elementCounts.values()).reduce(
+        (total, count) => total + count,
+        0
+      ),
       observerDetails: Array.from(this.elementCounts.entries()).map(([key, count]) => ({
         config: key,
         elementCount: count,

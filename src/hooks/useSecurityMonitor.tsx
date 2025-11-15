@@ -47,7 +47,7 @@ export const useSecurityMonitor = () => {
           email_verified: !!verification.email_verified,
           id_verified: !!verification.id_verified,
           password_strength: getPasswordStrength(verificationScore),
-          last_security_check: new Date().toISOString()
+          last_security_check: new Date().toISOString(),
         });
       }
     } catch (error) {
@@ -70,7 +70,7 @@ export const useSecurityMonitor = () => {
         failed_logins: 0, // Would be tracked through auth logs
         password_changes: 0, // Would be tracked through user metadata
         last_login: user.last_sign_in_at ?? undefined,
-        suspicious_activity: false
+        suspicious_activity: false,
       });
 
       // Check for suspicious patterns
@@ -115,7 +115,9 @@ export const useSecurityMonitor = () => {
     }
   };
 
-  const getPasswordStrength = (verificationScore: number): 'weak' | 'moderate' | 'strong' | 'very_strong' => {
+  const getPasswordStrength = (
+    verificationScore: number
+  ): 'weak' | 'moderate' | 'strong' | 'very_strong' => {
     if (verificationScore >= 80) return 'very_strong';
     if (verificationScore >= 60) return 'strong';
     if (verificationScore >= 30) return 'moderate';
@@ -139,7 +141,10 @@ export const useSecurityMonitor = () => {
       recommendations.push('Improve your verification score by completing all security steps');
     }
 
-    if (securityStatus.password_strength === 'weak' || securityStatus.password_strength === 'moderate') {
+    if (
+      securityStatus.password_strength === 'weak' ||
+      securityStatus.password_strength === 'moderate'
+    ) {
       recommendations.push('Update to a stronger password');
     }
 
@@ -158,7 +163,7 @@ export const useSecurityMonitor = () => {
     loading,
     recommendations: getSecurityRecommendations(),
     refreshSecurityStatus,
-    checkSuspiciousActivity
+    checkSuspiciousActivity,
   };
 };
 

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useMessageSearch, SearchResult } from '@/hooks/useMessageSearch';
 import { Input } from '../ui/input';
@@ -16,14 +15,8 @@ interface MessageSearchProps {
 
 const MessageSearch: React.FC<MessageSearchProps> = ({ userId, onSelectResult }) => {
   const [open, setOpen] = useState(false);
-  const {
-    searchTerm,
-    setSearchTerm,
-    searchMessages,
-    searchResults,
-    loading,
-    clearSearch
-  } = useMessageSearch(userId);
+  const { searchTerm, setSearchTerm, searchMessages, searchResults, loading, clearSearch } =
+    useMessageSearch(userId);
 
   // Check if this is a demo user ID
   const isDemoUser = userId?.startsWith('user-');
@@ -31,7 +24,7 @@ const MessageSearch: React.FC<MessageSearchProps> = ({ userId, onSelectResult })
   // Debounce search
   useEffect(() => {
     if (isDemoUser) return; // Skip search for demo users
-    
+
     const timer = setTimeout(() => {
       if (open && searchTerm.trim().length > 2) {
         searchMessages();
@@ -74,9 +67,9 @@ const MessageSearch: React.FC<MessageSearchProps> = ({ userId, onSelectResult })
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           {searchTerm && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6"
               onClick={() => setSearchTerm('')}
             >
@@ -84,26 +77,28 @@ const MessageSearch: React.FC<MessageSearchProps> = ({ userId, onSelectResult })
             </Button>
           )}
         </div>
-        
+
         <div className="text-sm text-muted-foreground mt-1 mb-2">
-          {isDemoUser ? (
-            'Search not available for demo users'
-          ) : searchTerm.length > 0 && searchTerm.length < 3 ? 
-            'Type at least 3 characters to search' : 
-            loading ? 
-              'Searching...' : 
-              searchResults.length > 0 ? 
-                `Found ${searchResults.length} results` : 
-                searchTerm.length >= 3 ? 
-                  'No matching messages found' : 
-                  'Search across all your conversations'}
+          {isDemoUser
+            ? 'Search not available for demo users'
+            : searchTerm.length > 0 && searchTerm.length < 3
+              ? 'Type at least 3 characters to search'
+              : loading
+                ? 'Searching...'
+                : searchResults.length > 0
+                  ? `Found ${searchResults.length} results`
+                  : searchTerm.length >= 3
+                    ? 'No matching messages found'
+                    : 'Search across all your conversations'}
         </div>
-        
+
         <ScrollArea className="flex-grow overflow-auto">
           {isDemoUser ? (
             <div className="flex justify-center items-center py-10">
               <MessageSquare className="mx-auto h-8 w-8 opacity-20 mb-2" />
-              <p className="text-center text-muted-foreground">Search is not available in demo mode</p>
+              <p className="text-center text-muted-foreground">
+                Search is not available in demo mode
+              </p>
             </div>
           ) : loading ? (
             <div className="flex justify-center items-center py-10">
@@ -139,7 +134,7 @@ const MessageSearch: React.FC<MessageSearchProps> = ({ userId, onSelectResult })
                   </div>
                 </div>
               ))}
-              
+
               {searchTerm.length >= 3 && searchResults.length === 0 && !loading && (
                 <div className="py-8 text-center text-muted-foreground">
                   <MessageSquare className="mx-auto h-8 w-8 opacity-20 mb-2" />

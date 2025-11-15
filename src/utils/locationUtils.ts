@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 export interface UserProfile {
@@ -20,7 +19,7 @@ export const findNearbyUsers = async (
 ): Promise<UserProfile[]> => {
   try {
     console.log('Finding nearby users for:', currentUserId, 'at', latitude, longitude);
-    
+
     // Since we don't have spatial functions available, fetch all profiles
     // and filter client-side for now
     const { data: profiles, error } = await supabase
@@ -35,7 +34,7 @@ export const findNearbyUsers = async (
     }
 
     const profilesData = profiles || [];
-    
+
     // Return mock data for now since we don't have actual coordinates
     return profilesData.slice(0, 10).map((profile: any) => ({
       id: profile.id,
@@ -45,7 +44,7 @@ export const findNearbyUsers = async (
       birth_date: profile.birth_date || '1990-01-01',
       education_level: profile.education_level || 'Not specified',
       occupation: profile.occupation || 'Not specified',
-      is_verified: profile.is_verified || false
+      is_verified: profile.is_verified || false,
     }));
   } catch (error) {
     console.error('Error in findNearbyUsers:', error);

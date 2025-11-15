@@ -3,14 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Bell, 
-  Shield, 
-  AlertTriangle, 
-  MessageSquare, 
-  CheckCircle,
-  Clock
-} from 'lucide-react';
+import { Bell, Shield, AlertTriangle, MessageSquare, CheckCircle, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -34,22 +27,29 @@ interface NotificationCenterProps {
 const NotificationCenter: React.FC<NotificationCenterProps> = ({
   notifications,
   onMarkAsRead,
-  onMarkAllAsRead
+  onMarkAllAsRead,
 }) => {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'critical': return 'destructive';
-      case 'high': return 'destructive';
-      case 'medium': return 'secondary';
-      default: return 'outline';
+      case 'critical':
+        return 'destructive';
+      case 'high':
+        return 'destructive';
+      case 'medium':
+        return 'secondary';
+      default:
+        return 'outline';
     }
   };
 
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
-     case 'critical': return <AlertTriangle className="h-4 w-4 text-destructive" />;
-     case 'high': return <AlertTriangle className="h-4 w-4 text-destructive" />;
-     default: return <MessageSquare className="h-4 w-4 text-primary" />;
+      case 'critical':
+        return <AlertTriangle className="h-4 w-4 text-destructive" />;
+      case 'high':
+        return <AlertTriangle className="h-4 w-4 text-destructive" />;
+      default:
+        return <MessageSquare className="h-4 w-4 text-primary" />;
     }
   };
 
@@ -58,7 +58,7 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
 
-    if (diffInMinutes < 1) return 'À l\'instant';
+    if (diffInMinutes < 1) return "À l'instant";
     if (diffInMinutes < 60) return `Il y a ${diffInMinutes} min`;
     if (diffInMinutes < 1440) return `Il y a ${Math.floor(diffInMinutes / 60)} h`;
     return `Il y a ${Math.floor(diffInMinutes / 1440)} j`;
@@ -74,15 +74,10 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
           </CardTitle>
           <div className="flex items-center gap-2">
             <Badge variant="secondary">
-              {notifications.filter(n => !n.is_read).length} non lues
+              {notifications.filter((n) => !n.is_read).length} non lues
             </Badge>
             {notifications.length > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onMarkAllAsRead}
-                className="text-xs"
-              >
+              <Button variant="outline" size="sm" onClick={onMarkAllAsRead} className="text-xs">
                 Tout marquer comme lu
               </Button>
             )}
@@ -101,11 +96,11 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
             </div>
           ) : (
             notifications.map((notification) => (
-              <Alert 
+              <Alert
                 key={notification.id}
                 className={`cursor-pointer transition-all ${
-                  !notification.is_read 
-                    ? 'border-primary bg-primary/5 hover:bg-primary/10' 
+                  !notification.is_read
+                    ? 'border-primary bg-primary/5 hover:bg-primary/10'
                     : 'hover:bg-muted/50'
                 }`}
                 onClick={() => onMarkAsRead(notification.id)}
@@ -126,17 +121,15 @@ const NotificationCenter: React.FC<NotificationCenterProps> = ({
                         )}
                       </div>
                     </div>
-                    
-                    <AlertDescription className="text-sm">
-                      {notification.content}
-                    </AlertDescription>
-                    
+
+                    <AlertDescription className="text-sm">{notification.content}</AlertDescription>
+
                     {notification.original_message && (
                       <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
                         <strong>Message original:</strong> {notification.original_message}
                       </div>
                     )}
-                    
+
                     {notification.action_required && (
                       <Badge variant="outline" className="text-xs">
                         <Clock className="h-3 w-3 mr-1" />

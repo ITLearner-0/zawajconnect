@@ -6,14 +6,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  AlertTriangle, 
-  ShieldAlert, 
-  Eye, 
-  XCircle, 
-  TrendingUp, 
+import {
+  AlertTriangle,
+  ShieldAlert,
+  Eye,
+  XCircle,
+  TrendingUp,
   CheckCircle,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -23,62 +23,57 @@ const severityConfig = {
     label: 'Faible',
     color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
     icon: Eye,
-    iconColor: 'text-blue-600'
+    iconColor: 'text-blue-600',
   },
   medium: {
     label: 'Moyen',
     color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
     icon: AlertTriangle,
-    iconColor: 'text-yellow-600'
+    iconColor: 'text-yellow-600',
   },
   high: {
     label: 'Élevé',
     color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
     icon: AlertTriangle,
-    iconColor: 'text-orange-600'
+    iconColor: 'text-orange-600',
   },
   critical: {
     label: 'Critique',
     color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
     icon: ShieldAlert,
-    iconColor: 'text-red-600'
-  }
+    iconColor: 'text-red-600',
+  },
 };
 
 const patternTypeConfig = {
   consecutive_rejections: {
     label: 'Rejets consécutifs',
     icon: XCircle,
-    description: 'Plusieurs rejets de matches consécutifs détectés'
+    description: 'Plusieurs rejets de matches consécutifs détectés',
   },
   repeated_views: {
     label: 'Vues répétées',
     icon: Eye,
-    description: 'Accès répétés au même profil dans un court laps de temps'
+    description: 'Accès répétés au même profil dans un court laps de temps',
   },
   rate_limit_exceeded: {
     label: 'Limite dépassée',
     icon: TrendingUp,
-    description: 'Tentative de dépassement des limites d\'utilisation'
-  }
+    description: "Tentative de dépassement des limites d'utilisation",
+  },
 };
 
 export const WaliAlertPanel = () => {
   const { user } = useAuth();
-  const { 
-    analyzeActivity, 
-    getWaliAlerts, 
-    patterns, 
-    checking 
-  } = useWaliSuspiciousActivity();
-  
+  const { analyzeActivity, getWaliAlerts, patterns, checking } = useWaliSuspiciousActivity();
+
   const [alerts, setAlerts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
 
   const loadAlerts = async () => {
     if (!user?.id) return;
-    
+
     try {
       setLoading(true);
       const alertsData = await getWaliAlerts(user.id);
@@ -92,7 +87,7 @@ export const WaliAlertPanel = () => {
 
   const runAnalysis = async () => {
     if (!user?.id) return;
-    
+
     try {
       setAnalyzing(true);
       await analyzeActivity(user.id);
@@ -129,8 +124,8 @@ export const WaliAlertPanel = () => {
     );
   }
 
-  const criticalPatterns = patterns.filter(p => p.severity === 'critical');
-  const highPatterns = patterns.filter(p => p.severity === 'high');
+  const criticalPatterns = patterns.filter((p) => p.severity === 'critical');
+  const highPatterns = patterns.filter((p) => p.severity === 'high');
   const hasWarnings = criticalPatterns.length > 0 || highPatterns.length > 0;
 
   return (
@@ -146,9 +141,7 @@ export const WaliAlertPanel = () => {
               )}
               Alertes de Sécurité
             </CardTitle>
-            <CardDescription>
-              Détection automatique de comportements suspects
-            </CardDescription>
+            <CardDescription>Détection automatique de comportements suspects</CardDescription>
           </div>
           <Button
             onClick={runAnalysis}
@@ -214,20 +207,21 @@ export const WaliAlertPanel = () => {
               <div className="space-y-3">
                 {alerts.map((alert) => {
                   const config = severityConfig[alert.risk_level as keyof typeof severityConfig];
-                  const typeConfig = patternTypeConfig[alert.alert_type as keyof typeof patternTypeConfig];
+                  const typeConfig =
+                    patternTypeConfig[alert.alert_type as keyof typeof patternTypeConfig];
                   const Icon = config?.icon || AlertTriangle;
 
                   return (
                     <div
                       key={alert.id}
                       className={`p-3 rounded-lg border ${
-                        alert.acknowledged 
-                          ? 'bg-muted/50 opacity-60' 
-                          : 'bg-background'
+                        alert.acknowledged ? 'bg-muted/50 opacity-60' : 'bg-background'
                       }`}
                     >
                       <div className="flex items-start gap-3">
-                        <Icon className={`h-4 w-4 ${config?.iconColor || 'text-orange-600'} flex-shrink-0 mt-0.5`} />
+                        <Icon
+                          className={`h-4 w-4 ${config?.iconColor || 'text-orange-600'} flex-shrink-0 mt-0.5`}
+                        />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
                             <p className="text-sm font-medium">
@@ -262,12 +256,8 @@ export const WaliAlertPanel = () => {
         {patterns.length === 0 && alerts.length === 0 && (
           <div className="text-center py-8">
             <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-3" />
-            <p className="text-sm font-medium text-foreground mb-1">
-              Aucune alerte active
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Aucun comportement suspect détecté
-            </p>
+            <p className="text-sm font-medium text-foreground mb-1">Aucune alerte active</p>
+            <p className="text-xs text-muted-foreground">Aucun comportement suspect détecté</p>
           </div>
         )}
       </CardContent>

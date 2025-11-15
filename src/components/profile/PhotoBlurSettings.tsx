@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -11,14 +10,11 @@ interface PhotoBlurSettingsProps {
   onChange: (settings: PhotoBlurSettingsType) => void;
 }
 
-const PhotoBlurSettings: React.FC<PhotoBlurSettingsProps> = ({
-  settings,
-  onChange
-}) => {
+const PhotoBlurSettings: React.FC<PhotoBlurSettingsProps> = ({ settings, onChange }) => {
   const updateSetting = (key: keyof PhotoBlurSettingsType, value: boolean) => {
     onChange({
       ...settings,
-      [key]: value
+      [key]: value,
     });
   };
 
@@ -47,9 +43,7 @@ const PhotoBlurSettings: React.FC<PhotoBlurSettingsProps> = ({
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
             <Label>Galerie photo floutée</Label>
-            <p className="text-sm text-muted-foreground">
-              Flouter les photos de votre galerie
-            </p>
+            <p className="text-sm text-muted-foreground">Flouter les photos de votre galerie</p>
           </div>
           <Switch
             checked={settings.blur_gallery_photos}
@@ -87,11 +81,10 @@ const PhotoBlurSettings: React.FC<PhotoBlurSettingsProps> = ({
           <div className="flex items-start gap-2">
             <Eye className="h-5 w-5 text-blue-600 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-blue-900">
-                Respect de la pudeur islamique
-              </p>
+              <p className="text-sm font-medium text-blue-900">Respect de la pudeur islamique</p>
               <p className="text-sm text-blue-700">
-                Ces paramètres vous permettent de préserver votre intimité tout en respectant les principes islamiques de modestie.
+                Ces paramètres vous permettent de préserver votre intimité tout en respectant les
+                principes islamiques de modestie.
               </p>
             </div>
           </div>

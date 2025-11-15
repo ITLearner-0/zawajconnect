@@ -3,7 +3,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { BookOpen, Search, Star, User, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -42,14 +48,16 @@ const Guidance = () => {
         .order('featured', { ascending: false })
         .order('created_at', { ascending: false });
 
-      setArticles((data ?? []).map(article => ({
-        ...article,
-        title: article.title ?? '',
-        content: article.content ?? '',
-        category: article.category ?? '',
-        author: article.author ?? '',
-        featured: !!article.featured
-      })));
+      setArticles(
+        (data ?? []).map((article) => ({
+          ...article,
+          title: article.title ?? '',
+          content: article.content ?? '',
+          category: article.category ?? '',
+          author: article.author ?? '',
+          featured: !!article.featured,
+        }))
+      );
     } catch (error) {
       console.error('Error fetching articles:', error);
     } finally {
@@ -62,15 +70,16 @@ const Guidance = () => {
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(article => 
-        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.content.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (article) =>
+          article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          article.content.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Category filter
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(article => article.category === selectedCategory);
+      filtered = filtered.filter((article) => article.category === selectedCategory);
     }
 
     setFilteredArticles(filtered);
@@ -82,7 +91,7 @@ const Guidance = () => {
       islamic_values: 'Valeurs islamiques',
       family_life: 'Vie familiale',
       courtship_etiquette: 'Étiquette de courtisation',
-      wedding_planning: 'Planification de mariage'
+      wedding_planning: 'Planification de mariage',
     };
     return labels[category as keyof typeof labels] || category;
   };
@@ -93,7 +102,7 @@ const Guidance = () => {
       islamic_values: 'bg-gold/10 text-gold-dark border-gold/20',
       family_life: 'bg-blue/10 text-blue-dark border-blue/20',
       courtship_etiquette: 'bg-purple/10 text-purple-dark border-purple/20',
-      wedding_planning: 'bg-pink/10 text-pink-dark border-pink/20'
+      wedding_planning: 'bg-pink/10 text-pink-dark border-pink/20',
     };
     return colors[category as keyof typeof colors] || 'bg-muted';
   };
@@ -123,7 +132,9 @@ const Guidance = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-foreground">Guide islamique</h1>
-              <p className="text-muted-foreground">Conseils et guidance pour un mariage islamique réussi</p>
+              <p className="text-muted-foreground">
+                Conseils et guidance pour un mariage islamique réussi
+              </p>
             </div>
           </div>
 
@@ -162,7 +173,7 @@ const Guidance = () => {
           </Card>
 
           {/* Featured Articles */}
-          {articles.some(article => article.featured) && (
+          {articles.some((article) => article.featured) && (
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
                 <Star className="h-6 w-6 text-gold" />
@@ -170,10 +181,13 @@ const Guidance = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {articles
-                  .filter(article => article.featured)
+                  .filter((article) => article.featured)
                   .slice(0, 2)
                   .map((article) => (
-                    <Card key={article.id} className="hover:shadow-lg transition-all duration-300 animate-fade-in">
+                    <Card
+                      key={article.id}
+                      className="hover:shadow-lg transition-all duration-300 animate-fade-in"
+                    >
                       <CardHeader>
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1">
@@ -185,7 +199,11 @@ const Guidance = () => {
                               </div>
                               <div className="flex items-center gap-1">
                                 <Calendar className="h-4 w-4" />
-                                <span>{format(new Date(article.created_at), 'dd MMM yyyy', { locale: fr })}</span>
+                                <span>
+                                  {format(new Date(article.created_at), 'dd MMM yyyy', {
+                                    locale: fr,
+                                  })}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -195,9 +213,7 @@ const Guidance = () => {
                         </div>
                       </CardHeader>
                       <CardContent>
-                        <p className="text-muted-foreground line-clamp-4">
-                          {article.content}
-                        </p>
+                        <p className="text-muted-foreground line-clamp-4">{article.content}</p>
                       </CardContent>
                     </Card>
                   ))}
@@ -210,17 +226,22 @@ const Guidance = () => {
             <h2 className="text-2xl font-bold text-foreground mb-6">
               Tous les articles ({filteredArticles.length})
             </h2>
-            
+
             {filteredArticles.length > 0 ? (
               <div className="grid gap-6">
                 {filteredArticles.map((article) => (
-                  <Card key={article.id} className="hover:shadow-lg transition-all duration-300 animate-fade-in">
+                  <Card
+                    key={article.id}
+                    className="hover:shadow-lg transition-all duration-300 animate-fade-in"
+                  >
                     <CardHeader>
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex-1">
                           <CardTitle className="text-xl mb-2 flex items-center gap-2">
                             {article.title}
-                            {article.featured && <Star className="h-4 w-4 text-gold fill-current" />}
+                            {article.featured && (
+                              <Star className="h-4 w-4 text-gold fill-current" />
+                            )}
                           </CardTitle>
                           <div className="flex items-center gap-3 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
@@ -229,7 +250,11 @@ const Guidance = () => {
                             </div>
                             <div className="flex items-center gap-1">
                               <Calendar className="h-4 w-4" />
-                              <span>{format(new Date(article.created_at), 'dd MMM yyyy', { locale: fr })}</span>
+                              <span>
+                                {format(new Date(article.created_at), 'dd MMM yyyy', {
+                                  locale: fr,
+                                })}
+                              </span>
                             </div>
                           </div>
                         </div>
@@ -239,9 +264,7 @@ const Guidance = () => {
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">
-                        {article.content}
-                      </p>
+                      <p className="text-muted-foreground">{article.content}</p>
                     </CardContent>
                   </Card>
                 ))}

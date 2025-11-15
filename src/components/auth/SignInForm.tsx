@@ -1,34 +1,32 @@
-
-import React from "react";
-import { Input } from "@/components/ui/input";
-import CustomButton from "@/components/CustomButton";
-import PasswordField from "./PasswordField";
-import { useTranslation } from "react-i18next";
-import { FormControl, FormItem, FormLabel, FormMessage, Form } from "@/components/ui/form";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { SignInData } from "@/types/auth";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import CustomButton from '@/components/CustomButton';
+import PasswordField from './PasswordField';
+import { useTranslation } from 'react-i18next';
+import { FormControl, FormItem, FormLabel, FormMessage, Form } from '@/components/ui/form';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { SignInData } from '@/types/auth';
 
 interface SignInFormProps {
   loading: boolean;
   onSubmit: (data: SignInData) => void;
 }
 
-const SignInForm: React.FC<SignInFormProps> = ({
-  loading,
-  onSubmit
-}) => {
+const SignInForm: React.FC<SignInFormProps> = ({ loading, onSubmit }) => {
   const { t } = useTranslation();
 
   // Create schema for form validation with proper French messages
   const formSchema = z.object({
-    email: z.string()
-      .email("Veuillez entrer une adresse email valide")
+    email: z
+      .string()
+      .email('Veuillez entrer une adresse email valide')
       .min(1, "L'email est requis"),
-    password: z.string()
-      .min(6, "Le mot de passe doit contenir au moins 6 caractères")
-      .max(100, "Le mot de passe ne peut pas dépasser 100 caractères"),
+    password: z
+      .string()
+      .min(6, 'Le mot de passe doit contenir au moins 6 caractères')
+      .max(100, 'Le mot de passe ne peut pas dépasser 100 caractères'),
   });
 
   type FormValues = z.infer<typeof formSchema>;
@@ -36,16 +34,16 @@ const SignInForm: React.FC<SignInFormProps> = ({
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
-    mode: "onChange"
+    mode: 'onChange',
   });
 
   const handleSubmit = (values: FormValues) => {
     onSubmit({
       email: values.email,
-      password: values.password
+      password: values.password,
     });
   };
 
@@ -56,7 +54,7 @@ const SignInForm: React.FC<SignInFormProps> = ({
           <FormLabel>Email</FormLabel>
           <FormControl>
             <Input
-              {...form.register("email")}
+              {...form.register('email')}
               placeholder="votre.email@exemple.com"
               type="email"
               autoComplete="email"
@@ -68,12 +66,8 @@ const SignInForm: React.FC<SignInFormProps> = ({
             <FormMessage>{form.formState.errors.email.message}</FormMessage>
           )}
         </FormItem>
-        
-        <PasswordField 
-          form={form} 
-          loading={loading} 
-          autoComplete="current-password"
-        />
+
+        <PasswordField form={form} loading={loading} autoComplete="current-password" />
 
         <CustomButton
           type="submit"

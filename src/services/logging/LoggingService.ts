@@ -43,7 +43,7 @@ class LoggingService {
       batchSize: 50,
       flushInterval: 30000, // 30 seconds
     };
-    
+
     this.sessionId = this.generateSessionId();
     this.startPeriodicFlush();
   }
@@ -72,9 +72,9 @@ class LoggingService {
       ERROR: 0,
       WARN: 1,
       INFO: 2,
-      DEBUG: 3
+      DEBUG: 3,
     };
-    
+
     return levels[level] <= levels[this.config.logLevel];
   }
 
@@ -95,13 +95,13 @@ class LoggingService {
         ...metadata,
         url: window.location.href,
         userAgent: navigator.userAgent,
-      }
+      },
     };
   }
 
   private addToLocalStorage(entry: LogEntry): void {
     this.localLogs.push(entry);
-    
+
     // Keep only the most recent logs
     if (this.localLogs.length > this.config.maxLocalLogs) {
       this.localLogs = this.localLogs.slice(-this.config.maxLocalLogs);
@@ -110,52 +110,52 @@ class LoggingService {
 
   error(message: string, context?: any, metadata?: Record<string, any>): void {
     if (!this.shouldLog('ERROR')) return;
-    
+
     const entry = this.createLogEntry('ERROR', message, context, metadata);
-    
+
     if (this.config.enableConsoleLogging) {
       console.error(`[${entry.timestamp}] ERROR: ${message}`, context);
     }
-    
+
     this.addToLocalStorage(entry);
-    
+
     // Immediately flush errors
     this.flushLogs();
   }
 
   warn(message: string, context?: any, metadata?: Record<string, any>): void {
     if (!this.shouldLog('WARN')) return;
-    
+
     const entry = this.createLogEntry('WARN', message, context, metadata);
-    
+
     if (this.config.enableConsoleLogging) {
       console.warn(`[${entry.timestamp}] WARN: ${message}`, context);
     }
-    
+
     this.addToLocalStorage(entry);
   }
 
   info(message: string, context?: any, metadata?: Record<string, any>): void {
     if (!this.shouldLog('INFO')) return;
-    
+
     const entry = this.createLogEntry('INFO', message, context, metadata);
-    
+
     if (this.config.enableConsoleLogging) {
       console.info(`[${entry.timestamp}] INFO: ${message}`, context);
     }
-    
+
     this.addToLocalStorage(entry);
   }
 
   debug(message: string, context?: any, metadata?: Record<string, any>): void {
     if (!this.shouldLog('DEBUG')) return;
-    
+
     const entry = this.createLogEntry('DEBUG', message, context, metadata);
-    
+
     if (this.config.enableConsoleLogging) {
       console.log(`[${entry.timestamp}] DEBUG: ${message}`, context);
     }
-    
+
     this.addToLocalStorage(entry);
   }
 
@@ -173,7 +173,7 @@ class LoggingService {
       endpoint,
       method,
       duration,
-      status
+      status,
     });
   }
 
@@ -184,7 +184,7 @@ class LoggingService {
   // Get logs for debugging
   getLocalLogs(level?: keyof LogLevel): LogEntry[] {
     if (level) {
-      return this.localLogs.filter(log => log.level === level);
+      return this.localLogs.filter((log) => log.level === level);
     }
     return [...this.localLogs];
   }
@@ -205,7 +205,7 @@ class LoggingService {
     }
 
     const logsToFlush = this.localLogs.splice(0, this.config.batchSize);
-    
+
     try {
       // Send logs to remote logging service
       await this.sendLogsToRemote(logsToFlush);

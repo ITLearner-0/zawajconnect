@@ -24,7 +24,7 @@ export function IncomingCallNotification({
   incomingCall,
   onAccept,
   onReject,
-  callerAvatar
+  callerAvatar,
 }: IncomingCallNotificationProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -63,7 +63,7 @@ export function IncomingCallNotification({
   const isVideoCall = incomingCall.callType === 'video';
   const callerInitials = incomingCall.callerName
     .split(' ')
-    .map(n => n[0])
+    .map((n) => n[0])
     .join('')
     .toUpperCase();
 
@@ -111,21 +111,14 @@ export function IncomingCallNotification({
                 </AvatarFallback>
               </Avatar>
 
-              <h2 className="text-2xl font-bold text-foreground mb-2">
-                {incomingCall.callerName}
-              </h2>
+              <h2 className="text-2xl font-bold text-foreground mb-2">{incomingCall.callerName}</h2>
 
-              <p className="text-muted-foreground mb-6">
-                vous appelle...
-              </p>
+              <p className="text-muted-foreground mb-6">vous appelle...</p>
 
               {/* Call Action Buttons */}
               <div className="flex gap-4 justify-center">
                 {/* Reject Button */}
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
                     variant="destructive"
                     size="lg"
@@ -155,12 +148,8 @@ export function IncomingCallNotification({
 
               {/* Button Labels */}
               <div className="flex gap-4 justify-center mt-2">
-                <span className="text-xs text-destructive w-16 text-center">
-                  Refuser
-                </span>
-                <span className="text-xs text-green-600 w-16 text-center">
-                  Accepter
-                </span>
+                <span className="text-xs text-destructive w-16 text-center">Refuser</span>
+                <span className="text-xs text-green-600 w-16 text-center">Accepter</span>
               </div>
             </div>
 

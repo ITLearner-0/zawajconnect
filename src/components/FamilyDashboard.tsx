@@ -28,7 +28,7 @@ import {
   Mail,
   Calendar,
   Star,
-  TrendingUp
+  TrendingUp,
 } from 'lucide-react';
 
 interface Profile {
@@ -71,7 +71,7 @@ interface SupervisedUser {
 const FamilyDashboard = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  
+
   const [supervisedUsers, setSupervisedUsers] = useState<SupervisedUser[]>([]);
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [matches, setMatches] = useState<Match[]>([]);
@@ -81,7 +81,7 @@ const FamilyDashboard = () => {
     totalMatches: 0,
     recentMatches: 0,
     mutualMatches: 0,
-    activeConversations: 0
+    activeConversations: 0,
   });
 
   useEffect(() => {
@@ -111,8 +111,8 @@ const FamilyDashboard = () => {
       if (familyError) throw familyError;
 
       if (familyData && familyData.length > 0) {
-        const userIds = familyData.map(f => f.user_id);
-        
+        const userIds = familyData.map((f) => f.user_id);
+
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
           .select('*')
@@ -120,23 +120,24 @@ const FamilyDashboard = () => {
 
         if (profilesError) throw profilesError;
 
-        const users: SupervisedUser[] = profilesData?.map(profile => ({
-          id: profile.user_id,
-          full_name: profile.full_name || 'Utilisateur',
-          profiles: {
-            ...profile,
-            age: profile.age ?? 0,
+        const users: SupervisedUser[] =
+          profilesData?.map((profile) => ({
+            id: profile.user_id,
             full_name: profile.full_name || 'Utilisateur',
-            location: profile.location || '',
-            profession: profile.profession || '',
-            education: profile.education || '',
-            bio: profile.bio || '',
-            avatar_url: profile.avatar_url ?? undefined
-          }
-        })) || [];
+            profiles: {
+              ...profile,
+              age: profile.age ?? 0,
+              full_name: profile.full_name || 'Utilisateur',
+              location: profile.location || '',
+              profession: profile.profession || '',
+              education: profile.education || '',
+              bio: profile.bio || '',
+              avatar_url: profile.avatar_url ?? undefined,
+            },
+          })) || [];
 
         setSupervisedUsers(users);
-        
+
         if (users.length > 0 && users[0]?.id) {
           setSelectedUser(users[0].id);
         }
@@ -144,9 +145,9 @@ const FamilyDashboard = () => {
     } catch (error) {
       console.error('Error fetching supervised users:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les utilisateurs supervisés",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les utilisateurs supervisés',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -171,7 +172,7 @@ const FamilyDashboard = () => {
           ...data,
           is_wali: data.is_wali ?? false,
           can_communicate: data.can_communicate ?? false,
-          can_view_profile: data.can_view_profile ?? false
+          can_view_profile: data.can_view_profile ?? false,
         });
       }
     } catch (error) {
@@ -190,7 +191,7 @@ const FamilyDashboard = () => {
       if (error) throw error;
 
       const matchData = data || [];
-      
+
       // Fetch profiles for each match
       const matchesWithProfiles = await Promise.all(
         matchData.map(async (match) => {
@@ -202,33 +203,35 @@ const FamilyDashboard = () => {
 
           return {
             ...match,
-            profiles: profileData ? {
-              ...profileData,
-              age: profileData.age ?? 0,
-              full_name: profileData.full_name || 'Utilisateur',
-              location: profileData.location || '',
-              profession: profileData.profession || '',
-              education: profileData.education || '',
-              bio: profileData.bio || '',
-              avatar_url: profileData.avatar_url ?? undefined
-            } : {
-              id: '',
-              full_name: 'Utilisateur',
-              age: 0,
-              location: '',
-              profession: '',
-              education: '',
-              bio: '',
-              avatar_url: undefined
-            }
+            profiles: profileData
+              ? {
+                  ...profileData,
+                  age: profileData.age ?? 0,
+                  full_name: profileData.full_name || 'Utilisateur',
+                  location: profileData.location || '',
+                  profession: profileData.profession || '',
+                  education: profileData.education || '',
+                  bio: profileData.bio || '',
+                  avatar_url: profileData.avatar_url ?? undefined,
+                }
+              : {
+                  id: '',
+                  full_name: 'Utilisateur',
+                  age: 0,
+                  location: '',
+                  profession: '',
+                  education: '',
+                  bio: '',
+                  avatar_url: undefined,
+                },
           };
         })
       );
 
-      const normalizedMatches = matchesWithProfiles.map(m => ({
+      const normalizedMatches = matchesWithProfiles.map((m) => ({
         ...m,
         is_mutual: m.is_mutual ?? false,
-        match_score: m.match_score ?? 0
+        match_score: m.match_score ?? 0,
       }));
 
       setMatches(normalizedMatches);
@@ -236,14 +239,14 @@ const FamilyDashboard = () => {
       // Calculate stats
       const now = new Date();
       const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      
+
       setStats({
         totalMatches: matchesWithProfiles.length,
-        recentMatches: matchesWithProfiles.filter(m => new Date(m.created_at) > oneWeekAgo).length,
-        mutualMatches: matchesWithProfiles.filter(m => m.is_mutual).length,
-        activeConversations: matchesWithProfiles.filter(m => m.is_mutual).length
+        recentMatches: matchesWithProfiles.filter((m) => new Date(m.created_at) > oneWeekAgo)
+          .length,
+        mutualMatches: matchesWithProfiles.filter((m) => m.is_mutual).length,
+        activeConversations: matchesWithProfiles.filter((m) => m.is_mutual).length,
       });
-
     } catch (error) {
       console.error('Error fetching matches:', error);
     }
@@ -257,20 +260,19 @@ const FamilyDashboard = () => {
         notification_type: 'family_advice',
         notification_title: 'Conseil de la famille',
         notification_content: advice,
-        sender_user_id: user?.id
+        sender_user_id: user?.id,
       });
 
       toast({
-        title: "Conseil envoyé",
-        description: "Votre conseil a été transmis avec succès"
+        title: 'Conseil envoyé',
+        description: 'Votre conseil a été transmis avec succès',
       });
-
     } catch (error) {
       console.error('Error sending family advice:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'envoyer le conseil",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -281,7 +283,7 @@ const FamilyDashboard = () => {
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-muted rounded w-1/3"></div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[1, 2, 3].map(i => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="h-32 bg-muted rounded"></div>
             ))}
           </div>
@@ -296,23 +298,23 @@ const FamilyDashboard = () => {
         <Alert>
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
-            Vous n'avez accès à aucun profil familial. Assurez-vous d'être ajouté comme membre de famille 
-            par la personne que vous souhaitez superviser.
+            Vous n'avez accès à aucun profil familial. Assurez-vous d'être ajouté comme membre de
+            famille par la personne que vous souhaitez superviser.
           </AlertDescription>
         </Alert>
       </div>
     );
   }
 
-  const selectedUserData = supervisedUsers.find(u => u.id === selectedUser);
+  const selectedUserData = supervisedUsers.find((u) => u.id === selectedUser);
 
   return (
     <div className="space-y-6">
       {/* Family Approval Dashboard */}
       <FamilyApprovalDashboard />
-      
+
       <Separator className="my-8" />
-      
+
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="h-12 w-12 bg-gradient-to-br from-gold to-emerald rounded-full flex items-center justify-center">
@@ -320,9 +322,7 @@ const FamilyDashboard = () => {
         </div>
         <div>
           <h2 className="text-2xl font-bold text-foreground">Supervision Continue</h2>
-          <p className="text-muted-foreground">
-            Supervisez et guidez les matches de votre famille
-          </p>
+          <p className="text-muted-foreground">Supervisez et guidez les matches de votre famille</p>
         </div>
       </div>
 
@@ -336,7 +336,7 @@ const FamilyDashboard = () => {
                 {supervisedUsers.map((user) => (
                   <Button
                     key={user.id}
-                    variant={selectedUser === user.id ? "default" : "outline"}
+                    variant={selectedUser === user.id ? 'default' : 'outline'}
                     onClick={() => setSelectedUser(user.id)}
                     className="flex items-center gap-2"
                   >
@@ -412,15 +412,9 @@ const FamilyDashboard = () => {
       {/* Main Content */}
       <Tabs defaultValue="matches" className="space-y-4">
         <ResponsiveTabsList tabCount={3}>
-          <TabsTrigger value="matches">
-            Matches récents ({matches.length})
-          </TabsTrigger>
-          <TabsTrigger value="mutual">
-            Matches mutuels ({stats.mutualMatches})
-          </TabsTrigger>
-          <TabsTrigger value="guidance">
-            Conseils familiaux
-          </TabsTrigger>
+          <TabsTrigger value="matches">Matches récents ({matches.length})</TabsTrigger>
+          <TabsTrigger value="mutual">Matches mutuels ({stats.mutualMatches})</TabsTrigger>
+          <TabsTrigger value="guidance">Conseils familiaux</TabsTrigger>
         </ResponsiveTabsList>
 
         <TabsContent value="matches" className="space-y-4">
@@ -447,15 +441,17 @@ const FamilyDashboard = () => {
         </TabsContent>
 
         <TabsContent value="mutual" className="space-y-4">
-          {matches.filter(m => m.is_mutual).map((match) => (
-            <MatchCard
-              key={match.id}
-              match={match}
-              onSendAdvice={(advice) => sendFamilyAdvice(match.id, advice)}
-              familyRole={familyRole}
-              isImportant={true}
-            />
-          ))}
+          {matches
+            .filter((m) => m.is_mutual)
+            .map((match) => (
+              <MatchCard
+                key={match.id}
+                match={match}
+                onSendAdvice={(advice) => sendFamilyAdvice(match.id, advice)}
+                familyRole={familyRole}
+                isImportant={true}
+              />
+            ))}
         </TabsContent>
 
         <TabsContent value="guidance" className="space-y-4">
@@ -485,8 +481,9 @@ const FamilyDashboard = () => {
                 <div>
                   <h3 className="font-semibold text-foreground mb-2">Guidance Islamique</h3>
                   <p className="text-muted-foreground text-sm">
-                    En tant que famille, votre rôle est d'offrir guidance et conseil selon les principes islamiques. 
-                    Rappelez l'importance de la compatibilité religieuse, du respect mutuel et de la piété dans le choix du partenaire.
+                    En tant que famille, votre rôle est d'offrir guidance et conseil selon les
+                    principes islamiques. Rappelez l'importance de la compatibilité religieuse, du
+                    respect mutuel et de la piété dans le choix du partenaire.
                   </p>
                 </div>
               </div>
@@ -506,10 +503,9 @@ const FamilyDashboard = () => {
                   Votre rôle : {familyRole.is_wali ? 'Wali (Tuteur)' : 'Membre de famille'}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  {familyRole.is_wali 
-                    ? 'Vous avez l\'autorité religieuse pour guider et approuver'
-                    : `Vous pouvez ${familyRole.can_communicate ? 'communiquer et ' : ''}${familyRole.can_view_profile ? 'consulter le profil' : 'voir les matches'}`
-                  }
+                  {familyRole.is_wali
+                    ? "Vous avez l'autorité religieuse pour guider et approuver"
+                    : `Vous pouvez ${familyRole.can_communicate ? 'communiquer et ' : ''}${familyRole.can_view_profile ? 'consulter le profil' : 'voir les matches'}`}
                 </p>
               </div>
             </div>
@@ -533,9 +529,11 @@ const MatchCard = ({ match, onSendAdvice, familyRole, isImportant = false }: Mat
   const [showAdviceField, setShowAdviceField] = useState(false);
 
   const profile = match.profiles;
-  
+
   return (
-    <Card className={`hover:shadow-md transition-shadow ${isImportant ? 'border-emerald/40 bg-emerald/5' : ''}`}>
+    <Card
+      className={`hover:shadow-md transition-shadow ${isImportant ? 'border-emerald/40 bg-emerald/5' : ''}`}
+    >
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
           <Avatar className="h-16 w-16">
@@ -552,14 +550,14 @@ const MatchCard = ({ match, onSendAdvice, familyRole, isImportant = false }: Mat
                 <Star className="h-3 w-3 mr-1" />
                 {match.match_score}% compatible
               </Badge>
-              
+
               {match.is_mutual && (
                 <Badge className="bg-pink/10 text-pink border-pink/20">
                   <Heart className="h-3 w-3 mr-1" />
                   Match mutuel
                 </Badge>
               )}
-              
+
               {isImportant && (
                 <Badge className="bg-orange/10 text-orange-dark border-orange/20">
                   <AlertTriangle className="h-3 w-3 mr-1" />
@@ -571,7 +569,9 @@ const MatchCard = ({ match, onSendAdvice, familyRole, isImportant = false }: Mat
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div>
                 <p className="text-sm text-muted-foreground">Âge & Localisation</p>
-                <p className="font-medium">{profile?.age} ans • {profile?.location}</p>
+                <p className="font-medium">
+                  {profile?.age} ans • {profile?.location}
+                </p>
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Profession</p>
@@ -592,9 +592,7 @@ const MatchCard = ({ match, onSendAdvice, familyRole, isImportant = false }: Mat
 
             {showAdviceField && (
               <div className="mb-4 p-4 bg-muted/50 rounded-lg">
-                <label className="block text-sm font-medium mb-2">
-                  Votre conseil familial
-                </label>
+                <label className="block text-sm font-medium mb-2">Votre conseil familial</label>
                 <Textarea
                   value={advice}
                   onChange={(e) => setAdvice(e.target.value)}
@@ -613,11 +611,7 @@ const MatchCard = ({ match, onSendAdvice, familyRole, isImportant = false }: Mat
                   >
                     Envoyer
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowAdviceField(false)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setShowAdviceField(false)}>
                     Annuler
                   </Button>
                 </div>
@@ -633,19 +627,12 @@ const MatchCard = ({ match, onSendAdvice, familyRole, isImportant = false }: Mat
 
               {(familyRole?.can_communicate || familyRole?.is_wali) && (
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowAdviceField(true)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setShowAdviceField(true)}>
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Conseiller
                   </Button>
                   {familyRole?.can_communicate && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                    >
+                    <Button variant="outline" size="sm">
                       <Phone className="h-4 w-4 mr-2" />
                       Contacter
                     </Button>

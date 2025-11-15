@@ -1,4 +1,3 @@
-
 // Re-export original hooks for backward compatibility
 export { useLazyLoading, useLazyImage } from '../useLazyLoading';
 
@@ -30,7 +29,11 @@ export { useEnhancedMonitoring } from './useEnhancedMonitoring';
 
 // Export monitoring & analytics services
 export { analyticsService } from './services/analyticsService';
-export type { LazyLoadingMetrics, AggregatedMetrics, UsagePattern } from './services/analyticsService';
+export type {
+  LazyLoadingMetrics,
+  AggregatedMetrics,
+  UsagePattern,
+} from './services/analyticsService';
 
 // Export network optimization service
 export { networkOptimizationService } from './services/networkOptimizationService';
@@ -56,7 +59,12 @@ export { AccessibilityProvider, useAccessibility } from '../../contexts/Accessib
 export { default as AccessibilityControls } from '../../components/AccessibilityControls';
 
 // Export state management - FIX: Add LazyLoadingProvider export
-export { LazyLoadingProvider, useLazyLoadingContext, useLazyLoadingState, useLazyLoadingActions } from './context/LazyLoadingContext';
+export {
+  LazyLoadingProvider,
+  useLazyLoadingContext,
+  useLazyLoadingState,
+  useLazyLoadingActions,
+} from './context/LazyLoadingContext';
 export { useCentralizedLazyLoading } from './state/useCentralizedLazyLoading';
 export { useStatefulLazyImage } from './state/useStatefulLazyImage';
 export { useBatchLoading } from './state/useBatchLoading';

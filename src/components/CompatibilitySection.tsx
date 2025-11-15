@@ -8,39 +8,39 @@ const CompatibilitySection = () => {
   const compatibilityFactors = [
     {
       icon: Heart,
-      title: "Valeurs Islamiques",
-      description: "Pratique religieuse, secte, importance de la foi",
+      title: 'Valeurs Islamiques',
+      description: 'Pratique religieuse, secte, importance de la foi',
       weight: 35,
-      color: "text-emerald"
+      color: 'text-emerald',
     },
     {
       icon: Users,
-      title: "Objectifs de Vie",
+      title: 'Objectifs de Vie',
       description: "Mariage, famille, projets d'avenir",
       weight: 25,
-      color: "text-gold"
+      color: 'text-gold',
     },
     {
       icon: Star,
-      title: "Compatibilité Sociale",
-      description: "Éducation, profession, mode de vie",
+      title: 'Compatibilité Sociale',
+      description: 'Éducation, profession, mode de vie',
       weight: 20,
-      color: "text-emerald-light"
+      color: 'text-emerald-light',
     },
     {
       icon: Calculator,
-      title: "Préférences Personnelles",
+      title: 'Préférences Personnelles',
       description: "Âge, localisation, centres d'intérêt",
       weight: 20,
-      color: "text-gold-dark"
-    }
+      color: 'text-gold-dark',
+    },
   ];
 
   const successStats = [
-    { label: "Matches Réussis", value: "87%", icon: TrendingUp },
-    { label: "Mariages Célébrés", value: "1,247", icon: Heart },
-    { label: "Familles Heureuses", value: "892", icon: Users },
-    { label: "Vérifications Actives", value: "100%", icon: Shield }
+    { label: 'Matches Réussis', value: '87%', icon: TrendingUp },
+    { label: 'Mariages Célébrés', value: '1,247', icon: Heart },
+    { label: 'Familles Heureuses', value: '892', icon: Users },
+    { label: 'Vérifications Actives', value: '100%', icon: Shield },
   ];
 
   return (
@@ -56,7 +56,8 @@ const CompatibilitySection = () => {
               Algorithme de Compatibilité Islamique
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Notre système avancé analyse plusieurs dimensions pour trouver votre partenaire idéal selon les valeurs islamiques
+              Notre système avancé analyse plusieurs dimensions pour trouver votre partenaire idéal
+              selon les valeurs islamiques
             </p>
           </div>
 
@@ -71,10 +72,16 @@ const CompatibilitySection = () => {
               </CardHeader>
               <CardContent className="space-y-6">
                 {compatibilityFactors.map((factor, index) => (
-                  <div key={factor.title} className="space-y-3" style={{ animationDelay: `${index * 0.1}s` }}>
+                  <div
+                    key={factor.title}
+                    className="space-y-3"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`h-10 w-10 rounded-full bg-gradient-to-br from-emerald/10 to-gold/10 flex items-center justify-center`}>
+                        <div
+                          className={`h-10 w-10 rounded-full bg-gradient-to-br from-emerald/10 to-gold/10 flex items-center justify-center`}
+                        >
                           <factor.icon className={`h-5 w-5 ${factor.color}`} />
                         </div>
                         <div>
@@ -86,16 +93,14 @@ const CompatibilitySection = () => {
                         {factor.weight}%
                       </Badge>
                     </div>
-                    <Progress 
-                      value={factor.weight} 
-                      className="h-2 bg-sage/20"
-                    />
+                    <Progress value={factor.weight} className="h-2 bg-sage/20" />
                   </div>
                 ))}
-                
+
                 <div className="bg-gradient-to-r from-emerald/5 to-gold/5 rounded-lg p-4 mt-6">
                   <p className="text-sm text-center text-muted-foreground">
-                    <strong>100%</strong> des facteurs sont analysés selon les principes islamiques du mariage
+                    <strong>100%</strong> des facteurs sont analysés selon les principes islamiques
+                    du mariage
                   </p>
                 </div>
               </CardContent>
@@ -112,7 +117,7 @@ const CompatibilitySection = () => {
               <CardContent>
                 <div className="grid grid-cols-2 gap-6">
                   {successStats.map((stat, index) => (
-                    <div 
+                    <div
                       key={stat.label}
                       className="text-center space-y-2 p-4 rounded-lg bg-gradient-to-br from-cream/30 to-sage/10 hover:scale-105 transition-transform"
                       style={{ animationDelay: `${0.1 + index * 0.1}s` }}
@@ -159,27 +164,30 @@ const CompatibilitySection = () => {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 {[
                   {
-                    step: "01",
-                    title: "Profil Détaillé",
-                    description: "Remplissez votre profil avec vos valeurs islamiques et préférences"
+                    step: '01',
+                    title: 'Profil Détaillé',
+                    description:
+                      'Remplissez votre profil avec vos valeurs islamiques et préférences',
                   },
                   {
-                    step: "02",
-                    title: "Analyse IA",
-                    description: "Notre algorithme analyse votre compatibilité avec d'autres membres"
+                    step: '02',
+                    title: 'Analyse IA',
+                    description:
+                      "Notre algorithme analyse votre compatibilité avec d'autres membres",
                   },
                   {
-                    step: "03", 
-                    title: "Matches Qualifiés",
-                    description: "Recevez des suggestions de profils hautement compatibles"
+                    step: '03',
+                    title: 'Matches Qualifiés',
+                    description: 'Recevez des suggestions de profils hautement compatibles',
                   },
                   {
-                    step: "04",
-                    title: "Connexion Halal",
-                    description: "Échangez dans un environnement respectueux des valeurs islamiques"
-                  }
+                    step: '04',
+                    title: 'Connexion Halal',
+                    description:
+                      'Échangez dans un environnement respectueux des valeurs islamiques',
+                  },
                 ].map((step, index) => (
-                  <div 
+                  <div
                     key={step.step}
                     className="text-center space-y-4"
                     style={{ animationDelay: `${0.5 + index * 0.1}s` }}
@@ -193,7 +201,9 @@ const CompatibilitySection = () => {
                       )}
                     </div>
                     <h3 className="font-semibold text-foreground text-lg">{step.title}</h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{step.description}</p>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      {step.description}
+                    </p>
                   </div>
                 ))}
               </div>

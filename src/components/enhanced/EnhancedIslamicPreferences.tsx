@@ -6,7 +6,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Slider } from '@/components/ui/slider';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +30,7 @@ import {
   Star,
   Shield,
   Home,
-  Save
+  Save,
 } from 'lucide-react';
 
 interface IslamicPreferences {
@@ -45,7 +51,10 @@ interface EnhancedIslamicPreferencesProps {
   embedded?: boolean;
 }
 
-const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIslamicPreferencesProps) => {
+const EnhancedIslamicPreferences = ({
+  onComplete,
+  embedded = false,
+}: EnhancedIslamicPreferencesProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [preferences, setPreferences] = useState<IslamicPreferences>({
@@ -58,7 +67,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
     halal_diet: true,
     importance_of_religion: '',
     desired_partner_sect: '',
-    smoking: ''
+    smoking: '',
   });
 
   const [loading, setLoading] = useState(true);
@@ -66,17 +75,14 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
   const [currentSection, setCurrentSection] = useState('basic');
 
   // Auto-save functionality
-  const { loadSaved, clearSaved, hasSavedData, getLastSaveTime } = useFormAutosave(
-    preferences,
-    {
-      storageKey: `islamic-preferences-${user?.id}`,
-      debounceMs: 2000,
-      announceChanges: false, // Silent for this form
-      onError: (error) => {
-        console.error('Auto-save error:', error);
-      }
-    }
-  );
+  const { loadSaved, clearSaved, hasSavedData, getLastSaveTime } = useFormAutosave(preferences, {
+    storageKey: `islamic-preferences-${user?.id}`,
+    debounceMs: 2000,
+    announceChanges: false, // Silent for this form
+    onError: (error) => {
+      console.error('Auto-save error:', error);
+    },
+  });
 
   const lastSaveTime = getLastSaveTime();
 
@@ -92,10 +98,10 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
       const savedData = loadSaved();
       if (savedData && Object.keys(savedData).length > 0) {
         toast({
-          title: "Brouillon trouvé",
-          description: "Vos modifications précédentes ont été restaurées",
+          title: 'Brouillon trouvé',
+          description: 'Vos modifications précédentes ont été restaurées',
         });
-        setPreferences(prev => ({ ...prev, ...savedData }));
+        setPreferences((prev) => ({ ...prev, ...savedData }));
       }
     }
   }, [user, loading]);
@@ -115,14 +121,14 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
       }
 
       if (data) {
-        setPreferences(prev => ({ ...prev, ...data }));
+        setPreferences((prev) => ({ ...prev, ...data }));
       }
     } catch (error) {
       console.error('Error loading Islamic preferences:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger vos préférences islamiques",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger vos préférences islamiques',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -134,13 +140,11 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
 
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('islamic_preferences')
-        .upsert({
-          user_id: user.id,
-          ...preferences,
-          updated_at: new Date().toISOString()
-        });
+      const { error } = await supabase.from('islamic_preferences').upsert({
+        user_id: user.id,
+        ...preferences,
+        updated_at: new Date().toISOString(),
+      });
 
       if (error) throw error;
 
@@ -148,8 +152,8 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
       clearSaved();
 
       toast({
-        title: "Préférences sauvegardées",
-        description: "Vos préférences islamiques ont été mises à jour",
+        title: 'Préférences sauvegardées',
+        description: 'Vos préférences islamiques ont été mises à jour',
       });
 
       if (onComplete) {
@@ -158,9 +162,9 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
     } catch (error) {
       console.error('Error saving Islamic preferences:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder vos préférences",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder vos préférences',
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
@@ -168,39 +172,39 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
   };
 
   const updatePreference = <K extends keyof IslamicPreferences>(
-    key: K, 
+    key: K,
     value: IslamicPreferences[K]
   ) => {
-    setPreferences(prev => ({ ...prev, [key]: value }));
+    setPreferences((prev) => ({ ...prev, [key]: value }));
   };
 
   const getCompletionPercentage = () => {
     const totalFields = Object.keys(preferences).length;
-    const filledFields = Object.values(preferences).filter(value => 
-      value !== '' && value !== null && value !== undefined
+    const filledFields = Object.values(preferences).filter(
+      (value) => value !== '' && value !== null && value !== undefined
     ).length;
     return (filledFields / totalFields) * 100;
   };
 
   const sections = [
-    { 
-      id: 'basic', 
-      title: 'Fondamentaux', 
+    {
+      id: 'basic',
+      title: 'Fondamentaux',
       icon: Moon,
-      fields: ['sect', 'madhab', 'prayer_frequency', 'quran_reading', 'importance_of_religion']
+      fields: ['sect', 'madhab', 'prayer_frequency', 'quran_reading', 'importance_of_religion'],
     },
-    { 
-      id: 'lifestyle', 
-      title: 'Style de Vie', 
+    {
+      id: 'lifestyle',
+      title: 'Style de Vie',
       icon: Utensils,
-      fields: ['halal_diet', 'smoking', 'hijab_preference', 'beard_preference']
+      fields: ['halal_diet', 'smoking', 'hijab_preference', 'beard_preference'],
     },
-    { 
-      id: 'family', 
-      title: 'Famille & Mariage', 
+    {
+      id: 'family',
+      title: 'Famille & Mariage',
       icon: Home,
-      fields: ['desired_partner_sect']
-    }
+      fields: ['desired_partner_sect'],
+    },
   ];
 
   if (loading) {
@@ -216,11 +220,17 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
     );
   }
 
-  const currentSectionData = sections.find(s => s.id === currentSection);
+  const currentSectionData = sections.find((s) => s.id === currentSection);
   const SectionIcon = currentSectionData?.icon || Moon;
 
   return (
-    <div className={embedded ? 'space-y-6' : 'min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4'}>
+    <div
+      className={
+        embedded
+          ? 'space-y-6'
+          : 'min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4'
+      }
+    >
       <div className={`container mx-auto ${embedded ? 'max-w-full' : 'max-w-4xl'}`}>
         <Card className={embedded ? '' : 'shadow-lg'}>
           <CardHeader className="text-center">
@@ -233,7 +243,7 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
             <p className="text-muted-foreground mb-4">
               Configurez vos préférences islamiques pour des matches plus compatibles
             </p>
-            
+
             {/* Progress Indicator */}
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
@@ -242,7 +252,10 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                   {lastSaveTime && (
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
                       <Save className="h-3 w-3" />
-                      <span>Sauvegardé il y a {Math.floor((Date.now() - lastSaveTime.getTime()) / 1000)}s</span>
+                      <span>
+                        Sauvegardé il y a {Math.floor((Date.now() - lastSaveTime.getTime()) / 1000)}
+                        s
+                      </span>
                     </div>
                   )}
                   <span>{Math.round(getCompletionPercentage())}% complété</span>
@@ -260,18 +273,18 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
           <CardContent>
             {/* Section Navigation */}
             <div className="flex flex-wrap gap-2 mb-6">
-              {sections.map(section => {
+              {sections.map((section) => {
                 const Icon = section.icon;
                 const sectionFields = section.fields;
-                const completedFields = sectionFields.filter(field => {
+                const completedFields = sectionFields.filter((field) => {
                   const value = preferences[field as keyof IslamicPreferences];
                   return value !== '' && value !== null && value !== undefined;
                 }).length;
-                
+
                 return (
                   <Button
                     key={section.id}
-                    variant={currentSection === section.id ? "default" : "outline"}
+                    variant={currentSection === section.id ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setCurrentSection(section.id)}
                     className="flex items-center gap-2"
@@ -296,7 +309,10 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                         <Moon className="h-4 w-4 text-primary" />
                         Confession Islamique
                       </Label>
-                      <Select value={preferences.sect} onValueChange={(value) => updatePreference('sect', value)}>
+                      <Select
+                        value={preferences.sect}
+                        onValueChange={(value) => updatePreference('sect', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Choisir..." />
                         </SelectTrigger>
@@ -314,7 +330,10 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                         <Book className="h-4 w-4 text-secondary" />
                         École Juridique (Madhab)
                       </Label>
-                      <Select value={preferences.madhab} onValueChange={(value) => updatePreference('madhab', value)}>
+                      <Select
+                        value={preferences.madhab}
+                        onValueChange={(value) => updatePreference('madhab', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Choisir..." />
                         </SelectTrigger>
@@ -335,7 +354,10 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                         <Clock className="h-4 w-4 text-primary" />
                         Fréquence de Prière
                       </Label>
-                      <Select value={preferences.prayer_frequency} onValueChange={(value) => updatePreference('prayer_frequency', value)}>
+                      <Select
+                        value={preferences.prayer_frequency}
+                        onValueChange={(value) => updatePreference('prayer_frequency', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Choisir..." />
                         </SelectTrigger>
@@ -356,7 +378,10 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                         <Book className="h-4 w-4 text-secondary" />
                         Lecture du Coran
                       </Label>
-                      <Select value={preferences.quran_reading} onValueChange={(value) => updatePreference('quran_reading', value)}>
+                      <Select
+                        value={preferences.quran_reading}
+                        onValueChange={(value) => updatePreference('quran_reading', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Choisir..." />
                         </SelectTrigger>
@@ -377,16 +402,19 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                       <Star className="h-4 w-4 text-primary" />
                       Importance de la Religion dans votre Vie
                     </Label>
-                    <Select value={preferences.importance_of_religion} onValueChange={(value) => updatePreference('importance_of_religion', value)}>
+                    <Select
+                      value={preferences.importance_of_religion}
+                      onValueChange={(value) => updatePreference('importance_of_religion', value)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Choisir..." />
                       </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="very_important">Très important</SelectItem>
-                          <SelectItem value="important">Important</SelectItem>
-                          <SelectItem value="somewhat_important">Assez important</SelectItem>
-                          <SelectItem value="not_important">Peu important</SelectItem>
-                        </SelectContent>
+                      <SelectContent>
+                        <SelectItem value="very_important">Très important</SelectItem>
+                        <SelectItem value="important">Important</SelectItem>
+                        <SelectItem value="somewhat_important">Assez important</SelectItem>
+                        <SelectItem value="not_important">Peu important</SelectItem>
+                      </SelectContent>
                     </Select>
                   </div>
                 </div>
@@ -414,7 +442,10 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                         <Shield className="h-4 w-4 text-secondary" />
                         Position sur le Tabac
                       </Label>
-                      <Select value={preferences.smoking} onValueChange={(value) => updatePreference('smoking', value)}>
+                      <Select
+                        value={preferences.smoking}
+                        onValueChange={(value) => updatePreference('smoking', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Choisir..." />
                         </SelectTrigger>
@@ -432,7 +463,10 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                         <Shirt className="h-4 w-4 text-primary" />
                         Préférence Hijab
                       </Label>
-                      <Select value={preferences.hijab_preference} onValueChange={(value) => updatePreference('hijab_preference', value)}>
+                      <Select
+                        value={preferences.hijab_preference}
+                        onValueChange={(value) => updatePreference('hijab_preference', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Choisir..." />
                         </SelectTrigger>
@@ -451,7 +485,10 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                         <Users className="h-4 w-4 text-secondary" />
                         Préférence Barbe
                       </Label>
-                      <Select value={preferences.beard_preference} onValueChange={(value) => updatePreference('beard_preference', value)}>
+                      <Select
+                        value={preferences.beard_preference}
+                        onValueChange={(value) => updatePreference('beard_preference', value)}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Choisir..." />
                         </SelectTrigger>
@@ -476,7 +513,10 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
                       <Home className="h-4 w-4 text-emerald" />
                       Préférence de Confession du Partenaire
                     </Label>
-                    <Select value={preferences.desired_partner_sect} onValueChange={(value) => updatePreference('desired_partner_sect', value)}>
+                    <Select
+                      value={preferences.desired_partner_sect}
+                      onValueChange={(value) => updatePreference('desired_partner_sect', value)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Choisir..." />
                       </SelectTrigger>
@@ -500,29 +540,25 @@ const EnhancedIslamicPreferences = ({ onComplete, embedded = false }: EnhancedIs
               <Button
                 variant="outline"
                 onClick={() => {
-                  const currentIndex = sections.findIndex(s => s.id === currentSection);
+                  const currentIndex = sections.findIndex((s) => s.id === currentSection);
                   if (currentIndex > 0) {
                     setCurrentSection(sections[currentIndex - 1].id);
                   }
                 }}
-                disabled={sections.findIndex(s => s.id === currentSection) === 0}
+                disabled={sections.findIndex((s) => s.id === currentSection) === 0}
               >
                 Section Précédente
               </Button>
-              
+
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={savePreferences}
-                  disabled={saving}
-                >
+                <Button variant="outline" onClick={savePreferences} disabled={saving}>
                   {saving ? 'Sauvegarde...' : 'Sauvegarder'}
                 </Button>
-                
-                {sections.findIndex(s => s.id === currentSection) < sections.length - 1 ? (
+
+                {sections.findIndex((s) => s.id === currentSection) < sections.length - 1 ? (
                   <Button
                     onClick={() => {
-                      const currentIndex = sections.findIndex(s => s.id === currentSection);
+                      const currentIndex = sections.findIndex((s) => s.id === currentSection);
                       setCurrentSection(sections[currentIndex + 1].id);
                     }}
                   >

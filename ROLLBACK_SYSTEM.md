@@ -11,7 +11,7 @@ Le système de rollback automatique protège votre application en production en 
 ✅ **Health Check Post-Déploiement** : Vérifie automatiquement que le site est accessible après chaque déploiement  
 ✅ **Détection d'Échec** : Identifie si le déploiement a cassé quelque chose  
 ✅ **Alertes Immédiates** : Notifications Slack/Discord en cas de problème  
-✅ **Documentation Automatique** : Rapport détaillé dans GitHub Actions  
+✅ **Documentation Automatique** : Rapport détaillé dans GitHub Actions
 
 ## Comment ça fonctionne
 
@@ -67,6 +67,7 @@ Le système nécessite une page `/status` qui retourne HTTP 200 quand tout va bi
 ✅ Déjà implémenté dans `src/pages/Status.tsx`
 
 Cette page vérifie :
+
 - Connectivité Supabase
 - Authentification
 - API REST
@@ -76,10 +77,10 @@ Cette page vérifie :
 
 Pour recevoir les notifications :
 
-| Secret | Description | Requis |
-|--------|-------------|---------|
-| `SLACK_WEBHOOK_URL` | URL du webhook Slack | Non |
-| `DISCORD_WEBHOOK_URL` | URL du webhook Discord | Non |
+| Secret                | Description            | Requis |
+| --------------------- | ---------------------- | ------ |
+| `SLACK_WEBHOOK_URL`   | URL du webhook Slack   | Non    |
+| `DISCORD_WEBHOOK_URL` | URL du webhook Discord | Non    |
 
 **Configuration** : Settings → Secrets and variables → Actions → New repository secret
 
@@ -107,6 +108,7 @@ Author: username
 ### Discord
 
 Embed similaire avec :
+
 - Titre avec emoji d'avertissement
 - Lien vers le site et la page de statut
 - Détails du commit
@@ -141,6 +143,7 @@ Embed similaire avec :
 #### Option 1 : Correction Rapide
 
 Si le problème est simple :
+
 1. Corriger le code localement
 2. Commit et push sur `main`
 3. Le système re-déploiera automatiquement
@@ -156,6 +159,7 @@ Si nécessaire, revenir à la version précédente :
 #### Option 3 : Investigation
 
 Si le problème est complexe :
+
 1. Créer une branche `hotfix/issue-name`
 2. Reproduire et corriger localement
 3. Tester avec `npm run preview`
@@ -190,6 +194,7 @@ Chaque déploiement génère un rapport avec :
 ### Historique
 
 Consultez l'historique complet :
+
 - GitHub → Actions → Deploy to Hostinger
 - Filtrer par succès/échec
 - Comparer les durées
@@ -199,13 +204,15 @@ Consultez l'historique complet :
 ### ⚠️ Rollback Automatique Complet
 
 Le système actuel :
+
 - ✅ Détecte les problèmes
 - ✅ Alerte l'équipe
 - ❌ Ne restaure pas automatiquement les fichiers
 
 **Raison** : L'hébergement mutualisé Hostinger ne permet pas facilement de maintenir plusieurs versions en parallèle via FTP.
 
-**Solution de Contournement** : 
+**Solution de Contournement** :
+
 - Les déploiements FTP sont incrémentaux (seuls les fichiers modifiés sont envoyés)
 - En cas d'échec du health check, le workflow est marqué comme "failed"
 - L'équipe est immédiatement notifiée
@@ -230,11 +237,13 @@ Le système actuel :
 ### Informations Sensibles
 
 ⚠️ **Ne jamais commit** :
+
 - `.ftp-deploy.json`
 - Mots de passe FTP
 - Tokens d'API
 
 ✅ **Toujours utiliser** :
+
 - GitHub Secrets pour les credentials
 - Variables d'environnement
 - `.gitignore` pour les fichiers sensibles
@@ -270,6 +279,6 @@ Le système de rollback automatique offre :
 ✅ Détection rapide des problèmes  
 ✅ Alertes en temps réel  
 ✅ Documentation automatique  
-✅ Processus de récupération clair  
+✅ Processus de récupération clair
 
 **Rappel Important** : Le système détecte et alerte, mais le rollback complet nécessite une intervention manuelle (re-déploiement d'une version stable via GitHub Actions).

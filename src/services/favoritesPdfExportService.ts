@@ -75,7 +75,7 @@ export class FavoritesPdfExportService {
     } else {
       this.doc.setFont('helvetica', 'normal');
     }
-    
+
     const lines = this.doc.splitTextToSize(text, 170);
     lines.forEach((line: string) => {
       this.addPageIfNeeded(7);
@@ -103,7 +103,7 @@ export class FavoritesPdfExportService {
     let xOffset = this.margin + 5;
     tags.forEach((tag) => {
       const tagWidth = this.doc.getTextWidth(tag.tag_name) + 6;
-      
+
       if (xOffset + tagWidth > 190) {
         this.currentY += 8;
         xOffset = this.margin + 5;
@@ -118,11 +118,11 @@ export class FavoritesPdfExportService {
 
       this.doc.setFillColor(r, g, b);
       this.doc.roundedRect(xOffset, this.currentY - 4, tagWidth, 6, 2, 2, 'F');
-      
+
       this.doc.setTextColor(255, 255, 255);
       this.doc.setFontSize(8);
       this.doc.text(tag.tag_name, xOffset + 3, this.currentY);
-      
+
       xOffset += tagWidth + 4;
     });
 
@@ -149,7 +149,7 @@ export class FavoritesPdfExportService {
   private addProfileSection(data: FavoriteExportData, index: number): void {
     // Profile header
     this.addTitle(`${index + 1}. ${data.profile.full_name || 'Profil anonyme'}`);
-    
+
     // Basic info
     if (data.profile.age) {
       this.addText(`Âge: ${data.profile.age} ans`, true);
@@ -171,7 +171,11 @@ export class FavoritesPdfExportService {
       this.addPageIfNeeded(10);
       this.doc.setFontSize(11);
       this.doc.setTextColor(...this.goldColor);
-      this.doc.text(`Score de compatibilité: ${data.compatibilityScore}%`, this.margin, this.currentY);
+      this.doc.text(
+        `Score de compatibilité: ${data.compatibilityScore}%`,
+        this.margin,
+        this.currentY
+      );
       this.currentY += 8;
     }
 
@@ -189,7 +193,7 @@ export class FavoritesPdfExportService {
 
     // Interests
     if (data.profile.interests && data.profile.interests.length > 0) {
-      this.addSectionTitle('Centres d\'intérêt');
+      this.addSectionTitle("Centres d'intérêt");
       this.addText(data.profile.interests.join(', '));
       this.currentY += 3;
     }
@@ -200,11 +204,11 @@ export class FavoritesPdfExportService {
       this.doc.setFillColor(255, 251, 235);
       const noteLines = this.doc.splitTextToSize(data.note.note, 165);
       const noteHeight = noteLines.length * 6 + 8;
-      
+
       this.addPageIfNeeded(noteHeight);
       this.doc.roundedRect(this.margin, this.currentY - 2, 170, noteHeight, 2, 2, 'F');
       this.currentY += 3;
-      
+
       this.addText(data.note.note);
       this.currentY += 3;
     }
@@ -220,10 +224,10 @@ export class FavoritesPdfExportService {
     }
 
     const filename = `favori-${data.profile.full_name?.replace(/\s+/g, '-') || 'profil'}.pdf`;
-    
+
     this.addTitle('Profil favori');
     this.addProfileSection(data, 0);
-    
+
     this.addFooter();
     this.doc.save(filename);
   }
@@ -246,7 +250,7 @@ export class FavoritesPdfExportService {
 
     // Cover page
     this.addCoverPage(allData.length);
-    
+
     // Table of contents
     this.addTableOfContents(allData);
 
@@ -268,14 +272,16 @@ export class FavoritesPdfExportService {
     this.doc.text('Mes Profils Favoris', 105, 50, { align: 'center' });
 
     this.doc.setFontSize(14);
-    this.doc.text(`${totalProfiles} profil${totalProfiles > 1 ? 's' : ''}`, 105, 65, { align: 'center' });
+    this.doc.text(`${totalProfiles} profil${totalProfiles > 1 ? 's' : ''}`, 105, 65, {
+      align: 'center',
+    });
 
     this.doc.setFontSize(10);
     this.doc.setTextColor(100, 100, 100);
-    const date = new Date().toLocaleDateString('fr-FR', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    const date = new Date().toLocaleDateString('fr-FR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
     this.doc.text(`Exporté le ${date}`, 105, 120, { align: 'center' });
 
@@ -285,23 +291,13 @@ export class FavoritesPdfExportService {
 
   private addFooter(): void {
     const totalPages = this.doc.getNumberOfPages();
-    
+
     for (let i = 1; i <= totalPages; i++) {
       this.doc.setPage(i);
       this.doc.setFontSize(8);
       this.doc.setTextColor(150, 150, 150);
-      this.doc.text(
-        `Page ${i} sur ${totalPages}`,
-        105,
-        290,
-        { align: 'center' }
-      );
-      this.doc.text(
-        'Document confidentiel - Ne pas diffuser',
-        105,
-        295,
-        { align: 'center' }
-      );
+      this.doc.text(`Page ${i} sur ${totalPages}`, 105, 290, { align: 'center' });
+      this.doc.text('Document confidentiel - Ne pas diffuser', 105, 295, { align: 'center' });
     }
   }
 
@@ -343,9 +339,7 @@ export class FavoritesPdfExportService {
           .eq('favorite_id', favorite.id);
 
         if (favoriteTags) {
-          tags = favoriteTags
-            .map((ft: any) => ft.profile_tags)
-            .filter(Boolean);
+          tags = favoriteTags.map((ft: any) => ft.profile_tags).filter(Boolean);
         }
       }
 

@@ -59,38 +59,46 @@ export const useProfileData = (): UseProfileDataReturn => {
         islamicPrefsResult,
         privacyResult,
         verificationsResult,
-        matchingPrefsResult
+        matchingPrefsResult,
       ] = await Promise.allSettled([
         supabase.from('profiles').select('*').eq('user_id', user.id).maybeSingle(),
         supabase.from('islamic_preferences').select('*').eq('user_id', user.id).maybeSingle(),
         supabase.from('privacy_settings').select('*').eq('user_id', user.id).maybeSingle(),
         supabase.from('user_verifications').select('*').eq('user_id', user.id).maybeSingle(),
-        supabase.from('matching_preferences').select('*').eq('user_id', user.id).maybeSingle()
+        supabase.from('matching_preferences').select('*').eq('user_id', user.id).maybeSingle(),
       ]);
 
       // Process results with strict type casting
-      const profile: Profile | null = 
+      const profile: Profile | null =
         profileResult.status === 'fulfilled' ? (profileResult.value.data ?? null) : null;
-      
-      const islamicPreferences: IslamicPreferences | null = 
+
+      const islamicPreferences: IslamicPreferences | null =
         islamicPrefsResult.status === 'fulfilled' ? (islamicPrefsResult.value.data ?? null) : null;
-      
-      const privacySettings: PrivacySettings | null = 
+
+      const privacySettings: PrivacySettings | null =
         privacyResult.status === 'fulfilled' ? (privacyResult.value.data ?? null) : null;
-      
-      const userVerifications: UserVerification | null = 
-        verificationsResult.status === 'fulfilled' ? (verificationsResult.value.data ?? null) : null;
-      
-      const matchingPreferences: MatchingPreferences | null = 
-        matchingPrefsResult.status === 'fulfilled' ? (matchingPrefsResult.value.data ?? null) : null;
+
+      const userVerifications: UserVerification | null =
+        verificationsResult.status === 'fulfilled'
+          ? (verificationsResult.value.data ?? null)
+          : null;
+
+      const matchingPreferences: MatchingPreferences | null =
+        matchingPrefsResult.status === 'fulfilled'
+          ? (matchingPrefsResult.value.data ?? null)
+          : null;
 
       // Check for errors with proper type handling
       const errors: Error[] = [
-        profileResult.status === 'rejected' ? profileResult.reason as Error : undefined,
-        islamicPrefsResult.status === 'rejected' ? islamicPrefsResult.reason as Error : undefined,
-        privacyResult.status === 'rejected' ? privacyResult.reason as Error : undefined,
-        verificationsResult.status === 'rejected' ? verificationsResult.reason as Error : undefined,
-        matchingPrefsResult.status === 'rejected' ? matchingPrefsResult.reason as Error : undefined
+        profileResult.status === 'rejected' ? (profileResult.reason as Error) : undefined,
+        islamicPrefsResult.status === 'rejected' ? (islamicPrefsResult.reason as Error) : undefined,
+        privacyResult.status === 'rejected' ? (privacyResult.reason as Error) : undefined,
+        verificationsResult.status === 'rejected'
+          ? (verificationsResult.reason as Error)
+          : undefined,
+        matchingPrefsResult.status === 'rejected'
+          ? (matchingPrefsResult.reason as Error)
+          : undefined,
       ].filter((err): err is Error => err !== undefined);
 
       if (errors.length > 0) {
@@ -104,17 +112,17 @@ export const useProfileData = (): UseProfileDataReturn => {
         islamicPreferences,
         privacySettings,
         userVerifications,
-        matchingPreferences
+        matchingPreferences,
       });
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
       console.error('Error fetching profile data:', errorMessage, err);
       setError('Erreur inattendue lors du chargement');
-      
+
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données du profil",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données du profil',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -130,6 +138,6 @@ export const useProfileData = (): UseProfileDataReturn => {
     data,
     loading,
     error,
-    refetch: fetchProfileData
+    refetch: fetchProfileData,
   };
 };

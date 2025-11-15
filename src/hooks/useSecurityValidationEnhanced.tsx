@@ -11,7 +11,7 @@ import type {
   UserVerificationStatus,
   ValidationAdditionalInfo,
   ValidationResult,
-  SecurityValidationHook
+  SecurityValidationHook,
 } from '@/types/supabase';
 
 export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
@@ -30,13 +30,15 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
     requiredScore: number = 80
   ): Promise<ValidationResult> => {
     if (!user) {
-      return { isValid: false, reason: "Utilisateur non authentifié" };
+      return { isValid: false, reason: 'Utilisateur non authentifié' };
     }
 
     try {
       // Check user verification status with strict typing
-      const { data: verification, error: verificationError } = await supabase
-        .rpc('get_user_verification_status_secure', { target_user_id: user.id });
+      const { data: verification, error: verificationError } = await supabase.rpc(
+        'get_user_verification_status_secure',
+        { target_user_id: user.id }
+      );
 
       if (verificationError) {
         await logSecurityEvent(
@@ -53,9 +55,9 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
       if (!userVerification) {
         return {
           isValid: false,
-          reason: "Données de vérification non trouvées",
+          reason: 'Données de vérification non trouvées',
           requiredScore,
-          currentScore: 0
+          currentScore: 0,
         };
       }
 
@@ -64,9 +66,9 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
         if (!userVerification.email_verified) {
           return {
             isValid: false,
-            reason: "Vérification email requise pour les invitations familiales",
+            reason: 'Vérification email requise pour les invitations familiales',
             requiredScore,
-            currentScore: userVerification.verification_score
+            currentScore: userVerification.verification_score,
           };
         }
 
@@ -86,10 +88,10 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
             reason: `Limite quotidienne d'invitations atteinte (${dailyLimit}). Vérifiez votre compte pour plus d'invitations.`,
             requiredScore,
             currentScore: userVerification.verification_score,
-            additionalInfo: { 
-              daily_limit: dailyLimit, 
-              current_count: todayInvitations?.length ?? 0 
-            }
+            additionalInfo: {
+              daily_limit: dailyLimit,
+              current_count: todayInvitations?.length ?? 0,
+            },
           };
         }
       }
@@ -100,7 +102,7 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
           isValid: false,
           reason: "Vérification d'identité requise pour les approbations familiales",
           requiredScore,
-          currentScore: userVerification.verification_score
+          currentScore: userVerification.verification_score,
         };
       }
 
@@ -110,7 +112,7 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
           isValid: false,
           reason: `Score de vérification insuffisant pour ${operationType}`,
           requiredScore,
-          currentScore
+          currentScore,
         };
       }
 
@@ -122,7 +124,7 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
         {
           operation_type: operationType,
           verification_score: currentScore,
-          required_score: requiredScore
+          required_score: requiredScore,
         }
       );
 
@@ -130,7 +132,7 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
     } catch (err) {
       const error = err as PostgrestError | Error;
       console.error('Family operation validation failed:', error);
-      return { isValid: false, reason: "Erreur de validation" };
+      return { isValid: false, reason: 'Erreur de validation' };
     }
   };
 
@@ -144,7 +146,7 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
     requiredScore: number = 60
   ): Promise<ValidationResult> => {
     if (!user) {
-      return { isValid: false, reason: "Utilisateur non authentifié" };
+      return { isValid: false, reason: 'Utilisateur non authentifié' };
     }
 
     try {
@@ -159,23 +161,25 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
 
       if (!match || (match.user1_id !== user.id && match.user2_id !== user.id)) {
         // Check if user is authorized family member
-        const { data: familyAccess, error: familyError } = await supabase
-          .rpc('can_access_match_security_definer', {
+        const { data: familyAccess, error: familyError } = await supabase.rpc(
+          'can_access_match_security_definer',
+          {
             match_user1_id: match.user1_id,
-            match_user2_id: match.user2_id
-          });
+            match_user2_id: match.user2_id,
+          }
+        );
 
         if (familyError || !familyAccess) {
           await logSecurityEvent(
             'unauthorized_message_attempt',
             'high',
-            'Tentative d\'envoi de message non autorisée',
+            "Tentative d'envoi de message non autorisée",
             { match_id: matchId, attempted_by: user.id }
           );
-          
+
           return {
             isValid: false,
-            reason: "Accès non autorisé à cette conversation"
+            reason: 'Accès non autorisé à cette conversation',
           };
         }
       }
@@ -184,11 +188,15 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
       const senderId = user.id;
       const recipientId = match.user1_id === senderId ? match.user2_id : match.user1_id;
 
-      const { data: senderVerification, error: senderError } = await supabase
-        .rpc('get_user_verification_status_secure', { target_user_id: senderId });
+      const { data: senderVerification, error: senderError } = await supabase.rpc(
+        'get_user_verification_status_secure',
+        { target_user_id: senderId }
+      );
 
-      const { data: recipientVerification, error: recipientError } = await supabase
-        .rpc('get_user_verification_status_secure', { target_user_id: recipientId });
+      const { data: recipientVerification, error: recipientError } = await supabase.rpc(
+        'get_user_verification_status_secure',
+        { target_user_id: recipientId }
+      );
 
       if (senderError || recipientError) {
         throw new Error('Erreur de vérification des utilisateurs');
@@ -204,18 +212,18 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
       if (senderScore < requiredScore) {
         return {
           isValid: false,
-          reason: "Votre niveau de vérification est insuffisant pour envoyer des messages",
+          reason: 'Votre niveau de vérification est insuffisant pour envoyer des messages',
           requiredScore,
-          currentScore: senderScore
+          currentScore: senderScore,
         };
       }
 
       if (recipientScore < 50) {
         return {
           isValid: false,
-          reason: "Le destinataire doit compléter sa vérification pour recevoir des messages",
+          reason: 'Le destinataire doit compléter sa vérification pour recevoir des messages',
           requiredScore: 50,
-          currentScore: recipientScore
+          currentScore: recipientScore,
         };
       }
 
@@ -223,7 +231,7 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
       if (!senderStatus?.email_verified || !recipientStatus?.email_verified) {
         return {
           isValid: false,
-          reason: "Vérification email requise pour tous les participants"
+          reason: 'Vérification email requise pour tous les participants',
         };
       }
 
@@ -231,7 +239,7 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
     } catch (err) {
       const error = err as PostgrestError | Error;
       console.error('Message permission validation failed:', error);
-      return { isValid: false, reason: "Erreur de validation des permissions" };
+      return { isValid: false, reason: 'Erreur de validation des permissions' };
     }
   };
 
@@ -245,7 +253,7 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
     requiredScore: number = 85
   ): Promise<ValidationResult> => {
     if (!user) {
-      return { isValid: false, reason: "Utilisateur non authentifié" };
+      return { isValid: false, reason: 'Utilisateur non authentifié' };
     }
 
     // Self-access is always allowed
@@ -254,8 +262,10 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
     }
 
     try {
-      const { data: verification, error: verificationError } = await supabase
-        .rpc('get_user_verification_status_secure', { target_user_id: user.id });
+      const { data: verification, error: verificationError } = await supabase.rpc(
+        'get_user_verification_status_secure',
+        { target_user_id: user.id }
+      );
 
       if (verificationError) throw verificationError;
 
@@ -264,7 +274,7 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
       if (!userVerification) {
         return {
           isValid: false,
-          reason: "Données de vérification non trouvées"
+          reason: 'Données de vérification non trouvées',
         };
       }
 
@@ -283,10 +293,10 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
         return {
           isValid: false,
           reason: `Limite horaire de consultation de profils atteinte (${hourlyLimit}). Vérifiez votre compte pour plus d'accès.`,
-          additionalInfo: { 
-            hourly_limit: hourlyLimit, 
-            current_count: recentViews?.length ?? 0 
-          }
+          additionalInfo: {
+            hourly_limit: hourlyLimit,
+            current_count: recentViews?.length ?? 0,
+          },
         };
       }
 
@@ -294,9 +304,9 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
       if (currentScore < requiredScore) {
         return {
           isValid: false,
-          reason: "Niveau de vérification insuffisant pour consulter ce profil",
+          reason: 'Niveau de vérification insuffisant pour consulter ce profil',
           requiredScore,
-          currentScore
+          currentScore,
         };
       }
 
@@ -314,37 +324,40 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
    */
   const validateContactInfoAccess = async (familyMemberId: string): Promise<ValidationResult> => {
     if (!user) {
-      return { isValid: false, reason: "Utilisateur non authentifié" };
+      return { isValid: false, reason: 'Utilisateur non authentifié' };
     }
 
     try {
       // Check if user can access contact info through secure function
-      const { data: contactAccess, error: contactError } = await supabase
-        .rpc('get_family_contact_secure', { family_member_uuid: familyMemberId });
+      const { data: contactAccess, error: contactError } = await supabase.rpc(
+        'get_family_contact_secure',
+        { family_member_uuid: familyMemberId }
+      );
 
       if (contactError) {
         // Log the access attempt
         await logSecurityEvent(
           'family_contact_access_denied',
           'high',
-          'Tentative d\'accès aux informations de contact familiales refusée',
+          "Tentative d'accès aux informations de contact familiales refusée",
           {
             family_member_id: familyMemberId,
             error: contactError.message,
-            attempted_by: user.id
+            attempted_by: user.id,
           }
         );
 
         return {
           isValid: false,
-          reason: "Accès aux informations de contact non autorisé. Vérification d'identité requise."
+          reason:
+            "Accès aux informations de contact non autorisé. Vérification d'identité requise.",
         };
       }
 
       if (!contactAccess || (Array.isArray(contactAccess) && contactAccess.length === 0)) {
         return {
           isValid: false,
-          reason: "Aucune information de contact disponible ou accessible"
+          reason: 'Aucune information de contact disponible ou accessible',
         };
       }
 
@@ -361,17 +374,17 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
    * @param result - Résultat de validation contenant les détails de l'erreur
    */
   const showValidationError = (result: ValidationResult): void => {
-    let description = result.reason ?? "Validation échouée";
-    
+    let description = result.reason ?? 'Validation échouée';
+
     if (result.requiredScore !== undefined && result.currentScore !== undefined) {
       description += ` (Score requis: ${result.requiredScore}, votre score: ${result.currentScore})`;
     }
 
     toast({
-      title: "Accès refusé",
+      title: 'Accès refusé',
       description,
-      variant: "destructive",
-      duration: 8000
+      variant: 'destructive',
+      duration: 8000,
     });
   };
 
@@ -386,13 +399,13 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
     setValidating(true);
     try {
       const result = await validationFn();
-      
+
       if (result.isValid) {
         toast({
-          title: "Validation réussie",
-          description: "Opération autorisée",
-          variant: "default",
-          duration: 3000
+          title: 'Validation réussie',
+          description: 'Opération autorisée',
+          variant: 'default',
+          duration: 3000,
         });
         return true;
       } else {
@@ -402,9 +415,9 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
     } catch (err) {
       const error = err as Error;
       toast({
-        title: "Erreur de validation",
-        description: error.message ?? "Une erreur est survenue lors de la validation",
-        variant: "destructive"
+        title: 'Erreur de validation',
+        description: error.message ?? 'Une erreur est survenue lors de la validation',
+        variant: 'destructive',
       });
       return false;
     } finally {
@@ -419,6 +432,6 @@ export const useSecurityValidationEnhanced = (): SecurityValidationHook => {
     validateContactInfoAccess,
     validateWithFeedback,
     showValidationError,
-    validating
+    validating,
   };
 };

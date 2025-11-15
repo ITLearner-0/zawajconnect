@@ -1,20 +1,19 @@
-
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { 
-  ChevronRight, 
-  ChevronLeft, 
-  Check, 
-  Play, 
-  Users, 
-  MessageSquare, 
-  Heart, 
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+import {
+  ChevronRight,
+  ChevronLeft,
+  Check,
+  Play,
+  Users,
+  MessageSquare,
+  Heart,
   BookOpen,
-  Star
-} from "lucide-react";
+  Star,
+} from 'lucide-react';
 import { demoTutorialSteps } from '@/data/demoPersonas';
 
 interface InteractiveTutorialProps {
@@ -26,7 +25,7 @@ interface InteractiveTutorialProps {
 const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
   onStepComplete,
   onTutorialComplete,
-  autoStart = false
+  autoStart = false,
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<string[]>([]);
@@ -38,12 +37,18 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
 
   const getStepIcon = (stepId: string) => {
     switch (stepId) {
-      case 'welcome': return Play;
-      case 'profiles': return Users;
-      case 'messaging': return MessageSquare;
-      case 'compatibility': return Heart;
-      case 'resources': return BookOpen;
-      default: return Star;
+      case 'welcome':
+        return Play;
+      case 'profiles':
+        return Users;
+      case 'messaging':
+        return MessageSquare;
+      case 'compatibility':
+        return Heart;
+      case 'resources':
+        return BookOpen;
+      default:
+        return Star;
     }
   };
 
@@ -52,7 +57,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
       const newCompleted = [...completedSteps, stepId];
       setCompletedSteps(newCompleted);
       onStepComplete?.(stepId);
-      
+
       if (newCompleted.length === steps.length) {
         onTutorialComplete?.();
       }
@@ -104,18 +109,18 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
               ×
             </Button>
           </div>
-          <CardDescription>
-            Découvrez toutes les fonctionnalités de la plateforme
-          </CardDescription>
+          <CardDescription>Découvrez toutes les fonctionnalités de la plateforme</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-center justify-between text-sm">
               <span className="text-rose-600 dark:text-rose-300">Progression</span>
-              <span className="text-rose-500 dark:text-rose-400">{completedSteps.length}/{steps.length}</span>
+              <span className="text-rose-500 dark:text-rose-400">
+                {completedSteps.length}/{steps.length}
+              </span>
             </div>
             <Progress value={progress} className="h-2" />
-            <Button 
+            <Button
               onClick={startTutorial}
               className="w-full bg-gradient-to-r from-rose-400 to-pink-400 hover:from-rose-500 hover:to-pink-500 text-white"
             >
@@ -130,7 +135,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
 
   const currentStepData = steps[currentStep];
   const StepIcon = currentStepData ? getStepIcon(currentStepData.id) : Play;
-  
+
   if (!currentStepData) return null;
 
   return (
@@ -150,7 +155,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
               ×
             </Button>
           </div>
-          
+
           <div className="flex items-center gap-4 mb-4">
             <div className="bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-800 dark:to-pink-800 p-3 rounded-full">
               <StepIcon className="h-8 w-8 text-rose-600 dark:text-rose-300" />
@@ -179,8 +184,8 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
                   index === currentStep
                     ? 'bg-rose-500 scale-125'
                     : completedSteps.includes(step.id)
-                    ? 'bg-green-500'
-                    : 'bg-gray-300 dark:bg-gray-600'
+                      ? 'bg-green-500'
+                      : 'bg-gray-300 dark:bg-gray-600'
                 }`}
               />
             ))}

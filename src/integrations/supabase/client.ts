@@ -5,8 +5,11 @@ import { logger } from '@/utils/logger';
 
 // Configuration Supabase - Use env vars first, fallback to hardcoded values
 // This allows deployment flexibility while working locally
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://dgfctwtivkqcfhwqgkya.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDU5OTYsImV4cCI6MjA3MjU4MTk5Nn0.3W530G6H6EO5bLXyd-NWgHQche1Y2Tf-WC00U8LQOdw';
+const SUPABASE_URL =
+  import.meta.env.VITE_SUPABASE_URL || 'https://dgfctwtivkqcfhwqgkya.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDU5OTYsImV4cCI6MjA3MjU4MTk5Nn0.3W530G6H6EO5bLXyd-NWgHQche1Y2Tf-WC00U8LQOdw';
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";

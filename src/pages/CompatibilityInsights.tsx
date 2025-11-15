@@ -27,9 +27,7 @@ const CompatibilityInsightsPage: React.FC = () => {
     <div className="space-y-8">
       {/* Header */}
       <div className="bg-card rounded-lg border p-6">
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Mes Insights de Compatibilité
-        </h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Mes Insights de Compatibilité</h1>
         <p className="text-muted-foreground">
           Analyses personnalisées basées sur votre test de compatibilité
         </p>
@@ -38,7 +36,7 @@ const CompatibilityInsightsPage: React.FC = () => {
       {/* Achievements Overview */}
       <div className="bg-card rounded-lg border p-6">
         <h2 className="text-xl font-semibold mb-4">Progression & Récompenses</h2>
-        <CompatibilityAchievements 
+        <CompatibilityAchievements
           completionPercentage={100}
           insightsViewed={3}
           profilesVisited={7}

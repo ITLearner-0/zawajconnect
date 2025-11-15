@@ -6,26 +6,26 @@ import { CheckCircle, Users, Shield, Heart, MessageCircle, Crown } from 'lucide-
 const StatusOverview = () => {
   const completedFeatures = [
     {
-      category: 'Système d\'Authentification',
+      category: "Système d'Authentification",
       icon: <Shield className="h-5 w-5 text-emerald" />,
       features: [
         'Inscription/Connexion avec Supabase Auth',
         'Gestion des rôles utilisateur (User, Wali, Admin)',
         'Protection des routes selon les rôles',
-        'Vérification de profil'
-      ]
+        'Vérification de profil',
+      ],
     },
     {
       category: 'Supervision Familiale',
       icon: <Users className="h-5 w-5 text-gold" />,
       features: [
         'Dashboard Wali complet avec métriques',
-        'Système d\'invitation familiale',
+        "Système d'invitation familiale",
         'Approbation des matches par la famille',
         'Notifications en temps réel pour la famille',
         'Supervision des conversations',
-        'Portail d\'accès famille dédié'
-      ]
+        "Portail d'accès famille dédié",
+      ],
     },
     {
       category: 'Système de Matching',
@@ -35,19 +35,19 @@ const StatusOverview = () => {
         'Test de compatibilité avec questions',
         'Insights et analyses de compatibilité',
         'Score de compatibilité en temps réel',
-        'Préférences religieuses détaillées'
-      ]
+        'Préférences religieuses détaillées',
+      ],
     },
     {
       category: 'Modération Islamique',
       icon: <MessageCircle className="h-5 w-5 text-primary" />,
       features: [
         'Modération AI basée sur les valeurs islamiques',
-        'Suggestions d\'amélioration des messages',
+        "Suggestions d'amélioration des messages",
         'Blocage automatique de contenu inapproprié',
         'Notifications famille pour contenu critique',
-        'Règles de modération configurables'
-      ]
+        'Règles de modération configurables',
+      ],
     },
     {
       category: 'Interface Utilisateur',
@@ -58,20 +58,20 @@ const StatusOverview = () => {
         'Composants UI réutilisables (shadcn)',
         'Animations et transitions fluides',
         'Mode sombre/clair supporté',
-        'Navigation intuitive'
-      ]
-    }
+        'Navigation intuitive',
+      ],
+    },
   ];
 
   const technicalAchievements = [
     'Architecture React + TypeScript + Vite',
-    'Backend Supabase avec RLS policies sécurisées', 
+    'Backend Supabase avec RLS policies sécurisées',
     'Edge Functions pour logique métier complexe',
     'Real-time avec Supabase Realtime',
     'Système de design avec Tailwind CSS',
     'Hooks React personnalisés réutilisables',
-    'Gestion d\'état optimisée',
-    'Tests de modération automatisés'
+    "Gestion d'état optimisée",
+    'Tests de modération automatisés',
   ];
 
   return (
@@ -141,11 +141,12 @@ const StatusOverview = () => {
                 🚀 Prêt pour Production
               </Badge>
             </div>
-            
+
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              Le système ZawajConnect est maintenant entièrement fonctionnel avec toutes les fonctionnalités 
-              essentielles d'une plateforme matrimoniale islamique moderne, incluant la supervision familiale, 
-              la modération basée sur les valeurs islamiques, et un système de compatibilité avancé.
+              Le système ZawajConnect est maintenant entièrement fonctionnel avec toutes les
+              fonctionnalités essentielles d'une plateforme matrimoniale islamique moderne, incluant
+              la supervision familiale, la modération basée sur les valeurs islamiques, et un
+              système de compatibilité avancé.
             </p>
 
             <div className="text-sm text-muted-foreground">

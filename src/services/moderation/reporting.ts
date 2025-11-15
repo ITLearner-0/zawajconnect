@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { ContentReport } from '@/types/profile';
 
@@ -14,24 +13,22 @@ export const reportContent = async (
 ): Promise<boolean> => {
   try {
     // Use content_flags table instead of content_reports
-    const { error } = await supabase
-      .from('content_flags')
-      .insert({
-        content_id: contentReference || reportedUserId,
-        content_type: 'profile',
-        flag_type: reportType,
-        flagged_by: reportingUserId,
-        severity: 'medium',
-        notes: reportDetails,
-        created_at: new Date().toISOString(),
-        resolved: false
-      } as any);
-    
+    const { error } = await supabase.from('content_flags').insert({
+      content_id: contentReference || reportedUserId,
+      content_type: 'profile',
+      flag_type: reportType,
+      flagged_by: reportingUserId,
+      severity: 'medium',
+      notes: reportDetails,
+      created_at: new Date().toISOString(),
+      resolved: false,
+    } as any);
+
     if (error) {
-      console.error("Error creating content flag:", error);
+      console.error('Error creating content flag:', error);
       return false;
     }
-    
+
     return true;
   } catch (err) {
     console.error('Error flagging content:', err);
@@ -66,15 +63,15 @@ export const resolveContentReport = async (
       .update({
         resolved: true,
         resolved_at: new Date().toISOString(),
-        notes: adminNotes
+        notes: adminNotes,
       })
       .eq('id', reportId);
-    
+
     if (error) {
-      console.error("Error resolving content flag:", error);
+      console.error('Error resolving content flag:', error);
       return false;
     }
-    
+
     return true;
   } catch (err) {
     console.error('Error resolving content flag:', err);

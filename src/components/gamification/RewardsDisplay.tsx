@@ -11,11 +11,11 @@ interface RewardsDisplayProps {
 }
 
 const RewardsDisplay = ({ userId }: RewardsDisplayProps) => {
-  const { 
-    rewards, 
-    loading, 
-    claiming, 
-    error, 
+  const {
+    rewards,
+    loading,
+    claiming,
+    error,
     claimReward,
     getUnclaimedRewards,
     getClaimedRewards,
@@ -45,9 +45,7 @@ const RewardsDisplay = ({ userId }: RewardsDisplayProps) => {
         <CardContent className="py-12 text-center">
           <Gift className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
           <CardTitle className="mb-2">No Rewards Yet</CardTitle>
-          <CardDescription>
-            Complete activities to earn rewards!
-          </CardDescription>
+          <CardDescription>Complete activities to earn rewards!</CardDescription>
         </CardContent>
       </Card>
     );
@@ -71,15 +69,9 @@ const RewardsDisplay = ({ userId }: RewardsDisplayProps) => {
       <CardContent>
         <Tabs defaultValue="unclaimed" className="w-full">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="unclaimed">
-              Unclaimed ({unclaimedRewards.length})
-            </TabsTrigger>
-            <TabsTrigger value="claimed">
-              Claimed ({claimedRewards.length})
-            </TabsTrigger>
-            <TabsTrigger value="expired">
-              Expired ({expiredRewards.length})
-            </TabsTrigger>
+            <TabsTrigger value="unclaimed">Unclaimed ({unclaimedRewards.length})</TabsTrigger>
+            <TabsTrigger value="claimed">Claimed ({claimedRewards.length})</TabsTrigger>
+            <TabsTrigger value="expired">Expired ({expiredRewards.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="unclaimed" className="mt-6">
@@ -90,9 +82,9 @@ const RewardsDisplay = ({ userId }: RewardsDisplayProps) => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {unclaimedRewards.map((reward) => (
-                  <RewardCard 
-                    key={reward.id} 
-                    reward={reward} 
+                  <RewardCard
+                    key={reward.id}
+                    reward={reward}
                     onClaim={claimReward}
                     claiming={claiming === reward.id}
                   />

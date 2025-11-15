@@ -34,6 +34,7 @@ SELECT net.http_post(
 ```
 
 **Résultat attendu:**
+
 - Une ligne avec un `request_id`
 - Un email reçu dans votre boîte mail en quelques secondes
 
@@ -71,12 +72,14 @@ https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/functions/send-welco
 https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/functions/send-match-notification/logs
 
 **Ce que vous devriez voir:**
+
 ```
 ✅ Sending welcome email to: votre-email@example.com
 ✅ Email sent successfully to votre-email@example.com
 ```
 
 **En cas d'erreur:**
+
 ```
 ❌ SMTP configuration missing
 ❌ Authentication failed
@@ -87,7 +90,7 @@ https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/functions/send-match
 
 ```sql
 -- Voir les dernières tentatives d'envoi d'emails
-SELECT 
+SELECT
   id,
   created_at,
   status_code,
@@ -104,6 +107,7 @@ LIMIT 10;
 ### Problème 1: "SMTP configuration missing"
 
 **Solution:**
+
 1. Allez dans Edge Functions Secrets: https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/settings/functions
 2. Ajoutez ces secrets:
    - `SMTP_HOST`: smtp.hostinger.com
@@ -116,6 +120,7 @@ LIMIT 10;
 ### Problème 2: "Authentication failed"
 
 **Causes possibles:**
+
 - Mot de passe SMTP incorrect
 - Compte email suspendu ou inactif
 - Authentification 2FA activée (désactiver pour SMTP)
@@ -126,11 +131,13 @@ Vérifiez dans Hostinger que l'email est actif et que le mot de passe est correc
 ### Problème 3: "Connection timeout"
 
 **Causes possibles:**
+
 - Firewall bloquant le port 465
 - Serveur SMTP Hostinger indisponible
 - Mauvaise configuration du port
 
 **Solutions à tester:**
+
 ```
 # Essayer le port 587 (TLS) au lieu de 465 (SSL)
 SMTP_PORT=587
@@ -142,11 +149,13 @@ SMTP_TLS=true
 ### Problème 4: Email envoyé mais non reçu
 
 **Vérifications:**
+
 1. ✅ Regardez dans vos **Spams/Courriers indésirables**
 2. ✅ Vérifiez que le domaine zawajconnect.me a des **enregistrements SPF/DKIM**
 3. ✅ Consultez les logs Hostinger pour voir si l'email a été envoyé
 
 **Configuration DNS recommandée (chez Hostinger):**
+
 ```
 # SPF Record
 Type: TXT
@@ -190,11 +199,13 @@ Une fois les tests réussis:
 ## 📧 Contenu des Emails de Test
 
 ### Email de Bienvenue
+
 - **Subject**: Bienvenue sur Zawaj-Connect ! 🌙
 - **Content**: Message de bienvenue + CTA "Compléter mon profil"
 - **Design**: Header violet gradient + sections claires
 
 ### Email de Match
+
 - **Subject**: 🎉 Nouveau match mutuel !
 - **Content**: Notification de match + CTA "Commencer la conversation"
 - **Design**: Header vert gradient + conseils islamiques
@@ -204,6 +215,7 @@ Une fois les tests réussis:
 ## 🆘 Support
 
 En cas de problème persistant:
+
 1. Vérifiez les logs des Edge Functions
 2. Testez manuellement avec `curl`
 3. Contactez le support Hostinger si problème côté serveur

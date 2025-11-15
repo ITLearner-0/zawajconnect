@@ -14,11 +14,13 @@ We respectfully request reconsideration of the account closure decision. **Zawaj
 ### KEY DIFFERENCES FROM DATING SERVICES
 
 **Dating Services (Prohibited):**
+
 - Casual relationships, no commitment
 - No family involvement
 - Various relationship types
 
 **Our Matrimonial Platform:**
+
 - **EXCLUSIVE objective: Islamic marriage (Nikah)**
 - **MANDATORY family guardian (Wali) system**
 - **Family supervision of all interactions**
@@ -27,23 +29,27 @@ We respectfully request reconsideration of the account closure decision. **Zawaj
 ### UNIQUE SAFEGUARDS
 
 **1. Mandatory Wali System**
+
 - Every user MUST invite their legal guardian (parent/family)
 - Guardians have full access to profiles and conversations
 - No communication possible without family approval
 - Dedicated parental supervision dashboard
 
 **2. Strict Islamic Moderation**
+
 - AI-powered content moderation
 - Real-time detection of inappropriate content
 - Automatic sanctions for violations
 - Zero tolerance for non-matrimonial interactions
 
 **3. Identity Verification**
+
 - Verification with official documents
 - Photo verification for authenticity
 - Visible verification badges
 
 **4. Limited Features**
+
 - No free chat - all conversations supervised
 - Limited simultaneous conversations
 - Automatic closure after inactivity
@@ -52,6 +58,7 @@ We respectfully request reconsideration of the account closure decision. **Zawaj
 ### COMPARABLE TO ACCEPTED PLATFORMS
 
 Similar Muslim matrimonial services using Stripe:
+
 - **Muzz** (formerly Muzmatch)
 - **SingleMuslim**
 - **Salams**
@@ -90,11 +97,13 @@ All legal documents publicly available:
 ### TRANSPARENT BUSINESS MODEL
 
 **Freemium Subscription Model:**
+
 - Free: Limited basic access
 - Premium: €29.99/month - Advanced features
 - VIP: €49.99/month - Priority access
 
 **Financial Transparency:**
+
 - Estimated refund rate: <5%
 - No disputes expected
 - Clear refund policy
@@ -133,7 +142,7 @@ We believe this account closure is based on miscategorization. We are NOT a dati
 ✅ Strict Islamic compliance  
 ✅ AI-powered moderation  
 ✅ Identity verification  
-✅ Comparable to Stripe-accepted platforms  
+✅ Comparable to Stripe-accepted platforms
 
 **We respectfully request a review of this decision** and are available for any clarification, documentation, or platform demonstration.
 

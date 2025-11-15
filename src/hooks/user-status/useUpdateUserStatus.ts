@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -11,8 +10,10 @@ export const useUpdateUserStatus = () => {
     setError(null);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!session?.user?.id) {
         throw new Error('User not authenticated');
       }
@@ -21,8 +22,8 @@ export const useUpdateUserStatus = () => {
       // In a real app, you'd have a dedicated user_status table
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ 
-          updated_at: new Date().toISOString()
+        .update({
+          updated_at: new Date().toISOString(),
         })
         .eq('id', session.user.id);
 

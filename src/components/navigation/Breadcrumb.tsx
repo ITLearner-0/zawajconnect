@@ -11,7 +11,6 @@ interface BreadcrumbItem {
   path?: string;
 }
 
-
 const Breadcrumb = () => {
   const location = useLocation();
   const { canGoBack, goBack } = useNavigation();
@@ -19,29 +18,27 @@ const Breadcrumb = () => {
   const pathnames = location.pathname.split('/').filter((x) => x);
 
   const handleBreadcrumbClick = (path: string, label: string) => {
-    trackAction('breadcrumb_navigation', { 
-      from: location.pathname, 
-      to: path, 
-      label 
+    trackAction('breadcrumb_navigation', {
+      from: location.pathname,
+      to: path,
+      label,
     });
   };
 
   const handleBackClick = () => {
-    trackAction('back_navigation', { 
-      from: location.pathname 
+    trackAction('back_navigation', {
+      from: location.pathname,
     });
     goBack();
   };
 
   const getBreadcrumbItems = (): BreadcrumbItem[] => {
-    const items: BreadcrumbItem[] = [
-      { label: 'Accueil', path: '/dashboard' }
-    ];
+    const items: BreadcrumbItem[] = [{ label: 'Accueil', path: '/dashboard' }];
 
     let currentPath = '';
     pathnames.forEach((pathname, index) => {
       currentPath += `/${pathname}`;
-      
+
       // Skip dynamic segments (like user IDs)
       if (pathname.match(/^[a-f0-9-]{36}$/)) {
         return;
@@ -51,7 +48,7 @@ const Breadcrumb = () => {
       if (route) {
         items.push({
           label: route.label,
-          path: index === pathnames.length - 1 ? undefined : currentPath
+          path: index === pathnames.length - 1 ? undefined : currentPath,
         });
       }
     });
@@ -82,22 +79,15 @@ const Breadcrumb = () => {
                 {item.label}
               </Link>
             ) : (
-              <span className="text-foreground font-medium">
-                {item.label}
-              </span>
+              <span className="text-foreground font-medium">{item.label}</span>
             )}
           </div>
         ))}
       </nav>
-      
+
       {/* Back Button */}
       {canGoBack && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleBackClick}
-          className="gap-2"
-        >
+        <Button variant="ghost" size="sm" onClick={handleBackClick} className="gap-2">
           <ArrowLeft className="h-4 w-4" />
           Retour
         </Button>

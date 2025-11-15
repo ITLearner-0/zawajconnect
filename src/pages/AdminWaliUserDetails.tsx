@@ -7,12 +7,7 @@ import { WaliAdminTabs } from '@/components/wali/navigation';
 import { UserDetailsCard } from '@/components/wali/permissions/UserDetailsCard';
 import { UserActionsHistory, AdminAction } from '@/components/wali/permissions/UserActionsHistory';
 import { PermissionHistory } from '@/components/wali/permissions/PermissionHistory';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const AdminWaliUserDetails = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -34,7 +29,7 @@ const AdminWaliUserDetails = () => {
       if (!userId || !permissions.canManagePermissions) return;
 
       setLoading(true);
-      
+
       // Fetch user permission details
       const permData = await fetchUserPermission(userId);
       setUserPermission(permData);
@@ -83,9 +78,7 @@ const AdminWaliUserDetails = () => {
           </Button>
           <div>
             <h1 className="text-3xl font-bold">Détails de l'Administrateur</h1>
-            <p className="text-muted-foreground">
-              Historique complet des permissions et actions
-            </p>
+            <p className="text-muted-foreground">Historique complet des permissions et actions</p>
           </div>
         </div>
       </div>
@@ -96,13 +89,9 @@ const AdminWaliUserDetails = () => {
         </div>
       ) : !userPermission ? (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            Aucune permission trouvée pour cet utilisateur
-          </p>
+          <p className="text-muted-foreground">Aucune permission trouvée pour cet utilisateur</p>
           <Button variant="outline" className="mt-4" asChild>
-            <Link to="/admin/wali-permissions">
-              Retour à la liste
-            </Link>
+            <Link to="/admin/wali-permissions">Retour à la liste</Link>
           </Button>
         </div>
       ) : (
@@ -111,9 +100,7 @@ const AdminWaliUserDetails = () => {
 
           <Tabs defaultValue="actions" className="space-y-6">
             <TabsList>
-              <TabsTrigger value="actions">
-                Actions ({userActions.length})
-              </TabsTrigger>
+              <TabsTrigger value="actions">Actions ({userActions.length})</TabsTrigger>
               <TabsTrigger value="permissions">
                 Changements de Permissions ({auditHistory.length})
               </TabsTrigger>

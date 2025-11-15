@@ -1,13 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ArrowLeft, 
-  ArrowRight, 
-  CheckCircle,
-  AlertCircle,
-  Loader2
-} from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 interface MobileStepNavigationProps {
   currentStep: number;
@@ -32,24 +26,23 @@ const MobileStepNavigation = ({
   onPrevious,
   onNext,
   onComplete,
-  className = ""
+  className = '',
 }: MobileStepNavigationProps) => {
-  
   const progress = (currentStep / totalSteps) * 100;
   const isLastStep = currentStep === totalSteps;
 
   const getStepStatus = () => {
     if (isStepValid) {
-      return { 
-        icon: <CheckCircle className="w-4 h-4 text-emerald" />, 
-        text: "Étape complète",
-        color: "text-emerald"
+      return {
+        icon: <CheckCircle className="w-4 h-4 text-emerald" />,
+        text: 'Étape complète',
+        color: 'text-emerald',
       };
     } else {
-      return { 
-        icon: <AlertCircle className="w-4 h-4 text-gold" />, 
-        text: "Remplissez les champs requis",
-        color: "text-gold"
+      return {
+        icon: <AlertCircle className="w-4 h-4 text-gold" />,
+        text: 'Remplissez les champs requis',
+        color: 'text-gold',
       };
     }
   };
@@ -64,19 +57,17 @@ const MobileStepNavigation = ({
           <span className="text-muted-foreground">
             Étape {currentStep} sur {totalSteps}
           </span>
-          <Badge variant={isStepValid ? "default" : "secondary"} className="text-xs">
+          <Badge variant={isStepValid ? 'default' : 'secondary'} className="text-xs">
             {Math.round(progress)}% complété
           </Badge>
         </div>
-        
+
         <Progress value={progress} className="h-2" />
-        
+
         {/* Step Status */}
         <div className="flex items-center space-x-2">
           {status.icon}
-          <span className={`text-sm font-medium ${status.color}`}>
-            {status.text}
-          </span>
+          <span className={`text-sm font-medium ${status.color}`}>{status.text}</span>
         </div>
       </div>
 
@@ -127,16 +118,12 @@ const MobileStepNavigation = ({
             const step = index + 1;
             const isCompleted = step < currentStep;
             const isCurrent = step === currentStep;
-            
+
             return (
               <div
                 key={step}
                 className={`w-2 h-2 rounded-full transition-all ${
-                  isCompleted 
-                    ? 'bg-emerald' 
-                    : isCurrent 
-                    ? 'bg-gold w-4' 
-                    : 'bg-muted'
+                  isCompleted ? 'bg-emerald' : isCurrent ? 'bg-gold w-4' : 'bg-muted'
                 }`}
               />
             );

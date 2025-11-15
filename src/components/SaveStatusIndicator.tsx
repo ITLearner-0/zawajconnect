@@ -10,10 +10,10 @@ interface SaveStatusIndicatorProps {
   isOnline?: boolean;
 }
 
-export const SaveStatusIndicator: React.FC<SaveStatusIndicatorProps> = ({ 
+export const SaveStatusIndicator: React.FC<SaveStatusIndicatorProps> = ({
   status: externalStatus,
   lastSaveTime: externalLastSaveTime,
-  isOnline = true
+  isOnline = true,
 }) => {
   const [lastSaveTime, setLastSaveTime] = useState<Date | null>(externalLastSaveTime || null);
   const [status, setStatus] = useState<'saved' | 'saving' | 'error' | 'offline' | 'idle'>(
@@ -63,27 +63,27 @@ export const SaveStatusIndicator: React.FC<SaveStatusIndicatorProps> = ({
         return {
           icon: <Loader2 className="h-3 w-3 animate-spin" />,
           text: 'Sauvegarde...',
-          variant: 'secondary' as const
+          variant: 'secondary' as const,
         };
       case 'saved':
         return {
           icon: <CheckCircle className="h-3 w-3" />,
-          text: lastSaveTime 
+          text: lastSaveTime
             ? `Sauvé ${formatDistanceToNow(lastSaveTime, { addSuffix: true, locale: fr })}`
             : 'Sauvegardé',
-          variant: 'default' as const
+          variant: 'default' as const,
         };
       case 'error':
         return {
           icon: <AlertCircle className="h-3 w-3" />,
           text: 'Erreur de sauvegarde',
-          variant: 'destructive' as const
+          variant: 'destructive' as const,
         };
       case 'offline':
         return {
           icon: <CloudOff className="h-3 w-3" />,
           text: 'Mode hors ligne',
-          variant: 'secondary' as const
+          variant: 'secondary' as const,
         };
       default:
         return null;
@@ -91,7 +91,7 @@ export const SaveStatusIndicator: React.FC<SaveStatusIndicatorProps> = ({
   };
 
   const statusContent = getStatusContent();
-  
+
   if (!statusContent) return null;
 
   const { icon, text, variant } = statusContent;
@@ -103,9 +103,7 @@ export const SaveStatusIndicator: React.FC<SaveStatusIndicatorProps> = ({
         <span>{text}</span>
       </Badge>
       {status === 'offline' && (
-        <span className="text-xs text-muted-foreground">
-          Données sauvées localement
-        </span>
+        <span className="text-xs text-muted-foreground">Données sauvées localement</span>
       )}
     </div>
   );

@@ -1,22 +1,21 @@
-
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { 
-  Send, 
-  Shield, 
-  Eye, 
-  Clock, 
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  Send,
+  Shield,
+  Eye,
+  Clock,
   CheckCheck,
   Mic,
   Video,
   Phone,
-  MoreVertical
-} from "lucide-react";
+  MoreVertical,
+} from 'lucide-react';
 import { demoPersonas, demoConversations } from '@/data/demoPersonas';
 import DemoStatusBanner from './DemoStatusBanner';
 
@@ -27,19 +26,22 @@ interface EnhancedDemoMessagingProps {
 
 const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
   selectedPersona,
-  onPersonaSelect
+  onPersonaSelect,
 }) => {
-  const [activeConversation, setActiveConversation] = useState<string>(selectedPersona ? `demo-conv-${selectedPersona.split('-')[2]}` : '');
+  const [activeConversation, setActiveConversation] = useState<string>(
+    selectedPersona ? `demo-conv-${selectedPersona.split('-')[2]}` : ''
+  );
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
   const [typingIndicator, setTypingIndicator] = useState(false);
 
   const personas = demoPersonas;
-  const selectedPersonaData = personas.find(p => p.id === selectedPersona);
+  const selectedPersonaData = personas.find((p) => p.id === selectedPersona);
 
   useEffect(() => {
     if (selectedPersona) {
-      const conversationKey = `demo-conv-${selectedPersona.split('-')[2]}` as keyof typeof demoConversations;
+      const conversationKey =
+        `demo-conv-${selectedPersona.split('-')[2]}` as keyof typeof demoConversations;
       const conversationMessages = demoConversations[conversationKey] || [];
       setMessages(conversationMessages);
       setActiveConversation(conversationKey);
@@ -56,12 +58,12 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
       content: messageInput,
       created_at: new Date().toISOString(),
       is_read: false,
-      is_wali_visible: selectedPersonaData?.gender === 'Female'
+      is_wali_visible: selectedPersonaData?.gender === 'Female',
     };
 
-    setMessages(prev => [...prev, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
     setMessageInput('');
-    
+
     // Simulate typing indicator
     setTypingIndicator(true);
     setTimeout(() => {
@@ -74,34 +76,34 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
         content: getAutoResponse(messageInput),
         created_at: new Date().toISOString(),
         is_read: true,
-        is_wali_visible: selectedPersonaData?.gender === 'Female'
+        is_wali_visible: selectedPersonaData?.gender === 'Female',
       };
-      setMessages(prev => [...prev, autoResponse]);
+      setMessages((prev) => [...prev, autoResponse]);
     }, 2000);
   };
 
   const getAutoResponse = (userMessage: string): string => {
     const responses = [
-      "BarakAllahu feeki pour votre message. Comment puis-je mieux vous connaître ?",
+      'BarakAllahu feeki pour votre message. Comment puis-je mieux vous connaître ?',
       "SubhanAllah, c'est une perspective intéressante. Qu'est-ce qui vous guide dans cette réflexion ?",
       "Alhamdulillah, je suis content(e) d'apprendre cela. Pouvez-vous m'en dire plus ?",
-      "MashaAllah, vos valeurs semblent bien ancrées. Comment les mettez-vous en pratique au quotidien ?",
-      "Qu'Allah vous bénisse. Cette conversation me permet de mieux comprendre votre personnalité."
+      'MashaAllah, vos valeurs semblent bien ancrées. Comment les mettez-vous en pratique au quotidien ?',
+      "Qu'Allah vous bénisse. Cette conversation me permet de mieux comprendre votre personnalité.",
     ];
     return (responses[Math.floor(Math.random() * responses.length)] || responses[0]) as string;
   };
 
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString('fr-FR', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    return new Date(dateString).toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
   return (
     <div className="h-full flex flex-col">
       <DemoStatusBanner variant="minimal" />
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-full">
         {/* Personas List */}
         <Card className="md:col-span-1">
@@ -114,7 +116,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
           <CardContent>
             <ScrollArea className="h-64">
               <div className="space-y-2">
-                {personas.map(persona => (
+                {personas.map((persona) => (
                   <div
                     key={persona.id}
                     onClick={() => onPersonaSelect?.(persona.id)}
@@ -128,16 +130,15 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={persona.profile_picture} />
                         <AvatarFallback>
-                          {persona.first_name[0]}{persona.last_name[0]}
+                          {persona.first_name[0]}
+                          {persona.last_name[0]}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">
                           {persona.first_name} {persona.last_name}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {persona.occupation}
-                        </p>
+                        <p className="text-xs text-gray-500 truncate">{persona.occupation}</p>
                         {persona.wali_verified && (
                           <Badge variant="outline" className="text-xs mt-1">
                             <Shield className="h-3 w-3 mr-1" />
@@ -164,7 +165,8 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
                     <Avatar>
                       <AvatarImage src={selectedPersonaData.profile_picture} />
                       <AvatarFallback>
-                        {selectedPersonaData.first_name[0]}{selectedPersonaData.last_name[0]}
+                        {selectedPersonaData.first_name[0]}
+                        {selectedPersonaData.last_name[0]}
                       </AvatarFallback>
                     </Avatar>
                     <div>
@@ -201,7 +203,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
               <CardContent className="flex-1 p-0">
                 <ScrollArea className="h-64 p-4">
                   <div className="space-y-4">
-                    {messages.map(message => (
+                    {messages.map((message) => (
                       <div
                         key={message.id}
                         className={`flex ${
@@ -227,14 +229,20 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
                         </div>
                       </div>
                     ))}
-                    
+
                     {typingIndicator && (
                       <div className="flex justify-start">
                         <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-3">
                           <div className="flex items-center gap-1">
                             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                            <div
+                              className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                              style={{ animationDelay: '0.1s' }}
+                            ></div>
+                            <div
+                              className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                              style={{ animationDelay: '0.2s' }}
+                            ></div>
                           </div>
                         </div>
                       </div>
@@ -256,7 +264,7 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
                     onKeyPress={(e) => e.key === 'Enter' && sendDemoMessage()}
                     className="flex-1"
                   />
-                  <Button 
+                  <Button
                     onClick={sendDemoMessage}
                     disabled={!messageInput.trim()}
                     className="bg-rose-500 hover:bg-rose-600 text-white"

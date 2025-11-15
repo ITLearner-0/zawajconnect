@@ -9,9 +9,7 @@ interface GamificationDashboardProps {
   layout?: 'grid' | 'stack';
 }
 
-const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ 
-  layout = 'grid' 
-}) => {
+const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ layout = 'grid' }) => {
   if (layout === 'stack') {
     return (
       <div className="space-y-6">

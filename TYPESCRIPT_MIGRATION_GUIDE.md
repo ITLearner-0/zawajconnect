@@ -24,26 +24,27 @@ rules: {
 
 Priority order for future cleanup (by warning count):
 
-| Count | File |
-|-------|------|
-| 10 | `src/components/matching/IslamicCompatibilityCalculator.tsx` |
-| 10 | `src/hooks/useConversationStatus.tsx` |
-| 7 | `src/components/enhanced/ProfileWizard.tsx` |
-| 5 | `src/components/enhanced/EnhancedWaliDashboard.tsx` |
-| 5 | `src/components/enhanced/RealTimeChat.tsx` |
-| 4 | `src/components/enhanced/FamilyChatPanel.tsx` |
-| 4 | `src/components/enhanced/FamilyMeetingScheduler.tsx` |
-| 4 | `src/hooks/useAuth.tsx` |
-| 4 | `src/hooks/useEnhancedSessionMonitor.tsx` |
-| 4 | `src/hooks/useSecurityEvents.tsx` |
-| 4 | `src/pages/Browse.tsx` |
-| 4 | `src/pages/Profile.tsx` |
+| Count | File                                                         |
+| ----- | ------------------------------------------------------------ |
+| 10    | `src/components/matching/IslamicCompatibilityCalculator.tsx` |
+| 10    | `src/hooks/useConversationStatus.tsx`                        |
+| 7     | `src/components/enhanced/ProfileWizard.tsx`                  |
+| 5     | `src/components/enhanced/EnhancedWaliDashboard.tsx`          |
+| 5     | `src/components/enhanced/RealTimeChat.tsx`                   |
+| 4     | `src/components/enhanced/FamilyChatPanel.tsx`                |
+| 4     | `src/components/enhanced/FamilyMeetingScheduler.tsx`         |
+| 4     | `src/hooks/useAuth.tsx`                                      |
+| 4     | `src/hooks/useEnhancedSessionMonitor.tsx`                    |
+| 4     | `src/hooks/useSecurityEvents.tsx`                            |
+| 4     | `src/pages/Browse.tsx`                                       |
+| 4     | `src/pages/Profile.tsx`                                      |
 
 ## Migration Strategies
 
 ### 1. Replace `any` in Error Handlers
 
 **Before:**
+
 ```typescript
 } catch (error: any) {
   console.error(error.message);
@@ -51,6 +52,7 @@ Priority order for future cleanup (by warning count):
 ```
 
 **After:**
+
 ```typescript
 } catch (error: unknown) {
   if (error instanceof Error) {
@@ -64,6 +66,7 @@ Priority order for future cleanup (by warning count):
 ### 2. Replace `any` in Function Parameters
 
 **Before:**
+
 ```typescript
 function processData(data: any) {
   return data.value;
@@ -71,6 +74,7 @@ function processData(data: any) {
 ```
 
 **After:**
+
 ```typescript
 interface DataInput {
   value: string;
@@ -85,11 +89,13 @@ function processData(data: DataInput) {
 ### 3. Replace `any` in Objects/Records
 
 **Before:**
+
 ```typescript
 const preferences: any = { ... };
 ```
 
 **After:**
+
 ```typescript
 // Option 1: Define proper interface
 interface Preferences {
@@ -106,11 +112,13 @@ const preferences: Record<string, unknown> = { ... };
 ### 4. Replace `any` in Arrays
 
 **Before:**
+
 ```typescript
 const items: any[] = [];
 ```
 
 **After:**
+
 ```typescript
 // Option 1: Specific type
 const items: Item[] = [];
@@ -122,6 +130,7 @@ const items: unknown[] = [];
 ### 5. Replace `any` in Generic Types
 
 **Before:**
+
 ```typescript
 interface Response {
   data: any;
@@ -129,14 +138,17 @@ interface Response {
 ```
 
 **After:**
+
 ```typescript
 interface Response<T = unknown> {
   data: T;
 }
 
 // Usage
-interface User { name: string; }
-const response: Response<User> = { data: { name: "Ahmed" } };
+interface User {
+  name: string;
+}
+const response: Response<User> = { data: { name: 'Ahmed' } };
 ```
 
 ## Automated Migration Script
@@ -167,19 +179,25 @@ done
 ## Recommended Migration Order
 
 ### Phase 1: High-Priority Files (Week 1)
+
 Focus on files with 7+ warnings:
+
 1. `IslamicCompatibilityCalculator.tsx` (10 warnings)
 2. `useConversationStatus.tsx` (10 warnings)
 3. `ProfileWizard.tsx` (7 warnings)
 
 ### Phase 2: Medium-Priority Files (Week 2-3)
+
 Focus on files with 4-6 warnings:
+
 - Enhanced components (5 files)
 - Core hooks (useAuth, useSecurityEvents, etc.)
 - Main pages (Browse, Profile)
 
 ### Phase 3: Low-Priority Files (Week 4+)
+
 Focus on files with 1-3 warnings:
+
 - Utility components
 - Less critical pages
 - Test files
@@ -187,11 +205,13 @@ Focus on files with 1-3 warnings:
 ## Type Safety Best Practices
 
 ### 1. Use `unknown` Instead of `any`
+
 - `unknown` requires type checking before use
 - Forces you to handle all possible types
 - Much safer than `any`
 
 ### 2. Create Proper Interfaces
+
 ```typescript
 // Good
 interface UserProfile {
@@ -209,14 +229,10 @@ const profile: any = { ... };
 ```
 
 ### 3. Use Type Guards
+
 ```typescript
 function isUser(value: unknown): value is User {
-  return (
-    typeof value === 'object' &&
-    value !== null &&
-    'id' in value &&
-    'name' in value
-  );
+  return typeof value === 'object' && value !== null && 'id' in value && 'name' in value;
 }
 
 // Usage
@@ -226,10 +242,9 @@ if (isUser(data)) {
 ```
 
 ### 4. Use Discriminated Unions
+
 ```typescript
-type ApiResponse<T> =
-  | { status: 'success'; data: T }
-  | { status: 'error'; error: string };
+type ApiResponse<T> = { status: 'success'; data: T } | { status: 'error'; error: string };
 
 function handleResponse<T>(response: ApiResponse<T>) {
   if (response.status === 'success') {
@@ -243,6 +258,7 @@ function handleResponse<T>(response: ApiResponse<T>) {
 ```
 
 ### 5. Use Generic Constraints
+
 ```typescript
 // Before
 function getValue(obj: any, key: string): any {
@@ -250,10 +266,7 @@ function getValue(obj: any, key: string): any {
 }
 
 // After
-function getValue<T extends Record<string, unknown>>(
-  obj: T,
-  key: keyof T
-): T[keyof T] {
+function getValue<T extends Record<string, unknown>>(obj: T, key: keyof T): T[keyof T] {
   return obj[key];
 }
 ```
@@ -322,6 +335,7 @@ rules: {
 ## Questions?
 
 If you encounter difficult type issues during migration, consider:
+
 1. Check if the library has type definitions (`@types/...`)
 2. Use type assertions sparingly: `value as Type`
 3. Document complex types with JSDoc comments

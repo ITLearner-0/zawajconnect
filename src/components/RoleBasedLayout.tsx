@@ -45,10 +45,11 @@ const RoleBasedLayoutContent: React.FC<RoleBasedLayoutProps> = ({ children }) =>
   }
 
   // Allow admin/moderator users to access admin routes without profile completion check
-  const isAdminRoute = location.pathname.startsWith('/admin') || 
-                       location.pathname === '/moderation-test' || 
-                       location.pathname === '/ab-testing';
-  
+  const isAdminRoute =
+    location.pathname.startsWith('/admin') ||
+    location.pathname === '/moderation-test' ||
+    location.pathname === '/ab-testing';
+
   if (isAdminRoute && hasAdminOrModerator()) {
     return <AppLayout>{children}</AppLayout>;
   }

@@ -21,6 +21,7 @@ const profile: Profile | null = null;
 ```
 
 **Pourquoi?**
+
 - Standard TypeScript et React moderne
 - Cohérent avec les types optionnels (`?`)
 - Meilleure intégration avec l'écosystème JavaScript
@@ -44,11 +45,13 @@ const age = profile.age || 0; // ⚠️ Problème si age = 0
 ```
 
 **Pourquoi?**
+
 - `??` ne considère que `null` et `undefined` comme "absents"
 - `||` traite aussi `0`, `""`, `false` comme "absents"
 - Évite les bugs subtils avec les valeurs falsy
 
 **Cas d'usage courants**:
+
 ```typescript
 // Valeurs par défaut
 const title = post.title ?? 'Untitled';
@@ -84,12 +87,14 @@ const hasProfile = user.profile_id ? true : false; // Verbeux
 ```
 
 **Pourquoi?**
+
 - Conversion explicite et claire
 - Type `boolean` garanti
 - Évite les valeurs "truthy/falsy" ambiguës
 - Plus concis que les ternaires
 
 **Cas d'usage courants**:
+
 ```typescript
 // Vérifier l'existence
 const hasData: boolean = !!data;
@@ -115,21 +120,19 @@ const city = user?.profile?.location?.city ?? 'Unknown';
 const count = data?.items?.length ?? 0;
 
 // ❌ MAUVAIS
-const score = verification && verification.verification_score 
-  ? verification.verification_score 
-  : 0;
-const city = user && user.profile && user.profile.location 
-  ? user.profile.location.city 
-  : 'Unknown';
+const score = verification && verification.verification_score ? verification.verification_score : 0;
+const city = user && user.profile && user.profile.location ? user.profile.location.city : 'Unknown';
 ```
 
 **Pourquoi?**
+
 - Code plus lisible et concis
 - Évite les vérifications `if` imbriquées
 - Gestion sûre des propriétés nested
 - Standard moderne JavaScript/TypeScript
 
 **Cas d'usage courants**:
+
 ```typescript
 // Accès nested sécurisé
 const email = user?.profile?.contact?.email;
@@ -156,16 +159,18 @@ const validItems = (data ?? []).filter((item): item is string => item !== null);
 const profiles = (results ?? []).filter((p): p is Profile => p !== undefined);
 
 // ❌ MAUVAIS
-const validItems = data.filter(item => item !== null); // Type pas raffiné
-const profiles = results.filter(p => p !== undefined); // Type (Profile | undefined)[]
+const validItems = data.filter((item) => item !== null); // Type pas raffiné
+const profiles = results.filter((p) => p !== undefined); // Type (Profile | undefined)[]
 ```
 
 **Pourquoi?**
+
 - Type final précis (`string[]` au lieu de `(string | null)[]`)
 - TypeScript comprend le filtrage
 - Évite les erreurs de type en aval
 
 **Pattern complet**:
+
 ```typescript
 interface Profile {
   id: string;
@@ -173,14 +178,12 @@ interface Profile {
 }
 
 // Filtrage avec type guard
-const profiles: Profile[] = (data ?? [])
-  .filter((item): item is Profile => {
-    return item !== null && item !== undefined && 'id' in item;
-  });
+const profiles: Profile[] = (data ?? []).filter((item): item is Profile => {
+  return item !== null && item !== undefined && 'id' in item;
+});
 
 // Ou plus simple si on sait que null/undefined sont les seuls cas
-const profiles: Profile[] = (data ?? [])
-  .filter((item): item is Profile => item !== null);
+const profiles: Profile[] = (data ?? []).filter((item): item is Profile => item !== null);
 ```
 
 ---
@@ -192,27 +195,28 @@ const profiles: Profile[] = (data ?? [])
 ```typescript
 // ✅ BON (si vraiment nécessaire)
 // TODO: Remove after adding moderation_rules to Supabase schema
-const { data } = await supabase
-  .from('moderation_rules' as any)
-  .select('*');
+const { data } = await supabase.from('moderation_rules' as any).select('*');
 
 // ❌ MAUVAIS
 const data = response as any; // Non documenté, pas de plan pour le supprimer
 ```
 
 **Quand utiliser `as any`?**
+
 1. **Tables Supabase manquantes du schéma TypeScript**
+
    ```typescript
    // Table existe en DB mais pas dans les types auto-générés
    const { data } = await supabase.from('custom_table' as any).select('*');
    ```
 
 2. **Mocks de tests très complexes**
+
    ```typescript
    const mockSupabase = {
      from: vi.fn().mockReturnValue({
-       select: vi.fn()
-     })
+       select: vi.fn(),
+     }),
    } as any; // Acceptable dans les tests
    ```
 
@@ -223,6 +227,7 @@ const data = response as any; // Non documenté, pas de plan pour le supprimer
    ```
 
 **Documentation obligatoire**:
+
 ```typescript
 // ✅ Format requis
 // TODO: [Raison] - [Action à prendre] - [Deadline si applicable]
@@ -235,6 +240,7 @@ const data = something as any;
 ```
 
 **Plan de suppression**:
+
 - Court terme: Identifier tous les `as any` dans le code
 - Moyen terme: Créer des types intermédiaires si possible
 - Long terme: Éliminer tous les `as any` non-essentiels
@@ -249,10 +255,7 @@ const data = something as any;
 
 ```typescript
 // ✅ BON
-const { data, error } = await supabase
-  .from('profiles')
-  .select('*')
-  .single();
+const { data, error } = await supabase.from('profiles').select('*').single();
 
 if (error) throw error;
 
@@ -263,7 +266,7 @@ const normalizedProfile: Profile = {
   bio: data.bio ?? undefined,
   is_active: !!data.is_active,
   settings: data.settings ?? {},
-  tags: data.tags ?? []
+  tags: data.tags ?? [],
 };
 
 // ❌ MAUVAIS
@@ -273,6 +276,7 @@ setProfile(data);
 ```
 
 **Pattern complet**:
+
 ```typescript
 async function fetchProfile(userId: string): Promise<Profile | undefined> {
   const { data, error } = await supabase
@@ -295,7 +299,7 @@ async function fetchProfile(userId: string): Promise<Profile | undefined> {
     is_active: !!data.is_active,
     verified_at: data.verified_at ?? undefined,
     settings: data.settings ?? {},
-    preferences: data.preferences ?? []
+    preferences: data.preferences ?? [],
   };
 }
 ```
@@ -320,6 +324,7 @@ const [error, setError] = useState<string | null>(null);
 ```
 
 **Pattern avec useEffect**:
+
 ```typescript
 const [data, setData] = useState<DataType | undefined>(undefined);
 const [loading, setLoading] = useState<boolean>(true);
@@ -372,6 +377,7 @@ try {
 ```
 
 **Pattern avec PostgrestError (Supabase)**:
+
 ```typescript
 import { PostgrestError } from '@supabase/supabase-js';
 
@@ -382,7 +388,7 @@ if (error) {
   console.error('Database error:', {
     message: error.message,
     code: error.code,
-    details: error.details
+    details: error.details,
   });
   return undefined;
 }
@@ -420,6 +426,7 @@ interface UserStatus = 'active' | 'inactive'; // ❌ Syntaxe invalide
 ```
 
 **Quand utiliser quoi?**
+
 - **Interface**: Objets, classes, extension (implements, extends)
 - **Type**: Unions, intersections, tuples, mapped types
 
@@ -469,15 +476,20 @@ interface ApiResponse {
 // ✅ BON
 const isUserActive = !!user.is_active;
 const hasProfileData = !!profile;
-const getUserById = (id: string) => { /* ... */ };
+const getUserById = (id: string) => {
+  /* ... */
+};
 
 // ❌ MAUVAIS
 const UserActive = !!user.is_active; // PascalCase pour variable
 const has_profile_data = !!profile; // snake_case
-const GetUserById = (id: string) => { /* ... */ }; // PascalCase pour fonction
+const GetUserById = (id: string) => {
+  /* ... */
+}; // PascalCase pour fonction
 ```
 
 **Règles**:
+
 - Variables/fonctions: `camelCase`
 - Booléens: préfixe `is`, `has`, `should`, `can`
 - Types/Interfaces: `PascalCase`
@@ -498,12 +510,17 @@ type UserStatus = 'active' | 'inactive';
 type UserWithStatus = UserProfile & { status: UserStatus };
 
 // ❌ MAUVAIS
-interface userProfile { /* ... */ } // camelCase
-interface IUserProfile { /* ... */ } // Préfixe I (style ancien)
+interface userProfile {
+  /* ... */
+} // camelCase
+interface IUserProfile {
+  /* ... */
+} // Préfixe I (style ancien)
 type TUserStatus = 'active' | 'inactive'; // Préfixe T
 ```
 
 **Règles**:
+
 - Pas de préfixes `I` ou `T`
 - `PascalCase` pour tous les types
 - Noms descriptifs et clairs
@@ -521,22 +538,23 @@ import { vi } from 'vitest';
 const mockSupabase = {
   from: vi.fn().mockReturnValue({
     select: vi.fn().mockResolvedValue({ data: [], error: null }),
-    insert: vi.fn().mockResolvedValue({ data: null, error: null })
-  })
+    insert: vi.fn().mockResolvedValue({ data: null, error: null }),
+  }),
 };
 
 // Type assertion acceptable dans les tests
 vi.mock('@/integrations/supabase/client', () => ({
-  supabase: mockSupabase as any
+  supabase: mockSupabase as any,
 }));
 
 // ❌ MAUVAIS
 const mockSupabase = {
-  from: () => ({ select: () => {} })
+  from: () => ({ select: () => {} }),
 }; // Pas de vi.fn(), difficile à tester les appels
 ```
 
 **Règles pour les tests**:
+
 - Utiliser `vi.fn()` pour tous les mocks
 - `as any` acceptable pour les mocks complexes (documenter)
 - Typer les données de test quand possible
@@ -582,11 +600,13 @@ npm run lint
 ## 📚 Ressources
 
 ### Documentation
+
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
 - [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
 - [Supabase TypeScript Support](https://supabase.com/docs/reference/javascript/typescript-support)
 
 ### Références Internes
+
 - [REFACTORING_TYPESCRIPT_COMPLETE.md](./REFACTORING_TYPESCRIPT_COMPLETE.md) - Rapport complet du refactoring
 - [TYPESCRIPT_REFACTORING_INDEX.md](./TYPESCRIPT_REFACTORING_INDEX.md) - Index de la documentation
 
@@ -617,6 +637,6 @@ R: Utiliser `as any` temporairement avec TODO, puis mettre à jour le schéma et
 
 ---
 
-*"Code is read more often than it is written."* - Guido van Rossum
+_"Code is read more often than it is written."_ - Guido van Rossum
 
 Écrivons du code TypeScript propre, sûr et maintenable! 🚀

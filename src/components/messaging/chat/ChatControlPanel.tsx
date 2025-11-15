@@ -1,4 +1,3 @@
-
 import React from 'react';
 import RetentionSettings from '../RetentionSettings';
 import SecuritySettingsPanel from '../SecuritySettingsPanel';
@@ -35,28 +34,25 @@ const ChatControlPanel: React.FC<ChatControlPanelProps> = ({
   toggleMonitoring,
   monitoringLoading,
   monitoringError,
-  onCloseMonitoring
+  onCloseMonitoring,
 }) => {
   return (
     <>
       {showRetentionSettings && (
-        <RetentionSettings 
-          conversationId={conversationId} 
+        <RetentionSettings
+          conversationId={conversationId}
           currentPolicy={{
             type: 'permanent',
-            auto_delete: false
+            auto_delete: false,
           }}
           onPolicyChanged={() => {}}
         />
       )}
-      
+
       {showSecuritySettings && (
-        <SecuritySettingsPanel 
-          encryptionEnabled={true}
-          toggleEncryption={() => {}}
-        />
+        <SecuritySettingsPanel encryptionEnabled={true} toggleEncryption={() => {}} />
       )}
-      
+
       {showMonitoring && (
         <AIMonitoringDashboard
           report={latestReport}
@@ -67,13 +63,9 @@ const ChatControlPanel: React.FC<ChatControlPanelProps> = ({
           onClose={onCloseMonitoring}
         />
       )}
-      
+
       {showEmergencyPanel && (
-        <EmergencyPanel
-          conversationId={conversationId}
-          userId={userId}
-          otherUserId={otherUserId}
-        />
+        <EmergencyPanel conversationId={conversationId} userId={userId} otherUserId={otherUserId} />
       )}
     </>
   );

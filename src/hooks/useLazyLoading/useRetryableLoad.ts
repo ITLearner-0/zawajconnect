@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useEffect } from 'react';
 
 interface UseRetryableLoadOptions {
@@ -12,12 +11,7 @@ export const useRetryableLoad = (
   loadFunction: () => Promise<void>,
   options: UseRetryableLoadOptions = {}
 ) => {
-  const {
-    maxRetries = 3,
-    retryDelay = 1000,
-    backoffMultiplier = 1.5,
-    onRetryExhausted,
-  } = options;
+  const { maxRetries = 3, retryDelay = 1000, backoffMultiplier = 1.5, onRetryExhausted } = options;
 
   const [retryCount, setRetryCount] = useState(0);
   const [isRetrying, setIsRetrying] = useState(false);
@@ -50,13 +44,13 @@ export const useRetryableLoad = (
     try {
       // Calculate delay with exponential backoff
       const delay = retryDelay * Math.pow(backoffMultiplier, retryCount);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      
+      await new Promise((resolve) => setTimeout(resolve, delay));
+
       await loadFunction();
       setRetryCount(0);
       setHasError(false);
     } catch (error) {
-      setRetryCount(prev => prev + 1);
+      setRetryCount((prev) => prev + 1);
       setHasError(true);
       console.warn(`Retry attempt ${retryCount + 1} failed:`, error);
     } finally {

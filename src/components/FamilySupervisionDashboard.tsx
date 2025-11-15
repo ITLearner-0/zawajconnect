@@ -54,9 +54,9 @@ const FamilySupervisionDashboard = () => {
       if (familyError || !familyMemberData) {
         console.error('Family member error:', familyError);
         toast({
-          title: "Erreur",
-          description: 'Vous n\'êtes pas autorisé à superviser les conversations',
-          variant: "destructive"
+          title: 'Erreur',
+          description: "Vous n'êtes pas autorisé à superviser les conversations",
+          variant: 'destructive',
         });
         setLoading(false);
         return;
@@ -66,22 +66,24 @@ const FamilySupervisionDashboard = () => {
         ...familyMemberData,
         is_wali: familyMemberData.is_wali ?? false,
         can_communicate: familyMemberData.can_communicate ?? false,
-        can_view_profile: familyMemberData.can_view_profile ?? false
+        can_view_profile: familyMemberData.can_view_profile ?? false,
       };
-      
+
       setFamilyRole(normalizedFamilyRole);
 
       // Get matches for the supervised user (person that this wali supervises)
       const { data: matchesData, error: matchesError } = await supabase
         .from('matches')
-        .select(`
+        .select(
+          `
           id,
           user1_id,
           user2_id,
           is_mutual,
           can_communicate,
           created_at
-        `)
+        `
+        )
         .or(`user1_id.eq.${familyMemberData.user_id},user2_id.eq.${familyMemberData.user_id}`)
         .eq('is_mutual', true);
 
@@ -131,17 +133,24 @@ const FamilySupervisionDashboard = () => {
           return {
             id: match.id,
             match_id: match.id,
-            user1_profile: user1Profile ? { 
-              full_name: user1Profile.full_name || 'Utilisateur inconnu', 
-              avatar_url: user1Profile.avatar_url || undefined 
-            } : { full_name: 'Utilisateur inconnu', avatar_url: undefined },
-            user2_profile: user2Profile ? { 
-              full_name: user2Profile.full_name || 'Utilisateur inconnu', 
-              avatar_url: user2Profile.avatar_url || undefined 
-            } : { full_name: 'Utilisateur inconnu', avatar_url: undefined },
-            last_message: lastMessage || { content: 'Aucun message', created_at: new Date().toISOString() },
+            user1_profile: user1Profile
+              ? {
+                  full_name: user1Profile.full_name || 'Utilisateur inconnu',
+                  avatar_url: user1Profile.avatar_url || undefined,
+                }
+              : { full_name: 'Utilisateur inconnu', avatar_url: undefined },
+            user2_profile: user2Profile
+              ? {
+                  full_name: user2Profile.full_name || 'Utilisateur inconnu',
+                  avatar_url: user2Profile.avatar_url || undefined,
+                }
+              : { full_name: 'Utilisateur inconnu', avatar_url: undefined },
+            last_message: lastMessage || {
+              content: 'Aucun message',
+              created_at: new Date().toISOString(),
+            },
             unread_count: unreadCount || 0,
-            is_active: match.can_communicate
+            is_active: match.can_communicate,
           };
         }) || []
       );
@@ -150,9 +159,9 @@ const FamilySupervisionDashboard = () => {
     } catch (error) {
       console.error('Error loading supervision data:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: 'Erreur lors du chargement des données',
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -169,15 +178,13 @@ const FamilySupervisionDashboard = () => {
         family_member_id: familyRole!.id,
         user_id: user?.id || '', // Use the current authenticated user's ID (the wali)
         can_send_messages: familyRole!.can_communicate,
-        can_read_messages: familyRole!.can_view_profile
+        can_read_messages: familyRole!.can_view_profile,
       };
-      
-      const { error } = await supabase
-        .from('conversation_participants')
-        .upsert([participantData], {
-          onConflict: 'match_id,participant_id',
-          ignoreDuplicates: false
-        });
+
+      const { error } = await supabase.from('conversation_participants').upsert([participantData], {
+        onConflict: 'match_id,participant_id',
+        ignoreDuplicates: false,
+      });
 
       if (error) {
         console.error('Database error:', error);
@@ -189,9 +196,9 @@ const FamilySupervisionDashboard = () => {
     } catch (error) {
       console.error('Error joining conversation:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: `Erreur lors de la participation à la conversation: ${error?.message || 'Erreur inconnue'}`,
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -231,9 +238,7 @@ const FamilySupervisionDashboard = () => {
             Supervisez les conversations en tant que {familyRole.relationship}
           </p>
         </div>
-        <Badge variant="secondary">
-          {familyRole.full_name}
-        </Badge>
+        <Badge variant="secondary">{familyRole.full_name}</Badge>
       </div>
 
       {/* Stats */}
@@ -269,7 +274,7 @@ const FamilySupervisionDashboard = () => {
               <div>
                 <p className="text-sm text-muted-foreground">Actives</p>
                 <p className="text-2xl font-bold">
-                  {conversations.filter(conv => conv.is_active).length}
+                  {conversations.filter((conv) => conv.is_active).length}
                 </p>
               </div>
             </div>
@@ -285,75 +290,79 @@ const FamilySupervisionDashboard = () => {
         </TabsList>
 
         <TabsContent value="active" className="space-y-4">
-          {conversations.filter(conv => conv.is_active).map(conversation => (
-            <Card key={conversation.id}>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold">
-                        {conversation.user1_profile.full_name} ↔ {conversation.user2_profile.full_name}
-                      </h3>
-                      {conversation.unread_count > 0 && (
-                        <Badge variant="destructive" className="text-xs">
-                          {conversation.unread_count} nouveau{conversation.unread_count > 1 ? 'x' : ''}
-                        </Badge>
-                      )}
+          {conversations
+            .filter((conv) => conv.is_active)
+            .map((conversation) => (
+              <Card key={conversation.id}>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="font-semibold">
+                          {conversation.user1_profile.full_name} ↔{' '}
+                          {conversation.user2_profile.full_name}
+                        </h3>
+                        {conversation.unread_count > 0 && (
+                          <Badge variant="destructive" className="text-xs">
+                            {conversation.unread_count} nouveau
+                            {conversation.unread_count > 1 ? 'x' : ''}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        Dernier message: {conversation.last_message.content.substring(0, 50)}...
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(conversation.last_message.created_at).toLocaleDateString(
+                          'fr-FR',
+                          {
+                            day: 'numeric',
+                            month: 'short',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          }
+                        )}
+                      </p>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Dernier message: {conversation.last_message.content.substring(0, 50)}...
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(conversation.last_message.created_at).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'short',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => joinConversation(conversation.match_id)}
-                      disabled={!familyRole.can_view_profile}
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      Voir
-                    </Button>
-                    {familyRole.can_communicate && (
+                    <div className="flex gap-2">
                       <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => joinConversation(conversation.match_id)}
+                        disabled={!familyRole.can_view_profile}
                       >
-                        <MessageCircle className="h-4 w-4 mr-1" />
-                        Participer
+                        <Eye className="h-4 w-4 mr-1" />
+                        Voir
                       </Button>
-                    )}
+                      {familyRole.can_communicate && (
+                        <Button size="sm" onClick={() => joinConversation(conversation.match_id)}>
+                          <MessageCircle className="h-4 w-4 mr-1" />
+                          Participer
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            ))}
         </TabsContent>
 
         <TabsContent value="all" className="space-y-4">
-          {conversations.map(conversation => (
+          {conversations.map((conversation) => (
             <Card key={conversation.id} className={!conversation.is_active ? 'opacity-60' : ''}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="font-semibold">
-                        {conversation.user1_profile.full_name} ↔ {conversation.user2_profile.full_name}
+                        {conversation.user1_profile.full_name} ↔{' '}
+                        {conversation.user2_profile.full_name}
                       </h3>
-                      {!conversation.is_active && (
-                        <Badge variant="secondary">Inactif</Badge>
-                      )}
+                      {!conversation.is_active && <Badge variant="secondary">Inactif</Badge>}
                       {conversation.unread_count > 0 && (
                         <Badge variant="destructive" className="text-xs">
-                          {conversation.unread_count} nouveau{conversation.unread_count > 1 ? 'x' : ''}
+                          {conversation.unread_count} nouveau
+                          {conversation.unread_count > 1 ? 'x' : ''}
                         </Badge>
                       )}
                     </div>
@@ -365,7 +374,7 @@ const FamilySupervisionDashboard = () => {
                         day: 'numeric',
                         month: 'short',
                         hour: '2-digit',
-                        minute: '2-digit'
+                        minute: '2-digit',
                       })}
                     </p>
                   </div>
@@ -380,10 +389,7 @@ const FamilySupervisionDashboard = () => {
                       Voir
                     </Button>
                     {familyRole.can_communicate && conversation.is_active && (
-                      <Button
-                        size="sm"
-                        onClick={() => joinConversation(conversation.match_id)}
-                      >
+                      <Button size="sm" onClick={() => joinConversation(conversation.match_id)}>
                         <MessageCircle className="h-4 w-4 mr-1" />
                         Participer
                       </Button>

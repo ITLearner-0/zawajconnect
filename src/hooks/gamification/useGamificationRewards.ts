@@ -53,9 +53,9 @@ export const useGamificationRewards = (userId?: string) => {
 
       const { error: updateError } = await (supabase as any)
         .from('gamification_rewards')
-        .update({ 
-          claimed: true, 
-          claimed_at: new Date().toISOString() 
+        .update({
+          claimed: true,
+          claimed_at: new Date().toISOString(),
         })
         .eq('id', rewardId)
         .eq('user_id', userId)
@@ -64,9 +64,9 @@ export const useGamificationRewards = (userId?: string) => {
       if (updateError) throw updateError;
 
       // Update local state
-      setRewards(prev => 
-        prev.map(reward => 
-          reward.id === rewardId 
+      setRewards((prev) =>
+        prev.map((reward) =>
+          reward.id === rewardId
             ? { ...reward, claimed: true, claimed_at: new Date().toISOString() }
             : reward
         )
@@ -95,35 +95,27 @@ export const useGamificationRewards = (userId?: string) => {
   const getUnclaimedRewards = (): GamificationReward[] => {
     const now = new Date();
     return rewards.filter(
-      reward => 
-        !reward.claimed && 
-        (!reward.expires_at || new Date(reward.expires_at) > now)
+      (reward) => !reward.claimed && (!reward.expires_at || new Date(reward.expires_at) > now)
     );
   };
 
   const getClaimedRewards = (): GamificationReward[] => {
-    return rewards.filter(reward => reward.claimed);
+    return rewards.filter((reward) => reward.claimed);
   };
 
   const getExpiredRewards = (): GamificationReward[] => {
     const now = new Date();
     return rewards.filter(
-      reward => 
-        !reward.claimed && 
-        reward.expires_at && 
-        new Date(reward.expires_at) <= now
+      (reward) => !reward.claimed && reward.expires_at && new Date(reward.expires_at) <= now
     );
   };
 
   const getRewardsByType = (type: RewardType): GamificationReward[] => {
-    return rewards.filter(reward => reward.reward_type === type);
+    return rewards.filter((reward) => reward.reward_type === type);
   };
 
   const getTotalUnclaimedValue = (): number => {
-    return getUnclaimedRewards().reduce(
-      (sum, reward) => sum + (reward.reward_amount || 0), 
-      0
-    );
+    return getUnclaimedRewards().reduce((sum, reward) => sum + (reward.reward_amount || 0), 0);
   };
 
   return {

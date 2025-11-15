@@ -1,4 +1,3 @@
-
 import { DatabaseProfile } from '@/types/profile';
 import { BookHeart } from 'lucide-react';
 

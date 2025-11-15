@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -109,7 +116,9 @@ const AuditLogRow = ({ log }: { log: AuditLogEntry }) => {
               {/* Technical Info */}
               <div className="flex gap-4 text-xs text-muted-foreground">
                 {log.ip_address && <span>IP: {log.ip_address}</span>}
-                {log.user_agent && <span className="truncate max-w-md">User Agent: {log.user_agent}</span>}
+                {log.user_agent && (
+                  <span className="truncate max-w-md">User Agent: {log.user_agent}</span>
+                )}
               </div>
             </div>
           </TableCell>

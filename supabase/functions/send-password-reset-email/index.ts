@@ -1,10 +1,10 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { sendEmail } from "../_shared/smtp.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.0";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { sendEmail } from '../_shared/smtp.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.0';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface PasswordResetRequest {
@@ -13,31 +13,31 @@ interface PasswordResetRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  console.log("🔑 Password reset email function called");
-  
+  console.log('🔑 Password reset email function called');
+
   // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { email, redirectUrl }: PasswordResetRequest = await req.json();
-    
-    console.log("📧 Processing password reset for:", email);
+
+    console.log('📧 Processing password reset for:', email);
 
     // Créer un client Supabase avec les permissions admin
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-    
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
     if (!supabaseUrl || !supabaseServiceKey) {
-      throw new Error("Missing Supabase configuration");
+      throw new Error('Missing Supabase configuration');
     }
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
-        persistSession: false
-      }
+        persistSession: false,
+      },
     });
 
     // Générer un lien de réinitialisation sans envoyer d'email
@@ -45,21 +45,21 @@ const handler = async (req: Request): Promise<Response> => {
       type: 'recovery',
       email: email,
       options: {
-        redirectTo: redirectUrl
-      }
+        redirectTo: redirectUrl,
+      },
     });
 
     if (generateError) {
-      console.error("❌ Error generating reset link:", generateError);
+      console.error('❌ Error generating reset link:', generateError);
       throw new Error(`Failed to generate reset link: ${generateError.message}`);
     }
 
     if (!data?.properties?.action_link) {
-      throw new Error("No reset link generated");
+      throw new Error('No reset link generated');
     }
 
     const resetLink = data.properties.action_link;
-    console.log("✅ Reset link generated, sending email via SMTP...");
+    console.log('✅ Reset link generated, sending email via SMTP...');
 
     // Créer le contenu HTML de l'email avec un design professionnel et compatible email
     const emailHtml = `<!DOCTYPE html>
@@ -146,36 +146,36 @@ const handler = async (req: Request): Promise<Response> => {
     // Envoyer l'email via SMTP
     await sendEmail({
       to: email,
-      subject: "Réinitialisation de votre mot de passe - Zawaj Connect",
+      subject: 'Réinitialisation de votre mot de passe - Zawaj Connect',
       html: emailHtml,
     });
 
-    console.log("✅ Password reset email sent successfully to:", email);
+    console.log('✅ Password reset email sent successfully to:', email);
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
-        message: "Email de réinitialisation envoyé avec succès"
+        message: 'Email de réinitialisation envoyé avec succès',
       }),
       {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           ...corsHeaders,
         },
       }
     );
   } catch (error: any) {
-    console.error("❌ Error in send-password-reset-email function:", error);
+    console.error('❌ Error in send-password-reset-email function:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error.message || "Une erreur est survenue lors de l'envoi de l'email"
+      JSON.stringify({
+        error: error.message || "Une erreur est survenue lors de l'envoi de l'email",
       }),
       {
         status: 500,
-        headers: { 
-          "Content-Type": "application/json", 
-          ...corsHeaders 
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders,
         },
       }
     );

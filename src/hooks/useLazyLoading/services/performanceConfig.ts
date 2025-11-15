@@ -1,4 +1,3 @@
-
 interface DeviceCapabilities {
   cores: number;
   memory: number;
@@ -40,7 +39,7 @@ export class PerformanceConfigService {
 
   getImageConfig(): LazyLoadingConfig {
     const { isLowEndDevice, connection } = this.deviceCapabilities;
-    
+
     return {
       rootMargin: connection === '4g' && !isLowEndDevice ? '100px' : '50px',
       batchSize: isLowEndDevice ? 5 : 10,
@@ -52,7 +51,7 @@ export class PerformanceConfigService {
 
   getMatchListConfig(): LazyLoadingConfig {
     const { isLowEndDevice, cores } = this.deviceCapabilities;
-    
+
     return {
       rootMargin: '75px',
       batchSize: cores > 4 ? 15 : isLowEndDevice ? 5 : 10,
@@ -64,7 +63,7 @@ export class PerformanceConfigService {
 
   getCompatibilityConfig(): LazyLoadingConfig {
     const { isLowEndDevice } = this.deviceCapabilities;
-    
+
     return {
       rootMargin: '50px',
       batchSize: isLowEndDevice ? 3 : 8,

@@ -1,28 +1,28 @@
 import { LucideProps } from 'lucide-react';
-import { 
-  Home, 
-  User, 
-  Search, 
-  Heart, 
-  MessageCircle, 
-  BookOpen, 
-  Users, 
-  Settings, 
-  Shield, 
-  CheckCircle, 
-  TrendingUp, 
-  Eye, 
-  Lock, 
-  Compass, 
-  Target, 
-  BarChart3, 
-  Crown, 
-  HelpCircle, 
+import {
+  Home,
+  User,
+  Search,
+  Heart,
+  MessageCircle,
+  BookOpen,
+  Users,
+  Settings,
+  Shield,
+  CheckCircle,
+  TrendingUp,
+  Eye,
+  Lock,
+  Compass,
+  Target,
+  BarChart3,
+  Crown,
+  HelpCircle,
   Zap,
   Calendar,
   Bell,
   Clock,
-  Star
+  Star,
 } from 'lucide-react';
 
 // Icon mapping for the application
@@ -49,7 +49,7 @@ const iconMap = {
   Calendar,
   Bell,
   Clock,
-  Star
+  Star,
 } as const;
 
 export type IconName = keyof typeof iconMap;
@@ -60,12 +60,12 @@ interface IconProps extends LucideProps {
 
 export const Icon = ({ name, ...props }: IconProps) => {
   const IconComponent = iconMap[name];
-  
+
   if (!IconComponent) {
     console.warn(`Icon "${name}" not found`);
     return null;
   }
-  
+
   return <IconComponent {...props} />;
 };
 

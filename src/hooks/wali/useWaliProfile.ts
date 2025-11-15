@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client'; 
+import { supabase } from '@/integrations/supabase/client';
 import { WaliProfileExtended, SupervisionSettings } from '@/types/waliInvitation';
 import { useToast } from '../use-toast';
 
@@ -12,38 +11,39 @@ const parseSupervisionSettings = (settings: any): SupervisionSettings => {
       receive_all_messages: false,
       can_end_conversations: true,
       notification_frequency: 'immediate',
-      auto_approve_known_contacts: false
+      auto_approve_known_contacts: false,
     };
   }
-  
+
   if (typeof settings === 'object') {
     return {
-      require_approval_for_new_conversations: settings.require_approval_for_new_conversations || true,
+      require_approval_for_new_conversations:
+        settings.require_approval_for_new_conversations || true,
       receive_all_messages: settings.receive_all_messages || false,
       can_end_conversations: settings.can_end_conversations || true,
       notification_frequency: settings.notification_frequency || 'immediate',
-      auto_approve_known_contacts: settings.auto_approve_known_contacts || false
+      auto_approve_known_contacts: settings.auto_approve_known_contacts || false,
     };
   }
-  
+
   return {
     require_approval_for_new_conversations: true,
     receive_all_messages: false,
     can_end_conversations: true,
     notification_frequency: 'immediate',
-    auto_approve_known_contacts: false
+    auto_approve_known_contacts: false,
   };
 };
 
 // Helper function to safely parse availability status
 const parseAvailabilityStatus = (status: string | null): 'online' | 'away' | 'busy' | 'offline' => {
   if (!status) return 'offline';
-  
+
   const validStatuses = ['online', 'away', 'busy', 'offline'] as const;
   if (validStatuses.includes(status as any)) {
     return status as 'online' | 'away' | 'busy' | 'offline';
   }
-  
+
   return 'offline';
 };
 
@@ -81,7 +81,7 @@ export const useWaliProfile = (userId: string) => {
           availability_status: parseAvailabilityStatus((data as any).availability_status),
           supervision_settings: parseSupervisionSettings((data as any).supervision_settings),
           supervision_level: (data as any).supervision_level || 'moderate',
-          invitation_status: (data as any).invitation_status || 'pending'
+          invitation_status: (data as any).invitation_status || 'pending',
         };
 
         setWaliProfile(waliProfile);
@@ -113,26 +113,26 @@ export const useWaliProfile = (userId: string) => {
       setWaliProfile({
         ...waliProfile,
         availability_status: status,
-        last_active: new Date().toISOString()
+        last_active: new Date().toISOString(),
       });
 
       toast({
-        title: "Status Updated",
+        title: 'Status Updated',
         description: `Your status is now set to ${status}`,
-        variant: "default"
+        variant: 'default',
       });
 
       return true;
     } catch (err: any) {
       console.error('Error updating wali status:', err);
       setError(err.message || 'Failed to update status');
-      
+
       toast({
-        title: "Status Update Failed",
-        description: err.message || "Could not update your status",
-        variant: "destructive"
+        title: 'Status Update Failed',
+        description: err.message || 'Could not update your status',
+        variant: 'destructive',
       });
-      
+
       return false;
     }
   };
@@ -144,9 +144,9 @@ export const useWaliProfile = (userId: string) => {
     try {
       const { error: updateError } = await (supabase as any)
         .from('wali_profiles')
-        .update({ 
+        .update({
           supervision_settings: settings,
-          supervision_level: level 
+          supervision_level: level,
         })
         .eq('user_id', userId);
 
@@ -157,7 +157,7 @@ export const useWaliProfile = (userId: string) => {
       setWaliProfile({
         ...waliProfile,
         supervision_settings: settings,
-        supervision_level: level as any
+        supervision_level: level as any,
       });
 
       return true;
@@ -173,6 +173,6 @@ export const useWaliProfile = (userId: string) => {
     loading,
     error,
     updateAvailability,
-    updateSupervisionSettings
+    updateSupervisionSettings,
   };
 };

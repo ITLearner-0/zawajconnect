@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -38,10 +37,7 @@ export const getVisibleProfiles = async (
   } = {},
   limit: number = 50
 ) => {
-  let query = supabase
-    .from('profiles')
-    .select('*')
-    .eq('is_visible', true); // Uses idx_profiles_is_visible
+  let query = supabase.from('profiles').select('*').eq('is_visible', true); // Uses idx_profiles_is_visible
 
   // Apply filters that use specific indexes
   if (filters.gender) {
@@ -71,21 +67,27 @@ export const getVisibleProfiles = async (
   // Age filtering using birth_date index
   if (filters.minAge || filters.maxAge) {
     const currentDate = new Date();
-    
+
     if (filters.maxAge) {
-      const minBirthDate = new Date(currentDate.getFullYear() - filters.maxAge, currentDate.getMonth(), currentDate.getDate());
+      const minBirthDate = new Date(
+        currentDate.getFullYear() - filters.maxAge,
+        currentDate.getMonth(),
+        currentDate.getDate()
+      );
       query = query.gte('birth_date', minBirthDate.toISOString().split('T')[0]);
     }
-    
+
     if (filters.minAge) {
-      const maxBirthDate = new Date(currentDate.getFullYear() - filters.minAge, currentDate.getMonth(), currentDate.getDate());
+      const maxBirthDate = new Date(
+        currentDate.getFullYear() - filters.minAge,
+        currentDate.getMonth(),
+        currentDate.getDate()
+      );
       query = query.lte('birth_date', maxBirthDate.toISOString().split('T')[0]);
     }
   }
 
-  const { data, error } = await query
-    .order('created_at', { ascending: false })
-    .limit(limit);
+  const { data, error } = await query.order('created_at', { ascending: false }).limit(limit);
 
   return { data, error };
 };
@@ -115,7 +117,8 @@ export const getUserConversations = async (userId: string) => {
   // Uses idx_conversations_participants GIN index
   const { data, error } = await supabase
     .from('conversations')
-    .select(`
+    .select(
+      `
       id,
       participants,
       wali_supervised,
@@ -128,7 +131,8 @@ export const getUserConversations = async (userId: string) => {
         sender_id,
         is_read
       )
-    `)
+    `
+    )
     .contains('participants', [userId])
     .order('created_at', { ascending: false }); // Uses idx_conversations_created_at
 

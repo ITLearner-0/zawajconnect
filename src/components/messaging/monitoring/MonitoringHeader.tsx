@@ -1,9 +1,8 @@
-
 import React from 'react';
-import { CardHeader } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
-import { Button } from "@/components/ui/button";
-import { Shield, X } from "lucide-react";
+import { CardHeader } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Button } from '@/components/ui/button';
+import { Shield, X } from 'lucide-react';
 
 interface MonitoringHeaderProps {
   isEnabled: boolean;
@@ -12,11 +11,11 @@ interface MonitoringHeaderProps {
   onClose?: () => void;
 }
 
-const MonitoringHeader: React.FC<MonitoringHeaderProps> = ({ 
-  isEnabled, 
-  onToggleMonitoring, 
+const MonitoringHeader: React.FC<MonitoringHeaderProps> = ({
+  isEnabled,
+  onToggleMonitoring,
   isLoading,
-  onClose
+  onClose,
 }) => {
   return (
     <CardHeader className="flex flex-row items-center justify-between p-4 pb-2 border-b">
@@ -24,18 +23,12 @@ const MonitoringHeader: React.FC<MonitoringHeaderProps> = ({
         <Shield className="h-5 w-5 text-primary" />
         <h3 className="font-semibold">AI Monitoring Dashboard</h3>
       </div>
-      
+
       <div className="flex items-center space-x-2">
         <div className="flex items-center space-x-2">
-          <span className="text-sm mr-2">
-            {isEnabled ? 'Enabled' : 'Disabled'}
-          </span>
-          
-          <Switch
-            checked={isEnabled}
-            onCheckedChange={onToggleMonitoring}
-            disabled={isLoading}
-          />
+          <span className="text-sm mr-2">{isEnabled ? 'Enabled' : 'Disabled'}</span>
+
+          <Switch checked={isEnabled} onCheckedChange={onToggleMonitoring} disabled={isLoading} />
         </div>
 
         {onClose && (

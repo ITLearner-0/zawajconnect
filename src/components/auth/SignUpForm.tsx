@@ -1,14 +1,13 @@
-
-import React, { useState, useEffect } from "react";
-import CustomButton from "@/components/CustomButton";
-import WaliInformationFields, { signUpFormSchema, SignUpFormValues } from "./WaliInformationFields";
-import PasswordField from "./PasswordField";
-import BasicInfoFields from "./BasicInfoFields";
-import GenderSelect from "./GenderSelect";
-import { useTranslation } from "react-i18next";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form } from "@/components/ui/form";
+import React, { useState, useEffect } from 'react';
+import CustomButton from '@/components/CustomButton';
+import WaliInformationFields, { signUpFormSchema, SignUpFormValues } from './WaliInformationFields';
+import PasswordField from './PasswordField';
+import BasicInfoFields from './BasicInfoFields';
+import GenderSelect from './GenderSelect';
+import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form } from '@/components/ui/form';
 
 interface SignUpFormProps {
   loading: boolean;
@@ -25,51 +24,50 @@ interface SignUpFormProps {
   preselectedGender?: string | null;
 }
 
-const SignUpForm: React.FC<SignUpFormProps> = ({
-  loading,
-  onSubmit,
-  preselectedGender,
-}) => {
+const SignUpForm: React.FC<SignUpFormProps> = ({ loading, onSubmit, preselectedGender }) => {
   const { t } = useTranslation();
   const [showWaliFields, setShowWaliFields] = useState(false);
-  
+
   // Extend the schema with conditional validation for wali fields
-  const formSchema = signUpFormSchema.refine((data) => {
-    // If gender is female, wali information is required
-    if (data.gender === "female") {
-      return !!data.waliName && !!data.waliRelationship && !!data.waliContact;
+  const formSchema = signUpFormSchema.refine(
+    (data) => {
+      // If gender is female, wali information is required
+      if (data.gender === 'female') {
+        return !!data.waliName && !!data.waliRelationship && !!data.waliContact;
+      }
+      return true;
+    },
+    {
+      message: t('auth.waliRequired'),
+      path: ['waliName'],
     }
-    return true;
-  }, {
-    message: t("auth.waliRequired"),
-    path: ["waliName"]
-  });
+  );
 
   const form = useForm<SignUpFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      gender: preselectedGender || "",
-      waliName: "",
-      waliRelationship: "",
-      waliContact: "",
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      gender: preselectedGender || '',
+      waliName: '',
+      waliRelationship: '',
+      waliContact: '',
     },
-    mode: "onChange"
+    mode: 'onChange',
   });
 
-  const gender = form.watch("gender");
+  const gender = form.watch('gender');
 
   useEffect(() => {
-    setShowWaliFields(gender === "female");
+    setShowWaliFields(gender === 'female');
   }, [gender]);
 
   // Set preselected gender when component mounts or preselectedGender changes
   useEffect(() => {
     if (preselectedGender) {
-      form.setValue("gender", preselectedGender);
+      form.setValue('gender', preselectedGender);
     }
   }, [preselectedGender, form]);
 
@@ -93,12 +91,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({
         <PasswordField form={form} loading={loading} />
         <GenderSelect form={form} loading={loading} />
 
-        {showWaliFields && (
-          <WaliInformationFields
-            form={form}
-            loading={loading}
-          />
-        )}
+        {showWaliFields && <WaliInformationFields form={form} loading={loading} />}
 
         <CustomButton
           type="submit"
@@ -107,7 +100,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({
           isLoading={loading}
           variant="gold"
         >
-          {t("auth.createAccount")}
+          {t('auth.createAccount')}
         </CustomButton>
       </form>
     </Form>

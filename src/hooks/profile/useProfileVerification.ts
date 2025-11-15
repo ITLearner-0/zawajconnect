@@ -1,25 +1,25 @@
-
-import { useState } from "react";
-import { VerificationStatus } from "@/types/profile";
+import { useState } from 'react';
+import { VerificationStatus } from '@/types/profile';
 
 interface UseProfileVerificationProps {
   initialVerificationStatus: VerificationStatus;
 }
 
-export const useProfileVerification = ({ 
-  initialVerificationStatus 
+export const useProfileVerification = ({
+  initialVerificationStatus,
 }: UseProfileVerificationProps) => {
-  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>(initialVerificationStatus);
+  const [verificationStatus, setVerificationStatus] =
+    useState<VerificationStatus>(initialVerificationStatus);
 
   const handleVerificationChange = (field: keyof VerificationStatus, value: boolean) => {
-    setVerificationStatus(prev => ({
+    setVerificationStatus((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   return {
     verificationStatus,
-    handleVerificationChange
+    handleVerificationChange,
   };
 };

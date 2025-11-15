@@ -2,19 +2,25 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  TrendingDown, 
-  Users, 
-  Heart, 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Users,
+  Heart,
   MessageCircle,
   Eye,
   Calendar,
   Clock,
   MapPin,
-  Activity
+  Activity,
 } from 'lucide-react';
 import { format, subDays, subMonths } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -51,14 +57,15 @@ const AnalyticsDashboard = () => {
   const loadAnalytics = async () => {
     try {
       setLoading(true);
-      
+
       // Get date range
       const endDate = new Date();
-      const startDate = timeRange === '7d' 
-        ? subDays(endDate, 7)
-        : timeRange === '30d' 
-        ? subDays(endDate, 30)
-        : subMonths(endDate, 3);
+      const startDate =
+        timeRange === '7d'
+          ? subDays(endDate, 7)
+          : timeRange === '30d'
+            ? subDays(endDate, 30)
+            : subMonths(endDate, 3);
 
       // Parallel queries for better performance
       const [
@@ -71,81 +78,77 @@ const AnalyticsDashboard = () => {
         verificationsResult,
         familySupervisionResult,
         reportsResult,
-        locationsResult
+        locationsResult,
       ] = await Promise.all([
         // Total users
         supabase.from('profiles').select('*', { count: 'exact', head: true }),
-        
+
         // New users this week
         supabase
           .from('profiles')
           .select('*', { count: 'exact', head: true })
           .gte('created_at', subDays(new Date(), 7).toISOString()),
-          
+
         // New users last week (for comparison)
         supabase
           .from('profiles')
           .select('*', { count: 'exact', head: true })
           .gte('created_at', subDays(new Date(), 14).toISOString())
           .lt('created_at', subDays(new Date(), 7).toISOString()),
-          
+
         // Total matches
         supabase.from('matches').select('*', { count: 'exact', head: true }),
-        
+
         // Mutual matches
-        supabase
-          .from('matches')
-          .select('*', { count: 'exact', head: true })
-          .eq('is_mutual', true),
-          
+        supabase.from('matches').select('*', { count: 'exact', head: true }).eq('is_mutual', true),
+
         // Messages stats
         supabase.from('messages').select('created_at, match_id'),
-        
+
         // Verifications
         supabase.from('user_verifications').select('user_id, verification_score'),
-        
+
         // Family supervision
         supabase
           .from('privacy_settings')
           .select('*', { count: 'exact', head: true })
           .eq('allow_family_involvement', true),
-          
+
         // Reports
         supabase
           .from('reports')
           .select('*', { count: 'exact', head: true })
           .eq('status', 'pending'),
-          
+
         // Top locations
-        supabase
-          .from('profiles')
-          .select('location')
-          .not('location', 'is', null)
+        supabase.from('profiles').select('location').not('location', 'is', null),
       ]);
 
       // Process messages data
       const messages = messagesResult.data || [];
-      const messagesThisWeek = messages.filter(m => 
-        new Date(m.created_at) >= subDays(new Date(), 7)
+      const messagesThisWeek = messages.filter(
+        (m) => new Date(m.created_at) >= subDays(new Date(), 7)
       ).length;
 
       // Process locations data
-      const locationCounts = (locationsResult.data || [])
-        .reduce((acc: Record<string, number>, profile) => {
+      const locationCounts = (locationsResult.data || []).reduce(
+        (acc: Record<string, number>, profile) => {
           if (profile.location) {
             acc[profile.location] = (acc[profile.location] || 0) + 1;
           }
           return acc;
-        }, {});
+        },
+        {}
+      );
 
       const topLocations = Object.entries(locationCounts)
-        .sort(([,a], [,b]) => b - a)
+        .sort(([, a], [, b]) => b - a)
         .slice(0, 5)
         .map(([location, count]) => ({ location, count }));
 
       // Process verifications
       const verifications = verificationsResult.data || [];
-      const verifiedUsers = verifications.filter(v => (v.verification_score ?? 0) >= 80).length;
+      const verifiedUsers = verifications.filter((v) => (v.verification_score ?? 0) >= 80).length;
 
       // Calculate daily activity from actual data
       const dailyActivity = Array.from({ length: 7 }, (_, i) => {
@@ -154,7 +157,7 @@ const AnalyticsDashboard = () => {
           date: format(date, 'dd/MM', { locale: fr }),
           users: 0,
           matches: 0,
-          messages: 0
+          messages: 0,
         };
       });
 
@@ -175,9 +178,8 @@ const AnalyticsDashboard = () => {
         reportedUsers: reportsResult.count || 0,
         topLocations,
         usersByAge: [],
-        dailyActivity
+        dailyActivity,
       });
-
     } catch (error) {
       console.error('Error loading analytics:', error);
     } finally {
@@ -228,10 +230,12 @@ const AnalyticsDashboard = () => {
           </div>
           <div>
             <h2 className="text-2xl font-bold">Analytics & Monitoring</h2>
-            <p className="text-muted-foreground">Surveillez la santé et les performances de votre plateforme</p>
+            <p className="text-muted-foreground">
+              Surveillez la santé et les performances de votre plateforme
+            </p>
           </div>
         </div>
-        
+
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-32">
             <SelectValue />
@@ -251,12 +255,15 @@ const AnalyticsDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Utilisateurs Total</p>
-                <p className="text-2xl font-bold">
-                  {analytics.totalUsers.toLocaleString()}
-                </p>
+                <p className="text-2xl font-bold">{analytics.totalUsers.toLocaleString()}</p>
                 <div className="flex items-center gap-1 text-sm">
                   {getTrendIcon(analytics.newUsersThisWeek, analytics.newUsersLastWeek)}
-                  <span className={getTrendColor(analytics.newUsersThisWeek, analytics.newUsersLastWeek)}>
+                  <span
+                    className={getTrendColor(
+                      analytics.newUsersThisWeek,
+                      analytics.newUsersLastWeek
+                    )}
+                  >
                     +{analytics.newUsersThisWeek} cette semaine
                   </span>
                 </div>
@@ -271,14 +278,10 @@ const AnalyticsDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Matches Mutuels</p>
-                <p className="text-2xl font-bold">
-                  {analytics.mutualMatches.toLocaleString()}
-                </p>
+                <p className="text-2xl font-bold">{analytics.mutualMatches.toLocaleString()}</p>
                 <div className="flex items-center gap-1 text-sm">
                   <Heart className="h-4 w-4 text-emerald-500" />
-                  <span className="text-emerald-600">
-                    +{analytics.newMatchesToday} aujourd'hui
-                  </span>
+                  <span className="text-emerald-600">+{analytics.newMatchesToday} aujourd'hui</span>
                 </div>
               </div>
               <Heart className="h-8 w-8 text-emerald-500" />
@@ -291,14 +294,10 @@ const AnalyticsDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Messages</p>
-                <p className="text-2xl font-bold">
-                  {analytics.totalMessages.toLocaleString()}
-                </p>
+                <p className="text-2xl font-bold">{analytics.totalMessages.toLocaleString()}</p>
                 <div className="flex items-center gap-1 text-sm">
                   <MessageCircle className="h-4 w-4 text-gold" />
-                  <span className="text-gold-dark">
-                    {analytics.messagesThisWeek} cette semaine
-                  </span>
+                  <span className="text-gold-dark">{analytics.messagesThisWeek} cette semaine</span>
                 </div>
               </div>
               <MessageCircle className="h-8 w-8 text-gold" />
@@ -311,9 +310,7 @@ const AnalyticsDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">Utilisateurs Vérifiés</p>
-                <p className="text-2xl font-bold">
-                  {analytics.verifiedUsers.toLocaleString()}
-                </p>
+                <p className="text-2xl font-bold">{analytics.verifiedUsers.toLocaleString()}</p>
                 <div className="flex items-center gap-1 text-sm">
                   <Eye className="h-4 w-4 text-purple-500" />
                   <span className="text-purple-600">
@@ -339,9 +336,7 @@ const AnalyticsDashboard = () => {
             <div className="space-y-4">
               {analytics.dailyActivity.map((day, index) => (
                 <div key={index} className="flex items-center gap-4">
-                  <div className="w-16 text-sm text-muted-foreground">
-                    {day.date}
-                  </div>
+                  <div className="w-16 text-sm text-muted-foreground">{day.date}</div>
                   <div className="flex-1 space-y-2">
                     <div className="flex items-center gap-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -376,9 +371,7 @@ const AnalyticsDashboard = () => {
                     <MapPin className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">{location.location}</span>
                   </div>
-                  <Badge variant="secondary">
-                    {location.count} utilisateurs
-                  </Badge>
+                  <Badge variant="secondary">{location.count} utilisateurs</Badge>
                 </div>
               ))}
             </div>

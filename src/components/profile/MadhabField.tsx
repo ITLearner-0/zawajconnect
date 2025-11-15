@@ -1,7 +1,12 @@
-
 import React from 'react';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface MadhabFieldProps {
   value: string;
@@ -13,10 +18,10 @@ const MadhabField: React.FC<MadhabFieldProps> = ({ value, onChange }) => {
     { value: '', label: 'Sélectionner une école' },
     { value: 'hanafi', label: 'Hanafi' },
     { value: 'maliki', label: 'Maliki' },
-    { value: 'shafi', label: 'Shafi\'i' },
+    { value: 'shafi', label: "Shafi'i" },
     { value: 'hanbali', label: 'Hanbali' },
-    { value: 'jafari', label: 'Ja\'fari (Chiite)' },
-    { value: 'other', label: 'Autre' }
+    { value: 'jafari', label: "Ja'fari (Chiite)" },
+    { value: 'other', label: 'Autre' },
   ];
 
   return (
@@ -34,9 +39,7 @@ const MadhabField: React.FC<MadhabFieldProps> = ({ value, onChange }) => {
           ))}
         </SelectContent>
       </Select>
-      <p className="text-sm text-muted-foreground">
-        L'école juridique islamique que vous suivez
-      </p>
+      <p className="text-sm text-muted-foreground">L'école juridique islamique que vous suivez</p>
     </div>
   );
 };

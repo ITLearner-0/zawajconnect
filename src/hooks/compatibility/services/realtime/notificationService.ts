@@ -1,15 +1,14 @@
-
-import { supabase } from "@/integrations/supabase/client";
-import { MatchNotification } from "./types";
-import { NotificationMapper } from "./notificationMapper";
-import { logInfo, logError } from "../loggingService";
+import { supabase } from '@/integrations/supabase/client';
+import { MatchNotification } from './types';
+import { NotificationMapper } from './notificationMapper';
+import { logInfo, logError } from '../loggingService';
 
 export class NotificationService {
-  async createNotification(notification: Omit<MatchNotification, 'id' | 'created_at' | 'is_read'>): Promise<void> {
+  async createNotification(
+    notification: Omit<MatchNotification, 'id' | 'created_at' | 'is_read'>
+  ): Promise<void> {
     try {
-      const { error } = await (supabase as any)
-        .from('match_notifications')
-        .insert(notification);
+      const { error } = await (supabase as any).from('match_notifications').insert(notification);
 
       if (error) {
         logError('notificationService', error, { notification });

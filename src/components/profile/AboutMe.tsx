@@ -1,8 +1,7 @@
-
-import { Label } from "@/components/ui/label";
-import { ProfileFormData } from "@/types/profile";
-import { FieldTooltip, TooltipProvider } from "@/components/ui/tooltip";
-import { fieldTooltips } from "@/utils/profileTooltips";
+import { Label } from '@/components/ui/label';
+import { ProfileFormData } from '@/types/profile';
+import { FieldTooltip, TooltipProvider } from '@/components/ui/tooltip';
+import { fieldTooltips } from '@/utils/profileTooltips';
 
 interface AboutMeProps {
   formData: ProfileFormData;
@@ -11,10 +10,17 @@ interface AboutMeProps {
 
 const AboutMe = ({ formData, handleChange }: AboutMeProps) => (
   <div className="space-y-4">
-    <h2 id="about-me-heading" className="text-xl font-semibold text-islamic-teal dark:text-islamic-cream">À Propos de Moi</h2>
+    <h2
+      id="about-me-heading"
+      className="text-xl font-semibold text-islamic-teal dark:text-islamic-cream"
+    >
+      À Propos de Moi
+    </h2>
     <div className="space-y-2">
       <div className="flex items-center">
-        <Label htmlFor="aboutMe" className="text-islamic-burgundy dark:text-islamic-cream/90">Parlez-nous de vous</Label>
+        <Label htmlFor="aboutMe" className="text-islamic-burgundy dark:text-islamic-cream/90">
+          Parlez-nous de vous
+        </Label>
         <TooltipProvider>
           <FieldTooltip content={fieldTooltips.aboutMe} />
         </TooltipProvider>

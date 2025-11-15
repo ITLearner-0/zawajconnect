@@ -47,26 +47,31 @@ const rarityEmojis: Record<BadgeRarity, string> = {
   legendary: '👑',
 };
 
-export const BadgeNotification: React.FC<BadgeNotificationProps> = ({
-  badge,
-  onClose,
-  show,
-}) => {
+export const BadgeNotification: React.FC<BadgeNotificationProps> = ({ badge, onClose, show }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (show) {
       setIsVisible(true);
-      
+
       // Trigger confetti based on rarity
-      const confettiCount = badge.rarity === 'legendary' ? 150 : 
-                           badge.rarity === 'epic' ? 100 : 
-                           badge.rarity === 'rare' ? 60 : 30;
-      
-      const colors = badge.rarity === 'legendary' ? ['#fbbf24', '#f59e0b', '#d97706'] :
-                     badge.rarity === 'epic' ? ['#a855f7', '#9333ea', '#7e22ce'] :
-                     badge.rarity === 'rare' ? ['#3b82f6', '#2563eb', '#1d4ed8'] :
-                     ['#94a3b8', '#64748b', '#475569'];
+      const confettiCount =
+        badge.rarity === 'legendary'
+          ? 150
+          : badge.rarity === 'epic'
+            ? 100
+            : badge.rarity === 'rare'
+              ? 60
+              : 30;
+
+      const colors =
+        badge.rarity === 'legendary'
+          ? ['#fbbf24', '#f59e0b', '#d97706']
+          : badge.rarity === 'epic'
+            ? ['#a855f7', '#9333ea', '#7e22ce']
+            : badge.rarity === 'rare'
+              ? ['#3b82f6', '#2563eb', '#1d4ed8']
+              : ['#94a3b8', '#64748b', '#475569'];
 
       // Fire confetti
       confetti({
@@ -106,7 +111,7 @@ export const BadgeNotification: React.FC<BadgeNotificationProps> = ({
 
       return () => clearTimeout(timer);
     }
-    
+
     return undefined;
   }, [show, badge.rarity]);
 
@@ -124,15 +129,15 @@ export const BadgeNotification: React.FC<BadgeNotificationProps> = ({
           initial={{ opacity: 0, y: -100, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -50, scale: 0.8 }}
-          transition={{ 
-            type: 'spring', 
-            stiffness: 300, 
+          transition={{
+            type: 'spring',
+            stiffness: 300,
             damping: 20,
-            duration: 0.4 
+            duration: 0.4,
           }}
           className="fixed top-4 left-1/2 transform -translate-x-1/2 z-[9999] w-full max-w-md px-4"
         >
-          <Card 
+          <Card
             className={`
               ${colors.bg} ${colors.border} ${colors.glow}
               border-2 shadow-2xl overflow-hidden
@@ -155,23 +160,25 @@ export const BadgeNotification: React.FC<BadgeNotificationProps> = ({
                 {/* Badge Icon */}
                 <motion.div
                   initial={{ rotate: 0, scale: 1 }}
-                  animate={{ 
+                  animate={{
                     rotate: [0, -10, 10, -10, 0],
-                    scale: [1, 1.1, 1.1, 1.1, 1]
+                    scale: [1, 1.1, 1.1, 1.1, 1],
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 0.6,
                     repeat: 2,
-                    repeatDelay: 0.3
+                    repeatDelay: 0.3,
                   }}
                   className="flex-shrink-0"
                 >
-                  <div className={`
+                  <div
+                    className={`
                     w-16 h-16 rounded-full 
                     ${colors.bg} ${colors.border}
                     border-2 flex items-center justify-center
                     text-3xl
-                  `}>
+                  `}
+                  >
                     {badge.badge_icon || rarityEmojis[badge.rarity]}
                   </div>
                 </motion.div>
@@ -184,11 +191,11 @@ export const BadgeNotification: React.FC<BadgeNotificationProps> = ({
                       Badge Earned!
                     </h3>
                   </div>
-                  
+
                   <h2 className="text-xl font-bold text-foreground mb-1 line-clamp-1">
                     {badge.badge_name}
                   </h2>
-                  
+
                   {badge.badge_description && (
                     <p className="text-sm text-muted-foreground line-clamp-2">
                       {badge.badge_description}
@@ -208,10 +215,10 @@ export const BadgeNotification: React.FC<BadgeNotificationProps> = ({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: [0, 0.5, 0] }}
-                transition={{ 
+                transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: 'easeInOut',
                 }}
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/10 to-transparent pointer-events-none"
               />

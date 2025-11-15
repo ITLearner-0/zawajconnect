@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -60,17 +59,17 @@ export const useSessionTimeout = () => {
     if (!user) return;
 
     const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-    
+
     const handleActivity = () => {
       resetActivity();
     };
 
-    events.forEach(event => {
+    events.forEach((event) => {
       document.addEventListener(event, handleActivity, { passive: true });
     });
 
     return () => {
-      events.forEach(event => {
+      events.forEach((event) => {
         document.removeEventListener(event, handleActivity);
       });
     };
@@ -91,6 +90,6 @@ export const useSessionTimeout = () => {
     showWarning,
     remainingTime,
     extendSession,
-    resetActivity
+    resetActivity,
   };
 };

@@ -5,12 +5,29 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { useQuestionnaireState } from '@/hooks/useQuestionnaireState';
 import { useSessionMonitor } from '@/hooks/useSessionMonitor';
 import { useEmergencyBackup } from '@/hooks/useEmergencyBackup';
-import { Heart, Users, Home, Activity, Baby, Handshake, User, Coins, Brain, AlertTriangle } from 'lucide-react';
+import {
+  Heart,
+  Users,
+  Home,
+  Activity,
+  Baby,
+  Handshake,
+  User,
+  Coins,
+  Brain,
+  AlertTriangle,
+} from 'lucide-react';
 
 interface Question {
   id: string;
@@ -46,35 +63,36 @@ const categoryConfig = {
   financial: { title: 'Aspects Financiers', icon: Coins, color: 'text-yellow-600' },
   personality: { title: 'Personnalité', icon: Brain, color: 'text-violet-600' },
   economic_autonomy: { title: 'Autonomie Économique', icon: Coins, color: 'text-amber-600' },
-  domestic_responsibilities: { title: 'Responsabilités Domestiques', icon: Home, color: 'text-orange-500' },
+  domestic_responsibilities: {
+    title: 'Responsabilités Domestiques',
+    icon: Home,
+    color: 'text-orange-500',
+  },
   decision_making: { title: 'Prise de Décision', icon: Brain, color: 'text-purple-500' },
   career_family: { title: 'Carrière vs Famille', icon: Activity, color: 'text-blue-500' },
   marriage_vision: { title: 'Vision du Mariage', icon: Heart, color: 'text-pink-500' },
-  intimacy_consent: { title: 'Intimité & Consentement', icon: Handshake, color: 'text-red-500' }
+  intimacy_consent: { title: 'Intimité & Consentement', icon: Handshake, color: 'text-red-500' },
 };
 
-const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: CompatibilityQuestionnaireProps) => {
+const CompatibilityQuestionnaire = ({
+  onComplete,
+  embedded = false,
+}: CompatibilityQuestionnaireProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentCategory, setCurrentCategory] = useState<string>('');
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  const {
-    responses,
-    updateResponse,
-    saveToDatabase,
-    loadFromDatabase,
-    saving,
-    hasUnsavedChanges
-  } = useQuestionnaireState({
-    storageKey: 'compatibility_responses',
-    autoSaveDelay: 2000 // Reduced to 2 seconds for faster saves
-  });
+
+  const { responses, updateResponse, saveToDatabase, loadFromDatabase, saving, hasUnsavedChanges } =
+    useQuestionnaireState({
+      storageKey: 'compatibility_responses',
+      autoSaveDelay: 2000, // Reduced to 2 seconds for faster saves
+    });
 
   const { isSessionNearExpiry } = useSessionMonitor();
-  
+
   // Emergency backup system
   const { saveEmergencyBackup, restoreEmergencyBackup } = useEmergencyBackup();
 
@@ -96,7 +114,8 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (hasUnsavedChanges) {
         e.preventDefault();
-        e.returnValue = 'Vous avez des réponses non sauvegardées. Êtes-vous sûr de vouloir quitter?';
+        e.returnValue =
+          'Vous avez des réponses non sauvegardées. Êtes-vous sûr de vouloir quitter?';
         return e.returnValue;
       }
     };
@@ -110,9 +129,9 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
       // Check if user is authenticated first
       if (!user) {
         toast({
-          title: "Authentification requise",
-          description: "Vous devez être connecté pour accéder au questionnaire.",
-          variant: "destructive"
+          title: 'Authentification requise',
+          description: 'Vous devez être connecté pour accéder au questionnaire.',
+          variant: 'destructive',
         });
         return;
       }
@@ -120,14 +139,14 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
       // Simple auth check without complex validation
       if (!user) {
         toast({
-          title: "Authentification requise",
-          description: "Veuillez vous connecter pour accéder au questionnaire.",
-          variant: "destructive"
+          title: 'Authentification requise',
+          description: 'Veuillez vous connecter pour accéder au questionnaire.',
+          variant: 'destructive',
         });
         window.location.href = '/auth?redirect=/compatibility-test';
         return;
       }
-      
+
       // Fetch questions
       const { data: questionsData, error: questionsError } = await supabase
         .from('compatibility_questions')
@@ -142,19 +161,19 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
 
       if (!questionsData || questionsData.length === 0) {
         toast({
-          title: "Aucune question trouvée",
-          description: "Le questionnaire ne contient actuellement aucune question active.",
-          variant: "destructive"
+          title: 'Aucune question trouvée',
+          description: 'Le questionnaire ne contient actuellement aucune question active.',
+          variant: 'destructive',
         });
         return;
       }
 
       // Parse options from JSONB
-      const parsedQuestions = questionsData.map(q => {
+      const parsedQuestions = questionsData.map((q) => {
         let options: string[] = [];
-        
+
         if (Array.isArray(q.options)) {
-          options = q.options.map(opt => String(opt));
+          options = q.options.map((opt) => String(opt));
         } else if (typeof q.options === 'string') {
           try {
             const parsed = JSON.parse(q.options);
@@ -167,7 +186,7 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
           // Handle case where options might be stored as an object
           const optionsObj = q.options as any;
           if (Array.isArray(optionsObj)) {
-            options = optionsObj.map(opt => String(opt));
+            options = optionsObj.map((opt) => String(opt));
           } else {
             options = [];
           }
@@ -177,15 +196,15 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
           ...q,
           options,
           weight: q.weight ?? 1,
-          is_active: q.is_active ?? true
+          is_active: q.is_active ?? true,
         };
       });
 
       setQuestions(parsedQuestions);
-      
-      const uniqueCategories = Array.from(new Set(parsedQuestions.map(q => q.category)));
+
+      const uniqueCategories = Array.from(new Set(parsedQuestions.map((q) => q.category)));
       setCategories(uniqueCategories);
-      
+
       if (uniqueCategories.length > 0 && uniqueCategories[0]) {
         setCurrentCategory(uniqueCategories[0] ?? '');
         console.log('🎯 Set current category to:', uniqueCategories[0]);
@@ -193,16 +212,15 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
 
       // Load existing responses from database
       await loadFromDatabase();
-
     } catch (error) {
       console.error('❌ Error fetching questions:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger le questionnaire. Erreur: " + (error?.message || 'Inconnue'),
-        variant: "destructive"
+        title: 'Erreur',
+        description:
+          'Impossible de charger le questionnaire. Erreur: ' + (error?.message || 'Inconnue'),
+        variant: 'destructive',
       });
     } finally {
-      
       setLoading(false);
     }
   };
@@ -215,11 +233,11 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
     if (!user) return;
 
     const success = await saveToDatabase();
-    
+
     if (success) {
       toast({
-        title: "Réponses sauvegardées",
-        description: "Vos réponses au questionnaire ont été enregistrées avec succès."
+        title: 'Réponses sauvegardées',
+        description: 'Vos réponses au questionnaire ont été enregistrées avec succès.',
       });
 
       if (onComplete) {
@@ -227,15 +245,15 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
       }
     } else {
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder vos réponses. Veuillez réessayer.",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder vos réponses. Veuillez réessayer.',
+        variant: 'destructive',
       });
     }
   };
 
   const getCurrentCategoryQuestions = () => {
-    return questions.filter(q => q.category === currentCategory);
+    return questions.filter((q) => q.category === currentCategory);
   };
 
   const getAnsweredCount = () => {
@@ -243,13 +261,12 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
   };
 
   const getTotalQuestions = () => {
-    
     return questions.length;
   };
 
   const getCategoryProgress = () => {
     const categoryQuestions = getCurrentCategoryQuestions();
-    const answeredInCategory = categoryQuestions.filter(q => responses[q.question_key]).length;
+    const answeredInCategory = categoryQuestions.filter((q) => responses[q.question_key]).length;
     return categoryQuestions.length > 0 ? (answeredInCategory / categoryQuestions.length) * 100 : 0;
   };
 
@@ -272,7 +289,13 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
   const Icon = currentCategoryConfig?.icon || Heart;
 
   return (
-    <div className={embedded ? '' : 'min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 py-8 px-4'}>
+    <div
+      className={
+        embedded
+          ? ''
+          : 'min-h-screen bg-gradient-to-br from-background via-accent/5 to-primary/5 py-8 px-4'
+      }
+    >
       <div className={`container mx-auto ${embedded ? 'max-w-full' : 'max-w-7xl'}`}>
         {/* Header Section */}
         <div className="mb-8 text-center">
@@ -294,7 +317,9 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
               <div className="flex justify-between items-center text-sm">
                 <span className="font-medium">Progression globale</span>
                 <div className="flex items-center gap-2 flex-wrap justify-end">
-                  <span className="text-muted-foreground">{getAnsweredCount()}/{getTotalQuestions()} questions</span>
+                  <span className="text-muted-foreground">
+                    {getAnsweredCount()}/{getTotalQuestions()} questions
+                  </span>
                   {isSessionNearExpiry && (
                     <Badge variant="destructive" className="text-xs animate-pulse">
                       <AlertTriangle className="h-3 w-3 mr-1" />
@@ -328,17 +353,19 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
         <Card className="mb-6 shadow-sm">
           <CardContent className="pt-6">
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-              {categories.map(category => {
+              {categories.map((category) => {
                 const config = categoryConfig[category as keyof typeof categoryConfig];
                 const CategoryIcon = config?.icon || Heart;
-                const categoryQuestions = questions.filter(q => q.category === category);
-                const answeredInCategory = categoryQuestions.filter(q => responses[q.question_key]).length;
+                const categoryQuestions = questions.filter((q) => q.category === category);
+                const answeredInCategory = categoryQuestions.filter(
+                  (q) => responses[q.question_key]
+                ).length;
                 const isComplete = answeredInCategory === categoryQuestions.length;
-                
+
                 return (
                   <Button
                     key={category}
-                    variant={currentCategory === category ? "default" : "outline"}
+                    variant={currentCategory === category ? 'default' : 'outline'}
                     size="lg"
                     onClick={() => setCurrentCategory(category)}
                     className={`flex flex-col items-center gap-2 h-auto py-4 ${
@@ -346,11 +373,10 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
                     }`}
                   >
                     <CategoryIcon className="h-5 w-5" />
-                    <span className="text-xs text-center leading-tight">{config?.title || category}</span>
-                    <Badge 
-                      variant={isComplete ? "default" : "secondary"} 
-                      className="text-xs"
-                    >
+                    <span className="text-xs text-center leading-tight">
+                      {config?.title || category}
+                    </span>
+                    <Badge variant={isComplete ? 'default' : 'secondary'} className="text-xs">
                       {answeredInCategory}/{categoryQuestions.length}
                     </Badge>
                   </Button>
@@ -369,9 +395,12 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
                   <Icon className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <CardTitle className="text-xl">{currentCategoryConfig?.title || currentCategory}</CardTitle>
+                  <CardTitle className="text-xl">
+                    {currentCategoryConfig?.title || currentCategory}
+                  </CardTitle>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {getCurrentCategoryQuestions().filter(q => responses[q.question_key]).length}/{getCurrentCategoryQuestions().length} questions répondues
+                    {getCurrentCategoryQuestions().filter((q) => responses[q.question_key]).length}/
+                    {getCurrentCategoryQuestions().length} questions répondues
                   </p>
                 </div>
               </div>
@@ -443,7 +472,7 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
               >
                 Catégorie précédente
               </Button>
-              
+
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -454,7 +483,7 @@ const CompatibilityQuestionnaire = ({ onComplete, embedded = false }: Compatibil
                 >
                   {saving ? 'Sauvegarde...' : hasUnsavedChanges ? 'Sauvegarder' : 'Sauvegarder'}
                 </Button>
-                
+
                 {categories.indexOf(currentCategory) < categories.length - 1 ? (
                   <Button
                     size="lg"

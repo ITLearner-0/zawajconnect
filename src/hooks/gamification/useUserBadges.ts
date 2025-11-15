@@ -47,7 +47,7 @@ export const useUserBadges = (userId?: string) => {
   };
 
   const getBadgesByRarity = (rarity: BadgeRarity): UserBadge[] => {
-    return badges.filter(badge => badge.rarity === rarity);
+    return badges.filter((badge) => badge.rarity === rarity);
   };
 
   const getTotalBadges = (): number => {

@@ -16,21 +16,21 @@ export const routes: RouteConfig[] = [
     component: 'Index',
     label: 'Accueil',
     requiresAuth: false,
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/auth',
     component: 'Auth',
     label: 'Connexion',
     requiresAuth: false,
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/privacy-policy',
     component: 'PrivacyPolicy',
     label: 'Politique de Confidentialité',
     requiresAuth: false,
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/wali-onboarding',
@@ -38,7 +38,7 @@ export const routes: RouteConfig[] = [
     label: 'Onboarding Wali',
     requiresAuth: true,
     requiresOnboarding: false,
-    category: 'main'
+    category: 'main',
   },
 
   // Main app routes
@@ -48,7 +48,7 @@ export const routes: RouteConfig[] = [
     label: 'Tableau de Bord',
     requiresAuth: true,
     icon: 'Home',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/enhanced-profile',
@@ -56,7 +56,7 @@ export const routes: RouteConfig[] = [
     label: 'Mon Profil',
     requiresAuth: true,
     icon: 'User',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/browse',
@@ -64,7 +64,7 @@ export const routes: RouteConfig[] = [
     label: 'Découvrir',
     requiresAuth: true,
     icon: 'Search',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/favorites',
@@ -72,7 +72,7 @@ export const routes: RouteConfig[] = [
     label: 'Mes Favoris',
     requiresAuth: true,
     icon: 'Heart',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/notes',
@@ -80,7 +80,7 @@ export const routes: RouteConfig[] = [
     label: 'Mes Notes',
     requiresAuth: true,
     icon: 'StickyNote',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/gamification',
@@ -88,7 +88,7 @@ export const routes: RouteConfig[] = [
     label: 'Récompenses',
     requiresAuth: true,
     icon: 'Award',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/badge-leaderboard',
@@ -96,7 +96,7 @@ export const routes: RouteConfig[] = [
     label: 'Classement des Badges',
     requiresAuth: true,
     icon: 'Trophy',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/matches',
@@ -104,7 +104,7 @@ export const routes: RouteConfig[] = [
     label: 'Mes Matches',
     requiresAuth: true,
     icon: 'Heart',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/chat',
@@ -112,7 +112,7 @@ export const routes: RouteConfig[] = [
     label: 'Messages',
     requiresAuth: true,
     icon: 'MessageCircle',
-    category: 'main'
+    category: 'main',
   },
 
   // Matching & Compatibility
@@ -122,7 +122,7 @@ export const routes: RouteConfig[] = [
     label: 'Matching Avancé',
     requiresAuth: true,
     icon: 'Zap',
-    category: 'matching'
+    category: 'matching',
   },
   {
     path: '/compatibility-test',
@@ -130,7 +130,7 @@ export const routes: RouteConfig[] = [
     label: 'Test de Compatibilité',
     requiresAuth: true,
     icon: 'Target',
-    category: 'matching'
+    category: 'matching',
   },
   {
     path: '/compatibility-insights',
@@ -138,7 +138,7 @@ export const routes: RouteConfig[] = [
     label: 'Mes Insights',
     requiresAuth: true,
     icon: 'BarChart3',
-    category: 'matching'
+    category: 'matching',
   },
 
   // Islamic Tools
@@ -148,7 +148,7 @@ export const routes: RouteConfig[] = [
     label: 'Guide Islamique',
     requiresAuth: true,
     icon: 'BookOpen',
-    category: 'tools'
+    category: 'tools',
   },
   {
     path: '/islamic-tools',
@@ -156,7 +156,7 @@ export const routes: RouteConfig[] = [
     label: 'Outils Islamiques',
     requiresAuth: true,
     icon: 'Compass',
-    category: 'tools'
+    category: 'tools',
   },
 
   // Family & Supervision
@@ -166,7 +166,7 @@ export const routes: RouteConfig[] = [
     label: 'Famille',
     requiresAuth: true,
     icon: 'Users',
-    category: 'family'
+    category: 'family',
   },
   {
     path: '/wali-dashboard',
@@ -175,7 +175,7 @@ export const routes: RouteConfig[] = [
     requiresAuth: true,
     icon: 'Shield',
     category: 'family',
-    roles: ['wali', 'admin']
+    roles: ['wali', 'admin'],
   },
   {
     path: '/match-approval',
@@ -184,7 +184,7 @@ export const routes: RouteConfig[] = [
     requiresAuth: true,
     icon: 'CheckCircle',
     category: 'family',
-    roles: ['wali', 'admin']
+    roles: ['wali', 'admin'],
   },
   {
     path: '/family-analytics',
@@ -193,7 +193,7 @@ export const routes: RouteConfig[] = [
     requiresAuth: true,
     icon: 'TrendingUp',
     category: 'family',
-    roles: ['wali', 'admin']
+    roles: ['wali', 'admin'],
   },
   {
     path: '/family-supervision',
@@ -202,7 +202,7 @@ export const routes: RouteConfig[] = [
     requiresAuth: true,
     icon: 'Eye',
     category: 'family',
-    roles: ['wali', 'admin']
+    roles: ['wali', 'admin'],
   },
 
   // Settings & Admin
@@ -212,7 +212,7 @@ export const routes: RouteConfig[] = [
     label: 'Paramètres',
     requiresAuth: true,
     icon: 'Settings',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/privacy',
@@ -220,7 +220,7 @@ export const routes: RouteConfig[] = [
     label: 'Confidentialité',
     requiresAuth: true,
     icon: 'Lock',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/admin',
@@ -229,7 +229,7 @@ export const routes: RouteConfig[] = [
     requiresAuth: true,
     icon: 'Crown',
     category: 'admin',
-    roles: ['admin']
+    roles: ['admin'],
   },
   {
     path: '/ab-testing',
@@ -238,7 +238,7 @@ export const routes: RouteConfig[] = [
     requiresAuth: true,
     icon: 'BarChart3',
     category: 'admin',
-    roles: ['admin']
+    roles: ['admin'],
   },
   {
     path: '/faq',
@@ -246,18 +246,18 @@ export const routes: RouteConfig[] = [
     label: 'FAQ',
     requiresAuth: true,
     icon: 'HelpCircle',
-    category: 'main'
-  }
+    category: 'main',
+  },
 ];
 
 export const getRoutesByCategory = (category: string) => {
-  return routes.filter(route => route.category === category);
+  return routes.filter((route) => route.category === category);
 };
 
 export const getRouteByPath = (path: string) => {
-  return routes.find(route => route.path === path);
+  return routes.find((route) => route.path === path);
 };
 
 export const getNavigationRoutes = () => {
-  return routes.filter(route => route.requiresAuth && route.icon);
+  return routes.filter((route) => route.requiresAuth && route.icon);
 };

@@ -1,8 +1,8 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
-import { 
-  parseTrackingParams, 
+import {
+  parseTrackingParams,
   validateTrackingRequest,
-  type TrackingParams 
+  type TrackingParams,
 } from '../_shared/tracking-security.ts';
 
 const corsHeaders = {
@@ -41,15 +41,12 @@ Deno.serve(async (req) => {
     if (req.method === 'GET') {
       const url = new URL(req.url);
       const params = parseTrackingParams(url);
-      
+
       if (!params) {
-        return new Response(
-          JSON.stringify({ error: 'Missing required tracking parameters' }),
-          {
-            status: 400,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+        return new Response(JSON.stringify({ error: 'Missing required tracking parameters' }), {
+          status: 400,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
       // Get the user_id from the result record to validate signature
@@ -68,22 +65,19 @@ Deno.serve(async (req) => {
       const validation = await validateTrackingRequest(params, resultData.user_id);
       if (!validation.valid) {
         console.error('❌ Validation failed:', validation.error);
-        return new Response(
-          JSON.stringify({ error: validation.error }),
-          {
-            status: 403,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+        return new Response(JSON.stringify({ error: validation.error }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
       // Replay attack prevention: check if already tracked
       if (params.event_type === 'opened' && resultData.opened_at) {
         console.log('⚠️ Email already opened, skipping duplicate');
         // Return success but don't update (idempotent)
-        return new Response('OK', { 
-          status: 200, 
-          headers: { ...corsHeaders, 'Content-Type': 'image/gif' }
+        return new Response('OK', {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'image/gif' },
         });
       }
 
@@ -114,10 +108,17 @@ Deno.serve(async (req) => {
 
       // For opened events, return 1x1 transparent GIF
       if (params.event_type === 'opened') {
-        const gif = Uint8Array.from(atob('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'), c => c.charCodeAt(0));
+        const gif = Uint8Array.from(
+          atob('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'),
+          (c) => c.charCodeAt(0)
+        );
         return new Response(gif, {
           status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'image/gif', 'Cache-Control': 'no-cache, no-store, must-revalidate' }
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'image/gif',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+          },
         });
       }
 
@@ -129,30 +130,28 @@ Deno.serve(async (req) => {
       // Extract JWT token
       const authHeader = req.headers.get('Authorization');
       if (!authHeader) {
-        return new Response(
-          JSON.stringify({ error: 'Authentication required' }),
-          {
-            status: 401,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+        return new Response(JSON.stringify({ error: 'Authentication required' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
       const token = authHeader.replace('Bearer ', '');
-      const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+      const {
+        data: { user },
+        error: authError,
+      } = await supabaseAdmin.auth.getUser(token);
 
       if (authError || !user) {
         console.error('❌ Authentication failed:', authError);
-        return new Response(
-          JSON.stringify({ error: 'Invalid authentication token' }),
-          {
-            status: 401,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+        return new Response(JSON.stringify({ error: 'Invalid authentication token' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
-      const { result_id, event_type, renewal_amount, promo_code_used }: TrackEventRequest = await req.json();
+      const { result_id, event_type, renewal_amount, promo_code_used }: TrackEventRequest =
+        await req.json();
 
       if (!result_id || !event_type) {
         return new Response(
@@ -164,7 +163,9 @@ Deno.serve(async (req) => {
         );
       }
 
-      console.log(`🔐 Authenticated user ${user.id} tracking ${event_type} for result ${result_id}`);
+      console.log(
+        `🔐 Authenticated user ${user.id} tracking ${event_type} for result ${result_id}`
+      );
 
       // Validate user ownership of the tracking result
       const { data: resultData, error: fetchError } = await supabaseAdmin
@@ -175,13 +176,10 @@ Deno.serve(async (req) => {
 
       if (fetchError || !resultData) {
         console.error('❌ Result not found:', result_id);
-        return new Response(
-          JSON.stringify({ error: 'Tracking result not found' }),
-          {
-            status: 404,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+        return new Response(JSON.stringify({ error: 'Tracking result not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
       // Verify user owns this result
@@ -199,29 +197,23 @@ Deno.serve(async (req) => {
       // Replay prevention for clicked and renewed events
       if (event_type === 'clicked' && resultData.clicked_at) {
         console.log('⚠️ Click already tracked, returning success (idempotent)');
-        return new Response(
-          JSON.stringify({ success: true, message: 'Click already tracked' }),
-          {
-            status: 200,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+        return new Response(JSON.stringify({ success: true, message: 'Click already tracked' }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
       if (event_type === 'renewed' && resultData.renewed_at) {
         console.log('⚠️ Renewal already tracked, returning success (idempotent)');
-        return new Response(
-          JSON.stringify({ success: true, message: 'Renewal already tracked' }),
-          {
-            status: 200,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          }
-        );
+        return new Response(JSON.stringify({ success: true, message: 'Renewal already tracked' }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
       }
 
       // Update the appropriate field based on event type
       const updateData: any = {};
-      
+
       if (event_type === 'clicked') {
         updateData.clicked_at = new Date().toISOString();
       } else if (event_type === 'renewed') {
@@ -257,13 +249,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    return new Response(
-      JSON.stringify({ error: 'Method not allowed' }),
-      {
-        status: 405,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      }
-    );
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   } catch (error: any) {
     console.error('❌ Error in track-email-event function:', error);
     return new Response(

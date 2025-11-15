@@ -7,15 +7,15 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Camera, 
-  Upload, 
-  X, 
-  CheckCircle, 
-  Shield, 
+import {
+  Camera,
+  Upload,
+  X,
+  CheckCircle,
+  Shield,
   Eye,
   AlertTriangle,
-  Image as ImageIcon
+  Image as ImageIcon,
 } from 'lucide-react';
 
 interface PhotoUploadStepProps {
@@ -25,11 +25,11 @@ interface PhotoUploadStepProps {
   className?: string;
 }
 
-const PhotoUploadStep = ({ 
-  avatarUrl, 
-  onPhotoChange, 
-  userName = "User", 
-  className = "" 
+const PhotoUploadStep = ({
+  avatarUrl,
+  onPhotoChange,
+  userName = 'User',
+  className = '',
 }: PhotoUploadStepProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -39,7 +39,7 @@ const PhotoUploadStep = ({
   const getInitials = (name: string) => {
     return name
       .split(' ')
-      .map(n => n[0])
+      .map((n) => n[0])
       .join('')
       .toUpperCase()
       .slice(0, 2);
@@ -51,9 +51,9 @@ const PhotoUploadStep = ({
     // Validate file type
     if (!file.type.startsWith('image/')) {
       toast({
-        title: "Format invalide",
-        description: "Veuillez sélectionner une image valide (JPG, PNG, WebP)",
-        variant: "destructive"
+        title: 'Format invalide',
+        description: 'Veuillez sélectionner une image valide (JPG, PNG, WebP)',
+        variant: 'destructive',
       });
       return;
     }
@@ -61,18 +61,18 @@ const PhotoUploadStep = ({
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: "Fichier trop volumineux",
+        title: 'Fichier trop volumineux',
         description: "L'image doit faire moins de 5MB",
-        variant: "destructive"
+        variant: 'destructive',
       });
       return;
     }
 
     if (!user) {
       toast({
-        title: "Erreur",
-        description: "Vous devez être connecté pour uploader une photo",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Vous devez être connecté pour uploader une photo',
+        variant: 'destructive',
       });
       return;
     }
@@ -81,7 +81,7 @@ const PhotoUploadStep = ({
 
     try {
       console.log('📸 Uploading avatar to Supabase Storage...');
-      
+
       // Upload file to Supabase storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/avatar-${Date.now()}.${fileExt}`;
@@ -90,7 +90,7 @@ const PhotoUploadStep = ({
         .from('profile-photos')
         .upload(fileName, file, {
           upsert: true,
-          contentType: file.type
+          contentType: file.type,
         });
 
       if (uploadError) {
@@ -99,25 +99,24 @@ const PhotoUploadStep = ({
       }
 
       // Get public URL
-      const { data } = supabase.storage
-        .from('profile-photos')
-        .getPublicUrl(fileName);
+      const { data } = supabase.storage.from('profile-photos').getPublicUrl(fileName);
 
       console.log('✅ Avatar uploaded successfully:', data.publicUrl);
-      
+
       onPhotoChange(data.publicUrl);
-      
+
       toast({
-        title: "Photo uploadée",
-        description: "Votre photo a été enregistrée avec succès",
+        title: 'Photo uploadée',
+        description: 'Votre photo a été enregistrée avec succès',
       });
     } catch (error: unknown) {
       console.error('Erreur upload:', error);
-      const errorMessage = error instanceof Error ? error.message : "Erreur lors de l'upload. Veuillez réessayer.";
+      const errorMessage =
+        error instanceof Error ? error.message : "Erreur lors de l'upload. Veuillez réessayer.";
       toast({
         title: "Erreur d'upload",
         description: errorMessage,
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setIsUploading(false);
@@ -134,9 +133,9 @@ const PhotoUploadStep = ({
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true);
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false);
     }
   };
@@ -157,11 +156,11 @@ const PhotoUploadStep = ({
   };
 
   const guidelines = [
-    "Photo claire et bien éclairée",
-    "Visage visible et souriant", 
-    "Tenue modeste et appropriée",
-    "Pas de photos de groupe",
-    "Format JPG, PNG ou WebP"
+    'Photo claire et bien éclairée',
+    'Visage visible et souriant',
+    'Tenue modeste et appropriée',
+    'Pas de photos de groupe',
+    'Format JPG, PNG ou WebP',
   ];
 
   return (
@@ -173,9 +172,7 @@ const PhotoUploadStep = ({
           </div>
         </div>
         <h2 className="text-2xl font-bold">Photo de profil</h2>
-        <p className="text-muted-foreground">
-          Ajoutez une photo pour recevoir 3x plus de matches
-        </p>
+        <p className="text-muted-foreground">Ajoutez une photo pour recevoir 3x plus de matches</p>
       </div>
 
       {/* Current Photo Display */}
@@ -187,7 +184,7 @@ const PhotoUploadStep = ({
               {getInitials(userName)}
             </AvatarFallback>
           </Avatar>
-          
+
           {avatarUrl && (
             <>
               <div className="absolute -top-2 -right-2 w-8 h-8 bg-emerald rounded-full flex items-center justify-center shadow-lg">
@@ -208,9 +205,11 @@ const PhotoUploadStep = ({
 
       {/* Upload Section */}
       {!avatarUrl && (
-        <Card 
+        <Card
           className={`transition-all cursor-pointer ${
-            dragActive ? 'border-emerald bg-emerald/5' : 'border-dashed border-2 hover:border-emerald/50'
+            dragActive
+              ? 'border-emerald bg-emerald/5'
+              : 'border-dashed border-2 hover:border-emerald/50'
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -223,13 +222,13 @@ const PhotoUploadStep = ({
                 <Upload className="h-8 w-8 text-muted-foreground" />
               </div>
             </div>
-            
+
             <div>
               <h3 className="font-medium mb-2">Glissez votre photo ici</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 ou cliquez pour sélectionner un fichier
               </p>
-              
+
               <input
                 type="file"
                 accept="image/*"
@@ -238,7 +237,7 @@ const PhotoUploadStep = ({
                 className="hidden"
                 id="photo-upload"
               />
-              
+
               <Button
                 variant="outline"
                 disabled={isUploading}
@@ -248,10 +247,8 @@ const PhotoUploadStep = ({
                 {isUploading ? 'Upload en cours...' : 'Sélectionner une photo'}
               </Button>
             </div>
-            
-            <p className="text-xs text-muted-foreground">
-              Max 5MB • JPG, PNG, WebP
-            </p>
+
+            <p className="text-xs text-muted-foreground">Max 5MB • JPG, PNG, WebP</p>
           </CardContent>
         </Card>
       )}
@@ -280,8 +277,8 @@ const PhotoUploadStep = ({
       <Alert>
         <Eye className="h-4 w-4" />
         <AlertDescription className="text-sm">
-          <strong>Confidentialité :</strong> Votre photo ne sera visible que par les membres vérifiés. 
-          Vous pouvez la modifier ou la supprimer à tout moment.
+          <strong>Confidentialité :</strong> Votre photo ne sera visible que par les membres
+          vérifiés. Vous pouvez la modifier ou la supprimer à tout moment.
         </AlertDescription>
       </Alert>
 

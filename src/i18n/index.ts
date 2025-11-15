@@ -1,4 +1,3 @@
-
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
@@ -8,8 +7,8 @@ import translationFR from './locales/fr/translation.json';
 // Les ressources contenant seulement les traductions françaises
 const resources = {
   fr: {
-    translation: translationFR
-  }
+    translation: translationFR,
+  },
 };
 
 i18next
@@ -21,10 +20,10 @@ i18next
     lng: 'fr', // Force French language
     fallbackLng: 'fr',
     debug: process.env.NODE_ENV === 'development',
-    
+
     interpolation: {
       escapeValue: false, // non nécessaire pour React
-    }
+    },
   });
 
 export default i18next;

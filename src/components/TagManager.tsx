@@ -3,7 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Plus, Edit2, Trash2, Check, X, Tag } from 'lucide-react';
 import { useProfileTags, ProfileTag } from '@/hooks/useProfileTags';
 
@@ -176,7 +182,7 @@ const TagManagerContent = ({
   cancelEdit,
   deleteTag,
   onTagSelect,
-  selectedTags
+  selectedTags,
 }: TagManagerContentProps) => {
   return (
     <div className="space-y-4">
@@ -303,9 +309,7 @@ const TagManagerContent = ({
                   >
                     <Tag className="h-3 w-3 mr-1" />
                     {tag.tag_name}
-                    {selectedTags.includes(tag.id) && (
-                      <Check className="h-3 w-3 ml-auto" />
-                    )}
+                    {selectedTags.includes(tag.id) && <Check className="h-3 w-3 ml-auto" />}
                   </Badge>
                   <Button
                     size="sm"

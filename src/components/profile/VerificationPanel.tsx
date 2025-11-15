@@ -1,9 +1,8 @@
-
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { VerificationStatus } from "@/types/profile";
-import EmailVerification from "./verification/EmailVerification";
-import PhoneVerification from "./verification/PhoneVerification";
-import IdVerification from "./verification/IdVerification";
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { VerificationStatus } from '@/types/profile';
+import EmailVerification from './verification/EmailVerification';
+import PhoneVerification from './verification/PhoneVerification';
+import IdVerification from './verification/IdVerification';
 
 interface VerificationPanelProps {
   verificationStatus: VerificationStatus;
@@ -23,27 +22,20 @@ const VerificationPanel = ({
   return (
     <Card className="mt-6">
       <CardHeader>
-        <h2 className="text-xl font-semibold text-primary">
-          Verify Your Profile
-        </h2>
+        <h2 className="text-xl font-semibold text-primary">Verify Your Profile</h2>
         <p className="text-sm text-gray-600">
           Verified profiles receive more attention and trust from other users
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Email Verification */}
-        <EmailVerification 
-          isVerified={verificationStatus.email} 
-          userEmail={userEmail || ''} 
-        />
+        <EmailVerification isVerified={verificationStatus.email} userEmail={userEmail || ''} />
 
         {/* Phone Verification */}
-        <PhoneVerification 
-          isVerified={verificationStatus.phone} 
-        />
+        <PhoneVerification isVerified={verificationStatus.phone} />
 
         {/* ID Verification */}
-        <IdVerification 
+        <IdVerification
           isVerified={verificationStatus.id}
           onVerificationChange={handleIdVerificationChange}
         />

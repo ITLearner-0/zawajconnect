@@ -21,7 +21,7 @@ const EnhancedProgressIndicator: React.FC<EnhancedProgressIndicatorProps> = ({
   title,
   overallProgress,
   steps,
-  className = ""
+  className = '',
 }) => {
   return (
     <Card className={`w-full ${className}`}>
@@ -30,52 +30,53 @@ const EnhancedProgressIndicator: React.FC<EnhancedProgressIndicatorProps> = ({
           {/* Header */}
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-medium text-foreground">{title}</h3>
-            <Badge variant={overallProgress === 100 ? "default" : "secondary"}>
+            <Badge variant={overallProgress === 100 ? 'default' : 'secondary'}>
               {overallProgress}% complété
             </Badge>
           </div>
-          
+
           {/* Overall Progress */}
           <div className="space-y-2">
-            <Progress 
-              value={overallProgress} 
-              className="h-3 animate-slide-in-right"
-            />
+            <Progress value={overallProgress} className="h-3 animate-slide-in-right" />
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>Progression globale</span>
               <span>{overallProgress}/100</span>
             </div>
           </div>
-          
+
           {/* Steps */}
           <div className="space-y-2">
             {steps.map((step, index) => (
-              <div 
+              <div
                 key={index}
                 className={`flex items-center justify-between p-2 rounded-lg border transition-all duration-300 animate-fade-in ${
-                  step.completed 
-                    ? 'bg-emerald/5 border-emerald/20' 
-                    : 'bg-muted/20 border-border'
+                  step.completed ? 'bg-emerald/5 border-emerald/20' : 'bg-muted/20 border-border'
                 }`}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="flex items-center space-x-2">
-                  <div className={`w-2 h-2 rounded-full transition-colors ${
-                    step.completed ? 'bg-emerald' : 'bg-muted-foreground'
-                  }`} />
-                  <span className={`text-xs ${
-                    step.completed ? 'text-foreground font-medium' : 'text-muted-foreground'
-                  }`}>
+                  <div
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      step.completed ? 'bg-emerald' : 'bg-muted-foreground'
+                    }`}
+                  />
+                  <span
+                    className={`text-xs ${
+                      step.completed ? 'text-foreground font-medium' : 'text-muted-foreground'
+                    }`}
+                  >
                     {step.label}
                   </span>
                 </div>
-                
+
                 {step.score !== undefined && (
                   <div className="flex items-center space-x-1">
                     {step.completed && <Star className="w-3 h-3 text-gold" />}
-                    <span className={`text-xs font-medium ${
-                      step.completed ? 'text-emerald' : 'text-muted-foreground'
-                    }`}>
+                    <span
+                      className={`text-xs font-medium ${
+                        step.completed ? 'text-emerald' : 'text-muted-foreground'
+                      }`}
+                    >
                       {step.score}%
                     </span>
                   </div>
@@ -83,7 +84,7 @@ const EnhancedProgressIndicator: React.FC<EnhancedProgressIndicatorProps> = ({
               </div>
             ))}
           </div>
-          
+
           {/* Action Button */}
           {overallProgress < 100 && (
             <div className="pt-2">

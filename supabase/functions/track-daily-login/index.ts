@@ -22,7 +22,10 @@ Deno.serve(async (req) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
+    const {
+      data: { user },
+      error: userError,
+    } = await supabaseClient.auth.getUser(token);
 
     if (userError || !user) {
       throw new Error('Unauthorized');
@@ -31,7 +34,7 @@ Deno.serve(async (req) => {
     const today = new Date().toISOString().split('T')[0];
 
     // Get or create user_levels record
-    let { data: userLevel, error: levelError } = await supabaseClient
+    const { data: userLevel, error: levelError } = await supabaseClient
       .from('user_levels')
       .select('*')
       .eq('user_id', user.id)
@@ -60,11 +63,11 @@ Deno.serve(async (req) => {
       if (createError) throw createError;
 
       return new Response(
-        JSON.stringify({ 
-          success: true, 
+        JSON.stringify({
+          success: true,
           streak: 1,
           isNewStreak: true,
-          message: 'Login streak started!' 
+          message: 'Login streak started!',
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -77,11 +80,11 @@ Deno.serve(async (req) => {
     // Check if already logged in today
     if (lastLoginDate === today) {
       return new Response(
-        JSON.stringify({ 
-          success: true, 
+        JSON.stringify({
+          success: true,
           streak: currentStreak,
           alreadyLoggedToday: true,
-          message: 'Already logged in today' 
+          message: 'Already logged in today',
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
@@ -90,7 +93,9 @@ Deno.serve(async (req) => {
     // Calculate new streak
     const lastLoginDateObj = new Date(lastLoginDate);
     const todayObj = new Date(today);
-    const daysDiff = Math.floor((todayObj.getTime() - lastLoginDateObj.getTime()) / (1000 * 60 * 60 * 24));
+    const daysDiff = Math.floor(
+      (todayObj.getTime() - lastLoginDateObj.getTime()) / (1000 * 60 * 60 * 24)
+    );
 
     let newStreak = currentStreak;
     let streakBroken = false;
@@ -136,27 +141,21 @@ Deno.serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         success: true,
         streak: newStreak,
         longestStreak: newLongestStreak,
         streakBroken,
         badgesAwarded: badgesToAward,
-        message: streakBroken 
-          ? 'Streak reset to 1' 
-          : `Login streak: ${newStreak} days!`
+        message: streakBroken ? 'Streak reset to 1' : `Login streak: ${newStreak} days!`,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-
   } catch (error) {
     console.error('Error in track-daily-login:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
-        status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });

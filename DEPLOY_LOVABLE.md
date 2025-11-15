@@ -47,6 +47,7 @@ VITE_APP_VERSION=1.0.0
 **Étape 3 : Obtenir l'URL**
 
 Une fois déployé, Lovable affiche :
+
 ```
 ✅ Deployed successfully!
 🌐 https://votre-app.lovable.app
@@ -69,6 +70,7 @@ Une fois déployé, Lovable affiche :
 **Étape 2 : Configuration Automatique**
 
 Lovable va détecter automatiquement :
+
 - ✅ Framework : Vite + React + TypeScript
 - ✅ Build command : `npm run build`
 - ✅ Output directory : `dist`
@@ -76,6 +78,7 @@ Lovable va détecter automatiquement :
 **Étape 3 : Ajouter Variables d'Environnement**
 
 Dans l'interface Lovable :
+
 1. Settings → Environment Variables
 2. Ajouter les variables Supabase (voir Option 1)
 
@@ -118,6 +121,7 @@ supabase login
    - `supabase/seeds/moderation_rules_seed.sql`
 
 **Vérification :**
+
 ```sql
 -- Vérifier les index
 SELECT COUNT(*) FROM pg_indexes
@@ -143,6 +147,7 @@ SELECT COUNT(*) FROM moderation_rules WHERE is_active = true;
 ### 2. Test Manuel
 
 Visitez votre app et testez :
+
 - [ ] Page d'accueil charge
 - [ ] Inscription fonctionne
 - [ ] Login fonctionne
@@ -156,6 +161,7 @@ Visitez votre app et testez :
 ### Depuis Lovable Interface
 
 **Si vous modifiez dans Lovable :**
+
 1. Faites vos modifications
 2. Cliquez **"Deploy"**
 3. Lovable redéploie automatiquement
@@ -185,39 +191,47 @@ git push origin main
 ### Avantages Lovable
 
 ✅ **Plus Simple**
+
 - Interface visuelle intuitive
 - Déploiement en 1 clic
 - Pas besoin CLI
 
 ✅ **Intégré avec l'Édition**
+
 - Éditer et déployer au même endroit
 - Prévisualisation instantanée
 
 ✅ **Gratuit**
+
 - Hébergement inclus
 - Pas de limite de déploiements
 
 ### Inconvénients Lovable
 
 ⚠️ **Moins de Contrôle**
+
 - Configuration limitée
 - Pas de domaine custom gratuit (selon plan)
 
 ⚠️ **Performance**
+
 - Peut être plus lent que Vercel CDN
 
 ⚠️ **Scalabilité**
+
 - Moins adapté pour très gros trafic
 
 ### Recommandation
 
 **Utilisez Lovable si :**
+
 - 👍 Vous voulez la simplicité
 - 👍 C'est votre premier déploiement
 - 👍 Prototype ou MVP
 - 👍 Trafic modéré
 
 **Utilisez Vercel/Netlify si :**
+
 - 👍 Vous voulez domaine custom
 - 👍 Performance maximale
 - 👍 Gros trafic attendu
@@ -261,6 +275,7 @@ git push origin main
 ### Variables d'Environnement Sécurisées
 
 Dans Lovable, les variables sont automatiquement :
+
 - ✅ Cryptées
 - ✅ Pas exposées dans le code
 - ✅ Rechargées à chaque déploiement
@@ -272,11 +287,13 @@ Dans Lovable, les variables sont automatiquement :
 ### Logs Intégrés
 
 Lovable fournit :
+
 - **Build Logs** - Voir la compilation
 - **Runtime Logs** - Erreurs en production
 - **Analytics** - Visiteurs, pages vues
 
 **Accès :**
+
 1. Interface Lovable → Votre projet
 2. Onglet **"Logs"**
 3. Filtrer par type (build/runtime/errors)
@@ -284,11 +301,13 @@ Lovable fournit :
 ### Ajouter Sentry (Recommandé)
 
 Même avec Lovable, configurez Sentry :
+
 ```
 VITE_SENTRY_DSN=https://xxx@sentry.io/xxx
 ```
 
 Avantages :
+
 - Tracking erreurs détaillé
 - Stack traces complètes
 - Alertes par email
@@ -361,16 +380,19 @@ VITE_APP_VERSION=1.0.0
 ## 🎯 Checklist Finale
 
 ### Avant Déploiement
+
 - [ ] Migrations Supabase appliquées
 - [ ] Règles modération chargées (17 règles)
 - [ ] Variables environnement prêtes
 
 ### Configuration Lovable
+
 - [ ] Projet importé/ouvert dans Lovable
 - [ ] Variables environnement ajoutées
 - [ ] Build réussi (vérifier logs)
 
 ### Post-Déploiement
+
 - [ ] URL de production obtenue
 - [ ] CORS Supabase configuré avec URL Lovable
 - [ ] Site accessible et fonctionnel
@@ -378,6 +400,7 @@ VITE_APP_VERSION=1.0.0
 - [ ] Pas d'erreurs console
 
 ### Monitoring
+
 - [ ] Sentry DSN configuré (optionnel)
 - [ ] Logs Lovable vérifiés
 - [ ] Analytics activé
@@ -389,6 +412,7 @@ VITE_APP_VERSION=1.0.0
 ### 1. Prévisualisation Avant Deploy
 
 Lovable offre une **Preview** automatique :
+
 - Chaque modification a une URL de preview
 - Testez avant de déployer en prod
 - Partagez facilement pour feedback
@@ -396,6 +420,7 @@ Lovable offre une **Preview** automatique :
 ### 2. Rollback Simple
 
 En cas de problème :
+
 1. Lovable → Deployments
 2. Sélectionner déploiement précédent
 3. Cliquer "Restore"
@@ -403,10 +428,12 @@ En cas de problème :
 ### 3. Variables par Environnement
 
 Lovable permet :
+
 - Variables **Development** (preview)
 - Variables **Production** (deploy)
 
 **Exemple :**
+
 ```
 Development: Supabase projet test
 Production: Supabase projet prod
@@ -415,6 +442,7 @@ Production: Supabase projet prod
 ### 4. Collaboration
 
 Inviter votre équipe :
+
 1. Settings → Team
 2. Add member par email
 3. Permissions: Admin / Editor / Viewer
@@ -428,6 +456,7 @@ Inviter votre équipe :
 **Problème : "Build failed"**
 
 **Solutions :**
+
 1. **Vérifier logs build** (Deployments → View Logs)
 2. **Variables environnement** manquantes ?
 3. **Tester build localement** :
@@ -441,6 +470,7 @@ Inviter votre équipe :
 **Problème : Page blanche ou 404**
 
 **Solutions :**
+
 1. **Vérifier Output Directory** (doit être `dist`)
 2. **Vérifier Build Command** (doit être `npm run build`)
 3. **Console navigateur** (F12) → Erreurs ?
@@ -450,12 +480,13 @@ Inviter votre équipe :
 **Problème : Connexion Supabase échoue**
 
 **Solutions :**
+
 1. **CORS mal configuré** → Ajouter URL Lovable dans Supabase
 2. **Variables environnement** incorrectes
 3. **Vérifier** :
    ```javascript
    // Dans console navigateur (F12)
-   console.log(import.meta.env.VITE_SUPABASE_URL)
+   console.log(import.meta.env.VITE_SUPABASE_URL);
    // Doit afficher l'URL, pas undefined
    ```
 
@@ -464,6 +495,7 @@ Inviter votre équipe :
 **Problème : App lente**
 
 **Solutions :**
+
 1. **Vérifier index BDD** appliqués (migrations)
 2. **Optimiser images** (compression)
 3. **Lazy loading** déjà implémenté ✅
@@ -474,11 +506,13 @@ Inviter votre équipe :
 ## 📞 Support
 
 ### Ressources Lovable
+
 - **Documentation** : https://docs.lovable.dev
 - **Support** : support@lovable.dev
 - **Discord** : https://discord.gg/lovable
 
 ### Ressources Projet
+
 - **DEPLOYMENT_GUIDE.md** - Guide complet alternatif
 - **DEPLOY_NOW.md** - Déploiement Vercel/Netlify
 - **WORKFLOW_ANALYSIS.md** - Vérification fonctionnalités

@@ -1,7 +1,7 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 // @deno-types="npm:@types/braintree@3.3.11"
-import braintree from "npm:braintree@3.23.0";
+import braintree from 'npm:braintree@3.23.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -30,7 +30,10 @@ serve(async (req) => {
 
     // Extract JWT token to get user context
     const jwt = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(jwt);
+    const {
+      data: { user },
+      error: userError,
+    } = await supabaseClient.auth.getUser(jwt);
 
     if (userError || !user) {
       console.error('User verification failed:', userError);
@@ -38,7 +41,7 @@ serve(async (req) => {
     }
 
     console.log('Authenticated user:', user.id);
-    
+
     console.log('User authenticated successfully:', user.email);
 
     const { paymentMethodNonce, planId } = await req.json();
@@ -57,19 +60,20 @@ serve(async (req) => {
     }
 
     console.log('Creating Braintree gateway...');
-    
+
     // Utiliser le SDK Braintree officiel
     const gateway = new braintree.BraintreeGateway({
-      environment: environment === 'production' 
-        ? braintree.Environment.Production 
-        : braintree.Environment.Sandbox,
+      environment:
+        environment === 'production'
+          ? braintree.Environment.Production
+          : braintree.Environment.Sandbox,
       merchantId: merchantId,
       publicKey: publicKey,
       privateKey: privateKey,
     });
 
     console.log('Creating subscription with planId:', planId);
-    
+
     // Étape 1: Créer le customer Braintree avec le payment method nonce
     console.log('Creating Braintree customer with payment method...');
     const customerResult = await gateway.customer.create({
@@ -78,16 +82,16 @@ serve(async (req) => {
       lastName: user.user_metadata?.full_name?.split(' ').slice(1).join(' ') || '',
       paymentMethodNonce: paymentMethodNonce,
     });
-    
+
     if (!customerResult.success) {
       console.error('Failed to create customer:', customerResult.message);
       throw new Error('Impossible de créer le client: ' + customerResult.message);
     }
-    
+
     const customerId = customerResult.customer.id;
     const paymentMethodToken = customerResult.customer.paymentMethods[0].token;
     console.log('Customer created:', customerId, 'Payment method:', paymentMethodToken);
-    
+
     // Créer l'abonnement avec le payment method token
     console.log('Creating subscription...');
     const result = await gateway.subscription.create({
@@ -97,7 +101,7 @@ serve(async (req) => {
 
     if (!result.success) {
       console.error('Braintree error:', result.message);
-      throw new Error(result.message || 'Impossible de créer l\'abonnement');
+      throw new Error(result.message || "Impossible de créer l'abonnement");
     }
 
     const subscription = result.subscription;
@@ -114,40 +118,35 @@ serve(async (req) => {
 
     // Enregistrer l'abonnement dans Supabase
     console.log('Saving subscription to database...');
-    const { error: dbError } = await supabaseClient
-      .from('subscriptions')
-      .upsert({
-        user_id: user.id,
-        plan_type: planId.includes('12_months') ? '12_months' : 
-                   planId.includes('6_months') ? '6_months' : '3_months',
-        status: 'active',
-        braintree_customer_id: customerId,
-        braintree_subscription_id: subscription.id,
-        expires_at: expiresAt.toISOString(),
-      });
+    const { error: dbError } = await supabaseClient.from('subscriptions').upsert({
+      user_id: user.id,
+      plan_type: planId.includes('12_months')
+        ? '12_months'
+        : planId.includes('6_months')
+          ? '6_months'
+          : '3_months',
+      status: 'active',
+      braintree_customer_id: customerId,
+      braintree_subscription_id: subscription.id,
+      expires_at: expiresAt.toISOString(),
+    });
 
     if (dbError) {
       console.error('Erreur DB:', dbError);
-      throw new Error('Erreur lors de l\'enregistrement');
+      throw new Error("Erreur lors de l'enregistrement");
     }
 
     console.log('Subscription created successfully');
-    
-    return new Response(
-      JSON.stringify({ success: true, subscription }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 200,
-      }
-    );
+
+    return new Response(JSON.stringify({ success: true, subscription }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 200,
+    });
   } catch (error) {
     console.error('Erreur:', error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
-      }
-    );
+    return new Response(JSON.stringify({ error: error.message }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 400,
+    });
   }
 });

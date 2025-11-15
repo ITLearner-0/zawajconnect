@@ -4,17 +4,17 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { 
-  Settings, 
-  Bell, 
-  Crown, 
-  Star, 
+import {
+  Settings,
+  Bell,
+  Crown,
+  Star,
   MapPin,
   Calendar,
   Shield,
   Heart,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import VerificationBadge from '@/components/VerificationBadge';
@@ -43,7 +43,7 @@ const MobileProfileHeader = ({ profile }: { profile?: UserProfile }) => {
     profession: 'Non spécifié',
     verification_score: 45,
     premium_status: false,
-    last_seen: 'Maintenant'
+    last_seen: 'Maintenant',
   };
 
   const userProfile = profile || defaultProfile;
@@ -63,7 +63,7 @@ const MobileProfileHeader = ({ profile }: { profile?: UserProfile }) => {
                     {userProfile.full_name?.charAt(0) || 'U'}
                   </AvatarFallback>
                 </Avatar>
-                
+
                 {/* Online Status */}
                 <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-emerald rounded-full border-2 border-background flex items-center justify-center">
                   <div className="h-2 w-2 bg-white rounded-full"></div>
@@ -76,7 +76,7 @@ const MobileProfileHeader = ({ profile }: { profile?: UserProfile }) => {
                   <h2 className="font-semibold text-foreground truncate">
                     {userProfile.full_name}
                   </h2>
-                  <VerificationBadge 
+                  <VerificationBadge
                     verificationScore={userProfile.verification_score}
                     className="text-xs"
                   />
@@ -87,7 +87,7 @@ const MobileProfileHeader = ({ profile }: { profile?: UserProfile }) => {
                     </Badge>
                   )}
                 </div>
-                
+
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
                   <MapPin className="h-3 w-3" />
                   <span className="truncate">{userProfile.location}</span>
@@ -131,11 +131,7 @@ const MobileProfileHeader = ({ profile }: { profile?: UserProfile }) => {
                 onClick={() => setExpanded(!expanded)}
                 className="p-2"
               >
-                {expanded ? (
-                  <ChevronUp className="h-4 w-4" />
-                ) : (
-                  <ChevronDown className="h-4 w-4" />
-                )}
+                {expanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </div>
           </div>
@@ -152,15 +148,17 @@ const MobileProfileHeader = ({ profile }: { profile?: UserProfile }) => {
                   <div className="text-lg font-bold text-emerald">24</div>
                   <div className="text-xs text-muted-foreground">Matches</div>
                 </div>
-                
+
                 <div className="text-center">
                   <div className="flex items-center justify-center mb-1">
                     <Star className="h-4 w-4 text-gold mr-1" />
                   </div>
-                  <div className="text-lg font-bold text-gold">{userProfile.verification_score}%</div>
+                  <div className="text-lg font-bold text-gold">
+                    {userProfile.verification_score}%
+                  </div>
                   <div className="text-xs text-muted-foreground">Vérifié</div>
                 </div>
-                
+
                 <div className="text-center">
                   <div className="flex items-center justify-center mb-1">
                     <Shield className="h-4 w-4 text-sage mr-1" />
@@ -172,19 +170,19 @@ const MobileProfileHeader = ({ profile }: { profile?: UserProfile }) => {
 
               {/* Quick Actions */}
               <div className="grid grid-cols-2 gap-3">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => navigate('/profile/edit')}
                   className="justify-start"
                 >
                   <Settings className="h-4 w-4 mr-2" />
                   Modifier le profil
                 </Button>
-                
+
                 {!userProfile.premium_status && (
-                  <Button 
-                    size="sm" 
+                  <Button
+                    size="sm"
                     onClick={() => navigate('/settings?tab=premium')}
                     className="bg-gradient-to-r from-gold to-gold-light hover:from-gold-dark hover:to-gold text-primary-foreground justify-start"
                   >

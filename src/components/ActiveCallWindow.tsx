@@ -10,16 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  Phone,
-  Mic,
-  MicOff,
-  Video,
-  VideoOff,
-  PhoneOff,
-  Minimize2,
-  Maximize2
-} from 'lucide-react';
+import { Phone, Mic, MicOff, Video, VideoOff, PhoneOff, Minimize2, Maximize2 } from 'lucide-react';
 import { CallState, QualityMetrics } from '@/services/webrtc-signaling';
 import { ConnectionQualityIndicator } from '@/components/ConnectionQualityIndicator';
 import { MobileCallInterface } from '@/components/mobile/MobileCallInterface';
@@ -55,7 +46,7 @@ export function ActiveCallWindow({
   qualityMetrics,
   onToggleAudio,
   onToggleVideo,
-  onEndCall
+  onEndCall,
 }: ActiveCallWindowProps) {
   const isMobile = useIsMobile();
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -131,7 +122,7 @@ export function ActiveCallWindow({
   const statusBadge = getStatusBadge();
   const partnerInitials = partnerName
     .split(' ')
-    .map(n => n[0])
+    .map((n) => n[0])
     .join('')
     .toUpperCase();
 
@@ -149,12 +140,7 @@ export function ActiveCallWindow({
       {/* Remote Video/Avatar - Main View */}
       <div className="relative w-full h-full flex items-center justify-center bg-gradient-to-b from-gray-800 to-gray-900">
         {isVideoCall && remoteStream ? (
-          <video
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-            className="w-full h-full object-cover"
-          />
+          <video ref={remoteVideoRef} autoPlay playsInline className="w-full h-full object-cover" />
         ) : (
           <div className="flex flex-col items-center justify-center">
             <Avatar className="w-32 h-32 mb-6 border-4 border-white/20">
@@ -213,11 +199,7 @@ export function ActiveCallWindow({
               onClick={() => setIsMinimized(!isMinimized)}
               className="text-white hover:bg-white/20"
             >
-              {isMinimized ? (
-                <Maximize2 className="w-5 h-5" />
-              ) : (
-                <Minimize2 className="w-5 h-5" />
-              )}
+              {isMinimized ? <Maximize2 className="w-5 h-5" /> : <Minimize2 className="w-5 h-5" />}
             </Button>
           </div>
         </div>
@@ -233,11 +215,7 @@ export function ActiveCallWindow({
                 onClick={onToggleAudio}
                 className="rounded-full w-14 h-14 p-0"
               >
-                {isAudioEnabled ? (
-                  <Mic className="w-6 h-6" />
-                ) : (
-                  <MicOff className="w-6 h-6" />
-                )}
+                {isAudioEnabled ? <Mic className="w-6 h-6" /> : <MicOff className="w-6 h-6" />}
               </Button>
             </motion.div>
 
@@ -287,9 +265,7 @@ export function ActiveCallWindow({
                 {isVideoEnabled ? 'Caméra' : 'Vidéo'}
               </span>
             )}
-            <span className="text-xs text-white/70 w-16 text-center">
-              Terminer
-            </span>
+            <span className="text-xs text-white/70 w-16 text-center">Terminer</span>
           </div>
         </div>
 

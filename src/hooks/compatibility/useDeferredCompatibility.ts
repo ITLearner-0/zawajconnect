@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { CompatibilityMatch } from '@/types/compatibility';
 import { useLazyLoading } from '@/hooks/useLazyLoading';
@@ -27,7 +26,7 @@ export const useDeferredCompatibility = ({
 
     setIsProcessing(true);
     const timeoutId = setTimeout(() => {
-      setProcessedCount(prev => Math.min(prev + batchSize, matches.length));
+      setProcessedCount((prev) => Math.min(prev + batchSize, matches.length));
       setIsProcessing(false);
     }, delay);
 

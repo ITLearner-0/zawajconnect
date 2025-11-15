@@ -9,8 +9,23 @@ import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Heart, MessageCircle, Eye, Users, Clock, Crown, ArrowUpDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ConversationStatusBadge } from '@/components/ui/ConversationStatusBadge';
-import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { MatchCard } from '@/components/MatchCard';
 
@@ -78,7 +93,7 @@ const Matches = () => {
         const processedMatches = await Promise.all(
           matchesData.map(async (match) => {
             const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
-            
+
             const { data: otherUserProfile } = await supabase
               .from('profiles')
               .select('id, full_name, age, location, profession, bio, user_id')
@@ -91,31 +106,36 @@ const Matches = () => {
               user1_liked: !!match.user1_liked,
               user2_liked: !!match.user2_liked,
               is_mutual: !!match.is_mutual,
-              conversation_status: (match.conversation_status ?? 'not_started') as 'not_started' | 'active' | 'ended',
-              other_user: otherUserProfile ? {
-                ...otherUserProfile,
-                user_id: otherUserId,
-                full_name: otherUserProfile.full_name ?? 'Utilisateur inconnu',
-                age: otherUserProfile.age ?? 0,
-                location: otherUserProfile.location ?? 'Non spécifié',
-                profession: otherUserProfile.profession ?? 'Non spécifié',
-                bio: otherUserProfile.bio ?? ''
-              } : {
-                id: otherUserId,
-                user_id: otherUserId,
-                full_name: 'Utilisateur inconnu',
-                age: 0,
-                location: 'Non spécifié',
-                profession: 'Non spécifié',
-                bio: ''
-              }
+              conversation_status: (match.conversation_status ?? 'not_started') as
+                | 'not_started'
+                | 'active'
+                | 'ended',
+              other_user: otherUserProfile
+                ? {
+                    ...otherUserProfile,
+                    user_id: otherUserId,
+                    full_name: otherUserProfile.full_name ?? 'Utilisateur inconnu',
+                    age: otherUserProfile.age ?? 0,
+                    location: otherUserProfile.location ?? 'Non spécifié',
+                    profession: otherUserProfile.profession ?? 'Non spécifié',
+                    bio: otherUserProfile.bio ?? '',
+                  }
+                : {
+                    id: otherUserId,
+                    user_id: otherUserId,
+                    full_name: 'Utilisateur inconnu',
+                    age: 0,
+                    location: 'Non spécifié',
+                    profession: 'Non spécifié',
+                    bio: '',
+                  },
             };
           })
         );
 
         setMatches(processedMatches);
-        setMutualMatches(processedMatches.filter(m => m.is_mutual));
-        setPendingMatches(processedMatches.filter(m => !m.is_mutual));
+        setMutualMatches(processedMatches.filter((m) => m.is_mutual));
+        setPendingMatches(processedMatches.filter((m) => !m.is_mutual));
       }
     } catch (error) {
       console.error('Error fetching matches:', error);
@@ -144,7 +164,7 @@ const Matches = () => {
   const sortMatches = (matchesToSort: Match[]) => {
     return [...matchesToSort].sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortColumn) {
         case 'name':
           comparison = (a.other_user?.full_name || '').localeCompare(b.other_user?.full_name || '');
@@ -156,38 +176,63 @@ const Matches = () => {
           comparison = new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
           break;
       }
-      
+
       return sortDirection === 'asc' ? comparison : -comparison;
     });
   };
 
-
   const getStatusBadge = (match: Match) => {
     if (match.conversation_status === 'ended') {
-      return <Badge variant="outline" className="border-destructive/50 text-destructive">Terminée</Badge>;
+      return (
+        <Badge variant="outline" className="border-destructive/50 text-destructive">
+          Terminée
+        </Badge>
+      );
     }
     if (match.conversation_status === 'active') {
-      return <Badge variant="outline" className="border-emerald/50 text-emerald">Active</Badge>;
+      return (
+        <Badge variant="outline" className="border-emerald/50 text-emerald">
+          Active
+        </Badge>
+      );
     }
     if (match.is_mutual) {
-      return <Badge variant="outline" className="border-gold/50 text-gold-dark">Mutuel</Badge>;
+      return (
+        <Badge variant="outline" className="border-gold/50 text-gold-dark">
+          Mutuel
+        </Badge>
+      );
     }
-    
-    const iLiked = (match.user1_id === user?.id && match.user1_liked) || 
-                   (match.user2_id === user?.id && match.user2_liked);
-    const theyLiked = (match.user1_id === user?.id && match.user2_liked) || 
-                      (match.user2_id === user?.id && match.user1_liked);
-    
+
+    const iLiked =
+      (match.user1_id === user?.id && match.user1_liked) ||
+      (match.user2_id === user?.id && match.user2_liked);
+    const theyLiked =
+      (match.user1_id === user?.id && match.user2_liked) ||
+      (match.user2_id === user?.id && match.user1_liked);
+
     if (iLiked && theyLiked) {
-      return <Badge variant="outline" className="border-gold/50 text-gold-dark">Mutuel</Badge>;
+      return (
+        <Badge variant="outline" className="border-gold/50 text-gold-dark">
+          Mutuel
+        </Badge>
+      );
     }
     if (iLiked) {
-      return <Badge variant="outline" className="border-emerald/50 text-emerald">Vous avez liké</Badge>;
+      return (
+        <Badge variant="outline" className="border-emerald/50 text-emerald">
+          Vous avez liké
+        </Badge>
+      );
     }
     if (theyLiked) {
-      return <Badge variant="outline" className="border-gold/50 text-gold-dark">Vous a liké</Badge>;
+      return (
+        <Badge variant="outline" className="border-gold/50 text-gold-dark">
+          Vous a liké
+        </Badge>
+      );
     }
-    
+
     return <Badge variant="outline">En attente</Badge>;
   };
 
@@ -266,7 +311,9 @@ const Matches = () => {
             </div>
             <div>
               <h1 className="text-3xl font-bold text-foreground">Mes Matches</h1>
-              <p className="text-muted-foreground">Découvrez vos compatibilités et commencez à discuter</p>
+              <p className="text-muted-foreground">
+                Découvrez vos compatibilités et commencez à discuter
+              </p>
             </div>
           </div>
 
@@ -285,169 +332,189 @@ const Matches = () => {
             <TabsContent value="mutual" className="space-y-4">
               {mutualMatches.length > 0 ? (
                 <>
-                {/* Mobile View - Cards */}
-                {isMobile ? (
-                  <div className="space-y-3">
-                    {sortMatches(mutualMatches).slice((mutualPage - 1) * matchesPerPage, mutualPage * matchesPerPage).map((match) => (
-                      <MatchCard
-                        key={match.id}
-                        match={match}
-                        statusBadge={getStatusBadge(match)}
-                        onViewProfile={viewProfile}
-                        onStartChat={startChat}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  /* Desktop View - Table */
-                  <div className="border rounded-lg overflow-x-auto max-w-full">
-                    <Table className="min-w-full">
-                    <TableHeader>
-                      <TableRow className="bg-muted/50">
-                        <TableHead className="w-16">Photo</TableHead>
-                        <TableHead>
-                          <button 
-                            onClick={() => handleSort('name')}
-                            className="flex items-center gap-1 hover:text-foreground"
-                          >
-                            Nom
-                            <ArrowUpDown className="h-4 w-4" />
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button 
-                            onClick={() => handleSort('score')}
-                            className="flex items-center gap-1 hover:text-foreground"
-                          >
-                            Score
-                            <ArrowUpDown className="h-4 w-4" />
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button 
-                            onClick={() => handleSort('date')}
-                            className="flex items-center gap-1 hover:text-foreground"
-                          >
-                            Date du match
-                            <ArrowUpDown className="h-4 w-4" />
-                          </button>
-                        </TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {sortMatches(mutualMatches).slice((mutualPage - 1) * matchesPerPage, mutualPage * matchesPerPage).map((match) => (
-                        <TableRow key={match.id} className="hover:bg-muted/30">
-                          <TableCell>
-                            <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-                              <span className="text-sm text-primary-foreground font-bold">
-                                {match.other_user?.full_name?.charAt(0) || '?'}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="max-w-[200px]">
-                              <div className="font-medium text-foreground truncate">{match.other_user?.full_name}</div>
-                              <div className="text-sm text-muted-foreground truncate">
-                                {match.other_user?.age} ans • {match.other_user?.location}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline" className="border-emerald/50 text-emerald">
-                              {match.match_score}%
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-sm text-muted-foreground">
-                              {new Date(match.created_at).toLocaleDateString('fr-FR', {
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric'
-                              })}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(match)}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                size="sm"
-                                onClick={() => viewProfile(match.other_user.user_id)}
-                                variant="outline"
+                  {/* Mobile View - Cards */}
+                  {isMobile ? (
+                    <div className="space-y-3">
+                      {sortMatches(mutualMatches)
+                        .slice((mutualPage - 1) * matchesPerPage, mutualPage * matchesPerPage)
+                        .map((match) => (
+                          <MatchCard
+                            key={match.id}
+                            match={match}
+                            statusBadge={getStatusBadge(match)}
+                            onViewProfile={viewProfile}
+                            onStartChat={startChat}
+                          />
+                        ))}
+                    </div>
+                  ) : (
+                    /* Desktop View - Table */
+                    <div className="border rounded-lg overflow-x-auto max-w-full">
+                      <Table className="min-w-full">
+                        <TableHeader>
+                          <TableRow className="bg-muted/50">
+                            <TableHead className="w-16">Photo</TableHead>
+                            <TableHead>
+                              <button
+                                onClick={() => handleSort('name')}
+                                className="flex items-center gap-1 hover:text-foreground"
                               >
-                                <Eye className="h-3 w-3 mr-1" />
-                                Profil
-                              </Button>
-                              <Button
-                                size="sm"
-                                onClick={() => startChat(match.id)}
-                                disabled={match.conversation_status === 'ended'}
-                                className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                                Nom
+                                <ArrowUpDown className="h-4 w-4" />
+                              </button>
+                            </TableHead>
+                            <TableHead>
+                              <button
+                                onClick={() => handleSort('score')}
+                                className="flex items-center gap-1 hover:text-foreground"
                               >
-                                <MessageCircle className="h-3 w-3 mr-1" />
-                                Message
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                )}
+                                Score
+                                <ArrowUpDown className="h-4 w-4" />
+                              </button>
+                            </TableHead>
+                            <TableHead>
+                              <button
+                                onClick={() => handleSort('date')}
+                                className="flex items-center gap-1 hover:text-foreground"
+                              >
+                                Date du match
+                                <ArrowUpDown className="h-4 w-4" />
+                              </button>
+                            </TableHead>
+                            <TableHead>Statut</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {sortMatches(mutualMatches)
+                            .slice((mutualPage - 1) * matchesPerPage, mutualPage * matchesPerPage)
+                            .map((match) => (
+                              <TableRow key={match.id} className="hover:bg-muted/30">
+                                <TableCell>
+                                  <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
+                                    <span className="text-sm text-primary-foreground font-bold">
+                                      {match.other_user?.full_name?.charAt(0) || '?'}
+                                    </span>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="max-w-[200px]">
+                                    <div className="font-medium text-foreground truncate">
+                                      {match.other_user?.full_name}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground truncate">
+                                      {match.other_user?.age} ans • {match.other_user?.location}
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge
+                                    variant="outline"
+                                    className="border-emerald/50 text-emerald"
+                                  >
+                                    {match.match_score}%
+                                  </Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <span className="text-sm text-muted-foreground">
+                                    {new Date(match.created_at).toLocaleDateString('fr-FR', {
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })}
+                                  </span>
+                                </TableCell>
+                                <TableCell>{getStatusBadge(match)}</TableCell>
+                                <TableCell>
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Button
+                                      size="sm"
+                                      onClick={() => viewProfile(match.other_user.user_id)}
+                                      variant="outline"
+                                    >
+                                      <Eye className="h-3 w-3 mr-1" />
+                                      Profil
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => startChat(match.id)}
+                                      disabled={match.conversation_status === 'ended'}
+                                      className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                                    >
+                                      <MessageCircle className="h-3 w-3 mr-1" />
+                                      Message
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
 
-                {/* Pagination for Mutual Matches */}
-                {mutualMatches.length > matchesPerPage && (
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious 
-                          onClick={() => setMutualPage(p => Math.max(1, p - 1))}
-                          className={mutualPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                        />
-                      </PaginationItem>
-                      
-                      {Array.from({ length: Math.ceil(mutualMatches.length / matchesPerPage) }, (_, i) => {
-                        const pageNumber = i + 1;
-                        const totalPages = Math.ceil(mutualMatches.length / matchesPerPage);
-                        
-                        if (
-                          pageNumber === 1 ||
-                          pageNumber === totalPages ||
-                          (pageNumber >= mutualPage - 1 && pageNumber <= mutualPage + 1)
-                        ) {
-                          return (
-                            <PaginationItem key={i}>
-                              <PaginationLink
-                                onClick={() => setMutualPage(pageNumber)}
-                                isActive={mutualPage === pageNumber}
-                                className="cursor-pointer"
-                              >
-                                {pageNumber}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        } else if (
-                          pageNumber === mutualPage - 2 ||
-                          pageNumber === mutualPage + 2
-                        ) {
-                          return <PaginationEllipsis key={i} />;
-                        }
-                        return null;
-                      })}
-                      
-                      <PaginationItem>
-                        <PaginationNext 
-                          onClick={() => setMutualPage(p => Math.min(Math.ceil(mutualMatches.length / matchesPerPage), p + 1))}
-                          className={mutualPage >= Math.ceil(mutualMatches.length / matchesPerPage) ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                )}
+                  {/* Pagination for Mutual Matches */}
+                  {mutualMatches.length > matchesPerPage && (
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={() => setMutualPage((p) => Math.max(1, p - 1))}
+                            className={
+                              mutualPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'
+                            }
+                          />
+                        </PaginationItem>
+
+                        {Array.from(
+                          { length: Math.ceil(mutualMatches.length / matchesPerPage) },
+                          (_, i) => {
+                            const pageNumber = i + 1;
+                            const totalPages = Math.ceil(mutualMatches.length / matchesPerPage);
+
+                            if (
+                              pageNumber === 1 ||
+                              pageNumber === totalPages ||
+                              (pageNumber >= mutualPage - 1 && pageNumber <= mutualPage + 1)
+                            ) {
+                              return (
+                                <PaginationItem key={i}>
+                                  <PaginationLink
+                                    onClick={() => setMutualPage(pageNumber)}
+                                    isActive={mutualPage === pageNumber}
+                                    className="cursor-pointer"
+                                  >
+                                    {pageNumber}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              );
+                            } else if (
+                              pageNumber === mutualPage - 2 ||
+                              pageNumber === mutualPage + 2
+                            ) {
+                              return <PaginationEllipsis key={i} />;
+                            }
+                            return null;
+                          }
+                        )}
+
+                        <PaginationItem>
+                          <PaginationNext
+                            onClick={() =>
+                              setMutualPage((p) =>
+                                Math.min(Math.ceil(mutualMatches.length / matchesPerPage), p + 1)
+                              )
+                            }
+                            className={
+                              mutualPage >= Math.ceil(mutualMatches.length / matchesPerPage)
+                                ? 'pointer-events-none opacity-50'
+                                : 'cursor-pointer'
+                            }
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
                 </>
               ) : (
                 <div className="text-center py-12">
@@ -455,8 +522,13 @@ const Matches = () => {
                     <Heart className="h-8 w-8 text-muted-foreground" />
                   </div>
                   <h3 className="text-lg font-medium text-foreground mb-2">Aucun match mutuel</h3>
-                  <p className="text-muted-foreground mb-4">Continuez à découvrir des profils pour trouver votre partenaire idéal</p>
-                  <Button onClick={() => navigate('/browse')} className="bg-emerald hover:bg-emerald-dark text-primary-foreground">
+                  <p className="text-muted-foreground mb-4">
+                    Continuez à découvrir des profils pour trouver votre partenaire idéal
+                  </p>
+                  <Button
+                    onClick={() => navigate('/browse')}
+                    className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                  >
                     Découvrir des profils
                   </Button>
                 </div>
@@ -466,176 +538,195 @@ const Matches = () => {
             <TabsContent value="pending" className="space-y-4">
               {pendingMatches.length > 0 ? (
                 <>
-                {/* Mobile View - Cards */}
-                {isMobile ? (
-                  <div className="space-y-3">
-                    {sortMatches(pendingMatches).slice((pendingPage - 1) * matchesPerPage, pendingPage * matchesPerPage).map((match) => (
-                      <MatchCard
-                        key={match.id}
-                        match={match}
-                        statusBadge={getStatusBadge(match)}
-                        onViewProfile={viewProfile}
-                        onStartChat={startChat}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  /* Desktop View - Table */
-                  <div className="border rounded-lg overflow-x-auto max-w-full">
-                    <Table className="min-w-full">
-                    <TableHeader>
-                      <TableRow className="bg-muted/50">
-                        <TableHead className="w-16">Photo</TableHead>
-                        <TableHead>
-                          <button 
-                            onClick={() => handleSort('name')}
-                            className="flex items-center gap-1 hover:text-foreground"
-                          >
-                            Nom
-                            <ArrowUpDown className="h-4 w-4" />
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button 
-                            onClick={() => handleSort('score')}
-                            className="flex items-center gap-1 hover:text-foreground"
-                          >
-                            Score
-                            <ArrowUpDown className="h-4 w-4" />
-                          </button>
-                        </TableHead>
-                        <TableHead>
-                          <button 
-                            onClick={() => handleSort('date')}
-                            className="flex items-center gap-1 hover:text-foreground"
-                          >
-                            Date du match
-                            <ArrowUpDown className="h-4 w-4" />
-                          </button>
-                        </TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {sortMatches(pendingMatches).slice((pendingPage - 1) * matchesPerPage, pendingPage * matchesPerPage).map((match) => (
-                        <TableRow key={match.id} className="hover:bg-muted/30">
-                          <TableCell>
-                            <div className="h-12 w-12 bg-gradient-to-br from-sage to-sage-dark rounded-full flex items-center justify-center">
-                              <span className="text-sm text-primary-foreground font-bold">
-                                {match.other_user?.full_name?.charAt(0) || '?'}
-                              </span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="max-w-[200px]">
-                              <div className="font-medium text-foreground truncate">{match.other_user?.full_name}</div>
-                              <div className="text-sm text-muted-foreground truncate">
-                                {match.other_user?.age} ans • {match.other_user?.location}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="outline">
-                              {match.match_score}%
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <span className="text-sm text-muted-foreground">
-                              {new Date(match.created_at).toLocaleDateString('fr-FR', {
-                                day: 'numeric',
-                                month: 'short',
-                                year: 'numeric'
-                              })}
-                            </span>
-                          </TableCell>
-                          <TableCell>
-                            {getStatusBadge(match)}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center justify-end gap-2">
-                              <Button
-                                size="sm"
-                                onClick={() => viewProfile(match.other_user.user_id)}
-                                variant="outline"
+                  {/* Mobile View - Cards */}
+                  {isMobile ? (
+                    <div className="space-y-3">
+                      {sortMatches(pendingMatches)
+                        .slice((pendingPage - 1) * matchesPerPage, pendingPage * matchesPerPage)
+                        .map((match) => (
+                          <MatchCard
+                            key={match.id}
+                            match={match}
+                            statusBadge={getStatusBadge(match)}
+                            onViewProfile={viewProfile}
+                            onStartChat={startChat}
+                          />
+                        ))}
+                    </div>
+                  ) : (
+                    /* Desktop View - Table */
+                    <div className="border rounded-lg overflow-x-auto max-w-full">
+                      <Table className="min-w-full">
+                        <TableHeader>
+                          <TableRow className="bg-muted/50">
+                            <TableHead className="w-16">Photo</TableHead>
+                            <TableHead>
+                              <button
+                                onClick={() => handleSort('name')}
+                                className="flex items-center gap-1 hover:text-foreground"
                               >
-                                <Eye className="h-3 w-3 mr-1" />
-                                Profil
-                              </Button>
-                              <Button
-                                size="sm"
-                                onClick={() => startChat(match.id)}
-                                disabled={!match.is_mutual}
-                                className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                                Nom
+                                <ArrowUpDown className="h-4 w-4" />
+                              </button>
+                            </TableHead>
+                            <TableHead>
+                              <button
+                                onClick={() => handleSort('score')}
+                                className="flex items-center gap-1 hover:text-foreground"
                               >
-                                <MessageCircle className="h-3 w-3 mr-1" />
-                                Message
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-                )}
+                                Score
+                                <ArrowUpDown className="h-4 w-4" />
+                              </button>
+                            </TableHead>
+                            <TableHead>
+                              <button
+                                onClick={() => handleSort('date')}
+                                className="flex items-center gap-1 hover:text-foreground"
+                              >
+                                Date du match
+                                <ArrowUpDown className="h-4 w-4" />
+                              </button>
+                            </TableHead>
+                            <TableHead>Statut</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {sortMatches(pendingMatches)
+                            .slice((pendingPage - 1) * matchesPerPage, pendingPage * matchesPerPage)
+                            .map((match) => (
+                              <TableRow key={match.id} className="hover:bg-muted/30">
+                                <TableCell>
+                                  <div className="h-12 w-12 bg-gradient-to-br from-sage to-sage-dark rounded-full flex items-center justify-center">
+                                    <span className="text-sm text-primary-foreground font-bold">
+                                      {match.other_user?.full_name?.charAt(0) || '?'}
+                                    </span>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="max-w-[200px]">
+                                    <div className="font-medium text-foreground truncate">
+                                      {match.other_user?.full_name}
+                                    </div>
+                                    <div className="text-sm text-muted-foreground truncate">
+                                      {match.other_user?.age} ans • {match.other_user?.location}
+                                    </div>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <Badge variant="outline">{match.match_score}%</Badge>
+                                </TableCell>
+                                <TableCell>
+                                  <span className="text-sm text-muted-foreground">
+                                    {new Date(match.created_at).toLocaleDateString('fr-FR', {
+                                      day: 'numeric',
+                                      month: 'short',
+                                      year: 'numeric',
+                                    })}
+                                  </span>
+                                </TableCell>
+                                <TableCell>{getStatusBadge(match)}</TableCell>
+                                <TableCell>
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Button
+                                      size="sm"
+                                      onClick={() => viewProfile(match.other_user.user_id)}
+                                      variant="outline"
+                                    >
+                                      <Eye className="h-3 w-3 mr-1" />
+                                      Profil
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => startChat(match.id)}
+                                      disabled={!match.is_mutual}
+                                      className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                                    >
+                                      <MessageCircle className="h-3 w-3 mr-1" />
+                                      Message
+                                    </Button>
+                                  </div>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
 
-                {/* Pagination for Pending Matches */}
-                {pendingMatches.length > matchesPerPage && (
-                  <Pagination>
-                    <PaginationContent>
-                      <PaginationItem>
-                        <PaginationPrevious 
-                          onClick={() => setPendingPage(p => Math.max(1, p - 1))}
-                          className={pendingPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                        />
-                      </PaginationItem>
-                      
-                      {Array.from({ length: Math.ceil(pendingMatches.length / matchesPerPage) }, (_, i) => {
-                        const pageNumber = i + 1;
-                        const totalPages = Math.ceil(pendingMatches.length / matchesPerPage);
-                        
-                        if (
-                          pageNumber === 1 ||
-                          pageNumber === totalPages ||
-                          (pageNumber >= pendingPage - 1 && pageNumber <= pendingPage + 1)
-                        ) {
-                          return (
-                            <PaginationItem key={i}>
-                              <PaginationLink
-                                onClick={() => setPendingPage(pageNumber)}
-                                isActive={pendingPage === pageNumber}
-                                className="cursor-pointer"
-                              >
-                                {pageNumber}
-                              </PaginationLink>
-                            </PaginationItem>
-                          );
-                        } else if (
-                          pageNumber === pendingPage - 2 ||
-                          pageNumber === pendingPage + 2
-                        ) {
-                          return <PaginationEllipsis key={i} />;
-                        }
-                        return null;
-                      })}
-                      
-                      <PaginationItem>
-                        <PaginationNext 
-                          onClick={() => setPendingPage(p => Math.min(Math.ceil(pendingMatches.length / matchesPerPage), p + 1))}
-                          className={pendingPage >= Math.ceil(pendingMatches.length / matchesPerPage) ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                        />
-                      </PaginationItem>
-                    </PaginationContent>
-                  </Pagination>
-                )}
+                  {/* Pagination for Pending Matches */}
+                  {pendingMatches.length > matchesPerPage && (
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={() => setPendingPage((p) => Math.max(1, p - 1))}
+                            className={
+                              pendingPage === 1
+                                ? 'pointer-events-none opacity-50'
+                                : 'cursor-pointer'
+                            }
+                          />
+                        </PaginationItem>
+
+                        {Array.from(
+                          { length: Math.ceil(pendingMatches.length / matchesPerPage) },
+                          (_, i) => {
+                            const pageNumber = i + 1;
+                            const totalPages = Math.ceil(pendingMatches.length / matchesPerPage);
+
+                            if (
+                              pageNumber === 1 ||
+                              pageNumber === totalPages ||
+                              (pageNumber >= pendingPage - 1 && pageNumber <= pendingPage + 1)
+                            ) {
+                              return (
+                                <PaginationItem key={i}>
+                                  <PaginationLink
+                                    onClick={() => setPendingPage(pageNumber)}
+                                    isActive={pendingPage === pageNumber}
+                                    className="cursor-pointer"
+                                  >
+                                    {pageNumber}
+                                  </PaginationLink>
+                                </PaginationItem>
+                              );
+                            } else if (
+                              pageNumber === pendingPage - 2 ||
+                              pageNumber === pendingPage + 2
+                            ) {
+                              return <PaginationEllipsis key={i} />;
+                            }
+                            return null;
+                          }
+                        )}
+
+                        <PaginationItem>
+                          <PaginationNext
+                            onClick={() =>
+                              setPendingPage((p) =>
+                                Math.min(Math.ceil(pendingMatches.length / matchesPerPage), p + 1)
+                              )
+                            }
+                            className={
+                              pendingPage >= Math.ceil(pendingMatches.length / matchesPerPage)
+                                ? 'pointer-events-none opacity-50'
+                                : 'cursor-pointer'
+                            }
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  )}
                 </>
               ) : (
                 <div className="text-center py-12">
                   <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
                     <Clock className="h-8 w-8 text-muted-foreground" />
                   </div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">Aucun match en attente</h3>
+                  <h3 className="text-lg font-medium text-foreground mb-2">
+                    Aucun match en attente
+                  </h3>
                   <p className="text-muted-foreground">Tous vos matches ont été traités</p>
                 </div>
               )}

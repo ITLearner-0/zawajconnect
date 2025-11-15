@@ -1,4 +1,3 @@
-
 // Validation utilities for better data integrity
 export const validators = {
   // Email validation

@@ -39,7 +39,7 @@ export const useFamilySupervision = () => {
     hasWali: false,
     canCommunicate: true, // Default to true, will be set to false only for females without wali
     familyApproved: true, // Default to true, will be set to false only for females without wali
-    supervisionRequired: false // Default to false, will be set to true only for females without wali
+    supervisionRequired: false, // Default to false, will be set to true only for females without wali
   });
   const [loading, setLoading] = useState(true);
   const [initialized, setInitialized] = useState(false);
@@ -47,9 +47,9 @@ export const useFamilySupervision = () => {
 
   useEffect(() => {
     if (initialized) return; // Prevent multiple initializations
-    
+
     setInitialized(true);
-    
+
     const initializeData = async () => {
       try {
         await Promise.all([loadFamilyData(), loadNotifications()]);
@@ -60,26 +60,30 @@ export const useFamilySupervision = () => {
     };
 
     initializeData();
-    
+
     // Subscribe to real-time notifications
     const subscription = supabase
       .channel('family-notifications')
-      .on('postgres_changes', { 
-        event: 'INSERT', 
-        schema: 'public', 
-        table: 'family_notifications' 
-      }, (payload) => {
-        setNotifications(prev => [payload.new as FamilyNotification, ...prev]);
-        
-        // Show critical notifications immediately
-        if (payload.new.severity === 'critical') {
-          toast({
-            title: "⚠️ Alerte Familiale Critique",
-            description: payload.new.content,
-            variant: "destructive"
-          });
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'family_notifications',
+        },
+        (payload) => {
+          setNotifications((prev) => [payload.new as FamilyNotification, ...prev]);
+
+          // Show critical notifications immediately
+          if (payload.new.severity === 'critical') {
+            toast({
+              title: '⚠️ Alerte Familiale Critique',
+              description: payload.new.content,
+              variant: 'destructive',
+            });
+          }
         }
-      })
+      )
       .subscribe();
 
     return () => {
@@ -89,7 +93,9 @@ export const useFamilySupervision = () => {
 
   const loadFamilyData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) {
         return;
       }
@@ -113,19 +119,21 @@ export const useFamilySupervision = () => {
       }
 
       // Combine both results and normalize types
-      const allFamilyData = [...(familyDataAsWali || []), ...(familyDataAsUser || [])].map(member => ({
-        id: member.id,
-        user_id: member.user_id,
-        invited_user_id: member.invited_user_id ?? undefined,
-        full_name: member.full_name,
-        relationship: member.relationship,
-        is_wali: !!member.is_wali,
-        can_communicate: !!member.can_communicate,
-        can_view_profile: !!member.can_view_profile,
-        invitation_status: member.invitation_status ?? 'pending'
-      }));
+      const allFamilyData = [...(familyDataAsWali || []), ...(familyDataAsUser || [])].map(
+        (member) => ({
+          id: member.id,
+          user_id: member.user_id,
+          invited_user_id: member.invited_user_id ?? undefined,
+          full_name: member.full_name,
+          relationship: member.relationship,
+          is_wali: !!member.is_wali,
+          can_communicate: !!member.can_communicate,
+          can_view_profile: !!member.can_view_profile,
+          invitation_status: member.invitation_status ?? 'pending',
+        })
+      );
       setFamilyMembers(allFamilyData);
-      
+
       // Check user's gender to determine if family supervision is needed
       const { data: userProfile } = await supabase
         .from('profiles')
@@ -135,11 +143,11 @@ export const useFamilySupervision = () => {
 
       // Only women need family supervision according to Islamic principles
       const isUserFemale = userProfile?.gender === 'female';
-      
+
       // Check supervision status - user is a wali if they appear in invited_user_id
       const isWali = (familyDataAsWali || []).length > 0;
-      const hasWali = isWali || (familyDataAsUser || []).some(member => member.is_wali);
-      
+      const hasWali = isWali || (familyDataAsUser || []).some((member) => member.is_wali);
+
       const newStatus = {
         ...supervisionStatus,
         hasWali,
@@ -148,17 +156,16 @@ export const useFamilySupervision = () => {
         // For walis: can always communicate
         canCommunicate: !isUserFemale || hasWali || isWali,
         familyApproved: !isUserFemale || hasWali || isWali,
-        supervisionRequired: isUserFemale && !hasWali && !isWali
+        supervisionRequired: isUserFemale && !hasWali && !isWali,
       };
-      
-      setSupervisionStatus(newStatus);
 
+      setSupervisionStatus(newStatus);
     } catch (error) {
       console.error('Error loading family data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données familiales",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données familiales',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -167,31 +174,37 @@ export const useFamilySupervision = () => {
 
   const loadNotifications = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       const { data, error } = await supabase
         .from('family_notifications')
-        .select(`
+        .select(
+          `
           *,
           family_member:family_members!inner(user_id, full_name, relationship)
-        `)
+        `
+        )
         .eq('family_member.user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50);
 
       if (error) throw error;
 
-      setNotifications((data || []).map(notif => ({
-        id: notif.id,
-        notification_type: notif.notification_type,
-        content: notif.content,
-        original_message: notif.original_message ?? undefined,
-        severity: notif.severity,
-        is_read: notif.is_read,
-        action_required: notif.action_required,
-        created_at: notif.created_at
-      })));
+      setNotifications(
+        (data || []).map((notif) => ({
+          id: notif.id,
+          notification_type: notif.notification_type,
+          content: notif.content,
+          original_message: notif.original_message ?? undefined,
+          severity: notif.severity,
+          is_read: notif.is_read,
+          action_required: notif.action_required,
+          created_at: notif.created_at,
+        }))
+      );
     } catch (error) {
       console.error('Error loading notifications:', error);
     }
@@ -218,8 +231,9 @@ export const useFamilySupervision = () => {
       if (profileError) throw profileError;
 
       // Check which users are female and need wali supervision
-      const femaleUsers = profiles?.filter(profile => profile.gender === 'female').map(p => p.user_id) || [];
-      
+      const femaleUsers =
+        profiles?.filter((profile) => profile.gender === 'female').map((p) => p.user_id) || [];
+
       if (femaleUsers.length === 0) {
         // No female users, no supervision needed
         return match.can_communicate;
@@ -233,9 +247,9 @@ export const useFamilySupervision = () => {
         .eq('is_wali', true)
         .eq('invitation_status', 'accepted');
 
-      const femaleUsersWithWali = new Set(femaleWalis?.map(w => w.user_id) || []);
-      const allFemalesHaveWali = femaleUsers.every(userId => femaleUsersWithWali.has(userId));
-      
+      const femaleUsersWithWali = new Set(femaleWalis?.map((w) => w.user_id) || []);
+      const allFemalesHaveWali = femaleUsers.every((userId) => femaleUsersWithWali.has(userId));
+
       return allFemalesHaveWali && match.can_communicate;
     } catch (error) {
       console.error('Error checking match supervision:', error);
@@ -245,46 +259,45 @@ export const useFamilySupervision = () => {
 
   const requestFamilyApproval = async (matchId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Get wali for current user
-      const walis = familyMembers.filter(member => member.is_wali);
-      
+      const walis = familyMembers.filter((member) => member.is_wali);
+
       if (walis.length === 0) {
         toast({
-          title: "Wali requis",
-          description: "Vous devez configurer un Wali pour procéder selon les principes islamiques",
-          variant: "destructive"
+          title: 'Wali requis',
+          description: 'Vous devez configurer un Wali pour procéder selon les principes islamiques',
+          variant: 'destructive',
         });
         return;
       }
 
       // Create notifications for all walis
       for (const wali of walis) {
-        await supabase
-          .from('family_notifications')
-          .insert({
-            family_member_id: wali.id,
-            match_id: matchId,
-            notification_type: 'match_started',
-            content: `Nouveau match nécessitant votre approbation pour commencer la communication`,
-            severity: 'high',
-            action_required: true
-          });
+        await supabase.from('family_notifications').insert({
+          family_member_id: wali.id,
+          match_id: matchId,
+          notification_type: 'match_started',
+          content: `Nouveau match nécessitant votre approbation pour commencer la communication`,
+          severity: 'high',
+          action_required: true,
+        });
       }
 
       toast({
-        title: "Demande envoyée",
-        description: "Votre famille a été notifiée pour approuver cette communication",
+        title: 'Demande envoyée',
+        description: 'Votre famille a été notifiée pour approuver cette communication',
       });
-
     } catch (error) {
       console.error('Error requesting family approval:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'envoyer la demande d'approbation",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -293,18 +306,14 @@ export const useFamilySupervision = () => {
     try {
       await supabase
         .from('family_notifications')
-        .update({ 
+        .update({
           is_read: true,
-          read_at: new Date().toISOString()
+          read_at: new Date().toISOString(),
         })
         .eq('id', notificationId);
 
-      setNotifications(prev => 
-        prev.map(notif => 
-          notif.id === notificationId 
-            ? { ...notif, is_read: true }
-            : notif
-        )
+      setNotifications((prev) =>
+        prev.map((notif) => (notif.id === notificationId ? { ...notif, is_read: true } : notif))
       );
     } catch (error) {
       console.error('Error marking notification as read:', error);
@@ -312,11 +321,11 @@ export const useFamilySupervision = () => {
   };
 
   const getUnreadNotifications = () => {
-    return notifications.filter(notif => !notif.is_read);
+    return notifications.filter((notif) => !notif.is_read);
   };
 
   const getCriticalNotifications = () => {
-    return notifications.filter(notif => notif.severity === 'critical' && !notif.is_read);
+    return notifications.filter((notif) => notif.severity === 'critical' && !notif.is_read);
   };
 
   return {
@@ -330,6 +339,6 @@ export const useFamilySupervision = () => {
     getUnreadNotifications,
     getCriticalNotifications,
     loadFamilyData,
-    loadNotifications
+    loadNotifications,
   };
 };

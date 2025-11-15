@@ -1,22 +1,27 @@
-
-import React, { useState } from "react";
-import CustomButton from "@/components/CustomButton";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useTranslation } from "react-i18next";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Form } from "@/components/ui/form";
-import { z } from "zod";
+import React, { useState } from 'react';
+import CustomButton from '@/components/CustomButton';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { FormControl, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { useTranslation } from 'react-i18next';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Form } from '@/components/ui/form';
+import { z } from 'zod';
 
 const waliSignUpSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Valid email is required"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  relationshipType: z.string().min(1, "Relationship type is required"),
-  contactPhone: z.string().min(1, "Phone number is required"),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email('Valid email is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  relationshipType: z.string().min(1, 'Relationship type is required'),
+  contactPhone: z.string().min(1, 'Phone number is required'),
   managedUserEmails: z.string().optional(),
 });
 
@@ -29,17 +34,17 @@ interface WaliSignUpFormProps {
 
 const WaliSignUpForm: React.FC<WaliSignUpFormProps> = ({ loading, onSubmit }) => {
   const { t } = useTranslation();
-  
+
   const form = useForm<WaliSignUpFormValues>({
     resolver: zodResolver(waliSignUpSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      relationshipType: "",
-      contactPhone: "",
-      managedUserEmails: "",
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      relationshipType: '',
+      contactPhone: '',
+      managedUserEmails: '',
     },
   });
 
@@ -55,7 +60,7 @@ const WaliSignUpForm: React.FC<WaliSignUpFormProps> = ({ loading, onSubmit }) =>
             <FormLabel>First Name *</FormLabel>
             <FormControl>
               <Input
-                {...form.register("firstName")}
+                {...form.register('firstName')}
                 placeholder="Enter first name"
                 disabled={loading}
               />
@@ -67,7 +72,7 @@ const WaliSignUpForm: React.FC<WaliSignUpFormProps> = ({ loading, onSubmit }) =>
             <FormLabel>Last Name *</FormLabel>
             <FormControl>
               <Input
-                {...form.register("lastName")}
+                {...form.register('lastName')}
                 placeholder="Enter last name"
                 disabled={loading}
               />
@@ -80,7 +85,7 @@ const WaliSignUpForm: React.FC<WaliSignUpFormProps> = ({ loading, onSubmit }) =>
           <FormLabel>Email Address *</FormLabel>
           <FormControl>
             <Input
-              {...form.register("email")}
+              {...form.register('email')}
               type="email"
               placeholder="Enter email address"
               disabled={loading}
@@ -93,7 +98,7 @@ const WaliSignUpForm: React.FC<WaliSignUpFormProps> = ({ loading, onSubmit }) =>
           <FormLabel>Password *</FormLabel>
           <FormControl>
             <Input
-              {...form.register("password")}
+              {...form.register('password')}
               type="password"
               placeholder="Enter password"
               disabled={loading}
@@ -106,8 +111,8 @@ const WaliSignUpForm: React.FC<WaliSignUpFormProps> = ({ loading, onSubmit }) =>
           <FormLabel>Relationship Type *</FormLabel>
           <Select
             disabled={loading}
-            onValueChange={(value) => form.setValue("relationshipType", value)}
-            value={form.watch("relationshipType")}
+            onValueChange={(value) => form.setValue('relationshipType', value)}
+            value={form.watch('relationshipType')}
           >
             <FormControl>
               <SelectTrigger>
@@ -130,7 +135,7 @@ const WaliSignUpForm: React.FC<WaliSignUpFormProps> = ({ loading, onSubmit }) =>
           <FormLabel>Contact Phone *</FormLabel>
           <FormControl>
             <Input
-              {...form.register("contactPhone")}
+              {...form.register('contactPhone')}
               placeholder="Enter phone number"
               disabled={loading}
             />
@@ -142,7 +147,7 @@ const WaliSignUpForm: React.FC<WaliSignUpFormProps> = ({ loading, onSubmit }) =>
           <FormLabel>Managed User Emails (Optional)</FormLabel>
           <FormControl>
             <Input
-              {...form.register("managedUserEmails")}
+              {...form.register('managedUserEmails')}
               placeholder="Enter emails separated by commas"
               disabled={loading}
             />

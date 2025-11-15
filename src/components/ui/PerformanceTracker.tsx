@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 import { usePerformanceMetrics } from '@/hooks/usePerformanceMetrics';
 
@@ -35,10 +34,11 @@ const PerformanceTracker: React.FC<PerformanceTrackerProps> = ({
 
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const elementName = target.tagName.toLowerCase() + 
+      const elementName =
+        target.tagName.toLowerCase() +
         (target.className ? `.${target.className.split(' ')[0]}` : '') +
         (target.id ? `#${target.id}` : '');
-      
+
       startInteraction();
       setTimeout(() => endInteraction('click', elementName), 0);
     };

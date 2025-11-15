@@ -29,47 +29,48 @@ const PROFILE_EXAMPLES: ProfileExample[] = [
     id: 'excellent',
     name: 'Ahmed',
     age: 28,
-    bio: 'Ingénieur passionné par la technologie et l\'innovation. J\'aime voyager, découvrir de nouvelles cultures et pratiquer le sport. Je recherche une personne partageant mes valeurs pour construire une famille solide basée sur la foi et le respect mutuel.',
+    bio: "Ingénieur passionné par la technologie et l'innovation. J'aime voyager, découvrir de nouvelles cultures et pratiquer le sport. Je recherche une personne partageant mes valeurs pour construire une famille solide basée sur la foi et le respect mutuel.",
     interests: ['Lecture du Coran', 'Randonnée', 'Cuisine', 'Voyage', 'Bénévolat', 'Photographie'],
-    lookingFor: 'Je recherche une épouse pieuse et éduquée pour construire une famille heureuse et équilibrée, basée sur l\'amour, le respect et la foi.',
+    lookingFor:
+      "Je recherche une épouse pieuse et éduquée pour construire une famille heureuse et équilibrée, basée sur l'amour, le respect et la foi.",
     score: 95,
     highlights: [
       'Bio détaillée (200+ caractères)',
-      '6+ centres d\'intérêt variés',
+      "6+ centres d'intérêt variés",
       'Objectifs clairs et précis',
-      'Valeurs bien définies'
-    ]
+      'Valeurs bien définies',
+    ],
   },
   {
     id: 'good',
     name: 'Fatima',
     age: 25,
-    bio: 'Professeure passionnée d\'éducation, j\'aime enseigner et apprendre. Je pratique régulièrement ma foi et je cherche quelqu\'un qui partage mes valeurs islamiques pour fonder une famille.',
+    bio: "Professeure passionnée d'éducation, j'aime enseigner et apprendre. Je pratique régulièrement ma foi et je cherche quelqu'un qui partage mes valeurs islamiques pour fonder une famille.",
     interests: ['Lecture', 'Enseignement', 'Couture', 'Cuisine'],
     lookingFor: 'Un époux pratiquant et respectueux pour construire une vie ensemble.',
     score: 78,
     highlights: [
       'Bio claire (150+ caractères)',
-      '4 centres d\'intérêt',
+      "4 centres d'intérêt",
       'Objectifs définis',
-      'Pratique religieuse mentionnée'
-    ]
+      'Pratique religieuse mentionnée',
+    ],
   },
   {
     id: 'needs_improvement',
     name: 'Omar',
     age: 30,
-    bio: 'Je travaille dans la finance. J\'aime le sport.',
+    bio: "Je travaille dans la finance. J'aime le sport.",
     interests: ['Sport', 'Lecture'],
-    lookingFor: 'Cherche quelqu\'un de sérieux.',
+    lookingFor: "Cherche quelqu'un de sérieux.",
     score: 42,
     highlights: [
       '❌ Bio trop courte (<50 caractères)',
-      '❌ Seulement 2 centres d\'intérêt',
+      "❌ Seulement 2 centres d'intérêt",
       '❌ Objectifs vagues',
-      '❌ Manque de détails personnels'
-    ]
-  }
+      '❌ Manque de détails personnels',
+    ],
+  },
 ];
 
 interface ProfileExamplesModalProps {
@@ -77,14 +78,12 @@ interface ProfileExamplesModalProps {
   onClose: () => void;
 }
 
-const ProfileExamplesModal: React.FC<ProfileExamplesModalProps> = ({
-  isOpen,
-  onClose
-}) => {
+const ProfileExamplesModal: React.FC<ProfileExamplesModalProps> = ({ isOpen, onClose }) => {
   const [selectedExample, setSelectedExample] = useState('excellent');
 
-  const currentExample = PROFILE_EXAMPLES.find(ex => ex.id === selectedExample) ?? PROFILE_EXAMPLES[0];
-  
+  const currentExample =
+    PROFILE_EXAMPLES.find((ex) => ex.id === selectedExample) ?? PROFILE_EXAMPLES[0];
+
   if (!currentExample) return null;
 
   const getScoreColor = (score: number) => {
@@ -132,7 +131,9 @@ const ProfileExamplesModal: React.FC<ProfileExamplesModalProps> = ({
             {/* Score Badge */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-semibold">{currentExample.name}, {currentExample.age} ans</h3>
+                <h3 className="text-lg font-semibold">
+                  {currentExample.name}, {currentExample.age} ans
+                </h3>
               </div>
               <Badge className={`text-base px-3 py-1 ${getScoreColor(currentExample.score)}`}>
                 {currentExample.score}/100
@@ -185,7 +186,9 @@ const ProfileExamplesModal: React.FC<ProfileExamplesModalProps> = ({
             </Card>
 
             {/* Highlights */}
-            <Card className={currentExample.score >= 80 ? 'border-emerald-200 bg-emerald-50/50' : ''}>
+            <Card
+              className={currentExample.score >= 80 ? 'border-emerald-200 bg-emerald-50/50' : ''}
+            >
               <CardContent className="p-4">
                 <h4 className="font-semibold text-sm mb-3 flex items-center gap-2">
                   <CheckCircle className="h-4 w-4" />
@@ -194,7 +197,9 @@ const ProfileExamplesModal: React.FC<ProfileExamplesModalProps> = ({
                 <ul className="space-y-2">
                   {currentExample.highlights.map((highlight, idx) => (
                     <li key={idx} className="text-sm flex items-start gap-2">
-                      <span className={highlight.startsWith('❌') ? 'text-red-500' : 'text-emerald-600'}>
+                      <span
+                        className={highlight.startsWith('❌') ? 'text-red-500' : 'text-emerald-600'}
+                      >
                         {highlight.startsWith('❌') ? '❌' : '✓'}
                       </span>
                       <span className={highlight.startsWith('❌') ? 'text-red-700' : ''}>
@@ -210,9 +215,9 @@ const ProfileExamplesModal: React.FC<ProfileExamplesModalProps> = ({
             {currentExample.score >= 80 && (
               <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p className="text-sm text-blue-900">
-                  <strong>💡 Conseil :</strong> Ce profil est un excellent exemple ! 
-                  Notez comment {currentExample.name} partage suffisamment de détails personnels 
-                  tout en restant authentique et respectueux des valeurs islamiques.
+                  <strong>💡 Conseil :</strong> Ce profil est un excellent exemple ! Notez comment{' '}
+                  {currentExample.name} partage suffisamment de détails personnels tout en restant
+                  authentique et respectueux des valeurs islamiques.
                 </p>
               </div>
             )}
@@ -220,9 +225,7 @@ const ProfileExamplesModal: React.FC<ProfileExamplesModalProps> = ({
         </Tabs>
 
         <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button onClick={onClose}>
-            Fermer
-          </Button>
+          <Button onClick={onClose}>Fermer</Button>
         </div>
       </DialogContent>
     </Dialog>

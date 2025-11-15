@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { WifiOff, Signal } from 'lucide-react';
 import { useNetworkStatus } from '@/hooks/useLazyLoading/useNetworkStatus';

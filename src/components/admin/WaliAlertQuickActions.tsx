@@ -19,7 +19,7 @@ const WaliAlertQuickActions: React.FC<WaliAlertQuickActionsProps> = ({
   onAcknowledge,
   onSuspend,
   onContact,
-  onGenerateReport
+  onGenerateReport,
 }) => {
   if (acknowledged) {
     return (
@@ -39,12 +39,7 @@ const WaliAlertQuickActions: React.FC<WaliAlertQuickActionsProps> = ({
 
   return (
     <div className="flex items-center gap-2 flex-wrap">
-      <Button
-        size="sm"
-        variant="default"
-        onClick={() => onAcknowledge(alertId)}
-        className="gap-2"
-      >
+      <Button size="sm" variant="default" onClick={() => onAcknowledge(alertId)} className="gap-2">
         <CheckCircle className="h-4 w-4" />
         Traiter
       </Button>
@@ -57,21 +52,11 @@ const WaliAlertQuickActions: React.FC<WaliAlertQuickActionsProps> = ({
         <Ban className="h-4 w-4" />
         Suspendre
       </Button>
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => onContact(alertId)}
-        className="gap-2"
-      >
+      <Button size="sm" variant="outline" onClick={() => onContact(alertId)} className="gap-2">
         <Mail className="h-4 w-4" />
         Contacter
       </Button>
-      <Button
-        size="sm"
-        variant="ghost"
-        onClick={() => onGenerateReport(alertId)}
-        className="gap-2"
-      >
+      <Button size="sm" variant="ghost" onClick={() => onGenerateReport(alertId)} className="gap-2">
         <FileText className="h-4 w-4" />
         Rapport
       </Button>

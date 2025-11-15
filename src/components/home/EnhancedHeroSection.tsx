@@ -1,4 +1,3 @@
-
 import React from 'react';
 import HeroNavigation from './hero/HeroNavigation';
 import HeroBismillah from './hero/HeroBismillah';
@@ -16,30 +15,30 @@ const EnhancedHeroSection = () => {
         <div className="absolute inset-0 bg-gradient-to-r from-white/30 to-transparent"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,182,193,0.2),transparent_70%)]"></div>
       </div>
-      
+
       {/* Navigation */}
       <HeroNavigation />
-      
+
       {/* Hero Content */}
       <div className="relative z-10 text-center max-w-5xl mx-auto pt-20">
         {/* Arabic text and translation */}
         <HeroBismillah />
-        
+
         {/* Main tagline */}
         <HeroContent />
-        
+
         {/* Stats Section */}
         <div className="mb-10">
           <HeroStats />
         </div>
-        
+
         {/* CTA Buttons */}
         <HeroCTAButtons />
 
         {/* Secondary Actions */}
         <HeroSecondaryActions />
       </div>
-      
+
       {/* Scroll Indicator */}
       <HeroScrollIndicator />
     </header>

@@ -22,21 +22,19 @@ export const SmartSuggestionPanel = ({
   loading,
   onSelect,
   onRefresh,
-  compact = false
+  compact = false,
 }: SmartSuggestionPanelProps) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   // Handle both array and object formats
-  const suggestionsList = Array.isArray(suggestions) 
-    ? suggestions 
-    : suggestions?.suggestions || [];
-  
+  const suggestionsList = Array.isArray(suggestions) ? suggestions : suggestions?.suggestions || [];
+
   const warnings = !Array.isArray(suggestions) ? suggestions?.warnings : undefined;
 
   const handleSelect = (suggestion: string, index: number) => {
     setSelectedIndex(index);
     onSelect?.(suggestion);
-    
+
     // Reset selection after 2 seconds
     setTimeout(() => setSelectedIndex(null), 2000);
   };
@@ -94,9 +92,7 @@ export const SmartSuggestionPanel = ({
             </div>
             <div>
               <CardTitle className="text-base">{title}</CardTitle>
-              {description && (
-                <p className="text-xs text-muted-foreground mt-1">{description}</p>
-              )}
+              {description && <p className="text-xs text-muted-foreground mt-1">{description}</p>}
             </div>
           </div>
           {onRefresh && (
@@ -121,7 +117,9 @@ export const SmartSuggestionPanel = ({
             <AlertDescription className="text-sm">
               <ul className="list-disc list-inside space-y-1">
                 {warnings.map((warning, index) => (
-                  <li key={index} className="text-gold">{warning}</li>
+                  <li key={index} className="text-gold">
+                    {warning}
+                  </li>
                 ))}
               </ul>
             </AlertDescription>
@@ -145,7 +143,10 @@ export const SmartSuggestionPanel = ({
                 {selectedIndex === index ? (
                   <CheckCircle className="h-5 w-5 text-emerald mt-0.5 flex-shrink-0" />
                 ) : (
-                  <Badge variant="outline" className="bg-primary/10 border-primary/30 flex-shrink-0">
+                  <Badge
+                    variant="outline"
+                    className="bg-primary/10 border-primary/30 flex-shrink-0"
+                  >
                     {index + 1}
                   </Badge>
                 )}

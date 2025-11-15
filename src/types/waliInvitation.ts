@@ -1,4 +1,3 @@
-
 export interface WaliInvitation {
   id: string;
   wali_profile_id: string;

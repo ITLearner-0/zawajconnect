@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,7 +10,7 @@ import {
   calculateIslamicCompatibility,
   calculateCulturalCompatibility,
   calculateOverallCompatibility,
-  generateCompatibilityExplanation
+  generateCompatibilityExplanation,
 } from '@/utils/matchingAlgorithm';
 import { logger } from '@/utils/logger';
 
@@ -68,7 +67,7 @@ const SmartMatchingSuggestions = () => {
 
       // Get potential matches (opposite gender, not already matched)
       const targetGender = myProfile.gender === 'male' ? 'female' : 'male';
-      
+
       const { data: potentialMatches } = await supabase
         .from('profiles')
         .select('*')
@@ -81,8 +80,8 @@ const SmartMatchingSuggestions = () => {
       }
 
       // Get Islamic preferences and verifications for these users
-      const userIds = potentialMatches.map(p => p.user_id);
-      
+      const userIds = potentialMatches.map((p) => p.user_id);
+
       const { data: islamicPrefs } = await supabase
         .from('islamic_preferences')
         .select('*')
@@ -94,22 +93,23 @@ const SmartMatchingSuggestions = () => {
         .in('user_id', userIds);
 
       // Combine the data
-      const enrichedMatches = potentialMatches.map(match => ({
+      const enrichedMatches = potentialMatches.map((match) => ({
         ...match,
-        islamic_preferences: islamicPrefs?.filter(p => p.user_id === match.user_id) || [],
-        user_verifications: verifications?.find(v => v.user_id === match.user_id) || null
+        islamic_preferences: islamicPrefs?.filter((p) => p.user_id === match.user_id) || [],
+        user_verifications: verifications?.find((v) => v.user_id === match.user_id) || null,
       }));
 
       // Calculate compatibility for each potential match using enhanced fuzzy matching
-      const scoredMatches = enrichedMatches.map(match => {
-        const sharedInterests = (myProfile.interests || []).filter(interest =>
+      const scoredMatches = enrichedMatches.map((match) => {
+        const sharedInterests = (myProfile.interests || []).filter((interest) =>
           (match.interests || []).includes(interest)
         );
 
         // Get Islamic preferences for this match
-        const matchIslamicPrefs = match.islamic_preferences && Array.isArray(match.islamic_preferences)
-          ? match.islamic_preferences[0]
-          : null;
+        const matchIslamicPrefs =
+          match.islamic_preferences && Array.isArray(match.islamic_preferences)
+            ? match.islamic_preferences[0]
+            : null;
 
         // Calculate Islamic compatibility using fuzzy matching
         let islamicScore = 60; // Default neutral score
@@ -117,7 +117,7 @@ const SmartMatchingSuggestions = () => {
           islamicScore = calculateIslamicCompatibility(
             {
               ...myPrefs,
-              smoking: typeof myPrefs.smoking === 'string' ? false : (myPrefs.smoking ?? null)
+              smoking: typeof myPrefs.smoking === 'string' ? false : (myPrefs.smoking ?? null),
             } as any,
             matchIslamicPrefs
           );
@@ -159,13 +159,13 @@ const SmartMatchingSuggestions = () => {
         // Build reasons array from explanation
         const reasons: string[] = [
           ...explanation.strengths,
-          ...sharedInterests.map(interest => `Intérêt commun: ${interest}`)
+          ...sharedInterests.map((interest) => `Intérêt commun: ${interest}`),
         ];
 
         // Add verification bonus
         const verificationScore = match.user_verifications?.verification_score || 0;
         if (verificationScore >= 70) {
-          reasons.push("Profil vérifié");
+          reasons.push('Profil vérifié');
         }
 
         logger.log('Match suggestion calculated', {
@@ -173,7 +173,7 @@ const SmartMatchingSuggestions = () => {
           islamicScore,
           culturalScore,
           personalityScore,
-          overallScore: compatibilityScore
+          overallScore: compatibilityScore,
         });
 
         return {
@@ -185,21 +185,23 @@ const SmartMatchingSuggestions = () => {
             profession: match.profession,
             education: match.education,
             bio: match.bio,
-            avatar_url: match.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(match.full_name)}&background=10b981&color=fff&size=200`,
-            interests: match.interests || []
+            avatar_url:
+              match.avatar_url ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(match.full_name)}&background=10b981&color=fff&size=200`,
+            interests: match.interests || [],
           },
           compatibility_score: compatibilityScore,
           shared_interests: sharedInterests,
-          compatibility_reasons: reasons
+          compatibility_reasons: reasons,
         };
       });
 
       // Sort by compatibility score and take top 3
       const topSuggestions = scoredMatches
-        .filter(match => match.compatibility_score > 20)
+        .filter((match) => match.compatibility_score > 20)
         .sort((a, b) => b.compatibility_score - a.compatibility_score)
         .slice(0, 3)
-        .map(match => ({
+        .map((match) => ({
           ...match,
           profile: {
             ...match.profile,
@@ -208,8 +210,8 @@ const SmartMatchingSuggestions = () => {
             location: match.profile.location ?? '',
             profession: match.profile.profession ?? '',
             education: match.profile.education ?? '',
-            bio: match.profile.bio ?? ''
-          }
+            bio: match.profile.bio ?? '',
+          },
         }));
 
       setSuggestions(topSuggestions);
@@ -252,7 +254,8 @@ const SmartMatchingSuggestions = () => {
         </CardHeader>
         <CardContent>
           <p className="text-muted-foreground text-center py-8">
-            Aucune suggestion disponible pour le moment. Complétez votre profil pour de meilleures recommandations.
+            Aucune suggestion disponible pour le moment. Complétez votre profil pour de meilleures
+            recommandations.
           </p>
         </CardContent>
       </Card>
@@ -294,7 +297,7 @@ const SmartMatchingSuggestions = () => {
                       {suggestion.compatibility_score}%
                     </Badge>
                   </div>
-                  
+
                   <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
                     <span>{suggestion.profile.age} ans</span>
                     <div className="flex items-center gap-1">
@@ -320,7 +323,7 @@ const SmartMatchingSuggestions = () => {
                         </span>
                       </div>
                     )}
-                    
+
                     <div className="flex flex-wrap gap-1">
                       {suggestion.compatibility_reasons.slice(0, 3).map((reason, index) => (
                         <Badge key={index} variant="outline" className="text-xs">

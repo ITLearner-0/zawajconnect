@@ -1,18 +1,17 @@
-
 import { supabase } from '@/integrations/supabase/client';
-import { 
-  StrictApiResponse, 
+import {
+  StrictApiResponse,
   StrictPaginatedResponse,
   StrictProfileData,
   StrictMessage,
-  StrictConversation 
+  StrictConversation,
 } from '@/types/strictTypes';
-import { 
-  validateProfileData, 
-  validateMessage, 
+import {
+  validateProfileData,
+  validateMessage,
   validateConversation,
   validateArray,
-  validateApiResponse 
+  validateApiResponse,
 } from '@/utils/validation/typeValidators';
 import { DatabaseId, assertDefined } from '@/types/typeUtils';
 
@@ -20,24 +19,19 @@ import { DatabaseId, assertDefined } from '@/types/typeUtils';
  * Type-safe API service with runtime validation
  */
 class TypeSafeApiService {
-  
   /**
    * Fetch profile data with type validation
    */
   async getProfile(userId: DatabaseId): Promise<StrictApiResponse<StrictProfileData>> {
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
 
       if (error) {
         return {
           data: null,
           error: error.message,
           success: false,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
       }
 
@@ -46,7 +40,7 @@ class TypeSafeApiService {
           data: null,
           error: 'Invalid profile data format',
           success: false,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
       }
 
@@ -54,14 +48,14 @@ class TypeSafeApiService {
         data,
         error: null,
         success: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (err) {
       return {
         data: null,
         error: err instanceof Error ? err.message : 'Unknown error',
         success: false,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -87,9 +81,9 @@ class TypeSafeApiService {
             total: 0,
             totalPages: 0,
             hasNext: false,
-            hasPrev: false
+            hasPrev: false,
           },
-          error: error.message
+          error: error.message,
         };
       }
 
@@ -101,9 +95,9 @@ class TypeSafeApiService {
           total: count || 0,
           totalPages: Math.ceil((count || 0) / limit),
           hasNext: (count || 0) > limit,
-          hasPrev: false
+          hasPrev: false,
         },
-        error: null
+        error: null,
       };
     } catch (err) {
       return {
@@ -114,9 +108,9 @@ class TypeSafeApiService {
           total: 0,
           totalPages: 0,
           hasNext: false,
-          hasPrev: false
+          hasPrev: false,
         },
-        error: err instanceof Error ? err.message : 'Unknown error'
+        error: err instanceof Error ? err.message : 'Unknown error',
       };
     }
   }
@@ -128,10 +122,12 @@ class TypeSafeApiService {
     try {
       const { data, error } = await (supabase as any)
         .from('conversations')
-        .select(`
+        .select(
+          `
           *,
           messages!inner(*)
-        `)
+        `
+        )
         .contains('participants', [userId])
         .order('created_at', { ascending: false });
 
@@ -140,7 +136,7 @@ class TypeSafeApiService {
           data: null,
           error: error.message,
           success: false,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
       }
 
@@ -148,14 +144,14 @@ class TypeSafeApiService {
         data: data || [],
         error: null,
         success: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (err) {
       return {
         data: null,
         error: err instanceof Error ? err.message : 'Unknown error',
         success: false,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }
@@ -176,7 +172,7 @@ class TypeSafeApiService {
           data: null,
           error: error.message || errorMessage,
           success: false,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
       }
 
@@ -185,7 +181,7 @@ class TypeSafeApiService {
           data: null,
           error: 'Invalid data format received',
           success: false,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
       }
 
@@ -193,14 +189,14 @@ class TypeSafeApiService {
         data,
         error: null,
         success: true,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     } catch (err) {
       return {
         data: null,
         error: err instanceof Error ? err.message : 'Unknown error',
         success: false,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
     }
   }

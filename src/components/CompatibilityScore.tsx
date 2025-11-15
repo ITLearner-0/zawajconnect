@@ -11,7 +11,11 @@ interface CompatibilityScoreProps {
   compact?: boolean;
 }
 
-const CompatibilityScore = ({ otherUserId, showDetails = false, compact = false }: CompatibilityScoreProps) => {
+const CompatibilityScore = ({
+  otherUserId,
+  showDetails = false,
+  compact = false,
+}: CompatibilityScoreProps) => {
   const { calculateDetailedCompatibility } = useUnifiedCompatibility();
   const [score, setScore] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -73,7 +77,7 @@ const CompatibilityScore = ({ otherUserId, showDetails = false, compact = false 
   if (compact) {
     return (
       <Badge className={`${getScoreColor(score)} text-xs font-medium`}>
-        {renderScoreIcon(score, "h-3 w-3 mr-1")}
+        {renderScoreIcon(score, 'h-3 w-3 mr-1')}
         {Math.round(score)}%
       </Badge>
     );
@@ -96,14 +100,13 @@ const CompatibilityScore = ({ otherUserId, showDetails = false, compact = false 
 
             <div>
               <Progress value={score} className="h-2 mb-1" />
-              <p className="text-sm text-muted-foreground">
-                {getScoreText(score)}
-              </p>
+              <p className="text-sm text-muted-foreground">{getScoreText(score)}</p>
             </div>
 
             {score >= 60 && (
               <div className="text-xs text-emerald-dark bg-emerald/10 p-2 rounded">
-                Ce score élevé indique une forte compatibilité basée sur vos valeurs et préférences communes.
+                Ce score élevé indique une forte compatibilité basée sur vos valeurs et préférences
+                communes.
               </div>
             )}
 
@@ -122,9 +125,7 @@ const CompatibilityScore = ({ otherUserId, showDetails = false, compact = false 
     <div className="flex items-center gap-2">
       {renderScoreIcon(score, `h-4 w-4 ${score >= 60 ? 'text-emerald' : 'text-gold'}`)}
       <span className="text-sm font-medium">{getScoreText(score)}</span>
-      <Badge className={`${getScoreColor(score)} text-xs`}>
-        {Math.round(score)}%
-      </Badge>
+      <Badge className={`${getScoreColor(score)} text-xs`}>{Math.round(score)}%</Badge>
     </div>
   );
 };

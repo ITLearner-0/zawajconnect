@@ -1,4 +1,3 @@
-
 import { logger } from '@/services/logging/LoggingService';
 
 export interface ComponentMetrics {
@@ -14,7 +13,7 @@ export class ComponentMetricsService {
 
   trackComponentRender(componentName: string, renderTime: number): void {
     const existing = this.componentMetrics.get(componentName);
-    
+
     if (existing) {
       existing.renderTime = renderTime;
       existing.updateCount += 1;
@@ -28,7 +27,7 @@ export class ComponentMetricsService {
         lastUpdate: Date.now(),
       });
     }
-    
+
     logger.logPerformance(`component-render-${componentName}`, renderTime);
   }
 

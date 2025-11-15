@@ -44,7 +44,7 @@ const Admin = () => {
       if (roles && roles.length > 0 && roles[0]) {
         const role = roles[0].role ?? undefined;
         setUserRole(role);
-        
+
         if (role && ['super_admin', 'admin', 'moderator'].includes(role)) {
           setIsAdmin(true);
         } else {
@@ -81,13 +81,11 @@ const Admin = () => {
 
       // If no super admin exists, make current user super admin
       if (!existingSuperAdmin || existingSuperAdmin.length === 0) {
-        const { error: insertError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: user!.id,
-            role: 'super_admin',
-            assigned_by: user!.id
-          });
+        const { error: insertError } = await supabase.from('user_roles').insert({
+          user_id: user!.id,
+          role: 'super_admin',
+          assigned_by: user!.id,
+        });
 
         if (insertError) {
           console.error('Error assigning super admin role:', insertError);
@@ -97,17 +95,17 @@ const Admin = () => {
 
         setUserRole('super_admin');
         setIsAdmin(true);
-        
+
         toast({
-          title: "Super Admin créé!",
-          description: "Vous avez été désigné comme Super Administrateur du système.",
+          title: 'Super Admin créé!',
+          description: 'Vous avez été désigné comme Super Administrateur du système.',
         });
       } else {
         setIsAdmin(false);
         toast({
-          title: "Accès refusé",
+          title: 'Accès refusé',
           description: "Vous n'avez pas les permissions d'administrateur",
-          variant: "destructive"
+          variant: 'destructive',
         });
       }
     } catch (error) {
@@ -120,37 +118,35 @@ const Admin = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase
-        .from('user_roles')
-        .upsert({
-          user_id: user.id,
-          role: 'super_admin',
-          assigned_by: user.id
-        });
+      const { error } = await supabase.from('user_roles').upsert({
+        user_id: user.id,
+        role: 'super_admin',
+        assigned_by: user.id,
+      });
 
       if (error) {
         console.error('Error granting super admin access:', error);
         toast({
-          title: "Erreur",
+          title: 'Erreur',
           description: "Impossible d'accorder les privilèges Super Admin",
-          variant: "destructive"
+          variant: 'destructive',
         });
         return;
       }
 
       setUserRole('super_admin');
       setIsAdmin(true);
-      
+
       toast({
-        title: "Accès accordé!",
-        description: "Vous disposez maintenant de tous les privilèges Super Admin",
+        title: 'Accès accordé!',
+        description: 'Vous disposez maintenant de tous les privilèges Super Admin',
       });
     } catch (error) {
       console.error('Error granting super admin access:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Une erreur est survenue lors de l'attribution des privilèges",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -181,18 +177,17 @@ const Admin = () => {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="text-sm text-muted-foreground">
-              <p>Si vous êtes le propriétaire de cette application, vous pouvez vous accorder les privilèges Super Admin.</p>
+              <p>
+                Si vous êtes le propriétaire de cette application, vous pouvez vous accorder les
+                privilèges Super Admin.
+              </p>
             </div>
             <div className="flex flex-col gap-2">
-              <Button 
-                onClick={grantSuperAdminAccess}
-                className="w-full"
-                variant="default"
-              >
+              <Button onClick={grantSuperAdminAccess} className="w-full" variant="default">
                 <Crown className="h-4 w-4 mr-2" />
                 Devenir Super Admin
               </Button>
-              <Button 
+              <Button
                 onClick={() => navigate('/enhanced-profile')}
                 variant="outline"
                 className="w-full"

@@ -4,20 +4,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
-import { 
-  BookOpen, 
-  Heart, 
-  Users, 
-  Compass, 
-  Star, 
+import {
+  BookOpen,
+  Heart,
+  Users,
+  Compass,
+  Star,
   Calendar,
   Search,
   Filter,
-  Bookmark
+  Bookmark,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface GuidanceArticle {
   id: string;
@@ -66,12 +72,14 @@ const IslamicGuidanceHub = () => {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setArticles((data || []).map(article => ({
-        ...article,
-        author: article.author || 'Auteur Inconnu',
-        featured: article.featured ?? false,
-        published: article.published ?? true
-      })));
+      setArticles(
+        (data || []).map((article) => ({
+          ...article,
+          author: article.author || 'Auteur Inconnu',
+          featured: article.featured ?? false,
+          published: article.published ?? true,
+        }))
+      );
     } catch (error) {
       console.error('Error fetching guidance articles:', error);
       setArticles([]);
@@ -89,9 +97,9 @@ const IslamicGuidanceHub = () => {
 
   const toggleBookmark = (articleId: string) => {
     const updated = bookmarkedArticles.includes(articleId)
-      ? bookmarkedArticles.filter(id => id !== articleId)
+      ? bookmarkedArticles.filter((id) => id !== articleId)
       : [...bookmarkedArticles, articleId];
-    
+
     setBookmarkedArticles(updated);
     localStorage.setItem('islamic-guidance-bookmarks', JSON.stringify(updated));
   };
@@ -101,27 +109,28 @@ const IslamicGuidanceHub = () => {
 
     // Filter by search term
     if (searchTerm) {
-      filtered = filtered.filter(article =>
-        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.content.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        (article) =>
+          article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          article.content.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(article => article.category === selectedCategory);
+      filtered = filtered.filter((article) => article.category === selectedCategory);
     }
 
     setFilteredArticles(filtered);
   };
 
   const getCategoryIcon = (category: string) => {
-    const categoryData = categories.find(cat => cat.value === category);
+    const categoryData = categories.find((cat) => cat.value === category);
     return categoryData?.icon || BookOpen;
   };
 
   const getCategoryLabel = (category: string) => {
-    const categoryData = categories.find(cat => cat.value === category);
+    const categoryData = categories.find((cat) => cat.value === category);
     return categoryData?.label || category;
   };
 
@@ -129,7 +138,6 @@ const IslamicGuidanceHub = () => {
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength) + '...';
   };
-
 
   if (loading) {
     return (
@@ -208,8 +216,8 @@ const IslamicGuidanceHub = () => {
         <ResponsiveTabsList tabCount={3}>
           <TabsTrigger value="all">Tous ({filteredArticles.length})</TabsTrigger>
           <TabsTrigger value="featured">
-            <Star className="h-4 w-4 mr-1" />
-            À la une ({filteredArticles.filter(a => a.featured).length})
+            <Star className="h-4 w-4 mr-1" />À la une (
+            {filteredArticles.filter((a) => a.featured).length})
           </TabsTrigger>
           <TabsTrigger value="bookmarked">
             <Bookmark className="h-4 w-4 mr-1" />
@@ -233,7 +241,7 @@ const IslamicGuidanceHub = () => {
               {filteredArticles.map((article) => {
                 const CategoryIcon = getCategoryIcon(article.category);
                 const isBookmarked = bookmarkedArticles.includes(article.id);
-                
+
                 return (
                   <Card key={article.id} className="hover:shadow-md transition-shadow">
                     <CardHeader>
@@ -246,8 +254,7 @@ const IslamicGuidanceHub = () => {
                             </Badge>
                             {article.featured && (
                               <Badge className="bg-gold/10 text-gold-dark border-gold/20">
-                                <Star className="h-3 w-3 mr-1" />
-                                À la une
+                                <Star className="h-3 w-3 mr-1" />À la une
                               </Badge>
                             )}
                           </div>
@@ -286,54 +293,58 @@ const IslamicGuidanceHub = () => {
 
         <TabsContent value="featured" className="space-y-4">
           <div className="grid gap-4">
-            {filteredArticles.filter(article => article.featured).map((article) => {
-              const CategoryIcon = getCategoryIcon(article.category);
-              const isBookmarked = bookmarkedArticles.includes(article.id);
-              
-              return (
-                <Card key={article.id} className="hover:shadow-md transition-shadow border-gold/20">
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <CategoryIcon className="h-4 w-4 text-emerald" />
-                          <Badge variant="outline" className="text-xs">
-                            {getCategoryLabel(article.category)}
-                          </Badge>
-                          <Badge className="bg-gold/10 text-gold-dark border-gold/20">
-                            <Star className="h-3 w-3 mr-1" />
-                            À la une
-                          </Badge>
+            {filteredArticles
+              .filter((article) => article.featured)
+              .map((article) => {
+                const CategoryIcon = getCategoryIcon(article.category);
+                const isBookmarked = bookmarkedArticles.includes(article.id);
+
+                return (
+                  <Card
+                    key={article.id}
+                    className="hover:shadow-md transition-shadow border-gold/20"
+                  >
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <CategoryIcon className="h-4 w-4 text-emerald" />
+                            <Badge variant="outline" className="text-xs">
+                              {getCategoryLabel(article.category)}
+                            </Badge>
+                            <Badge className="bg-gold/10 text-gold-dark border-gold/20">
+                              <Star className="h-3 w-3 mr-1" />À la une
+                            </Badge>
+                          </div>
+                          <CardTitle className="text-xl mb-2">{article.title}</CardTitle>
+                          <p className="text-sm text-muted-foreground flex items-center gap-2">
+                            <span>Par {article.author}</span>
+                            <span>•</span>
+                            <Calendar className="h-3 w-3" />
+                            <span>{new Date(article.created_at).toLocaleDateString('fr-FR')}</span>
+                          </p>
                         </div>
-                        <CardTitle className="text-xl mb-2">{article.title}</CardTitle>
-                        <p className="text-sm text-muted-foreground flex items-center gap-2">
-                          <span>Par {article.author}</span>
-                          <span>•</span>
-                          <Calendar className="h-3 w-3" />
-                          <span>{new Date(article.created_at).toLocaleDateString('fr-FR')}</span>
-                        </p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleBookmark(article.id)}
+                          className={isBookmarked ? 'text-gold' : 'text-muted-foreground'}
+                        >
+                          <Bookmark className={`h-4 w-4 ${isBookmarked ? 'fill-current' : ''}`} />
+                        </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => toggleBookmark(article.id)}
-                        className={isBookmarked ? 'text-gold' : 'text-muted-foreground'}
-                      >
-                        <Bookmark className={`h-4 w-4 ${isBookmarked ? 'fill-current' : ''}`} />
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground mb-4">
+                        {truncateContent(article.content, 300)}
+                      </p>
+                      <Button size="sm" className="bg-emerald hover:bg-emerald-dark">
+                        Lire l'article complet
                       </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground mb-4">
-                      {truncateContent(article.content, 300)}
-                    </p>
-                    <Button size="sm" className="bg-emerald hover:bg-emerald-dark">
-                      Lire l'article complet
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    </CardContent>
+                  </Card>
+                );
+              })}
           </div>
         </TabsContent>
 
@@ -351,10 +362,10 @@ const IslamicGuidanceHub = () => {
           ) : (
             <div className="grid gap-4">
               {filteredArticles
-                .filter(article => bookmarkedArticles.includes(article.id))
+                .filter((article) => bookmarkedArticles.includes(article.id))
                 .map((article) => {
                   const CategoryIcon = getCategoryIcon(article.category);
-                  
+
                   return (
                     <Card key={article.id} className="hover:shadow-md transition-shadow">
                       <CardHeader>
@@ -367,8 +378,7 @@ const IslamicGuidanceHub = () => {
                               </Badge>
                               {article.featured && (
                                 <Badge className="bg-gold/10 text-gold-dark border-gold/20">
-                                  <Star className="h-3 w-3 mr-1" />
-                                  À la une
+                                  <Star className="h-3 w-3 mr-1" />À la une
                                 </Badge>
                               )}
                             </div>
@@ -377,7 +387,9 @@ const IslamicGuidanceHub = () => {
                               <span>Par {article.author}</span>
                               <span>•</span>
                               <Calendar className="h-3 w-3" />
-                              <span>{new Date(article.created_at).toLocaleDateString('fr-FR')}</span>
+                              <span>
+                                {new Date(article.created_at).toLocaleDateString('fr-FR')}
+                              </span>
                             </p>
                           </div>
                           <Button

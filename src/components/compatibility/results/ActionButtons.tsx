@@ -1,7 +1,6 @@
-
-import { Users, Heart } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import CustomButton from "../../CustomButton";
+import { Users, Heart } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import CustomButton from '../../CustomButton';
 
 const ActionButtons = () => {
   const navigate = useNavigate();
@@ -15,21 +14,19 @@ const ActionButtons = () => {
         </span>
       </div>
       <p className="text-sm text-blue-700 dark:text-blue-300 mb-4">
-        Explorez maintenant des profils avec des pourcentages de compatibilité basés sur vos valeurs islamiques partagées.
+        Explorez maintenant des profils avec des pourcentages de compatibilité basés sur vos valeurs
+        islamiques partagées.
       </p>
       <div className="flex gap-3 justify-center flex-wrap">
         <CustomButton
-          onClick={() => navigate("/nearby")}
+          onClick={() => navigate('/nearby')}
           variant="default"
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
         >
           <Users className="h-4 w-4" />
           Explorer les Profils
         </CustomButton>
-        <CustomButton
-          onClick={() => navigate("/profile")}
-          variant="outline"
-        >
+        <CustomButton onClick={() => navigate('/profile')} variant="outline">
           Retour au Profil
         </CustomButton>
       </div>

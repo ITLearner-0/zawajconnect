@@ -19,13 +19,8 @@ import { InsightCard } from './InsightCard';
 const SmartRecommendationEngine = (): JSX.Element => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { 
-    recommendations, 
-    insights, 
-    loading, 
-    analyzing, 
-    generateSmartRecommendations 
-  } = useSmartRecommendations();
+  const { recommendations, insights, loading, analyzing, generateSmartRecommendations } =
+    useSmartRecommendations();
 
   return (
     <div className="space-y-6">
@@ -40,9 +35,10 @@ const SmartRecommendationEngine = (): JSX.Element => {
         <CardContent>
           <div className="text-center space-y-4">
             <p className="text-muted-foreground">
-              Utilisez l'IA pour découvrir vos matches les plus prometteurs selon vos valeurs islamiques
+              Utilisez l'IA pour découvrir vos matches les plus prometteurs selon vos valeurs
+              islamiques
             </p>
-            
+
             {analyzing && (
               <div className="space-y-3">
                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
@@ -55,8 +51,8 @@ const SmartRecommendationEngine = (): JSX.Element => {
                 </p>
               </div>
             )}
-            
-            <Button 
+
+            <Button
               onClick={generateSmartRecommendations}
               disabled={loading}
               size="lg"
@@ -95,10 +91,7 @@ const SmartRecommendationEngine = (): JSX.Element => {
           <TabsContent value="recommendations" className="space-y-4">
             <div className="grid gap-6 md:grid-cols-2">
               {recommendations.map((recommendation: SmartRecommendation) => (
-                <RecommendationCard
-                  key={recommendation.user_id}
-                  recommendation={recommendation}
-                />
+                <RecommendationCard key={recommendation.user_id} recommendation={recommendation} />
               ))}
             </div>
           </TabsContent>
@@ -106,10 +99,7 @@ const SmartRecommendationEngine = (): JSX.Element => {
           <TabsContent value="insights" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2">
               {insights.map((insight, index: number) => (
-                <InsightCard
-                  key={index}
-                  insight={insight}
-                />
+                <InsightCard key={index} insight={insight} />
               ))}
             </div>
           </TabsContent>
@@ -123,7 +113,8 @@ const SmartRecommendationEngine = (): JSX.Element => {
             <Brain className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">Moteur IA Prêt</h3>
             <p className="text-muted-foreground mb-4">
-              Lancez l'analyse IA pour découvrir vos matches les plus compatibles selon les valeurs islamiques
+              Lancez l'analyse IA pour découvrir vos matches les plus compatibles selon les valeurs
+              islamiques
             </p>
             <Button onClick={generateSmartRecommendations} disabled={loading}>
               <Sparkles className="h-4 w-4 mr-2" />

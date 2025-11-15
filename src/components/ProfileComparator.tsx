@@ -3,7 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend } from 'recharts';
+import {
+  Radar,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
 import { Users, Heart, Globe, User, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 import { useUnifiedCompatibility } from '@/hooks/useUnifiedCompatibility';
 import { supabase } from '@/integrations/supabase/client';
@@ -86,9 +94,9 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
       { category: 'Overall', key: 'overall' },
     ];
 
-    return categories.map(cat => {
+    return categories.map((cat) => {
       const dataPoint: any = { category: cat.category };
-      profiles.forEach(profile => {
+      profiles.forEach((profile) => {
         const compat = compatibilityData[profile.id];
         if (compat && profile.full_name) {
           dataPoint[profile.full_name] = compat[cat.key as keyof CompatibilityData];
@@ -106,9 +114,13 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
   };
 
   const getRecommendations = () => {
-    const recommendations: { profile: string; message: string; type: 'success' | 'warning' | 'info' }[] = [];
+    const recommendations: {
+      profile: string;
+      message: string;
+      type: 'success' | 'warning' | 'info';
+    }[] = [];
 
-    profiles.forEach(profile => {
+    profiles.forEach((profile) => {
       const compat = compatibilityData[profile.id];
       if (!compat) return;
 
@@ -195,8 +207,8 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
           <ResponsiveContainer width="100%" height={400}>
             <RadarChart data={radarData}>
               <PolarGrid stroke="hsl(var(--border))" />
-              <PolarAngleAxis 
-                dataKey="category" 
+              <PolarAngleAxis
+                dataKey="category"
                 tick={{ fill: 'hsl(var(--foreground))', fontSize: 12 }}
               />
               <PolarRadiusAxis angle={90} domain={[0, 100]} />
@@ -227,7 +239,7 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
               <thead>
                 <tr className="border-b">
                   <th className="text-left py-3 px-4">Catégorie</th>
-                  {profiles.map(profile => (
+                  {profiles.map((profile) => (
                     <th key={profile.id} className="text-center py-3 px-4">
                       <div className="flex flex-col items-center gap-1">
                         <span className="font-semibold">{profile.full_name}</span>
@@ -245,7 +257,7 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
                     <Heart className="h-4 w-4 text-emerald" />
                     Compatibilité Globale
                   </td>
-                  {profiles.map(profile => {
+                  {profiles.map((profile) => {
                     const compat = compatibilityData[profile.id];
                     return (
                       <td key={profile.id} className="text-center py-3 px-4">
@@ -265,7 +277,7 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
                     <Globe className="h-4 w-4 text-gold" />
                     Valeurs Islamiques
                   </td>
-                  {profiles.map(profile => {
+                  {profiles.map((profile) => {
                     const compat = compatibilityData[profile.id];
                     return (
                       <td key={profile.id} className="text-center py-3 px-4">
@@ -285,7 +297,7 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
                     <Users className="h-4 w-4 text-chart-3" />
                     Compatibilité Culturelle
                   </td>
-                  {profiles.map(profile => {
+                  {profiles.map((profile) => {
                     const compat = compatibilityData[profile.id];
                     return (
                       <td key={profile.id} className="text-center py-3 px-4">
@@ -305,7 +317,7 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
                     <User className="h-4 w-4 text-chart-4" />
                     Personnalité
                   </td>
-                  {profiles.map(profile => {
+                  {profiles.map((profile) => {
                     const compat = compatibilityData[profile.id];
                     return (
                       <td key={profile.id} className="text-center py-3 px-4">
@@ -335,14 +347,18 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {profiles.map(profile => {
+            {profiles.map((profile) => {
               const compat = compatibilityData[profile.id];
               return (
                 <div key={profile.id} className="space-y-2">
                   <h4 className="font-semibold text-sm">{profile.full_name}</h4>
                   <div className="flex flex-wrap gap-2">
                     {compat?.matchingReasons.slice(0, 4).map((reason, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs bg-emerald/10 text-emerald-dark border-emerald/20">
+                      <Badge
+                        key={idx}
+                        variant="outline"
+                        className="text-xs bg-emerald/10 text-emerald-dark border-emerald/20"
+                      >
                         {reason}
                       </Badge>
                     ))}
@@ -361,14 +377,18 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {profiles.map(profile => {
+            {profiles.map((profile) => {
               const compat = compatibilityData[profile.id];
               return (
                 <div key={profile.id} className="space-y-2">
                   <h4 className="font-semibold text-sm">{profile.full_name}</h4>
                   <div className="flex flex-wrap gap-2">
                     {compat?.concerns.slice(0, 3).map((concern, idx) => (
-                      <Badge key={idx} variant="outline" className="text-xs bg-orange-100 text-orange-700 border-orange-200">
+                      <Badge
+                        key={idx}
+                        variant="outline"
+                        className="text-xs bg-orange-100 text-orange-700 border-orange-200"
+                      >
                         {concern}
                       </Badge>
                     ))}
@@ -396,13 +416,15 @@ const ProfileComparator = ({ profileIds, maxProfiles = 3 }: ProfileComparatorPro
                 rec.type === 'success'
                   ? 'bg-emerald/10 border-emerald/20'
                   : rec.type === 'warning'
-                  ? 'bg-orange-100 border-orange-200'
-                  : 'bg-blue-50 border-blue-200'
+                    ? 'bg-orange-100 border-orange-200'
+                    : 'bg-blue-50 border-blue-200'
               }`}
             >
               <div className="flex items-start gap-3">
                 {rec.type === 'success' && <CheckCircle className="h-5 w-5 text-emerald mt-0.5" />}
-                {rec.type === 'warning' && <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5" />}
+                {rec.type === 'warning' && (
+                  <AlertCircle className="h-5 w-5 text-orange-600 mt-0.5" />
+                )}
                 {rec.type === 'info' && <TrendingUp className="h-5 w-5 text-blue-600 mt-0.5" />}
                 <div>
                   <p className="font-semibold text-sm">{rec.profile}</p>

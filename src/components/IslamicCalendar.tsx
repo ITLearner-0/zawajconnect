@@ -27,22 +27,31 @@ const IslamicCalendar = () => {
   const [importantDates, setImportantDates] = useState<ImportantDate[]>([]);
 
   const islamicMonths = [
-    'Muharram', 'Safar', 'Rabi\' al-awwal', 'Rabi\' al-thani',
-    'Jumada al-awwal', 'Jumada al-thani', 'Rajab', 'Sha\'ban',
-    'Ramadan', 'Shawwal', 'Dhu al-Qi\'dah', 'Dhu al-Hijjah'
+    'Muharram',
+    'Safar',
+    "Rabi' al-awwal",
+    "Rabi' al-thani",
+    'Jumada al-awwal',
+    'Jumada al-thani',
+    'Rajab',
+    "Sha'ban",
+    'Ramadan',
+    'Shawwal',
+    "Dhu al-Qi'dah",
+    'Dhu al-Hijjah',
   ];
 
   const importantIslamicDates: ImportantDate[] = [
     { day: 1, month: 1, event: 'Nouvel An Islamique', type: 'holy' },
-    { day: 10, month: 1, event: 'Jour d\'Ashura', type: 'holy' },
+    { day: 10, month: 1, event: "Jour d'Ashura", type: 'holy' },
     { day: 12, month: 3, event: 'Mawlid an-Nabi (naissance du Prophète)', type: 'sunnah' },
-    { day: 27, month: 7, event: 'Isra et Mi\'raj', type: 'holy' },
-    { day: 15, month: 8, event: 'Laylat al-Bara\'at (Nuit du pardon)', type: 'sunnah' },
+    { day: 27, month: 7, event: "Isra et Mi'raj", type: 'holy' },
+    { day: 15, month: 8, event: "Laylat al-Bara'at (Nuit du pardon)", type: 'sunnah' },
     { day: 1, month: 9, event: 'Début du Ramadan', type: 'holy' },
     { day: 27, month: 9, event: 'Laylat al-Qadr (Nuit du destin)', type: 'holy' },
     { day: 1, month: 10, event: 'Eid al-Fitr', type: 'holy' },
-    { day: 9, month: 12, event: 'Jour d\'Arafah', type: 'holy' },
-    { day: 10, month: 12, event: 'Eid al-Adha', type: 'holy' }
+    { day: 9, month: 12, event: "Jour d'Arafah", type: 'holy' },
+    { day: 10, month: 12, event: 'Eid al-Adha', type: 'holy' },
   ];
 
   // Simplified Islamic date conversion (approximation)
@@ -51,24 +60,24 @@ const IslamicCalendar = () => {
     const gregorianYear = gregorianDate.getFullYear();
     const gregorianMonth = gregorianDate.getMonth() + 1;
     const gregorianDay = gregorianDate.getDate();
-    
+
     // Approximate Islamic year (this is not accurate, use proper conversion)
     const islamicYear = Math.floor((gregorianYear - 622) * 1.030684) + 1;
-    
+
     // For demonstration, using current month index
     const monthIndex = (gregorianMonth + 6) % 12; // Rough approximation
     const islamicMonth = islamicMonths[monthIndex];
-    
+
     const weekDays = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
     const weekDay = weekDays[gregorianDate.getDay()];
-    
+
     return {
       day: gregorianDay,
       month: islamicMonth || '',
       monthNumber: monthIndex + 1,
       year: islamicYear,
       weekDay: weekDay || '',
-      gregorianDate
+      gregorianDate,
     };
   };
 
@@ -81,7 +90,7 @@ const IslamicCalendar = () => {
 
     // Filter important dates for current month
     const currentMonthEvents = importantIslamicDates.filter(
-      date => date.month === islamicDate.monthNumber
+      (date) => date.month === islamicDate.monthNumber
     );
     setImportantDates(currentMonthEvents);
   }, []);
@@ -104,9 +113,7 @@ const IslamicCalendar = () => {
     }
 
     // Update important dates for new month
-    const monthEvents = importantIslamicDates.filter(
-      date => date.month === selectedMonth
-    );
+    const monthEvents = importantIslamicDates.filter((date) => date.month === selectedMonth);
     setImportantDates(monthEvents);
   };
 
@@ -152,15 +159,11 @@ const IslamicCalendar = () => {
         {/* Current Date Display */}
         <div className="text-center bg-gradient-to-r from-emerald/10 to-gold/10 rounded-lg p-6 border border-emerald/20">
           <div className="space-y-2">
-            <p className="text-3xl font-bold text-emerald">
-              {currentIslamicDate.day}
-            </p>
+            <p className="text-3xl font-bold text-emerald">{currentIslamicDate.day}</p>
             <p className="text-lg font-semibold text-foreground">
               {currentIslamicDate.month} {currentIslamicDate.year}
             </p>
-            <p className="text-sm text-muted-foreground">
-              {currentIslamicDate.weekDay}
-            </p>
+            <p className="text-sm text-muted-foreground">{currentIslamicDate.weekDay}</p>
             <Badge variant="outline" className="text-xs">
               {currentIslamicDate.gregorianDate.toLocaleDateString('fr-FR')}
             </Badge>
@@ -178,13 +181,13 @@ const IslamicCalendar = () => {
             <ArrowLeft className="h-4 w-4" />
             Précédent
           </Button>
-          
+
           <div className="text-center">
             <h3 className="font-semibold text-lg">
               {islamicMonths[selectedMonth - 1]} {selectedYear}
             </h3>
           </div>
-          
+
           <Button
             variant="outline"
             size="sm"
@@ -217,8 +220,7 @@ const IslamicCalendar = () => {
                     <span className="font-medium">{date.event}</span>
                   </div>
                   <Badge variant="secondary" className="text-xs">
-                    {date.type === 'holy' ? 'Sacré' : 
-                     date.type === 'sunnah' ? 'Sunnah' : 'Rappel'}
+                    {date.type === 'holy' ? 'Sacré' : date.type === 'sunnah' ? 'Sunnah' : 'Rappel'}
                   </Badge>
                 </div>
               ))}
@@ -233,17 +235,17 @@ const IslamicCalendar = () => {
             {islamicMonths.map((month, index) => (
               <Button
                 key={month}
-                variant={selectedMonth === index + 1 ? "default" : "outline"}
+                variant={selectedMonth === index + 1 ? 'default' : 'outline'}
                 size="sm"
                 className={`text-xs ${
-                  selectedMonth === index + 1 
-                    ? 'bg-emerald hover:bg-emerald-dark text-white' 
+                  selectedMonth === index + 1
+                    ? 'bg-emerald hover:bg-emerald-dark text-white'
                     : 'hover:bg-emerald/10'
                 }`}
                 onClick={() => {
                   setSelectedMonth(index + 1);
                   const monthEvents = importantIslamicDates.filter(
-                    date => date.month === index + 1
+                    (date) => date.month === index + 1
                   );
                   setImportantDates(monthEvents);
                 }}
@@ -262,9 +264,7 @@ const IslamicCalendar = () => {
           <p className="text-center text-sm text-muted-foreground italic">
             "Le nombre de mois, auprès d'Allah, est de douze mois"
           </p>
-          <p className="text-center text-xs text-gold-dark mt-2">
-            - Coran 9:36
-          </p>
+          <p className="text-center text-xs text-gold-dark mt-2">- Coran 9:36</p>
         </div>
       </CardContent>
     </Card>

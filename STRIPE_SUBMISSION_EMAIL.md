@@ -26,6 +26,7 @@ Je me permets de vous contacter concernant l'activation des paiements pour notre
 Zawaj-Connect est une plateforme de rencontres sérieuses destinée à la communauté musulmane francophone. Notre service facilite les rencontres matrimoniales dans le respect des valeurs islamiques et des traditions familiales.
 
 ### Caractéristiques principales :
+
 - Vérification d'identité obligatoire
 - Modération de contenu automatisée et humaine
 - Implication familiale (Wali) optionnelle
@@ -41,6 +42,7 @@ Nous proposons un modèle **freemium** avec abonnements mensuels :
 3. **Formule VIP** : 39,99€/mois - Services avancés + accompagnement
 
 ### Détails des transactions :
+
 - **Paiements récurrents** : Abonnements mensuels automatiques
 - **Montant moyen** : 19,99€ - 39,99€
 - **Volume estimé** : 500-1000 transactions/mois (première année)
@@ -105,6 +107,7 @@ Notre plateforme intègre plusieurs mécanismes anti-fraude :
 Je reste à votre entière disposition pour toute information complémentaire ou clarification nécessaire. Je peux organiser un appel ou une visioconférence selon votre convenance.
 
 **Coordonnées :**
+
 - **E-mail :** [votre-email@zawajconnect.me]
 - **Téléphone :** [votre numéro]
 - **Disponibilité :** Lundi-Vendredi, 9h-18h CET
@@ -112,6 +115,7 @@ Je reste à votre entière disposition pour toute information complémentaire ou
 ## 🙏 Demande
 
 Nous sollicitons l'activation complète de notre compte Stripe avec :
+
 - Paiements récurrents (abonnements)
 - Webhooks pour synchronisation
 - Accès au Customer Portal
@@ -132,6 +136,7 @@ Fondateur & CEO - Zawaj-Connect
 ---
 
 ## 📎 Pièces jointes :
+
 1. STRIPE_SUBMISSION_DOCUMENT.md (document complet)
 2. CGU_Zawaj-Connect.pdf
 3. Politique_Confidentialite.pdf

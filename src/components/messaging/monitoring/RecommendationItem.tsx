@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Lightbulb, AlertTriangle, CheckCircle } from 'lucide-react';
 
@@ -7,16 +6,15 @@ interface RecommendationItemProps {
   severity?: 'low' | 'medium' | 'high';
 }
 
-const RecommendationItem: React.FC<RecommendationItemProps> = ({ 
-  text, 
-  severity = 'low' 
-}) => {
+const RecommendationItem: React.FC<RecommendationItemProps> = ({ text, severity = 'low' }) => {
   const getIcon = () => {
     switch (severity) {
       case 'high':
         return <AlertTriangle className="h-5 w-5 text-red-500 dark:text-red-300 flex-shrink-0" />;
       case 'medium':
-        return <Lightbulb className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold/90 flex-shrink-0" />;
+        return (
+          <Lightbulb className="h-5 w-5 text-islamic-brightGold dark:text-islamic-darkBrightGold/90 flex-shrink-0" />
+        );
       case 'low':
       default:
         return <CheckCircle className="h-5 w-5 text-green-500 dark:text-green-300 flex-shrink-0" />;
@@ -35,7 +33,9 @@ const RecommendationItem: React.FC<RecommendationItemProps> = ({
   };
 
   return (
-    <li className={`flex items-start gap-3 mb-3 p-3.5 rounded-md border-2 ${getItemStyle()} shadow-sm dark:shadow-black/30`}>
+    <li
+      className={`flex items-start gap-3 mb-3 p-3.5 rounded-md border-2 ${getItemStyle()} shadow-sm dark:shadow-black/30`}
+    >
       <div className="mt-0.5">{getIcon()}</div>
       <span className="text-sm font-medium">{text}</span>
     </li>

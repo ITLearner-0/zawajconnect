@@ -1,9 +1,8 @@
-
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
-import { Home, ArrowLeft } from "lucide-react";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import AccessibilityControls from "@/components/AccessibilityControls";
+import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
+import { Home, ArrowLeft } from 'lucide-react';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import AccessibilityControls from '@/components/AccessibilityControls';
 
 const ResourcesHeader = () => {
   return (
@@ -25,27 +24,39 @@ const ResourcesHeader = () => {
 
           {/* Navigation Links */}
           <div className="hidden md:flex items-center gap-6">
-            <Button variant="ghost" asChild className="text-rose-700 hover:text-rose-800 hover:bg-rose-100 dark:text-rose-300 dark:hover:text-rose-200 dark:hover:bg-rose-800/50">
+            <Button
+              variant="ghost"
+              asChild
+              className="text-rose-700 hover:text-rose-800 hover:bg-rose-100 dark:text-rose-300 dark:hover:text-rose-200 dark:hover:bg-rose-800/50"
+            >
               <Link to="/" className="flex items-center gap-2">
                 <Home className="h-4 w-4" />
                 Accueil
               </Link>
             </Button>
-            <Button variant="ghost" asChild className="text-rose-700 hover:text-rose-800 hover:bg-rose-100 dark:text-rose-300 dark:hover:text-rose-200 dark:hover:bg-rose-800/50">
-              <Link to="/auth">
-                Inscription
-              </Link>
+            <Button
+              variant="ghost"
+              asChild
+              className="text-rose-700 hover:text-rose-800 hover:bg-rose-100 dark:text-rose-300 dark:hover:text-rose-200 dark:hover:bg-rose-800/50"
+            >
+              <Link to="/auth">Inscription</Link>
             </Button>
-            <Button variant="ghost" asChild className="text-rose-700 hover:text-rose-800 hover:bg-rose-100 dark:text-rose-300 dark:hover:text-rose-200 dark:hover:bg-rose-800/50">
-              <Link to="/demo">
-                Démo
-              </Link>
+            <Button
+              variant="ghost"
+              asChild
+              className="text-rose-700 hover:text-rose-800 hover:bg-rose-100 dark:text-rose-300 dark:hover:text-rose-200 dark:hover:bg-rose-800/50"
+            >
+              <Link to="/demo">Démo</Link>
             </Button>
           </div>
 
           {/* Mobile Back Button + Controls */}
           <div className="flex items-center gap-3">
-            <Button variant="outline" asChild className="md:hidden border-rose-300 text-rose-700 hover:bg-rose-100 dark:border-rose-600 dark:text-rose-300 dark:hover:bg-rose-800">
+            <Button
+              variant="outline"
+              asChild
+              className="md:hidden border-rose-300 text-rose-700 hover:bg-rose-100 dark:border-rose-600 dark:text-rose-300 dark:hover:bg-rose-800"
+            >
               <Link to="/" className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Retour

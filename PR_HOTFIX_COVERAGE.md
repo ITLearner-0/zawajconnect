@@ -12,6 +12,7 @@
 ## 🔥 Problem Statement
 
 ### Current Situation
+
 The deployment workflow is **failing** with the following error:
 
 ```
@@ -23,6 +24,7 @@ Requirements:
 ```
 
 ### Impact
+
 - ❌ **Deployment BLOCKED** - Cannot deploy to production
 - ❌ **Tests taking 4+ minutes** - Slow CI/CD pipeline
 - ❌ **Current coverage ~70%** - Below the 80% threshold but still good
@@ -35,22 +37,27 @@ Requirements:
 This PR implements a **comprehensive fix** with two main components:
 
 ### 1. Lower Coverage Thresholds (Temporary)
+
 **Changed from 80% → 10%** for all metrics:
+
 - ✅ Lines coverage: 80% → 10%
 - ✅ Functions coverage: 80% → 10%
 - ✅ Branches coverage: 80% → 10%
 - ✅ Statements coverage: 80% → 10%
 
 **Rationale:**
+
 - Current coverage is ~70%, which is **good but not excellent**
 - The 80% threshold was aspirational but blocks progress
 - 10% ensures tests are running without being too restrictive
 - Allows gradual improvement of test coverage over time
 
 ### 2. Test Execution Optimizations
+
 **Performance improvements** to reduce test time from 4+ minutes to 30-60 seconds:
 
 #### Changes in `vitest.config.ts`:
+
 ```typescript
 // Before: Using forks, isolated tests, CSS processing
 pool: 'forks',
@@ -72,7 +79,9 @@ exclude: ['node_modules', 'dist', '.git', '.cache'],  // 🚫 Explicit excludes
 ### Files Modified
 
 #### 1. `vitest.config.ts`
+
 **Before:**
+
 ```typescript
 {
   css: true,
@@ -88,6 +97,7 @@ exclude: ['node_modules', 'dist', '.git', '.cache'],  // 🚫 Explicit excludes
 ```
 
 **After:**
+
 ```typescript
 {
   css: false, // Disable CSS processing to speed up tests
@@ -116,33 +126,39 @@ exclude: ['node_modules', 'dist', '.git', '.cache'],  // 🚫 Explicit excludes
 ## 🎯 Expected Impact
 
 ### Immediate Benefits
+
 ✅ **Deployment Unblocked**
+
 - CI/CD pipeline will pass
 - Can deploy to production immediately
 - No more 403 errors in deployment workflow
 
 ✅ **Faster Test Execution**
+
 - **Before:** 4+ minutes
 - **After:** 30-60 seconds
 - **Improvement:** ~75% faster
 
 ✅ **Better Developer Experience**
+
 - Faster feedback loops
 - Less waiting for CI
 - More productive development
 
 ### Performance Metrics
-| Metric | Before | After | Improvement |
-|--------|--------|-------|-------------|
-| Test execution time | 4m 15s | ~45s | **83% faster** |
-| Environment setup | 30s | ~6s | **80% faster** |
-| Coverage threshold | 80% | 10% | Deployment unblocked |
+
+| Metric              | Before | After | Improvement          |
+| ------------------- | ------ | ----- | -------------------- |
+| Test execution time | 4m 15s | ~45s  | **83% faster**       |
+| Environment setup   | 30s    | ~6s   | **80% faster**       |
+| Coverage threshold  | 80%    | 10%   | Deployment unblocked |
 
 ---
 
 ## 🧪 Testing
 
 ### Local Test Results
+
 ```bash
 $ npm run test:run
 
@@ -161,6 +177,7 @@ $ npm run test:run
 ```
 
 **Coverage Results:**
+
 ```
 Coverage report from v8
 -------------------|---------|----------|---------|---------|
@@ -180,6 +197,7 @@ All files          |   69.96 |     59.7 |   61.81 |    71.4 |
 ### This is a Temporary Measure
 
 **Coverage should be gradually increased:**
+
 - Target: Return to 80% coverage over the next 2-3 months
 - Strategy: Add tests incrementally with each new feature
 - Tracking: Monitor coverage trends in CI/CD reports
@@ -187,6 +205,7 @@ All files          |   69.96 |     59.7 |   61.81 |    71.4 |
 ### Why 10% Instead of 70%?
 
 We chose 10% rather than matching current 70% coverage because:
+
 1. ✅ **Safety net** - Ensures tests exist and run
 2. ✅ **Flexibility** - Allows for natural fluctuation as code evolves
 3. ✅ **Non-blocking** - Won't block deployment for small coverage dips
@@ -216,16 +235,19 @@ thresholds: {
 ## 📈 Future Improvements
 
 ### Short-term (1-2 weeks)
+
 - [ ] Monitor test execution time in CI
 - [ ] Verify deployment succeeds
 - [ ] Document any issues encountered
 
 ### Medium-term (1-2 months)
+
 - [ ] Add tests for critical paths
 - [ ] Increase threshold to 40%
 - [ ] Set up coverage trending dashboard
 
 ### Long-term (2-3 months)
+
 - [ ] Achieve 60% coverage
 - [ ] Consider increasing to 80%
 - [ ] Implement coverage gates per-file
@@ -282,6 +304,7 @@ npm run test:coverage
 ## 👥 Reviewers
 
 **Recommended reviewers:**
+
 - Technical lead for approval
 - DevOps team for CI/CD validation
 - QA team for test strategy review
@@ -312,6 +335,7 @@ We chose to **optimize test execution AND lower thresholds** together because:
 ## 📞 Questions or Concerns?
 
 If you have questions about this PR:
+
 - Comment on this PR
 - Contact the development team
 - Review the documentation in `ANALYSE_BDD_FONCTIONNALITES.md`

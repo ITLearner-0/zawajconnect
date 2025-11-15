@@ -13,6 +13,7 @@
 ### ✅ Aucun `any` implicite trouvé !
 
 Ce composant est **exemplaire** en termes de typage TypeScript :
+
 - ✅ Interface `InteractiveInsightCardProps` complète et bien définie
 - ✅ Type `React.FC<InteractiveInsightCardProps>` explicite
 - ✅ Props avec valeurs par défaut correctement typées
@@ -24,6 +25,7 @@ Ce composant est **exemplaire** en termes de typage TypeScript :
 Bien que le code soit excellent, quelques types de retour explicites pourraient être ajoutés pour une documentation parfaite :
 
 ### 1. Fonction getVariantStyles (ligne 44)
+
 ```typescript
 const getVariantStyles = (): string => {
   switch (variant) {
@@ -35,6 +37,7 @@ const getVariantStyles = (): string => {
 ```
 
 ### 2. Fonction getIconColor (ligne 57)
+
 ```typescript
 const getIconColor = (): string => {
   switch (variant) {
@@ -46,6 +49,7 @@ const getIconColor = (): string => {
 ```
 
 ### 3. Fonction renderContent (ligne 70)
+
 ```typescript
 const renderContent = (content: string | string[]): React.ReactNode => {
   if (Array.isArray(content)) {
@@ -62,25 +66,28 @@ const renderContent = (content: string | string[]): React.ReactNode => {
 ## 📦 Architecture du composant
 
 ### Props bien définies
+
 ```typescript
 interface InteractiveInsightCardProps {
-  title: string;                    // ✅ Requis
-  subtitle?: string;                // ✅ Optionnel
-  mainContent: string | string[];   // ✅ Union type
+  title: string; // ✅ Requis
+  subtitle?: string; // ✅ Optionnel
+  mainContent: string | string[]; // ✅ Union type
   expandedContent?: string | string[]; // ✅ Union type
-  insights?: string[];              // ✅ Array typé
-  recommendations?: string[];       // ✅ Array typé
-  icon?: React.ReactNode;          // ✅ Type React
+  insights?: string[]; // ✅ Array typé
+  recommendations?: string[]; // ✅ Array typé
+  icon?: React.ReactNode; // ✅ Type React
   variant?: 'default' | 'success' | 'warning' | 'info'; // ✅ Enum-like
-  showExpand?: boolean;            // ✅ Boolean
-  className?: string;              // ✅ String
+  showExpand?: boolean; // ✅ Boolean
+  className?: string; // ✅ String
 }
 ```
 
 ### État local
+
 - `isExpanded: boolean` - Gestion de l'expansion/collapse
 
 ### Fonctionnalités
+
 1. **Variantes de style**: 4 variantes (default, success, warning, info)
 2. **Contenu flexible**: Accepte string ou array
 3. **Expansion**: Révèle contenu additionnel
@@ -90,6 +97,7 @@ interface InteractiveInsightCardProps {
 ## 🎨 Qualité du code
 
 ### Points forts
+
 - ✅ **100% typé** - Aucun any implicite
 - ✅ **Props flexibles** - Union types bien utilisés
 - ✅ **Variantes** - Pattern variant bien implémenté
@@ -98,6 +106,7 @@ interface InteractiveInsightCardProps {
 - ✅ **Accessible** - Structure sémantique correcte
 
 ### Design Patterns utilisés
+
 1. **Variant Pattern**: Styles conditionnels basés sur props
 2. **Compound Components**: CardHeader, CardContent bien séparés
 3. **Conditional Rendering**: Gestion élégante du contenu optionnel
@@ -105,22 +114,24 @@ interface InteractiveInsightCardProps {
 
 ## 📈 Métriques
 
-| Métrique | Valeur | Statut |
-|----------|--------|--------|
-| Any implicites | 0 | ✅ Parfait |
-| Props typées | 10/10 | ✅ 100% |
-| Fonctions typées | 3/3 | ⚠️ 0% (retours non explicites) |
-| Interfaces | 1 | ✅ Complète |
-| Complexité | Moyenne | ✅ Gérable |
+| Métrique         | Valeur  | Statut                         |
+| ---------------- | ------- | ------------------------------ |
+| Any implicites   | 0       | ✅ Parfait                     |
+| Props typées     | 10/10   | ✅ 100%                        |
+| Fonctions typées | 3/3     | ⚠️ 0% (retours non explicites) |
+| Interfaces       | 1       | ✅ Complète                    |
+| Complexité       | Moyenne | ✅ Gérable                     |
 
 ## 🔗 Dépendances
 
 ### Dépend de:
+
 - Composants UI (Card, Badge, Button, Separator) ✅
 - Icons Lucide-react ✅
 - React (useState) ✅
 
 ### Utilisé dans:
+
 - `MobileInsightsDashboard.tsx` ✅
 - `CompatibilityInsights.tsx` (probablement)
 - Autres composants d'insights
@@ -135,12 +146,19 @@ interface InteractiveInsightCardProps {
 
 ```typescript
 // Ajouter types de retour explicites
-const getVariantStyles = (): string => { /* ... */ };
-const getIconColor = (): string => { /* ... */ };
-const renderContent = (content: string | string[]): React.ReactNode => { /* ... */ };
+const getVariantStyles = (): string => {
+  /* ... */
+};
+const getIconColor = (): string => {
+  /* ... */
+};
+const renderContent = (content: string | string[]): React.ReactNode => {
+  /* ... */
+};
 ```
 
 ### Bénéfices
+
 - 📚 **Documentation**: Types de retour visibles dans l'IDE
 - 🔍 **Autocomplete**: Meilleure suggestion IDE
 - ✅ **Validation**: TypeScript valide les retours
@@ -148,7 +166,9 @@ const renderContent = (content: string | string[]): React.ReactNode => { /* ... 
 ## 📝 Notes supplémentaires
 
 ### Utilisations observées
+
 Le composant est utilisé dans:
+
 1. **MobileInsightsDashboard** (ligne 104, 134, 143, 157)
    - Affichage des red flags
    - Affichage du partenaire idéal
@@ -156,6 +176,7 @@ Le composant est utilisé dans:
    - Affichage de la guidance islamique
 
 ### Patterns d'utilisation
+
 ```typescript
 // Pattern 1: Simple avec expansion
 <InteractiveInsightCard
@@ -181,12 +202,14 @@ Le composant est utilisé dans:
 ## 🎖️ Verdict final
 
 Ce composant est un **modèle d'excellence TypeScript** :
+
 - ⭐⭐⭐⭐⭐ **5/5** - Qualité du typage
 - ⭐⭐⭐⭐⭐ **5/5** - Architecture
 - ⭐⭐⭐⭐⭐ **5/5** - Réutilisabilité
 - ⭐⭐⭐⭐⭐ **5/5** - Maintenabilité
 
 ### Recommandation
+
 **Migration optionnelle** - Le composant est déjà excellent. L'ajout de types de retour explicites apporterait un bénéfice marginal en termes de documentation, mais n'est pas nécessaire.
 
 **Priorité**: Très faible 🟢  

@@ -15,9 +15,7 @@ const SubscriptionCanceled = () => {
               <XCircle className="h-12 w-12 text-muted-foreground" />
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold">
-            Paiement Annulé
-          </CardTitle>
+          <CardTitle className="text-2xl font-bold">Paiement Annulé</CardTitle>
         </CardHeader>
         <CardContent className="text-center space-y-6">
           <p className="text-muted-foreground">
@@ -29,16 +27,10 @@ const SubscriptionCanceled = () => {
           </p>
 
           <div className="flex flex-col gap-3">
-            <Button
-              onClick={() => navigate('/settings?tab=premium')}
-              variant="default"
-            >
+            <Button onClick={() => navigate('/settings?tab=premium')} variant="default">
               Voir les Plans Premium
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => navigate('/')}
-            >
+            <Button variant="outline" onClick={() => navigate('/')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour à l'accueil
             </Button>

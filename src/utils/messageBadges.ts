@@ -42,7 +42,7 @@ export const checkAndAwardMessageMilestones = async (userId: string): Promise<vo
 
     // Award badges for milestones (1, 100, 500)
     await checkAndAwardMessageBadges(totalMessages);
-    
+
     console.log('Message badge check completed');
   } catch (error) {
     // Don't fail the message send if badge awarding fails

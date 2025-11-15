@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -42,15 +41,15 @@ export const useFetchUserStatus = (userId: string | null) => {
           const lastActive = new Date(profile.updated_at);
           const now = new Date();
           const diffMinutes = (now.getTime() - lastActive.getTime()) / (1000 * 60);
-          
+
           setUserStatus({
             status: diffMinutes < 15 ? 'online' : 'offline',
-            last_active: profile.updated_at
+            last_active: profile.updated_at,
           });
         } else {
           setUserStatus({
             status: 'offline',
-            last_active: null
+            last_active: null,
           });
         }
       } catch (err: any) {

@@ -20,7 +20,7 @@ SMTP_FROM_NAME=Zawaj Connect
 ### Détails pour Hostinger
 
 - **SMTP_HOST**: `smtp.hostinger.com`
-- **SMTP_PORT**: 
+- **SMTP_PORT**:
   - `465` pour SSL (recommandé)
   - `587` pour TLS
   - `25` pour non-sécurisé (non recommandé)
@@ -31,7 +31,8 @@ SMTP_FROM_NAME=Zawaj Connect
 
 ## 🔒 Sécurité
 
-⚠️ **Important**: 
+⚠️ **Important**:
+
 - Ne jamais mettre ces informations directement dans le code
 - Utilisez toujours les secrets de Supabase Edge Functions
 - Ces secrets sont chiffrés et sécurisés par Supabase
@@ -68,10 +69,12 @@ Pour vérifier que tout fonctionne:
 ## ⚡ Migration depuis Resend
 
 Les nouvelles fonctions utilisent SMTP au lieu de Resend:
+
 - ❌ Ancienne méthode: `Resend API`
 - ✅ Nouvelle méthode: `SMTP Hostinger`
 
 Avantages:
+
 - ✅ Pas de dépendance externe (Resend)
 - ✅ Utilisation de votre propre serveur email
 - ✅ Plus de contrôle sur les emails envoyés

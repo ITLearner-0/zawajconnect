@@ -1,4 +1,3 @@
-
 import { Badge } from '@/components/ui/badge';
 import { RetentionPolicy } from '@/types/profile';
 import { useTranslation } from 'react-i18next';
@@ -9,10 +8,10 @@ interface FeaturesAndSettingsProps {
   retentionPolicy: RetentionPolicy;
 }
 
-const FeaturesAndSettings = ({ 
-  encryptionEnabled, 
-  monitoringEnabled, 
-  retentionPolicy 
+const FeaturesAndSettings = ({
+  encryptionEnabled,
+  monitoringEnabled,
+  retentionPolicy,
 }: FeaturesAndSettingsProps) => {
   const { t } = useTranslation();
 
@@ -27,28 +26,32 @@ const FeaturesAndSettings = ({
         <li>{t('demo.featuresList.messageRetention')}</li>
         <li>{t('demo.featuresList.contentMonitoring')}</li>
       </ul>
-      
+
       <div className="mt-4">
         <h3 className="font-semibold mb-2">{t('demo.settings')}</h3>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span>{t('demo.settingsLabels.encryption')}:</span>
             <Badge variant={encryptionEnabled ? 'default' : 'outline'}>
-              {encryptionEnabled ? t('demo.settingsLabels.enabled') : t('demo.settingsLabels.disabled')}
+              {encryptionEnabled
+                ? t('demo.settingsLabels.enabled')
+                : t('demo.settingsLabels.disabled')}
             </Badge>
           </div>
           <div className="flex items-center justify-between">
             <span>{t('demo.settingsLabels.retention')}:</span>
             <Badge variant="outline">
-              {retentionPolicy.type === 'temporary' 
-                ? `${retentionPolicy.duration_days} ${t('demo.settingsLabels.days')}` 
+              {retentionPolicy.type === 'temporary'
+                ? `${retentionPolicy.duration_days} ${t('demo.settingsLabels.days')}`
                 : t('demo.settingsLabels.permanent')}
             </Badge>
           </div>
           <div className="flex items-center justify-between">
             <span>{t('demo.settingsLabels.aiMonitoring')}:</span>
             <Badge variant={monitoringEnabled ? 'default' : 'outline'}>
-              {monitoringEnabled ? t('demo.settingsLabels.enabled') : t('demo.settingsLabels.disabled')}
+              {monitoringEnabled
+                ? t('demo.settingsLabels.enabled')
+                : t('demo.settingsLabels.disabled')}
             </Badge>
           </div>
         </div>

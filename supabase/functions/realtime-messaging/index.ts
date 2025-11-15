@@ -1,6 +1,5 @@
-
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 interface WebSocketMessage {
   type: 'message' | 'typing' | 'presence' | 'join' | 'leave';
@@ -23,19 +22,19 @@ const conversationRooms = new Map<string, Set<string>>();
 
 serve(async (req) => {
   const { headers } = req;
-  const upgradeHeader = headers.get("upgrade") || "";
+  const upgradeHeader = headers.get('upgrade') || '';
 
-  if (upgradeHeader.toLowerCase() !== "websocket") {
-    return new Response("Expected WebSocket connection", { status: 400 });
+  if (upgradeHeader.toLowerCase() !== 'websocket') {
+    return new Response('Expected WebSocket connection', { status: 400 });
   }
 
   const url = new URL(req.url);
-  const userId = url.searchParams.get("userId");
-  const conversationId = url.searchParams.get("conversationId");
-  const token = url.searchParams.get("token");
+  const userId = url.searchParams.get('userId');
+  const conversationId = url.searchParams.get('conversationId');
+  const token = url.searchParams.get('token');
 
   if (!userId || !token) {
-    return new Response("Missing required parameters", { status: 400 });
+    return new Response('Missing required parameters', { status: 400 });
   }
 
   // Vérifier l'authentification
@@ -44,9 +43,12 @@ serve(async (req) => {
     Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
   );
 
-  const { data: { user }, error } = await supabase.auth.getUser(token);
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser(token);
   if (error || !user || user.id !== userId) {
-    return new Response("Authentication failed", { status: 401 });
+    return new Response('Authentication failed', { status: 401 });
   }
 
   const { socket, response } = Deno.upgradeWebSocket(req);
@@ -57,23 +59,23 @@ serve(async (req) => {
     socket,
     userId,
     conversationId,
-    lastPing: Date.now()
+    lastPing: Date.now(),
   };
 
   socket.onopen = () => {
     console.log(`WebSocket connected: ${clientId} (user: ${userId})`);
     connectedClients.set(clientId, client);
-    
+
     // Joindre la conversation si spécifiée
     if (conversationId) {
       joinConversation(clientId, conversationId);
     }
-    
+
     // Envoyer confirmation de connexion
     sendToClient(clientId, {
       type: 'join',
       data: { status: 'connected', clientId },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   };
 
@@ -86,7 +88,7 @@ serve(async (req) => {
       sendToClient(clientId, {
         type: 'error',
         data: { error: 'Invalid message format' },
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
     }
   };
@@ -115,27 +117,27 @@ async function handleMessage(clientId: string, message: WebSocketMessage) {
     case 'message':
       await handleChatMessage(clientId, message);
       break;
-    
+
     case 'typing':
       handleTypingIndicator(clientId, message);
       break;
-    
+
     case 'presence':
       handlePresenceUpdate(clientId, message);
       break;
-    
+
     case 'join':
       if (message.conversationId) {
         joinConversation(clientId, message.conversationId);
       }
       break;
-    
+
     case 'leave':
       if (message.conversationId) {
         leaveConversation(clientId, message.conversationId);
       }
       break;
-    
+
     default:
       console.warn(`Unknown message type: ${message.type}`);
   }
@@ -158,7 +160,7 @@ async function handleChatMessage(clientId: string, message: WebSocketMessage) {
       conversation_id: message.conversationId,
       sender_id: client.userId,
       content: message.data.content,
-      message_type: message.data.type || 'text'
+      message_type: message.data.type || 'text',
     })
     .select()
     .single();
@@ -168,17 +170,21 @@ async function handleChatMessage(clientId: string, message: WebSocketMessage) {
     sendToClient(clientId, {
       type: 'error',
       data: { error: 'Failed to save message' },
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     return;
   }
 
   // Diffuser le message aux autres clients de la conversation
-  broadcastToConversation(message.conversationId, {
-    type: 'message',
-    data: data,
-    timestamp: Date.now()
-  }, clientId);
+  broadcastToConversation(
+    message.conversationId,
+    {
+      type: 'message',
+      data: data,
+      timestamp: Date.now(),
+    },
+    clientId
+  );
 }
 
 // Gérer les indicateurs de frappe
@@ -186,14 +192,18 @@ function handleTypingIndicator(clientId: string, message: WebSocketMessage) {
   const client = connectedClients.get(clientId);
   if (!client || !message.conversationId) return;
 
-  broadcastToConversation(message.conversationId, {
-    type: 'typing',
-    data: {
-      userId: client.userId,
-      isTyping: message.data.isTyping
+  broadcastToConversation(
+    message.conversationId,
+    {
+      type: 'typing',
+      data: {
+        userId: client.userId,
+        isTyping: message.data.isTyping,
+      },
+      timestamp: Date.now(),
     },
-    timestamp: Date.now()
-  }, clientId);
+    clientId
+  );
 }
 
 // Gérer les mises à jour de présence
@@ -202,15 +212,18 @@ function handlePresenceUpdate(clientId: string, message: WebSocketMessage) {
   if (!client) return;
 
   // Diffuser le statut de présence
-  broadcastToAllConnected({
-    type: 'presence',
-    data: {
-      userId: client.userId,
-      status: message.data.status,
-      lastSeen: Date.now()
+  broadcastToAllConnected(
+    {
+      type: 'presence',
+      data: {
+        userId: client.userId,
+        status: message.data.status,
+        lastSeen: Date.now(),
+      },
+      timestamp: Date.now(),
     },
-    timestamp: Date.now()
-  }, clientId);
+    clientId
+  );
 }
 
 // Joindre une conversation
@@ -219,13 +232,13 @@ function joinConversation(clientId: string, conversationId: string) {
   if (!client) return;
 
   client.conversationId = conversationId;
-  
+
   if (!conversationRooms.has(conversationId)) {
     conversationRooms.set(conversationId, new Set());
   }
-  
+
   conversationRooms.get(conversationId)!.add(clientId);
-  
+
   console.log(`Client ${clientId} joined conversation ${conversationId}`);
 }
 
@@ -238,12 +251,12 @@ function leaveConversation(clientId: string, conversationId: string) {
       conversationRooms.delete(conversationId);
     }
   }
-  
+
   const client = connectedClients.get(clientId);
   if (client && client.conversationId === conversationId) {
     client.conversationId = undefined;
   }
-  
+
   console.log(`Client ${clientId} left conversation ${conversationId}`);
 }
 
@@ -261,11 +274,15 @@ function sendToClient(clientId: string, message: WebSocketMessage) {
 }
 
 // Diffuser à tous les clients d'une conversation
-function broadcastToConversation(conversationId: string, message: WebSocketMessage, excludeClientId?: string) {
+function broadcastToConversation(
+  conversationId: string,
+  message: WebSocketMessage,
+  excludeClientId?: string
+) {
   const room = conversationRooms.get(conversationId);
   if (!room) return;
 
-  room.forEach(clientId => {
+  room.forEach((clientId) => {
     if (clientId !== excludeClientId) {
       sendToClient(clientId, message);
     }
@@ -292,15 +309,18 @@ function handleDisconnection(clientId: string) {
   }
 
   // Notifier la déconnexion
-  broadcastToAllConnected({
-    type: 'presence',
-    data: {
-      userId: client.userId,
-      status: 'offline',
-      lastSeen: Date.now()
+  broadcastToAllConnected(
+    {
+      type: 'presence',
+      data: {
+        userId: client.userId,
+        status: 'offline',
+        lastSeen: Date.now(),
+      },
+      timestamp: Date.now(),
     },
-    timestamp: Date.now()
-  }, clientId);
+    clientId
+  );
 
   connectedClients.delete(clientId);
 }

@@ -4,16 +4,16 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { 
-  Settings as SettingsIcon, 
-  Shield, 
-  Users, 
-  Bell, 
+import {
+  Settings as SettingsIcon,
+  Shield,
+  Users,
+  Bell,
   User,
   LogOut,
   ArrowLeft,
   Crown,
-  Code
+  Code,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import PrivacySettingsForm from '@/components/PrivacySettingsForm';
@@ -34,10 +34,10 @@ const Settings = () => {
   const { user, subscription, signOut } = useAuth();
   const navigate = useNavigate();
   const { securityStatus } = useSecurityMonitor();
-  
+
   // Check for dev mode
   const isDevMode = import.meta.env.VITE_DEV_MODE === 'true';
-  
+
   // Check for active section in URL params
   const urlParams = new URLSearchParams(window.location.search);
   const sectionFromUrl = urlParams.get('section');
@@ -64,11 +64,7 @@ const Settings = () => {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between border-b pb-4">
           <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/enhanced-profile')}
-            >
+            <Button variant="ghost" size="sm" onClick={() => navigate('/enhanced-profile')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour
             </Button>
@@ -77,11 +73,7 @@ const Settings = () => {
               <h1 className="text-2xl font-bold text-foreground">Paramètres</h1>
             </div>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleSignOut}
-          >
+          <Button variant="outline" size="sm" onClick={handleSignOut}>
             <LogOut className="h-4 w-4 mr-2" />
             Se déconnecter
           </Button>
@@ -99,16 +91,16 @@ const Settings = () => {
                 {menuItems.map((item) => {
                   const Icon = item.icon;
                   const isActive = activeSection === item.id;
-                  
+
                   return (
                     <button
                       key={item.id}
                       onClick={() => setActiveSection(item.id)}
                       className={cn(
-                        "w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                        'w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
                         isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-foreground hover:bg-accent"
+                          ? 'bg-primary text-primary-foreground'
+                          : 'text-foreground hover:bg-accent'
                       )}
                     >
                       <Icon className="h-4 w-4" />
@@ -190,9 +182,7 @@ const Settings = () => {
                           </p>
                         </div>
                       </div>
-                      <Badge className="bg-emerald text-white px-4 py-1.5">
-                        Actif
-                      </Badge>
+                      <Badge className="bg-emerald text-white px-4 py-1.5">Actif</Badge>
                     </div>
                   </Card>
                 )}

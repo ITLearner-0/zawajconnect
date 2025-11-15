@@ -1,4 +1,3 @@
-
 // Environment security utilities
 
 // Check if we're in a secure context
@@ -20,7 +19,7 @@ export const generateCSPHeader = (): string => {
     "base-uri 'self'",
     "form-action 'self'",
     "frame-ancestors 'none'",
-    "upgrade-insecure-requests"
+    'upgrade-insecure-requests',
   ].join('; ');
 };
 
@@ -32,34 +31,34 @@ export const securityHeaders = {
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-  'Content-Security-Policy': generateCSPHeader()
+  'Content-Security-Policy': generateCSPHeader(),
 };
 
 // Check for mixed content issues
 export const checkMixedContent = (): { hasIssues: boolean; issues: string[] } => {
   const issues: string[] = [];
-  
+
   // Check for insecure scripts
   const scripts = document.querySelectorAll('script[src]');
-  scripts.forEach(script => {
+  scripts.forEach((script) => {
     const src = script.getAttribute('src');
     if (src && src.startsWith('http://')) {
       issues.push(`Insecure script: ${src}`);
     }
   });
-  
+
   // Check for insecure stylesheets
   const stylesheets = document.querySelectorAll('link[rel="stylesheet"]');
-  stylesheets.forEach(link => {
+  stylesheets.forEach((link) => {
     const href = link.getAttribute('href');
     if (href && href.startsWith('http://')) {
       issues.push(`Insecure stylesheet: ${href}`);
     }
   });
-  
+
   return {
     hasIssues: issues.length > 0,
-    issues
+    issues,
   };
 };
 
@@ -67,7 +66,7 @@ export const checkMixedContent = (): { hasIssues: boolean; issues: string[] } =>
 export const getSecurityConfig = () => {
   const isDevelopment = import.meta.env.DEV;
   const isProduction = import.meta.env.PROD;
-  
+
   return {
     isDevelopment,
     isProduction,
@@ -75,6 +74,6 @@ export const getSecurityConfig = () => {
     enableSecurityHeaders: isProduction,
     requireHTTPS: isProduction,
     enableCSP: isProduction,
-    logSecurityEvents: true
+    logSecurityEvents: true,
   };
 };

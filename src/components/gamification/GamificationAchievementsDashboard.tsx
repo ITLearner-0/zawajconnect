@@ -11,7 +11,8 @@ interface GamificationAchievementsDashboardProps {
 }
 
 const GamificationAchievementsDashboard = ({ userId }: GamificationAchievementsDashboardProps) => {
-  const { badges, rewards, isLoading, refreshAll, getGamificationSummary } = useGamification(userId);
+  const { badges, rewards, isLoading, refreshAll, getGamificationSummary } =
+    useGamification(userId);
 
   if (isLoading) {
     return <StandardLoadingState loading={true} loadingText="Loading gamification..." />;

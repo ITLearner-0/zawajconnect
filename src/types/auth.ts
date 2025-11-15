@@ -1,4 +1,3 @@
-
 // Authentication related types
 export interface SignUpData {
   email: string;

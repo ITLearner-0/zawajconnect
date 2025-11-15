@@ -6,15 +6,15 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 
 ## 📊 État Initial
 
-| Métrique | Valeur |
-|----------|--------|
-| **Warnings ESLint** | 204 → **184** ✅ |
-| **Type de warning** | `@typescript-eslint/no-explicit-any` |
-| **Statut actuel** | `warn` (permet la compilation) |
-| **Objectif final** | 0 warnings (règle à `error`) |
-| **Dernière action** | Centralisation des types dans `src/types/supabase.ts` |
+| Métrique            | Valeur                                                         |
+| ------------------- | -------------------------------------------------------------- |
+| **Warnings ESLint** | 204 → **184** ✅                                               |
+| **Type de warning** | `@typescript-eslint/no-explicit-any`                           |
+| **Statut actuel**   | `warn` (permet la compilation)                                 |
+| **Objectif final**  | 0 warnings (règle à `error`)                                   |
+| **Dernière action** | Centralisation des types dans `src/types/supabase.ts`          |
 | **Progrès Phase 1** | 21 types stricts ajoutés (16 any + 5 unknown), 1 any documenté |
-| **Status** | ✅ **Phase 1 TERMINÉE (100%)** + Types centralisés |
+| **Status**          | ✅ **Phase 1 TERMINÉE (100%)** + Types centralisés             |
 
 ---
 
@@ -25,6 +25,7 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 **Warnings éliminés**: 2 `any` remplacés
 
 **Changements effectués**:
+
 1. `presenceChannelRef`: `any` → `RealtimeChannel | undefined`
    - Import du type `RealtimeChannel` depuis `@supabase/supabase-js`
    - Changement de `null` à `undefined` pour cohérence TypeScript
@@ -35,11 +36,13 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
    - Amélioration de la lisibilité avec variable `typingPayload`
 
 **Validation**:
+
 - ✅ Types stricts sans `any`
 - ✅ Comportement fonctionnel identique
 - ✅ Pattern réutilisable pour autres hooks de présence
 
 **Leçons apprises**:
+
 - Les types Supabase Realtime sont disponibles et bien documentés
 - Utiliser `undefined` au lieu de `null` pour les refs (cohérence)
 - Créer des interfaces pour les payloads complexes améliore la maintenabilité
@@ -51,6 +54,7 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 **Warnings éliminés**: 5 `unknown` remplacés par types stricts
 
 **Changements effectués**:
+
 1. Import des types Supabase stricts depuis `Database`
    - `Profile`, `IslamicPreferences`, `PrivacySettings`, `UserVerification`, `MatchingPreferences`
    - Tous les types extraits du schéma auto-généré
@@ -77,12 +81,14 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
    - Évite re-renders inutiles
 
 **Validation**:
+
 - ✅ Types stricts pour toutes les tables Supabase
 - ✅ Type safety complète pour `ProfileData`
 - ✅ Pas de régression fonctionnelle
 - ✅ Cohérence avec patterns du refactoring TypeScript
 
 **Leçons apprises**:
+
 - Les types auto-générés Supabase sont fiables et complets
 - Type guards avec `filter` améliorent la safety
 - Documentation JSDoc importante pour types complexes
@@ -95,18 +101,21 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 **Warnings éliminés**: 1 `any` remplacé
 
 **Changements effectués**:
+
 1. `channelRef`: `any` → `RealtimeChannel | null`
    - Import du type `RealtimeChannel` depuis `@supabase/supabase-js`
    - Pattern cohérent avec `useChatPresence.tsx`
    - Utilisation de `null` car compatible avec le cleanup existant
 
 **Validation**:
+
 - ✅ Type strict pour le canal realtime
 - ✅ Comportement fonctionnel identique
 - ✅ Pattern réutilisable pour tous les hooks realtime
 - ✅ Pas de régression dans la gestion des messages
 
 **Leçons apprises**:
+
 - Le pattern `RealtimeChannel | null` est standard pour les refs de canaux
 - Cohérence importante entre hooks utilisant Supabase Realtime
 - Migration simple quand le code est déjà bien structuré
@@ -120,11 +129,13 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 **Status**: Déjà utilisant des types stricts Supabase Auth
 
 **Validation**:
+
 - ✅ Utilise `User`, `Session`, `AuthError` de `@supabase/supabase-js`
 - ✅ Pas d'`any` explicite ou implicite
 - ✅ Exemple de bonnes pratiques pour les autres hooks
 
 **Leçons apprises**:
+
 - Certains hooks sont déjà conformes et ne nécessitent pas de migration
 - Vérifier les issues réelles avant de commencer un travail de migration
 - Documenter les fichiers conformes pour tracer les bonnes pratiques
@@ -136,7 +147,9 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 **Warnings éliminés**: 2 types `any` implicites
 
 **Changements effectués**:
+
 1. **Remplacement de l'interface locale par les types Supabase:**
+
    ```typescript
    // Avant: Interface locale personnalisée
    export interface MatchingPreferences {
@@ -144,10 +157,13 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
      weight_islamic: number;
      // ...
    }
-   
+
    // Après: Type strict extrait de la base de données
    export type MatchingPreferences = Database['public']['Tables']['matching_preferences']['Row'];
-   export type MatchingPreferencesUpdate = Omit<MatchingPreferences, 'id' | 'created_at' | 'updated_at' | 'user_id'>;
+   export type MatchingPreferencesUpdate = Omit<
+     MatchingPreferences,
+     'id' | 'created_at' | 'updated_at' | 'user_id'
+   >;
    ```
 
 2. **Typage strict des réponses Supabase:**
@@ -167,12 +183,14 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
    ```
 
 **Validation**:
+
 - ✅ Types correspondent exactement au schéma Supabase
 - ✅ Toutes les opérations base de données correctement typées
 - ✅ Pas d'`any` implicite dans l'état ou les fonctions
 - ✅ Logique auto-save maintient la type safety
 
 **Leçons apprises**:
+
 - Utiliser `Database['public']['Tables']['table_name']['Row']` garantit la cohérence du schéma
 - Créer des types Update séparés (`Omit<Row, ...>`) pour les opérations upsert
 - Importer `PostgrestError` de `@supabase/supabase-js` pour le typage des erreurs
@@ -185,11 +203,13 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 **Warnings éliminés**: 3 types `any` implicites (1 `any` nécessaire documenté)
 
 **Changements effectués**:
+
 1. **Remplacement de l'interface locale par les types Supabase:**
+
    ```typescript
    // Avant: Interface personnalisée FamilyNotification
    interface FamilyNotification { ... }
-   
+
    // Après: Types stricts exportés
    export interface EnrichedFamilyNotification { ... }
    export interface EnrichedMatch { ... }
@@ -202,11 +222,13 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
    - Type guards pour `memberError`, `reviewError`, `notifError`, `matchError`
 
 3. **Gestion des relations complexes Supabase:**
+
    ```typescript
    // Limitation connue: les joins complexes ne sont pas bien typés par Supabase
    // eslint-disable-next-line @typescript-eslint/no-explicit-any
    const rawMatch = (item as any).match;
    ```
+
    - Documentation du `as any` nécessaire (limitation Supabase)
    - Normalisation stricte des données avec fallbacks
 
@@ -221,12 +243,14 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
    - `match_score: number` avec fallback 0
 
 **Validation**:
+
 - ✅ Types exportés utilisables dans les composants
 - ✅ Toutes les opérations base de données typées
 - ✅ 1 `any` documenté avec eslint-disable (limitation Supabase connue)
 - ✅ Normalisation stricte des données avec type safety
 
 **Leçons apprises**:
+
 - Supabase ne type pas bien les relations SQL complexes avec joins
 - `as any` est acceptable si bien documenté avec eslint-disable et commentaire
 - Exporter les interfaces pour réutilisation dans les composants
@@ -240,10 +264,13 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 **Warnings éliminés**: 4 types `any` implicites
 
 **Changements effectués**:
+
 1. **Import des types Supabase stricts:**
+
    ```typescript
    type CompatibilityQuestionRow = Database['public']['Tables']['compatibility_questions']['Row'];
-   type UserCompatibilityResponseRow = Database['public']['Tables']['user_compatibility_responses']['Row'];
+   type UserCompatibilityResponseRow =
+     Database['public']['Tables']['user_compatibility_responses']['Row'];
    ```
 
 2. **Interfaces exportées pour réutilisation:**
@@ -269,12 +296,14 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
    - Documentation JSDoc pour toutes les fonctions
 
 **Validation**:
+
 - ✅ Tous les types Supabase correctement importés
 - ✅ Gestion stricte des erreurs avec `PostgrestError`
 - ✅ Pas d'`any` implicite dans les réponses Supabase
 - ✅ Calcul de compatibilité entièrement typé
 
 **Leçons apprises**:
+
 - Typer explicitement toutes les erreurs Supabase même pour les queries simples
 - Créer des types intermédiaires (`WeightedQuestion`) pour améliorer la clarté
 - Documenter les fonctions complexes avec JSDoc
@@ -288,11 +317,13 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 **Warnings éliminés**: 3 types `any` (1 dans `Record<string, any>` + 2 implicites dans RPC)
 
 **Changements effectués**:
+
 1. **Remplacement de `Record<string, any>` par un type strict:**
+
    ```typescript
    // Avant: additionalInfo?: Record<string, any>
    // Après: additionalInfo?: ValidationAdditionalInfo
-   
+
    interface ValidationAdditionalInfo {
      daily_limit?: number;
      current_count?: number;
@@ -304,13 +335,14 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
    ```
 
 2. **Typage strict des réponses RPC:**
+
    ```typescript
    interface UserVerificationStatus {
      email_verified: boolean;
      id_verified: boolean;
      verification_score: number;
    }
-   
+
    // Type guard pour les réponses RPC
    const userVerification = (verification as UserVerificationStatus[] | null)?.[0];
    ```
@@ -333,12 +365,14 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
    - Vérification de `Array.isArray()` pour `contactAccess`
 
 **Validation**:
+
 - ✅ Plus aucun `Record<string, any>` dans le code
 - ✅ Toutes les réponses RPC correctement typées
 - ✅ Type safety complète pour les validations de sécurité
 - ✅ Documentation JSDoc pour toutes les fonctions publiques
 
 **Leçons apprises**:
+
 - Créer des interfaces spécifiques (`ValidationAdditionalInfo`) plutôt que `Record<string, any>`
 - Les réponses RPC Supabase nécessitent des type guards car elles ne sont pas typées automatiquement
 - Documenter toutes les fonctions de sécurité avec JSDoc pour la maintenabilité
@@ -350,12 +384,14 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 ## 🎉 Phase 1 TERMINÉE - Hooks Core (100%)
 
 **Récapitulatif Phase 1:**
+
 - ✅ 8/8 hooks migrés (100%)
 - ✅ 21 types stricts ajoutés (16 `any` + 5 `unknown` éliminés)
 - ✅ 1 `any` nécessaire documenté (limitation Supabase)
 - ✅ 204 → 184 warnings (-20 warnings, ~9.8%)
 
 **Hooks complétés:**
+
 1. `useChatPresence.tsx` - 2 any éliminés
 2. `useProfileData.tsx` - 5 unknown éliminés
 3. `useChatMessages.tsx` - 1 any éliminé
@@ -366,6 +402,7 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 8. `useSecurityValidationEnhanced.tsx` - 3 any éliminés
 
 **Patterns établis:**
+
 - ✅ Import systématique de `Database` et `PostgrestError`
 - ✅ Interfaces exportées pour réutilisation
 - ✅ Type guards pour erreurs et réponses RPC
@@ -420,12 +457,14 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
    - `DeepPartial<T>`
 
 **Hooks mis à jour:**
+
 - ✅ `useCompatibility.tsx` - Import depuis types centralisés
 - ✅ `useFamilyApproval.tsx` - Import depuis types centralisés
 - ✅ `useMatchingPreferences.tsx` - Import depuis types centralisés
 - ✅ `useSecurityValidationEnhanced.tsx` - Import depuis types centralisés
 
 **Bénéfices:**
+
 - ✅ Source unique de vérité pour tous les types
 - ✅ Facilite la maintenance et les mises à jour
 - ✅ Évite la duplication de code
@@ -433,6 +472,7 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 - ✅ Prêt pour Phase 2 (Services & Utils)
 
 **Leçons apprises:**
+
 - Centraliser les types dès le début facilite grandement les phases suivantes
 - Organiser les types par domaine (tables, compatibilité, sécurité, etc.)
 - Documenter chaque type avec JSDoc pour la clarté
@@ -443,6 +483,7 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 ## 🎉 Phase 3 TERMINÉE - Hooks & Composants Matching (100%)
 
 **Récapitulatif Phase 3:**
+
 - ✅ 5/5 hooks migrés (100%)
 - ✅ 4/4 composants matching migrés (100%)
 - ✅ 24 any éliminés (14 hooks + 10 composants)
@@ -450,6 +491,7 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 - ✅ 175 → 151 warnings (-24 warnings, ~13.7%)
 
 **Hooks complétés:**
+
 1. `useSmartRecommendations.tsx` - 8 any éliminés
 2. `useIslamicModeration.tsx` - 4 any éliminés
 3. `useMatchingHistory.tsx` - 2 any éliminés
@@ -457,24 +499,28 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 5. `useCompatibility.tsx` - 0 any (logging amélioré)
 
 **Composants complétés:**
+
 1. `MatchCard.tsx` - 4 any éliminés
 2. `RecommendationCard.tsx` - 4 any éliminés
 3. `SmartRecommendationEngine.tsx` - 2 any éliminés
 4. `MatchResultsGrid.tsx` - 0 any (types centralisés)
 
 **Types centralisés ajoutés:**
+
 1. `MatchProfile` (extends `ScoredMatch`) - Pour affichage UI des matches
 2. `SmartRecommendation` (extends `ScoredMatch`) - Pour recommandations ML
 3. `MatchingHistoryPreferences` - Pour historique de recherche
 4. `ModerationSuggestion` - Pour suggestions de modération
 
 **Harmonisation UI/Services:**
+
 - ✅ `matchingOptimizationService.ts` ↔ `useSmartRecommendations.tsx` ↔ `SmartRecommendationEngine.tsx`
 - ✅ `contentModerationService.ts` ↔ `useIslamicModeration.tsx`
 - ✅ Types partagés entre services backend, hooks UI et composants UI
 - ✅ Flux de données cohérent de bout en bout (Service → Hook → Component)
 
 **Patterns établis:**
+
 - ✅ Extensions de `ScoredMatch` pour types UI (MatchProfile, SmartRecommendation)
 - ✅ Typage explicite des callbacks map avec `(item: Type, index: number)`
 - ✅ Import de `Json` type depuis Supabase pour JSONB columns
@@ -485,6 +531,7 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 - ✅ Documentation JSDoc pour composants complexes
 
 **Impact cumulatif (Phases 1-3):**
+
 - Phase 1: 29 any éliminés (Services & Utils)
 - Phase 2: 0 any (Consolidation types)
 - Phase 3: 24 any éliminés (Hooks & Composants)
@@ -492,6 +539,7 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 - **Progression: 204 → 151 warnings (-26%)**
 
 **Prochaine phase:**
+
 - Phase 4: Enhanced Components & Admin Components
 - Cibles: EnhancedWaliDashboard, CompatibilityAssessment, ModerationDashboard
 - Estimation: ~40 any à éliminer
@@ -513,6 +561,7 @@ Plan progressif pour éliminer les 204 warnings ESLint `@typescript-eslint/no-ex
 ## 📋 Priorisation des Fichiers
 
 ### 🔴 Phase 1 - Critique (Priorité P1)
+
 **Hooks Core** - Impactent toute l'application
 
 ```
@@ -538,6 +587,7 @@ Warnings restants: 184 (204 initial)
 ---
 
 ### 🟠 Phase 2 - Important (Priorité P2)
+
 **Services & Utils** - Logique métier partagée
 
 ```
@@ -559,6 +609,7 @@ Warnings restants: ~162 (204 initial)
 ---
 
 ### 🟡 Phase 3 - Moyen (Priorité P3)
+
 **Hooks & Composants UI** - Couche d'interface
 
 ```
@@ -584,6 +635,7 @@ Durée estimée: 2-3 semaines
 ---
 
 ### 🟢 Phase 4 - Standard (Priorité P4)
+
 **Pages & Composants UI** - Interface utilisateur
 
 ```
@@ -600,6 +652,7 @@ Durée estimée: 3-4 semaines
 ---
 
 ### 🔵 Phase 5 - Final (Priorité P5)
+
 **Composants Tertiaires** - Fonctionnalités secondaires
 
 ```
@@ -621,6 +674,7 @@ Durée estimée: 1-2 semaines
 ### 1. Types d'Événements React
 
 #### ❌ Avant (any)
+
 ```typescript
 const handleChange = (e: any) => {
   setValue(e.target.value);
@@ -628,6 +682,7 @@ const handleChange = (e: any) => {
 ```
 
 #### ✅ Après (strict)
+
 ```typescript
 const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   setValue(e.target.value);
@@ -644,12 +699,14 @@ const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 ### 2. Réponses Supabase
 
 #### ❌ Avant (any)
+
 ```typescript
 const { data } = await supabase.from('profiles').select('*');
 // data est any
 ```
 
 #### ✅ Après (strict)
+
 ```typescript
 interface ProfileRow {
   id: string;
@@ -659,13 +716,10 @@ interface ProfileRow {
   // ... autres champs
 }
 
-const { data } = await supabase
-  .from('profiles')
-  .select('*')
-  .returns<ProfileRow[]>();
+const { data } = await supabase.from('profiles').select('*').returns<ProfileRow[]>();
 
 // Ou avec normalisation
-const normalizedData: Profile[] = (data ?? []).map(row => ({
+const normalizedData: Profile[] = (data ?? []).map((row) => ({
   id: row.id,
   userId: row.user_id,
   fullName: row.full_name ?? '',
@@ -678,6 +732,7 @@ const normalizedData: Profile[] = (data ?? []).map(row => ({
 ### 3. Callbacks et Handlers
 
 #### ❌ Avant (any)
+
 ```typescript
 const handleSubmit = (values: any) => {
   // Process values
@@ -685,6 +740,7 @@ const handleSubmit = (values: any) => {
 ```
 
 #### ✅ Après (strict)
+
 ```typescript
 interface FormValues {
   name: string;
@@ -702,6 +758,7 @@ const handleSubmit = (values: FormValues) => {
 ### 4. Props de Composants
 
 #### ❌ Avant (any)
+
 ```typescript
 interface Props {
   data: any;
@@ -710,6 +767,7 @@ interface Props {
 ```
 
 #### ✅ Après (strict)
+
 ```typescript
 interface UserData {
   id: string;
@@ -728,11 +786,13 @@ interface Props {
 ### 5. États Génériques
 
 #### ❌ Avant (any)
+
 ```typescript
 const [data, setData] = useState<any>(null);
 ```
 
 #### ✅ Après (strict)
+
 ```typescript
 interface ApiData {
   items: Item[];
@@ -747,6 +807,7 @@ const [data, setData] = useState<ApiData | undefined>(undefined);
 ### 6. Fonctions Utilitaires
 
 #### ❌ Avant (any)
+
 ```typescript
 function transformData(input: any): any {
   return input.map((item: any) => item.value);
@@ -754,6 +815,7 @@ function transformData(input: any): any {
 ```
 
 #### ✅ Après (strict)
+
 ```typescript
 interface InputItem {
   value: string;
@@ -761,7 +823,7 @@ interface InputItem {
 }
 
 function transformData(input: InputItem[]): string[] {
-  return input.map(item => item.value);
+  return input.map((item) => item.value);
 }
 ```
 
@@ -770,6 +832,7 @@ function transformData(input: InputItem[]): string[] {
 ### 7. Objets de Configuration
 
 #### ❌ Avant (any)
+
 ```typescript
 const config: any = {
   apiUrl: 'https://api.example.com',
@@ -778,6 +841,7 @@ const config: any = {
 ```
 
 #### ✅ Après (strict)
+
 ```typescript
 interface ApiConfig {
   apiUrl: string;
@@ -798,18 +862,21 @@ const config: ApiConfig = {
 Pour chaque fichier migré:
 
 ### Avant Migration
+
 - [ ] Identifier tous les `any` dans le fichier
 - [ ] Comprendre le contexte d'utilisation de chaque `any`
 - [ ] Déterminer le type strict approprié
 - [ ] Vérifier si des types existent déjà (`src/integrations/supabase/types.ts`)
 
 ### Pendant Migration
+
 - [ ] Remplacer les `any` un par un
 - [ ] Ajouter les types manquants si nécessaire
 - [ ] Maintenir la compatibilité avec le code existant
 - [ ] Documenter les choix complexes
 
 ### Après Migration
+
 - [ ] Vérifier que `npx tsc --noEmit` passe sans erreur
 - [ ] Vérifier que `npm run lint` passe ou réduit les warnings
 - [ ] Exécuter les tests (`npm run test`)
@@ -821,18 +888,21 @@ Pour chaque fichier migré:
 ## 🎯 Objectifs Mesurables par Phase
 
 ### Phase 1 (Semaines 1-3) ✅ TERMINÉE
+
 - **Objectif**: Services & Utils Layer
 - **Warnings**: 204 → 175 (-29 warnings) ✅ OBJECTIF ATTEINT
 - **Résultat**: 29 any éliminés dans 3 services
 - **Validation**: ✅ Services core strictement typés (matchingOptimizationService, contentModerationService, matchingAlgorithm)
 
 ### Phase 2 (Semaines 4-5) ✅ TERMINÉE
+
 - **Objectif**: Consolidation des types centralisés
 - **Warnings**: 175 → 175 (0 warnings, consolidation)
 - **Résultat**: Types centralisés dans `src/types/supabase.ts`
 - **Validation**: ✅ Types réutilisables disponibles pour toutes les couches
 
 ### Phase 3 (Semaines 6-8) ✅ TERMINÉE
+
 - **Objectif**: Hooks & Composants Matching
 - **Warnings**: 175 → 151 (-24 warnings) ✅
 - **Résultat**: 24 any éliminés (5 hooks + 4 composants = 9 fichiers)
@@ -852,16 +922,19 @@ Pour chaque fichier migré:
 - **Validation**: ✅ Couche Hooks & Composants matching strictement typée, harmonisation Service → Hook → Component complète
 
 **Impact cumulatif (Phases 1-3):**
+
 - Total: 53 any éliminés sur 204 (26% de réduction)
 - 12 fichiers migrés (3 services + 5 hooks + 4 composants)
 - Progression: 204 → 151 warnings restants
 
 ### Phase 4 (Semaines 9-12)
+
 - **Objectif**: Enhanced Components & Admin
 - **Warnings**: ~151 → ~110 (-41 warnings estimés)
 - **Validation**: Composants enhanced et admin typés
 
 ### Phase 5 (Semaines 13-14)
+
 - **Objectif**: Pages & Composants Tertiaires
 - **Warnings**: ~110 → 0 (-110 warnings)
 - **Validation**: 0 warnings ESLint ✅
@@ -983,14 +1056,17 @@ const excludeDirs = ['node_modules', 'dist', 'build'];
 function analyzeFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const anyMatches = content.match(/:\s*any[\s,\)>]/g) || [];
-  
+
   return {
     file: filePath,
     count: anyMatches.length,
-    lines: content.split('\n').map((line, idx) => ({
-      lineNumber: idx + 1,
-      content: line
-    })).filter(l => l.content.includes(': any'))
+    lines: content
+      .split('\n')
+      .map((line, idx) => ({
+        lineNumber: idx + 1,
+        content: line,
+      }))
+      .filter((l) => l.content.includes(': any')),
   };
 }
 
@@ -1003,15 +1079,15 @@ function analyzeFile(filePath) {
 
 ### Tableau de Bord
 
-| Phase | Début | Fin | Warnings Réduits | Fichiers Migrés | Status |
-|-------|-------|-----|------------------|-----------------|--------|
-| **Pilote** | **204** | **202** | **2** ✅ | **1 fichier** | **✅ Complété** |
-| **P1 - Hooks Core** | **202** | **196** | **6** ✅ | **2 fichiers** | **🟡 En cours (3/8)** |
-| P1 - Hooks Core (suite) | 196 | ~165 | ~31 | ~5 fichiers | 🔴 À faire |
-| P2 - Services | ~165 | ~140 | ~25 | ~5 fichiers | 🔴 À faire |
-| P3 - Composants Core | ~140 | ~95 | ~45 | ~15 fichiers | 🔴 À faire |
-| P4 - Pages & UI | ~95 | ~30 | ~65 | ~30 fichiers | 🔴 À faire |
-| P5 - Final | ~30 | 0 | ~30 | ~15 fichiers | 🔴 À faire |
+| Phase                   | Début   | Fin     | Warnings Réduits | Fichiers Migrés | Status                |
+| ----------------------- | ------- | ------- | ---------------- | --------------- | --------------------- |
+| **Pilote**              | **204** | **202** | **2** ✅         | **1 fichier**   | **✅ Complété**       |
+| **P1 - Hooks Core**     | **202** | **196** | **6** ✅         | **2 fichiers**  | **🟡 En cours (3/8)** |
+| P1 - Hooks Core (suite) | 196     | ~165    | ~31              | ~5 fichiers     | 🔴 À faire            |
+| P2 - Services           | ~165    | ~140    | ~25              | ~5 fichiers     | 🔴 À faire            |
+| P3 - Composants Core    | ~140    | ~95     | ~45              | ~15 fichiers    | 🔴 À faire            |
+| P4 - Pages & UI         | ~95     | ~30     | ~65              | ~30 fichiers    | 🔴 À faire            |
+| P5 - Final              | ~30     | 0       | ~30              | ~15 fichiers    | 🔴 À faire            |
 
 **Total migrés**: 3 hooks (useChatPresence, useProfileData, useChatMessages)  
 **Total warnings éliminés**: 8 (3 any + 5 unknown)
@@ -1043,18 +1119,21 @@ function analyzeFile(filePath) {
 ## ✅ Critères de Succès
 
 ### Critères Techniques
+
 - [ ] 0 warnings ESLint `@typescript-eslint/no-explicit-any`
 - [ ] 0 erreurs TypeScript avec `npx tsc --noEmit`
 - [ ] Tous les tests passent (`npm run test`)
 - [ ] Build de production réussit (`npm run build`)
 
 ### Critères Qualité
+
 - [ ] Types stricts et réutilisables
 - [ ] Documentation des patterns complexes
 - [ ] Pas de régression fonctionnelle
 - [ ] Code review approuvé
 
 ### Critères Long Terme
+
 - [ ] Règle ESLint changée de `warn` à `error`
 - [ ] Guide de style TypeScript respecté
 - [ ] Types réutilisables créés et documentés
@@ -1065,6 +1144,7 @@ function analyzeFile(filePath) {
 ## 🚀 Actions Immédiates (Next Steps)
 
 ### ✅ Semaine 1 - COMPLÉTÉE
+
 1. **✅ Hook pilote migré**
    - ✅ `useChatPresence.tsx` complété (2 any → types stricts)
    - ✅ Patterns validés et documentés
@@ -1078,6 +1158,7 @@ function analyzeFile(filePath) {
    - ✅ Pattern RealtimeChannel validé
 
 ### Semaine 1-2 - EN COURS
+
 1. **Continuer Phase 1 - Hooks suivants**
    - [ ] `useAuth.tsx` (hook critique auth)
    - [ ] `useMatchingPreferences.tsx` (algorithme matching)
@@ -1089,6 +1170,7 @@ function analyzeFile(filePath) {
    - [ ] Tests manuels des flows critiques
 
 ### Semaine 3
+
 1. **Compléter Phase 1**
    - [ ] 3 hooks restants
    - [ ] Validation complète
@@ -1103,12 +1185,14 @@ function analyzeFile(filePath) {
 ## 📞 Support et Questions
 
 ### En cas de doute
+
 1. Consulter le **[TYPESCRIPT_STYLE_GUIDE.md](./TYPESCRIPT_STYLE_GUIDE.md)**
 2. Vérifier les exemples dans **[REFACTORING_TYPESCRIPT_COMPLETE.md](./REFACTORING_TYPESCRIPT_COMPLETE.md)**
 3. Chercher des patterns similaires dans le code déjà refactorisé
 4. Utiliser le TypeScript Playground pour tester des patterns
 
 ### Documentation de Référence
+
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
 - [React TypeScript Cheatsheet](https://react-typescript-cheatsheet.netlify.app/)
 - [Supabase TypeScript Support](https://supabase.com/docs/reference/javascript/typescript-support)
@@ -1142,6 +1226,6 @@ Mois 4 (Semaines 13-14) : Phase 5 - Final & Validation (~30 → 0)
 
 ---
 
-*"Le voyage de mille lieues commence par un premier pas."* - Lao Tseu
+_"Le voyage de mille lieues commence par un premier pas."_ - Lao Tseu
 
 Commençons cette migration progressive vers un code 100% type-safe! 🚀

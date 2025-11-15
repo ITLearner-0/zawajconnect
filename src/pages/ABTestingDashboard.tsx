@@ -1,16 +1,18 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { BarChart, TrendingUp, Mail, DollarSign, Eye, MousePointerClick } from "lucide-react";
-import { ABTestVariantForm } from "@/components/abtesting/ABTestVariantForm";
-import { ABTestResults } from "@/components/abtesting/ABTestResults";
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Card } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { BarChart, TrendingUp, Mail, DollarSign, Eye, MousePointerClick } from 'lucide-react';
+import { ABTestVariantForm } from '@/components/abtesting/ABTestVariantForm';
+import { ABTestResults } from '@/components/abtesting/ABTestResults';
 
 export default function ABTestingDashboard() {
-  const [selectedReminderType, setSelectedReminderType] = useState<'7days' | '3days' | '1day'>('7days');
+  const [selectedReminderType, setSelectedReminderType] = useState<'7days' | '3days' | '1day'>(
+    '7days'
+  );
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Fetch all A/B tests
@@ -21,7 +23,7 @@ export default function ABTestingDashboard() {
         .from('email_ab_tests')
         .select('*')
         .order('created_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
@@ -36,31 +38,40 @@ export default function ABTestingDashboard() {
         .select('*')
         .eq('reminder_type', selectedReminderType)
         .order('conversion_rate', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
   });
 
   // Calculate summary stats
-  const summaryStats = analytics?.reduce((acc, variant) => {
-    acc.totalSent += variant.total_sent || 0;
-    acc.totalOpened += variant.total_opened || 0;
-    acc.totalClicked += variant.total_clicked || 0;
-    acc.totalRenewed += variant.total_renewed || 0;
-    acc.totalRevenue += Number(variant.total_revenue || 0);
-    return acc;
-  }, {
-    totalSent: 0,
-    totalOpened: 0,
-    totalClicked: 0,
-    totalRenewed: 0,
-    totalRevenue: 0,
-  });
+  const summaryStats = analytics?.reduce(
+    (acc, variant) => {
+      acc.totalSent += variant.total_sent || 0;
+      acc.totalOpened += variant.total_opened || 0;
+      acc.totalClicked += variant.total_clicked || 0;
+      acc.totalRenewed += variant.total_renewed || 0;
+      acc.totalRevenue += Number(variant.total_revenue || 0);
+      return acc;
+    },
+    {
+      totalSent: 0,
+      totalOpened: 0,
+      totalClicked: 0,
+      totalRenewed: 0,
+      totalRevenue: 0,
+    }
+  );
 
-  const avgOpenRate = summaryStats ? (summaryStats.totalOpened / summaryStats.totalSent * 100).toFixed(2) : '0.00';
-  const avgClickRate = summaryStats ? (summaryStats.totalClicked / summaryStats.totalSent * 100).toFixed(2) : '0.00';
-  const avgConversionRate = summaryStats ? (summaryStats.totalRenewed / summaryStats.totalSent * 100).toFixed(2) : '0.00';
+  const avgOpenRate = summaryStats
+    ? ((summaryStats.totalOpened / summaryStats.totalSent) * 100).toFixed(2)
+    : '0.00';
+  const avgClickRate = summaryStats
+    ? ((summaryStats.totalClicked / summaryStats.totalSent) * 100).toFixed(2)
+    : '0.00';
+  const avgConversionRate = summaryStats
+    ? ((summaryStats.totalRenewed / summaryStats.totalSent) * 100).toFixed(2)
+    : '0.00';
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -78,9 +89,9 @@ export default function ABTestingDashboard() {
 
       {showCreateForm && (
         <Card className="p-6">
-          <ABTestVariantForm 
-            reminderType={selectedReminderType} 
-            onSuccess={() => setShowCreateForm(false)} 
+          <ABTestVariantForm
+            reminderType={selectedReminderType}
+            onSuccess={() => setShowCreateForm(false)}
           />
         </Card>
       )}
@@ -147,24 +158,24 @@ export default function ABTestingDashboard() {
           </TabsList>
 
           <TabsContent value="7days" className="mt-6">
-            <ABTestResults 
-              analytics={analytics || []} 
+            <ABTestResults
+              analytics={analytics || []}
               isLoading={analyticsLoading}
               reminderType="7days"
             />
           </TabsContent>
 
           <TabsContent value="3days" className="mt-6">
-            <ABTestResults 
-              analytics={analytics || []} 
+            <ABTestResults
+              analytics={analytics || []}
               isLoading={analyticsLoading}
               reminderType="3days"
             />
           </TabsContent>
 
           <TabsContent value="1day" className="mt-6">
-            <ABTestResults 
-              analytics={analytics || []} 
+            <ABTestResults
+              analytics={analytics || []}
               isLoading={analyticsLoading}
               reminderType="1day"
             />

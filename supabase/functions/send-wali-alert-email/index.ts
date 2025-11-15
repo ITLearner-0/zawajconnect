@@ -1,12 +1,12 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@4.0.0";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { Resend } from 'npm:resend@4.0.0';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface WaliAlertEmailRequest {
@@ -260,11 +260,15 @@ const getSuspensionTemplate = (waliName: string, message: string, suspensionDeta
                     <p style="color: #581c87; font-size: 15px; line-height: 1.6; margin: 0;">
                       <strong>Raison:</strong> ${suspensionDetails?.reason || 'Non spécifié'}<br>
                       <strong>Durée:</strong> ${suspensionDetails?.duration || 0} jours<br>
-                      <strong>Expire le:</strong> ${suspensionDetails?.expiresAt ? new Date(suspensionDetails.expiresAt).toLocaleDateString('fr-FR', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      }) : 'N/A'}
+                      <strong>Expire le:</strong> ${
+                        suspensionDetails?.expiresAt
+                          ? new Date(suspensionDetails.expiresAt).toLocaleDateString('fr-FR', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric',
+                            })
+                          : 'N/A'
+                      }
                     </p>
                   </td>
                 </tr>
@@ -329,16 +333,16 @@ const getSuspensionTemplate = (waliName: string, message: string, suspensionDeta
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const requestData: WaliAlertEmailRequest = await req.json();
-    console.log('Sending wali alert email:', { 
-      alertId: requestData.alertId, 
+    console.log('Sending wali alert email:', {
+      alertId: requestData.alertId,
       emailType: requestData.emailType,
-      waliEmail: requestData.waliEmail 
+      waliEmail: requestData.waliEmail,
     });
 
     // Validate required fields
@@ -376,13 +380,13 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email via Resend
     const emailResponse = await resend.emails.send({
-      from: "Mariage Halal - Modération <onboarding@resend.dev>",
+      from: 'Mariage Halal - Modération <onboarding@resend.dev>',
       to: [requestData.waliEmail],
       subject: requestData.subject,
       html: htmlContent,
     });
 
-    console.log("Email sent successfully:", emailResponse);
+    console.log('Email sent successfully:', emailResponse);
 
     // Log the email in database using Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -396,35 +400,35 @@ const handler = async (req: Request): Promise<Response> => {
       subject: requestData.subject,
       message_content: requestData.message,
       delivery_status: 'sent',
-      sent_by: requestData.waliUserId // This should be the admin user ID in real implementation
+      sent_by: requestData.waliUserId, // This should be the admin user ID in real implementation
     });
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         emailId: emailResponse.id,
-        message: 'Email sent successfully' 
+        message: 'Email sent successfully',
       }),
       {
         status: 200,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           ...corsHeaders,
         },
       }
     );
   } catch (error: any) {
-    console.error("Error in send-wali-alert-email function:", error);
+    console.error('Error in send-wali-alert-email function:', error);
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message 
+      JSON.stringify({
+        success: false,
+        error: error.message,
       }),
       {
         status: 500,
-        headers: { 
-          "Content-Type": "application/json", 
-          ...corsHeaders 
+        headers: {
+          'Content-Type': 'application/json',
+          ...corsHeaders,
         },
       }
     );

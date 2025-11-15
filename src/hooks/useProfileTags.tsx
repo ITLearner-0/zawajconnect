@@ -53,14 +53,14 @@ export const useProfileTags = () => {
         .insert({
           user_id: user.id,
           tag_name: tagName,
-          color: color
+          color: color,
         })
         .select()
         .single();
 
       if (error) throw error;
 
-      setTags(prev => [...prev, data]);
+      setTags((prev) => [...prev, data]);
       toast.success(`Tag "${tagName}" créé`);
       return data;
     } catch (error: any) {
@@ -86,9 +86,9 @@ export const useProfileTags = () => {
 
       if (error) throw error;
 
-      setTags(prev => prev.map(tag => 
-        tag.id === tagId ? { ...tag, tag_name: tagName, color: color } : tag
-      ));
+      setTags((prev) =>
+        prev.map((tag) => (tag.id === tagId ? { ...tag, tag_name: tagName, color: color } : tag))
+      );
       toast.success('Tag mis à jour');
       return true;
     } catch (error) {
@@ -110,7 +110,7 @@ export const useProfileTags = () => {
 
       if (error) throw error;
 
-      setTags(prev => prev.filter(tag => tag.id !== tagId));
+      setTags((prev) => prev.filter((tag) => tag.id !== tagId));
       toast.success('Tag supprimé');
       return true;
     } catch (error) {
@@ -135,12 +135,10 @@ export const useProfileTags = () => {
       if (favError || !favorite) throw favError;
 
       // Add tag to favorite
-      const { error } = await supabase
-        .from('favorite_tags')
-        .insert({
-          favorite_id: favorite.id,
-          tag_id: tagId
-        });
+      const { error } = await supabase.from('favorite_tags').insert({
+        favorite_id: favorite.id,
+        tag_id: tagId,
+      });
 
       if (error) throw error;
 
@@ -151,7 +149,7 @@ export const useProfileTags = () => {
       if (error.code === '23505') {
         toast.error('Ce tag est déjà associé à ce favori');
       } else {
-        toast.error('Erreur lors de l\'ajout du tag');
+        toast.error("Erreur lors de l'ajout du tag");
       }
       return false;
     }
@@ -207,7 +205,7 @@ export const useProfileTags = () => {
 
       if (error) throw error;
 
-      return data?.map(item => (item as any).profile_tags).filter(Boolean) || [];
+      return data?.map((item) => (item as any).profile_tags).filter(Boolean) || [];
     } catch (error) {
       console.error('Error fetching favorite tags:', error);
       return [];
@@ -218,12 +216,10 @@ export const useProfileTags = () => {
     if (!user) return false;
 
     try {
-      const { error } = await supabase
-        .from('note_tags')
-        .insert({
-          note_id: noteId,
-          tag_id: tagId
-        });
+      const { error } = await supabase.from('note_tags').insert({
+        note_id: noteId,
+        tag_id: tagId,
+      });
 
       if (error) throw error;
 
@@ -234,7 +230,7 @@ export const useProfileTags = () => {
       if (error.code === '23505') {
         toast.error('Ce tag est déjà associé à cette note');
       } else {
-        toast.error('Erreur lors de l\'ajout du tag');
+        toast.error("Erreur lors de l'ajout du tag");
       }
       return false;
     }
@@ -272,7 +268,7 @@ export const useProfileTags = () => {
 
       if (error) throw error;
 
-      return data?.map(item => (item as any).profile_tags).filter(Boolean) || [];
+      return data?.map((item) => (item as any).profile_tags).filter(Boolean) || [];
     } catch (error) {
       console.error('Error fetching note tags:', error);
       return [];
@@ -291,6 +287,6 @@ export const useProfileTags = () => {
     addTagToNote,
     removeTagFromNote,
     getNoteTags,
-    refetch: fetchTags
+    refetch: fetchTags,
   };
 };

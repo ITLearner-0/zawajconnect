@@ -1,10 +1,9 @@
-
-import CustomButton from "../CustomButton";
-import ScoreDisplay from "./results/ScoreDisplay";
-import CategoryBreakdown from "./results/CategoryBreakdown";
-import ActionButtons from "./results/ActionButtons";
-import IslamicReminder from "./results/IslamicReminder";
-import { compatibilityTranslations } from "@/utils/translations";
+import CustomButton from '../CustomButton';
+import ScoreDisplay from './results/ScoreDisplay';
+import CategoryBreakdown from './results/CategoryBreakdown';
+import ActionButtons from './results/ActionButtons';
+import IslamicReminder from './results/IslamicReminder';
+import { compatibilityTranslations } from '@/utils/translations';
 
 interface EnhancedResultsDisplayProps {
   score: number;
@@ -21,11 +20,7 @@ const EnhancedResultsDisplay = ({ score, answers, onRetake }: EnhancedResultsDis
       <IslamicReminder />
 
       <div className="border-t pt-4">
-        <CustomButton
-          onClick={onRetake}
-          variant="outline"
-          className="text-sm"
-        >
+        <CustomButton onClick={onRetake} variant="outline" className="text-sm">
           {compatibilityTranslations.retakeTest}
         </CustomButton>
       </div>

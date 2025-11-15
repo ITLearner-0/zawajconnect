@@ -24,26 +24,33 @@ const IslamicReminders = () => {
       category: 'dua',
       title: 'Dua pour trouver un bon époux/épouse',
       arabic: 'رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ',
-      translation: 'Notre Seigneur ! Donne-nous, en nos épouses et nos descendants, la joie des yeux',
+      translation:
+        'Notre Seigneur ! Donne-nous, en nos épouses et nos descendants, la joie des yeux',
       source: 'Coran 25:74',
-      benefits: ['Demande la bénédiction d\'Allah', 'Recherche la tranquillité', 'Invoque la satisfaction']
+      benefits: [
+        "Demande la bénédiction d'Allah",
+        'Recherche la tranquillité',
+        'Invoque la satisfaction',
+      ],
     },
     {
-      id: '2', 
+      id: '2',
       category: 'hadith',
-      title: 'L\'importance du mariage en Islam',
+      title: "L'importance du mariage en Islam",
       translation: 'Quand une personne se marie, elle complète la moitié de sa religion',
       source: 'Hadith rapporté par At-Tabarani',
-      benefits: ['Complète la foi', 'Protège de la tentation', 'Apporte la bénédiction']
+      benefits: ['Complète la foi', 'Protège de la tentation', 'Apporte la bénédiction'],
     },
     {
       id: '3',
       category: 'quran',
-      title: 'Les qualités d\'un bon partenaire',
-      arabic: 'وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا',
-      translation: 'Et parmi Ses signes, Il a créé de vous, pour vous, des épouses pour que vous viviez en tranquillité avec elles',
+      title: "Les qualités d'un bon partenaire",
+      arabic:
+        'وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا',
+      translation:
+        'Et parmi Ses signes, Il a créé de vous, pour vous, des épouses pour que vous viviez en tranquillité avec elles',
       source: 'Coran 30:21',
-      benefits: ['Recherche la tranquillité', 'Compréhension mutuelle', 'Paix du cœur']
+      benefits: ['Recherche la tranquillité', 'Compréhension mutuelle', 'Paix du cœur'],
     },
     {
       id: '4',
@@ -51,7 +58,7 @@ const IslamicReminders = () => {
       title: 'Conseil pour les candidats au mariage',
       translation: 'Épousez celle qui est religieuse, vous serez gagnants',
       source: 'Hadith du Prophète ﷺ (Bukhari & Muslim)',
-      benefits: ['Priorité à la religion', 'Stabilité du foyer', 'Éducation des enfants']
+      benefits: ['Priorité à la religion', 'Stabilité du foyer', 'Éducation des enfants'],
     },
     {
       id: '5',
@@ -59,8 +66,8 @@ const IslamicReminders = () => {
       title: 'Dua avant de rencontrer un prétendant',
       arabic: 'اللَّهُمَّ خِرْ لِي وَاخْتَرْ لِي',
       translation: 'Ô Allah, choisis pour moi et fais le bon choix pour moi',
-      source: 'Dua d\'Istikhara',
-      benefits: ['Guidance divine', 'Bon choix', 'Tranquillité d\'esprit']
+      source: "Dua d'Istikhara",
+      benefits: ['Guidance divine', 'Bon choix', "Tranquillité d'esprit"],
     },
     {
       id: '6',
@@ -68,23 +75,31 @@ const IslamicReminders = () => {
       title: 'Les droits et devoirs des époux',
       translation: 'Les meilleures personnes sont celles qui sont bonnes envers leurs familles',
       source: 'Hadith du Prophète ﷺ',
-      benefits: ['Respect mutuel', 'Harmonie conjugale', 'Exemple prophétique']
-    }
+      benefits: ['Respect mutuel', 'Harmonie conjugale', 'Exemple prophétique'],
+    },
   ];
 
   const categoryConfig = {
     marriage: { icon: Heart, color: 'bg-pink/10 text-pink-dark border-pink/20', label: 'Mariage' },
     dua: { icon: Star, color: 'bg-gold/10 text-gold-dark border-gold/20', label: 'Dua' },
-    hadith: { icon: BookOpen, color: 'bg-emerald/10 text-emerald-dark border-emerald/20', label: 'Hadith' },
+    hadith: {
+      icon: BookOpen,
+      color: 'bg-emerald/10 text-emerald-dark border-emerald/20',
+      label: 'Hadith',
+    },
     quran: { icon: BookOpen, color: 'bg-blue/10 text-blue-dark border-blue/20', label: 'Coran' },
-    advice: { icon: Users, color: 'bg-purple/10 text-purple-dark border-purple/20', label: 'Conseil' }
+    advice: {
+      icon: Users,
+      color: 'bg-purple/10 text-purple-dark border-purple/20',
+      label: 'Conseil',
+    },
   };
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(prev => {
+      setTimeLeft((prev) => {
         if (prev <= 1) {
-          setCurrentReminder(curr => (curr + 1) % reminders.length);
+          setCurrentReminder((curr) => (curr + 1) % reminders.length);
           return 300; // Reset to 5 minutes
         }
         return prev - 1;
@@ -112,7 +127,7 @@ const IslamicReminders = () => {
 
   const current = reminders[currentReminder];
   if (!current) return null;
-  
+
   const category = categoryConfig[current.category];
 
   return (
@@ -122,11 +137,10 @@ const IslamicReminders = () => {
           <div className="h-16 w-16 bg-gradient-to-br from-gold to-emerald rounded-full flex items-center justify-center mx-auto mb-6">
             <BookOpen className="h-8 w-8 text-white" />
           </div>
-          <h2 className="text-4xl font-bold text-foreground mb-4">
-            Rappels Islamiques
-          </h2>
+          <h2 className="text-4xl font-bold text-foreground mb-4">Rappels Islamiques</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Des versets, hadiths et conseils pour vous guider dans votre recherche du partenaire idéal
+            Des versets, hadiths et conseils pour vous guider dans votre recherche du partenaire
+            idéal
           </p>
         </div>
 
@@ -148,9 +162,7 @@ const IslamicReminders = () => {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-2xl font-bold text-foreground mb-6">
-                  {current.title}
-                </h3>
+                <h3 className="text-2xl font-bold text-foreground mb-6">{current.title}</h3>
 
                 {/* Arabic Text */}
                 {current.arabic && (
@@ -166,9 +178,7 @@ const IslamicReminders = () => {
                   <blockquote className="text-lg text-muted-foreground italic leading-relaxed border-l-4 border-emerald pl-4">
                     "{current.translation}"
                   </blockquote>
-                  <p className="text-sm text-gold-dark font-medium mt-2">
-                    - {current.source}
-                  </p>
+                  <p className="text-sm text-gold-dark font-medium mt-2">- {current.source}</p>
                 </div>
 
                 {/* Benefits */}
@@ -193,7 +203,7 @@ const IslamicReminders = () => {
                   >
                     ← Précédent
                   </Button>
-                  
+
                   <div className="flex gap-2">
                     {reminders.map((_, index) => (
                       <button
@@ -231,16 +241,12 @@ const IslamicReminders = () => {
                   Actions Rapides
                 </h4>
                 <div className="space-y-3">
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start"
-                    onClick={nextReminder}
-                  >
+                  <Button variant="outline" className="w-full justify-start" onClick={nextReminder}>
                     <RefreshCw className="h-4 w-4 mr-2" />
                     Nouveau rappel
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     className="w-full justify-start"
                     onClick={() => setTimeLeft(300)}
                   >
@@ -257,7 +263,7 @@ const IslamicReminders = () => {
                 <h4 className="font-semibold text-foreground mb-4">Catégories</h4>
                 <div className="space-y-2">
                   {Object.entries(categoryConfig).map(([key, config]) => {
-                    const count = reminders.filter(r => r.category === key).length;
+                    const count = reminders.filter((r) => r.category === key).length;
                     return (
                       <div key={key} className="flex items-center justify-between text-sm">
                         <div className="flex items-center gap-2">
@@ -275,15 +281,18 @@ const IslamicReminders = () => {
             </Card>
 
             {/* Daily Reminder */}
-            <Card className="animate-slide-up card-hover bg-gradient-to-br from-gold/10 to-emerald/10 border-gold/20" style={{ animationDelay: '0.6s' }}>
+            <Card
+              className="animate-slide-up card-hover bg-gradient-to-br from-gold/10 to-emerald/10 border-gold/20"
+              style={{ animationDelay: '0.6s' }}
+            >
               <CardContent className="p-6 text-center">
                 <h4 className="font-semibold text-foreground mb-3">Rappel du Jour</h4>
                 <p className="text-sm text-muted-foreground mb-3">
                   "Recherchez la guidance d'Allah dans tous vos choix importants."
                 </p>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="w-full border-gold/30 text-gold-dark hover:bg-gold/10"
                 >
                   <Star className="h-4 w-4 mr-2" />

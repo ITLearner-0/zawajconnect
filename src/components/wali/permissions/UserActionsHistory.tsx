@@ -118,9 +118,7 @@ export const UserActionsHistory = ({ actions, loading }: UserActionsHistoryProps
                     {format(new Date(action.created_at), 'dd/MM/yyyy HH:mm', { locale: fr })}
                   </div>
                 </TableCell>
-                <TableCell>
-                  {getActionBadge(action.action_type, action.success)}
-                </TableCell>
+                <TableCell>{getActionBadge(action.action_type, action.success)}</TableCell>
                 <TableCell className="text-sm">
                   {action.registration_id && (
                     <div className="flex items-center gap-1">
@@ -139,7 +137,9 @@ export const UserActionsHistory = ({ actions, loading }: UserActionsHistoryProps
                 </TableCell>
                 <TableCell>
                   {action.success ? (
-                    <Badge variant="outline" className="text-green-600">Succès</Badge>
+                    <Badge variant="outline" className="text-green-600">
+                      Succès
+                    </Badge>
                   ) : (
                     <Badge variant="destructive">Échec</Badge>
                   )}

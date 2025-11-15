@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Message } from '@/types/profile';
 import MessageItem from './MessageItem';
@@ -22,7 +21,7 @@ const MessagesList: React.FC<MessagesListProps> = ({
   isWaliSupervised,
   conversationId,
   loading,
-  error
+  error,
 }) => {
   return (
     <div className="flex-grow overflow-y-auto p-4 space-y-4">
@@ -31,8 +30,8 @@ const MessagesList: React.FC<MessagesListProps> = ({
         error={error}
         loadingText="Loading messages..."
         emptyState={{
-          title: "No messages yet",
-          description: "Start the conversation!"
+          title: 'No messages yet',
+          description: 'Start the conversation!',
         }}
       >
         {messages.length > 0 && (
@@ -45,7 +44,7 @@ const MessagesList: React.FC<MessagesListProps> = ({
                 onReport={() => onReportMessage(message)}
               />
             ))}
-            
+
             {/* Show this when wali is supervising */}
             {isWaliSupervised && <WaliSupervisor conversationId={conversationId} />}
           </>

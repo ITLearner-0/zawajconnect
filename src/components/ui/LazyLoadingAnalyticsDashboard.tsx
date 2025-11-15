@@ -1,9 +1,12 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { analyticsService, AggregatedMetrics, UsagePattern } from '@/hooks/useLazyLoading/services/analyticsService';
+import {
+  analyticsService,
+  AggregatedMetrics,
+  UsagePattern,
+} from '@/hooks/useLazyLoading/services/analyticsService';
 import { TrendingUp } from 'lucide-react';
 import { formatters, APP_CONSTANTS } from '@/utils/helpers';
 import ErrorBoundary from './ErrorBoundary';
@@ -18,7 +21,10 @@ interface LazyLoadingAnalyticsDashboardProps {
   onToggle?: (show: boolean) => void;
 }
 
-const LazyLoadingAnalyticsDashboard = ({ show = false, onToggle }: LazyLoadingAnalyticsDashboardProps) => {
+const LazyLoadingAnalyticsDashboard = ({
+  show = false,
+  onToggle,
+}: LazyLoadingAnalyticsDashboardProps) => {
   const [metrics, setMetrics] = useState<AggregatedMetrics | null>(null);
   const [usagePatterns, setUsagePatterns] = useState<Map<string, UsagePattern>>(new Map());
   const [trends, setTrends] = useState<{ timestamp: number; metrics: AggregatedMetrics }[]>([]);
@@ -31,7 +37,7 @@ const LazyLoadingAnalyticsDashboard = ({ show = false, onToggle }: LazyLoadingAn
         setUsagePatterns(analyticsService.getUsagePatterns());
         setTrends(analyticsService.getPerformanceTrends());
       };
-      
+
       updateData();
       const interval = setInterval(updateData, APP_CONSTANTS.ANALYTICS.REFRESH_INTERVAL);
       return () => clearInterval(interval);
@@ -40,7 +46,7 @@ const LazyLoadingAnalyticsDashboard = ({ show = false, onToggle }: LazyLoadingAn
   }, [show, refreshKey]);
 
   const handleRefresh = () => {
-    setRefreshKey(prev => prev + 1);
+    setRefreshKey((prev) => prev + 1);
   };
 
   const handleExport = () => {
@@ -55,7 +61,7 @@ const LazyLoadingAnalyticsDashboard = ({ show = false, onToggle }: LazyLoadingAn
   };
 
   // Prepare chart data
-  const performanceData = trends.map(trend => ({
+  const performanceData = trends.map((trend) => ({
     timestamp: formatters.dateTime(new Date(trend.timestamp)),
     loadTime: trend.metrics.averageLoadTime,
     successRate: trend.metrics.successRate,
@@ -78,12 +84,12 @@ const LazyLoadingAnalyticsDashboard = ({ show = false, onToggle }: LazyLoadingAn
   return (
     <ErrorBoundary>
       <Card className="fixed top-4 right-4 w-[600px] max-h-[80vh] z-50 shadow-lg bg-white dark:bg-gray-900">
-        <DashboardHeader 
+        <DashboardHeader
           onRefresh={handleRefresh}
           onExport={handleExport}
           onToggle={onToggle || (() => {})}
         />
-        
+
         <CardContent className="p-4">
           <Tabs defaultValue="overview" className="w-full">
             <TabsList className="grid w-full grid-cols-4">
@@ -92,19 +98,19 @@ const LazyLoadingAnalyticsDashboard = ({ show = false, onToggle }: LazyLoadingAn
               <TabsTrigger value="usage">Usage</TabsTrigger>
               <TabsTrigger value="insights">Insights</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="overview">
               <OverviewTab metrics={metrics} />
             </TabsContent>
-            
+
             <TabsContent value="performance">
               <PerformanceTab performanceData={performanceData} />
             </TabsContent>
-            
+
             <TabsContent value="usage">
               <UsageTab usagePatterns={usagePatterns} />
             </TabsContent>
-            
+
             <TabsContent value="insights">
               <InsightsTab metrics={metrics} />
             </TabsContent>

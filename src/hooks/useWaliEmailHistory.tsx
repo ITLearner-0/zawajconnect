@@ -33,12 +33,15 @@ export const useWaliEmailHistory = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
-  const getEmailHistory = async (waliUserId: string, limit: number = 50): Promise<WaliEmailHistoryItem[]> => {
+  const getEmailHistory = async (
+    waliUserId: string,
+    limit: number = 50
+  ): Promise<WaliEmailHistoryItem[]> => {
     setLoading(true);
     try {
       const { data, error } = await supabase.rpc('get_wali_email_history', {
         p_wali_user_id: waliUserId,
-        p_limit: limit
+        p_limit: limit,
       });
 
       if (error) throw error;
@@ -47,9 +50,9 @@ export const useWaliEmailHistory = () => {
     } catch (error: any) {
       console.error('Error fetching email history:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible de charger l'historique des emails",
-        variant: "destructive",
+        variant: 'destructive',
       });
       return [];
     } finally {
@@ -61,7 +64,7 @@ export const useWaliEmailHistory = () => {
     setLoading(true);
     try {
       const { data, error } = await supabase.rpc('get_wali_email_stats', {
-        p_wali_user_id: waliUserId
+        p_wali_user_id: waliUserId,
       });
 
       if (error) throw error;
@@ -70,9 +73,9 @@ export const useWaliEmailHistory = () => {
     } catch (error: any) {
       console.error('Error fetching email stats:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible de charger les statistiques d'emails",
-        variant: "destructive",
+        variant: 'destructive',
       });
       return null;
     } finally {
@@ -83,6 +86,6 @@ export const useWaliEmailHistory = () => {
   return {
     getEmailHistory,
     getEmailStats,
-    loading
+    loading,
   };
 };

@@ -6,17 +6,30 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { 
-  Calendar as CalendarIcon, 
-  Clock, 
-  Users, 
-  Video, 
-  Phone, 
+import {
+  Calendar as CalendarIcon,
+  Clock,
+  Users,
+  Video,
+  Phone,
   MapPin,
   Plus,
   Edit,
@@ -25,7 +38,7 @@ import {
   AlertTriangle,
   Send,
   Copy,
-  ExternalLink
+  ExternalLink,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -68,8 +81,12 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [selectedMatch, setSelectedMatch] = useState<string>('');
-  const [meetingType, setMeetingType] = useState<'family_discussion' | 'candidate_interview' | 'family_meeting'>('family_discussion');
-  const [meetingLocation, setMeetingLocation] = useState<'online' | 'in_person' | 'phone'>('online');
+  const [meetingType, setMeetingType] = useState<
+    'family_discussion' | 'candidate_interview' | 'family_meeting'
+  >('family_discussion');
+  const [meetingLocation, setMeetingLocation] = useState<'online' | 'in_person' | 'phone'>(
+    'online'
+  );
   const [meetingNotes, setMeetingNotes] = useState<string>('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingMeeting, setEditingMeeting] = useState<FamilyMeeting | null>(null);
@@ -84,13 +101,17 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
   const setupRealtimeSubscription = () => {
     const channel = supabase
       .channel('family-meetings')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'family_meetings'
-      }, () => {
-        loadMeetingsAndMatches();
-      })
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'family_meetings',
+        },
+        () => {
+          loadMeetingsAndMatches();
+        }
+      )
       .subscribe();
 
     return () => supabase.removeChannel(channel);
@@ -98,7 +119,9 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
 
   const loadMeetingsAndMatches = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Load existing meetings
@@ -120,13 +143,13 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
               .eq('id', meeting.match_id)
               .maybeSingle();
 
-            // Get profiles separately 
+            // Get profiles separately
             const { data: user1Profile } = await supabase
               .from('profiles')
               .select('full_name')
               .eq('user_id', matchData?.user1_id)
               .maybeSingle();
-              
+
             const { data: user2Profile } = await supabase
               .from('profiles')
               .select('full_name')
@@ -137,37 +160,40 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
               ...meeting,
               match_details: matchData,
               supervised_user_name: user1Profile?.full_name || 'Utilisateur',
-              candidate_name: user2Profile?.full_name || 'Candidat'
+              candidate_name: user2Profile?.full_name || 'Candidat',
             };
           })
         );
-        
+
         setMeetings(enrichedMeetings as FamilyMeeting[]);
       }
 
       // Load available matches for scheduling
-      const supervisedUserIds = supervisedUsers.map(u => u.user_id);
+      const supervisedUserIds = supervisedUsers.map((u) => u.user_id);
       if (supervisedUserIds.length > 0) {
         const { data: matchesData } = await supabase
           .from('matches')
-          .select(`
+          .select(
+            `
             *,
             user1_profile:profiles!matches_user1_id_fkey(full_name),
             user2_profile:profiles!matches_user2_id_fkey(full_name)
-          `)
-          .or(`user1_id.in.(${supervisedUserIds.join(',')}),user2_id.in.(${supervisedUserIds.join(',')})`)
+          `
+          )
+          .or(
+            `user1_id.in.(${supervisedUserIds.join(',')}),user2_id.in.(${supervisedUserIds.join(',')})`
+          )
           .eq('is_mutual', true)
           .eq('family_supervision_required', true);
 
         setAvailableMatches(matchesData || []);
       }
-
     } catch (error) {
       console.error('Error loading meetings and matches:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les réunions",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les réunions',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -177,7 +203,7 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
   const generateMeetingLink = (type: string) => {
     // Generate a unique meeting room ID
     const roomId = `family-meeting-${Date.now()}`;
-    
+
     switch (type) {
       case 'zoom':
         return `https://zoom.us/j/${roomId}`;
@@ -194,14 +220,16 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
     try {
       if (!selectedDate || !selectedTime || !selectedMatch) {
         toast({
-          title: "Informations manquantes",
-          description: "Veuillez remplir tous les champs obligatoires",
-          variant: "destructive"
+          title: 'Informations manquantes',
+          description: 'Veuillez remplir tous les champs obligatoires',
+          variant: 'destructive',
         });
         return;
       }
 
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Combine date and time
@@ -219,7 +247,7 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
         meeting_type: meetingType,
         meeting_link: meetingLink,
         notes: meetingNotes || null,
-        status: 'scheduled'
+        status: 'scheduled',
       };
 
       const { data, error } = await supabase
@@ -233,8 +261,8 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
       }
 
       toast({
-        title: "Réunion programmée",
-        description: `La réunion a été programmée pour le ${format(scheduledDateTime, "d MMM yyyy 'à' HH:mm", { locale: fr })}`
+        title: 'Réunion programmée',
+        description: `La réunion a été programmée pour le ${format(scheduledDateTime, "d MMM yyyy 'à' HH:mm", { locale: fr })}`,
       });
 
       // Reset form
@@ -243,16 +271,15 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
       setSelectedMatch('');
       setMeetingNotes('');
       setIsDialogOpen(false);
-      
+
       // Reload meetings
       loadMeetingsAndMatches();
-
     } catch (error) {
       console.error('Error scheduling meeting:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de programmer la réunion",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de programmer la réunion',
+        variant: 'destructive',
       });
     }
   };
@@ -261,51 +288,48 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
     try {
       const { error } = await supabase
         .from('family_meetings')
-        .update({ 
+        .update({
           status,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', meetingId);
 
       if (error) throw error;
 
       toast({
-        title: "Statut mis à jour",
-        description: `La réunion a été marquée comme ${status}`
+        title: 'Statut mis à jour',
+        description: `La réunion a été marquée comme ${status}`,
       });
 
       loadMeetingsAndMatches();
     } catch (error) {
       console.error('Error updating meeting status:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour le statut",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de mettre à jour le statut',
+        variant: 'destructive',
       });
     }
   };
 
   const deleteMeeting = async (meetingId: string) => {
     try {
-      const { error } = await supabase
-        .from('family_meetings')
-        .delete()
-        .eq('id', meetingId);
+      const { error } = await supabase.from('family_meetings').delete().eq('id', meetingId);
 
       if (error) throw error;
 
       toast({
-        title: "Réunion supprimée",
-        description: "La réunion a été supprimée"
+        title: 'Réunion supprimée',
+        description: 'La réunion a été supprimée',
       });
 
       loadMeetingsAndMatches();
     } catch (error) {
       console.error('Error deleting meeting:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la réunion",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de supprimer la réunion',
+        variant: 'destructive',
       });
     }
   };
@@ -313,8 +337,8 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
   const copyMeetingLink = (link: string) => {
     navigator.clipboard.writeText(link);
     toast({
-      title: "Lien copié",
-      description: "Le lien de la réunion a été copié dans le presse-papiers"
+      title: 'Lien copié',
+      description: 'Le lien de la réunion a été copié dans le presse-papiers',
     });
   };
 
@@ -348,14 +372,12 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
     }
   };
 
-  const upcomingMeetings = meetings.filter(m => 
-    m.status === 'scheduled' && 
-    isAfter(new Date(m.scheduled_datetime), new Date())
+  const upcomingMeetings = meetings.filter(
+    (m) => m.status === 'scheduled' && isAfter(new Date(m.scheduled_datetime), new Date())
   );
 
-  const pastMeetings = meetings.filter(m => 
-    m.status === 'completed' || 
-    isBefore(new Date(m.scheduled_datetime), new Date())
+  const pastMeetings = meetings.filter(
+    (m) => m.status === 'completed' || isBefore(new Date(m.scheduled_datetime), new Date())
   );
 
   if (loading) {
@@ -436,12 +458,14 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
                     <Button
                       variant="outline"
                       className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground"
+                        'w-full justify-start text-left font-normal',
+                        !selectedDate && 'text-muted-foreground'
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, "PPP", { locale: fr }) : "Sélectionner une date"}
+                      {selectedDate
+                        ? format(selectedDate, 'PPP', { locale: fr })
+                        : 'Sélectionner une date'}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -469,7 +493,10 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
               {/* Meeting Location */}
               <div className="space-y-2">
                 <Label>Modalité</Label>
-                <Select value={meetingLocation} onValueChange={(value) => setMeetingLocation(value as any)}>
+                <Select
+                  value={meetingLocation}
+                  onValueChange={(value) => setMeetingLocation(value as any)}
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -527,16 +554,14 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
         <Card>
           <CardContent className="p-4 text-center">
             <div className="text-2xl font-bold text-green-600">
-              {meetings.filter(m => m.status === 'completed').length}
+              {meetings.filter((m) => m.status === 'completed').length}
             </div>
             <div className="text-sm text-muted-foreground">Terminées</div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-4 text-center">
-            <div className="text-2xl font-bold text-amber-600">
-              {availableMatches.length}
-            </div>
+            <div className="text-2xl font-bold text-amber-600">{availableMatches.length}</div>
             <div className="text-sm text-muted-foreground">Matches disponibles</div>
           </CardContent>
         </Card>
@@ -571,19 +596,19 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
                           {getStatusIcon(meeting.status)}
                           <span className="ml-1">{meeting.status}</span>
                         </Badge>
-                        <Badge variant="outline">
-                          {meeting.meeting_type.replace('_', ' ')}
-                        </Badge>
+                        <Badge variant="outline">{meeting.meeting_type.replace('_', ' ')}</Badge>
                       </div>
-                      
+
                       <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
                         <span className="flex items-center gap-1">
                           <CalendarIcon className="h-4 w-4" />
-                          {format(new Date(meeting.scheduled_datetime), "d MMM yyyy", { locale: fr })}
+                          {format(new Date(meeting.scheduled_datetime), 'd MMM yyyy', {
+                            locale: fr,
+                          })}
                         </span>
                         <span className="flex items-center gap-1">
                           <Clock className="h-4 w-4" />
-                          {format(new Date(meeting.scheduled_datetime), "HH:mm", { locale: fr })}
+                          {format(new Date(meeting.scheduled_datetime), 'HH:mm', { locale: fr })}
                         </span>
                         {meeting.meeting_link && (
                           <span className="flex items-center gap-1">
@@ -594,9 +619,7 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
                       </div>
 
                       {meeting.notes && (
-                        <p className="text-sm text-muted-foreground mt-2">
-                          {meeting.notes}
-                        </p>
+                        <p className="text-sm text-muted-foreground mt-2">{meeting.notes}</p>
                       )}
                     </div>
 
@@ -619,7 +642,7 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
                           </Button>
                         </>
                       )}
-                      
+
                       <Button
                         variant="outline"
                         size="sm"
@@ -627,7 +650,7 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
                       >
                         <CheckCircle className="h-4 w-4" />
                       </Button>
-                      
+
                       <Button
                         variant="outline"
                         size="sm"
@@ -665,12 +688,20 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
           ) : (
             <div className="space-y-3">
               {meetings.map((meeting) => (
-                <Card key={meeting.id} className={`
-                  ${meeting.status === 'scheduled' ? 'border-l-4 border-l-blue-500' :
-                    meeting.status === 'completed' ? 'border-l-4 border-l-green-500' :
-                    meeting.status === 'cancelled' ? 'border-l-4 border-l-red-500' :
-                    'border-l-4 border-l-yellow-500'}
-                `}>
+                <Card
+                  key={meeting.id}
+                  className={`
+                  ${
+                    meeting.status === 'scheduled'
+                      ? 'border-l-4 border-l-blue-500'
+                      : meeting.status === 'completed'
+                        ? 'border-l-4 border-l-green-500'
+                        : meeting.status === 'cancelled'
+                          ? 'border-l-4 border-l-red-500'
+                          : 'border-l-4 border-l-yellow-500'
+                  }
+                `}
+                >
                   <CardContent className="p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -682,15 +713,15 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
                             {getStatusIcon(meeting.status)}
                             <span className="ml-1">{meeting.status}</span>
                           </Badge>
-                          <Badge variant="outline">
-                            {meeting.meeting_type.replace('_', ' ')}
-                          </Badge>
+                          <Badge variant="outline">{meeting.meeting_type.replace('_', ' ')}</Badge>
                         </div>
-                        
+
                         <div className="flex items-center gap-4 text-sm text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <CalendarIcon className="h-4 w-4" />
-                            {format(new Date(meeting.scheduled_datetime), "d MMM yyyy 'à' HH:mm", { locale: fr })}
+                            {format(new Date(meeting.scheduled_datetime), "d MMM yyyy 'à' HH:mm", {
+                              locale: fr,
+                            })}
                           </span>
                           {meeting.meeting_link && (
                             <span className="flex items-center gap-1">
@@ -701,9 +732,7 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
                         </div>
 
                         {meeting.notes && (
-                          <p className="text-sm text-muted-foreground mt-2">
-                            {meeting.notes}
-                          </p>
+                          <p className="text-sm text-muted-foreground mt-2">{meeting.notes}</p>
                         )}
                       </div>
 
@@ -726,7 +755,7 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
                             </Button>
                           </>
                         )}
-                        
+
                         {meeting.status === 'scheduled' && (
                           <Button
                             variant="outline"
@@ -736,7 +765,7 @@ const FamilyMeetingScheduler: React.FC<FamilyMeetingSchedulerProps> = ({ supervi
                             <CheckCircle className="h-4 w-4" />
                           </Button>
                         )}
-                        
+
                         <Button
                           variant="outline"
                           size="sm"

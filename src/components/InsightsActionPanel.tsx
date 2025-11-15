@@ -3,20 +3,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Share2, 
-  Download, 
-  RefreshCw, 
-  BookOpen, 
-  Target, 
+import {
+  Share2,
+  Download,
+  RefreshCw,
+  BookOpen,
+  Target,
   TrendingUp,
   Heart,
   Users,
   Calendar,
-  CheckCircle
+  CheckCircle,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useInsightsAnalytics, type UseInsightsAnalyticsReturn } from '@/hooks/useInsightsAnalytics';
+import {
+  useInsightsAnalytics,
+  type UseInsightsAnalyticsReturn,
+} from '@/hooks/useInsightsAnalytics';
 import { useCompatibilityInsights } from '@/hooks/useCompatibilityInsights';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
@@ -36,36 +39,37 @@ interface NextStep {
 }
 
 const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
-  completionPercentage, 
-  insightsAvailable 
+  completionPercentage,
+  insightsAvailable,
 }) => {
   const [isSharing, setIsSharing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
   const { insights } = useCompatibilityInsights(user?.id);
-  const { trackShare, trackExport, trackAction, getRecommendations }: UseInsightsAnalyticsReturn = useInsightsAnalytics();
+  const { trackShare, trackExport, trackAction, getRecommendations }: UseInsightsAnalyticsReturn =
+    useInsightsAnalytics();
 
   const handleShare = async (): Promise<void> => {
     setIsSharing(true);
     try {
       if (navigator.share) {
         await navigator.share({
-           title: 'Mes Insights de Compatibilité',
-           text: 'Découvrez mon profil de compatibilité sur Muslima',
-          url: window.location.href
+          title: 'Mes Insights de Compatibilité',
+          text: 'Découvrez mon profil de compatibilité sur Muslima',
+          url: window.location.href,
         });
-        
+
         // Tracker le partage
         await trackShare();
-        
+
         toast.success('Insights partagés avec succès !');
       } else {
         await navigator.clipboard.writeText(window.location.href);
-        
+
         // Tracker même si c'est juste le lien copié
         await trackShare();
-        
+
         toast.success('Lien copié dans le presse-papier !');
       }
     } catch (error: unknown) {
@@ -80,7 +84,7 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
     setIsExporting(true);
     try {
       if (!insights) {
-        toast.error('Aucun insight disponible pour l\'export');
+        toast.error("Aucun insight disponible pour l'export");
         return;
       }
 
@@ -88,15 +92,15 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
       await generateEnhancedPDF({
         insights,
         userName: user?.email?.split('@')[0] || 'Utilisateur',
-        completionPercentage
+        completionPercentage,
       });
-      
+
       // Tracker l'export
       await trackExport();
-      
+
       toast.success('PDF professionnel téléchargé avec succès !');
     } catch (error: unknown) {
-      console.error('Erreur lors de l\'export PDF:', error);
+      console.error("Erreur lors de l'export PDF:", error);
       toast.error('Erreur lors de la génération du PDF');
     } finally {
       setIsExporting(false);
@@ -106,44 +110,44 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
   const nextSteps: NextStep[] = [
     {
       icon: TrendingUp,
-      title: "Améliorer mon profil",
-      description: "Optimisez votre profil selon vos insights",
+      title: 'Améliorer mon profil',
+      description: 'Optimisez votre profil selon vos insights',
       action: () => {
         trackAction('improve_profile');
         navigate('/profile');
       },
-      available: completionPercentage < 100
+      available: completionPercentage < 100,
     },
     {
       icon: Users,
-      title: "Découvrir des profils",
-      description: "Trouvez des personnes compatibles",
+      title: 'Découvrir des profils',
+      description: 'Trouvez des personnes compatibles',
       action: () => {
         trackAction('browse_profiles');
         navigate('/browse');
       },
-      available: insightsAvailable
+      available: insightsAvailable,
     },
     {
       icon: BookOpen,
-      title: "Guidance islamique",
-      description: "Consultez nos conseils islamiques",
+      title: 'Guidance islamique',
+      description: 'Consultez nos conseils islamiques',
       action: () => {
         trackAction('read_guidance');
         navigate('/guidance');
       },
-      available: true
+      available: true,
     },
     {
       icon: RefreshCw,
-      title: "Refaire le test",
-      description: "Mettez à jour vos réponses",
+      title: 'Refaire le test',
+      description: 'Mettez à jour vos réponses',
       action: () => {
         trackAction('retake_test');
         navigate('/compatibility-test');
       },
-      available: insightsAvailable
-    }
+      available: insightsAvailable,
+    },
   ];
 
   return (
@@ -188,7 +192,7 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
               )}
               Partager
             </Button>
-            
+
             <Button
               onClick={handleExport}
               disabled={!insightsAvailable || isExporting}
@@ -230,18 +234,20 @@ const InsightsActionPanel: React.FC<InsightsActionPanelProps> = ({
               <div
                 key={index}
                 className={`flex items-start space-x-3 p-3 rounded-lg border transition-colors ${
-                  step.available 
-                    ? 'hover:bg-slate-50 cursor-pointer' 
+                  step.available
+                    ? 'hover:bg-slate-50 cursor-pointer'
                     : 'opacity-50 cursor-not-allowed bg-slate-25'
                 }`}
                 onClick={step.available ? step.action : undefined}
               >
-                <div className={`p-2 rounded-full ${
-                  step.available ? 'bg-primary/10' : 'bg-slate-100'
-                }`}>
-                  <Icon className={`h-4 w-4 ${
-                    step.available ? 'text-primary' : 'text-slate-400'
-                  }`} />
+                <div
+                  className={`p-2 rounded-full ${
+                    step.available ? 'bg-primary/10' : 'bg-slate-100'
+                  }`}
+                >
+                  <Icon
+                    className={`h-4 w-4 ${step.available ? 'text-primary' : 'text-slate-400'}`}
+                  />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">

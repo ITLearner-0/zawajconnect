@@ -10,7 +10,7 @@ interface ChatMessageHandlerProps {
     isFiltered: boolean;
   };
   processContentFlags: (
-    conversationId: string, 
+    conversationId: string,
     contentType: 'message',
     flagType: any,
     severity: any
@@ -22,34 +22,35 @@ export const useChatMessageHandler = ({
   conversationId,
   onSendMessage,
   moderateMessageContent,
-  processContentFlags
+  processContentFlags,
 }: ChatMessageHandlerProps) => {
   const { toast } = useToast();
 
   const handleSendMessage = (content: string) => {
     // Apply content moderation
     const { flags, filteredContent, isFiltered } = moderateMessageContent(content);
-    
+
     // If the content was filtered, show a toast
     if (isFiltered) {
       toast({
-        title: "Message Modified",
-        description: "Your message contained inappropriate content and was modified before sending.",
-        variant: "default"
+        title: 'Message Modified',
+        description:
+          'Your message contained inappropriate content and was modified before sending.',
+        variant: 'default',
       });
-      
+
       // Process content flags
-      flags.forEach(flag => {
+      flags.forEach((flag) => {
         if (flag.flag_type && flag.severity) {
           processContentFlags(
-            conversationId, 
+            conversationId,
             'message',
             flag.flag_type as any,
             flag.severity as any
           );
         }
       });
-      
+
       // Send the filtered content
       onSendMessage(filteredContent);
     } else {

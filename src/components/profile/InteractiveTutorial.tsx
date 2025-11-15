@@ -6,9 +6,9 @@ import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  GraduationCap, 
-  CheckCircle2, 
+import {
+  GraduationCap,
+  CheckCircle2,
   Circle,
   ArrowRight,
   ArrowLeft,
@@ -18,7 +18,7 @@ import {
   Clock,
   Sparkles,
   X,
-  Play
+  Play,
 } from 'lucide-react';
 
 interface TutorialStep {
@@ -40,11 +40,11 @@ interface InteractiveTutorialProps {
   onNavigateToTab: (tab: string) => void;
 }
 
-const InteractiveTutorial = ({ 
-  profile, 
-  islamicPrefs, 
+const InteractiveTutorial = ({
+  profile,
+  islamicPrefs,
   completionStats,
-  onNavigateToTab 
+  onNavigateToTab,
 }: InteractiveTutorialProps) => {
   const [steps, setSteps] = useState<TutorialStep[]>([]);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
@@ -54,9 +54,10 @@ const InteractiveTutorial = ({
   const { toast } = useToast();
 
   const currentStep = steps[currentStepIndex];
-  const progress = steps.length > 0 
-    ? Math.round((steps.filter(s => s.completed).length / steps.length) * 100)
-    : 0;
+  const progress =
+    steps.length > 0
+      ? Math.round((steps.filter((s) => s.completed).length / steps.length) * 100)
+      : 0;
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -74,11 +75,21 @@ const InteractiveTutorial = ({
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case 'high':
-        return <Badge variant="destructive" className="text-xs">Priorité haute</Badge>;
+        return (
+          <Badge variant="destructive" className="text-xs">
+            Priorité haute
+          </Badge>
+        );
       case 'medium':
-        return <Badge className="text-xs bg-gold/20 text-gold border-gold/30">Priorité moyenne</Badge>;
+        return (
+          <Badge className="text-xs bg-gold/20 text-gold border-gold/30">Priorité moyenne</Badge>
+        );
       case 'low':
-        return <Badge variant="outline" className="text-xs">Priorité basse</Badge>;
+        return (
+          <Badge variant="outline" className="text-xs">
+            Priorité basse
+          </Badge>
+        );
       default:
         return null;
     }
@@ -91,22 +102,22 @@ const InteractiveTutorial = ({
         body: {
           profile,
           islamicPrefs,
-          completionStats
-        }
+          completionStats,
+        },
       });
 
       if (error) {
         if (error.message.includes('429')) {
           toast({
-            title: "Limite atteinte",
-            description: "Trop de requêtes. Réessayez dans quelques instants.",
-            variant: "destructive"
+            title: 'Limite atteinte',
+            description: 'Trop de requêtes. Réessayez dans quelques instants.',
+            variant: 'destructive',
           });
         } else if (error.message.includes('402')) {
           toast({
-            title: "Crédits épuisés",
-            description: "Les crédits AI sont épuisés.",
-            variant: "destructive"
+            title: 'Crédits épuisés',
+            description: 'Les crédits AI sont épuisés.',
+            variant: 'destructive',
           });
         } else {
           throw error;
@@ -120,16 +131,16 @@ const InteractiveTutorial = ({
         setIsActive(true);
         setShowSpotlight(true);
         toast({
-          title: "Tutoriel généré !",
+          title: 'Tutoriel généré !',
           description: `${data.steps.length} étapes personnalisées créées pour vous.`,
         });
       }
     } catch (error) {
       console.error('Error generating tutorial:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de générer le tutoriel.",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de générer le tutoriel.',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -139,7 +150,7 @@ const InteractiveTutorial = ({
   const completeStep = () => {
     const currentStepData = steps[currentStepIndex];
     if (!currentStepData) return;
-    
+
     const newSteps = [...steps];
     const stepToComplete = newSteps[currentStepIndex];
     if (stepToComplete) {
@@ -150,13 +161,13 @@ const InteractiveTutorial = ({
     if (currentStepIndex < steps.length - 1) {
       setCurrentStepIndex(currentStepIndex + 1);
       toast({
-        title: "Étape complétée ! 🎉",
-        description: "Passons à la suivante.",
+        title: 'Étape complétée ! 🎉',
+        description: 'Passons à la suivante.',
       });
     } else {
       toast({
-        title: "Tutoriel terminé ! 🎊",
-        description: "Félicitations ! Vous avez complété toutes les étapes.",
+        title: 'Tutoriel terminé ! 🎊',
+        description: 'Félicitations ! Vous avez complété toutes les étapes.',
       });
       setIsActive(false);
     }
@@ -203,13 +214,10 @@ const InteractiveTutorial = ({
             </motion.div>
             <h3 className="font-semibold mb-2">Commencez votre parcours guidé</h3>
             <p className="text-sm text-muted-foreground mb-4">
-              L'IA va analyser votre profil et créer un tutoriel personnalisé étape par étape pour maximiser vos chances de match.
+              L'IA va analyser votre profil et créer un tutoriel personnalisé étape par étape pour
+              maximiser vos chances de match.
             </p>
-            <Button
-              onClick={generateTutorial}
-              disabled={loading}
-              className="gap-2"
-            >
+            <Button onClick={generateTutorial} disabled={loading} className="gap-2">
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -255,7 +263,9 @@ const InteractiveTutorial = ({
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
-                  <span>Étape {currentStepIndex + 1} sur {steps.length}</span>
+                  <span>
+                    Étape {currentStepIndex + 1} sur {steps.length}
+                  </span>
                   <span>{progress}% complété</span>
                 </div>
                 <Progress value={progress} className="h-2 bg-primary-foreground/20" />
@@ -269,9 +279,7 @@ const InteractiveTutorial = ({
                   <h3 className="font-semibold text-lg">{currentStep.title}</h3>
                   {getPriorityBadge(currentStep.priority)}
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {currentStep.description}
-                </p>
+                <p className="text-sm text-muted-foreground">{currentStep.description}</p>
               </div>
 
               {/* Objective */}
@@ -325,7 +333,7 @@ const InteractiveTutorial = ({
                   <ArrowLeft className="h-3 w-3 mr-1" />
                   Précédent
                 </Button>
-                
+
                 {currentStep.completed ? (
                   <Button
                     variant="outline"
@@ -338,11 +346,7 @@ const InteractiveTutorial = ({
                     <ArrowRight className="h-3 w-3 ml-1" />
                   </Button>
                 ) : (
-                  <Button
-                    size="sm"
-                    onClick={goToStepAndNavigate}
-                    className="flex-1 gap-1"
-                  >
+                  <Button size="sm" onClick={goToStepAndNavigate} className="flex-1 gap-1">
                     <Play className="h-3 w-3" />
                     Commencer
                   </Button>
@@ -351,11 +355,7 @@ const InteractiveTutorial = ({
 
               {/* Complete button */}
               {!currentStep.completed && (
-                <Button
-                  onClick={completeStep}
-                  className="w-full gap-2"
-                  variant="default"
-                >
+                <Button onClick={completeStep} className="w-full gap-2" variant="default">
                   <CheckCircle2 className="h-4 w-4" />
                   Marquer comme complétée
                 </Button>
@@ -372,15 +372,11 @@ const InteractiveTutorial = ({
                         index === currentStepIndex
                           ? 'bg-primary text-primary-foreground'
                           : step.completed
-                          ? 'bg-emerald text-white'
-                          : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                            ? 'bg-emerald text-white'
+                            : 'bg-muted text-muted-foreground hover:bg-muted/80'
                       }`}
                     >
-                      {step.completed ? (
-                        <CheckCircle2 className="h-4 w-4" />
-                      ) : (
-                        index + 1
-                      )}
+                      {step.completed ? <CheckCircle2 className="h-4 w-4" /> : index + 1}
                     </button>
                   ))}
                 </div>

@@ -40,12 +40,11 @@ interface UseOnboardingValidationProps {
   currentStep: number;
 }
 
-export const useOnboardingValidation = ({ 
-  profileData, 
-  islamicPrefs, 
-  currentStep 
+export const useOnboardingValidation = ({
+  profileData,
+  islamicPrefs,
+  currentStep,
 }: UseOnboardingValidationProps) => {
-  
   const stepValidationRules = useMemo(() => {
     const rules: { [key: number]: ValidationRule[] } = {
       1: [
@@ -54,66 +53,66 @@ export const useOnboardingValidation = ({
           label: 'Nom complet',
           isValid: profileData.full_name.trim().length >= 2,
           message: 'Le nom doit contenir au moins 2 caractères',
-          isRequired: true
+          isRequired: true,
         },
         {
           field: 'age',
           label: 'Âge',
           isValid: profileData.age !== undefined && profileData.age >= 18 && profileData.age <= 80,
-          message: 'L\'âge doit être entre 18 et 80 ans',
-          isRequired: true
+          message: "L'âge doit être entre 18 et 80 ans",
+          isRequired: true,
         },
         {
           field: 'gender',
           label: 'Genre',
           isValid: ['male', 'female'].includes(profileData.gender),
           message: 'Veuillez sélectionner votre genre',
-          isRequired: true
+          isRequired: true,
         },
         {
           field: 'location',
           label: 'Localisation',
           isValid: profileData.location.trim().length >= 2,
           message: 'La localisation doit contenir au moins 2 caractères',
-          isRequired: true
-        }
+          isRequired: true,
+        },
       ],
       2: [
         {
           field: 'education',
           label: 'Éducation',
           isValid: profileData.education.trim().length >= 3,
-          message: 'L\'éducation doit contenir au moins 3 caractères',
-          isRequired: true
+          message: "L'éducation doit contenir au moins 3 caractères",
+          isRequired: true,
         },
         {
           field: 'profession',
           label: 'Profession',
           isValid: profileData.profession.trim().length >= 3,
           message: 'La profession doit contenir au moins 3 caractères',
-          isRequired: true
+          isRequired: true,
         },
         {
           field: 'bio',
           label: 'Description personnelle',
           isValid: profileData.bio.trim().length >= 50,
           message: 'La description doit contenir au moins 50 caractères',
-          isRequired: true
+          isRequired: true,
         },
         {
           field: 'interests',
-          label: 'Centres d\'intérêt',
+          label: "Centres d'intérêt",
           isValid: profileData.interests.length >= 3,
-          message: 'Ajoutez au moins 3 centres d\'intérêt',
-          isRequired: false
+          message: "Ajoutez au moins 3 centres d'intérêt",
+          isRequired: false,
         },
         {
           field: 'avatar_url',
           label: 'Photo de profil',
           isValid: profileData.avatar_url.length > 0,
           message: 'Une photo de profil est fortement recommandée',
-          isRequired: false
-        }
+          isRequired: false,
+        },
       ],
       3: [
         {
@@ -121,36 +120,36 @@ export const useOnboardingValidation = ({
           label: 'Fréquence de prière',
           isValid: islamicPrefs.prayer_frequency.length > 0,
           message: 'Veuillez indiquer votre fréquence de prière',
-          isRequired: true
+          isRequired: true,
         },
         {
           field: 'sect',
           label: 'Secte',
           isValid: islamicPrefs.sect.length > 0,
           message: 'Veuillez indiquer votre secte',
-          isRequired: true
+          isRequired: true,
         },
         {
           field: 'importance_of_religion',
           label: 'Importance de la religion',
           isValid: islamicPrefs.importance_of_religion.length > 0,
-          message: 'Veuillez indiquer l\'importance de la religion pour vous',
-          isRequired: true
+          message: "Veuillez indiquer l'importance de la religion pour vous",
+          isRequired: true,
         },
         {
           field: 'quran_reading',
           label: 'Lecture du Coran',
           isValid: islamicPrefs.quran_reading.length > 0,
           message: 'Indiquez votre fréquence de lecture du Coran',
-          isRequired: false
+          isRequired: false,
         },
         {
           field: 'madhab',
           label: 'Madhab',
           isValid: islamicPrefs.madhab.length > 0,
           message: 'Indiquez votre madhab si applicable',
-          isRequired: false
-        }
+          isRequired: false,
+        },
       ],
       4: [
         {
@@ -158,9 +157,9 @@ export const useOnboardingValidation = ({
           label: 'Ce que vous recherchez',
           isValid: profileData.looking_for.trim().length >= 30,
           message: 'Décrivez ce que vous recherchez (minimum 30 caractères)',
-          isRequired: true
-        }
-      ]
+          isRequired: true,
+        },
+      ],
     };
 
     return rules;
@@ -172,25 +171,27 @@ export const useOnboardingValidation = ({
 
   const isStepValid = (step: number) => {
     const rules = stepValidationRules[step] || [];
-    return rules.filter(rule => rule.isRequired).every(rule => rule.isValid);
+    return rules.filter((rule) => rule.isRequired).every((rule) => rule.isValid);
   };
 
   const getOverallProgress = () => {
     const allRules = Object.values(stepValidationRules).flat();
-    const validRules = allRules.filter(rule => rule.isValid);
+    const validRules = allRules.filter((rule) => rule.isValid);
     return Math.round((validRules.length / allRules.length) * 100);
   };
 
   const getRequiredProgress = () => {
-    const requiredRules = Object.values(stepValidationRules).flat().filter(rule => rule.isRequired);
-    const validRequiredRules = requiredRules.filter(rule => rule.isValid);
+    const requiredRules = Object.values(stepValidationRules)
+      .flat()
+      .filter((rule) => rule.isRequired);
+    const validRequiredRules = requiredRules.filter((rule) => rule.isValid);
     return Math.round((validRequiredRules.length / requiredRules.length) * 100);
   };
 
   const getStepProgress = (step: number) => {
     const rules = stepValidationRules[step] || [];
     if (rules.length === 0) return 100;
-    const validRules = rules.filter(rule => rule.isValid);
+    const validRules = rules.filter((rule) => rule.isValid);
     return Math.round((validRules.length / rules.length) * 100);
   };
 
@@ -205,12 +206,12 @@ export const useOnboardingValidation = ({
 
   const getMissingRequiredFields = () => {
     const allRules = Object.values(stepValidationRules).flat();
-    return allRules.filter(rule => rule.isRequired && !rule.isValid);
+    return allRules.filter((rule) => rule.isRequired && !rule.isValid);
   };
 
   const getOptionalCompletedFields = () => {
     const allRules = Object.values(stepValidationRules).flat();
-    return allRules.filter(rule => !rule.isRequired && rule.isValid);
+    return allRules.filter((rule) => !rule.isRequired && rule.isValid);
   };
 
   return {
@@ -222,7 +223,7 @@ export const useOnboardingValidation = ({
     getNextIncompleteStep,
     getMissingRequiredFields,
     getOptionalCompletedFields,
-    stepValidationRules
+    stepValidationRules,
   };
 };
 

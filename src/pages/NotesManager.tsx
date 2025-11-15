@@ -6,9 +6,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { ArrowLeft, StickyNote, Search, Filter, Save, Trash2, Tag, Calendar, User, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  StickyNote,
+  Search,
+  Filter,
+  Save,
+  Trash2,
+  Tag,
+  Calendar,
+  User,
+  X,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useProfileTags, ProfileTag } from '@/hooks/useProfileTags';
 import { toast } from 'sonner';
@@ -64,7 +81,8 @@ export default function NotesManager() {
       setLoading(true);
       const { data: notesData, error } = await supabase
         .from('profile_notes')
-        .select(`
+        .select(
+          `
           id,
           note,
           profile_id,
@@ -77,7 +95,8 @@ export default function NotesManager() {
             location,
             avatar_url
           )
-        `)
+        `
+        )
         .eq('user_id', user.id)
         .order('updated_at', { ascending: false });
 
@@ -90,7 +109,7 @@ export default function NotesManager() {
           return {
             ...note,
             profile: note.profiles,
-            tags: noteTags
+            tags: noteTags,
           };
         })
       );
@@ -109,17 +128,16 @@ export default function NotesManager() {
 
     // Search filter
     if (searchQuery) {
-      filtered = filtered.filter(note =>
-        note.note.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        note.profile.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
+      filtered = filtered.filter(
+        (note) =>
+          note.note.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          note.profile.full_name?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
 
     // Tag filter
     if (selectedTagFilter) {
-      filtered = filtered.filter(note =>
-        note.tags.some(tag => tag.id === selectedTagFilter)
-      );
+      filtered = filtered.filter((note) => note.tags.some((tag) => tag.id === selectedTagFilter));
     }
 
     // Sort
@@ -153,14 +171,14 @@ export default function NotesManager() {
         .from('profile_notes')
         .update({
           note: editingContent.trim(),
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq('id', noteId);
 
       if (error) throw error;
 
-      setNotes(prev =>
-        prev.map(note =>
+      setNotes((prev) =>
+        prev.map((note) =>
           note.id === noteId
             ? { ...note, note: editingContent.trim(), updated_at: new Date().toISOString() }
             : note
@@ -188,7 +206,7 @@ export default function NotesManager() {
 
       if (error) throw error;
 
-      setNotes(prev => prev.filter(note => note.id !== noteId));
+      setNotes((prev) => prev.filter((note) => note.id !== noteId));
       toast.success('Note supprimée');
     } catch (error) {
       console.error('Error deleting note:', error);
@@ -197,31 +215,25 @@ export default function NotesManager() {
   };
 
   const handleTagToggle = async (noteId: string, tag: ProfileTag) => {
-    const note = notes.find(n => n.id === noteId);
+    const note = notes.find((n) => n.id === noteId);
     if (!note) return;
 
-    const hasTag = note.tags.some(t => t.id === tag.id);
+    const hasTag = note.tags.some((t) => t.id === tag.id);
 
     if (hasTag) {
       const success = await removeTagFromNote(noteId, tag.id);
       if (success) {
-        setNotes(prev =>
-          prev.map(n =>
-            n.id === noteId
-              ? { ...n, tags: n.tags.filter(t => t.id !== tag.id) }
-              : n
+        setNotes((prev) =>
+          prev.map((n) =>
+            n.id === noteId ? { ...n, tags: n.tags.filter((t) => t.id !== tag.id) } : n
           )
         );
       }
     } else {
       const success = await addTagToNote(noteId, tag.id);
       if (success) {
-        setNotes(prev =>
-          prev.map(n =>
-            n.id === noteId
-              ? { ...n, tags: [...n.tags, tag] }
-              : n
-          )
+        setNotes((prev) =>
+          prev.map((n) => (n.id === noteId ? { ...n, tags: [...n.tags, tag] } : n))
         );
       }
     }
@@ -251,11 +263,7 @@ export default function NotesManager() {
       <Header />
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/browse')}
-            className="mb-4"
-          >
+          <Button variant="outline" onClick={() => navigate('/browse')} className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour
           </Button>
@@ -265,7 +273,7 @@ export default function NotesManager() {
             <div>
               <h1 className="text-3xl font-bold">Mes Notes Privées</h1>
               <p className="text-muted-foreground">
-                {filteredNotes.length} note{filteredNotes.length > 1 ? 's' : ''} 
+                {filteredNotes.length} note{filteredNotes.length > 1 ? 's' : ''}
                 {searchQuery || selectedTagFilter ? ' (filtrées)' : ''}
               </p>
             </div>
@@ -329,10 +337,12 @@ export default function NotesManager() {
                         style={{
                           backgroundColor: selectedTagFilter === tag.id ? tag.color : 'transparent',
                           color: selectedTagFilter === tag.id ? 'white' : tag.color,
-                          borderColor: tag.color
+                          borderColor: tag.color,
                         }}
                         className="cursor-pointer border-2 hover:opacity-80 transition-opacity"
-                        onClick={() => setSelectedTagFilter(selectedTagFilter === tag.id ? null : tag.id)}
+                        onClick={() =>
+                          setSelectedTagFilter(selectedTagFilter === tag.id ? null : tag.id)
+                        }
                       >
                         <Tag className="h-3 w-3 mr-1" />
                         {tag.tag_name}
@@ -466,19 +476,21 @@ export default function NotesManager() {
                         {tag.tag_name}
                       </Badge>
                     ))}
-                    
-                    {tags.filter(t => !note.tags.some(nt => nt.id === t.id)).length > 0 && (
-                      <Select onValueChange={(tagId) => {
-                        const tag = tags.find(t => t.id === tagId);
-                        if (tag) handleTagToggle(note.id, tag);
-                      }}>
+
+                    {tags.filter((t) => !note.tags.some((nt) => nt.id === t.id)).length > 0 && (
+                      <Select
+                        onValueChange={(tagId) => {
+                          const tag = tags.find((t) => t.id === tagId);
+                          if (tag) handleTagToggle(note.id, tag);
+                        }}
+                      >
                         <SelectTrigger className="h-6 w-auto text-xs">
                           <Tag className="h-3 w-3 mr-1" />
                           Ajouter tag
                         </SelectTrigger>
                         <SelectContent>
                           {tags
-                            .filter(t => !note.tags.some(nt => nt.id === t.id))
+                            .filter((t) => !note.tags.some((nt) => nt.id === t.id))
                             .map((tag) => (
                               <SelectItem key={tag.id} value={tag.id}>
                                 <div className="flex items-center gap-2">

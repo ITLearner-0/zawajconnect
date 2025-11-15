@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Dialog,
@@ -34,16 +33,17 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
   currentUserId,
 }) => {
   const { toast } = useToast();
-  const [reportType, setReportType] = useState<ContentReport['report_type']>('inappropriate_message');
+  const [reportType, setReportType] =
+    useState<ContentReport['report_type']>('inappropriate_message');
   const [reportDetails, setReportDetails] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     if (!reportDetails.trim()) {
       toast({
-        title: "Error",
-        description: "Please provide details about your report",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Please provide details about your report',
+        variant: 'destructive',
       });
       return;
     }
@@ -63,20 +63,20 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
 
       if (success) {
         toast({
-          title: "Report Submitted",
-          description: "Thank you for your report. Our team will review it shortly.",
+          title: 'Report Submitted',
+          description: 'Thank you for your report. Our team will review it shortly.',
         });
         onClose();
         setReportDetails('');
         setReportType('inappropriate_message');
       } else {
-        throw new Error("Failed to submit report");
+        throw new Error('Failed to submit report');
       }
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to submit report. Please try again later.",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to submit report. Please try again later.',
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -101,7 +101,11 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label>Report Type</Label>
-            <RadioGroup value={reportType} onValueChange={handleReportTypeChange} className="space-y-1">
+            <RadioGroup
+              value={reportType}
+              onValueChange={handleReportTypeChange}
+              className="space-y-1"
+            >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="inappropriate_message" id="inappropriate_message" />
                 <Label htmlFor="inappropriate_message">Inappropriate Message</Label>
@@ -142,9 +146,11 @@ const ReportDialog: React.FC<ReportDialogProps> = ({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Submit Report"}
+            {isSubmitting ? 'Submitting...' : 'Submit Report'}
           </Button>
         </DialogFooter>
       </DialogContent>

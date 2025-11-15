@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 
 export const useChatControls = () => {
@@ -7,7 +6,7 @@ export const useChatControls = () => {
   const [showMonitoring, setShowMonitoring] = useState(false);
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [showEmergencyPanel, setShowEmergencyPanel] = useState(false);
-  
+
   const toggleRetentionSettings = () => {
     setShowRetentionSettings(!showRetentionSettings);
     // Close other panels
@@ -17,7 +16,7 @@ export const useChatControls = () => {
       setShowEmergencyPanel(false);
     }
   };
-  
+
   const toggleSecuritySettings = () => {
     setShowSecuritySettings(!showSecuritySettings);
     // Close other panels
@@ -27,7 +26,7 @@ export const useChatControls = () => {
       setShowEmergencyPanel(false);
     }
   };
-  
+
   const toggleMonitoringPanel = () => {
     setShowMonitoring(!showMonitoring);
     // Close other panels
@@ -37,7 +36,7 @@ export const useChatControls = () => {
       setShowEmergencyPanel(false);
     }
   };
-  
+
   const toggleEmergencyPanel = () => {
     setShowEmergencyPanel(!showEmergencyPanel);
     // Close other panels
@@ -47,7 +46,7 @@ export const useChatControls = () => {
       setShowMonitoring(false);
     }
   };
-  
+
   return {
     showRetentionSettings,
     showSecuritySettings,
@@ -58,6 +57,6 @@ export const useChatControls = () => {
     toggleRetentionSettings,
     toggleSecuritySettings,
     toggleMonitoringPanel,
-    toggleEmergencyPanel
+    toggleEmergencyPanel,
   };
 };

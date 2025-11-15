@@ -1,10 +1,10 @@
-import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { sendEmail } from "../_shared/smtp.ts";
+import { serve } from 'https://deno.land/std@0.190.0/http/server.ts';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.2';
+import { sendEmail } from '../_shared/smtp.ts';
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface MatchNotificationRequest {
@@ -15,18 +15,19 @@ interface MatchNotificationRequest {
 }
 
 const handler = async (req: Request): Promise<Response> => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { recipientEmail, recipientName, matchName, matchId }: MatchNotificationRequest = await req.json();
+    const { recipientEmail, recipientName, matchName, matchId }: MatchNotificationRequest =
+      await req.json();
 
-    console.log("Sending match notification to:", recipientEmail);
+    console.log('Sending match notification to:', recipientEmail);
 
     await sendEmail({
       to: recipientEmail,
-      subject: "🎉 Nouveau match mutuel !",
+      subject: '🎉 Nouveau match mutuel !',
       html: `
         <!DOCTYPE html>
         <html>
@@ -68,7 +69,7 @@ const handler = async (req: Request): Promise<Response> => {
                       </div>
                       
                       <div style="text-align: center; margin: 30px 0;">
-                        <a href="${Deno.env.get("SUPABASE_URL")}/chat?match=${matchId}" 
+                        <a href="${Deno.env.get('SUPABASE_URL')}/chat?match=${matchId}" 
                            style="display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);">
                           Commencer la conversation 💬
                         </a>
@@ -94,7 +95,7 @@ const handler = async (req: Request): Promise<Response> => {
                         © 2025 Zawaj-Connect. Tous droits réservés.
                       </p>
                       <p style="color: #999999; font-size: 12px; margin: 0;">
-                        <a href="${Deno.env.get("SUPABASE_URL")}/settings" style="color: #10b981; text-decoration: none;">Gérer mes notifications</a>
+                        <a href="${Deno.env.get('SUPABASE_URL')}/settings" style="color: #10b981; text-decoration: none;">Gérer mes notifications</a>
                       </p>
                     </td>
                   </tr>
@@ -107,21 +108,18 @@ const handler = async (req: Request): Promise<Response> => {
       `,
     });
 
-    console.log("Match notification sent successfully to:", recipientEmail);
+    console.log('Match notification sent successfully to:', recipientEmail);
 
     return new Response(JSON.stringify({ success: true, email: recipientEmail }), {
       status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error: any) {
-    console.error("Error in send-match-notification function:", error);
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json", ...corsHeaders },
-      }
-    );
+    console.error('Error in send-match-notification function:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json', ...corsHeaders },
+    });
   }
 };
 

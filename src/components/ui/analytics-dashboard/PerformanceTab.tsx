@@ -1,14 +1,13 @@
-
 import React from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
 } from 'recharts';
 import { formatters } from '@/utils/helpers';
 
@@ -33,17 +32,19 @@ const PerformanceTab = ({ performanceData }: PerformanceTabProps) => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="timestamp" />
                   <YAxis />
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value: number, name: string) => [
-                      name === 'loadTime' ? formatters.duration(value) : formatters.percentage(value),
-                      name === 'loadTime' ? 'Load Time' : 'Success Rate'
+                      name === 'loadTime'
+                        ? formatters.duration(value)
+                        : formatters.percentage(value),
+                      name === 'loadTime' ? 'Load Time' : 'Success Rate',
                     ]}
                   />
                   <Line type="monotone" dataKey="loadTime" stroke="#8884d8" name="loadTime" />
                 </LineChart>
               </ResponsiveContainer>
             </div>
-            
+
             <div>
               <h4 className="font-semibold mb-2">Success Rate Trends</h4>
               <ResponsiveContainer width="100%" height={200}>
@@ -51,7 +52,7 @@ const PerformanceTab = ({ performanceData }: PerformanceTabProps) => {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="timestamp" />
                   <YAxis domain={[0, 100]} />
-                  <Tooltip 
+                  <Tooltip
                     formatter={(value: number) => [formatters.percentage(value), 'Success Rate']}
                   />
                   <Line type="monotone" dataKey="successRate" stroke="#82ca9d" name="successRate" />

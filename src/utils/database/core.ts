@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -40,7 +39,11 @@ export const executeSql = async (sql: string): Promise<any> => {
  */
 export const columnExists = async (tableName: string, columnName: string): Promise<boolean> => {
   try {
-    console.log('Column existence check requested but not available from client:', tableName, columnName);
+    console.log(
+      'Column existence check requested but not available from client:',
+      tableName,
+      columnName
+    );
     return false;
   } catch (err) {
     console.error('Error checking if column exists:', err);

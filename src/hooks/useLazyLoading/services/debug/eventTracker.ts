@@ -1,4 +1,3 @@
-
 import { LazyLoadingEvent } from './types';
 import { DebugLogger } from './logger';
 
@@ -12,16 +11,16 @@ export class EventTracker {
 
   logEvent(elementId: string, event: Omit<LazyLoadingEvent, 'timestamp'>): void {
     if (!this.enableLogging) return;
-    
+
     const fullEvent: LazyLoadingEvent = {
       ...event,
       timestamp: Date.now(),
     };
-    
+
     const events = this.events.get(elementId) || [];
     events.push(fullEvent);
     this.events.set(elementId, events);
-    
+
     this.logger.log('debug', `Event: ${event.type}`, { elementId, ...event.data });
   }
 

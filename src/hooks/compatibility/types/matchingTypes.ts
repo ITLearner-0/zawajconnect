@@ -1,6 +1,5 @@
-
-import { UserAnswers, UserPreferences } from "./validationTypes";
-import { PaginationOptions } from "./paginationTypes";
+import { UserAnswers, UserPreferences } from './validationTypes';
+import { PaginationOptions } from './paginationTypes';
 
 export interface MatchingFilters {
   ageRange?: [number, number];

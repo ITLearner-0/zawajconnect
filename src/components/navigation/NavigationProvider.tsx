@@ -4,8 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { routes, getRouteByPath } from '@/config/routes';
 
 interface NavigationContextType {
-  currentRoute: typeof routes[0] | null;
-  previousRoute: typeof routes[0] | null;
+  currentRoute: (typeof routes)[0] | null;
+  previousRoute: (typeof routes)[0] | null;
   navigationHistory: string[];
   canGoBack: boolean;
   goBack: () => void;
@@ -30,32 +30,32 @@ export const NavigationProvider = ({ children }: NavigationProviderProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
-  const [previousRoute, setPreviousRoute] = useState<typeof routes[0] | null>(null);
+  const [previousRoute, setPreviousRoute] = useState<(typeof routes)[0] | null>(null);
 
   const currentRoute = getRouteByPath(location.pathname);
 
   useEffect(() => {
     const currentPath = location.pathname;
-    
-    setNavigationHistory(prev => {
+
+    setNavigationHistory((prev) => {
       const newHistory = [...prev];
-      
+
       // Don't add duplicate consecutive entries
       if (newHistory[newHistory.length - 1] !== currentPath) {
         newHistory.push(currentPath);
-        
+
         // Keep only last 10 entries
         if (newHistory.length > 10) {
           newHistory.shift();
         }
-        
+
         // Set previous route
         if (newHistory.length > 1) {
           const previousPath = newHistory[newHistory.length - 2];
           setPreviousRoute(getRouteByPath(previousPath));
         }
       }
-      
+
       return newHistory;
     });
   }, [location.pathname]);
@@ -78,12 +78,8 @@ export const NavigationProvider = ({ children }: NavigationProviderProps) => {
     navigationHistory,
     canGoBack,
     goBack,
-    navigateWithTransition
+    navigateWithTransition,
   };
 
-  return (
-    <NavigationContext.Provider value={value}>
-      {children}
-    </NavigationContext.Provider>
-  );
+  return <NavigationContext.Provider value={value}>{children}</NavigationContext.Provider>;
 };

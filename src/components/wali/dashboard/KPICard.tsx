@@ -28,19 +28,19 @@ export const KPICard = ({
 }: KPICardProps) => {
   const getTrendColor = () => {
     if (trend === 'neutral') return 'text-muted-foreground';
-    
+
     const isPositive = trend === 'up';
     const shouldBeGreen = invertColors ? !isPositive : isPositive;
-    
+
     return shouldBeGreen ? 'text-green-600' : 'text-red-600';
   };
 
   const getTrendBgColor = () => {
     if (trend === 'neutral') return 'bg-muted';
-    
+
     const isPositive = trend === 'up';
     const shouldBeGreen = invertColors ? !isPositive : isPositive;
-    
+
     return shouldBeGreen ? 'bg-green-100' : 'bg-red-100';
   };
 
@@ -63,18 +63,12 @@ export const KPICard = ({
           {value}
           {isPercentage && '%'}
         </div>
-        {subtitle && (
-          <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
-        )}
+        {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
         {change !== undefined && (
           <div className="flex items-center gap-2 mt-2">
             <Badge
               variant="outline"
-              className={cn(
-                'flex items-center gap-1',
-                getTrendColor(),
-                getTrendBgColor()
-              )}
+              className={cn('flex items-center gap-1', getTrendColor(), getTrendBgColor())}
             >
               <TrendIcon className="h-3 w-3" />
               <span className="text-xs font-medium">
@@ -82,9 +76,7 @@ export const KPICard = ({
                 {change}%
               </span>
             </Badge>
-            {changeLabel && (
-              <span className="text-xs text-muted-foreground">{changeLabel}</span>
-            )}
+            {changeLabel && <span className="text-xs text-muted-foreground">{changeLabel}</span>}
           </div>
         )}
       </CardContent>

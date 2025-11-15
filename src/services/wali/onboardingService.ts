@@ -1,4 +1,3 @@
-
 export interface OnboardingModule {
   id: string;
   title: string;
@@ -36,7 +35,7 @@ export class OnboardingService {
     {
       id: 'intro',
       title: 'Introduction au Rôle de Wali',
-      description: 'Comprendre les responsabilités et l\'importance du rôle de wali dans l\'Islam',
+      description: "Comprendre les responsabilités et l'importance du rôle de wali dans l'Islam",
       duration_minutes: 15,
       required: true,
       order: 1,
@@ -49,7 +48,7 @@ export class OnboardingService {
         • Protection contre les comportements inappropriés
         • Facilitation des rencontres appropriées
         • Participation aux décisions importantes
-      `
+      `,
     },
     {
       id: 'supervision_guidelines',
@@ -75,7 +74,7 @@ export class OnboardingService {
         - Redirection respectueuse
         - Éducation sur les limites islamiques
         - Communication avec les autres walis si nécessaire
-      `
+      `,
     },
     {
       id: 'technology_tools',
@@ -94,7 +93,7 @@ export class OnboardingService {
         • Outils de signalement
         • Paramètres de confidentialité
         • Communication avec d'autres walis
-      `
+      `,
     },
     {
       id: 'islamic_ethics',
@@ -107,15 +106,15 @@ export class OnboardingService {
       quiz_questions: [
         {
           id: 'q1',
-          question: 'Quelle est la principale responsabilité d\'un wali selon l\'Islam?',
+          question: "Quelle est la principale responsabilité d'un wali selon l'Islam?",
           options: [
             'Choisir le conjoint pour son proche',
             'Protéger et guider son proche dans le processus de mariage',
             'Négocier les conditions financières',
-            'Organiser la cérémonie de mariage'
+            'Organiser la cérémonie de mariage',
           ],
           correct_answer: 1,
-          explanation: 'Le wali doit protéger et guider, pas imposer ses choix.'
+          explanation: 'Le wali doit protéger et guider, pas imposer ses choix.',
         },
         {
           id: 'q2',
@@ -124,12 +123,12 @@ export class OnboardingService {
             'Pour des raisons personnelles seulement',
             'Si le prétendant ne respecte pas les exigences islamiques',
             'Jamais, le choix revient entièrement à la personne',
-            'Pour des raisons financières uniquement'
+            'Pour des raisons financières uniquement',
           ],
           correct_answer: 1,
-          explanation: 'Le refus doit être basé sur des critères islamiques valides.'
-        }
-      ]
+          explanation: 'Le refus doit être basé sur des critères islamiques valides.',
+        },
+      ],
     },
     {
       id: 'crisis_management',
@@ -156,8 +155,8 @@ export class OnboardingService {
         - Médiation basée sur les principes islamiques
         - Recherche de solutions mutuellement bénéfiques
         - Implication d'érudits islamiques si nécessaire
-      `
-    }
+      `,
+    },
   ];
 
   static getModules(): OnboardingModule[] {
@@ -165,18 +164,18 @@ export class OnboardingService {
   }
 
   static getRequiredModules(): OnboardingModule[] {
-    return this.modules.filter(m => m.required);
+    return this.modules.filter((m) => m.required);
   }
 
   static async getProgress(waliId: string): Promise<WaliOnboardingProgress[]> {
     // In a real implementation, this would fetch from the database
     // For now, return mock data
-    return this.modules.map(module => ({
+    return this.modules.map((module) => ({
       wali_id: waliId,
       module_id: module.id,
       status: 'not_started',
       progress_percentage: 0,
-      attempts: 0
+      attempts: 0,
     }));
   }
 
@@ -189,7 +188,13 @@ export class OnboardingService {
   ): Promise<{ success: boolean; error?: string }> {
     try {
       // In a real implementation, this would update the database
-      console.log('Updating progress:', { waliId, moduleId, status, progressPercentage, quizScore });
+      console.log('Updating progress:', {
+        waliId,
+        moduleId,
+        status,
+        progressPercentage,
+        quizScore,
+      });
       return { success: true };
     } catch (error: any) {
       return { success: false, error: error.message };
@@ -198,10 +203,10 @@ export class OnboardingService {
 
   static calculateOverallProgress(progressArray: WaliOnboardingProgress[]): number {
     const requiredModules = this.getRequiredModules();
-    const completedRequired = progressArray.filter(p => 
-      requiredModules.find(m => m.id === p.module_id) && p.status === 'completed'
+    const completedRequired = progressArray.filter(
+      (p) => requiredModules.find((m) => m.id === p.module_id) && p.status === 'completed'
     ).length;
-    
+
     return (completedRequired / requiredModules.length) * 100;
   }
 

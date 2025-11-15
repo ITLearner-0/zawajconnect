@@ -18,13 +18,12 @@ const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-  throw new Error(
-    'Missing Supabase environment variables. Please check your .env file.'
-  );
+  throw new Error('Missing Supabase environment variables. Please check your .env file.');
 }
 ```
 
 **Pourquoi page blanche ?**
+
 - Cette erreur est lancée AVANT que React ne commence à rendre l'application
 - L'erreur se produit pendant l'import du module Supabase
 - React ne peut jamais monter → page blanche
@@ -38,6 +37,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 ### Option A: Netlify (recommandé si votre site est sur Netlify)
 
 1. **Aller sur Netlify Dashboard**
+
    ```
    https://app.netlify.com
    ```
@@ -69,6 +69,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 ### Option B: Vercel (si votre site est sur Vercel)
 
 1. **Aller sur Vercel Dashboard**
+
    ```
    https://vercel.com/dashboard
    ```
@@ -80,6 +81,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
    - Add New
 
 4. **Ajouter ces 2 variables :**
+
    ```bash
    VITE_SUPABASE_URL=https://votre-projet.supabase.co
    VITE_SUPABASE_PUBLISHABLE_KEY=votre_clé_publique_supabase
@@ -93,6 +95,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 ### Comment Obtenir les Valeurs Supabase
 
 1. **Se connecter à Supabase**
+
    ```
    https://app.supabase.com
    ```
@@ -106,6 +109,7 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
    - **anon/public key** → Utiliser pour `VITE_SUPABASE_PUBLISHABLE_KEY`
 
    Example:
+
    ```
    URL: https://abcdefghijklm.supabase.co
    anon key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
@@ -118,11 +122,13 @@ if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
 **Problème trouvé et corrigé** dans `netlify.toml`:
 
 ### Avant (❌ Bloque micro/caméra) :
+
 ```toml
 Permissions-Policy = "geolocation=(), microphone=(), camera=()"
 ```
 
 ### Après (✅ Autorise micro/caméra pour WebRTC) :
+
 ```toml
 Permissions-Policy = "geolocation=(), microphone=(self), camera=(self)"
 ```
@@ -138,6 +144,7 @@ Permissions-Policy = "geolocation=(), microphone=(self), camera=(self)"
 1. **Redéployer le site** (Netlify/Vercel)
 
 2. **Ouvrir le site**
+
    ```
    https://zawajconnect.me/
    ```

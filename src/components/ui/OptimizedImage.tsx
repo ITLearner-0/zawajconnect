@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
@@ -11,13 +10,13 @@ interface OptimizedImageProps {
   onError?: () => void;
 }
 
-const OptimizedImage = ({ 
-  src, 
-  alt, 
-  className = "", 
-  placeholder = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PC9zdmc+",
+const OptimizedImage = ({
+  src,
+  alt,
+  className = '',
+  placeholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PC9zdmc+',
   onLoad,
-  onError
+  onError,
 }: OptimizedImageProps) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -43,7 +42,7 @@ const OptimizedImage = ({
           aria-hidden="true"
         />
       )}
-      
+
       {hasIntersected && (
         <img
           src={src}
@@ -55,7 +54,7 @@ const OptimizedImage = ({
           } ${hasError ? 'hidden' : ''}`}
         />
       )}
-      
+
       {hasError && (
         <div className="w-full h-full flex items-center justify-center bg-rose-100 dark:bg-rose-900/30">
           <span className="text-rose-400 text-sm">Image non disponible</span>

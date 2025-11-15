@@ -36,7 +36,7 @@ const tabs: WaliAdminTab[] = [
   },
   {
     value: 'audit',
-    label: 'Journal d\'audit',
+    label: "Journal d'audit",
     path: '/admin/wali-audit',
     icon: Shield,
   },
@@ -50,7 +50,7 @@ const tabs: WaliAdminTab[] = [
 
 export const WaliAdminTabs = () => {
   const location = useLocation();
-  const currentTab = tabs.find(tab => location.pathname === tab.path)?.value || 'dashboard';
+  const currentTab = tabs.find((tab) => location.pathname === tab.path)?.value || 'dashboard';
 
   return (
     <Tabs value={currentTab} className="w-full">

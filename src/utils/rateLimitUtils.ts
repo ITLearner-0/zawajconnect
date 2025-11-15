@@ -1,4 +1,3 @@
-
 import { rateLimitingService } from '@/services/rateLimiting/rateLimitingService';
 import { toast } from 'sonner';
 
@@ -22,7 +21,9 @@ export async function withRateLimit<T>(
       if (options.showToasts !== false) {
         if (rateLimitResult.blocked && rateLimitResult.blockUntil) {
           const blockDuration = Math.ceil((rateLimitResult.blockUntil - Date.now()) / (60 * 1000));
-          toast.error(`You've been temporarily blocked for ${blockDuration} minutes due to excessive requests.`);
+          toast.error(
+            `You've been temporarily blocked for ${blockDuration} minutes due to excessive requests.`
+          );
         } else {
           const resetTime = new Date(rateLimitResult.resetTime);
           toast.error(`Rate limit reached. Please wait until ${resetTime.toLocaleTimeString()}.`);
@@ -32,11 +33,15 @@ export async function withRateLimit<T>(
     }
 
     // Check for abuse
-    const abuseResult = await rateLimitingService.detectAbuse(userId, options.endpoint, options.requestData);
-    
+    const abuseResult = await rateLimitingService.detectAbuse(
+      userId,
+      options.endpoint,
+      options.requestData
+    );
+
     if (abuseResult.isAbusive) {
       console.warn('Abuse detected:', abuseResult);
-      
+
       if (abuseResult.recommendedAction === 'block') {
         await rateLimitingService.blockUser(userId, 60 * 60 * 1000, abuseResult.reason);
         if (options.showToasts !== false) {
@@ -49,7 +54,11 @@ export async function withRateLimit<T>(
     }
 
     // Show warning if approaching limit
-    if (rateLimitResult.remaining <= 5 && rateLimitResult.remaining > 0 && options.showToasts !== false) {
+    if (
+      rateLimitResult.remaining <= 5 &&
+      rateLimitResult.remaining > 0 &&
+      options.showToasts !== false
+    ) {
       toast.warning(`Rate limit warning: ${rateLimitResult.remaining} requests remaining.`);
     }
 
@@ -66,10 +75,11 @@ export function rateLimited(endpoint: string, showToasts = true) {
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
-      return withRateLimit(
-        () => originalMethod.apply(this, args),
-        { endpoint, showToasts, requestData: args[0] }
-      );
+      return withRateLimit(() => originalMethod.apply(this, args), {
+        endpoint,
+        showToasts,
+        requestData: args[0],
+      });
     };
 
     return descriptor;
@@ -77,11 +87,11 @@ export function rateLimited(endpoint: string, showToasts = true) {
 }
 
 // Helper for common endpoints
-export const rateLimitedFetch = async (url: string, options: RequestInit = {}): Promise<Response | null> => {
+export const rateLimitedFetch = async (
+  url: string,
+  options: RequestInit = {}
+): Promise<Response | null> => {
   const endpoint = new URL(url).pathname.replace('/api/', 'api/');
-  
-  return withRateLimit(
-    () => fetch(url, options),
-    { endpoint, requestData: options.body }
-  );
+
+  return withRateLimit(() => fetch(url, options), { endpoint, requestData: options.body });
 };

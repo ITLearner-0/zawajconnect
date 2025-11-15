@@ -1,50 +1,41 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Heart, 
-  Target, 
-  Star, 
-  Users, 
-  Shield,
-  Sparkles,
-  Trophy,
-  TrendingUp
-} from 'lucide-react';
+import { Heart, Target, Star, Users, Shield, Sparkles, Trophy, TrendingUp } from 'lucide-react';
 
 const AuthPreview: React.FC = () => {
   const features = [
     {
       icon: <Heart className="w-5 h-5 text-emerald" />,
-      title: "Test de Compatibilité",
-      description: "Découvrez votre profil unique",
-      highlight: "Personnalisé"
+      title: 'Test de Compatibilité',
+      description: 'Découvrez votre profil unique',
+      highlight: 'Personnalisé',
     },
     {
       icon: <Target className="w-5 h-5 text-gold" />,
-      title: "Insights Détaillés",
-      description: "Analyses approfondies et conseils",
-      highlight: "IA Avancée"
+      title: 'Insights Détaillés',
+      description: 'Analyses approfondies et conseils',
+      highlight: 'IA Avancée',
     },
     {
       icon: <Users className="w-5 h-5 text-primary" />,
-      title: "Matches Compatibles",
-      description: "Trouvez votre âme sœur idéale",
-      highlight: "Algorithmique"
+      title: 'Matches Compatibles',
+      description: 'Trouvez votre âme sœur idéale',
+      highlight: 'Algorithmique',
     },
     {
       icon: <Shield className="w-5 h-5 text-emerald-dark" />,
-      title: "Sécurité Garantie",
-      description: "Environnement sûr et respectueux",
-      highlight: "Vérifié"
-    }
+      title: 'Sécurité Garantie',
+      description: 'Environnement sûr et respectueux',
+      highlight: 'Vérifié',
+    },
   ];
 
   const stats = [
-    { label: "Utilisateurs actifs", value: "10,000+", icon: <Users className="w-4 h-4" /> },
-    { label: "Mariages réussis", value: "500+", icon: <Heart className="w-4 h-4" /> },
-    { label: "Taux de compatibilité", value: "89%", icon: <Star className="w-4 h-4" /> },
-    { label: "Satisfaction", value: "4.8/5", icon: <Trophy className="w-4 h-4" /> }
+    { label: 'Utilisateurs actifs', value: '10,000+', icon: <Users className="w-4 h-4" /> },
+    { label: 'Mariages réussis', value: '500+', icon: <Heart className="w-4 h-4" /> },
+    { label: 'Taux de compatibilité', value: '89%', icon: <Star className="w-4 h-4" /> },
+    { label: 'Satisfaction', value: '4.8/5', icon: <Trophy className="w-4 h-4" /> },
   ];
 
   return (
@@ -67,7 +58,7 @@ const AuthPreview: React.FC = () => {
         <CardContent className="pt-0">
           <div className="grid grid-cols-2 gap-4">
             {stats.map((stat, index) => (
-              <div 
+              <div
                 key={index}
                 className="text-center p-3 bg-background/50 rounded-lg animate-scale-in"
                 style={{ animationDelay: `${index * 100}ms` }}
@@ -94,14 +85,12 @@ const AuthPreview: React.FC = () => {
         <CardContent>
           <div className="space-y-4">
             {features.map((feature, index) => (
-              <div 
+              <div
                 key={index}
                 className="flex items-center space-x-3 p-3 rounded-lg hover:bg-muted/50 transition-colors animate-fade-in"
                 style={{ animationDelay: `${300 + index * 100}ms` }}
               >
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  {feature.icon}
-                </div>
+                <div className="p-2 bg-primary/10 rounded-lg">{feature.icon}</div>
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-1">
                     <h4 className="text-sm font-medium">{feature.title}</h4>
@@ -109,9 +98,7 @@ const AuthPreview: React.FC = () => {
                       {feature.highlight}
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    {feature.description}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{feature.description}</p>
                 </div>
               </div>
             ))}
@@ -120,7 +107,10 @@ const AuthPreview: React.FC = () => {
       </Card>
 
       {/* Success Stories Preview */}
-      <Card className="bg-gradient-to-r from-emerald/5 to-gold/5 animate-slide-up" style={{ animationDelay: '400ms' }}>
+      <Card
+        className="bg-gradient-to-r from-emerald/5 to-gold/5 animate-slide-up"
+        style={{ animationDelay: '400ms' }}
+      >
         <CardContent className="p-4">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-2 mb-2">
@@ -129,7 +119,8 @@ const AuthPreview: React.FC = () => {
               <Heart className="w-4 h-4 text-emerald" />
             </div>
             <blockquote className="text-sm italic text-muted-foreground mb-2">
-              "Grâce à ZawajConnect, j'ai trouvé mon âme sœur. Le test de compatibilité était très précis !"
+              "Grâce à ZawajConnect, j'ai trouvé mon âme sœur. Le test de compatibilité était très
+              précis !"
             </blockquote>
             <div className="flex items-center justify-center space-x-1">
               {[...Array(5)].map((_, i) => (

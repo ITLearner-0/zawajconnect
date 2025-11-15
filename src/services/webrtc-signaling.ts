@@ -9,7 +9,15 @@ import { supabase } from '@/integrations/supabase/client';
 import type { RealtimeChannel } from '@supabase/supabase-js';
 
 export type CallType = 'audio' | 'video';
-export type CallState = 'idle' | 'calling' | 'ringing' | 'connecting' | 'connected' | 'ended' | 'rejected' | 'failed';
+export type CallState =
+  | 'idle'
+  | 'calling'
+  | 'ringing'
+  | 'connecting'
+  | 'connected'
+  | 'ended'
+  | 'rejected'
+  | 'failed';
 export type ConnectionQuality = 'excellent' | 'good' | 'fair' | 'poor';
 
 export interface QualityMetrics {
@@ -60,12 +68,12 @@ export class WebRTCSignalingService {
   private userId: string;
   private iceCandidateQueue: RTCIceCandidateInit[] = [];
   private isRemoteDescriptionSet = false;
-  
+
   // Quality monitoring
   private qualityMonitorInterval: NodeJS.Timeout | null = null;
   private currentQualityMetrics: QualityMetrics | null = null;
   private currentVideoConstraints: VideoConstraints = { width: 1280, height: 720, frameRate: 30 };
-  
+
   // Retry mechanism
   private reconnectAttempts = 0;
   private readonly MAX_RECONNECT_ATTEMPTS = 3;
@@ -91,21 +99,21 @@ export class WebRTCSignalingService {
       {
         urls: 'turn:a.relay.metered.ca:80',
         username: 'openrelayproject',
-        credential: 'openrelayproject'
+        credential: 'openrelayproject',
       },
       {
         urls: 'turn:a.relay.metered.ca:443',
         username: 'openrelayproject',
-        credential: 'openrelayproject'
+        credential: 'openrelayproject',
       },
       {
         urls: 'turn:a.relay.metered.ca:443?transport=tcp',
         username: 'openrelayproject',
-        credential: 'openrelayproject'
-      }
+        credential: 'openrelayproject',
+      },
     ],
     iceTransportPolicy: 'all', // Try all connection methods
-    iceCandidatePoolSize: 10
+    iceCandidatePoolSize: 10,
   };
 
   constructor(matchId: string, userId: string) {
@@ -121,8 +129,8 @@ export class WebRTCSignalingService {
       // Create Supabase Realtime channel for this match
       this.channel = supabase.channel(`webrtc:${this.matchId}`, {
         config: {
-          broadcast: { self: false } // Don't receive our own messages
-        }
+          broadcast: { self: false }, // Don't receive our own messages
+        },
       });
 
       // Listen for incoming call signals
@@ -185,15 +193,18 @@ export class WebRTCSignalingService {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-          sampleRate: 48000
+          sampleRate: 48000,
         },
-        video: callType === 'video' ? {
-          width: { ideal: this.currentVideoConstraints.width },
-          height: { ideal: this.currentVideoConstraints.height },
-          frameRate: { ideal: this.currentVideoConstraints.frameRate }
-        } : false
+        video:
+          callType === 'video'
+            ? {
+                width: { ideal: this.currentVideoConstraints.width },
+                height: { ideal: this.currentVideoConstraints.height },
+                frameRate: { ideal: this.currentVideoConstraints.frameRate },
+              }
+            : false,
       };
-      
+
       this.localStream = await this.getUserMediaWithRetry(constraints);
 
       this.onLocalStream?.(this.localStream);
@@ -202,14 +213,14 @@ export class WebRTCSignalingService {
       await this.createPeerConnection();
 
       // Add local tracks to peer connection
-      this.localStream.getTracks().forEach(track => {
+      this.localStream.getTracks().forEach((track) => {
         this.peerConnection!.addTrack(track, this.localStream!);
       });
 
       // Create and send offer
       const offer = await this.peerConnection!.createOffer({
         offerToReceiveAudio: true,
-        offerToReceiveVideo: callType === 'video'
+        offerToReceiveVideo: callType === 'video',
       });
 
       await this.peerConnection!.setLocalDescription(offer);
@@ -219,7 +230,7 @@ export class WebRTCSignalingService {
         sdp: offer,
         callType,
         callerId: this.userId,
-        callerName
+        callerName,
       });
 
       console.log('✅ Call offer sent');
@@ -246,21 +257,24 @@ export class WebRTCSignalingService {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
-          sampleRate: 48000
+          sampleRate: 48000,
         },
-        video: callType === 'video' ? {
-          width: { ideal: this.currentVideoConstraints.width },
-          height: { ideal: this.currentVideoConstraints.height },
-          frameRate: { ideal: this.currentVideoConstraints.frameRate }
-        } : false
+        video:
+          callType === 'video'
+            ? {
+                width: { ideal: this.currentVideoConstraints.width },
+                height: { ideal: this.currentVideoConstraints.height },
+                frameRate: { ideal: this.currentVideoConstraints.frameRate },
+              }
+            : false,
       };
-      
+
       this.localStream = await this.getUserMediaWithRetry(constraints);
 
       this.onLocalStream?.(this.localStream);
 
       // Add local tracks to existing peer connection
-      this.localStream.getTracks().forEach(track => {
+      this.localStream.getTracks().forEach((track) => {
         this.peerConnection!.addTrack(track, this.localStream!);
       });
 
@@ -270,7 +284,7 @@ export class WebRTCSignalingService {
 
       // Send answer via signaling channel
       await this.sendSignal('call-answer', {
-        sdp: answer
+        sdp: answer,
       });
 
       console.log('✅ Call answer sent');
@@ -307,7 +321,7 @@ export class WebRTCSignalingService {
    */
   toggleAudio(enabled: boolean): void {
     if (this.localStream) {
-      this.localStream.getAudioTracks().forEach(track => {
+      this.localStream.getAudioTracks().forEach((track) => {
         track.enabled = enabled;
       });
     }
@@ -318,7 +332,7 @@ export class WebRTCSignalingService {
    */
   toggleVideo(enabled: boolean): void {
     if (this.localStream) {
-      this.localStream.getVideoTracks().forEach(track => {
+      this.localStream.getVideoTracks().forEach((track) => {
         track.enabled = enabled;
       });
     }
@@ -351,7 +365,7 @@ export class WebRTCSignalingService {
       if (event.candidate) {
         console.log('🧊 Sending ICE candidate');
         this.sendSignal('ice-candidate', {
-          candidate: event.candidate.toJSON()
+          candidate: event.candidate.toJSON(),
         });
       }
     };
@@ -506,8 +520,8 @@ export class WebRTCSignalingService {
       event,
       payload: {
         senderId: this.userId,
-        payload
-      }
+        payload,
+      },
     });
   }
 
@@ -525,14 +539,14 @@ export class WebRTCSignalingService {
       return await navigator.mediaDevices.getUserMedia(constraints);
     } catch (error) {
       console.error(`❌ getUserMedia attempt ${attempt} failed:`, error);
-      
+
       if (attempt < MAX_ATTEMPTS) {
         const delay = RETRY_DELAY * Math.pow(2, attempt - 1);
         console.log(`⏳ Retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
         return this.getUserMediaWithRetry(constraints, attempt + 1);
       }
-      
+
       throw error;
     }
   }
@@ -548,13 +562,15 @@ export class WebRTCSignalingService {
 
     this.reconnectAttempts++;
     const delay = 1000 * Math.pow(2, this.reconnectAttempts - 1);
-    
-    console.log(`🔄 Reconnection attempt ${this.reconnectAttempts}/${this.MAX_RECONNECT_ATTEMPTS} in ${delay}ms...`);
-    
+
+    console.log(
+      `🔄 Reconnection attempt ${this.reconnectAttempts}/${this.MAX_RECONNECT_ATTEMPTS} in ${delay}ms...`
+    );
+
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
     }
-    
+
     this.reconnectTimeout = setTimeout(async () => {
       try {
         // Attempt to restart ICE
@@ -616,7 +632,7 @@ export class WebRTCSignalingService {
           jitter += report.jitter || 0;
           bytesReceived += report.bytesReceived || 0;
         }
-        
+
         if (report.type === 'candidate-pair' && report.state === 'succeeded') {
           rtt = report.currentRoundTripTime * 1000 || 0; // Convert to ms
         }
@@ -625,14 +641,13 @@ export class WebRTCSignalingService {
       // Calculate bitrate (simple approximation)
       if (this.currentQualityMetrics) {
         const timeDiff = 2; // 2 seconds between checks
-        const bytesDiff = bytesReceived - (this.currentQualityMetrics.bitrate / 8 * timeDiff);
+        const bytesDiff = bytesReceived - (this.currentQualityMetrics.bitrate / 8) * timeDiff;
         bitrate = (bytesDiff * 8) / timeDiff; // bits per second
       }
 
       // Calculate packet loss percentage
-      const packetLossPercentage = packetsReceived > 0 
-        ? (packetsLost / (packetsLost + packetsReceived)) * 100 
-        : 0;
+      const packetLossPercentage =
+        packetsReceived > 0 ? (packetsLost / (packetsLost + packetsReceived)) * 100 : 0;
 
       // Determine quality level
       let quality: ConnectionQuality = 'excellent';
@@ -649,7 +664,7 @@ export class WebRTCSignalingService {
         jitter: jitter * 1000, // Convert to ms
         rtt,
         bitrate,
-        quality
+        quality,
       };
 
       console.log('📊 Quality metrics:', this.currentQualityMetrics);
@@ -697,7 +712,7 @@ export class WebRTCSignalingService {
       await videoTrack.applyConstraints({
         width: { ideal: newConstraints.width },
         height: { ideal: newConstraints.height },
-        frameRate: { ideal: newConstraints.frameRate }
+        frameRate: { ideal: newConstraints.frameRate },
       });
 
       this.currentVideoConstraints = newConstraints;
@@ -722,7 +737,7 @@ export class WebRTCSignalingService {
 
     // Stop quality monitoring
     this.stopQualityMonitoring();
-    
+
     // Clear reconnect timeout
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);
@@ -731,7 +746,7 @@ export class WebRTCSignalingService {
 
     // Stop local stream
     if (this.localStream) {
-      this.localStream.getTracks().forEach(track => track.stop());
+      this.localStream.getTracks().forEach((track) => track.stop());
       this.localStream = null;
     }
 

@@ -33,15 +33,8 @@ const AdminWaliMonitoring = () => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const { permissions } = useWaliAdminPermissions();
-  const {
-    alerts,
-    statistics,
-    activities,
-    loading,
-    refetch,
-    acknowledgeAlert,
-    suspendWali,
-  } = useWaliMonitoring();
+  const { alerts, statistics, activities, loading, refetch, acknowledgeAlert, suspendWali } =
+    useWaliMonitoring();
 
   const [selectedAlert, setSelectedAlert] = useState<WaliAlert | null>(null);
   const [suspendDialog, setSuspendDialog] = useState<{
@@ -50,7 +43,12 @@ const AdminWaliMonitoring = () => {
     name: string;
   }>({ open: false, userId: '', name: '' });
   const [trendPeriod, setTrendPeriod] = useState(12);
-  const { alertsTrend, activityTrend, registrationsTrend, loading: trendsLoading } = useWaliTrends(trendPeriod);
+  const {
+    alertsTrend,
+    activityTrend,
+    registrationsTrend,
+    loading: trendsLoading,
+  } = useWaliTrends(trendPeriod);
   const { isConnected } = useWaliRealtimeNotifications();
 
   // Check admin access
@@ -188,10 +186,7 @@ const AdminWaliMonitoring = () => {
         <TabsContent value="activity" className="space-y-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Activité des Walis</h2>
-            <Button
-              variant="outline"
-              onClick={() => exportWaliActivitiesToExcel(activities)}
-            >
+            <Button variant="outline" onClick={() => exportWaliActivitiesToExcel(activities)}>
               <FileText className="w-4 h-4 mr-2" />
               Exporter Activités
             </Button>

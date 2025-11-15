@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNetworkStatus } from './useNetworkStatus';
 
@@ -52,12 +51,13 @@ export const useNetworkOptimization = (config?: Partial<NetworkOptimizationConfi
 
     try {
       const startTime = performance.now();
-      const testImageUrl = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=';
-      
+      const testImageUrl =
+        'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=';
+
       await fetch(testImageUrl);
       const endTime = performance.now();
       const duration = (endTime - startTime) / 1000; // seconds
-      
+
       // Estimate based on test file size (very small, so this is a rough estimate)
       const estimatedBandwidth = (0.1 / duration) * 8; // Convert to Mbps
       setBandwidth(estimatedBandwidth);
@@ -103,8 +103,10 @@ export const useNetworkOptimization = (config?: Partial<NetworkOptimizationConfi
         enableLazyLoading: true,
         compressionLevel: 0.4,
       };
-    }
-    else if (effectiveType === '3g' || (currentBandwidth > 0 && currentBandwidth < defaultConfig.qualityThresholds.medium)) {
+    } else if (
+      effectiveType === '3g' ||
+      (currentBandwidth > 0 && currentBandwidth < defaultConfig.qualityThresholds.medium)
+    ) {
       strategy = {
         imageQuality: 'medium',
         batchSize: 5,
@@ -113,8 +115,7 @@ export const useNetworkOptimization = (config?: Partial<NetworkOptimizationConfi
         enableLazyLoading: true,
         compressionLevel: 0.6,
       };
-    }
-    else if (effectiveType === '4g' || currentBandwidth >= defaultConfig.qualityThresholds.high) {
+    } else if (effectiveType === '4g' || currentBandwidth >= defaultConfig.qualityThresholds.high) {
       strategy = {
         imageQuality: 'high',
         batchSize: 15,
@@ -129,27 +130,30 @@ export const useNetworkOptimization = (config?: Partial<NetworkOptimizationConfi
   }, [networkStatus, bandwidth, defaultConfig]);
 
   // Generate optimized image URL based on strategy
-  const optimizeImageUrl = useCallback((originalUrl: string) => {
-    const strategy = loadingStrategy;
-    let optimizedUrl = originalUrl;
+  const optimizeImageUrl = useCallback(
+    (originalUrl: string) => {
+      const strategy = loadingStrategy;
+      let optimizedUrl = originalUrl;
 
-    // Add quality and compression parameters
-    const separator = originalUrl.includes('?') ? '&' : '?';
-    
-    switch (strategy.imageQuality) {
-      case 'low':
-        optimizedUrl += `${separator}q=30&w=400&f=webp`;
-        break;
-      case 'medium':
-        optimizedUrl += `${separator}q=60&w=800&f=webp`;
-        break;
-      case 'high':
-        optimizedUrl += `${separator}q=90&w=1200&f=webp`;
-        break;
-    }
+      // Add quality and compression parameters
+      const separator = originalUrl.includes('?') ? '&' : '?';
 
-    return optimizedUrl;
-  }, [loadingStrategy]);
+      switch (strategy.imageQuality) {
+        case 'low':
+          optimizedUrl += `${separator}q=30&w=400&f=webp`;
+          break;
+        case 'medium':
+          optimizedUrl += `${separator}q=60&w=800&f=webp`;
+          break;
+        case 'high':
+          optimizedUrl += `${separator}q=90&w=1200&f=webp`;
+          break;
+      }
+
+      return optimizedUrl;
+    },
+    [loadingStrategy]
+  );
 
   // Get preload strategy
   const getPreloadStrategy = useCallback(() => {

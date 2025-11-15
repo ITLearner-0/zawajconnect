@@ -1,4 +1,3 @@
-
 // Security monitoring hook
 import { useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,40 +10,49 @@ export const useSecurityMonitoring = () => {
   const { user } = useAuth();
 
   // Record user activity
-  const recordActivity = useCallback((action: string, metadata: Record<string, any> = {}) => {
-    if (user) {
-      SuspiciousActivityDetector.recordActivity(user.id, action, metadata);
-    }
-  }, [user]);
+  const recordActivity = useCallback(
+    (action: string, metadata: Record<string, any> = {}) => {
+      if (user) {
+        SuspiciousActivityDetector.recordActivity(user.id, action, metadata);
+      }
+    },
+    [user]
+  );
 
   // Log security event
-  const logSecurityEvent = useCallback(async (action: string, resource: string, success: boolean, details?: Record<string, any>) => {
-    await SecurityAuditLogger.logEvent({
-      userId: user?.id,
-      action,
-      resource,
-      success,
-      details
-    });
-  }, [user]);
+  const logSecurityEvent = useCallback(
+    async (action: string, resource: string, success: boolean, details?: Record<string, any>) => {
+      await SecurityAuditLogger.logEvent({
+        userId: user?.id,
+        action,
+        resource,
+        success,
+        details,
+      });
+    },
+    [user]
+  );
 
   // Initialize security monitoring
   useEffect(() => {
     // Initialize CSRF protection
     CSRFProtection.initialize();
-    
+
     // Initialize audit logger
     SecurityAuditLogger.initialize();
 
     // Monitor JWT token
-    const tokenCheckInterval = setInterval(async () => {
-      if (user) {
-        const isValid = await JWTManager.validateToken();
-        if (!isValid) {
-          console.warn('JWT token validation failed');
+    const tokenCheckInterval = setInterval(
+      async () => {
+        if (user) {
+          const isValid = await JWTManager.validateToken();
+          if (!isValid) {
+            console.warn('JWT token validation failed');
+          }
         }
-      }
-    }, 5 * 60 * 1000); // Check every 5 minutes
+      },
+      5 * 60 * 1000
+    ); // Check every 5 minutes
 
     // Monitor page visibility for security
     const handleVisibilityChange = () => {
@@ -64,9 +72,9 @@ export const useSecurityMonitoring = () => {
     const handleSensitiveClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (target.classList.contains('sensitive') || target.closest('.sensitive')) {
-        recordActivity('sensitive_click', { 
+        recordActivity('sensitive_click', {
           element: target.tagName,
-          text: target.textContent?.substring(0, 50) 
+          text: target.textContent?.substring(0, 50),
         });
       }
     };
@@ -86,6 +94,6 @@ export const useSecurityMonitoring = () => {
 
   return {
     recordActivity,
-    logSecurityEvent
+    logSecurityEvent,
   };
 };

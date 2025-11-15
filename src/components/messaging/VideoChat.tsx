@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '../ui/button';
 import { PhoneOff, Mic, MicOff, Video, VideoOff } from 'lucide-react';
@@ -14,31 +13,31 @@ const VideoChat = ({ participantId, onEndCall }: VideoChatProps) => {
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
   const [isConnecting, setIsConnecting] = useState(true);
-  
+
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  
+
   // Initialize video chat when component mounts
   useEffect(() => {
     const startVideoChat = async () => {
       try {
         setIsConnecting(true);
         console.log('Starting video chat with participant:', participantId);
-        
+
         // For demo purposes, we're just getting the local stream
         // In a real app, you'd implement WebRTC peer connections
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          video: true, 
-          audio: true 
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
         });
-        
+
         setLocalStream(stream);
-        
+
         // Set the stream to the video element
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = stream;
         }
-        
+
         // In a real app, you'd connect to the other participant here
         // For demo, we'll create a mock remote stream (just a copy)
         setTimeout(() => {
@@ -53,38 +52,38 @@ const VideoChat = ({ participantId, onEndCall }: VideoChatProps) => {
         setIsConnecting(false);
       }
     };
-    
+
     startVideoChat();
-    
+
     // Cleanup function
     return () => {
       if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
+        localStream.getTracks().forEach((track) => track.stop());
       }
     };
   }, [participantId]);
-  
+
   const toggleMute = () => {
     if (localStream) {
-      localStream.getAudioTracks().forEach(track => {
+      localStream.getAudioTracks().forEach((track) => {
         track.enabled = !track.enabled;
       });
       setIsMuted(!isMuted);
     }
   };
-  
+
   const toggleVideo = () => {
     if (localStream) {
-      localStream.getVideoTracks().forEach(track => {
+      localStream.getVideoTracks().forEach((track) => {
         track.enabled = !track.enabled;
       });
       setIsVideoOff(!isVideoOff);
     }
   };
-  
+
   const handleEndCall = () => {
     if (localStream) {
-      localStream.getTracks().forEach(track => track.stop());
+      localStream.getTracks().forEach((track) => track.stop());
     }
     onEndCall();
   };
@@ -108,7 +107,7 @@ const VideoChat = ({ participantId, onEndCall }: VideoChatProps) => {
             />
           )}
         </div>
-        
+
         {/* Local video (picture-in-picture) */}
         <div className="absolute top-4 right-4 w-1/4 aspect-video bg-gray-800 rounded-lg overflow-hidden border-2 border-white">
           <video
@@ -120,7 +119,7 @@ const VideoChat = ({ participantId, onEndCall }: VideoChatProps) => {
           />
         </div>
       </div>
-      
+
       {/* Controls */}
       <div className="p-4 bg-gray-800 flex items-center justify-center space-x-4">
         <Button
@@ -131,7 +130,7 @@ const VideoChat = ({ participantId, onEndCall }: VideoChatProps) => {
         >
           {isMuted ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
         </Button>
-        
+
         <Button
           variant="outline"
           size="icon"
@@ -140,7 +139,7 @@ const VideoChat = ({ participantId, onEndCall }: VideoChatProps) => {
         >
           <PhoneOff className="h-6 w-6" />
         </Button>
-        
+
         <Button
           variant="outline"
           size="icon"

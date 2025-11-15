@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Checkbox } from '@/components/ui/checkbox';
-import { 
-  Scale, 
-  FileText, 
-  Upload, 
-  Info, 
-  CheckCircle,
-  AlertTriangle 
-} from 'lucide-react';
+import { Scale, FileText, Upload, Info, CheckCircle, AlertTriangle } from 'lucide-react';
 import { AppealSystem, AppealSubmission } from '@/services/moderation/appealSystem';
 import { useToast } from '@/hooks/use-toast';
 
@@ -32,7 +31,7 @@ const AppealForm: React.FC<AppealFormProps> = ({
   moderationActionId,
   originalAction,
   onAppealSubmitted,
-  onCancel
+  onCancel,
 }) => {
   const { toast } = useToast();
   const [appealReason, setAppealReason] = useState('');
@@ -60,9 +59,9 @@ const AppealForm: React.FC<AppealFormProps> = ({
   const handleSubmit = async () => {
     if (!appealReason.trim() || !selectedReason || !hasReadGuidelines) {
       toast({
-        title: "Champs requis",
-        description: "Veuillez remplir tous les champs obligatoires et accepter les conditions.",
-        variant: "destructive"
+        title: 'Champs requis',
+        description: 'Veuillez remplir tous les champs obligatoires et accepter les conditions.',
+        variant: 'destructive',
       });
       return;
     }
@@ -73,30 +72,31 @@ const AppealForm: React.FC<AppealFormProps> = ({
       moderationActionId,
       appealReason: `${selectedReason}: ${appealReason}`,
       evidence: evidence.length > 0 ? evidence : undefined,
-      additionalContext: additionalContext.trim() || undefined
+      additionalContext: additionalContext.trim() || undefined,
     };
 
     try {
       const result = await AppealSystem.submitAppeal(submission, 'current-user-id'); // Replace with actual user ID
-      
+
       if (result.success) {
         toast({
-          title: "Appel soumis",
-          description: "Votre appel a été soumis avec succès. Vous recevrez une notification lors de la révision.",
+          title: 'Appel soumis',
+          description:
+            'Votre appel a été soumis avec succès. Vous recevrez une notification lors de la révision.',
         });
         onAppealSubmitted();
       } else {
         toast({
-          title: "Erreur",
+          title: 'Erreur',
           description: result.error || "Erreur lors de la soumission de l'appel",
-          variant: "destructive"
+          variant: 'destructive',
         });
       }
     } catch (error) {
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Une erreur technique s'est produite",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
@@ -115,9 +115,15 @@ const AppealForm: React.FC<AppealFormProps> = ({
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
-            <div><strong>Type:</strong> {originalAction.type}</div>
-            <div><strong>Motif:</strong> {originalAction.reason}</div>
-            <div><strong>Date:</strong> {originalAction.date}</div>
+            <div>
+              <strong>Type:</strong> {originalAction.type}
+            </div>
+            <div>
+              <strong>Motif:</strong> {originalAction.reason}
+            </div>
+            <div>
+              <strong>Date:</strong> {originalAction.date}
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -128,11 +134,7 @@ const AppealForm: React.FC<AppealFormProps> = ({
           <CardTitle className="flex items-center gap-2">
             <Info className="h-5 w-5 text-blue-600" />
             Directives d'Appel
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setShowGuidelines(!showGuidelines)}
-            >
+            <Button variant="ghost" size="sm" onClick={() => setShowGuidelines(!showGuidelines)}>
               {showGuidelines ? 'Masquer' : 'Afficher'}
             </Button>
           </CardTitle>
@@ -150,7 +152,7 @@ const AppealForm: React.FC<AppealFormProps> = ({
                 ))}
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-medium mb-2">Types de Preuves:</h4>
               <ul className="text-sm space-y-1">
@@ -238,7 +240,7 @@ const AppealForm: React.FC<AppealFormProps> = ({
                 Ajouter
               </Button>
             </div>
-            
+
             {evidence.length > 0 && (
               <div className="space-y-2">
                 <Label className="text-sm">Preuves Ajoutées:</Label>
@@ -280,15 +282,16 @@ const AppealForm: React.FC<AppealFormProps> = ({
               onCheckedChange={(checked) => setHasReadGuidelines(checked === true)}
             />
             <Label htmlFor="guidelines-read" className="text-sm">
-              J'ai lu et compris les directives d'appel et je certifie que les informations fournies sont exactes.
+              J'ai lu et compris les directives d'appel et je certifie que les informations fournies
+              sont exactes.
             </Label>
           </div>
 
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription className="text-sm">
-              Les appels sont généralement traités sous 3-5 jours ouvrables. 
-              Vous recevrez une notification par email du résultat.
+              Les appels sont généralement traités sous 3-5 jours ouvrables. Vous recevrez une
+              notification par email du résultat.
             </AlertDescription>
           </Alert>
         </CardContent>
@@ -299,11 +302,8 @@ const AppealForm: React.FC<AppealFormProps> = ({
         <Button variant="outline" onClick={onCancel}>
           Annuler
         </Button>
-        <Button 
-          onClick={handleSubmit} 
-          disabled={isSubmitting || !hasReadGuidelines}
-        >
-          {isSubmitting ? 'Soumission...' : 'Soumettre l\'Appel'}
+        <Button onClick={handleSubmit} disabled={isSubmitting || !hasReadGuidelines}>
+          {isSubmitting ? 'Soumission...' : "Soumettre l'Appel"}
         </Button>
       </div>
     </div>

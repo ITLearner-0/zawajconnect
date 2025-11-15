@@ -18,11 +18,7 @@ import { handleError, handleAIError, successResponse, ErrorCode } from '../_shar
 
 // Handle general errors
 if (!data) {
-  return handleError(
-    new Error('Data not found'),
-    ErrorCode.NOT_FOUND,
-    'MY_FUNCTION'
-  );
+  return handleError(new Error('Data not found'), ErrorCode.NOT_FOUND, 'MY_FUNCTION');
 }
 
 // Handle AI Gateway errors

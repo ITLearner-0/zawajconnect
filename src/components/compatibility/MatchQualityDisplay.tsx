@@ -1,9 +1,8 @@
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { MatchQualityMetrics } from "@/hooks/compatibility/services/matchQualityService";
-import { CheckCircle, AlertCircle, TrendingUp, Users, Shield, FileText } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { MatchQualityMetrics } from '@/hooks/compatibility/services/matchQualityService';
+import { CheckCircle, AlertCircle, TrendingUp, Users, Shield, FileText } from 'lucide-react';
 
 interface MatchQualityDisplayProps {
   metrics: MatchQualityMetrics;
@@ -12,17 +11,17 @@ interface MatchQualityDisplayProps {
 
 const MatchQualityDisplay = ({ metrics, compact = false }: MatchQualityDisplayProps) => {
   const getConfidenceColor = (score: number) => {
-    if (score >= 85) return "text-green-600";
-    if (score >= 70) return "text-blue-600";
-    if (score >= 55) return "text-yellow-600";
-    return "text-orange-600";
+    if (score >= 85) return 'text-green-600';
+    if (score >= 70) return 'text-blue-600';
+    if (score >= 55) return 'text-yellow-600';
+    return 'text-orange-600';
   };
 
   const getConfidenceLabel = (score: number) => {
-    if (score >= 85) return "Very High";
-    if (score >= 70) return "High";
-    if (score >= 55) return "Moderate";
-    return "Low";
+    if (score >= 85) return 'Very High';
+    if (score >= 70) return 'High';
+    if (score >= 55) return 'Moderate';
+    return 'Low';
   };
 
   if (compact) {
@@ -32,12 +31,14 @@ const MatchQualityDisplay = ({ metrics, compact = false }: MatchQualityDisplayPr
           <span className="text-sm font-medium">Match Confidence</span>
           <div className="flex items-center gap-2">
             <Progress value={metrics.confidenceScore} className="w-16 h-2" />
-            <span className={`text-sm font-semibold ${getConfidenceColor(metrics.confidenceScore)}`}>
+            <span
+              className={`text-sm font-semibold ${getConfidenceColor(metrics.confidenceScore)}`}
+            >
               {getConfidenceLabel(metrics.confidenceScore)}
             </span>
           </div>
         </div>
-        
+
         {metrics.compatibilityReasons.length > 0 && (
           <div className="text-xs text-gray-600">
             <strong>Top reason:</strong> {metrics.compatibilityReasons[0]}

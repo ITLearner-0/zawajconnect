@@ -35,7 +35,7 @@ export function useTouchGestures(
 
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 0) return;
-      
+
       const firstTouch = e.touches[0];
       if (!firstTouch) return;
 
@@ -44,7 +44,7 @@ export function useTouchGestures(
       touchStartRef.current = {
         x: firstTouch.clientX,
         y: firstTouch.clientY,
-        timestamp: now
+        timestamp: now,
       };
 
       // Handle double tap

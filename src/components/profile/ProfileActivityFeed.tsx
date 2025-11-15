@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -53,7 +52,7 @@ const ProfileActivityFeed: React.FC<ProfileActivityFeedProps> = ({ activities })
   const formatTimestamp = (timestamp: Date) => {
     const now = new Date();
     const diffInMinutes = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60));
-    
+
     if (diffInMinutes < 60) {
       return `Il y a ${diffInMinutes} min`;
     } else if (diffInMinutes < 1440) {
@@ -67,12 +66,10 @@ const ProfileActivityFeed: React.FC<ProfileActivityFeedProps> = ({ activities })
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold text-rose-800">
-            Activité Récente
-          </CardTitle>
-          {activities.some(a => !a.read) && (
+          <CardTitle className="text-lg font-semibold text-rose-800">Activité Récente</CardTitle>
+          {activities.some((a) => !a.read) && (
             <Badge variant="destructive" className="text-xs">
-              {activities.filter(a => !a.read).length} nouveau(x)
+              {activities.filter((a) => !a.read).length} nouveau(x)
             </Badge>
           )}
         </div>
@@ -87,23 +84,21 @@ const ProfileActivityFeed: React.FC<ProfileActivityFeedProps> = ({ activities })
         ) : (
           <div className="space-y-3">
             {activities.slice(0, 10).map((activity) => (
-              <div 
-                key={activity.id} 
+              <div
+                key={activity.id}
                 className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
                   !activity.read ? 'bg-blue-50 border-l-4 border-blue-500' : 'bg-gray-50'
                 }`}
               >
                 {/* Activity Icon */}
-                <div className="flex-shrink-0">
-                  {getActivityIcon(activity.type)}
-                </div>
+                <div className="flex-shrink-0">{getActivityIcon(activity.type)}</div>
 
                 {/* User Avatar */}
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center">
                     {activity.user.profilePicture ? (
-                      <img 
-                        src={activity.user.profilePicture} 
+                      <img
+                        src={activity.user.profilePicture}
                         alt={activity.user.name}
                         className="w-8 h-8 rounded-full object-cover"
                       />
@@ -120,9 +115,7 @@ const ProfileActivityFeed: React.FC<ProfileActivityFeedProps> = ({ activities })
                   <p className={`text-sm ${!activity.read ? 'font-semibold' : ''}`}>
                     {getActivityText(activity)}
                   </p>
-                  <p className="text-xs text-gray-500">
-                    {formatTimestamp(activity.timestamp)}
-                  </p>
+                  <p className="text-xs text-gray-500">{formatTimestamp(activity.timestamp)}</p>
                 </div>
 
                 {/* Unread Indicator */}

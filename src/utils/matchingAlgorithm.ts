@@ -10,26 +10,23 @@ import type {
   MatchingIslamicPreferences,
   CulturalPreferences,
   CompatibilityWeights,
-  CompatibilityExplanation
+  CompatibilityExplanation,
 } from '@/types/supabase';
 
 /**
  * Re-export types for backwards compatibility
  */
-export type {
-  CompatibilityWeights,
-  CompatibilityExplanation
-};
+export type { CompatibilityWeights, CompatibilityExplanation };
 
 /**
  * Islamic preference compatibility levels
  */
 export enum CompatibilityLevel {
-  EXACT_MATCH = 1.0,      // Perfect match
-  HIGH = 0.8,              // Very compatible
-  MEDIUM = 0.6,            // Somewhat compatible
-  LOW = 0.3,               // Minimally compatible
-  NO_MATCH = 0.0,          // Incompatible
+  EXACT_MATCH = 1.0, // Perfect match
+  HIGH = 0.8, // Very compatible
+  MEDIUM = 0.6, // Somewhat compatible
+  LOW = 0.3, // Minimally compatible
+  NO_MATCH = 0.0, // Incompatible
 }
 
 /**
@@ -79,8 +76,8 @@ function levenshteinDistance(str1: string, str2: string): number {
       } else {
         matrix[i]![j] = Math.min(
           matrix[i - 1]![j - 1]! + 1, // substitution
-          matrix[i]![j - 1]! + 1,     // insertion
-          matrix[i - 1]![j]! + 1      // deletion
+          matrix[i]![j - 1]! + 1, // insertion
+          matrix[i - 1]![j]! + 1 // deletion
         );
       }
     }
@@ -130,9 +127,8 @@ export const calculateIslamicCompatibility = (
 
   // Sect compatibility (very important)
   if (user1Prefs.sect && user2Prefs.sect) {
-    const sectScore = user1Prefs.sect === user2Prefs.sect
-      ? CompatibilityLevel.EXACT_MATCH
-      : CompatibilityLevel.LOW;
+    const sectScore =
+      user1Prefs.sect === user2Prefs.sect ? CompatibilityLevel.EXACT_MATCH : CompatibilityLevel.LOW;
     scores.push(sectScore * 1.5); // 1.5x weight for sect
   }
 
@@ -140,9 +136,8 @@ export const calculateIslamicCompatibility = (
   const madhab1 = user1Prefs['madhab'] as string | undefined;
   const madhab2 = user2Prefs['madhab'] as string | undefined;
   if (madhab1 && madhab2) {
-    const madhabScore = madhab1 === madhab2
-      ? CompatibilityLevel.EXACT_MATCH
-      : CompatibilityLevel.MEDIUM; // Same sect but different madhab is okay
+    const madhabScore =
+      madhab1 === madhab2 ? CompatibilityLevel.EXACT_MATCH : CompatibilityLevel.MEDIUM; // Same sect but different madhab is okay
     scores.push(madhabScore);
   }
 
@@ -157,9 +152,7 @@ export const calculateIslamicCompatibility = (
   const halal1 = user1Prefs['halal_diet'] as boolean | undefined;
   const halal2 = user2Prefs['halal_diet'] as boolean | undefined;
   if (halal1 !== undefined && halal2 !== undefined) {
-    const halalScore = halal1 === halal2
-      ? CompatibilityLevel.EXACT_MATCH
-      : CompatibilityLevel.LOW;
+    const halalScore = halal1 === halal2 ? CompatibilityLevel.EXACT_MATCH : CompatibilityLevel.LOW;
     scores.push(halalScore);
   }
 
@@ -167,9 +160,8 @@ export const calculateIslamicCompatibility = (
   const smoking1 = user1Prefs['smoking'] as string | undefined;
   const smoking2 = user2Prefs['smoking'] as string | undefined;
   if (smoking1 !== undefined && smoking2 !== undefined) {
-    const smokingScore = smoking1 === smoking2
-      ? CompatibilityLevel.EXACT_MATCH
-      : CompatibilityLevel.MEDIUM; // Some flexibility
+    const smokingScore =
+      smoking1 === smoking2 ? CompatibilityLevel.EXACT_MATCH : CompatibilityLevel.MEDIUM; // Some flexibility
     scores.push(smokingScore);
   }
 
@@ -191,9 +183,7 @@ export const calculateIslamicCompatibility = (
   const beard2 = user2Prefs['beard_preference'] as string | undefined;
   if (hijab1 && beard2) {
     // Cross-gender appearance compatibility
-    scores.push(
-      calculateAppearanceCompatibility(hijab1, beard2)
-    );
+    scores.push(calculateAppearanceCompatibility(hijab1, beard2));
   }
 
   if (scores.length === 0) {
@@ -224,11 +214,11 @@ export const calculateIslamicCompatibility = (
  */
 const calculatePrayerCompatibility = (freq1: string, freq2: string): number => {
   const prayerLevels: Record<string, number> = {
-    'five_times_daily': 5,
-    'regularly': 4,
-    'sometimes': 3,
-    'rarely': 2,
-    'never': 1,
+    five_times_daily: 5,
+    regularly: 4,
+    sometimes: 3,
+    rarely: 2,
+    never: 1,
   };
 
   const level1 = prayerLevels[freq1.toLowerCase()] ?? 0;
@@ -245,26 +235,23 @@ const calculatePrayerCompatibility = (freq1: string, freq2: string): number => {
 /**
  * Calculate appearance preference compatibility
  */
-const calculateAppearanceCompatibility = (
-  hijabPref: string,
-  beardPref: string
-): number => {
+const calculateAppearanceCompatibility = (hijabPref: string, beardPref: string): number => {
   // Conservative preferences align
   const conservative = ['always', 'full', 'traditional'];
   const moderate = ['sometimes', 'partial', 'trimmed'];
   const flexible = ['rarely', 'optional', 'clean_shaven'];
 
-  const hijabLevel = conservative.some(c => hijabPref.toLowerCase().includes(c))
+  const hijabLevel = conservative.some((c) => hijabPref.toLowerCase().includes(c))
     ? 'conservative'
-    : moderate.some(m => hijabPref.toLowerCase().includes(m))
-    ? 'moderate'
-    : 'flexible';
+    : moderate.some((m) => hijabPref.toLowerCase().includes(m))
+      ? 'moderate'
+      : 'flexible';
 
-  const beardLevel = conservative.some(c => beardPref.toLowerCase().includes(c))
+  const beardLevel = conservative.some((c) => beardPref.toLowerCase().includes(c))
     ? 'conservative'
-    : moderate.some(m => beardPref.toLowerCase().includes(m))
-    ? 'moderate'
-    : 'flexible';
+    : moderate.some((m) => beardPref.toLowerCase().includes(m))
+      ? 'moderate'
+      : 'flexible';
 
   if (hijabLevel === beardLevel) return CompatibilityLevel.EXACT_MATCH;
   if (
@@ -296,10 +283,7 @@ export const calculateCulturalCompatibility = (
   // Education level compatibility
   if (user1Prefs.education_level && user2Prefs.education_level) {
     scores.push(
-      calculateEducationCompatibility(
-        user1Prefs.education_level,
-        user2Prefs.education_level
-      )
+      calculateEducationCompatibility(user1Prefs.education_level, user2Prefs.education_level)
     );
   }
 
@@ -321,7 +305,8 @@ export const calculateCulturalCompatibility = (
   if (scores.length === 0) return 60;
 
   // Calculate average score (already in 0-1 range from CompatibilityLevel enum)
-  const averageScore = scores.reduce((sum: number, score: number) => sum + score, 0) / scores.length;
+  const averageScore =
+    scores.reduce((sum: number, score: number) => sum + score, 0) / scores.length;
 
   // Scale to 0-100
   return Math.round(averageScore * 100);
@@ -332,12 +317,12 @@ export const calculateCulturalCompatibility = (
  */
 const calculateEducationCompatibility = (edu1: string, edu2: string): number => {
   const educationLevels: Record<string, number> = {
-    'doctorate': 6,
-    'masters': 5,
-    'bachelors': 4,
-    'associates': 3,
-    'high_school': 2,
-    'some_high_school': 1,
+    doctorate: 6,
+    masters: 5,
+    bachelors: 4,
+    associates: 3,
+    high_school: 2,
+    some_high_school: 1,
   };
 
   const level1 = educationLevels[edu1.toLowerCase().replace(/\s/g, '_')] ?? 0;

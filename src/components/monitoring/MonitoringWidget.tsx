@@ -1,17 +1,8 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Activity, 
-  AlertCircle, 
-  ChevronDown, 
-  ChevronUp, 
-  Gauge, 
-  Network,
-  X 
-} from 'lucide-react';
+import { Activity, AlertCircle, ChevronDown, ChevronUp, Gauge, Network, X } from 'lucide-react';
 import { useApplicationMonitoring } from '@/hooks/useApplicationMonitoring';
 
 interface MonitoringWidgetProps {
@@ -19,13 +10,13 @@ interface MonitoringWidgetProps {
   showInProduction?: boolean;
 }
 
-const MonitoringWidget: React.FC<MonitoringWidgetProps> = ({ 
+const MonitoringWidget: React.FC<MonitoringWidgetProps> = ({
   position = 'bottom-right',
-  showInProduction = false 
+  showInProduction = false,
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  
+
   const {
     isMonitoring,
     performanceMetrics,
@@ -61,7 +52,7 @@ const MonitoringWidget: React.FC<MonitoringWidgetProps> = ({
 
   const getPerformanceStatus = () => {
     if (!performanceMetrics) return 'Unknown';
-    
+
     const loadTime = performanceMetrics.pageLoadTime;
     if (loadTime < 1000) return 'Excellent';
     if (loadTime < 2000) return 'Good';
@@ -82,7 +73,7 @@ const MonitoringWidget: React.FC<MonitoringWidgetProps> = ({
                 {process.env.NODE_ENV === 'development' ? 'DEV' : 'PROD'}
               </Badge>
             </div>
-            
+
             <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
@@ -90,7 +81,11 @@ const MonitoringWidget: React.FC<MonitoringWidgetProps> = ({
                 onClick={() => setIsExpanded(!isExpanded)}
                 className="h-6 w-6 p-0"
               >
-                {isExpanded ? <ChevronDown className="h-3 w-3" /> : <ChevronUp className="h-3 w-3" />}
+                {isExpanded ? (
+                  <ChevronDown className="h-3 w-3" />
+                ) : (
+                  <ChevronUp className="h-3 w-3" />
+                )}
               </Button>
               <Button
                 variant="ghost"
@@ -109,12 +104,12 @@ const MonitoringWidget: React.FC<MonitoringWidgetProps> = ({
               <Activity className="h-3 w-3" />
               <span>{isMonitoring ? 'Active' : 'Inactive'}</span>
             </div>
-            
+
             <div className="flex items-center gap-1">
               <Network className="h-3 w-3" />
               <span className="capitalize">{networkStatus}</span>
             </div>
-            
+
             {errors.length > 0 && (
               <div className="flex items-center gap-1 text-red-500">
                 <AlertCircle className="h-3 w-3" />
@@ -131,25 +126,35 @@ const MonitoringWidget: React.FC<MonitoringWidgetProps> = ({
                 <div className="space-y-2">
                   <div className="flex items-center gap-2">
                     <Gauge className="h-3 w-3" />
-                    <span className="text-xs font-medium">Performance: {getPerformanceStatus()}</span>
+                    <span className="text-xs font-medium">
+                      Performance: {getPerformanceStatus()}
+                    </span>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
                       <span className="text-muted-foreground">Load Time:</span>
-                      <div className="font-mono">{Math.round(performanceMetrics.pageLoadTime)}ms</div>
+                      <div className="font-mono">
+                        {Math.round(performanceMetrics.pageLoadTime)}ms
+                      </div>
                     </div>
                     <div>
                       <span className="text-muted-foreground">FCP:</span>
-                      <div className="font-mono">{Math.round(performanceMetrics.firstContentfulPaint)}ms</div>
+                      <div className="font-mono">
+                        {Math.round(performanceMetrics.firstContentfulPaint)}ms
+                      </div>
                     </div>
                     <div>
                       <span className="text-muted-foreground">TTFB:</span>
-                      <div className="font-mono">{Math.round(performanceMetrics.timeToFirstByte)}ms</div>
+                      <div className="font-mono">
+                        {Math.round(performanceMetrics.timeToFirstByte)}ms
+                      </div>
                     </div>
                     <div>
                       <span className="text-muted-foreground">Memory:</span>
-                      <div className="font-mono">{(performanceMetrics.memoryUsage / 1024 / 1024).toFixed(1)}MB</div>
+                      <div className="font-mono">
+                        {(performanceMetrics.memoryUsage / 1024 / 1024).toFixed(1)}MB
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -161,7 +166,9 @@ const MonitoringWidget: React.FC<MonitoringWidgetProps> = ({
                 <div className="flex items-center gap-1">
                   <span className="capitalize">{networkStatus}</span>
                   {isSlowConnection && (
-                    <Badge variant="secondary" className="text-xs">Slow</Badge>
+                    <Badge variant="secondary" className="text-xs">
+                      Slow
+                    </Badge>
                   )}
                 </div>
               </div>
@@ -169,14 +176,14 @@ const MonitoringWidget: React.FC<MonitoringWidgetProps> = ({
               {/* Controls */}
               <div className="flex gap-2">
                 <Button
-                  variant={isMonitoring ? "destructive" : "default"}
+                  variant={isMonitoring ? 'destructive' : 'default'}
                   size="sm"
                   onClick={isMonitoring ? stopMonitoring : startMonitoring}
                   className="flex-1 text-xs h-7"
                 >
                   {isMonitoring ? 'Stop' : 'Start'}
                 </Button>
-                
+
                 <Button
                   variant="outline"
                   size="sm"

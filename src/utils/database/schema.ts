@@ -1,21 +1,20 @@
-
-import { executeSql, tableExists, columnExists } from "./core";
+import { executeSql, tableExists, columnExists } from './core';
 
 /**
  * Creates a table if it doesn't exist
  */
 export const createTableIfNotExists = async (
-  tableName: string, 
+  tableName: string,
   schema: string
 ): Promise<boolean> => {
   try {
     const exists = await tableExists(tableName);
-    
+
     if (!exists) {
       await executeSql(schema);
       return true;
     }
-    
+
     return false;
   } catch (err) {
     console.error(`Error creating table ${tableName}:`, err);
@@ -33,7 +32,7 @@ export const addColumnIfNotExists = async (
 ): Promise<boolean> => {
   try {
     const exists = await columnExists(tableName, columnName);
-    
+
     if (!exists) {
       const query = `
         ALTER TABLE ${tableName}
@@ -42,7 +41,7 @@ export const addColumnIfNotExists = async (
       await executeSql(query);
       return true;
     }
-    
+
     return false;
   } catch (err) {
     console.error(`Error adding column ${columnName} to ${tableName}:`, err);

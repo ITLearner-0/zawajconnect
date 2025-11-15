@@ -111,29 +111,29 @@ export const publicRoutes: AppRouteConfig[] = [
 
 // Special routes - protected but may have different requirements
 export const specialRoutes: AppRouteConfig[] = [
-  { 
-    path: '/onboarding', 
-    component: Onboarding, 
-    protected: true, 
-    requiresOnboarding: false 
+  {
+    path: '/onboarding',
+    component: Onboarding,
+    protected: true,
+    requiresOnboarding: false,
   },
-  { 
-    path: '/wali-onboarding', 
-    component: WaliOnboarding, 
-    protected: true, 
-    requiresOnboarding: false 
+  {
+    path: '/wali-onboarding',
+    component: WaliOnboarding,
+    protected: true,
+    requiresOnboarding: false,
   },
-  { 
-    path: '/wali-registration', 
-    component: WaliRegistration, 
-    protected: true, 
-    requiresOnboarding: false 
+  {
+    path: '/wali-registration',
+    component: WaliRegistration,
+    protected: true,
+    requiresOnboarding: false,
   },
-  { 
-    path: '/subscription-success', 
-    component: SubscriptionSuccess, 
-    protected: true, 
-    requiresOnboarding: false 
+  {
+    path: '/subscription-success',
+    component: SubscriptionSuccess,
+    protected: true,
+    requiresOnboarding: false,
   },
 ];
 

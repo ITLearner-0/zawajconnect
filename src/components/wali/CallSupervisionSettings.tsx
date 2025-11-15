@@ -20,15 +20,15 @@ interface CallSupervisionSettingsProps {
   supervisedUserName: string;
 }
 
-export function CallSupervisionSettings({ 
-  familyMemberId, 
-  supervisedUserName 
+export function CallSupervisionSettings({
+  familyMemberId,
+  supervisedUserName,
 }: CallSupervisionSettingsProps) {
   const [settings, setSettings] = useState<CallSettings>({
     allow_video_calls: true,
     require_call_approval: false,
     max_call_duration_minutes: 60,
-    notify_on_calls: true
+    notify_on_calls: true,
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -42,7 +42,9 @@ export function CallSupervisionSettings({
     try {
       const { data, error } = await supabase
         .from('family_members')
-        .select('allow_video_calls, require_call_approval, max_call_duration_minutes, notify_on_calls')
+        .select(
+          'allow_video_calls, require_call_approval, max_call_duration_minutes, notify_on_calls'
+        )
         .eq('id', familyMemberId)
         .single();
 
@@ -53,15 +55,15 @@ export function CallSupervisionSettings({
           allow_video_calls: data.allow_video_calls ?? true,
           require_call_approval: data.require_call_approval ?? false,
           max_call_duration_minutes: data.max_call_duration_minutes,
-          notify_on_calls: data.notify_on_calls ?? true
+          notify_on_calls: data.notify_on_calls ?? true,
         });
       }
     } catch (error) {
       console.error('Error loading call settings:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les paramètres",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les paramètres',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -77,22 +79,22 @@ export function CallSupervisionSettings({
           allow_video_calls: settings.allow_video_calls,
           require_call_approval: settings.require_call_approval,
           max_call_duration_minutes: settings.max_call_duration_minutes,
-          notify_on_calls: settings.notify_on_calls
+          notify_on_calls: settings.notify_on_calls,
         })
         .eq('id', familyMemberId);
 
       if (error) throw error;
 
       toast({
-        title: "Paramètres enregistrés",
-        description: "Les paramètres de supervision des appels ont été mis à jour"
+        title: 'Paramètres enregistrés',
+        description: 'Les paramètres de supervision des appels ont été mis à jour',
       });
     } catch (error) {
       console.error('Error saving call settings:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'enregistrer les paramètres",
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
@@ -118,9 +120,7 @@ export function CallSupervisionSettings({
           <Phone className="h-5 w-5" />
           Paramètres de supervision des appels
         </CardTitle>
-        <CardDescription>
-          Configuration pour {supervisedUserName}
-        </CardDescription>
+        <CardDescription>Configuration pour {supervisedUserName}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Video Calls Permission */}
@@ -137,8 +137,8 @@ export function CallSupervisionSettings({
           <Switch
             id="allow-video"
             checked={settings.allow_video_calls}
-            onCheckedChange={(checked) => 
-              setSettings(prev => ({ ...prev, allow_video_calls: checked }))
+            onCheckedChange={(checked) =>
+              setSettings((prev) => ({ ...prev, allow_video_calls: checked }))
             }
           />
         </div>
@@ -157,8 +157,8 @@ export function CallSupervisionSettings({
           <Switch
             id="require-approval"
             checked={settings.require_call_approval}
-            onCheckedChange={(checked) => 
-              setSettings(prev => ({ ...prev, require_call_approval: checked }))
+            onCheckedChange={(checked) =>
+              setSettings((prev) => ({ ...prev, require_call_approval: checked }))
             }
           />
         </div>
@@ -178,13 +178,13 @@ export function CallSupervisionSettings({
               value={settings.max_call_duration_minutes || ''}
               onChange={(e) => {
                 const value = e.target.value === '' ? null : parseInt(e.target.value);
-                setSettings(prev => ({ ...prev, max_call_duration_minutes: value }));
+                setSettings((prev) => ({ ...prev, max_call_duration_minutes: value }));
               }}
               placeholder="Illimité"
               className="max-w-[200px]"
             />
             <span className="text-sm text-muted-foreground">
-              {settings.max_call_duration_minutes 
+              {settings.max_call_duration_minutes
                 ? `${settings.max_call_duration_minutes} minutes maximum`
                 : 'Aucune limite'}
             </span>
@@ -208,8 +208,8 @@ export function CallSupervisionSettings({
           <Switch
             id="notify-calls"
             checked={settings.notify_on_calls}
-            onCheckedChange={(checked) => 
-              setSettings(prev => ({ ...prev, notify_on_calls: checked }))
+            onCheckedChange={(checked) =>
+              setSettings((prev) => ({ ...prev, notify_on_calls: checked }))
             }
           />
         </div>

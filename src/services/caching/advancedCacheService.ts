@@ -32,9 +32,9 @@ class AdvancedCacheService {
     totalHits: 0,
     totalMisses: 0,
     cacheSize: 0,
-    memoryUsage: 0
+    memoryUsage: 0,
   };
-  
+
   private dbName = 'nikah-connect-cache';
   private dbVersion = 1;
   private db?: IDBDatabase;
@@ -48,16 +48,16 @@ class AdvancedCacheService {
   private async initIndexedDB(): Promise<void> {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(this.dbName, this.dbVersion);
-      
+
       request.onerror = () => reject(request.error);
       request.onsuccess = () => {
         this.db = request.result;
         resolve();
       };
-      
+
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
-        
+
         if (!db.objectStoreNames.contains('cache')) {
           const store = db.createObjectStore('cache', { keyPath: 'key' });
           store.createIndex('timestamp', 'timestamp', { unique: false });
@@ -84,15 +84,13 @@ class AdvancedCacheService {
   // Récupérer depuis le cache
   async get<T>(key: string): Promise<T | null> {
     this.cacheStats.totalRequests++;
-    
+
     // Vérifier d'abord le cache mémoire
     const memoryItem = this.memoryCache.get(key);
     if (memoryItem && this.isValid(memoryItem)) {
       this.cacheStats.totalHits++;
       this.updateHitRate();
-      return memoryItem.compressed 
-        ? this.decompress(memoryItem.data as string)
-        : memoryItem.data;
+      return memoryItem.compressed ? this.decompress(memoryItem.data as string) : memoryItem.data;
     }
 
     // Vérifier IndexedDB
@@ -119,26 +117,23 @@ class AdvancedCacheService {
   }
 
   // Sauvegarder dans le cache
-  async set<T>(
-    key: string, 
-    data: T, 
-    config: Partial<CacheConfig> = {}
-  ): Promise<void> {
+  async set<T>(key: string, data: T, config: Partial<CacheConfig> = {}): Promise<void> {
     const defaultConfig: CacheConfig = {
       ttl: 30 * 60 * 1000, // 30 minutes
       maxSize: 100,
       persistent: true,
-      compression: false
+      compression: false,
     };
 
     const finalConfig = { ...defaultConfig, ...config };
     const size = this.calculateSize(data);
-    
+
     // Compression si activée et si la taille le justifie
     let processedData: T | string = data;
     let compressed = false;
-    
-    if (finalConfig.compression && size > 1024) { // Compresser si > 1KB
+
+    if (finalConfig.compression && size > 1024) {
+      // Compresser si > 1KB
       processedData = this.compress(data);
       compressed = true;
     }
@@ -148,12 +143,12 @@ class AdvancedCacheService {
       timestamp: Date.now(),
       ttl: finalConfig.ttl,
       size,
-      compressed
+      compressed,
     };
 
     // Sauvegarder en mémoire
     this.memoryCache.set(key, cacheItem);
-    
+
     // Nettoyer le cache mémoire si nécessaire
     this.evictIfNeeded(finalConfig.maxSize);
 
@@ -172,7 +167,7 @@ class AdvancedCacheService {
   // Supprimer du cache
   async delete(key: string): Promise<void> {
     this.memoryCache.delete(key);
-    
+
     if (this.db) {
       try {
         await this.deleteFromIndexedDB(key);
@@ -180,14 +175,14 @@ class AdvancedCacheService {
         console.warn('IndexedDB cache delete error:', error);
       }
     }
-    
+
     this.updateCacheStats();
   }
 
   // Vider le cache
   async clear(): Promise<void> {
     this.memoryCache.clear();
-    
+
     if (this.db) {
       try {
         await this.clearIndexedDB();
@@ -195,7 +190,7 @@ class AdvancedCacheService {
         console.warn('IndexedDB cache clear error:', error);
       }
     }
-    
+
     this.resetStats();
   }
 
@@ -208,8 +203,9 @@ class AdvancedCacheService {
   private evictIfNeeded(maxSize: number): void {
     if (this.memoryCache.size <= maxSize) return;
 
-    const entries = Array.from(this.memoryCache.entries())
-      .sort(([, a], [, b]) => a.timestamp - b.timestamp);
+    const entries = Array.from(this.memoryCache.entries()).sort(
+      ([, a], [, b]) => a.timestamp - b.timestamp
+    );
 
     const toRemove = entries.slice(0, this.memoryCache.size - maxSize);
     toRemove.forEach(([key]) => this.memoryCache.delete(key));
@@ -219,16 +215,16 @@ class AdvancedCacheService {
   private async getFromIndexedDB<T>(key: string): Promise<CacheItem<T> | null> {
     return new Promise((resolve, reject) => {
       if (!this.db) return resolve(null);
-      
+
       const transaction = this.db.transaction(['cache'], 'readonly');
       const store = transaction.objectStore('cache');
       const request = store.get(key);
-      
+
       request.onsuccess = () => {
         const result = request.result;
         resolve(result ? result.item : null);
       };
-      
+
       request.onerror = () => reject(request.error);
     });
   }
@@ -236,11 +232,11 @@ class AdvancedCacheService {
   private async saveToIndexedDB<T>(key: string, item: CacheItem<T>): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.db) return resolve();
-      
+
       const transaction = this.db.transaction(['cache'], 'readwrite');
       const store = transaction.objectStore('cache');
       const request = store.put({ key, item, timestamp: item.timestamp, ttl: item.ttl });
-      
+
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
@@ -249,11 +245,11 @@ class AdvancedCacheService {
   private async deleteFromIndexedDB(key: string): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.db) return resolve();
-      
+
       const transaction = this.db.transaction(['cache'], 'readwrite');
       const store = transaction.objectStore('cache');
       const request = store.delete(key);
-      
+
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
@@ -262,11 +258,11 @@ class AdvancedCacheService {
   private async clearIndexedDB(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.db) return resolve();
-      
+
       const transaction = this.db.transaction(['cache'], 'readwrite');
       const store = transaction.objectStore('cache');
       const request = store.clear();
-      
+
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
@@ -274,24 +270,27 @@ class AdvancedCacheService {
 
   // Nettoyage automatique
   private startCleanupInterval(): void {
-    setInterval(() => {
-      this.cleanup();
-    }, 5 * 60 * 1000); // Nettoyage toutes les 5 minutes
+    setInterval(
+      () => {
+        this.cleanup();
+      },
+      5 * 60 * 1000
+    ); // Nettoyage toutes les 5 minutes
   }
 
   private async cleanup(): Promise<void> {
     const now = Date.now();
     const expiredKeys: string[] = [];
-    
+
     // Nettoyer le cache mémoire
     this.memoryCache.forEach((item, key) => {
       if (!this.isValid(item)) {
         expiredKeys.push(key);
       }
     });
-    
-    expiredKeys.forEach(key => this.memoryCache.delete(key));
-    
+
+    expiredKeys.forEach((key) => this.memoryCache.delete(key));
+
     // Nettoyer IndexedDB
     if (this.db) {
       try {
@@ -300,19 +299,19 @@ class AdvancedCacheService {
         console.warn('IndexedDB cleanup error:', error);
       }
     }
-    
+
     this.updateCacheStats();
   }
 
   private async cleanupIndexedDB(): Promise<void> {
     return new Promise((resolve, reject) => {
       if (!this.db) return resolve();
-      
+
       const transaction = this.db.transaction(['cache'], 'readwrite');
       const store = transaction.objectStore('cache');
       const index = store.index('timestamp');
       const now = Date.now();
-      
+
       index.openCursor().onsuccess = (event) => {
         const cursor = (event.target as IDBRequest).result;
         if (cursor) {
@@ -325,7 +324,7 @@ class AdvancedCacheService {
           resolve();
         }
       };
-      
+
       transaction.onerror = () => reject(transaction.error);
     });
   }
@@ -340,9 +339,9 @@ class AdvancedCacheService {
 
   private updateCacheStats(): void {
     this.cacheStats.cacheSize = this.memoryCache.size;
-    
+
     let memoryUsage = 0;
-    this.memoryCache.forEach(item => {
+    this.memoryCache.forEach((item) => {
       memoryUsage += item.size;
     });
     this.cacheStats.memoryUsage = memoryUsage;
@@ -356,7 +355,7 @@ class AdvancedCacheService {
       totalHits: 0,
       totalMisses: 0,
       cacheSize: 0,
-      memoryUsage: 0
+      memoryUsage: 0,
     };
   }
 
@@ -366,7 +365,9 @@ class AdvancedCacheService {
   }
 
   // Préchargement intelligent
-  async preload(keys: Array<{ key: string; fetcher: () => Promise<any>; config?: Partial<CacheConfig> }>): Promise<void> {
+  async preload(
+    keys: Array<{ key: string; fetcher: () => Promise<any>; config?: Partial<CacheConfig> }>
+  ): Promise<void> {
     const promises = keys.map(async ({ key, fetcher, config }) => {
       const cached = await this.get(key);
       if (!cached) {
@@ -378,7 +379,7 @@ class AdvancedCacheService {
         }
       }
     });
-    
+
     await Promise.allSettled(promises);
   }
 }

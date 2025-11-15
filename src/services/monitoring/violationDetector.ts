@@ -1,4 +1,3 @@
-
 import { Message } from '@/types/profile';
 import { Violation, ISLAMIC_GUIDELINES } from './types';
 
@@ -7,11 +6,11 @@ import { Violation, ISLAMIC_GUIDELINES } from './types';
  */
 export function detectViolations(message: Message): Violation[] {
   const violations: Violation[] = [];
-  
+
   if (!message) {
     return violations;
   }
-  
+
   // Check for behavioral violations
   if (message.content.length > 500) {
     violations.push({
@@ -19,22 +18,22 @@ export function detectViolations(message: Message): Violation[] {
       severity: 'low',
       message: 'Unusually long message detected',
       messageId: message.id,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
-  
+
   // Check for Islamic compliance violations
-  ISLAMIC_GUIDELINES.forEach(guideline => {
+  ISLAMIC_GUIDELINES.forEach((guideline) => {
     if (guideline.pattern.test(message.content.toLowerCase())) {
       violations.push({
         type: 'islamic',
         severity: guideline.severity,
         message: guideline.message,
         messageId: message.id,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
   });
-  
+
   return violations;
 }

@@ -3,20 +3,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  AlertTriangle, 
-  Shield, 
-  CheckCircle, 
-  Ban, 
-  Mail, 
+import {
+  AlertTriangle,
+  Shield,
+  CheckCircle,
+  Ban,
+  Mail,
   Filter,
   TrendingUp,
   Bell,
   Clock,
-  User
+  User,
 } from 'lucide-react';
 import { useAdminWaliAlerts, AdminWaliAlert } from '@/hooks/useAdminWaliAlerts';
 import { supabase } from '@/integrations/supabase/client';
@@ -42,8 +48,9 @@ interface Filters {
 const WaliAlertsAdminDashboard: React.FC = () => {
   const { user } = useAuth();
   const { toast } = useToast();
-  const { getAlerts, getStatistics, getTrends, acknowledgeAlert, suspendWali } = useAdminWaliAlerts();
-  
+  const { getAlerts, getStatistics, getTrends, acknowledgeAlert, suspendWali } =
+    useAdminWaliAlerts();
+
   const [alerts, setAlerts] = useState<AdminWaliAlert[]>([]);
   const [filteredAlerts, setFilteredAlerts] = useState<AdminWaliAlert[]>([]);
   const [loading, setLoading] = useState(true);
@@ -67,26 +74,24 @@ const WaliAlertsAdminDashboard: React.FC = () => {
         {
           event: '*',
           schema: 'public',
-          table: 'wali_admin_alerts'
+          table: 'wali_admin_alerts',
         },
         (payload) => {
           console.log('Alert change detected:', payload);
-          
+
           if (payload.eventType === 'INSERT') {
             // New alert created
             loadData();
             toast({
               title: '🚨 Nouvelle alerte',
               description: 'Une nouvelle alerte wali a été détectée',
-              variant: 'destructive'
+              variant: 'destructive',
             });
           } else if (payload.eventType === 'UPDATE') {
             // Alert updated
-            setAlerts(prev => 
-              prev.map(alert => 
-                alert.id === payload.new.id 
-                  ? { ...alert, ...payload.new }
-                  : alert
+            setAlerts((prev) =>
+              prev.map((alert) =>
+                alert.id === payload.new.id ? { ...alert, ...payload.new } : alert
               )
             );
           }
@@ -110,9 +115,9 @@ const WaliAlertsAdminDashboard: React.FC = () => {
       const [alertsData, statsData, trendsData] = await Promise.all([
         getAlerts({ limit: 100 }),
         getStatistics(),
-        getTrends(30)
+        getTrends(30),
       ]);
-      
+
       setAlerts(alertsData);
       setStatistics(statsData);
       setTrends(trendsData);
@@ -121,7 +126,7 @@ const WaliAlertsAdminDashboard: React.FC = () => {
       toast({
         title: 'Erreur',
         description: 'Impossible de charger les données',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -133,34 +138,35 @@ const WaliAlertsAdminDashboard: React.FC = () => {
 
     // Risk level filter
     if (filters.riskLevel && filters.riskLevel !== 'all') {
-      filtered = filtered.filter(alert => alert.risk_level === filters.riskLevel);
+      filtered = filtered.filter((alert) => alert.risk_level === filters.riskLevel);
     }
 
     // Acknowledged filter
     if (filters.acknowledged !== undefined) {
-      filtered = filtered.filter(alert => alert.acknowledged === filters.acknowledged);
+      filtered = filtered.filter((alert) => alert.acknowledged === filters.acknowledged);
     }
 
     // Date range filter
     if (filters.dateFrom) {
-      filtered = filtered.filter(alert => 
-        new Date(alert.created_at) >= new Date(filters.dateFrom!)
+      filtered = filtered.filter(
+        (alert) => new Date(alert.created_at) >= new Date(filters.dateFrom!)
       );
     }
     if (filters.dateTo) {
-      filtered = filtered.filter(alert => 
-        new Date(alert.created_at) <= new Date(filters.dateTo!)
+      filtered = filtered.filter(
+        (alert) => new Date(alert.created_at) <= new Date(filters.dateTo!)
       );
     }
 
     // Search query
     if (filters.searchQuery) {
       const query = filters.searchQuery.toLowerCase();
-      filtered = filtered.filter(alert => 
-        alert.pattern_detected.toLowerCase().includes(query) ||
-        alert.alert_type.toLowerCase().includes(query) ||
-        alert.wali_profile?.first_name?.toLowerCase().includes(query) ||
-        alert.wali_profile?.last_name?.toLowerCase().includes(query)
+      filtered = filtered.filter(
+        (alert) =>
+          alert.pattern_detected.toLowerCase().includes(query) ||
+          alert.alert_type.toLowerCase().includes(query) ||
+          alert.wali_profile?.first_name?.toLowerCase().includes(query) ||
+          alert.wali_profile?.last_name?.toLowerCase().includes(query)
       );
     }
 
@@ -169,17 +175,17 @@ const WaliAlertsAdminDashboard: React.FC = () => {
 
   const handleAcknowledge = async (alertId: string) => {
     if (!user) return;
-    
+
     const success = await acknowledgeAlert(alertId, user.id);
     if (success) {
-      setAlerts(prev => 
-        prev.map(alert => 
-          alert.id === alertId 
-            ? { 
-                ...alert, 
-                acknowledged: true, 
+      setAlerts((prev) =>
+        prev.map((alert) =>
+          alert.id === alertId
+            ? {
+                ...alert,
+                acknowledged: true,
                 acknowledged_by: user.id,
-                acknowledged_at: new Date().toISOString()
+                acknowledged_at: new Date().toISOString(),
               }
             : alert
         )
@@ -189,7 +195,7 @@ const WaliAlertsAdminDashboard: React.FC = () => {
 
   const handleSuspend = async (alertId: string, waliUserId: string) => {
     if (!user) return;
-    
+
     const reason = window.prompt('Raison de la suspension:');
     if (!reason) return;
 
@@ -208,7 +214,7 @@ const WaliAlertsAdminDashboard: React.FC = () => {
     setContactModalOpen(true);
   };
 
-  const unacknowledgedCount = alerts.filter(a => !a.acknowledged).length;
+  const unacknowledgedCount = alerts.filter((a) => !a.acknowledged).length;
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -223,7 +229,7 @@ const WaliAlertsAdminDashboard: React.FC = () => {
             Surveillance en temps réel des comportements suspects
           </p>
         </div>
-        
+
         {unacknowledgedCount > 0 && (
           <Badge variant="destructive" className="text-lg px-4 py-2">
             <Bell className="h-4 w-4 mr-2" />
@@ -233,13 +239,11 @@ const WaliAlertsAdminDashboard: React.FC = () => {
       </div>
 
       {/* Statistics */}
-      {statistics && (
-        <WaliAlertsStatistics statistics={statistics} />
-      )}
+      {statistics && <WaliAlertsStatistics statistics={statistics} />}
 
       {/* Filters */}
-      <WaliAlertFilters 
-        filters={filters} 
+      <WaliAlertFilters
+        filters={filters}
         onFiltersChange={setFilters}
         alertCount={filteredAlerts.length}
       />
@@ -269,12 +273,10 @@ const WaliAlertsAdminDashboard: React.FC = () => {
             <Card>
               <CardContent className="p-12 text-center">
                 <CheckCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-xl font-semibold text-foreground mb-2">
-                  Aucune alerte
-                </h3>
+                <h3 className="text-xl font-semibold text-foreground mb-2">Aucune alerte</h3>
                 <p className="text-muted-foreground">
-                  {alerts.length === 0 
-                    ? 'Aucune alerte détectée pour le moment' 
+                  {alerts.length === 0
+                    ? 'Aucune alerte détectée pour le moment'
                     : 'Aucune alerte ne correspond aux filtres sélectionnés'}
                 </p>
               </CardContent>

@@ -1,12 +1,11 @@
-
-import React from "react";
-import { Link } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { LanguageSwitcher } from "@/components/ui/language-switcher";
-import { ArrowLeft, Home } from "lucide-react";
-import AuthHeader from "./AuthHeader";
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { LanguageSwitcher } from '@/components/ui/language-switcher';
+import { ArrowLeft, Home } from 'lucide-react';
+import AuthHeader from './AuthHeader';
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -36,9 +35,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, isSignUp }) => {
         </div>
         <Card className="shadow-2xl border border-rose-200 dark:border-rose-700 bg-white/80 dark:bg-rose-900/80 backdrop-blur-sm">
           <AuthHeader isSignUp={isSignUp} />
-          <CardContent>
-            {children}
-          </CardContent>
+          <CardContent>{children}</CardContent>
         </Card>
       </div>
     </div>

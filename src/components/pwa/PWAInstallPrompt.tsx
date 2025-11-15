@@ -1,9 +1,8 @@
-
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { X, Download, Smartphone, Zap, Shield, Wifi } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { X, Download, Smartphone, Zap, Shield, Wifi } from 'lucide-react';
 import { usePWA } from '@/hooks/usePWA';
 
 const PWAInstallPrompt: React.FC = () => {
@@ -30,7 +29,7 @@ const PWAInstallPrompt: React.FC = () => {
           >
             <X className="h-4 w-4" />
           </Button>
-          
+
           <div className="flex items-center gap-3 mb-2">
             <div className="bg-gradient-to-br from-rose-100 to-pink-100 dark:from-rose-800 dark:to-pink-800 p-3 rounded-full">
               <Smartphone className="h-6 w-6 text-rose-600 dark:text-rose-300" />
@@ -61,31 +60,25 @@ const PWAInstallPrompt: React.FC = () => {
                 Accès rapide depuis l'écran d'accueil
               </span>
             </div>
-            
+
             <div className="flex items-center gap-3 text-sm">
               <div className="bg-blue-100 dark:bg-blue-800 p-1 rounded-full">
                 <Wifi className="h-3 w-3 text-blue-600 dark:text-blue-300" />
               </div>
-              <span className="text-rose-700 dark:text-rose-300">
-                Fonctionne hors ligne
-              </span>
+              <span className="text-rose-700 dark:text-rose-300">Fonctionne hors ligne</span>
             </div>
-            
+
             <div className="flex items-center gap-3 text-sm">
               <div className="bg-purple-100 dark:bg-purple-800 p-1 rounded-full">
                 <Shield className="h-3 w-3 text-purple-600 dark:text-purple-300" />
               </div>
-              <span className="text-rose-700 dark:text-rose-300">
-                Notifications en temps réel
-              </span>
+              <span className="text-rose-700 dark:text-rose-300">Notifications en temps réel</span>
             </div>
           </div>
 
           {/* État de la connexion */}
           <div className="flex items-center justify-between p-3 bg-rose-50 dark:bg-rose-900/30 rounded-lg">
-            <span className="text-sm text-rose-600 dark:text-rose-400">
-              État de la connexion
-            </span>
+            <span className="text-sm text-rose-600 dark:text-rose-400">État de la connexion</span>
             <Badge className={isOnline ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
               {isOnline ? 'En ligne' : 'Hors ligne'}
             </Badge>
@@ -100,7 +93,7 @@ const PWAInstallPrompt: React.FC = () => {
               <Download className="h-4 w-4 mr-2" />
               Installer l'app
             </Button>
-            
+
             <Button
               variant="outline"
               onClick={hideInstallDialog}

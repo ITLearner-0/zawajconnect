@@ -1,7 +1,13 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Filter, X, Search } from 'lucide-react';
 
@@ -19,10 +25,10 @@ interface WaliAlertFiltersProps {
   alertCount: number;
 }
 
-const WaliAlertFilters: React.FC<WaliAlertFiltersProps> = ({ 
-  filters, 
+const WaliAlertFilters: React.FC<WaliAlertFiltersProps> = ({
+  filters,
   onFiltersChange,
-  alertCount
+  alertCount,
 }) => {
   const updateFilter = (key: keyof Filters, value: any) => {
     onFiltersChange({ ...filters, [key]: value });
@@ -32,8 +38,8 @@ const WaliAlertFilters: React.FC<WaliAlertFiltersProps> = ({
     onFiltersChange({});
   };
 
-  const hasActiveFilters = Object.keys(filters).some(key => 
-    filters[key as keyof Filters] !== undefined && filters[key as keyof Filters] !== ''
+  const hasActiveFilters = Object.keys(filters).some(
+    (key) => filters[key as keyof Filters] !== undefined && filters[key as keyof Filters] !== ''
   );
 
   return (
@@ -45,12 +51,7 @@ const WaliAlertFilters: React.FC<WaliAlertFiltersProps> = ({
             Filtres ({alertCount} résultat{alertCount > 1 ? 's' : ''})
           </h3>
           {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearFilters}
-              className="ml-auto gap-2"
-            >
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="ml-auto gap-2">
               <X className="h-4 w-4" />
               Réinitialiser
             </Button>
@@ -72,7 +73,9 @@ const WaliAlertFilters: React.FC<WaliAlertFiltersProps> = ({
           {/* Risk Level */}
           <Select
             value={filters.riskLevel || 'all'}
-            onValueChange={(value) => updateFilter('riskLevel', value === 'all' ? undefined : value)}
+            onValueChange={(value) =>
+              updateFilter('riskLevel', value === 'all' ? undefined : value)
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="Niveau de risque" />
@@ -89,17 +92,14 @@ const WaliAlertFilters: React.FC<WaliAlertFiltersProps> = ({
           {/* Acknowledgment Status */}
           <Select
             value={
-              filters.acknowledged === undefined 
-                ? 'all' 
-                : filters.acknowledged 
-                  ? 'acknowledged' 
+              filters.acknowledged === undefined
+                ? 'all'
+                : filters.acknowledged
+                  ? 'acknowledged'
                   : 'unacknowledged'
             }
-            onValueChange={(value) => 
-              updateFilter(
-                'acknowledged', 
-                value === 'all' ? undefined : value === 'acknowledged'
-              )
+            onValueChange={(value) =>
+              updateFilter('acknowledged', value === 'all' ? undefined : value === 'acknowledged')
             }
           >
             <SelectTrigger>

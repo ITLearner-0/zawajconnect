@@ -1,9 +1,8 @@
-
-import { useState, ReactNode } from "react";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import CustomButton from "@/components/CustomButton";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-import { IslamicPattern } from "@/components/ui/islamic-pattern";
+import { useState, ReactNode } from 'react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import CustomButton from '@/components/CustomButton';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { IslamicPattern } from '@/components/ui/islamic-pattern';
 
 interface OnboardingWrapperProps {
   children: ReactNode;
@@ -32,9 +31,7 @@ const OnboardingWrapper = ({
       <div className="container max-w-3xl mx-auto px-4 relative z-10">
         <IslamicPattern variant="card" color="teal" className="shadow-lg overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-islamic-teal to-islamic-teal/90 text-white">
-            <h1 className="text-2xl font-bold text-center">
-              Complete Your Profile
-            </h1>
+            <h1 className="text-2xl font-bold text-center">Complete Your Profile</h1>
             <p className="text-center text-islamic-cream mb-4">
               Step {currentStep + 1} of {steps.length}: {steps[currentStep]}
             </p>
@@ -43,7 +40,7 @@ const OnboardingWrapper = ({
                 <div
                   key={index}
                   className={`h-1 flex-1 rounded-full transition-colors duration-300 ${
-                    index <= currentStep ? "bg-islamic-gold" : "bg-white/20"
+                    index <= currentStep ? 'bg-islamic-gold' : 'bg-white/20'
                   }`}
                 />
               ))}
@@ -70,7 +67,8 @@ const OnboardingWrapper = ({
                   variant="teal"
                   className="group"
                 >
-                  Complete <Check className="ml-2 h-4 w-4 group-hover:scale-110 transition-transform" />
+                  Complete{' '}
+                  <Check className="ml-2 h-4 w-4 group-hover:scale-110 transition-transform" />
                 </CustomButton>
               ) : (
                 <CustomButton
@@ -80,7 +78,8 @@ const OnboardingWrapper = ({
                   variant="teal"
                   className="group"
                 >
-                  Next <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                  Next{' '}
+                  <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </CustomButton>
               )}
             </div>

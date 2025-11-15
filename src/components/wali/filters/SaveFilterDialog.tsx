@@ -17,11 +17,7 @@ interface SaveFilterDialogProps {
   onSave: (name: string) => void;
 }
 
-export const SaveFilterDialog = ({
-  open,
-  onOpenChange,
-  onSave,
-}: SaveFilterDialogProps) => {
+export const SaveFilterDialog = ({ open, onOpenChange, onSave }: SaveFilterDialogProps) => {
   const [name, setName] = useState('');
 
   const handleSave = () => {

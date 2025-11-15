@@ -6,7 +6,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -63,7 +69,7 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
     bio: '',
     looking_for: '',
     interests: [],
-    avatar_url: ''
+    avatar_url: '',
   });
   const [islamicPreferences, setIslamicPreferences] = useState<IslamicPreferences>({
     sect: '',
@@ -75,12 +81,24 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
     halal_diet: true,
     smoking: '',
     importance_of_religion: '',
-    desired_partner_sect: ''
+    desired_partner_sect: '',
   });
 
   const availableInterests = [
-    'Lecture', 'Sport', 'Voyage', 'Cuisine', 'Art', 'Musique', 'Nature', 'Technologie',
-    'Éducation', 'Bénévolat', 'Jardinage', 'Photographie', 'Films', 'Langues'
+    'Lecture',
+    'Sport',
+    'Voyage',
+    'Cuisine',
+    'Art',
+    'Musique',
+    'Nature',
+    'Technologie',
+    'Éducation',
+    'Bénévolat',
+    'Jardinage',
+    'Photographie',
+    'Films',
+    'Langues',
   ];
 
   const steps: WizardStep[] = [
@@ -89,68 +107,68 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
       title: 'Informations de base',
       description: 'Présentez-vous avec vos informations essentielles',
       icon: User,
-      completed: Boolean(profileData.full_name && profileData.age && profileData.gender)
+      completed: Boolean(profileData.full_name && profileData.age && profileData.gender),
     },
     {
       id: 'location_work',
       title: 'Lieu et profession',
       description: 'Où vivez-vous et que faites-vous ?',
       icon: MapPin,
-      completed: Boolean(profileData.location && profileData.profession)
+      completed: Boolean(profileData.location && profileData.profession),
     },
     {
       id: 'education',
       title: 'Éducation et intérêts',
       description: 'Parlez-nous de votre parcours et passions',
       icon: GraduationCap,
-      completed: Boolean(profileData.education && profileData.interests.length > 0)
+      completed: Boolean(profileData.education && profileData.interests.length > 0),
     },
     {
       id: 'islamic',
       title: 'Préférences islamiques',
       description: 'Vos valeurs et pratiques religieuses',
       icon: Heart,
-      completed: Boolean(islamicPreferences.sect && islamicPreferences.prayer_frequency)
+      completed: Boolean(islamicPreferences.sect && islamicPreferences.prayer_frequency),
     },
     {
       id: 'photo',
       title: 'Photo de profil',
       description: 'Ajoutez une photo respectueuse',
       icon: Image,
-      completed: Boolean(profileData.avatar_url)
+      completed: Boolean(profileData.avatar_url),
     },
     {
       id: 'bio',
       title: 'À propos de vous',
       description: 'Décrivez-vous et ce que vous recherchez',
       icon: Briefcase,
-      completed: Boolean(profileData.bio && profileData.looking_for)
+      completed: Boolean(profileData.bio && profileData.looking_for),
     },
     {
       id: 'compatibility',
       title: 'Questionnaire de compatibilité',
       description: 'Questions détaillées pour un meilleur matching',
       icon: CheckCircle,
-      completed: false // This will be updated based on compatibility responses
-    }
+      completed: false, // This will be updated based on compatibility responses
+    },
   ];
 
-  const progress = (steps.filter(step => step.completed).length / steps.length) * 100;
+  const progress = (steps.filter((step) => step.completed).length / steps.length) * 100;
 
   const updateProfileData = (field: keyof ProfileData, value: any) => {
-    setProfileData(prev => ({ ...prev, [field]: value }));
+    setProfileData((prev) => ({ ...prev, [field]: value }));
   };
 
   const updateIslamicPreferences = (field: keyof IslamicPreferences, value: any) => {
-    setIslamicPreferences(prev => ({ ...prev, [field]: value }));
+    setIslamicPreferences((prev) => ({ ...prev, [field]: value }));
   };
 
   const toggleInterest = (interest: string) => {
-    setProfileData(prev => ({
+    setProfileData((prev) => ({
       ...prev,
       interests: prev.interests.includes(interest)
-        ? prev.interests.filter(i => i !== interest)
-        : [...prev.interests, interest]
+        ? prev.interests.filter((i) => i !== interest)
+        : [...prev.interests, interest],
     }));
   };
 
@@ -175,40 +193,40 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
 
     try {
       // Update or create profile
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
+      const { error: profileError } = await supabase.from('profiles').upsert(
+        {
           user_id: user.id,
-          ...profileData
-        }, {
+          ...profileData,
+        },
+        {
           onConflict: 'user_id',
-          ignoreDuplicates: false
-        });
+          ignoreDuplicates: false,
+        }
+      );
 
       if (profileError) throw profileError;
 
       // Update or create Islamic preferences
-      const { error: preferencesError } = await supabase
-        .from('islamic_preferences')
-        .upsert({
-          user_id: user.id,
-          ...islamicPreferences
-        });
+      const { error: preferencesError } = await supabase.from('islamic_preferences').upsert({
+        user_id: user.id,
+        ...islamicPreferences,
+      });
 
       if (preferencesError) throw preferencesError;
 
       toast({
-        title: "Profil créé avec succès !",
-        description: "Bienvenue dans la communauté. Vous pouvez maintenant découvrir des profils compatibles.",
+        title: 'Profil créé avec succès !',
+        description:
+          'Bienvenue dans la communauté. Vous pouvez maintenant découvrir des profils compatibles.',
       });
 
       onComplete();
     } catch (error) {
       console.error('Error saving profile:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder le profil. Veuillez réessayer.",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder le profil. Veuillez réessayer.',
+        variant: 'destructive',
       });
     }
   };
@@ -244,7 +262,10 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
               </div>
               <div>
                 <Label htmlFor="gender">Genre *</Label>
-                <Select value={profileData.gender} onValueChange={(value) => updateProfileData('gender', value)}>
+                <Select
+                  value={profileData.gender}
+                  onValueChange={(value) => updateProfileData('gender', value)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner" />
                   </SelectTrigger>
@@ -287,7 +308,10 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
           <div className="space-y-4">
             <div>
               <Label htmlFor="education">Niveau d'éducation *</Label>
-              <Select value={profileData.education} onValueChange={(value) => updateProfileData('education', value)}>
+              <Select
+                value={profileData.education}
+                onValueChange={(value) => updateProfileData('education', value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner votre niveau" />
                 </SelectTrigger>
@@ -296,7 +320,9 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
                   <SelectItem value="Licence/Bachelor">Licence/Bachelor</SelectItem>
                   <SelectItem value="Master">Master</SelectItem>
                   <SelectItem value="Doctorat">Doctorat</SelectItem>
-                  <SelectItem value="Formation professionnelle">Formation professionnelle</SelectItem>
+                  <SelectItem value="Formation professionnelle">
+                    Formation professionnelle
+                  </SelectItem>
                   <SelectItem value="Autre">Autre</SelectItem>
                 </SelectContent>
               </Select>
@@ -304,21 +330,21 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
             <div>
               <Label>Centres d'intérêt * (sélectionnez au moins 3)</Label>
               <div className="grid grid-cols-2 gap-2 mt-2">
-                {availableInterests.map(interest => (
+                {availableInterests.map((interest) => (
                   <div key={interest} className="flex items-center space-x-2">
                     <Checkbox
                       id={interest}
                       checked={profileData.interests.includes(interest)}
                       onCheckedChange={() => toggleInterest(interest)}
                     />
-                    <label htmlFor={interest} className="text-sm">{interest}</label>
+                    <label htmlFor={interest} className="text-sm">
+                      {interest}
+                    </label>
                   </div>
                 ))}
               </div>
               <div className="mt-2">
-                <Badge variant="outline">
-                  {profileData.interests.length} sélectionné(s)
-                </Badge>
+                <Badge variant="outline">{profileData.interests.length} sélectionné(s)</Badge>
               </div>
             </div>
           </div>
@@ -330,7 +356,10 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Secte *</Label>
-                <Select value={islamicPreferences.sect} onValueChange={(value) => updateIslamicPreferences('sect', value)}>
+                <Select
+                  value={islamicPreferences.sect}
+                  onValueChange={(value) => updateIslamicPreferences('sect', value)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner" />
                   </SelectTrigger>
@@ -343,7 +372,10 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
               </div>
               <div>
                 <Label>Madhab</Label>
-                <Select value={islamicPreferences.madhab} onValueChange={(value) => updateIslamicPreferences('madhab', value)}>
+                <Select
+                  value={islamicPreferences.madhab}
+                  onValueChange={(value) => updateIslamicPreferences('madhab', value)}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Sélectionner" />
                   </SelectTrigger>
@@ -362,7 +394,10 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
             </div>
             <div>
               <Label>Fréquence de prière *</Label>
-              <Select value={islamicPreferences.prayer_frequency} onValueChange={(value) => updateIslamicPreferences('prayer_frequency', value)}>
+              <Select
+                value={islamicPreferences.prayer_frequency}
+                onValueChange={(value) => updateIslamicPreferences('prayer_frequency', value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner" />
                 </SelectTrigger>
@@ -377,7 +412,10 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
             </div>
             <div>
               <Label>Importance de la religion *</Label>
-              <Select value={islamicPreferences.importance_of_religion} onValueChange={(value) => updateIslamicPreferences('importance_of_religion', value)}>
+              <Select
+                value={islamicPreferences.importance_of_religion}
+                onValueChange={(value) => updateIslamicPreferences('importance_of_religion', value)}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Sélectionner" />
                 </SelectTrigger>
@@ -395,7 +433,9 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
                 checked={islamicPreferences.halal_diet}
                 onCheckedChange={(checked) => updateIslamicPreferences('halal_diet', checked)}
               />
-              <label htmlFor="halal_diet" className="text-sm">Je suis un régime halal strict</label>
+              <label htmlFor="halal_diet" className="text-sm">
+                Je suis un régime halal strict
+              </label>
             </div>
           </div>
         );
@@ -405,10 +445,13 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
           <div className="space-y-4">
             <div className="text-center">
               <p className="text-muted-foreground mb-4">
-                Ajoutez une photo de profil respectueuse selon les valeurs islamiques. 
-                Les photos doivent être modestes et appropriées.
+                Ajoutez une photo de profil respectueuse selon les valeurs islamiques. Les photos
+                doivent être modestes et appropriées.
               </p>
-              <PhotoUpload onPhotoUpdate={handlePhotoUpdate} currentPhotoUrl={profileData.avatar_url} />
+              <PhotoUpload
+                onPhotoUpdate={handlePhotoUpdate}
+                currentPhotoUrl={profileData.avatar_url}
+              />
             </div>
           </div>
         );
@@ -444,8 +487,9 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
           <div className="space-y-4">
             <div className="text-center mb-4">
               <p className="text-muted-foreground">
-                Ce questionnaire détaillé nous aide à trouver les partenaires les plus compatibles avec vos valeurs et préférences.
-                Vous pouvez le compléter maintenant ou plus tard depuis votre profil.
+                Ce questionnaire détaillé nous aide à trouver les partenaires les plus compatibles
+                avec vos valeurs et préférences. Vous pouvez le compléter maintenant ou plus tard
+                depuis votre profil.
               </p>
             </div>
             <CompatibilityQuestionnaire embedded />
@@ -473,9 +517,7 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
             </p>
             <div className="mt-4">
               <Progress value={progress} className="w-full" />
-              <p className="text-sm text-muted-foreground mt-2">
-                {Math.round(progress)}% complété
-              </p>
+              <p className="text-sm text-muted-foreground mt-2">{Math.round(progress)}% complété</p>
             </div>
           </CardHeader>
 
@@ -488,7 +530,9 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
                   return (
                     <Button
                       key={step.id}
-                      variant={index === currentStep ? "default" : step.completed ? "secondary" : "outline"}
+                      variant={
+                        index === currentStep ? 'default' : step.completed ? 'secondary' : 'outline'
+                      }
                       size="sm"
                       onClick={() => setCurrentStep(index)}
                       className="flex items-center gap-2"
@@ -514,11 +558,7 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
 
             {/* Navigation Buttons */}
             <div className="flex justify-between pt-6 border-t">
-              <Button
-                variant="outline"
-                onClick={previousStep}
-                disabled={currentStep === 0}
-              >
+              <Button variant="outline" onClick={previousStep} disabled={currentStep === 0}>
                 Précédent
               </Button>
 
@@ -533,7 +573,7 @@ const ProfileWizard = ({ onComplete }: { onComplete: () => void }) => {
               ) : (
                 <Button
                   onClick={saveProfile}
-                  disabled={!steps.every(step => step?.completed)}
+                  disabled={!steps.every((step) => step?.completed)}
                   className="bg-emerald hover:bg-emerald-dark"
                 >
                   Terminer le profil

@@ -20,7 +20,9 @@ const FamilySupervision = () => {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-foreground">Supervision Familiale</h1>
-            <p className="text-muted-foreground">Gérez et supervisez les relations selon les principes islamiques</p>
+            <p className="text-muted-foreground">
+              Gérez et supervisez les relations selon les principes islamiques
+            </p>
           </div>
         </div>
 

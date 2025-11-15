@@ -10,19 +10,23 @@
 ## 🔍 Instances `any` identifiées
 
 ### 1. Typage implicite des valeurs du hook `useCompatibility` (Ligne 48)
+
 ```typescript
 const { stats, responses, loading, refreshData } = useCompatibility();
 ```
+
 **Problème**: Pas de typage explicite, dépend de l'inférence TypeScript
 **Solution**: Importer et utiliser `CompatibilityStats`, `CompatibilityResponse[]`
 **Impact**: ⚠️ Moyen - risque de perte de type safety
 
 ### 2. Gestion d'erreur non typée (Ligne 97)
+
 ```typescript
 } catch (error) {
   console.error('Error generating insights:', error);
 }
 ```
+
 **Problème**: `error` est implicitement `unknown`
 **Solution**: Typer explicitement comme `error: unknown`
 **Impact**: 🟢 Faible - bonne pratique
@@ -32,12 +36,16 @@ const { stats, responses, loading, refreshData } = useCompatibility();
 ### Types de `src/types/supabase.ts` disponibles
 
 1. **CompatibilityResponse**
+
    ```typescript
-   export type CompatibilityResponse = Database["public"]["Tables"]["compatibility_responses"]["Row"];
+   export type CompatibilityResponse =
+     Database['public']['Tables']['compatibility_responses']['Row'];
    ```
+
    - Utilisation: Typer `responses` du hook
 
 2. **CompatibilityStats**
+
    ```typescript
    export interface CompatibilityStats {
      totalQuestions: number;
@@ -46,9 +54,11 @@ const { stats, responses, loading, refreshData } = useCompatibility();
      lastUpdated?: string;
    }
    ```
+
    - Utilisation: Typer `stats` du hook
 
 3. **WeightedQuestion**
+
    ```typescript
    export interface WeightedQuestion {
      id: string;
@@ -61,11 +71,13 @@ const { stats, responses, loading, refreshData } = useCompatibility();
      is_active: boolean;
    }
    ```
+
    - Utilisation: Non directement utilisé dans ce composant, mais disponible si besoin
 
 ## 🎯 Interfaces locales existantes (à conserver)
 
 Les interfaces suivantes sont spécifiques à l'UI et ne correspondent pas à des tables DB:
+
 - `CompatibilityMatch` (lignes 24-31): UI pour afficher les matches potentiels
 - `CompatibilityInsight` (lignes 33-38): UI pour afficher les insights générés
 - `CompatibilityAssessmentProps` (lignes 40-43): Props du composant
@@ -75,21 +87,23 @@ Ces interfaces **doivent être conservées** car elles représentent des donnée
 ## 📋 Plan de migration détaillé
 
 ### Étape 1: Importer les types centralisés
+
 ```typescript
 import { CompatibilityResponse, CompatibilityStats } from '@/types/supabase';
 ```
 
 ### Étape 2: Typer explicitement les valeurs du hook (Ligne 48)
+
 ```typescript
 // Avant
 const { stats, responses, loading, refreshData } = useCompatibility();
 
 // Après
-const { 
-  stats, 
-  responses, 
-  loading, 
-  refreshData 
+const {
+  stats,
+  responses,
+  loading,
+  refreshData,
 }: {
   stats: CompatibilityStats;
   responses: CompatibilityResponse[];
@@ -99,6 +113,7 @@ const {
 ```
 
 **Alternative (préférée)**: Modifier le hook `useCompatibility` pour retourner un type explicite:
+
 ```typescript
 // Dans useCompatibility.tsx
 interface UseCompatibilityReturn {
@@ -112,10 +127,11 @@ interface UseCompatibilityReturn {
 
 export const useCompatibility = (): UseCompatibilityReturn => {
   // ...
-}
+};
 ```
 
 ### Étape 3: Typer le catch block (Ligne 97)
+
 ```typescript
 // Avant
 } catch (error) {
@@ -129,6 +145,7 @@ export const useCompatibility = (): UseCompatibilityReturn => {
 ```
 
 ### Étape 4: Améliorer le typage de `generateCompatibilityInsights`
+
 ```typescript
 // Avant
 const generateCompatibilityInsights = async () => {
@@ -142,23 +159,26 @@ const generateCompatibilityInsights = async (): Promise<void> => {
 ## ⚡ Optimisations recommandées
 
 ### 1. Créer un type pour le retour du hook
+
 Créer `UseCompatibilityReturn` dans `src/types/supabase.ts` ou dans le hook lui-même.
 
 ### 2. Utiliser les données réelles pour les insights
+
 Actuellement, les insights sont hardcodés (lignes 66-94). Considérer:
+
 - Analyser les vraies `responses` typées
 - Utiliser les `WeightedQuestion` pour calculer les scores réels
 - Intégrer avec `useCompatibilityInsights` hook existant
 
 ## 📊 Métriques d'amélioration
 
-| Métrique | Avant | Après | Impact |
-|----------|-------|-------|--------|
-| Instances `any` explicites | 0 | 0 | ✅ Aucun |
-| Instances `any` implicites | 2 | 0 | 🎯 -100% |
-| Types centralisés utilisés | 0 | 2 | ⬆️ +2 |
-| Type safety globale | 85% | 98% | ⬆️ +13% |
-| Risque de régression | Faible | Très faible | ✅ |
+| Métrique                   | Avant  | Après       | Impact   |
+| -------------------------- | ------ | ----------- | -------- |
+| Instances `any` explicites | 0      | 0           | ✅ Aucun |
+| Instances `any` implicites | 2      | 0           | 🎯 -100% |
+| Types centralisés utilisés | 0      | 2           | ⬆️ +2    |
+| Type safety globale        | 85%    | 98%         | ⬆️ +13%  |
+| Risque de régression       | Faible | Très faible | ✅       |
 
 ## 🚨 Points d'attention
 
@@ -176,10 +196,12 @@ Actuellement, les insights sont hardcodés (lignes 66-94). Considérer:
 ## 🔄 Dépendances
 
 ### Dépend de:
+
 - ✅ `src/types/supabase.ts` (déjà créé avec les types nécessaires)
 - ⚠️ Modification de `src/hooks/useCompatibility.tsx` pour typage explicite du retour
 
 ### Impacte:
+
 - Aucun autre composant directement
 - Améliore la cohérence du système de types
 
@@ -195,6 +217,6 @@ Actuellement, les insights sont hardcodés (lignes 66-94). Considérer:
 
 ## 📝 Notes additionnelles
 
-Ce composant est globalement bien structuré avec des interfaces locales claires. La migration principale concerne le typage explicite des valeurs retournées par le hook custom `useCompatibility`. 
+Ce composant est globalement bien structuré avec des interfaces locales claires. La migration principale concerne le typage explicite des valeurs retournées par le hook custom `useCompatibility`.
 
 **Recommandation**: Migrer d'abord le hook `useCompatibility` pour avoir un type de retour explicite, puis mettre à jour ce composant pour l'utiliser.

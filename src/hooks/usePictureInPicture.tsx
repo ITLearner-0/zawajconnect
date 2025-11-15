@@ -13,9 +13,7 @@ export interface PictureInPictureState {
  * Hook to manage Picture-in-Picture mode for video elements
  * Allows video to float above other content while user navigates the app
  */
-export function usePictureInPicture(
-  videoRef: RefObject<HTMLVideoElement>
-): PictureInPictureState {
+export function usePictureInPicture(videoRef: RefObject<HTMLVideoElement>): PictureInPictureState {
   const { toast } = useToast();
   const [isInPiP, setIsInPiP] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
@@ -54,9 +52,9 @@ export function usePictureInPicture(
   const enterPiP = useCallback(async () => {
     if (!isSupported) {
       toast({
-        title: "Non supporté",
+        title: 'Non supporté',
         description: "Le mode Picture-in-Picture n'est pas disponible sur votre appareil",
-        variant: "destructive"
+        variant: 'destructive',
       });
       return;
     }
@@ -75,9 +73,9 @@ export function usePictureInPicture(
     } catch (error) {
       console.error('Error entering Picture-in-Picture:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'activer le mode Picture-in-Picture",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   }, [videoRef, isSupported, toast]);
@@ -107,6 +105,6 @@ export function usePictureInPicture(
     isSupported,
     enterPiP,
     exitPiP,
-    togglePiP
+    togglePiP,
   };
 }

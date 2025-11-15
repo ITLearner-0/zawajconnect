@@ -16,7 +16,7 @@ interface StepIndicatorProps {
   className?: string;
 }
 
-const StepIndicator = ({ steps, currentStep, onStepClick, className = "" }: StepIndicatorProps) => {
+const StepIndicator = ({ steps, currentStep, onStepClick, className = '' }: StepIndicatorProps) => {
   const getStepStatus = (stepNumber: number) => {
     if (stepNumber < currentStep) return 'completed';
     if (stepNumber === currentStep) return 'current';
@@ -43,9 +43,9 @@ const StepIndicator = ({ steps, currentStep, onStepClick, className = "" }: Step
             const stepNumber = index + 1;
             const status = getStepStatus(stepNumber);
             const isClickable = status === 'completed' || status === 'current';
-            
+
             return (
-              <div 
+              <div
                 key={step.id}
                 className={`flex-shrink-0 cursor-pointer transition-all ${
                   isClickable && onStepClick ? 'hover:scale-105' : ''
@@ -53,7 +53,9 @@ const StepIndicator = ({ steps, currentStep, onStepClick, className = "" }: Step
                 onClick={() => isClickable && onStepClick?.(stepNumber)}
               >
                 <div className="flex flex-col items-center space-y-2 min-w-[80px]">
-                  <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${getStepColor(status)}`}>
+                  <div
+                    className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${getStepColor(status)}`}
+                  >
                     {status === 'completed' ? (
                       <CheckCircle className="w-5 h-5" />
                     ) : (
@@ -81,23 +83,23 @@ const StepIndicator = ({ steps, currentStep, onStepClick, className = "" }: Step
             const status = getStepStatus(stepNumber);
             const isClickable = status === 'completed' || status === 'current';
             const isLast = index === steps.length - 1;
-            
+
             return (
               <div key={step.id} className="flex items-center flex-1">
-                <div 
+                <div
                   className={`flex items-center space-x-4 cursor-pointer transition-all ${
                     isClickable && onStepClick ? 'hover:scale-105' : ''
                   }`}
                   onClick={() => isClickable && onStepClick?.(stepNumber)}
                 >
                   {/* Step Circle */}
-                  <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${getStepColor(status)}`}>
+                  <div
+                    className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${getStepColor(status)}`}
+                  >
                     {status === 'completed' ? (
                       <CheckCircle className="w-5 h-5" />
                     ) : step.icon ? (
-                      <div className="w-5 h-5 flex items-center justify-center">
-                        {step.icon}
-                      </div>
+                      <div className="w-5 h-5 flex items-center justify-center">{step.icon}</div>
                     ) : (
                       <span className="font-semibold">{stepNumber}</span>
                     )}
@@ -106,23 +108,25 @@ const StepIndicator = ({ steps, currentStep, onStepClick, className = "" }: Step
                   {/* Step Info */}
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-1">
-                      <h3 className={`font-medium ${
-                        status === 'current' ? 'text-gold' :
-                        status === 'completed' ? 'text-emerald' :
-                        'text-muted-foreground'
-                      }`}>
+                      <h3
+                        className={`font-medium ${
+                          status === 'current'
+                            ? 'text-gold'
+                            : status === 'completed'
+                              ? 'text-emerald'
+                              : 'text-muted-foreground'
+                        }`}
+                      >
                         {step.title}
                       </h3>
-                      <Badge 
-                        variant={status === 'current' ? 'default' : 'outline'} 
+                      <Badge
+                        variant={status === 'current' ? 'default' : 'outline'}
                         className="text-xs"
                       >
                         {step.estimatedTime}
                       </Badge>
                       {status === 'current' && (
-                        <Badge className="text-xs bg-gold text-white">
-                          En cours
-                        </Badge>
+                        <Badge className="text-xs bg-gold text-white">En cours</Badge>
                       )}
                       {status === 'completed' && (
                         <Badge variant="secondary" className="text-xs">
@@ -130,21 +134,23 @@ const StepIndicator = ({ steps, currentStep, onStepClick, className = "" }: Step
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {step.description}
-                    </p>
+                    <p className="text-sm text-muted-foreground">{step.description}</p>
                   </div>
                 </div>
 
                 {/* Connector Line */}
                 {!isLast && (
                   <div className="flex items-center mx-4">
-                    <div className={`h-0.5 w-8 transition-all ${
-                      stepNumber <= currentStep ? 'bg-emerald' : 'bg-muted'
-                    }`} />
-                    <ArrowRight className={`w-4 h-4 ml-2 transition-all ${
-                      stepNumber < currentStep ? 'text-emerald' : 'text-muted-foreground'
-                    }`} />
+                    <div
+                      className={`h-0.5 w-8 transition-all ${
+                        stepNumber <= currentStep ? 'bg-emerald' : 'bg-muted'
+                      }`}
+                    />
+                    <ArrowRight
+                      className={`w-4 h-4 ml-2 transition-all ${
+                        stepNumber < currentStep ? 'text-emerald' : 'text-muted-foreground'
+                      }`}
+                    />
                   </div>
                 )}
               </div>

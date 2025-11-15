@@ -60,7 +60,7 @@ SELECT check_unread_messages_and_notify();
 
 ```sql
 -- Voir tous les cron jobs configurés
-SELECT 
+SELECT
   jobid,
   jobname,
   schedule,
@@ -77,7 +77,7 @@ ORDER BY jobid;
 
 ```sql
 -- Voir les 20 dernières exécutions
-SELECT 
+SELECT
   jobid,
   runid,
   job_pid,
@@ -97,7 +97,7 @@ LIMIT 20;
 
 ```sql
 -- Voir uniquement les exécutions échouées
-SELECT 
+SELECT
   jobid,
   runid,
   status,
@@ -113,7 +113,7 @@ ORDER BY start_time DESC;
 
 ```sql
 -- Statistiques d'exécution par job
-SELECT 
+SELECT
   j.jobname,
   COUNT(*) as total_runs,
   COUNT(CASE WHEN jrd.status = 'succeeded' THEN 1 END) as successful_runs,
@@ -133,7 +133,7 @@ ORDER BY j.jobid;
 
 Pour chaque fonction email, vous pouvez voir les logs détaillés:
 
-1. **send-unread-messages-reminder**: 
+1. **send-unread-messages-reminder**:
    - https://supabase.com/dashboard/project/dgfctwtivkqcfhwqgkya/functions/send-unread-messages-reminder/logs
 
 2. **send-subscription-expiring-email**:
@@ -210,14 +210,14 @@ SELECT cron.alter_job(
 
 ## ⏰ Horaires des Cron Jobs
 
-| Job | Fréquence | Heure (UTC) | Description |
-|-----|-----------|-------------|-------------|
-| Messages non lus | Quotidien | 10h | Rappel messages > 24h |
-| Abonnements expirant | Quotidien | 9h | Alerte 7/3/1 jours avant |
-| Profils incomplets | Hebdomadaire | Dim 14h | Rappel compléter profil |
-| Suggestions matches | Hebdomadaire | Lun 8h | Nouveaux profils compatibles |
-| Newsletter | Mensuel | 1er à 6h | Contenu mensuel |
-| Conseils hebdo | Hebdomadaire | Ven 7h | Tips & conseils |
+| Job                  | Fréquence    | Heure (UTC) | Description                  |
+| -------------------- | ------------ | ----------- | ---------------------------- |
+| Messages non lus     | Quotidien    | 10h         | Rappel messages > 24h        |
+| Abonnements expirant | Quotidien    | 9h          | Alerte 7/3/1 jours avant     |
+| Profils incomplets   | Hebdomadaire | Dim 14h     | Rappel compléter profil      |
+| Suggestions matches  | Hebdomadaire | Lun 8h      | Nouveaux profils compatibles |
+| Newsletter           | Mensuel      | 1er à 6h    | Contenu mensuel              |
+| Conseils hebdo       | Hebdomadaire | Ven 7h      | Tips & conseils              |
 
 **Note**: Tous les horaires sont en UTC. Ajoutez +1h (hiver) ou +2h (été) pour l'heure française.
 

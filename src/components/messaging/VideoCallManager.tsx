@@ -1,4 +1,3 @@
-
 import { VideoCallStatus } from '@/types/profile';
 import VideoChat from './VideoChat';
 import WaliSupervisor from './WaliSupervisor';
@@ -9,19 +8,16 @@ interface VideoCallManagerProps {
   conversationId: string | undefined;
 }
 
-const VideoCallManager = ({ 
-  videoCallStatus, 
-  onEndCall, 
-  conversationId 
+const VideoCallManager = ({
+  videoCallStatus,
+  onEndCall,
+  conversationId,
 }: VideoCallManagerProps) => {
   if (!videoCallStatus.isActive) return null;
-  
+
   return (
     <div className="flex flex-col h-full">
-      <VideoChat 
-        participantId={videoCallStatus.participantId || ''} 
-        onEndCall={onEndCall}
-      />
+      <VideoChat participantId={videoCallStatus.participantId || ''} onEndCall={onEndCall} />
       {videoCallStatus.waliPresent && conversationId && (
         <WaliSupervisor conversationId={conversationId} />
       )}

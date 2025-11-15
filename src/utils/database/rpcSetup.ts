@@ -1,5 +1,4 @@
-
-import { executeSql } from "./core";
+import { executeSql } from './core';
 
 /**
  * Sets up RPC functions for table operations
@@ -19,7 +18,7 @@ export const setupRpcFunctions = async (): Promise<boolean> => {
       END;
       $$ LANGUAGE plpgsql SECURITY DEFINER;
     `);
-    
+
     // Create function for executing SQL
     await executeSql(`
       CREATE OR REPLACE FUNCTION execute_sql(sql_query TEXT) 
@@ -34,7 +33,7 @@ export const setupRpcFunctions = async (): Promise<boolean> => {
       END;
       $$ LANGUAGE plpgsql SECURITY DEFINER;
     `);
-    
+
     return true;
   } catch (err) {
     console.error('Error setting up RPC functions:', err);

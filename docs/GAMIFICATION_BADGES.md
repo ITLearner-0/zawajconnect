@@ -14,39 +14,47 @@ The badge system automatically awards achievements to users when they complete s
 ## Available Badges
 
 ### Profile Completion
+
 - `profile_complete_25` - Getting Started (50 XP)
 - `profile_complete_50` - Half Way There (100 XP)
 - `profile_complete_75` - Almost Complete (200 XP)
 - `profile_complete_100` - Profile Master (500 XP)
 
 ### Verification
+
 - `email_verified` - Email Verified (100 XP)
 - `phone_verified` - Phone Verified (150 XP)
 - `id_verified` - Identity Verified (300 XP)
 
 ### Matching
+
 - `first_match` - First Connection (250 XP)
 - `match_streak_7` - Social Butterfly (500 XP)
 - `match_streak_25` - Popular Connection (1000 XP)
 
 ### Messaging
+
 - `first_message` - Conversation Starter (100 XP)
 - `messages_100` - Chatty (300 XP)
 - `messages_500` - Master Communicator (750 XP)
 
 ### Activity
+
 - `daily_login_7` - Week Warrior (300 XP)
 - `daily_login_30` - Monthly Champion (1000 XP)
 
 ### Family
+
 - `family_added` - Family Involvement (200 XP)
 - `wali_verified` - Wali Verified (400 XP)
 
 ### Compatibility
+
 - `test_completed` - Self Aware (150 XP)
 - `high_compatibility` - Perfect Match (1500 XP)
 
 ### Special
+
 - `early_adopter` - Early Adopter (500 XP)
 - `community_helper` - Community Helper (300 XP)
 
@@ -66,9 +74,9 @@ const MyComponent = () => {
   };
 
   const handleEmailVerified = async () => {
-    await awardBadge({ 
+    await awardBadge({
       badge_id: 'email_verified',
-      showToast: true 
+      showToast: true
     });
   };
 
@@ -101,6 +109,7 @@ const { data, error } = await supabase.functions.invoke('award-badge', {
 ## Integration Points
 
 ### 1. Profile Updates
+
 **Where**: Profile update/save handlers
 **When**: After successfully updating profile
 **How**: Calculate completion percentage and award appropriate badge
@@ -125,6 +134,7 @@ await checkAndAwardProfileCompletion(completionPercentage);
 ```
 
 ### 2. Verification Success
+
 **Where**: Email/Phone/ID verification handlers
 **When**: After successful verification
 **How**: Call awardVerificationBadge with type
@@ -139,6 +149,7 @@ const handleVerificationSuccess = async (type: 'email' | 'phone' | 'id') => {
 ```
 
 ### 3. Match Creation
+
 **Where**: Match acceptance/creation handler
 **When**: After successful match creation
 **How**: Get total match count and award milestone badges
@@ -154,12 +165,13 @@ const handleMatchCreated = async (userId: string) => {
     .select('*', { count: 'exact', head: true })
     .or(`user1_id.eq.${userId},user2_id.eq.${userId}`)
     .eq('is_mutual', true);
-  
+
   await checkAndAwardMatchBadges(count || 0);
 };
 ```
 
 ### 4. Message Sending
+
 **Where**: Message send handler
 **When**: After successfully sending a message
 **How**: Get total message count and award milestone badges
@@ -173,12 +185,13 @@ const handleMessageSent = async (userId: string) => {
     .from('messages')
     .select('*', { count: 'exact', head: true })
     .eq('sender_id', userId);
-  
+
   await checkAndAwardMessageBadges(count || 0);
 };
 ```
 
 ### 5. Compatibility Test
+
 **Where**: Test submission handler
 **When**: After completing compatibility test
 **How**: Award test_completed badge
@@ -189,18 +202,19 @@ const { awardBadge } = useAwardBadge();
 
 const handleTestComplete = async (score: number) => {
   await awardBadge({ badge_id: 'test_completed' });
-  
+
   // Also check for high compatibility
   if (score >= 90) {
-    await awardBadge({ 
+    await awardBadge({
       badge_id: 'high_compatibility',
-      progress_value: score 
+      progress_value: score,
     });
   }
 };
 ```
 
 ### 6. Family Features
+
 **Where**: Family member addition handler
 **When**: After adding family member
 **How**: Award family_added badge
@@ -238,6 +252,7 @@ await awardBadge({ badge_id: 'wali_verified' });
 ## Database Schema
 
 ### user_badges
+
 ```sql
 - id: UUID
 - user_id: UUID (references auth.users)
@@ -252,6 +267,7 @@ await awardBadge({ badge_id: 'wali_verified' });
 ```
 
 ### gamification_rewards
+
 ```sql
 - id: UUID
 - user_id: UUID
@@ -267,6 +283,7 @@ await awardBadge({ badge_id: 'wali_verified' });
 ## Monitoring & Analytics
 
 Track badge effectiveness:
+
 ```sql
 -- Most earned badges
 SELECT badge_id, COUNT(*) as earned_count
@@ -290,11 +307,12 @@ LIMIT 10;
 ## Testing
 
 Test badge awarding in development:
+
 ```typescript
 // Test all badge types
 const testBadges = async () => {
   const { awardBadge } = useAwardBadge();
-  
+
   await awardBadge({ badge_id: 'test_completed', showToast: true });
   await awardBadge({ badge_id: 'first_match', showToast: true });
   await awardBadge({ badge_id: 'email_verified', showToast: true });

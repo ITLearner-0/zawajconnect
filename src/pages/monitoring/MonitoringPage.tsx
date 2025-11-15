@@ -1,4 +1,3 @@
-
 import React from 'react';
 import MonitoringDashboard from '@/components/monitoring/MonitoringDashboard';
 import { MonitoringProvider } from '@/components/monitoring/MonitoringProvider';

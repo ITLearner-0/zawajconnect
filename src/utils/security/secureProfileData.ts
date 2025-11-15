@@ -1,4 +1,3 @@
-
 import { sanitizeText, sanitizeHtml, profileValidationSchema } from './enhancedValidation';
 import { ProfileFormData } from '@/types/profile';
 
@@ -59,9 +58,11 @@ export const secureProfileData = (data: Partial<ProfileFormData>): Partial<Profi
   return securedData;
 };
 
-export const validateProfileData = (data: Partial<ProfileFormData>): { 
-  isValid: boolean; 
-  errors: string[] 
+export const validateProfileData = (
+  data: Partial<ProfileFormData>
+): {
+  isValid: boolean;
+  errors: string[];
 } => {
   try {
     // Convert ProfileFormData to the expected validation schema format
@@ -70,13 +71,15 @@ export const validateProfileData = (data: Partial<ProfileFormData>): {
       lastName: data.fullName?.split(' ').slice(1).join(' ') || '',
       aboutMe: data.aboutMe,
       location: data.location,
-      occupation: data.occupation
+      occupation: data.occupation,
     };
 
     profileValidationSchema.parse(validationData);
     return { isValid: true, errors: [] };
   } catch (error: any) {
-    const errors = error.errors?.map((err: any) => `${err.path.join('.')}: ${err.message}`) || ['Validation failed'];
+    const errors = error.errors?.map((err: any) => `${err.path.join('.')}: ${err.message}`) || [
+      'Validation failed',
+    ];
     return { isValid: false, errors };
   }
 };

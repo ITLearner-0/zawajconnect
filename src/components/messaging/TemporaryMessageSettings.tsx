@@ -1,9 +1,20 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Clock, Timer, AlertTriangle } from 'lucide-react';
 
@@ -27,7 +38,7 @@ const DURATION_OPTIONS = [
   { value: 24, label: '1 jour' },
   { value: 72, label: '3 jours' },
   { value: 168, label: '1 semaine' },
-  { value: 720, label: '1 mois' }
+  { value: 720, label: '1 mois' },
 ];
 
 const WARNING_OPTIONS = [
@@ -35,12 +46,12 @@ const WARNING_OPTIONS = [
   { value: 15, label: '15 minutes' },
   { value: 30, label: '30 minutes' },
   { value: 60, label: '1 heure' },
-  { value: 120, label: '2 heures' }
+  { value: 120, label: '2 heures' },
 ];
 
 const TemporaryMessageSettings: React.FC<TemporaryMessageSettingsProps> = ({
   settings,
-  onSettingsChange
+  onSettingsChange,
 }) => {
   const [localSettings, setLocalSettings] = useState<TemporaryMessageSettings>(settings);
   const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +65,7 @@ const TemporaryMessageSettings: React.FC<TemporaryMessageSettingsProps> = ({
     key: K,
     value: TemporaryMessageSettings[K]
   ) => {
-    setLocalSettings(prev => ({ ...prev, [key]: value }));
+    setLocalSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -65,7 +76,7 @@ const TemporaryMessageSettings: React.FC<TemporaryMessageSettingsProps> = ({
           Messages Temporaires
         </Button>
       </DialogTrigger>
-      
+
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -73,7 +84,7 @@ const TemporaryMessageSettings: React.FC<TemporaryMessageSettingsProps> = ({
             Messages à Durée Limitée
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-6">
           {/* Enable/Disable */}
           <div className="flex items-center justify-between">
@@ -96,9 +107,7 @@ const TemporaryMessageSettings: React.FC<TemporaryMessageSettingsProps> = ({
                 <Label>Durée par défaut</Label>
                 <Select
                   value={localSettings.defaultDuration.toString()}
-                  onValueChange={(value) => 
-                    updateSetting('defaultDuration', parseInt(value))
-                  }
+                  onValueChange={(value) => updateSetting('defaultDuration', parseInt(value))}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -126,9 +135,7 @@ const TemporaryMessageSettings: React.FC<TemporaryMessageSettingsProps> = ({
                 </div>
                 <Switch
                   checked={localSettings.allowCustomDuration}
-                  onCheckedChange={(checked) => 
-                    updateSetting('allowCustomDuration', checked)
-                  }
+                  onCheckedChange={(checked) => updateSetting('allowCustomDuration', checked)}
                 />
               </div>
 
@@ -136,15 +143,11 @@ const TemporaryMessageSettings: React.FC<TemporaryMessageSettingsProps> = ({
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <Label>Avertir avant expiration</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Notifier avant la suppression
-                  </p>
+                  <p className="text-xs text-muted-foreground">Notifier avant la suppression</p>
                 </div>
                 <Switch
                   checked={localSettings.warnBeforeExpiry}
-                  onCheckedChange={(checked) => 
-                    updateSetting('warnBeforeExpiry', checked)
-                  }
+                  onCheckedChange={(checked) => updateSetting('warnBeforeExpiry', checked)}
                 />
               </div>
 
@@ -154,9 +157,7 @@ const TemporaryMessageSettings: React.FC<TemporaryMessageSettingsProps> = ({
                   <Label>Temps d'avertissement</Label>
                   <Select
                     value={localSettings.warningTime.toString()}
-                    onValueChange={(value) => 
-                      updateSetting('warningTime', parseInt(value))
-                    }
+                    onValueChange={(value) => updateSetting('warningTime', parseInt(value))}
                   >
                     <SelectTrigger>
                       <SelectValue />

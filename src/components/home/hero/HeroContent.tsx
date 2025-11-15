@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 const HeroContent = () => {
@@ -10,10 +9,10 @@ const HeroContent = () => {
           LÉGIFÉRÉE
         </span>
       </h1>
-      
+
       <p className="text-lg md:text-xl mb-8 text-rose-700 dark:text-rose-200 max-w-3xl mx-auto leading-relaxed">
-        Une plateforme de mariage construite sur les valeurs islamiques, 
-        vous guidant vers une union bénie et harmonieuse.
+        Une plateforme de mariage construite sur les valeurs islamiques, vous guidant vers une union
+        bénie et harmonieuse.
       </p>
     </>
   );

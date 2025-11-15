@@ -16,13 +16,13 @@ interface StepValidationProps {
   className?: string;
 }
 
-const StepValidation = ({ rules, stepNumber, className = "" }: StepValidationProps) => {
-  const requiredRules = rules.filter(rule => rule.isRequired);
-  const validRules = rules.filter(rule => rule.isValid);
-  const invalidRules = rules.filter(rule => !rule.isValid && rule.isRequired);
-  
+const StepValidation = ({ rules, stepNumber, className = '' }: StepValidationProps) => {
+  const requiredRules = rules.filter((rule) => rule.isRequired);
+  const validRules = rules.filter((rule) => rule.isValid);
+  const invalidRules = rules.filter((rule) => !rule.isValid && rule.isRequired);
+
   const completionPercentage = Math.round((validRules.length / rules.length) * 100);
-  const isStepComplete = requiredRules.every(rule => rule.isValid);
+  const isStepComplete = requiredRules.every((rule) => rule.isValid);
 
   const getStatusColor = () => {
     if (isStepComplete) return 'text-emerald';
@@ -49,20 +49,20 @@ const StepValidation = ({ rules, stepNumber, className = "" }: StepValidationPro
           ) : (
             <AlertCircle className="w-4 h-4 text-gold" />
           )}
-          <span className={`text-sm font-medium ${getStatusColor()}`}>
-            Étape {stepNumber}
-          </span>
+          <span className={`text-sm font-medium ${getStatusColor()}`}>Étape {stepNumber}</span>
         </div>
-        <Badge 
-          variant={isStepComplete ? "default" : "secondary"}
-          className={isStepComplete ? "bg-emerald" : ""}
+        <Badge
+          variant={isStepComplete ? 'default' : 'secondary'}
+          className={isStepComplete ? 'bg-emerald' : ''}
         >
           {completionPercentage}% complété
         </Badge>
       </div>
 
       {/* Status Message */}
-      <Alert className={isStepComplete ? "border-emerald/20 bg-emerald/5" : "border-gold/20 bg-gold/5"}>
+      <Alert
+        className={isStepComplete ? 'border-emerald/20 bg-emerald/5' : 'border-gold/20 bg-gold/5'}
+      >
         <AlertDescription className={`text-sm ${getStatusColor()}`}>
           {getStatusMessage()}
         </AlertDescription>
@@ -74,7 +74,7 @@ const StepValidation = ({ rules, stepNumber, className = "" }: StepValidationPro
           <h4 className="text-sm font-medium text-muted-foreground">Champs manquants :</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {invalidRules.map((rule) => (
-              <div 
+              <div
                 key={rule.field}
                 className="flex items-center space-x-2 text-sm text-muted-foreground"
               >
@@ -92,9 +92,9 @@ const StepValidation = ({ rules, stepNumber, className = "" }: StepValidationPro
           <h4 className="text-sm font-medium text-muted-foreground">Complété :</h4>
           <div className="flex flex-wrap gap-1">
             {validRules.slice(0, 4).map((rule) => (
-              <Badge 
-                key={rule.field} 
-                variant="secondary" 
+              <Badge
+                key={rule.field}
+                variant="secondary"
                 className="text-xs bg-emerald/10 text-emerald border-emerald/20"
               >
                 <CheckCircle className="w-3 h-3 mr-1" />

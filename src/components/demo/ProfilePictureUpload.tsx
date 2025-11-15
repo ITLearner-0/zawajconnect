@@ -1,4 +1,3 @@
-
 import { DatabaseProfile } from '@/types/profile';
 import LazyProfilePictureUpload from './LazyProfilePictureUpload';
 

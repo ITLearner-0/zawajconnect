@@ -45,13 +45,13 @@ export const useNavigationPreferences = () => {
   ) => {
     const newPreferences = { ...preferences, [key]: value };
     setPreferences(newPreferences);
-    
+
     localStorage.setItem('navigation_preferences', JSON.stringify(newPreferences));
-    
+
     trackAction('navigation_preference_changed', {
       setting: key,
       value: value,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
   };
 
@@ -63,7 +63,7 @@ export const useNavigationPreferences = () => {
   };
 
   const removeFavoriteRoute = (route: string) => {
-    const newFavorites = preferences.favoriteRoutes.filter(r => r !== route);
+    const newFavorites = preferences.favoriteRoutes.filter((r) => r !== route);
     updatePreference('favoriteRoutes', newFavorites);
   };
 

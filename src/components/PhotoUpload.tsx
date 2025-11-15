@@ -29,7 +29,7 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUpdate }: PhotoUploadProps) => {
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      alert('La taille de l\'image ne doit pas dépasser 5 MB');
+      alert("La taille de l'image ne doit pas dépasser 5 MB");
       return;
     }
 
@@ -57,7 +57,7 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUpdate }: PhotoUploadProps) => {
 
       // Simulate upload progress
       const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
+        setUploadProgress((prev) => {
           if (prev >= 90) {
             clearInterval(progressInterval);
             return prev;
@@ -67,12 +67,10 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUpdate }: PhotoUploadProps) => {
       }, 200);
 
       // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from('profile-photos')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
+      const { data, error } = await supabase.storage.from('profile-photos').upload(fileName, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
 
       clearInterval(progressInterval);
       setUploadProgress(100);
@@ -80,24 +78,18 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUpdate }: PhotoUploadProps) => {
       if (error) throw error;
 
       // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('profile-photos')
-        .getPublicUrl(fileName);
+      const { data: urlData } = supabase.storage.from('profile-photos').getPublicUrl(fileName);
 
       const photoUrl = urlData.publicUrl;
 
       // Update profile with new photo URL
-      await supabase
-        .from('profiles')
-        .update({ avatar_url: photoUrl })
-        .eq('user_id', user.id);
+      await supabase.from('profiles').update({ avatar_url: photoUrl }).eq('user_id', user.id);
 
       onPhotoUpdate(photoUrl);
-      
+
       setTimeout(() => {
         setUploadProgress(0);
       }, 2000);
-
     } catch (error) {
       console.error('Error uploading photo:', error);
       alert('Erreur lors du téléchargement de la photo');
@@ -117,15 +109,10 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUpdate }: PhotoUploadProps) => {
       const filePath = `${user.id}/${fileName}`;
 
       // Delete from storage
-      await supabase.storage
-        .from('profile-photos')
-        .remove([filePath]);
+      await supabase.storage.from('profile-photos').remove([filePath]);
 
       // Update profile
-      await supabase
-        .from('profiles')
-        .update({ avatar_url: null })
-        .eq('user_id', user.id);
+      await supabase.from('profiles').update({ avatar_url: null }).eq('user_id', user.id);
 
       setPreviewUrl(null);
       onPhotoUpdate('');
@@ -149,16 +136,16 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUpdate }: PhotoUploadProps) => {
           <div className="relative">
             <div className="h-32 w-32 rounded-full overflow-hidden bg-gradient-to-br from-emerald/20 to-gold/20 flex items-center justify-center border-4 border-border">
               {previewUrl ? (
-                <img 
-                  src={previewUrl} 
-                  alt="Photo de profil" 
+                <img
+                  src={previewUrl}
+                  alt="Photo de profil"
                   className="h-full w-full object-cover"
                 />
               ) : (
                 <Camera className="h-12 w-12 text-muted-foreground" />
               )}
             </div>
-            
+
             {previewUrl && (
               <Button
                 size="sm"
@@ -209,8 +196,8 @@ const PhotoUpload = ({ currentPhotoUrl, onPhotoUpdate }: PhotoUploadProps) => {
           />
 
           <p className="text-xs text-center text-muted-foreground max-w-xs">
-            Formats acceptés: JPG, PNG, GIF. Taille maximale: 5 MB. 
-            Une photo de profil améliore vos chances de trouver un match.
+            Formats acceptés: JPG, PNG, GIF. Taille maximale: 5 MB. Une photo de profil améliore vos
+            chances de trouver un match.
           </p>
         </div>
       </CardContent>

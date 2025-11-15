@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,9 +8,19 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { 
-  Shield, ShieldCheck, ShieldAlert, Upload, Mail, Phone, 
-  IdCard, Users, Camera, CheckCircle, AlertCircle, Clock 
+import {
+  Shield,
+  ShieldCheck,
+  ShieldAlert,
+  Upload,
+  Mail,
+  Phone,
+  IdCard,
+  Users,
+  Camera,
+  CheckCircle,
+  AlertCircle,
+  Clock,
 } from 'lucide-react';
 
 interface VerificationStatus {
@@ -43,7 +52,7 @@ const VerificationCenter = () => {
     id_verified: false,
     family_verified: false,
     verification_score: 0,
-    verification_documents: []
+    verification_documents: [],
   });
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
@@ -86,7 +95,7 @@ const VerificationCenter = () => {
           user_id: data.user_id,
           id: data.id,
           created_at: data.created_at,
-          updated_at: data.updated_at
+          updated_at: data.updated_at,
         });
       } else {
         // Create initial verification record
@@ -94,7 +103,7 @@ const VerificationCenter = () => {
           .from('user_verifications')
           .insert({
             user_id: user.id,
-            email_verified: user.email_confirmed_at !== null
+            email_verified: user.email_confirmed_at !== null,
           })
           .select()
           .maybeSingle();
@@ -113,16 +122,16 @@ const VerificationCenter = () => {
             user_id: newRecord.user_id,
             id: newRecord.id,
             created_at: newRecord.created_at,
-            updated_at: newRecord.updated_at
+            updated_at: newRecord.updated_at,
           });
         }
       }
     } catch (error) {
       console.error('Error loading verification status:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger le statut de vérification",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger le statut de vérification',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -135,21 +144,21 @@ const VerificationCenter = () => {
     try {
       const { error } = await supabase.auth.resend({
         type: 'signup',
-        email: user.email
+        email: user.email,
       });
 
       if (error) throw error;
 
       toast({
-        title: "Email envoyé",
-        description: "Vérifiez votre boîte mail et cliquez sur le lien de confirmation",
+        title: 'Email envoyé',
+        description: 'Vérifiez votre boîte mail et cliquez sur le lien de confirmation',
       });
     } catch (error) {
       console.error('Error sending email verification:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'envoyer l'email de vérification",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -157,9 +166,9 @@ const VerificationCenter = () => {
   const sendPhoneVerification = async () => {
     if (!phoneNumber) {
       toast({
-        title: "Erreur",
-        description: "Veuillez saisir un numéro de téléphone",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Veuillez saisir un numéro de téléphone',
+        variant: 'destructive',
       });
       return;
     }
@@ -169,15 +178,15 @@ const VerificationCenter = () => {
       // For now, we'll simulate the process
       setShowPhoneVerification(true);
       toast({
-        title: "Code envoyé",
+        title: 'Code envoyé',
         description: `Un code de vérification a été envoyé au ${phoneNumber}`,
       });
     } catch (error) {
       console.error('Error sending phone verification:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'envoyer le code de vérification",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
@@ -185,9 +194,9 @@ const VerificationCenter = () => {
   const verifyPhoneCode = async () => {
     if (!verificationCode || verificationCode.length !== 6) {
       toast({
-        title: "Code invalide",
-        description: "Veuillez saisir un code à 6 chiffres",
-        variant: "destructive"
+        title: 'Code invalide',
+        description: 'Veuillez saisir un code à 6 chiffres',
+        variant: 'destructive',
       });
       return;
     }
@@ -198,24 +207,21 @@ const VerificationCenter = () => {
 
       const { error } = await supabase
         .from('user_verifications')
-        .update({ 
+        .update({
           phone_verified: true,
-          verification_score: verificationStatus.verification_score + 25
+          verification_score: verificationStatus.verification_score + 25,
         })
         .eq('user_id', user.id);
 
       if (error) throw error;
 
       // Update profile with phone number
-      await supabase
-        .from('profiles')
-        .update({ phone: phoneNumber })
-        .eq('user_id', user.id);
+      await supabase.from('profiles').update({ phone: phoneNumber }).eq('user_id', user.id);
 
-      setVerificationStatus(prev => ({
+      setVerificationStatus((prev) => ({
         ...prev,
         phone_verified: true,
-        verification_score: prev.verification_score + 25
+        verification_score: prev.verification_score + 25,
       }));
 
       setShowPhoneVerification(false);
@@ -230,38 +236,41 @@ const VerificationCenter = () => {
       }
 
       toast({
-        title: "Téléphone vérifié",
-        description: "Votre numéro de téléphone a été vérifié avec succès",
+        title: 'Téléphone vérifié',
+        description: 'Votre numéro de téléphone a été vérifié avec succès',
       });
     } catch (error) {
       console.error('Error verifying phone:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de vérifier le téléphone",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de vérifier le téléphone',
+        variant: 'destructive',
       });
     }
   };
 
-  const uploadDocument = async (event: React.ChangeEvent<HTMLInputElement>, documentType: string) => {
+  const uploadDocument = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+    documentType: string
+  ) => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
 
     // Validate file
     if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
       toast({
-        title: "Format invalide",
-        description: "Seules les images et les PDFs sont acceptés",
-        variant: "destructive"
+        title: 'Format invalide',
+        description: 'Seules les images et les PDFs sont acceptés',
+        variant: 'destructive',
       });
       return;
     }
 
     if (file.size > 10 * 1024 * 1024) {
       toast({
-        title: "Fichier trop volumineux",
-        description: "La taille maximale est de 10 MB",
-        variant: "destructive"
+        title: 'Fichier trop volumineux',
+        description: 'La taille maximale est de 10 MB',
+        variant: 'destructive',
       });
       return;
     }
@@ -281,28 +290,29 @@ const VerificationCenter = () => {
 
       // Update verification documents
       const updatedDocuments = [...verificationStatus.verification_documents, fileName];
-      const newScore = documentType === 'id' 
-        ? verificationStatus.verification_score + 30
-        : verificationStatus.verification_score + 20;
+      const newScore =
+        documentType === 'id'
+          ? verificationStatus.verification_score + 30
+          : verificationStatus.verification_score + 20;
 
       const { error: updateError } = await supabase
         .from('user_verifications')
-        .update({ 
+        .update({
           verification_documents: updatedDocuments,
           verification_score: newScore,
           ...(documentType === 'id' && { id_verified: true }),
-          ...(documentType === 'family' && { family_verified: true })
+          ...(documentType === 'family' && { family_verified: true }),
         })
         .eq('user_id', user.id);
 
       if (updateError) throw updateError;
 
-      setVerificationStatus(prev => ({
+      setVerificationStatus((prev) => ({
         ...prev,
         verification_documents: updatedDocuments,
         verification_score: newScore,
         ...(documentType === 'id' && { id_verified: true }),
-        ...(documentType === 'family' && { family_verified: true })
+        ...(documentType === 'family' && { family_verified: true }),
       }));
 
       // Award ID verification badge if verified
@@ -316,15 +326,15 @@ const VerificationCenter = () => {
       }
 
       toast({
-        title: "Document téléchargé",
-        description: "Votre document est en cours de vérification",
+        title: 'Document téléchargé',
+        description: 'Votre document est en cours de vérification',
       });
     } catch (error) {
       console.error('Error uploading document:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de télécharger le document",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de télécharger le document',
+        variant: 'destructive',
       });
     } finally {
       setUploading(false);
@@ -338,7 +348,7 @@ const VerificationCenter = () => {
       description: 'Vérifiez votre adresse email',
       icon: Mail,
       status: verificationStatus.email_verified ? 'completed' : 'pending',
-      points: 20
+      points: 20,
     },
     {
       id: 'phone',
@@ -346,15 +356,15 @@ const VerificationCenter = () => {
       description: 'Confirmez votre numéro de téléphone',
       icon: Phone,
       status: verificationStatus.phone_verified ? 'completed' : 'pending',
-      points: 25
+      points: 25,
     },
     {
       id: 'identity',
-      title: 'Pièce d\'identité',
-      description: 'Téléchargez une pièce d\'identité officielle',
+      title: "Pièce d'identité",
+      description: "Téléchargez une pièce d'identité officielle",
       icon: IdCard,
       status: verificationStatus.id_verified ? 'completed' : 'pending',
-      points: 30
+      points: 30,
     },
     {
       id: 'family',
@@ -362,33 +372,33 @@ const VerificationCenter = () => {
       description: 'Document confirmant votre situation familiale',
       icon: Users,
       status: verificationStatus.family_verified ? 'completed' : 'pending',
-      points: 25
-    }
+      points: 25,
+    },
   ];
 
   const verificationSteps = getVerificationSteps();
-  const completedSteps = verificationSteps.filter(step => step.status === 'completed');
+  const completedSteps = verificationSteps.filter((step) => step.status === 'completed');
   const progress = (verificationStatus.verification_score / 100) * 100;
 
   const getVerificationBadge = () => {
     const score = verificationStatus.verification_score;
     if (score >= 80) {
-      return { 
-        label: 'Profil Vérifié', 
-        color: 'bg-emerald text-primary-foreground', 
-        icon: ShieldCheck 
+      return {
+        label: 'Profil Vérifié',
+        color: 'bg-emerald text-primary-foreground',
+        icon: ShieldCheck,
       };
     } else if (score >= 50) {
-      return { 
-        label: 'Partiellement Vérifié', 
-        color: 'bg-gold text-primary-foreground', 
-        icon: Shield 
+      return {
+        label: 'Partiellement Vérifié',
+        color: 'bg-gold text-primary-foreground',
+        icon: Shield,
       };
     } else {
-      return { 
-        label: 'Non Vérifié', 
-        color: 'bg-muted text-muted-foreground', 
-        icon: ShieldAlert 
+      return {
+        label: 'Non Vérifié',
+        color: 'bg-muted text-muted-foreground',
+        icon: ShieldAlert,
       };
     }
   };
@@ -434,14 +444,16 @@ const VerificationCenter = () => {
               </div>
               <Progress value={progress} className="w-full" />
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="text-center">
                 <div className="text-2xl font-bold text-emerald">{completedSteps.length}</div>
                 <div className="text-muted-foreground">Étapes complétées</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gold">{verificationSteps.length - completedSteps.length}</div>
+                <div className="text-2xl font-bold text-gold">
+                  {verificationSteps.length - completedSteps.length}
+                </div>
                 <div className="text-muted-foreground">Étapes restantes</div>
               </div>
             </div>
@@ -454,10 +466,10 @@ const VerificationCenter = () => {
         {verificationSteps.map((step) => {
           const StepIcon = step.icon;
           const isCompleted = step.status === 'completed';
-          
+
           return (
-            <Card 
-              key={step.id} 
+            <Card
+              key={step.id}
               className={`transition-colors ${
                 isCompleted ? 'border-emerald/20 bg-emerald/5' : 'border-border'
               }`}
@@ -465,16 +477,18 @@ const VerificationCenter = () => {
               <CardContent className="p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-full ${
-                      isCompleted ? 'bg-emerald text-primary-foreground' : 'bg-muted'
-                    }`}>
+                    <div
+                      className={`p-3 rounded-full ${
+                        isCompleted ? 'bg-emerald text-primary-foreground' : 'bg-muted'
+                      }`}
+                    >
                       {isCompleted ? (
                         <CheckCircle className="h-6 w-6" />
                       ) : (
                         <StepIcon className="h-6 w-6" />
                       )}
                     </div>
-                    
+
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="font-semibold text-lg">{step.title}</h3>
@@ -488,15 +502,18 @@ const VerificationCenter = () => {
                         )}
                       </div>
                       <p className="text-muted-foreground mb-4">{step.description}</p>
-                      
+
                       {/* Step-specific content */}
                       {step.id === 'email' && !isCompleted && (
-                        <Button onClick={sendEmailVerification} className="bg-emerald hover:bg-emerald-dark">
+                        <Button
+                          onClick={sendEmailVerification}
+                          className="bg-emerald hover:bg-emerald-dark"
+                        >
                           <Mail className="h-4 w-4 mr-2" />
                           Renvoyer l'email de vérification
                         </Button>
                       )}
-                      
+
                       {step.id === 'phone' && !isCompleted && (
                         <div className="space-y-3">
                           {!showPhoneVerification ? (
@@ -507,7 +524,10 @@ const VerificationCenter = () => {
                                 onChange={(e) => setPhoneNumber(e.target.value)}
                                 className="flex-1"
                               />
-                              <Button onClick={sendPhoneVerification} className="bg-emerald hover:bg-emerald-dark">
+                              <Button
+                                onClick={sendPhoneVerification}
+                                className="bg-emerald hover:bg-emerald-dark"
+                              >
                                 <Phone className="h-4 w-4 mr-2" />
                                 Envoyer le code
                               </Button>
@@ -523,7 +543,10 @@ const VerificationCenter = () => {
                                   maxLength={6}
                                   className="flex-1"
                                 />
-                                <Button onClick={verifyPhoneCode} className="bg-emerald hover:bg-emerald-dark">
+                                <Button
+                                  onClick={verifyPhoneCode}
+                                  className="bg-emerald hover:bg-emerald-dark"
+                                >
                                   Vérifier
                                 </Button>
                               </div>
@@ -531,14 +554,13 @@ const VerificationCenter = () => {
                           )}
                         </div>
                       )}
-                      
+
                       {(step.id === 'identity' || step.id === 'family') && !isCompleted && (
                         <div className="space-y-2">
                           <Label>
-                            {step.id === 'identity' 
-                              ? 'Carte d\'identité, passeport ou permis de conduire'
-                              : 'Document familial (livret de famille, etc.)'
-                            }
+                            {step.id === 'identity'
+                              ? "Carte d'identité, passeport ou permis de conduire"
+                              : 'Document familial (livret de famille, etc.)'}
                           </Label>
                           <div className="flex items-center gap-2">
                             <Input

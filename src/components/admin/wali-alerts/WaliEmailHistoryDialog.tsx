@@ -8,7 +8,11 @@ import {
 } from '@/components/ui/dialog';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useWaliEmailHistory, WaliEmailStats, WaliEmailHistoryItem } from '@/hooks/useWaliEmailHistory';
+import {
+  useWaliEmailHistory,
+  WaliEmailStats,
+  WaliEmailHistoryItem,
+} from '@/hooks/useWaliEmailHistory';
 import { Mail, Table as TableIcon } from 'lucide-react';
 import WaliEmailHistoryTable from './WaliEmailHistoryTable';
 import WaliEmailHistoryFilters, { EmailFilters } from './WaliEmailHistoryFilters';
@@ -24,7 +28,7 @@ export const WaliEmailHistoryDialog = ({
   open,
   onOpenChange,
   waliUserId,
-  waliName
+  waliName,
 }: WaliEmailHistoryDialogProps) => {
   const { getEmailHistory, getEmailStats, loading } = useWaliEmailHistory();
   const [history, setHistory] = useState<WaliEmailHistoryItem[]>([]);
@@ -34,7 +38,7 @@ export const WaliEmailHistoryDialog = ({
     status: 'all',
     emailType: 'all',
     sortBy: 'date',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
   });
 
   useEffect(() => {
@@ -46,7 +50,7 @@ export const WaliEmailHistoryDialog = ({
   const loadData = async () => {
     const [historyData, statsData] = await Promise.all([
       getEmailHistory(waliUserId),
-      getEmailStats(waliUserId)
+      getEmailStats(waliUserId),
     ]);
     setHistory(historyData);
     setStats(statsData);
@@ -58,7 +62,7 @@ export const WaliEmailHistoryDialog = ({
       status: 'all',
       emailType: 'all',
       sortBy: 'date',
-      sortOrder: 'desc'
+      sortOrder: 'desc',
     });
   };
 
@@ -77,16 +81,17 @@ export const WaliEmailHistoryDialog = ({
     // Search filter
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
-      filtered = filtered.filter(email =>
-        email.subject.toLowerCase().includes(searchLower) ||
-        email.message_content.toLowerCase().includes(searchLower) ||
-        email.sender_name.toLowerCase().includes(searchLower)
+      filtered = filtered.filter(
+        (email) =>
+          email.subject.toLowerCase().includes(searchLower) ||
+          email.message_content.toLowerCase().includes(searchLower) ||
+          email.sender_name.toLowerCase().includes(searchLower)
       );
     }
 
     // Status filter
     if (filters.status !== 'all') {
-      filtered = filtered.filter(email => {
+      filtered = filtered.filter((email) => {
         const effectiveStatus = getEffectiveStatus(email);
         return effectiveStatus === filters.status;
       });
@@ -94,21 +99,17 @@ export const WaliEmailHistoryDialog = ({
 
     // Email type filter
     if (filters.emailType !== 'all') {
-      filtered = filtered.filter(email => email.email_type === filters.emailType);
+      filtered = filtered.filter((email) => email.email_type === filters.emailType);
     }
 
     // Date range filter
     if (filters.dateFrom) {
-      filtered = filtered.filter(email => 
-        new Date(email.sent_at) >= filters.dateFrom!
-      );
+      filtered = filtered.filter((email) => new Date(email.sent_at) >= filters.dateFrom!);
     }
     if (filters.dateTo) {
       const endOfDay = new Date(filters.dateTo);
       endOfDay.setHours(23, 59, 59, 999);
-      filtered = filtered.filter(email => 
-        new Date(email.sent_at) <= endOfDay
-      );
+      filtered = filtered.filter((email) => new Date(email.sent_at) <= endOfDay);
     }
 
     // Sort
@@ -190,10 +191,13 @@ export const WaliEmailHistoryDialog = ({
             <div className="mt-4 mb-2 flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
                 {filteredEmails.length === history.length ? (
-                  <span>{filteredEmails.length} email{filteredEmails.length > 1 ? 's' : ''}</span>
+                  <span>
+                    {filteredEmails.length} email{filteredEmails.length > 1 ? 's' : ''}
+                  </span>
                 ) : (
                   <span>
-                    {filteredEmails.length} résultat{filteredEmails.length > 1 ? 's' : ''} sur {history.length} email{history.length > 1 ? 's' : ''}
+                    {filteredEmails.length} résultat{filteredEmails.length > 1 ? 's' : ''} sur{' '}
+                    {history.length} email{history.length > 1 ? 's' : ''}
                   </span>
                 )}
               </p>

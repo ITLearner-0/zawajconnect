@@ -45,9 +45,10 @@ Deno.serve(async (req) => {
     }
 
     // Get user email from auth
-    const { data: { user }, error: userError } = await supabaseClient.auth.admin.getUserById(
-      registration.user_id
-    );
+    const {
+      data: { user },
+      error: userError,
+    } = await supabaseClient.auth.admin.getUserById(registration.user_id);
 
     if (userError || !user?.email) {
       console.error('Error fetching user:', userError);
@@ -141,12 +142,16 @@ Deno.serve(async (req) => {
                 
                 <p>Nous vous informons que votre candidature en tant que Wali n'a pas pu être approuvée pour le moment.</p>
                 
-                ${rejection_reason ? `
+                ${
+                  rejection_reason
+                    ? `
                   <div class="reason-box">
                     <strong>Raison :</strong><br>
                     ${rejection_reason}
                   </div>
-                ` : ''}
+                `
+                    : ''
+                }
                 
                 <p><strong>Prochaines étapes :</strong></p>
                 <ul>
@@ -183,10 +188,10 @@ Deno.serve(async (req) => {
     console.log('Wali status notification sent successfully to:', user.email);
 
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         message: 'Notification sent successfully',
-        email: user.email 
+        email: user.email,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -196,9 +201,9 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Error sending Wali status notification:', error);
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error.message || 'Failed to send notification',
-        details: error.toString()
+        details: error.toString(),
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -119,10 +119,7 @@ export const useWaliFilters = () => {
 
   const deleteFilter = async (id: string): Promise<boolean> => {
     try {
-      const { error } = await (supabase as any)
-        .from('wali_saved_filters')
-        .delete()
-        .eq('id', id);
+      const { error } = await (supabase as any).from('wali_saved_filters').delete().eq('id', id);
 
       if (error) throw error;
 

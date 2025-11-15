@@ -9,8 +9,8 @@ export interface IslamicGuidanceData {
 export const islamicGuidanceDatabase: IslamicGuidanceData[] = [];
 
 export const getGuidanceByCategory = (categories: string[]): IslamicGuidanceData[] => {
-  return islamicGuidanceDatabase.filter(guidance => 
-    guidance.category.some(cat => categories.includes(cat))
+  return islamicGuidanceDatabase.filter((guidance) =>
+    guidance.category.some((cat) => categories.includes(cat))
   );
 };
 

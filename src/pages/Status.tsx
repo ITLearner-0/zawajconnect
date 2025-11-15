@@ -1,13 +1,21 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { CheckCircle2, XCircle, AlertCircle, RefreshCw, Database, Server, GitBranch } from "lucide-react";
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import {
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  RefreshCw,
+  Database,
+  Server,
+  GitBranch,
+} from 'lucide-react';
 
 interface HealthCheck {
   name: string;
-  status: "success" | "error" | "warning" | "checking";
+  status: 'success' | 'error' | 'warning' | 'checking';
   message: string;
   responseTime?: number;
 }
@@ -26,42 +34,44 @@ const Status = () => {
     try {
       const { error } = await supabase.auth.getSession();
       const responseTime = Date.now() - supabaseStart;
-      
+
       if (error) {
         newChecks.push({
-          name: "Connexion Supabase",
-          status: "error",
+          name: 'Connexion Supabase',
+          status: 'error',
           message: `Erreur: ${error.message}`,
           responseTime,
         });
       } else {
         newChecks.push({
-          name: "Connexion Supabase",
-          status: "success",
-          message: "Connecté et opérationnel",
+          name: 'Connexion Supabase',
+          status: 'success',
+          message: 'Connecté et opérationnel',
           responseTime,
         });
       }
     } catch (error) {
       newChecks.push({
-        name: "Connexion Supabase",
-        status: "error",
+        name: 'Connexion Supabase',
+        status: 'error',
         message: `Impossible de se connecter: ${error}`,
       });
     }
 
     // 2. Vérifier l'authentification
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       newChecks.push({
         name: "Service d'authentification",
-        status: "success",
-        message: session ? "Session active" : "Service disponible (non connecté)",
+        status: 'success',
+        message: session ? 'Session active' : 'Service disponible (non connecté)',
       });
     } catch (error) {
       newChecks.push({
         name: "Service d'authentification",
-        status: "error",
+        status: 'error',
         message: `Erreur auth: ${error}`,
       });
     }
@@ -70,18 +80,19 @@ const Status = () => {
     try {
       const response = await fetch(`https://dgfctwtivkqcfhwqgkya.supabase.co/rest/v1/`, {
         headers: {
-          'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDU5OTYsImV4cCI6MjA3MjU4MTk5Nn0.3W530G6H6EO5bLXyd-NWgHQche1Y2Tf-WC00U8LQOdw'
-        }
+          apikey:
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRnZmN0d3RpdmtxY2Zod3Fna3lhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwMDU5OTYsImV4cCI6MjA3MjU4MTk5Nn0.3W530G6H6EO5bLXyd-NWgHQche1Y2Tf-WC00U8LQOdw',
+        },
       });
       newChecks.push({
-        name: "API REST Supabase",
-        status: response.ok ? "success" : "warning",
-        message: response.ok ? "API REST opérationnelle" : `HTTP ${response.status}`,
+        name: 'API REST Supabase',
+        status: response.ok ? 'success' : 'warning',
+        message: response.ok ? 'API REST opérationnelle' : `HTTP ${response.status}`,
       });
     } catch (error) {
       newChecks.push({
-        name: "API REST Supabase",
-        status: "error",
+        name: 'API REST Supabase',
+        status: 'error',
         message: `Erreur API: ${error}`,
       });
     }
@@ -91,21 +102,21 @@ const Status = () => {
       const { data, error } = await supabase.storage.listBuckets();
       if (error) {
         newChecks.push({
-          name: "Supabase Storage",
-          status: "warning",
+          name: 'Supabase Storage',
+          status: 'warning',
           message: `Erreur storage: ${error.message}`,
         });
       } else {
         newChecks.push({
-          name: "Supabase Storage",
-          status: "success",
+          name: 'Supabase Storage',
+          status: 'success',
           message: `${data?.length || 0} bucket(s) disponible(s)`,
         });
       }
     } catch (error) {
       newChecks.push({
-        name: "Supabase Storage",
-        status: "error",
+        name: 'Supabase Storage',
+        status: 'error',
         message: `Erreur: ${error}`,
       });
     }
@@ -119,39 +130,48 @@ const Status = () => {
     runHealthChecks();
   }, []);
 
-  const getStatusIcon = (status: HealthCheck["status"]) => {
+  const getStatusIcon = (status: HealthCheck['status']) => {
     switch (status) {
-      case "success":
+      case 'success':
         return <CheckCircle2 className="h-5 w-5 text-green-500" />;
-      case "error":
+      case 'error':
         return <XCircle className="h-5 w-5 text-red-500" />;
-      case "warning":
+      case 'warning':
         return <AlertCircle className="h-5 w-5 text-yellow-500" />;
-      case "checking":
+      case 'checking':
         return <RefreshCw className="h-5 w-5 text-blue-500 animate-spin" />;
     }
   };
 
-  const getStatusBadge = (status: HealthCheck["status"]) => {
+  const getStatusBadge = (status: HealthCheck['status']) => {
     switch (status) {
-      case "success":
-        return <Badge variant="default" className="bg-green-500">Opérationnel</Badge>;
-      case "error":
+      case 'success':
+        return (
+          <Badge variant="default" className="bg-green-500">
+            Opérationnel
+          </Badge>
+        );
+      case 'error':
         return <Badge variant="destructive">Erreur</Badge>;
-      case "warning":
-        return <Badge variant="secondary" className="bg-yellow-500">Avertissement</Badge>;
-      case "checking":
+      case 'warning':
+        return (
+          <Badge variant="secondary" className="bg-yellow-500">
+            Avertissement
+          </Badge>
+        );
+      case 'checking':
         return <Badge variant="outline">Vérification...</Badge>;
     }
   };
 
-  const overallStatus = checks.length === 0 
-    ? "checking" 
-    : checks.every(c => c.status === "success") 
-    ? "success" 
-    : checks.some(c => c.status === "error") 
-    ? "error" 
-    : "warning";
+  const overallStatus =
+    checks.length === 0
+      ? 'checking'
+      : checks.every((c) => c.status === 'success')
+        ? 'success'
+        : checks.some((c) => c.status === 'error')
+          ? 'error'
+          : 'warning';
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -175,16 +195,9 @@ const Status = () => {
           <CardContent>
             <div className="flex items-center justify-between">
               <div className="text-sm text-muted-foreground">
-                {lastCheck && (
-                  <p>Dernière vérification: {lastCheck.toLocaleString('fr-FR')}</p>
-                )}
+                {lastCheck && <p>Dernière vérification: {lastCheck.toLocaleString('fr-FR')}</p>}
               </div>
-              <Button
-                onClick={runHealthChecks}
-                disabled={isChecking}
-                variant="outline"
-                size="sm"
-              >
+              <Button onClick={runHealthChecks} disabled={isChecking} variant="outline" size="sm">
                 <RefreshCw className={`h-4 w-4 mr-2 ${isChecking ? 'animate-spin' : ''}`} />
                 Actualiser
               </Button>
@@ -217,9 +230,7 @@ const Status = () => {
                       {getStatusIcon(check.status)}
                       <div className="flex-1">
                         <h4 className="font-medium">{check.name}</h4>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {check.message}
-                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">{check.message}</p>
                       </div>
                     </div>
                     {check.responseTime && (
@@ -268,7 +279,8 @@ const Status = () => {
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-muted-foreground text-center">
-              Cette page permet de vérifier l'état de santé de l'application après chaque déploiement.
+              Cette page permet de vérifier l'état de santé de l'application après chaque
+              déploiement.
               <br />
               Pour signaler un problème, contactez l'équipe technique.
             </p>

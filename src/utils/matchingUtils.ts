@@ -1,18 +1,11 @@
 import { supabase } from '@/integrations/supabase/client';
 import type { PostgrestError } from '@supabase/supabase-js';
-import type {
-  ProfileRow,
-  UserMatchingRole,
-  FetchMatchingProfilesOptions
-} from '@/types/supabase';
+import type { ProfileRow, UserMatchingRole, FetchMatchingProfilesOptions } from '@/types/supabase';
 
 /**
  * Re-export types for backwards compatibility
  */
-export type {
-  UserMatchingRole,
-  FetchMatchingProfilesOptions
-};
+export type { UserMatchingRole, FetchMatchingProfilesOptions };
 
 /**
  * Utility function to get Wali user IDs that should be excluded from matching
@@ -57,7 +50,7 @@ export const getOppositeGender = async (userId: string): Promise<string | undefi
 
     const gender = currentUserProfile?.gender ?? undefined;
     if (!gender) return undefined;
-    
+
     return gender === 'male' ? 'female' : 'male';
   } catch (error) {
     console.error('Error fetching user gender:', error as PostgrestError);
@@ -68,24 +61,24 @@ export const getOppositeGender = async (userId: string): Promise<string | undefi
 /**
  * Enhanced function to fetch profiles for matching, excluding:
  * - Current user
- * - Same gender users  
+ * - Same gender users
  * - Wali/supervisors (they are not candidates)
  */
 export const fetchMatchingProfiles = async (
-  userId: string, 
+  userId: string,
   options: FetchMatchingProfilesOptions = {}
 ): Promise<ProfileRow[]> => {
-  const { 
-    limit = 50, 
+  const {
+    limit = 50,
     select = '*',
-    orderBy = { column: 'created_at', ascending: false }
+    orderBy = { column: 'created_at', ascending: false },
   } = options;
 
   try {
     // Get opposite gender and Wali IDs in parallel
     const [oppositeGender, waliUserIds] = await Promise.all([
       getOppositeGender(userId),
-      getWaliUserIds()
+      getWaliUserIds(),
     ]);
 
     if (!oppositeGender) {
@@ -112,10 +105,9 @@ export const fetchMatchingProfiles = async (
     if (error) {
       throw error as PostgrestError;
     }
-    
+
     // Cast data as unknown first to safely convert to ProfileRow[]
     return (data ?? []) as unknown as ProfileRow[];
-
   } catch (error) {
     console.error('Error fetching matching profiles:', error as PostgrestError);
     throw error;
@@ -153,31 +145,33 @@ export const getUserMatchingRole = async (userId: string): Promise<UserMatchingR
   try {
     const [isWali, profile] = await Promise.all([
       isUserWali(userId),
-      supabase.from('profiles').select('gender, age, bio').eq('user_id', userId).maybeSingle()
+      supabase.from('profiles').select('gender, age, bio').eq('user_id', userId).maybeSingle(),
     ]);
 
     if (profile.error) {
       throw profile.error as PostgrestError;
     }
 
-    const profileData = profile.data ? {
-      gender: profile.data.gender ?? undefined,
-      age: profile.data.age ?? undefined,
-      bio: profile.data.bio ?? undefined
-    } : undefined;
+    const profileData = profile.data
+      ? {
+          gender: profile.data.gender ?? undefined,
+          age: profile.data.age ?? undefined,
+          bio: profile.data.bio ?? undefined,
+        }
+      : undefined;
 
     const hasCompleteProfile = Boolean(
-      profileData && 
-      profileData.age !== undefined && 
-      profileData.gender !== undefined && 
-      profileData.bio
+      profileData &&
+        profileData.age !== undefined &&
+        profileData.gender !== undefined &&
+        profileData.bio
     );
 
     return {
       isWali,
       hasCompleteProfile,
       canBeMatched: hasCompleteProfile && !isWali, // Only users with complete profiles who are not Walis can be matched
-      profile: profileData
+      profile: profileData,
     };
   } catch (error) {
     console.error('Error getting user matching role:', error as PostgrestError);
@@ -185,7 +179,7 @@ export const getUserMatchingRole = async (userId: string): Promise<UserMatchingR
       isWali: false,
       hasCompleteProfile: false,
       canBeMatched: false,
-      profile: undefined
+      profile: undefined,
     };
   }
 };

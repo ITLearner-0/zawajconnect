@@ -1,7 +1,6 @@
-
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { User } from "@supabase/supabase-js";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User } from '@supabase/supabase-js';
 
 interface UseAuthRedirectProps {
   user: User | null;
@@ -10,11 +9,11 @@ interface UseAuthRedirectProps {
   redirectFrom?: string;
 }
 
-export const useAuthRedirect = ({ 
-  user, 
-  loading, 
-  redirectTo = "/profile", 
-  redirectFrom = "/auth" 
+export const useAuthRedirect = ({
+  user,
+  loading,
+  redirectTo = '/profile',
+  redirectFrom = '/auth',
 }: UseAuthRedirectProps) => {
   const navigate = useNavigate();
 

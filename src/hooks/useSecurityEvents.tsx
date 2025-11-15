@@ -37,7 +37,7 @@ export const useSecurityEvents = () => {
         p_event_type: eventType,
         p_severity: severity,
         p_description: description,
-        p_metadata: metadata as any
+        p_metadata: metadata as any,
       });
 
       if (error) throw error;
@@ -45,10 +45,10 @@ export const useSecurityEvents = () => {
       // Show critical alerts to user
       if (severity === 'critical' || severity === 'high') {
         toast({
-          title: "Alerte de sécurité",
+          title: 'Alerte de sécurité',
           description: description,
-          variant: "destructive",
-          duration: 10000
+          variant: 'destructive',
+          duration: 10000,
         });
       }
 
@@ -76,18 +76,20 @@ export const useSecurityEvents = () => {
       }
 
       const normalizedData = data ?? [];
-      setEvents(normalizedData.map(event => ({
-        id: event.id,
-        user_id: event.user_id ?? '',
-        event_type: event.event_type,
-        severity: event.severity,
-        description: event.description,
-        metadata: (event.metadata as Record<string, unknown> | null) ?? {},
-        ip_address: (event.ip_address as string | null) ?? undefined,
-        user_agent: event.user_agent ?? undefined,
-        resolved: !!event.resolved,
-        created_at: event.created_at ?? new Date().toISOString()
-      })));
+      setEvents(
+        normalizedData.map((event) => ({
+          id: event.id,
+          user_id: event.user_id ?? '',
+          event_type: event.event_type,
+          severity: event.severity,
+          description: event.description,
+          metadata: (event.metadata as Record<string, unknown> | null) ?? {},
+          ip_address: (event.ip_address as string | null) ?? undefined,
+          user_agent: event.user_agent ?? undefined,
+          resolved: !!event.resolved,
+          created_at: event.created_at ?? new Date().toISOString(),
+        }))
+      );
     } catch (error) {
       console.error('Failed to load security events:', error);
     } finally {
@@ -102,7 +104,7 @@ export const useSecurityEvents = () => {
     const metadata: Record<string, unknown> = {
       user_agent: navigator.userAgent,
       timestamp: new Date().toISOString(),
-      url: window.location.href
+      url: window.location.href,
     };
 
     // Check for rapid requests
@@ -111,11 +113,13 @@ export const useSecurityEvents = () => {
     const now = Date.now();
     const lastRequest = parseInt(requestTimestamp);
 
-    if (now - lastRequest < 60000) { // Within 1 minute
+    if (now - lastRequest < 60000) {
+      // Within 1 minute
       const count = parseInt(requestCount) + 1;
       sessionStorage.setItem('request_count', count.toString());
-      
-      if (count > 30) { // More than 30 requests per minute
+
+      if (count > 30) {
+        // More than 30 requests per minute
         await logSecurityEvent(
           'suspicious_activity',
           'high',
@@ -141,6 +145,6 @@ export const useSecurityEvents = () => {
     loading,
     logSecurityEvent,
     loadSecurityEvents,
-    checkSuspiciousActivity
+    checkSuspiciousActivity,
   };
 };

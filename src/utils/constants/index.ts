@@ -1,4 +1,3 @@
-
 // Application-wide constants for better maintainability
 export const APP_CONSTANTS = {
   // Compatibility scoring

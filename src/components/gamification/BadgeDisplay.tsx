@@ -32,9 +32,7 @@ const BadgeDisplay = ({ userId, compact = false }: BadgeDisplayProps) => {
         <CardContent className="py-12 text-center">
           <Award className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
           <CardTitle className="mb-2">No Badges Yet</CardTitle>
-          <CardDescription>
-            Complete achievements to earn your first badge!
-          </CardDescription>
+          <CardDescription>Complete achievements to earn your first badge!</CardDescription>
         </CardContent>
       </Card>
     );
@@ -67,18 +65,14 @@ const BadgeDisplay = ({ userId, compact = false }: BadgeDisplayProps) => {
               <Award className="h-5 w-5" />
               Your Achievements
             </CardTitle>
-            <CardDescription>
-              {getTotalBadges()} badges earned
-            </CardDescription>
+            <CardDescription>{getTotalBadges()} badges earned</CardDescription>
           </div>
         </div>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="all" className="w-full">
           <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="all">
-              All ({getTotalBadges()})
-            </TabsTrigger>
+            <TabsTrigger value="all">All ({getTotalBadges()})</TabsTrigger>
             <TabsTrigger value="legendary" className="gap-1">
               <Crown className="h-3 w-3" />
               {categorizedBadges.legendary.length}

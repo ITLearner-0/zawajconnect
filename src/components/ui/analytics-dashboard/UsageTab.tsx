@@ -1,14 +1,7 @@
-
 import React from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
-import { 
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer
-} from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { APP_CONSTANTS } from '@/utils/helpers';
 import { UsagePattern } from '@/hooks/useLazyLoading/services/analyticsService';
 
@@ -42,7 +35,14 @@ const UsageTab = ({ usagePatterns }: UsageTabProps) => {
                     label
                   >
                     {deviceTypeData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={APP_CONSTANTS.COLORS.CHART_COLORS[index % APP_CONSTANTS.COLORS.CHART_COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={
+                          APP_CONSTANTS.COLORS.CHART_COLORS[
+                            index % APP_CONSTANTS.COLORS.CHART_COLORS.length
+                          ]
+                        }
+                      />
                     ))}
                   </Pie>
                   <Tooltip />
@@ -71,9 +71,7 @@ const UsageTab = ({ usagePatterns }: UsageTabProps) => {
             </div>
           </>
         ) : (
-          <div className="text-center py-8 text-gray-500">
-            No usage patterns data available yet
-          </div>
+          <div className="text-center py-8 text-gray-500">No usage patterns data available yet</div>
         )}
       </div>
     </ScrollArea>

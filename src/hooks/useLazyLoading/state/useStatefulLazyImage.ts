@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useRef } from 'react';
 import { useCentralizedLazyLoading } from './useCentralizedLazyLoading';
 
@@ -48,25 +47,31 @@ export const useStatefulLazyImage = (options: UseStatefulLazyImageOptions) => {
   });
 
   // Handle image loading
-  const handleImageLoad = useCallback((event: React.SyntheticEvent<HTMLImageElement>) => {
-    markAsLoaded();
-    setRetryCount(0);
-  }, [markAsLoaded]);
+  const handleImageLoad = useCallback(
+    (event: React.SyntheticEvent<HTMLImageElement>) => {
+      markAsLoaded();
+      setRetryCount(0);
+    },
+    [markAsLoaded]
+  );
 
   // Handle image error with retry logic
   const handleImageError = useCallback(() => {
     if (enableRetry && retryCount < maxRetries) {
-      setTimeout(() => {
-        setRetryCount(prev => prev + 1);
-        setActualSrc(`${src}?retry=${retryCount + 1}`);
-      }, globalState.retryDelay * Math.pow(2, retryCount)); // Exponential backoff
+      setTimeout(
+        () => {
+          setRetryCount((prev) => prev + 1);
+          setActualSrc(`${src}?retry=${retryCount + 1}`);
+        },
+        globalState.retryDelay * Math.pow(2, retryCount)
+      ); // Exponential backoff
     } else {
       markAsFailed();
     }
   }, [enableRetry, retryCount, maxRetries, src, markAsFailed, globalState.retryDelay]);
 
   // Update src when should load changes
-  const effectiveSrc = shouldLoad ? (actualSrc || src) : '';
+  const effectiveSrc = shouldLoad ? actualSrc || src : '';
 
   return {
     elementRef,
@@ -84,9 +89,10 @@ export const useStatefulLazyImage = (options: UseStatefulLazyImageOptions) => {
       totalImages: globalState.totalImages,
       loadedImages: globalState.loadedImages,
       queueLength: globalState.loadingQueue.length,
-      successRate: globalState.totalImages > 0 
-        ? (globalState.loadedImages / globalState.totalImages) * 100 
-        : 0,
+      successRate:
+        globalState.totalImages > 0
+          ? (globalState.loadedImages / globalState.totalImages) * 100
+          : 0,
     },
   };
 };

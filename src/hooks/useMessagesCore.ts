@@ -1,4 +1,3 @@
-
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { Conversation } from '@/types/profile';
 import { useConversations } from './useConversations';
@@ -13,16 +12,16 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
   // Use refs to track previous values and prevent unnecessary updates
   const prevConversationId = useRef(conversationId);
   const prevCurrentUserId = useRef(currentUserId);
-  const errorsRef = useRef<{ 
-    conversations: string | null; 
+  const errorsRef = useRef<{
+    conversations: string | null;
     messages: string | null;
-    videoCall: string | null; 
-    monitoring: string | null 
+    videoCall: string | null;
+    monitoring: string | null;
   }>({
     conversations: null,
     messages: null,
     videoCall: null,
-    monitoring: null
+    monitoring: null,
   });
 
   const [errors, setErrors] = useState(errorsRef.current);
@@ -35,20 +34,29 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
   }, []);
 
   // Import all required hooks with stable parameters
-  const { 
-    conversations, 
-    currentConversation, 
+  const {
+    conversations,
+    currentConversation,
     setCurrentConversation,
     loadCurrentConversation,
     loading: conversationsLoading,
-    error: conversationsError
+    error: conversationsError,
   } = useConversations(currentUserId || null);
-  
+
   const { encryptionEnabled, toggleEncryption } = useMessageEncryption(conversationId);
   const { retentionPolicy, updateRetentionPolicy } = useMessageRetention(conversationId);
-  const { videoCallStatus, startVideoCall, endVideoCall } = useVideoCall(conversationId, currentUserId);
-  const { latestReport, monitoringEnabled, toggleMonitoring, loading: monitoringLoading, error: monitoringError } = useAIMonitoring(conversationId);
-  
+  const { videoCallStatus, startVideoCall, endVideoCall } = useVideoCall(
+    conversationId,
+    currentUserId
+  );
+  const {
+    latestReport,
+    monitoringEnabled,
+    toggleMonitoring,
+    loading: monitoringLoading,
+    error: monitoringError,
+  } = useAIMonitoring(conversationId);
+
   const {
     messages,
     loading: messagesLoading,
@@ -57,7 +65,7 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
     sendingMessage,
     messageInput,
     setMessageInput,
-    sendMessage: sendMessageBase
+    sendMessage: sendMessageBase,
   } = useMessageHandling(conversationId, currentUserId);
 
   const { violations } = useMessageModeration(conversationId, messages, currentUserId ?? null);
@@ -93,7 +101,7 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
     }
   }, [sendMessageBase]);
 
-  // Stable fetch messages function  
+  // Stable fetch messages function
   const stableFetchMessages = useCallback(() => {
     return fetchMessages(encryptionEnabled);
   }, [fetchMessages, encryptionEnabled]);
@@ -106,7 +114,7 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
     conversations,
     currentConversation,
     loadCurrentConversation,
-    
+
     // Messages
     messages,
     loading,
@@ -115,31 +123,31 @@ export const useMessagesCore = (conversationId?: string, currentUserId?: string 
     messageInput,
     setMessageInput,
     sendMessage,
-    
+
     // Combined errors with proper typing
     errors: {
       conversations: errorsRef.current.conversations,
       messages: messageErrors.messages,
       videoCall: errorsRef.current.videoCall,
-      monitoring: errorsRef.current.monitoring
+      monitoring: errorsRef.current.monitoring,
     },
-    
+
     // Video call
     videoCallStatus,
     startVideoCall,
     endVideoCall,
-    
+
     // AI monitoring
     violations,
     latestReport,
     monitoringEnabled,
     toggleMonitoring,
     monitoringLoading,
-    
+
     // Encryption and retention
     encryptionEnabled,
     toggleEncryption,
     retentionPolicy,
-    updateRetentionPolicy
+    updateRetentionPolicy,
   };
 };

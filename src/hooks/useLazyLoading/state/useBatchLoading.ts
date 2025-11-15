@@ -1,4 +1,3 @@
-
 import { useEffect, useCallback, useRef } from 'react';
 import { useLazyLoadingContext } from '../context/LazyLoadingContext';
 
@@ -10,11 +9,7 @@ interface UseBatchLoadingOptions {
 
 export const useBatchLoading = (options: UseBatchLoadingOptions = {}) => {
   const { state, actions } = useLazyLoadingContext();
-  const {
-    batchSize = state.batchSize,
-    batchDelay = 100,
-    enablePriorityQueue = true,
-  } = options;
+  const { batchSize = state.batchSize, batchDelay = 100, enablePriorityQueue = true } = options;
 
   const processingRef = useRef(false);
   const timeoutRef = useRef<NodeJS.Timeout>();
@@ -27,13 +22,11 @@ export const useBatchLoading = (options: UseBatchLoadingOptions = {}) => {
 
     // Sort queue by priority if enabled
     const queueToProcess = [...state.loadingQueue];
-    
+
     if (enablePriorityQueue) {
       queueToProcess.sort((a, b) => {
-        const aPriority = a.includes('high-priority') ? 3 : 
-                        a.includes('medium-priority') ? 2 : 1;
-        const bPriority = b.includes('high-priority') ? 3 : 
-                        b.includes('medium-priority') ? 2 : 1;
+        const aPriority = a.includes('high-priority') ? 3 : a.includes('medium-priority') ? 2 : 1;
+        const bPriority = b.includes('high-priority') ? 3 : b.includes('medium-priority') ? 2 : 1;
         return bPriority - aPriority;
       });
     }
@@ -54,13 +47,12 @@ export const useBatchLoading = (options: UseBatchLoadingOptions = {}) => {
 
     setTimeout(() => {
       processingRef.current = false;
-      
+
       // Schedule next batch if queue still has items
       if (state.loadingQueue.length > currentBatch.length) {
         timeoutRef.current = setTimeout(processBatch, batchDelay);
       }
     }, batchDelay);
-
   }, [state.loadingQueue, batchSize, batchDelay, enablePriorityQueue, state.enableDebug]);
 
   // Trigger batch processing when queue changes
@@ -80,9 +72,12 @@ export const useBatchLoading = (options: UseBatchLoadingOptions = {}) => {
   }, [state.loadingQueue.length, processBatch, batchDelay]);
 
   // Update batch size dynamically
-  const updateBatchSize = useCallback((newSize: number) => {
-    actions.updateConfig({ batchSize: newSize });
-  }, [actions]);
+  const updateBatchSize = useCallback(
+    (newSize: number) => {
+      actions.updateConfig({ batchSize: newSize });
+    },
+    [actions]
+  );
 
   // Get current batch status
   const getBatchStatus = useCallback(() => {

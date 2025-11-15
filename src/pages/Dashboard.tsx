@@ -6,12 +6,32 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Tabs, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { ResponsiveTabsList } from '@/components/ui/responsive-tabs-list';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { User, Heart, Settings, Eye, Save, Camera, MapPin, Briefcase, GraduationCap, Brain, Target, Sparkles, Trophy } from 'lucide-react';
+import {
+  User,
+  Heart,
+  Settings,
+  Eye,
+  Save,
+  Camera,
+  MapPin,
+  Briefcase,
+  GraduationCap,
+  Brain,
+  Target,
+  Sparkles,
+  Trophy,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import PhotoUpload from '@/components/PhotoUpload';
@@ -96,40 +116,48 @@ const Dashboard = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
-      setProfile(profileData ? {
-        id: profileData.id,
-        full_name: profileData.full_name ?? '',
-        age: profileData.age ?? 0,
-        gender: profileData.gender ?? '',
-        location: profileData.location ?? '',
-        education: profileData.education ?? '',
-        profession: profileData.profession ?? '',
-        bio: profileData.bio ?? '',
-        looking_for: profileData.looking_for ?? '',
-        interests: (profileData.interests as string[] | null) ?? [],
-        avatar_url: profileData.avatar_url ?? ''
-      } : undefined);
-      
-      setIslamicPrefs(prefsData ? {
-        prayer_frequency: prefsData.prayer_frequency ?? '',
-        quran_reading: prefsData.quran_reading ?? '',
-        hijab_preference: prefsData.hijab_preference ?? '',
-        beard_preference: prefsData.beard_preference ?? '',
-        sect: prefsData.sect ?? '',
-        madhab: prefsData.madhab ?? '',
-        halal_diet: !!prefsData.halal_diet,
-        smoking: prefsData.smoking ?? '',
-        desired_partner_sect: prefsData.desired_partner_sect ?? '',
-        importance_of_religion: prefsData.importance_of_religion ?? ''
-      } : undefined);
-      
+      setProfile(
+        profileData
+          ? {
+              id: profileData.id,
+              full_name: profileData.full_name ?? '',
+              age: profileData.age ?? 0,
+              gender: profileData.gender ?? '',
+              location: profileData.location ?? '',
+              education: profileData.education ?? '',
+              profession: profileData.profession ?? '',
+              bio: profileData.bio ?? '',
+              looking_for: profileData.looking_for ?? '',
+              interests: (profileData.interests as string[] | null) ?? [],
+              avatar_url: profileData.avatar_url ?? '',
+            }
+          : undefined
+      );
+
+      setIslamicPrefs(
+        prefsData
+          ? {
+              prayer_frequency: prefsData.prayer_frequency ?? '',
+              quran_reading: prefsData.quran_reading ?? '',
+              hijab_preference: prefsData.hijab_preference ?? '',
+              beard_preference: prefsData.beard_preference ?? '',
+              sect: prefsData.sect ?? '',
+              madhab: prefsData.madhab ?? '',
+              halal_diet: !!prefsData.halal_diet,
+              smoking: prefsData.smoking ?? '',
+              desired_partner_sect: prefsData.desired_partner_sect ?? '',
+              importance_of_religion: prefsData.importance_of_religion ?? '',
+            }
+          : undefined
+      );
+
       setVerification(verificationData ?? undefined);
     } catch (error) {
       console.error('Error fetching profile data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données du profil",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données du profil',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -138,18 +166,19 @@ const Dashboard = () => {
 
   const saveProfile = async () => {
     if (!profile || !user) return;
-    
+
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
+      const { error } = await supabase.from('profiles').upsert(
+        {
           user_id: user.id,
-          ...profile
-        }, {
+          ...profile,
+        },
+        {
           onConflict: 'user_id',
-          ignoreDuplicates: false
-        });
+          ignoreDuplicates: false,
+        }
+      );
 
       if (error) throw error;
 
@@ -157,15 +186,15 @@ const Dashboard = () => {
       await fetchProfileData();
 
       toast({
-        title: "Profil sauvegardé",
-        description: "Vos modifications ont été enregistrées avec succès."
+        title: 'Profil sauvegardé',
+        description: 'Vos modifications ont été enregistrées avec succès.',
       });
     } catch (error) {
       console.error('Error saving profile:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder le profil",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder le profil',
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
@@ -174,28 +203,26 @@ const Dashboard = () => {
 
   const saveIslamicPreferences = async () => {
     if (!islamicPrefs || !user) return;
-    
+
     setSaving(true);
     try {
-      const { error } = await supabase
-        .from('islamic_preferences')
-        .upsert({
-          user_id: user.id,
-          ...islamicPrefs
-        });
+      const { error } = await supabase.from('islamic_preferences').upsert({
+        user_id: user.id,
+        ...islamicPrefs,
+      });
 
       if (error) throw error;
 
       toast({
-        title: "Préférences sauvegardées",
-        description: "Vos préférences islamiques ont été enregistrées."
+        title: 'Préférences sauvegardées',
+        description: 'Vos préférences islamiques ont été enregistrées.',
       });
     } catch (error) {
       console.error('Error updating Islamic preferences:', error);
       toast({
-        title: "Erreur", 
-        description: "Impossible de sauvegarder les préférences",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de sauvegarder les préférences',
+        variant: 'destructive',
       });
     } finally {
       setSaving(false);
@@ -204,21 +231,21 @@ const Dashboard = () => {
 
   const addInterest = (interest: string) => {
     if (!interest.trim() || !profile) return;
-    
+
     if (!profile.interests.includes(interest.trim())) {
       setProfile({
         ...profile,
-        interests: [...profile.interests, interest.trim()]
+        interests: [...profile.interests, interest.trim()],
       });
     }
   };
 
   const removeInterest = (interestToRemove: string) => {
     if (!profile) return;
-    
+
     setProfile({
       ...profile,
-      interests: profile.interests.filter(interest => interest !== interestToRemove)
+      interests: profile.interests.filter((interest) => interest !== interestToRemove),
     });
   };
 
@@ -228,7 +255,10 @@ const Dashboard = () => {
         <div className="container mx-auto max-w-2xl">
           <div className="border rounded p-8">
             <div className="flex items-center justify-center">
-              <div className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full" style={{ animation: 'spin 1s linear infinite' }}></div>
+              <div
+                className="h-8 w-8 border-2 border-primary border-t-transparent rounded-full"
+                style={{ animation: 'spin 1s linear infinite' }}
+              ></div>
             </div>
           </div>
         </div>
@@ -272,7 +302,7 @@ const Dashboard = () => {
               {profile?.bio ? 'Complet' : 'À compléter'}
             </p>
           </div>
-          
+
           <div className="p-3 border rounded">
             <div className="flex items-center gap-2 mb-2">
               <Heart className="h-4 w-4 text-primary" />
@@ -283,7 +313,10 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <div className="p-3 border rounded cursor-pointer" onClick={() => navigate('/advanced-matching')}>
+          <div
+            className="p-3 border rounded cursor-pointer"
+            onClick={() => navigate('/advanced-matching')}
+          >
             <div className="flex items-center gap-2 mb-2">
               <Brain className="h-4 w-4 text-primary" />
               <span className="text-sm font-medium">Matching IA</span>
@@ -301,8 +334,8 @@ const Dashboard = () => {
       <div className="border rounded p-4 max-w-full overflow-x-hidden w-full">
         <h2 className="text-lg font-semibold mb-4 pb-2 border-b">Actions rapides</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 w-full">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="justify-start py-3"
             onClick={() => navigate('/advanced-matching')}
           >
@@ -312,9 +345,9 @@ const Dashboard = () => {
               <div className="text-xs text-muted-foreground">Analyse IA de compatibilité</div>
             </div>
           </Button>
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             className="justify-start py-3"
             onClick={() => navigate('/browse')}
           >
@@ -324,9 +357,9 @@ const Dashboard = () => {
               <div className="text-xs text-muted-foreground">Parcourir les profils</div>
             </div>
           </Button>
-          
-          <Button 
-            variant="outline" 
+
+          <Button
+            variant="outline"
             className="justify-start py-3"
             onClick={() => navigate('/compatibility-insights')}
           >
@@ -342,7 +375,7 @@ const Dashboard = () => {
       {/* Profile Management Section */}
       <div className="border rounded p-4 max-w-full overflow-x-hidden w-full">
         <h2 className="text-lg font-semibold mb-4 pb-2 border-b">Gestion du Profil</h2>
-        
+
         <div className="space-y-6">
           {/* Main Content */}
           <div>
@@ -370,7 +403,11 @@ const Dashboard = () => {
                         <Input
                           id="fullName"
                           value={profile?.full_name ?? ''}
-                          onChange={(e) => setProfile(prev => prev ? {...prev, full_name: e.target.value} : undefined)}
+                          onChange={(e) =>
+                            setProfile((prev) =>
+                              prev ? { ...prev, full_name: e.target.value } : undefined
+                            )
+                          }
                           placeholder="Votre nom complet"
                         />
                       </div>
@@ -380,7 +417,11 @@ const Dashboard = () => {
                           id="age"
                           type="number"
                           value={profile?.age ?? ''}
-                          onChange={(e) => setProfile(prev => prev ? {...prev, age: parseInt(e.target.value)} : undefined)}
+                          onChange={(e) =>
+                            setProfile((prev) =>
+                              prev ? { ...prev, age: parseInt(e.target.value) } : undefined
+                            )
+                          }
                           placeholder="Votre âge"
                         />
                       </div>
@@ -389,7 +430,12 @@ const Dashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="gender">Genre</Label>
-                        <Select value={profile?.gender ?? ''} onValueChange={(value) => setProfile(prev => prev ? {...prev, gender: value} : undefined)}>
+                        <Select
+                          value={profile?.gender ?? ''}
+                          onValueChange={(value) =>
+                            setProfile((prev) => (prev ? { ...prev, gender: value } : undefined))
+                          }
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez votre genre" />
                           </SelectTrigger>
@@ -404,7 +450,11 @@ const Dashboard = () => {
                         <Input
                           id="location"
                           value={profile?.location ?? ''}
-                          onChange={(e) => setProfile(prev => prev ? {...prev, location: e.target.value} : undefined)}
+                          onChange={(e) =>
+                            setProfile((prev) =>
+                              prev ? { ...prev, location: e.target.value } : undefined
+                            )
+                          }
                           placeholder="Ville, Pays"
                         />
                       </div>
@@ -416,7 +466,11 @@ const Dashboard = () => {
                         <Input
                           id="education"
                           value={profile?.education ?? ''}
-                          onChange={(e) => setProfile(prev => prev ? {...prev, education: e.target.value} : undefined)}
+                          onChange={(e) =>
+                            setProfile((prev) =>
+                              prev ? { ...prev, education: e.target.value } : undefined
+                            )
+                          }
                           placeholder="Votre niveau d'éducation"
                         />
                       </div>
@@ -425,7 +479,11 @@ const Dashboard = () => {
                         <Input
                           id="profession"
                           value={profile?.profession ?? ''}
-                          onChange={(e) => setProfile(prev => prev ? {...prev, profession: e.target.value} : undefined)}
+                          onChange={(e) =>
+                            setProfile((prev) =>
+                              prev ? { ...prev, profession: e.target.value } : undefined
+                            )
+                          }
                           placeholder="Votre profession"
                         />
                       </div>
@@ -436,7 +494,11 @@ const Dashboard = () => {
                       <Textarea
                         id="bio"
                         value={profile?.bio ?? ''}
-                        onChange={(e) => setProfile(prev => prev ? {...prev, bio: e.target.value} : undefined)}
+                        onChange={(e) =>
+                          setProfile((prev) =>
+                            prev ? { ...prev, bio: e.target.value } : undefined
+                          )
+                        }
                         placeholder="Décrivez-vous brièvement..."
                         rows={4}
                       />
@@ -447,25 +509,31 @@ const Dashboard = () => {
                       <Textarea
                         id="lookingFor"
                         value={profile?.looking_for ?? ''}
-                        onChange={(e) => setProfile(prev => prev ? {...prev, looking_for: e.target.value} : undefined)}
+                        onChange={(e) =>
+                          setProfile((prev) =>
+                            prev ? { ...prev, looking_for: e.target.value } : undefined
+                          )
+                        }
                         placeholder="Décrivez le type de partenaire que vous recherchez..."
                         rows={3}
                       />
                     </div>
 
-                    <PhotoUpload 
+                    <PhotoUpload
                       currentPhotoUrl={profile?.avatar_url}
-                      onPhotoUpdate={(url) => setProfile(prev => prev ? {...prev, avatar_url: url} : undefined)}
+                      onPhotoUpdate={(url) =>
+                        setProfile((prev) => (prev ? { ...prev, avatar_url: url } : undefined))
+                      }
                     />
 
                     <div>
                       <Label>Centres d'intérêt</Label>
                       <div className="flex flex-wrap gap-2 mt-2">
                         {(profile?.interests || []).map((interest) => (
-                          <Badge 
-                            key={interest} 
-                            variant="secondary" 
-                            className="cursor-pointer" 
+                          <Badge
+                            key={interest}
+                            variant="secondary"
+                            className="cursor-pointer"
                             onClick={() => removeInterest(interest)}
                           >
                             {interest} ×
@@ -490,11 +558,7 @@ const Dashboard = () => {
 
                     <Separator />
 
-                    <Button 
-                      onClick={saveProfile} 
-                      disabled={saving}
-                      className="w-full"
-                    >
+                    <Button onClick={saveProfile} disabled={saving} className="w-full">
                       {saving ? (
                         <span className="mr-2">⏳</span>
                       ) : (
@@ -516,9 +580,13 @@ const Dashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label>Fréquence de prière</Label>
-                        <Select 
-                          value={islamicPrefs?.prayer_frequency ?? ''} 
-                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, prayer_frequency: value} : undefined)}
+                        <Select
+                          value={islamicPrefs?.prayer_frequency ?? ''}
+                          onValueChange={(value) =>
+                            setIslamicPrefs((prev) =>
+                              prev ? { ...prev, prayer_frequency: value } : undefined
+                            )
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez" />
@@ -533,9 +601,13 @@ const Dashboard = () => {
                       </div>
                       <div>
                         <Label>Lecture du Coran</Label>
-                        <Select 
-                          value={islamicPrefs?.quran_reading ?? ''} 
-                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, quran_reading: value} : undefined)}
+                        <Select
+                          value={islamicPrefs?.quran_reading ?? ''}
+                          onValueChange={(value) =>
+                            setIslamicPrefs((prev) =>
+                              prev ? { ...prev, quran_reading: value } : undefined
+                            )
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez" />
@@ -554,9 +626,11 @@ const Dashboard = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <Label>Secte</Label>
-                        <Select 
-                          value={islamicPrefs?.sect ?? ''} 
-                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, sect: value} : undefined)}
+                        <Select
+                          value={islamicPrefs?.sect ?? ''}
+                          onValueChange={(value) =>
+                            setIslamicPrefs((prev) => (prev ? { ...prev, sect: value } : undefined))
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez" />
@@ -571,9 +645,13 @@ const Dashboard = () => {
                       </div>
                       <div>
                         <Label>Importance de la religion</Label>
-                        <Select 
-                          value={islamicPrefs?.importance_of_religion ?? ''} 
-                          onValueChange={(value) => setIslamicPrefs(prev => prev ? {...prev, importance_of_religion: value} : undefined)}
+                        <Select
+                          value={islamicPrefs?.importance_of_religion ?? ''}
+                          onValueChange={(value) =>
+                            setIslamicPrefs((prev) =>
+                              prev ? { ...prev, importance_of_religion: value } : undefined
+                            )
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="Sélectionnez" />
@@ -590,11 +668,7 @@ const Dashboard = () => {
 
                     <Separator />
 
-                    <Button 
-                      onClick={saveIslamicPreferences} 
-                      disabled={saving}
-                      className="w-full"
-                    >
+                    <Button onClick={saveIslamicPreferences} disabled={saving} className="w-full">
                       {saving ? (
                         <span className="mr-2">⏳</span>
                       ) : (
@@ -616,10 +690,12 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between p-3 border rounded">
                       <div>
                         <h4 className="text-sm font-medium">Visibilité du profil</h4>
-                        <p className="text-xs text-muted-foreground">Qui peut voir votre profil complet</p>
+                        <p className="text-xs text-muted-foreground">
+                          Qui peut voir votre profil complet
+                        </p>
                       </div>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => navigate('/settings?tab=privacy')}
                       >
@@ -627,14 +703,16 @@ const Dashboard = () => {
                         Gérer
                       </Button>
                     </div>
-                    
+
                     <div className="flex items-center justify-between p-3 border rounded">
                       <div>
                         <h4 className="text-sm font-medium">Photos</h4>
-                        <p className="text-xs text-muted-foreground">Gérer la visibilité de vos photos</p>
+                        <p className="text-xs text-muted-foreground">
+                          Gérer la visibilité de vos photos
+                        </p>
                       </div>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         size="sm"
                         onClick={() => navigate('/settings?tab=privacy')}
                       >

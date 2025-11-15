@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -9,15 +8,17 @@ interface UseDeviceFingerprintSyncProps {
 
 export const useDeviceFingerprintSync = ({
   deviceFingerprint,
-  updateDeviceFingerprint
+  updateDeviceFingerprint,
 }: UseDeviceFingerprintSyncProps) => {
   useEffect(() => {
     const syncDeviceFingerprint = async () => {
       if (!deviceFingerprint) return;
 
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
         if (!user) return;
 
         // Store device fingerprint in security events for tracking
@@ -28,8 +29,8 @@ export const useDeviceFingerprintSync = ({
           p_severity: 'low',
           p_metadata: {
             device_fingerprint: deviceFingerprint,
-            timestamp: new Date().toISOString()
-          }
+            timestamp: new Date().toISOString(),
+          },
         });
       } catch (error) {
         console.error('Failed to sync device fingerprint:', error);

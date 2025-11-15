@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { ComponentMetrics } from '@/services/performance/componentMetricsService';
 
@@ -7,10 +6,7 @@ interface ComponentsTabProps {
   formatTime: (ms: number) => string;
 }
 
-const ComponentsTab: React.FC<ComponentsTabProps> = ({
-  componentMetrics,
-  formatTime,
-}) => {
+const ComponentsTab: React.FC<ComponentsTabProps> = ({ componentMetrics, formatTime }) => {
   const sortedComponents = Array.from(componentMetrics.values())
     .sort((a, b) => b.renderTime - a.renderTime)
     .slice(0, 10);
@@ -26,11 +22,9 @@ const ComponentsTab: React.FC<ComponentsTabProps> = ({
           </div>
         </div>
       ))}
-      
+
       {componentMetrics.size === 0 && (
-        <div className="text-center text-muted-foreground text-xs py-4">
-          No component data yet
-        </div>
+        <div className="text-center text-muted-foreground text-xs py-4">No component data yet</div>
       )}
     </div>
   );

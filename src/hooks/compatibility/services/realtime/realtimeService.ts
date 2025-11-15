@@ -1,9 +1,8 @@
-
-import { RealtimeChannel } from "@supabase/supabase-js";
-import { CompatibilityMatch } from "@/types/compatibility";
-import { MatchNotification, RealtimeCallbacks } from "./types";
-import { ChannelManager } from "./channelManager";
-import { NotificationService } from "./notificationService";
+import { RealtimeChannel } from '@supabase/supabase-js';
+import { CompatibilityMatch } from '@/types/compatibility';
+import { MatchNotification, RealtimeCallbacks } from './types';
+import { ChannelManager } from './channelManager';
+import { NotificationService } from './notificationService';
 
 export class RealtimeService {
   private channelManager = new ChannelManager();
@@ -25,7 +24,9 @@ export class RealtimeService {
   }
 
   // Create a notification
-  async createNotification(notification: Omit<MatchNotification, 'id' | 'created_at' | 'is_read'>): Promise<void> {
+  async createNotification(
+    notification: Omit<MatchNotification, 'id' | 'created_at' | 'is_read'>
+  ): Promise<void> {
     return this.notificationService.createNotification(notification);
   }
 

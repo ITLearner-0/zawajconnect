@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -20,7 +19,7 @@ const MetricsTab = ({ metrics }: MetricsTabProps) => {
       intersection: { good: 50, fair: 100 },
       render: { good: 16, fair: 33 },
     };
-    
+
     const threshold = thresholds[type];
     if (time <= threshold.good) return 'bg-green-500';
     if (time <= threshold.fair) return 'bg-yellow-500';
@@ -32,49 +31,47 @@ const MetricsTab = ({ metrics }: MetricsTabProps) => {
       <div className="space-y-2">
         {Array.from(metrics.entries()).map(([elementId, metric]) => (
           <Card key={elementId} className="p-2">
-            <div className="text-xs font-medium truncate mb-1">
-              {elementId}
-            </div>
-            
+            <div className="text-xs font-medium truncate mb-1">{elementId}</div>
+
             <div className="grid grid-cols-2 gap-1 text-xs">
               <div className="flex items-center justify-between">
                 <span>Load:</span>
-                <Badge 
-                  variant="outline" 
+                <Badge
+                  variant="outline"
                   className={`text-white ${getPerformanceColor(metric.loadTime, 'load')}`}
                 >
                   {formatDuration(metric.loadTime)}
                 </Badge>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span>Intersection:</span>
-                <Badge 
+                <Badge
                   variant="outline"
                   className={`text-white ${getPerformanceColor(metric.intersectionTime, 'intersection')}`}
                 >
                   {formatDuration(metric.intersectionTime)}
                 </Badge>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span>Render:</span>
-                <Badge 
+                <Badge
                   variant="outline"
                   className={`text-white ${getPerformanceColor(metric.renderTime, 'render')}`}
                 >
                   {formatDuration(metric.renderTime)}
                 </Badge>
               </div>
-              
+
               <div className="flex items-center justify-between">
                 <span>Retries:</span>
-                <Badge variant={metric.retryCount > 0 ? "destructive" : "secondary"}>
+                <Badge variant={metric.retryCount > 0 ? 'destructive' : 'secondary'}>
                   {metric.retryCount}
                 </Badge>
               </div>
             </div>
-            
+
             {metric.errorCount > 0 && (
               <div className="mt-1">
                 <Badge variant="destructive" className="text-xs">
@@ -84,7 +81,7 @@ const MetricsTab = ({ metrics }: MetricsTabProps) => {
             )}
           </Card>
         ))}
-        
+
         {metrics.size === 0 && (
           <div className="text-center text-gray-500 text-xs py-4">
             No performance data available
