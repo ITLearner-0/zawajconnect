@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Message } from '@/types/profile';
@@ -23,7 +22,7 @@ const parseContentFlags = (flags: any): any[] => {
 const convertDbMessageToMessage = (dbMessage: any): Message => {
   return {
     ...dbMessage,
-    content_flags: parseContentFlags(dbMessage.content_flags)
+    content_flags: parseContentFlags(dbMessage.content_flags),
   };
 };
 
@@ -55,7 +54,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
     try {
       // First check if the messages table exists
       const messagesTableExists = await tableExists('messages');
-      
+
       if (!messagesTableExists) {
         setSearchResults([]);
         setLoading(false);
@@ -100,7 +99,7 @@ export const useMessageSearch = (currentUserId: string | null) => {
       if (messagesData && messagesData.length > 0) {
         // Build a map of conversation participants
         const participantsMap = new Map();
-        
+
         conversations.forEach((conv: any) => {
           participantsMap.set(conv.id, conv.participants);
         });
@@ -108,11 +107,11 @@ export const useMessageSearch = (currentUserId: string | null) => {
         // Process each message
         for (const messageData of messagesData) {
           const message = convertDbMessageToMessage(messageData);
-          
+
           // Get the other participant in this conversation
           const participants = participantsMap.get(message.conversation_id) || [];
           const otherParticipantId = participants.find((id: any) => id !== currentUserId);
-          
+
           if (otherParticipantId) {
             // Fetch the other participant's profile
             const { data: profile } = await supabase
@@ -124,27 +123,28 @@ export const useMessageSearch = (currentUserId: string | null) => {
             results.push({
               message,
               conversationId: message.conversation_id,
-              otherParticipantName: profile ? `${(profile as any).first_name} ${(profile as any).last_name}` : 'Unknown User'
+              otherParticipantName: profile
+                ? `${(profile as any).first_name} ${(profile as any).last_name}`
+                : 'Unknown User',
             });
           } else {
             // No other participant found
             results.push({
               message,
-              conversationId: message.conversation_id
+              conversationId: message.conversation_id,
             });
           }
         }
       }
 
       setSearchResults(results);
-
     } catch (err: any) {
       console.error('Error searching messages:', err);
       setError(`Error searching messages: ${err.message}`);
       toast({
-        title: "Search Error",
+        title: 'Search Error',
         description: `Failed to search messages: ${err.message}`,
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -161,6 +161,6 @@ export const useMessageSearch = (currentUserId: string | null) => {
     clearSearch: () => {
       setSearchTerm('');
       setSearchResults([]);
-    }
+    },
   };
 };

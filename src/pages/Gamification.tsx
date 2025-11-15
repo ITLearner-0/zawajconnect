@@ -41,7 +41,7 @@ const GamificationPage = () => {
           <StreakDisplay />
         </div>
       </div>
-      
+
       <GamificationAchievementsDashboard userId={user.id} />
     </div>
   );

@@ -6,7 +6,7 @@ import {
   Anomaly,
   predictFutureValues,
   detectAnomalies,
-  calculateTrend
+  calculateTrend,
 } from '@/utils/analytics/predictiveAnalytics';
 
 export interface PredictiveAnalytics {
@@ -55,41 +55,43 @@ export const usePredictiveAnalytics = (months: number = 3) => {
         const date = new Date(startDate);
         date.setDate(date.getDate() + i);
         const dateStr = date.toISOString();
-        
+
         // Registrations with upward trend
         const baseReg = 5 + Math.floor(i / 10);
         const regCount = baseReg + Math.floor(Math.random() * 5);
         for (let j = 0; j < regCount; j++) {
           registrationsData.push({
             created_at: dateStr,
-            reviewed_at: new Date(date.getTime() + (Math.random() * 24 * 60 * 60 * 1000)).toISOString()
+            reviewed_at: new Date(
+              date.getTime() + Math.random() * 24 * 60 * 60 * 1000
+            ).toISOString(),
           });
         }
-        
+
         // Alerts with slight downward trend
         const baseAlert = Math.max(1, 8 - Math.floor(i / 15));
         const alertCount = baseAlert + Math.floor(Math.random() * 4);
         for (let j = 0; j < alertCount; j++) {
           alertsData.push({
             created_at: dateStr,
-            risk_level: Math.random() > 0.7 ? 'critical' : 'medium'
+            risk_level: Math.random() > 0.7 ? 'critical' : 'medium',
           });
         }
-        
+
         // Processing times
         const procCount = Math.floor(regCount * 0.7);
         for (let j = 0; j < procCount; j++) {
           const procHours = 2 + Math.random() * 20;
           processingData.push({
             created_at: dateStr,
-            reviewed_at: new Date(date.getTime() + (procHours * 60 * 60 * 1000)).toISOString()
+            reviewed_at: new Date(date.getTime() + procHours * 60 * 60 * 1000).toISOString(),
           });
         }
       }
 
       // Process registrations data
       const regByDay = new Map<string, number>();
-      (registrationsData as any[] || []).forEach((reg: any) => {
+      ((registrationsData as any[]) || []).forEach((reg: any) => {
         if (reg.created_at) {
           const date = reg.created_at.split('T')[0];
           if (date) {
@@ -104,7 +106,7 @@ export const usePredictiveAnalytics = (months: number = 3) => {
 
       // Process alerts data
       const alertsByDay = new Map<string, number>();
-      (alertsData as any[] || []).forEach((alert: any) => {
+      ((alertsData as any[]) || []).forEach((alert: any) => {
         if (alert.created_at) {
           const date = alert.created_at.split('T')[0];
           if (date) {
@@ -119,14 +121,14 @@ export const usePredictiveAnalytics = (months: number = 3) => {
 
       // Process processing time data
       const procTimeByDay = new Map<string, number[]>();
-      (processingData as any[] || []).forEach((proc: any) => {
+      ((processingData as any[]) || []).forEach((proc: any) => {
         if (proc.created_at && proc.reviewed_at) {
           const date = proc.created_at.split('T')[0];
           if (date) {
             const createdAt = new Date(proc.created_at);
             const reviewedAt = new Date(proc.reviewed_at);
             const hours = (reviewedAt.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
-            
+
             if (!procTimeByDay.has(date)) {
               procTimeByDay.set(date, []);
             }
@@ -138,7 +140,7 @@ export const usePredictiveAnalytics = (months: number = 3) => {
       const processingTimeHistorical: DataPoint[] = Array.from(procTimeByDay.entries())
         .map(([date, times]) => ({
           date,
-          value: Math.round(times.reduce((a, b) => a + b, 0) / times.length * 10) / 10
+          value: Math.round((times.reduce((a, b) => a + b, 0) / times.length) * 10) / 10,
         }))
         .sort((a, b) => a.date.localeCompare(b.date));
 
@@ -148,20 +150,20 @@ export const usePredictiveAnalytics = (months: number = 3) => {
           historical: registrationsHistorical,
           predictions: predictFutureValues(registrationsHistorical, 30),
           anomalies: detectAnomalies(registrationsHistorical, 'Inscriptions'),
-          trend: calculateTrend(registrationsHistorical)
+          trend: calculateTrend(registrationsHistorical),
         },
         alerts: {
           historical: alertsHistorical,
           predictions: predictFutureValues(alertsHistorical, 30),
           anomalies: detectAnomalies(alertsHistorical, 'Alertes'),
-          trend: calculateTrend(alertsHistorical)
+          trend: calculateTrend(alertsHistorical),
         },
         processingTime: {
           historical: processingTimeHistorical,
           predictions: predictFutureValues(processingTimeHistorical, 30),
           anomalies: detectAnomalies(processingTimeHistorical, 'Temps de traitement'),
-          trend: calculateTrend(processingTimeHistorical)
-        }
+          trend: calculateTrend(processingTimeHistorical),
+        },
       });
     } catch (err) {
       console.error('Error fetching predictive analytics:', err);
@@ -179,6 +181,6 @@ export const usePredictiveAnalytics = (months: number = 3) => {
     analytics,
     loading,
     error,
-    refetch: fetchPredictiveData
+    refetch: fetchPredictiveData,
   };
 };

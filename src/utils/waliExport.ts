@@ -9,15 +9,15 @@ import type { WaliAlert, WaliActivity } from '@/hooks/wali/useWaliMonitoring';
  */
 export const exportWaliRegistrationsToExcel = (registrations: WaliRegistration[]) => {
   const data = registrations.map((reg) => ({
-    'ID': reg.id,
+    ID: reg.id,
     'Nom Complet': reg.full_name,
-    'Email': reg.email,
-    'Téléphone': reg.phone || 'N/A',
-    'Relation': reg.relationship_to_user,
-    'Statut': getStatusLabel(reg.status),
+    Email: reg.email,
+    Téléphone: reg.phone || 'N/A',
+    Relation: reg.relationship_to_user,
+    Statut: getStatusLabel(reg.status),
     'Document ID': reg.id_document_url ? 'Oui' : 'Non',
     'Document Preuve': reg.proof_of_relationship_url ? 'Oui' : 'Non',
-    'Notes': reg.verification_notes || '',
+    Notes: reg.verification_notes || '',
     'Raison Rejet': reg.rejection_reason || '',
     'Créé le': format(new Date(reg.created_at), 'PPP à HH:mm', { locale: fr }),
     'Vérifié le': reg.verified_at
@@ -31,7 +31,10 @@ export const exportWaliRegistrationsToExcel = (registrations: WaliRegistration[]
   XLSX.utils.book_append_sheet(wb, ws, 'Inscriptions Wali');
 
   // Auto-size columns
-  const maxWidth = data.reduce((w, r) => Math.max(w, ...Object.values(r).map(v => String(v).length)), 10);
+  const maxWidth = data.reduce(
+    (w, r) => Math.max(w, ...Object.values(r).map((v) => String(v).length)),
+    10
+  );
   ws['!cols'] = Object.keys(data[0] || {}).map(() => ({ wch: Math.min(maxWidth, 50) }));
 
   const fileName = `inscriptions-wali-${format(new Date(), 'yyyy-MM-dd-HHmm')}.xlsx`;
@@ -43,15 +46,15 @@ export const exportWaliRegistrationsToExcel = (registrations: WaliRegistration[]
  */
 export const exportWaliRegistrationsToCSV = (registrations: WaliRegistration[]) => {
   const data = registrations.map((reg) => ({
-    'ID': reg.id,
+    ID: reg.id,
     'Nom Complet': reg.full_name,
-    'Email': reg.email,
-    'Téléphone': reg.phone || 'N/A',
-    'Relation': reg.relationship_to_user,
-    'Statut': getStatusLabel(reg.status),
+    Email: reg.email,
+    Téléphone: reg.phone || 'N/A',
+    Relation: reg.relationship_to_user,
+    Statut: getStatusLabel(reg.status),
     'Document ID': reg.id_document_url ? 'Oui' : 'Non',
     'Document Preuve': reg.proof_of_relationship_url ? 'Oui' : 'Non',
-    'Notes': reg.verification_notes || '',
+    Notes: reg.verification_notes || '',
     'Raison Rejet': reg.rejection_reason || '',
     'Créé le': format(new Date(reg.created_at), 'PPP à HH:mm', { locale: fr }),
     'Vérifié le': reg.verified_at
@@ -62,15 +65,15 @@ export const exportWaliRegistrationsToCSV = (registrations: WaliRegistration[]) 
 
   const ws = XLSX.utils.json_to_sheet(data);
   const csv = XLSX.utils.sheet_to_csv(ws);
-  
+
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  
+
   link.setAttribute('href', url);
   link.setAttribute('download', `inscriptions-wali-${format(new Date(), 'yyyy-MM-dd-HHmm')}.csv`);
   link.style.visibility = 'hidden';
-  
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -81,18 +84,18 @@ export const exportWaliRegistrationsToCSV = (registrations: WaliRegistration[]) 
  */
 export const exportWaliAlertsToExcel = (alerts: WaliAlert[]) => {
   const data = alerts.map((alert) => ({
-    'ID': alert.id,
+    ID: alert.id,
     'ID Wali': alert.wali_user_id,
     'Type Alerte': alert.alert_type,
     'Niveau Risque': getRiskLabel(alert.risk_level),
-    'Description': alert.description,
-    'Confirmée': alert.acknowledged ? 'Oui' : 'Non',
+    Description: alert.description,
+    Confirmée: alert.acknowledged ? 'Oui' : 'Non',
     'Confirmée par': alert.acknowledged_by || 'N/A',
     'Confirmée le': alert.acknowledged_at
       ? format(new Date(alert.acknowledged_at), 'PPP à HH:mm', { locale: fr })
       : 'N/A',
     'Créée le': format(new Date(alert.created_at), 'PPP à HH:mm', { locale: fr }),
-    'Métadonnées': JSON.stringify(alert.metadata),
+    Métadonnées: JSON.stringify(alert.metadata),
   }));
 
   const ws = XLSX.utils.json_to_sheet(data);
@@ -110,31 +113,31 @@ export const exportWaliAlertsToExcel = (alerts: WaliAlert[]) => {
  */
 export const exportWaliAlertsToCSV = (alerts: WaliAlert[]) => {
   const data = alerts.map((alert) => ({
-    'ID': alert.id,
+    ID: alert.id,
     'ID Wali': alert.wali_user_id,
     'Type Alerte': alert.alert_type,
     'Niveau Risque': getRiskLabel(alert.risk_level),
-    'Description': alert.description,
-    'Confirmée': alert.acknowledged ? 'Oui' : 'Non',
+    Description: alert.description,
+    Confirmée: alert.acknowledged ? 'Oui' : 'Non',
     'Confirmée par': alert.acknowledged_by || 'N/A',
     'Confirmée le': alert.acknowledged_at
       ? format(new Date(alert.acknowledged_at), 'PPP à HH:mm', { locale: fr })
       : 'N/A',
     'Créée le': format(new Date(alert.created_at), 'PPP à HH:mm', { locale: fr }),
-    'Métadonnées': JSON.stringify(alert.metadata),
+    Métadonnées: JSON.stringify(alert.metadata),
   }));
 
   const ws = XLSX.utils.json_to_sheet(data);
   const csv = XLSX.utils.sheet_to_csv(ws);
-  
+
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   const url = URL.createObjectURL(blob);
-  
+
   link.setAttribute('href', url);
   link.setAttribute('download', `alertes-wali-${format(new Date(), 'yyyy-MM-dd-HHmm')}.csv`);
   link.style.visibility = 'hidden';
-  
+
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -146,7 +149,7 @@ export const exportWaliAlertsToCSV = (alerts: WaliAlert[]) => {
 export const exportWaliActivitiesToExcel = (activities: WaliActivity[]) => {
   const data = activities.map((activity) => ({
     'ID Wali': activity.wali_user_id,
-    'Nom': activity.full_name,
+    Nom: activity.full_name,
     'Total Actions': activity.total_actions,
     'Actions Suspectes': activity.suspicious_actions,
     'Score Risque': activity.risk_score,
@@ -178,10 +181,10 @@ export const exportComprehensiveWaliReport = (
 
   // Registrations sheet
   const regData = registrations.map((reg) => ({
-    'ID': reg.id,
+    ID: reg.id,
     'Nom Complet': reg.full_name,
-    'Email': reg.email,
-    'Statut': getStatusLabel(reg.status),
+    Email: reg.email,
+    Statut: getStatusLabel(reg.status),
     'Créé le': format(new Date(reg.created_at), 'dd/MM/yyyy HH:mm'),
   }));
   const wsReg = XLSX.utils.json_to_sheet(regData);
@@ -189,21 +192,21 @@ export const exportComprehensiveWaliReport = (
 
   // Alerts sheet
   const alertData = alerts.map((alert) => ({
-    'Type': alert.alert_type,
-    'Risque': getRiskLabel(alert.risk_level),
-    'Description': alert.description,
-    'Confirmée': alert.acknowledged ? 'Oui' : 'Non',
-    'Date': format(new Date(alert.created_at), 'dd/MM/yyyy HH:mm'),
+    Type: alert.alert_type,
+    Risque: getRiskLabel(alert.risk_level),
+    Description: alert.description,
+    Confirmée: alert.acknowledged ? 'Oui' : 'Non',
+    Date: format(new Date(alert.created_at), 'dd/MM/yyyy HH:mm'),
   }));
   const wsAlert = XLSX.utils.json_to_sheet(alertData);
   XLSX.utils.book_append_sheet(wb, wsAlert, 'Alertes');
 
   // Activities sheet
   const actData = activities.map((activity) => ({
-    'Nom': activity.full_name,
-    'Actions': activity.total_actions,
-    'Suspectes': activity.suspicious_actions,
-    'Score': activity.risk_score,
+    Nom: activity.full_name,
+    Actions: activity.total_actions,
+    Suspectes: activity.suspicious_actions,
+    Score: activity.risk_score,
     'Dernière Activité': format(new Date(activity.last_activity), 'dd/MM/yyyy HH:mm'),
   }));
   const wsAct = XLSX.utils.json_to_sheet(actData);

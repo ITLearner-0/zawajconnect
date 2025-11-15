@@ -14,7 +14,7 @@ export class RateLimitCore {
     if (!config) {
       throw new Error('Rate limit configuration not found');
     }
-    
+
     const key = this.memoryStore.getKey(userId, endpoint);
     const now = Date.now();
 

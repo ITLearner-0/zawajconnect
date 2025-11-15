@@ -24,57 +24,57 @@
 
 ### ✅ Tables Déjà Créées
 
-| Table | Statut | Fonctionnalités Associées |
-|-------|--------|---------------------------|
-| `achievement_unlocks` | ✅ Existe | Gamification, badges, récompenses |
-| `admin_settings` | ✅ Existe | Configuration admin, paramètres système |
-| `blocked_match_pairs` | ✅ Existe | Blocage d'utilisateurs, sécurité |
-| `compatibility_questions` | ✅ Existe | Tests de compatibilité |
-| `compatibility_results` | ✅ Existe | Résultats et insights de compatibilité |
-| `compatibility_scores` | ✅ Existe | Scores de matching |
-| `conversation_participants` | ✅ Existe | Participants aux conversations |
-| `daily_quests` | ✅ Existe | Quêtes quotidiennes |
-| `email_ab_tests` | ✅ Existe | Tests A/B pour emails |
-| `email_ab_test_results` | ✅ Existe | Résultats des tests A/B |
-| `family_members` | ✅ Existe | Gestion des walis et familles |
-| `family_notifications` | ✅ Existe | Notifications famille |
-| `insight_actions` | ✅ Existe | Actions sur les insights |
-| `insights_analytics` | ✅ Existe | Analytics des insights |
-| `islamic_moderation_rules` | ✅ Existe | Règles de modération islamique |
-| `islamic_preferences` | ✅ Existe | Préférences religieuses |
-| `login_streaks` | ✅ Existe | Suivi des connexions |
-| `matches` | ✅ Existe | Matching et compatibilité |
-| `messages` | ✅ Existe | Messagerie |
-| `message_suggestions` | ✅ Existe | Suggestions de messages IA |
-| `moderation_logs` | ✅ Existe | Logs de modération |
-| `moderation_rules` | ✅ Existe | Règles de modération |
-| `moderation_violations` | ✅ Existe | Violations de contenu |
-| `notifications` | ✅ Existe | Notifications générales |
-| `onboarding_analytics` | ✅ Existe | Analytics d'onboarding |
-| `privacy_settings` | ✅ Existe | Paramètres de confidentialité |
-| `profile_comparison_history` | ✅ Existe | Historique de comparaisons |
-| `profile_notes` | ✅ Existe | Notes sur profils |
-| `profile_views` | ✅ Existe | Vues de profils |
-| `profile_views_daily` | ✅ Existe | Vues quotidiennes agrégées |
-| `profiles` | ✅ Existe | Profils utilisateurs |
-| `reports` | ✅ Existe | Signalements |
-| `role_audit_log` | ✅ Existe | Audit des rôles |
-| `security_audit_log` | ✅ Existe | Audit de sécurité |
-| `security_events` | ✅ Existe | Événements de sécurité |
-| `subscribers` | ✅ Existe | Abonnés newsletter |
-| `subscriptions` | ✅ Existe | Abonnements payants |
-| `subscription_history` | ✅ Existe | Historique abonnements |
-| `user_compatibility_responses` | ✅ Existe | Réponses aux tests |
-| `user_daily_quest_progress` | ✅ Existe | Progression quêtes |
-| `user_levels` | ✅ Existe | Niveaux et XP |
-| `user_progression` | ✅ Existe | Progression utilisateur |
-| `user_roles` | ✅ Existe | Rôles utilisateurs |
-| `user_sessions` | ✅ Existe | Sessions utilisateurs |
-| `user_settings` | ✅ Existe | Paramètres utilisateurs |
-| `user_status` | ✅ Existe | Statut en ligne/hors ligne |
-| `user_verifications` | ✅ Existe | Vérifications utilisateurs |
-| `video_calls` | ✅ Existe | Appels vidéo |
-| `wali_invitations` | ✅ Existe | Invitations wali |
+| Table                          | Statut    | Fonctionnalités Associées               |
+| ------------------------------ | --------- | --------------------------------------- |
+| `achievement_unlocks`          | ✅ Existe | Gamification, badges, récompenses       |
+| `admin_settings`               | ✅ Existe | Configuration admin, paramètres système |
+| `blocked_match_pairs`          | ✅ Existe | Blocage d'utilisateurs, sécurité        |
+| `compatibility_questions`      | ✅ Existe | Tests de compatibilité                  |
+| `compatibility_results`        | ✅ Existe | Résultats et insights de compatibilité  |
+| `compatibility_scores`         | ✅ Existe | Scores de matching                      |
+| `conversation_participants`    | ✅ Existe | Participants aux conversations          |
+| `daily_quests`                 | ✅ Existe | Quêtes quotidiennes                     |
+| `email_ab_tests`               | ✅ Existe | Tests A/B pour emails                   |
+| `email_ab_test_results`        | ✅ Existe | Résultats des tests A/B                 |
+| `family_members`               | ✅ Existe | Gestion des walis et familles           |
+| `family_notifications`         | ✅ Existe | Notifications famille                   |
+| `insight_actions`              | ✅ Existe | Actions sur les insights                |
+| `insights_analytics`           | ✅ Existe | Analytics des insights                  |
+| `islamic_moderation_rules`     | ✅ Existe | Règles de modération islamique          |
+| `islamic_preferences`          | ✅ Existe | Préférences religieuses                 |
+| `login_streaks`                | ✅ Existe | Suivi des connexions                    |
+| `matches`                      | ✅ Existe | Matching et compatibilité               |
+| `messages`                     | ✅ Existe | Messagerie                              |
+| `message_suggestions`          | ✅ Existe | Suggestions de messages IA              |
+| `moderation_logs`              | ✅ Existe | Logs de modération                      |
+| `moderation_rules`             | ✅ Existe | Règles de modération                    |
+| `moderation_violations`        | ✅ Existe | Violations de contenu                   |
+| `notifications`                | ✅ Existe | Notifications générales                 |
+| `onboarding_analytics`         | ✅ Existe | Analytics d'onboarding                  |
+| `privacy_settings`             | ✅ Existe | Paramètres de confidentialité           |
+| `profile_comparison_history`   | ✅ Existe | Historique de comparaisons              |
+| `profile_notes`                | ✅ Existe | Notes sur profils                       |
+| `profile_views`                | ✅ Existe | Vues de profils                         |
+| `profile_views_daily`          | ✅ Existe | Vues quotidiennes agrégées              |
+| `profiles`                     | ✅ Existe | Profils utilisateurs                    |
+| `reports`                      | ✅ Existe | Signalements                            |
+| `role_audit_log`               | ✅ Existe | Audit des rôles                         |
+| `security_audit_log`           | ✅ Existe | Audit de sécurité                       |
+| `security_events`              | ✅ Existe | Événements de sécurité                  |
+| `subscribers`                  | ✅ Existe | Abonnés newsletter                      |
+| `subscriptions`                | ✅ Existe | Abonnements payants                     |
+| `subscription_history`         | ✅ Existe | Historique abonnements                  |
+| `user_compatibility_responses` | ✅ Existe | Réponses aux tests                      |
+| `user_daily_quest_progress`    | ✅ Existe | Progression quêtes                      |
+| `user_levels`                  | ✅ Existe | Niveaux et XP                           |
+| `user_progression`             | ✅ Existe | Progression utilisateur                 |
+| `user_roles`                   | ✅ Existe | Rôles utilisateurs                      |
+| `user_sessions`                | ✅ Existe | Sessions utilisateurs                   |
+| `user_settings`                | ✅ Existe | Paramètres utilisateurs                 |
+| `user_status`                  | ✅ Existe | Statut en ligne/hors ligne              |
+| `user_verifications`           | ✅ Existe | Vérifications utilisateurs              |
+| `video_calls`                  | ✅ Existe | Appels vidéo                            |
+| `wali_invitations`             | ✅ Existe | Invitations wali                        |
 
 **Total : 49 tables existantes confirmées**
 
@@ -708,22 +708,22 @@ CREATE INDEX idx_profiles_location ON profiles USING GIST(coordinates);
 
 ### Tables par Catégorie
 
-| Catégorie | Existantes | À Créer | Mises à Jour | Total |
-|-----------|-----------|----------|--------------|-------|
-| **Authentification** | 6 | 0 | 1 | 7 |
-| **Profils** | 8 | 5 | 2 | 15 |
-| **Matching** | 5 | 3 | 1 | 9 |
-| **Messagerie** | 3 | 0 | 1 | 4 |
-| **Wali/Famille** | 3 | 12 | 1 | 16 |
-| **Gamification** | 5 | 2 | 1 | 8 |
-| **Paiement** | 3 | 0 | 0 | 3 |
-| **Modération** | 4 | 1 | 0 | 5 |
-| **Analytics** | 4 | 0 | 1 | 5 |
-| **Appels** | 1 | 2 | 0 | 3 |
-| **Notifications** | 3 | 1 | 0 | 4 |
-| **Sécurité** | 4 | 3 | 1 | 8 |
-| **Divers** | 0 | 2 | 0 | 2 |
-| **TOTAL** | **49** | **31** | **9** | **89** |
+| Catégorie            | Existantes | À Créer | Mises à Jour | Total  |
+| -------------------- | ---------- | ------- | ------------ | ------ |
+| **Authentification** | 6          | 0       | 1            | 7      |
+| **Profils**          | 8          | 5       | 2            | 15     |
+| **Matching**         | 5          | 3       | 1            | 9      |
+| **Messagerie**       | 3          | 0       | 1            | 4      |
+| **Wali/Famille**     | 3          | 12      | 1            | 16     |
+| **Gamification**     | 5          | 2       | 1            | 8      |
+| **Paiement**         | 3          | 0       | 0            | 3      |
+| **Modération**       | 4          | 1       | 0            | 5      |
+| **Analytics**        | 4          | 0       | 1            | 5      |
+| **Appels**           | 1          | 2       | 0            | 3      |
+| **Notifications**    | 3          | 1       | 0            | 4      |
+| **Sécurité**         | 4          | 3       | 1            | 8      |
+| **Divers**           | 0          | 2       | 0            | 2      |
+| **TOTAL**            | **49**     | **31**  | **9**        | **89** |
 
 ### Effort Estimé
 
@@ -734,17 +734,17 @@ CREATE INDEX idx_profiles_location ON profiles USING GIST(coordinates);
 
 ### Impact par Fonctionnalité
 
-| Fonctionnalité | Impact | Nouvelles Tables | Mises à Jour |
-|----------------|--------|------------------|--------------|
-| **Système Wali** | 🔴 Élevé | 6 | 1 |
-| **Supervision Famille** | 🔴 Élevé | 4 | 0 |
-| **Appels Vidéo/Audio** | 🟡 Moyen | 2 | 0 |
-| **Gamification Avancée** | 🟡 Moyen | 2 | 1 |
-| **Favoris & Tags** | 🟡 Moyen | 5 | 0 |
-| **Matching Avancé** | 🟡 Moyen | 3 | 1 |
-| **Vérifications** | 🟢 Faible | 2 | 0 |
-| **Guidance Islamique** | 🟢 Faible | 1 | 0 |
-| **Autres** | 🟢 Faible | 6 | 6 |
+| Fonctionnalité           | Impact    | Nouvelles Tables | Mises à Jour |
+| ------------------------ | --------- | ---------------- | ------------ |
+| **Système Wali**         | 🔴 Élevé  | 6                | 1            |
+| **Supervision Famille**  | 🔴 Élevé  | 4                | 0            |
+| **Appels Vidéo/Audio**   | 🟡 Moyen  | 2                | 0            |
+| **Gamification Avancée** | 🟡 Moyen  | 2                | 1            |
+| **Favoris & Tags**       | 🟡 Moyen  | 5                | 0            |
+| **Matching Avancé**      | 🟡 Moyen  | 3                | 1            |
+| **Vérifications**        | 🟢 Faible | 2                | 0            |
+| **Guidance Islamique**   | 🟢 Faible | 1                | 0            |
+| **Autres**               | 🟢 Faible | 6                | 6            |
 
 ---
 

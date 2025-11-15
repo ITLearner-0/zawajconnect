@@ -21,12 +21,7 @@ import {
   PermissionHistory,
 } from '@/components/wali/permissions';
 import { WaliAdminTabs } from '@/components/wali/navigation';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const AdminWaliPermissions = () => {
   const {
@@ -66,7 +61,10 @@ const AdminWaliPermissions = () => {
   }
 
   const getRoleBadge = (role: string) => {
-    const variants: Record<string, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {
+    const variants: Record<
+      string,
+      { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }
+    > = {
       super_admin: { variant: 'destructive', label: 'Super Admin' },
       approver: { variant: 'default', label: 'Approbateur' },
       editor: { variant: 'secondary', label: 'Éditeur' },
@@ -99,7 +97,7 @@ const AdminWaliPermissions = () => {
   return (
     <div className="container mx-auto py-8 space-y-6">
       <WaliAdminTabs />
-      
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Shield className="w-8 h-8 text-primary" />
@@ -225,11 +223,7 @@ const AdminWaliPermissions = () => {
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              asChild
-                            >
+                            <Button variant="outline" size="sm" asChild>
                               <Link to={`/admin/wali-permissions/${perm.user_id}`}>
                                 <Eye className="w-4 h-4 mr-2" />
                                 Détails

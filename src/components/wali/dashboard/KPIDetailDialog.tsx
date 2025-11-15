@@ -6,7 +6,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from 'recharts';
 import { supabase } from '@/integrations/supabase/client';
 import { format, subDays } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -92,7 +102,7 @@ export const KPIDetailDialog: React.FC<KPIDetailDialogProps> = ({
 
         // Fetch data for each day
         const dailyResults: DailyData[] = [];
-        
+
         for (let i = 0; i < days; i++) {
           const date = subDays(endDate, days - i);
           const dateStr = format(date, 'yyyy-MM-dd');
@@ -112,7 +122,7 @@ export const KPIDetailDialog: React.FC<KPIDetailDialogProps> = ({
           }
 
           const { count } = await query;
-          
+
           dailyResults.push({
             date: format(date, 'dd MMM', { locale: fr }),
             value: count || 0,
@@ -135,8 +145,8 @@ export const KPIDetailDialog: React.FC<KPIDetailDialogProps> = ({
   // Calculate statistics
   const total = dailyData.reduce((sum, d) => sum + d.value, 0);
   const average = dailyData.length > 0 ? (total / dailyData.length).toFixed(1) : '0';
-  const max = Math.max(...dailyData.map(d => d.value), 0);
-  const min = Math.min(...dailyData.map(d => d.value), 0);
+  const max = Math.max(...dailyData.map((d) => d.value), 0);
+  const min = Math.min(...dailyData.map((d) => d.value), 0);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -149,10 +159,7 @@ export const KPIDetailDialog: React.FC<KPIDetailDialogProps> = ({
         <div className="space-y-6">
           {/* Period Selector */}
           <div className="flex justify-end">
-            <TrendPeriodSelector 
-              value={drillDownMonths} 
-              onChange={setDrillDownMonths} 
-            />
+            <TrendPeriodSelector value={drillDownMonths} onChange={setDrillDownMonths} />
           </div>
 
           {/* Statistics Cards */}
@@ -187,16 +194,13 @@ export const KPIDetailDialog: React.FC<KPIDetailDialogProps> = ({
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={dailyData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis 
-                      dataKey="date" 
+                    <XAxis
+                      dataKey="date"
                       className="text-xs"
                       tick={{ fill: 'hsl(var(--muted-foreground))' }}
                       interval="preserveStartEnd"
                     />
-                    <YAxis 
-                      className="text-xs"
-                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                    />
+                    <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: 'hsl(var(--card))',
@@ -231,16 +235,13 @@ export const KPIDetailDialog: React.FC<KPIDetailDialogProps> = ({
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={dailyData}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis 
-                      dataKey="date" 
+                    <XAxis
+                      dataKey="date"
                       className="text-xs"
                       tick={{ fill: 'hsl(var(--muted-foreground))' }}
                       interval="preserveStartEnd"
                     />
-                    <YAxis 
-                      className="text-xs"
-                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
-                    />
+                    <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: 'hsl(var(--card))',
@@ -248,9 +249,9 @@ export const KPIDetailDialog: React.FC<KPIDetailDialogProps> = ({
                         borderRadius: '6px',
                       }}
                     />
-                    <Bar 
-                      dataKey="value" 
-                      fill={config.color} 
+                    <Bar
+                      dataKey="value"
+                      fill={config.color}
                       radius={[4, 4, 0, 0]}
                       name={config.title}
                     />

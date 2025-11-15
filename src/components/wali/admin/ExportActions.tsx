@@ -21,9 +21,10 @@ export const ExportActions = ({ registrations, selectedIds }: ExportActionsProps
   const [exporting, setExporting] = useState(false);
   const { toast } = useToast();
 
-  const dataToExport = selectedIds && selectedIds.length > 0
-    ? registrations.filter((r) => selectedIds.includes(r.id))
-    : registrations;
+  const dataToExport =
+    selectedIds && selectedIds.length > 0
+      ? registrations.filter((r) => selectedIds.includes(r.id))
+      : registrations;
 
   const exportToCSV = () => {
     setExporting(true);

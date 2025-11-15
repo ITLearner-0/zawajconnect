@@ -86,18 +86,11 @@ export const AlertsTable = ({ alerts, onAcknowledge, onViewDetails }: AlertsTabl
               </div>
             </div>
             <div className="flex gap-2">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => onViewDetails(alert)}
-              >
+              <Button size="sm" variant="outline" onClick={() => onViewDetails(alert)}>
                 Détails
               </Button>
               {!alert.acknowledged && (
-                <Button
-                  size="sm"
-                  onClick={() => onAcknowledge(alert.id)}
-                >
+                <Button size="sm" onClick={() => onAcknowledge(alert.id)}>
                   Confirmer
                 </Button>
               )}

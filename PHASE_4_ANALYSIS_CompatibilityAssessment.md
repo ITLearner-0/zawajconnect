@@ -58,6 +58,7 @@ const { stats, responses, loading, refreshData } = useCompatibility();
    - Utilisation: Typer `stats` du hook
 
 3. **WeightedQuestion**
+
    ```typescript
    export interface WeightedQuestion {
      id: string;

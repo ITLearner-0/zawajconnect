@@ -53,43 +53,44 @@ export const useWaliTrends = (months: number = 12) => {
       const monthsRange = eachMonthOfInterval({ start: startDate, end: endDate });
 
       // Fetch alerts trend
-      const { data: alertsData, error: alertsError } = await supabase
+      const { data: alertsData, error: alertsError } = (await supabase
         .from('wali_admin_alerts' as any)
         .select('created_at, risk_level')
         .gte('created_at', startDate.toISOString())
         .lte('created_at', endDate.toISOString())
-        .order('created_at', { ascending: true }) as any;
+        .order('created_at', { ascending: true })) as any;
 
       if (alertsError) throw alertsError;
 
       // Fetch activity trend
-      const { data: activityData, error: activityError } = await supabase
+      const { data: activityData, error: activityError } = (await supabase
         .from('wali_action_audit' as any)
         .select('created_at, action_type')
         .gte('created_at', startDate.toISOString())
         .lte('created_at', endDate.toISOString())
-        .order('created_at', { ascending: true }) as any;
+        .order('created_at', { ascending: true })) as any;
 
       if (activityError) throw activityError;
 
       // Fetch registrations trend
-      const { data: registrationsData, error: registrationsError } = await supabase
+      const { data: registrationsData, error: registrationsError } = (await supabase
         .from('wali_registrations' as any)
         .select('created_at, status')
         .gte('created_at', startDate.toISOString())
         .lte('created_at', endDate.toISOString())
-        .order('created_at', { ascending: true }) as any;
+        .order('created_at', { ascending: true })) as any;
 
       if (registrationsError) throw registrationsError;
 
       // Process alerts trend
-      const alertsTrendData = monthsRange.map(month => {
+      const alertsTrendData = monthsRange.map((month) => {
         const monthKey = format(month, 'yyyy-MM');
         const monthLabel = format(month, 'MMM yyyy', { locale: fr });
-        
-        const monthAlerts = alertsData?.filter((alert: any) => 
-          format(new Date(alert.created_at), 'yyyy-MM') === monthKey
-        ) || [];
+
+        const monthAlerts =
+          alertsData?.filter(
+            (alert: any) => format(new Date(alert.created_at), 'yyyy-MM') === monthKey
+          ) || [];
 
         return {
           month: monthKey,
@@ -103,32 +104,37 @@ export const useWaliTrends = (months: number = 12) => {
       });
 
       // Process activity trend
-      const activityTrendData = monthsRange.map(month => {
+      const activityTrendData = monthsRange.map((month) => {
         const monthKey = format(month, 'yyyy-MM');
         const monthLabel = format(month, 'MMM yyyy', { locale: fr });
-        
-        const monthActivities = activityData?.filter((activity: any) => 
-          format(new Date(activity.created_at), 'yyyy-MM') === monthKey
-        ) || [];
+
+        const monthActivities =
+          activityData?.filter(
+            (activity: any) => format(new Date(activity.created_at), 'yyyy-MM') === monthKey
+          ) || [];
 
         return {
           month: monthKey,
           monthLabel,
-          registrations: monthActivities.filter((a: any) => a.action_type === 'wali_registration_submitted').length,
+          registrations: monthActivities.filter(
+            (a: any) => a.action_type === 'wali_registration_submitted'
+          ).length,
           approvals: monthActivities.filter((a: any) => a.action_type === 'wali_approved').length,
           rejections: monthActivities.filter((a: any) => a.action_type === 'wali_rejected').length,
-          suspensions: monthActivities.filter((a: any) => a.action_type === 'wali_suspended').length,
+          suspensions: monthActivities.filter((a: any) => a.action_type === 'wali_suspended')
+            .length,
         };
       });
 
       // Process registrations status trend
-      const registrationsTrendData = monthsRange.map(month => {
+      const registrationsTrendData = monthsRange.map((month) => {
         const monthKey = format(month, 'yyyy-MM');
         const monthLabel = format(month, 'MMM yyyy', { locale: fr });
-        
-        const monthRegistrations = registrationsData?.filter((reg: any) => 
-          format(new Date(reg.created_at), 'yyyy-MM') === monthKey
-        ) || [];
+
+        const monthRegistrations =
+          registrationsData?.filter(
+            (reg: any) => format(new Date(reg.created_at), 'yyyy-MM') === monthKey
+          ) || [];
 
         return {
           month: monthKey,

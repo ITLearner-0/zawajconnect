@@ -135,7 +135,7 @@ const InteractiveTutorial: React.FC<InteractiveTutorialProps> = ({
 
   const currentStepData = steps[currentStep];
   const StepIcon = currentStepData ? getStepIcon(currentStepData.id) : Play;
-  
+
   if (!currentStepData) return null;
 
   return (

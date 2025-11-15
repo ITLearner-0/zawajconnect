@@ -28,7 +28,9 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
   selectedPersona,
   onPersonaSelect,
 }) => {
-  const [activeConversation, setActiveConversation] = useState<string>(selectedPersona ? `demo-conv-${selectedPersona.split('-')[2]}` : '');
+  const [activeConversation, setActiveConversation] = useState<string>(
+    selectedPersona ? `demo-conv-${selectedPersona.split('-')[2]}` : ''
+  );
   const [messageInput, setMessageInput] = useState('');
   const [messages, setMessages] = useState<any[]>([]);
   const [typingIndicator, setTypingIndicator] = useState(false);
@@ -38,7 +40,8 @@ const EnhancedDemoMessaging: React.FC<EnhancedDemoMessagingProps> = ({
 
   useEffect(() => {
     if (selectedPersona) {
-      const conversationKey = `demo-conv-${selectedPersona.split('-')[2]}` as keyof typeof demoConversations;
+      const conversationKey =
+        `demo-conv-${selectedPersona.split('-')[2]}` as keyof typeof demoConversations;
       const conversationMessages = demoConversations[conversationKey] || [];
       setMessages(conversationMessages);
       setActiveConversation(conversationKey);

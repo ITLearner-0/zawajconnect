@@ -21,7 +21,9 @@ export const useBadgeNotifications = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       setUserId(user?.id || null);
     };
     fetchUser();
@@ -48,7 +50,7 @@ export const useBadgeNotifications = () => {
       },
     };
 
-    setNotificationQueue(prev => [...prev, notification]);
+    setNotificationQueue((prev) => [...prev, notification]);
   }, []);
 
   // Close current notification
@@ -81,10 +83,10 @@ export const useBadgeNotifications = () => {
         },
         (payload) => {
           console.log('[BadgeNotifications] New badge received:', payload);
-          
+
           // Cast payload to UserBadge type
           const newBadge = payload.new as UserBadge;
-          
+
           // Add to notification queue
           addNotification(newBadge);
         }

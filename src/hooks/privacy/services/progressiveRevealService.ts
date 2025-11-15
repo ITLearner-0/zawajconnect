@@ -69,7 +69,10 @@ export class ProgressiveRevealService {
     }
   }
 
-  filterProfileData(profile: any, revealLevel: keyof ProgressiveRevealSettings['revealStages']): any {
+  filterProfileData(
+    profile: any,
+    revealLevel: keyof ProgressiveRevealSettings['revealStages']
+  ): any {
     const filtered = { ...profile };
 
     switch (revealLevel) {

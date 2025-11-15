@@ -34,9 +34,7 @@ export default function BadgeLeaderboard() {
       setLoading(true);
 
       // Get total badges leaderboard
-      const { data: totalBadgesData } = await (supabase as any)
-        .from('user_badges')
-        .select(`
+      const { data: totalBadgesData } = await (supabase as any).from('user_badges').select(`
           user_id,
           profiles:user_id (
             username,
@@ -45,9 +43,7 @@ export default function BadgeLeaderboard() {
         `);
 
       // Get legendary badges leaderboard
-      const { data: legendaryData } = await (supabase as any)
-        .from('user_badges')
-        .select(`
+      const { data: legendaryData } = await (supabase as any).from('user_badges').select(`
           user_id,
           rarity,
           profiles:user_id (
@@ -59,14 +55,16 @@ export default function BadgeLeaderboard() {
       // Get XP leaderboard
       const { data: xpData } = await supabase
         .from('user_levels')
-        .select(`
+        .select(
+          `
           user_id,
           total_xp,
           profiles:user_id (
             username,
             avatar_url
           )
-        `)
+        `
+        )
         .order('total_xp', { ascending: false })
         .limit(50);
 
@@ -152,15 +150,17 @@ export default function BadgeLeaderboard() {
     return <span className="text-sm font-semibold text-muted-foreground">#{rank}</span>;
   };
 
-  const renderLeaderboardEntry = (entry: LeaderboardEntry, showBadges: boolean, showXp: boolean) => (
+  const renderLeaderboardEntry = (
+    entry: LeaderboardEntry,
+    showBadges: boolean,
+    showXp: boolean
+  ) => (
     <div
       key={entry.user_id}
       className="flex items-center gap-4 p-4 rounded-lg border border-border bg-card hover:bg-accent/50 transition-colors"
     >
-      <div className="flex items-center justify-center w-12">
-        {getRankIcon(entry.rank)}
-      </div>
-      
+      <div className="flex items-center justify-center w-12">{getRankIcon(entry.rank)}</div>
+
       <Avatar className="w-12 h-12">
         <AvatarImage src={entry.avatar_url || undefined} alt={entry.username} />
         <AvatarFallback className="bg-primary/10 text-primary">
@@ -173,13 +173,19 @@ export default function BadgeLeaderboard() {
         {showBadges && (
           <div className="flex gap-2 mt-1">
             {entry.legendary_count > 0 && (
-              <Badge variant="outline" className="text-xs bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50">
+              <Badge
+                variant="outline"
+                className="text-xs bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-500/50"
+              >
                 <Crown className="w-3 h-3 mr-1" />
                 {entry.legendary_count} Legendary
               </Badge>
             )}
             {entry.epic_count > 0 && (
-              <Badge variant="outline" className="text-xs bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-500/30">
+              <Badge
+                variant="outline"
+                className="text-xs bg-gradient-to-r from-purple-500/10 to-blue-500/10 border-purple-500/30"
+              >
                 {entry.epic_count} Epic
               </Badge>
             )}
@@ -188,9 +194,7 @@ export default function BadgeLeaderboard() {
       </div>
 
       <div className="text-right">
-        {showBadges && (
-          <p className="text-2xl font-bold text-primary">{entry.total_badges}</p>
-        )}
+        {showBadges && <p className="text-2xl font-bold text-primary">{entry.total_badges}</p>}
         {showXp && (
           <div className="flex items-center gap-1">
             <Zap className="w-4 h-4 text-yellow-500" />
@@ -253,9 +257,7 @@ export default function BadgeLeaderboard() {
           <Card>
             <CardHeader>
               <CardTitle>Total Badges Leaderboard</CardTitle>
-              <CardDescription>
-                Users ranked by their total number of badges earned
-              </CardDescription>
+              <CardDescription>Users ranked by their total number of badges earned</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
@@ -293,9 +295,7 @@ export default function BadgeLeaderboard() {
           <Card>
             <CardHeader>
               <CardTitle>Experience Points Leaderboard</CardTitle>
-              <CardDescription>
-                Users ranked by their total XP accumulated
-              </CardDescription>
+              <CardDescription>Users ranked by their total XP accumulated</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">

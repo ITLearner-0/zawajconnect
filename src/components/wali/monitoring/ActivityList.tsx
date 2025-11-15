@@ -40,9 +40,7 @@ export const ActivityList = ({ activities, onSuspend }: ActivityListProps) => {
       <CardContent>
         <div className="space-y-3">
           {sortedActivities.length === 0 ? (
-            <p className="text-center text-muted-foreground py-4">
-              Aucune activité récente
-            </p>
+            <p className="text-center text-muted-foreground py-4">Aucune activité récente</p>
           ) : (
             sortedActivities.map((activity) => (
               <div
@@ -64,9 +62,7 @@ export const ActivityList = ({ activities, onSuspend }: ActivityListProps) => {
                       <span className="font-medium">Suspectes:</span>{' '}
                       <span
                         className={
-                          activity.suspicious_actions > 0
-                            ? 'text-red-500 font-semibold'
-                            : ''
+                          activity.suspicious_actions > 0 ? 'text-red-500 font-semibold' : ''
                         }
                       >
                         {activity.suspicious_actions}

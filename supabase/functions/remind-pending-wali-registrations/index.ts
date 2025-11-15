@@ -40,14 +40,16 @@ Deno.serve(async (req) => {
       throw fetchError;
     }
 
-    console.log(`Found ${pendingRegistrations?.length || 0} pending registrations older than 7 days`);
+    console.log(
+      `Found ${pendingRegistrations?.length || 0} pending registrations older than 7 days`
+    );
 
     if (!pendingRegistrations || pendingRegistrations.length === 0) {
       return new Response(
         JSON.stringify({
           success: true,
           message: 'No pending registrations requiring reminders',
-          results: { total: 0, emailsSent: 0, errors: [] }
+          results: { total: 0, emailsSent: 0, errors: [] },
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
@@ -205,8 +207,8 @@ Deno.serve(async (req) => {
           admins_notified: adminEmails.length,
           days_pending: Math.floor(
             (Date.now() - new Date(registration.created_at).getTime()) / (1000 * 60 * 60 * 24)
-          )
-        }
+          ),
+        },
       });
     }
 
@@ -218,18 +220,17 @@ Deno.serve(async (req) => {
           total: pendingRegistrations.length,
           emailsSent: emailsSent.length,
           adminEmails: adminEmails.length,
-          errors
-        }
+          errors,
+        },
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
-
   } catch (error) {
     console.error('Error in remind-pending-wali-registrations function:', error);
     return new Response(
       JSON.stringify({
         success: false,
-        error: error.message
+        error: error.message,
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     );

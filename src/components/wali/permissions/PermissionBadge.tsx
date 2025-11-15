@@ -10,7 +10,10 @@ interface PermissionBadgeProps {
 export const PermissionBadge = ({ role, showIcon = true }: PermissionBadgeProps) => {
   if (!role) return null;
 
-  const variants: Record<WaliAdminRole, { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }> = {
+  const variants: Record<
+    WaliAdminRole,
+    { variant: 'default' | 'secondary' | 'destructive' | 'outline'; label: string }
+  > = {
     super_admin: { variant: 'destructive', label: 'Super Admin' },
     approver: { variant: 'default', label: 'Approbateur' },
     editor: { variant: 'secondary', label: 'Éditeur' },

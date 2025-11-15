@@ -87,7 +87,7 @@ export class DelegationService {
       const delegations: WaliDelegation[] = (data || []).map((d: any) => ({
         ...d,
         primary_wali_id: d.delegate_wali_id, // Map for compatibility
-        delegation_type: d.delegation_type as 'temporary' | 'emergency' | 'specific_event'
+        delegation_type: d.delegation_type as 'temporary' | 'emergency' | 'specific_event',
       }));
       return delegations;
     } catch (error) {
@@ -152,7 +152,7 @@ export class DelegationService {
         ...d,
         contact_information: d.contact_information || '',
         is_verified: d.is_verified ?? false,
-        availability_status: d.availability_status || 'unknown'
+        availability_status: d.availability_status || 'unknown',
       }));
       return delegates;
     } catch (error) {

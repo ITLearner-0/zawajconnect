@@ -32,8 +32,16 @@ interface WaliAlertContactModalProps {
 
 const emailSchema = z.object({
   emailType: z.enum(['warning', 'inquiry', 'suspension']),
-  subject: z.string().trim().min(5, 'Le sujet doit contenir au moins 5 caractères').max(200, 'Le sujet ne doit pas dépasser 200 caractères'),
-  message: z.string().trim().min(20, 'Le message doit contenir au moins 20 caractères').max(2000, 'Le message ne doit pas dépasser 2000 caractères'),
+  subject: z
+    .string()
+    .trim()
+    .min(5, 'Le sujet doit contenir au moins 5 caractères')
+    .max(200, 'Le sujet ne doit pas dépasser 200 caractères'),
+  message: z
+    .string()
+    .trim()
+    .min(20, 'Le message doit contenir au moins 20 caractères')
+    .max(2000, 'Le message ne doit pas dépasser 2000 caractères'),
 });
 
 const WaliAlertContactModal: React.FC<WaliAlertContactModalProps> = ({
@@ -139,7 +147,7 @@ const WaliAlertContactModal: React.FC<WaliAlertContactModalProps> = ({
       case 'warning':
         return 'Avertissement formel concernant un comportement suspect';
       case 'inquiry':
-        return 'Demande d\'information ou de clarification';
+        return "Demande d'information ou de clarification";
       case 'suspension':
         return 'Notification de suspension du compte wali';
       default:
@@ -153,13 +161,13 @@ const WaliAlertContactModal: React.FC<WaliAlertContactModalProps> = ({
     switch (emailType) {
       case 'warning':
         return `Bonjour,\n\nNous avons détecté un comportement inhabituel sur votre compte wali. Cette alerte concerne: ${alert.pattern_detected}.\n\nNous vous demandons de réviser vos activités récentes et de vous assurer que toutes vos actions sont conformes à nos directives communautaires.\n\nSi vous avez des questions ou pensez qu'il s'agit d'une erreur, n'hésitez pas à nous contacter.\n\nCordialement,\nL'équipe de modération`;
-      
+
       case 'inquiry':
         return `Bonjour,\n\nNous aimerions obtenir des clarifications concernant une alerte récente sur votre compte: ${alert.pattern_detected}.\n\nPourriez-vous nous fournir plus d'informations sur cette situation?\n\nNous restons à votre disposition pour toute question.\n\nCordialement,\nL'équipe administrative`;
-      
+
       case 'suspension':
         return `Bonjour,\n\nSuite à l'alerte concernant: ${alert.pattern_detected}, votre compte wali a été temporairement suspendu.\n\nCette mesure est prise pour assurer la sécurité de notre communauté. Vous pouvez soumettre un recours via le portail de support.\n\nCordialement,\nL'équipe de modération`;
-      
+
       default:
         return '';
     }
@@ -191,10 +199,7 @@ const WaliAlertContactModal: React.FC<WaliAlertContactModalProps> = ({
           {/* Email Type Selection */}
           <div className="space-y-2">
             <Label htmlFor="emailType">Type d'Email</Label>
-            <Select
-              value={emailType}
-              onValueChange={(value: any) => setEmailType(value)}
-            >
+            <Select value={emailType} onValueChange={(value: any) => setEmailType(value)}>
               <SelectTrigger id="emailType">
                 <SelectValue />
               </SelectTrigger>
@@ -225,9 +230,7 @@ const WaliAlertContactModal: React.FC<WaliAlertContactModalProps> = ({
                 </SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-sm text-muted-foreground">
-              {getEmailTypeDescription()}
-            </p>
+            <p className="text-sm text-muted-foreground">{getEmailTypeDescription()}</p>
           </div>
 
           {/* Alert Context */}
@@ -254,12 +257,8 @@ const WaliAlertContactModal: React.FC<WaliAlertContactModalProps> = ({
               maxLength={200}
               className={errors.subject ? 'border-destructive' : ''}
             />
-            {errors.subject && (
-              <p className="text-sm text-destructive">{errors.subject}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              {subject.length}/200 caractères
-            </p>
+            {errors.subject && <p className="text-sm text-destructive">{errors.subject}</p>}
+            <p className="text-xs text-muted-foreground">{subject.length}/200 caractères</p>
           </div>
 
           {/* Message */}
@@ -276,21 +275,13 @@ const WaliAlertContactModal: React.FC<WaliAlertContactModalProps> = ({
               maxLength={2000}
               className={errors.message ? 'border-destructive' : ''}
             />
-            {errors.message && (
-              <p className="text-sm text-destructive">{errors.message}</p>
-            )}
-            <p className="text-xs text-muted-foreground">
-              {message.length}/2000 caractères
-            </p>
+            {errors.message && <p className="text-sm text-destructive">{errors.message}</p>}
+            <p className="text-xs text-muted-foreground">{message.length}/2000 caractères</p>
           </div>
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={sending}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={sending}>
             Annuler
           </Button>
           <Button

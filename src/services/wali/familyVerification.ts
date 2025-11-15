@@ -75,12 +75,27 @@ export class FamilyVerificationService {
         .single();
 
       if (error && error.code !== 'PGRST116') throw error;
-      const verification: FamilyRelationshipVerification | null = data ? {
-        ...data,
-        relationship_type: data.relationship_type as 'father' | 'brother' | 'uncle' | 'grandfather' | 'other',
-        verification_method: data.verification_method as 'document' | 'witness' | 'community' | 'self_declaration',
-        verification_status: data.verification_status as 'pending' | 'verified' | 'rejected' | 'requires_review'
-      } : null;
+      const verification: FamilyRelationshipVerification | null = data
+        ? {
+            ...data,
+            relationship_type: data.relationship_type as
+              | 'father'
+              | 'brother'
+              | 'uncle'
+              | 'grandfather'
+              | 'other',
+            verification_method: data.verification_method as
+              | 'document'
+              | 'witness'
+              | 'community'
+              | 'self_declaration',
+            verification_status: data.verification_status as
+              | 'pending'
+              | 'verified'
+              | 'rejected'
+              | 'requires_review',
+          }
+        : null;
       return verification;
     } catch (error) {
       console.error('Error fetching verification status:', error);

@@ -1,6 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 
-type BadgeId = 
+type BadgeId =
   | 'profile_complete_25'
   | 'profile_complete_50'
   | 'profile_complete_75'

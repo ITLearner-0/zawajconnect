@@ -73,9 +73,7 @@ export const ActivityTimeline = ({ activities }: ActivityTimelineProps) => {
                     {/* Activity content */}
                     <div className="space-y-1">
                       <div className="flex items-start justify-between gap-2">
-                        <p className="text-sm font-medium">
-                          {activity.action_description}
-                        </p>
+                        <p className="text-sm font-medium">{activity.action_description}</p>
                         <span className="text-xs text-muted-foreground whitespace-nowrap">
                           {format(new Date(activity.created_at), 'dd MMM HH:mm', {
                             locale: fr,
@@ -83,9 +81,7 @@ export const ActivityTimeline = ({ activities }: ActivityTimelineProps) => {
                         </span>
                       </div>
 
-                      <p className="text-xs text-muted-foreground">
-                        par {activity.admin_name}
-                      </p>
+                      <p className="text-xs text-muted-foreground">par {activity.admin_name}</p>
 
                       {/* Show old/new values for certain actions */}
                       {(activity.old_value || activity.new_value) && (

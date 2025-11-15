@@ -102,11 +102,7 @@ export const CommentsSection = ({
               onChange={(e) => setNewComment(e.target.value)}
               rows={3}
             />
-            <Button
-              onClick={handleAdd}
-              disabled={!newComment.trim() || isSubmitting}
-              size="sm"
-            >
+            <Button onClick={handleAdd} disabled={!newComment.trim() || isSubmitting} size="sm">
               <Plus className="w-4 h-4 mr-2" />
               Ajouter un commentaire
             </Button>
@@ -121,16 +117,11 @@ export const CommentsSection = ({
             </p>
           ) : (
             comments.map((comment) => (
-              <div
-                key={comment.id}
-                className="border rounded-lg p-3 space-y-2 bg-muted/50"
-              >
+              <div key={comment.id} className="border rounded-lg p-3 space-y-2 bg-muted/50">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-medium text-sm">
-                        {comment.admin_name}
-                      </span>
+                      <span className="font-medium text-sm">{comment.admin_name}</span>
                       {comment.is_internal && (
                         <Badge variant="secondary" className="text-xs">
                           Interne
@@ -172,9 +163,7 @@ export const CommentsSection = ({
                         </div>
                       </div>
                     ) : (
-                      <p className="text-sm whitespace-pre-wrap">
-                        {comment.comment_text}
-                      </p>
+                      <p className="text-sm whitespace-pre-wrap">{comment.comment_text}</p>
                     )}
                   </div>
 
@@ -182,18 +171,10 @@ export const CommentsSection = ({
                     permissions.canEdit &&
                     editingId !== comment.id && (
                       <div className="flex gap-1">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => startEdit(comment)}
-                        >
+                        <Button size="sm" variant="ghost" onClick={() => startEdit(comment)}>
                           <Edit2 className="w-3 h-3" />
                         </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setDeleteId(comment.id)}
-                        >
+                        <Button size="sm" variant="ghost" onClick={() => setDeleteId(comment.id)}>
                           <Trash2 className="w-3 h-3 text-destructive" />
                         </Button>
                       </div>
@@ -209,8 +190,7 @@ export const CommentsSection = ({
             <AlertDialogHeader>
               <AlertDialogTitle>Supprimer le commentaire ?</AlertDialogTitle>
               <AlertDialogDescription>
-                Cette action est irréversible. Le commentaire sera définitivement
-                supprimé.
+                Cette action est irréversible. Le commentaire sera définitivement supprimé.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

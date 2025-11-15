@@ -3,7 +3,13 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, Search, X } from 'lucide-react';
@@ -41,7 +47,7 @@ export const AuditFilters = ({ filters, onFiltersChange }: AuditFiltersProps) =>
   };
 
   const hasActiveFilters = Object.keys(localFilters).some(
-    key => localFilters[key as keyof AuditFiltersType] !== undefined
+    (key) => localFilters[key as keyof AuditFiltersType] !== undefined
   );
 
   return (
@@ -70,7 +76,7 @@ export const AuditFilters = ({ filters, onFiltersChange }: AuditFiltersProps) =>
             onValueChange={(value) =>
               setLocalFilters({
                 ...localFilters,
-                actionType: value === 'all' ? undefined : value
+                actionType: value === 'all' ? undefined : value,
               })
             }
           >
@@ -95,7 +101,9 @@ export const AuditFilters = ({ filters, onFiltersChange }: AuditFiltersProps) =>
             <PopoverTrigger asChild>
               <Button variant="outline" className="w-full justify-start text-left font-normal">
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {localFilters.startDate ? format(localFilters.startDate, 'dd/MM/yyyy') : 'Sélectionner'}
+                {localFilters.startDate
+                  ? format(localFilters.startDate, 'dd/MM/yyyy')
+                  : 'Sélectionner'}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">

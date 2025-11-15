@@ -18,20 +18,24 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
 
 const registrationSchema = z.object({
-  full_name: z.string()
+  full_name: z
+    .string()
     .trim()
     .min(2, 'Le nom doit contenir au moins 2 caractères')
     .max(100, 'Le nom ne peut pas dépasser 100 caractères'),
-  email: z.string()
+  email: z
+    .string()
     .trim()
     .email('Adresse email invalide')
-    .max(255, 'L\'email ne peut pas dépasser 255 caractères'),
-  phone: z.string()
+    .max(255, "L'email ne peut pas dépasser 255 caractères"),
+  phone: z
+    .string()
     .trim()
     .regex(/^\+?[1-9]\d{7,14}$/, 'Numéro de téléphone invalide')
     .optional()
     .or(z.literal('')),
-  relationship_to_user: z.string()
+  relationship_to_user: z
+    .string()
     .trim()
     .min(10, 'Veuillez décrire votre relation avec les membres (minimum 10 caractères)')
     .max(500, 'La description ne peut pas dépasser 500 caractères'),
@@ -69,10 +73,7 @@ export const WaliRegistrationForm = () => {
     return null;
   };
 
-  const handleFileChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: 'id' | 'proof'
-  ) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'id' | 'proof') => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -110,9 +111,9 @@ export const WaliRegistrationForm = () => {
       throw new Error(`Erreur lors de l'upload: ${uploadError.message}`);
     }
 
-    const { data: { publicUrl } } = supabase.storage
-      .from('documents')
-      .getPublicUrl(filePath);
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from('documents').getPublicUrl(filePath);
 
     return publicUrl;
   };
@@ -124,7 +125,7 @@ export const WaliRegistrationForm = () => {
     }
 
     if (!idDocument) {
-      toast.error('Veuillez fournir une pièce d\'identité');
+      toast.error("Veuillez fournir une pièce d'identité");
       return;
     }
 
@@ -139,11 +140,11 @@ export const WaliRegistrationForm = () => {
       // Upload ID document
       setUploadProgress({ id: 30, proof: 0 });
       const idUrl = await uploadDocument(idDocument, 'id', user.id);
-      
+
       // Upload proof document
       setUploadProgress({ id: 100, proof: 30 });
       const proofUrl = await uploadDocument(proofDocument, 'proof', user.id);
-      
+
       setUploadProgress({ id: 100, proof: 100 });
 
       // Create registration
@@ -179,7 +180,8 @@ export const WaliRegistrationForm = () => {
       <CardHeader>
         <CardTitle className="text-2xl">Inscription Wali</CardTitle>
         <CardDescription>
-          Remplissez ce formulaire pour devenir un Wali (tuteur) et superviser les membres de votre famille
+          Remplissez ce formulaire pour devenir un Wali (tuteur) et superviser les membres de votre
+          famille
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -187,7 +189,7 @@ export const WaliRegistrationForm = () => {
           {/* Personal Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Informations Personnelles</h3>
-            
+
             <div className="space-y-2">
               <Label htmlFor="full_name">
                 Nom Complet <span className="text-destructive">*</span>
@@ -214,9 +216,7 @@ export const WaliRegistrationForm = () => {
                 placeholder="votre.email@example.com"
                 disabled={isSubmitting}
               />
-              {errors.email && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
-              )}
+              {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -228,9 +228,7 @@ export const WaliRegistrationForm = () => {
                 placeholder="+33 6 12 34 56 78"
                 disabled={isSubmitting}
               />
-              {errors.phone && (
-                <p className="text-sm text-destructive">{errors.phone.message}</p>
-              )}
+              {errors.phone && <p className="text-sm text-destructive">{errors.phone.message}</p>}
             </div>
 
             <div className="space-y-2">
@@ -245,9 +243,7 @@ export const WaliRegistrationForm = () => {
                 disabled={isSubmitting}
               />
               {errors.relationship_to_user && (
-                <p className="text-sm text-destructive">
-                  {errors.relationship_to_user.message}
-                </p>
+                <p className="text-sm text-destructive">{errors.relationship_to_user.message}</p>
               )}
             </div>
           </div>
@@ -309,7 +305,8 @@ export const WaliRegistrationForm = () => {
                 Preuve de Relation <span className="text-destructive">*</span>
               </Label>
               <p className="text-xs text-muted-foreground">
-                Livret de famille, certificat de naissance, ou tout document officiel prouvant votre relation
+                Livret de famille, certificat de naissance, ou tout document officiel prouvant votre
+                relation
               </p>
               <div className="flex items-center gap-2">
                 <Input
@@ -362,11 +359,7 @@ export const WaliRegistrationForm = () => {
             >
               Annuler
             </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="flex-1"
-            >
+            <Button type="submit" disabled={isSubmitting} className="flex-1">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />

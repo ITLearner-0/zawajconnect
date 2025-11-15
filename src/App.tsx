@@ -1,19 +1,19 @@
-import React, { Suspense } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AuthProvider from "@/contexts/AuthContext";
-import { UserDataProvider } from "@/contexts/UserDataContext";
-import NavigationGuard from "@/components/navigation/NavigationGuard";
-import { NavigationProvider } from "@/components/navigation/NavigationProvider";
-import RouteTransition from "@/components/navigation/RouteTransition";
-import { publicRoutes, specialRoutes, protectedRoutes, notFoundRoute } from "@/config/appRoutes";
-import { Toaster } from "@/components/ui/toaster";
-import { BadgeNotificationProvider } from "@/components/gamification/BadgeNotificationProvider";
-import ProtectedRouteWrapper from "@/components/routing/ProtectedRouteWrapper";
-import { FreemiumBanner } from "@/components/FreemiumBanner";
-import { CookieConsentBanner } from "@/components/CookieConsentBanner";
-import { AchievementNotificationProvider } from "@/components/AchievementNotificationProvider";
-import { EmailVerificationMonitor } from "@/components/EmailVerificationMonitor";
+import React, { Suspense } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import AuthProvider from '@/contexts/AuthContext';
+import { UserDataProvider } from '@/contexts/UserDataContext';
+import NavigationGuard from '@/components/navigation/NavigationGuard';
+import { NavigationProvider } from '@/components/navigation/NavigationProvider';
+import RouteTransition from '@/components/navigation/RouteTransition';
+import { publicRoutes, specialRoutes, protectedRoutes, notFoundRoute } from '@/config/appRoutes';
+import { Toaster } from '@/components/ui/toaster';
+import { BadgeNotificationProvider } from '@/components/gamification/BadgeNotificationProvider';
+import ProtectedRouteWrapper from '@/components/routing/ProtectedRouteWrapper';
+import { FreemiumBanner } from '@/components/FreemiumBanner';
+import { CookieConsentBanner } from '@/components/CookieConsentBanner';
+import { AchievementNotificationProvider } from '@/components/AchievementNotificationProvider';
+import { EmailVerificationMonitor } from '@/components/EmailVerificationMonitor';
 
 // Loading fallback component for lazy-loaded routes
 const RouteLoadingFallback = () => (
@@ -37,13 +37,13 @@ const queryClient = new QueryClient({
 
 function App() {
   const NotFoundComponent = notFoundRoute.component;
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter
         future={{
           v7_startTransition: true,
-          v7_relativeSplatPath: true
+          v7_relativeSplatPath: true,
         }}
       >
         <AuthProvider>
@@ -55,64 +55,68 @@ function App() {
                   <NavigationGuard>
                     <FreemiumBanner />
                     <RouteTransition>
-                <Suspense fallback={<RouteLoadingFallback />}>
-                  <Routes>
-                    {/* Public routes */}
-                    {publicRoutes.map((route) => {
-                      const Component = route.component;
-                      return (
-                        <Route
-                          key={route.path}
-                          path={route.path}
-                          element={
-                            <Suspense fallback={<RouteLoadingFallback />}>
-                              <Component />
-                            </Suspense>
-                          }
-                        />
-                      );
-                    })}
+                      <Suspense fallback={<RouteLoadingFallback />}>
+                        <Routes>
+                          {/* Public routes */}
+                          {publicRoutes.map((route) => {
+                            const Component = route.component;
+                            return (
+                              <Route
+                                key={route.path}
+                                path={route.path}
+                                element={
+                                  <Suspense fallback={<RouteLoadingFallback />}>
+                                    <Component />
+                                  </Suspense>
+                                }
+                              />
+                            );
+                          })}
 
-                    {/* Special routes (protected with different requirements) */}
-                    {specialRoutes.map((route) => {
-                      const Component = route.component;
-                      return (
-                        <Route
-                          key={route.path}
-                          path={route.path}
-                          element={
-                            <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
-                              <Suspense fallback={<RouteLoadingFallback />}>
-                                <Component />
-                              </Suspense>
-                            </ProtectedRouteWrapper>
-                          }
-                        />
-                      );
-                    })}
+                          {/* Special routes (protected with different requirements) */}
+                          {specialRoutes.map((route) => {
+                            const Component = route.component;
+                            return (
+                              <Route
+                                key={route.path}
+                                path={route.path}
+                                element={
+                                  <ProtectedRouteWrapper
+                                    requireOnboarding={route.requiresOnboarding}
+                                  >
+                                    <Suspense fallback={<RouteLoadingFallback />}>
+                                      <Component />
+                                    </Suspense>
+                                  </ProtectedRouteWrapper>
+                                }
+                              />
+                            );
+                          })}
 
-                    {/* Protected routes */}
-                    {protectedRoutes.map((route) => {
-                      const Component = route.component;
-                      return (
-                        <Route
-                          key={route.path}
-                          path={route.path}
-                          element={
-                            <ProtectedRouteWrapper requireOnboarding={route.requiresOnboarding}>
-                              <Suspense fallback={<RouteLoadingFallback />}>
-                                <Component />
-                              </Suspense>
-                            </ProtectedRouteWrapper>
-                          }
-                        />
-                      );
-                    })}
+                          {/* Protected routes */}
+                          {protectedRoutes.map((route) => {
+                            const Component = route.component;
+                            return (
+                              <Route
+                                key={route.path}
+                                path={route.path}
+                                element={
+                                  <ProtectedRouteWrapper
+                                    requireOnboarding={route.requiresOnboarding}
+                                  >
+                                    <Suspense fallback={<RouteLoadingFallback />}>
+                                      <Component />
+                                    </Suspense>
+                                  </ProtectedRouteWrapper>
+                                }
+                              />
+                            );
+                          })}
 
-                    {/* Catch all route */}
-                    <Route path={notFoundRoute.path} element={<NotFoundComponent />} />
-                  </Routes>
-                </Suspense>
+                          {/* Catch all route */}
+                          <Route path={notFoundRoute.path} element={<NotFoundComponent />} />
+                        </Routes>
+                      </Suspense>
                     </RouteTransition>
                     <CookieConsentBanner />
                   </NavigationGuard>

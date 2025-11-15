@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { VideoCallStatus } from '@/types/profile';
@@ -8,17 +7,17 @@ export const useVideoCall = (conversationId: string | undefined, userId?: string
   const { toast } = useToast();
   const [videoCallStatus, setVideoCallStatus] = useState<VideoCallStatus>({
     isActive: false,
-    waliPresent: false
+    waliPresent: false,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const startVideoCall = async (participantId: string) => {
     if (!userId || !conversationId) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       // Check if wali supervision is required
       const { data: profileData, error: profileError } = await supabase
@@ -26,51 +25,49 @@ export const useVideoCall = (conversationId: string | undefined, userId?: string
         .select('gender')
         .eq('id', userId)
         .single();
-        
+
       if (profileError) {
         throw profileError;
       }
-      
+
       const isUserFemale = profileData?.gender === 'Female';
       const waliPresent = isUserFemale;
-      
+
       setVideoCallStatus({
         isActive: true,
         participantId,
         waliPresent,
-        startTime: new Date()
+        startTime: new Date(),
       });
-      
+
       // Log video call start in database
-      const { error: insertError } = await (supabase as any)
-        .from('video_calls')
-        .insert({
-          match_id: conversationId,
-          initiator_id: userId,
-          receiver_id: participantId,
-          wali_present: waliPresent
-        });
-        
+      const { error: insertError } = await (supabase as any).from('video_calls').insert({
+        match_id: conversationId,
+        initiator_id: userId,
+        receiver_id: participantId,
+        wali_present: waliPresent,
+      });
+
       if (insertError) {
         throw insertError;
       }
-      
+
       toast({
-        title: "Video call started",
+        title: 'Video call started',
         description: `Connected with ${participantId}`,
       });
     } catch (err: any) {
       setError(err.message);
       toast({
-        title: "Error starting video call",
+        title: 'Error starting video call',
         description: err.message,
-        variant: "destructive"
+        variant: 'destructive',
       });
-      
+
       // Reset video call state in case of error
       setVideoCallStatus({
         isActive: false,
-        waliPresent: false
+        waliPresent: false,
       });
     } finally {
       setLoading(false);
@@ -79,49 +76,49 @@ export const useVideoCall = (conversationId: string | undefined, userId?: string
 
   const endVideoCall = async () => {
     if (!videoCallStatus.startTime || !userId) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       // Calculate duration
       const duration = Math.round(
         (new Date().getTime() - videoCallStatus.startTime.getTime()) / 1000
       );
-      
+
       // Update video call record
       if (conversationId && videoCallStatus.participantId) {
         const { error: updateError } = await supabase
           .from('video_calls')
           .update({
             end_time: new Date().toISOString(),
-            duration_seconds: duration
+            duration_seconds: duration,
           })
           .eq('match_id', conversationId)
           .eq('initiator_id', userId)
           .is('end_time', null);
-          
+
         if (updateError) {
           throw updateError;
         }
-        
+
         toast({
-          title: "Video call ended",
+          title: 'Video call ended',
           description: `Call duration: ${Math.floor(duration / 60)}m ${duration % 60}s`,
         });
       }
     } catch (err: any) {
       setError(err.message);
       toast({
-        title: "Error ending video call",
+        title: 'Error ending video call',
         description: err.message,
-        variant: "destructive"
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
       setVideoCallStatus({
         isActive: false,
-        waliPresent: false
+        waliPresent: false,
       });
     }
   };
@@ -131,6 +128,6 @@ export const useVideoCall = (conversationId: string | undefined, userId?: string
     startVideoCall,
     endVideoCall,
     loading,
-    error
+    error,
   };
 };

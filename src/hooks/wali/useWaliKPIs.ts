@@ -43,7 +43,7 @@ const getPeriodDates = (period: KPIPeriod) => {
       currentStart = new Date(now);
       currentStart.setDate(now.getDate() - 7);
       currentStart.setHours(0, 0, 0, 0);
-      
+
       previousEnd = new Date(currentStart);
       previousEnd.setMilliseconds(-1);
       previousStart = new Date(previousEnd);
@@ -55,7 +55,7 @@ const getPeriodDates = (period: KPIPeriod) => {
       currentStart = new Date(now);
       currentStart.setDate(now.getDate() - 30);
       currentStart.setHours(0, 0, 0, 0);
-      
+
       previousEnd = new Date(currentStart);
       previousEnd.setMilliseconds(-1);
       previousStart = new Date(previousEnd);
@@ -67,7 +67,7 @@ const getPeriodDates = (period: KPIPeriod) => {
       currentStart = new Date(now);
       currentStart.setDate(now.getDate() - 90);
       currentStart.setHours(0, 0, 0, 0);
-      
+
       previousEnd = new Date(currentStart);
       previousEnd.setMilliseconds(-1);
       previousStart = new Date(previousEnd);
@@ -79,7 +79,7 @@ const getPeriodDates = (period: KPIPeriod) => {
       currentStart = new Date(now);
       currentStart.setDate(now.getDate() - 30);
       currentStart.setHours(0, 0, 0, 0);
-      
+
       previousEnd = new Date(currentStart);
       previousEnd.setMilliseconds(-1);
       previousStart = new Date(previousEnd);

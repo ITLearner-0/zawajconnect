@@ -6,7 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { RegistrationDetailModal } from './RegistrationDetailModal';
 import { SuspensionManagementPanel } from '../suspension/SuspensionManagementPanel';
 import { OnboardingProgressTracker } from '../onboarding/OnboardingProgressTracker';
@@ -84,9 +90,7 @@ export const WaliAdminDashboard = () => {
   };
 
   const handleToggleSelect = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
-    );
+    setSelectedIds((prev) => (prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]));
   };
 
   const handleToggleSelectAll = () => {
@@ -99,9 +103,7 @@ export const WaliAdminDashboard = () => {
 
   const handleBulkApprove = async (ids: string[]) => {
     if (!user?.id) return;
-    const results = await Promise.allSettled(
-      ids.map((id) => approveRegistration(id, user.id))
-    );
+    const results = await Promise.allSettled(ids.map((id) => approveRegistration(id, user.id)));
     const successCount = results.filter((r) => r.status === 'fulfilled').length;
     toast({
       title: 'Approba tions en masse',
@@ -197,9 +199,7 @@ export const WaliAdminDashboard = () => {
       <div className="grid gap-4 md:grid-cols-5">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Total</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.total}</div>
@@ -207,9 +207,7 @@ export const WaliAdminDashboard = () => {
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              En attente
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">En attente</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-orange-500">{stats.pending}</div>
@@ -217,9 +215,7 @@ export const WaliAdminDashboard = () => {
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Approuvées
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Approuvées</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-500">{stats.approved}</div>
@@ -227,9 +223,7 @@ export const WaliAdminDashboard = () => {
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Vérifiées
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Vérifiées</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-success">{stats.verified}</div>
@@ -237,9 +231,7 @@ export const WaliAdminDashboard = () => {
         </Card>
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Rejetées
-            </CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Rejetées</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-destructive">{stats.rejected}</div>
@@ -287,10 +279,7 @@ export const WaliAdminDashboard = () => {
                 </div>
                 <AdvancedFilters filters={filters} onFiltersChange={setFilters} />
                 <div className="flex gap-2">
-                  <ExportActions
-                    registrations={filteredRegistrations}
-                    selectedIds={selectedIds}
-                  />
+                  <ExportActions registrations={filteredRegistrations} selectedIds={selectedIds} />
                   <NotificationSender
                     registrations={filteredRegistrations}
                     selectedIds={selectedIds}
@@ -322,9 +311,7 @@ export const WaliAdminDashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Sélectionner un Wali</CardTitle>
-              <CardDescription>
-                Choisissez un Wali pour gérer ses suspensions
-              </CardDescription>
+              <CardDescription>Choisissez un Wali pour gérer ses suspensions</CardDescription>
             </CardHeader>
             <CardContent>
               <Select value={selectedWaliId} onValueChange={setSelectedWaliId}>

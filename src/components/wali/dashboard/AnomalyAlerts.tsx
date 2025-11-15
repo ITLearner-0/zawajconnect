@@ -80,8 +80,11 @@ export const AnomalyAlerts: React.FC<AnomalyAlertsProps> = ({ anomalies }) => {
                 <AlertTitle className="flex items-center gap-2">
                   {anomaly.metric}
                   <Badge variant={getSeverityColor(anomaly.severity)}>
-                    {anomaly.severity === 'high' ? 'Critique' : 
-                     anomaly.severity === 'medium' ? 'Modéré' : 'Faible'}
+                    {anomaly.severity === 'high'
+                      ? 'Critique'
+                      : anomaly.severity === 'medium'
+                        ? 'Modéré'
+                        : 'Faible'}
                   </Badge>
                 </AlertTitle>
                 <AlertDescription className="mt-2 space-y-1">
@@ -90,7 +93,7 @@ export const AnomalyAlerts: React.FC<AnomalyAlertsProps> = ({ anomalies }) => {
                     {new Date(anomaly.date).toLocaleDateString('fr-FR', {
                       day: 'numeric',
                       month: 'long',
-                      year: 'numeric'
+                      year: 'numeric',
                     })}
                   </p>
                   <p>
@@ -102,7 +105,8 @@ export const AnomalyAlerts: React.FC<AnomalyAlertsProps> = ({ anomalies }) => {
                   <p>
                     <span className="font-medium">Écart:</span>{' '}
                     <span className={anomaly.deviation > 0 ? 'text-green-600' : 'text-red-600'}>
-                      {anomaly.deviation > 0 ? '+' : ''}{anomaly.deviation}%
+                      {anomaly.deviation > 0 ? '+' : ''}
+                      {anomaly.deviation}%
                     </span>
                   </p>
                 </AlertDescription>
@@ -110,7 +114,7 @@ export const AnomalyAlerts: React.FC<AnomalyAlertsProps> = ({ anomalies }) => {
             </div>
           </Alert>
         ))}
-        
+
         {anomalies.length > 10 && (
           <p className="text-sm text-muted-foreground text-center pt-2">
             +{anomalies.length - 10} anomalie(s) supplémentaire(s)

@@ -6,10 +6,7 @@ export const useGamification = (userId?: string) => {
   const rewards = useGamificationRewards(userId);
 
   const refreshAll = async () => {
-    await Promise.all([
-      badges.refetch(),
-      rewards.refetch(),
-    ]);
+    await Promise.all([badges.refetch(), rewards.refetch()]);
   };
 
   const isLoading = badges.loading || rewards.loading;

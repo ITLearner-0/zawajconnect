@@ -12,19 +12,19 @@ import NotificationCenter from '@/components/NotificationCenter';
 import { SupervisedCallsHistory } from '@/components/wali/SupervisedCallsHistory';
 import { CallSupervisionSettings } from '@/components/wali/CallSupervisionSettings';
 import { KPITrendChart, PredictiveDashboard } from '@/components/wali/dashboard';
-import { 
-  Shield, 
-  Users, 
-  MessageSquare, 
-  AlertTriangle, 
-  CheckCircle, 
-  XCircle, 
+import {
+  Shield,
+  Users,
+  MessageSquare,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
   Clock,
   Eye,
   Heart,
   Calendar,
   TrendingUp,
-  Phone
+  Phone,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -78,14 +78,17 @@ const WaliDashboard: React.FC = () => {
     totalSupervised: 0,
     criticalAlerts: 0,
     pendingApprovals: 0,
-    approvalRate: 85
+    approvalRate: 85,
   });
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   // Fonction helper pour calculer la compatibilité entre deux utilisateurs spécifiques
-  const calculateCompatibilityBetweenUsers = async (user1Id: string, user2Id: string): Promise<number> => {
+  const calculateCompatibilityBetweenUsers = async (
+    user1Id: string,
+    user2Id: string
+  ): Promise<number> => {
     try {
       // Récupérer les réponses des deux utilisateurs
       const { data: user1Responses } = await supabase
@@ -110,14 +113,14 @@ const WaliDashboard: React.FC = () => {
       let totalWeight = 0;
       let matchedWeight = 0;
 
-      questions.forEach(question => {
-        const user1Response = user1Responses.find(r => r.question_key === question.question_key);
-        const user2Response = user2Responses.find(r => r.question_key === question.question_key);
+      questions.forEach((question) => {
+        const user1Response = user1Responses.find((r) => r.question_key === question.question_key);
+        const user2Response = user2Responses.find((r) => r.question_key === question.question_key);
 
         if (user1Response && user2Response) {
           const weight = question.weight ?? 1;
           totalWeight += weight;
-          
+
           // Simple matching - exact match scores full weight
           if (user1Response.response_value === user2Response.response_value) {
             matchedWeight += weight;
@@ -126,7 +129,6 @@ const WaliDashboard: React.FC = () => {
       });
 
       return totalWeight > 0 ? (matchedWeight / totalWeight) * 100 : 0;
-
     } catch (error) {
       console.error('Error calculating compatibility score:', error);
       return 0;
@@ -148,7 +150,9 @@ const WaliDashboard: React.FC = () => {
 
   const loadWaliData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Set userId
@@ -157,12 +161,14 @@ const WaliDashboard: React.FC = () => {
       // Charger les utilisateurs supervisés (ceux que ce wali supervise)
       const { data: familyMembers } = await supabase
         .from('family_members')
-        .select(`
+        .select(
+          `
           id,
           full_name,
           user_id,
           relationship
-        `)
+        `
+        )
         .eq('invited_user_id', user.id)
         .eq('invitation_status', 'accepted')
         .eq('is_wali', true);
@@ -182,7 +188,7 @@ const WaliDashboard: React.FC = () => {
               full_name: profile?.full_name || 'Utilisateur',
               user_id: member.user_id, // L'ID de la personne supervisée (Sarah)
               relationship: member.relationship,
-              avatar_url: profile?.avatar_url ?? undefined
+              avatar_url: profile?.avatar_url ?? undefined,
             };
           })
         );
@@ -193,20 +199,22 @@ const WaliDashboard: React.FC = () => {
       const { data: notificationData } = await supabase
         .from('family_notifications')
         .select('*')
-        .in('family_member_id', familyMembers?.map(fm => fm.id) || [])
+        .in('family_member_id', familyMembers?.map((fm) => fm.id) || [])
         .order('created_at', { ascending: false })
         .limit(20);
 
       if (notificationData) {
-        setNotifications(notificationData.map(n => ({
-          ...n,
-          original_message: n.original_message ?? undefined,
-          read_at: n.read_at ?? undefined
-        })));
+        setNotifications(
+          notificationData.map((n) => ({
+            ...n,
+            original_message: n.original_message ?? undefined,
+            read_at: n.read_at ?? undefined,
+          }))
+        );
       }
 
       // Charger les matches en attente d'approbation
-      const userIds = familyMembers?.map(fm => fm.user_id) || [];
+      const userIds = familyMembers?.map((fm) => fm.user_id) || [];
       let matchData = null;
       if (userIds.length > 0) {
         const { data } = await supabase
@@ -214,20 +222,25 @@ const WaliDashboard: React.FC = () => {
           .select('*')
           .or(`user1_id.in.(${userIds.join(',')}),user2_id.in.(${userIds.join(',')})`)
           .eq('family_supervision_required', true)
-          .or(`and(user1_id.in.(${userIds.join(',')}),family1_approved.is.null),and(user2_id.in.(${userIds.join(',')}),family2_approved.is.null)`);
+          .or(
+            `and(user1_id.in.(${userIds.join(',')}),family1_approved.is.null),and(user2_id.in.(${userIds.join(',')}),family2_approved.is.null)`
+          );
 
         matchData = data;
         if (matchData) {
           // Récupérer les profils des candidats et utilisateurs supervisés
           const enrichedMatches = await Promise.all(
             matchData.map(async (match) => {
-              const supervisedUserId = userIds.find(id => id === match.user1_id || id === match.user2_id);
-              const candidateId = supervisedUserId === match.user1_id ? match.user2_id : match.user1_id;
-              
+              const supervisedUserId = userIds.find(
+                (id) => id === match.user1_id || id === match.user2_id
+              );
+              const candidateId =
+                supervisedUserId === match.user1_id ? match.user2_id : match.user1_id;
+
               if (!supervisedUserId) {
                 return null;
               }
-              
+
               // Récupérer le profil du candidat
               const { data: candidateProfile } = await supabase
                 .from('profiles')
@@ -243,38 +256,40 @@ const WaliDashboard: React.FC = () => {
                 .maybeSingle();
 
               // Calculer le score de compatibilité réel
-              const compatibilityScore = await calculateCompatibilityBetweenUsers(supervisedUserId, candidateId);
+              const compatibilityScore = await calculateCompatibilityBetweenUsers(
+                supervisedUserId,
+                candidateId
+              );
 
               return {
                 ...match,
                 candidate_name: candidateProfile?.full_name || 'Candidat inconnu',
                 candidate_id: candidateId,
                 supervised_user_name: supervisedProfile?.full_name || 'Utilisateur supervisé',
-                match_score: Math.round(compatibilityScore)
+                match_score: Math.round(compatibilityScore),
               };
             })
           );
-          setMatchesForApproval(enrichedMatches.filter(m => m !== null) as MatchForApproval[]);
+          setMatchesForApproval(enrichedMatches.filter((m) => m !== null) as MatchForApproval[]);
         }
       }
 
       // Calculer les stats
-      const criticalCount = notificationData?.filter(n => n.severity === 'critical').length || 0;
+      const criticalCount = notificationData?.filter((n) => n.severity === 'critical').length || 0;
       const pendingCount = matchData?.length || 0;
 
       setStats({
         totalSupervised: familyMembers?.length || 0,
         criticalAlerts: criticalCount,
         pendingApprovals: pendingCount,
-        approvalRate: 85
+        approvalRate: 85,
       });
-
     } catch (error) {
       console.error('Error loading wali data:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de charger les données",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de charger les données',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -284,22 +299,26 @@ const WaliDashboard: React.FC = () => {
   const subscribeToNotifications = () => {
     const channel = supabase
       .channel('wali-notifications')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'family_notifications'
-      }, (payload) => {
-        const newNotification = payload.new as FamilyNotification;
-        setNotifications(prev => [newNotification, ...prev]);
-        
-        if (newNotification.severity === 'critical') {
-          toast({
-            title: "🚨 Alerte Critique",
-            description: newNotification.content,
-            variant: "destructive"
-          });
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'family_notifications',
+        },
+        (payload) => {
+          const newNotification = payload.new as FamilyNotification;
+          setNotifications((prev) => [newNotification, ...prev]);
+
+          if (newNotification.severity === 'critical') {
+            toast({
+              title: '🚨 Alerte Critique',
+              description: newNotification.content,
+              variant: 'destructive',
+            });
+          }
         }
-      })
+      )
       .subscribe();
 
     return () => supabase.removeChannel(channel);
@@ -312,10 +331,8 @@ const WaliDashboard: React.FC = () => {
         .update({ is_read: true, read_at: new Date().toISOString() })
         .eq('id', id);
 
-      setNotifications(prev => 
-        prev.map(notif => 
-          notif.id === id ? { ...notif, is_read: true } : notif
-        )
+      setNotifications((prev) =>
+        prev.map((notif) => (notif.id === id ? { ...notif, is_read: true } : notif))
       );
     } catch (error) {
       console.error('Error marking notification as read:', error);
@@ -324,17 +341,15 @@ const WaliDashboard: React.FC = () => {
 
   const markAllNotificationsAsRead = async () => {
     try {
-      const unreadIds = notifications.filter(n => !n.is_read).map(n => n.id);
-      
+      const unreadIds = notifications.filter((n) => !n.is_read).map((n) => n.id);
+
       if (unreadIds.length > 0) {
         await supabase
           .from('family_notifications')
           .update({ is_read: true, read_at: new Date().toISOString() })
           .in('id', unreadIds);
 
-        setNotifications(prev => 
-          prev.map(notif => ({ ...notif, is_read: true }))
-        );
+        setNotifications((prev) => prev.map((notif) => ({ ...notif, is_read: true })));
       }
     } catch (error) {
       console.error('Error marking all notifications as read:', error);
@@ -343,11 +358,13 @@ const WaliDashboard: React.FC = () => {
 
   const approveMatch = async (matchId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Trouver le match pour déterminer quelle famille approuve
-      const match = matchesForApproval.find(m => m.id === matchId);
+      const match = matchesForApproval.find((m) => m.id === matchId);
       if (!match) return;
 
       // Déterminer si ce wali supervise user1 ou user2
@@ -358,47 +375,49 @@ const WaliDashboard: React.FC = () => {
         .eq('invitation_status', 'accepted')
         .eq('is_wali', true);
 
-      const supervisedUserIds = familyMembers?.map(fm => fm.user_id) || [];
+      const supervisedUserIds = familyMembers?.map((fm) => fm.user_id) || [];
       const isFamily1 = supervisedUserIds.includes(match.user1_id);
-      
+
       const updateField = isFamily1 ? 'family1_approved' : 'family2_approved';
-      
+
       await supabase
         .from('matches')
-        .update({ 
+        .update({
           [updateField]: true,
           can_communicate: true,
-          family_reviewed_at: new Date().toISOString()
+          family_reviewed_at: new Date().toISOString(),
         })
         .eq('id', matchId);
 
-      setMatchesForApproval(prev => prev.filter(m => m.id !== matchId));
-      setStats(prev => ({
+      setMatchesForApproval((prev) => prev.filter((m) => m.id !== matchId));
+      setStats((prev) => ({
         ...prev,
-        pendingApprovals: prev.pendingApprovals - 1
+        pendingApprovals: prev.pendingApprovals - 1,
       }));
-      
+
       toast({
-        title: "Match approuvé",
-        description: "Le match a été approuvé avec succès"
+        title: 'Match approuvé',
+        description: 'Le match a été approuvé avec succès',
       });
     } catch (error) {
       console.error('Error approving match:', error);
       toast({
-        title: "Erreur",
+        title: 'Erreur',
         description: "Impossible d'approuver le match",
-        variant: "destructive"
+        variant: 'destructive',
       });
     }
   };
 
   const rejectMatch = async (matchId: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       // Trouver le match pour déterminer quelle famille rejette
-      const match = matchesForApproval.find(m => m.id === matchId);
+      const match = matchesForApproval.find((m) => m.id === matchId);
       if (!match) return;
 
       // Déterminer si ce wali supervise user1 ou user2
@@ -409,35 +428,35 @@ const WaliDashboard: React.FC = () => {
         .eq('invitation_status', 'accepted')
         .eq('is_wali', true);
 
-      const supervisedUserIds = familyMembers?.map(fm => fm.user_id) || [];
+      const supervisedUserIds = familyMembers?.map((fm) => fm.user_id) || [];
       const isFamily1 = supervisedUserIds.includes(match.user1_id);
-      
+
       const updateField = isFamily1 ? 'family1_approved' : 'family2_approved';
-      
+
       await supabase
         .from('matches')
-        .update({ 
+        .update({
           [updateField]: false,
-          family_reviewed_at: new Date().toISOString()
+          family_reviewed_at: new Date().toISOString(),
         })
         .eq('id', matchId);
 
-      setMatchesForApproval(prev => prev.filter(m => m.id !== matchId));
-      setStats(prev => ({
+      setMatchesForApproval((prev) => prev.filter((m) => m.id !== matchId));
+      setStats((prev) => ({
         ...prev,
-        pendingApprovals: prev.pendingApprovals - 1
+        pendingApprovals: prev.pendingApprovals - 1,
       }));
-      
+
       toast({
-        title: "Match rejeté",
-        description: "Le match a été rejeté"
+        title: 'Match rejeté',
+        description: 'Le match a été rejeté',
       });
     } catch (error) {
       console.error('Error rejecting match:', error);
       toast({
-        title: "Erreur",
-        description: "Impossible de rejeter le match",
-        variant: "destructive"
+        title: 'Erreur',
+        description: 'Impossible de rejeter le match',
+        variant: 'destructive',
       });
     }
   };
@@ -468,11 +487,7 @@ const WaliDashboard: React.FC = () => {
             </p>
           </div>
         </div>
-        <Button 
-          onClick={() => navigate('/wali-monitoring')}
-          variant="outline"
-          className="gap-2"
-        >
+        <Button onClick={() => navigate('/wali-monitoring')} variant="outline" className="gap-2">
           <TrendingUp className="h-4 w-4" />
           Dashboard de Monitoring
         </Button>
@@ -481,7 +496,9 @@ const WaliDashboard: React.FC = () => {
       {/* Métriques de supervision avec le nouveau composant */}
       <SupervisionMetrics
         activeSupervisions={stats.totalSupervised}
-        totalMessages={notifications.filter(n => n.notification_type === 'inappropriate_content').length}
+        totalMessages={
+          notifications.filter((n) => n.notification_type === 'inappropriate_content').length
+        }
         moderationAlerts={stats.criticalAlerts}
         approvalsPending={stats.pendingApprovals}
       />
@@ -544,47 +561,48 @@ const WaliDashboard: React.FC = () => {
                     <Card key={match.id} className="border-l-4 border-l-gold">
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
-                           <div className="flex items-center gap-4">
-                             <div className="p-2 bg-gold-light rounded-full">
-                               <Heart className="h-6 w-6 text-gold-dark" />
-                             </div>
-                             <div>
-                               <p className="font-medium">{match.candidate_name}</p>
-                                <p className="text-sm text-muted-foreground">
-                                  Match avec {match.supervised_user_name} • Score: {match.match_score || 0}%
-                                </p>
-                               <p className="text-xs text-muted-foreground">
-                                 {new Date(match.created_at).toLocaleDateString('fr-FR')}
-                               </p>
-                             </div>
-                           </div>
-                           <div className="flex gap-2">
-                             <Button
-                               variant="outline"
-                               size="sm"
-                               onClick={() => handleViewProfile(match.candidate_id!)}
-                             >
-                               <Eye className="h-4 w-4 mr-1" />
-                               Voir Profil
-                             </Button>
-                             <Button
-                               variant="outline"
-                               size="sm"
-                               onClick={() => rejectMatch(match.id)}
-                               className="border-destructive/30 text-destructive hover:bg-destructive/10"
-                             >
-                               <XCircle className="h-4 w-4 mr-1" />
-                               Rejeter
-                             </Button>
-                             <Button
-                               size="sm"
-                               onClick={() => approveMatch(match.id)}
-                               className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
-                             >
-                               <CheckCircle className="h-4 w-4 mr-1" />
-                               Approuver
-                             </Button>
-                           </div>
+                          <div className="flex items-center gap-4">
+                            <div className="p-2 bg-gold-light rounded-full">
+                              <Heart className="h-6 w-6 text-gold-dark" />
+                            </div>
+                            <div>
+                              <p className="font-medium">{match.candidate_name}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Match avec {match.supervised_user_name} • Score:{' '}
+                                {match.match_score || 0}%
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {new Date(match.created_at).toLocaleDateString('fr-FR')}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleViewProfile(match.candidate_id!)}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Voir Profil
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => rejectMatch(match.id)}
+                              className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                            >
+                              <XCircle className="h-4 w-4 mr-1" />
+                              Rejeter
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => approveMatch(match.id)}
+                              className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                            >
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              Approuver
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -634,16 +652,16 @@ const WaliDashboard: React.FC = () => {
                               </div>
                             </div>
                             <div className="flex gap-2">
-                              <Button 
-                                variant="outline" 
-                                size="sm" 
+                              <Button
+                                variant="outline"
+                                size="sm"
                                 onClick={() => handleViewProfile(user.user_id)}
                               >
                                 <Eye className="h-4 w-4 mr-1" />
                                 Voir Profil
                               </Button>
-                              <Button 
-                                variant="outline" 
+                              <Button
+                                variant="outline"
                                 size="sm"
                                 onClick={() => handleViewConversations(user.user_id)}
                               >
@@ -654,7 +672,7 @@ const WaliDashboard: React.FC = () => {
                           </div>
                         </CardContent>
                       </Card>
-                      <CallSupervisionSettings 
+                      <CallSupervisionSettings
                         familyMemberId={user.id}
                         supervisedUserName={user.full_name}
                       />
@@ -685,9 +703,13 @@ const WaliDashboard: React.FC = () => {
                       <div className="space-y-2">
                         <p className="text-sm font-medium">Activité cette semaine</p>
                         <p className="text-2xl font-bold text-emerald">
-                          {notifications.filter(n => 
-                            new Date(n.created_at) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-                          ).length}
+                          {
+                            notifications.filter(
+                              (n) =>
+                                new Date(n.created_at) >
+                                new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                            ).length
+                          }
                         </p>
                         <p className="text-xs text-muted-foreground">Nouvelles notifications</p>
                       </div>
@@ -699,7 +721,10 @@ const WaliDashboard: React.FC = () => {
                       <div className="space-y-2">
                         <p className="text-sm font-medium">Taux d'intervention</p>
                         <p className="text-2xl font-bold text-primary">
-                          {stats.criticalAlerts > 0 ? Math.round((stats.criticalAlerts / notifications.length) * 100) : 0}%
+                          {stats.criticalAlerts > 0
+                            ? Math.round((stats.criticalAlerts / notifications.length) * 100)
+                            : 0}
+                          %
                         </p>
                         <p className="text-xs text-muted-foreground">Messages modérés</p>
                       </div>
@@ -713,15 +738,24 @@ const WaliDashboard: React.FC = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Contenu Inapproprié</span>
                       <span className="text-sm font-medium">
-                        {notifications.filter(n => n.notification_type === 'inappropriate_content').length}
+                        {
+                          notifications.filter(
+                            (n) => n.notification_type === 'inappropriate_content'
+                          ).length
+                        }
                       </span>
                     </div>
-                    <Progress 
-                      value={notifications.length > 0 ? 
-                        (notifications.filter(n => n.notification_type === 'inappropriate_content').length / notifications.length) * 100 
-                        : 0
-                      } 
-                      className="h-2" 
+                    <Progress
+                      value={
+                        notifications.length > 0
+                          ? (notifications.filter(
+                              (n) => n.notification_type === 'inappropriate_content'
+                            ).length /
+                              notifications.length) *
+                            100
+                          : 0
+                      }
+                      className="h-2"
                     />
                   </div>
 
@@ -729,15 +763,18 @@ const WaliDashboard: React.FC = () => {
                     <div className="flex justify-between items-center">
                       <span className="text-sm">Alertes Critiques</span>
                       <span className="text-sm font-medium">
-                        {notifications.filter(n => n.severity === 'critical').length}
+                        {notifications.filter((n) => n.severity === 'critical').length}
                       </span>
                     </div>
-                    <Progress 
-                      value={notifications.length > 0 ? 
-                        (notifications.filter(n => n.severity === 'critical').length / notifications.length) * 100 
-                        : 0
-                      } 
-                      className="h-2" 
+                    <Progress
+                      value={
+                        notifications.length > 0
+                          ? (notifications.filter((n) => n.severity === 'critical').length /
+                              notifications.length) *
+                            100
+                          : 0
+                      }
+                      className="h-2"
                     />
                   </div>
                 </div>

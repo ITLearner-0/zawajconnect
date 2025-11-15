@@ -16,7 +16,13 @@ export type { WaliSuspension } from './useWaliSuspensions';
 export type { WaliAlert, WaliStatistics, WaliActivity } from './useWaliMonitoring';
 export type { WaliComment, WaliActivityLog } from './useWaliRegistrationComments';
 export type { MonthlyTrend, ActivityTrend, RegistrationStatusTrend } from './useWaliTrends';
-export type { WaliAdminRole, WaliAdminPermission, WaliPermissionCheck, WaliPermissionAudit, UserSearchResult } from './useWaliAdminPermissions';
+export type {
+  WaliAdminRole,
+  WaliAdminPermission,
+  WaliPermissionCheck,
+  WaliPermissionAudit,
+  UserSearchResult,
+} from './useWaliAdminPermissions';
 export type { WaliKPIs, WaliKPIData, WaliKPIComparison, KPIPeriod } from './useWaliKPIs';
 export type { WaliFilterValues, SavedFilter } from './useWaliFilters';
 export type { AuditLogEntry, AuditFilters } from './useWaliAuditTrail';

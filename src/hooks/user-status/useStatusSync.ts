@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { UserStatusType } from './types';
@@ -17,20 +16,24 @@ export const useStatusSync = (
 
     const channel = supabase
       .channel(`user_status_${userId}`)
-      .on('postgres_changes', { 
-        event: 'UPDATE', 
-        schema: 'public', 
-        table: 'user_sessions',
-        filter: `user_id=eq.${userId}`
-      }, (payload) => {
-        if (payload.new) {
-          const userData = payload.new as any;
-          setStatus(userData.status || 'offline');
-          setLastActive(userData.last_active || null);
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'user_sessions',
+          filter: `user_id=eq.${userId}`,
+        },
+        (payload) => {
+          if (payload.new) {
+            const userData = payload.new as any;
+            setStatus(userData.status || 'offline');
+            setLastActive(userData.last_active || null);
+          }
         }
-      })
+      )
       .subscribe();
-      
+
     return () => {
       supabase.removeChannel(channel);
     };

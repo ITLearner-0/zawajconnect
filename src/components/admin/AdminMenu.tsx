@@ -1,9 +1,13 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUserRoles } from '@/hooks/auth/useUserRoles';
 import { Button } from '@/components/ui/button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Shield, Settings, BarChart3, AlertTriangle, Users, Sliders } from 'lucide-react';
 
 const AdminMenu: React.FC = () => {

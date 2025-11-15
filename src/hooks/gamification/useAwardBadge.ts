@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
-type BadgeId = 
+type BadgeId =
   | 'profile_complete_25'
   | 'profile_complete_50'
   | 'profile_complete_75'
@@ -35,7 +35,11 @@ export const useAwardBadge = () => {
   const [awarding, setAwarding] = useState(false);
   const { toast } = useToast();
 
-  const awardBadge = async ({ badge_id, progress_value = 0, showToast = true }: AwardBadgeParams) => {
+  const awardBadge = async ({
+    badge_id,
+    progress_value = 0,
+    showToast = true,
+  }: AwardBadgeParams) => {
     try {
       setAwarding(true);
 
@@ -59,7 +63,7 @@ export const useAwardBadge = () => {
       return { success: true, data };
     } catch (error) {
       console.error('Error awarding badge:', error);
-      
+
       if (showToast) {
         toast({
           title: 'Error',
@@ -67,7 +71,7 @@ export const useAwardBadge = () => {
           variant: 'destructive',
         });
       }
-      
+
       return { success: false, error };
     } finally {
       setAwarding(false);

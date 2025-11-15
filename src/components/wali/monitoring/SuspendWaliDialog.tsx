@@ -48,8 +48,8 @@ export const SuspendWaliDialog = ({
         <DialogHeader>
           <DialogTitle>Suspendre le Wali</DialogTitle>
           <DialogDescription>
-            Vous êtes sur le point de suspendre <strong>{waliName}</strong>.
-            Cette action empêchera temporairement le Wali d'accéder à son compte.
+            Vous êtes sur le point de suspendre <strong>{waliName}</strong>. Cette action empêchera
+            temporairement le Wali d'accéder à son compte.
           </DialogDescription>
         </DialogHeader>
 

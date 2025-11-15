@@ -20,7 +20,7 @@ export const useLoginStreak = (userId?: string) => {
 
   useEffect(() => {
     if (!userId) {
-      setStreakData(prev => ({ ...prev, loading: false }));
+      setStreakData((prev) => ({ ...prev, loading: false }));
       return;
     }
 
@@ -30,7 +30,7 @@ export const useLoginStreak = (userId?: string) => {
 
   const loadStreak = async () => {
     if (!userId) return;
-    
+
     try {
       const { data, error } = await (supabase as any)
         .from('user_levels')
@@ -40,7 +40,7 @@ export const useLoginStreak = (userId?: string) => {
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error loading streak:', error);
-        setStreakData(prev => ({ ...prev, loading: false }));
+        setStreakData((prev) => ({ ...prev, loading: false }));
         return;
       }
 
@@ -52,11 +52,11 @@ export const useLoginStreak = (userId?: string) => {
           loading: false,
         });
       } else {
-        setStreakData(prev => ({ ...prev, loading: false }));
+        setStreakData((prev) => ({ ...prev, loading: false }));
       }
     } catch (error) {
       console.error('Error loading login streak:', error);
-      setStreakData(prev => ({ ...prev, loading: false }));
+      setStreakData((prev) => ({ ...prev, loading: false }));
     }
   };
 

@@ -7,22 +7,22 @@ import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Save, 
-  Play, 
-  RefreshCw, 
-  Settings, 
+import {
+  Save,
+  Play,
+  RefreshCw,
+  Settings,
   BarChart3,
   TrendingUp,
   Sliders,
-  Trash2
+  Trash2,
 } from 'lucide-react';
-import { 
+import {
   useMatchingAlgorithmConfig,
   type MatchingAlgorithmConfig,
   type AlgorithmWeights,
   type AlgorithmThresholds,
-  type AlgorithmFilters
+  type AlgorithmFilters,
 } from '@/hooks/useMatchingAlgorithmConfig';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -35,38 +35,38 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+} from '@/components/ui/alert-dialog';
 
 const defaultWeights: AlgorithmWeights = {
   religious: 35,
   values: 25,
   lifestyle: 20,
   personality: 15,
-  family: 5
+  family: 5,
 };
 
 const defaultThresholds: AlgorithmThresholds = {
   minCompatibility: 60,
   dealbreakerThreshold: 70,
-  strongMatchThreshold: 85
+  strongMatchThreshold: 85,
 };
 
 const defaultFilters: AlgorithmFilters = {
   requireVerified: false,
   maxDistance: null,
-  ageRange: null
+  ageRange: null,
 };
 
 export default function AdminMatchingConfigPanel() {
-  const { 
-    configs, 
-    activeConfig, 
-    loading, 
-    saving, 
-    saveConfig, 
+  const {
+    configs,
+    activeConfig,
+    loading,
+    saving,
+    saveConfig,
     activateConfig,
     deleteConfig,
-    refreshConfigs 
+    refreshConfigs,
   } = useMatchingAlgorithmConfig();
 
   const [currentConfig, setCurrentConfig] = useState<MatchingAlgorithmConfig>({
@@ -75,7 +75,7 @@ export default function AdminMatchingConfigPanel() {
     weights: defaultWeights,
     thresholds: defaultThresholds,
     filters: defaultFilters,
-    is_active: false
+    is_active: false,
   });
 
   const [simulatedScore, setSimulatedScore] = useState<number>(75);
@@ -89,43 +89,48 @@ export default function AdminMatchingConfigPanel() {
   // Real-time simulation when weights change
   useEffect(() => {
     const totalWeight = Object.values(currentConfig.weights).reduce((a, b) => a + b, 0);
-    const normalizedScore = totalWeight > 0 
-      ? Math.round((currentConfig.weights.religious * 0.9 + 
-          currentConfig.weights.values * 0.85 + 
-          currentConfig.weights.lifestyle * 0.8 +
-          currentConfig.weights.personality * 0.75 +
-          currentConfig.weights.family * 0.85) / totalWeight * 100)
-      : 0;
+    const normalizedScore =
+      totalWeight > 0
+        ? Math.round(
+            ((currentConfig.weights.religious * 0.9 +
+              currentConfig.weights.values * 0.85 +
+              currentConfig.weights.lifestyle * 0.8 +
+              currentConfig.weights.personality * 0.75 +
+              currentConfig.weights.family * 0.85) /
+              totalWeight) *
+              100
+          )
+        : 0;
     setSimulatedScore(Math.min(100, normalizedScore));
   }, [currentConfig.weights]);
 
   const updateWeight = (dimension: keyof AlgorithmWeights, value: number) => {
-    setCurrentConfig(prev => ({
+    setCurrentConfig((prev) => ({
       ...prev,
       weights: {
         ...prev.weights,
-        [dimension]: value
-      }
+        [dimension]: value,
+      },
     }));
   };
 
   const updateThreshold = (key: keyof AlgorithmThresholds, value: number) => {
-    setCurrentConfig(prev => ({
+    setCurrentConfig((prev) => ({
       ...prev,
       thresholds: {
         ...prev.thresholds,
-        [key]: value
-      }
+        [key]: value,
+      },
     }));
   };
 
   const updateFilter = (key: keyof AlgorithmFilters, value: any) => {
-    setCurrentConfig(prev => ({
+    setCurrentConfig((prev) => ({
       ...prev,
       filters: {
         ...prev.filters,
-        [key]: value
-      }
+        [key]: value,
+      },
     }));
   };
 
@@ -215,7 +220,7 @@ export default function AdminMatchingConfigPanel() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <h3 className="text-lg font-semibold">Poids par Dimension</h3>
-                  <Badge variant={isWeightValid ? "default" : "destructive"}>
+                  <Badge variant={isWeightValid ? 'default' : 'destructive'}>
                     Total: {totalWeight}%
                   </Badge>
                 </div>
@@ -226,24 +231,26 @@ export default function AdminMatchingConfigPanel() {
                   </div>
                 )}
 
-                {(Object.keys(currentConfig.weights) as Array<keyof AlgorithmWeights>).map((dimension) => {
-                  const weight = currentConfig.weights[dimension] ?? 0;
-                  return (
-                    <div key={dimension} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Label className="capitalize">{dimension}</Label>
-                        <span className="text-sm font-medium">{weight}%</span>
+                {(Object.keys(currentConfig.weights) as Array<keyof AlgorithmWeights>).map(
+                  (dimension) => {
+                    const weight = currentConfig.weights[dimension] ?? 0;
+                    return (
+                      <div key={dimension} className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <Label className="capitalize">{dimension}</Label>
+                          <span className="text-sm font-medium">{weight}%</span>
+                        </div>
+                        <Slider
+                          value={[weight]}
+                          onValueChange={(value) => updateWeight(dimension, value[0] ?? 0)}
+                          max={100}
+                          step={1}
+                          className="w-full"
+                        />
                       </div>
-                      <Slider
-                        value={[weight]}
-                        onValueChange={(value) => updateWeight(dimension, value[0] ?? 0)}
-                        max={100}
-                        step={1}
-                        className="w-full"
-                      />
-                    </div>
-                  );
-                })}
+                    );
+                  }
+                )}
               </div>
             </TabsContent>
 
@@ -254,7 +261,9 @@ export default function AdminMatchingConfigPanel() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label>Compatibilité Minimale</Label>
-                    <span className="text-sm font-medium">{currentConfig.thresholds.minCompatibility ?? 60}%</span>
+                    <span className="text-sm font-medium">
+                      {currentConfig.thresholds.minCompatibility ?? 60}%
+                    </span>
                   </div>
                   <Slider
                     value={[currentConfig.thresholds.minCompatibility ?? 60]}
@@ -270,11 +279,15 @@ export default function AdminMatchingConfigPanel() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label>Seuil Dealbreaker</Label>
-                    <span className="text-sm font-medium">{currentConfig.thresholds.dealbreakerThreshold ?? 70}%</span>
+                    <span className="text-sm font-medium">
+                      {currentConfig.thresholds.dealbreakerThreshold ?? 70}%
+                    </span>
                   </div>
                   <Slider
                     value={[currentConfig.thresholds.dealbreakerThreshold ?? 70]}
-                    onValueChange={(value) => updateThreshold('dealbreakerThreshold', value[0] ?? 70)}
+                    onValueChange={(value) =>
+                      updateThreshold('dealbreakerThreshold', value[0] ?? 70)
+                    }
                     max={100}
                     step={1}
                   />
@@ -286,11 +299,15 @@ export default function AdminMatchingConfigPanel() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label>Match Excellent</Label>
-                    <span className="text-sm font-medium">{currentConfig.thresholds.strongMatchThreshold ?? 85}%</span>
+                    <span className="text-sm font-medium">
+                      {currentConfig.thresholds.strongMatchThreshold ?? 85}%
+                    </span>
                   </div>
                   <Slider
                     value={[currentConfig.thresholds.strongMatchThreshold ?? 85]}
-                    onValueChange={(value) => updateThreshold('strongMatchThreshold', value[0] ?? 85)}
+                    onValueChange={(value) =>
+                      updateThreshold('strongMatchThreshold', value[0] ?? 85)
+                    }
                     max={100}
                     step={1}
                   />
@@ -324,7 +341,9 @@ export default function AdminMatchingConfigPanel() {
                     type="number"
                     placeholder="Illimité"
                     value={currentConfig.filters.maxDistance || ''}
-                    onChange={(e) => updateFilter('maxDistance', e.target.value ? parseInt(e.target.value) : null)}
+                    onChange={(e) =>
+                      updateFilter('maxDistance', e.target.value ? parseInt(e.target.value) : null)
+                    }
                   />
                 </div>
 
@@ -335,19 +354,23 @@ export default function AdminMatchingConfigPanel() {
                       type="number"
                       placeholder="Min"
                       value={currentConfig.filters.ageRange?.[0] || ''}
-                      onChange={(e) => updateFilter('ageRange', [
-                        e.target.value ? parseInt(e.target.value) : 18,
-                        currentConfig.filters.ageRange?.[1] || 65
-                      ])}
+                      onChange={(e) =>
+                        updateFilter('ageRange', [
+                          e.target.value ? parseInt(e.target.value) : 18,
+                          currentConfig.filters.ageRange?.[1] || 65,
+                        ])
+                      }
                     />
                     <Input
                       type="number"
                       placeholder="Max"
                       value={currentConfig.filters.ageRange?.[1] || ''}
-                      onChange={(e) => updateFilter('ageRange', [
-                        currentConfig.filters.ageRange?.[0] || 18,
-                        e.target.value ? parseInt(e.target.value) : 65
-                      ])}
+                      onChange={(e) =>
+                        updateFilter('ageRange', [
+                          currentConfig.filters.ageRange?.[0] || 18,
+                          e.target.value ? parseInt(e.target.value) : 65,
+                        ])
+                      }
                     />
                   </div>
                 </div>
@@ -365,44 +388,56 @@ export default function AdminMatchingConfigPanel() {
                         <div className={`text-6xl font-bold ${getScoreColor(simulatedScore)}`}>
                           {simulatedScore}%
                         </div>
-                        <p className="text-lg font-medium mt-2">
-                          {getScoreLabel(simulatedScore)}
-                        </p>
+                        <p className="text-lg font-medium mt-2">{getScoreLabel(simulatedScore)}</p>
                       </div>
 
                       <Progress value={simulatedScore} className="h-3" />
 
                       <div className="grid grid-cols-2 gap-4 mt-6">
-                        {(Object.keys(currentConfig.weights) as Array<keyof AlgorithmWeights>).map((dimension) => {
-                          const weight = currentConfig.weights[dimension];
-                          const contribution = (weight / totalWeight) * simulatedScore;
-                          
-                          return (
-                            <div key={dimension} className="space-y-1">
-                              <div className="flex justify-between text-sm">
-                                <span className="capitalize">{dimension}</span>
-                                <span className="font-medium">{Math.round(contribution)}%</span>
+                        {(Object.keys(currentConfig.weights) as Array<keyof AlgorithmWeights>).map(
+                          (dimension) => {
+                            const weight = currentConfig.weights[dimension];
+                            const contribution = (weight / totalWeight) * simulatedScore;
+
+                            return (
+                              <div key={dimension} className="space-y-1">
+                                <div className="flex justify-between text-sm">
+                                  <span className="capitalize">{dimension}</span>
+                                  <span className="font-medium">{Math.round(contribution)}%</span>
+                                </div>
+                                <Progress value={contribution} className="h-2" />
                               </div>
-                              <Progress value={contribution} className="h-2" />
-                            </div>
-                          );
-                        })}
+                            );
+                          }
+                        )}
                       </div>
 
                       <div className="border-t pt-4 mt-4 space-y-2">
                         <div className="flex justify-between text-sm">
                           <span>Sera affiché?</span>
-                          <Badge variant={simulatedScore >= currentConfig.thresholds.minCompatibility ? "default" : "destructive"}>
-                            {simulatedScore >= currentConfig.thresholds.minCompatibility ? "Oui" : "Non"}
+                          <Badge
+                            variant={
+                              simulatedScore >= currentConfig.thresholds.minCompatibility
+                                ? 'default'
+                                : 'destructive'
+                            }
+                          >
+                            {simulatedScore >= currentConfig.thresholds.minCompatibility
+                              ? 'Oui'
+                              : 'Non'}
                           </Badge>
                         </div>
                         <div className="flex justify-between text-sm">
                           <span>Qualité du match</span>
-                          <Badge variant={
-                            simulatedScore >= currentConfig.thresholds.strongMatchThreshold ? "default" :
-                            simulatedScore >= currentConfig.thresholds.minCompatibility ? "secondary" :
-                            "destructive"
-                          }>
+                          <Badge
+                            variant={
+                              simulatedScore >= currentConfig.thresholds.strongMatchThreshold
+                                ? 'default'
+                                : simulatedScore >= currentConfig.thresholds.minCompatibility
+                                  ? 'secondary'
+                                  : 'destructive'
+                            }
+                          >
                             {getScoreLabel(simulatedScore)}
                           </Badge>
                         </div>
@@ -418,14 +453,12 @@ export default function AdminMatchingConfigPanel() {
             <Input
               placeholder="Nom de la configuration"
               value={currentConfig.config_name}
-              onChange={(e) => setCurrentConfig(prev => ({ ...prev, config_name: e.target.value }))}
+              onChange={(e) =>
+                setCurrentConfig((prev) => ({ ...prev, config_name: e.target.value }))
+              }
               className="flex-1"
             />
-            <Button 
-              onClick={handleSave} 
-              disabled={saving || !isWeightValid}
-              className="gap-2"
-            >
+            <Button onClick={handleSave} disabled={saving || !isWeightValid} className="gap-2">
               <Save className="h-4 w-4" />
               {saving ? 'Sauvegarde...' : 'Sauvegarder'}
             </Button>
@@ -446,7 +479,7 @@ export default function AdminMatchingConfigPanel() {
               </p>
             ) : (
               configs.map((config) => (
-                <Card key={config.id} className={config.is_active ? "border-primary" : ""}>
+                <Card key={config.id} className={config.is_active ? 'border-primary' : ''}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div className="space-y-1">
@@ -484,11 +517,7 @@ export default function AdminMatchingConfigPanel() {
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              disabled={config.is_active}
-                            >
+                            <Button size="sm" variant="destructive" disabled={config.is_active}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </AlertDialogTrigger>
@@ -496,7 +525,8 @@ export default function AdminMatchingConfigPanel() {
                             <AlertDialogHeader>
                               <AlertDialogTitle>Supprimer la configuration?</AlertDialogTitle>
                               <AlertDialogDescription>
-                                Cette action est irréversible. La configuration sera définitivement supprimée.
+                                Cette action est irréversible. La configuration sera définitivement
+                                supprimée.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>

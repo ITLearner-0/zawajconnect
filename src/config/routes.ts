@@ -88,7 +88,7 @@ export const routes: RouteConfig[] = [
     label: 'Récompenses',
     requiresAuth: true,
     icon: 'Award',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/badge-leaderboard',
@@ -96,7 +96,7 @@ export const routes: RouteConfig[] = [
     label: 'Classement des Badges',
     requiresAuth: true,
     icon: 'Trophy',
-    category: 'main'
+    category: 'main',
   },
   {
     path: '/matches',

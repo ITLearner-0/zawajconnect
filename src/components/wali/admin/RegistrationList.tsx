@@ -16,15 +16,10 @@ interface RegistrationListProps {
   onViewDetails: (registration: WaliRegistration) => void;
 }
 
-export const RegistrationList = ({
-  registrations,
-  onViewDetails,
-}: RegistrationListProps) => {
+export const RegistrationList = ({ registrations, onViewDetails }: RegistrationListProps) => {
   if (registrations.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        Aucune inscription trouvée
-      </div>
+      <div className="text-center py-12 text-muted-foreground">Aucune inscription trouvée</div>
     );
   }
 
@@ -44,23 +39,15 @@ export const RegistrationList = ({
         <TableBody>
           {registrations.map((registration) => (
             <TableRow key={registration.id}>
-              <TableCell className="font-medium">
-                {registration.full_name}
-              </TableCell>
+              <TableCell className="font-medium">{registration.full_name}</TableCell>
               <TableCell>{registration.email}</TableCell>
               <TableCell>{registration.phone || '-'}</TableCell>
-              <TableCell>
-                {new Date(registration.created_at).toLocaleDateString('fr-FR')}
-              </TableCell>
+              <TableCell>{new Date(registration.created_at).toLocaleDateString('fr-FR')}</TableCell>
               <TableCell>
                 <RegistrationStatusBadge status={registration.status} />
               </TableCell>
               <TableCell className="text-right">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => onViewDetails(registration)}
-                >
+                <Button size="sm" variant="outline" onClick={() => onViewDetails(registration)}>
                   <Eye className="h-3 w-3 mr-2" />
                   Voir
                 </Button>

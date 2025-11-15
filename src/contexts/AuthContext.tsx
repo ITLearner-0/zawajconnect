@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, ReactNode, useContext } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { useAuthState } from '@/hooks/auth/useAuthState';
@@ -9,7 +8,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: ((data: any) => Promise<any>) & ((email: string, password: string, fullName?: string, metadata?: any) => Promise<any>);
+  signUp: ((data: any) => Promise<any>) &
+    ((email: string, password: string, fullName?: string, metadata?: any) => Promise<any>);
   signIn: ((data: any) => Promise<any>) & ((email: string, password: string) => Promise<any>);
   signOut: () => Promise<any>;
   subscribed: boolean;
@@ -32,14 +32,19 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
 
 const AuthProvider = ({ children }: { children: ReactNode }) => {
   const { user, session, loading: authLoading } = useAuthState();
-  const { loading: actionsLoading, signUp: signUpAction, signIn: signInAction, signOut: signOutAction } = useAuthActions();
+  const {
+    loading: actionsLoading,
+    signUp: signUpAction,
+    signIn: signInAction,
+    signOut: signOutAction,
+  } = useAuthActions();
   const [subscriptionData, setSubscriptionData] = useState<{
     subscribed: boolean;
     subscription_tier: string | null;
@@ -47,7 +52,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   }>({
     subscribed: false,
     subscription_tier: null,
-    subscription_end: null
+    subscription_end: null,
   });
 
   // Check subscription status when user changes
@@ -56,7 +61,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSubscriptionData({
         subscribed: false,
         subscription_tier: null,
-        subscription_end: null
+        subscription_end: null,
       });
       return;
     }
@@ -87,7 +92,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: emailOrData,
         password: password!,
         fullName,
-        ...metadata
+        ...metadata,
       });
     }
   };
@@ -99,7 +104,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     } else {
       return signInAction({
         email: emailOrData,
-        password: password!
+        password: password!,
       });
     }
   };
@@ -117,16 +122,12 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
       product_id: subscriptionData.subscription_tier,
       subscription_end: subscriptionData.subscription_end,
       plan_duration: null,
-      months_remaining: null
+      months_remaining: null,
     },
-    checkSubscription
+    checkSubscription,
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;

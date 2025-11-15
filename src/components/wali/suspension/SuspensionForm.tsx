@@ -6,7 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle } from 'lucide-react';
 
@@ -61,9 +67,7 @@ export const SuspensionForm = ({ waliId, userId, onSubmit, onCancel }: Suspensio
           <AlertTriangle className="h-5 w-5 text-destructive" />
           <CardTitle>Suspendre le Wali</CardTitle>
         </div>
-        <CardDescription>
-          Cette action affectera les permissions et l'accès du Wali
-        </CardDescription>
+        <CardDescription>Cette action affectera les permissions et l'accès du Wali</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-4">
@@ -111,11 +115,7 @@ export const SuspensionForm = ({ waliId, userId, onSubmit, onCancel }: Suspensio
           {suspensionType === 'temporary' && (
             <div className="space-y-2">
               <Label htmlFor="expires_at">Date d'expiration</Label>
-              <Input
-                id="expires_at"
-                type="datetime-local"
-                {...register('expires_at')}
-              />
+              <Input id="expires_at" type="datetime-local" {...register('expires_at')} />
               {errors.expires_at && (
                 <p className="text-sm text-destructive">{errors.expires_at.message}</p>
               )}
@@ -130,9 +130,7 @@ export const SuspensionForm = ({ waliId, userId, onSubmit, onCancel }: Suspensio
               {...register('reason')}
               rows={4}
             />
-            {errors.reason && (
-              <p className="text-sm text-destructive">{errors.reason.message}</p>
-            )}
+            {errors.reason && <p className="text-sm text-destructive">{errors.reason.message}</p>}
           </div>
 
           <div className="space-y-2">

@@ -77,7 +77,10 @@ export const useProfileRecommendations = (userId?: string) => {
         }
 
         // Check for wali information if female
-        if ((profile as any).gender === 'female' && (!(profile as any).wali_name || !(profile as any).wali_contact)) {
+        if (
+          (profile as any).gender === 'female' &&
+          (!(profile as any).wali_name || !(profile as any).wali_contact)
+        ) {
           newRecommendations.push({
             id: 'wali-info',
             type: 'content',

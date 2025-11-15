@@ -108,10 +108,12 @@ export const useWaliAdminPermissions = () => {
       // Fetch permissions with user emails from profiles
       const { data, error } = await (supabase as any)
         .from('wali_admin_permissions')
-        .select(`
+        .select(
+          `
           *,
           profiles!wali_admin_permissions_user_id_fkey(email, full_name)
-        `)
+        `
+        )
         .order('assigned_at', { ascending: false });
 
       if (error) throw error;
@@ -168,11 +170,13 @@ export const useWaliAdminPermissions = () => {
     try {
       let query = (supabase as any)
         .from('wali_admin_permission_audit')
-        .select(`
+        .select(
+          `
           *,
           user:profiles!wali_admin_permission_audit_user_id_fkey(email),
           changer:profiles!wali_admin_permission_audit_changed_by_fkey(email)
-        `)
+        `
+        )
         .order('changed_at', { ascending: false })
         .limit(100);
 
@@ -197,7 +201,7 @@ export const useWaliAdminPermissions = () => {
       console.error('Error fetching audit history:', err);
       toast({
         title: 'Erreur',
-        description: 'Impossible de charger l\'historique',
+        description: "Impossible de charger l'historique",
         variant: 'destructive',
       });
     }
@@ -223,7 +227,7 @@ export const useWaliAdminPermissions = () => {
       console.error('Error fetching user actions:', err);
       toast({
         title: 'Erreur',
-        description: 'Impossible de charger les actions de l\'utilisateur',
+        description: "Impossible de charger les actions de l'utilisateur",
         variant: 'destructive',
       });
       return [];
@@ -238,10 +242,12 @@ export const useWaliAdminPermissions = () => {
     try {
       const { data, error } = await (supabase as any)
         .from('wali_admin_permissions')
-        .select(`
+        .select(
+          `
           *,
           profiles!wali_admin_permissions_user_id_fkey(email, full_name)
-        `)
+        `
+        )
         .eq('user_id', userId)
         .maybeSingle();
 
@@ -259,7 +265,7 @@ export const useWaliAdminPermissions = () => {
       console.error('Error fetching user permission:', err);
       toast({
         title: 'Erreur',
-        description: 'Impossible de charger les informations de l\'utilisateur',
+        description: "Impossible de charger les informations de l'utilisateur",
         variant: 'destructive',
       });
       return null;
@@ -272,7 +278,7 @@ export const useWaliAdminPermissions = () => {
     if (!permissions.canManagePermissions) {
       toast({
         title: 'Accès refusé',
-        description: 'Vous n\'avez pas la permission de gérer les rôles',
+        description: "Vous n'avez pas la permission de gérer les rôles",
         variant: 'destructive',
       });
       return { success: 0, failed: assignments.length };
@@ -283,14 +289,12 @@ export const useWaliAdminPermissions = () => {
 
     for (const assignment of assignments) {
       try {
-        const { error } = await (supabase as any)
-          .from('wali_admin_permissions')
-          .upsert({
-            user_id: assignment.userId,
-            role: assignment.role,
-            assigned_by: user?.id,
-            notes: assignment.notes,
-          });
+        const { error } = await (supabase as any).from('wali_admin_permissions').upsert({
+          user_id: assignment.userId,
+          role: assignment.role,
+          assigned_by: user?.id,
+          notes: assignment.notes,
+        });
 
         if (error) throw error;
         success++;
@@ -320,7 +324,7 @@ export const useWaliAdminPermissions = () => {
     if (!permissions.canManagePermissions) {
       toast({
         title: 'Accès refusé',
-        description: 'Vous n\'avez pas la permission de gérer les rôles',
+        description: "Vous n'avez pas la permission de gérer les rôles",
         variant: 'destructive',
       });
       return false;
@@ -347,7 +351,7 @@ export const useWaliAdminPermissions = () => {
       console.error('Error assigning permission:', err);
       toast({
         title: 'Erreur',
-        description: 'Impossible d\'assigner la permission',
+        description: "Impossible d'assigner la permission",
         variant: 'destructive',
       });
       return false;
@@ -358,7 +362,7 @@ export const useWaliAdminPermissions = () => {
     if (!permissions.canManagePermissions) {
       toast({
         title: 'Accès refusé',
-        description: 'Vous n\'avez pas la permission de révoquer les rôles',
+        description: "Vous n'avez pas la permission de révoquer les rôles",
         variant: 'destructive',
       });
       return false;

@@ -30,7 +30,9 @@ interface BulkAssignment {
 interface BulkAssignDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAssign: (assignments: Array<{ userId: string; role: WaliAdminRole; notes?: string }>) => Promise<{ success: number; failed: number }>;
+  onAssign: (
+    assignments: Array<{ userId: string; role: WaliAdminRole; notes?: string }>
+  ) => Promise<{ success: number; failed: number }>;
   onSearchUser: (email: string) => Promise<{ id: string; email: string }[]>;
 }
 
@@ -40,9 +42,7 @@ export const BulkAssignDialog = ({
   onAssign,
   onSearchUser,
 }: BulkAssignDialogProps) => {
-  const [assignments, setAssignments] = useState<BulkAssignment[]>([
-    { email: '', role: 'viewer' },
-  ]);
+  const [assignments, setAssignments] = useState<BulkAssignment[]>([{ email: '', role: 'viewer' }]);
   const [submitting, setSubmitting] = useState(false);
 
   const addAssignment = () => {
@@ -57,7 +57,7 @@ export const BulkAssignDialog = ({
     const updated = [...assignments];
     const current = updated[index];
     if (!current) return;
-    
+
     if (field === 'email') {
       updated[index] = { email: value, role: current.role, notes: current.notes };
     } else if (field === 'role') {
@@ -65,22 +65,22 @@ export const BulkAssignDialog = ({
     } else if (field === 'notes') {
       updated[index] = { email: current.email, role: current.role, notes: value };
     }
-    
+
     setAssignments(updated);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Filter out empty assignments
-    const validAssignments = assignments.filter(a => a.email.trim());
+    const validAssignments = assignments.filter((a) => a.email.trim());
     if (validAssignments.length === 0) return;
 
     setSubmitting(true);
 
     // Search for user IDs
     const assignmentsWithIds: Array<{ userId: string; role: WaliAdminRole; notes?: string }> = [];
-    
+
     for (const assignment of validAssignments) {
       try {
         const results = await onSearchUser(assignment.email);
@@ -130,7 +130,7 @@ export const BulkAssignDialog = ({
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 )}
-                
+
                 <div className="space-y-2">
                   <Label>Email</Label>
                   <Input
@@ -172,12 +172,7 @@ export const BulkAssignDialog = ({
               </div>
             ))}
 
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full"
-              onClick={addAssignment}
-            >
+            <Button type="button" variant="outline" className="w-full" onClick={addAssignment}>
               <Plus className="w-4 h-4 mr-2" />
               Ajouter un utilisateur
             </Button>
@@ -187,7 +182,9 @@ export const BulkAssignDialog = ({
               Annuler
             </Button>
             <Button type="submit" disabled={submitting}>
-              {submitting ? 'Attribution...' : `Assigner (${assignments.filter(a => a.email).length})`}
+              {submitting
+                ? 'Attribution...'
+                : `Assigner (${assignments.filter((a) => a.email).length})`}
             </Button>
           </DialogFooter>
         </form>

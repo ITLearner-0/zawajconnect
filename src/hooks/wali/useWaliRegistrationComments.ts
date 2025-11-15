@@ -66,9 +66,7 @@ export const useWaliRegistrationComments = (registrationId: string) => {
       const adminIds = [
         ...new Set([
           ...(commentsData || []).map((c: any) => c.admin_id),
-          ...(activityData || [])
-            .map((a: any) => a.admin_id)
-            .filter((id: any) => id),
+          ...(activityData || []).map((a: any) => a.admin_id).filter((id: any) => id),
         ]),
       ];
 
@@ -78,9 +76,7 @@ export const useWaliRegistrationComments = (registrationId: string) => {
           .select('user_id, full_name')
           .in('user_id', adminIds);
 
-        const adminMap = new Map(
-          profilesData?.map((p: any) => [p.user_id, p.full_name]) || []
-        );
+        const adminMap = new Map(profilesData?.map((p: any) => [p.user_id, p.full_name]) || []);
 
         // Add admin names to comments
         const commentsWithNames = (commentsData || []).map((comment: any) => ({
@@ -91,9 +87,7 @@ export const useWaliRegistrationComments = (registrationId: string) => {
         // Add admin names to activity log
         const activityWithNames = (activityData || []).map((activity: any) => ({
           ...activity,
-          admin_name: activity.admin_id
-            ? adminMap.get(activity.admin_id) || 'Système'
-            : 'Système',
+          admin_name: activity.admin_id ? adminMap.get(activity.admin_id) || 'Système' : 'Système',
         }));
 
         setComments(commentsWithNames);
@@ -104,8 +98,7 @@ export const useWaliRegistrationComments = (registrationId: string) => {
       }
     } catch (err) {
       console.error('Error fetching comments and activity:', err);
-      const errorMessage =
-        err instanceof Error ? err.message : 'Failed to load data';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load data';
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -141,8 +134,7 @@ export const useWaliRegistrationComments = (registrationId: string) => {
       console.error('Error adding comment:', err);
       toast({
         title: 'Erreur',
-        description:
-          err instanceof Error ? err.message : 'Erreur lors de l\'ajout du commentaire',
+        description: err instanceof Error ? err.message : "Erreur lors de l'ajout du commentaire",
         variant: 'destructive',
       });
       return false;
@@ -169,10 +161,7 @@ export const useWaliRegistrationComments = (registrationId: string) => {
       console.error('Error updating comment:', err);
       toast({
         title: 'Erreur',
-        description:
-          err instanceof Error
-            ? err.message
-            : 'Erreur lors de la modification',
+        description: err instanceof Error ? err.message : 'Erreur lors de la modification',
         variant: 'destructive',
       });
       return false;
@@ -199,8 +188,7 @@ export const useWaliRegistrationComments = (registrationId: string) => {
       console.error('Error deleting comment:', err);
       toast({
         title: 'Erreur',
-        description:
-          err instanceof Error ? err.message : 'Erreur lors de la suppression',
+        description: err instanceof Error ? err.message : 'Erreur lors de la suppression',
         variant: 'destructive',
       });
       return false;

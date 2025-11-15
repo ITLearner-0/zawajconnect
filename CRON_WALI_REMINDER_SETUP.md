@@ -51,7 +51,7 @@ Exemples :
 
 ```sql
 -- View the scheduled job
-SELECT 
+SELECT
   jobid,
   jobname,
   schedule,
@@ -79,7 +79,7 @@ SELECT
 
 ```sql
 -- View cron job execution history
-SELECT 
+SELECT
   runid,
   jobid,
   job_name,
@@ -111,6 +111,7 @@ SELECT cron.unschedule('remind-pending-wali-registrations-daily');
 Les administrateurs reçoivent un email professionnel contenant :
 
 ### 🎨 Design & Contenu
+
 - ⚠️ **En-tête d'alerte** : Badge rouge avec nombre d'inscriptions en attente
 - 📊 **Tableau récapitulatif** : Nom, relation, email, durée d'attente pour chaque inscription
 - 🚨 **Alerte visuelle** : Bannière rouge indiquant l'urgence
@@ -118,13 +119,16 @@ Les administrateurs reçoivent un email professionnel contenant :
 - 🎯 **CTA direct** : Bouton vers la page d'administration des inscriptions Wali
 
 ### 📋 Informations Affichées par Inscription
+
 - **Nom complet** du Wali
 - **Relation** avec l'utilisateur
 - **Email** de contact
 - **Nombre de jours** en attente (en rouge)
 
 ### 🔗 Lien CTA
+
 Le bouton redirige vers :
+
 ```
 https://mariage-halal.com/admin/wali-registrations
 ```
@@ -132,6 +136,7 @@ https://mariage-halal.com/admin/wali-registrations
 ## 🎯 Logique de Détection
 
 La fonction cherche les inscriptions qui :
+
 1. ✅ Ont le statut `'pending'`
 2. ✅ Ont une date `created_at` antérieure à il y a 7 jours
 
@@ -140,15 +145,16 @@ Exemple : Si exécuté le 13 novembre 2025, cherche les inscriptions créées av
 ## 📈 Métriques & Logs
 
 Chaque exécution génère un rapport avec :
+
 ```json
 {
   "success": true,
   "message": "Pending Wali registrations reminder process completed",
   "results": {
-    "total": 5,              // Nombre total d'inscriptions en attente 7+ jours
-    "emailsSent": 3,         // Nombre d'emails envoyés avec succès
-    "adminEmails": 3,        // Nombre d'admins notifiés
-    "errors": []             // Liste des erreurs éventuelles
+    "total": 5, // Nombre total d'inscriptions en attente 7+ jours
+    "emailsSent": 3, // Nombre d'emails envoyés avec succès
+    "adminEmails": 3, // Nombre d'admins notifiés
+    "errors": [] // Liste des erreurs éventuelles
   }
 }
 ```
@@ -156,6 +162,7 @@ Chaque exécution génère un rapport avec :
 ## 🔍 Historique d'Activité
 
 Chaque envoi de rappel est automatiquement loggé dans `wali_registration_activity_log` :
+
 - **Type d'action** : `reminder_sent`
 - **Détails** : Type de rappel, nombre d'admins notifiés, jours d'attente
 - **Visible** : Dans l'onglet "Activité" du modal de détails d'inscription
@@ -163,13 +170,17 @@ Chaque envoi de rappel est automatiquement loggé dans `wali_registration_activi
 ## 🔔 Notifications & Monitoring
 
 ### Logs Supabase
+
 Consultez les logs dans le dashboard Supabase pour :
+
 - Nombre d'inscriptions détectées en attente
 - Emails envoyés avec succès aux admins
 - Erreurs d'envoi (email invalide, SMTP down, etc.)
 
 ### Alertes Recommandées
+
 Configurez des alertes si :
+
 - ❌ Aucun email n'est envoyé pendant 7 jours (possible problème SMTP)
 - ❌ Taux d'erreur > 50%
 - ❌ Échec de l'exécution du cron job
@@ -179,12 +190,12 @@ Configurez des alertes si :
 
 Cette fonction fait partie d'une stratégie complète de gestion des Walis :
 
-| Timing | Action | Fonction |
-|--------|--------|----------|
-| J+7    | 🔔 Premier rappel aux admins | `remind-pending-wali-registrations` (CETTE FONCTION) |
-| J+14   | ⚠️ Deuxième rappel urgent | À créer |
-| J+21   | 🚨 Escalade - Notification super admin | À créer |
-| Traitement | ✅ Approbation/Rejet | Interface admin existante |
+| Timing     | Action                                 | Fonction                                             |
+| ---------- | -------------------------------------- | ---------------------------------------------------- |
+| J+7        | 🔔 Premier rappel aux admins           | `remind-pending-wali-registrations` (CETTE FONCTION) |
+| J+14       | ⚠️ Deuxième rappel urgent              | À créer                                              |
+| J+21       | 🚨 Escalade - Notification super admin | À créer                                              |
+| Traitement | ✅ Approbation/Rejet                   | Interface admin existante                            |
 
 ## 💡 Prochaines Améliorations
 
@@ -197,6 +208,7 @@ Cette fonction fait partie d'une stratégie complète de gestion des Walis :
 ## ⚙️ Configuration SMTP
 
 Assurez-vous que :
+
 - ✅ Le domaine d'envoi est vérifié (Hostinger ou autre)
 - ✅ Les variables SMTP sont configurées dans Supabase Edge Functions
 - ✅ Les emails admins sont valides dans `user_roles`

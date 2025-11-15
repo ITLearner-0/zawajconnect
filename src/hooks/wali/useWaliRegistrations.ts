@@ -75,7 +75,7 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
         p_registration_id: id,
         p_action_details: { reviewed_by: reviewedBy },
         p_old_values: oldData,
-        p_new_values: { status: 'approved' }
+        p_new_values: { status: 'approved' },
       });
 
       // Send notification email
@@ -102,18 +102,14 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
       console.error('Error approving registration:', err);
       toast({
         title: 'Erreur',
-        description: err instanceof Error ? err.message : 'Erreur lors de l\'approbation',
+        description: err instanceof Error ? err.message : "Erreur lors de l'approbation",
         variant: 'destructive',
       });
       return false;
     }
   };
 
-  const rejectRegistration = async (
-    id: string,
-    reviewedBy: string,
-    rejectionReason: string
-  ) => {
+  const rejectRegistration = async (id: string, reviewedBy: string, rejectionReason: string) => {
     try {
       // Get old values for audit
       const { data: oldData } = await (supabase as any)
@@ -140,7 +136,7 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
         p_registration_id: id,
         p_action_details: { reviewed_by: reviewedBy, rejection_reason: rejectionReason },
         p_old_values: oldData,
-        p_new_values: { status: 'rejected', rejection_reason: rejectionReason }
+        p_new_values: { status: 'rejected', rejection_reason: rejectionReason },
       });
 
       // Send notification email
@@ -198,7 +194,7 @@ export const useWaliRegistrations = (options: UseWaliRegistrationsOptions = {}) 
         p_action_type: 'notes_updated',
         p_registration_id: id,
         p_old_values: oldData,
-        p_new_values: { verification_notes: notes }
+        p_new_values: { verification_notes: notes },
       });
 
       toast({

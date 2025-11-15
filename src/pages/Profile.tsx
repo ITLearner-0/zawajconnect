@@ -7,7 +7,18 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft, MapPin, GraduationCap, Briefcase, Heart, User, MessageCircle, Eye, Calendar, Flag } from 'lucide-react';
+import {
+  ArrowLeft,
+  MapPin,
+  GraduationCap,
+  Briefcase,
+  Heart,
+  User,
+  MessageCircle,
+  Eye,
+  Calendar,
+  Flag,
+} from 'lucide-react';
 import VerificationBadge from '@/components/VerificationBadge';
 import CompatibilityScore from '@/components/CompatibilityScore';
 import ReportModal from '@/components/ReportModal';
@@ -48,7 +59,9 @@ const Profile = () => {
   const [profile, setProfile] = useState<ProfileData | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [isLiked, setIsLiked] = useState(false);
-  const [verification, setVerification] = useState<{ verification_score?: number } | undefined>(undefined);
+  const [verification, setVerification] = useState<{ verification_score?: number } | undefined>(
+    undefined
+  );
   const [showReportModal, setShowReportModal] = useState(false);
 
   useEffect(() => {
@@ -109,17 +122,19 @@ const Profile = () => {
           looking_for: profileData.looking_for ?? '',
           interests: (profileData.interests ?? []).filter((i): i is string => i !== null),
           avatar_url: profileData.avatar_url ?? undefined,
-          islamic_preferences: prefsData ? {
-            prayer_frequency: prefsData.prayer_frequency ?? '',
-            quran_reading: prefsData.quran_reading ?? '',
-            hijab_preference: prefsData.hijab_preference ?? '',
-            beard_preference: prefsData.beard_preference ?? '',
-            sect: prefsData.sect ?? '',
-            madhab: prefsData.madhab ?? '',
-            halal_diet: !!prefsData.halal_diet,
-            smoking: prefsData.smoking ?? '',
-            importance_of_religion: prefsData.importance_of_religion ?? ''
-          } : undefined
+          islamic_preferences: prefsData
+            ? {
+                prayer_frequency: prefsData.prayer_frequency ?? '',
+                quran_reading: prefsData.quran_reading ?? '',
+                hijab_preference: prefsData.hijab_preference ?? '',
+                beard_preference: prefsData.beard_preference ?? '',
+                sect: prefsData.sect ?? '',
+                madhab: prefsData.madhab ?? '',
+                halal_diet: !!prefsData.halal_diet,
+                smoking: prefsData.smoking ?? '',
+                importance_of_religion: prefsData.importance_of_religion ?? '',
+              }
+            : undefined,
         });
       } else {
         // Profile doesn't exist
@@ -140,12 +155,15 @@ const Profile = () => {
       const { data: match } = await supabase
         .from('matches')
         .select('*')
-        .or(`and(user1_id.eq.${user.id},user2_id.eq.${userId}),and(user1_id.eq.${userId},user2_id.eq.${user.id})`)
+        .or(
+          `and(user1_id.eq.${user.id},user2_id.eq.${userId}),and(user1_id.eq.${userId},user2_id.eq.${user.id})`
+        )
         .maybeSingle();
 
       if (match) {
-        const userLiked = (match.user1_id === user.id && !!match.user1_liked) || 
-                          (match.user2_id === user.id && !!match.user2_liked);
+        const userLiked =
+          (match.user1_id === user.id && !!match.user1_liked) ||
+          (match.user2_id === user.id && !!match.user2_liked);
         setIsLiked(userLiked);
       }
     } catch (error) {
@@ -164,9 +182,13 @@ const Profile = () => {
         .eq('user_id', userId)
         .maybeSingle();
 
-      setVerification(data ? {
-        verification_score: data.verification_score ?? 0
-      } : undefined);
+      setVerification(
+        data
+          ? {
+              verification_score: data.verification_score ?? 0,
+            }
+          : undefined
+      );
     } catch (error) {
       console.warn('Could not fetch verification status:', error);
     }
@@ -188,12 +210,13 @@ const Profile = () => {
 
       if (!targetProfile) return;
 
-      await supabase
-        .from('profile_views')
-        .upsert({
+      await supabase.from('profile_views').upsert(
+        {
           viewer_id: user.id,
-          viewed_id: userId
-        }, { onConflict: 'viewer_id,viewed_id' });
+          viewed_id: userId,
+        },
+        { onConflict: 'viewer_id,viewed_id' }
+      );
     } catch (error) {
       // Silently handle errors - profile views are not critical
       console.warn('Could not record profile view:', error);
@@ -207,41 +230,36 @@ const Profile = () => {
       const { data: existingMatch } = await supabase
         .from('matches')
         .select('*')
-        .or(`and(user1_id.eq.${user.id},user2_id.eq.${userId}),and(user1_id.eq.${userId},user2_id.eq.${user.id})`)
+        .or(
+          `and(user1_id.eq.${user.id},user2_id.eq.${userId}),and(user1_id.eq.${userId},user2_id.eq.${user.id})`
+        )
         .maybeSingle();
 
       if (existingMatch) {
         // Update existing match
         const isUser1 = existingMatch.user1_id === user.id;
-        const updateData = isUser1 
-          ? { user1_liked: true }
-          : { user2_liked: true };
+        const updateData = isUser1 ? { user1_liked: true } : { user2_liked: true };
 
-        const isMutual = isUser1 
-          ? existingMatch.user2_liked 
-          : existingMatch.user1_liked;
+        const isMutual = isUser1 ? existingMatch.user2_liked : existingMatch.user1_liked;
 
         if (isMutual) {
           (updateData as any).is_mutual = true;
         }
 
-        await supabase
-          .from('matches')
-          .update(updateData)
-          .eq('id', existingMatch.id);
+        await supabase.from('matches').update(updateData).eq('id', existingMatch.id);
 
         if (isMutual) {
-          alert('C\'est un match ! 🎉 Vous pouvez maintenant discuter.');
-          
+          alert("C'est un match ! 🎉 Vous pouvez maintenant discuter.");
+
           // Envoyer les emails de notification de match
           try {
             await supabase.functions.invoke('send-match-notifications', {
-              body: { matchId: existingMatch.id }
+              body: { matchId: existingMatch.id },
             });
           } catch (emailError) {
             console.error('Erreur envoi emails de match:', emailError);
           }
-          
+
           // Award match badges to both users
           try {
             const { awardMatchBadgesToBothUsers } = await import('@/utils/matchBadges');
@@ -249,7 +267,7 @@ const Profile = () => {
           } catch (badgeError) {
             console.error('Error awarding match badges:', badgeError);
           }
-          
+
           navigate('/matches');
         } else {
           setIsLiked(true);
@@ -259,16 +277,14 @@ const Profile = () => {
         // Calculate real compatibility score
         const compatibilityResult = await calculateDetailedCompatibility(userId);
         const compatibilityScore = compatibilityResult.compatibility_score;
-        
+
         // Create new match
-        await supabase
-          .from('matches')
-          .insert({
-            user1_id: user.id,
-            user2_id: userId,
-            user1_liked: true,
-            match_score: Math.round(compatibilityScore)
-          });
+        await supabase.from('matches').insert({
+          user1_id: user.id,
+          user2_id: userId,
+          user1_liked: true,
+          match_score: Math.round(compatibilityScore),
+        });
 
         setIsLiked(true);
         alert('Profil liké ! Si cette personne vous like en retour, vous pourrez discuter.');
@@ -303,21 +319,18 @@ const Profile = () => {
           </div>
           <h2 className="text-2xl font-bold text-foreground mb-2">Profil introuvable</h2>
           <p className="text-muted-foreground mb-6">
-            Ce profil n'existe pas ou a été supprimé. Découvrez d'autres profils compatibles avec vous.
+            Ce profil n'existe pas ou a été supprimé. Découvrez d'autres profils compatibles avec
+            vous.
           </p>
           <div className="space-y-3">
-            <Button 
-              onClick={() => navigate('/browse')} 
+            <Button
+              onClick={() => navigate('/browse')}
               className="w-full bg-emerald hover:bg-emerald-dark text-primary-foreground"
             >
               <Eye className="h-4 w-4 mr-2" />
               Découvrir des profils
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/matches')} 
-              className="w-full"
-            >
+            <Button variant="outline" onClick={() => navigate('/matches')} className="w-full">
               <Heart className="h-4 w-4 mr-2" />
               Voir mes matches
             </Button>
@@ -329,37 +342,37 @@ const Profile = () => {
 
   const prayerFrequencyMap = {
     '5_times_daily': '5 fois par jour',
-    'sometimes': 'Parfois',
-    'fridays_only': 'Seulement le vendredi',
-    'occasionally': 'Occasionnellement'
+    sometimes: 'Parfois',
+    fridays_only: 'Seulement le vendredi',
+    occasionally: 'Occasionnellement',
   };
 
   const quranReadingMap = {
-    'daily': 'Quotidiennement',
-    'weekly': 'Hebdomadairement',
-    'monthly': 'Mensuellement',
-    'occasionally': 'Occasionnellement',
-    'learning': 'En apprentissage'
+    daily: 'Quotidiennement',
+    weekly: 'Hebdomadairement',
+    monthly: 'Mensuellement',
+    occasionally: 'Occasionnellement',
+    learning: 'En apprentissage',
   };
 
   const sectMap = {
-    'sunni': 'Sunnite',
-    'shia': 'Chiite',
-    'other': 'Autre',
-    'prefer_not_to_say': 'Préfère ne pas dire'
+    sunni: 'Sunnite',
+    shia: 'Chiite',
+    other: 'Autre',
+    prefer_not_to_say: 'Préfère ne pas dire',
   };
 
   const importanceMap = {
-    'very_important': 'Très important',
-    'important': 'Important',
-    'somewhat_important': 'Assez important',
-    'not_important': 'Pas important'
+    very_important: 'Très important',
+    important: 'Important',
+    somewhat_important: 'Assez important',
+    not_important: 'Pas important',
   };
 
   const smokingMap = {
-    'never': 'Jamais',
-    'occasionally': 'Occasionnellement',
-    'regularly': 'Régulièrement'
+    never: 'Jamais',
+    occasionally: 'Occasionnellement',
+    regularly: 'Régulièrement',
   };
 
   return (
@@ -367,11 +380,7 @@ const Profile = () => {
       <div className="container mx-auto">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
-            <Button
-              variant="ghost"
-              onClick={() => navigate(-1)}
-              className="p-2"
-            >
+            <Button variant="ghost" onClick={() => navigate(-1)} className="p-2">
               <ArrowLeft className="h-4 w-4" />
             </Button>
             <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
@@ -390,8 +399,8 @@ const Profile = () => {
                 <CardHeader className="text-center">
                   <div className="h-32 w-32 rounded-full overflow-hidden mx-auto mb-4 bg-gradient-to-br from-emerald to-emerald-light flex items-center justify-center">
                     {profile.avatar_url ? (
-                      <img 
-                        src={profile.avatar_url} 
+                      <img
+                        src={profile.avatar_url}
                         alt={`Photo de ${profile.full_name}`}
                         className="h-full w-full object-cover"
                       />
@@ -469,13 +478,19 @@ const Profile = () => {
                       <div>
                         <h4 className="font-medium text-foreground mb-1">Fréquence de prière</h4>
                         <p className="text-muted-foreground">
-                          {getDisplayValue(profile.islamic_preferences.prayer_frequency, prayerFrequencyMap)}
+                          {getDisplayValue(
+                            profile.islamic_preferences.prayer_frequency,
+                            prayerFrequencyMap
+                          )}
                         </p>
                       </div>
                       <div>
                         <h4 className="font-medium text-foreground mb-1">Lecture du Coran</h4>
                         <p className="text-muted-foreground">
-                          {getDisplayValue(profile.islamic_preferences.quran_reading, quranReadingMap)}
+                          {getDisplayValue(
+                            profile.islamic_preferences.quran_reading,
+                            quranReadingMap
+                          )}
                         </p>
                       </div>
                       <div>
@@ -485,15 +500,22 @@ const Profile = () => {
                         </p>
                       </div>
                       <div>
-                        <h4 className="font-medium text-foreground mb-1">Importance de la religion</h4>
+                        <h4 className="font-medium text-foreground mb-1">
+                          Importance de la religion
+                        </h4>
                         <p className="text-muted-foreground">
-                          {getDisplayValue(profile.islamic_preferences.importance_of_religion, importanceMap)}
+                          {getDisplayValue(
+                            profile.islamic_preferences.importance_of_religion,
+                            importanceMap
+                          )}
                         </p>
                       </div>
                       {profile.islamic_preferences.madhab && (
                         <div>
                           <h4 className="font-medium text-foreground mb-1">Madhab</h4>
-                          <p className="text-muted-foreground">{profile.islamic_preferences.madhab}</p>
+                          <p className="text-muted-foreground">
+                            {profile.islamic_preferences.madhab}
+                          </p>
                         </div>
                       )}
                       <div>
@@ -503,11 +525,13 @@ const Profile = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-foreground">Alimentation Halal:</span>
-                        <Badge variant={profile.islamic_preferences.halal_diet ? "default" : "secondary"}>
+                        <Badge
+                          variant={profile.islamic_preferences.halal_diet ? 'default' : 'secondary'}
+                        >
                           {profile.islamic_preferences.halal_diet ? 'Oui' : 'Non'}
                         </Badge>
                       </div>
@@ -517,9 +541,7 @@ const Profile = () => {
               )}
 
               {/* Onboarding Achievements - Only visible to owner */}
-              {user && userId === user.id && (
-                <OnboardingBadges />
-              )}
+              {user && userId === user.id && <OnboardingBadges />}
             </div>
 
             {/* Action Sidebar */}
@@ -537,31 +559,20 @@ const Profile = () => {
                     <Heart className={`h-4 w-4 mr-2 ${isLiked ? 'fill-current' : ''}`} />
                     {isLiked ? 'Déjà liké' : 'Liker ce profil'}
                   </Button>
-                  
-                  <Button
-                    variant="outline"
-                    onClick={() => navigate(`/matches`)}
-                    className="w-full"
-                  >
+
+                  <Button variant="outline" onClick={() => navigate(`/matches`)} className="w-full">
                     <MessageCircle className="h-4 w-4 mr-2" />
                     Voir mes matches
                   </Button>
-                  
-                  <Button
-                    variant="outline"
-                    onClick={() => navigate('/browse')}
-                    className="w-full"
-                  >
+
+                  <Button variant="outline" onClick={() => navigate('/browse')} className="w-full">
                     <Eye className="h-4 w-4 mr-2" />
                     Autres profils
                   </Button>
                 </CardContent>
               </Card>
 
-              <CompatibilityScore 
-                otherUserId={userId!} 
-                showDetails={true} 
-              />
+              <CompatibilityScore otherUserId={userId!} showDetails={true} />
 
               <Card className="animate-fade-in">
                 <CardHeader>

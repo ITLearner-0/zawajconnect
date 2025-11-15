@@ -11,13 +11,15 @@ export const useEmailVerificationCheck = () => {
   useEffect(() => {
     const checkEmailVerification = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
         if (!user) return;
 
         // Check if email is confirmed in auth
         const emailConfirmed = user.email_confirmed_at !== null;
-        
+
         if (!emailConfirmed) return;
 
         // Check if user_verifications record exists and email_verified status
@@ -35,12 +37,12 @@ export const useEmailVerificationCheck = () => {
         // If email is confirmed but not marked as verified in user_verifications
         if (verificationData && !verificationData.email_verified) {
           console.log('[EmailVerification] Email confirmed but not verified in DB, updating...');
-          
+
           // Update user_verifications (score will be recalculated by trigger)
           const { error: updateError } = await supabase
             .from('user_verifications')
-            .update({ 
-              email_verified: true
+            .update({
+              email_verified: true,
             })
             .eq('user_id', user.id);
 
@@ -62,7 +64,9 @@ export const useEmailVerificationCheck = () => {
     checkEmailVerification();
 
     // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
         checkEmailVerification();
       }

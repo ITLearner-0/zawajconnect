@@ -1,4 +1,3 @@
-
 // JWT Management with short expiration
 import { supabase } from '@/integrations/supabase/client';
 
@@ -17,8 +16,11 @@ export class JWTManager {
   // Validate JWT token
   static async validateToken(): Promise<boolean> {
     try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+
       if (error || !session) {
         return false;
       }
@@ -52,7 +54,7 @@ export class JWTManager {
   static async refreshToken(): Promise<boolean> {
     try {
       const { data, error } = await supabase.auth.refreshSession();
-      
+
       if (error) {
         console.error('Token refresh failed:', error);
         // Force logout if refresh fails
@@ -71,10 +73,12 @@ export class JWTManager {
   // Get token expiry time
   static async getTokenExpiry(): Promise<number | null> {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
       if (!session?.expires_at) return null;
-      
+
       return new Date(session.expires_at).getTime();
     } catch (error) {
       console.error('Failed to get token expiry:', error);
@@ -96,15 +100,17 @@ export class JWTManager {
   // Force logout on security breach
   static async forceLogout(reason: string): Promise<void> {
     console.warn(`Force logout triggered: ${reason}`);
-    
+
     // Log security event
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (user) {
         await (supabase as any).from('security_events').insert({
           event_type: 'force_logout',
           description: `Force logout: ${reason}`,
-          metadata: { reason, timestamp: new Date().toISOString(), user_id: user.id }
+          metadata: { reason, timestamp: new Date().toISOString(), user_id: user.id },
         });
       }
     } catch (error) {

@@ -62,9 +62,7 @@ const BadgeCard = ({ badge, compact = false }: BadgeCardProps) => {
       <CardContent>
         <CardTitle className="text-lg mb-1">{badge.badge_name}</CardTitle>
         {badge.badge_description && (
-          <CardDescription className="mb-3">
-            {badge.badge_description}
-          </CardDescription>
+          <CardDescription className="mb-3">{badge.badge_description}</CardDescription>
         )}
         <div className="flex items-center justify-between text-xs text-muted-foreground">
           <span>Earned {formatDistanceToNow(new Date(badge.earned_at), { addSuffix: true })}</span>

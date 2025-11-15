@@ -49,7 +49,10 @@ const RewardCard = ({ reward, onClaim, claiming = false }: RewardCardProps) => {
               {reward.reward_type}
             </Badge>
             {reward.claimed && (
-              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
+              <Badge
+                variant="outline"
+                className="bg-green-500/10 text-green-500 border-green-500/20"
+              >
                 <Check className="h-3 w-3 mr-1" />
                 Claimed
               </Badge>
@@ -73,10 +76,8 @@ const RewardCard = ({ reward, onClaim, claiming = false }: RewardCardProps) => {
           </div>
         )}
         <CardTitle className="text-lg mb-2">{reward.reward_description}</CardTitle>
-        <CardDescription className="mb-3">
-          From: {reward.source_action}
-        </CardDescription>
-        
+        <CardDescription className="mb-3">From: {reward.source_action}</CardDescription>
+
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
           <span>
             Earned {formatDistanceToNow(new Date(reward.created_at), { addSuffix: true })}
@@ -89,8 +90,8 @@ const RewardCard = ({ reward, onClaim, claiming = false }: RewardCardProps) => {
         </div>
 
         {!reward.claimed && !isExpired && onClaim && (
-          <Button 
-            onClick={() => onClaim(reward.id)} 
+          <Button
+            onClick={() => onClaim(reward.id)}
             disabled={claiming}
             className="w-full"
             size="sm"

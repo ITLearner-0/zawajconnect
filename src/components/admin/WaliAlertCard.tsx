@@ -22,7 +22,7 @@ const getRiskLevelConfig = (level: string) => {
         color: 'text-destructive',
         bgColor: 'bg-destructive/10',
         label: 'Critique',
-        icon: AlertTriangle
+        icon: AlertTriangle,
       };
     case 'high':
       return {
@@ -30,7 +30,7 @@ const getRiskLevelConfig = (level: string) => {
         color: 'text-orange-600',
         bgColor: 'bg-orange-100 dark:bg-orange-900/20',
         label: 'Élevé',
-        icon: AlertTriangle
+        icon: AlertTriangle,
       };
     case 'medium':
       return {
@@ -38,7 +38,7 @@ const getRiskLevelConfig = (level: string) => {
         color: 'text-yellow-600',
         bgColor: 'bg-yellow-100 dark:bg-yellow-900/20',
         label: 'Moyen',
-        icon: AlertTriangle
+        icon: AlertTriangle,
       };
     case 'low':
       return {
@@ -46,7 +46,7 @@ const getRiskLevelConfig = (level: string) => {
         color: 'text-blue-600',
         bgColor: 'bg-blue-100 dark:bg-blue-900/20',
         label: 'Faible',
-        icon: AlertTriangle
+        icon: AlertTriangle,
       };
     default:
       return {
@@ -54,16 +54,16 @@ const getRiskLevelConfig = (level: string) => {
         color: 'text-muted-foreground',
         bgColor: 'bg-muted',
         label: level,
-        icon: AlertTriangle
+        icon: AlertTriangle,
       };
   }
 };
 
-const WaliAlertCard: React.FC<WaliAlertCardProps> = ({ 
-  alert, 
-  onAcknowledge, 
-  onSuspend, 
-  onContact 
+const WaliAlertCard: React.FC<WaliAlertCardProps> = ({
+  alert,
+  onAcknowledge,
+  onSuspend,
+  onContact,
 }) => {
   const riskConfig = getRiskLevelConfig(alert.risk_level);
   const RiskIcon = riskConfig.icon;
@@ -76,15 +76,11 @@ const WaliAlertCard: React.FC<WaliAlertCardProps> = ({
             <div className={`p-2 rounded-lg ${riskConfig.bgColor}`}>
               <RiskIcon className={`h-5 w-5 ${riskConfig.color}`} />
             </div>
-            
+
             <div className="flex-1 space-y-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <Badge variant={riskConfig.variant}>
-                  {riskConfig.label}
-                </Badge>
-                <Badge variant="outline">
-                  {alert.alert_type}
-                </Badge>
+                <Badge variant={riskConfig.variant}>{riskConfig.label}</Badge>
+                <Badge variant="outline">{alert.alert_type}</Badge>
                 {alert.acknowledged && (
                   <Badge variant="secondary" className="gap-1">
                     <CheckCircle className="h-3 w-3" />
@@ -92,11 +88,9 @@ const WaliAlertCard: React.FC<WaliAlertCardProps> = ({
                   </Badge>
                 )}
               </div>
-              
-              <h3 className="font-semibold text-foreground text-lg">
-                {alert.pattern_detected}
-              </h3>
-              
+
+              <h3 className="font-semibold text-foreground text-lg">{alert.pattern_detected}</h3>
+
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <User className="h-4 w-4" />
@@ -107,9 +101,9 @@ const WaliAlertCard: React.FC<WaliAlertCardProps> = ({
                 <div className="flex items-center gap-1">
                   <Clock className="h-4 w-4" />
                   <span>
-                    {formatDistanceToNow(new Date(alert.created_at), { 
-                      addSuffix: true, 
-                      locale: fr 
+                    {formatDistanceToNow(new Date(alert.created_at), {
+                      addSuffix: true,
+                      locale: fr,
                     })}
                   </span>
                 </div>
@@ -139,9 +133,10 @@ const WaliAlertCard: React.FC<WaliAlertCardProps> = ({
         {alert.acknowledged && alert.acknowledged_at && (
           <div className="bg-secondary/50 rounded-lg p-3 mb-4">
             <p className="text-sm text-muted-foreground">
-              Traité {formatDistanceToNow(new Date(alert.acknowledged_at), { 
-                addSuffix: true, 
-                locale: fr 
+              Traité{' '}
+              {formatDistanceToNow(new Date(alert.acknowledged_at), {
+                addSuffix: true,
+                locale: fr,
               })}
             </p>
           </div>
@@ -168,12 +163,7 @@ const WaliAlertCard: React.FC<WaliAlertCardProps> = ({
               <Ban className="h-4 w-4" />
               Suspendre
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onContact(alert)}
-              className="gap-2"
-            >
+            <Button size="sm" variant="outline" onClick={() => onContact(alert)} className="gap-2">
               <Mail className="h-4 w-4" />
               Contacter
             </Button>

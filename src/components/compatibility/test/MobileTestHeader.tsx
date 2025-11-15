@@ -1,11 +1,10 @@
-
-import { Progress } from "@/components/ui/progress";
-import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, ChevronLeft } from "lucide-react";
-import { questions } from "@/data/compatibilityQuestions";
-import CategoryGroup from "./CategoryGroup";
-import { Answer } from "@/types/compatibility";
+import { Progress } from '@/components/ui/progress';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Menu, ChevronLeft } from 'lucide-react';
+import { questions } from '@/data/compatibilityQuestions';
+import CategoryGroup from './CategoryGroup';
+import { Answer } from '@/types/compatibility';
 
 interface MobileTestHeaderProps {
   currentQuestion: number;
@@ -13,16 +12,23 @@ interface MobileTestHeaderProps {
   onQuestionSelect?: (index: number) => void;
 }
 
-const MobileTestHeader = ({ currentQuestion, answers, onQuestionSelect }: MobileTestHeaderProps) => {
+const MobileTestHeader = ({
+  currentQuestion,
+  answers,
+  onQuestionSelect,
+}: MobileTestHeaderProps) => {
   // Group questions by category
-  const questionsByCategory = questions.reduce((acc, question, index) => {
-    const category = question?.category || 'Other';
-    if (!acc[category]) {
-      acc[category] = [];
-    }
-    acc[category].push({ ...question, originalIndex: index });
-    return acc;
-  }, {} as Record<string, any[]>);
+  const questionsByCategory = questions.reduce(
+    (acc, question, index) => {
+      const category = question?.category || 'Other';
+      if (!acc[category]) {
+        acc[category] = [];
+      }
+      acc[category].push({ ...question, originalIndex: index });
+      return acc;
+    },
+    {} as Record<string, any[]>
+  );
 
   const progressPercentage = ((currentQuestion + 1) / questions.length) * 100;
 
@@ -70,12 +76,8 @@ const MobileTestHeader = ({ currentQuestion, answers, onQuestionSelect }: Mobile
           <span className="hidden md:inline">
             Question {currentQuestion + 1} sur {questions.length}
           </span>
-          <span className="md:hidden">
-            {Math.round(progressPercentage)}% terminé
-          </span>
-          <span className="hidden md:inline">
-            {Math.round(progressPercentage)}% terminé
-          </span>
+          <span className="md:hidden">{Math.round(progressPercentage)}% terminé</span>
+          <span className="hidden md:inline">{Math.round(progressPercentage)}% terminé</span>
         </div>
       </div>
 
@@ -83,19 +85,19 @@ const MobileTestHeader = ({ currentQuestion, answers, onQuestionSelect }: Mobile
       <div className="hidden md:block mt-4">
         <div className="flex flex-wrap gap-2">
           {Object.entries(questionsByCategory).map(([category, categoryQuestions]) => {
-            const categoryIndices = categoryQuestions.map(q => q.originalIndex);
-            const answeredInCategory = categoryIndices.filter(idx => answers[idx]).length;
+            const categoryIndices = categoryQuestions.map((q) => q.originalIndex);
+            const answeredInCategory = categoryIndices.filter((idx) => answers[idx]).length;
             const isCurrentCategory = categoryIndices.includes(currentQuestion);
             const progress = (answeredInCategory / categoryQuestions.length) * 100;
-            
+
             return (
               <Button
                 key={category}
-                variant={isCurrentCategory ? "default" : "outline"}
+                variant={isCurrentCategory ? 'default' : 'outline'}
                 size="sm"
                 className={`text-xs transition-all ${
-                  progress === 100 ? "bg-green-100 border-green-300 text-green-800" : ""
-                } ${isCurrentCategory ? "ring-2 ring-blue-300" : ""}`}
+                  progress === 100 ? 'bg-green-100 border-green-300 text-green-800' : ''
+                } ${isCurrentCategory ? 'ring-2 ring-blue-300' : ''}`}
               >
                 <span className="truncate max-w-[120px]">{category}</span>
                 <span className="ml-1 text-xs opacity-75">

@@ -63,21 +63,24 @@ export const useWaliMonitoring = () => {
       if (alertsError) throw alertsError;
 
       // Fetch statistics using RPC
-      const { data: statsData, error: statsError } = await (supabase as any)
-        .rpc('get_wali_alerts_statistics');
+      const { data: statsData, error: statsError } = await (supabase as any).rpc(
+        'get_wali_alerts_statistics'
+      );
 
       if (statsError) throw statsError;
 
       // Fetch recent activities
       const { data: activitiesData, error: activitiesError } = await (supabase as any)
         .from('wali_action_audit')
-        .select(`
+        .select(
+          `
           wali_user_id,
           action_type,
           risk_level,
           suspicious_pattern,
           created_at
-        `)
+        `
+        )
         .order('created_at', { ascending: false })
         .limit(100);
 
@@ -85,7 +88,7 @@ export const useWaliMonitoring = () => {
 
       // Process activities to get aggregated data
       const activityMap = new Map<string, any>();
-      
+
       activitiesData?.forEach((activity: any) => {
         const existing = activityMap.get(activity.wali_user_id) || {
           wali_user_id: activity.wali_user_id,
@@ -140,17 +143,16 @@ export const useWaliMonitoring = () => {
 
   const acknowledgeAlert = async (alertId: string, adminId: string) => {
     try {
-      const { error } = await (supabase as any)
-        .rpc('acknowledge_wali_alert', {
-          p_alert_id: alertId,
-          p_admin_id: adminId,
-        });
+      const { error } = await (supabase as any).rpc('acknowledge_wali_alert', {
+        p_alert_id: alertId,
+        p_admin_id: adminId,
+      });
 
       if (error) throw error;
 
       toast({
         title: 'Alerte confirmée',
-        description: 'L\'alerte a été marquée comme lue.',
+        description: "L'alerte a été marquée comme lue.",
       });
 
       await fetchMonitoringData();
@@ -173,13 +175,12 @@ export const useWaliMonitoring = () => {
     durationDays: number = 30
   ) => {
     try {
-      const { error } = await (supabase as any)
-        .rpc('suspend_wali_user', {
-          p_wali_user_id: waliUserId,
-          p_admin_id: adminId,
-          p_reason: reason,
-          p_duration_days: durationDays,
-        });
+      const { error } = await (supabase as any).rpc('suspend_wali_user', {
+        p_wali_user_id: waliUserId,
+        p_admin_id: adminId,
+        p_reason: reason,
+        p_duration_days: durationDays,
+      });
 
       if (error) throw error;
 

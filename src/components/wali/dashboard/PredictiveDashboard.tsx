@@ -1,22 +1,28 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { 
-  LineChart, 
-  Line, 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  Legend, 
+import {
+  LineChart,
+  Line,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
   ResponsiveContainer,
-  ReferenceLine
+  ReferenceLine,
 } from 'recharts';
 import { TrendingUp, TrendingDown, Minus, BarChart3, Calendar } from 'lucide-react';
 import { usePredictiveAnalytics } from '@/hooks/wali/usePredictiveAnalytics';
 import { AnomalyAlerts } from './AnomalyAlerts';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 
 interface PredictiveDashboardProps {
@@ -59,20 +65,20 @@ export const PredictiveDashboard: React.FC<PredictiveDashboardProps> = ({ userId
 
   // Combine historical and predicted data for charts
   const combineData = (historical: any[], predictions: any[]) => {
-    const historicalData = historical.map(point => ({
+    const historicalData = historical.map((point) => ({
       date: new Date(point.date).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }),
       actual: point.value,
       predicted: null,
       lower: null,
-      upper: null
+      upper: null,
     }));
 
-    const predictedData = predictions.map(pred => ({
+    const predictedData = predictions.map((pred) => ({
       date: new Date(pred.date).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' }),
       actual: null,
       predicted: pred.predicted,
       lower: pred.lower_bound,
-      upper: pred.upper_bound
+      upper: pred.upper_bound,
     }));
 
     return [...historicalData, ...predictedData];
@@ -83,10 +89,7 @@ export const PredictiveDashboard: React.FC<PredictiveDashboardProps> = ({ userId
     analytics.registrations.predictions
   );
 
-  const alertsChart = combineData(
-    analytics.alerts.historical,
-    analytics.alerts.predictions
-  );
+  const alertsChart = combineData(analytics.alerts.historical, analytics.alerts.predictions);
 
   const getTrendIcon = (direction: string) => {
     if (direction === 'up') return <TrendingUp className="h-4 w-4 text-green-600" />;
@@ -104,7 +107,7 @@ export const PredictiveDashboard: React.FC<PredictiveDashboardProps> = ({ userId
   const allAnomalies = [
     ...analytics.registrations.anomalies,
     ...analytics.alerts.anomalies,
-    ...analytics.processingTime.anomalies
+    ...analytics.processingTime.anomalies,
   ];
 
   return (
@@ -119,7 +122,8 @@ export const PredictiveDashboard: React.FC<PredictiveDashboardProps> = ({ userId
                 Analyse prédictive & Détection d'anomalies
               </CardTitle>
               <CardDescription className="mt-2">
-                Anticipation des tendances et identification automatique des variations inhabituelles
+                Anticipation des tendances et identification automatique des variations
+                inhabituelles
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
@@ -150,14 +154,21 @@ export const PredictiveDashboard: React.FC<PredictiveDashboardProps> = ({ userId
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {getTrendIcon(analytics.registrations.trend.direction)}
-                <span className={`text-2xl font-bold ${getTrendColor(analytics.registrations.trend.direction)}`}>
+                <span
+                  className={`text-2xl font-bold ${getTrendColor(analytics.registrations.trend.direction)}`}
+                >
                   {analytics.registrations.trend.changePercent > 0 ? '+' : ''}
                   {analytics.registrations.trend.changePercent}%
                 </span>
               </div>
-              <Badge variant={analytics.registrations.trend.direction === 'up' ? 'default' : 'secondary'}>
-                {analytics.registrations.trend.direction === 'up' ? 'Hausse' : 
-                 analytics.registrations.trend.direction === 'down' ? 'Baisse' : 'Stable'}
+              <Badge
+                variant={analytics.registrations.trend.direction === 'up' ? 'default' : 'secondary'}
+              >
+                {analytics.registrations.trend.direction === 'up'
+                  ? 'Hausse'
+                  : analytics.registrations.trend.direction === 'down'
+                    ? 'Baisse'
+                    : 'Stable'}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
@@ -174,14 +185,21 @@ export const PredictiveDashboard: React.FC<PredictiveDashboardProps> = ({ userId
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {getTrendIcon(analytics.alerts.trend.direction)}
-                <span className={`text-2xl font-bold ${getTrendColor(analytics.alerts.trend.direction)}`}>
+                <span
+                  className={`text-2xl font-bold ${getTrendColor(analytics.alerts.trend.direction)}`}
+                >
                   {analytics.alerts.trend.changePercent > 0 ? '+' : ''}
                   {analytics.alerts.trend.changePercent}%
                 </span>
               </div>
-              <Badge variant={analytics.alerts.trend.direction === 'down' ? 'default' : 'destructive'}>
-                {analytics.alerts.trend.direction === 'up' ? 'Hausse' : 
-                 analytics.alerts.trend.direction === 'down' ? 'Baisse' : 'Stable'}
+              <Badge
+                variant={analytics.alerts.trend.direction === 'down' ? 'default' : 'destructive'}
+              >
+                {analytics.alerts.trend.direction === 'up'
+                  ? 'Hausse'
+                  : analytics.alerts.trend.direction === 'down'
+                    ? 'Baisse'
+                    : 'Stable'}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
@@ -198,14 +216,23 @@ export const PredictiveDashboard: React.FC<PredictiveDashboardProps> = ({ userId
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 {getTrendIcon(analytics.processingTime.trend.direction)}
-                <span className={`text-2xl font-bold ${getTrendColor(analytics.processingTime.trend.direction === 'down' ? 'up' : 'down')}`}>
+                <span
+                  className={`text-2xl font-bold ${getTrendColor(analytics.processingTime.trend.direction === 'down' ? 'up' : 'down')}`}
+                >
                   {analytics.processingTime.trend.changePercent > 0 ? '+' : ''}
                   {analytics.processingTime.trend.changePercent}%
                 </span>
               </div>
-              <Badge variant={analytics.processingTime.trend.direction === 'down' ? 'default' : 'secondary'}>
-                {analytics.processingTime.trend.direction === 'down' ? 'Amélioration' : 
-                 analytics.processingTime.trend.direction === 'up' ? 'Dégradation' : 'Stable'}
+              <Badge
+                variant={
+                  analytics.processingTime.trend.direction === 'down' ? 'default' : 'secondary'
+                }
+              >
+                {analytics.processingTime.trend.direction === 'down'
+                  ? 'Amélioration'
+                  : analytics.processingTime.trend.direction === 'up'
+                    ? 'Dégradation'
+                    : 'Stable'}
               </Badge>
             </div>
             <p className="text-xs text-muted-foreground mt-2">
@@ -233,45 +260,45 @@ export const PredictiveDashboard: React.FC<PredictiveDashboardProps> = ({ userId
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={registrationsChart}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis 
-                    dataKey="date" 
+                  <XAxis
+                    dataKey="date"
                     tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
                   />
                   <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
-                  <Tooltip 
-                    contentStyle={{ 
+                  <Tooltip
+                    contentStyle={{
                       backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: '6px'
+                      borderRadius: '6px',
                     }}
                   />
                   <Legend />
-                  <ReferenceLine 
-                    x={registrationsChart[analytics.registrations.historical.length - 1]?.date} 
-                    stroke="hsl(var(--muted-foreground))" 
-                    strokeDasharray="3 3" 
+                  <ReferenceLine
+                    x={registrationsChart[analytics.registrations.historical.length - 1]?.date}
+                    stroke="hsl(var(--muted-foreground))"
+                    strokeDasharray="3 3"
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="actual" 
-                    stroke="hsl(var(--primary))" 
+                  <Area
+                    type="monotone"
+                    dataKey="actual"
+                    stroke="hsl(var(--primary))"
                     fill="hsl(var(--primary))"
                     fillOpacity={0.6}
                     name="Réel"
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="predicted" 
-                    stroke="hsl(142 76% 36%)" 
+                  <Area
+                    type="monotone"
+                    dataKey="predicted"
+                    stroke="hsl(142 76% 36%)"
                     fill="hsl(142 76% 36%)"
                     fillOpacity={0.3}
                     strokeDasharray="5 5"
                     name="Prévu"
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="upper" 
-                    stroke="transparent" 
+                  <Area
+                    type="monotone"
+                    dataKey="upper"
+                    stroke="transparent"
                     fill="hsl(142 76% 36%)"
                     fillOpacity={0.1}
                     name="Limite haute"
@@ -286,45 +313,43 @@ export const PredictiveDashboard: React.FC<PredictiveDashboardProps> = ({ userId
         <Card>
           <CardHeader>
             <CardTitle>Prédiction Alertes</CardTitle>
-            <CardDescription>
-              Évolution et anticipation du volume d'alertes
-            </CardDescription>
+            <CardDescription>Évolution et anticipation du volume d'alertes</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={alertsChart}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis 
-                    dataKey="date" 
+                  <XAxis
+                    dataKey="date"
                     tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }}
                   />
                   <YAxis tick={{ fontSize: 11, fill: 'hsl(var(--muted-foreground))' }} />
-                  <Tooltip 
-                    contentStyle={{ 
+                  <Tooltip
+                    contentStyle={{
                       backgroundColor: 'hsl(var(--card))',
                       border: '1px solid hsl(var(--border))',
-                      borderRadius: '6px'
+                      borderRadius: '6px',
                     }}
                   />
                   <Legend />
-                  <ReferenceLine 
-                    x={alertsChart[analytics.alerts.historical.length - 1]?.date} 
-                    stroke="hsl(var(--muted-foreground))" 
-                    strokeDasharray="3 3" 
+                  <ReferenceLine
+                    x={alertsChart[analytics.alerts.historical.length - 1]?.date}
+                    stroke="hsl(var(--muted-foreground))"
+                    strokeDasharray="3 3"
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="actual" 
-                    stroke="hsl(0 84% 60%)" 
+                  <Line
+                    type="monotone"
+                    dataKey="actual"
+                    stroke="hsl(0 84% 60%)"
                     strokeWidth={2}
                     name="Réel"
                     dot={{ r: 3 }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="predicted" 
-                    stroke="hsl(0 72% 51%)" 
+                  <Line
+                    type="monotone"
+                    dataKey="predicted"
+                    stroke="hsl(0 72% 51%)"
                     strokeWidth={2}
                     strokeDasharray="5 5"
                     name="Prévu"

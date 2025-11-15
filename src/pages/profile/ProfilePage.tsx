@@ -1,25 +1,24 @@
-
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AccessibilityProvider } from "@/contexts/AccessibilityContext";
-import { useNavigate } from "react-router-dom";
-import ProfileHeader from "@/components/profile/ProfileHeader";
-import { BadgeShowcase } from "@/components/gamification/BadgeShowcase";
-import ProfileForm from "@/components/profile/ProfileForm";
-import ProfileOnboarding from "@/components/profile/ProfileOnboarding";
-import ProfileAnalytics from "@/components/profile/ProfileAnalytics";
-import ProfileRecommendations from "@/components/profile/ProfileRecommendations";
-import ProfileVisibilityManager from "@/components/profile/ProfileVisibilityManager";
-import StandardLoadingState from "@/components/ui/StandardLoadingState";
-import { useProfilePageLogic } from "./hooks/useProfilePageLogic";
+import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
+import { useNavigate } from 'react-router-dom';
+import ProfileHeader from '@/components/profile/ProfileHeader';
+import { BadgeShowcase } from '@/components/gamification/BadgeShowcase';
+import ProfileForm from '@/components/profile/ProfileForm';
+import ProfileOnboarding from '@/components/profile/ProfileOnboarding';
+import ProfileAnalytics from '@/components/profile/ProfileAnalytics';
+import ProfileRecommendations from '@/components/profile/ProfileRecommendations';
+import ProfileVisibilityManager from '@/components/profile/ProfileVisibilityManager';
+import StandardLoadingState from '@/components/ui/StandardLoadingState';
+import { useProfilePageLogic } from './hooks/useProfilePageLogic';
 
 const ProfilePage = () => {
-  console.log("ProfilePage: Component rendering started");
-  
+  console.log('ProfilePage: Component rendering started');
+
   const navigate = useNavigate();
-  
-  console.log("ProfilePage: About to call useProfilePageLogic");
-  
+
+  console.log('ProfilePage: About to call useProfilePageLogic');
+
   const {
     // Profile data
     formData,
@@ -33,7 +32,7 @@ const ProfilePage = () => {
     hasCompatibilityResults,
     loading,
     error,
-    
+
     // Handlers
     handleChange,
     handleVerificationChange,
@@ -43,7 +42,7 @@ const ProfilePage = () => {
     handleToggleVisibility,
     handleUnblockUser,
     handleVisibilitySettingsChange,
-    
+
     // Onboarding
     isOnboarding,
     currentStep,
@@ -52,24 +51,24 @@ const ProfilePage = () => {
     handlePrevious,
     completeOnboarding,
     canProceedCurrentStep,
-    
+
     // Analytics and recommendations
     analytics,
     analyticsLoading,
     recommendations,
     recommendationsLoading,
     handleRecommendationAction,
-    
+
     // Visibility settings
-    visibilitySettings
+    visibilitySettings,
   } = useProfilePageLogic();
 
-  console.log("ProfilePage: useProfilePageLogic returned:", {
+  console.log('ProfilePage: useProfilePageLogic returned:', {
     formData: !!formData,
     userId,
     loading,
     error,
-    isOnboarding
+    isOnboarding,
   });
 
   // Create a wrapper that converts field-based changes to the expected format for onboarding
@@ -78,10 +77,10 @@ const ProfilePage = () => {
     const syntheticEvent = {
       target: {
         name: field,
-        value: value
-      }
+        value: value,
+      },
     } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
-    
+
     handleChange(syntheticEvent);
   };
 
@@ -90,15 +89,17 @@ const ProfilePage = () => {
     const syntheticEvent = {
       target: {
         name: field,
-        value: value
-      }
+        value: value,
+      },
     } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
-    
+
     handleChange(syntheticEvent);
   };
 
   // Create a wrapper that converts field-based handler to event-based handler for ProfileOnboarding
-  const handleOnboardingChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleOnboardingChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     handleChange(e);
   };
 
@@ -108,7 +109,7 @@ const ProfilePage = () => {
     if (result && result.success && result.shouldNavigateToMatches) {
       // Navigate to nearby matches page
       setTimeout(() => {
-        navigate("/nearby");
+        navigate('/nearby');
       }, 2000);
       return true;
     }
@@ -117,24 +118,26 @@ const ProfilePage = () => {
 
   // Show loading state if data is not ready
   if (loading) {
-    console.log("ProfilePage: Showing loading state");
+    console.log('ProfilePage: Showing loading state');
     return <StandardLoadingState loading={true} loadingText="Chargement du profil..." />;
   }
 
   // Show error state if there's an error
   if (error) {
-    console.log("ProfilePage: Showing error state:", error);
-    
+    console.log('ProfilePage: Showing error state:', error);
+
     // If user is not authenticated, redirect to auth page
-    if (error.includes("No authenticated user found")) {
+    if (error.includes('No authenticated user found')) {
       return (
         <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 flex items-center justify-center">
           <Card className="max-w-md mx-auto">
             <CardContent className="p-6">
               <h2 className="text-xl font-semibold text-red-600 mb-4">Authentification requise</h2>
-              <p className="text-gray-600 mb-4">Vous devez être connecté pour accéder à votre profil.</p>
-              <button 
-                onClick={() => navigate("/auth")} 
+              <p className="text-gray-600 mb-4">
+                Vous devez être connecté pour accéder à votre profil.
+              </p>
+              <button
+                onClick={() => navigate('/auth')}
                 className="w-full bg-rose-500 text-white py-2 px-4 rounded hover:bg-rose-600"
               >
                 Se connecter
@@ -144,7 +147,7 @@ const ProfilePage = () => {
         </div>
       );
     }
-    
+
     // Other errors
     return (
       <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 flex items-center justify-center">
@@ -152,8 +155,8 @@ const ProfilePage = () => {
           <CardContent className="p-6">
             <h2 className="text-xl font-semibold text-red-600 mb-4">Erreur de chargement</h2>
             <p className="text-gray-600 mb-4">{error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="w-full bg-rose-500 text-white py-2 px-4 rounded hover:bg-rose-600"
             >
               Réessayer
@@ -166,14 +169,14 @@ const ProfilePage = () => {
 
   // Show loading state if data is not ready
   if (!formData) {
-    console.log("ProfilePage: No form data available, showing loading state");
+    console.log('ProfilePage: No form data available, showing loading state');
     return <StandardLoadingState loading={true} loadingText="Chargement des données..." />;
   }
 
-  console.log("ProfilePage: About to render main content");
+  console.log('ProfilePage: About to render main content');
 
   if (isOnboarding) {
-    console.log("ProfilePage: Rendering onboarding");
+    console.log('ProfilePage: Rendering onboarding');
     return (
       <AccessibilityProvider>
         <ProfileOnboarding
@@ -191,11 +194,15 @@ const ProfilePage = () => {
     );
   }
 
-  console.log("ProfilePage: Rendering main profile page");
+  console.log('ProfilePage: Rendering main profile page');
 
   return (
     <AccessibilityProvider>
-      <div className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-12" role="main" aria-labelledby="profile-heading">
+      <div
+        className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-12"
+        role="main"
+        aria-labelledby="profile-heading"
+      >
         <div className="container max-w-4xl mx-auto px-4">
           <Card className="shadow-lg border-rose-200 dark:border-rose-800">
             <CardHeader className="bg-gradient-to-r from-rose-400 to-pink-400 text-white">

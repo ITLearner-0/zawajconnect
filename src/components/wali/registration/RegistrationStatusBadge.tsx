@@ -6,10 +6,7 @@ interface RegistrationStatusBadgeProps {
   className?: string;
 }
 
-export const RegistrationStatusBadge = ({ 
-  status, 
-  className 
-}: RegistrationStatusBadgeProps) => {
+export const RegistrationStatusBadge = ({ status, className }: RegistrationStatusBadgeProps) => {
   const statusConfig = {
     pending: {
       label: 'En attente',
@@ -40,10 +37,7 @@ export const RegistrationStatusBadge = ({
   const badgeClassName = 'className' in config ? config.className : '';
 
   return (
-    <Badge 
-      variant={config.variant} 
-      className={`${badgeClassName} ${className || ''}`}
-    >
+    <Badge variant={config.variant} className={`${badgeClassName} ${className || ''}`}>
       <Icon className="mr-1 h-3 w-3" />
       {config.label}
     </Badge>

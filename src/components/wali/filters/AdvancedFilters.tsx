@@ -48,11 +48,7 @@ export const AdvancedFilters = ({
           <div className="flex gap-2">
             {hasActiveFilters && (
               <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setSaveDialogOpen(true)}
-                >
+                <Button variant="outline" size="sm" onClick={() => setSaveDialogOpen(true)}>
                   <Save className="w-4 h-4 mr-2" />
                   Sauvegarder
                 </Button>

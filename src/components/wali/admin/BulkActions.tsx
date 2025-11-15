@@ -90,7 +90,8 @@ export const BulkActions = ({
               {selectedIds.length > 0 && (
                 <Alert className="py-2 px-3 border-primary">
                   <AlertDescription className="text-sm">
-                    Actions en masse disponibles pour {selectedIds.length} inscription{selectedIds.length > 1 ? 's' : ''}
+                    Actions en masse disponibles pour {selectedIds.length} inscription
+                    {selectedIds.length > 1 ? 's' : ''}
                   </AlertDescription>
                 </Alert>
               )}
@@ -126,8 +127,9 @@ export const BulkActions = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Approuver les inscriptions ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Vous êtes sur le point d'approuver {selectedIds.length} inscription{selectedIds.length > 1 ? 's' : ''}.
-              Cette action enverra des notifications par email aux Walis concernés.
+              Vous êtes sur le point d'approuver {selectedIds.length} inscription
+              {selectedIds.length > 1 ? 's' : ''}. Cette action enverra des notifications par email
+              aux Walis concernés.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -146,8 +148,8 @@ export const BulkActions = ({
           <AlertDialogHeader>
             <AlertDialogTitle>Rejeter les inscriptions ?</AlertDialogTitle>
             <AlertDialogDescription>
-              Vous êtes sur le point de rejeter {selectedIds.length} inscription{selectedIds.length > 1 ? 's' : ''}.
-              Veuillez fournir une raison pour ce rejet.
+              Vous êtes sur le point de rejeter {selectedIds.length} inscription
+              {selectedIds.length > 1 ? 's' : ''}. Veuillez fournir une raison pour ce rejet.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">

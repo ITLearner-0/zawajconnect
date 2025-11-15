@@ -773,8 +773,8 @@ SELECT increment_insight_views('YOUR_USER_ID');
 ```markdown
 # Rapport de Test Phase 5
 
-Date: ****\_\_****
-Testeur: ****\_\_****
+Date: \***\*\_\_\*\***
+Testeur: \***\*\_\_\*\***
 
 ## Résumé
 

@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { rateLimitingService } from '@/services/rateLimiting/rateLimitingService';
@@ -18,48 +17,58 @@ interface BlockInfo {
 export const useRateLimiting = () => {
   const [rateLimitData, setRateLimitData] = useState<Map<string, any>>(new Map());
 
-  const checkRateLimit = useCallback(async (action: string, customConfig?: RateLimitConfig): Promise<boolean> => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return false;
+  const checkRateLimit = useCallback(
+    async (action: string, customConfig?: RateLimitConfig): Promise<boolean> => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return false;
 
-      const result = await rateLimitingService.checkRateLimit(user.id, action);
-      
-      if (!result.allowed) {
-        // Log rate limit violation
-        await (supabase as any).rpc('log_security_event', {
-          p_user_id: user.id,
-          p_event_type: 'rate_limit_exceeded',
-          p_description: `Rate limit exceeded for action: ${action}`,
-          p_severity: 'medium',
-          p_metadata: {
-            action,
-            remaining: result.remaining,
-            reset_time: result.resetTime,
-            blocked: result.blocked
-          }
-        });
+        const result = await rateLimitingService.checkRateLimit(user.id, action);
+
+        if (!result.allowed) {
+          // Log rate limit violation
+          await (supabase as any).rpc('log_security_event', {
+            p_user_id: user.id,
+            p_event_type: 'rate_limit_exceeded',
+            p_description: `Rate limit exceeded for action: ${action}`,
+            p_severity: 'medium',
+            p_metadata: {
+              action,
+              remaining: result.remaining,
+              reset_time: result.resetTime,
+              blocked: result.blocked,
+            },
+          });
+        }
+
+        return result.allowed;
+      } catch (error) {
+        console.error('Rate limit check failed:', error);
+        return true; // Allow by default if check fails
       }
+    },
+    []
+  );
 
-      return result.allowed;
-    } catch (error) {
-      console.error('Rate limit check failed:', error);
-      return true; // Allow by default if check fails
-    }
-  }, []);
-
-  const getRemainingRequests = useCallback((action: string): number => {
-    const data = rateLimitData.get(action);
-    return data?.remaining || 0;
-  }, [rateLimitData]);
+  const getRemainingRequests = useCallback(
+    (action: string): number => {
+      const data = rateLimitData.get(action);
+      return data?.remaining || 0;
+    },
+    [rateLimitData]
+  );
 
   const resetRateLimit = useCallback(async (action: string): Promise<void> => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       await rateLimitingService.unblockUser(user.id);
-      setRateLimitData(prev => {
+      setRateLimitData((prev) => {
         const newData = new Map(prev);
         newData.delete(action);
         return newData;
@@ -69,28 +78,37 @@ export const useRateLimiting = () => {
     }
   }, []);
 
-  const isBlocked = useCallback((action: string): boolean => {
-    const data = rateLimitData.get(action);
-    return data?.blocked || false;
-  }, [rateLimitData]);
+  const isBlocked = useCallback(
+    (action: string): boolean => {
+      const data = rateLimitData.get(action);
+      return data?.blocked || false;
+    },
+    [rateLimitData]
+  );
 
-  const blockInfo = useCallback((action: string): BlockInfo => {
-    const data = rateLimitData.get(action);
-    return {
-      isBlocked: data?.blocked || false,
-      blockedUntil: data?.blockUntil,
-      reason: data?.reason
-    };
-  }, [rateLimitData]);
+  const blockInfo = useCallback(
+    (action: string): BlockInfo => {
+      const data = rateLimitData.get(action);
+      return {
+        isBlocked: data?.blocked || false,
+        blockedUntil: data?.blockUntil,
+        reason: data?.reason,
+      };
+    },
+    [rateLimitData]
+  );
 
-  const getRemainingBlockTime = useCallback((action: string): number => {
-    const data = rateLimitData.get(action);
-    if (!data?.blocked || !data?.blockUntil) return 0;
-    
-    const now = Date.now();
-    const remaining = data.blockUntil - now;
-    return Math.max(0, remaining);
-  }, [rateLimitData]);
+  const getRemainingBlockTime = useCallback(
+    (action: string): number => {
+      const data = rateLimitData.get(action);
+      if (!data?.blocked || !data?.blockUntil) return 0;
+
+      const now = Date.now();
+      const remaining = data.blockUntil - now;
+      return Math.max(0, remaining);
+    },
+    [rateLimitData]
+  );
 
   return {
     checkRateLimit,
@@ -98,6 +116,6 @@ export const useRateLimiting = () => {
     resetRateLimit,
     isBlocked,
     blockInfo,
-    getRemainingBlockTime
+    getRemainingBlockTime,
   };
 };
