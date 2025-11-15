@@ -40,18 +40,18 @@ function App() {
   
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <UserDataProvider>
-          <AchievementNotificationProvider>
-            <BadgeNotificationProvider>
-              <EmailVerificationMonitor />
-              <BrowserRouter
-                future={{
-                  v7_startTransition: true,
-                  v7_relativeSplatPath: true
-                }}
-              >
-            <NavigationProvider>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true
+        }}
+      >
+        <AuthProvider>
+          <UserDataProvider>
+            <AchievementNotificationProvider>
+              <BadgeNotificationProvider>
+                <EmailVerificationMonitor />
+                <NavigationProvider>
               <NavigationGuard>
               <FreemiumBanner />
               <RouteTransition>
@@ -114,16 +114,16 @@ function App() {
                   </Routes>
                 </Suspense>
               </RouteTransition>
+              <CookieConsentBanner />
               </NavigationGuard>
             </NavigationProvider>
-              <CookieConsentBanner />
-              <Toaster />
-            </BrowserRouter>
+            <Toaster />
           </BadgeNotificationProvider>
         </AchievementNotificationProvider>
       </UserDataProvider>
     </AuthProvider>
-  </QueryClientProvider>
+  </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 
