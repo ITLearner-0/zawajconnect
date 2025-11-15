@@ -52,9 +52,9 @@ function App() {
               <BadgeNotificationProvider>
                 <EmailVerificationMonitor />
                 <NavigationProvider>
-              <NavigationGuard>
-              <FreemiumBanner />
-              <RouteTransition>
+                  <NavigationGuard>
+                    <FreemiumBanner />
+                    <RouteTransition>
                 <Suspense fallback={<RouteLoadingFallback />}>
                   <Routes>
                     {/* Public routes */}
@@ -113,16 +113,16 @@ function App() {
                     <Route path={notFoundRoute.path} element={<NotFoundComponent />} />
                   </Routes>
                 </Suspense>
-              </RouteTransition>
-              <CookieConsentBanner />
-              </NavigationGuard>
-            </NavigationProvider>
-            <Toaster />
-          </BadgeNotificationProvider>
-        </AchievementNotificationProvider>
-      </UserDataProvider>
-    </AuthProvider>
-  </BrowserRouter>
+                    </RouteTransition>
+                    <CookieConsentBanner />
+                  </NavigationGuard>
+                </NavigationProvider>
+                <Toaster />
+              </BadgeNotificationProvider>
+            </AchievementNotificationProvider>
+          </UserDataProvider>
+        </AuthProvider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 }
