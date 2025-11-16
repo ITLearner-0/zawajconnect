@@ -12,12 +12,14 @@ export default defineConfig({
     include: ['src/**/*.{test,spec}.{ts,tsx}'], // Only run tests in src directory
     exclude: ['node_modules', 'dist', '.git', '.cache'], // Exclude common directories
     pool: 'threads', // Use threads pool for faster execution than forks
-    isolate: false, // Reuse environment between test files to reduce setup overhead
     poolOptions: {
       threads: {
         singleThread: true, // Use single thread to reduce overhead
       },
     },
+    testTimeout: 30000, // 30 second timeout for tests (important for CI)
+    hookTimeout: 30000, // 30 second timeout for hooks
+    teardownTimeout: 30000, // 30 second timeout for teardown
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

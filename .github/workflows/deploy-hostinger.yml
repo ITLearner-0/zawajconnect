@@ -23,11 +23,21 @@ jobs:
           
       - name: 📦 Install dependencies
         run: npm ci
-        
+
+      - name: 🔍 Debug environment
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Current directory: $(pwd)"
+          echo "Environment: CI=$CI, NODE_ENV=$NODE_ENV"
+
       - name: 🧪 Run tests with coverage
-        run: npm run test:coverage
+        run: |
+          echo "Running tests with coverage..."
+          npm run test:coverage -- --reporter=verbose
         env:
           CI: true
+          NODE_ENV: test
           
       - name: 📤 Upload coverage to Codecov
         uses: codecov/codecov-action@v4
