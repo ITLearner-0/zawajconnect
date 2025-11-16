@@ -32,6 +32,7 @@ jobs:
           echo "Environment: CI=$CI, NODE_ENV=$NODE_ENV"
 
       - name: 🧪 Run tests with coverage
+        timeout-minutes: 10
         run: |
           echo "Running tests with coverage..."
           npm run test:coverage -- --reporter=verbose
