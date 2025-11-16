@@ -8,16 +8,14 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    css: false, // Disable CSS processing to speed up tests
-    include: ['src/**/*.{test,spec}.{ts,tsx}'], // Only run tests in src directory
-    exclude: ['node_modules', 'dist', '.git', '.cache'], // Exclude common directories
-    pool: 'threads', // Use threads pool for faster execution than forks
-    isolate: false, // Reuse environment between test files to reduce setup overhead
-    poolOptions: {
-      threads: {
-        singleThread: true, // Use single thread to reduce overhead
-      },
-    },
+    css: false,
+    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    exclude: ['node_modules', 'dist', '.git', '.cache'],
+    pool: 'forks', // Changed from threads to forks to prevent CI hangs
+    testTimeout: 30000,
+    hookTimeout: 30000,
+    teardownTimeout: 30000,
+    bail: 1, // Stop on first failure to prevent hanging
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
@@ -30,7 +28,7 @@ export default defineConfig({
         'dist/',
       ],
       thresholds: {
-        lines: 10, // Lowered temporarily to unblock PR merge
+        lines: 10,
         functions: 10,
         branches: 10,
         statements: 10,

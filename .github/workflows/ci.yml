@@ -108,6 +108,7 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
 
       - name: Run tests with coverage
+        timeout-minutes: 10
         run: npm run test:coverage
         continue-on-error: true
 
