@@ -27,9 +27,7 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          npm cache clean --force
-          npm ci
+        run: npm ci
 
       - name: Cache node_modules
         uses: actions/cache@v4
