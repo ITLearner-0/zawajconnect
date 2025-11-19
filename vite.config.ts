@@ -5,7 +5,7 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: "./",
+  base: "/", // Use absolute paths from root to fix routing issues
   server: {
     host: "::",
     port: 8080,
