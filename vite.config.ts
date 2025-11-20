@@ -87,21 +87,11 @@ export default defineConfig(({ mode }) => ({
     },
     // Optimize for modern browsers (ES2020 for better code)
     target: 'es2020',
-    minify: mode === 'production' ? 'terser' : false,
-    terserOptions: mode === 'production' ? {
-      compress: {
-        drop_console: true, // Safe now with our logger system
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
-        passes: 2, // More aggressive compression
-      },
-      mangle: {
-        safari10: true, // Safari 10 compatibility
-      },
-      format: {
-        comments: false, // Remove all comments
-      },
-    } : undefined,
+    // Disable JS minification in production to avoid rare TDZ/runtime issues
+    // Once everything is stable in production, we can reintroduce minification
+    // using esbuild or safer settings.
+    minify: false,
+    terserOptions: undefined,
     // Source maps only in development
     sourcemap: mode === 'development' ? 'inline' : false,
     // Asset size warnings
