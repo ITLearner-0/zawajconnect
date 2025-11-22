@@ -112,8 +112,10 @@ const SmartMatchingSuggestions = () => {
             : null;
 
         // Calculate Islamic compatibility using fuzzy matching
-        let islamicScore = 60; // Default neutral score
+        let islamicScore = 30; // Low score for incomplete profiles
+        let hasIslamicPreferences = false;
         if (myPrefs && matchIslamicPrefs) {
+          hasIslamicPreferences = true;
           islamicScore = calculateIslamicCompatibility(
             {
               ...myPrefs,
@@ -142,11 +144,13 @@ const SmartMatchingSuggestions = () => {
         const personalityScore = 70; // Default - will be enhanced when questionnaire responses are available
 
         // Calculate overall compatibility with weighted scoring
+        // Note: Personality weight reduced to 0.1 since it's currently a placeholder
+        // Islamic and cultural weights increased to 0.5 and 0.4 respectively
         const compatibilityScore = calculateOverallCompatibility(
           islamicScore,
           culturalScore,
           personalityScore,
-          { islamic: 0.4, cultural: 0.3, personality: 0.3 }
+          { islamic: 0.5, cultural: 0.4, personality: 0.1 }
         );
 
         // Generate explanation with strengths and concerns
@@ -166,6 +170,11 @@ const SmartMatchingSuggestions = () => {
         const verificationScore = match.user_verifications?.verification_score || 0;
         if (verificationScore >= 70) {
           reasons.push('Profil vérifié');
+        }
+
+        // Flag incomplete profiles
+        if (!hasIslamicPreferences) {
+          reasons.push('⚠️ Préférences islamiques non renseignées');
         }
 
         logger.log('Match suggestion calculated', {
@@ -276,10 +285,11 @@ const SmartMatchingSuggestions = () => {
       <CardContent>
         <div className="grid gap-4">
           {suggestions.map((suggestion) => (
-            <div
+            <button
               key={suggestion.profile.user_id}
-              className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+              className="border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer text-left w-full"
               onClick={() => handleViewProfile(suggestion.profile.user_id)}
+              aria-label={`Voir le profil de ${suggestion.profile.full_name}, compatibilité ${suggestion.compatibility_score}%`}
             >
               <div className="flex items-start gap-4">
                 <img
@@ -334,7 +344,7 @@ const SmartMatchingSuggestions = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </button>
           ))}
         </div>
 

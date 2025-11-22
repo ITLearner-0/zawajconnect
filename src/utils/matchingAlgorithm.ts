@@ -188,7 +188,7 @@ export const calculateIslamicCompatibility = (
 
   if (scores.length === 0) {
     logger.warn('No Islamic preferences available for matching');
-    return 60; // Default neutral score
+    return 30; // Low score for incomplete profiles to encourage completion
   }
 
   // Calculate total weight used
@@ -359,12 +359,14 @@ const calculateArrayOverlap = (arr1: string[], arr2: string[]): number => {
 
 /**
  * Calculate overall compatibility score with weighted dimensions
+ * Default weights: Islamic 50%, Cultural 40%, Personality 10%
+ * Note: Personality weight is low since it's currently a placeholder
  */
 export const calculateOverallCompatibility = (
   islamicScore: number,
   culturalScore: number,
   personalityScore: number,
-  weights: CompatibilityWeights = { islamic: 0.4, cultural: 0.3, personality: 0.3 }
+  weights: CompatibilityWeights = { islamic: 0.5, cultural: 0.4, personality: 0.1 }
 ): number => {
   // Normalize weights to sum to 1
   const totalWeight = weights.islamic + weights.cultural + weights.personality;

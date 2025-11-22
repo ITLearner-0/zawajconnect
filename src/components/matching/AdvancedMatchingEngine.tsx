@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,9 +35,6 @@ const AdvancedMatchingEngine = () => {
     setAnalyzing(true);
 
     try {
-      // Simulate AI-powered matching analysis
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
       // Get current user's profile to determine gender
       const { data: currentUserProfile } = await supabase
         .from('profiles')
@@ -60,7 +56,7 @@ const AdvancedMatchingEngine = () => {
       const waliUserIds = waliUsers?.map((w) => w.invited_user_id).filter(Boolean) || [];
 
       // Fetch potential matches with AI scoring (opposite gender only, excluding Walis)
-      const { data: profiles } = await supabase
+      let query = supabase
         .from('profiles')
         .select(
           `
@@ -74,9 +70,14 @@ const AdvancedMatchingEngine = () => {
         `
         )
         .neq('user_id', user.id)
-        .eq('gender', oppositeGender)
-        .not('user_id', 'in', waliUserIds.length > 0 ? `(${waliUserIds.join(',')})` : '()')
-        .limit(20);
+        .eq('gender', oppositeGender);
+
+      // Exclude Walis only if there are any
+      if (waliUserIds.length > 0) {
+        query = query.not('user_id', 'in', `(${waliUserIds.join(',')})`);
+      }
+
+      const { data: profiles } = await query.limit(20);
 
       if (profiles) {
         // Use real unified compatibility scoring

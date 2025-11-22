@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -102,9 +101,6 @@ const IslamicCompatibilityCalculator = () => {
     setCalculating(true);
 
     try {
-      // Simulate Islamic compatibility calculation
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
       // Get both users' Islamic preferences
       const { data: myPrefs } = await supabase
         .from('islamic_preferences')
