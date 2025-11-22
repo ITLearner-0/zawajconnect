@@ -43,6 +43,7 @@ const AdvancedMatching = lazy(() => import('@/pages/AdvancedMatching'));
 const CompatibilityTest = lazy(() => import('@/pages/CompatibilityTest'));
 const CompatibilityInsightsPage = lazy(() => import('@/pages/CompatibilityInsights'));
 const Compare = lazy(() => import('@/pages/Compare'));
+const PersonalityQuestionnaire = lazy(() => import('@/pages/PersonalityQuestionnaire'));
 
 // Family features
 const Family = lazy(() => import('@/pages/Family'));
@@ -184,6 +185,7 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/compatibility-test', component: CompatibilityTest },
   { path: '/compatibility-insights', component: CompatibilityInsightsPage },
   { path: '/compare', component: Compare },
+  { path: '/personality-questionnaire', component: PersonalityQuestionnaire },
   { path: '/gamification', component: Gamification },
   { path: '/badge-leaderboard', component: BadgeLeaderboard },
 ];

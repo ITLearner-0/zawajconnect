@@ -12,6 +12,7 @@ import type {
   CompatibilityWeights,
   CompatibilityExplanation,
 } from '@/types/supabase';
+import type { PersonalityQuestionnaire } from '@/types/personality';
 
 /**
  * Re-export types for backwards compatibility
@@ -449,4 +450,171 @@ export const generateCompatibilityExplanation = (
     concerns,
     summary: summary.trim(),
   };
+};
+
+/**
+ * Calculate personality compatibility based on questionnaire responses
+ * Uses weighted scoring for different personality dimensions
+ *
+ * Compatibility factors:
+ * - Complementary traits (opposites attract) for some dimensions
+ * - Similar traits (birds of a feather) for others
+ * - Weighted importance based on relationship research
+ */
+export const calculatePersonalityCompatibility = (
+  user1Prefs: PersonalityQuestionnaire | null,
+  user2Prefs: PersonalityQuestionnaire | null
+): number => {
+  if (!user1Prefs || !user2Prefs) {
+    logger.warn('Missing personality questionnaire data');
+    return 70; // Default score when data is missing
+  }
+
+  const scores: { score: number; weight: number }[] = [];
+
+  // Life Goals & Ambitions (Should be SIMILAR - high weight)
+  // People with similar life goals have more successful relationships
+  scores.push({
+    score: calculateSimilarityScore(user1Prefs.career_ambition, user2Prefs.career_ambition),
+    weight: 1.5, // High importance
+  });
+  scores.push({
+    score: calculateSimilarityScore(user1Prefs.family_priority, user2Prefs.family_priority),
+    weight: 2.0, // Very high importance - critical in marriage
+  });
+  scores.push({
+    score: calculateSimilarityScore(user1Prefs.religious_growth, user2Prefs.religious_growth),
+    weight: 1.8, // Very high importance - spiritual alignment
+  });
+  scores.push({
+    score: calculateSimilarityScore(user1Prefs.community_involvement, user2Prefs.community_involvement),
+    weight: 1.0,
+  });
+
+  // Communication & Conflict Resolution (MODERATE BALANCE)
+  // Some difference is okay, but extremes are problematic
+  scores.push({
+    score: calculateBalancedScore(user1Prefs.communication_style, user2Prefs.communication_style),
+    weight: 1.5, // Important for daily interaction
+  });
+  scores.push({
+    score: calculateBalancedScore(user1Prefs.conflict_resolution, user2Prefs.conflict_resolution),
+    weight: 1.7, // Very important - conflict management is key
+  });
+  scores.push({
+    score: calculateBalancedScore(user1Prefs.emotional_expression, user2Prefs.emotional_expression),
+    weight: 1.2,
+  });
+
+  // Financial Management (Should be SIMILAR - high weight)
+  // Financial disagreements are a top cause of relationship stress
+  scores.push({
+    score: calculateSimilarityScore(user1Prefs.spending_habits, user2Prefs.spending_habits),
+    weight: 1.6, // High importance
+  });
+  scores.push({
+    score: calculateSimilarityScore(user1Prefs.financial_planning, user2Prefs.financial_planning),
+    weight: 1.6, // High importance
+  });
+
+  // Social & Lifestyle (MODERATE BALANCE or COMPLEMENTARY)
+  // Some difference adds richness, but extreme gaps cause issues
+  scores.push({
+    score: calculateBalancedScore(user1Prefs.social_energy, user2Prefs.social_energy),
+    weight: 1.1,
+  });
+  scores.push({
+    score: calculateBalancedScore(user1Prefs.adventure_level, user2Prefs.adventure_level),
+    weight: 1.0,
+  });
+  scores.push({
+    score: calculateComplementaryScore(user1Prefs.organization_level, user2Prefs.organization_level),
+    weight: 0.9, // Can be complementary - one organized, one spontaneous
+  });
+
+  // Family Roles & Responsibilities (Should be SIMILAR - critical)
+  // Alignment on family values is essential for long-term harmony
+  scores.push({
+    score: calculateSimilarityScore(user1Prefs.household_roles, user2Prefs.household_roles),
+    weight: 1.8, // Very important
+  });
+  scores.push({
+    score: calculateSimilarityScore(user1Prefs.decision_making, user2Prefs.decision_making),
+    weight: 1.5, // Important
+  });
+  scores.push({
+    score: calculateSimilarityScore(user1Prefs.parenting_style, user2Prefs.parenting_style),
+    weight: 1.7, // Very important for future family
+  });
+
+  // Calculate weighted average
+  const totalWeight = scores.reduce((sum, item) => sum + item.weight, 0);
+  const weightedSum = scores.reduce((sum, item) => sum + item.score * item.weight, 0);
+  const normalizedScore = weightedSum / totalWeight;
+
+  // Scale to 0-100
+  return Math.round(normalizedScore * 100);
+};
+
+/**
+ * Calculate similarity score (1-5 scale) - higher score when values are closer
+ * Used for traits that should match (e.g., family priorities, religious goals)
+ */
+const calculateSimilarityScore = (value1: number, value2: number): number => {
+  const difference = Math.abs(value1 - value2);
+
+  // Perfect match
+  if (difference === 0) return CompatibilityLevel.EXACT_MATCH;
+
+  // 1 point difference
+  if (difference === 1) return CompatibilityLevel.HIGH;
+
+  // 2 points difference
+  if (difference === 2) return CompatibilityLevel.MEDIUM;
+
+  // 3 points difference
+  if (difference === 3) return CompatibilityLevel.LOW;
+
+  // 4 points difference (maximum)
+  return CompatibilityLevel.NO_MATCH;
+};
+
+/**
+ * Calculate balanced score - prefers moderate alignment
+ * Used for communication traits where some difference is okay but extremes are problematic
+ */
+const calculateBalancedScore = (value1: number, value2: number): number => {
+  const difference = Math.abs(value1 - value2);
+
+  // Perfect or close match is good
+  if (difference <= 1) return CompatibilityLevel.EXACT_MATCH;
+
+  // Moderate difference is acceptable
+  if (difference === 2) return CompatibilityLevel.HIGH;
+
+  // Larger differences are less ideal
+  if (difference === 3) return CompatibilityLevel.MEDIUM;
+
+  // Extreme difference
+  return CompatibilityLevel.LOW;
+};
+
+/**
+ * Calculate complementary score - allows for differences
+ * Used for traits that can complement each other (e.g., one organized, one spontaneous)
+ */
+const calculateComplementaryScore = (value1: number, value2: number): number => {
+  const difference = Math.abs(value1 - value2);
+
+  // Moderate difference can be complementary
+  if (difference >= 1 && difference <= 2) return CompatibilityLevel.EXACT_MATCH;
+
+  // Same or very similar is also good
+  if (difference === 0) return CompatibilityLevel.HIGH;
+
+  // Larger difference is acceptable
+  if (difference === 3) return CompatibilityLevel.MEDIUM;
+
+  // Extreme difference
+  return CompatibilityLevel.LOW;
 };

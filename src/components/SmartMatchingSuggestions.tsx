@@ -9,6 +9,7 @@ import { Brain, Heart, MapPin, GraduationCap, Briefcase, Star, Sparkles } from '
 import {
   calculateIslamicCompatibility,
   calculateCulturalCompatibility,
+  calculatePersonalityCompatibility,
   calculateOverallCompatibility,
   generateCompatibilityExplanation,
 } from '@/utils/matchingAlgorithm';
@@ -60,6 +61,12 @@ const SmartMatchingSuggestions = () => {
         .eq('user_id', user.id)
         .maybeSingle();
 
+      const { data: myPersonality } = await supabase
+        .from('personality_questionnaire')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
       if (!myProfile) {
         setLoading(false);
         return;
@@ -92,11 +99,17 @@ const SmartMatchingSuggestions = () => {
         .select('user_id, verification_score')
         .in('user_id', userIds);
 
+      const { data: personalityData } = await supabase
+        .from('personality_questionnaire')
+        .select('*')
+        .in('user_id', userIds);
+
       // Combine the data
       const enrichedMatches = potentialMatches.map((match) => ({
         ...match,
         islamic_preferences: islamicPrefs?.filter((p) => p.user_id === match.user_id) || [],
         user_verifications: verifications?.find((v) => v.user_id === match.user_id) || null,
+        personality_questionnaire: personalityData?.find((p) => p.user_id === match.user_id) || null,
       }));
 
       // Calculate compatibility for each potential match using enhanced fuzzy matching
@@ -140,17 +153,24 @@ const SmartMatchingSuggestions = () => {
 
         const culturalScore = calculateCulturalCompatibility(culturalPrefs, matchCulturalPrefs);
 
-        // Calculate personality score (based on questionnaire - default for now)
-        const personalityScore = 70; // Default - will be enhanced when questionnaire responses are available
+        // Calculate personality score using real questionnaire data
+        const matchPersonality = match.personality_questionnaire || null;
+        const personalityScore = calculatePersonalityCompatibility(
+          myPersonality,
+          matchPersonality
+        );
 
         // Calculate overall compatibility with weighted scoring
-        // Note: Personality weight reduced to 0.1 since it's currently a placeholder
-        // Islamic and cultural weights increased to 0.5 and 0.4 respectively
+        // Weights adjusted based on whether personality data is available
+        const weights = myPersonality && matchPersonality
+          ? { islamic: 0.4, cultural: 0.3, personality: 0.3 } // Balanced when all data available
+          : { islamic: 0.5, cultural: 0.4, personality: 0.1 }; // Reduced personality weight when data missing
+
         const compatibilityScore = calculateOverallCompatibility(
           islamicScore,
           culturalScore,
           personalityScore,
-          { islamic: 0.5, cultural: 0.4, personality: 0.1 }
+          weights
         );
 
         // Generate explanation with strengths and concerns
