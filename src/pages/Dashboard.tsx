@@ -45,6 +45,9 @@ import SmartMatchingSuggestions from '@/components/SmartMatchingSuggestions';
 import QuickActionsPanel from '@/components/QuickActionsPanel';
 import OnboardingCompletionGuide from '@/components/OnboardingCompletionGuide';
 import GamificationDashboard from '@/components/gamification/GamificationDashboard';
+import PersonalityQuestionnaireCTA from '@/components/PersonalityQuestionnaireCTA';
+import PersonalityQuestionnaireBadge from '@/components/PersonalityQuestionnaireBadge';
+import { usePersonalityQuestionnaire } from '@/hooks/usePersonalityQuestionnaire';
 
 interface Profile {
   id: string;
@@ -82,6 +85,7 @@ const Dashboard = () => {
   const [verification, setVerification] = useState<any>(undefined);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const { isCompleted: isPersonalityCompleted, loading: personalityLoading } = usePersonalityQuestionnaire();
 
   useEffect(() => {
     if (!user) {
@@ -281,13 +285,21 @@ const Dashboard = () => {
               Vue d'ensemble de votre profil et activité
             </p>
           </div>
-          <VerificationBadge verificationScore={verification?.verification_score || 0} />
+          <div className="flex flex-col gap-2 items-end">
+            <VerificationBadge verificationScore={verification?.verification_score || 0} />
+            <PersonalityQuestionnaireBadge />
+          </div>
         </div>
       </div>
 
       {/* Onboarding Guide */}
       <OnboardingCompletionGuide />
       <CompatibilityPrompt />
+
+      {/* Personality Questionnaire CTA */}
+      {!personalityLoading && !isPersonalityCompleted && (
+        <PersonalityQuestionnaireCTA variant="banner" />
+      )}
 
       {/* Statistics Section */}
       <div className="border rounded p-4 max-w-full overflow-x-hidden w-full">
