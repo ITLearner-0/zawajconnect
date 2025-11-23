@@ -517,11 +517,11 @@ const AdvancedIslamicFiltering = () => {
               <div>
                 <label className="text-sm font-medium mb-2 block">Alimentation halal</label>
                 <Select
-                  value={filters.halal_diet === null ? '' : filters.halal_diet.toString()}
+                  value={filters.halal_diet === null ? 'any' : filters.halal_diet.toString()}
                   onValueChange={(value) =>
                     setFilters((prev) => ({
                       ...prev,
-                      halal_diet: value === '' ? null : value === 'true',
+                      halal_diet: value === 'any' ? null : value === 'true',
                     }))
                   }
                 >
@@ -529,7 +529,7 @@ const AdvancedIslamicFiltering = () => {
                     <SelectValue placeholder="Peu importe" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Peu importe</SelectItem>
+                    <SelectItem value="any">Peu importe</SelectItem>
                     <SelectItem value="true">Obligatoire</SelectItem>
                     <SelectItem value="false">Pas nécessaire</SelectItem>
                   </SelectContent>
