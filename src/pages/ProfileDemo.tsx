@@ -54,7 +54,7 @@ import { fadeInUp, staggerContainer, staggerItem } from '@/styles/animations';
  * Demo Profile Data
  */
 const demoProfile: DatabaseProfile = {
-  id: 'demo-user-123',
+  id: '00000000-0000-0000-0000-000000000001', // Valid UUID for demo
   first_name: 'Amira',
   last_name: 'Hassan',
   gender: 'female',

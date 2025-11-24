@@ -14,6 +14,7 @@ import { FreemiumBanner } from '@/components/FreemiumBanner';
 import { CookieConsentBanner } from '@/components/CookieConsentBanner';
 import { AchievementNotificationProvider } from '@/components/AchievementNotificationProvider';
 import { EmailVerificationMonitor } from '@/components/EmailVerificationMonitor';
+import '@/i18n'; // Initialize i18next
 
 // Loading fallback component for lazy-loaded routes
 const RouteLoadingFallback = () => (
