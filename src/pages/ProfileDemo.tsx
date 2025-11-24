@@ -70,7 +70,11 @@ const demoProfile: DatabaseProfile = {
   wali_relationship: 'Père',
   wali_contact: '+33 6 12 34 56 78',
   profile_picture: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400',
-  gallery: [],
+  gallery: [
+    'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400',
+  ],
   email_verified: true,
   phone_verified: true,
   id_verified: true,
@@ -122,6 +126,7 @@ const ProfileDemo = () => {
     halal_diet: true,
     smoking: 'Non',
     importance_of_religion: 'Très importante',
+    desired_partner_sect: 'Sunnite',
   };
 
   // Mock additional education/career info
@@ -146,7 +151,15 @@ const ProfileDemo = () => {
   };
 
   const handleEdit = () => {
-    console.log('Edit clicked');
+    // Scroll to the About Me section
+    const aboutSection = document.querySelector('[data-section="about-me"]');
+    if (aboutSection) {
+      aboutSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    // Show an alert to indicate this is a demo
+    setTimeout(() => {
+      alert('💡 Ceci est une démo. En mode réel, cela vous permettrait de modifier toutes les sections de votre profil.');
+    }, 500);
   };
 
   return (
@@ -161,10 +174,10 @@ const ProfileDemo = () => {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                🎨 Profile Redesign Demo - Phase 1
+                🎨 Profile Redesign Demo - Phase 1 & 2
               </h1>
               <p className="text-gray-600">
-                Découvrez le nouveau design "Hero Profile" avec le système Islamic Matrimony
+                Découvrez le nouveau design "Hero Profile" avec toutes les sections de contenu
               </p>
             </div>
 
@@ -231,7 +244,7 @@ const ProfileDemo = () => {
                 className="space-y-6"
               >
                 {/* About Me Section - Using new component */}
-                <motion.div variants={staggerItem}>
+                <motion.div variants={staggerItem} data-section="about-me">
                   <AboutMeSection
                     profile={demoProfile}
                     isOwnProfile={isOwnProfile}
