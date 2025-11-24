@@ -2,15 +2,15 @@
  * Profile Redesign Components
  *
  * Centralized export for all redesigned profile components.
- * Part of Phase 1: Foundations of the profile redesign implementation.
+ * Includes Phase 1 (Foundations) and Phase 2 (Content Sections).
  */
 
-// Main Components
+// Main Components (Phase 1)
 export { default as HeroProfileSection } from './HeroProfileSection';
 export { default as ProfileSidebar } from './ProfileSidebar';
 export { default as ProfileSection } from './ProfileSection';
 
-// Section Sub-components
+// Section Sub-components (Phase 1)
 export {
   InfoGrid,
   InfoItem,
@@ -19,7 +19,7 @@ export {
   EmptyState,
 } from './ProfileSection';
 
-// Stat Components
+// Stat Components (Phase 1)
 export {
   StatCard,
   StatItem,
@@ -30,6 +30,15 @@ export {
   getScoreColor,
   formatNumber,
 } from './StatComponents';
+
+// Content Sections (Phase 2)
+export {
+  AboutMeSection,
+  IslamicPreferencesSection,
+  EducationCareerSection,
+  WaliInfoSection,
+  PhotoGallerySection,
+} from './sections';
 
 // Re-export ProgressItem from ProfileSidebar for backward compatibility
 export { ProgressItem as SidebarProgressItem } from './ProfileSidebar';

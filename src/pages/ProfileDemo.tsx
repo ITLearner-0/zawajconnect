@@ -39,6 +39,12 @@ import {
   CircularProgress,
   MetricRow,
   ComparisonBar,
+  // Phase 2: Content Sections
+  AboutMeSection,
+  IslamicPreferencesSection,
+  EducationCareerSection,
+  WaliInfoSection,
+  PhotoGallerySection,
 } from '@/components/profile/redesign';
 
 import { DatabaseProfile } from '@/types/profile';
@@ -104,6 +110,27 @@ const ProfileDemo = () => {
     views: 1247,
     likes: 89,
     messages: 34,
+  };
+
+  // Mock Islamic preferences
+  const islamicPrefs = {
+    prayer_frequency: '5 fois par jour',
+    quran_reading: 'Quotidienne',
+    hijab_preference: 'Oui',
+    sect: 'Sunnite',
+    madhab: 'Maliki',
+    halal_diet: true,
+    smoking: 'Non',
+    importance_of_religion: 'Très importante',
+  };
+
+  // Mock additional education/career info
+  const additionalInfo = {
+    field: 'Technologie',
+    company: 'Tech Startup',
+    years_of_experience: 5,
+    education_institution: 'Université Paris-Saclay',
+    languages: ['Français', 'Anglais', 'Arabe'],
   };
 
   const handleMessage = () => {
@@ -203,105 +230,47 @@ const ProfileDemo = () => {
                 animate="visible"
                 className="space-y-6"
               >
-                {/* About Me Section */}
+                {/* About Me Section - Using new component */}
                 <motion.div variants={staggerItem}>
-                  <ProfileSection
-                    icon={FileText}
-                    title="À Propos de Moi"
-                    accentColor="rose"
-                    defaultOpen={true}
-                  >
-                    <SectionContent>
-                      <SectionText>{demoProfile.about_me}</SectionText>
-                    </SectionContent>
-                  </ProfileSection>
+                  <AboutMeSection
+                    profile={demoProfile}
+                    isOwnProfile={isOwnProfile}
+                  />
                 </motion.div>
 
-                {/* Islamic Preferences Section */}
+                {/* Islamic Preferences Section - Using new component */}
                 <motion.div variants={staggerItem}>
-                  <ProfileSection
-                    icon={Heart}
-                    title="Préférences Islamiques"
-                    accentColor="emerald"
-                    badge={
-                      <Badge variant="outline" className="border-emerald-500 text-emerald-700">
-                        <CheckCircle className="h-3 w-3 mr-1" />
-                        Complété
-                      </Badge>
-                    }
-                  >
-                    <SectionContent>
-                      <InfoGrid
-                        columns={2}
-                        items={[
-                          { label: 'Pratique religieuse', value: demoProfile.religious_practice_level },
-                          { label: 'Prière', value: demoProfile.prayer_frequency },
-                          { label: 'Lecture du Coran', value: 'Quotidienne' },
-                          { label: 'Madhab', value: 'Maliki' },
-                          { label: 'Port du Hijab', value: 'Oui' },
-                          { label: 'Régime Halal', value: 'Strictement' },
-                        ]}
-                      />
-                    </SectionContent>
-                  </ProfileSection>
+                  <IslamicPreferencesSection
+                    profile={demoProfile}
+                    isOwnProfile={isOwnProfile}
+                    islamicPrefs={islamicPrefs}
+                  />
                 </motion.div>
 
-                {/* Education & Career Section */}
+                {/* Education & Career Section - Using new component */}
                 <motion.div variants={staggerItem}>
-                  <ProfileSection
-                    icon={Briefcase}
-                    title="Éducation & Carrière"
-                    accentColor="gold"
-                  >
-                    <SectionContent>
-                      <InfoGrid
-                        columns={2}
-                        items={[
-                          {
-                            label: 'Niveau d\'éducation',
-                            value: demoProfile.education_level,
-                            icon: BookOpen,
-                          },
-                          {
-                            label: 'Profession',
-                            value: demoProfile.occupation,
-                            icon: Briefcase,
-                          },
-                          { label: 'Domaine', value: 'Technologie' },
-                          { label: 'Expérience', value: '5+ ans' },
-                        ]}
-                      />
-                    </SectionContent>
-                  </ProfileSection>
+                  <EducationCareerSection
+                    profile={demoProfile}
+                    isOwnProfile={isOwnProfile}
+                    additionalInfo={additionalInfo}
+                  />
                 </motion.div>
 
-                {/* Family & Wali Section */}
+                {/* Photo Gallery Section - Using new component */}
                 <motion.div variants={staggerItem}>
-                  <ProfileSection
-                    icon={Users}
-                    title="Famille & Wali"
-                    accentColor="sage"
-                  >
-                    <SectionContent>
-                      <InfoGrid
-                        columns={2}
-                        items={[
-                          { label: 'Nom du Wali', value: demoProfile.wali_name },
-                          { label: 'Relation', value: demoProfile.wali_relationship },
-                          { label: 'Contact', value: demoProfile.wali_contact },
-                          {
-                            label: 'Statut de vérification',
-                            value: (
-                              <Badge variant="outline" className="border-emerald-500 text-emerald-700">
-                                <CheckCircle className="h-3 w-3 mr-1" />
-                                Vérifié
-                              </Badge>
-                            ),
-                          },
-                        ]}
-                      />
-                    </SectionContent>
-                  </ProfileSection>
+                  <PhotoGallerySection
+                    profile={demoProfile}
+                    isOwnProfile={isOwnProfile}
+                  />
+                </motion.div>
+
+                {/* Family & Wali Section - Using new component */}
+                <motion.div variants={staggerItem}>
+                  <WaliInfoSection
+                    profile={demoProfile}
+                    isOwnProfile={isOwnProfile}
+                    onContactWali={handleContactWali}
+                  />
                 </motion.div>
               </motion.div>
             </div>
