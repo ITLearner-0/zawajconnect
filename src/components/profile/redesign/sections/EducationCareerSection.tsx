@@ -1,4 +1,4 @@
-import { Briefcase, BookOpen, GraduationCap, TrendingUp } from 'lucide-react';
+import { Briefcase, BookOpen, GraduationCap, TrendingUp, Languages, Layers } from 'lucide-react';
 import ProfileSection, { InfoGrid, SectionContent, EmptyState } from '../ProfileSection';
 import { DatabaseProfile } from '@/types/profile';
 
@@ -72,6 +72,7 @@ const EducationCareerSection = ({
       items.push({
         label: 'Domaine',
         value: additionalInfo.field,
+        icon: Layers,
       });
     }
 
@@ -109,6 +110,7 @@ const EducationCareerSection = ({
             ))}
           </div>
         ),
+        icon: Languages,
       });
     }
 

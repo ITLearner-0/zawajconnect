@@ -101,13 +101,13 @@ const ProfileDemo = () => {
 
   const isOwnProfile = viewMode === 'own';
 
-  // Mock stats
+  // Mock stats - Based on demoProfile data which is complete
   const completionStats = {
-    overall: 85,
-    basicInfo: 95,
-    photos: 80,
-    islamicPrefs: 90,
-    compatibility: 75,
+    overall: 100,
+    basicInfo: 100,
+    photos: 100,
+    islamicPrefs: 100,
+    compatibility: 100,
   };
 
   const profileStats = {
@@ -285,6 +285,56 @@ const ProfileDemo = () => {
                     onContactWali={handleContactWali}
                   />
                 </motion.div>
+
+                {/* Profile Completion Tips */}
+                {isOwnProfile && (
+                  <motion.div variants={staggerItem}>
+                    <div className={`p-6 rounded-lg border-2 ${
+                      completionStats.overall >= 100
+                        ? 'bg-emerald-50 border-emerald-200'
+                        : 'bg-blue-50 border-blue-200'
+                    }`}>
+                      {completionStats.overall >= 100 ? (
+                        <div className="flex items-start gap-3">
+                          <CheckCircle className="h-6 w-6 text-emerald-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <h3 className="text-lg font-semibold text-emerald-800 mb-1">
+                              Félicitations ! Votre profil est complet
+                            </h3>
+                            <p className="text-sm text-emerald-700">
+                              Vous avez rempli toutes les sections de votre profil. Un profil complet
+                              augmente considérablement vos chances de trouver des matches compatibles et
+                              inspire confiance aux autres utilisateurs.
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start gap-3">
+                          <TrendingUp className="h-6 w-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <h3 className="text-lg font-semibold text-blue-800 mb-2">
+                              Conseil pour améliorer votre profil
+                            </h3>
+                            <p className="text-sm text-blue-700 mb-3">
+                              Un profil complet augmente vos chances de trouver des matches compatibles de 300% !
+                            </p>
+                            <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
+                              {completionStats.basicInfo < 100 && (
+                                <li>Complétez vos informations de base ({completionStats.basicInfo}%)</li>
+                              )}
+                              {completionStats.photos < 100 && (
+                                <li>Ajoutez plus de photos à votre profil ({completionStats.photos}%)</li>
+                              )}
+                              {completionStats.islamicPrefs < 100 && (
+                                <li>Renseignez vos préférences islamiques ({completionStats.islamicPrefs}%)</li>
+                              )}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
               </motion.div>
             </div>
           </TabsContent>
