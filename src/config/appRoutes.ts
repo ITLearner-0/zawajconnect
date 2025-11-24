@@ -80,6 +80,9 @@ const AdminUsers = lazy(() => import('@/pages/AdminUsers'));
 const ModerationTest = lazy(() => import('@/pages/ModerationTest'));
 const ModerationTests = lazy(() => import('@/pages/ModerationTests'));
 
+// Demo & Testing pages
+const ProfileDemo = lazy(() => import('@/pages/ProfileDemo'));
+
 // 404 page
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
@@ -107,6 +110,7 @@ export const publicRoutes: AppRouteConfig[] = [
   { path: '/invitation/accept', component: InvitationAccept },
   { path: '/invitation-accept', component: InvitationAccept },
   { path: '/status', component: Status },
+  { path: '/profile-demo', component: ProfileDemo }, // Demo page for Phase 1 redesign
 ];
 
 // Special routes - protected but may have different requirements
