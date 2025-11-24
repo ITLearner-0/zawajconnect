@@ -83,6 +83,9 @@ const ModerationTests = lazy(() => import('@/pages/ModerationTests'));
 // Demo & Testing pages
 const ProfileDemo = lazy(() => import('@/pages/ProfileDemo'));
 
+// Phase 3: New Profile View (Unified)
+const ProfileView = lazy(() => import('@/pages/ProfileView'));
+
 // 404 page
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
@@ -146,6 +149,8 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/dashboard', component: Dashboard },
   { path: '/enhanced-profile', component: EnhancedProfile },
   { path: '/profile', component: EnhancedProfile },
+  { path: '/profile-view', component: ProfileView }, // Phase 3: New unified profile view (own profile)
+  { path: '/profile-view/:id', component: ProfileView }, // Phase 3: New unified profile view (any profile)
   { path: '/advanced-matching', component: AdvancedMatching },
   { path: '/browse', component: Browse },
   { path: '/favorites', component: Favorites },

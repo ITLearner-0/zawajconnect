@@ -181,7 +181,7 @@ const ProfileDemo = () => {
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <Button
                 variant={isOwnProfile ? 'default' : 'outline'}
                 onClick={() => setViewMode('own')}
@@ -195,6 +195,13 @@ const ProfileDemo = () => {
                 className={!isOwnProfile ? 'bg-rose-500 hover:bg-rose-600' : ''}
               >
                 Profil d'un autre
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => navigate('/profile-view/user-1')}
+                className="bg-blue-50 hover:bg-blue-100 border-blue-300"
+              >
+                🚀 Phase 3: ProfileView
               </Button>
               <Button variant="ghost" onClick={() => navigate(-1)}>
                 Retour
