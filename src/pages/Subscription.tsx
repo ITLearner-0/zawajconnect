@@ -110,7 +110,7 @@ const Subscription = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-green-500" />
-                  <span>5 correspondances par jour</span>
+                  <span>Navigation illimitée des profils</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-green-500" />
@@ -119,6 +119,9 @@ const Subscription = () => {
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-green-500" />
                   <span>Recherche de base</span>
+                </li>
+                <li className="flex items-center gap-2 text-gray-500">
+                  <span className="text-xs">⚠️ Likes/matches Premium uniquement</span>
                 </li>
               </ul>
               <Button asChild variant="outline" className="w-full">
@@ -154,7 +157,7 @@ const Subscription = () => {
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-green-500" />
-                  <span>Correspondances illimitées</span>
+                  <span>Likes et matches illimités</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-green-500" />
