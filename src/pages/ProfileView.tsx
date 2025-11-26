@@ -162,46 +162,66 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
       }
 
       // Fetch from database
-      // Search by both user_id and id to handle both own profile (user.id) and other profiles
+      // Try fetching by user_id first (for own profile), then by id (for other profiles)
       console.log('Fetching profile from database:', profileId);
-      const { data, error } = await supabase
+
+      // First try by user_id
+      let { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .or(`user_id.eq.${profileId},id.eq.${profileId}`)
-        .single();
+        .eq('user_id', profileId)
+        .maybeSingle();
 
+      // If not found by user_id, try by id
+      if (!data && !error) {
+        const result = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', profileId)
+          .maybeSingle();
+
+        data = result.data;
+        error = result.error;
+      }
+
+      // Handle errors
       if (error) {
         console.error('Error fetching profile:', error);
-        if (error.code === 'PGRST116') {
-          // Check if this is the user's own profile (trying to load by user_id)
-          const isOwn = currentUserId === profileId;
-
-          if (isOwn) {
-            // User doesn't have a profile yet - redirect to onboarding
-            toast({
-              title: 'Profil incomplet',
-              description: 'Veuillez compléter votre profil pour continuer.',
-            });
-            navigate('/onboarding');
-            return;
-          } else {
-            // Other user's profile not found
-            toast({
-              title: 'Profil introuvable',
-              description: "Ce profil n'existe pas ou a été supprimé.",
-              variant: 'destructive',
-            });
-          }
-        } else {
-          toast({
-            title: 'Erreur',
-            description: 'Impossible de charger le profil. Veuillez réessayer.',
-            variant: 'destructive',
-          });
-        }
+        toast({
+          title: 'Erreur',
+          description: 'Impossible de charger le profil. Veuillez réessayer.',
+          variant: 'destructive',
+        });
         setProfile(null);
         setLoading(false);
         return;
+      }
+
+      // Handle no profile found
+      if (!data) {
+        console.log('No profile found for:', profileId);
+        // Check if this is the user's own profile (trying to load by user_id)
+        const isOwn = currentUserId === profileId;
+
+        if (isOwn) {
+          // User doesn't have a profile yet - redirect to onboarding
+          toast({
+            title: 'Profil incomplet',
+            description: 'Veuillez compléter votre profil pour continuer.',
+          });
+          navigate('/onboarding');
+          return;
+        } else {
+          // Other user's profile not found
+          toast({
+            title: 'Profil introuvable',
+            description: "Ce profil n'existe pas ou a été supprimé.",
+            variant: 'destructive',
+          });
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
       }
 
       // Check visibility (if not own profile)
