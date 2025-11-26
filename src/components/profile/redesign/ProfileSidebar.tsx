@@ -69,15 +69,15 @@ const ProfileSidebar = ({
       animate="visible"
       className="space-y-6"
     >
-      {/* Action Buttons (for other profiles) */}
+      {/* Action Buttons (for other profiles) - Hidden on mobile, shown in MobileActionBar instead */}
       {!isOwnProfile && (
-        <motion.div variants={staggerContainer} initial="hidden" animate="visible">
+        <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="hidden lg:block">
           <Card className="p-6">
             <motion.div variants={staggerItem} className="space-y-3">
               <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                 <Button
                   onClick={onMessage}
-                  className="w-full bg-rose-500 hover:bg-rose-600 text-white shadow-md"
+                  className="w-full bg-rose-500 hover:bg-rose-600 text-white shadow-md touch-manipulation min-h-[44px]"
                 >
                   <Heart className="h-4 w-4 mr-2" />
                   Envoyer un Message
@@ -88,7 +88,7 @@ const ProfileSidebar = ({
                 <Button
                   onClick={onVideoCall}
                   variant="outline"
-                  className="w-full border-2 hover:bg-gray-50"
+                  className="w-full border-2 hover:bg-gray-50 touch-manipulation min-h-[44px]"
                 >
                   <Video className="h-4 w-4 mr-2" />
                   Appel Vidéo
@@ -100,7 +100,7 @@ const ProfileSidebar = ({
                   <Button
                     onClick={onContactWali}
                     variant="outline"
-                    className="w-full border-2 hover:bg-gray-50"
+                    className="w-full border-2 hover:bg-gray-50 touch-manipulation min-h-[44px]"
                   >
                     <Users className="h-4 w-4 mr-2" />
                     Contacter le Wali

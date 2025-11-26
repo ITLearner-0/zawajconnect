@@ -67,7 +67,7 @@ const HeroProfileSection = ({
     >
       <Card className="overflow-hidden border-0 shadow-xl">
         {/* Cover Photo with Islamic Pattern */}
-        <div className="relative h-48 bg-gradient-to-br from-emerald-500 via-emerald-400 to-gold-400">
+        <div className="relative h-32 sm:h-48 bg-gradient-to-br from-emerald-500 via-emerald-400 to-gold-400">
           <IslamicPattern
             variant="geometric"
             className="absolute inset-0 opacity-20 text-white"
@@ -83,10 +83,10 @@ const HeroProfileSection = ({
             >
               <Button
                 onClick={onEdit}
-                className="bg-white/90 hover:bg-white text-gray-900 shadow-lg"
+                className="bg-white/90 hover:bg-white text-gray-900 shadow-lg touch-manipulation min-h-[44px]"
                 size="sm"
               >
-                <Edit className="h-4 w-4 mr-2" />
+                <Edit className="h-4 w-4 sm:mr-2" />
                 <span className="hidden sm:inline">Modifier</span>
               </Button>
             </motion.div>
@@ -96,7 +96,7 @@ const HeroProfileSection = ({
         {/* Profile Content */}
         <div className="relative px-6 pb-6">
           {/* Avatar & Info Section */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-16">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-4 -mt-12 sm:-mt-16">
             {/* Avatar */}
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
@@ -104,7 +104,7 @@ const HeroProfileSection = ({
               transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
               className="relative"
             >
-              <Avatar className="h-32 w-32 border-4 border-white shadow-xl ring-2 ring-emerald-100">
+              <Avatar className="h-24 w-24 sm:h-32 sm:w-32 border-4 border-white shadow-xl ring-2 ring-emerald-100">
                 <AvatarImage
                   src={profile.profile_picture}
                   alt={fullName}
@@ -134,7 +134,7 @@ const HeroProfileSection = ({
                 variants={staggerItem}
                 className="flex items-center gap-2 flex-wrap"
               >
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                   {fullName || 'Utilisateur'}
                 </h1>
                 {profile.is_verified && (

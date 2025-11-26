@@ -30,6 +30,8 @@ import {
 } from '@/components/profile/redesign';
 
 import { fadeInUp, staggerContainer, staggerItem } from '@/styles/animations';
+import { MobileActionBar, QuickActionsScroll, QuickAction } from '@/components/profile/mobile';
+import { Share2, Users, Heart, Camera } from 'lucide-react';
 
 interface ProfileViewProps {
   /** If true, shows the current user's own profile */
@@ -234,6 +236,90 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
     navigate('/profile/edit');
   };
 
+  const handleShare = () => {
+    if (profile) {
+      const shareUrl = `${window.location.origin}/profile/${profile.id}`;
+      if (navigator.share) {
+        navigator
+          .share({
+            title: `${profile.first_name} ${profile.last_name}`,
+            text: `Découvrez le profil de ${profile.first_name} sur ZawajConnect`,
+            url: shareUrl,
+          })
+          .catch((error) => console.log('Error sharing:', error));
+      } else {
+        navigator.clipboard.writeText(shareUrl);
+        toast({
+          title: 'Lien copié',
+          description: 'Le lien du profil a été copié dans le presse-papier.',
+        });
+      }
+    }
+  };
+
+  const handleReport = () => {
+    toast({
+      title: 'Signaler le profil',
+      description: 'Cette fonctionnalité sera bientôt disponible.',
+    });
+  };
+
+  const handleBlock = () => {
+    toast({
+      title: 'Bloquer l\'utilisateur',
+      description: 'Cette fonctionnalité sera bientôt disponible.',
+      variant: 'destructive',
+    });
+  };
+
+  const handleLike = () => {
+    toast({
+      title: 'Profil aimé',
+      description: 'Ce profil a été ajouté à vos favoris.',
+    });
+  };
+
+  const handleViewPhotos = () => {
+    // Scroll to photos section
+    const photosSection = document.querySelector('[data-section="photos"]');
+    if (photosSection) {
+      photosSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  // Quick actions for mobile scroll
+  const quickActions: QuickAction[] = [
+    {
+      id: 'like',
+      label: 'J\'aime',
+      icon: Heart,
+      onClick: handleLike,
+      variant: 'default',
+      className: 'bg-rose-500 hover:bg-rose-600 text-white border-rose-500',
+    },
+    {
+      id: 'wali',
+      label: 'Contacter le Wali',
+      icon: Users,
+      onClick: handleContactWali,
+      variant: 'outline',
+    },
+    {
+      id: 'photos',
+      label: 'Voir les photos',
+      icon: Camera,
+      onClick: handleViewPhotos,
+      variant: 'outline',
+    },
+    {
+      id: 'share',
+      label: 'Partager',
+      icon: Share2,
+      onClick: handleShare,
+      variant: 'outline',
+    },
+  ];
+
   // Loading state
   if (loading) {
     return (
@@ -280,7 +366,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50">
-      <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="container mx-auto px-4 py-8 max-w-7xl pb-24 lg:pb-8">
         {/* Back Button */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -311,6 +397,18 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
             onEdit={handleEdit}
           />
         </motion.div>
+
+        {/* Quick Actions Scroll (Mobile Only) */}
+        {!isOwnProfile && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+            className="mt-4"
+          >
+            <QuickActionsScroll actions={quickActions} />
+          </motion.div>
+        )}
 
         {/* Main Layout: Sidebar + Content */}
         <div className="grid lg:grid-cols-[320px_1fr] gap-6 mt-6">
@@ -365,7 +463,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
             </motion.div>
 
             {/* Photo Gallery Section */}
-            <motion.div variants={staggerItem}>
+            <motion.div variants={staggerItem} data-section="photos">
               <PhotoGallerySection
                 profile={profile}
                 isOwnProfile={isOwnProfile}
@@ -437,6 +535,17 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
             )}
           </motion.div>
         </div>
+
+        {/* Mobile Action Bar (Mobile Only) */}
+        <MobileActionBar
+          profile={profile}
+          isOwnProfile={isOwnProfile}
+          onMessage={handleMessage}
+          onVideoCall={handleVideoCall}
+          onShare={handleShare}
+          onReport={handleReport}
+          onBlock={handleBlock}
+        />
       </div>
     </div>
   );
