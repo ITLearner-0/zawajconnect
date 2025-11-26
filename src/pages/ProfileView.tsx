@@ -162,11 +162,12 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
       }
 
       // Fetch from database
+      // Search by both user_id and id to handle both own profile (user.id) and other profiles
       console.log('Fetching profile from database:', profileId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', profileId)
+        .or(`user_id.eq.${profileId},id.eq.${profileId}`)
         .single();
 
       if (error) {
