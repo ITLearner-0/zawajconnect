@@ -173,11 +173,25 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
       if (error) {
         console.error('Error fetching profile:', error);
         if (error.code === 'PGRST116') {
-          toast({
-            title: 'Profil introuvable',
-            description: "Ce profil n'existe pas ou a été supprimé.",
-            variant: 'destructive',
-          });
+          // Check if this is the user's own profile (trying to load by user_id)
+          const isOwn = currentUserId === profileId;
+
+          if (isOwn) {
+            // User doesn't have a profile yet - redirect to onboarding
+            toast({
+              title: 'Profil incomplet',
+              description: 'Veuillez compléter votre profil pour continuer.',
+            });
+            navigate('/onboarding');
+            return;
+          } else {
+            // Other user's profile not found
+            toast({
+              title: 'Profil introuvable',
+              description: "Ce profil n'existe pas ou a été supprimé.",
+              variant: 'destructive',
+            });
+          }
         } else {
           toast({
             title: 'Erreur',
