@@ -29,6 +29,9 @@ import {
   PhotoGallerySection,
 } from '@/components/profile/redesign';
 
+// Hybrid Design - Advanced Features
+import { AdvancedTabs } from '@/components/profile/advanced';
+
 import { fadeInUp, staggerContainer, staggerItem } from '@/styles/animations';
 import { MobileActionBar, QuickActionsScroll, QuickAction } from '@/components/profile/mobile';
 import { Share2, Users, Heart, Camera } from 'lucide-react';
@@ -477,6 +480,11 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
                 isOwnProfile={isOwnProfile}
                 onContactWali={handleContactWali}
               />
+            </motion.div>
+
+            {/* Advanced Features - Hybrid Design */}
+            <motion.div variants={staggerItem}>
+              <AdvancedTabs profile={profile} isOwnProfile={isOwnProfile} />
             </motion.div>
 
             {/* Profile Completion Tips */}
