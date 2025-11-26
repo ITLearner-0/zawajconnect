@@ -72,7 +72,7 @@ const NavigationGuard = ({ children }: NavigationGuardProps) => {
             description: "Vous n'avez pas les permissions administrateur nécessaires.",
             variant: 'destructive',
           });
-          navigate('/enhanced-profile', { replace: true });
+          navigate('/profile', { replace: true });
           return;
         }
       }

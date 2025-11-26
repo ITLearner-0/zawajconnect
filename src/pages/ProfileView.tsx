@@ -109,6 +109,12 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
         return;
       }
 
+      // If no ID in URL, load current user's profile
+      if (!id && user?.id) {
+        await loadProfileById(user.id);
+        return;
+      }
+
       // Otherwise, load profile by URL param
       if (!id) {
         setLoading(false);

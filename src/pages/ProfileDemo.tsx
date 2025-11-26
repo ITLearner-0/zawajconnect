@@ -198,7 +198,7 @@ const ProfileDemo = () => {
               </Button>
               <Button
                 variant="outline"
-                onClick={() => navigate('/profile-view/user-1')}
+                onClick={() => navigate('/profile/user-1')}
                 className="bg-blue-50 hover:bg-blue-100 border-blue-300"
               >
                 🚀 Phase 3: ProfileView

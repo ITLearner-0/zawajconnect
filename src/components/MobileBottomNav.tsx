@@ -99,7 +99,7 @@ const MobileBottomNav = () => {
       badge: unreadMessages,
     },
     {
-      path: '/enhanced-profile',
+      path: '/profile',
       icon: User,
       label: 'Profil',
       badge: 0,
@@ -107,7 +107,7 @@ const MobileBottomNav = () => {
   ];
 
   const isActive = (path: string) => {
-    if (path === '/enhanced-profile' && location.pathname === '/profile') return true;
+    if (path === '/profile' && location.pathname === '/profile') return true;
     if (path === '/dashboard' && (location.pathname === '/dashboard' || location.pathname === '/'))
       return true;
     return location.pathname === path || location.pathname.startsWith(path + '/');

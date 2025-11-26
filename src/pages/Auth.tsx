@@ -68,7 +68,7 @@ const Auth = () => {
           navigate('/onboarding');
         } else {
           // Profile complete, go to profile page
-          navigate('/enhanced-profile');
+          navigate('/profile');
         }
       }
     }

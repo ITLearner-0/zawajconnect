@@ -52,7 +52,7 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
       description:
         'Créez votre profil étape par étape avec notre assistant IA qui respecte les valeurs islamiques.',
       icon: User,
-      route: '/enhanced-profile?tab=wizard',
+      route: '/profile?tab=wizard',
       completed: (completionStats?.basicInfo || 0) >= 80,
       importance: 'high',
       benefits: [
@@ -68,7 +68,7 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
       description:
         'Système de vérification intelligent avec approbation familiale et conformité islamique.',
       icon: Camera,
-      route: '/enhanced-profile?tab=photos',
+      route: '/profile?tab=photos',
       completed: (completionStats?.photos || 0) >= 100,
       importance: 'high',
       benefits: [
@@ -84,7 +84,7 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
       description:
         'Configuration complète de vos valeurs et pratiques islamiques pour des matches parfaits.',
       icon: Heart,
-      route: '/enhanced-profile?tab=islamic',
+      route: '/profile?tab=islamic',
       completed: (completionStats?.islamicPrefs || 0) >= 80,
       importance: 'high',
       benefits: [
@@ -100,7 +100,7 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
       description:
         'Intelligence artificielle avancée pour analyser votre compatibilité avec des partenaires potentiels.',
       icon: Brain,
-      route: '/enhanced-profile?tab=compatibility',
+      route: '/profile?tab=compatibility',
       completed: (completionStats?.compatibility || 0) >= 70,
       importance: 'medium',
       benefits: [
@@ -116,7 +116,7 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
       description:
         'Protection complète de vos données avec paramètres islamiques et supervision familiale.',
       icon: Shield,
-      route: '/enhanced-profile?tab=privacy',
+      route: '/profile?tab=privacy',
       completed: (completionStats?.privacy || 0) >= 70,
       importance: 'medium',
       benefits: [
@@ -195,7 +195,7 @@ const ProfileManagementGuide = ({ completionStats }: ProfileManagementGuideProps
                     : '🚀 Commencez votre transformation !'}
               </span>
               <Button
-                onClick={() => navigate('/enhanced-profile')}
+                onClick={() => navigate('/profile')}
                 size="sm"
                 className="bg-gradient-to-r from-emerald to-gold text-primary-foreground"
               >

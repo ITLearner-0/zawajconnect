@@ -51,8 +51,8 @@ export const routes: RouteConfig[] = [
     category: 'main',
   },
   {
-    path: '/enhanced-profile',
-    component: 'EnhancedProfile',
+    path: '/profile',
+    component: 'ProfileView',
     label: 'Mon Profil',
     requiresAuth: true,
     icon: 'User',

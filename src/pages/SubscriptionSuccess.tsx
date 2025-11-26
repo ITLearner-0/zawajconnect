@@ -51,7 +51,7 @@ const SubscriptionSuccess = () => {
 
           <div className="flex flex-col sm:flex-row gap-3">
             <Button
-              onClick={() => navigate('/enhanced-profile')}
+              onClick={() => navigate('/profile')}
               className="flex-1 bg-gradient-to-r from-gold to-gold-light hover:from-gold-dark hover:to-gold text-primary-foreground"
             >
               <Crown className="h-4 w-4 mr-2" />

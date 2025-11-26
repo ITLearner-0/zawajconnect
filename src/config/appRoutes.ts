@@ -147,10 +147,14 @@ export const specialRoutes: AppRouteConfig[] = [
 // Protected routes - require authentication and complete profile
 export const protectedRoutes: AppRouteConfig[] = [
   { path: '/dashboard', component: Dashboard },
-  { path: '/enhanced-profile', component: EnhancedProfile },
-  { path: '/profile', component: EnhancedProfile },
-  { path: '/profile-view', component: ProfileView }, // Phase 3: New unified profile view (own profile)
-  { path: '/profile-view/:id', component: ProfileView }, // Phase 3: New unified profile view (any profile)
+  // Profile routes - Standardized to use ProfileView (Phase 3)
+  { path: '/profile', component: ProfileView }, // Own profile (isOwnProfile prop)
+  { path: '/profile/edit', component: EnhancedProfile }, // Edit profile
+  { path: '/profile/:id', component: ProfileView }, // Other users' profiles
+  // Legacy redirects - maintained for backward compatibility
+  { path: '/enhanced-profile', component: ProfileView }, // Redirect to /profile
+  { path: '/profile-view', component: ProfileView }, // Redirect to /profile
+  { path: '/profile-view/:id', component: ProfileView }, // Redirect to /profile/:id
   { path: '/advanced-matching', component: AdvancedMatching },
   { path: '/browse', component: Browse },
   { path: '/favorites', component: Favorites },
@@ -158,7 +162,6 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/matches', component: Matches },
   { path: '/chat', component: Chat },
   { path: '/chat/:matchId', component: Chat },
-  { path: '/profile/:userId', component: Profile },
   { path: '/privacy', component: Privacy },
   { path: '/family', component: Family },
   { path: '/guidance', component: Guidance },

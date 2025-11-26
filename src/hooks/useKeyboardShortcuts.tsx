@@ -32,8 +32,8 @@ export const useKeyboardShortcuts = () => {
       key: 'p',
       altKey: true,
       action: () => {
-        navigate('/enhanced-profile');
-        trackAction('keyboard_navigation', { shortcut: 'alt+p', destination: '/enhanced-profile' });
+        navigate('/profile');
+        trackAction('keyboard_navigation', { shortcut: 'alt+p', destination: '/profile' });
       },
       description: 'Aller au profil',
       category: 'Navigation',

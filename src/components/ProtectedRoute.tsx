@@ -35,12 +35,11 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
     return <>{children}</>;
   }
 
-  // Also skip onboarding check for enhanced-profile and dashboard
+  // Also skip onboarding check for profile and dashboard
   // These pages will handle their own onboarding status checks
   if (
-    location.pathname === '/enhanced-profile' ||
-    location.pathname === '/dashboard' ||
-    location.pathname === '/profile'
+    location.pathname === '/profile' ||
+    location.pathname === '/dashboard'
   ) {
     return <>{children}</>;
   }

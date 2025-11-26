@@ -67,7 +67,7 @@ export function AppSidebar() {
 
   const baseNavItems = [
     { path: '/dashboard', icon: Home, label: 'Tableau de Bord', group: 'main' },
-    { path: '/enhanced-profile', icon: User, label: 'Mon Profil', group: 'main' },
+    { path: '/profile', icon: User, label: 'Mon Profil', group: 'main' },
     { path: '/browse', icon: Search, label: 'Découvrir', group: 'main' },
     { path: '/gamification', icon: Award, label: 'Récompenses', group: 'main' },
     {

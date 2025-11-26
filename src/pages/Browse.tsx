@@ -1246,7 +1246,7 @@ const Browse = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/enhanced-profile')}
+                  onClick={() => navigate('/profile')}
                   className="w-full justify-start"
                 >
                   Mon profil
