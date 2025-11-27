@@ -34,6 +34,8 @@ const handler = async (req: Request): Promise<Response> => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  let logId: string | null = null;
+
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -41,6 +43,9 @@ const handler = async (req: Request): Promise<Response> => {
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Missing Supabase configuration');
     }
+
+    // Initialize Supabase client
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Parse request body (optional)
     const body: DailyQuestionNotificationRequest = req.method === 'POST'
@@ -54,8 +59,17 @@ const handler = async (req: Request): Promise<Response> => {
     console.log('Sending daily question notification for date:', scheduledDate);
     console.log('Test mode:', testMode);
 
-    // Initialize Supabase client
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // Start cron job log
+    const { data: logData, error: logError } = await supabase.rpc('start_cron_job_log', {
+      p_job_name: 'send-daily-question-notification',
+      p_job_type: 'edge_function',
+      p_metadata: { scheduled_date: scheduledDate, test_mode: testMode }
+    });
+
+    if (!logError && logData) {
+      logId = logData;
+      console.log('Cron job log started with ID:', logId);
+    }
 
     // Get today's question from the schedule
     const { data: scheduleData, error: scheduleError } = await supabase
@@ -194,6 +208,22 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Notification complete. Success: ${successCount}, Failures: ${failureCount}`);
 
+    // Complete cron job log
+    if (logId) {
+      await supabase.rpc('complete_cron_job_log', {
+        p_log_id: logId,
+        p_status: failureCount > 0 ? 'error' : 'success',
+        p_error_message: failureCount > 0 ? `${failureCount} failures out of ${users.length} users` : null,
+        p_metadata: {
+          users_notified: successCount,
+          failures: failureCount,
+          total_users: users.length,
+          test_mode: testMode,
+        }
+      });
+      console.log('Cron job log completed');
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -213,6 +243,27 @@ const handler = async (req: Request): Promise<Response> => {
     );
   } catch (error: any) {
     console.error('Error in send-daily-question-notification function:', error);
+
+    // Complete cron job log with error
+    if (logId) {
+      try {
+        const supabaseUrl = Deno.env.get('SUPABASE_URL');
+        const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+        if (supabaseUrl && supabaseKey) {
+          const supabase = createClient(supabaseUrl, supabaseKey);
+          await supabase.rpc('complete_cron_job_log', {
+            p_log_id: logId,
+            p_status: 'error',
+            p_error_message: error.message,
+            p_error_stack: error.stack,
+          });
+          console.log('Cron job log completed with error');
+        }
+      } catch (logError) {
+        console.error('Failed to log error:', logError);
+      }
+    }
+
     return new Response(
       JSON.stringify({
         error: error.message,
