@@ -9,13 +9,14 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, BarChart3, Shield, Settings } from 'lucide-react';
+import { Camera, BarChart3, Shield, Settings, MessageCircleQuestion } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { DatabaseProfile } from '@/types/profile';
 import PhotoGalleryTab from './PhotoGalleryTab';
 import AnalyticsTab from './AnalyticsTab';
 import PrivacyTab from './PrivacyTab';
+import ProfileAnswersSection from '../ProfileAnswersSection';
 
 interface AdvancedTabsProps {
   profile: DatabaseProfile;
@@ -31,6 +32,12 @@ const AdvancedTabs = ({ profile, isOwnProfile }: AdvancedTabsProps) => {
       id: 'photos',
       label: 'Galerie Photos',
       icon: Camera,
+      showFor: 'all', // Show for everyone
+    },
+    {
+      id: 'questions',
+      label: 'Questions du Jour',
+      icon: MessageCircleQuestion,
       showFor: 'all', // Show for everyone
     },
     {
@@ -78,7 +85,7 @@ const AdvancedTabs = ({ profile, isOwnProfile }: AdvancedTabsProps) => {
                 <Settings className="h-6 w-6 text-gray-400" />
               </div>
 
-              <TabsList className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 bg-transparent h-auto">
+              <TabsList className={`grid w-full ${isOwnProfile ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-1 sm:grid-cols-2'} gap-2 bg-transparent h-auto`}>
                 {tabs.map((tab) => (
                   <TabsTrigger
                     key={tab.id}
@@ -100,6 +107,14 @@ const AdvancedTabs = ({ profile, isOwnProfile }: AdvancedTabsProps) => {
             <AnimatePresence mode="wait">
               <TabsContent value="photos" className="mt-0">
                 <PhotoGalleryTab profile={profile} isOwnProfile={isOwnProfile} />
+              </TabsContent>
+
+              <TabsContent value="questions" className="mt-0">
+                <ProfileAnswersSection
+                  userId={profile.user_id}
+                  isOwnProfile={isOwnProfile}
+                  maxAnswers={5}
+                />
               </TabsContent>
 
               {isOwnProfile && (

@@ -45,6 +45,7 @@ const Compare = lazy(() => import('@/pages/Compare'));
 
 // Daily Question Feature
 const DailyQuestion = lazy(() => import('@/pages/daily-question/DailyQuestion'));
+const QuestionHistory = lazy(() => import('@/pages/daily-question/QuestionHistory'));
 
 // Family features
 const Family = lazy(() => import('@/pages/Family'));
@@ -202,6 +203,7 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/badge-leaderboard', component: BadgeLeaderboard },
   // Daily Question
   { path: '/daily-question', component: DailyQuestion },
+  { path: '/daily-question/history', component: QuestionHistory },
 ];
 
 // Catch all route
