@@ -350,11 +350,14 @@ const DailyQuestion = () => {
                         <div className="flex gap-3">
                           <Button onClick={() => navigate('/daily-question/history')} variant="outline" className="flex-1">
                             <Calendar className="h-4 w-4 mr-2" />
-                            Voir l'historique
+                            Historique
                           </Button>
-                          <Button onClick={() => navigate('/matches')} className="flex-1 bg-emerald hover:bg-emerald-dark">
+                          <Button
+                            onClick={() => navigate(`/daily-question/matches?question_id=${question.question_id}`)}
+                            className="flex-1 bg-gradient-to-r from-emerald to-emerald-light hover:from-emerald-dark hover:to-emerald text-white"
+                          >
                             <Users className="h-4 w-4 mr-2" />
-                            Voir les réponses de mes matches
+                            Réponses des matches
                           </Button>
                         </div>
                       </div>
