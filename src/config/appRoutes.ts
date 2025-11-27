@@ -47,6 +47,7 @@ const Compare = lazy(() => import('@/pages/Compare'));
 const DailyQuestion = lazy(() => import('@/pages/daily-question/DailyQuestion'));
 const QuestionHistory = lazy(() => import('@/pages/daily-question/QuestionHistory'));
 const MatchesAnswers = lazy(() => import('@/pages/daily-question/MatchesAnswers'));
+const AdminQuestions = lazy(() => import('@/pages/daily-question/AdminQuestions'));
 
 // Family features
 const Family = lazy(() => import('@/pages/Family'));
@@ -206,6 +207,7 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/daily-question', component: DailyQuestion },
   { path: '/daily-question/history', component: QuestionHistory },
   { path: '/daily-question/matches', component: MatchesAnswers },
+  { path: '/admin/daily-questions', component: AdminQuestions },
 ];
 
 // Catch all route

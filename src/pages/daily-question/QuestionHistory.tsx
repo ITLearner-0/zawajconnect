@@ -30,6 +30,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import StandardLoadingState from '@/components/ui/StandardLoadingState';
+import BadgeProgressComponent from '@/components/daily-question/BadgeProgress';
 
 interface Answer {
   id: string;
@@ -396,6 +397,9 @@ const QuestionHistory = () => {
                     ))}
                   </CardContent>
                 </Card>
+
+                {/* Badge Progress - Phase 5 */}
+                {user && <BadgeProgressComponent userId={user.id} compact={false} />}
               </>
             )}
           </div>
