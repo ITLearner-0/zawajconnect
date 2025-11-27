@@ -28,8 +28,7 @@ const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const Browse = lazy(() => import('@/pages/Browse'));
 const Matches = lazy(() => import('@/pages/Matches'));
 const Chat = lazy(() => import('@/pages/Chat'));
-const Profile = lazy(() => import('@/pages/Profile'));
-const EnhancedProfile = lazy(() => import('@/pages/EnhancedProfile'));
+const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const PaymentHistory = lazy(() => import('@/pages/PaymentHistory'));
@@ -147,10 +146,10 @@ export const specialRoutes: AppRouteConfig[] = [
 // Protected routes - require authentication and complete profile
 export const protectedRoutes: AppRouteConfig[] = [
   { path: '/dashboard', component: Dashboard },
-  // Profile routes - Standardized to use ProfileView (Phase 3)
-  { path: '/profile', component: ProfileView }, // Own profile (isOwnProfile prop)
-  { path: '/profile/edit', component: EnhancedProfile }, // Edit profile
-  { path: '/profile/:id', component: ProfileView }, // Other users' profiles
+  // Profile routes - Clean architecture (Phase 4)
+  { path: '/profile', component: ProfileView }, // View own profile
+  { path: '/profile/edit', component: ProfilePage }, // Edit profile + onboarding
+  { path: '/profile/:id', component: ProfileView }, // View other users' profiles
   // Legacy redirects - maintained for backward compatibility
   { path: '/enhanced-profile', component: ProfileView }, // Redirect to /profile
   { path: '/profile-view', component: ProfileView }, // Redirect to /profile

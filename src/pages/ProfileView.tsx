@@ -32,6 +32,11 @@ import {
 // Hybrid Design - Advanced Features
 import { AdvancedTabs } from '@/components/profile/advanced';
 
+// AI & Tutorial Features (migrated from EnhancedProfile)
+import AISuggestions from '@/components/profile/AISuggestions';
+import ProfileChatbot from '@/components/profile/ProfileChatbot';
+import InteractiveTutorial from '@/components/profile/InteractiveTutorial';
+
 import { fadeInUp, staggerContainer, staggerItem } from '@/styles/animations';
 import { MobileActionBar, QuickActionsScroll, QuickAction } from '@/components/profile/mobile';
 import { Share2, Users, Heart, Camera } from 'lucide-react';
@@ -576,6 +581,50 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
                 </div>
               </motion.div>
             )}
+
+            {/* AI Suggestions (Own Profile Only) */}
+            {isOwnProfile && (
+              <motion.div variants={staggerItem}>
+                <AISuggestions
+                  profile={{
+                    full_name: `${profile.first_name} ${profile.last_name}`,
+                    age: profile.birth_date
+                      ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear()
+                      : undefined,
+                    bio: profile.about_me || undefined,
+                    location: profile.location || undefined,
+                    education: profile.education_level || undefined,
+                    profession: profile.occupation || undefined,
+                    interests: profile.interests || [],
+                    avatar_url: profile.profile_picture || undefined,
+                  }}
+                  islamicPrefs={islamicPrefs}
+                  completionStats={completionStats}
+                />
+              </motion.div>
+            )}
+
+            {/* Interactive Tutorial (Own Profile Only) */}
+            {isOwnProfile && completionStats.overall < 80 && (
+              <motion.div variants={staggerItem}>
+                <InteractiveTutorial
+                  profile={{
+                    full_name: `${profile.first_name} ${profile.last_name}`,
+                    age: profile.birth_date
+                      ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear()
+                      : undefined,
+                    bio: profile.about_me || undefined,
+                    location: profile.location || undefined,
+                    education: profile.education_level || undefined,
+                    profession: profile.occupation || undefined,
+                    interests: profile.interests || [],
+                  }}
+                  islamicPrefs={islamicPrefs}
+                  completionStats={completionStats}
+                  onNavigateToTab={() => navigate('/profile/edit')}
+                />
+              </motion.div>
+            )}
           </motion.div>
         </div>
 
@@ -589,6 +638,24 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
           onReport={handleReport}
           onBlock={handleBlock}
         />
+
+        {/* Profile Chatbot - Always visible for own profile */}
+        {isOwnProfile && (
+          <ProfileChatbot
+            profile={{
+              full_name: `${profile.first_name} ${profile.last_name}`,
+              age: profile.birth_date
+                ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear()
+                : undefined,
+              bio: profile.about_me || undefined,
+              location: profile.location || undefined,
+              education: profile.education_level || undefined,
+              profession: profile.occupation || undefined,
+              interests: profile.interests || [],
+            }}
+            completionStats={completionStats}
+          />
+        )}
       </div>
     </div>
   );
