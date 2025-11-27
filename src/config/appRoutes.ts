@@ -43,6 +43,9 @@ const CompatibilityTest = lazy(() => import('@/pages/CompatibilityTest'));
 const CompatibilityInsightsPage = lazy(() => import('@/pages/CompatibilityInsights'));
 const Compare = lazy(() => import('@/pages/Compare'));
 
+// Daily Question Feature
+const DailyQuestion = lazy(() => import('@/pages/daily-question/DailyQuestion'));
+
 // Family features
 const Family = lazy(() => import('@/pages/Family'));
 const WaliDashboard = lazy(() => import('@/pages/WaliDashboard'));
@@ -197,6 +200,8 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/compare', component: Compare },
   { path: '/gamification', component: Gamification },
   { path: '/badge-leaderboard', component: BadgeLeaderboard },
+  // Daily Question
+  { path: '/daily-question', component: DailyQuestion },
 ];
 
 // Catch all route
