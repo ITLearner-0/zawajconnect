@@ -105,53 +105,25 @@ const AdvancedTabs = ({ profile, isOwnProfile }: AdvancedTabsProps) => {
           {/* Tabs Content */}
           <div className="p-6">
             <TabsContent value="photos" className="mt-0">
-              <motion.div
-                key="photos-content"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <PhotoGalleryTab profile={profile} isOwnProfile={isOwnProfile} />
-              </motion.div>
+              <PhotoGalleryTab profile={profile} isOwnProfile={isOwnProfile} />
             </TabsContent>
 
             <TabsContent value="questions" className="mt-0">
-              <motion.div
-                key="questions-content"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <ProfileAnswersSection
-                  userId={profile.user_id}
-                  isOwnProfile={isOwnProfile}
-                  maxAnswers={5}
-                />
-              </motion.div>
+              <ProfileAnswersSection
+                userId={profile.user_id}
+                isOwnProfile={isOwnProfile}
+                maxAnswers={5}
+              />
             </TabsContent>
 
             {isOwnProfile && (
               <>
                 <TabsContent value="analytics" className="mt-0">
-                  <motion.div
-                    key="analytics-content"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <AnalyticsTab profile={profile} />
-                  </motion.div>
+                  <AnalyticsTab profile={profile} />
                 </TabsContent>
 
                 <TabsContent value="privacy" className="mt-0">
-                  <motion.div
-                    key="privacy-content"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <PrivacyTab profile={profile} />
-                  </motion.div>
+                  <PrivacyTab profile={profile} />
                 </TabsContent>
               </>
             )}
