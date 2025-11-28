@@ -34,7 +34,14 @@ const QuickActionsScroll = ({ actions, className }: QuickActionsScrollProps) => 
   if (actions.length === 0) return null;
 
   return (
-    <div className={cn('lg:hidden -mx-4 px-4 overflow-x-auto', className)}>
+    <div
+      className={cn(
+        'lg:hidden -mx-4 px-4 overflow-x-auto',
+        '[scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch]',
+        '[&::-webkit-scrollbar]:hidden',
+        className
+      )}
+    >
       <div className="flex gap-3 pb-2 min-w-max">
         {actions.map((action) => {
           const Icon = action.icon;
@@ -57,18 +64,6 @@ const QuickActionsScroll = ({ actions, className }: QuickActionsScrollProps) => 
           );
         })}
       </div>
-
-      {/* Scroll indicator gradient */}
-      <style jsx>{`
-        .overflow-x-auto {
-          -webkit-overflow-scrolling: touch;
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-        }
-        .overflow-x-auto::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 };
