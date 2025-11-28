@@ -209,12 +209,23 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
         const isOwn = currentUserId === profileId;
 
         if (isOwn) {
-          // User doesn't have a profile yet - redirect to onboarding
+          // User doesn't have a profile yet - show message but don't auto-redirect
+          // to avoid redirect loops. User can manually navigate to onboarding if needed.
+          console.warn('User profile not found. User should complete onboarding.');
           toast({
             title: 'Profil incomplet',
-            description: 'Veuillez compléter votre profil pour continuer.',
+            description: 'Votre profil semble incomplet. Veuillez compléter votre profil.',
+            action: (
+              <button
+                onClick={() => navigate('/onboarding')}
+                className="px-3 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700"
+              >
+                Compléter mon profil
+              </button>
+            ),
           });
-          navigate('/onboarding');
+          setProfile(null);
+          setLoading(false);
           return;
         } else {
           // Other user's profile not found

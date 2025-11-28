@@ -35,20 +35,29 @@ const ProtectedRoute = ({ children, requireOnboarding = true }: ProtectedRoutePr
     return <>{children}</>;
   }
 
-  // Also skip onboarding check for profile and dashboard
+  // Also skip onboarding check for profile, dashboard, and settings
   // These pages will handle their own onboarding status checks
+  // Settings should always be accessible so users can log out if stuck
   if (
     location.pathname === '/profile' ||
-    location.pathname === '/dashboard'
+    location.pathname === '/dashboard' ||
+    location.pathname === '/settings' ||
+    location.pathname.startsWith('/profile/')
   ) {
     return <>{children}</>;
   }
 
   // Redirect to onboarding if profile is incomplete and onboarding is required
   if (requireOnboarding && !profileComplete) {
-    // Redirect Walis to wali-onboarding, regular users to onboarding
-    const onboardingPath = isWali ? '/wali-onboarding' : '/onboarding';
-    return <Navigate to={onboardingPath} replace />;
+    // Prevent redirect loop: only redirect if not already on an exempt page
+    const exemptPages = ['/onboarding', '/wali-onboarding', '/profile', '/dashboard', '/settings'];
+    const shouldRedirect = !exemptPages.some(page => location.pathname.startsWith(page));
+
+    if (shouldRedirect) {
+      // Redirect Walis to wali-onboarding, regular users to onboarding
+      const onboardingPath = isWali ? '/wali-onboarding' : '/onboarding';
+      return <Navigate to={onboardingPath} replace />;
+    }
   }
 
   return <>{children}</>;
