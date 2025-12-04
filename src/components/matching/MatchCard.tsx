@@ -44,12 +44,80 @@ const MatchCard = ({ match, familyApprovalRequired, isInConversation = false }: 
   };
 
   const handleShowInterest = async () => {
-    toast({
-      title: 'Intérêt envoyé',
-      description: `Votre intérêt pour ${match.full_name} a été exprimé (Compatibilité: ${match.compatibility_score}%)`,
-    });
+    if (!user?.id) {
+      toast({
+        title: 'Erreur',
+        description: 'Vous devez être connecté pour exprimer votre intérêt',
+        variant: 'destructive',
+      });
+      return;
+    }
 
-    // TODO: Implement actual interest logic with database
+    try {
+      // Check if a match already exists (in either direction)
+      const { data: existingMatches, error: fetchError } = await supabase
+        .from('matches')
+        .select('*')
+        .or(`and(user1_id.eq.${user.id},user2_id.eq.${match.user_id}),and(user1_id.eq.${match.user_id},user2_id.eq.${user.id})`);
+
+      if (fetchError) {
+        throw fetchError;
+      }
+
+      const existingMatch = existingMatches?.[0];
+
+      if (existingMatch) {
+        // Match already exists, update the like status
+        const isUser1 = existingMatch.user1_id === user.id;
+        const updateField = isUser1 ? 'user1_liked' : 'user2_liked';
+        const otherUserLiked = isUser1 ? existingMatch.user2_liked : existingMatch.user1_liked;
+
+        const { error: updateError } = await supabase
+          .from('matches')
+          .update({
+            [updateField]: true,
+            is_mutual: otherUserLiked, // Set to true only if the other user also liked
+          })
+          .eq('id', existingMatch.id);
+
+        if (updateError) {
+          throw updateError;
+        }
+
+        toast({
+          title: otherUserLiked ? '🎉 Match mutuel !' : 'Intérêt envoyé',
+          description: otherUserLiked
+            ? `Vous et ${match.full_name} êtes maintenant en match ! Vous pouvez commencer à discuter.`
+            : `Votre intérêt pour ${match.full_name} a été exprimé (Compatibilité: ${match.compatibility_score}%)`,
+        });
+      } else {
+        // Create a new match
+        const { error: insertError } = await supabase.from('matches').insert({
+          user1_id: user.id,
+          user2_id: match.user_id,
+          match_score: match.compatibility_score,
+          user1_liked: true,
+          user2_liked: false,
+          is_mutual: false,
+        });
+
+        if (insertError) {
+          throw insertError;
+        }
+
+        toast({
+          title: 'Intérêt envoyé',
+          description: `Votre intérêt pour ${match.full_name} a été exprimé (Compatibilité: ${match.compatibility_score}%)`,
+        });
+      }
+    } catch (error) {
+      console.error('Error showing interest:', error);
+      toast({
+        title: 'Erreur',
+        description: "Impossible d'envoyer votre intérêt. Veuillez réessayer.",
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleFamilyApproval = async () => {

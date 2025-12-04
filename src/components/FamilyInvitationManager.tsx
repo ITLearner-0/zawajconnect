@@ -43,6 +43,8 @@ import { familyMemberSchema } from '@/lib/validation';
 interface FamilyMember {
   id: string;
   full_name: string;
+  email?: string;
+  phone?: string;
   relationship: string;
   invitation_status: string;
   can_view_profile: boolean;
@@ -258,27 +260,42 @@ const FamilyInvitationManager = () => {
     try {
       console.log('📤 [RESEND] Renvoi invitation à:', member.full_name);
 
-      toast({
-        title: 'Fonctionnalité non disponible',
-        description: "Le renvoi d'invitation nécessite que l'email soit stocké",
-        variant: 'destructive',
-      });
+      // Check if email is available
+      if (!member.email) {
+        toast({
+          title: 'Email manquant',
+          description: "Ce membre n'a pas d'email enregistré. Veuillez le modifier pour ajouter un email.",
+          variant: 'destructive',
+        });
+        return;
+      }
 
-      return;
-
-      /* TODO: Implement resend when email is available
       const { data: { session } } = await supabase.auth.getSession();
-      await supabase.functions.invoke('send-family-invitation', {
+
+      if (!session) {
+        toast({
+          title: 'Non autorisé',
+          description: 'Vous devez être connecté pour renvoyer une invitation',
+          variant: 'destructive',
+        });
+        return;
+      }
+
+      const { error: functionError } = await supabase.functions.invoke('send-family-invitation', {
         body: {
           fullName: member.full_name,
-          email: 'TODO',
+          email: member.email,
           relationship: member.relationship,
           isWali: member.is_wali
         },
         headers: {
-          Authorization: `Bearer ${session?.access_token}`,
+          Authorization: `Bearer ${session.access_token}`,
         },
       });
+
+      if (functionError) {
+        throw functionError;
+      }
 
       await supabase
         .from('family_members')
@@ -287,16 +304,16 @@ const FamilyInvitationManager = () => {
 
       toast({
         title: "Invitation renvoyée",
-        description: `L'invitation a été renvoyée à ${member.full_name}`,
+        description: `L'invitation a été renvoyée à ${member.full_name} (${member.email})`,
       });
 
       fetchFamilyMembers();
-      */
     } catch (error) {
       console.error('Error resending invitation:', error);
+      const errorMessage = error instanceof Error ? error.message : "Impossible de renvoyer l'invitation";
       toast({
         title: 'Erreur',
-        description: "Impossible de renvoyer l'invitation",
+        description: errorMessage,
         variant: 'destructive',
       });
     }
