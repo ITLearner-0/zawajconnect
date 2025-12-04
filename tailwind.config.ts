@@ -53,22 +53,74 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				// Islamic Design System Colors
+				// Enhanced Islamic Design System Colors with full palette
 				emerald: {
+					50: '#ecfdf5',
+					100: '#d1fae5',
+					200: '#a7f3d0',
+					300: '#6ee7b7',
+					400: '#34d399',
+					500: '#10b981',
+					600: '#059669',
+					700: '#047857',
+					800: '#065f46',
+					900: '#064e3b',
+					950: '#022c22',
 					DEFAULT: 'hsl(var(--emerald))',
 					light: 'hsl(var(--emerald-light))',
 					dark: 'hsl(var(--emerald-dark))'
 				},
 				gold: {
+					50: '#fffbeb',
+					100: '#fef3c7',
+					200: '#fde68a',
+					300: '#fcd34d',
+					400: '#fbbf24',
+					500: '#f59e0b',
+					600: '#d97706',
+					700: '#b45309',
+					800: '#92400e',
+					900: '#78350f',
+					950: '#451a03',
 					DEFAULT: 'hsl(var(--gold))',
 					light: 'hsl(var(--gold-light))',
 					dark: 'hsl(var(--gold-dark))'
 				},
+				rose: {
+					50: '#fff1f2',
+					100: '#ffe4e6',
+					200: '#fecdd3',
+					300: '#fda4af',
+					400: '#fb7185',
+					500: '#f43f5e',
+					600: '#e11d48',
+					700: '#be123c',
+					800: '#9f1239',
+					900: '#881337',
+					950: '#4c0519',
+				},
 				sage: {
+					50: '#f6f7f6',
+					100: '#e8ebe9',
+					200: '#d1d7d3',
+					300: '#adb8b3',
+					400: '#84a98c',
+					500: '#6b8a74',
+					600: '#546f5e',
+					700: '#455a4d',
+					800: '#394a40',
+					900: '#303d36',
+					950: '#1a221e',
 					DEFAULT: 'hsl(var(--sage))',
 					dark: 'hsl(var(--sage-dark))'
 				},
 				cream: {
+					50: '#fefdfb',
+					100: '#fdfcf8',
+					200: '#fbf9f1',
+					300: '#f8f5e9',
+					400: '#f5f1e1',
+					500: '#f2edd9',
 					DEFAULT: 'hsl(var(--cream))',
 					dark: 'hsl(var(--cream-dark))'
 				},
@@ -87,8 +139,9 @@ export default {
 				}
 			},
 			fontFamily: {
-				sans: ['Inter', 'system-ui', 'sans-serif'],
-				arabic: ['Amiri', 'serif'],
+				sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+				arabic: ['Cairo', 'Tajawal', 'Amiri', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+				mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

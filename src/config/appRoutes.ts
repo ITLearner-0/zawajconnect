@@ -28,8 +28,7 @@ const Dashboard = lazy(() => import('@/pages/Dashboard'));
 const Browse = lazy(() => import('@/pages/Browse'));
 const Matches = lazy(() => import('@/pages/Matches'));
 const Chat = lazy(() => import('@/pages/Chat'));
-const Profile = lazy(() => import('@/pages/Profile'));
-const EnhancedProfile = lazy(() => import('@/pages/EnhancedProfile'));
+const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
 const Privacy = lazy(() => import('@/pages/Privacy'));
 const Settings = lazy(() => import('@/pages/Settings'));
 const PaymentHistory = lazy(() => import('@/pages/PaymentHistory'));
@@ -43,6 +42,12 @@ const AdvancedMatching = lazy(() => import('@/pages/AdvancedMatching'));
 const CompatibilityTest = lazy(() => import('@/pages/CompatibilityTest'));
 const CompatibilityInsightsPage = lazy(() => import('@/pages/CompatibilityInsights'));
 const Compare = lazy(() => import('@/pages/Compare'));
+
+// Daily Question Feature
+const DailyQuestion = lazy(() => import('@/pages/daily-question/DailyQuestion'));
+const QuestionHistory = lazy(() => import('@/pages/daily-question/QuestionHistory'));
+const MatchesAnswers = lazy(() => import('@/pages/daily-question/MatchesAnswers'));
+const AdminQuestions = lazy(() => import('@/pages/daily-question/AdminQuestions'));
 
 // Family features
 const Family = lazy(() => import('@/pages/Family'));
@@ -80,6 +85,12 @@ const AdminUsers = lazy(() => import('@/pages/AdminUsers'));
 const ModerationTest = lazy(() => import('@/pages/ModerationTest'));
 const ModerationTests = lazy(() => import('@/pages/ModerationTests'));
 
+// Demo & Testing pages
+const ProfileDemo = lazy(() => import('@/pages/ProfileDemo'));
+
+// Phase 3: New Profile View (Unified)
+const ProfileView = lazy(() => import('@/pages/ProfileView'));
+
 // 404 page
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
@@ -107,6 +118,7 @@ export const publicRoutes: AppRouteConfig[] = [
   { path: '/invitation/accept', component: InvitationAccept },
   { path: '/invitation-accept', component: InvitationAccept },
   { path: '/status', component: Status },
+  { path: '/profile-demo', component: ProfileDemo }, // Demo page for Phase 1 redesign
 ];
 
 // Special routes - protected but may have different requirements
@@ -140,8 +152,14 @@ export const specialRoutes: AppRouteConfig[] = [
 // Protected routes - require authentication and complete profile
 export const protectedRoutes: AppRouteConfig[] = [
   { path: '/dashboard', component: Dashboard },
-  { path: '/enhanced-profile', component: EnhancedProfile },
-  { path: '/profile', component: EnhancedProfile },
+  // Profile routes - Clean architecture (Phase 4)
+  { path: '/profile', component: ProfileView }, // View own profile
+  { path: '/profile/edit', component: ProfilePage }, // Edit profile + onboarding
+  { path: '/profile/:id', component: ProfileView }, // View other users' profiles
+  // Legacy redirects - maintained for backward compatibility
+  { path: '/enhanced-profile', component: ProfileView }, // Redirect to /profile
+  { path: '/profile-view', component: ProfileView }, // Redirect to /profile
+  { path: '/profile-view/:id', component: ProfileView }, // Redirect to /profile/:id
   { path: '/advanced-matching', component: AdvancedMatching },
   { path: '/browse', component: Browse },
   { path: '/favorites', component: Favorites },
@@ -149,7 +167,6 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/matches', component: Matches },
   { path: '/chat', component: Chat },
   { path: '/chat/:matchId', component: Chat },
-  { path: '/profile/:userId', component: Profile },
   { path: '/privacy', component: Privacy },
   { path: '/family', component: Family },
   { path: '/guidance', component: Guidance },
@@ -186,6 +203,11 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/compare', component: Compare },
   { path: '/gamification', component: Gamification },
   { path: '/badge-leaderboard', component: BadgeLeaderboard },
+  // Daily Question
+  { path: '/daily-question', component: DailyQuestion },
+  { path: '/daily-question/history', component: QuestionHistory },
+  { path: '/daily-question/matches', component: MatchesAnswers },
+  { path: '/admin/daily-questions', component: AdminQuestions },
 ];
 
 // Catch all route

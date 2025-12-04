@@ -64,7 +64,7 @@ const Settings = () => {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between border-b pb-4">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" onClick={() => navigate('/enhanced-profile')}>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/profile')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Retour
             </Button>

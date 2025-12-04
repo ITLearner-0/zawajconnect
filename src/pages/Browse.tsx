@@ -43,7 +43,6 @@ import ReportModal from '@/components/ReportModal';
 import { useToast } from '@/hooks/use-toast';
 import ProfileCard from '@/components/ProfileCard';
 import CompatibilityScore from '@/components/CompatibilityScore';
-import { DailyLimitIndicator } from '@/components/DailyLimitIndicator';
 import { UpgradeToPremiumModal } from '@/components/UpgradeToPremiumModal';
 import { ActiveConversationBanner } from '@/components/ActiveConversationBanner';
 import ProfileComparator from '@/components/ProfileComparator';
@@ -128,16 +127,8 @@ const Browse = () => {
     setFilteredProfiles(profiles);
   }, [profiles]);
 
-  // Log initial profile view for free users
-  useEffect(() => {
-    if (filteredProfiles.length > 0 && currentIndex === 0 && !subscription.subscribed) {
-      checkDailyLimit().then((canView) => {
-        if (canView && filteredProfiles[0]) {
-          logProfileView(filteredProfiles[0].user_id);
-        }
-      });
-    }
-  }, [filteredProfiles]);
+  // Note: Daily viewing limit removed - all users can browse all profiles
+  // Only likes/matches require Premium subscription
 
   const checkUserConversationStatus = async () => {
     if (!user) return;
@@ -378,49 +369,14 @@ const Browse = () => {
     });
   };
 
-  const checkDailyLimit = async () => {
-    if (subscription.subscribed) return true; // Premium users bypass check
+  // Daily viewing limit removed - all users can browse profiles freely
+  // Premium subscription only required for likes/matches
 
-    try {
-      const { data } = await supabase.functions.invoke('check-daily-limit');
-      if (data?.limit_reached) {
-        setDailyLimitReached(true);
-        setShowUpgradeModal(true);
-        return false;
-      }
-      return true;
-    } catch (error) {
-      console.error('Error checking daily limit:', error);
-      return true; // En cas d'erreur, on laisse passer
-    }
-  };
+  // Profile view logging removed - no longer needed since viewing is unlimited
 
-  const logProfileView = async (viewedUserId: string) => {
-    if (subscription.subscribed) return; // Premium users don't need tracking
-
-    try {
-      await supabase.functions.invoke('log-profile-view', {
-        body: { viewed_user_id: viewedUserId },
-      });
-    } catch (error) {
-      console.error('Error logging profile view:', error);
-    }
-  };
-
-  const nextProfile = async () => {
-    // Check limit BEFORE showing next profile
-    const canView = await checkDailyLimit();
-    if (!canView) return;
-
+  const nextProfile = () => {
     if (currentIndex < filteredProfiles.length - 1) {
-      const newIndex = currentIndex + 1;
-      setCurrentIndex(newIndex);
-
-      // Log the view
-      const profileToView = filteredProfiles[newIndex];
-      if (profileToView) {
-        await logProfileView(profileToView.user_id);
-      }
+      setCurrentIndex(currentIndex + 1);
     } else {
       toast({
         title: 'Plus de profils',
@@ -602,20 +558,9 @@ const Browse = () => {
   const gridProfilesPerPage = 9;
   const gridProfiles = filteredProfiles.slice(gridStartIndex, gridStartIndex + gridProfilesPerPage);
 
-  const nextGridPage = async () => {
-    const canView = await checkDailyLimit();
-    if (!canView) return;
-
+  const nextGridPage = () => {
     if (gridStartIndex + gridProfilesPerPage < filteredProfiles.length) {
       setGridStartIndex(gridStartIndex + gridProfilesPerPage);
-      // Log views for the new page
-      const newProfiles = filteredProfiles.slice(
-        gridStartIndex + gridProfilesPerPage,
-        gridStartIndex + gridProfilesPerPage * 2
-      );
-      for (const profile of newProfiles) {
-        await logProfileView(profile.user_id);
-      }
     }
   };
 
@@ -716,7 +661,6 @@ const Browse = () => {
           </p>
         </div>
 
-        <DailyLimitIndicator />
         {isInActiveConversation && <ActiveConversationBanner matchId={activeMatchId} />}
 
         {/* Controls */}
@@ -934,9 +878,7 @@ const Browse = () => {
                       </Button>
                       <Button
                         onClick={() => handleLike(currentProfile.user_id)}
-                        disabled={
-                          !subscription.subscribed || dailyLimitReached || isInActiveConversation
-                        }
+                        disabled={!subscription.subscribed || isInActiveConversation}
                         className="flex-1"
                       >
                         {isInActiveConversation ? (
@@ -1128,11 +1070,7 @@ const Browse = () => {
                                 </Button>
                                 <Button
                                   onClick={() => handleLike(profile.user_id)}
-                                  disabled={
-                                    !subscription.subscribed ||
-                                    dailyLimitReached ||
-                                    isInActiveConversation
-                                  }
+                                  disabled={!subscription.subscribed || isInActiveConversation}
                                   size="sm"
                                   className="text-xs"
                                 >
@@ -1190,11 +1128,7 @@ const Browse = () => {
                           return (
                             <PaginationItem key={i}>
                               <PaginationLink
-                                onClick={async () => {
-                                  const canView = await checkDailyLimit();
-                                  if (!canView) return;
-                                  setGridStartIndex(i * gridProfilesPerPage);
-                                }}
+                                onClick={() => setGridStartIndex(i * gridProfilesPerPage)}
                                 isActive={currentPage === pageNumber}
                                 className="cursor-pointer"
                               >
@@ -1246,7 +1180,7 @@ const Browse = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => navigate('/enhanced-profile')}
+                  onClick={() => navigate('/profile')}
                   className="w-full justify-start"
                 >
                   Mon profil

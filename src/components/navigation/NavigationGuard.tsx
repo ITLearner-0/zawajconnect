@@ -67,12 +67,15 @@ const NavigationGuard = ({ children }: NavigationGuardProps) => {
       // Special handling for admin routes
       if (currentRoute.roles.includes('admin')) {
         if (!isAdmin) {
-          toast({
-            title: 'Accès refusé',
-            description: "Vous n'avez pas les permissions administrateur nécessaires.",
-            variant: 'destructive',
-          });
-          navigate('/enhanced-profile', { replace: true });
+          // Prevent redirect loop: don't redirect if already on dashboard
+          if (location.pathname !== '/dashboard') {
+            toast({
+              title: 'Accès refusé',
+              description: "Vous n'avez pas les permissions administrateur nécessaires.",
+              variant: 'destructive',
+            });
+            navigate('/dashboard', { replace: true });
+          }
           return;
         }
       }

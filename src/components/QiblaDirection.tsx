@@ -48,6 +48,12 @@ const QiblaDirection = () => {
   useEffect(() => {
     checkDeviceOrientation();
     getCurrentLocation();
+
+    // Cleanup function to remove event listeners
+    return () => {
+      window.removeEventListener('deviceorientationabsolute', handleOrientation);
+      window.removeEventListener('deviceorientation', handleOrientation);
+    };
   }, []);
 
   const checkDeviceOrientation = () => {
@@ -58,17 +64,13 @@ const QiblaDirection = () => {
       const DeviceOrientationEventIOS =
         DeviceOrientationEvent as unknown as IOSDeviceOrientationEventConstructor;
       if (typeof DeviceOrientationEventIOS.requestPermission === 'function') {
-        DeviceOrientationEventIOS.requestPermission()
-          .then((permission) => {
-            setPermissionStatus(permission);
-            if (permission === 'granted') {
-              startCompass();
-            }
-          })
-          .catch(() => setPermissionStatus('denied'));
+        // iOS requires user interaction to request permission
+        // Don't automatically request - wait for user button click
+        setPermissionStatus('prompt');
       } else {
-        setPermissionStatus('granted');
-        startCompass();
+        // For non-iOS devices, permission might not be required
+        // but modern browsers still prefer user interaction
+        setPermissionStatus('prompt');
       }
     }
   };
@@ -203,8 +205,10 @@ const QiblaDirection = () => {
   const requestCompassPermission = async () => {
     const DeviceOrientationEventIOS =
       DeviceOrientationEvent as unknown as IOSDeviceOrientationEventConstructor;
-    if (typeof DeviceOrientationEventIOS.requestPermission === 'function') {
-      try {
+
+    try {
+      if (typeof DeviceOrientationEventIOS.requestPermission === 'function') {
+        // iOS - explicit permission required
         const permission = await DeviceOrientationEventIOS.requestPermission();
         setPermissionStatus(permission);
         if (permission === 'granted') {
@@ -213,15 +217,30 @@ const QiblaDirection = () => {
             title: 'Permission accordée',
             description: 'La boussole est maintenant active',
           });
+        } else {
+          toast({
+            title: 'Permission refusée',
+            description: "L'accès à la boussole a été refusé",
+            variant: 'destructive',
+          });
         }
-      } catch (error) {
-        setPermissionStatus('denied');
+      } else {
+        // Non-iOS - try to start compass directly
+        setPermissionStatus('granted');
+        startCompass();
         toast({
-          title: 'Permission refusée',
-          description: "Impossible d'activer la boussole",
-          variant: 'destructive',
+          title: 'Boussole activée',
+          description: 'La boussole est maintenant active',
         });
       }
+    } catch (error) {
+      console.error('Error requesting compass permission:', error);
+      setPermissionStatus('denied');
+      toast({
+        title: 'Erreur',
+        description: "Impossible d'activer la boussole",
+        variant: 'destructive',
+      });
     }
   };
 

@@ -238,7 +238,7 @@ const Onboarding = () => {
           title: 'Profil déjà complet',
           description: 'Vous avez déjà terminé votre onboarding. Redirection vers votre profil...',
         });
-        navigate('/enhanced-profile');
+        navigate('/profile');
         return;
       }
 
@@ -562,7 +562,7 @@ const Onboarding = () => {
         // Refresh user data to update profileComplete status
         await refreshUserData();
 
-        navigate('/enhanced-profile');
+        navigate('/profile');
       } else {
         toast({
           title: 'Erreur de sauvegarde',

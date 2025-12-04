@@ -113,7 +113,7 @@ const Privacy = () => {
             <div className="text-center">
               <h2 className="text-xl font-bold text-foreground mb-2">Paramètres non trouvés</h2>
               <Button
-                onClick={() => navigate('/enhanced-profile')}
+                onClick={() => navigate('/profile')}
                 className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
               >
                 Retour au profil

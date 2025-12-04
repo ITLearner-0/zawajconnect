@@ -33,6 +33,7 @@ import CallAnalyticsDashboard from '@/components/admin/CallAnalyticsDashboard';
 import CallFeedbackDashboard from '@/components/admin/CallFeedbackDashboard';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import ABTestingDashboard from '@/pages/ABTestingDashboard';
+import CronJobsMonitoring from '@/components/admin/CronJobsMonitoring';
 import {
   Users,
   Heart,
@@ -529,7 +530,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
       {/* Admin Tabs */}
       <Tabs defaultValue="users" className="space-y-4">
         <div className="flex items-center justify-between mb-4">
-          <ResponsiveTabsList tabCount={10}>
+          <ResponsiveTabsList tabCount={11}>
             <TabsTrigger value="users">Utilisateurs</TabsTrigger>
             <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
             <TabsTrigger value="roles">Rôles</TabsTrigger>
@@ -539,6 +540,7 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
             <TabsTrigger value="abtesting">Tests A/B</TabsTrigger>
             <TabsTrigger value="onboarding">Onboarding</TabsTrigger>
             <TabsTrigger value="insights">Insights</TabsTrigger>
+            <TabsTrigger value="cronjobs">Cron Jobs</TabsTrigger>
             <TabsTrigger value="settings">Paramètres</TabsTrigger>
           </ResponsiveTabsList>
 
@@ -928,6 +930,11 @@ const AdminDashboard = ({ userRole }: AdminDashboardProps) => {
         {/* Insights Analytics Tab */}
         <TabsContent value="insights" className="space-y-4">
           <InsightsAnalyticsDashboard />
+        </TabsContent>
+
+        {/* Cron Jobs Monitoring Tab */}
+        <TabsContent value="cronjobs" className="space-y-4">
+          <CronJobsMonitoring />
         </TabsContent>
 
         {/* Moderation Tab */}
