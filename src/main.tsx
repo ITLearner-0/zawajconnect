@@ -5,6 +5,10 @@ import App from './App.tsx';
 import './index.css';
 import { setupGlobalErrorHandler } from './errorHandler';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { initSentry } from './config/sentry';
+
+// Initialize Sentry FIRST for error monitoring
+initSentry();
 
 // Setup global error handler BEFORE anything else
 setupGlobalErrorHandler();

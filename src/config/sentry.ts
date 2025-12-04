@@ -5,13 +5,12 @@
  * in production environment.
  */
 
-// @ts-nocheck - Sentry not installed, keeping for future integration
 import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
 
 const SENTRY_DSN = import.meta.env.VITE_SENTRY_DSN;
 const ENV = import.meta.env.MODE;
 const APP_VERSION = import.meta.env.VITE_APP_VERSION || '1.0.0';
+const isDev = import.meta.env.DEV;
 
 /**
  * Initialize Sentry error monitoring
@@ -32,21 +31,29 @@ export function initSentry(): void {
     environment: ENV,
     release: `zawajconnect@${APP_VERSION}`,
 
-    // Performance Monitoring
+    // Performance Monitoring with new API
     integrations: [
-      new BrowserTracing({
+      Sentry.browserTracingIntegration({
         // Trace all navigation
-        tracingOrigins: ['localhost', 'zawajconnect.com', /^\//],
+        tracePropagationTargets: ['localhost', 'zawajconnect.com', /^https:\/\/[^/]*\.supabase\.co/],
+      }),
+      Sentry.replayIntegration({
+        // Capture 10% of all sessions
+        sessionSampleRate: 0.1,
+        // Capture 100% of sessions with errors
+        errorSampleRate: 1.0,
+        // Mask all text and user input by default for privacy
+        maskAllText: true,
+        blockAllMedia: true,
       }),
     ],
 
     // Set sample rate for performance monitoring
-    // 0.1 = 10% of transactions will be sent
+    // 0.1 = 10% of transactions will be sent in production
     tracesSampleRate: ENV === 'production' ? 0.1 : 1.0,
 
-    // Set sample rate for error events
-    // 1.0 = 100% of errors will be sent
-    sampleRate: 1.0,
+    // Set sample rate for profiling
+    profilesSampleRate: ENV === 'production' ? 0.1 : 1.0,
 
     // Filter errors before sending
     beforeSend(event, hint) {
@@ -55,18 +62,33 @@ export function initSentry(): void {
         return null;
       }
 
-      // Filter out common non-critical errors
-      if (event.exception) {
-        const error = hint.originalException;
+      // Remove sensitive user data for privacy
+      if (event.user) {
+        delete event.user.email;
+        delete event.user.ip_address;
+      }
 
+      // Filter out non-error console messages
+      if (event.level === 'log' || event.level === 'info') {
+        return null;
+      }
+
+      // Filter out common non-critical errors
+      const error = hint.originalException;
+      if (error instanceof Error) {
         // Network errors that are expected
-        if (error instanceof Error) {
-          if (error.message.includes('Failed to fetch')) {
-            return null;
-          }
-          if (error.message.includes('NetworkError')) {
-            return null;
-          }
+        if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+          return null;
+        }
+
+        // Ignore ResizeObserver errors (common browser quirk)
+        if (error.message?.includes('ResizeObserver loop')) {
+          return null;
+        }
+
+        // Ignore cancelled fetch requests
+        if (error.message?.includes('AbortError') || error.message?.includes('cancelled')) {
+          return null;
         }
       }
 
@@ -77,6 +99,8 @@ export function initSentry(): void {
     ignoreErrors: [
       // Browser extensions
       'top.GLOBALS',
+      'chrome-extension',
+      'moz-extension',
       // Random plugins/extensions
       'originalCreateNotification',
       'canvas.contentDocument',
@@ -86,9 +110,23 @@ export function initSentry(): void {
       // ISP optimizers
       'bmi_SafeAddOnload',
       'EBCallBackMessageReceived',
-      // Chrome extensions
-      'chrome-extension://',
-      'moz-extension://',
+      // Network errors
+      'NetworkError',
+      'Network request failed',
+      // React errors that are handled
+      'ResizeObserver loop limit exceeded',
+      'ResizeObserver loop completed with undelivered notifications',
+      // Third-party scripts
+      'Script error',
+    ],
+
+    // Ignore specific URLs
+    denyUrls: [
+      // Browser extensions
+      /extensions\//i,
+      /^chrome:\/\//i,
+      /^moz-extension:\/\//i,
+      /^chrome-extension:\/\//i,
     ],
 
     // Privacy settings
@@ -131,9 +169,9 @@ export function clearSentryUser(): void {
 /**
  * Manually capture an exception
  */
-export function captureException(error: Error, context?: Record<string, any>): void {
-  if (ENV !== 'production') {
-    console.error('Error captured:', error, context);
+export function captureException(error: Error | unknown, context?: Record<string, unknown>): void {
+  if (isDev) {
+    console.error('❌ [Sentry] Error:', error, context);
     return;
   }
 
@@ -145,39 +183,55 @@ export function captureException(error: Error, context?: Record<string, any>): v
 /**
  * Manually capture a message
  */
-export function captureMessage(message: string, level: Sentry.SeverityLevel = 'info'): void {
-  if (ENV !== 'production') {
-    console.log(`[${level}] ${message}`);
+export function captureMessage(
+  message: string,
+  level: Sentry.SeverityLevel = 'info',
+  context?: Record<string, unknown>
+): void {
+  if (isDev) {
+    console.log(`📝 [Sentry] Message (${level}):`, message, context);
     return;
   }
 
-  Sentry.captureMessage(message, level);
+  Sentry.captureMessage(message, {
+    level,
+    extra: context,
+  });
 }
 
 /**
  * Add breadcrumb for debugging
  */
-export function addBreadcrumb(message: string, category: string, data?: Record<string, any>): void {
-  if (ENV !== 'production') return;
+export function addBreadcrumb(
+  message: string,
+  category: string,
+  level: Sentry.SeverityLevel = 'info',
+  data?: Record<string, unknown>
+): void {
+  if (isDev) return;
 
   Sentry.addBreadcrumb({
     message,
     category,
+    level,
     data,
-    level: 'info',
   });
 }
 
 /**
- * Start a performance transaction
+ * Set user context for better error tracking
  */
-export function startTransaction(name: string, op: string): Sentry.Transaction | null {
-  if (ENV !== 'production') return null;
+export function setUser(user: { id: string; username?: string } | null): void {
+  if (isDev) return;
 
-  return Sentry.startTransaction({
-    name,
-    op,
-  });
+  if (user) {
+    Sentry.setUser({
+      id: user.id,
+      username: user.username,
+    });
+  } else {
+    Sentry.setUser(null);
+  }
 }
 
 /**
@@ -185,6 +239,11 @@ export function startTransaction(name: string, op: string): Sentry.Transaction |
  * Wrap your app with this component
  */
 export const SentryErrorBoundary = Sentry.ErrorBoundary;
+
+/**
+ * Wrap a component with Sentry error boundary
+ */
+export const withSentryErrorBoundary = Sentry.withErrorBoundary;
 
 /**
  * HOC for profiling React components

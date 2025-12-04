@@ -1,8 +1,11 @@
 /**
  * Production-safe logging utilities
  * Logs are only shown in development mode
- * In production, they can be sent to a monitoring service (Sentry, LogRocket, etc.)
+ * In production, they are sent to Sentry for monitoring
  */
+
+import { captureException, captureMessage, addBreadcrumb } from '@/config/sentry';
+import type * as Sentry from '@sentry/react';
 
 const isDev = import.meta.env.DEV;
 
@@ -13,16 +16,24 @@ interface LogContext {
 }
 
 /**
- * Send logs to monitoring service in production
- * TODO: Integrate with Sentry or similar service
+ * Send logs to Sentry monitoring service in production
  */
 const sendToMonitoring = (level: LogLevel, message: string, context?: LogContext) => {
-  // In production, send to monitoring service
-  // Example: Sentry.captureMessage(message, { level, extra: context });
-
-  // For now, only log errors to console in production
+  // In production, send to Sentry
   if (level === 'error') {
-    console.error('[PRODUCTION]', message, context);
+    // For errors, capture as exception if context contains an error object
+    const error = context?.error;
+    if (error instanceof Error) {
+      captureException(error, { ...context, message });
+    } else {
+      captureMessage(message, 'error' as Sentry.SeverityLevel, context);
+    }
+  } else if (level === 'warn') {
+    captureMessage(message, 'warning' as Sentry.SeverityLevel, context);
+    addBreadcrumb(message, 'warning', 'warning' as Sentry.SeverityLevel, context);
+  } else {
+    // For info/debug, add as breadcrumb only
+    addBreadcrumb(message, level, 'info' as Sentry.SeverityLevel, context);
   }
 };
 
