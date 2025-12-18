@@ -91,6 +91,14 @@ const ProfileDemo = lazy(() => import('@/pages/ProfileDemo'));
 // Phase 3: New Profile View (Unified)
 const ProfileView = lazy(() => import('@/pages/ProfileView'));
 
+// IT Certification Test App
+const ITCertificationHome = lazy(() => import('@/pages/ITCertificationHome'));
+const ITTestSelection = lazy(() => import('@/pages/ITTestSelection'));
+const ITTestTaking = lazy(() => import('@/pages/ITTestTaking'));
+const ITTestResult = lazy(() => import('@/pages/ITTestResult'));
+const ITDashboard = lazy(() => import('@/pages/ITDashboard'));
+const ITAdmin = lazy(() => import('@/pages/ITAdmin'));
+
 // 404 page
 const NotFound = lazy(() => import('@/pages/NotFound'));
 
@@ -208,6 +216,13 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/daily-question/history', component: QuestionHistory },
   { path: '/daily-question/matches', component: MatchesAnswers },
   { path: '/admin/daily-questions', component: AdminQuestions },
+  // IT Certification Test App
+  { path: '/it-certification', component: ITCertificationHome },
+  { path: '/it-certification/dashboard', component: ITDashboard },
+  { path: '/it-certification/test/select/:certificationId', component: ITTestSelection },
+  { path: '/it-certification/test/:testId', component: ITTestTaking },
+  { path: '/it-certification/result/:testId', component: ITTestResult },
+  { path: '/it-certification/admin', component: ITAdmin },
 ];
 
 // Catch all route
