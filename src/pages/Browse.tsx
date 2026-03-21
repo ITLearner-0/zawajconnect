@@ -85,6 +85,7 @@ interface SearchFilters {
   profession?: string;
   verifiedOnly?: boolean;
   withPhoto?: boolean;
+  minTrustScore?: number;
 }
 
 const Browse = () => {
@@ -288,6 +289,11 @@ const Browse = () => {
     // Apply verified filter
     if (filters.verifiedOnly) {
       filtered = filtered.filter((profile) => profile.verification_score >= 50);
+    }
+
+    // Apply trust score filter
+    if (filters.minTrustScore && filters.minTrustScore > 0) {
+      filtered = filtered.filter((profile) => profile.verification_score >= filters.minTrustScore!);
     }
 
     // Apply photo filter

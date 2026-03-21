@@ -13,7 +13,7 @@ import {
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, X } from 'lucide-react';
+import { Search, Filter, X, Shield } from 'lucide-react';
 
 interface SearchFilters {
   ageRange: [number, number];
@@ -27,6 +27,7 @@ interface SearchFilters {
   interests: string[];
   verifiedOnly: boolean;
   withPhoto: boolean;
+  minTrustScore: number;
 }
 
 interface AdvancedSearchProps {
@@ -47,6 +48,7 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
     interests: [],
     verifiedOnly: false,
     withPhoto: false,
+    minTrustScore: 0,
   });
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -91,6 +93,7 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
       interests: [],
       verifiedOnly: false,
       withPhoto: false,
+      minTrustScore: 0,
     });
     onReset();
   };
@@ -129,6 +132,27 @@ const AdvancedSearch = ({ onSearch, onReset }: AdvancedSearchProps) => {
           >
             Avec Photo
           </Button>
+        </div>
+
+        {/* Trust Score Filter */}
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-emerald" />
+            Score de confiance minimum: {filters.minTrustScore > 0 ? `${filters.minTrustScore}+` : 'Tous'}
+          </Label>
+          <div className="flex gap-2">
+            {[0, 50, 70, 90].map((score) => (
+              <Button
+                key={score}
+                variant={filters.minTrustScore === score ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilters((prev) => ({ ...prev, minTrustScore: score }))}
+                className={filters.minTrustScore === score ? 'bg-emerald hover:bg-emerald-dark' : ''}
+              >
+                {score === 0 ? 'Tous' : `${score}+`}
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* Age Range */}
