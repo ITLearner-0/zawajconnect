@@ -70,7 +70,7 @@ const WaliAdmin = lazy(() => import('@/pages/WaliAdmin'));
 const IslamicTools = lazy(() => import('@/pages/IslamicTools'));
 const Guidance = lazy(() => import('@/pages/Guidance'));
 
-// New Features - Phase 2
+// New Features - Phase 2 (UI Prototypes)
 const CoupleQuestions = lazy(() => import('@/pages/CoupleQuestions'));
 const PrivacyLayers = lazy(() => import('@/pages/PrivacyLayers'));
 const CompatibilityDeepDive = lazy(() => import('@/pages/CompatibilityDeepDive'));
@@ -81,6 +81,10 @@ const MahramMode = lazy(() => import('@/pages/MahramMode'));
 const SmartTiming = lazy(() => import('@/pages/SmartTiming'));
 const MahrCalculator = lazy(() => import('@/pages/MahrCalculator'));
 const ImamDashboard = lazy(() => import('@/pages/ImamDashboard'));
+
+// New Features - Phase 2 (Production: Supabase-backed)
+const NikahAdvisor = lazy(() => import('@/pages/NikahAdvisor'));
+const IstikharaSession = lazy(() => import('@/pages/IstikharaSession'));
 
 // Admin & Moderation
 const Admin = lazy(() => import('@/pages/Admin'));
@@ -226,6 +230,9 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/smart-timing', component: SmartTiming },
   { path: '/mahr-calculator', component: MahrCalculator },
   { path: '/imam-dashboard', component: ImamDashboard },
+  // New Features - Phase 2 (Production: Supabase-backed)
+  { path: '/nikah-advisor', component: NikahAdvisor },
+  { path: '/istikhara-session', component: IstikharaSession },
   // Daily Question
   { path: '/daily-question', component: DailyQuestion },
   { path: '/daily-question/history', component: QuestionHistory },

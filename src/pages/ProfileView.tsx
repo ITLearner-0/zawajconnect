@@ -37,6 +37,9 @@ import AISuggestions from '@/components/profile/AISuggestions';
 import ProfileChatbot from '@/components/profile/ProfileChatbot';
 import InteractiveTutorial from '@/components/profile/InteractiveTutorial';
 
+import TrustScoreBadge from '@/components/profile/TrustScoreBadge';
+import FamilyContributionsBlock from '@/components/profile/FamilyContributionsBlock';
+import ValuesRadarChart from '@/components/matching/ValuesRadarChart';
 import { fadeInUp, staggerContainer, staggerItem } from '@/styles/animations';
 import { MobileActionBar, QuickActionsScroll, QuickAction } from '@/components/profile/mobile';
 import { Share2, Users, Heart, Camera } from 'lucide-react';
@@ -523,6 +526,27 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
                 isOwnProfile={isOwnProfile}
               />
             </motion.div>
+
+            {/* Trust Score Badge */}
+            {profile?.user_id && (
+              <motion.div variants={staggerItem}>
+                <TrustScoreBadge userId={profile.user_id} />
+              </motion.div>
+            )}
+
+            {/* Values Radar Chart */}
+            {profile?.user_id && (
+              <motion.div variants={staggerItem}>
+                <ValuesRadarChart userId={profile.user_id} />
+              </motion.div>
+            )}
+
+            {/* Family Contributions */}
+            {profile?.user_id && (
+              <motion.div variants={staggerItem}>
+                <FamilyContributionsBlock userId={profile.user_id} isOwnProfile={!!isOwnProfile} />
+              </motion.div>
+            )}
 
             {/* Family & Wali Section */}
             <motion.div variants={staggerItem}>
