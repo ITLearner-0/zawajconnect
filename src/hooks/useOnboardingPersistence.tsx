@@ -132,22 +132,34 @@ export const useOnboardingPersistence = ({
       try {
         // Save profile data
         if (data.profileData.full_name) {
-          const { error: profileError } = await supabase.from('profiles').upsert({
-            user_id: user.id,
-            ...data.profileData,
-            updated_at: new Date().toISOString(),
-          });
+          const { error: profileError } = await supabase.from('profiles').upsert(
+            {
+              user_id: user.id,
+              ...data.profileData,
+              updated_at: new Date().toISOString(),
+            },
+            {
+              onConflict: 'user_id',
+              ignoreDuplicates: false,
+            }
+          );
 
           if (profileError) throw profileError;
         }
 
         // Save Islamic preferences
         if (data.islamicPrefs.prayer_frequency) {
-          const { error: prefsError } = await supabase.from('islamic_preferences').upsert({
-            user_id: user.id,
-            ...data.islamicPrefs,
-            updated_at: new Date().toISOString(),
-          });
+          const { error: prefsError } = await supabase.from('islamic_preferences').upsert(
+            {
+              user_id: user.id,
+              ...data.islamicPrefs,
+              updated_at: new Date().toISOString(),
+            },
+            {
+              onConflict: 'user_id',
+              ignoreDuplicates: false,
+            }
+          );
 
           if (prefsError) throw prefsError;
         }
