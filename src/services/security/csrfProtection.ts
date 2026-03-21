@@ -67,13 +67,11 @@ export class CSRFProtection {
     ); // Refresh every 30 minutes
   }
 
-  // Generate random string
+  // Generate cryptographically secure random string
   private static generateRandomString(length: number): string {
+    const array = new Uint8Array(length);
+    crypto.getRandomValues(array);
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let result = '';
-    for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return result;
+    return Array.from(array, (byte) => chars[byte % chars.length]).join('');
   }
 }

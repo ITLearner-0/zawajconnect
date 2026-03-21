@@ -56,7 +56,7 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
 
   // Check subscription status when user changes
-  const checkSubscription = async () => {
+  const checkSubscription = React.useCallback(async () => {
     if (!user) {
       setSubscriptionData({
         subscribed: false,
@@ -74,11 +74,11 @@ const AuthProvider = ({ children }: { children: ReactNode }) => {
     } catch (error) {
       console.error('Error checking subscription in AuthContext:', error);
     }
-  };
+  }, [user]);
 
   useEffect(() => {
     checkSubscription();
-  }, [user]);
+  }, [checkSubscription]);
 
   const loading = authLoading || actionsLoading;
 

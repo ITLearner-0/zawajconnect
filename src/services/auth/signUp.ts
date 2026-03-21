@@ -8,7 +8,7 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
     data;
 
   try {
-    console.log('Starting signup process with:', { email, firstName, lastName, gender });
+    // Signup process started
 
     // Validate email format
     if (!validateEmail(email)) {
@@ -72,7 +72,7 @@ export const signUp = async (data: SignUpData, t: (key: string) => string) => {
       return false;
     }
 
-    console.log('Signup successful, user data:', userData);
+    // Signup successful
 
     // Show success messages only when signup actually succeeds
     if (userData?.user) {

@@ -74,7 +74,20 @@ export const useChatMessages = (matchId: string | null) => {
           filter: `match_id=eq.${matchId}`,
         },
         (payload) => {
-          const newMessage = payload.new as Message;
+          const raw = payload.new;
+          if (!raw || typeof raw !== 'object' || !('id' in raw) || !('content' in raw) || !('sender_id' in raw)) {
+            return;
+          }
+          const newMessage: Message = {
+            id: raw.id as string,
+            match_id: raw.match_id as string,
+            sender_id: raw.sender_id as string,
+            content: raw.content as string,
+            is_read: (raw.is_read as boolean) ?? false,
+            created_at: raw.created_at as string,
+            family_member_id: (raw.family_member_id as string) ?? undefined,
+            is_family_supervised: (raw.is_family_supervised as boolean) ?? false,
+          };
           setMessages((prev) => [...prev, newMessage]);
 
           // Mark as read if not sent by current user
@@ -92,7 +105,20 @@ export const useChatMessages = (matchId: string | null) => {
           filter: `match_id=eq.${matchId}`,
         },
         (payload) => {
-          const updatedMessage = payload.new as Message;
+          const raw = payload.new;
+          if (!raw || typeof raw !== 'object' || !('id' in raw)) {
+            return;
+          }
+          const updatedMessage: Message = {
+            id: raw.id as string,
+            match_id: raw.match_id as string,
+            sender_id: raw.sender_id as string,
+            content: raw.content as string,
+            is_read: (raw.is_read as boolean) ?? false,
+            created_at: raw.created_at as string,
+            family_member_id: (raw.family_member_id as string) ?? undefined,
+            is_family_supervised: (raw.is_family_supervised as boolean) ?? false,
+          };
           setMessages((prev) =>
             prev.map((msg) => (msg.id === updatedMessage.id ? updatedMessage : msg))
           );

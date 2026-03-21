@@ -6,7 +6,7 @@ export const signIn = async (data: SignInData, t: (key: string) => string) => {
   const { email, password } = data;
 
   try {
-    console.log('Starting login process with:', email);
+    // Login process started
 
     const { data: sessionData, error } = await supabase.auth.signInWithPassword({
       email,
@@ -77,14 +77,14 @@ export const signIn = async (data: SignInData, t: (key: string) => string) => {
     }
 
     if (sessionData?.session && sessionData?.user) {
-      console.log('Login successful');
+      // Login successful
 
       toast.success('Connexion réussie', {
         description: 'Bienvenue !',
       });
       return true;
     } else {
-      console.log('Login failed - no session or user data');
+      // Login failed - no session or user data
       toast.error('Échec de la connexion', {
         description: 'Aucune session créée',
       });

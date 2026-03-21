@@ -79,6 +79,11 @@ export function TestUserSelector() {
   const [selectedUser, setSelectedUser] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
+  // Only render in development mode
+  if (import.meta.env.PROD) {
+    return null;
+  }
+
   const currentTestUser = TEST_USERS.find((u) => u.email === user?.email);
 
   const handleSwitchUser = async (userId: string) => {

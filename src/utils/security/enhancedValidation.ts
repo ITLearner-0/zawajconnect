@@ -69,23 +69,14 @@ export const validatePhoneNumber = (phone: string): boolean => {
   return phoneRegex.test(phone.replace(/\s|-|\(|\)/g, ''));
 };
 
-// SQL injection prevention for user input
+/**
+ * @deprecated Supabase uses parameterized queries which prevent SQL injection.
+ * Do NOT rely on string sanitization for database security.
+ * Use Supabase's built-in query builder instead.
+ */
 export const sanitizeForDatabase = (input: string): string => {
   if (!input) return '';
-
-  // Escape single quotes and remove common SQL injection patterns
-  return input
-    .replace(/'/g, "''")
-    .replace(/;/g, '')
-    .replace(/--/g, '')
-    .replace(/\/\*/g, '')
-    .replace(/\*\//g, '')
-    .replace(/\bDROP\b/gi, '')
-    .replace(/\bDELETE\b/gi, '')
-    .replace(/\bUPDATE\b/gi, '')
-    .replace(/\bINSERT\b/gi, '')
-    .replace(/\bSELECT\b/gi, '')
-    .replace(/\bUNION\b/gi, '');
+  return input;
 };
 
 // Content moderation checks
