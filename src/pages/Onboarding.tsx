@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserData } from '@/contexts/UserDataContext';
@@ -200,6 +200,9 @@ const Onboarding = () => {
     },
   ];
 
+  const hasRedirectedRef = useRef(false);
+  const hasLoadedRef = useRef(false);
+
   useEffect(() => {
     if (!user) {
       navigate('/auth');
@@ -211,13 +214,16 @@ const Onboarding = () => {
 
     if (userType === 'wali') {
       const token = user.user_metadata?.invitation_token;
-      navigate(`/wali-onboarding${token ? `?token=${token}` : ''}`);
+      navigate(`/wali-onboarding${token ? `?token=${token}` : ''}`, { replace: true });
       return;
     }
 
     // PRIORITÉ: Charger d'abord les données de la base de données
-    loadExistingData();
-  }, [user, navigate]);
+    if (!hasLoadedRef.current) {
+      hasLoadedRef.current = true;
+      loadExistingData();
+    }
+  }, [user]);
 
   const loadExistingData = async () => {
     if (!user) return;
@@ -233,12 +239,15 @@ const Onboarding = () => {
         .maybeSingle();
 
       if (profileCheck?.onboarding_completed) {
-        console.log('✅ Profil déjà complet - redirection vers /enhanced-profile');
-        toast({
-          title: 'Profil déjà complet',
-          description: 'Vous avez déjà terminé votre onboarding. Redirection vers votre profil...',
-        });
-        navigate('/profile');
+        if (!hasRedirectedRef.current) {
+          hasRedirectedRef.current = true;
+          console.log('✅ Profil déjà complet - redirection vers /profile');
+          toast({
+            title: 'Profil déjà complet',
+            description: 'Vous avez déjà terminé votre onboarding. Redirection vers votre profil...',
+          });
+          navigate('/profile', { replace: true });
+        }
         return;
       }
 
