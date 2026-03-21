@@ -19,8 +19,15 @@ export function setupGlobalErrorHandler() {
   });
 }
 
+function escapeHtml(text: string): string {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
 function showErrorPage(error: any) {
   const errorMessage = error?.message || error?.toString() || 'Une erreur inconnue est survenue';
+  const safeErrorMessage = escapeHtml(errorMessage);
   const isEnvError =
     errorMessage.includes('environment variables') || errorMessage.includes('Supabase');
 
@@ -158,7 +165,7 @@ function showErrorPage(error: any) {
             <p class="error-description">
               Le site ne peut pas démarrer car les variables d'environnement Supabase sont manquantes.
             </p>
-            <div class="error-message">${errorMessage}</div>
+            <div class="error-message">${safeErrorMessage}</div>
             <div class="solution-box">
               <h2 class="solution-title">🔧 Solution pour l'administrateur :</h2>
               <ol class="solution-steps">
@@ -189,7 +196,7 @@ function showErrorPage(error: any) {
             <p class="error-description">
               Une erreur inattendue s'est produite lors du chargement de l'application.
             </p>
-            <div class="error-message">${errorMessage}</div>
+            <div class="error-message">${safeErrorMessage}</div>
             <button
               onclick="window.location.reload()"
               style="

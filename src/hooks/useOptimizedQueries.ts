@@ -135,14 +135,9 @@ export const useOptimizedQueries = () => {
     [executeQuery]
   );
 
-  // Clear cache for a specific prefix
+  // Clear cache for a specific prefix or all entries
   const clearCache = useCallback((prefix?: string) => {
-    if (prefix) {
-      // Clear specific cache entries (simplified implementation)
-      queryCache.clear();
-    } else {
-      queryCache.clear();
-    }
+    queryCache.clear(prefix);
   }, []);
 
   return {

@@ -122,13 +122,13 @@ export function useFormAutosave<T extends Record<string, any>>(
    * Main save function
    */
   const save = useCallback(
-    (data: T) => {
+    async (data: T) => {
       // Always save to localStorage
       saveToLocalStorage(data);
 
       // Optionally save to database
       if (saveToDatabase) {
-        saveToSupabase(data);
+        await saveToSupabase(data);
       }
     },
     [saveToLocalStorage, saveToSupabase, saveToDatabase]
@@ -139,7 +139,8 @@ export function useFormAutosave<T extends Record<string, any>>(
    */
   useEffect(() => {
     // Skip if data hasn't changed
-    if (JSON.stringify(debouncedData) === JSON.stringify(previousDataRef.current)) {
+    const serialized = JSON.stringify(debouncedData);
+    if (serialized === JSON.stringify(previousDataRef.current)) {
       return;
     }
 
