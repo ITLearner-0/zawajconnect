@@ -45,6 +45,8 @@ import SmartMatchingSuggestions from '@/components/SmartMatchingSuggestions';
 import QuickActionsPanel from '@/components/QuickActionsPanel';
 import OnboardingCompletionGuide from '@/components/OnboardingCompletionGuide';
 import GamificationDashboard from '@/components/gamification/GamificationDashboard';
+import NikahJourneyTracker from '@/components/journey/NikahJourneyTracker';
+import ContextualGuidance from '@/components/guidance/ContextualGuidance';
 
 interface Profile {
   id: string;
@@ -284,6 +286,12 @@ const Dashboard = () => {
           <VerificationBadge verificationScore={verification?.verification_score || 0} />
         </div>
       </div>
+
+      {/* Nikah Journey Tracker */}
+      {user && <NikahJourneyTracker userId={user.id} />}
+
+      {/* Islamic Guidance */}
+      <ContextualGuidance context="dashboard" maxItems={1} />
 
       {/* Onboarding Guide */}
       <OnboardingCompletionGuide />

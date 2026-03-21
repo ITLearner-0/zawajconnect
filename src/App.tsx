@@ -14,6 +14,7 @@ import { FreemiumBanner } from '@/components/FreemiumBanner';
 import { CookieConsentBanner } from '@/components/CookieConsentBanner';
 import { AchievementNotificationProvider } from '@/components/AchievementNotificationProvider';
 import { EmailVerificationMonitor } from '@/components/EmailVerificationMonitor';
+import NikahAdvisorWidget from '@/components/NikahAdvisorWidget';
 
 // Loading fallback component for lazy-loaded routes
 const RouteLoadingFallback = () => (
@@ -118,6 +119,7 @@ function App() {
                         </Routes>
                       </Suspense>
                     </RouteTransition>
+                    <NikahAdvisorWidget />
                     <CookieConsentBanner />
                   </NavigationGuard>
                 </NavigationProvider>

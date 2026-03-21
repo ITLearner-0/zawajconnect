@@ -29,6 +29,10 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useCompatibility } from '@/hooks/useCompatibility';
+import FamilyMeetingScheduler from '@/components/wali/FamilyMeetingScheduler';
+import CandidateReviewForm from '@/components/wali/CandidateReviewForm';
+import WaliDelegationManager from '@/components/wali/WaliDelegationManager';
+import ContextualGuidance from '@/components/guidance/ContextualGuidance';
 
 interface FamilyNotification {
   id: string;
@@ -508,7 +512,7 @@ const WaliDashboard: React.FC = () => {
 
       {/* Main Content */}
       <Tabs defaultValue="notifications" className="space-y-6">
-        <ResponsiveTabsList tabCount={6}>
+        <ResponsiveTabsList tabCount={9}>
           <TabsTrigger value="notifications">
             Notifications
             {stats.criticalAlerts > 0 && (
@@ -527,6 +531,9 @@ const WaliDashboard: React.FC = () => {
           </TabsTrigger>
           <TabsTrigger value="calls">Appels</TabsTrigger>
           <TabsTrigger value="supervised">Supervisés</TabsTrigger>
+          <TabsTrigger value="meetings">Rencontres</TabsTrigger>
+          <TabsTrigger value="reviews">Évaluations</TabsTrigger>
+          <TabsTrigger value="delegation">Délégation</TabsTrigger>
           <TabsTrigger value="predictions">Prédictions</TabsTrigger>
           <TabsTrigger value="reports">Rapports</TabsTrigger>
         </ResponsiveTabsList>
@@ -682,6 +689,26 @@ const WaliDashboard: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Meetings Tab */}
+        <TabsContent value="meetings" className="space-y-4">
+          <FamilyMeetingScheduler waliUserId={userId} />
+        </TabsContent>
+
+        {/* Reviews Tab */}
+        <TabsContent value="reviews" className="space-y-4">
+          <CandidateReviewForm
+            candidateId={matchesForApproval[0]?.candidate_id || ''}
+            candidateName={matchesForApproval[0]?.candidate_name || 'Candidat'}
+            waliUserId={userId}
+          />
+        </TabsContent>
+
+        {/* Delegation Tab */}
+        <TabsContent value="delegation" className="space-y-4">
+          <WaliDelegationManager waliUserId={userId} />
+          <ContextualGuidance context="dashboard" maxItems={1} />
         </TabsContent>
 
         {/* Predictions Tab */}
