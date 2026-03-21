@@ -1,4 +1,4 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import AuthProvider from '@/contexts/AuthContext';
@@ -37,6 +37,11 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  // Clear stale-asset reload flag on successful load
+  useEffect(() => {
+    sessionStorage.removeItem('lazy_reload');
+  }, []);
+
   const NotFoundComponent = notFoundRoute.component;
 
   return (
