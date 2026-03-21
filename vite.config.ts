@@ -34,9 +34,8 @@ export default defineConfig(({ mode }) => ({
             if (id.includes('react-router-dom')) {
               return 'vendor-router';
             }
-            if (id.includes('@supabase/supabase-js')) {
-              return 'vendor-supabase';
-            }
+            // Supabase must stay in the default vendor chunk to avoid
+            // circular-dependency TDZ errors (AuthClient before init)
             if (id.includes('@tanstack/react-query')) {
               return 'vendor-query';
             }
@@ -49,7 +48,7 @@ export default defineConfig(({ mode }) => ({
             if (id.includes('recharts') || id.includes('date-fns')) {
               return 'vendor-utils';
             }
-            // All other node_modules
+            // All other node_modules (including @supabase)
             return 'vendor';
           }
 
