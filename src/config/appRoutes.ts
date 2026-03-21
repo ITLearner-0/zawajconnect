@@ -70,6 +70,18 @@ const WaliAdmin = lazy(() => import('@/pages/WaliAdmin'));
 const IslamicTools = lazy(() => import('@/pages/IslamicTools'));
 const Guidance = lazy(() => import('@/pages/Guidance'));
 
+// New Features - Phase 2
+const CoupleQuestions = lazy(() => import('@/pages/CoupleQuestions'));
+const PrivacyLayers = lazy(() => import('@/pages/PrivacyLayers'));
+const CompatibilityDeepDive = lazy(() => import('@/pages/CompatibilityDeepDive'));
+const CommunityVerification = lazy(() => import('@/pages/CommunityVerification'));
+const ValuesMatching = lazy(() => import('@/pages/ValuesMatching'));
+const IstikharahAssistant = lazy(() => import('@/pages/IstikharahAssistant'));
+const MahramMode = lazy(() => import('@/pages/MahramMode'));
+const SmartTiming = lazy(() => import('@/pages/SmartTiming'));
+const MahrCalculator = lazy(() => import('@/pages/MahrCalculator'));
+const ImamDashboard = lazy(() => import('@/pages/ImamDashboard'));
+
 // Admin & Moderation
 const Admin = lazy(() => import('@/pages/Admin'));
 const ABTestingDashboard = lazy(() => import('@/pages/ABTestingDashboard'));
@@ -203,6 +215,17 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/compare', component: Compare },
   { path: '/gamification', component: Gamification },
   { path: '/badge-leaderboard', component: BadgeLeaderboard },
+  // New Features - Phase 2
+  { path: '/couple-questions', component: CoupleQuestions },
+  { path: '/privacy-layers', component: PrivacyLayers },
+  { path: '/compatibility-deep-dive', component: CompatibilityDeepDive },
+  { path: '/community-verification', component: CommunityVerification },
+  { path: '/values-matching', component: ValuesMatching },
+  { path: '/istikharah', component: IstikharahAssistant },
+  { path: '/mahram-mode', component: MahramMode },
+  { path: '/smart-timing', component: SmartTiming },
+  { path: '/mahr-calculator', component: MahrCalculator },
+  { path: '/imam-dashboard', component: ImamDashboard },
   // Daily Question
   { path: '/daily-question', component: DailyQuestion },
   { path: '/daily-question/history', component: QuestionHistory },
