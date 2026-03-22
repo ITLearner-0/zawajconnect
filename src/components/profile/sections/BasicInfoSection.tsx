@@ -78,6 +78,48 @@ const BasicInfoSection: React.FC<BasicInfoSectionProps> = ({
             className="w-full"
           />
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="nationality">Nationalité</Label>
+          <Input
+            id="nationality"
+            name="nationality"
+            value={formData.nationality || ''}
+            onChange={handleChange}
+            placeholder="Ex: Française, Marocaine..."
+            className="w-full"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="motherTongue">Langue maternelle</Label>
+          <Input
+            id="motherTongue"
+            name="motherTongue"
+            value={formData.motherTongue || ''}
+            onChange={handleChange}
+            placeholder="Ex: Arabe, Français..."
+            className="w-full"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="hasChildren">Enfants</Label>
+          <Select
+            value={formData.hasChildren || ''}
+            onValueChange={(value) => handleSelectChange('hasChildren', value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Avez-vous des enfants ?" />
+            </SelectTrigger>
+            <SelectContent className="bg-white dark:bg-gray-800 border shadow-lg z-50">
+              <SelectItem value="no">Non</SelectItem>
+              <SelectItem value="yes_living_together">Oui, vivent avec moi</SelectItem>
+              <SelectItem value="yes_not_living_together">Oui, ne vivent pas avec moi</SelectItem>
+              <SelectItem value="prefer_not_to_say">Préfère ne pas dire</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="space-y-2">
