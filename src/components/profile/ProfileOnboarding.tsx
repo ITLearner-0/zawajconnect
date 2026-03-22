@@ -5,6 +5,7 @@ import EducationCareer from '@/components/profile/EducationCareer';
 import ReligiousBackground from '@/components/profile/ReligiousBackground';
 import AboutMe from '@/components/profile/AboutMe';
 import WaliInformation from '@/components/profile/WaliInformation';
+import PhotoUploadStep from '@/components/onboarding/PhotoUploadStep';
 import { ProfileFormData } from '@/types/profile';
 import { IslamicPattern } from '@/components/ui/islamic-pattern';
 
@@ -20,6 +21,8 @@ interface ProfileOnboardingProps {
   handlePrevious: () => void;
   completeOnboarding: () => void;
   canProceedCurrentStep: () => boolean;
+  getStepErrors: () => string[];
+  onPhotoChange: (url: string) => void;
 }
 
 const ProfileOnboarding = ({
@@ -32,6 +35,8 @@ const ProfileOnboarding = ({
   handlePrevious,
   completeOnboarding,
   canProceedCurrentStep,
+  getStepErrors,
+  onPhotoChange,
 }: ProfileOnboardingProps) => {
   const renderCurrentStepContent = () => {
     switch (currentStep) {
@@ -76,6 +81,20 @@ const ProfileOnboarding = ({
           </IslamicPattern>
         );
       case 4:
+        return (
+          <IslamicPattern
+            variant="background"
+            intensity="light"
+            className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard"
+          >
+            <PhotoUploadStep
+              avatarUrl={formData.profilePicture || ''}
+              onPhotoChange={onPhotoChange}
+              userName={formData.fullName}
+            />
+          </IslamicPattern>
+        );
+      case 5:
         return formData.gender === 'female' ? (
           <IslamicPattern
             variant="background"
@@ -102,6 +121,7 @@ const ProfileOnboarding = ({
           // Note: handleSubmit will be called in the parent component
         }}
         canProceed={canProceedCurrentStep()}
+        errors={getStepErrors()}
       >
         {renderCurrentStepContent()}
       </OnboardingWrapper>

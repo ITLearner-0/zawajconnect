@@ -51,6 +51,7 @@ const ProfilePage = () => {
     handlePrevious,
     completeOnboarding,
     canProceedCurrentStep,
+    getStepErrors,
 
     // Analytics and recommendations
     analytics,
@@ -71,20 +72,7 @@ const ProfilePage = () => {
     isOnboarding,
   });
 
-  // Create a wrapper that converts field-based changes to the expected format for onboarding
-  const handleFieldChange = (field: keyof typeof formData, value: any) => {
-    // Create a synthetic event that matches the expected signature
-    const syntheticEvent = {
-      target: {
-        name: field,
-        value: value,
-      },
-    } as React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
-
-    handleChange(syntheticEvent);
-  };
-
-  // Create a wrapper that converts event-based handler to field-based handler for ProfileForm
+  // Wrapper that converts field-based handler to event-based handler for ProfileForm
   const handleProfileFormChange = (field: keyof typeof formData, value: any) => {
     const syntheticEvent = {
       target: {
@@ -196,6 +184,12 @@ const ProfilePage = () => {
           handlePrevious={handlePrevious}
           completeOnboarding={handleCompleteOnboarding}
           canProceedCurrentStep={canProceedCurrentStep}
+          getStepErrors={getStepErrors}
+          onPhotoChange={(url: string) => {
+            handleChange({
+              target: { name: 'profilePicture', value: url },
+            } as React.ChangeEvent<HTMLInputElement>);
+          }}
         />
       </AccessibilityProvider>
     );

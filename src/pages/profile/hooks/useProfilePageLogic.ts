@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useSimpleProfile } from '@/hooks/profile/useSimpleProfile';
@@ -58,7 +58,17 @@ export const useProfilePageLogic = () => {
     handlePrevious,
     completeOnboarding,
     canProceedCurrentStep,
-  } = useOnboarding(formData, isNewUser);
+    getStepErrors,
+  } = useOnboarding(formData, isNewUser, () => {
+    // Clear wali data when gender changes away from female
+    const clearEvent = (name: string) =>
+      handleChange({
+        target: { name, value: '' },
+      } as React.ChangeEvent<HTMLInputElement>);
+    clearEvent('waliName');
+    clearEvent('waliRelationship');
+    clearEvent('waliContact');
+  });
 
   // Visibility settings state
   const [visibilitySettings, setVisibilitySettings] = useState({
@@ -247,6 +257,7 @@ export const useProfilePageLogic = () => {
     handlePrevious,
     completeOnboarding,
     canProceedCurrentStep,
+    getStepErrors,
 
     // Analytics and recommendations
     analytics,
