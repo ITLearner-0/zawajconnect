@@ -39,6 +39,7 @@ interface Match {
   is_mutual: boolean;
   created_at: string;
   conversation_status?: 'not_started' | 'active' | 'ended';
+  verification_score?: number;
   other_user: {
     id: string;
     user_id: string;
@@ -89,49 +90,77 @@ const Matches = () => {
         .or(`user1_id.eq.${user.id},user2_id.eq.${user.id}`)
         .order('created_at', { ascending: false });
 
-      if (matchesData) {
-        const processedMatches = await Promise.all(
-          matchesData.map(async (match) => {
-            const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
-
-            const { data: otherUserProfile } = await supabase
-              .from('profiles')
-              .select('id, full_name, age, location, profession, bio, user_id')
-              .eq('user_id', otherUserId)
-              .maybeSingle();
-
-            return {
-              ...match,
-              match_score: match.match_score ?? 0,
-              user1_liked: !!match.user1_liked,
-              user2_liked: !!match.user2_liked,
-              is_mutual: !!match.is_mutual,
-              conversation_status: (match.conversation_status ?? 'not_started') as
-                | 'not_started'
-                | 'active'
-                | 'ended',
-              other_user: otherUserProfile
-                ? {
-                    ...otherUserProfile,
-                    user_id: otherUserId,
-                    full_name: otherUserProfile.full_name ?? 'Utilisateur inconnu',
-                    age: otherUserProfile.age ?? 0,
-                    location: otherUserProfile.location ?? 'Non spécifié',
-                    profession: otherUserProfile.profession ?? 'Non spécifié',
-                    bio: otherUserProfile.bio ?? '',
-                  }
-                : {
-                    id: otherUserId,
-                    user_id: otherUserId,
-                    full_name: 'Utilisateur inconnu',
-                    age: 0,
-                    location: 'Non spécifié',
-                    profession: 'Non spécifié',
-                    bio: '',
-                  },
-            };
-          })
+      if (matchesData && matchesData.length > 0) {
+        // Collect all other user IDs
+        const otherUserIds = matchesData.map((m) =>
+          m.user1_id === user.id ? m.user2_id : m.user1_id
         );
+
+        // Batch fetch profiles and verification scores in parallel
+        const [profilesResult, verificationsResult] = await Promise.all([
+          supabase
+            .from('profiles')
+            .select('id, full_name, age, location, profession, bio, user_id')
+            .in('user_id', otherUserIds),
+          supabase
+            .from('user_verifications')
+            .select('user_id, verification_score')
+            .in('user_id', otherUserIds),
+        ]);
+
+        // Build lookup maps
+        const profileMap = (profilesResult.data ?? []).reduce(
+          (acc, p) => {
+            acc[p.user_id] = p;
+            return acc;
+          },
+          {} as Record<string, (typeof profilesResult.data)[0]>
+        );
+
+        const verificationMap = (verificationsResult.data ?? []).reduce(
+          (acc, v) => {
+            acc[v.user_id] = v.verification_score ?? 0;
+            return acc;
+          },
+          {} as Record<string, number>
+        );
+
+        const processedMatches: Match[] = matchesData.map((match) => {
+          const otherUserId = match.user1_id === user.id ? match.user2_id : match.user1_id;
+          const otherUserProfile = profileMap[otherUserId];
+
+          return {
+            ...match,
+            match_score: match.match_score ?? 0,
+            user1_liked: !!match.user1_liked,
+            user2_liked: !!match.user2_liked,
+            is_mutual: !!match.is_mutual,
+            conversation_status: (match.conversation_status ?? 'not_started') as
+              | 'not_started'
+              | 'active'
+              | 'ended',
+            verification_score: verificationMap[otherUserId] ?? 0,
+            other_user: otherUserProfile
+              ? {
+                  ...otherUserProfile,
+                  user_id: otherUserId,
+                  full_name: otherUserProfile.full_name ?? 'Utilisateur inconnu',
+                  age: otherUserProfile.age ?? 0,
+                  location: otherUserProfile.location ?? 'Non spécifié',
+                  profession: otherUserProfile.profession ?? 'Non spécifié',
+                  bio: otherUserProfile.bio ?? '',
+                }
+              : {
+                  id: otherUserId,
+                  user_id: otherUserId,
+                  full_name: 'Utilisateur inconnu',
+                  age: 0,
+                  location: 'Non spécifié',
+                  profession: 'Non spécifié',
+                  bio: '',
+                },
+          };
+        });
 
         setMatches(processedMatches);
         setMutualMatches(processedMatches.filter((m) => m.is_mutual));

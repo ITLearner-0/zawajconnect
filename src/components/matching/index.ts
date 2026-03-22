@@ -5,3 +5,4 @@ export { default as MatchCard } from './MatchCard';
 export { RecommendationCard } from './RecommendationCard';
 export { InsightCard } from './InsightCard';
 export { MatchingScoreDisplay } from './MatchingScoreDisplay';
+export { CompatibilitySummary, buildDefaultDimensions } from './CompatibilitySummary';
