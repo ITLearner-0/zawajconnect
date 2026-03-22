@@ -28,7 +28,7 @@ const WaliContactDialog = ({ profile, open, onOpenChange }: WaliContactDialogPro
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            According to Islamic tradition, communication with {profile.first_name} requires wali
+            According to Islamic tradition, communication with {profile.full_name} requires wali
             permission.
           </p>
 

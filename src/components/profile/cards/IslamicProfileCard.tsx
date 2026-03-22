@@ -1,11 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { Moon } from 'lucide-react';
 import { ProfileFormData } from '@/types/profile';
 
 interface IslamicProfileCardProps {
-  formData: ProfileFormData;
+  formData: Partial<ProfileFormData>;
   hijabPreference?: string;
   beardPreference?: string;
+  lookingFor?: string;
 }
 
 const LABELS: Record<string, Record<string, string>> = {
@@ -53,7 +55,9 @@ const InfoField = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-const IslamicProfileCard = ({ formData, hijabPreference, beardPreference }: IslamicProfileCardProps) => {
+const IslamicProfileCard = ({ formData, hijabPreference, beardPreference, lookingFor }: IslamicProfileCardProps) => {
+  const resolvedLookingFor = lookingFor || (formData as any)?.lookingFor;
+
   return (
     <Card className="dark:bg-gray-900 dark:border-gray-800">
       <CardHeader className="pb-3">
@@ -62,7 +66,7 @@ const IslamicProfileCard = ({ formData, hijabPreference, beardPreference }: Isla
           Profil islamique
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <InfoField label="Pratique religieuse" value={getLabel('religiousLevel', formData.religiousLevel)} />
           <InfoField label="Prière quotidienne" value={getLabel('prayerFrequency', formData.prayerFrequency)} />
@@ -73,9 +77,20 @@ const IslamicProfileCard = ({ formData, hijabPreference, beardPreference }: Isla
             <InfoField label="Barbe" value={beardPreference} />
           )}
           <InfoField label="Madhab" value={getLabel('madhab', formData.madhab)} />
-          <InfoField label="Langue maternelle" value={formData.motherTongue || '—'} />
-          <InfoField label="Nationalité" value={formData.nationality || '—'} />
+          <InfoField label="Langues" value={formData.motherTongue || '—'} />
+          <InfoField label="Origine" value={formData.nationality || '—'} />
         </div>
+
+        {/* Ce que je recherche */}
+        {resolvedLookingFor && (
+          <>
+            <Separator />
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Ce que je recherche</p>
+              <p className="text-sm text-foreground">{resolvedLookingFor}</p>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

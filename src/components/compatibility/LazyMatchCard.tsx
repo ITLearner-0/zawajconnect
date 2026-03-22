@@ -62,7 +62,7 @@ const LazyMatchCard = ({ match }: LazyMatchCardProps) => {
         key={match.userId}
         className="overflow-hidden"
         role="article"
-        aria-label={`Match profile for ${match.profileData?.first_name || 'User'}`}
+        aria-label={`Match profile for ${match.profileData?.full_name || 'User'}`}
       >
         <MatchCardHeader
           match={match}

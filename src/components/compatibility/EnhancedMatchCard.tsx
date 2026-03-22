@@ -49,14 +49,14 @@ const EnhancedMatchCard: React.FC<EnhancedMatchCardProps> = ({ match, onMessageC
               />
             ) : (
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-400 to-pink-400 flex items-center justify-center text-white font-bold text-xl">
-                {match.profileData?.first_name?.[0] || 'U'}
+                {match.profileData?.full_name?.[0] || 'U'}
               </div>
             )}
 
             <div className="flex-1">
               <h3 className="font-semibold text-lg">
                 {match.profileData
-                  ? `${match.profileData.first_name} ${match.profileData.last_name || ''}`.trim()
+                  ? match.profileData.full_name ?? 'Utilisateur'
                   : 'Utilisateur'}
               </h3>
 

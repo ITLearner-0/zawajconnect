@@ -12,7 +12,7 @@ const ProfileCardHeader = ({ profile }: ProfileCardHeaderProps) => {
       <ProfileCardAvatar profile={profile} />
 
       <h1 className="text-2xl font-bold text-islamic-blue">
-        {profile.first_name} {profile.last_name}
+        {profile.full_name ?? 'Utilisateur'}
       </h1>
 
       <p className="text-muted-foreground mt-1">{profile.occupation}</p>

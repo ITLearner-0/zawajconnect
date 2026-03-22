@@ -4,8 +4,7 @@ import { DatabaseProfile } from '@/types/profile';
 export const dummyProfiles: DatabaseProfile[] = [
   {
     id: 'user-1',
-    first_name: 'Ahmed',
-    last_name: 'Khan',
+    full_name: 'Ahmed Khan',
     birth_date: '1990-05-15',
     gender: 'Male',
     location: 'New York, USA',
@@ -41,8 +40,7 @@ export const dummyProfiles: DatabaseProfile[] = [
   },
   {
     id: 'user-2',
-    first_name: 'Fatima',
-    last_name: 'Rahman',
+    full_name: 'Fatima Rahman',
     birth_date: '1992-09-20',
     gender: 'Female',
     location: 'Chicago, USA',
@@ -78,8 +76,7 @@ export const dummyProfiles: DatabaseProfile[] = [
   },
   {
     id: 'user-3',
-    first_name: 'Yusuf',
-    last_name: 'Ali',
+    full_name: 'Yusuf Ali',
     birth_date: '1989-03-10',
     gender: 'Male',
     location: 'London, UK',
@@ -115,8 +112,7 @@ export const dummyProfiles: DatabaseProfile[] = [
   },
   {
     id: 'user-4',
-    first_name: 'Aisha',
-    last_name: 'Mahmood',
+    full_name: 'Aisha Mahmood',
     birth_date: '1993-11-05',
     gender: 'Female',
     location: 'Toronto, Canada',
@@ -152,8 +148,7 @@ export const dummyProfiles: DatabaseProfile[] = [
   },
   {
     id: 'user-5',
-    first_name: 'Omar',
-    last_name: 'Farooq',
+    full_name: 'Omar Farooq',
     birth_date: '1988-07-25',
     gender: 'Male',
     location: 'Sydney, Australia',

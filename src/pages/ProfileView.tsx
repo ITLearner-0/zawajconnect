@@ -372,8 +372,8 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
       if (navigator.share) {
         navigator
           .share({
-            title: `${profile.first_name} ${profile.last_name}`,
-            text: `Découvrez le profil de ${profile.first_name} sur ZawajConnect`,
+            title: `${profile.full_name ?? 'Profil'}`,
+            text: `Découvrez le profil de ${profile.full_name ?? 'cet utilisateur'} sur ZawajConnect`,
             url: shareUrl,
           })
           .catch((error) => console.log('Error sharing:', error));
@@ -744,7 +744,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
               <motion.div variants={staggerItem}>
                 <AISuggestions
                   profile={{
-                    full_name: `${profile.first_name} ${profile.last_name}`,
+                    full_name: profile.full_name ?? 'Utilisateur',
                     age: profile.birth_date
                       ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear()
                       : undefined,
@@ -766,7 +766,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
               <motion.div variants={staggerItem}>
                 <InteractiveTutorial
                   profile={{
-                    full_name: `${profile.first_name} ${profile.last_name}`,
+                    full_name: profile.full_name ?? 'Utilisateur',
                     age: profile.birth_date
                       ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear()
                       : undefined,
@@ -800,7 +800,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
         {isOwnProfile && (
           <ProfileChatbot
             profile={{
-              full_name: `${profile.first_name} ${profile.last_name}`,
+              full_name: profile.full_name ?? 'Utilisateur',
               age: profile.birth_date
                 ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear()
                 : undefined,
@@ -822,8 +822,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
 function calculateCompletionPercentage(profile: DatabaseProfile): number {
   let score = 0;
   const fields = [
-    profile.first_name,
-    profile.last_name,
+    profile.full_name,
     profile.birth_date,
     profile.gender,
     profile.location,
@@ -844,8 +843,7 @@ function calculateCompletionPercentage(profile: DatabaseProfile): number {
 function calculateBasicInfoCompletion(profile: DatabaseProfile): number {
   let score = 0;
   const fields = [
-    profile.first_name,
-    profile.last_name,
+    profile.full_name,
     profile.birth_date,
     profile.gender,
     profile.location,

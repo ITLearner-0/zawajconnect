@@ -51,14 +51,14 @@ const MatchCardHeader = ({
       <div className="text-left flex-1 flex items-center gap-3">
         <ProfilePicture
           profileImageSrc={profileImageSrc}
-          firstName={match.profileData?.first_name}
+          firstName={match.profileData?.full_name}
         />
 
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <span className="font-medium">
               {match.profileData
-                ? `${match.profileData.first_name} ${match.profileData.last_name?.charAt(0) || ''}`
+                ? match.profileData.full_name ?? 'Utilisateur'
                 : `Match #${match.userId.slice(0, 4)}`}
             </span>
 

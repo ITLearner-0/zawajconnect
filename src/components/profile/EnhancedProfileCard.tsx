@@ -40,11 +40,11 @@ const EnhancedProfileCard: React.FC<EnhancedProfileCardProps> = ({
           {profile.profile_picture ? (
             <img
               src={profile.profile_picture}
-              alt={`${profile.first_name} ${profile.last_name}`}
+              alt={profile.full_name ?? 'Utilisateur'}
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="text-6xl text-rose-300">{profile.first_name?.charAt(0)}</div>
+            <div className="text-6xl text-rose-300">{profile.full_name?.charAt(0) ?? '?'}</div>
           )}
         </div>
 
@@ -75,7 +75,7 @@ const EnhancedProfileCard: React.FC<EnhancedProfileCardProps> = ({
         {/* Basic Info */}
         <div className="mb-3">
           <h3 className="text-xl font-bold text-rose-800">
-            {profile.first_name} {profile.last_name}
+            {profile.full_name ?? 'Utilisateur'}
           </h3>
           <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
             {age && <span>{age} ans</span>}
