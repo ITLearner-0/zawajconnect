@@ -10,6 +10,10 @@ import ProfileAnalytics from '@/components/profile/ProfileAnalytics';
 import ProfileRecommendations from '@/components/profile/ProfileRecommendations';
 import ProfileVisibilityManager from '@/components/profile/ProfileVisibilityManager';
 import StandardLoadingState from '@/components/ui/StandardLoadingState';
+import TrustScoreCard from '@/components/profile/cards/TrustScoreCard';
+import IslamicProfileCard from '@/components/profile/cards/IslamicProfileCard';
+import NikahJourneyCard from '@/components/profile/cards/NikahJourneyCard';
+import ValuesProfileCard from '@/components/profile/cards/ValuesProfileCard';
 import { useProfilePageLogic } from './hooks/useProfilePageLogic';
 
 const ProfilePage = () => {
@@ -229,6 +233,24 @@ const ProfilePage = () => {
                 </TabsList>
 
                 <TabsContent value="profile" className="space-y-6">
+                  {/* Profile dashboard cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <TrustScoreCard
+                      verificationStatus={verificationStatus}
+                      verificationScore={
+                        [verificationStatus.email, verificationStatus.phone, verificationStatus.id, verificationStatus.wali]
+                          .filter(Boolean).length * 25
+                      }
+                      hasCompatibilityTest={hasCompatibilityResults ?? false}
+                    />
+                    <IslamicProfileCard formData={formData} />
+                    <NikahJourneyCard
+                      profileCompleted={!!formData.aboutMe && !!formData.fullName}
+                      compatibilityDone={hasCompatibilityResults ?? false}
+                    />
+                    <ValuesProfileCard />
+                  </div>
+
                   <ProfileForm
                     formData={formData}
                     handleChange={handleProfileFormChange}

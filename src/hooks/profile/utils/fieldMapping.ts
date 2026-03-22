@@ -15,6 +15,10 @@ export const getDbFieldName = (field: string): string => {
     waliRelationship: 'wali_relationship',
     waliContact: 'wali_contact',
     madhab: 'madhab',
+    hasChildren: 'has_children',
+    nationality: 'nationality',
+    motherTongue: 'mother_tongue',
+    maritalStatus: 'marital_status',
   };
   return fieldMap[field] || field;
 };
@@ -69,6 +73,10 @@ export const mapProfileDataToDatabase = (
     'waliRelationship',
     'waliContact',
     'madhab',
+    'hasChildren',
+    'nationality',
+    'motherTongue',
+    'maritalStatus',
   ] as const;
 
   stringFields.forEach((field) => {
