@@ -14,6 +14,8 @@ import TrustScoreCard from '@/components/profile/cards/TrustScoreCard';
 import IslamicProfileCard from '@/components/profile/cards/IslamicProfileCard';
 import NikahJourneyCard from '@/components/profile/cards/NikahJourneyCard';
 import ValuesProfileCard from '@/components/profile/cards/ValuesProfileCard';
+import FamilyCard from '@/components/profile/cards/FamilyCard';
+import SearchCriteriaCard from '@/components/profile/cards/SearchCriteriaCard';
 import { useProfilePageLogic } from './hooks/useProfilePageLogic';
 
 const ProfilePage = () => {
@@ -220,6 +222,9 @@ const ProfilePage = () => {
                 userId={userId}
                 hasCompatibilityResults={hasCompatibilityResults ?? undefined}
                 onSignOut={handleSignOut}
+                verificationStatus={verificationStatus}
+                waliActive={verificationStatus.wali}
+                fullName={formData.fullName}
               />
             </CardHeader>
 
@@ -249,6 +254,8 @@ const ProfilePage = () => {
                       compatibilityDone={hasCompatibilityResults ?? false}
                     />
                     <ValuesProfileCard />
+                    <FamilyCard waliActive={verificationStatus.wali} />
+                    <SearchCriteriaCard aboutMe={formData.aboutMe} />
                   </div>
 
                   <ProfileForm

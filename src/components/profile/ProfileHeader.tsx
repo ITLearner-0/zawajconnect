@@ -4,13 +4,18 @@ import CustomButton from '@/components/CustomButton';
 import { Button } from '@/components/ui/button';
 import AccessibilityControls from '@/components/AccessibilityControls';
 import { IslamicPattern } from '@/components/ui/islamic-pattern';
-import { LogOut, User, Settings, Home, ArrowLeft } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { LogOut, User, Settings, Home, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { VerificationStatus } from '@/types/profile';
 
 interface ProfileHeaderProps {
   userEmail?: string | null;
   userId?: string | null;
   hasCompatibilityResults?: boolean;
   onSignOut: () => void | Promise<void>;
+  verificationStatus?: VerificationStatus;
+  waliActive?: boolean;
+  fullName?: string;
 }
 
 const ProfileHeader = ({
@@ -18,7 +23,16 @@ const ProfileHeader = ({
   userId,
   hasCompatibilityResults,
   onSignOut,
+  verificationStatus,
+  waliActive = false,
+  fullName,
 }: ProfileHeaderProps) => {
+  const verificationPct = verificationStatus
+    ? Math.round(
+        ([verificationStatus.email, verificationStatus.phone, verificationStatus.id, verificationStatus.wali]
+          .filter(Boolean).length / 4) * 100
+      )
+    : 0;
   return (
     <IslamicPattern
       variant="background"
@@ -67,6 +81,27 @@ const ProfileHeader = ({
               Update your information and privacy settings
               {userEmail && <span className="block text-xs opacity-75">{userEmail}</span>}
             </p>
+            {verificationStatus && (
+              <div className="flex gap-2 mt-1">
+                <Badge
+                  className={`text-xs ${
+                    verificationPct >= 75
+                      ? 'bg-green-600 hover:bg-green-700'
+                      : verificationPct >= 50
+                        ? 'bg-amber-600 hover:bg-amber-700'
+                        : 'bg-gray-500 hover:bg-gray-600'
+                  }`}
+                >
+                  <ShieldCheck className="h-3 w-3 mr-1" />
+                  Profil vérifié {verificationPct}%
+                </Badge>
+                {waliActive && (
+                  <Badge className="bg-emerald-600 hover:bg-emerald-700 text-xs">
+                    Wali actif
+                  </Badge>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
