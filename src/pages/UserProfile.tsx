@@ -81,7 +81,7 @@ const UserProfile = () => {
         console.log('Checking if profile exists in database...');
         const { data: profileCheck, error: checkError } = await supabase
           .from('profiles')
-          .select('id, is_visible, first_name, last_name')
+          .select('id, is_visible, full_name')
           .eq('id', id)
           .single();
 
@@ -148,8 +148,7 @@ const UserProfile = () => {
           const profileDataAny = profileData as any;
           const formattedProfile: DatabaseProfile = {
             id: profileData.id,
-            first_name: profileDataAny.first_name || '',
-            last_name: profileDataAny.last_name || '',
+            full_name: profileDataAny.full_name || '',
             gender: profileData.gender || '',
             location: profileData.location || '',
             education_level: profileDataAny.education_level || '',

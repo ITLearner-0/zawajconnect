@@ -40,13 +40,15 @@ export interface ProfileFormData {
   preferredLanguages?: string[];
 }
 
-// Database profile interface
+// Database profile interface — mirrors the `profiles` table.
+// The table has a single `full_name` column (no first_name / last_name).
 export interface DatabaseProfile {
   id: string;
-  first_name: string;
-  last_name: string;
+  user_id?: string;
+  full_name: string;
   gender: string;
   birth_date?: string;
+  age?: number;
   location?: string;
   education_level?: string;
   occupation?: string;
@@ -54,17 +56,23 @@ export interface DatabaseProfile {
   madhab?: string;
   prayer_frequency?: string;
   bio?: string;
+  about_me?: string;
+  looking_for?: string;
   wali_name?: string;
   wali_relationship?: string;
   wali_contact?: string;
   profile_picture?: string;
+  avatar_url?: string;
   gallery?: string[];
+  interests?: string[];
   polygamy_stance?: string;
   languages?: string[];
   marital_status?: string;
   has_children?: boolean;
   nationality?: string;
   mother_tongue?: string;
+  religious_level?: string;
+  niyyah_stated_at?: string;
   spoken_languages?: string[];
   preferred_languages?: string[];
   email_verified: boolean;

@@ -43,9 +43,10 @@ const HeroProfileSection = ({
   };
 
   // Get initials for avatar fallback
-  const getInitials = (firstName: string, lastName: string): string => {
-    const first = firstName?.charAt(0)?.toUpperCase() || '';
-    const last = lastName?.charAt(0)?.toUpperCase() || '';
+  const getInitials = (fullName: string): string => {
+    const parts = fullName.trim().split(/\s+/);
+    const first = parts[0]?.charAt(0)?.toUpperCase() || '';
+    const last = parts.length > 1 ? parts[parts.length - 1]?.charAt(0)?.toUpperCase() : '';
     return `${first}${last}` || '?';
   };
 
@@ -56,8 +57,8 @@ const HeroProfileSection = ({
   };
 
   const age = calculateAge(profile.birth_date);
-  const fullName = `${profile.first_name} ${profile.last_name}`.trim();
-  const initials = getInitials(profile.first_name, profile.last_name);
+  const fullName = profile.full_name ?? 'Utilisateur';
+  const initials = getInitials(profile.full_name ?? '');
 
   return (
     <motion.div

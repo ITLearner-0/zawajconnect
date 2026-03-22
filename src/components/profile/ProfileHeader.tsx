@@ -1,11 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import CustomButton from '@/components/CustomButton';
 import { Button } from '@/components/ui/button';
-import AccessibilityControls from '@/components/AccessibilityControls';
-import { IslamicPattern } from '@/components/ui/islamic-pattern';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, User, Settings, Home, ArrowLeft, ShieldCheck } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Edit, ShieldCheck, Users } from 'lucide-react';
 import { VerificationStatus } from '@/types/profile';
 
 interface ProfileHeaderProps {
@@ -16,96 +14,130 @@ interface ProfileHeaderProps {
   verificationStatus?: VerificationStatus;
   waliActive?: boolean;
   fullName?: string;
+  avatarUrl?: string;
+  location?: string;
+  age?: number | string;
+  profession?: string;
+  profileViews?: number;
+  favoritesCount?: number;
+  completionScore?: number;
 }
 
+/** Stat cell rendered in the bottom bar of the header */
+const StatCell = ({
+  value,
+  label,
+  valueColor,
+  className = '',
+}: {
+  value: string | number;
+  label: string;
+  valueColor?: string;
+  className?: string;
+}) => (
+  <div className={`flex flex-col items-center justify-center py-3 ${className}`}>
+    <span className="text-base font-semibold" style={valueColor ? { color: valueColor } : undefined}>
+      {value}
+    </span>
+    <span className="text-[11px] text-muted-foreground">{label}</span>
+  </div>
+);
+
 const ProfileHeader = ({
-  userEmail,
-  userId,
-  hasCompatibilityResults,
-  onSignOut,
+  fullName,
+  avatarUrl,
   verificationStatus,
   waliActive = false,
-  fullName,
+  location,
+  age,
+  profession,
+  profileViews = 0,
+  favoritesCount = 0,
+  completionScore = 0,
 }: ProfileHeaderProps) => {
-  const verificationPct = verificationStatus
-    ? Math.round(
-        ([verificationStatus.email, verificationStatus.phone, verificationStatus.id, verificationStatus.wali]
-          .filter(Boolean).length / 4) * 100
-      )
-    : 0;
-  return (
-    <IslamicPattern
-      variant="background"
-      intensity="light"
-      className="mb-6 rounded-lg bg-islamic-cream/30 dark:bg-islamic-darkCard/30"
-    >
-      <div className="flex flex-col gap-4 p-4">
-        <div className="flex justify-between items-center">
-          <Button
-            asChild
-            variant="ghost"
-            className="flex items-center gap-2 text-islamic-teal hover:bg-islamic-teal/10"
-          >
-            <Link to="/">
-              <ArrowLeft className="h-4 w-4" />
-              <Home className="h-4 w-4" />
-              <span>Home</span>
-            </Link>
-          </Button>
-          <div className="flex items-center gap-3">
-            <AccessibilityControls />
-            <CustomButton
-              variant="outline"
-              onClick={onSignOut}
-              aria-label="Sign out of your account"
-              className="flex items-center gap-2 border-islamic-teal/30 hover:bg-islamic-teal/10 dark:border-islamic-darkTeal/40 dark:hover:bg-islamic-darkTeal/20"
-            >
-              <LogOut className="h-4 w-4 text-islamic-burgundy dark:text-islamic-darkBrightGold" />
-              Sign Out
-            </CustomButton>
-          </div>
-        </div>
+  const isVerified =
+    verificationStatus &&
+    [verificationStatus.email, verificationStatus.phone, verificationStatus.id].filter(Boolean)
+      .length >= 2;
 
-        <div className="flex items-center">
-          <div className="bg-islamic-teal rounded-full p-2 mr-3 text-white">
-            <User className="h-6 w-6" />
-          </div>
-          <div>
-            <h1
-              id="profile-heading"
-              className="text-2xl font-bold text-islamic-teal dark:text-islamic-cream"
-            >
-              Your Profile
+  const trustScore = verificationStatus
+    ? [verificationStatus.email, verificationStatus.phone, verificationStatus.id, verificationStatus.wali]
+        .filter(Boolean).length * 25
+    : 0;
+
+  const getInitials = (name?: string) => {
+    if (!name) return '?';
+    const parts = name.trim().split(/\s+/);
+    return parts.map((p) => p.charAt(0).toUpperCase()).slice(0, 2).join('');
+  };
+
+  return (
+    <div className="rounded-lg overflow-hidden border border-border/40 bg-card shadow-sm">
+      {/* Banner — vert sauge doux */}
+      <div
+        className="flex items-end px-5 pb-3 gap-2"
+        style={{ height: 100, background: '#EAF3DE', borderBottom: '0.5px solid var(--border)' }}
+      >
+        <Badge className="ml-auto bg-emerald-600 hover:bg-emerald-700 text-white text-xs">
+          Profil {completionScore}% complété
+        </Badge>
+        <Button variant="outline" size="sm" asChild className="h-8 text-xs">
+          <Link to="/profile/edit">
+            <Edit className="h-3.5 w-3.5 mr-1" />
+            Modifier
+          </Link>
+        </Button>
+      </div>
+
+      {/* Avatar + nom + badges — chevauchant le banner */}
+      <div className="flex items-end gap-4 px-5 pb-4" style={{ marginTop: -38 }}>
+        <Avatar className="h-[72px] w-[72px] border-[3px] border-white shadow-md flex-shrink-0">
+          <AvatarImage src={avatarUrl} alt={fullName ?? ''} />
+          <AvatarFallback className="text-lg font-semibold bg-gradient-to-br from-emerald-100 to-emerald-200 text-emerald-700">
+            {getInitials(fullName)}
+          </AvatarFallback>
+        </Avatar>
+
+        <div className="pt-10 flex-1 min-w-0">
+          {/* Nom + badges */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <h1 className="text-[17px] font-medium text-foreground truncate">
+              {fullName ?? 'Nom non renseigné'}
             </h1>
-            <p className="text-sm text-muted-foreground dark:text-islamic-cream/70">
-              Update your information and privacy settings
-              {userEmail && <span className="block text-xs opacity-75">{userEmail}</span>}
-            </p>
-            {verificationStatus && (
-              <div className="flex gap-2 mt-1">
-                <Badge
-                  className={`text-xs ${
-                    verificationPct >= 75
-                      ? 'bg-green-600 hover:bg-green-700'
-                      : verificationPct >= 50
-                        ? 'bg-amber-600 hover:bg-amber-700'
-                        : 'bg-gray-500 hover:bg-gray-600'
-                  }`}
-                >
-                  <ShieldCheck className="h-3 w-3 mr-1" />
-                  Profil vérifié {verificationPct}%
-                </Badge>
-                {waliActive && (
-                  <Badge className="bg-emerald-600 hover:bg-emerald-700 text-xs">
-                    Wali actif
-                  </Badge>
-                )}
-              </div>
+            {isVerified && (
+              <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[10px] px-1.5 py-0 h-5">
+                <ShieldCheck className="h-3 w-3 mr-0.5" />
+                Vérifié
+              </Badge>
+            )}
+            {waliActive && (
+              <Badge className="bg-sky-100 text-sky-700 hover:bg-sky-100 text-[10px] px-1.5 py-0 h-5">
+                <Users className="h-3 w-3 mr-0.5" />
+                Wali actif
+              </Badge>
             )}
           </div>
+
+          {/* Localisation + âge + profession */}
+          <p className="text-[13px] text-muted-foreground mt-0.5 flex gap-3 flex-wrap">
+            {location && <span>📍 {location}</span>}
+            {age && <span>{age} ans</span>}
+            {profession && <span>{profession}</span>}
+          </p>
         </div>
       </div>
-    </IslamicPattern>
+
+      {/* Stats bar — 3 colonnes avec séparateurs */}
+      <div className="grid grid-cols-3" style={{ borderTop: '0.5px solid var(--border)' }}>
+        <StatCell value={profileViews} label="Vues du profil" />
+        <StatCell
+          value={favoritesCount}
+          label="Favoris reçus"
+          className="border-x border-border/40"
+        />
+        <StatCell value={`${trustScore}%`} label="Score de confiance" valueColor="#27500A" />
+      </div>
+    </div>
   );
 };
 

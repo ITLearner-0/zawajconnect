@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AccessibilityProvider } from '@/contexts/AccessibilityContext';
 import { useNavigate } from 'react-router-dom';
@@ -217,70 +217,88 @@ const ProfilePage = () => {
 
   console.log('ProfilePage: Rendering main profile page');
 
+  const verificationScore = trustData.publicTrustScore || (
+    [verificationStatus.email, verificationStatus.phone, verificationStatus.id, verificationStatus.wali]
+      .filter(Boolean).length * 25
+  );
+
+  const completionScore = Math.min(100, Math.round(
+    [formData.fullName, formData.age, formData.gender, formData.location,
+     formData.education, formData.occupation, formData.aboutMe,
+     formData.religiousLevel, formData.prayerFrequency, formData.profilePicture]
+      .filter(Boolean).length * 10
+  ));
+
   return (
     <AccessibilityProvider>
       <div
-        className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-12"
+        className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 py-8"
         role="main"
         aria-labelledby="profile-heading"
       >
-        <div className="container max-w-4xl mx-auto px-4">
-          <Card className="shadow-lg border-rose-200 dark:border-rose-800">
-            <CardHeader className="bg-gradient-to-r from-rose-400 to-pink-400 text-white">
-              <ProfileHeader
-                userEmail={userEmail}
-                userId={userId}
-                hasCompatibilityResults={hasCompatibilityResults ?? undefined}
-                onSignOut={handleSignOut}
-                verificationStatus={verificationStatus}
-                waliActive={verificationStatus.wali}
-                fullName={formData.fullName}
-              />
-            </CardHeader>
+        <div className="container max-w-5xl mx-auto px-4 space-y-4">
+          {/* Header — nouveau design sauge */}
+          <ProfileHeader
+            userEmail={userEmail}
+            userId={userId}
+            hasCompatibilityResults={hasCompatibilityResults ?? undefined}
+            onSignOut={handleSignOut}
+            verificationStatus={verificationStatus}
+            waliActive={verificationStatus.wali}
+            fullName={formData.fullName}
+            avatarUrl={formData.profilePicture}
+            location={formData.location}
+            age={formData.age}
+            profession={formData.occupation}
+            completionScore={completionScore}
+          />
 
-            <CardContent className="p-6">
-              <Tabs defaultValue="profile" className="w-full">
-                <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="profile">Profil</TabsTrigger>
-                  <TabsTrigger value="analytics">Statistiques</TabsTrigger>
-                  <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
-                  <TabsTrigger value="visibility">Visibilité</TabsTrigger>
-                </TabsList>
+          {/* Tabs navigation */}
+          <Tabs defaultValue="profile" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="profile">Profil</TabsTrigger>
+              <TabsTrigger value="analytics">Statistiques</TabsTrigger>
+              <TabsTrigger value="recommendations">Recommandations</TabsTrigger>
+              <TabsTrigger value="visibility">Visibilité</TabsTrigger>
+            </TabsList>
 
-                <TabsContent value="profile" className="space-y-6">
-                  {/* Profile dashboard cards */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <TrustScoreCard
-                      verificationStatus={verificationStatus}
-                      verificationScore={trustData.publicTrustScore || (
-                        [verificationStatus.email, verificationStatus.phone, verificationStatus.id, verificationStatus.wali]
-                          .filter(Boolean).length * 25
-                      )}
-                      hasCompatibilityTest={trustData.compatibilityTestCompleted || (hasCompatibilityResults ?? false)}
-                    />
-                    <IslamicProfileCard
-                      formData={formData}
-                      hijabPreference={islamicPrefs.hijabPreference ?? undefined}
-                      beardPreference={islamicPrefs.beardPreference ?? undefined}
-                    />
-                    <NikahJourneyCard
-                      profileCompleted={journeyProgress.profileCompleted || (!!formData.aboutMe && !!formData.fullName)}
-                      compatibilityDone={journeyProgress.compatibilityDone || (hasCompatibilityResults ?? false)}
-                      firstMatch={journeyProgress.firstMatch}
-                      supervisedExchange={journeyProgress.supervisedExchange}
-                      familyMeeting={journeyProgress.familyMeeting}
-                      istikharaCompleted={journeyProgress.istikharaCompleted}
-                      nikah={journeyProgress.nikah}
-                    />
-                    <ValuesProfileCard />
-                    <FamilyCard
-                      waliActive={verificationStatus.wali}
-                      contribution={familyData.contribution}
-                      familyCriteria={familyData.criteria}
-                    />
-                    <SearchCriteriaCard aboutMe={formData.aboutMe} />
-                  </div>
+            <TabsContent value="profile" className="mt-4">
+              {/* 2-column layout: sidebar (220px) + main content */}
+              <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] gap-3 items-start">
+                {/* COLONNE GAUCHE — sticky */}
+                <div className="flex flex-col gap-3 md:sticky md:top-4">
+                  <TrustScoreCard
+                    verificationStatus={verificationStatus}
+                    verificationScore={verificationScore}
+                    hasCompatibilityTest={trustData.compatibilityTestCompleted || (hasCompatibilityResults ?? false)}
+                  />
+                  <NikahJourneyCard
+                    profileCompleted={journeyProgress.profileCompleted || (!!formData.aboutMe && !!formData.fullName)}
+                    compatibilityDone={journeyProgress.compatibilityDone || (hasCompatibilityResults ?? false)}
+                    firstMatch={journeyProgress.firstMatch}
+                    supervisedExchange={journeyProgress.supervisedExchange}
+                    familyMeeting={journeyProgress.familyMeeting}
+                    istikharaCompleted={journeyProgress.istikharaCompleted}
+                    nikah={journeyProgress.nikah}
+                  />
+                </div>
 
+                {/* COLONNE DROITE */}
+                <div className="flex flex-col gap-3">
+                  <IslamicProfileCard
+                    formData={formData}
+                    hijabPreference={islamicPrefs.hijabPreference ?? undefined}
+                    beardPreference={islamicPrefs.beardPreference ?? undefined}
+                  />
+                  <ValuesProfileCard />
+                  <FamilyCard
+                    waliActive={verificationStatus.wali}
+                    contribution={familyData.contribution}
+                    familyCriteria={familyData.criteria}
+                  />
+                  <SearchCriteriaCard aboutMe={formData.aboutMe} />
+
+                  {/* Formulaire d'édition du profil */}
                   <ProfileForm
                     formData={formData}
                     handleChange={handleProfileFormChange}
@@ -295,44 +313,44 @@ const ProfilePage = () => {
                     onToggleAccountVisibility={handleToggleVisibility}
                     onUnblockUser={handleUnblockUser}
                   />
-                </TabsContent>
+                </div>
+              </div>
+            </TabsContent>
 
-                <TabsContent value="analytics" className="space-y-6">
-                  {userId && (
-                    <>
-                      <BadgeShowcase userId={userId} maxBadges={5} />
-                      <ProfileAnalytics
-                        userId={userId}
-                        analytics={analytics}
-                        loading={analyticsLoading}
-                      />
-                    </>
-                  )}
-                </TabsContent>
+            <TabsContent value="analytics" className="space-y-6 mt-4">
+              {userId && (
+                <>
+                  <BadgeShowcase userId={userId} maxBadges={5} />
+                  <ProfileAnalytics
+                    userId={userId}
+                    analytics={analytics}
+                    loading={analyticsLoading}
+                  />
+                </>
+              )}
+            </TabsContent>
 
-                <TabsContent value="recommendations" className="space-y-6">
-                  {userId && (
-                    <ProfileRecommendations
-                      userId={userId}
-                      recommendations={recommendations}
-                      loading={recommendationsLoading}
-                      onRecommendationAction={handleRecommendationAction}
-                    />
-                  )}
-                </TabsContent>
+            <TabsContent value="recommendations" className="space-y-6 mt-4">
+              {userId && (
+                <ProfileRecommendations
+                  userId={userId}
+                  recommendations={recommendations}
+                  loading={recommendationsLoading}
+                  onRecommendationAction={handleRecommendationAction}
+                />
+              )}
+            </TabsContent>
 
-                <TabsContent value="visibility" className="space-y-6">
-                  {userId && (
-                    <ProfileVisibilityManager
-                      userId={userId}
-                      settings={visibilitySettings}
-                      onSettingsChange={handleVisibilitySettingsChange}
-                    />
-                  )}
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+            <TabsContent value="visibility" className="space-y-6 mt-4">
+              {userId && (
+                <ProfileVisibilityManager
+                  userId={userId}
+                  settings={visibilitySettings}
+                  onSettingsChange={handleVisibilitySettingsChange}
+                />
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </AccessibilityProvider>

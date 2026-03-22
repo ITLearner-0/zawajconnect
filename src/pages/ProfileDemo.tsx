@@ -55,8 +55,7 @@ import { fadeInUp, staggerContainer, staggerItem } from '@/styles/animations';
  */
 const demoProfile: DatabaseProfile = {
   id: '00000000-0000-0000-0000-000000000001', // Valid UUID for demo
-  first_name: 'Amira',
-  last_name: 'Hassan',
+  full_name: 'Amira Hassan',
   gender: 'female',
   birth_date: '1995-03-15',
   location: 'Paris, France',

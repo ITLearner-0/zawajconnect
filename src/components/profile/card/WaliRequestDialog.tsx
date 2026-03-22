@@ -76,7 +76,7 @@ const WaliRequestDialog = ({
 
       toast({
         title: 'Request sent',
-        description: `Your ${requestType} request has been sent to ${profile.first_name}'s wali.`,
+        description: `Your ${requestType} request has been sent to ${profile.full_name}'s wali.`,
       });
 
       onOpenChange(false);
@@ -102,7 +102,7 @@ const WaliRequestDialog = ({
 
         <div className="space-y-4 py-4">
           <p className="text-sm text-muted-foreground">
-            To {requestType === 'message' ? 'message' : 'video call'} {profile.first_name}, you need
+            To {requestType === 'message' ? 'message' : 'video call'} {profile.full_name}, you need
             permission from her wali ({profile.wali_name}).
           </p>
 
@@ -115,7 +115,7 @@ const WaliRequestDialog = ({
               rows={4}
               value={requestMessage}
               onChange={(e) => setRequestMessage(e.target.value)}
-              placeholder={`Assalamu alaikum, I would like to ${requestType === 'message' ? 'have a conversation' : 'schedule a video call'} with ${profile.first_name}...`}
+              placeholder={`Assalamu alaikum, I would like to ${requestType === 'message' ? 'have a conversation' : 'schedule a video call'} with ${profile.full_name}...`}
             />
 
             <div className="flex items-center mt-4">
