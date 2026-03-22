@@ -51,6 +51,7 @@ const SubscriptionCanceled = lazyRetry(() => import('@/pages/SubscriptionCancele
 const Dashboard = lazyRetry(() => import('@/pages/Dashboard'));
 const Browse = lazyRetry(() => import('@/pages/Browse'));
 const Matches = lazyRetry(() => import('@/pages/Matches'));
+const Visiteurs = lazyRetry(() => import('@/pages/Visiteurs'));
 const Chat = lazyRetry(() => import('@/pages/Chat'));
 const ProfilePage = lazyRetry(() => import('@/pages/profile/ProfilePage'));
 const Privacy = lazyRetry(() => import('@/pages/Privacy'));
@@ -205,6 +206,7 @@ export const protectedRoutes: AppRouteConfig[] = [
   { path: '/favorites', component: Favorites },
   { path: '/notes', component: NotesManager },
   { path: '/matches', component: Matches },
+  { path: '/visiteurs', component: Visiteurs },
   { path: '/chat', component: Chat },
   { path: '/chat/:matchId', component: Chat },
   { path: '/privacy', component: Privacy },

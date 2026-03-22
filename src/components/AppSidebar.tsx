@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
+import { useNotificationCounts } from '@/hooks/useNotificationCounts';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -19,6 +20,7 @@ import {
   Brain,
   Shield,
   Award,
+  Eye,
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 import {
@@ -51,6 +53,7 @@ interface PrayerTime {
 export function AppSidebar() {
   const { user } = useAuth();
   const { isWali, loading: roleLoading } = useUserRole();
+  const { counts: notifCounts, markVisitorsRead } = useNotificationCounts(user?.id ?? null);
   const { state } = useSidebar();
   const location = useLocation();
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -79,6 +82,7 @@ export function AppSidebar() {
     { path: '/advanced-matching', icon: Brain, label: 'Matching Avancé', group: 'compatibility' },
     { path: '/compatibility-insights', icon: Brain, label: 'Mes Insights', group: 'compatibility' },
     { path: '/matches', icon: Users, label: 'Mes Matches', group: 'social' },
+    { path: '/visiteurs', icon: Eye, label: 'Visiteurs', group: 'social' },
     { path: '/family', icon: Users, label: 'Famille', group: 'social' },
     { path: '/guidance', icon: BookOpen, label: 'Guide islamique', group: 'resources' },
     { path: '/islamic-tools', icon: Clock, label: 'Outils islamiques', group: 'resources' },
@@ -209,12 +213,36 @@ export function AppSidebar() {
             <SidebarMenu>
               {groupedNavItems.social.map((item) => {
                 const Icon = item.icon;
+                const badgeCount =
+                  item.path === '/visiteurs'
+                    ? notifCounts.visitors
+                    : item.path === '/matches'
+                      ? notifCounts.matches
+                      : 0;
+
+                const handleClick = item.path === '/visiteurs' ? markVisitorsRead : undefined;
+
                 return (
                   <SidebarMenuItem key={item.path}>
                     <SidebarMenuButton asChild>
-                      <NavLink to={item.path} className={getNavCls}>
+                      <NavLink to={item.path} className={getNavCls} onClick={handleClick}>
                         <Icon className="h-4 w-4" />
-                        {!isCollapsed && <span>{item.label}</span>}
+                        {!isCollapsed && (
+                          <span className="flex-1 flex items-center justify-between">
+                            {item.label}
+                            {badgeCount > 0 && (
+                              <Badge
+                                variant="default"
+                                className="ml-auto h-5 min-w-[20px] px-1.5 text-[10px] bg-rose-500 hover:bg-rose-500 text-white"
+                              >
+                                {badgeCount > 99 ? '99+' : badgeCount}
+                              </Badge>
+                            )}
+                          </span>
+                        )}
+                        {isCollapsed && badgeCount > 0 && (
+                          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-rose-500" />
+                        )}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
