@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, GraduationCap, Briefcase, User, Eye, Heart, Star } from 'lucide-react';
+import { MapPin, GraduationCap, Briefcase, User, Eye, Heart, Star, ShieldCheck } from 'lucide-react';
 import VerificationBadge from '@/components/VerificationBadge';
 
 interface BrowseProfileCardProps {
@@ -87,6 +87,28 @@ export const BrowseProfileCard = ({
               </div>
               <VerificationBadge verificationScore={profile.verification_score} />
             </div>
+
+            {/* Trust Score Mini Bar */}
+            {profile.verification_score > 0 && (
+              <div className="flex items-center gap-2 mb-2">
+                <ShieldCheck className="h-3 w-3 text-emerald-500 flex-shrink-0" />
+                <div className="flex-1 h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${
+                      profile.verification_score >= 75
+                        ? 'bg-emerald-500'
+                        : profile.verification_score >= 50
+                          ? 'bg-amber-500'
+                          : 'bg-gray-400'
+                    }`}
+                    style={{ width: `${Math.min(profile.verification_score, 100)}%` }}
+                  />
+                </div>
+                <span className="text-xs text-muted-foreground font-medium">
+                  {profile.verification_score}%
+                </span>
+              </div>
+            )}
 
             {/* Details */}
             <div className="space-y-1 mb-3">

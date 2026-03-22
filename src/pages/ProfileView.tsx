@@ -40,6 +40,11 @@ import InteractiveTutorial from '@/components/profile/InteractiveTutorial';
 import TrustScoreBadge from '@/components/profile/TrustScoreBadge';
 import FamilyContributionsBlock from '@/components/profile/FamilyContributionsBlock';
 import ValuesRadarChart from '@/components/matching/ValuesRadarChart';
+import IslamicProfileCard from '@/components/profile/cards/IslamicProfileCard';
+import NikahJourneyCard from '@/components/profile/cards/NikahJourneyCard';
+import { useIslamicPreferences } from '@/hooks/profile/useIslamicPreferences';
+import { useJourneyProgress } from '@/hooks/profile/useJourneyProgress';
+import { ProfileFormData } from '@/types/profile';
 import { fadeInUp, staggerContainer, staggerItem } from '@/styles/animations';
 import { MobileActionBar, QuickActionsScroll, QuickAction } from '@/components/profile/mobile';
 import { Share2, Users, Heart, Camera } from 'lucide-react';
@@ -62,6 +67,20 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
   // Determine if this is the user's own profile
   const isOwnProfile = forceOwnProfile || (currentUserId && profile?.id === currentUserId);
 
+  // Load real islamic preferences and journey progress
+  const profileUserId = profile?.id || profile?.user_id || null;
+  const { preferences: realIslamicPrefs } = useIslamicPreferences(profileUserId);
+  const { progress: journeyProgress } = useJourneyProgress(profileUserId);
+
+  // Build a minimal ProfileFormData for IslamicProfileCard
+  const profileFormData: Partial<ProfileFormData> = {
+    religiousLevel: profile?.religious_practice_level || '',
+    prayerFrequency: profile?.prayer_frequency || '',
+    madhab: profile?.madhab || '',
+    nationality: (profile as any)?.nationality || '',
+    motherTongue: (profile as any)?.mother_tongue || '',
+  };
+
   // Mock stats - Will be loaded from database in production
   const completionStats = {
     overall: profile ? calculateCompletionPercentage(profile) : 0,
@@ -77,17 +96,17 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
     messages: 34,
   };
 
-  // Mock Islamic preferences - Will be loaded from database
+  // Islamic preferences - loaded from database with fallbacks
   const islamicPrefs = {
     prayer_frequency: profile?.prayer_frequency || 'Non renseigné',
-    quran_reading: 'Quotidienne',
-    hijab_preference: 'Oui',
-    sect: 'Sunnite',
-    madhab: 'Maliki',
+    quran_reading: 'Non renseigné',
+    hijab_preference: realIslamicPrefs.hijabPreference || 'Non renseigné',
+    sect: 'Non renseigné',
+    madhab: profile?.madhab || 'Non renseigné',
     halal_diet: true,
-    smoking: 'Non',
-    importance_of_religion: 'Très importante',
-    desired_partner_sect: 'Sunnite',
+    smoking: 'Non renseigné',
+    importance_of_religion: 'Non renseigné',
+    desired_partner_sect: 'Non renseigné',
   };
 
   // Mock additional education/career info
@@ -499,6 +518,26 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
                 profile={profile}
                 isOwnProfile={isOwnProfile}
               />
+            </motion.div>
+
+            {/* Islamic Profile Card (Mockup Grid) */}
+            <motion.div variants={staggerItem}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <IslamicProfileCard
+                  formData={profileFormData as ProfileFormData}
+                  hijabPreference={realIslamicPrefs.hijabPreference ?? undefined}
+                  beardPreference={realIslamicPrefs.beardPreference ?? undefined}
+                />
+                <NikahJourneyCard
+                  profileCompleted={journeyProgress.profileCompleted || completionStats.overall >= 80}
+                  compatibilityDone={journeyProgress.compatibilityDone}
+                  firstMatch={journeyProgress.firstMatch}
+                  supervisedExchange={journeyProgress.supervisedExchange}
+                  familyMeeting={journeyProgress.familyMeeting}
+                  istikharaCompleted={journeyProgress.istikharaCompleted}
+                  nikah={journeyProgress.nikah}
+                />
+              </div>
             </motion.div>
 
             {/* Islamic Preferences Section */}
