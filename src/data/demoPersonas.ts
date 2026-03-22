@@ -13,7 +13,7 @@ export const demoPersonas: DatabaseProfile[] = [
     occupation: 'Ingénieur informatique',
     religious_practice_level: 'Practicing',
     prayer_frequency: 'Five times daily',
-    about_me:
+    bio:
       "Je suis un musulman pratiquant à la recherche d'une épouse pieuse qui partage mes valeurs islamiques. J'aime lire le Coran, faire du sport et passer du temps en famille.",
     email_verified: true,
     phone_verified: true,
@@ -52,7 +52,7 @@ export const demoPersonas: DatabaseProfile[] = [
     occupation: 'Professeure',
     religious_practice_level: 'Very Practicing',
     prayer_frequency: 'Five times daily',
-    about_me:
+    bio:
       "Enseignante passionnée et musulmane pratiquante. Je cherche un époux qui comprend l'importance de l'éducation islamique des enfants et qui souhaite construire une famille unie.",
     email_verified: true,
     phone_verified: true,
@@ -91,7 +91,7 @@ export const demoPersonas: DatabaseProfile[] = [
     occupation: 'Médecin',
     religious_practice_level: 'Practicing',
     prayer_frequency: 'Five times daily',
-    about_me:
+    bio:
       "Médecin dévoué et musulman engagé. Je crois en l'importance de servir la communauté tout en maintenant un équilibre spirituel fort.",
     email_verified: true,
     phone_verified: true,
@@ -130,7 +130,7 @@ export const demoPersonas: DatabaseProfile[] = [
     occupation: 'Architecte',
     religious_practice_level: 'Moderately Practicing',
     prayer_frequency: 'Five times daily',
-    about_me:
+    bio:
       "Architecte créative avec une forte connexion à ma foi. J'aime voyager, découvrir de nouvelles cultures tout en respectant les valeurs islamiques.",
     email_verified: true,
     phone_verified: true,

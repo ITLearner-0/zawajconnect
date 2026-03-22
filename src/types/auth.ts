@@ -25,7 +25,7 @@ export interface AuthProfileData {
   location: string;
   prayer_frequency: string;
   religious_practice_level: string;
-  about_me: string;
+  bio: string;
   education_level: string;
   occupation: string;
   is_visible: boolean;

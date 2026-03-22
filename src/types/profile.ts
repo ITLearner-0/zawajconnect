@@ -50,7 +50,7 @@ export interface DatabaseProfile {
   religious_practice_level?: string;
   madhab?: string;
   prayer_frequency?: string;
-  about_me?: string;
+  bio?: string;
   wali_name?: string;
   wali_relationship?: string;
   wali_contact?: string;

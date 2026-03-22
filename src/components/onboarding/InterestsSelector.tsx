@@ -75,7 +75,7 @@ const InterestsSelector = ({
       {/* Selected Interests */}
       {interests.length > 0 && (
         <div className="space-y-3">
-          <Label>Vos centres d'intérêt ({interests.length}/10)</Label>
+          <Label id="interests_label">Vos centres d'intérêt ({interests.length}/10)</Label>
           <div className="flex flex-wrap gap-2">
             {interests.map((interest, index) => (
               <Badge
@@ -131,7 +131,7 @@ const InterestsSelector = ({
 
       {/* Suggested Interests */}
       <div className="space-y-3">
-        <Label>Suggestions populaires</Label>
+        <Label id="suggestions_label">Suggestions populaires</Label>
         <Card className="bg-muted/30">
           <CardContent className="p-4">
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">

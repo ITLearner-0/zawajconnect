@@ -108,7 +108,7 @@ export class ProgressiveRevealService {
         // Add personal details
         return {
           ...this.filterProfileData(profile, 'religious'),
-          about_me: filtered.about_me,
+          bio: filtered.bio,
           profile_picture: filtered.profile_picture, // Unblur photos
           gallery: filtered.gallery || [],
         };

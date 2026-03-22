@@ -1,114 +1,138 @@
 import { ComponentType, lazy } from 'react';
 
+/**
+ * Retry dynamic imports on failure (handles stale cache after deployments).
+ * When Vercel serves a new build, old chunk filenames become 404s.
+ * This retries the import once, and if it still fails, reloads the page.
+ */
+function lazyRetry<T extends ComponentType<any>>(
+  importFn: () => Promise<{ default: T }>
+) {
+  return lazy(() =>
+    importFn().catch((error) => {
+      // Retry once
+      return importFn().catch(() => {
+        // If still failing, force a full page reload to get the new assets
+        const hasReloaded = sessionStorage.getItem('lazy_reload');
+        if (!hasReloaded) {
+          sessionStorage.setItem('lazy_reload', '1');
+          window.location.reload();
+        }
+        throw error;
+      });
+    })
+  );
+}
+
 // Import Index directly (no lazy loading for landing page)
 import Index from '@/pages/Index';
 
 // Lazy load all other pages to reduce initial bundle size
 // Public pages (loaded on demand)
-const Auth = lazy(() => import('@/pages/Auth'));
-const ResetPassword = lazy(() => import('@/pages/ResetPassword'));
-const PrivacyPolicy = lazy(() => import('@/pages/PrivacyPolicy'));
-const TermsOfService = lazy(() => import('@/pages/TermsOfService'));
-const RefundPolicy = lazy(() => import('@/pages/RefundPolicy'));
-const CommunityGuidelines = lazy(() => import('@/pages/CommunityGuidelines'));
-const CookiePolicy = lazy(() => import('@/pages/CookiePolicy'));
-const FAQ = lazy(() => import('@/pages/FAQ'));
-const InvitationAuth = lazy(() => import('@/pages/InvitationAuth'));
-const InvitationAccept = lazy(() => import('@/pages/InvitationAccept'));
-const Status = lazy(() => import('@/pages/Status'));
+const Auth = lazyRetry(() => import('@/pages/Auth'));
+const ResetPassword = lazyRetry(() => import('@/pages/ResetPassword'));
+const PrivacyPolicy = lazyRetry(() => import('@/pages/PrivacyPolicy'));
+const TermsOfService = lazyRetry(() => import('@/pages/TermsOfService'));
+const RefundPolicy = lazyRetry(() => import('@/pages/RefundPolicy'));
+const CommunityGuidelines = lazyRetry(() => import('@/pages/CommunityGuidelines'));
+const CookiePolicy = lazyRetry(() => import('@/pages/CookiePolicy'));
+const FAQ = lazyRetry(() => import('@/pages/FAQ'));
+const InvitationAuth = lazyRetry(() => import('@/pages/InvitationAuth'));
+const InvitationAccept = lazyRetry(() => import('@/pages/InvitationAccept'));
+const Status = lazyRetry(() => import('@/pages/Status'));
 
 // Special routes (onboarding flows)
-const Onboarding = lazy(() => import('@/pages/Onboarding'));
-const WaliOnboarding = lazy(() => import('@/pages/WaliOnboarding'));
-const SubscriptionSuccess = lazy(() => import('@/pages/SubscriptionSuccess'));
-const SubscriptionCanceled = lazy(() => import('@/pages/SubscriptionCanceled'));
+const Onboarding = lazyRetry(() => import('@/pages/Onboarding'));
+const WaliOnboarding = lazyRetry(() => import('@/pages/WaliOnboarding'));
+const SubscriptionSuccess = lazyRetry(() => import('@/pages/SubscriptionSuccess'));
+const SubscriptionCanceled = lazyRetry(() => import('@/pages/SubscriptionCanceled'));
 
 // Protected pages (user features)
-const Dashboard = lazy(() => import('@/pages/Dashboard'));
-const Browse = lazy(() => import('@/pages/Browse'));
-const Matches = lazy(() => import('@/pages/Matches'));
-const Chat = lazy(() => import('@/pages/Chat'));
-const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage'));
-const Privacy = lazy(() => import('@/pages/Privacy'));
-const Settings = lazy(() => import('@/pages/Settings'));
-const PaymentHistory = lazy(() => import('@/pages/PaymentHistory'));
-const Favorites = lazy(() => import('@/pages/Favorites'));
-const NotesManager = lazy(() => import('@/pages/NotesManager'));
-const Gamification = lazy(() => import('@/pages/Gamification'));
-const BadgeLeaderboard = lazy(() => import('@/pages/BadgeLeaderboard'));
+const Dashboard = lazyRetry(() => import('@/pages/Dashboard'));
+const Browse = lazyRetry(() => import('@/pages/Browse'));
+const Matches = lazyRetry(() => import('@/pages/Matches'));
+const Chat = lazyRetry(() => import('@/pages/Chat'));
+const ProfilePage = lazyRetry(() => import('@/pages/profile/ProfilePage'));
+const Privacy = lazyRetry(() => import('@/pages/Privacy'));
+const Settings = lazyRetry(() => import('@/pages/Settings'));
+const PaymentHistory = lazyRetry(() => import('@/pages/PaymentHistory'));
+const Favorites = lazyRetry(() => import('@/pages/Favorites'));
+const NotesManager = lazyRetry(() => import('@/pages/NotesManager'));
+const Gamification = lazyRetry(() => import('@/pages/Gamification'));
+const BadgeLeaderboard = lazyRetry(() => import('@/pages/BadgeLeaderboard'));
 
 // Matching & Compatibility
-const AdvancedMatching = lazy(() => import('@/pages/AdvancedMatching'));
-const CompatibilityTest = lazy(() => import('@/pages/CompatibilityTest'));
-const CompatibilityInsightsPage = lazy(() => import('@/pages/CompatibilityInsights'));
-const Compare = lazy(() => import('@/pages/Compare'));
+const AdvancedMatching = lazyRetry(() => import('@/pages/AdvancedMatching'));
+const CompatibilityTest = lazyRetry(() => import('@/pages/CompatibilityTest'));
+const CompatibilityInsightsPage = lazyRetry(() => import('@/pages/CompatibilityInsights'));
+const Compare = lazyRetry(() => import('@/pages/Compare'));
 
 // Daily Question Feature
-const DailyQuestion = lazy(() => import('@/pages/daily-question/DailyQuestion'));
-const QuestionHistory = lazy(() => import('@/pages/daily-question/QuestionHistory'));
-const MatchesAnswers = lazy(() => import('@/pages/daily-question/MatchesAnswers'));
-const AdminQuestions = lazy(() => import('@/pages/daily-question/AdminQuestions'));
+const DailyQuestion = lazyRetry(() => import('@/pages/daily-question/DailyQuestion'));
+const QuestionHistory = lazyRetry(() => import('@/pages/daily-question/QuestionHistory'));
+const MatchesAnswers = lazyRetry(() => import('@/pages/daily-question/MatchesAnswers'));
+const AdminQuestions = lazyRetry(() => import('@/pages/daily-question/AdminQuestions'));
 
 // Family features
-const Family = lazy(() => import('@/pages/Family'));
-const WaliDashboard = lazy(() => import('@/pages/WaliDashboard'));
-const WaliAccess = lazy(() => import('@/pages/WaliAccess'));
-const WaliRegistration = lazy(() => import('@/pages/WaliRegistration'));
-const MatchApproval = lazy(() => import('@/pages/MatchApproval'));
-const FamilyAnalyticsPage = lazy(() => import('@/pages/FamilyAnalytics'));
-const FamilySupervision = lazy(() => import('@/pages/FamilySupervision'));
-const FamilyNotifications = lazy(() => import('@/pages/FamilyNotifications'));
-const FamilyAccess = lazy(() => import('@/pages/FamilyAccess'));
-const FamilyAccessPortal = lazy(() => import('@/components/FamilyAccessPortal'));
-const FamilySupervisionPanel = lazy(() => import('@/components/FamilySupervisionPanel'));
-const WaliMonitoring = lazy(() => import('@/pages/WaliMonitoring'));
-const AdminWaliAlerts = lazy(() => import('@/pages/AdminWaliAlerts'));
-const AdminWaliAlertsDashboard = lazy(() => import('@/pages/AdminWaliAlertsDashboard'));
-const WaliAdmin = lazy(() => import('@/pages/WaliAdmin'));
+const Family = lazyRetry(() => import('@/pages/Family'));
+const WaliDashboard = lazyRetry(() => import('@/pages/WaliDashboard'));
+const WaliAccess = lazyRetry(() => import('@/pages/WaliAccess'));
+const WaliRegistration = lazyRetry(() => import('@/pages/WaliRegistration'));
+const MatchApproval = lazyRetry(() => import('@/pages/MatchApproval'));
+const FamilyAnalyticsPage = lazyRetry(() => import('@/pages/FamilyAnalytics'));
+const FamilySupervision = lazyRetry(() => import('@/pages/FamilySupervision'));
+const FamilyNotifications = lazyRetry(() => import('@/pages/FamilyNotifications'));
+const FamilyAccess = lazyRetry(() => import('@/pages/FamilyAccess'));
+const FamilyAccessPortal = lazyRetry(() => import('@/components/FamilyAccessPortal'));
+const FamilySupervisionPanel = lazyRetry(() => import('@/components/FamilySupervisionPanel'));
+const WaliMonitoring = lazyRetry(() => import('@/pages/WaliMonitoring'));
+const AdminWaliAlerts = lazyRetry(() => import('@/pages/AdminWaliAlerts'));
+const AdminWaliAlertsDashboard = lazyRetry(() => import('@/pages/AdminWaliAlertsDashboard'));
+const WaliAdmin = lazyRetry(() => import('@/pages/WaliAdmin'));
 
 // Islamic tools
-const IslamicTools = lazy(() => import('@/pages/IslamicTools'));
-const Guidance = lazy(() => import('@/pages/Guidance'));
+const IslamicTools = lazyRetry(() => import('@/pages/IslamicTools'));
+const Guidance = lazyRetry(() => import('@/pages/Guidance'));
 
 // New Features - Phase 2 (UI Prototypes)
-const CoupleQuestions = lazy(() => import('@/pages/CoupleQuestions'));
-const PrivacyLayers = lazy(() => import('@/pages/PrivacyLayers'));
-const CompatibilityDeepDive = lazy(() => import('@/pages/CompatibilityDeepDive'));
-const CommunityVerification = lazy(() => import('@/pages/CommunityVerification'));
-const ValuesMatching = lazy(() => import('@/pages/ValuesMatching'));
-const IstikharahAssistant = lazy(() => import('@/pages/IstikharahAssistant'));
-const MahramMode = lazy(() => import('@/pages/MahramMode'));
-const SmartTiming = lazy(() => import('@/pages/SmartTiming'));
-const MahrCalculator = lazy(() => import('@/pages/MahrCalculator'));
-const ImamDashboard = lazy(() => import('@/pages/ImamDashboard'));
+const CoupleQuestions = lazyRetry(() => import('@/pages/CoupleQuestions'));
+const PrivacyLayers = lazyRetry(() => import('@/pages/PrivacyLayers'));
+const CompatibilityDeepDive = lazyRetry(() => import('@/pages/CompatibilityDeepDive'));
+const CommunityVerification = lazyRetry(() => import('@/pages/CommunityVerification'));
+const ValuesMatching = lazyRetry(() => import('@/pages/ValuesMatching'));
+const IstikharahAssistant = lazyRetry(() => import('@/pages/IstikharahAssistant'));
+const MahramMode = lazyRetry(() => import('@/pages/MahramMode'));
+const SmartTiming = lazyRetry(() => import('@/pages/SmartTiming'));
+const MahrCalculator = lazyRetry(() => import('@/pages/MahrCalculator'));
+const ImamDashboard = lazyRetry(() => import('@/pages/ImamDashboard'));
 
 // New Features - Phase 2 (Production: Supabase-backed)
-const NikahAdvisor = lazy(() => import('@/pages/NikahAdvisor'));
-const IstikharaSession = lazy(() => import('@/pages/IstikharaSession'));
+const NikahAdvisor = lazyRetry(() => import('@/pages/NikahAdvisor'));
+const IstikharaSession = lazyRetry(() => import('@/pages/IstikharaSession'));
 
 // Admin & Moderation
-const Admin = lazy(() => import('@/pages/Admin'));
-const ABTestingDashboard = lazy(() => import('@/pages/ABTestingDashboard'));
-const AdminUserProfile = lazy(() => import('@/pages/AdminUserProfile'));
-const AdminWaliRegistrations = lazy(() => import('@/pages/AdminWaliRegistrations'));
-const AdminWaliMonitoring = lazy(() => import('@/pages/AdminWaliMonitoring'));
-const AdminWaliAuditTrail = lazy(() => import('@/pages/AdminWaliAuditTrail'));
-const AdminWaliDashboard = lazy(() => import('@/pages/AdminWaliDashboard'));
-const AdminWaliPermissions = lazy(() => import('@/pages/AdminWaliPermissions'));
-const AdminWaliUserDetails = lazy(() => import('@/pages/AdminWaliUserDetails'));
-const AdminMatchingConfig = lazy(() => import('@/pages/AdminMatchingConfig'));
-const AdminUsers = lazy(() => import('@/pages/AdminUsers'));
-const ModerationTest = lazy(() => import('@/pages/ModerationTest'));
-const ModerationTests = lazy(() => import('@/pages/ModerationTests'));
+const Admin = lazyRetry(() => import('@/pages/Admin'));
+const ABTestingDashboard = lazyRetry(() => import('@/pages/ABTestingDashboard'));
+const AdminUserProfile = lazyRetry(() => import('@/pages/AdminUserProfile'));
+const AdminWaliRegistrations = lazyRetry(() => import('@/pages/AdminWaliRegistrations'));
+const AdminWaliMonitoring = lazyRetry(() => import('@/pages/AdminWaliMonitoring'));
+const AdminWaliAuditTrail = lazyRetry(() => import('@/pages/AdminWaliAuditTrail'));
+const AdminWaliDashboard = lazyRetry(() => import('@/pages/AdminWaliDashboard'));
+const AdminWaliPermissions = lazyRetry(() => import('@/pages/AdminWaliPermissions'));
+const AdminWaliUserDetails = lazyRetry(() => import('@/pages/AdminWaliUserDetails'));
+const AdminMatchingConfig = lazyRetry(() => import('@/pages/AdminMatchingConfig'));
+const AdminUsers = lazyRetry(() => import('@/pages/AdminUsers'));
+const ModerationTest = lazyRetry(() => import('@/pages/ModerationTest'));
+const ModerationTests = lazyRetry(() => import('@/pages/ModerationTests'));
 
 // Demo & Testing pages
-const ProfileDemo = lazy(() => import('@/pages/ProfileDemo'));
+const ProfileDemo = lazyRetry(() => import('@/pages/ProfileDemo'));
 
 // Phase 3: New Profile View (Unified)
-const ProfileView = lazy(() => import('@/pages/ProfileView'));
+const ProfileView = lazyRetry(() => import('@/pages/ProfileView'));
 
 // 404 page
-const NotFound = lazy(() => import('@/pages/NotFound'));
+const NotFound = lazyRetry(() => import('@/pages/NotFound'));
 
 export interface AppRouteConfig {
   path: string;

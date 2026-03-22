@@ -10,7 +10,7 @@ export const getDbFieldName = (field: string): string => {
     religiousLevel: 'religious_practice_level',
     prayerFrequency: 'prayer_frequency',
     polygamyStance: 'polygamy_stance',
-    aboutMe: 'about_me',
+    aboutMe: 'bio',
     waliName: 'wali_name',
     waliRelationship: 'wali_relationship',
     waliContact: 'wali_contact',

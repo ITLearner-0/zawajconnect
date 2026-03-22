@@ -124,7 +124,7 @@ const ProfileList: React.FC<ProfileListProps> = ({ profiles, onSelectProfile }) 
             <CardContent className="space-y-4">
               {/* About Me */}
               <CardDescription className="line-clamp-3 text-rose-600 dark:text-rose-300 leading-relaxed">
-                {profile.about_me}
+                {profile.bio}
               </CardDescription>
 
               {/* Badges */}

@@ -694,12 +694,12 @@ const Onboarding = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label>Genre *</Label>
+                <Label htmlFor="gender">Genre *</Label>
                 <Select
                   value={profileData.gender}
                   onValueChange={(value) => setProfileData({ ...profileData, gender: value })}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="gender">
                     <SelectValue placeholder="Sélectionnez votre genre" />
                   </SelectTrigger>
                   <SelectContent>
@@ -955,14 +955,14 @@ const Onboarding = () => {
             </div>
 
             <div>
-              <Label>Secte du partenaire souhaité</Label>
+              <Label htmlFor="desired_partner_sect_onboarding">Secte du partenaire souhaité</Label>
               <Select
                 value={islamicPrefs.desired_partner_sect}
                 onValueChange={(value) =>
                   setIslamicPrefs({ ...islamicPrefs, desired_partner_sect: value })
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger id="desired_partner_sect_onboarding">
                   <SelectValue placeholder="Sélectionnez" />
                 </SelectTrigger>
                 <SelectContent>

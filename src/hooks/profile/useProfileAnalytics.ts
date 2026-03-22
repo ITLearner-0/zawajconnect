@@ -83,7 +83,7 @@ export const useProfileAnalytics = (userId?: string) => {
         'education_level',
         'occupation',
         'religious_practice_level',
-        'about_me',
+        'bio',
       ];
 
       const completedFields = requiredFields.filter(

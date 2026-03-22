@@ -141,9 +141,9 @@ const EnhancedProfileCard: React.FC<EnhancedProfileCardProps> = ({
         )}
 
         {/* About Me Preview */}
-        {profile.about_me && (
+        {profile.bio && (
           <div className="mb-4">
-            <p className="text-sm text-gray-700 line-clamp-2">{profile.about_me}</p>
+            <p className="text-sm text-gray-700 line-clamp-2">{profile.bio}</p>
           </div>
         )}
 
