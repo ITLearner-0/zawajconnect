@@ -53,6 +53,7 @@ export const useProfilePageLogic = () => {
   const {
     isOnboarding,
     currentStep,
+    currentStepId,
     steps,
     handleNext,
     handlePrevious,
@@ -252,6 +253,7 @@ export const useProfilePageLogic = () => {
     // Onboarding
     isOnboarding,
     currentStep,
+    currentStepId,
     steps,
     handleNext,
     handlePrevious,

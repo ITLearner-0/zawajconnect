@@ -2,6 +2,44 @@ import { useState, useEffect } from 'react';
 import { isFieldRequired } from '@/utils/profileTooltips';
 import { ProfileFormData } from '@/types/profile';
 
+type StepId =
+  | 'basic'
+  | 'education'
+  | 'religious'
+  | 'about'
+  | 'photo'
+  | 'verification'
+  | 'wali'
+  | 'summary';
+
+interface StepDef {
+  id: StepId;
+  label: string;
+  requiredFields: string[];
+}
+
+const STEP_DEFS: StepDef[] = [
+  { id: 'basic', label: 'Informations de base', requiredFields: ['fullName', 'gender', 'location'] },
+  { id: 'education', label: 'Éducation et carrière', requiredFields: [] },
+  { id: 'religious', label: 'Parcours religieux', requiredFields: ['religiousLevel'] },
+  { id: 'about', label: 'À propos de moi', requiredFields: ['aboutMe'] },
+  { id: 'photo', label: 'Photo de profil', requiredFields: [] },
+  { id: 'verification', label: 'Vérification', requiredFields: [] },
+  { id: 'wali', label: 'Informations du Wali', requiredFields: ['waliName', 'waliRelationship', 'waliContact'] },
+  { id: 'summary', label: 'Récapitulatif', requiredFields: [] },
+];
+
+const FIELD_LABELS: Record<string, string> = {
+  fullName: 'Nom complet',
+  gender: 'Genre',
+  location: 'Localisation',
+  religiousLevel: 'Niveau de pratique religieuse',
+  aboutMe: 'À propos de moi',
+  waliName: 'Nom du Wali',
+  waliRelationship: 'Relation du Wali',
+  waliContact: 'Contact du Wali',
+};
+
 export const useOnboarding = (
   formData: ProfileFormData,
   isNewUser: boolean,
@@ -20,45 +58,26 @@ export const useOnboarding = (
     }
   });
 
-  // Get base steps
-  const getSteps = () => {
-    const baseSteps = [
-      'Informations de base',
-      'Éducation et carrière',
-      'Parcours religieux',
-      'À propos de moi',
-      'Photo de profil',
-    ];
-
-    // Add Wali Information step only for female users
-    if (formData.gender === 'female') {
-      baseSteps.push('Informations du Wali');
-    }
-
-    // Always end with summary
-    baseSteps.push('Récapitulatif');
-
-    return baseSteps;
+  // Build active steps based on gender
+  const getActiveSteps = (): StepDef[] => {
+    return STEP_DEFS.filter((step) => {
+      if (step.id === 'wali') return formData.gender === 'female';
+      return true;
+    });
   };
 
-  const steps = getSteps();
+  const activeSteps = getActiveSteps();
+  const steps = activeSteps.map((s) => s.label);
+
+  // Get current step definition
+  const currentStepDef = activeSteps[currentStep];
 
   // Check if the current step is complete enough to proceed
   const canProceedCurrentStep = (): boolean => {
-    const requiredFieldsByStep: Record<number, string[]> = {
-      0: ['fullName', 'gender', 'location'],
-      1: [],
-      2: ['religiousLevel'],
-      3: ['aboutMe'],
-      4: [], // Photo step - optional
-      5: formData.gender === 'female' ? ['waliName', 'waliRelationship', 'waliContact'] : [],
-    };
-
-    const requiredFields = requiredFieldsByStep[currentStep] ?? [];
-    return requiredFields.every((field) => {
+    if (!currentStepDef) return true;
+    return currentStepDef.requiredFields.every((field) => {
       const value = formData[field as keyof ProfileFormData];
       if (!value) return false;
-      // Enforce 50 chars minimum for aboutMe
       if (field === 'aboutMe' && typeof value === 'string' && value.length < 50) return false;
       return true;
     });
@@ -66,38 +85,21 @@ export const useOnboarding = (
 
   // Get validation errors for the current step
   const getStepErrors = (): string[] => {
+    if (!currentStepDef) return [];
     const errors: string[] = [];
-    const fieldLabels: Record<string, string> = {
-      fullName: 'Nom complet',
-      gender: 'Genre',
-      location: 'Localisation',
-      religiousLevel: 'Niveau de pratique religieuse',
-      aboutMe: 'À propos de moi',
-      waliName: 'Nom du Wali',
-      waliRelationship: 'Relation du Wali',
-      waliContact: 'Contact du Wali',
-    };
-
-    const requiredFieldsByStep: Record<number, string[]> = {
-      0: ['fullName', 'gender', 'location'],
-      1: [],
-      2: ['religiousLevel'],
-      3: ['aboutMe'],
-      4: [], // Photo step - optional
-      5: formData.gender === 'female' ? ['waliName', 'waliRelationship', 'waliContact'] : [],
-    };
-
-    const requiredFields = requiredFieldsByStep[currentStep] ?? [];
-    for (const field of requiredFields) {
+    for (const field of currentStepDef.requiredFields) {
       const value = formData[field as keyof ProfileFormData];
       if (!value) {
-        errors.push(`${fieldLabels[field] || field} est requis`);
+        errors.push(`${FIELD_LABELS[field] || field} est requis`);
       } else if (field === 'aboutMe' && typeof value === 'string' && value.length < 50) {
         errors.push(`À propos de moi doit contenir au moins 50 caractères (${value.length}/50)`);
       }
     }
     return errors;
   };
+
+  // Get the step ID for the current step (used by ProfileOnboarding to render content)
+  const currentStepId = currentStepDef?.id ?? 'basic';
 
   const persistStep = (step: number) => {
     try {
@@ -134,9 +136,8 @@ export const useOnboarding = (
 
   // Update steps when gender changes and clean wali data if switching away from female
   useEffect(() => {
-    const newSteps = getSteps();
+    const newSteps = getActiveSteps();
     if (formData.gender !== 'female') {
-      // Clear wali data when user is not female
       onClearWaliData?.();
       if (currentStep >= newSteps.length) {
         setCurrentStep(newSteps.length - 1);
@@ -148,6 +149,7 @@ export const useOnboarding = (
     isOnboarding,
     setIsOnboarding,
     currentStep,
+    currentStepId,
     steps,
     handleNext,
     handlePrevious,

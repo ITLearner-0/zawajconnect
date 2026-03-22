@@ -46,6 +46,7 @@ const ProfilePage = () => {
     // Onboarding
     isOnboarding,
     currentStep,
+    currentStepId,
     steps,
     handleNext,
     handlePrevious,
@@ -190,6 +191,9 @@ const ProfilePage = () => {
               target: { name: 'profilePicture', value: url },
             } as React.ChangeEvent<HTMLInputElement>);
           }}
+          verificationStatus={verificationStatus}
+          userEmail={userEmail}
+          currentStepId={currentStepId}
         />
       </AccessibilityProvider>
     );
