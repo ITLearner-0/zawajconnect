@@ -11,21 +11,29 @@ interface NikahJourneyCardProps {
   profileCompleted?: boolean;
   compatibilityDone?: boolean;
   firstMatch?: boolean;
+  supervisedExchange?: boolean;
+  familyMeeting?: boolean;
+  istikharaCompleted?: boolean;
+  nikah?: boolean;
 }
 
 const NikahJourneyCard = ({
   profileCompleted = false,
   compatibilityDone = false,
   firstMatch = false,
+  supervisedExchange = false,
+  familyMeeting = false,
+  istikharaCompleted = false,
+  nikah = false,
 }: NikahJourneyCardProps) => {
   const steps: JourneyStep[] = [
     { label: 'Profil complété', status: profileCompleted ? 'completed' : 'current' },
     { label: 'Test compatibilité', status: compatibilityDone ? 'completed' : profileCompleted ? 'current' : 'pending' },
     { label: 'Premier match', status: firstMatch ? 'completed' : compatibilityDone ? 'current' : 'pending' },
-    { label: 'Échange supervisé', status: firstMatch ? 'current' : 'pending' },
-    { label: 'Réunion famille', status: 'pending' },
-    { label: 'Istikhara & décision', status: 'pending' },
-    { label: 'Nikah', status: 'pending' },
+    { label: 'Échange supervisé', status: supervisedExchange ? 'completed' : firstMatch ? 'current' : 'pending' },
+    { label: 'Réunion famille', status: familyMeeting ? 'completed' : supervisedExchange ? 'current' : 'pending' },
+    { label: 'Istikhara & décision', status: istikharaCompleted ? 'completed' : familyMeeting ? 'current' : 'pending' },
+    { label: 'Nikah', status: nikah ? 'completed' : istikharaCompleted ? 'current' : 'pending' },
   ];
 
   const completedCount = steps.filter((s) => s.status === 'completed').length;
