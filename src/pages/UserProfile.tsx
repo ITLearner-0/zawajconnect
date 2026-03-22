@@ -156,7 +156,7 @@ const UserProfile = () => {
             occupation: profileDataAny.occupation || '',
             religious_practice_level: profileDataAny.religious_practice_level || '',
             birth_date: profileDataAny.birth_date || '',
-            about_me: profileDataAny.about_me || '',
+            bio: profileDataAny.bio || '',
             prayer_frequency: profileDataAny.prayer_frequency || '',
             wali_name: profileDataAny.wali_name || '',
             wali_relationship: profileDataAny.wali_relationship || '',

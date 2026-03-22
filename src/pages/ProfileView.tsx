@@ -626,7 +626,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
                     age: profile.birth_date
                       ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear()
                       : undefined,
-                    bio: profile.about_me || undefined,
+                    bio: profile.bio || undefined,
                     location: profile.location || undefined,
                     education: profile.education_level || undefined,
                     profession: profile.occupation || undefined,
@@ -648,7 +648,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
                     age: profile.birth_date
                       ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear()
                       : undefined,
-                    bio: profile.about_me || undefined,
+                    bio: profile.bio || undefined,
                     location: profile.location || undefined,
                     education: profile.education_level || undefined,
                     profession: profile.occupation || undefined,
@@ -682,7 +682,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
               age: profile.birth_date
                 ? new Date().getFullYear() - new Date(profile.birth_date).getFullYear()
                 : undefined,
-              bio: profile.about_me || undefined,
+              bio: profile.bio || undefined,
               location: profile.location || undefined,
               education: profile.education_level || undefined,
               profession: profile.occupation || undefined,
@@ -707,7 +707,7 @@ function calculateCompletionPercentage(profile: DatabaseProfile): number {
     profile.location,
     profile.education_level,
     profile.occupation,
-    profile.about_me,
+    profile.bio,
     profile.religious_practice_level,
     profile.prayer_frequency,
   ];

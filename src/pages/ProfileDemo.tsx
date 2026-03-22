@@ -64,7 +64,7 @@ const demoProfile: DatabaseProfile = {
   occupation: 'Software Engineer',
   religious_practice_level: 'Practicing',
   prayer_frequency: '5 times daily',
-  about_me:
+  bio:
     "Assalamu alaikum! Je suis une développeuse passionnée qui aime apprendre et partager ses connaissances. Je cherche quelqu'un qui partage mes valeurs islamiques et qui souhaite construire une famille basée sur la foi, le respect et l'amour.\n\nJ'aime lire, voyager et découvrir de nouvelles cultures. Je suis très proche de ma famille et j'accorde une grande importance aux liens familiaux.",
   wali_name: 'Ahmed Hassan',
   wali_relationship: 'Père',

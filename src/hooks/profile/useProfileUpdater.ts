@@ -49,7 +49,7 @@ export const useProfileUpdater = (userId?: string | null) => {
         education_level: newProfileData.education || null,
         occupation: newProfileData.occupation || null,
         religious_practice_level: newProfileData.religiousLevel || null,
-        about_me: newProfileData.aboutMe || null,
+        bio: newProfileData.aboutMe || null,
         prayer_frequency: newProfileData.prayerFrequency || null,
         polygamy_stance: newProfileData.polygamyStance || null,
         wali_name: newProfileData.waliName || null,

@@ -13,7 +13,7 @@ export const profileUpdateSchema = z.object({
   education_level: z.string().max(100).optional(),
   occupation: z.string().max(100).optional(),
   religious_practice_level: z.string().max(50).optional(),
-  about_me: z.string().max(1000).optional(),
+  bio: z.string().max(1000).optional(),
   prayer_frequency: z.string().max(50).optional(),
   polygamy_stance: z.enum(['oui', 'non', 'ouvert']).optional(),
   wali_name: z.string().max(100).optional(),

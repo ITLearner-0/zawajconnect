@@ -15,7 +15,7 @@ export interface StrictProfileData {
   readonly occupation: string | null;
   readonly religious_practice_level: 'beginner' | 'practicing' | 'devout' | 'scholar' | null;
   readonly prayer_frequency: 'rarely' | 'sometimes' | 'regularly' | 'always' | null;
-  readonly about_me: string | null;
+  readonly bio: string | null;
   readonly profile_picture: string | null;
   readonly gallery: readonly string[];
   readonly privacy_settings: StrictPrivacySettings;

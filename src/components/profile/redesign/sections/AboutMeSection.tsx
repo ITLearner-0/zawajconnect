@@ -28,11 +28,11 @@ interface AboutMeSectionProps {
 const AboutMeSection = ({ profile, isOwnProfile, onUpdate }: AboutMeSectionProps) => {
   const { toast } = useToast();
   const [isEditing, setIsEditing] = useState(false);
-  const [aboutText, setAboutText] = useState(profile.about_me || '');
+  const [aboutText, setAboutText] = useState(profile.bio || '');
   const [isSaving, setIsSaving] = useState(false);
 
   const MAX_LENGTH = 1000;
-  const hasContent = profile.about_me && profile.about_me.trim().length > 0;
+  const hasContent = profile.bio && profile.bio.trim().length > 0;
 
   const handleSave = async () => {
     if (aboutText.trim().length === 0) {
@@ -58,7 +58,7 @@ const AboutMeSection = ({ profile, isOwnProfile, onUpdate }: AboutMeSectionProps
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ about_me: aboutText.trim() })
+        .update({ bio: aboutText.trim() })
         .eq('id', profile.id);
 
       if (error) throw error;
@@ -71,7 +71,7 @@ const AboutMeSection = ({ profile, isOwnProfile, onUpdate }: AboutMeSectionProps
       setIsEditing(false);
 
       if (onUpdate) {
-        onUpdate({ about_me: aboutText.trim() });
+        onUpdate({ bio: aboutText.trim() });
       }
     } catch (error) {
       console.error('Error updating about me:', error);
@@ -86,7 +86,7 @@ const AboutMeSection = ({ profile, isOwnProfile, onUpdate }: AboutMeSectionProps
   };
 
   const handleCancel = () => {
-    setAboutText(profile.about_me || '');
+    setAboutText(profile.bio || '');
     setIsEditing(false);
   };
 
@@ -168,7 +168,7 @@ const AboutMeSection = ({ profile, isOwnProfile, onUpdate }: AboutMeSectionProps
           </div>
         ) : hasContent ? (
           // View Mode with content
-          <SectionText>{profile.about_me}</SectionText>
+          <SectionText>{profile.bio}</SectionText>
         ) : isOwnProfile ? (
           // Empty state for own profile
           <EmptyState

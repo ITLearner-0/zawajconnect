@@ -126,7 +126,7 @@ export const useProfileFetcher = (userId?: string | null) => {
             occupation: (profile as any).occupation || '',
             religiousLevel: (profile as any).religious_practice_level || '',
             familyBackground: '',
-            aboutMe: (profile as any).about_me || '',
+            aboutMe: (profile as any).bio || '',
             prayerFrequency: (profile as any).prayer_frequency || '',
             polygamyStance: (profile as any).polygamy_stance || '',
             waliName: (profile as any).wali_name || '',

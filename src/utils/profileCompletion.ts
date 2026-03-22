@@ -12,7 +12,7 @@ interface IslamicPreferences {
 interface DatabaseProfile {
   full_name?: string | null;
   bio?: string | null;
-  about_me?: string | null;
+  // about_me removed - use bio
   education?: string | null;
   education_level?: string | null;
   profession?: string | null;
@@ -44,7 +44,7 @@ export const calculateProfileCompletionPercentage = (
   if (hasBasicInfo) completedSections++;
 
   // Section 2: Bio
-  const bioText = profile.bio || profile.about_me || '';
+  const bioText = profile.bio || '';
   const hasBio = Boolean(bioText && bioText.length >= 50);
   if (hasBio) completedSections++;
 

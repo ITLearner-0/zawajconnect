@@ -40,7 +40,7 @@ export const useProfileRecommendations = (userId?: string) => {
         const newRecommendations: Recommendation[] = [];
 
         // Check for missing profile information
-        if (!(profile as any).about_me || (profile as any).about_me.trim().length < 50) {
+        if (!(profile as any).bio || (profile as any).bio.trim().length < 50) {
           newRecommendations.push({
             id: 'about-me',
             type: 'content',
