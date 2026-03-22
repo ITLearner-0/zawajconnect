@@ -26,8 +26,11 @@ const FamilyCard = ({ contribution, familyCriteria, waliActive = false }: Family
             La famille se présente
           </CardTitle>
           {waliActive && (
-            <Badge className="bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-700/50">
-              Co-créé avec la famille
+            <Badge
+              className="text-xs border-0"
+              style={{ background: '#0C447C', color: '#B5D4F4' }}
+            >
+              Co-créé en famille
             </Badge>
           )}
         </div>

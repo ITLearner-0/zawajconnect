@@ -55,10 +55,10 @@ const ValuesProfileCard = ({
             {dimensions.map((dim) => (
               <div key={dim.label} className="space-y-1">
                 <p className="text-xs text-muted-foreground">{dim.label}</p>
-                <div className="h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <div className="rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden" style={{ height: 8, borderRadius: 4 }}>
                   <div
-                    className={`h-full rounded-full transition-all duration-500 ${getBarColor(dim.score)}`}
-                    style={{ width: `${dim.score}%` }}
+                    className={`h-full transition-all duration-500 ${getBarColor(dim.score)}`}
+                    style={{ width: `${dim.score}%`, borderRadius: 4 }}
                   />
                 </div>
                 <p className="text-xs font-medium">{dim.score}%</p>
