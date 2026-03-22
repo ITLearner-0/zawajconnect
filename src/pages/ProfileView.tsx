@@ -45,6 +45,7 @@ import NikahJourneyCard from '@/components/profile/cards/NikahJourneyCard';
 import { CompatibilitySummary, buildDefaultDimensions } from '@/components/matching/CompatibilitySummary';
 import { useIslamicPreferences } from '@/hooks/profile/useIslamicPreferences';
 import { useJourneyProgress } from '@/hooks/profile/useJourneyProgress';
+import { useProfileStats } from '@/hooks/profile/useProfileStats';
 import { ProfileFormData } from '@/types/profile';
 import { fadeInUp, staggerContainer, staggerItem } from '@/styles/animations';
 import { MobileActionBar, QuickActionsScroll, QuickAction } from '@/components/profile/mobile';
@@ -80,6 +81,7 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
   const profileUserId = profile?.id || profile?.user_id || null;
   const { preferences: realIslamicPrefs } = useIslamicPreferences(profileUserId);
   const { progress: journeyProgress } = useJourneyProgress(profileUserId);
+  const { stats: realProfileStats, recordView } = useProfileStats(profileUserId);
 
   // Build a minimal ProfileFormData for IslamicProfileCard
   const profileFormData: Partial<ProfileFormData> = {
@@ -100,9 +102,9 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
   };
 
   const profileStats = {
-    views: 1247,
-    likes: 89,
-    messages: 34,
+    views: realProfileStats.views,
+    likes: realProfileStats.likes,
+    messages: realProfileStats.messages,
   };
 
   // Islamic preferences - loaded from database with fallbacks
@@ -203,6 +205,13 @@ const ProfileView = ({ isOwnProfile: forceOwnProfile }: ProfileViewProps) => {
 
     fetchMatchData();
   }, [currentUserId, profile?.user_id, isOwnProfile]);
+
+  // Record profile view when visiting another user's profile
+  useEffect(() => {
+    if (currentUserId && profileUserId && !isOwnProfile) {
+      recordView(currentUserId);
+    }
+  }, [currentUserId, profileUserId, isOwnProfile, recordView]);
 
   const loadProfileById = async (profileId: string) => {
     setLoading(true);
