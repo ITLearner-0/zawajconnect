@@ -93,13 +93,13 @@ export class MatchQualityService {
 
     // Add specific compatibility reasons based on profile data
     if (match.profileData) {
-      if (match.profileData.religious_practice_level) {
+      if ((match.profileData as any).religious_level) {
         reasons.push(
-          `Shared religious practice level: ${match.profileData.religious_practice_level}`
+          `Shared religious practice level: ${(match.profileData as any).religious_level}`
         );
       }
-      if (match.profileData.education_level) {
-        reasons.push(`Compatible education background: ${match.profileData.education_level}`);
+      if ((match.profileData as any).education) {
+        reasons.push(`Compatible education background: ${(match.profileData as any).education}`);
       }
     }
 

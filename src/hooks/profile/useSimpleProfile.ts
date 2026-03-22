@@ -104,8 +104,8 @@ export const useSimpleProfile = () => {
 
           const { error: createError } = await (supabase as any).from('profiles').insert({
             id: currentUserId,
-            first_name: '',
-            last_name: '',
+            user_id: currentUserId,
+            full_name: '',
             privacy_settings: DEFAULT_PRIVACY_SETTINGS,
             is_visible: true,
           });
@@ -121,23 +121,22 @@ export const useSimpleProfile = () => {
           setIsNewUser(false);
 
           const mappedData: ProfileFormData = {
-            fullName:
-              `${(profile as any).first_name || ''} ${(profile as any).last_name || ''}`.trim(),
-            age: (profile as any).birth_date || '',
+            fullName: (profile as any).full_name || '',
+            age: (profile as any).age != null ? String((profile as any).age) : '',
             gender: (profile as any).gender || '',
             location: (profile as any).location || '',
-            education: (profile as any).education_level || '',
-            occupation: (profile as any).occupation || '',
-            religiousLevel: (profile as any).religious_practice_level || '',
+            education: (profile as any).education || '',
+            occupation: (profile as any).profession || '',
+            religiousLevel: (profile as any).religious_level || '',
             familyBackground: '',
             aboutMe: (profile as any).bio || '',
-            prayerFrequency: (profile as any).prayer_frequency || '',
-            polygamyStance: (profile as any).polygamy_stance || '',
-            waliName: (profile as any).wali_name || '',
-            waliRelationship: (profile as any).wali_relationship || '',
-            waliContact: (profile as any).wali_contact || '',
-            profilePicture: (profile as any).profile_picture || '',
-            gallery: (profile as any).gallery || [],
+            prayerFrequency: '',
+            polygamyStance: '',
+            waliName: '',
+            waliRelationship: '',
+            waliContact: '',
+            profilePicture: (profile as any).avatar_url || '',
+            gallery: [],
             maritalStatus: (profile as any).marital_status || '',
             hasChildren: (profile as any).has_children != null ? String((profile as any).has_children) : '',
             nationality: (profile as any).nationality || '',
@@ -146,11 +145,12 @@ export const useSimpleProfile = () => {
 
           setFormData(mappedData);
 
+          // Verification data comes from user_verifications table, not profiles
           setVerificationStatus({
-            email: (profile as any).email_verified || false,
-            phone: (profile as any).phone_verified || false,
-            id: (profile as any).id_verified || false,
-            wali: (profile as any).wali_verified || false,
+            email: false,
+            phone: false,
+            id: false,
+            wali: false,
           });
 
           setPrivacySettings(

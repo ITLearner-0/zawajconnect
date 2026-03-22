@@ -9,20 +9,6 @@ export function sortCompatibilityMatches(matches: CompatibilityMatch[]): Compati
       const bScore = b.score ?? b.compatibilityScore ?? 0;
       if (bScore !== aScore) return bScore - aScore;
 
-      // Secondary sort by verification status (if available)
-      if (a.profileData && b.profileData) {
-        const aVerified =
-          (a.profileData.email_verified ? 1 : 0) +
-          (a.profileData.phone_verified ? 1 : 0) +
-          (a.profileData.id_verified ? 1 : 0);
-        const bVerified =
-          (b.profileData.email_verified ? 1 : 0) +
-          (b.profileData.phone_verified ? 1 : 0) +
-          (b.profileData.id_verified ? 1 : 0);
-
-        return bVerified - aVerified;
-      }
-
       return 0;
     });
 }

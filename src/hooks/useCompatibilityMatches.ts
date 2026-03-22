@@ -132,17 +132,14 @@ export function useCompatibilityMatches() {
           .select(
             `
             id,
-            first_name,
-            last_name,
+            full_name,
+            gender,
+            age,
             location,
-            religious_practice_level,
-            education_level,
-            occupation,
-            birth_date,
-            email_verified,
-            phone_verified,
-            id_verified,
-            profile_picture,
+            religious_level,
+            education,
+            profession,
+            avatar_url,
             is_visible
           `
           )
@@ -172,28 +169,18 @@ export function useCompatibilityMatches() {
             result.answers as Record<string, any>
           );
 
-          // Calculer l'âge si la date de naissance est disponible
-          let age: number | undefined;
-          if (profile.birth_date) {
-            age = calculateAge(profile.birth_date);
-          }
-
           const match: CompatibilityMatch = {
             userId: result.user_id,
             score: compatibilityScore,
             profileData: {
               id: profile.id,
-              first_name: profile.first_name || 'Utilisateur',
-              last_name: profile.last_name || undefined,
+              full_name: profile.full_name || 'Utilisateur',
               gender: profile.gender || 'non-spécifié',
-              age,
+              age: profile.age || undefined,
               location: profile.location || undefined,
-              religious_practice_level: profile.religious_practice_level || undefined,
-              education_level: profile.education_level || undefined,
-              email_verified: profile.email_verified || false,
-              phone_verified: profile.phone_verified || false,
-              id_verified: profile.id_verified || false,
-              profile_picture: profile.profile_picture || undefined,
+              religious_level: profile.religious_level || undefined,
+              education: profile.education || undefined,
+              avatar_url: profile.avatar_url || undefined,
             },
             matchDetails: {
               strengths: ['Compatibilité calculée à partir des vraies données'],

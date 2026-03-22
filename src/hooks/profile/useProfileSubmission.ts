@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ProfileFormData, PrivacySettings } from '@/types/profile';
 import { useToast } from '@/hooks/use-toast';
-import { processFullName, processBirthDate, processGallery } from './utils/dataProcessing';
+import { processBirthDate } from './utils/dataProcessing';
 import { mapProfileDataToDatabase } from './utils/fieldMapping';
 import { checkProfileExists, updateProfile, insertProfile } from './utils/databaseOperations';
 import { supabase } from '@/integrations/supabase/client';
@@ -75,37 +75,33 @@ export const useProfileSubmission = () => {
       console.log('=== PROCESSING DATA ===');
 
       // Process name and birth date
-      const nameResult = processFullName(profileData.fullName);
+      const fullName = (profileData.fullName || '').trim();
       const birthDate = processBirthDate(profileData.age);
 
-      console.log('Processed name:', nameResult);
+      console.log('Processed full name:', fullName);
       console.log('Processed birth date:', birthDate);
 
-      // Prepare base update data
+      // Prepare base update data — only valid profiles table columns
       const updateData = mapProfileDataToDatabase(
         userId,
         profileData,
-        nameResult.firstName,
-        nameResult.lastName,
+        fullName,
+        '',
         birthDate
       );
 
       // Add privacy settings
       updateData.privacy_settings = privacySettings;
 
-      // Handle profile picture
+      // Handle profile picture → DB column is 'avatar_url'
       if (profileData.profilePicture && typeof profileData.profilePicture === 'string') {
         const trimmedPicture = profileData.profilePicture.trim();
         if (trimmedPicture) {
-          updateData.profile_picture = trimmedPicture;
+          updateData.avatar_url = trimmedPicture;
         }
       }
 
-      // Handle gallery
-      const processedGallery = processGallery(profileData.gallery);
-      if (processedGallery.length > 0) {
-        updateData.gallery = processedGallery;
-      }
+      // Note: gallery is not a column in the profiles table — skip it
 
       console.log('=== FINAL UPDATE DATA ===');
       console.log(JSON.stringify(updateData, null, 2));

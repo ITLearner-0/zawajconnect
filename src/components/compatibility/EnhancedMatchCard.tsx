@@ -41,9 +41,9 @@ const EnhancedMatchCard: React.FC<EnhancedMatchCardProps> = ({ match, onMessageC
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
-            {match.profileData?.profile_picture ? (
+            {match.profileData?.avatar_url ? (
               <img
-                src={match.profileData.profile_picture}
+                src={match.profileData.avatar_url}
                 alt="Profile"
                 className="w-16 h-16 rounded-full object-cover"
               />
@@ -71,14 +71,14 @@ const EnhancedMatchCard: React.FC<EnhancedMatchCardProps> = ({ match, onMessageC
               </div>
 
               <div className="flex items-center gap-2 mt-1">
-                {match.profileData?.religious_practice_level && (
+                {match.profileData?.religious_level && (
                   <Badge variant="outline" className="text-xs">
-                    {match.profileData.religious_practice_level}
+                    {match.profileData.religious_level}
                   </Badge>
                 )}
-                {match.profileData?.education_level && (
+                {match.profileData?.education && (
                   <Badge variant="outline" className="text-xs">
-                    {match.profileData.education_level}
+                    {match.profileData.education}
                   </Badge>
                 )}
               </div>
