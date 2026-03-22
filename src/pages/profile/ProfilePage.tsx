@@ -10,7 +10,17 @@ import ProfileAnalytics from '@/components/profile/ProfileAnalytics';
 import ProfileRecommendations from '@/components/profile/ProfileRecommendations';
 import ProfileVisibilityManager from '@/components/profile/ProfileVisibilityManager';
 import StandardLoadingState from '@/components/ui/StandardLoadingState';
+import TrustScoreCard from '@/components/profile/cards/TrustScoreCard';
+import IslamicProfileCard from '@/components/profile/cards/IslamicProfileCard';
+import NikahJourneyCard from '@/components/profile/cards/NikahJourneyCard';
+import ValuesProfileCard from '@/components/profile/cards/ValuesProfileCard';
+import FamilyCard from '@/components/profile/cards/FamilyCard';
+import SearchCriteriaCard from '@/components/profile/cards/SearchCriteriaCard';
 import { useProfilePageLogic } from './hooks/useProfilePageLogic';
+import { useIslamicPreferences } from '@/hooks/profile/useIslamicPreferences';
+import { useJourneyProgress } from '@/hooks/profile/useJourneyProgress';
+import { useFamilyContributions } from '@/hooks/profile/useFamilyContributions';
+import { useTrustScore } from '@/hooks/profile/useTrustScore';
 
 const ProfilePage = () => {
   console.log('ProfilePage: Component rendering started');
@@ -64,6 +74,12 @@ const ProfilePage = () => {
     // Visibility settings
     visibilitySettings,
   } = useProfilePageLogic();
+
+  // Load enriched profile data from Phase 2 tables
+  const { preferences: islamicPrefs } = useIslamicPreferences(userId);
+  const { progress: journeyProgress } = useJourneyProgress(userId);
+  const { familyData } = useFamilyContributions(userId);
+  const { trustData } = useTrustScore(userId);
 
   console.log('ProfilePage: useProfilePageLogic returned:', {
     formData: !!formData,
@@ -216,6 +232,9 @@ const ProfilePage = () => {
                 userId={userId}
                 hasCompatibilityResults={hasCompatibilityResults ?? undefined}
                 onSignOut={handleSignOut}
+                verificationStatus={verificationStatus}
+                waliActive={verificationStatus.wali}
+                fullName={formData.fullName}
               />
             </CardHeader>
 
@@ -229,6 +248,39 @@ const ProfilePage = () => {
                 </TabsList>
 
                 <TabsContent value="profile" className="space-y-6">
+                  {/* Profile dashboard cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <TrustScoreCard
+                      verificationStatus={verificationStatus}
+                      verificationScore={trustData.publicTrustScore || (
+                        [verificationStatus.email, verificationStatus.phone, verificationStatus.id, verificationStatus.wali]
+                          .filter(Boolean).length * 25
+                      )}
+                      hasCompatibilityTest={trustData.compatibilityTestCompleted || (hasCompatibilityResults ?? false)}
+                    />
+                    <IslamicProfileCard
+                      formData={formData}
+                      hijabPreference={islamicPrefs.hijabPreference ?? undefined}
+                      beardPreference={islamicPrefs.beardPreference ?? undefined}
+                    />
+                    <NikahJourneyCard
+                      profileCompleted={journeyProgress.profileCompleted || (!!formData.aboutMe && !!formData.fullName)}
+                      compatibilityDone={journeyProgress.compatibilityDone || (hasCompatibilityResults ?? false)}
+                      firstMatch={journeyProgress.firstMatch}
+                      supervisedExchange={journeyProgress.supervisedExchange}
+                      familyMeeting={journeyProgress.familyMeeting}
+                      istikharaCompleted={journeyProgress.istikharaCompleted}
+                      nikah={journeyProgress.nikah}
+                    />
+                    <ValuesProfileCard />
+                    <FamilyCard
+                      waliActive={verificationStatus.wali}
+                      contribution={familyData.contribution}
+                      familyCriteria={familyData.criteria}
+                    />
+                    <SearchCriteriaCard aboutMe={formData.aboutMe} />
+                  </div>
+
                   <ProfileForm
                     formData={formData}
                     handleChange={handleProfileFormChange}

@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Heart, X, MapPin, GraduationCap, Briefcase, User, Info } from 'lucide-react';
+import { Heart, X, MapPin, GraduationCap, Briefcase, User, Info, ShieldCheck } from 'lucide-react';
 import VerificationBadge from '@/components/VerificationBadge';
 import { hapticLight, hapticMedium, hapticSuccess, hapticImpact } from '@/utils/haptics';
 
@@ -239,6 +239,28 @@ export const SwipeableProfileCard = ({
               <h3 className="text-2xl font-bold">Profil Anonyme</h3>
               <span className="text-xl text-muted-foreground">{profile.age} ans</span>
             </div>
+
+            {/* Trust Score Mini Bar */}
+            {profile.verification_score > 0 && (
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 flex-shrink-0" />
+                <div className="flex-1 h-1.5 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full ${
+                      profile.verification_score >= 75
+                        ? 'bg-emerald-500'
+                        : profile.verification_score >= 50
+                          ? 'bg-amber-500'
+                          : 'bg-gray-400'
+                    }`}
+                    style={{ width: `${Math.min(profile.verification_score, 100)}%` }}
+                  />
+                </div>
+                <span className="text-xs text-muted-foreground font-medium">
+                  {profile.verification_score}%
+                </span>
+              </div>
+            )}
 
             <div className="space-y-2">
               {profile.city_only && (

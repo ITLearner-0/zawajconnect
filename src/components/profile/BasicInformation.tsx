@@ -102,6 +102,55 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           Your current city and country of residence
         </p>
       </div>
+      <div className="space-y-2">
+        <Label htmlFor="nationality">Nationalité</Label>
+        <Input
+          id="nationality"
+          name="nationality"
+          value={formData.nationality || ''}
+          onChange={handleChange}
+          placeholder="Ex: Franco-marocaine"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="motherTongue">Langue maternelle</Label>
+        <Input
+          id="motherTongue"
+          name="motherTongue"
+          value={formData.motherTongue || ''}
+          onChange={handleChange}
+          placeholder="Ex: Arabe, Français"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="maritalStatus">Situation matrimoniale</Label>
+        <select
+          id="maritalStatus"
+          name="maritalStatus"
+          value={formData.maritalStatus || ''}
+          onChange={handleChange}
+          className="w-full h-10 px-3 rounded-md border border-input bg-background"
+        >
+          <option value="">Sélectionnez</option>
+          <option value="celibataire">Célibataire</option>
+          <option value="divorce">Divorcé(e)</option>
+          <option value="veuf">Veuf/Veuve</option>
+        </select>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="hasChildren">Enfants</Label>
+        <select
+          id="hasChildren"
+          name="hasChildren"
+          value={formData.hasChildren || ''}
+          onChange={handleChange}
+          className="w-full h-10 px-3 rounded-md border border-input bg-background"
+        >
+          <option value="">Sélectionnez</option>
+          <option value="false">Non</option>
+          <option value="true">Oui</option>
+        </select>
+      </div>
     </div>
   </div>
 );

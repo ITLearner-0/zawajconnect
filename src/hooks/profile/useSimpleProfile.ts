@@ -138,6 +138,10 @@ export const useSimpleProfile = () => {
             waliContact: (profile as any).wali_contact || '',
             profilePicture: (profile as any).profile_picture || '',
             gallery: (profile as any).gallery || [],
+            maritalStatus: (profile as any).marital_status || '',
+            hasChildren: (profile as any).has_children != null ? String((profile as any).has_children) : '',
+            nationality: (profile as any).nationality || '',
+            motherTongue: (profile as any).mother_tongue || '',
           };
 
           setFormData(mappedData);
