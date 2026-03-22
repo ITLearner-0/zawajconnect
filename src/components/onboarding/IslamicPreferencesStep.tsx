@@ -115,8 +115,8 @@ const IslamicPreferencesStep = ({
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <Label className="text-base font-medium mb-3 block">Fréquence de prière *</Label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <Label id="prayer_frequency_label" className="text-base font-medium mb-3 block">Fréquence de prière *</Label>
+            <div role="group" aria-labelledby="prayer_frequency_label" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {prayerOptions.map((option) => (
                 <button
                   key={option.value}
@@ -141,8 +141,8 @@ const IslamicPreferencesStep = ({
           </div>
 
           <div>
-            <Label className="text-base font-medium mb-3 block">Lecture du Coran</Label>
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+            <Label id="quran_reading_label" className="text-base font-medium mb-3 block">Lecture du Coran</Label>
+            <div role="group" aria-labelledby="quran_reading_label" className="grid grid-cols-2 lg:grid-cols-3 gap-3">
               {quranOptions.map((option) => (
                 <button
                   key={option.value}
@@ -181,7 +181,7 @@ const IslamicPreferencesStep = ({
                 value={preferences.sect}
                 onValueChange={(value) => updatePreference('sect', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger id="sect">
                   <SelectValue placeholder="Sélectionnez votre secte" />
                 </SelectTrigger>
                 <SelectContent>
@@ -200,7 +200,7 @@ const IslamicPreferencesStep = ({
                 value={preferences.madhab}
                 onValueChange={(value) => updatePreference('madhab', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger id="madhab">
                   <SelectValue placeholder="Sélectionnez votre madhab" />
                 </SelectTrigger>
                 <SelectContent>
@@ -215,8 +215,8 @@ const IslamicPreferencesStep = ({
           </div>
 
           <div>
-            <Label className="text-base font-medium mb-3 block">Importance de la religion *</Label>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <Label id="importance_of_religion_label" className="text-base font-medium mb-3 block">Importance de la religion *</Label>
+            <div role="group" aria-labelledby="importance_of_religion_label" className="grid grid-cols-2 lg:grid-cols-4 gap-3">
               {importanceOptions.map((option) => (
                 <button
                   key={option.value}
@@ -254,7 +254,7 @@ const IslamicPreferencesStep = ({
                 value={preferences.hijab_preference}
                 onValueChange={(value) => updatePreference('hijab_preference', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger id="hijab">
                   <SelectValue placeholder="Votre préférence" />
                 </SelectTrigger>
                 <SelectContent>
@@ -275,7 +275,7 @@ const IslamicPreferencesStep = ({
                 value={preferences.beard_preference}
                 onValueChange={(value) => updatePreference('beard_preference', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger id="beard">
                   <SelectValue placeholder="Votre préférence" />
                 </SelectTrigger>
                 <SelectContent>
@@ -292,8 +292,8 @@ const IslamicPreferencesStep = ({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label className="text-base font-medium mb-3 block">Tabagisme</Label>
-              <div className="space-y-2">
+              <Label id="smoking_label" className="text-base font-medium mb-3 block">Tabagisme</Label>
+              <div role="group" aria-labelledby="smoking_label" className="space-y-2">
                 {smokingOptions.map((option) => (
                   <button
                     key={option.value}
@@ -348,7 +348,7 @@ const IslamicPreferencesStep = ({
               value={preferences.desired_partner_sect}
               onValueChange={(value) => updatePreference('desired_partner_sect', value)}
             >
-              <SelectTrigger>
+              <SelectTrigger id="desired_partner_sect">
                 <SelectValue placeholder="Aucune préférence particulière" />
               </SelectTrigger>
               <SelectContent>
