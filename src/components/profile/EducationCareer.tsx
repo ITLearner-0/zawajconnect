@@ -15,13 +15,13 @@ const EducationCareer = ({ formData, handleChange }: EducationCareerProps) => (
       id="education-career-heading"
       className="text-xl font-semibold text-islamic-teal dark:text-islamic-cream"
     >
-      Education & Career
+      Éducation et carrière
     </h2>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <div className="flex items-center">
           <Label htmlFor="education" className="text-islamic-burgundy dark:text-islamic-cream/90">
-            Education Level
+            Niveau d'éducation
           </Label>
           <TooltipProvider>
             <FieldTooltip content={fieldTooltips.education} />
@@ -32,7 +32,7 @@ const EducationCareer = ({ formData, handleChange }: EducationCareerProps) => (
           name="education"
           value={formData.education}
           onChange={handleChange}
-          placeholder="Highest education achieved"
+          placeholder="Plus haut diplôme obtenu"
           aria-describedby="education-description"
           className="border-islamic-teal/30 dark:border-islamic-darkTeal/30 dark:bg-islamic-darkCard/80 dark:text-islamic-cream"
         />
@@ -44,7 +44,7 @@ const EducationCareer = ({ formData, handleChange }: EducationCareerProps) => (
       <div className="space-y-2">
         <div className="flex items-center">
           <Label htmlFor="occupation" className="text-islamic-burgundy dark:text-islamic-cream/90">
-            Occupation
+            Profession
           </Label>
           <TooltipProvider>
             <FieldTooltip content={fieldTooltips.occupation} />
@@ -55,7 +55,7 @@ const EducationCareer = ({ formData, handleChange }: EducationCareerProps) => (
           name="occupation"
           value={formData.occupation}
           onChange={handleChange}
-          placeholder="Current occupation"
+          placeholder="Profession actuelle"
           aria-describedby="occupation-description"
           className="border-islamic-teal/30 dark:border-islamic-darkTeal/30 dark:bg-islamic-darkCard/80 dark:text-islamic-cream"
         />

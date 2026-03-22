@@ -25,12 +25,12 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
   return (
     <div className="space-y-4">
       <h2 id="religious-background-heading" className="text-xl font-semibold text-primary">
-        Religious Background
+        Parcours religieux
       </h2>
       <div className="grid grid-cols-1 gap-4">
         <div className="space-y-2">
           <div className="flex items-center">
-            <Label htmlFor="religiousLevel">Religious Practice Level</Label>
+            <Label htmlFor="religiousLevel">Niveau de pratique religieuse</Label>
             <TooltipProvider>
               <FieldTooltip content={fieldTooltips.religiousLevel} />
             </TooltipProvider>
@@ -43,11 +43,11 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
             className="w-full h-10 px-3 rounded-md border border-input bg-background"
             aria-describedby="religiousLevel-description"
           >
-            <option value="">Select level</option>
-            <option value="very-practicing">Very practicing</option>
-            <option value="practicing">Practicing</option>
-            <option value="moderately-practicing">Moderately practicing</option>
-            <option value="learning">Learning more about Islam</option>
+            <option value="">Sélectionnez le niveau</option>
+            <option value="very-practicing">Très pratiquant</option>
+            <option value="practicing">Pratiquant</option>
+            <option value="moderately-practicing">Modérément pratiquant</option>
+            <option value="learning">En apprentissage</option>
           </select>
           <p id="religiousLevel-description" className="sr-only">
             How you would describe your level of religious practice
@@ -58,7 +58,7 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
 
         <div className="space-y-2">
           <div className="flex items-center">
-            <Label htmlFor="prayerFrequency">Prayer Frequency</Label>
+            <Label htmlFor="prayerFrequency">Fréquence de prière</Label>
             <TooltipProvider>
               <FieldTooltip content={fieldTooltips.prayerFrequency} />
             </TooltipProvider>
@@ -71,10 +71,10 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
             className="w-full h-10 px-3 rounded-md border border-input bg-background"
             aria-describedby="prayerFrequency-description"
           >
-            <option value="five-daily">Five times daily</option>
-            <option value="regular">Regular but not all five</option>
-            <option value="sometimes">Sometimes</option>
-            <option value="learning">Learning to pray</option>
+            <option value="five-daily">Cinq prières quotidiennes</option>
+            <option value="regular">Régulier mais pas les cinq</option>
+            <option value="sometimes">Parfois</option>
+            <option value="learning">En apprentissage</option>
           </select>
           <p id="prayerFrequency-description" className="sr-only">
             How frequently you perform prayers
@@ -82,7 +82,7 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
         </div>
         <div className="space-y-2">
           <div className="flex items-center">
-            <Label htmlFor="familyBackground">Family Background</Label>
+            <Label htmlFor="familyBackground">Contexte familial</Label>
             <TooltipProvider>
               <FieldTooltip content={fieldTooltips.familyBackground} />
             </TooltipProvider>
@@ -92,7 +92,7 @@ const ReligiousBackground = ({ formData, handleChange }: ReligiousBackgroundProp
             name="familyBackground"
             value={formData.familyBackground}
             onChange={handleChange}
-            placeholder="Share about your family background"
+            placeholder="Partagez des informations sur votre contexte familial"
             className="w-full min-h-[100px] px-3 py-2 rounded-md border border-input bg-background"
             aria-describedby="familyBackground-description"
           />

@@ -34,6 +34,12 @@ const AboutMe = ({ formData, handleChange }: AboutMeProps) => (
         className="w-full min-h-[150px] px-3 py-2 rounded-md border border-islamic-teal/30 bg-white dark:bg-islamic-darkCard/80 dark:border-islamic-darkTeal/30 dark:text-islamic-cream"
         aria-describedby="aboutMe-description"
       />
+      <div className="flex justify-between text-xs text-gray-500">
+        <span>Minimum 50 caractères</span>
+        <span className={formData.aboutMe && formData.aboutMe.length >= 50 ? 'text-green-600' : 'text-gray-500'}>
+          {formData.aboutMe ? formData.aboutMe.length : 0} / 50
+        </span>
+      </div>
       <p id="aboutMe-description" className="sr-only">
         Décrivez-vous, vos intérêts, hobbies, valeurs et ce que vous recherchez chez un partenaire
       </p>

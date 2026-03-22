@@ -9,15 +9,15 @@ export const useOnboarding = (formData: ProfileFormData, isNewUser: boolean) => 
   // Get base steps
   const getSteps = () => {
     const baseSteps = [
-      'Basic Information',
-      'Education & Career',
-      'Religious Background',
-      'About Me',
+      'Informations de base',
+      'Éducation et carrière',
+      'Parcours religieux',
+      'À propos de moi',
     ];
 
     // Add Wali Information step only for female users
     if (formData.gender === 'female') {
-      baseSteps.push('Wali Information');
+      baseSteps.push('Informations du Wali');
     }
 
     return baseSteps;
@@ -35,11 +35,14 @@ export const useOnboarding = (formData: ProfileFormData, isNewUser: boolean) => 
       4: formData.gender === 'female' ? ['waliName', 'waliRelationship', 'waliContact'] : [],
     };
 
-    return (
-      requiredFieldsByStep[currentStep]?.every(
-        (field) => formData[field as keyof ProfileFormData]
-      ) ?? true
-    );
+    const requiredFields = requiredFieldsByStep[currentStep] ?? [];
+    return requiredFields.every((field) => {
+      const value = formData[field as keyof ProfileFormData];
+      if (!value) return false;
+      // Enforce 50 chars minimum for aboutMe
+      if (field === 'aboutMe' && typeof value === 'string' && value.length < 50) return false;
+      return true;
+    });
   };
 
   const handleNext = () => {

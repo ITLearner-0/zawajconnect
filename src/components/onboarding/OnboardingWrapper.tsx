@@ -31,9 +31,9 @@ const OnboardingWrapper = ({
       <div className="container max-w-3xl mx-auto px-4 relative z-10">
         <IslamicPattern variant="card" color="teal" className="shadow-lg overflow-hidden">
           <CardHeader className="bg-gradient-to-r from-islamic-teal to-islamic-teal/90 text-white">
-            <h1 className="text-2xl font-bold text-center">Complete Your Profile</h1>
+            <h1 className="text-2xl font-bold text-center">Complétez votre profil</h1>
             <p className="text-center text-islamic-cream mb-4">
-              Step {currentStep + 1} of {steps.length}: {steps[currentStep]}
+              Étape {currentStep + 1} sur {steps.length} : {steps[currentStep]}
             </p>
             <div className="flex space-x-1 mb-2">
               {steps.map((_, index) => (
@@ -56,7 +56,7 @@ const OnboardingWrapper = ({
                 disabled={currentStep === 0}
                 className="border-islamic-teal/20 text-islamic-teal hover:bg-islamic-teal/5"
               >
-                <ArrowLeft className="mr-2 h-4 w-4" /> Previous
+                <ArrowLeft className="mr-2 h-4 w-4" /> Précédent
               </CustomButton>
 
               {isLastStep ? (
@@ -67,7 +67,7 @@ const OnboardingWrapper = ({
                   variant="teal"
                   className="group"
                 >
-                  Complete{' '}
+                  Terminer{' '}
                   <Check className="ml-2 h-4 w-4 group-hover:scale-110 transition-transform" />
                 </CustomButton>
               ) : (
@@ -78,7 +78,7 @@ const OnboardingWrapper = ({
                   variant="teal"
                   className="group"
                 >
-                  Next{' '}
+                  Suivant{' '}
                   <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </CustomButton>
               )}

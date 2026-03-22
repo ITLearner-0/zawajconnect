@@ -10,7 +10,7 @@ export const profileFormSchema = z.object({
   religiousLevel: z.string().min(1, 'Religious level is required'),
   prayerFrequency: z.string().optional(),
   familyBackground: z.string().optional(),
-  aboutMe: z.string().min(10, 'Please write at least 10 characters about yourself'),
+  aboutMe: z.string().min(50, 'Veuillez écrire au moins 50 caractères à propos de vous'),
   waliName: z.string().optional(),
   waliRelationship: z.string().optional(),
   waliContact: z.string().optional(),

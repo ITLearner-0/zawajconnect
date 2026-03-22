@@ -116,6 +116,13 @@ const ProfilePage = () => {
     return result ? result.success : false;
   };
 
+  // Auto-save profile when onboarding completes
+  const handleCompleteOnboarding = async () => {
+    completeOnboarding();
+    // Save the profile data collected during onboarding
+    await handleSaveProfile();
+  };
+
   // Show loading state if data is not ready
   if (loading) {
     console.log('ProfilePage: Showing loading state');
@@ -187,7 +194,7 @@ const ProfilePage = () => {
           handleChange={handleOnboardingChange}
           handleNext={handleNext}
           handlePrevious={handlePrevious}
-          completeOnboarding={completeOnboarding}
+          completeOnboarding={handleCompleteOnboarding}
           canProceedCurrentStep={canProceedCurrentStep}
         />
       </AccessibilityProvider>

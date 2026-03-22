@@ -65,7 +65,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({
           }
           break;
         case 'aboutMe':
-          if (value && typeof value === 'string' && value.length >= 10) {
+          if (value && typeof value === 'string' && value.length >= 50) {
             validateField(name as keyof ProfileFormData, value, () => null);
           }
           break;

@@ -12,12 +12,12 @@ interface BasicInformationProps {
 const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => (
   <div className="space-y-4">
     <h2 id="basic-info-heading" className="text-xl font-semibold text-primary">
-      Basic Information
+      Informations de base
     </h2>
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="fullName">Full Name</Label>
+          <Label htmlFor="fullName">Nom complet</Label>
           <TooltipProvider>
             <FieldTooltip content={fieldTooltips.fullName} />
           </TooltipProvider>
@@ -27,7 +27,7 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           name="fullName"
           value={formData.fullName}
           onChange={handleChange}
-          placeholder="Enter your full name"
+          placeholder="Entrez votre nom complet"
           aria-required="true"
           aria-describedby="fullName-description"
         />
@@ -37,7 +37,7 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="age">Age</Label>
+          <Label htmlFor="age">Âge</Label>
           <TooltipProvider>
             <FieldTooltip content={fieldTooltips.age} />
           </TooltipProvider>
@@ -48,7 +48,7 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           type="number"
           value={formData.age}
           onChange={handleChange}
-          placeholder="Your age"
+          placeholder="Votre âge"
           aria-required="true"
           min="18"
           max="120"
@@ -60,7 +60,7 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="gender">Gender</Label>
+          <Label htmlFor="gender">Genre</Label>
           <TooltipProvider>
             <FieldTooltip content={fieldTooltips.gender} />
           </TooltipProvider>
@@ -74,9 +74,9 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           aria-required="true"
           aria-describedby="gender-description"
         >
-          <option value="">Select gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+          <option value="">Sélectionnez le genre</option>
+          <option value="male">Homme</option>
+          <option value="female">Femme</option>
         </select>
         <p id="gender-description" className="sr-only">
           Please select your gender
@@ -84,7 +84,7 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
       </div>
       <div className="space-y-2">
         <div className="flex items-center">
-          <Label htmlFor="location">Location</Label>
+          <Label htmlFor="location">Localisation</Label>
           <TooltipProvider>
             <FieldTooltip content={fieldTooltips.location} />
           </TooltipProvider>
@@ -94,7 +94,7 @@ const BasicInformation = ({ formData, handleChange }: BasicInformationProps) => 
           name="location"
           value={formData.location}
           onChange={handleChange}
-          placeholder="City, Country"
+          placeholder="Ville, Pays"
           aria-required="true"
           aria-describedby="location-description"
         />
