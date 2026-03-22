@@ -6,6 +6,7 @@ import ReligiousBackground from '@/components/profile/ReligiousBackground';
 import AboutMe from '@/components/profile/AboutMe';
 import WaliInformation from '@/components/profile/WaliInformation';
 import PhotoUploadStep from '@/components/onboarding/PhotoUploadStep';
+import OnboardingSummary from '@/components/onboarding/OnboardingSummary';
 import { ProfileFormData } from '@/types/profile';
 import { IslamicPattern } from '@/components/ui/islamic-pattern';
 
@@ -95,15 +96,38 @@ const ProfileOnboarding = ({
           </IslamicPattern>
         );
       case 5:
-        return formData.gender === 'female' ? (
+        if (formData.gender === 'female') {
+          return (
+            <IslamicPattern
+              variant="background"
+              intensity="light"
+              className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard"
+            >
+              <WaliInformation formData={formData} handleChange={handleChange} showRequired={true} />
+            </IslamicPattern>
+          );
+        }
+        // For non-female users, step 5 is the summary
+        return (
           <IslamicPattern
             variant="background"
             intensity="light"
             className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard"
           >
-            <WaliInformation formData={formData} handleChange={handleChange} showRequired={true} />
+            <OnboardingSummary formData={formData} />
           </IslamicPattern>
-        ) : null;
+        );
+      case 6:
+        // For female users, step 6 is the summary
+        return (
+          <IslamicPattern
+            variant="background"
+            intensity="light"
+            className="p-6 rounded-lg bg-white shadow-md dark:bg-islamic-darkCard"
+          >
+            <OnboardingSummary formData={formData} />
+          </IslamicPattern>
+        );
       default:
         return null;
     }

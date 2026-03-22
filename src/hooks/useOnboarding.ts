@@ -7,8 +7,18 @@ export const useOnboarding = (
   isNewUser: boolean,
   onClearWaliData?: () => void
 ) => {
+  const STORAGE_KEY = 'zawaj_onboarding_step';
+
   const [isOnboarding, setIsOnboarding] = useState(isNewUser);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(() => {
+    if (!isNewUser) return 0;
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? parseInt(saved, 10) : 0;
+    } catch {
+      return 0;
+    }
+  });
 
   // Get base steps
   const getSteps = () => {
@@ -24,6 +34,9 @@ export const useOnboarding = (
     if (formData.gender === 'female') {
       baseSteps.push('Informations du Wali');
     }
+
+    // Always end with summary
+    baseSteps.push('Récapitulatif');
 
     return baseSteps;
   };
@@ -86,20 +99,37 @@ export const useOnboarding = (
     return errors;
   };
 
+  const persistStep = (step: number) => {
+    try {
+      localStorage.setItem(STORAGE_KEY, String(step));
+    } catch {
+      // localStorage may be unavailable
+    }
+  };
+
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
+      const next = currentStep + 1;
+      setCurrentStep(next);
+      persistStep(next);
     }
   };
 
   const handlePrevious = () => {
     if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
+      const prev = currentStep - 1;
+      setCurrentStep(prev);
+      persistStep(prev);
     }
   };
 
   const completeOnboarding = () => {
     setIsOnboarding(false);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // localStorage may be unavailable
+    }
   };
 
   // Update steps when gender changes and clean wali data if switching away from female
