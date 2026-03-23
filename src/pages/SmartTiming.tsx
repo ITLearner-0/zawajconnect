@@ -126,7 +126,7 @@ const SmartTiming = () => {
             <MessageCircle className="h-6 w-6 mx-auto mb-1" style={{ color: 'var(--color-accent)' }} />
             <p className="text-lg font-bold flex items-center justify-center gap-1">
               {engagementData.weeklyMessages}
-              <ArrowUp className="h-3 w-3 text-emerald-500" />
+              <ArrowUp className="h-3 w-3" style={{ color: 'var(--color-success)' }} />
             </p>
             <p className="text-xs text-muted-foreground">Messages/semaine</p>
           </CardContent>
@@ -137,7 +137,7 @@ const SmartTiming = () => {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-cyan-500" />
+            <BarChart3 className="h-5 w-5" style={{ color: 'var(--color-accent)' }} />
             Carte d'activité
           </CardTitle>
         </CardHeader>

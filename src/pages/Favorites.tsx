@@ -309,11 +309,11 @@ export default function Favorites() {
 
         {filteredProfiles.length === 0 ? (
           <div className="text-center py-16">
-            <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-2xl font-semibold mb-2">
+            <Heart className="h-16 w-16 mx-auto mb-4" style={{ color: 'var(--color-text-muted)' }} />
+            <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
               {selectedTagFilter ? 'Aucun favori avec ce tag' : 'Aucun favori'}
             </h2>
-            <p className="text-muted-foreground mb-6">
+            <p className="mb-6" style={{ color: 'var(--color-text-muted)' }}>
               {selectedTagFilter
                 ? 'Aucun profil favori ne correspond à ce filtre.'
                 : 'Commencez à ajouter des profils à vos favoris pour les retrouver facilement ici.'}
@@ -323,7 +323,7 @@ export default function Favorites() {
                 Voir tous les favoris
               </Button>
             ) : (
-              <Button onClick={() => navigate('/browse')}>Explorer les profils</Button>
+              <Button onClick={() => navigate('/browse')} style={{ backgroundColor: 'var(--color-primary)', color: '#fff', borderRadius: 'var(--radius-md)' }}>Explorer les profils</Button>
             )}
           </div>
         ) : (

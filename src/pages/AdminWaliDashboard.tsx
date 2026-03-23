@@ -266,37 +266,37 @@ const AdminWaliDashboard = () => {
                   <span className="text-sm font-bold">{kpis.current.total_registrations}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm">Approuvées</span>
-                  <span className="text-sm font-bold text-green-600">
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Approuvées</span>
+                  <span className="text-sm font-bold" style={{ color: 'var(--color-success)' }}>
                     {kpis.current.approved_count}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm">Rejetées</span>
-                  <span className="text-sm font-bold text-red-600">
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Rejetées</span>
+                  <span className="text-sm font-bold" style={{ color: 'var(--color-danger)' }}>
                     {kpis.current.rejected_count}
                   </span>
                 </div>
               </div>
 
-              <div className="border-t pt-4 space-y-2">
+              <div className="pt-4 space-y-2" style={{ borderTop: '1px solid var(--color-border-default)' }}>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium">Période précédente</span>
-                  <span className="text-sm text-muted-foreground">Comparaison</span>
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Période précédente</span>
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Comparaison</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-sm">Inscriptions</span>
                   <span className="text-sm font-bold">{kpis.previous.total_registrations}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm">Approuvées</span>
-                  <span className="text-sm font-bold text-green-600">
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Approuvées</span>
+                  <span className="text-sm font-bold" style={{ color: 'var(--color-success)' }}>
                     {kpis.previous.approved_count}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm">Rejetées</span>
-                  <span className="text-sm font-bold text-red-600">
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Rejetées</span>
+                  <span className="text-sm font-bold" style={{ color: 'var(--color-danger)' }}>
                     {kpis.previous.rejected_count}
                   </span>
                 </div>
