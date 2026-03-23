@@ -139,23 +139,37 @@ export function AppSidebar() {
 
   const isActive = (path: string) => currentPath === path;
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
-    isActive ? 'bg-primary/10 text-primary font-medium' : 'hover:bg-muted/50';
+    isActive
+      ? 'font-medium'
+      : '';
 
   // Don't render sidebar if still loading roles to prevent errors
   if (!user || roleLoading) return null;
 
   return (
     <Sidebar collapsible="icon">
-      <SidebarContent className="bg-card/95 backdrop-blur-sm border-r border-border/40">
+      <SidebarContent
+        style={{
+          background: 'var(--color-bg-card)',
+          borderRight: '1px solid var(--color-border-default)',
+        }}
+      >
         {/* Logo */}
         <div className={`flex items-center gap-3 p-4 ${isCollapsed ? 'justify-center' : ''}`}>
-          <div className="h-10 w-10 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-            <Heart className="h-5 w-5 text-primary-foreground fill-current" />
+          <div
+            className="h-10 w-10 rounded-full flex items-center justify-center"
+            style={{ background: 'var(--color-primary)', color: '#fff' }}
+          >
+            <Heart className="h-5 w-5 fill-current" />
           </div>
           {!isCollapsed && (
             <div>
-              <h2 className="font-bold text-foreground">ZawajConnect</h2>
-              <p className="text-xs text-muted-foreground">Matrimonial islamique</p>
+              <h2 className="font-bold font-arabic text-lg" style={{ color: 'var(--color-primary)' }}>
+                ZawajConnect
+              </h2>
+              <p className="text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
+                Matrimonial islamique
+              </p>
             </div>
           )}
         </div>
@@ -303,49 +317,61 @@ export function AppSidebar() {
             <Separator />
 
             {/* Prayer Times */}
-            <Card className="mx-4 mb-4">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <Clock className="h-4 w-4 text-emerald" />
-                  <h3 className="font-medium text-foreground">Horaires de prière</h3>
-                </div>
-                <div className="space-y-2">
-                  {prayerTimes.map((prayer) => (
-                    <div
-                      key={prayer.name}
-                      className={`flex justify-between items-center text-sm ${
-                        prayer.next ? 'text-emerald font-medium' : 'text-muted-foreground'
-                      }`}
-                    >
-                      <span>{prayer.name}</span>
-                      <span>{prayer.time}</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <div
+              className="mx-4 mb-4 rounded-xl p-4"
+              style={{ background: 'var(--color-primary-light)', border: '1px solid var(--color-primary-border)' }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <Clock className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
+                <h3 className="font-medium text-sm" style={{ color: 'var(--color-text-primary)' }}>
+                  Horaires de prière
+                </h3>
+              </div>
+              <div className="space-y-2">
+                {prayerTimes.map((prayer) => (
+                  <div
+                    key={prayer.name}
+                    className="flex justify-between items-center text-sm"
+                    style={{
+                      color: prayer.next ? 'var(--color-primary)' : 'var(--color-text-muted)',
+                      fontWeight: prayer.next ? 500 : 400,
+                    }}
+                  >
+                    <span>{prayer.name}</span>
+                    <span>{prayer.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
             {/* Notifications */}
             {notifications.length > 0 && (
-              <Card className="mx-4 mb-4">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Bell className="h-4 w-4 text-gold" />
-                    <h3 className="font-medium text-foreground">Notifications</h3>
-                    <Badge variant="secondary" className="text-xs">
-                      {notifications.length}
-                    </Badge>
-                  </div>
-                  <div className="space-y-2">
-                    {notifications.slice(0, 2).map((notification) => (
-                      <div key={notification.id} className="text-xs">
-                        <p className="font-medium text-foreground">{notification.title}</p>
-                        <p className="text-muted-foreground truncate">{notification.content}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              <div
+                className="mx-4 mb-4 rounded-xl p-4"
+                style={{ background: 'var(--color-bg-subtle)', border: '1px solid var(--color-border-default)' }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <Bell className="h-4 w-4" style={{ color: 'var(--color-warning)' }} />
+                  <h3 className="font-medium text-sm" style={{ color: 'var(--color-text-primary)' }}>
+                    Notifications
+                  </h3>
+                  <Badge variant="secondary" className="text-xs">
+                    {notifications.length}
+                  </Badge>
+                </div>
+                <div className="space-y-2">
+                  {notifications.slice(0, 2).map((notification) => (
+                    <div key={notification.id} className="text-xs">
+                      <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                        {notification.title}
+                      </p>
+                      <p className="truncate" style={{ color: 'var(--color-text-muted)' }}>
+                        {notification.content}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             )}
           </>
         )}

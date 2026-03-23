@@ -7,7 +7,8 @@ const Compatibility = () => {
     <AccessibilityProvider>
       <TooltipProvider>
         <div
-          className="min-h-screen bg-gradient-to-br from-rose-50 via-pink-25 to-rose-100 dark:from-rose-950 dark:via-rose-900 dark:to-pink-950 py-12"
+          className="min-h-screen py-12"
+          style={{ backgroundColor: 'var(--color-bg-page)' }}
           role="main"
           aria-labelledby="compatibility-heading"
         >
@@ -15,12 +16,13 @@ const Compatibility = () => {
             <div className="text-center mb-8">
               <h1
                 id="compatibility-heading"
-                className="text-3xl font-bold text-rose-800 dark:text-rose-200 mb-4"
+                className="text-3xl font-bold mb-4"
+                style={{ color: 'var(--color-primary)' }}
               >
                 Test de Compatibilité Matrimoniale selon le Coran et la Sunna
               </h1>
               <div className="max-w-2xl mx-auto space-y-4">
-                <p className="text-rose-600 dark:text-rose-300 italic text-lg">
+                <p className="italic text-lg" style={{ color: 'var(--color-text-secondary)' }}>
                   "Et parmi Ses signes Il a créé de vous, pour vous, des épouses pour que vous
                   viviez en tranquillité avec elles et Il a mis entre vous de l'affection et de la
                   bonté." - Coran 30:21

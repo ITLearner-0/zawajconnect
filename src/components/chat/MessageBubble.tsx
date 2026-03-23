@@ -33,15 +33,28 @@ export const MessageBubble = ({ message, isMyMessage }: MessageBubbleProps) => {
   return (
     <div className={`flex mb-3 ${isMyMessage ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[70%] px-3 py-2 rounded-lg ${
-          isMyMessage ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'
-        }`}
+        className="max-w-[70%] px-3 py-2"
+        style={
+          isMyMessage
+            ? {
+                backgroundColor: 'var(--color-primary)',
+                color: 'white',
+                borderRadius: '16px 16px 4px 16px',
+              }
+            : {
+                backgroundColor: 'var(--color-bg-card)',
+                color: 'var(--color-text-primary)',
+                border: '1px solid var(--color-border-default)',
+                borderRadius: '16px 16px 16px 4px',
+              }
+        }
       >
         <p className="text-sm whitespace-pre-wrap break-words">{message.content}</p>
         <div
-          className={`flex items-center gap-2 text-xs mt-1 ${
-            isMyMessage ? 'text-primary-foreground/70' : 'text-muted-foreground'
-          }`}
+          className="flex items-center gap-2 text-xs mt-1"
+          style={{
+            color: isMyMessage ? 'rgba(255,255,255,0.7)' : 'var(--color-text-secondary)',
+          }}
         >
           <span>{formatMessageTime(message.created_at)}</span>
           {getMessageStatus()}

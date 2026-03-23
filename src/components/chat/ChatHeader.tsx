@@ -13,7 +13,7 @@ interface ChatHeaderProps {
 
 export const ChatHeader = ({ match, isOnline, onClose, onCall }: ChatHeaderProps) => {
   return (
-    <div className="border-b bg-gradient-to-r from-primary/5 to-secondary/5">
+    <div style={{ backgroundColor: 'var(--color-bg-card)', borderBottom: '1px solid var(--color-border-default)' }}>
       <div className="flex items-center justify-between p-4">
         <div className="flex items-center gap-3">
           <div className="relative">

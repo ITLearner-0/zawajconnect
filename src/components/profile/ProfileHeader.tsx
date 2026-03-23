@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Edit, ShieldCheck, Users } from 'lucide-react';
 import { VerificationStatus } from '@/types/profile';
+import { ZAvatar } from '@/components/ui/ZAvatar';
+import { ZBadge } from '@/components/ui/ZBadge';
+import { ZButton } from '@/components/ui/ZButton';
 
 interface ProfileHeaderProps {
   userEmail?: string | null;
@@ -45,71 +45,76 @@ const ProfileHeader = ({
         .filter(Boolean).length * 25
     : 0;
 
-  const getInitials = (name?: string) => {
-    if (!name) return '?';
-    const parts = name.trim().split(/\s+/);
-    return parts.map((p) => p.charAt(0).toUpperCase()).slice(0, 2).join('');
-  };
-
   return (
     <div className="space-y-3">
       {/* Card 1 — Banner + Avatar + Nom + Badges */}
-      <div className="rounded-lg overflow-visible border border-border/40 bg-card shadow-sm">
-        {/* Banner — vert sauge doux */}
+      <div
+        className="rounded-2xl overflow-visible"
+        style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+      >
+        {/* Banner — emerald */}
         <div
           className="flex items-end px-5 pb-3 gap-2"
-          style={{ height: 100, background: '#EAF3DE', borderBottom: '0.5px solid var(--border)' }}
+          style={{
+            height: 100,
+            background: 'var(--color-primary)',
+            borderRadius: '16px 16px 0 0',
+            borderBottom: '1px solid var(--color-primary-border)',
+          }}
         >
-          <Badge className="ml-auto bg-emerald-600 hover:bg-emerald-700 text-white text-xs">
+          <ZBadge variant="success" className="ml-auto">
             Profil {completionScore}% complété
-          </Badge>
-          <Button variant="outline" size="sm" asChild className="h-8 text-xs">
-            <Link to="/profile/edit">
-              <Edit className="h-3.5 w-3.5 mr-1" />
-              Modifier
-            </Link>
-          </Button>
+          </ZBadge>
+          <Link
+            to="/profile/edit"
+            className="inline-flex items-center text-xs px-3 py-1.5 rounded-lg"
+            style={{
+              background: 'rgba(255,255,255,0.15)',
+              color: '#fff',
+              border: '1px solid rgba(255,255,255,0.3)',
+            }}
+          >
+            <Edit className="h-3.5 w-3.5 mr-1" />
+            Modifier
+          </Link>
         </div>
 
         {/* Avatar + nom + badges — avatar chevauche le banner */}
         <div className="flex items-center gap-4 px-5 pb-5" style={{ marginTop: -40 }}>
-          <Avatar
-            className="flex-shrink-0 shadow-md"
+          <div
+            className="flex-shrink-0"
             style={{
-              width: 80,
-              height: 80,
-              border: '3px solid var(--background)',
+              border: '3px solid var(--color-bg-card)',
               borderRadius: '50%',
+              boxShadow: 'var(--shadow-md)',
             }}
           >
-            <AvatarImage src={avatarUrl} alt={fullName ?? ''} />
-            <AvatarFallback className="text-xl font-semibold bg-gradient-to-br from-emerald-100 to-emerald-200 text-emerald-700">
-              {getInitials(fullName)}
-            </AvatarFallback>
-          </Avatar>
+            <ZAvatar src={avatarUrl} name={fullName} size="xl" />
+          </div>
 
           <div className="pt-10 flex-1 min-w-0">
-            {/* Nom + badges — même ligne que l'avatar */}
             <div className="flex items-center gap-2 flex-wrap">
-              <h1 className="text-[17px] font-medium text-foreground truncate">
+              <h1
+                className="text-[17px] font-medium truncate"
+                style={{ color: 'var(--color-text-primary)' }}
+              >
                 {fullName ?? 'Nom non renseigné'}
               </h1>
               {isVerified && (
-                <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 text-[10px] px-1.5 py-0 h-5">
-                  <ShieldCheck className="h-3 w-3 mr-0.5" />
+                <ZBadge variant="success">
+                  <ShieldCheck className="h-3 w-3" />
                   Vérifié
-                </Badge>
+                </ZBadge>
               )}
               {waliActive && (
-                <Badge className="bg-sky-100 text-sky-700 hover:bg-sky-100 text-[10px] px-1.5 py-0 h-5">
-                  <Users className="h-3 w-3 mr-0.5" />
+                <ZBadge variant="info">
+                  <Users className="h-3 w-3" />
                   Wali actif
-                </Badge>
+                </ZBadge>
               )}
             </div>
 
-            {/* Localisation + âge + profession */}
-            <p className="text-[13px] text-muted-foreground mt-0.5 flex gap-3 flex-wrap">
+            <p className="text-[13px] mt-0.5 flex gap-3 flex-wrap" style={{ color: 'var(--color-text-muted)' }}>
               {location && <span>📍 {location}</span>}
               {age && <span>{age} ans</span>}
               {profession && <span>{profession}</span>}
@@ -119,22 +124,37 @@ const ProfileHeader = ({
       </div>
 
       {/* Card 2 — Stats bar SÉPARÉE */}
-      <div className="rounded-lg border border-border/40 bg-card shadow-sm">
+      <div
+        className="rounded-2xl"
+        style={{ background: 'var(--color-bg-card)', border: '1px solid var(--color-border-default)' }}
+      >
         <div className="grid grid-cols-3">
-          {/* Vues — valeur en couleur primaire */}
           <div className="flex flex-col items-center justify-center py-3">
-            <span className="text-base font-semibold text-foreground">{profileViews}</span>
-            <span className="text-[11px] text-muted-foreground">Vues du profil</span>
+            <span className="text-base font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+              {profileViews}
+            </span>
+            <span className="text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
+              Vues du profil
+            </span>
           </div>
-          {/* Favoris — valeur en couleur primaire */}
-          <div className="flex flex-col items-center justify-center py-3 border-x border-border/40">
-            <span className="text-base font-semibold text-foreground">{favoritesCount}</span>
-            <span className="text-[11px] text-muted-foreground">Favoris reçus</span>
+          <div
+            className="flex flex-col items-center justify-center py-3"
+            style={{ borderLeft: '1px solid var(--color-border-default)', borderRight: '1px solid var(--color-border-default)' }}
+          >
+            <span className="text-base font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+              {favoritesCount}
+            </span>
+            <span className="text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
+              Favoris reçus
+            </span>
           </div>
-          {/* Score de confiance — vert sémantique */}
           <div className="flex flex-col items-center justify-center py-3">
-            <span className="text-base font-semibold text-emerald-600">{trustScore}%</span>
-            <span className="text-[11px] text-muted-foreground">Score de confiance</span>
+            <span className="text-base font-semibold" style={{ color: 'var(--color-primary)' }}>
+              {trustScore}%
+            </span>
+            <span className="text-[11px]" style={{ color: 'var(--color-text-muted)' }}>
+              Score de confiance
+            </span>
           </div>
         </div>
       </div>

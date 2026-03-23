@@ -51,6 +51,33 @@ interface Match {
   };
 }
 
+/* ─── inline style helpers using design-system tokens ─── */
+const pageBg: React.CSSProperties = { background: 'var(--color-bg-page)' };
+const cardStyle: React.CSSProperties = {
+  background: 'var(--color-bg-card)',
+  border: '1px solid var(--color-border-default)',
+  borderRadius: '16px',
+};
+const primaryBtnStyle: React.CSSProperties = {
+  background: 'var(--color-primary)',
+  color: '#fff',
+};
+const secondaryBtnStyle: React.CSSProperties = {
+  border: '1px solid var(--color-border-default)',
+  color: 'var(--color-text-secondary)',
+};
+const scoreBadgeStyle: React.CSSProperties = {
+  background: 'var(--color-primary-light)',
+  color: 'var(--color-primary)',
+};
+const tabActiveStyle: React.CSSProperties = {
+  color: 'var(--color-primary)',
+  borderBottom: '2px solid var(--color-primary)',
+};
+const tabInactiveStyle: React.CSSProperties = {
+  color: 'var(--color-text-muted)',
+};
+
 const Matches = () => {
   const { user, subscription, checkSubscription, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -213,21 +240,21 @@ const Matches = () => {
   const getStatusBadge = (match: Match) => {
     if (match.conversation_status === 'ended') {
       return (
-        <Badge variant="outline" className="border-destructive/50 text-destructive">
+        <Badge variant="outline" style={{ borderColor: 'var(--color-danger)', color: 'var(--color-danger)' }}>
           Terminée
         </Badge>
       );
     }
     if (match.conversation_status === 'active') {
       return (
-        <Badge variant="outline" className="border-emerald/50 text-emerald">
+        <Badge variant="outline" style={{ borderColor: 'var(--color-success)', color: 'var(--color-success)' }}>
           Active
         </Badge>
       );
     }
     if (match.is_mutual) {
       return (
-        <Badge variant="outline" className="border-gold/50 text-gold-dark">
+        <Badge variant="outline" style={{ borderColor: 'var(--color-warning-border)', color: 'var(--color-warning)' }}>
           Mutuel
         </Badge>
       );
@@ -242,36 +269,43 @@ const Matches = () => {
 
     if (iLiked && theyLiked) {
       return (
-        <Badge variant="outline" className="border-gold/50 text-gold-dark">
+        <Badge variant="outline" style={{ borderColor: 'var(--color-warning-border)', color: 'var(--color-warning)' }}>
           Mutuel
         </Badge>
       );
     }
     if (iLiked) {
       return (
-        <Badge variant="outline" className="border-emerald/50 text-emerald">
+        <Badge variant="outline" style={{ borderColor: 'var(--color-success-border)', color: 'var(--color-success)' }}>
           Vous avez liké
         </Badge>
       );
     }
     if (theyLiked) {
       return (
-        <Badge variant="outline" className="border-gold/50 text-gold-dark">
+        <Badge variant="outline" style={{ borderColor: 'var(--color-warning-border)', color: 'var(--color-warning)' }}>
           Vous a liké
         </Badge>
       );
     }
 
-    return <Badge variant="outline">En attente</Badge>;
+    return (
+      <Badge variant="outline" style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-muted)' }}>
+        En attente
+      </Badge>
+    );
   };
 
   // Tous les returns conditionnels APRÈS les hooks et fonctions
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={pageBg}>
         <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald border-t-transparent mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Vérification de votre abonnement...</p>
+          <div
+            className="h-8 w-8 animate-spin rounded-full border-4 border-t-transparent mx-auto mb-4"
+            style={{ borderColor: 'var(--color-primary)', borderTopColor: 'transparent' }}
+          ></div>
+          <p style={{ color: 'var(--color-text-muted)' }}>Vérification de votre abonnement...</p>
         </div>
       </div>
     );
@@ -279,14 +313,19 @@ const Matches = () => {
 
   if (!subscription.subscribed) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center p-4">
-        <Card className="max-w-md w-full p-8 text-center space-y-6">
-          <div className="h-20 w-20 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center mx-auto">
-            <Heart className="h-10 w-10 text-primary-foreground" />
+      <div className="min-h-screen flex items-center justify-center p-4" style={pageBg}>
+        <Card className="max-w-md w-full p-8 text-center space-y-6" style={cardStyle}>
+          <div
+            className="h-20 w-20 rounded-full flex items-center justify-center mx-auto"
+            style={{ background: 'var(--color-primary)' }}
+          >
+            <Heart className="h-10 w-10 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold mb-2">Fonctionnalité Premium</h2>
-            <p className="text-muted-foreground">
+            <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+              Fonctionnalité Premium
+            </h2>
+            <p style={{ color: 'var(--color-text-muted)' }}>
               Accédez à vos matches, likes et mises en relation en passant à Premium.
             </p>
           </div>
@@ -296,8 +335,9 @@ const Matches = () => {
                 console.log('Navigation vers Premium...');
                 navigate('/settings?tab=premium');
               }}
-              className="w-full bg-gradient-to-r from-emerald to-emerald-light"
+              className="w-full text-white"
               size="lg"
+              style={primaryBtnStyle}
             >
               <Crown className="h-4 w-4 mr-2" />
               Passer à Premium
@@ -310,6 +350,7 @@ const Matches = () => {
               }}
               variant="outline"
               className="w-full"
+              style={secondaryBtnStyle}
             >
               Vérifier mon abonnement
             </Button>
@@ -321,42 +362,69 @@ const Matches = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={pageBg}>
         <div className="text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald border-t-transparent mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Chargement de vos matches...</p>
+          <div
+            className="h-8 w-8 animate-spin rounded-full border-4 border-t-transparent mx-auto mb-4"
+            style={{ borderColor: 'var(--color-primary)', borderTopColor: 'transparent' }}
+          ></div>
+          <p style={{ color: 'var(--color-text-muted)' }}>Chargement de vos matches...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="py-8 px-4 overflow-x-hidden max-w-full w-full">
+    <div className="py-8 px-4 overflow-x-hidden max-w-full w-full" style={pageBg}>
       <div className="container mx-auto max-w-full w-full">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-8">
-            <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-              <Heart className="h-6 w-6 text-primary-foreground" />
+            <div
+              className="h-12 w-12 rounded-full flex items-center justify-center"
+              style={{ background: 'var(--color-primary)' }}
+            >
+              <Heart className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Mes Matches</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                Mes Matches
+              </h1>
+              <p style={{ color: 'var(--color-text-muted)' }}>
                 Découvrez vos compatibilités et commencez à discuter
               </p>
             </div>
           </div>
 
-          <Tabs defaultValue="mutual" className="space-y-6">
+          <Tabs defaultValue="mutual" className="matches-tabs space-y-6">
             <ResponsiveTabsList tabCount={2}>
-              <TabsTrigger value="mutual" className="flex items-center gap-2">
+              <TabsTrigger
+                value="mutual"
+                className="flex items-center gap-2 data-[state=active]:shadow-none data-[state=active]:bg-transparent"
+                style={{ /* active/inactive styling handled by data-state attr in CSS override below */ }}
+              >
                 <Users className="h-4 w-4" />
                 Matches Mutuels ({mutualMatches.length})
               </TabsTrigger>
-              <TabsTrigger value="pending" className="flex items-center gap-2">
+              <TabsTrigger
+                value="pending"
+                className="flex items-center gap-2 data-[state=active]:shadow-none data-[state=active]:bg-transparent"
+              >
                 <Clock className="h-4 w-4" />
                 En Attente ({pendingMatches.length})
               </TabsTrigger>
             </ResponsiveTabsList>
+
+            {/* Inline style tag for tab active/inactive states via data attributes */}
+            <style>{`
+              .matches-tabs [data-state="active"] {
+                color: var(--color-primary) !important;
+                border-bottom: 2px solid var(--color-primary) !important;
+                border-radius: 0 !important;
+              }
+              .matches-tabs [data-state="inactive"] {
+                color: var(--color-text-muted) !important;
+              }
+            `}</style>
 
             <TabsContent value="mutual" className="space-y-4">
               {mutualMatches.length > 0 ? (
@@ -378,15 +446,19 @@ const Matches = () => {
                     </div>
                   ) : (
                     /* Desktop View - Table */
-                    <div className="border rounded-lg overflow-x-auto max-w-full">
+                    <div
+                      className="overflow-x-auto max-w-full"
+                      style={{ border: '1px solid var(--color-border-default)', borderRadius: '16px' }}
+                    >
                       <Table className="min-w-full">
                         <TableHeader>
-                          <TableRow className="bg-muted/50">
+                          <TableRow style={{ background: 'var(--color-bg-subtle)' }}>
                             <TableHead className="w-16">Photo</TableHead>
                             <TableHead>
                               <button
                                 onClick={() => handleSort('name')}
-                                className="flex items-center gap-1 hover:text-foreground"
+                                className="flex items-center gap-1"
+                                style={{ color: 'var(--color-text-secondary)' }}
                               >
                                 Nom
                                 <ArrowUpDown className="h-4 w-4" />
@@ -395,7 +467,8 @@ const Matches = () => {
                             <TableHead>
                               <button
                                 onClick={() => handleSort('score')}
-                                className="flex items-center gap-1 hover:text-foreground"
+                                className="flex items-center gap-1"
+                                style={{ color: 'var(--color-text-secondary)' }}
                               >
                                 Score
                                 <ArrowUpDown className="h-4 w-4" />
@@ -404,7 +477,8 @@ const Matches = () => {
                             <TableHead>
                               <button
                                 onClick={() => handleSort('date')}
-                                className="flex items-center gap-1 hover:text-foreground"
+                                className="flex items-center gap-1"
+                                style={{ color: 'var(--color-text-secondary)' }}
                               >
                                 Date du match
                                 <ArrowUpDown className="h-4 w-4" />
@@ -418,34 +492,43 @@ const Matches = () => {
                           {sortMatches(mutualMatches)
                             .slice((mutualPage - 1) * matchesPerPage, mutualPage * matchesPerPage)
                             .map((match) => (
-                              <TableRow key={match.id} className="hover:bg-muted/30">
+                              <TableRow
+                                key={match.id}
+                                className="transition-colors"
+                                style={{ background: 'var(--color-bg-card)' }}
+                                onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-bg-hover)')}
+                                onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-bg-card)')}
+                              >
                                 <TableCell>
-                                  <div className="h-12 w-12 bg-gradient-to-br from-emerald to-emerald-light rounded-full flex items-center justify-center">
-                                    <span className="text-sm text-primary-foreground font-bold">
+                                  <div
+                                    className="h-12 w-12 rounded-full flex items-center justify-center"
+                                    style={{ background: 'var(--color-primary)' }}
+                                  >
+                                    <span className="text-sm font-bold text-white">
                                       {match.other_user?.full_name?.charAt(0) || '?'}
                                     </span>
                                   </div>
                                 </TableCell>
                                 <TableCell>
                                   <div className="max-w-[200px]">
-                                    <div className="font-medium text-foreground truncate">
+                                    <div className="font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>
                                       {match.other_user?.full_name}
                                     </div>
-                                    <div className="text-sm text-muted-foreground truncate">
+                                    <div className="text-sm truncate" style={{ color: 'var(--color-text-muted)' }}>
                                       {match.other_user?.age} ans • {match.other_user?.location}
                                     </div>
                                   </div>
                                 </TableCell>
                                 <TableCell>
-                                  <Badge
-                                    variant="outline"
-                                    className="border-emerald/50 text-emerald"
+                                  <span
+                                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                                    style={scoreBadgeStyle}
                                   >
                                     {match.match_score}%
-                                  </Badge>
+                                  </span>
                                 </TableCell>
                                 <TableCell>
-                                  <span className="text-sm text-muted-foreground">
+                                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                                     {new Date(match.created_at).toLocaleDateString('fr-FR', {
                                       day: 'numeric',
                                       month: 'short',
@@ -460,18 +543,21 @@ const Matches = () => {
                                       size="sm"
                                       onClick={() => viewProfile(match.other_user.user_id)}
                                       variant="outline"
+                                      className="rounded-xl"
+                                      style={secondaryBtnStyle}
                                     >
                                       <Eye className="h-3 w-3 mr-1" />
-                                      Profil
+                                      Voir profil
                                     </Button>
                                     <Button
                                       size="sm"
                                       onClick={() => startChat(match.id)}
                                       disabled={match.conversation_status === 'ended'}
-                                      className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                                      className="text-sm rounded-xl text-white"
+                                      style={primaryBtnStyle}
                                     >
                                       <MessageCircle className="h-3 w-3 mr-1" />
-                                      Message
+                                      Envoyer un message
                                     </Button>
                                   </div>
                                 </TableCell>
@@ -547,16 +633,22 @@ const Matches = () => {
                 </>
               ) : (
                 <div className="text-center py-12">
-                  <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Heart className="h-8 w-8 text-muted-foreground" />
+                  <div
+                    className="h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                    style={{ background: 'var(--color-bg-subtle)' }}
+                  >
+                    <Heart className="h-8 w-8" style={{ color: 'var(--color-text-muted)' }} />
                   </div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">Aucun match mutuel</h3>
-                  <p className="text-muted-foreground mb-4">
+                  <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                    Aucun match mutuel
+                  </h3>
+                  <p className="mb-4" style={{ color: 'var(--color-text-muted)' }}>
                     Continuez à découvrir des profils pour trouver votre partenaire idéal
                   </p>
                   <Button
                     onClick={() => navigate('/browse')}
-                    className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                    className="text-sm rounded-xl text-white"
+                    style={primaryBtnStyle}
                   >
                     Découvrir des profils
                   </Button>
@@ -584,15 +676,19 @@ const Matches = () => {
                     </div>
                   ) : (
                     /* Desktop View - Table */
-                    <div className="border rounded-lg overflow-x-auto max-w-full">
+                    <div
+                      className="overflow-x-auto max-w-full"
+                      style={{ border: '1px solid var(--color-border-default)', borderRadius: '16px' }}
+                    >
                       <Table className="min-w-full">
                         <TableHeader>
-                          <TableRow className="bg-muted/50">
+                          <TableRow style={{ background: 'var(--color-bg-subtle)' }}>
                             <TableHead className="w-16">Photo</TableHead>
                             <TableHead>
                               <button
                                 onClick={() => handleSort('name')}
-                                className="flex items-center gap-1 hover:text-foreground"
+                                className="flex items-center gap-1"
+                                style={{ color: 'var(--color-text-secondary)' }}
                               >
                                 Nom
                                 <ArrowUpDown className="h-4 w-4" />
@@ -601,7 +697,8 @@ const Matches = () => {
                             <TableHead>
                               <button
                                 onClick={() => handleSort('score')}
-                                className="flex items-center gap-1 hover:text-foreground"
+                                className="flex items-center gap-1"
+                                style={{ color: 'var(--color-text-secondary)' }}
                               >
                                 Score
                                 <ArrowUpDown className="h-4 w-4" />
@@ -610,7 +707,8 @@ const Matches = () => {
                             <TableHead>
                               <button
                                 onClick={() => handleSort('date')}
-                                className="flex items-center gap-1 hover:text-foreground"
+                                className="flex items-center gap-1"
+                                style={{ color: 'var(--color-text-secondary)' }}
                               >
                                 Date du match
                                 <ArrowUpDown className="h-4 w-4" />
@@ -624,29 +722,43 @@ const Matches = () => {
                           {sortMatches(pendingMatches)
                             .slice((pendingPage - 1) * matchesPerPage, pendingPage * matchesPerPage)
                             .map((match) => (
-                              <TableRow key={match.id} className="hover:bg-muted/30">
+                              <TableRow
+                                key={match.id}
+                                className="transition-colors"
+                                style={{ background: 'var(--color-bg-card)' }}
+                                onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-bg-hover)')}
+                                onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-bg-card)')}
+                              >
                                 <TableCell>
-                                  <div className="h-12 w-12 bg-gradient-to-br from-sage to-sage-dark rounded-full flex items-center justify-center">
-                                    <span className="text-sm text-primary-foreground font-bold">
+                                  <div
+                                    className="h-12 w-12 rounded-full flex items-center justify-center"
+                                    style={{ background: 'var(--color-primary)' }}
+                                  >
+                                    <span className="text-sm font-bold text-white">
                                       {match.other_user?.full_name?.charAt(0) || '?'}
                                     </span>
                                   </div>
                                 </TableCell>
                                 <TableCell>
                                   <div className="max-w-[200px]">
-                                    <div className="font-medium text-foreground truncate">
+                                    <div className="font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>
                                       {match.other_user?.full_name}
                                     </div>
-                                    <div className="text-sm text-muted-foreground truncate">
+                                    <div className="text-sm truncate" style={{ color: 'var(--color-text-muted)' }}>
                                       {match.other_user?.age} ans • {match.other_user?.location}
                                     </div>
                                   </div>
                                 </TableCell>
                                 <TableCell>
-                                  <Badge variant="outline">{match.match_score}%</Badge>
+                                  <span
+                                    className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold"
+                                    style={scoreBadgeStyle}
+                                  >
+                                    {match.match_score}%
+                                  </span>
                                 </TableCell>
                                 <TableCell>
-                                  <span className="text-sm text-muted-foreground">
+                                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                                     {new Date(match.created_at).toLocaleDateString('fr-FR', {
                                       day: 'numeric',
                                       month: 'short',
@@ -661,18 +773,21 @@ const Matches = () => {
                                       size="sm"
                                       onClick={() => viewProfile(match.other_user.user_id)}
                                       variant="outline"
+                                      className="rounded-xl"
+                                      style={secondaryBtnStyle}
                                     >
                                       <Eye className="h-3 w-3 mr-1" />
-                                      Profil
+                                      Voir profil
                                     </Button>
                                     <Button
                                       size="sm"
                                       onClick={() => startChat(match.id)}
                                       disabled={!match.is_mutual}
-                                      className="bg-emerald hover:bg-emerald-dark text-primary-foreground"
+                                      className="text-sm rounded-xl text-white"
+                                      style={primaryBtnStyle}
                                     >
                                       <MessageCircle className="h-3 w-3 mr-1" />
-                                      Message
+                                      Envoyer un message
                                     </Button>
                                   </div>
                                 </TableCell>
@@ -750,13 +865,16 @@ const Matches = () => {
                 </>
               ) : (
                 <div className="text-center py-12">
-                  <div className="h-16 w-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Clock className="h-8 w-8 text-muted-foreground" />
+                  <div
+                    className="h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                    style={{ background: 'var(--color-bg-subtle)' }}
+                  >
+                    <Clock className="h-8 w-8" style={{ color: 'var(--color-text-muted)' }} />
                   </div>
-                  <h3 className="text-lg font-medium text-foreground mb-2">
+                  <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                     Aucun match en attente
                   </h3>
-                  <p className="text-muted-foreground">Tous vos matches ont été traités</p>
+                  <p style={{ color: 'var(--color-text-muted)' }}>Tous vos matches ont été traités</p>
                 </div>
               )}
             </TabsContent>

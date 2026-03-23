@@ -64,20 +64,20 @@ const Chat = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="min-h-screen p-4" style={{ backgroundColor: 'var(--color-bg-page)' }}>
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-4 pb-4 border-b">
+        <div className="flex items-center gap-4 mb-4 pb-4" style={{ borderBottom: '1px solid var(--color-border-default)' }}>
           <Button variant="ghost" onClick={() => navigate('/matches')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Retour
           </Button>
-          <h1 className="text-xl font-semibold text-foreground">Messages</h1>
+          <h1 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Messages</h1>
         </div>
 
-        <div className="flex gap-4 h-[calc(100vh-10rem)]">
+        <div className="flex h-[calc(100vh-10rem)]">
           {/* Chat List - 30% */}
-          <div className="w-[30%] border-r pr-4">
+          <div className="w-[30%] pr-4" style={{ backgroundColor: 'var(--color-bg-card)', borderRight: '1px solid var(--color-border-default)' }}>
             <ChatList onChatSelect={handleChatSelect} selectedChatId={selectedChatId} />
           </div>
 
@@ -86,11 +86,11 @@ const Chat = () => {
             {selectedChatId ? (
               <ChatWindow matchId={selectedChatId} />
             ) : (
-              <div className="h-full flex items-center justify-center border rounded-lg bg-muted/20">
+              <div className="h-full flex items-center justify-center rounded-lg" style={{ backgroundColor: 'var(--color-bg-page)', border: '1px solid var(--color-border-default)' }}>
                 <div className="text-center p-6">
-                  <MessageCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Sélectionnez une conversation</h3>
-                  <p className="text-muted-foreground">
+                  <MessageCircle className="h-16 w-16 mx-auto mb-4" style={{ color: 'var(--color-text-secondary)' }} />
+                  <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>Sélectionnez une conversation</h3>
+                  <p style={{ color: 'var(--color-text-secondary)' }}>
                     Choisissez une conversation dans la liste pour commencer à discuter
                   </p>
                 </div>

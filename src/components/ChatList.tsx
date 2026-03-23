@@ -193,9 +193,23 @@ const ChatList = ({ onChatSelect, selectedChatId }: ChatListProps) => {
             {filteredChats.map((chat) => (
               <div
                 key={chat.match_id}
-                className={`border-b p-3 cursor-pointer hover:bg-muted/50 transition-colors ${
-                  selectedChatId === chat.match_id ? 'bg-muted' : ''
-                }`}
+                className="p-3 cursor-pointer transition-colors"
+                style={{
+                  borderBottom: '1px solid var(--color-border-default)',
+                  ...(selectedChatId === chat.match_id
+                    ? { backgroundColor: 'var(--color-primary-light)', borderLeft: '3px solid var(--color-primary)' }
+                    : {}),
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedChatId !== chat.match_id) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = 'var(--color-bg-hover)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedChatId !== chat.match_id) {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = '';
+                  }
+                }}
                 onClick={() => onChatSelect(chat.match_id)}
               >
                 <div className="flex items-center space-x-3">

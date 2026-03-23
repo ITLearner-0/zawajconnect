@@ -232,7 +232,8 @@ const ProfilePage = () => {
   return (
     <AccessibilityProvider>
       <div
-        className="min-h-screen bg-gradient-to-br from-cream-50 via-white to-sage-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 py-8"
+        className="min-h-screen py-8"
+        style={{ background: 'var(--color-bg-page)' }}
         role="main"
         aria-labelledby="profile-heading"
       >

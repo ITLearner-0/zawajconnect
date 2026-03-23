@@ -578,22 +578,22 @@ const Browse = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
+      <div className="min-h-screen p-4 md:p-8" style={{ background: 'var(--color-bg-page, #f9f8f5)' }}>
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <Card className="h-96 animate-pulse">
-                <CardContent className="p-6">
-                  <div className="h-full bg-muted rounded"></div>
-                </CardContent>
-              </Card>
+              <div className="h-96 animate-pulse rounded-2xl" style={{ background: 'var(--color-bg-card, #ffffff)', border: '1px solid var(--color-border-default, #e5e2db)', borderRadius: '16px' }}>
+                <div className="p-6">
+                  <div className="h-full rounded" style={{ background: 'var(--color-border-default, #e5e2db)', opacity: 0.3 }}></div>
+                </div>
+              </div>
             </div>
             <div className="space-y-4">
-              <Card className="h-48 animate-pulse">
-                <CardContent className="p-6">
-                  <div className="h-full bg-muted rounded"></div>
-                </CardContent>
-              </Card>
+              <div className="h-48 animate-pulse rounded-2xl" style={{ background: 'var(--color-bg-card, #ffffff)', border: '1px solid var(--color-border-default, #e5e2db)', borderRadius: '16px' }}>
+                <div className="p-6">
+                  <div className="h-full rounded" style={{ background: 'var(--color-border-default, #e5e2db)', opacity: 0.3 }}></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -604,26 +604,26 @@ const Browse = () => {
   // Show empty state if no profiles available (works for both carousel and grid modes)
   if (filteredProfiles.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
+      <div className="min-h-screen p-4 md:p-8" style={{ background: 'var(--color-bg-page, #f9f8f5)' }}>
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              <Card className="bg-card">
-                <CardContent className="p-12 text-center">
-                  <User className="h-20 w-20 mx-auto text-muted-foreground mb-6" />
+              <div className="rounded-2xl" style={{ background: 'var(--color-bg-card, #ffffff)', border: '1px solid var(--color-border-default, #e5e2db)', borderRadius: '16px' }}>
+                <div className="p-12 text-center">
+                  <User className="h-20 w-20 mx-auto mb-6" style={{ color: 'var(--color-text-muted, #8a8680)' }} />
                   <h2 className="text-2xl font-bold mb-3">Aucun profil disponible</h2>
-                  <p className="text-muted-foreground mb-6">
+                  <p className="mb-6" style={{ color: 'var(--color-text-muted, #8a8680)' }}>
                     {profiles.length === 0
                       ? "Il n'y a pas de nouveaux profils à découvrir pour le moment. Revenez plus tard !"
                       : 'Aucun profil ne correspond à vos critères de recherche. Essayez de modifier vos filtres.'}
                   </p>
                   {profiles.length > 0 && (
-                    <Button onClick={handleResetSearch} variant="outline">
+                    <Button onClick={handleResetSearch} variant="outline" style={{ borderColor: 'var(--color-border-default, #e5e2db)' }}>
                       Réinitialiser les filtres
                     </Button>
                   )}
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </div>
             <div>
               <AdvancedSearch onSearch={handleSearch} onReset={handleResetSearch} />
@@ -637,32 +637,32 @@ const Browse = () => {
   // Additional safety check for carousel mode
   if (!currentProfile) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-cream via-sage/20 to-emerald/5 p-4 md:p-8">
+      <div className="min-h-screen p-4 md:p-8" style={{ background: 'var(--color-bg-page, #f9f8f5)' }}>
         <div className="container mx-auto max-w-6xl">
-          <Card className="bg-card">
-            <CardContent className="p-12 text-center">
-              <User className="h-20 w-20 mx-auto text-muted-foreground mb-6" />
+          <div className="rounded-2xl" style={{ background: 'var(--color-bg-card, #ffffff)', border: '1px solid var(--color-border-default, #e5e2db)', borderRadius: '16px' }}>
+            <div className="p-12 text-center">
+              <User className="h-20 w-20 mx-auto mb-6" style={{ color: 'var(--color-text-muted, #8a8680)' }} />
               <h2 className="text-2xl font-bold mb-3">Erreur de chargement</h2>
-              <p className="text-muted-foreground mb-6">
+              <p className="mb-6" style={{ color: 'var(--color-text-muted, #8a8680)' }}>
                 Une erreur s'est produite lors du chargement des profils.
               </p>
-              <Button onClick={fetchProfiles} variant="outline">
+              <Button onClick={fetchProfiles} variant="outline" style={{ borderColor: 'var(--color-border-default, #e5e2db)' }}>
                 Réessayer
               </Button>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen overflow-x-hidden max-w-full w-full">
+    <div className="min-h-screen overflow-x-hidden max-w-full w-full" style={{ background: 'var(--color-bg-page, #f9f8f5)' }}>
       <div className="container mx-auto px-4 py-6 space-y-6 max-w-full w-full">
         {/* Header */}
-        <div className="bg-card rounded-lg border p-6 max-w-full overflow-x-hidden w-full">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Découvrir les Profils</h1>
-          <p className="text-muted-foreground">
+        <div className="rounded-2xl p-6 max-w-full overflow-x-hidden w-full" style={{ background: 'var(--color-bg-card, #ffffff)', border: '1px solid var(--color-border-default, #e5e2db)' }}>
+          <h1 className="text-3xl font-bold mb-2">Découvrir les Profils</h1>
+          <p style={{ color: 'var(--color-text-muted, #8a8680)' }}>
             Parcourez et connectez-vous avec des profils compatibles
           </p>
         </div>
@@ -670,11 +670,12 @@ const Browse = () => {
         {isInActiveConversation && <ActiveConversationBanner matchId={activeMatchId} />}
 
         {/* Controls */}
-        <div className="flex flex-wrap items-center justify-between gap-4 bg-card rounded-lg border p-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl p-4" style={{ background: 'var(--color-bg-card, #ffffff)', border: '1px solid var(--color-border-default, #e5e2db)' }}>
           <div className="flex items-center gap-2">
             <Button
               variant={selectionMode ? 'default' : 'outline'}
               onClick={() => setSelectionMode(!selectionMode)}
+              style={selectionMode ? { background: 'var(--color-primary, #047857)', color: '#ffffff' } : { borderColor: 'var(--color-border-default, #e5e2db)' }}
             >
               <Users className="h-4 w-4 mr-2" />
               {selectionMode ? 'Mode sélection' : 'Comparer'}
@@ -683,6 +684,7 @@ const Browse = () => {
             <Button
               variant={viewMode === 'grid' ? 'default' : 'outline'}
               onClick={() => setViewMode(viewMode === 'carousel' ? 'grid' : 'carousel')}
+              style={viewMode === 'grid' ? { background: 'var(--color-primary, #047857)', color: '#ffffff' } : { borderColor: 'var(--color-border-default, #e5e2db)' }}
             >
               {viewMode === 'grid' ? (
                 <LayoutGrid className="h-4 w-4 mr-2" />
@@ -711,7 +713,8 @@ const Browse = () => {
             <Button
               onClick={() => setShowAdvancedSearch(!showAdvancedSearch)}
               variant="outline"
-              className="w-full mb-4 border-emerald text-emerald hover:bg-emerald hover:text-white"
+              className="w-full mb-4"
+              style={{ borderColor: 'var(--color-primary, #047857)', color: 'var(--color-primary, #047857)' }}
             >
               {showAdvancedSearch ? 'Masquer la recherche' : 'Recherche avancée'}
             </Button>
@@ -750,12 +753,12 @@ const Browse = () => {
                 </div>
               ) : (
                 /* Desktop: Traditional Carousel */
-                <div className="border rounded overflow-hidden">
+                <div className="overflow-hidden" style={{ background: 'var(--color-bg-card, #ffffff)', border: '1px solid var(--color-border-default, #e5e2db)', borderRadius: '16px' }}>
                   <div className="relative">
                     {/* Selection Checkbox */}
                     {selectionMode && (
                       <div className="absolute top-4 right-20 z-10">
-                        <div className="bg-white rounded p-2 shadow border">
+                        <div className="rounded p-2 shadow" style={{ background: 'var(--color-bg-card, #ffffff)', border: '1px solid var(--color-border-default, #e5e2db)' }}>
                           <Checkbox
                             checked={selectedProfiles.includes(currentProfile.user_id)}
                             onCheckedChange={() => toggleProfileSelection(currentProfile.user_id)}
@@ -808,11 +811,11 @@ const Browse = () => {
                     </div>
                   </div>
 
-                  <div className="p-6 border-t">
+                  <div className="p-6" style={{ borderTop: '1px solid var(--color-border-default, #e5e2db)' }}>
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
                       <div>
-                        <h2 className="text-2xl font-bold mb-1">Profil Anonyme</h2>
-                        <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
+                        <h2 style={{ fontSize: '15px', fontWeight: 500 }} className="mb-1">Profil Anonyme</h2>
+                        <div className="flex flex-wrap items-center gap-2" style={{ color: 'var(--color-text-muted, #8a8680)' }}>
                           {currentProfile.age && (
                             <span className="text-lg">{currentProfile.age} ans</span>
                           )}
@@ -827,13 +830,22 @@ const Browse = () => {
                           )}
                         </div>
                       </div>
+
+                      {/* Trust Score Progress Bar */}
+                      <div className="mt-2 sm:mt-0 flex items-center gap-2">
+                        <span className="text-xs" style={{ color: 'var(--color-text-muted, #8a8680)' }}>Confiance</span>
+                        <div className="w-24 rounded-full overflow-hidden" style={{ height: '4px', background: 'var(--color-border-default, #e5e2db)' }}>
+                          <div className="h-full rounded-full" style={{ width: `${currentProfile.verification_score}%`, background: 'var(--color-primary, #047857)' }} />
+                        </div>
+                        <span className="text-xs font-medium">{currentProfile.verification_score}%</span>
+                      </div>
                     </div>
 
                     {/* Details sécurisés - données anonymisées */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                       {currentProfile.education_level && (
                         <div>
-                          <span className="text-sm font-medium text-muted-foreground">
+                          <span className="text-sm font-medium" style={{ color: 'var(--color-text-muted, #8a8680)' }}>
                             Niveau d'éducation
                           </span>
                           <p className="font-medium">{currentProfile.education_level}</p>
@@ -841,7 +853,7 @@ const Browse = () => {
                       )}
                       {currentProfile.profession_category && (
                         <div>
-                          <span className="text-sm font-medium text-muted-foreground">
+                          <span className="text-sm font-medium" style={{ color: 'var(--color-text-muted, #8a8680)' }}>
                             Domaine professionnel
                           </span>
                           <p className="font-medium">{currentProfile.profession_category}</p>
@@ -849,7 +861,7 @@ const Browse = () => {
                       )}
                       {currentProfile.looking_for && (
                         <div className="sm:col-span-2">
-                          <span className="text-sm font-medium text-muted-foreground">
+                          <span className="text-sm font-medium" style={{ color: 'var(--color-text-muted, #8a8680)' }}>
                             Recherche
                           </span>
                           <p className="font-medium">{currentProfile.looking_for}</p>
@@ -862,22 +874,30 @@ const Browse = () => {
                       <div className="mb-6">
                         <h3 className="font-semibold mb-2">Centres d'intérêt</h3>
                         <div className="flex flex-wrap gap-2">
-                          {currentProfile.interests.map((interest: string) => (
-                            <Badge key={interest} variant="secondary" className="text-sm">
+                          {currentProfile.interests.map((interest: string, idx: number) => (
+                            <span
+                              key={interest}
+                              className="text-sm px-3 py-1 rounded-full font-medium"
+                              style={{
+                                background: idx % 3 === 0 ? 'var(--color-success-bg, #ecfdf5)' : idx % 3 === 1 ? 'var(--color-info-bg, #eff6ff)' : 'var(--color-success-bg, #ecfdf5)',
+                                color: idx % 3 === 0 ? 'var(--color-primary, #047857)' : idx % 3 === 1 ? '#1d4ed8' : 'var(--color-primary, #047857)',
+                              }}
+                            >
                               {interest}
-                            </Badge>
+                            </span>
                           ))}
                         </div>
                       </div>
                     )}
 
                     {/* Enhanced Mobile Navigation */}
-                    <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
+                    <div className="flex flex-col sm:flex-row gap-3 pt-4" style={{ borderTop: '1px solid var(--color-border-default, #e5e2db)' }}>
                       <Button
                         onClick={handlePass}
                         variant="outline"
                         disabled={isInActiveConversation}
                         className="flex-1"
+                        style={{ borderColor: 'var(--color-border-default, #e5e2db)', color: 'var(--color-text-muted, #8a8680)' }}
                       >
                         <X className="h-4 w-4 mr-2" />
                         Passer
@@ -886,6 +906,7 @@ const Browse = () => {
                         onClick={() => handleLike(currentProfile.user_id)}
                         disabled={!subscription.subscribed || isInActiveConversation}
                         className="flex-1"
+                        style={{ background: 'var(--color-primary, #047857)', color: '#ffffff' }}
                       >
                         {isInActiveConversation ? (
                           <>
@@ -899,7 +920,7 @@ const Browse = () => {
                           </>
                         ) : (
                           <>
-                            <Heart className="h-4 w-4 mr-2" />
+                            <Heart className="h-4 w-4 mr-2" style={{ color: 'var(--color-primary, #047857)' }} />
                             J'aime ce profil
                           </>
                         )}
@@ -908,6 +929,7 @@ const Browse = () => {
                         variant="outline"
                         onClick={() => navigate(`/profile/${currentProfile.user_id}`)}
                         className="flex-1"
+                        style={{ borderColor: 'var(--color-border-default, #e5e2db)' }}
                       >
                         Voir le profil complet
                       </Button>
@@ -970,9 +992,9 @@ const Browse = () => {
                   </div>
                 ) : (
                   /* Desktop View - Table */
-                  <div className="border rounded overflow-x-auto max-w-full">
+                  <div className="overflow-x-auto max-w-full" style={{ background: 'var(--color-bg-card, #ffffff)', border: '1px solid var(--color-border-default, #e5e2db)', borderRadius: '16px' }}>
                     <table className="w-full min-w-full">
-                      <thead className="bg-muted/30 border-b">
+                      <thead style={{ background: 'var(--color-bg-page, #f9f8f5)', borderBottom: '1px solid var(--color-border-default, #e5e2db)' }}>
                         <tr>
                           <th className="text-left p-3 text-sm font-semibold">Photo</th>
                           <th className="text-left p-3 text-sm font-semibold">Nom</th>
@@ -987,7 +1009,7 @@ const Browse = () => {
                         {gridProfiles.map((profile, index) => (
                           <tr
                             key={profile.user_id}
-                            className={`border-b ${index % 2 === 0 ? 'bg-background' : 'bg-muted/20'}`}
+                            style={{ borderBottom: '1px solid var(--color-border-default, #e5e2db)', background: index % 2 === 0 ? 'var(--color-bg-card, #ffffff)' : 'var(--color-bg-page, #f9f8f5)' }}
                           >
                             {/* Photo */}
                             <td className="p-3">
@@ -996,17 +1018,19 @@ const Browse = () => {
                                   <img
                                     src={profile.avatar_url}
                                     alt="Photo de profil"
-                                    className="h-16 w-16 rounded object-cover border"
+                                    className="h-16 w-16 object-cover"
+                                    style={{ borderRadius: '12px', border: '1px solid var(--color-border-default, #e5e2db)' }}
                                   />
                                 ) : (
-                                  <div className="h-16 w-16 rounded border bg-muted flex items-center justify-center">
-                                    <User className="h-8 w-8 text-muted-foreground" />
+                                  <div className="h-16 w-16 flex items-center justify-center" style={{ borderRadius: '12px', border: '1px solid var(--color-border-default, #e5e2db)', background: 'var(--color-bg-page, #f9f8f5)' }}>
+                                    <User className="h-8 w-8" style={{ color: 'var(--color-text-muted, #8a8680)' }} />
                                   </div>
                                 )}
                                 {/* Favorite Star */}
                                 <button
                                   onClick={() => toggleFavorite(profile.user_id)}
-                                  className="absolute -top-1 -right-1 bg-white rounded-full p-1 shadow border"
+                                  className="absolute -top-1 -right-1 rounded-full p-1 shadow"
+                                  style={{ background: 'var(--color-bg-card, #ffffff)', border: '1px solid var(--color-border-default, #e5e2db)' }}
                                 >
                                   <Star
                                     className={`h-3 w-3 ${
@@ -1021,9 +1045,9 @@ const Browse = () => {
 
                             {/* Nom */}
                             <td className="p-3 max-w-[150px]">
-                              <div className="font-medium text-sm truncate">Profil Anonyme</div>
+                              <div className="truncate" style={{ fontSize: '15px', fontWeight: 500 }}>Profil Anonyme</div>
                               {profile.profession_category && (
-                                <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1 truncate">
+                                <div className="text-xs flex items-center gap-1 mt-1 truncate" style={{ color: 'var(--color-text-muted, #8a8680)' }}>
                                   <Briefcase className="h-3 w-3 flex-shrink-0" />
                                   {profile.profession_category}
                                 </div>
@@ -1037,15 +1061,15 @@ const Browse = () => {
 
                             {/* Localisation */}
                             <td className="p-3 max-w-[120px]">
-                              <div className="text-sm flex items-center gap-1 truncate">
-                                <MapPin className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                              <div className="text-sm flex items-center gap-1 truncate" style={{ color: 'var(--color-text-muted, #8a8680)' }}>
+                                <MapPin className="h-3 w-3 flex-shrink-0" />
                                 {profile.city_only || '-'}
                               </div>
                             </td>
 
                             {/* Éducation */}
                             <td className="p-3 max-w-[120px]">
-                              <div className="text-xs text-muted-foreground flex items-center gap-1 truncate">
+                              <div className="text-xs flex items-center gap-1 truncate" style={{ color: 'var(--color-text-muted, #8a8680)' }}>
                                 <GraduationCap className="h-3 w-3 flex-shrink-0" />
                                 {profile.education_level || '-'}
                               </div>
@@ -1071,6 +1095,7 @@ const Browse = () => {
                                   size="sm"
                                   onClick={() => navigate(`/profile/${profile.user_id}`)}
                                   className="text-xs"
+                                  style={{ borderColor: 'var(--color-border-default, #e5e2db)' }}
                                 >
                                   Voir
                                 </Button>
@@ -1079,6 +1104,7 @@ const Browse = () => {
                                   disabled={!subscription.subscribed || isInActiveConversation}
                                   size="sm"
                                   className="text-xs"
+                                  style={{ background: 'var(--color-primary, #047857)', color: '#ffffff' }}
                                 >
                                   <Heart className="h-3 w-3" />
                                 </Button>
@@ -1098,7 +1124,7 @@ const Browse = () => {
 
                     {/* Empty State */}
                     {gridProfiles.length === 0 && (
-                      <div className="text-center py-12 text-muted-foreground">
+                      <div className="text-center py-12" style={{ color: 'var(--color-text-muted, #8a8680)' }}>
                         <User className="h-12 w-12 mx-auto mb-3 opacity-50" />
                         <p>Aucun profil à afficher</p>
                       </div>
@@ -1172,15 +1198,16 @@ const Browse = () => {
           <div className="hidden lg:block space-y-6">
             <AdvancedSearch onSearch={handleSearch} onReset={handleResetSearch} />
 
-            <Card>
-              <CardHeader>
+            <div className="rounded-2xl" style={{ background: 'var(--color-bg-card, #ffffff)', border: '1px solid var(--color-border-default, #e5e2db)' }}>
+              <div className="p-4 pb-2">
                 <div className="text-lg font-semibold">Navigation</div>
-              </CardHeader>
-              <CardContent className="space-y-3">
+              </div>
+              <div className="p-4 pt-2 space-y-3">
                 <Button
                   variant="outline"
                   onClick={() => navigate('/matches')}
-                  className="w-full justify-start border-emerald text-emerald hover:bg-emerald hover:text-white"
+                  className="w-full justify-start"
+                  style={{ borderColor: 'var(--color-primary, #047857)', color: 'var(--color-primary, #047857)' }}
                 >
                   Voir mes matches
                 </Button>
@@ -1188,11 +1215,12 @@ const Browse = () => {
                   variant="outline"
                   onClick={() => navigate('/profile')}
                   className="w-full justify-start"
+                  style={{ borderColor: 'var(--color-border-default, #e5e2db)' }}
                 >
                   Mon profil
                 </Button>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
 
